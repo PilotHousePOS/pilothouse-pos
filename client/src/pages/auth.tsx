@@ -13,30 +13,28 @@ export default function Auth() {
 
   const handleDemoLogin = async () => {
     setIsLoading(true);
-    try {
-      const response = await fetch('/api/demo-login', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (response.ok) {
-        const userData = await response.json();
-        console.log('Demo login successful:', userData);
-        
-        // Force a complete page reload to ensure session is recognized
-        window.location.href = '/';
-      } else {
-        const errorText = await response.text();
-        console.error('Demo login failed:', errorText);
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    
+    // Create demo user directly in localStorage
+    const demoUser = {
+      id: 'demo-user',
+      email: 'demo@animalhouse.com',
+      firstName: 'Demo',
+      lastName: 'User',
+      profileImageUrl: null,
+      isAdmin: true,
+    };
+    
+    // Store in localStorage
+    localStorage.setItem('demoUser', JSON.stringify(demoUser));
+    
+    console.log('Demo login successful:', demoUser);
+    
+    // Redirect to home
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 100);
+    
+    setIsLoading(false);
   };
 
   const handleSignUp = async (e: React.FormEvent) => {

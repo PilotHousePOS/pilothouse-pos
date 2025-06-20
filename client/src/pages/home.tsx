@@ -13,17 +13,26 @@ export default function Home() {
 
   const { data: pets = [] } = useQuery({
     queryKey: ["/api/pets"],
+    retry: false,
+  });
+
+  const { data: supplies = [] } = useQuery({
+    queryKey: ["/api/supplies"],
+    retry: false,
   });
 
   const { data: cartItems = [] } = useQuery({
     queryKey: ["/api/cart"],
+    retry: false,
   });
 
   const featuredPets = pets.slice(0, 2);
+  const featuredSupplies = supplies.slice(0, 3);
   const cartCount = cartItems.length;
 
   // Calculate stats
   const totalPets = pets.filter(p => p.isAvailable).length;
+  const totalSupplies = supplies.length;
 
   return (
     <div className="pb-20 bg-gradient-to-b from-gray-50 to-white">
@@ -95,8 +104,8 @@ export default function Home() {
           >
             <CardContent className="p-6 text-center">
               <div className="text-4xl mb-3">🐾</div>
-              <h4 className="font-bold text-lg mb-1">Adopt Now</h4>
-              <p className="text-blue-100 text-sm">{totalPets} pets available</p>
+              <h4 className="font-bold text-lg mb-1">Adopt Pets</h4>
+              <p className="text-blue-100 text-sm">{totalPets} animals in stock</p>
               <ArrowRight className="w-5 h-5 mx-auto mt-2 text-blue-200" />
             </CardContent>
           </Card>
@@ -107,9 +116,21 @@ export default function Home() {
           >
             <CardContent className="p-6 text-center">
               <div className="text-4xl mb-3">🛍️</div>
-              <h4 className="font-bold text-lg mb-1">Shop Supplies</h4>
-              <p className="text-red-100 text-sm">Everything you need</p>
+              <h4 className="font-bold text-lg mb-1">Shop Products</h4>
+              <p className="text-red-100 text-sm">{totalSupplies} items available</p>
               <ArrowRight className="w-5 h-5 mx-auto mt-2 text-red-200" />
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="bg-gradient-to-br from-green-600 to-green-700 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer col-span-2"
+            onClick={() => setLocation('/booking')}
+          >
+            <CardContent className="p-6 text-center">
+              <div className="text-4xl mb-3">📅</div>
+              <h4 className="font-bold text-lg mb-1">Book Appointment</h4>
+              <p className="text-green-100 text-sm">Grooming services available</p>
+              <ArrowRight className="w-5 h-5 mx-auto mt-2 text-green-200" />
             </CardContent>
           </Card>
         </div>
