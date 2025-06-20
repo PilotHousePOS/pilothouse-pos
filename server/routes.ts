@@ -16,34 +16,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
-  // Demo login route
+  // Simple demo login route that bypasses database
   app.post('/api/demo-login', async (req, res) => {
     try {
       console.log('Demo login request received');
       
-      // Create demo user
-      const demoUser = await storage.upsertUser({
+      // Create demo user object without database
+      const demoUser = {
         id: 'demo-user',
         email: 'demo@animalhouse.com',
         firstName: 'Demo',
         lastName: 'User',
         profileImageUrl: null,
-      });
+        isAdmin: true, // Give admin access for demo
+      };
       
       console.log('Demo user created:', demoUser);
       
       // Set session
       (req.session as any).user = demoUser;
       
-      // Save session explicitly
-      req.session.save((err) => {
-        if (err) {
-          console.error('Session save error:', err);
-          return res.status(500).json({ message: "Session save failed" });
-        }
-        console.log('Session saved successfully');
-        res.json(demoUser);
-      });
+      console.log('Session set, responding with user');
+      res.json(demoUser);
     } catch (error) {
       console.error("Demo login error:", error);
       res.status(500).json({ message: "Demo login failed" });

@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/landing";
+import Auth from "@/pages/auth";
 import Home from "@/pages/home";
 import Pets from "@/pages/pets";
 import Supplies from "@/pages/supplies";
@@ -34,7 +35,10 @@ function Router() {
     <div className="max-w-md mx-auto bg-white min-h-screen relative overflow-hidden">
       <Switch>
         {!isAuthenticated ? (
-          <Route path="/" component={Landing} />
+          <>
+            <Route path="/" component={Landing} />
+            <Route path="/auth" component={Auth} />
+          </>
         ) : (
           <>
             <Route path="/" component={Home} />

@@ -5,28 +5,9 @@ import animalHouseLogoPath from "@assets/animal house logo full_1750438187184.jp
 import mascotLogoPath from "@assets/Circle Mascot Logo_1750438195696.jpg";
 
 export default function Landing() {
-  const handleLogin = async () => {
-    try {
-      console.log('Starting demo login...');
-      const response = await fetch('/api/demo-login', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (response.ok) {
-        console.log('Demo login successful, redirecting...');
-        // Force reload to update auth state
-        window.location.reload();
-      } else {
-        const error = await response.text();
-        console.error('Demo login failed:', error);
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-    }
+  const handleLogin = () => {
+    // Navigate to dedicated auth page
+    window.location.href = '/auth';
   };
 
   return (
