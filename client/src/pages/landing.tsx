@@ -6,8 +6,7 @@ import mascotLogoPath from "@assets/Circle Mascot Logo_1750438195696.jpg";
 
 export default function Landing() {
   const handleLogin = () => {
-    // For demo purposes, simulate login by going directly to the app
-    window.location.href = "/?demo=true";
+    window.location.href = "/api/login";
   };
 
   return (

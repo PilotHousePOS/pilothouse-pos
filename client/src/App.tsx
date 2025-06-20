@@ -16,7 +16,6 @@ import BottomNav from "@/components/bottom-nav";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
-  const isDemoMode = new URLSearchParams(window.location.search).get('demo') === 'true';
 
   if (isLoading) {
     return (
@@ -34,7 +33,7 @@ function Router() {
   return (
     <div className="max-w-md mx-auto bg-white min-h-screen relative overflow-hidden">
       <Switch>
-        {!isAuthenticated && !isDemoMode ? (
+        {!isAuthenticated ? (
           <Route path="/" component={Landing} />
         ) : (
           <>
@@ -48,7 +47,7 @@ function Router() {
         )}
         <Route component={NotFound} />
       </Switch>
-      {(isAuthenticated || isDemoMode) && <BottomNav />}
+      {isAuthenticated && <BottomNav />}
     </div>
   );
 }
