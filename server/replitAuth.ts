@@ -27,12 +27,13 @@ export function getSession() {
   
   return session({
     secret: process.env.SESSION_SECRET!,
-    resave: false,
+    resave: true,
     saveUninitialized: true,
     cookie: {
-      httpOnly: true,
+      httpOnly: false, // Allow client access for debugging
       secure: false,
       maxAge: sessionTtl,
+      sameSite: 'lax',
     },
   });
 }

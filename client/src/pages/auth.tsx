@@ -23,9 +23,14 @@ export default function Auth() {
       });
       
       if (response.ok) {
-        window.location.href = '/';
+        console.log('Demo login successful, redirecting...');
+        // Wait a bit longer and reload the page to ensure session is picked up
+        setTimeout(() => {
+          window.location.replace('/');
+        }, 500);
       } else {
-        console.error('Demo login failed');
+        const errorText = await response.text();
+        console.error('Demo login failed:', errorText);
       }
     } catch (error) {
       console.error('Login error:', error);

@@ -33,11 +33,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('Demo user created:', demoUser);
       
-      // Set session
+      // Set session and save explicitly
       (req.session as any).user = demoUser;
       
-      console.log('Session set, responding with user');
-      res.json(demoUser);
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).json({ message: "Session save failed" });
+        }
+        console.log('Session saved successfully');
+        res.json(demoUser);
+      });
     } catch (error) {
       console.error("Demo login error:", error);
       res.status(500).json({ message: "Demo login failed" });
@@ -47,7 +53,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.get('/api/auth/user', async (req, res) => {
     try {
+      console.log('Session check:', req.session);
       const sessionUser = (req.session as any)?.user;
+      console.log('Session user:', sessionUser);
       if (!sessionUser) {
         return res.status(401).json({ message: "Unauthorized" });
       }
