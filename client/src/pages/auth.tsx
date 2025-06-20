@@ -23,11 +23,11 @@ export default function Auth() {
       });
       
       if (response.ok) {
-        console.log('Demo login successful, redirecting...');
-        // Wait a bit longer and reload the page to ensure session is picked up
-        setTimeout(() => {
-          window.location.replace('/');
-        }, 500);
+        const userData = await response.json();
+        console.log('Demo login successful:', userData);
+        
+        // Force a complete page reload to ensure session is recognized
+        window.location.href = '/';
       } else {
         const errorText = await response.text();
         console.error('Demo login failed:', errorText);
