@@ -21,7 +21,6 @@ export default function Supplies() {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   const { data: supplies = [], isLoading } = useQuery({
-    queryKey: ["/api/supplies", selectedCategory || undefined, searchQuery || undefined],
     queryKey: [
       "/api/supplies", 
       ...(selectedCategory ? [`category=${selectedCategory}`] : []),

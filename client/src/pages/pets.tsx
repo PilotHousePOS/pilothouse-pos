@@ -18,7 +18,6 @@ export default function Pets() {
   const [selectedSpecies, setSelectedSpecies] = useState('all');
 
   const { data: pets = [], isLoading } = useQuery({
-    queryKey: ["/api/pets", selectedSpecies === 'all' ? undefined : selectedSpecies],
     queryKey: selectedSpecies === 'all' ? ["/api/pets"] : ["/api/pets", `species=${selectedSpecies}`],
   });
 

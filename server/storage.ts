@@ -199,7 +199,7 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(cartItems.userId, cartItem.userId),
-          cartItem.supplyId ? eq(cartItems.supplyId, cartItem.supplyId) : eq(cartItems.petId, cartItem.petId!)
+          cartItem.supplyId ? eq(cartItems.supplyId, cartItem.supplyId) : eq(cartItems.petId, cartItem.petId || 0)
         )
       );
 
@@ -207,7 +207,7 @@ export class DatabaseStorage implements IStorage {
       // Update quantity
       const [updated] = await db
         .update(cartItems)
-        .set({ quantity: existing[0].quantity + (cartItem.quantity || 1) })
+        .set({ quantity: (existing[0]?.quantity || 0) + (cartItem.quantity || 1) })
         .where(eq(cartItems.id, existing[0].id))
         .returning();
       return updated;

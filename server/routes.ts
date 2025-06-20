@@ -249,7 +249,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = orderSchema.parse({ ...orderData, userId, items });
       const order = await storage.createOrder(
         { ...validatedData, userId },
-        validatedData.items
+        validatedData.items.map(item => ({ ...item, orderId: 0 }))
       );
       
       // Clear cart after successful order

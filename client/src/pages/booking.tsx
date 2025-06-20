@@ -13,7 +13,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 
 const SERVICES = [
-  { id: 'grooming', name: 'Pet Grooming', description: 'Full service grooming', price: 50 },
+  { id: 'grooming', name: 'Pet Grooming', description: 'Full service grooming', price: 0 },
   { id: 'vet', name: 'Vet Checkup', description: 'Health examination', price: 75 },
   { id: 'training', name: 'Training Session', description: '1-hour training', price: 60 },
 ];
