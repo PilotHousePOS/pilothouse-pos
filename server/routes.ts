@@ -19,6 +19,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Demo login route
   app.post('/api/demo-login', async (req, res) => {
     try {
+      console.log('Demo login request received');
+      
       // Create demo user
       const demoUser = await storage.upsertUser({
         id: 'demo-user',
@@ -28,9 +30,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         profileImageUrl: null,
       });
       
+      console.log('Demo user created:', demoUser);
+      
       // Set session
       (req.session as any).user = demoUser;
-      res.json(demoUser);
+      
+      // Save session explicitly
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).json({ message: "Session save failed" });
+        }
+        console.log('Session saved successfully');
+        res.json(demoUser);
+      });
     } catch (error) {
       console.error("Demo login error:", error);
       res.status(500).json({ message: "Demo login failed" });

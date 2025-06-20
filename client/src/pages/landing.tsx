@@ -11,13 +11,18 @@ export default function Landing() {
       const response = await fetch('/api/demo-login', {
         method: 'POST',
         credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
       
       if (response.ok) {
         console.log('Demo login successful, redirecting...');
-        window.location.href = '/';
+        // Force reload to update auth state
+        window.location.reload();
       } else {
-        console.error('Demo login failed');
+        const error = await response.text();
+        console.error('Demo login failed:', error);
       }
     } catch (error) {
       console.error('Login error:', error);

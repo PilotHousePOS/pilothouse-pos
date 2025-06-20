@@ -23,23 +23,16 @@ const getOidcConfig = memoize(
 );
 
 export function getSession() {
-  const sessionTtl = 7 * 24 * 60 * 60; // 1 week in seconds
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: process.env.DATABASE_URL,
-    createTableIfMissing: true,
-    ttl: sessionTtl,
-    tableName: "sessions",
-  });
+  const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week in milliseconds
+  
   return session({
     secret: process.env.SESSION_SECRET!,
-    store: sessionStore,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
       httpOnly: true,
-      secure: false, // Set to false for development
-      maxAge: sessionTtl * 1000, // convert back to milliseconds
+      secure: false,
+      maxAge: sessionTtl,
     },
   });
 }
