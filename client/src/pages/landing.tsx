@@ -10,129 +10,129 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-blue via-purple-600 to-brand-red text-white overflow-hidden relative">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white overflow-hidden relative">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-16 w-16 h-16 bg-brand-orange/20 rounded-full animate-bounce"></div>
-        <div className="absolute bottom-32 left-20 w-12 h-12 bg-yellow-300/20 rounded-full animate-pulse"></div>
-        <div className="absolute bottom-20 right-12 w-24 h-24 bg-pink-300/10 rounded-full animate-bounce"></div>
+        <div className="absolute top-20 left-10 w-20 h-20 bg-brand-red/30 rounded-full animate-pulse shadow-2xl"></div>
+        <div className="absolute top-40 right-16 w-16 h-16 bg-brand-blue/40 rounded-full animate-bounce shadow-xl"></div>
+        <div className="absolute bottom-32 left-20 w-12 h-12 bg-brand-orange/30 rounded-full animate-pulse shadow-xl"></div>
+        <div className="absolute bottom-20 right-12 w-24 h-24 bg-purple-600/20 rounded-full animate-bounce shadow-2xl"></div>
       </div>
 
       {/* Status Bar */}
-      <div className="bg-black/20 backdrop-blur-sm text-white text-xs py-1 px-4 flex justify-between items-center relative z-10">
-        <span>9:41 AM</span>
-        <span>100% 📶 📶 🔋</span>
+      <div className="bg-black text-white text-xs py-1 px-4 flex justify-between items-center relative z-10 border-b border-gray-700">
+        <span className="font-bold">9:41 AM</span>
+        <span className="font-bold">100% 📶 📶 🔋</span>
       </div>
 
       {/* Main Content */}
       <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center relative z-10">
-        {/* Logo with Modern Design */}
+        {/* Logo with Bold Design */}
         <div className="mb-8 relative">
           <div className="relative mb-6">
-            <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-3xl flex items-center justify-center shadow-2xl mx-auto mb-4 border border-white/30">
+            <div className="w-28 h-28 bg-gradient-to-br from-brand-red to-brand-blue rounded-3xl flex items-center justify-center shadow-2xl mx-auto mb-4 border-2 border-white">
               <img 
                 src={mascotLogoPath} 
                 alt="Animal House Mascot" 
-                className="w-16 h-16 rounded-2xl object-cover"
+                className="w-20 h-20 rounded-2xl object-cover"
               />
             </div>
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+            <div className="absolute -top-3 -right-3 w-8 h-8 bg-green-500 rounded-full border-3 border-white animate-pulse shadow-lg"></div>
           </div>
           <img 
             src={animalHouseLogoPath} 
             alt="Animal House Logo" 
-            className="w-40 h-24 object-contain mx-auto opacity-90"
+            className="w-48 h-28 object-contain mx-auto drop-shadow-2xl"
           />
         </div>
 
-        {/* Hero Text with Modern Typography */}
+        {/* Hero Text with Bold Typography */}
         <div className="mb-10">
           <div className="flex items-center justify-center mb-4">
-            <Sparkles className="w-6 h-6 text-yellow-300 mr-2 animate-pulse" />
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-yellow-100 to-white bg-clip-text text-transparent">
-              Animal House
+            <Sparkles className="w-8 h-8 text-brand-orange mr-3 animate-pulse" />
+            <h1 className="text-6xl font-black bg-gradient-to-r from-brand-red via-white to-brand-blue bg-clip-text text-transparent drop-shadow-2xl">
+              ANIMAL HOUSE
             </h1>
-            <Sparkles className="w-6 h-6 text-yellow-300 ml-2 animate-pulse" />
+            <Sparkles className="w-8 h-8 text-brand-orange ml-3 animate-pulse" />
           </div>
-          <p className="text-2xl font-semibold text-blue-100 mb-3">Where Pets Find Families</p>
-          <p className="text-lg text-blue-200 max-w-xs mx-auto leading-relaxed">
-            Discover loving companions, premium supplies, and expert care services
+          <p className="text-3xl font-bold text-white mb-4 drop-shadow-lg">WHERE PETS FIND FAMILIES</p>
+          <p className="text-xl font-semibold text-gray-200 max-w-sm mx-auto leading-relaxed">
+            Premium companions, expert care, unmatched quality
           </p>
         </div>
 
-        {/* Modern Feature Cards */}
-        <div className="grid grid-cols-2 gap-4 mb-10 w-full max-w-sm">
-          <Card className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:scale-105 cursor-pointer">
-            <CardContent className="p-4 text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                <span className="text-2xl">🐾</span>
+        {/* Bold Feature Cards */}
+        <div className="grid grid-cols-2 gap-6 mb-12 w-full max-w-md">
+          <Card className="bg-gradient-to-br from-brand-blue to-blue-700 border-2 border-white/30 hover:border-white/60 transition-all duration-300 transform hover:scale-110 cursor-pointer shadow-2xl">
+            <CardContent className="p-6 text-center">
+              <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-white">
+                <span className="text-3xl">🐾</span>
               </div>
-              <div className="text-sm font-bold text-white">Adopt Pets</div>
-              <div className="text-xs text-blue-200 mt-1">Find your soulmate</div>
+              <div className="text-lg font-black text-white">ADOPT PETS</div>
+              <div className="text-sm font-bold text-blue-100 mt-2">Elite companions</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:scale-105 cursor-pointer">
-            <CardContent className="p-4 text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-red-400 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                <span className="text-2xl">🛍️</span>
+          <Card className="bg-gradient-to-br from-brand-red to-red-700 border-2 border-white/30 hover:border-white/60 transition-all duration-300 transform hover:scale-110 cursor-pointer shadow-2xl">
+            <CardContent className="p-6 text-center">
+              <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-white">
+                <span className="text-3xl">🛍️</span>
               </div>
-              <div className="text-sm font-bold text-white">Premium Supplies</div>
-              <div className="text-xs text-blue-200 mt-1">Best quality guaranteed</div>
+              <div className="text-lg font-black text-white">PREMIUM GEAR</div>
+              <div className="text-sm font-bold text-red-100 mt-2">Top-tier quality</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:scale-105 cursor-pointer">
-            <CardContent className="p-4 text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                <span className="text-2xl">✂️</span>
+          <Card className="bg-gradient-to-br from-green-600 to-green-800 border-2 border-white/30 hover:border-white/60 transition-all duration-300 transform hover:scale-110 cursor-pointer shadow-2xl">
+            <CardContent className="p-6 text-center">
+              <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-white">
+                <span className="text-3xl">✂️</span>
               </div>
-              <div className="text-sm font-bold text-white">Free Grooming</div>
-              <div className="text-xs text-blue-200 mt-1">Professional styling</div>
+              <div className="text-lg font-black text-white">FREE GROOMING</div>
+              <div className="text-sm font-bold text-green-100 mt-2">Expert styling</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:scale-105 cursor-pointer">
-            <CardContent className="p-4 text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                <span className="text-2xl">🏥</span>
+          <Card className="bg-gradient-to-br from-purple-600 to-purple-800 border-2 border-white/30 hover:border-white/60 transition-all duration-300 transform hover:scale-110 cursor-pointer shadow-2xl">
+            <CardContent className="p-6 text-center">
+              <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-white">
+                <span className="text-3xl">🏥</span>
               </div>
-              <div className="text-sm font-bold text-white">Expert Vet Care</div>
-              <div className="text-xs text-blue-200 mt-1">Health first priority</div>
+              <div className="text-lg font-black text-white">VET CARE</div>
+              <div className="text-sm font-bold text-purple-100 mt-2">Health experts</div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Modern Login Button */}
-        <div className="space-y-4">
+        {/* Bold CTA Button */}
+        <div className="space-y-6">
           <Button 
             onClick={handleLogin}
-            className="bg-gradient-to-r from-white to-gray-100 text-brand-blue hover:from-gray-100 hover:to-white px-10 py-4 text-lg font-bold rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-white/30"
+            className="bg-gradient-to-r from-brand-red to-brand-blue hover:from-red-700 hover:to-blue-700 text-white px-12 py-6 text-xl font-black rounded-2xl shadow-2xl transform hover:scale-110 transition-all duration-300 border-3 border-white uppercase tracking-wider"
           >
-            <Heart className="w-5 h-5 mr-2 text-brand-red" />
-            Start Your Journey
-            <ArrowRight className="w-5 h-5 ml-2" />
+            <Heart className="w-6 h-6 mr-3 text-white" />
+            START NOW
+            <ArrowRight className="w-6 h-6 ml-3" />
           </Button>
           
-          <p className="text-sm text-blue-200">
-            Join 10,000+ happy pet families
+          <p className="text-lg font-bold text-white">
+            JOIN 10,000+ ELITE PET FAMILIES
           </p>
         </div>
 
-        {/* Stats Bar */}
-        <div className="mt-10 grid grid-cols-3 gap-6 text-center">
-          <div>
-            <div className="text-2xl font-bold text-white">500+</div>
-            <div className="text-xs text-blue-200">Pets Adopted</div>
+        {/* Bold Stats Bar */}
+        <div className="mt-12 grid grid-cols-3 gap-8 text-center">
+          <div className="bg-black/50 rounded-xl p-4 border border-white/30">
+            <div className="text-3xl font-black text-brand-red">500+</div>
+            <div className="text-sm font-bold text-white uppercase">Pets Adopted</div>
           </div>
-          <div>
-            <div className="text-2xl font-bold text-white">1000+</div>
-            <div className="text-xs text-blue-200">Happy Families</div>
+          <div className="bg-black/50 rounded-xl p-4 border border-white/30">
+            <div className="text-3xl font-black text-brand-blue">1000+</div>
+            <div className="text-sm font-bold text-white uppercase">Happy Families</div>
           </div>
-          <div>
-            <div className="text-2xl font-bold text-white">5⭐</div>
-            <div className="text-xs text-blue-200">Rating</div>
+          <div className="bg-black/50 rounded-xl p-4 border border-white/30">
+            <div className="text-3xl font-black text-brand-orange">5⭐</div>
+            <div className="text-sm font-bold text-white uppercase">Rating</div>
           </div>
         </div>
       </div>
