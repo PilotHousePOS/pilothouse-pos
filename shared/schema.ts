@@ -1,0 +1,232 @@
+import {
+  pgTable,
+  text,
+  varchar,
+  timestamp,
+  jsonb,
+  index,
+  serial,
+  integer,
+  decimal,
+  boolean,
+  date,
+} from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
+import { relations } from "drizzle-orm";
+
+// Session storage table for Replit Auth
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// User storage table for Replit Auth
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().notNull(),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  isAdmin: boolean("is_admin").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Pet animals for sale
+export const pets = pgTable("pets", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  species: varchar("species", { length: 100 }).notNull(), // dog, cat, bird, fish, reptile
+  breed: varchar("breed", { length: 255 }).notNull(),
+  age: varchar("age", { length: 50 }).notNull(),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  description: text("description"),
+  imageUrl: varchar("image_url", { length: 500 }),
+  isAvailable: boolean("is_available").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Pet supplies inventory
+export const supplies = pgTable("supplies", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // food, toys, beds, leashes, healthcare, accessories
+  brand: varchar("brand", { length: 255 }),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  description: text("description"),
+  imageUrl: varchar("image_url", { length: 500 }),
+  stockQuantity: integer("stock_quantity").default(0),
+  isActive: boolean("is_active").default(true),
+  weight: varchar("weight", { length: 50 }),
+  size: varchar("size", { length: 50 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Shopping cart items
+export const cartItems = pgTable("cart_items", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  supplyId: integer("supply_id").references(() => supplies.id),
+  petId: integer("pet_id").references(() => pets.id),
+  quantity: integer("quantity").default(1),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Orders
+export const orders = pgTable("orders", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+  status: varchar("status", { length: 50 }).default("pending"), // pending, confirmed, shipped, delivered, cancelled
+  shippingAddress: text("shipping_address"),
+  orderDate: timestamp("order_date").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Order items
+export const orderItems = pgTable("order_items", {
+  id: serial("id").primaryKey(),
+  orderId: integer("order_id").notNull().references(() => orders.id),
+  supplyId: integer("supply_id").references(() => supplies.id),
+  petId: integer("pet_id").references(() => pets.id),
+  quantity: integer("quantity").default(1),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+});
+
+// Appointments
+export const appointments = pgTable("appointments", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  serviceType: varchar("service_type", { length: 100 }).notNull(), // grooming, vet, training
+  appointmentDate: date("appointment_date").notNull(),
+  appointmentTime: varchar("appointment_time", { length: 20 }).notNull(),
+  petName: varchar("pet_name", { length: 255 }).notNull(),
+  petType: varchar("pet_type", { length: 100 }).notNull(),
+  specialNotes: text("special_notes"),
+  status: varchar("status", { length: 50 }).default("scheduled"), // scheduled, confirmed, completed, cancelled
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Customer pets (pets owned by users)
+export const customerPets = pgTable("customer_pets", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  name: varchar("name", { length: 255 }).notNull(),
+  species: varchar("species", { length: 100 }).notNull(),
+  breed: varchar("breed", { length: 255 }),
+  age: varchar("age", { length: 50 }),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  cartItems: many(cartItems),
+  orders: many(orders),
+  appointments: many(appointments),
+  customerPets: many(customerPets),
+}));
+
+export const petsRelations = relations(pets, ({ many }) => ({
+  cartItems: many(cartItems),
+  orderItems: many(orderItems),
+}));
+
+export const suppliesRelations = relations(supplies, ({ many }) => ({
+  cartItems: many(cartItems),
+  orderItems: many(orderItems),
+}));
+
+export const cartItemsRelations = relations(cartItems, ({ one }) => ({
+  user: one(users, { fields: [cartItems.userId], references: [users.id] }),
+  supply: one(supplies, { fields: [cartItems.supplyId], references: [supplies.id] }),
+  pet: one(pets, { fields: [cartItems.petId], references: [pets.id] }),
+}));
+
+export const ordersRelations = relations(orders, ({ one, many }) => ({
+  user: one(users, { fields: [orders.userId], references: [users.id] }),
+  orderItems: many(orderItems),
+}));
+
+export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+  order: one(orders, { fields: [orderItems.orderId], references: [orders.id] }),
+  supply: one(supplies, { fields: [orderItems.supplyId], references: [supplies.id] }),
+  pet: one(pets, { fields: [orderItems.petId], references: [pets.id] }),
+}));
+
+export const appointmentsRelations = relations(appointments, ({ one }) => ({
+  user: one(users, { fields: [appointments.userId], references: [users.id] }),
+}));
+
+export const customerPetsRelations = relations(customerPets, ({ one }) => ({
+  user: one(users, { fields: [customerPets.userId], references: [users.id] }),
+}));
+
+// Insert schemas
+export const insertPetSchema = createInsertSchema(pets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSupplySchema = createInsertSchema(supplies).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCartItemSchema = createInsertSchema(cartItems).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertOrderSchema = createInsertSchema(orders).omit({
+  id: true,
+  orderDate: true,
+  updatedAt: true,
+});
+
+export const insertOrderItemSchema = createInsertSchema(orderItems).omit({
+  id: true,
+});
+
+export const insertAppointmentSchema = createInsertSchema(appointments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCustomerPetSchema = createInsertSchema(customerPets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Types
+export type UpsertUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;
+export type Pet = typeof pets.$inferSelect;
+export type InsertPet = z.infer<typeof insertPetSchema>;
+export type Supply = typeof supplies.$inferSelect;
+export type InsertSupply = z.infer<typeof insertSupplySchema>;
+export type CartItem = typeof cartItems.$inferSelect;
+export type InsertCartItem = z.infer<typeof insertCartItemSchema>;
+export type Order = typeof orders.$inferSelect;
+export type InsertOrder = z.infer<typeof insertOrderSchema>;
+export type OrderItem = typeof orderItems.$inferSelect;
+export type InsertOrderItem = z.infer<typeof insertOrderItemSchema>;
+export type Appointment = typeof appointments.$inferSelect;
+export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
+export type CustomerPet = typeof customerPets.$inferSelect;
+export type InsertCustomerPet = z.infer<typeof insertCustomerPetSchema>;

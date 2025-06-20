@@ -1,0 +1,234 @@
+import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useLocation } from "wouter";
+import { 
+  ShoppingBag, 
+  Calendar, 
+  Heart, 
+  Settings, 
+  Edit, 
+  Plus,
+  Shield
+} from "lucide-react";
+
+export default function Profile() {
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const { toast } = useToast();
+  const [, setLocation] = useLocation();
+
+  const { data: customerPets = [] } = useQuery({
+    queryKey: ["/api/customer-pets"],
+    enabled: isAuthenticated,
+  });
+
+  const { data: orders = [] } = useQuery({
+    queryKey: ["/api/orders"],
+    enabled: isAuthenticated,
+  });
+
+  const { data: appointments = [] } = useQuery({
+    queryKey: ["/api/appointments"],
+    enabled: isAuthenticated,
+  });
+
+  // Redirect to home if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      toast({
+        title: "Unauthorized",
+        description: "You are logged out. Logging in again...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
+      return;
+    }
+  }, [isAuthenticated, isLoading, toast]);
+
+  if (isLoading) {
+    return (
+      <div className="px-6 py-4 pb-20">
+        <div className="animate-pulse space-y-4">
+          <div className="h-20 bg-gray-200 rounded-full w-20 mx-auto"></div>
+          <div className="h-4 bg-gray-200 rounded w-32 mx-auto"></div>
+          <div className="h-4 bg-gray-200 rounded w-48 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) return null;
+
+  const handleLogout = () => {
+    window.location.href = "/api/logout";
+  };
+
+  const userInitials = user.firstName && user.lastName 
+    ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
+    : user.email?.[0]?.toUpperCase() || 'U';
+
+  const userName = user.firstName && user.lastName
+    ? `${user.firstName} ${user.lastName}`
+    : user.email || 'User';
+
+  return (
+    <div className="px-6 py-4 pb-20">
+      {/* Profile Header */}
+      <div className="text-center mb-8">
+        <div className="w-20 h-20 bg-brand-red rounded-full mx-auto mb-4 flex items-center justify-center">
+          {user.profileImageUrl ? (
+            <img 
+              src={user.profileImageUrl} 
+              alt="Profile" 
+              className="w-20 h-20 rounded-full object-cover"
+            />
+          ) : (
+            <span className="text-2xl text-white font-bold">{userInitials}</span>
+          )}
+        </div>
+        <h2 className="text-xl font-bold text-gray-900">{userName}</h2>
+        <p className="text-sm text-gray-500">{user.email}</p>
+        <div className="flex justify-center mt-2">
+          <Badge variant="secondary" className="bg-green-100 text-green-700">
+            Premium Member
+          </Badge>
+        </div>
+      </div>
+
+      {/* My Pets Section */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-gray-900">My Pets</h3>
+          <Button variant="ghost" size="sm" className="text-brand-blue">
+            <Plus className="w-4 h-4 mr-1" />
+            Add Pet
+          </Button>
+        </div>
+        <div className="space-y-3">
+          {customerPets.length === 0 ? (
+            <Card>
+              <CardContent className="p-4 text-center">
+                <div className="text-gray-400 mb-2">🐾</div>
+                <p className="text-gray-500 text-sm">No pets added yet</p>
+              </CardContent>
+            </Card>
+          ) : (
+            customerPets.map((pet) => (
+              <Card key={pet.id} className="shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-brand-orange rounded-full flex items-center justify-center">
+                      <span className="text-lg">
+                        {pet.species === 'dog' ? '🐕' : 
+                         pet.species === 'cat' ? '🐱' : 
+                         pet.species === 'bird' ? '🦜' : '🐾'}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-gray-900">{pet.name}</h4>
+                      <p className="text-sm text-gray-500">
+                        {pet.breed && `${pet.breed} • `}{pet.age}
+                      </p>
+                    </div>
+                    <Button variant="ghost" size="sm">
+                      <Edit className="w-4 h-4 text-gray-400" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="mb-8">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
+        <div className="space-y-3">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-3">
+                <ShoppingBag className="w-5 h-5 text-brand-blue" />
+                <span className="font-semibold text-gray-900 flex-1">Order History</span>
+                <Badge variant="secondary">{orders.length}</Badge>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-3">
+                <Calendar className="w-5 h-5 text-brand-blue" />
+                <span className="font-semibold text-gray-900 flex-1">My Appointments</span>
+                <Badge variant="secondary">{appointments.length}</Badge>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-3">
+                <Heart className="w-5 h-5 text-brand-red" />
+                <span className="font-semibold text-gray-900 flex-1">Wishlist</span>
+                <Badge variant="secondary">0</Badge>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-3">
+                <Settings className="w-5 h-5 text-gray-600" />
+                <span className="font-semibold text-gray-900 flex-1">Settings</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Admin Panel */}
+      {user.isAdmin && (
+        <div className="mb-8">
+          <Card className="bg-gradient-to-r from-brand-blue to-brand-red text-white">
+            <CardContent className="p-4">
+              <h3 className="text-lg font-bold mb-3 flex items-center">
+                <Shield className="w-5 h-5 mr-2" />
+                Admin Panel
+              </h3>
+              <div className="space-y-2">
+                <Button 
+                  variant="ghost" 
+                  className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white justify-start"
+                  onClick={() => setLocation('/admin')}
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  Dashboard
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white justify-start"
+                  onClick={() => setLocation('/admin')}
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Manage Inventory
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Logout Button */}
+      <Button 
+        variant="destructive" 
+        className="w-full"
+        onClick={handleLogout}
+      >
+        Sign Out
+      </Button>
+    </div>
+  );
+}

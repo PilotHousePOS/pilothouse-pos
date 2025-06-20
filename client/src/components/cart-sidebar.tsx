@@ -1,0 +1,390 @@
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { 
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { isUnauthorizedError } from "@/lib/authUtils";
+import { Minus, Plus, Trash2, ShoppingCart, X } from "lucide-react";
+
+interface CartSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [shippingAddress, setShippingAddress] = useState("");
+
+  const { data: cartItems = [], isLoading } = useQuery({
+    queryKey: ["/api/cart"],
+    enabled: isOpen,
+  });
+
+  const { data: supplies = [] } = useQuery({
+    queryKey: ["/api/supplies"],
+    enabled: isOpen && cartItems.length > 0,
+  });
+
+  const { data: pets = [] } = useQuery({
+    queryKey: ["/api/pets"],
+    enabled: isOpen && cartItems.length > 0,
+  });
+
+  const updateQuantityMutation = useMutation({
+    mutationFn: async ({ id, quantity }: { id: number; quantity: number }) => {
+      await apiRequest("PUT", `/api/cart/${id}`, { quantity });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to update quantity.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const removeItemMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/cart/${id}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Item Removed",
+        description: "Item has been removed from your cart.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to remove item.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const createOrderMutation = useMutation({
+    mutationFn: async (orderData: any) => {
+      await apiRequest("POST", "/api/orders", orderData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Order Placed!",
+        description: "Your order has been placed successfully.",
+      });
+      setIsCheckoutOpen(false);
+      onClose();
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Order Failed",
+        description: "Failed to place order. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Get item details with fallback for missing data
+  const getItemDetails = (item: any) => {
+    if (item.supplyId) {
+      const supply = supplies.find(s => s.id === item.supplyId);
+      return {
+        name: supply?.name || "Unknown Supply",
+        price: supply?.price || "0",
+        image: supply?.imageUrl || "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+        type: "supply"
+      };
+    } else if (item.petId) {
+      const pet = pets.find(p => p.id === item.petId);
+      return {
+        name: pet?.name || "Unknown Pet",
+        price: pet?.price || "0",
+        image: pet?.imageUrl || "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+        type: "pet",
+        breed: pet?.breed
+      };
+    }
+    return {
+      name: "Unknown Item",
+      price: "0",
+      image: "",
+      type: "unknown"
+    };
+  };
+
+  const cartItemsWithDetails = cartItems.map(item => ({
+    ...item,
+    details: getItemDetails(item)
+  }));
+
+  const totalAmount = cartItemsWithDetails.reduce((total, item) => {
+    return total + (parseFloat(item.details.price) * item.quantity);
+  }, 0);
+
+  const handleCheckout = () => {
+    if (cartItems.length === 0) {
+      toast({
+        title: "Empty Cart",
+        description: "Add items to cart before checkout.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsCheckoutOpen(true);
+  };
+
+  const handlePlaceOrder = () => {
+    if (!shippingAddress.trim()) {
+      toast({
+        title: "Missing Address",
+        description: "Please enter a shipping address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const orderItems = cartItemsWithDetails.map(item => ({
+      supplyId: item.supplyId || undefined,
+      petId: item.petId || undefined,
+      quantity: item.quantity,
+      price: item.details.price,
+    }));
+
+    createOrderMutation.mutate({
+      orderData: {
+        totalAmount: totalAmount.toFixed(2),
+        shippingAddress,
+      },
+      items: orderItems,
+    });
+  };
+
+  return (
+    <>
+      <Sheet open={isOpen} onOpenChange={onClose}>
+        <SheetContent side="right" className="w-full max-w-md p-0">
+          <SheetHeader className="p-6 pb-4">
+            <SheetTitle className="flex items-center space-x-2">
+              <ShoppingCart className="w-5 h-5" />
+              <span>Shopping Cart</span>
+            </SheetTitle>
+            <SheetDescription>
+              {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'} in your cart
+            </SheetDescription>
+          </SheetHeader>
+
+          <div className="flex-1 overflow-y-auto px-6">
+            {isLoading ? (
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="bg-gray-200 rounded-xl h-20 animate-pulse"></div>
+                ))}
+              </div>
+            ) : cartItems.length === 0 ? (
+              <div className="text-center py-12">
+                <ShoppingCart className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Your cart is empty</h3>
+                <p className="text-gray-500 mb-4">Add some items to get started!</p>
+                <Button onClick={onClose} className="bg-brand-blue hover:bg-blue-600">
+                  Continue Shopping
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {cartItemsWithDetails.map((item) => (
+                  <Card key={item.id} className="shadow-sm">
+                    <CardContent className="p-4">
+                      <div className="flex space-x-3">
+                        <img 
+                          src={item.details.image}
+                          alt={item.details.name}
+                          className="w-16 h-16 object-cover rounded-lg" 
+                        />
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-sm text-gray-900">{item.details.name}</h4>
+                          {item.details.breed && (
+                            <p className="text-xs text-gray-500">{item.details.breed}</p>
+                          )}
+                          <div className="flex items-center justify-between mt-2">
+                            <p className="text-sm font-bold text-brand-red">${item.details.price}</p>
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-8 h-8 p-0"
+                                onClick={() => updateQuantityMutation.mutate({ 
+                                  id: item.id, 
+                                  quantity: Math.max(1, item.quantity - 1) 
+                                })}
+                                disabled={updateQuantityMutation.isPending}
+                              >
+                                <Minus className="w-3 h-3" />
+                              </Button>
+                              <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-8 h-8 p-0"
+                                onClick={() => updateQuantityMutation.mutate({ 
+                                  id: item.id, 
+                                  quantity: item.quantity + 1 
+                                })}
+                                disabled={updateQuantityMutation.isPending}
+                              >
+                                <Plus className="w-3 h-3" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-8 h-8 p-0 text-red-500 hover:text-red-700"
+                                onClick={() => removeItemMutation.mutate(item.id)}
+                                disabled={removeItemMutation.isPending}
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {cartItems.length > 0 && (
+            <div className="border-t p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-lg font-semibold">Total:</span>
+                <span className="text-lg font-bold text-brand-red">${totalAmount.toFixed(2)}</span>
+              </div>
+              <Button 
+                onClick={handleCheckout}
+                className="w-full bg-brand-red hover:bg-red-600 text-white py-3"
+                disabled={createOrderMutation.isPending}
+              >
+                Proceed to Checkout
+              </Button>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+
+      {/* Checkout Dialog */}
+      <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Checkout</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-semibold mb-2">Order Summary</h4>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {cartItemsWithDetails.map((item) => (
+                  <div key={item.id} className="flex justify-between text-sm">
+                    <span>{item.details.name} x{item.quantity}</span>
+                    <span>${(parseFloat(item.details.price) * item.quantity).toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+              <Separator className="my-2" />
+              <div className="flex justify-between font-semibold">
+                <span>Total:</span>
+                <span className="text-brand-red">${totalAmount.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Shipping Address *
+              </label>
+              <Textarea
+                placeholder="Enter your complete address..."
+                value={shippingAddress}
+                onChange={(e) => setShippingAddress(e.target.value)}
+                className="h-20 resize-none"
+                required
+              />
+            </div>
+
+            <div className="flex space-x-3">
+              <Button 
+                variant="outline" 
+                onClick={() => setIsCheckoutOpen(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handlePlaceOrder}
+                disabled={createOrderMutation.isPending}
+                className="flex-1 bg-brand-red hover:bg-red-600"
+              >
+                {createOrderMutation.isPending ? "Placing..." : "Place Order"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
