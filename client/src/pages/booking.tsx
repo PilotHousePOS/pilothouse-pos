@@ -13,9 +13,9 @@ import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 
 const SERVICES = [
-  { id: 'grooming', name: 'Pet Grooming', description: 'Full service grooming', price: 0 },
-  { id: 'vet', name: 'Vet Checkup', description: 'Health examination', price: 75 },
-  { id: 'training', name: 'Training Session', description: '1-hour training', price: 60 },
+  { id: 'grooming-full', name: 'Full Grooming', description: 'Complete grooming service', price: 35 },
+  { id: 'grooming-bath', name: 'Bath Only', description: 'Professional bath and dry', price: 20 },
+  { id: 'training', name: 'Training Session', description: '1-hour training session', price: 60 },
 ];
 
 const TIME_SLOTS = [
@@ -116,10 +116,7 @@ export default function Booking() {
                       <RadioGroupItem value={service.id} id={service.id} />
                       <div className="flex-1">
                         <div className="font-semibold text-gray-900">{service.name}</div>
-                        <div className="text-sm text-gray-500">
-                          {service.description} 
-                          {service.price > 0 ? ` - $${service.price}` : ' - Free'}
-                        </div>
+                        <div className="text-sm text-gray-500">{service.description} - ${service.price}</div>
                       </div>
                     </Label>
                   </CardContent>
@@ -209,9 +206,7 @@ export default function Booking() {
         >
           {createAppointmentMutation.isPending 
             ? "Booking..." 
-            : selectedServiceData?.price === 0 
-              ? "Confirm Free Booking" 
-              : `Confirm Booking${selectedServiceData ? ` - $${selectedServiceData.price}` : ''}`
+            : `Confirm Booking${selectedServiceData ? ` - $${selectedServiceData.price}` : ''}`
           }
         </Button>
       </form>
