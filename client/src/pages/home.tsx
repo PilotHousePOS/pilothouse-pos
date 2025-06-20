@@ -51,7 +51,7 @@ export default function Home() {
               <h1 className="text-xl font-bold bg-gradient-to-r from-brand-blue to-brand-red bg-clip-text text-transparent">
                 Animal House
               </h1>
-              <p className="text-xs text-gray-500 font-medium">Where pets find families</p>
+              <p className="text-xs text-gray-500 font-medium">Where pets find families ✨</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
