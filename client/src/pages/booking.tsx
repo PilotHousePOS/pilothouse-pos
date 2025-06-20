@@ -116,7 +116,10 @@ export default function Booking() {
                       <RadioGroupItem value={service.id} id={service.id} />
                       <div className="flex-1">
                         <div className="font-semibold text-gray-900">{service.name}</div>
-                        <div className="text-sm text-gray-500">{service.description} - ${service.price}</div>
+                        <div className="text-sm text-gray-500">
+                          {service.description} 
+                          {service.price > 0 ? ` - $${service.price}` : ' - Free'}
+                        </div>
                       </div>
                     </Label>
                   </CardContent>
@@ -206,7 +209,9 @@ export default function Booking() {
         >
           {createAppointmentMutation.isPending 
             ? "Booking..." 
-            : `Confirm Booking${selectedServiceData ? ` - $${selectedServiceData.price}` : ''}`
+            : selectedServiceData?.price === 0 
+              ? "Confirm Free Booking" 
+              : `Confirm Booking${selectedServiceData ? ` - $${selectedServiceData.price}` : ''}`
           }
         </Button>
       </form>
