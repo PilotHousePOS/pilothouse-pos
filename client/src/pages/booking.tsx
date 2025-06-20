@@ -15,7 +15,6 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 const SERVICES = [
   { id: 'grooming-full', name: 'Full Grooming', description: 'Complete grooming service', price: 35 },
   { id: 'grooming-bath', name: 'Bath Only', description: 'Professional bath and dry', price: 20 },
-  { id: 'training', name: 'Training Session', description: '1-hour training session', price: 60 },
 ];
 
 const TIME_SLOTS = [

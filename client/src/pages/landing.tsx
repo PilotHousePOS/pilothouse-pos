@@ -96,10 +96,10 @@ export default function Landing() {
           <Card className="bg-gradient-to-br from-orange-600 to-orange-800 border-2 border-white/30 hover:border-white/60 transition-all duration-300 transform hover:scale-110 cursor-pointer shadow-2xl">
             <CardContent className="p-6 text-center">
               <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-white">
-                <span className="text-3xl">🎓</span>
+                <span className="text-3xl">🦎</span>
               </div>
-              <div className="text-lg font-black text-white">TRAINING</div>
-              <div className="text-sm font-bold text-orange-100 mt-2">Expert coaching</div>
+              <div className="text-lg font-black text-white">EXOTIC REPTILES</div>
+              <div className="text-sm font-bold text-orange-100 mt-2">Rare species</div>
             </CardContent>
           </Card>
         </div>
