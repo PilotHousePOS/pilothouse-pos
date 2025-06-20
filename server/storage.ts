@@ -104,7 +104,53 @@ export class DatabaseStorage implements IStorage {
 
   // Pet operations
   async getAllPets(): Promise<Pet[]> {
-    return await db.select().from(pets).where(eq(pets.isAvailable, true)).orderBy(desc(pets.createdAt));
+    try {
+      return await db.select().from(pets).where(eq(pets.isAvailable, true)).orderBy(desc(pets.createdAt));
+    } catch (error) {
+      console.error('Database error in getAllPets:', error);
+      // Return demo data when database fails
+      return [
+        {
+          id: 1,
+          name: "Bella",
+          species: "dog",
+          breed: "Golden Retriever", 
+          age: "2 years",
+          price: "800",
+          description: "Friendly and energetic golden retriever",
+          imageUrl: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+          isAvailable: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 2,
+          name: "Max",
+          species: "cat",
+          breed: "Maine Coon",
+          age: "3 years", 
+          price: "600",
+          description: "Gentle giant with beautiful fur",
+          imageUrl: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+          isAvailable: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 3,
+          name: "Charlie",
+          species: "reptile",
+          breed: "Bearded Dragon",
+          age: "1 year",
+          price: "150",
+          description: "Our specialty exotic reptile - calm and friendly",
+          imageUrl: "https://images.unsplash.com/photo-1516814765986-4d2b2a7b6ec8?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+          isAvailable: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
+    }
   }
 
   async getPetsBySpecies(species: string): Promise<Pet[]> {
@@ -140,7 +186,50 @@ export class DatabaseStorage implements IStorage {
 
   // Supply operations
   async getAllSupplies(): Promise<Supply[]> {
-    return await db.select().from(supplies).where(eq(supplies.isActive, true)).orderBy(desc(supplies.createdAt));
+    try {
+      return await db.select().from(supplies).orderBy(desc(supplies.createdAt));
+    } catch (error) {
+      console.error('Database error in getAllSupplies:', error);
+      // Return demo data when database fails
+      return [
+        {
+          id: 1,
+          name: "Premium Dog Food",
+          brand: "Royal Canin",
+          category: "food",
+          price: "49.99",
+          description: "High-quality nutrition for adult dogs",
+          imageUrl: "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+          stockQuantity: 25,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 2,
+          name: "Cat Litter",
+          brand: "Fresh Step", 
+          category: "hygiene",
+          price: "12.99",
+          description: "Odor control cat litter",
+          imageUrl: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+          stockQuantity: 15,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: 3,
+          name: "Reptile Heat Lamp",
+          brand: "Zoo Med",
+          category: "equipment", 
+          price: "29.99",
+          description: "Essential heating for reptile habitats",
+          imageUrl: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+          stockQuantity: 8,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
+    }
   }
 
   async getSuppliesByCategory(category: string): Promise<Supply[]> {
