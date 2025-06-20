@@ -16,12 +16,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // Demo login route
+  app.post('/api/demo-login', async (req, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
+      // Create demo user
+      const demoUser = await storage.upsertUser({
+        id: 'demo-user',
+        email: 'demo@animalhouse.com',
+        firstName: 'Demo',
+        lastName: 'User',
+        profileImageUrl: null,
+      });
+      
+      // Set session
+      (req.session as any).user = demoUser;
+      res.json(demoUser);
+    } catch (error) {
+      console.error("Demo login error:", error);
+      res.status(500).json({ message: "Demo login failed" });
+    }
+  });
+
+  // Auth routes
+  app.get('/api/auth/user', async (req, res) => {
+    try {
+      const sessionUser = (req.session as any)?.user;
+      if (!sessionUser) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      res.json(sessionUser);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
