@@ -287,6 +287,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: "High-quality nutrition for adult dogs",
           imageUrl: "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
           stockQuantity: 25,
+          isActive: true,
+          weight: null,
+          size: null,
           createdAt: new Date(),
           updatedAt: new Date()
         },
@@ -299,6 +302,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: "Odor control cat litter", 
           imageUrl: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
           stockQuantity: 15,
+          isActive: true,
+          weight: null,
+          size: null,
           createdAt: new Date(),
           updatedAt: new Date()
         },
@@ -311,6 +317,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: "Essential heating for reptile habitats",
           imageUrl: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
           stockQuantity: 8,
+          isActive: true,
+          weight: null,
+          size: null,
           createdAt: new Date(),
           updatedAt: new Date()
         }

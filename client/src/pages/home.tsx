@@ -79,6 +79,15 @@ export default function Home() {
                 </span>
               )}
             </button>
+            <button 
+              className="px-3 py-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+              onClick={() => {
+                fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+                  .then(() => window.location.href = '/');
+              }}
+            >
+              <span className="text-gray-600 text-xs font-medium">Logout</span>
+            </button>
           </div>
         </div>
       </header>
