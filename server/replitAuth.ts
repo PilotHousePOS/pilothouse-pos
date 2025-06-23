@@ -28,14 +28,15 @@ export function getSession() {
   return session({
     secret: process.env.SESSION_SECRET!,
     name: 'connect.sid',
-    resave: false,
-    saveUninitialized: false,
-    rolling: false,
+    resave: true,
+    saveUninitialized: true,
+    rolling: true,
     cookie: {
       httpOnly: false,
       secure: false,
       maxAge: sessionTtl,
       sameSite: 'lax',
+      path: '/',
     },
   });
 }

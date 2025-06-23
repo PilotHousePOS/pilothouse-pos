@@ -40,17 +40,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Set session
-      (req.session as any).user = newUser;
-      
-      req.session.save((saveErr) => {
-        if (saveErr) {
-          console.error('Session save error:', saveErr);
-          return res.status(500).json({ message: "Session save failed" });
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error('Session regenerate error:', err);
+          return res.status(500).json({ message: "Session error" });
         }
         
-        console.log('User created and session saved:', newUser.id);
-        const { password, ...userWithoutPassword } = newUser;
-        res.json(userWithoutPassword);
+        (req.session as any).user = newUser;
+        
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error('Session save error:', saveErr);
+            return res.status(500).json({ message: "Session save failed" });
+          }
+          
+          console.log('User created and session saved:', newUser.id);
+          const { password, ...userWithoutPassword } = newUser;
+          res.json(userWithoutPassword);
+        });
       });
     } catch (error) {
       console.error("Signup error:", error);
@@ -79,17 +86,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Set session
-      (req.session as any).user = user;
-      
-      req.session.save((saveErr) => {
-        if (saveErr) {
-          console.error('Session save error:', saveErr);
-          return res.status(500).json({ message: "Session save failed" });
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error('Session regenerate error:', err);
+          return res.status(500).json({ message: "Session error" });
         }
         
-        console.log('User logged in and session saved:', user.id);
-        const { password, ...userWithoutPassword } = user;
-        res.json(userWithoutPassword);
+        (req.session as any).user = user;
+        
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error('Session save error:', saveErr);
+            return res.status(500).json({ message: "Session save failed" });
+          }
+          
+          console.log('User logged in and session saved:', user.id);
+          const { password, ...userWithoutPassword } = user;
+          res.json(userWithoutPassword);
+        });
       });
     } catch (error) {
       console.error("Login error:", error);
