@@ -11,42 +11,74 @@ export default function Auth() {
   const [, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleDemoLogin = async () => {
+  const handleLogin = async (email: string, password: string) => {
     setIsLoading(true);
-    
-    // Create demo user directly in localStorage
-    const demoUser = {
-      id: 'demo-user',
-      email: 'demo@animalhouse.com',
-      firstName: 'Demo',
-      lastName: 'User',
-      profileImageUrl: null,
-      isAdmin: true,
-    };
-    
-    // Store in localStorage
-    localStorage.setItem('demoUser', JSON.stringify(demoUser));
-    
-    console.log('Demo login successful:', demoUser);
-    
-    // Redirect to home
-    setTimeout(() => {
-      window.location.href = '/';
-    }, 100);
-    
-    setIsLoading(false);
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      if (response.ok) {
+        window.location.href = '/';
+      } else {
+        const error = await response.json();
+        console.error('Login failed:', error.message);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // For demo, just do demo login
-    await handleDemoLogin();
+  const handleSignUp = async (email: string, password: string, firstName: string, lastName: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, firstName, lastName }),
+      });
+      
+      if (response.ok) {
+        window.location.href = '/';
+      } else {
+        const error = await response.json();
+        console.error('Signup failed:', error.message);
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For demo, just do demo login
-    await handleDemoLogin();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const firstName = formData.get('firstName') as string;
+    const lastName = formData.get('lastName') as string;
+    
+    await handleSignUp(email, password, firstName, lastName);
+  };
+
+  const handleSignInSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    
+    await handleLogin(email, password);
   };
 
   return (
@@ -82,11 +114,11 @@ export default function Auth() {
               </TabsList>
               
               <TabsContent value="signin" className="space-y-4 mt-6">
-                <form onSubmit={handleSignIn} className="space-y-4">
+                <form onSubmit={handleSignInSubmit} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-white">Email</Label>
                     <Input
-                      id="email"
+                      name="email"
                       type="email"
                       placeholder="Enter your email"
                       className="bg-white/10 border-white/30 text-white placeholder:text-gray-400"
@@ -96,7 +128,7 @@ export default function Auth() {
                   <div className="space-y-2">
                     <Label htmlFor="password" className="text-white">Password</Label>
                     <Input
-                      id="password"
+                      name="password"
                       type="password"
                       placeholder="Enter your password"
                       className="bg-white/10 border-white/30 text-white placeholder:text-gray-400"
@@ -114,12 +146,12 @@ export default function Auth() {
               </TabsContent>
               
               <TabsContent value="signup" className="space-y-4 mt-6">
-                <form onSubmit={handleSignUp} className="space-y-4">
+                <form onSubmit={handleSignUpSubmit} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName" className="text-white">First Name</Label>
                       <Input
-                        id="firstName"
+                        name="firstName"
                         placeholder="First name"
                         className="bg-white/10 border-white/30 text-white placeholder:text-gray-400"
                         required
@@ -128,7 +160,7 @@ export default function Auth() {
                     <div className="space-y-2">
                       <Label htmlFor="lastName" className="text-white">Last Name</Label>
                       <Input
-                        id="lastName"
+                        name="lastName"
                         placeholder="Last name"
                         className="bg-white/10 border-white/30 text-white placeholder:text-gray-400"
                         required
@@ -138,7 +170,7 @@ export default function Auth() {
                   <div className="space-y-2">
                     <Label htmlFor="signupEmail" className="text-white">Email</Label>
                     <Input
-                      id="signupEmail"
+                      name="email"
                       type="email"
                       placeholder="Enter your email"
                       className="bg-white/10 border-white/30 text-white placeholder:text-gray-400"
@@ -148,7 +180,7 @@ export default function Auth() {
                   <div className="space-y-2">
                     <Label htmlFor="signupPassword" className="text-white">Password</Label>
                     <Input
-                      id="signupPassword"
+                      name="password"
                       type="password"
                       placeholder="Create a password"
                       className="bg-white/10 border-white/30 text-white placeholder:text-gray-400"
@@ -167,17 +199,7 @@ export default function Auth() {
               </TabsContent>
             </Tabs>
 
-            <div className="mt-6 pt-6 border-t border-white/20 text-center">
-              <p className="text-gray-400 text-sm mb-4">Or try our demo</p>
-              <Button
-                onClick={handleDemoLogin}
-                disabled={isLoading}
-                variant="outline"
-                className="w-full border-white/30 text-white hover:bg-white/10"
-              >
-                {isLoading ? "Loading..." : "Demo Access"}
-              </Button>
-            </div>
+
           </CardContent>
         </Card>
       </div>

@@ -16,21 +16,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
-  // Simple demo login route
-  app.post('/api/demo-login', async (req, res) => {
+  // Customer signup
+  app.post('/api/auth/signup', async (req, res) => {
     try {
-      console.log('Demo login request received');
+      const { email, password, firstName, lastName } = req.body;
       
-      // Create demo user object
-      const demoUser = {
-        id: 'demo-user',
-        email: 'demo@animalhouse.com',
-        firstName: 'Demo',
-        lastName: 'User',
-        profileImageUrl: null,
-        isAdmin: true,
-      };
-      
+      if (!email || !password || !firstName || !lastName) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+
+      // Create new user
+      const newUser = await storage.createUser({
+        email,
+        password, // In production, hash this password
+        firstName,
+        lastName,
+      });
+
       // Set session
       req.session.regenerate((err) => {
         if (err) {
@@ -38,7 +46,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(500).json({ message: "Session error" });
         }
         
-        (req.session as any).user = demoUser;
+        (req.session as any).user = newUser;
         
         req.session.save((saveErr) => {
           if (saveErr) {
@@ -46,14 +54,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return res.status(500).json({ message: "Session save failed" });
           }
           
-          console.log('Session saved successfully, user:', demoUser);
-          res.json(demoUser);
+          res.json({ id: newUser.id, email: newUser.email, firstName: newUser.firstName, lastName: newUser.lastName });
         });
       });
     } catch (error) {
-      console.error("Demo login error:", error);
-      res.status(500).json({ message: "Demo login failed" });
+      console.error("Signup error:", error);
+      res.status(500).json({ message: "Signup failed" });
     }
+  });
+
+  // Customer login
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+
+      // Find user
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      // In production, verify hashed password
+      if (user.password !== password) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      // Set session
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error('Session regenerate error:', err);
+          return res.status(500).json({ message: "Session error" });
+        }
+        
+        (req.session as any).user = user;
+        
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error('Session save error:', saveErr);
+            return res.status(500).json({ message: "Session save failed" });
+          }
+          
+          res.json({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName });
+        });
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  // Logout
+  app.post('/api/auth/logout', (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Logout error:', err);
+        return res.status(500).json({ message: "Logout failed" });
+      }
+      res.clearCookie('animalhouse.sid');
+      res.json({ message: "Logged out successfully" });
+    });
   });
 
   // Auth routes

@@ -28,8 +28,10 @@ import { db } from "./db";
 import { eq, desc, and, or, ilike } from "drizzle-orm";
 
 export interface IStorage {
-  // User operations (required for Replit Auth)
+  // User operations
   getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: { email: string; password: string; firstName: string; lastName: string }): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
 
   // Pet operations
@@ -84,6 +86,37 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Database error in getUser:', error);
       return undefined;
+    }
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    try {
+      const [user] = await db.select().from(users).where(eq(users.email, email));
+      return user;
+    } catch (error) {
+      console.error('Database error in getUserByEmail:', error);
+      return undefined;
+    }
+  }
+
+  async createUser(userData: { email: string; password: string; firstName: string; lastName: string }): Promise<User> {
+    try {
+      const userId = Math.random().toString(36).substring(2, 15);
+      const [user] = await db
+        .insert(users)
+        .values({
+          id: userId,
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          profileImageUrl: null,
+          password: userData.password,
+        })
+        .returning();
+      return user;
+    } catch (error) {
+      console.error('Database error in createUser:', error);
+      throw new Error('Failed to create user');
     }
   }
 
