@@ -39,25 +39,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastName,
       });
 
-      // Set session
-      req.session.regenerate((err) => {
-        if (err) {
-          console.error('Session regenerate error:', err);
-          return res.status(500).json({ message: "Session error" });
+      // Set session directly without regeneration
+      (req.session as any).user = newUser;
+      
+      req.session.save((saveErr) => {
+        if (saveErr) {
+          console.error('Session save error:', saveErr);
+          return res.status(500).json({ message: "Session save failed" });
         }
         
-        (req.session as any).user = newUser;
-        
-        req.session.save((saveErr) => {
-          if (saveErr) {
-            console.error('Session save error:', saveErr);
-            return res.status(500).json({ message: "Session save failed" });
-          }
-          
-          console.log('User created and session saved:', newUser.id);
-          const { password, ...userWithoutPassword } = newUser;
-          res.json(userWithoutPassword);
-        });
+        console.log('User created and session saved:', newUser.id);
+        console.log('Session ID:', req.sessionID);
+        const { password, ...userWithoutPassword } = newUser;
+        res.json(userWithoutPassword);
       });
     } catch (error) {
       console.error("Signup error:", error);
@@ -85,25 +79,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      // Set session
-      req.session.regenerate((err) => {
-        if (err) {
-          console.error('Session regenerate error:', err);
-          return res.status(500).json({ message: "Session error" });
+      // Set session directly without regeneration
+      (req.session as any).user = user;
+      
+      req.session.save((saveErr) => {
+        if (saveErr) {
+          console.error('Session save error:', saveErr);
+          return res.status(500).json({ message: "Session save failed" });
         }
         
-        (req.session as any).user = user;
-        
-        req.session.save((saveErr) => {
-          if (saveErr) {
-            console.error('Session save error:', saveErr);
-            return res.status(500).json({ message: "Session save failed" });
-          }
-          
-          console.log('User logged in and session saved:', user.id);
-          const { password, ...userWithoutPassword } = user;
-          res.json(userWithoutPassword);
-        });
+        console.log('User logged in and session saved:', user.id);
+        console.log('Session ID:', req.sessionID);
+        const { password, ...userWithoutPassword } = user;
+        res.json(userWithoutPassword);
       });
     } catch (error) {
       console.error("Login error:", error);
@@ -126,7 +114,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.get('/api/auth/user', async (req, res) => {
     try {
-      console.log('Session check:', req.session);
+      console.log('Session ID check:', req.sessionID);
+      console.log('Session data:', req.session);
       const sessionUser = (req.session as any)?.user;
       console.log('Session user:', sessionUser);
       if (!sessionUser) {
