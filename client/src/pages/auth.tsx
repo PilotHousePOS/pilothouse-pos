@@ -24,7 +24,11 @@ export default function Auth() {
       });
       
       if (response.ok) {
-        window.location.href = '/';
+        console.log('Login successful, redirecting...');
+        // Force a complete reload to ensure authentication state is updated
+        setTimeout(() => {
+          window.location.replace('/');
+        }, 100);
       } else {
         const error = await response.json();
         console.error('Login failed:', error.message);
@@ -49,7 +53,11 @@ export default function Auth() {
       });
       
       if (response.ok) {
-        window.location.href = '/';
+        console.log('Signup successful, redirecting...');
+        // Force a complete reload to ensure authentication state is updated
+        setTimeout(() => {
+          window.location.replace('/');
+        }, 100);
       } else {
         const error = await response.json();
         console.error('Signup failed:', error.message);

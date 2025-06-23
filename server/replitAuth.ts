@@ -28,8 +28,9 @@ export function getSession() {
   return session({
     secret: process.env.SESSION_SECRET!,
     name: 'animalhouse.sid',
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
+    rolling: true,
     cookie: {
       httpOnly: false,
       secure: false,
