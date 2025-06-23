@@ -24,13 +24,20 @@ const getOidcConfig = memoize(
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week in milliseconds
+  const pgStore = connectPg(session);
   
   return session({
     secret: process.env.SESSION_SECRET!,
     name: 'connect.sid',
-    resave: true,
-    saveUninitialized: true,
-    rolling: true,
+    store: new pgStore({
+      conString: process.env.DATABASE_URL,
+      createTableIfMissing: false, // Don't create table to avoid conflicts
+      ttl: sessionTtl / 1000,
+      tableName: 'sessions', // Use existing sessions table
+    }),
+    resave: false,
+    saveUninitialized: false,
+    rolling: false,
     cookie: {
       httpOnly: false,
       secure: false,
