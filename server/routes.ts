@@ -104,7 +104,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error('Logout error:', err);
         return res.status(500).json({ message: "Logout failed" });
       }
-      res.clearCookie('animalhouse.sid');
+      res.clearCookie('connect.sid');
       res.json({ message: "Logged out successfully" });
     });
   });

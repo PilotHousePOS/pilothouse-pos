@@ -25,10 +25,10 @@ export default function Auth() {
       
       if (response.ok) {
         console.log('Login successful, redirecting...');
-        // Force a complete reload to ensure authentication state is updated
+        // Wait a bit longer for session to save, then reload
         setTimeout(() => {
-          window.location.replace('/');
-        }, 100);
+          window.location.href = '/';
+        }, 500);
       } else {
         const error = await response.json();
         console.error('Login failed:', error.message);
@@ -54,10 +54,10 @@ export default function Auth() {
       
       if (response.ok) {
         console.log('Signup successful, redirecting...');
-        // Force a complete reload to ensure authentication state is updated
+        // Wait a bit longer for session to save, then reload
         setTimeout(() => {
-          window.location.replace('/');
-        }, 100);
+          window.location.href = '/';
+        }, 500);
       } else {
         const error = await response.json();
         console.error('Signup failed:', error.message);
