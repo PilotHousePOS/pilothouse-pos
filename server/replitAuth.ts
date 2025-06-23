@@ -31,19 +31,20 @@ export function getSession() {
     name: 'connect.sid',
     store: new pgStore({
       conString: process.env.DATABASE_URL,
-      createTableIfMissing: false, // Don't create table to avoid conflicts
+      createTableIfMissing: false,
       ttl: sessionTtl / 1000,
-      tableName: 'sessions', // Use existing sessions table
+      tableName: 'sessions',
     }),
-    resave: false,
-    saveUninitialized: false,
-    rolling: false,
+    resave: true, // Force session save
+    saveUninitialized: true, // Save uninitialized sessions
+    rolling: true, // Reset expiry on access
     cookie: {
       httpOnly: false,
       secure: false,
       maxAge: sessionTtl,
       sameSite: 'lax',
       path: '/',
+      domain: undefined, // Let browser set domain
     },
   });
 }

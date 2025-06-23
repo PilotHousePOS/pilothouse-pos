@@ -25,10 +25,8 @@ export default function Auth() {
       
       if (response.ok) {
         console.log('Login successful, redirecting...');
-        // Wait for session to be properly saved, then redirect
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 1000);
+        // Force complete page refresh to pick up session
+        window.location.replace('/');
       } else {
         const error = await response.json();
         console.error('Login failed:', error.message);
@@ -54,10 +52,8 @@ export default function Auth() {
       
       if (response.ok) {
         console.log('Signup successful, redirecting...');
-        // Wait for session to be properly saved, then redirect
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 1000);
+        // Force complete page refresh to pick up session
+        window.location.replace('/');
       } else {
         const error = await response.json();
         console.error('Signup failed:', error.message);
