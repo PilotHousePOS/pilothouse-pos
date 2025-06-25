@@ -1,14 +1,20 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Home, PawPrint, ShoppingBag, Calendar, User } from "lucide-react";
+import { Home, PawPrint, ShoppingBag, Calendar, User, Settings } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
-const NAV_ITEMS = [
-  { path: "/", icon: Home, label: "Home" },
-  { path: "/pets", icon: PawPrint, label: "Pets" },
-  { path: "/supplies", icon: ShoppingBag, label: "Supplies" },
-  { path: "/booking", icon: Calendar, label: "Book" },
-  { path: "/profile", icon: User, label: "Profile" },
-];
+export default function BottomNav() {
+  const [location, setLocation] = useLocation();
+  const { user } = useAuth();
+
+  const NAV_ITEMS = [
+    { path: "/", icon: Home, label: "Home" },
+    { path: "/pets", icon: PawPrint, label: "Pets" },
+    { path: "/supplies", icon: ShoppingBag, label: "Supplies" },
+    { path: "/booking", icon: Calendar, label: "Book" },
+    { path: "/profile", icon: User, label: "Profile" },
+    ...(user?.isAdmin ? [{ path: "/admin", icon: Settings, label: "Admin" }] : []),
+  ];
 
 export default function BottomNav() {
   const [location, setLocation] = useLocation();

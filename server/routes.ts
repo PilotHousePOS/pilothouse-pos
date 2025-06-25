@@ -90,7 +90,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Auth routes
-  app.get('/api/auth/user', (req, res) => {
+  app.get('/api/auth/user', async (req, res) => {
     try {
       // Check both cookies and Authorization header
       const cookieToken = req.cookies?.auth_token;
@@ -114,7 +114,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid token" });
       }
 
-      res.json(user);
+      // Get fresh user data from database to ensure admin status is current
+      const freshUser = await storage.getUser(user.id);
+      if (!freshUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { password, ...userWithoutPassword } = freshUser;
+      res.json(userWithoutPassword);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
