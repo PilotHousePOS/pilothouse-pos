@@ -8,10 +8,9 @@ import { Bell, ShoppingCart, Heart, Star, ArrowRight, Sparkles } from "lucide-re
 import animalHouseLogoPath from "@assets/Circle Mascot Logo_1750438195696.jpg";
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   
-  // Debug: Log user data to see what we're getting
-  console.log('Home page - User data:', user);
+
   
   const handleLogout = () => {
     console.log('Logging out...');
@@ -75,8 +74,9 @@ export default function Home() {
                 Animal House
               </h1>
               <p className="text-xs text-gray-500 font-medium">
-                {user && (user as any).firstName ? `Welcome, ${(user as any).firstName}${(user as any).isAdmin ? ' (Admin)' : ''}` : 
-                 user ? 'Welcome, User' : 'Where pets find families'}
+                {isLoading ? 'Loading...' : 
+                 user && (user as any).firstName ? `Welcome, ${(user as any).firstName}${(user as any).isAdmin ? ' (Admin)' : ''}` : 
+                 'Where pets find families'}
               </p>
             </div>
           </div>

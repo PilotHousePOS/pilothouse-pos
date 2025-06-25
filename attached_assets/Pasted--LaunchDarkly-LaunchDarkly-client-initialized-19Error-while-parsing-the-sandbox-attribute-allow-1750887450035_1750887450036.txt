@@ -1,0 +1,63 @@
+[LaunchDarkly] LaunchDarkly client initialized
+19Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.Understand this error
+framework-c2d28537c1f004d3.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-c2d28537c1f004d3.js:1Understand this warning
+framework-c2d28537c1f004d3.js:1 Unrecognized feature: 'battery'.
+_ @ framework-c2d28537c1f004d3.js:1Understand this warning
+framework-c2d28537c1f004d3.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-c2d28537c1f004d3.js:1Understand this warning
+framework-c2d28537c1f004d3.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-c2d28537c1f004d3.js:1Understand this warning
+framework-c2d28537c1f004d3.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-c2d28537c1f004d3.js:1Understand this warning
+framework-c2d28537c1f004d3.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-c2d28537c1f004d3.js:1Understand this warning
+framework-c2d28537c1f004d3.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-c2d28537c1f004d3.js:1Understand this warning
+framework-c2d28537c1f004d3.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-c2d28537c1f004d3.js:1Understand this warning
+framework-c2d28537c1f004d3.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-c2d28537c1f004d3.js:1Understand this warning
+framework-c2d28537c1f004d3.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-c2d28537c1f004d3.js:1Understand this warning
+framework-c2d28537c1f004d3.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-c2d28537c1f004d3.js:1Understand this warning
+framework-c2d28537c1f004d3.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-c2d28537c1f004d3.js:1Understand this warning
+framework-c2d28537c1f004d3.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-c2d28537c1f004d3.js:1Understand this warning
+framework-c2d28537c1f004d3.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-c2d28537c1f004d3.js:1Understand this warning
+framework-c2d28537c1f004d3.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-c2d28537c1f004d3.js:1Understand this warning
+attached_assets/animal%20house%20logo%20full_1750438187184.jpg:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+attached_assets/Circle%20Mascot%20Logo_1750438195696.jpg:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+attached_assets/Circle%20Mascot%20Logo%20Full_1750438190683.jpg:1 
+            
+            
+           Failed to load resource: the server responded with a status of 404 ()Understand this error
+PetPalTracker:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+workspace_iframe.html:32 Unrecognized feature: 'ambient-light-sensor'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'battery'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-not-rendered'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-out-of-viewport'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'layout-animations'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'legacy-image-formats'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'navigation-override'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'oversized-images'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'publickey-credentials'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'speaker-selection'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'unoptimized-images'.Understand this warning
+workspace_iframe.html:32 Unrecognized feature: 'unsized-media'.Understand this warning
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowfullscreen'.Understand this warning
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowpaymentrequest'.Understand this warning
+Console.js:61 Home page - User data: undefined
+Console.js:61 Home page - User data: Object
+Console.js:61 Home page - User data: Object
+stallwart.build.js:1 stallwart: failed ping 1

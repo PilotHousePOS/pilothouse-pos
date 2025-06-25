@@ -12,6 +12,8 @@ export function useAuth() {
     refetchOnWindowFocus: true,
   });
 
+
+
   return {
     user,
     isLoading,
