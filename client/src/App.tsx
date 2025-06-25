@@ -16,6 +16,7 @@ import NotFound from "@/pages/not-found";
 import BottomNav from "@/components/bottom-nav";
 
 function Router() {
+  // Simple approach - just check localStorage directly
   const hasToken = !!localStorage.getItem('auth_token');
   
   return (

@@ -11,16 +11,14 @@ export default function Home() {
   const { user } = useAuth();
   
   const handleLogout = () => {
-    // Clear token from localStorage
-    localStorage.removeItem('auth_token');
-    console.log('Token removed from localStorage');
+    console.log('Logging out...');
     
-    // Call logout API 
-    fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
-      .finally(() => {
-        // Force redirect to landing page
-        window.location.href = '/';
-      });
+    // Clear token from localStorage first
+    localStorage.removeItem('auth_token');
+    localStorage.clear();
+    
+    // Force immediate redirect to landing page
+    window.location.href = '/';
   };
   const [, setLocation] = useLocation();
 
@@ -93,13 +91,10 @@ export default function Home() {
               )}
             </button>
             <button 
-              className="px-3 py-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
-              onClick={() => {
-                fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
-                  .then(() => window.location.href = '/');
-              }}
+              className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+              onClick={handleLogout}
             >
-              <span className="text-gray-600 text-xs font-medium">Logout</span>
+              <span className="text-xs font-medium">Logout</span>
             </button>
           </div>
         </div>
