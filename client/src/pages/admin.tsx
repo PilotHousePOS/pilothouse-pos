@@ -73,6 +73,32 @@ export default function Admin() {
     enabled: isAuthenticated && user?.isAdmin,
   });
 
+  const { data: users = [] } = useQuery<any[]>({
+    queryKey: ["/api/admin/users"],
+    enabled: isAuthenticated && user?.isAdmin,
+  });
+
+  const updateAdminMutation = useMutation({
+    mutationFn: async ({ userId, isAdmin }: { userId: string; isAdmin: boolean }) => {
+      const res = await apiRequest("POST", `/api/admin/users/${userId}/admin`, { isAdmin });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({
+        title: "Success",
+        description: "User admin status updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error", 
+        description: error.message || "Failed to update admin status",
+        variant: "destructive",
+      });
+    },
+  });
+
   const createPetMutation = useMutation({
     mutationFn: async (petData: any) => {
       await apiRequest("POST", "/api/pets", petData);
@@ -197,11 +223,12 @@ export default function Admin() {
 
       {/* Management Tabs */}
       <Tabs defaultValue="pets" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="pets">Pets</TabsTrigger>
           <TabsTrigger value="supplies">Supplies</TabsTrigger>
           <TabsTrigger value="orders">Orders</TabsTrigger>
           <TabsTrigger value="appointments">Appointments</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pets" className="space-y-4">
@@ -342,6 +369,67 @@ export default function Admin() {
                     >
                       {appointment.status}
                     </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="users" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-medium">User Management</h3>
+            <div className="flex items-center space-x-2">
+              <Shield className="w-4 h-4 text-blue-600" />
+              <span className="text-sm text-gray-600">Manage admin access</span>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            {users.map((userItem: any) => (
+              <Card key={userItem.id}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">
+                          {userItem.firstName?.[0] || userItem.email?.[0]?.toUpperCase() || 'U'}
+                        </span>
+                      </div>
+                      <div>
+                        <h4 className="font-medium">
+                          {userItem.firstName && userItem.lastName 
+                            ? `${userItem.firstName} ${userItem.lastName}`
+                            : userItem.email
+                          }
+                        </h4>
+                        <p className="text-sm text-gray-500">{userItem.email}</p>
+                        <p className="text-xs text-gray-400">
+                          Member since {new Date(userItem.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <Badge variant={userItem.isAdmin ? "default" : "secondary"}>
+                        {userItem.isAdmin ? "Admin" : "Customer"}
+                      </Badge>
+                      <div className="flex items-center space-x-2">
+                        <Label htmlFor={`admin-${userItem.id}`} className="text-sm">
+                          Admin Access
+                        </Label>
+                        <Switch
+                          id={`admin-${userItem.id}`}
+                          checked={userItem.isAdmin}
+                          onCheckedChange={(checked) => {
+                            updateAdminMutation.mutate({
+                              userId: userItem.id,
+                              isAdmin: checked
+                            });
+                          }}
+                          disabled={updateAdminMutation.isPending}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
