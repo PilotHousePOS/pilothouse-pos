@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function BottomNav() {
   const [location, setLocation] = useLocation();
-  const { user } = useAuth();
+  const { user } = useAuth() as { user: any };
 
   const NAV_ITEMS = [
     { path: "/", icon: Home, label: "Home" },
@@ -13,7 +13,7 @@ export default function BottomNav() {
     { path: "/supplies", icon: ShoppingBag, label: "Supplies" },
     { path: "/booking", icon: Calendar, label: "Book" },
     { path: "/profile", icon: User, label: "Profile" },
-    ...(user?.isAdmin ? [{ path: "/admin", icon: Settings, label: "Admin" }] : []),
+    ...((user as any)?.isAdmin ? [{ path: "/admin", icon: Settings, label: "Admin" }] : []),
   ];
 
   return (

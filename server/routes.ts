@@ -553,7 +553,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/appointments/:id", authMiddleware, async (req: AuthRequest, res) => {
+  app.put("/api/appointments/:id", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin) {
@@ -582,23 +582,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid appointment data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to create appointment" });
-    }
-  });
-
-  app.put("/api/appointments/:id", authMiddleware, async (req: AuthRequest, res) => {
-    try {
-      const user = await storage.getUser(req.user?.id);
-      if (!user?.isAdmin) {
-        return res.status(403).json({ message: "Admin access required" });
-      }
-
-      const id = parseInt(req.params.id);
-      const { status } = req.body;
-      const appointment = await storage.updateAppointmentStatus(id, status);
-      res.json(appointment);
-    } catch (error) {
-      console.error("Error updating appointment:", error);
-      res.status(500).json({ message: "Failed to update appointment" });
     }
   });
 
