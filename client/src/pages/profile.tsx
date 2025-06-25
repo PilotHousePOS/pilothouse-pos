@@ -223,7 +223,7 @@ export default function Profile() {
               <div className="space-y-2">
                 <Button 
                   variant="ghost" 
-                  className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white justify-start"
+                  className="w-full bg-black bg-opacity-40 hover:bg-opacity-60 text-white justify-start border border-white/20"
                   onClick={() => setLocation('/admin')}
                 >
                   <Shield className="w-4 h-4 mr-2" />
@@ -231,7 +231,7 @@ export default function Profile() {
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white justify-start"
+                  className="w-full bg-black bg-opacity-40 hover:bg-opacity-60 text-white justify-start border border-white/20"
                   onClick={() => setLocation('/admin')}
                 >
                   <Settings className="w-4 h-4 mr-2" />
