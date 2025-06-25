@@ -4,6 +4,12 @@
 A mobile-friendly web application for "Animal House" pet store featuring pet browsing, grooming appointment booking, supply purchasing, inventory management, customer accounts with admin functionality, and Animal House branding. The app has a dark, bold design focusing on grooming services (bath and full service), pet adoption, and exotic reptile specialty - no vet care or training services offered.
 
 ## Recent Changes
+- **June 25, 2025**: Resolved mobile authentication and caching issues
+  - Added comprehensive cache-busting headers to prevent mobile browser caching
+  - Updated HTML meta tags to force fresh content loading on mobile devices
+  - Fixed authentication display to show current user name and admin status in header
+  - Implemented server-side cache prevention headers for mobile compatibility
+  - Authentication working correctly: Falen Spears account shows admin privileges
 - **June 25, 2025**: Resolved critical type mismatches and authentication system stability
   - Fixed type conflicts between JWT User type and database schema types by creating separate JWTUser type
   - Systematically resolved admin page errors and user authentication checks throughout application
@@ -45,6 +51,7 @@ A mobile-friendly web application for "Animal House" pet store featuring pet bro
 - Authentication must work reliably without session persistence issues
 - Booking restrictions: No appointments on Sundays, no appointments after 1:30 PM
 - Grooming services: Only "Bath Only" and "Full Grooming" options
+- Mobile authentication consistency: Same account should show identical admin access across devices
 
 ## Project Architecture
 - **Frontend**: React with Vite, TypeScript, Tailwind CSS, shadcn/ui components
