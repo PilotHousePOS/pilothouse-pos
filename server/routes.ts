@@ -199,7 +199,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/pets", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const user = await storage.getUser(req.user?.id);
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -218,7 +221,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/pets/:id", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const user = await storage.getUser(req.user?.id);
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -238,7 +244,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/pets/:id", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const user = await storage.getUser(req.user?.id);
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }

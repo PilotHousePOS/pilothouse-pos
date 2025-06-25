@@ -16,7 +16,12 @@ export function generateToken(user: User): string {
 
 export function verifyToken(token: string): User | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as User;
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    // Ensure the decoded token has the correct User structure
+    if (decoded && typeof decoded === 'object' && decoded.id) {
+      return decoded as User;
+    }
+    return null;
   } catch (error) {
     return null;
   }
