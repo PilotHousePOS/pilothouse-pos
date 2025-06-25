@@ -37,9 +37,7 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const token = localStorage.getItem('auth_token');
-    const headers: HeadersInit = {
-      credentials: "include",
-    };
+    const headers: HeadersInit = {};
     
     if (token) {
       headers.Authorization = `Bearer ${token}`;
