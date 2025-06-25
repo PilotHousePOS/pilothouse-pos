@@ -20,38 +20,48 @@ export default function Profile() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const hasToken = !!localStorage.getItem('auth_token');
 
   const { data: customerPets = [] } = useQuery({
     queryKey: ["/api/customer-pets"],
-    enabled: isAuthenticated,
+    enabled: hasToken,
   });
 
   const { data: orders = [] } = useQuery({
     queryKey: ["/api/orders"],
-    enabled: isAuthenticated,
+    enabled: hasToken,
   });
 
   const { data: appointments = [] } = useQuery({
     queryKey: ["/api/appointments"],
-    enabled: isAuthenticated,
+    enabled: hasToken,
+  });
+
+  const { data: currentUser } = useQuery({
+    queryKey: ["/api/auth/user"],
+    enabled: hasToken,
   });
 
   // Redirect to home if not authenticated
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!hasToken) {
       toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
+        title: "Please sign in",
+        description: "You need to be logged in to view your profile.",
         variant: "destructive",
       });
       setTimeout(() => {
-        window.location.href = "/api/login";
-      }, 500);
+        window.location.href = "/";
+      }, 1000);
       return;
     }
-  }, [isAuthenticated, isLoading, toast]);
+  }, [hasToken, toast]);
 
-  if (isLoading) {
+  if (!hasToken) return null;
+
+  const displayUser = currentUser || user;
+
+  if (!displayUser) {
     return (
       <div className="px-6 py-4 pb-20">
         <div className="animate-pulse space-y-4">
@@ -63,28 +73,28 @@ export default function Profile() {
     );
   }
 
-  if (!user) return null;
-
   const handleLogout = () => {
-    window.location.href = "/api/logout";
+    localStorage.removeItem('auth_token');
+    localStorage.clear();
+    window.location.href = '/';
   };
 
-  const userInitials = user.firstName && user.lastName 
-    ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
-    : user.email?.[0]?.toUpperCase() || 'U';
+  const userInitials = displayUser.firstName && displayUser.lastName 
+    ? `${displayUser.firstName[0]}${displayUser.lastName[0]}`.toUpperCase()
+    : displayUser.email?.[0]?.toUpperCase() || 'U';
 
-  const userName = user.firstName && user.lastName
-    ? `${user.firstName} ${user.lastName}`
-    : user.email || 'User';
+  const userName = displayUser.firstName && displayUser.lastName
+    ? `${displayUser.firstName} ${displayUser.lastName}`
+    : displayUser.email || 'User';
 
   return (
     <div className="px-6 py-4 pb-20">
       {/* Profile Header */}
       <div className="text-center mb-8">
         <div className="w-20 h-20 bg-brand-red rounded-full mx-auto mb-4 flex items-center justify-center">
-          {user.profileImageUrl ? (
+          {displayUser.profileImageUrl ? (
             <img 
-              src={user.profileImageUrl} 
+              src={displayUser.profileImageUrl} 
               alt="Profile" 
               className="w-20 h-20 rounded-full object-cover"
             />
@@ -93,7 +103,7 @@ export default function Profile() {
           )}
         </div>
         <h2 className="text-xl font-bold text-gray-900">{userName}</h2>
-        <p className="text-sm text-gray-500">{user.email}</p>
+        <p className="text-sm text-gray-500">{displayUser.email}</p>
         <div className="flex justify-center mt-2">
           <Badge variant="secondary" className="bg-green-100 text-green-700">
             Premium Member
@@ -190,7 +200,7 @@ export default function Profile() {
       </div>
 
       {/* Admin Panel */}
-      {user.isAdmin && (
+      {displayUser.isAdmin && (
         <div className="mb-8">
           <Card className="bg-gradient-to-r from-brand-blue to-brand-red text-white">
             <CardContent className="p-4">
