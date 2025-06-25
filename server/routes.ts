@@ -197,7 +197,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/pets", authMiddleware, async (req: AuthRequest, res) => {
+  app.post("/api/pets", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.id) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -219,7 +219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/pets/:id", authMiddleware, async (req: AuthRequest, res) => {
+  app.put("/api/pets/:id", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.id) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -242,7 +242,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/pets/:id", authMiddleware, async (req: AuthRequest, res) => {
+  app.delete("/api/pets/:id", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.id) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -343,9 +343,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/supplies", authMiddleware, async (req: AuthRequest, res) => {
+  app.post("/api/supplies", authMiddleware, async (req: any, res) => {
     try {
-      const user = await storage.getUser(req.user?.id);
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "User ID not found" });
+      }
+      const user = await storage.getUser(req.user.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -362,7 +365,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/supplies/:id", authMiddleware, async (req: AuthRequest, res) => {
+  app.put("/api/supplies/:id", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.id) {
         return res.status(401).json({ message: "User ID not found" });
@@ -385,7 +388,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/supplies/:id", authMiddleware, async (req: AuthRequest, res) => {
+  app.delete("/api/supplies/:id", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.id) {
         return res.status(401).json({ message: "User ID not found" });
@@ -405,7 +408,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Cart routes
-  app.get("/api/cart", authMiddleware, async (req: AuthRequest, res) => {
+  app.get("/api/cart", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;
       const cartItems = await storage.getCartItems(userId);
@@ -416,7 +419,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/cart", authMiddleware, async (req: AuthRequest, res) => {
+  app.post("/api/cart", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;
       const cartItemData = insertCartItemSchema.parse({ ...req.body, userId });
@@ -431,7 +434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/cart/:id", authMiddleware, async (req: AuthRequest, res) => {
+  app.put("/api/cart/:id", authMiddleware, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       const { quantity } = req.body;
@@ -443,7 +446,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/cart/:id", authMiddleware, async (req: AuthRequest, res) => {
+  app.delete("/api/cart/:id", authMiddleware, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       await storage.removeFromCart(id);
@@ -455,7 +458,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Order routes
-  app.get("/api/orders", authMiddleware, async (req: AuthRequest, res) => {
+  app.get("/api/orders", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;
       const user = await storage.getUser(userId);
@@ -471,7 +474,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/orders/:id", authMiddleware, async (req: AuthRequest, res) => {
+  app.put("/api/orders/:id", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin) {
