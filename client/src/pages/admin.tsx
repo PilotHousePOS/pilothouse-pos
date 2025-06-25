@@ -38,12 +38,9 @@ export default function Admin() {
   const queryClient = useQueryClient();
   const [isAddPetOpen, setIsAddPetOpen] = useState(false);
   const [isAddSupplyOpen, setIsAddSupplyOpen] = useState(false);
-  const [editingPet, setEditingPet] = useState(null);
-  const [editingSupply, setEditingSupply] = useState(null);
-  const [editingOrder, setEditingOrder] = useState(null);
-  const [editingAppointment, setEditingAppointment] = useState(null);
+  const [editingPet, setEditingPet] = useState<any>(null);
+  const [editingSupply, setEditingSupply] = useState<any>(null);
 
-  // Show loading while checking authentication
   if (isLoading) {
     return (
       <div className="p-6">
@@ -52,7 +49,6 @@ export default function Admin() {
     );
   }
 
-  // Show access denied for non-admin users
   if (!user?.isAdmin) {
     return (
       <div className="p-6">
@@ -90,27 +86,7 @@ export default function Admin() {
     enabled: isAuthenticated && user?.isAdmin,
   });
 
-  const updateAdminMutation = useMutation({
-    mutationFn: async ({ userId, isAdmin }: { userId: string; isAdmin: boolean }) => {
-      const res = await apiRequest("POST", `/api/admin/users/${userId}/admin`, { isAdmin });
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
-      toast({
-        title: "Success",
-        description: "User admin status updated successfully",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error", 
-        description: error.message || "Failed to update admin status",
-        variant: "destructive",
-      });
-    },
-  });
-
+  // Create Pet Mutation
   const createPetMutation = useMutation({
     mutationFn: async (petData: any) => {
       await apiRequest("POST", "/api/pets", petData);
@@ -138,38 +114,6 @@ export default function Admin() {
       toast({
         title: "Error",
         description: "Failed to add pet.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const createSupplyMutation = useMutation({
-    mutationFn: async (supplyData: any) => {
-      await apiRequest("POST", "/api/supplies", supplyData);
-    },
-    onSuccess: () => {
-      toast({
-        title: "Supply Added",
-        description: "Supply has been added successfully.",
-      });
-      setIsAddSupplyOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
-    },
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
-      toast({
-        title: "Error",
-        description: "Failed to add supply.",
         variant: "destructive",
       });
     },
@@ -210,9 +154,53 @@ export default function Admin() {
       queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
     },
     onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
       toast({
         title: "Error",
         description: "Failed to delete pet.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Create Supply Mutation
+  const createSupplyMutation = useMutation({
+    mutationFn: async (supplyData: any) => {
+      await apiRequest("POST", "/api/supplies", supplyData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Supply Added",
+        description: "Supply has been added successfully.",
+      });
+      setIsAddSupplyOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to add supply.",
         variant: "destructive",
       });
     },
@@ -232,6 +220,17 @@ export default function Admin() {
       queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
     },
     onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
       toast({
         title: "Error",
         description: "Failed to update supply.",
@@ -253,6 +252,17 @@ export default function Admin() {
       queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
     },
     onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
       toast({
         title: "Error",
         description: "Failed to delete supply.",
@@ -303,33 +313,30 @@ export default function Admin() {
     },
   });
 
-  if (isLoading) {
-    return (
-      <div className="px-6 py-4 pb-20">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-48"></div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="h-24 bg-gray-200 rounded"></div>
-            <div className="h-24 bg-gray-200 rounded"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Admin User Management Mutation
+  const updateAdminMutation = useMutation({
+    mutationFn: async ({ userId, isAdmin }: { userId: string; isAdmin: boolean }) => {
+      const res = await apiRequest("POST", `/api/admin/users/${userId}/admin`, { isAdmin });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({
+        title: "Success",
+        description: "User admin status updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error", 
+        description: error.message || "Failed to update admin status",
+        variant: "destructive",
+      });
+    },
+  });
 
-  if (!user?.isAdmin) {
-    return (
-      <div className="px-6 py-4 pb-20">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
-          <p className="text-gray-600">You need admin privileges to access this page.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const pendingAppointments = appointments.filter(a => a.status === 'scheduled').length;
-  const pendingOrders = orders.filter(o => o.status === 'pending').length;
+  const pendingAppointments = (appointments as any[]).filter((a: any) => a.status === 'scheduled').length;
+  const pendingOrders = (orders as any[]).filter((o: any) => o.status === 'pending').length;
 
   return (
     <div className="px-6 py-4 pb-20">
@@ -345,14 +352,14 @@ export default function Admin() {
         <Card>
           <CardContent className="p-4 text-center">
             <PawPrint className="w-8 h-8 mx-auto mb-2 text-brand-blue" />
-            <div className="text-2xl font-bold">{pets.length}</div>
+            <div className="text-2xl font-bold">{(pets as any[]).length}</div>
             <div className="text-sm text-gray-500">Total Pets</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <Package className="w-8 h-8 mx-auto mb-2 text-brand-orange" />
-            <div className="text-2xl font-bold">{supplies.length}</div>
+            <div className="text-2xl font-bold">{(supplies as any[]).length}</div>
             <div className="text-sm text-gray-500">Total Supplies</div>
           </CardContent>
         </Card>
@@ -372,129 +379,154 @@ export default function Admin() {
         </Card>
       </div>
 
-      {/* Management Tabs */}
-      <Tabs defaultValue="pets" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="pets">Pets</TabsTrigger>
-          <TabsTrigger value="supplies">Supplies</TabsTrigger>
-          <TabsTrigger value="orders">Orders</TabsTrigger>
-          <TabsTrigger value="appointments">Appointments</TabsTrigger>
+      <Tabs defaultValue="inventory" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="inventory">Inventory</TabsTrigger>
+          <TabsTrigger value="orders">Orders & Appointments</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="pets" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Manage Pets</h3>
-            <Dialog open={isAddPetOpen} onOpenChange={setIsAddPetOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-brand-blue hover:bg-blue-600">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Pet
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add New Pet</DialogTitle>
-                </DialogHeader>
-                <AddPetForm onSubmit={(data) => createPetMutation.mutate(data)} />
-              </DialogContent>
-            </Dialog>
-          </div>
-          <div className="space-y-3">
-            {pets.map((pet) => (
-              <Card key={pet.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-semibold">{pet.name}</h4>
-                      <p className="text-sm text-gray-500">{pet.breed} • {pet.age} • ${pet.price}</p>
+        <TabsContent value="inventory" className="space-y-6">
+          {/* Pets Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <PawPrint className="w-5 h-5" />
+                  Pets ({(pets as any[]).length})
+                </CardTitle>
+                <Dialog open={isAddPetOpen} onOpenChange={setIsAddPetOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" className="bg-brand-blue hover:bg-blue-600">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Pet
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New Pet</DialogTitle>
+                    </DialogHeader>
+                    <AddPetForm onSubmit={(data) => createPetMutation.mutate(data)} />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {(pets as any[]).map((pet: any) => (
+                  <div key={pet.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex-1">
+                      <h3 className="font-semibold">{pet.name}</h3>
+                      <p className="text-sm text-gray-600">{pet.species} • {pet.breed} • ${pet.price}</p>
+                      <p className="text-xs text-gray-500">{pet.description}</p>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-2">
                       <Badge variant={pet.isAvailable ? "default" : "secondary"}>
-                        {pet.isAvailable ? "Available" : "Sold"}
+                        {pet.isAvailable ? "Available" : "Adopted"}
                       </Badge>
-                      <Button variant="ghost" size="sm">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setEditingPet(pet)}
+                      >
                         <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => deletePetMutation.mutate(pet.id)}
+                        disabled={deletePetMutation.isPending}
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-        <TabsContent value="supplies" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Manage Supplies</h3>
-            <Dialog open={isAddSupplyOpen} onOpenChange={setIsAddSupplyOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-brand-blue hover:bg-blue-600">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Supply
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add New Supply</DialogTitle>
-                </DialogHeader>
-                <AddSupplyForm onSubmit={(data) => createSupplyMutation.mutate(data)} />
-              </DialogContent>
-            </Dialog>
-          </div>
-          <div className="space-y-3">
-            {supplies.map((supply) => (
-              <Card key={supply.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-semibold">{supply.name}</h4>
-                      <p className="text-sm text-gray-500">
-                        {supply.brand} • {supply.category} • ${supply.price}
-                      </p>
+          {/* Supplies Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="w-5 h-5" />
+                  Supplies ({(supplies as any[]).length})
+                </CardTitle>
+                <Dialog open={isAddSupplyOpen} onOpenChange={setIsAddSupplyOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" className="bg-brand-orange hover:bg-orange-600">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Supply
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New Supply</DialogTitle>
+                    </DialogHeader>
+                    <AddSupplyForm onSubmit={(data) => createSupplyMutation.mutate(data)} />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {(supplies as any[]).map((supply: any) => (
+                  <div key={supply.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex-1">
+                      <h3 className="font-semibold">{supply.name}</h3>
+                      <p className="text-sm text-gray-600">{supply.brand} • {supply.category} • ${supply.price}</p>
+                      <p className="text-xs text-gray-500">Stock: {supply.stockQuantity}</p>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-2">
                       <Badge variant={supply.stockQuantity > 0 ? "default" : "destructive"}>
-                        Stock: {supply.stockQuantity}
+                        {supply.stockQuantity > 0 ? "In Stock" : "Out of Stock"}
                       </Badge>
-                      <Button 
-                        variant="ghost" 
+                      <Button
                         size="sm"
+                        variant="outline"
                         onClick={() => setEditingSupply(supply)}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button 
-                        variant="ghost" 
+                      <Button
                         size="sm"
+                        variant="outline"
                         onClick={() => deleteSupplyMutation.mutate(supply.id)}
+                        disabled={deleteSupplyMutation.isPending}
                       >
-                        <Trash2 className="w-4 h-4 text-red-500" />
+                        <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
-        <TabsContent value="orders" className="space-y-4">
-          <h3 className="text-lg font-semibold">Recent Orders</h3>
-          <div className="space-y-3">
-            {orders.map((order) => (
-              <Card key={order.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-semibold">Order #{order.id}</h4>
-                      <p className="text-sm text-gray-500">
-                        ${order.totalAmount} • {new Date(order.orderDate).toLocaleDateString()}
-                      </p>
+        <TabsContent value="orders" className="space-y-6">
+          {/* Orders Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5" />
+                Orders ({(orders as any[]).length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {(orders as any[]).map((order: any) => (
+                  <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex-1">
+                      <h3 className="font-semibold">Order #{order.id}</h3>
+                      <p className="text-sm text-gray-600">Total: ${order.totalAmount}</p>
+                      <p className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</p>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Select 
-                        value={order.status} 
+                    <div className="flex items-center gap-2">
+                      <Select
+                        value={order.status}
                         onValueChange={(status) => updateOrderMutation.mutate({ id: order.id, status })}
                       >
                         <SelectTrigger className="w-32">
@@ -510,28 +542,31 @@ export default function Admin() {
                       </Select>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-        <TabsContent value="appointments" className="space-y-4">
-          <h3 className="text-lg font-semibold">Recent Appointments</h3>
-          <div className="space-y-3">
-            {appointments.map((appointment) => (
-              <Card key={appointment.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-semibold">{appointment.petName}</h4>
-                      <p className="text-sm text-gray-500">
-                        {appointment.serviceType} • {appointment.appointmentDate} at {appointment.appointmentTime}
-                      </p>
+          {/* Appointments Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                Appointments ({(appointments as any[]).length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {(appointments as any[]).map((appointment: any) => (
+                  <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex-1">
+                      <h3 className="font-semibold">{appointment.service}</h3>
+                      <p className="text-sm text-gray-600">{appointment.petName}</p>
+                      <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()}</p>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Select 
-                        value={appointment.status} 
+                    <div className="flex items-center gap-2">
+                      <Select
+                        value={appointment.status}
                         onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
                       >
                         <SelectTrigger className="w-32">
@@ -542,76 +577,59 @@ export default function Admin() {
                           <SelectItem value="in-progress">In Progress</SelectItem>
                           <SelectItem value="completed">Completed</SelectItem>
                           <SelectItem value="cancelled">Cancelled</SelectItem>
-                          <SelectItem value="no-show">No Show</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
-        <TabsContent value="users" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium">User Management</h3>
-            <div className="flex items-center space-x-2">
-              <Shield className="w-4 h-4 text-blue-600" />
-              <span className="text-sm text-gray-600">Manage admin access</span>
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            {users.map((userItem: any) => (
-              <Card key={userItem.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">
-                          {userItem.firstName?.[0] || userItem.email?.[0]?.toUpperCase() || 'U'}
-                        </span>
+        <TabsContent value="users" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                User Management ({users.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {users.map((userItem: any) => (
+                  <Card key={userItem.id}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <h3 className="font-semibold">{userItem.firstName} {userItem.lastName}</h3>
+                          <p className="text-sm text-gray-600">{userItem.email}</p>
+                          <p className="text-xs text-gray-500">
+                            Joined: {new Date(userItem.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <Badge variant={userItem.isAdmin ? "default" : "secondary"}>
+                            {userItem.isAdmin ? "Admin" : "User"}
+                          </Badge>
+                          <Switch
+                            checked={userItem.isAdmin}
+                            onCheckedChange={(checked) => {
+                              updateAdminMutation.mutate({
+                                userId: userItem.id,
+                                isAdmin: checked
+                              });
+                            }}
+                            disabled={updateAdminMutation.isPending}
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="font-medium">
-                          {userItem.firstName && userItem.lastName 
-                            ? `${userItem.firstName} ${userItem.lastName}`
-                            : userItem.email
-                          }
-                        </h4>
-                        <p className="text-sm text-gray-500">{userItem.email}</p>
-                        <p className="text-xs text-gray-400">
-                          Member since {new Date(userItem.createdAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <Badge variant={userItem.isAdmin ? "default" : "secondary"}>
-                        {userItem.isAdmin ? "Admin" : "Customer"}
-                      </Badge>
-                      <div className="flex items-center space-x-2">
-                        <Label htmlFor={`admin-${userItem.id}`} className="text-sm">
-                          Admin Access
-                        </Label>
-                        <Switch
-                          id={`admin-${userItem.id}`}
-                          checked={userItem.isAdmin}
-                          onCheckedChange={(checked) => {
-                            updateAdminMutation.mutate({
-                              userId: userItem.id,
-                              isAdmin: checked
-                            });
-                          }}
-                          disabled={updateAdminMutation.isPending}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
 
@@ -711,7 +729,7 @@ function EditPetForm({ pet, onSubmit }: { pet: any; onSubmit: (data: any) => voi
         <input
           type="number"
           value={formData.price}
-          onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+          onChange={(e) => setFormData({ ...formData, price: e.target.value })}
           className="w-full p-2 border rounded"
           required
         />
@@ -773,7 +791,6 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
           value={formData.brand}
           onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
           className="w-full p-2 border rounded"
-          required
         />
       </div>
       <div>
@@ -790,8 +807,9 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
         <label className="block text-sm font-medium mb-1">Price ($)</label>
         <input
           type="number"
+          step="0.01"
           value={formData.price}
-          onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+          onChange={(e) => setFormData({ ...formData, price: e.target.value })}
           className="w-full p-2 border rounded"
           required
         />
