@@ -374,43 +374,54 @@ export default function Admin() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <PawPrint className="w-8 h-8 mx-auto mb-2 text-brand-blue" />
-            <div className="text-2xl font-bold">{(pets as any[]).length}</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <Card className="min-h-[120px]">
+          <CardContent className="p-6 text-center flex flex-col justify-center h-full">
+            <PawPrint className="w-8 h-8 mx-auto mb-3 text-brand-blue" />
+            <div className="text-2xl font-bold mb-1">{(pets as any[]).length}</div>
             <div className="text-sm text-gray-500">Total Pets</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Package className="w-8 h-8 mx-auto mb-2 text-brand-orange" />
-            <div className="text-2xl font-bold">{(supplies as any[]).length}</div>
+        <Card className="min-h-[120px]">
+          <CardContent className="p-6 text-center flex flex-col justify-center h-full">
+            <Package className="w-8 h-8 mx-auto mb-3 text-brand-orange" />
+            <div className="text-2xl font-bold mb-1">{(supplies as any[]).length}</div>
             <div className="text-sm text-gray-500">Total Supplies</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <ShoppingBag className="w-8 h-8 mx-auto mb-2 text-brand-red" />
-            <div className="text-2xl font-bold">{pendingOrders}</div>
+        <Card className="min-h-[120px]">
+          <CardContent className="p-6 text-center flex flex-col justify-center h-full">
+            <ShoppingBag className="w-8 h-8 mx-auto mb-3 text-brand-red" />
+            <div className="text-2xl font-bold mb-1">{pendingOrders}</div>
             <div className="text-sm text-gray-500">Pending Orders</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Calendar className="w-8 h-8 mx-auto mb-2 text-green-600" />
-            <div className="text-2xl font-bold">{pendingAppointments}</div>
+        <Card className="min-h-[120px]">
+          <CardContent className="p-6 text-center flex flex-col justify-center h-full">
+            <Calendar className="w-8 h-8 mx-auto mb-3 text-green-600" />
+            <div className="text-2xl font-bold mb-1">{pendingAppointments}</div>
             <div className="text-sm text-gray-500">Pending Appts</div>
           </CardContent>
         </Card>
       </div>
 
       <Tabs defaultValue="inventory" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="inventory">Inventory</TabsTrigger>
-          <TabsTrigger value="orders">Orders & Appointments</TabsTrigger>
-          <TabsTrigger value="grooming">Grooming Settings</TabsTrigger>
-          <TabsTrigger value="users">Users</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 h-auto p-1">
+          <TabsTrigger value="inventory" className="text-xs sm:text-sm py-2 px-2">
+            <span className="hidden sm:inline">Inventory</span>
+            <span className="sm:hidden">Stock</span>
+          </TabsTrigger>
+          <TabsTrigger value="orders" className="text-xs sm:text-sm py-2 px-2">
+            <span className="hidden sm:inline">Orders & Appointments</span>
+            <span className="sm:hidden">Orders</span>
+          </TabsTrigger>
+          <TabsTrigger value="grooming" className="text-xs sm:text-sm py-2 px-2">
+            <span className="hidden sm:inline">Grooming Settings</span>
+            <span className="sm:hidden">Settings</span>
+          </TabsTrigger>
+          <TabsTrigger value="users" className="text-xs sm:text-sm py-2 px-2">
+            Users
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="inventory" className="space-y-6">
