@@ -13,15 +13,6 @@ import {
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
-  
-  // Debug middleware to log all session activity
-  app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path} - Session ID: ${req.sessionID || 'none'}`);
-    console.log('Session data:', req.session);
-    next();
-  });
 
   // Customer signup
   app.post('/api/auth/signup', async (req, res) => {
@@ -46,12 +37,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastName,
       });
 
-      // Set session data
-      (req.session as any).user = newUser;
-      (req.session as any).isAuthenticated = true;
+      // Generate JWT token
+      const token = generateToken(newUser);
+      setAuthCookie(res, token);
       
-      console.log('User created, session set:', newUser.id);
-      console.log('Session ID after signup:', req.sessionID);
+      console.log('User created, token generated:', newUser.id);
       const { password: _, ...userWithoutPassword } = newUser;
       res.json(userWithoutPassword);
     } catch (error) {
@@ -80,12 +70,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      // Set session data
-      (req.session as any).user = user;
-      (req.session as any).isAuthenticated = true;
+      // Generate JWT token
+      const token = generateToken(user);
+      setAuthCookie(res, token);
       
-      console.log('User logged in, session set:', user.id);
-      console.log('Session ID after login:', req.sessionID);
+      console.log('User logged in, token generated:', user.id);
       const { password: _, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
     } catch (error) {
@@ -96,28 +85,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Logout
   app.post('/api/auth/logout', (req, res) => {
-    req.session.destroy((err) => {
-      if (err) {
-        console.error('Logout error:', err);
-        return res.status(500).json({ message: "Logout failed" });
-      }
-      res.clearCookie('connect.sid');
-      res.json({ message: "Logged out successfully" });
-    });
+    res.clearCookie('auth_token');
+    res.json({ message: "Logged out successfully" });
   });
 
   // Auth routes
-  app.get('/api/auth/user', async (req, res) => {
+  app.get('/api/auth/user', (req, res) => {
     try {
-      const sessionUser = (req.session as any)?.user;
-      const isAuthenticated = (req.session as any)?.isAuthenticated;
-      
-      if (!sessionUser || !isAuthenticated) {
+      const token = req.cookies?.auth_token;
+      if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      // Return user data without password
-      const { password: _, ...userWithoutPassword } = sessionUser;
-      res.json(userWithoutPassword);
+
+      const user = verifyToken(token);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+
+      res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
