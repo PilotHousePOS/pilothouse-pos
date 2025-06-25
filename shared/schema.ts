@@ -106,7 +106,7 @@ export const orderItems = pgTable("order_items", {
 export const appointments = pgTable("appointments", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").notNull().references(() => users.id),
-  serviceType: varchar("service_type", { length: 100 }).notNull(), // grooming, vet, training
+  serviceType: varchar("service_type", { length: 100 }).notNull(), // grooming
   appointmentDate: date("appointment_date").notNull(),
   appointmentTime: varchar("appointment_time", { length: 20 }).notNull(),
   petName: varchar("pet_name", { length: 255 }).notNull(),

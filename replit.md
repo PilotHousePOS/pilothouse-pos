@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Project Overview
-A mobile-friendly web application for "Animal House" pet store featuring pet browsing, appointment booking, supply purchasing, inventory management, customer accounts with admin functionality, and Animal House branding. The app has a dark, bold design with pricing: grooming from $20 (baths) to $35 (full service), no vet care or training services, and highlighting exotic reptiles as a specialty.
+A mobile-friendly web application for "Animal House" pet store featuring pet browsing, grooming appointment booking, supply purchasing, inventory management, customer accounts with admin functionality, and Animal House branding. The app has a dark, bold design focusing on grooming services (bath and full service), pet adoption, and exotic reptile specialty - no vet care or training services offered.
 
 ## Recent Changes
 - **June 25, 2025**: Simplified authentication system implementation
@@ -15,7 +15,7 @@ A mobile-friendly web application for "Animal House" pet store featuring pet bro
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
 - No free services - but don't display prices in booking appointments
-- Remove vet care and training services completely
+- Remove vet care and training services completely - only grooming services offered
 - Add exotic reptiles as specialty instead of training
 - Customer login should redirect to full-access customer homepage, not welcome page
 - Authentication must work reliably without session persistence issues
