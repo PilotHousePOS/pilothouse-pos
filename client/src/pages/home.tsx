@@ -37,13 +37,13 @@ export default function Home() {
     retry: false,
   });
 
-  const featuredPets = pets.slice(0, 2);
-  const featuredSupplies = supplies.slice(0, 3);
-  const cartCount = cartItems.length;
+  const featuredPets = (pets as any[]).slice(0, 2);
+  const featuredSupplies = (supplies as any[]).slice(0, 3);
+  const cartCount = (cartItems as any[]).length;
 
   // Calculate stats
-  const totalPets = pets.filter(p => p.isAvailable).length;
-  const totalSupplies = supplies.length;
+  const totalPets = (pets as any[]).filter((p: any) => p.isAvailable).length;
+  const totalSupplies = (supplies as any[]).length;
 
   return (
     <div className="pb-20 bg-gradient-to-b from-gray-50 to-white">
@@ -71,7 +71,9 @@ export default function Home() {
               <h1 className="text-xl font-bold bg-gradient-to-r from-brand-blue to-brand-red bg-clip-text text-transparent">
                 Animal House
               </h1>
-              <p className="text-xs text-gray-500 font-medium">Where pets find families ✨</p>
+              <p className="text-xs text-gray-500 font-medium">
+                {user ? `Welcome, ${(user as any).firstName}${(user as any).isAdmin ? ' (Admin)' : ''}` : 'Where pets find families'}
+              </p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -183,7 +185,7 @@ export default function Home() {
           </Card>
         ) : (
           <div className="space-y-4">
-            {featuredPets.map((pet) => (
+            {featuredPets.map((pet: any) => (
               <Card key={pet.id} className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm">
                 <CardContent className="p-0">
                   <div className="flex">
