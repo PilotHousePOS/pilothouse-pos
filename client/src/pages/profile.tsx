@@ -21,10 +21,11 @@ export default function Profile() {
   const [, setLocation] = useLocation();
   const hasToken = !!localStorage.getItem('auth_token');
 
-  const { data: currentUser, isLoading: userLoading } = useQuery<User>({
+  const { data: currentUser, isLoading: userLoading, error } = useQuery<User>({
     queryKey: ["/api/auth/user"],
     enabled: hasToken,
     retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const { data: customerPets = [] } = useQuery<CustomerPet[]>({
@@ -42,7 +43,7 @@ export default function Profile() {
     enabled: hasToken && !!currentUser,
   });
 
-  // Redirect to home if not authenticated
+  // Handle authentication errors and redirects
   useEffect(() => {
     if (!hasToken) {
       toast({
@@ -55,7 +56,20 @@ export default function Profile() {
       }, 1000);
       return;
     }
-  }, [hasToken, toast]);
+
+    if (error && !userLoading) {
+      console.error("Profile authentication error:", error);
+      toast({
+        title: "Session expired",
+        description: "Please sign in again.",
+        variant: "destructive",
+      });
+      localStorage.removeItem('auth_token');
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
+    }
+  }, [hasToken, error, userLoading, toast]);
 
   if (!hasToken) return null;
 

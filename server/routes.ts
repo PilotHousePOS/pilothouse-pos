@@ -92,8 +92,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.get('/api/auth/user', (req, res) => {
     try {
-      const token = req.cookies?.auth_token;
+      // Check both cookies and Authorization header
+      const cookieToken = req.cookies?.auth_token;
+      const authHeader = req.headers.authorization;
+      const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+      
+      const token = headerToken || cookieToken;
+      
       console.log('Auth check - cookies:', req.cookies);
+      console.log('Auth check - authorization header:', authHeader);
       console.log('Auth check - token found:', !!token);
       
       if (!token) {
