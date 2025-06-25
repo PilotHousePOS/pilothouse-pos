@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
+import type { User } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,6 +35,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 
 export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const typedUser = user as User;
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isAddPetOpen, setIsAddPetOpen] = useState(false);
@@ -49,7 +51,7 @@ export default function Admin() {
     );
   }
 
-  if (!user?.isAdmin) {
+  if (!typedUser?.isAdmin) {
     return (
       <div className="p-6">
         <div className="text-center">
@@ -63,32 +65,32 @@ export default function Admin() {
 
   const { data: pets = [] } = useQuery({
     queryKey: ["/api/pets"],
-    enabled: isAuthenticated && user?.isAdmin,
+    enabled: isAuthenticated && typedUser?.isAdmin,
   });
 
   const { data: supplies = [] } = useQuery({
     queryKey: ["/api/supplies"],
-    enabled: isAuthenticated && user?.isAdmin,
+    enabled: isAuthenticated && typedUser?.isAdmin,
   });
 
   const { data: orders = [] } = useQuery({
     queryKey: ["/api/orders"],
-    enabled: isAuthenticated && user?.isAdmin,
+    enabled: isAuthenticated && typedUser?.isAdmin,
   });
 
   const { data: appointments = [] } = useQuery({
     queryKey: ["/api/appointments"],
-    enabled: isAuthenticated && user?.isAdmin,
+    enabled: isAuthenticated && typedUser?.isAdmin,
   });
 
   const { data: users = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/users"],
-    enabled: isAuthenticated && user?.isAdmin,
+    enabled: isAuthenticated && typedUser?.isAdmin,
   });
 
   const { data: groomingSettings = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/grooming-settings"],
-    enabled: isAuthenticated && user?.isAdmin,
+    enabled: isAuthenticated && typedUser?.isAdmin,
   });
 
   // Create Pet Mutation
