@@ -26,7 +26,8 @@ import {
   Calendar,
   ShoppingBag,
   PawPrint,
-  Package
+  Package,
+  Shield
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -163,7 +164,7 @@ export default function Admin() {
     },
   });
 
-  if (isLoading || !user?.isAdmin) {
+  if (isLoading) {
     return (
       <div className="px-6 py-4 pb-20">
         <div className="animate-pulse space-y-4">
@@ -172,6 +173,17 @@ export default function Admin() {
             <div className="h-24 bg-gray-200 rounded"></div>
             <div className="h-24 bg-gray-200 rounded"></div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user?.isAdmin) {
+    return (
+      <div className="px-6 py-4 pb-20">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
+          <p className="text-gray-600">You need admin privileges to access this page.</p>
         </div>
       </div>
     );
