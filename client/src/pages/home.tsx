@@ -249,8 +249,22 @@ export default function Home() {
                 <span className="text-2xl">✂️</span>
               </div>
               <h4 className="font-bold text-gray-900 mb-1">Grooming</h4>
-              <p className="text-green-700 text-sm font-medium">FREE Service</p>
+              <p className="text-green-700 text-sm font-medium">Prices Vary</p>
               <p className="text-gray-600 text-xs mt-1">Professional styling</p>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
+            onClick={() => setLocation('/pets')}
+          >
+            <CardContent className="p-6 text-center">
+              <div className="w-12 h-12 bg-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
+                <span className="text-2xl">🦎</span>
+              </div>
+              <h4 className="font-bold text-gray-900 mb-1">Exotic Reptiles</h4>
+              <p className="text-purple-700 text-sm font-medium">Specialty Pets</p>
+              <p className="text-gray-600 text-xs mt-1">Rare species</p>
             </CardContent>
           </Card>
 
@@ -260,25 +274,11 @@ export default function Home() {
           >
             <CardContent className="p-6 text-center">
               <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                <span className="text-2xl">🏥</span>
+                <span className="text-2xl">📅</span>
               </div>
-              <h4 className="font-bold text-gray-900 mb-1">Vet Care</h4>
-              <p className="text-blue-700 text-sm font-medium">From $75</p>
-              <p className="text-gray-600 text-xs mt-1">Health checkups</p>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
-            onClick={() => setLocation('/booking')}
-          >
-            <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 bg-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                <span className="text-2xl">🎓</span>
-              </div>
-              <h4 className="font-bold text-gray-900 mb-1">Training</h4>
-              <p className="text-purple-700 text-sm font-medium">From $60</p>
-              <p className="text-gray-600 text-xs mt-1">Expert coaching</p>
+              <h4 className="font-bold text-gray-900 mb-1">Book Grooming</h4>
+              <p className="text-blue-700 text-sm font-medium">Schedule Now</p>
+              <p className="text-gray-600 text-xs mt-1">Bath & full service</p>
             </CardContent>
           </Card>
 
