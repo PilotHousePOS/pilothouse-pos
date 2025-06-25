@@ -25,8 +25,10 @@ export default function Auth() {
       
       if (response.ok) {
         console.log('Login successful, redirecting...');
-        // Force complete page refresh to pick up session
-        window.location.replace('/');
+        // Add a small delay to ensure cookie is set, then redirect
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 100);
       } else {
         const error = await response.json();
         console.error('Login failed:', error.message);
@@ -52,8 +54,10 @@ export default function Auth() {
       
       if (response.ok) {
         console.log('Signup successful, redirecting...');
-        // Force complete page refresh to pick up session
-        window.location.replace('/');
+        // Add a small delay to ensure cookie is set, then redirect
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 100);
       } else {
         const error = await response.json();
         console.error('Signup failed:', error.message);

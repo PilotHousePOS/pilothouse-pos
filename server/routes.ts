@@ -93,11 +93,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/auth/user', (req, res) => {
     try {
       const token = req.cookies?.auth_token;
+      console.log('Auth check - cookies:', req.cookies);
+      console.log('Auth check - token found:', !!token);
+      
       if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
       const user = verifyToken(token);
+      console.log('Auth check - user verified:', !!user);
+      
       if (!user) {
         return res.status(401).json({ message: "Invalid token" });
       }

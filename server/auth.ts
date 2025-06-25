@@ -25,11 +25,16 @@ export function verifyToken(token: string): User | null {
 export function authMiddleware(req: AuthRequest, res: Response, next: NextFunction) {
   const token = req.cookies?.auth_token || req.headers.authorization?.replace('Bearer ', '');
   
+  console.log('Auth middleware - Token found:', !!token);
+  console.log('Cookies:', req.cookies);
+  
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
   const user = verifyToken(token);
+  console.log('Auth middleware - User verified:', !!user);
+  
   if (!user) {
     return res.status(401).json({ message: 'Invalid token' });
   }
@@ -39,6 +44,7 @@ export function authMiddleware(req: AuthRequest, res: Response, next: NextFuncti
 }
 
 export function setAuthCookie(res: Response, token: string) {
+  console.log('Setting auth cookie with token length:', token.length);
   res.cookie('auth_token', token, {
     httpOnly: false,
     secure: false,
