@@ -199,7 +199,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/pets", authMiddleware, async (req: any, res) => {
     try {
-      if (!req.user?.id) {
+      const userId = (req as any).user?.id;
+      if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
       const user = await storage.getUser(req.user.id);
@@ -221,7 +222,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/pets/:id", authMiddleware, async (req: any, res) => {
     try {
-      if (!req.user?.id) {
+      const userId = (req as any).user?.id;
+      if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
       const user = await storage.getUser(req.user.id);
@@ -244,7 +246,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/pets/:id", authMiddleware, async (req: any, res) => {
     try {
-      if (!req.user?.id) {
+      const userId = (req as any).user?.id;
+      if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
       const user = await storage.getUser(req.user.id);
@@ -410,7 +413,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Cart routes
   app.get("/api/cart", authMiddleware, async (req: any, res) => {
     try {
-      const userId = req.user?.id;
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const cartItems = await storage.getCartItems(userId);
       res.json(cartItems);
     } catch (error) {
@@ -421,7 +427,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/cart", authMiddleware, async (req: any, res) => {
     try {
-      const userId = req.user?.id;
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const cartItemData = insertCartItemSchema.parse({ ...req.body, userId });
       const cartItem = await storage.addToCart(cartItemData);
       res.json(cartItem);
