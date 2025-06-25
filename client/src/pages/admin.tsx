@@ -38,6 +38,10 @@ export default function Admin() {
   const queryClient = useQueryClient();
   const [isAddPetOpen, setIsAddPetOpen] = useState(false);
   const [isAddSupplyOpen, setIsAddSupplyOpen] = useState(false);
+  const [editingPet, setEditingPet] = useState(null);
+  const [editingSupply, setEditingSupply] = useState(null);
+  const [editingOrder, setEditingOrder] = useState(null);
+  const [editingAppointment, setEditingAppointment] = useState(null);
 
   // Show loading while checking authentication
   if (isLoading) {
@@ -166,6 +170,134 @@ export default function Admin() {
       toast({
         title: "Error",
         description: "Failed to add supply.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Edit Pet Mutation
+  const editPetMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      await apiRequest("PUT", `/api/pets/${id}`, data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Pet Updated",
+        description: "Pet has been updated successfully.",
+      });
+      setEditingPet(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update pet.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete Pet Mutation
+  const deletePetMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/pets/${id}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Pet Deleted",
+        description: "Pet has been deleted successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to delete pet.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Edit Supply Mutation
+  const editSupplyMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      await apiRequest("PUT", `/api/supplies/${id}`, data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Supply Updated",
+        description: "Supply has been updated successfully.",
+      });
+      setEditingSupply(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update supply.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete Supply Mutation
+  const deleteSupplyMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/supplies/${id}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Supply Deleted",
+        description: "Supply has been deleted successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to delete supply.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update Order Status Mutation
+  const updateOrderMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: string }) => {
+      await apiRequest("PUT", `/api/orders/${id}`, { status });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Order Updated",
+        description: "Order status has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update order.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update Appointment Status Mutation
+  const updateAppointmentMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: string }) => {
+      await apiRequest("PUT", `/api/appointments/${id}`, { status });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Appointment Updated",
+        description: "Appointment status has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update appointment.",
         variant: "destructive",
       });
     },
@@ -379,15 +511,23 @@ export default function Admin() {
                         {appointment.serviceType} • {appointment.appointmentDate} at {appointment.appointmentTime}
                       </p>
                     </div>
-                    <Badge 
-                      variant={
-                        appointment.status === 'scheduled' ? 'secondary' :
-                        appointment.status === 'confirmed' ? 'default' :
-                        appointment.status === 'completed' ? 'default' : 'destructive'
-                      }
-                    >
-                      {appointment.status}
-                    </Badge>
+                    <div className="flex items-center space-x-2">
+                      <Select 
+                        value={appointment.status} 
+                        onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
+                      >
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="scheduled">Scheduled</SelectItem>
+                          <SelectItem value="in-progress">In Progress</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
+                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                          <SelectItem value="no-show">No Show</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
