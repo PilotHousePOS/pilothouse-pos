@@ -33,6 +33,8 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: { email: string; password: string; firstName: string; lastName: string }): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
+  updateUserAdmin(id: string, isAdmin: boolean): Promise<User>;
+  getAllUsers(): Promise<User[]>;
 
   // Pet operations
   getAllPets(): Promise<Pet[]>;
@@ -465,6 +467,19 @@ export class DatabaseStorage implements IStorage {
 
   async deleteCustomerPet(id: number): Promise<void> {
     await db.delete(customerPets).where(eq(customerPets.id, id));
+  }
+
+  async updateUserAdmin(id: string, isAdmin: boolean): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ isAdmin, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
   }
 }
 
