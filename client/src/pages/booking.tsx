@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useMemo } from "react";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,11 +17,12 @@ const SERVICES = [
   { id: 'grooming-bath', name: 'Bath Only', description: 'Professional bath and dry', price: 20 },
 ];
 
-const TIME_SLOTS = [
-  '9:00 AM', '10:30 AM', '1:00 PM', '2:30 PM', '4:00 PM', '5:30 PM'
-];
-
 export default function Booking() {
+  // Fetch grooming settings
+  const { data: groomingSettings = [] } = useQuery({
+    queryKey: ["/api/admin/grooming-settings"],
+    retry: false,
+  });
   const [selectedService, setSelectedService] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState('');
@@ -33,6 +34,69 @@ export default function Booking() {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Generate available time slots based on settings
+  const availableTimeSlots = useMemo(() => {
+    const settings = groomingSettings as any[];
+    const startTime = settings.find(s => s.setting === 'start_time')?.value || '09:00';
+    const endTime = settings.find(s => s.setting === 'end_time')?.value || '17:00';
+    const duration = parseInt(settings.find(s => s.setting === 'appointment_duration')?.value || '90');
+    
+    const slots = [];
+    const [startHour, startMin] = startTime.split(':').map(Number);
+    const [endHour, endMin] = endTime.split(':').map(Number);
+    
+    let currentTime = new Date();
+    currentTime.setHours(startHour, startMin, 0, 0);
+    
+    const endDateTime = new Date();
+    endDateTime.setHours(endHour, endMin, 0, 0);
+    
+    while (currentTime < endDateTime) {
+      const timeString = currentTime.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit', 
+        hour12: true 
+      });
+      slots.push(timeString);
+      currentTime.setMinutes(currentTime.getMinutes() + duration);
+    }
+    
+    return slots;
+  }, [groomingSettings]);
+
+  // Check if a date is available for booking
+  const isDateAvailable = (date: Date) => {
+    const settings = groomingSettings as any[];
+    const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    const dayEnabledSetting = settings.find(s => s.setting === `${dayName}_enabled`);
+    const isDayEnabled = dayEnabledSetting ? dayEnabledSetting.value === 'true' : true;
+    
+    if (!isDayEnabled) return false;
+    
+    // Check blocked dates
+    const blockedDates = settings.find(s => s.setting === 'blocked_dates')?.value || '';
+    const dateString = date.toISOString().split('T')[0];
+    const blockedList = blockedDates.split(',').map((d: string) => d.trim()).filter((d: string) => d);
+    
+    if (blockedList.includes(dateString)) return false;
+    
+    // Check advance booking limit
+    const advanceBookingDays = parseInt(settings.find(s => s.setting === 'advance_booking_days')?.value || '30');
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + advanceBookingDays);
+    
+    if (date > maxDate) return false;
+    
+    // Check minimum notice
+    const minimumNoticeHours = parseInt(settings.find(s => s.setting === 'minimum_notice_hours')?.value || '24');
+    const minDate = new Date();
+    minDate.setHours(minDate.getHours() + minimumNoticeHours);
+    
+    if (date < minDate) return false;
+    
+    return true;
+  };
 
   const createAppointmentMutation = useMutation({
     mutationFn: async (appointmentData: any) => {
@@ -134,7 +198,7 @@ export default function Booking() {
                 mode="single"
                 selected={selectedDate}
                 onSelect={setSelectedDate}
-                disabled={(date) => date < new Date()}
+                disabled={(date) => !isDateAvailable(date)}
                 className="rounded-md border-none"
               />
             </CardContent>
@@ -145,7 +209,7 @@ export default function Booking() {
         <div>
           <Label className="text-sm font-semibold text-gray-900 mb-3 block">Available Times</Label>
           <div className="grid grid-cols-3 gap-3">
-            {TIME_SLOTS.map((time) => (
+            {availableTimeSlots.map((time) => (
               <Button
                 key={time}
                 type="button"
