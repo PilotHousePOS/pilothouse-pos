@@ -5,8 +5,20 @@ import type { User } from '@shared/schema';
 const JWT_SECRET = process.env.SESSION_SECRET || 'fallback-secret-key';
 const JWT_EXPIRES = '7d';
 
+// JWT User type - matches what's stored in the token
+export interface JWTUser {
+  id: string;
+  email: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  profileImageUrl: string | null;
+  isAdmin: boolean | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+}
+
 export interface AuthRequest extends Request {
-  user?: User;
+  user?: JWTUser;
 }
 
 export function generateToken(user: User): string {
@@ -14,12 +26,12 @@ export function generateToken(user: User): string {
   return jwt.sign(userWithoutPassword, JWT_SECRET, { expiresIn: JWT_EXPIRES });
 }
 
-export function verifyToken(token: string): User | null {
+export function verifyToken(token: string): JWTUser | null {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
     // Ensure the decoded token has the correct User structure
     if (decoded && typeof decoded === 'object' && decoded.id) {
-      return decoded as User;
+      return decoded as JWTUser;
     }
     return null;
   } catch (error) {
