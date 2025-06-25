@@ -11,8 +11,16 @@ export default function Home() {
   const { user } = useAuth();
   
   const handleLogout = () => {
+    // Clear token from localStorage
     localStorage.removeItem('auth_token');
-    window.location.href = '/';
+    console.log('Token removed from localStorage');
+    
+    // Call logout API 
+    fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+      .finally(() => {
+        // Force redirect to landing page
+        window.location.href = '/';
+      });
   };
   const [, setLocation] = useLocation();
 
