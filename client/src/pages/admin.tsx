@@ -717,17 +717,32 @@ export default function Admin() {
                 <h3 className="text-lg font-semibold">Available Days</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => {
-                    const isEnabled = groomingSettings.find(s => s.setting === `${day.toLowerCase()}_enabled`)?.value !== 'false';
+                    const settingName = `${day.toLowerCase()}_enabled`;
+                    const currentSetting = groomingSettings.find(s => s.setting === settingName);
+                    const isEnabled = currentSetting ? currentSetting.value === 'true' : true; // Default to true if not set
+                    
                     return (
-                      <div key={day} className="flex items-center space-x-2">
+                      <div key={day} className="flex items-center space-x-3">
                         <Switch
                           checked={isEnabled}
-                          onCheckedChange={(checked) => updateGroomingSettingMutation.mutate({
-                            setting: `${day.toLowerCase()}_enabled`,
-                            value: checked.toString()
-                          })}
+                          onCheckedChange={(checked) => {
+                            console.log(`Updating ${settingName} to ${checked}`);
+                            updateGroomingSettingMutation.mutate({
+                              setting: settingName,
+                              value: checked.toString()
+                            });
+                          }}
+                          disabled={updateGroomingSettingMutation.isPending}
                         />
-                        <label className="text-sm font-medium">{day}</label>
+                        <label className="text-sm font-medium cursor-pointer" onClick={() => {
+                          const newValue = !isEnabled;
+                          updateGroomingSettingMutation.mutate({
+                            setting: settingName,
+                            value: newValue.toString()
+                          });
+                        }}>
+                          {day}
+                        </label>
                       </div>
                     );
                   })}
