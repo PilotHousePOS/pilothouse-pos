@@ -39,20 +39,27 @@ export default function Admin() {
   const [isAddPetOpen, setIsAddPetOpen] = useState(false);
   const [isAddSupplyOpen, setIsAddSupplyOpen] = useState(false);
 
-  // Redirect if not admin
-  useEffect(() => {
-    if (!isLoading && (!isAuthenticated || !user?.isAdmin)) {
-      toast({
-        title: "Access Denied",
-        description: "Admin access required.",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 500);
-      return;
-    }
-  }, [isAuthenticated, isLoading, user, toast]);
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="p-6">
+        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto" />
+      </div>
+    );
+  }
+
+  // Show access denied for non-admin users
+  if (!user?.isAdmin) {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
+          <p className="text-gray-600">Administrator privileges required</p>
+        </div>
+      </div>
+    );
+  }
 
   const { data: pets = [] } = useQuery({
     queryKey: ["/api/pets"],
