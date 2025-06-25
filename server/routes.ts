@@ -353,6 +353,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/supplies/:id", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const supplyData = insertSupplySchema.partial().parse(req.body);
+      const supply = await storage.updateSupply(id, supplyData);
+      res.json(supply);
+    } catch (error) {
+      console.error("Error updating supply:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid supply data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update supply" });
+    }
+  });
+
+  app.delete("/api/supplies/:id", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      await storage.deleteSupply(id);
+      res.json({ message: "Supply deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting supply:", error);
+      res.status(500).json({ message: "Failed to delete supply" });
+    }
+  });
+
   // Cart routes
   app.get("/api/cart", authMiddleware, async (req: AuthRequest, res) => {
     try {
@@ -420,6 +456,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/orders/:id", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const { status } = req.body;
+      const order = await storage.updateOrderStatus(id, status);
+      res.json(order);
+    } catch (error) {
+      console.error("Error updating order:", error);
+      res.status(500).json({ message: "Failed to update order" });
+    }
+  });
+
   app.post("/api/orders", authMiddleware, async (req: AuthRequest, res) => {
     try {
       const userId = req.user?.id;
@@ -467,6 +520,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching appointments:", error);
       res.status(500).json({ message: "Failed to fetch appointments" });
+    }
+  });
+
+  app.put("/api/appointments/:id", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const { status } = req.body;
+      const appointment = await storage.updateAppointmentStatus(id, status);
+      res.json(appointment);
+    } catch (error) {
+      console.error("Error updating appointment:", error);
+      res.status(500).json({ message: "Failed to update appointment" });
     }
   });
 
