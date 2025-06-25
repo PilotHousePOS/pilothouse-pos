@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,31 +14,32 @@ import {
   Plus,
   Shield
 } from "lucide-react";
+import type { User, CustomerPet, Order, Appointment } from "@shared/schema";
 
 export default function Profile() {
-  const { user, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const hasToken = !!localStorage.getItem('auth_token');
 
-  const { data: customerPets = [] } = useQuery({
-    queryKey: ["/api/customer-pets"],
-    enabled: hasToken,
-  });
-
-  const { data: orders = [] } = useQuery({
-    queryKey: ["/api/orders"],
-    enabled: hasToken,
-  });
-
-  const { data: appointments = [] } = useQuery({
-    queryKey: ["/api/appointments"],
-    enabled: hasToken,
-  });
-
-  const { data: currentUser } = useQuery({
+  const { data: currentUser, isLoading: userLoading } = useQuery<User>({
     queryKey: ["/api/auth/user"],
     enabled: hasToken,
+    retry: false,
+  });
+
+  const { data: customerPets = [] } = useQuery<CustomerPet[]>({
+    queryKey: ["/api/customer-pets"],
+    enabled: hasToken && !!currentUser,
+  });
+
+  const { data: orders = [] } = useQuery<Order[]>({
+    queryKey: ["/api/orders"],
+    enabled: hasToken && !!currentUser,
+  });
+
+  const { data: appointments = [] } = useQuery<Appointment[]>({
+    queryKey: ["/api/appointments"],
+    enabled: hasToken && !!currentUser,
   });
 
   // Redirect to home if not authenticated
@@ -59,9 +59,7 @@ export default function Profile() {
 
   if (!hasToken) return null;
 
-  const displayUser = currentUser || user;
-
-  if (!displayUser) {
+  if (userLoading || !currentUser) {
     return (
       <div className="px-6 py-4 pb-20">
         <div className="animate-pulse space-y-4">
@@ -79,22 +77,22 @@ export default function Profile() {
     window.location.href = '/';
   };
 
-  const userInitials = displayUser.firstName && displayUser.lastName 
-    ? `${displayUser.firstName[0]}${displayUser.lastName[0]}`.toUpperCase()
-    : displayUser.email?.[0]?.toUpperCase() || 'U';
+  const userInitials = currentUser?.firstName && currentUser?.lastName 
+    ? `${currentUser.firstName[0]}${currentUser.lastName[0]}`.toUpperCase()
+    : currentUser?.email?.[0]?.toUpperCase() || 'U';
 
-  const userName = displayUser.firstName && displayUser.lastName
-    ? `${displayUser.firstName} ${displayUser.lastName}`
-    : displayUser.email || 'User';
+  const userName = currentUser?.firstName && currentUser?.lastName
+    ? `${currentUser.firstName} ${currentUser.lastName}`
+    : currentUser?.email || 'User';
 
   return (
     <div className="px-6 py-4 pb-20">
       {/* Profile Header */}
       <div className="text-center mb-8">
         <div className="w-20 h-20 bg-brand-red rounded-full mx-auto mb-4 flex items-center justify-center">
-          {displayUser.profileImageUrl ? (
+          {currentUser?.profileImageUrl ? (
             <img 
-              src={displayUser.profileImageUrl} 
+              src={currentUser.profileImageUrl} 
               alt="Profile" 
               className="w-20 h-20 rounded-full object-cover"
             />
@@ -103,7 +101,7 @@ export default function Profile() {
           )}
         </div>
         <h2 className="text-xl font-bold text-gray-900">{userName}</h2>
-        <p className="text-sm text-gray-500">{displayUser.email}</p>
+        <p className="text-sm text-gray-500">{currentUser?.email}</p>
         <div className="flex justify-center mt-2">
           <Badge variant="secondary" className="bg-green-100 text-green-700">
             Premium Member
@@ -129,7 +127,7 @@ export default function Profile() {
               </CardContent>
             </Card>
           ) : (
-            customerPets.map((pet) => (
+            customerPets.map((pet: CustomerPet) => (
               <Card key={pet.id} className="shadow-sm">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
@@ -200,7 +198,7 @@ export default function Profile() {
       </div>
 
       {/* Admin Panel */}
-      {displayUser.isAdmin && (
+      {currentUser?.isAdmin && (
         <div className="mb-8">
           <Card className="bg-gradient-to-r from-brand-blue to-brand-red text-white">
             <CardContent className="p-4">
