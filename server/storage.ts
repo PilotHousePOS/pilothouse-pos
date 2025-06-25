@@ -7,6 +7,7 @@ import {
   orderItems,
   appointments,
   customerPets,
+  groomingSettings,
   type User,
   type UpsertUser,
   type Pet,
@@ -23,6 +24,8 @@ import {
   type InsertAppointment,
   type CustomerPet,
   type InsertCustomerPet,
+  type GroomingSetting,
+  type InsertGroomingSetting,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, ilike } from "drizzle-orm";
@@ -77,6 +80,11 @@ export interface IStorage {
   createCustomerPet(pet: InsertCustomerPet): Promise<CustomerPet>;
   updateCustomerPet(id: number, pet: Partial<InsertCustomerPet>): Promise<CustomerPet>;
   deleteCustomerPet(id: number): Promise<void>;
+
+  // Grooming settings operations
+  getGroomingSettings(): Promise<GroomingSetting[]>;
+  getGroomingSetting(setting: string): Promise<GroomingSetting | undefined>;
+  upsertGroomingSetting(setting: InsertGroomingSetting): Promise<GroomingSetting>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -480,6 +488,31 @@ export class DatabaseStorage implements IStorage {
 
   async getAllUsers(): Promise<User[]> {
     return await db.select().from(users);
+  }
+
+  // Grooming settings operations
+  async getGroomingSettings(): Promise<GroomingSetting[]> {
+    return await db.select().from(groomingSettings);
+  }
+
+  async getGroomingSetting(setting: string): Promise<GroomingSetting | undefined> {
+    const [result] = await db.select().from(groomingSettings).where(eq(groomingSettings.setting, setting));
+    return result;
+  }
+
+  async upsertGroomingSetting(settingData: InsertGroomingSetting): Promise<GroomingSetting> {
+    const [result] = await db
+      .insert(groomingSettings)
+      .values(settingData)
+      .onConflictDoUpdate({
+        target: groomingSettings.setting,
+        set: {
+          value: settingData.value,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return result;
   }
 }
 

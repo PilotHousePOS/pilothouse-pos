@@ -131,6 +131,14 @@ export const customerPets = pgTable("customer_pets", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Grooming settings for admin control
+export const groomingSettings = pgTable("grooming_settings", {
+  id: serial("id").primaryKey(),
+  setting: varchar("setting", { length: 100 }).notNull().unique(), // 'available_days', 'start_time', 'end_time', 'max_appointments_per_day'
+  value: text("value").notNull(), // JSON string for complex values
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   cartItems: many(cartItems),
@@ -214,6 +222,11 @@ export const insertCustomerPetSchema = createInsertSchema(customerPets).omit({
   updatedAt: true,
 });
 
+export const insertGroomingSettingsSchema = createInsertSchema(groomingSettings).omit({
+  id: true,
+  updatedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -231,3 +244,5 @@ export type Appointment = typeof appointments.$inferSelect;
 export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
 export type CustomerPet = typeof customerPets.$inferSelect;
 export type InsertCustomerPet = z.infer<typeof insertCustomerPetSchema>;
+export type GroomingSetting = typeof groomingSettings.$inferSelect;
+export type InsertGroomingSetting = z.infer<typeof insertGroomingSettingsSchema>;
