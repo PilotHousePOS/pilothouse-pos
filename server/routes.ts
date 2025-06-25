@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { generateToken, verifyToken, authMiddleware, setAuthCookie, type AuthRequest } from "./auth";
 import {
   insertPetSchema,
   insertSupplySchema,
@@ -178,9 +178,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/pets", isAuthenticated, async (req: any, res) => {
+  app.post("/api/pets", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -197,9 +197,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/pets/:id", isAuthenticated, async (req: any, res) => {
+  app.put("/api/pets/:id", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -217,9 +217,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/pets/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/pets/:id", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -315,9 +315,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/supplies", isAuthenticated, async (req: any, res) => {
+  app.post("/api/supplies", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -335,9 +335,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Cart routes
-  app.get("/api/cart", isAuthenticated, async (req: any, res) => {
+  app.get("/api/cart", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user?.id;
       const cartItems = await storage.getCartItems(userId);
       res.json(cartItems);
     } catch (error) {
@@ -346,9 +346,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/cart", isAuthenticated, async (req: any, res) => {
+  app.post("/api/cart", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user?.id;
       const cartItemData = insertCartItemSchema.parse({ ...req.body, userId });
       const cartItem = await storage.addToCart(cartItemData);
       res.json(cartItem);
@@ -361,7 +361,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/cart/:id", isAuthenticated, async (req: any, res) => {
+  app.put("/api/cart/:id", authMiddleware, async (req: AuthRequest, res) => {
     try {
       const id = parseInt(req.params.id);
       const { quantity } = req.body;
@@ -373,7 +373,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/cart/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/cart/:id", authMiddleware, async (req: AuthRequest, res) => {
     try {
       const id = parseInt(req.params.id);
       await storage.removeFromCart(id);
@@ -385,9 +385,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Order routes
-  app.get("/api/orders", isAuthenticated, async (req: any, res) => {
+  app.get("/api/orders", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user?.id;
       const user = await storage.getUser(userId);
       
       const orders = user?.isAdmin 
@@ -401,9 +401,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/orders", isAuthenticated, async (req: any, res) => {
+  app.post("/api/orders", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user?.id;
       const { orderData, items } = req.body;
       
       const orderSchema = insertOrderSchema.extend({
@@ -435,9 +435,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Appointment routes
-  app.get("/api/appointments", isAuthenticated, async (req: any, res) => {
+  app.get("/api/appointments", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user?.id;
       const user = await storage.getUser(userId);
       
       const appointments = user?.isAdmin 
@@ -451,9 +451,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/appointments", isAuthenticated, async (req: any, res) => {
+  app.post("/api/appointments", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user?.id;
       const appointmentData = insertAppointmentSchema.parse({ ...req.body, userId });
       const appointment = await storage.createAppointment(appointmentData);
       res.json(appointment);
@@ -466,9 +466,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/appointments/:id", isAuthenticated, async (req: any, res) => {
+  app.put("/api/appointments/:id", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const user = await storage.getUser(req.user.claims.sub);
+      const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -484,9 +484,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Customer pet routes
-  app.get("/api/customer-pets", isAuthenticated, async (req: any, res) => {
+  app.get("/api/customer-pets", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user?.id;
       const pets = await storage.getCustomerPets(userId);
       res.json(pets);
     } catch (error) {
@@ -495,9 +495,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/customer-pets", isAuthenticated, async (req: any, res) => {
+  app.post("/api/customer-pets", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user?.id;
       const petData = insertCustomerPetSchema.parse({ ...req.body, userId });
       const pet = await storage.createCustomerPet(petData);
       res.json(pet);
