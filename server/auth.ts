@@ -23,18 +23,19 @@ export function verifyToken(token: string): User | null {
 }
 
 export function authMiddleware(req: AuthRequest, res: Response, next: NextFunction) {
+  console.log('Auth check - cookies:', req.cookies);
+  console.log('Auth check - authorization header:', req.headers.authorization);
+  
   const token = req.cookies?.auth_token || req.headers.authorization?.replace('Bearer ', '');
   
-  console.log('Auth middleware - Token from cookies:', !!req.cookies?.auth_token);
-  console.log('Auth middleware - Token from header:', !!req.headers.authorization);
-  console.log('Auth middleware - Final token found:', !!token);
+  console.log('Auth check - token found:', !!token);
   
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
   const user = verifyToken(token);
-  console.log('Auth middleware - User verified:', !!user);
+  console.log('Auth check - user verified:', !!user);
   
   if (!user) {
     return res.status(401).json({ message: 'Invalid token' });

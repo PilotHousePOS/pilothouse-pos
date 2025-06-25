@@ -6,12 +6,12 @@ export function useAuth() {
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/user"],
     retry: false,
-    enabled: hasToken, // Only query if token exists
+    enabled: false, // Disable automatic queries for now
   });
 
   return {
     user,
-    isLoading: hasToken ? isLoading : false,
-    isAuthenticated: hasToken && !!user && !error,
+    isLoading: false,
+    isAuthenticated: hasToken,
   };
 }

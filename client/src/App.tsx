@@ -31,10 +31,12 @@ function Router() {
     );
   }
 
+  const hasToken = !!localStorage.getItem('auth_token');
+  
   return (
     <div className="max-w-md mx-auto bg-white min-h-screen relative overflow-hidden">
       <Switch>
-        {!isAuthenticated ? (
+        {!hasToken ? (
           <>
             <Route path="/" component={Landing} />
             <Route path="/auth" component={Auth} />
@@ -51,7 +53,7 @@ function Router() {
         )}
         <Route component={NotFound} />
       </Switch>
-      {isAuthenticated && <BottomNav />}
+      {hasToken && <BottomNav />}
     </div>
   );
 }

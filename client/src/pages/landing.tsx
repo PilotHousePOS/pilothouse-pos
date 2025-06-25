@@ -5,13 +5,7 @@ import animalHouseLogoPath from "@assets/animal house logo full_1750438187184.jp
 import mascotLogoPath from "@assets/Circle Mascot Logo_1750438195696.jpg";
 
 export default function Landing() {
-  // Check if user is already logged in
-  const hasToken = localStorage.getItem('auth_token');
-  if (hasToken) {
-    console.log('User has token, redirecting to home');
-    window.location.href = '/';
-    return null;
-  }
+  // Don't redirect from landing page - let the router handle it
 
   const handleLogin = () => {
     // Navigate to dedicated auth page

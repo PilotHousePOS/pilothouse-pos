@@ -9,6 +9,11 @@ import animalHouseLogoPath from "@assets/Circle Mascot Logo_1750438195696.jpg";
 
 export default function Home() {
   const { user } = useAuth();
+  
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token');
+    window.location.href = '/';
+  };
   const [, setLocation] = useLocation();
 
   const { data: pets = [] } = useQuery({
