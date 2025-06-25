@@ -406,23 +406,25 @@ export default function Admin() {
       </div>
 
       <Tabs defaultValue="inventory" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 h-auto p-1">
-          <TabsTrigger value="inventory" className="text-xs sm:text-sm py-2 px-2">
-            <span className="hidden sm:inline">Inventory</span>
-            <span className="sm:hidden">Stock</span>
-          </TabsTrigger>
-          <TabsTrigger value="orders" className="text-xs sm:text-sm py-2 px-2">
-            <span className="hidden sm:inline">Orders & Appointments</span>
-            <span className="sm:hidden">Orders</span>
-          </TabsTrigger>
-          <TabsTrigger value="grooming" className="text-xs sm:text-sm py-2 px-2">
-            <span className="hidden sm:inline">Grooming Settings</span>
-            <span className="sm:hidden">Settings</span>
-          </TabsTrigger>
-          <TabsTrigger value="users" className="text-xs sm:text-sm py-2 px-2">
-            Users
-          </TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList className="inline-flex w-max min-w-full gap-1 h-auto p-1">
+            <TabsTrigger value="inventory" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
+              <span className="hidden md:inline">Inventory</span>
+              <span className="md:hidden">Stock</span>
+            </TabsTrigger>
+            <TabsTrigger value="orders" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
+              <span className="hidden md:inline">Orders & Appointments</span>
+              <span className="md:hidden">Orders</span>
+            </TabsTrigger>
+            <TabsTrigger value="grooming" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
+              <span className="hidden md:inline">Grooming Settings</span>
+              <span className="md:hidden">Settings</span>
+            </TabsTrigger>
+            <TabsTrigger value="users" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
+              Users
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="inventory" className="space-y-6">
           {/* Pets Section */}
