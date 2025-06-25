@@ -43,7 +43,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('User created, token generated:', newUser.id);
       const { password: _, ...userWithoutPassword } = newUser;
-      res.json(userWithoutPassword);
+      res.json({ ...userWithoutPassword, token });
     } catch (error) {
       console.error("Signup error:", error);
       res.status(500).json({ message: "Signup failed" });
@@ -76,7 +76,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('User logged in, token generated:', user.id);
       const { password: _, ...userWithoutPassword } = user;
-      res.json(userWithoutPassword);
+      res.json({ ...userWithoutPassword, token });
     } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ message: "Login failed" });

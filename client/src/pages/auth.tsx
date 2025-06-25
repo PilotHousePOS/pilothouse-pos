@@ -25,10 +25,17 @@ export default function Auth() {
       
       if (response.ok) {
         console.log('Login successful, redirecting...');
-        // Add a small delay to ensure cookie is set, then redirect
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 100);
+        const userData = await response.json();
+        console.log('User data received:', userData);
+        
+        // Store token in localStorage as backup to cookies
+        if (userData.token) {
+          localStorage.setItem('auth_token', userData.token);
+          console.log('Token stored in localStorage');
+        }
+        
+        // Force a complete page reload to ensure authentication state is picked up
+        window.location.replace('/');
       } else {
         const error = await response.json();
         console.error('Login failed:', error.message);
@@ -54,10 +61,17 @@ export default function Auth() {
       
       if (response.ok) {
         console.log('Signup successful, redirecting...');
-        // Add a small delay to ensure cookie is set, then redirect
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 100);
+        const userData = await response.json();
+        console.log('User data received:', userData);
+        
+        // Store token in localStorage as backup to cookies
+        if (userData.token) {
+          localStorage.setItem('auth_token', userData.token);
+          console.log('Token stored in localStorage');
+        }
+        
+        // Force a complete page reload to ensure authentication state is picked up
+        window.location.replace('/');
       } else {
         const error = await response.json();
         console.error('Signup failed:', error.message);
