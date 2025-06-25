@@ -16,21 +16,6 @@ import NotFound from "@/pages/not-found";
 import BottomNav from "@/components/bottom-nav";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-blue to-brand-red">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 mx-auto">
-            <div className="animate-spin w-8 h-8 border-4 border-brand-blue border-t-transparent rounded-full"></div>
-          </div>
-          <p className="text-white font-semibold">Loading Animal House...</p>
-        </div>
-      </div>
-    );
-  }
-
   const hasToken = !!localStorage.getItem('auth_token');
   
   return (

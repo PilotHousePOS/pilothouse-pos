@@ -4,14 +4,13 @@
 A mobile-friendly web application for "Animal House" pet store featuring pet browsing, appointment booking, supply purchasing, inventory management, customer accounts with admin functionality, and Animal House branding. The app has a dark, bold design with pricing: grooming from $20 (baths) to $35 (full service), no vet care or training services, and highlighting exotic reptiles as a specialty.
 
 ## Recent Changes
-- **June 25, 2025**: Complete authentication system rebuild
-  - Replaced unreliable server sessions with JWT token authentication
-  - Fixed persistent login redirect issues that prevented customer access
-  - JWT tokens now stored in secure cookies for proper persistence
-  - All protected routes updated to use new authentication middleware
-  - Backend authentication fully functional with proper token generation/verification
-  - Added CORS headers and credentials support for cookie-based authentication
-  - Fixed frontend fetch requests to include credentials for cookie persistence
+- **June 25, 2025**: Simplified authentication system implementation
+  - Implemented localStorage-based token authentication
+  - Fixed redirect loop issues that prevented app loading
+  - Created clear landing page → auth → authenticated home flow
+  - Added proper logout functionality that clears tokens and redirects
+  - Removed complex server authentication queries for routing
+  - Simple token presence check determines authentication state
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
