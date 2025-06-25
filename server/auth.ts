@@ -50,6 +50,7 @@ export function setAuthCookie(res: Response, token: string) {
     secure: false,
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    path: '/'
+    path: '/',
+    domain: undefined // Let browser determine domain
   });
 }

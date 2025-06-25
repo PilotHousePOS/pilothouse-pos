@@ -10,6 +10,8 @@ A mobile-friendly web application for "Animal House" pet store featuring pet bro
   - JWT tokens now stored in secure cookies for proper persistence
   - All protected routes updated to use new authentication middleware
   - Backend authentication fully functional with proper token generation/verification
+  - Added CORS headers and credentials support for cookie-based authentication
+  - Fixed frontend fetch requests to include credentials for cookie persistence
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
