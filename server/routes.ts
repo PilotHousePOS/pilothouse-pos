@@ -203,7 +203,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      const user = await storage.getUser(req.user.id);
+      const user = await storage.getUser(userId);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -226,7 +226,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      const user = await storage.getUser(req.user.id);
+      const user = await storage.getUser(userId);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -250,7 +250,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      const user = await storage.getUser(req.user.id);
+      const user = await storage.getUser(userId);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -352,7 +352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      const user = await storage.getUser(req.user.id);
+      const user = await storage.getUser(userId);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -375,7 +375,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      const user = await storage.getUser(req.user.id);
+      const user = await storage.getUser(userId);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -399,7 +399,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      const user = await storage.getUser(req.user.id);
+      const user = await storage.getUser(userId);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
@@ -503,7 +503,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/orders", authMiddleware, async (req: AuthRequest, res) => {
+  app.post("/api/orders", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;
       const { orderData, items } = req.body;
@@ -537,7 +537,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Appointment routes
-  app.get("/api/appointments", authMiddleware, async (req: AuthRequest, res) => {
+  app.get("/api/appointments", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;
       const user = await storage.getUser(userId);
@@ -570,7 +570,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/appointments", authMiddleware, async (req: AuthRequest, res) => {
+  app.post("/api/appointments", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;
       const appointmentData = insertAppointmentSchema.parse({ ...req.body, userId });
@@ -603,7 +603,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Customer pet routes
-  app.get("/api/customer-pets", authMiddleware, async (req: AuthRequest, res) => {
+  app.get("/api/customer-pets", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;
       const pets = await storage.getCustomerPets(userId);
@@ -614,7 +614,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/customer-pets", authMiddleware, async (req: AuthRequest, res) => {
+  app.post("/api/customer-pets", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;
       const petData = insertCustomerPetSchema.parse({ ...req.body, userId });
@@ -630,7 +630,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin user management routes
-  app.get("/api/admin/users", authMiddleware, async (req: AuthRequest, res) => {
+  app.get("/api/admin/users", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
@@ -646,7 +646,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/users/:userId/admin", authMiddleware, async (req: AuthRequest, res) => {
+  app.post("/api/admin/users/:userId/admin", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
@@ -670,7 +670,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Grooming settings routes
-  app.get("/api/admin/grooming-settings", authMiddleware, async (req: AuthRequest, res) => {
+  app.get("/api/admin/grooming-settings", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
@@ -684,7 +684,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/admin/grooming-settings", authMiddleware, async (req: AuthRequest, res) => {
+  app.put("/api/admin/grooming-settings", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });

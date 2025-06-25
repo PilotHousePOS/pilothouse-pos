@@ -39,7 +39,7 @@ export function verifyToken(token: string): JWTUser | null {
   }
 }
 
-export function authMiddleware(req: AuthRequest, res: Response, next: NextFunction) {
+export function authMiddleware(req: any, res: Response, next: NextFunction) {
   console.log('Auth check - cookies:', req.cookies);
   console.log('Auth check - authorization header:', req.headers.authorization);
   
