@@ -15,6 +15,13 @@ import { z } from "zod";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
+  
+  // Debug middleware to log all session activity
+  app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path} - Session ID: ${req.sessionID || 'none'}`);
+    console.log('Session data:', req.session);
+    next();
+  });
 
   // Customer signup
   app.post('/api/auth/signup', async (req, res) => {
@@ -39,20 +46,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastName,
       });
 
-      // Set session directly without regeneration
+      // Set session data
       (req.session as any).user = newUser;
+      (req.session as any).isAuthenticated = true;
       
-      req.session.save((saveErr) => {
-        if (saveErr) {
-          console.error('Session save error:', saveErr);
-          return res.status(500).json({ message: "Session save failed" });
-        }
-        
-        console.log('User created and session saved:', newUser.id);
-        console.log('Session ID:', req.sessionID);
-        const { password, ...userWithoutPassword } = newUser;
-        res.json(userWithoutPassword);
-      });
+      console.log('User created, session set:', newUser.id);
+      console.log('Session ID after signup:', req.sessionID);
+      const { password: _, ...userWithoutPassword } = newUser;
+      res.json(userWithoutPassword);
     } catch (error) {
       console.error("Signup error:", error);
       res.status(500).json({ message: "Signup failed" });
@@ -79,20 +80,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      // Set session directly without regeneration
+      // Set session data
       (req.session as any).user = user;
+      (req.session as any).isAuthenticated = true;
       
-      req.session.save((saveErr) => {
-        if (saveErr) {
-          console.error('Session save error:', saveErr);
-          return res.status(500).json({ message: "Session save failed" });
-        }
-        
-        console.log('User logged in and session saved:', user.id);
-        console.log('Session ID:', req.sessionID);
-        const { password, ...userWithoutPassword } = user;
-        res.json(userWithoutPassword);
-      });
+      console.log('User logged in, session set:', user.id);
+      console.log('Session ID after login:', req.sessionID);
+      const { password: _, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
     } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ message: "Login failed" });
@@ -114,15 +109,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.get('/api/auth/user', async (req, res) => {
     try {
-      console.log('Session ID check:', req.sessionID);
-      console.log('Session data:', req.session);
       const sessionUser = (req.session as any)?.user;
-      console.log('Session user:', sessionUser);
-      if (!sessionUser) {
+      const isAuthenticated = (req.session as any)?.isAuthenticated;
+      
+      if (!sessionUser || !isAuthenticated) {
         return res.status(401).json({ message: "Unauthorized" });
       }
       // Return user data without password
-      const { password, ...userWithoutPassword } = sessionUser;
+      const { password: _, ...userWithoutPassword } = sessionUser;
       res.json(userWithoutPassword);
     } catch (error) {
       console.error("Error fetching user:", error);
