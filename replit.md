@@ -14,11 +14,13 @@ A mobile-friendly web application for "Animal House" pet store featuring pet bro
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
-- No free services - grooming starts at $20 for baths, $35 for full service
+- No free services - but don't display prices in booking appointments
 - Remove vet care and training services completely
 - Add exotic reptiles as specialty instead of training
 - Customer login should redirect to full-access customer homepage, not welcome page
 - Authentication must work reliably without session persistence issues
+- Booking restrictions: No appointments on Sundays, no appointments after 1:30 PM
+- Grooming services: Only "Bath Only" and "Full Grooming" options
 
 ## Project Architecture
 - **Frontend**: React with Vite, TypeScript, Tailwind CSS, shadcn/ui components
