@@ -343,21 +343,54 @@ export default function Admin() {
   // Grooming Settings Mutation
   const updateGroomingSettingMutation = useMutation({
     mutationFn: async ({ setting, value }: { setting: string; value: string }) => {
-      await apiRequest("PUT", "/api/admin/grooming-settings", { setting, value });
+      const response = await apiRequest("PUT", "/api/admin/grooming-settings", { setting, value });
+      return response;
+    },
+    onMutate: async ({ setting, value }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["/api/admin/grooming-settings"] });
+      
+      // Snapshot the previous value
+      const previousSettings = queryClient.getQueryData(["/api/admin/grooming-settings"]);
+      
+      // Optimistically update to the new value
+      queryClient.setQueryData(["/api/admin/grooming-settings"], (old: any) => {
+        if (!old) return [{ setting, value }];
+        
+        const existingIndex = old.findIndex((s: any) => s.setting === setting);
+        if (existingIndex >= 0) {
+          // Update existing setting
+          const newSettings = [...old];
+          newSettings[existingIndex] = { ...newSettings[existingIndex], value };
+          return newSettings;
+        } else {
+          // Add new setting
+          return [...old, { setting, value }];
+        }
+      });
+      
+      return { previousSettings };
+    },
+    onError: (err, variables, context) => {
+      // If mutation fails, use the context returned from onMutate to roll back
+      if (context?.previousSettings) {
+        queryClient.setQueryData(["/api/admin/grooming-settings"], context.previousSettings);
+      }
+      toast({
+        title: "Error",
+        description: "Failed to update grooming settings",
+        variant: "destructive",
+      });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/grooming-settings"] });
       toast({
         title: "Settings Updated",
         description: "Grooming settings have been updated successfully",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update grooming settings",
-        variant: "destructive",
-      });
+    onSettled: () => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/grooming-settings"] });
     },
   });
 
