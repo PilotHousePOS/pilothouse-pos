@@ -457,8 +457,19 @@ export default function Admin() {
                       <Badge variant={supply.stockQuantity > 0 ? "default" : "destructive"}>
                         Stock: {supply.stockQuantity}
                       </Badge>
-                      <Button variant="ghost" size="sm">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setEditingSupply(supply)}
+                      >
                         <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => deleteSupplyMutation.mutate(supply.id)}
+                      >
+                        <Trash2 className="w-4 h-4 text-red-500" />
                       </Button>
                     </div>
                   </div>
@@ -481,16 +492,23 @@ export default function Admin() {
                         ${order.totalAmount} • {new Date(order.orderDate).toLocaleDateString()}
                       </p>
                     </div>
-                    <Badge 
-                      variant={
-                        order.status === 'pending' ? 'secondary' :
-                        order.status === 'confirmed' ? 'default' :
-                        order.status === 'shipped' ? 'default' :
-                        order.status === 'delivered' ? 'default' : 'destructive'
-                      }
-                    >
-                      {order.status}
-                    </Badge>
+                    <div className="flex items-center space-x-2">
+                      <Select 
+                        value={order.status} 
+                        onValueChange={(status) => updateOrderMutation.mutate({ id: order.id, status })}
+                      >
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="processing">Processing</SelectItem>
+                          <SelectItem value="shipped">Shipped</SelectItem>
+                          <SelectItem value="delivered">Delivered</SelectItem>
+                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -596,7 +614,211 @@ export default function Admin() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Pet Dialog */}
+      {editingPet && (
+        <Dialog open={!!editingPet} onOpenChange={() => setEditingPet(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Pet</DialogTitle>
+            </DialogHeader>
+            <EditPetForm 
+              pet={editingPet}
+              onSubmit={(data) => editPetMutation.mutate({ id: editingPet.id, data })} 
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Edit Supply Dialog */}
+      {editingSupply && (
+        <Dialog open={!!editingSupply} onOpenChange={() => setEditingSupply(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Supply</DialogTitle>
+            </DialogHeader>
+            <EditSupplyForm 
+              supply={editingSupply}
+              onSubmit={(data) => editSupplyMutation.mutate({ id: editingSupply.id, data })} 
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
+  );
+}
+
+function EditPetForm({ pet, onSubmit }: { pet: any; onSubmit: (data: any) => void }) {
+  const [formData, setFormData] = useState({
+    name: pet.name || "",
+    species: pet.species || "",
+    breed: pet.breed || "",
+    age: pet.age || "",
+    price: pet.price || "",
+    description: pet.description || "",
+    isAvailable: pet.isAvailable || false,
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium mb-1">Name</label>
+        <input
+          type="text"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Species</label>
+        <input
+          type="text"
+          value={formData.species}
+          onChange={(e) => setFormData({ ...formData, species: e.target.value })}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Breed</label>
+        <input
+          type="text"
+          value={formData.breed}
+          onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Age</label>
+        <input
+          type="text"
+          value={formData.age}
+          onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Price ($)</label>
+        <input
+          type="number"
+          value={formData.price}
+          onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Description</label>
+        <textarea
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          className="w-full p-2 border rounded"
+          rows={3}
+        />
+      </div>
+      <div className="flex items-center space-x-2">
+        <Switch
+          checked={formData.isAvailable}
+          onCheckedChange={(checked) => setFormData({ ...formData, isAvailable: checked })}
+        />
+        <label className="text-sm">Available for adoption</label>
+      </div>
+      <Button type="submit" className="w-full bg-brand-blue hover:bg-blue-600">
+        Update Pet
+      </Button>
+    </form>
+  );
+}
+
+function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: any) => void }) {
+  const [formData, setFormData] = useState({
+    name: supply.name || "",
+    brand: supply.brand || "",
+    category: supply.category || "",
+    price: supply.price || "",
+    description: supply.description || "",
+    stockQuantity: supply.stockQuantity || 0,
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium mb-1">Name</label>
+        <input
+          type="text"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Brand</label>
+        <input
+          type="text"
+          value={formData.brand}
+          onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Category</label>
+        <input
+          type="text"
+          value={formData.category}
+          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Price ($)</label>
+        <input
+          type="number"
+          value={formData.price}
+          onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Stock Quantity</label>
+        <input
+          type="number"
+          value={formData.stockQuantity}
+          onChange={(e) => setFormData({ ...formData, stockQuantity: Number(e.target.value) })}
+          className="w-full p-2 border rounded"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Description</label>
+        <textarea
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          className="w-full p-2 border rounded"
+          rows={3}
+        />
+      </div>
+      <Button type="submit" className="w-full bg-brand-blue hover:bg-blue-600">
+        Update Supply
+      </Button>
+    </form>
   );
 }
 
