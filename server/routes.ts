@@ -639,6 +639,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Grooming settings routes
+  app.get("/api/admin/grooming-settings", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const settings = await storage.getGroomingSettings();
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching grooming settings:", error);
+      res.status(500).json({ message: "Failed to fetch grooming settings" });
+    }
+  });
+
+  app.put("/api/admin/grooming-settings", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { setting, value } = req.body;
+      
+      if (!setting || !value) {
+        return res.status(400).json({ message: "Setting and value are required" });
+      }
+
+      const updatedSetting = await storage.upsertGroomingSetting({ setting, value });
+      res.json(updatedSetting);
+    } catch (error) {
+      console.error("Error updating grooming setting:", error);
+      res.status(500).json({ message: "Failed to update grooming setting" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

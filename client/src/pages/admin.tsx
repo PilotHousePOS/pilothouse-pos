@@ -86,6 +86,11 @@ export default function Admin() {
     enabled: isAuthenticated && user?.isAdmin,
   });
 
+  const { data: groomingSettings = [] } = useQuery<any[]>({
+    queryKey: ["/api/admin/grooming-settings"],
+    enabled: isAuthenticated && user?.isAdmin,
+  });
+
   // Create Pet Mutation
   const createPetMutation = useMutation({
     mutationFn: async (petData: any) => {
@@ -335,6 +340,27 @@ export default function Admin() {
     },
   });
 
+  // Grooming Settings Mutation
+  const updateGroomingSettingMutation = useMutation({
+    mutationFn: async ({ setting, value }: { setting: string; value: string }) => {
+      await apiRequest("PUT", "/api/admin/grooming-settings", { setting, value });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/grooming-settings"] });
+      toast({
+        title: "Settings Updated",
+        description: "Grooming settings have been updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update grooming settings",
+        variant: "destructive",
+      });
+    },
+  });
+
   const pendingAppointments = (appointments as any[]).filter((a: any) => a.status === 'scheduled').length;
   const pendingOrders = (orders as any[]).filter((o: any) => o.status === 'pending').length;
 
@@ -380,9 +406,10 @@ export default function Admin() {
       </div>
 
       <Tabs defaultValue="inventory" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="inventory">Inventory</TabsTrigger>
           <TabsTrigger value="orders">Orders & Appointments</TabsTrigger>
+          <TabsTrigger value="grooming">Grooming Settings</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
         </TabsList>
 
@@ -628,6 +655,173 @@ export default function Admin() {
                   </Card>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="grooming">
+          <Card>
+            <CardHeader>
+              <CardTitle>Grooming Appointment Settings</CardTitle>
+              <CardDescription>
+                Configure appointment restrictions, time slots, and capacity limits
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Operating Hours */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Operating Hours</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Start Time</label>
+                    <input
+                      type="time"
+                      defaultValue={groomingSettings.find(s => s.setting === 'start_time')?.value || '09:00'}
+                      className="w-full p-2 border rounded"
+                      onChange={(e) => updateGroomingSettingMutation.mutate({
+                        setting: 'start_time',
+                        value: e.target.value
+                      })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">End Time</label>
+                    <input
+                      type="time"
+                      defaultValue={groomingSettings.find(s => s.setting === 'end_time')?.value || '17:00'}
+                      className="w-full p-2 border rounded"
+                      onChange={(e) => updateGroomingSettingMutation.mutate({
+                        setting: 'end_time',
+                        value: e.target.value
+                      })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Available Days */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Available Days</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => {
+                    const isEnabled = groomingSettings.find(s => s.setting === `${day.toLowerCase()}_enabled`)?.value !== 'false';
+                    return (
+                      <div key={day} className="flex items-center space-x-2">
+                        <Switch
+                          checked={isEnabled}
+                          onCheckedChange={(checked) => updateGroomingSettingMutation.mutate({
+                            setting: `${day.toLowerCase()}_enabled`,
+                            value: checked.toString()
+                          })}
+                        />
+                        <label className="text-sm font-medium">{day}</label>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Appointment Capacity */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Appointment Limits</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Max Appointments Per Day</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="50"
+                      defaultValue={groomingSettings.find(s => s.setting === 'max_daily_appointments')?.value || '10'}
+                      className="w-full p-2 border rounded"
+                      onChange={(e) => updateGroomingSettingMutation.mutate({
+                        setting: 'max_daily_appointments',
+                        value: e.target.value
+                      })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Appointment Duration (minutes)</label>
+                    <select
+                      defaultValue={groomingSettings.find(s => s.setting === 'appointment_duration')?.value || '60'}
+                      className="w-full p-2 border rounded"
+                      onChange={(e) => updateGroomingSettingMutation.mutate({
+                        setting: 'appointment_duration',
+                        value: e.target.value
+                      })}
+                    >
+                      <option value="30">30 minutes</option>
+                      <option value="45">45 minutes</option>
+                      <option value="60">1 hour</option>
+                      <option value="90">1.5 hours</option>
+                      <option value="120">2 hours</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Booking Restrictions */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Booking Restrictions</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Advance Booking Limit (days)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="365"
+                      defaultValue={groomingSettings.find(s => s.setting === 'advance_booking_days')?.value || '30'}
+                      className="w-full p-2 border rounded"
+                      onChange={(e) => updateGroomingSettingMutation.mutate({
+                        setting: 'advance_booking_days',
+                        value: e.target.value
+                      })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Minimum Notice (hours)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="72"
+                      defaultValue={groomingSettings.find(s => s.setting === 'minimum_notice_hours')?.value || '24'}
+                      className="w-full p-2 border rounded"
+                      onChange={(e) => updateGroomingSettingMutation.mutate({
+                        setting: 'minimum_notice_hours',
+                        value: e.target.value
+                      })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Holiday/Block Dates */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Special Dates</h3>
+                <div className="space-y-2">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Blocked Dates (comma-separated, YYYY-MM-DD format)</label>
+                    <textarea
+                      placeholder="2025-12-25, 2025-01-01"
+                      defaultValue={groomingSettings.find(s => s.setting === 'blocked_dates')?.value || ''}
+                      className="w-full p-2 border rounded h-20"
+                      onChange={(e) => updateGroomingSettingMutation.mutate({
+                        setting: 'blocked_dates',
+                        value: e.target.value
+                      })}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Enter dates when appointments should not be available (holidays, maintenance, etc.)
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {updateGroomingSettingMutation.isPending && (
+                <div className="text-center">
+                  <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
+                  <p className="text-sm text-gray-500 mt-2">Updating settings...</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
