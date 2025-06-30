@@ -611,9 +611,9 @@ export default function Admin() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="processing">Processing</SelectItem>
-                          <SelectItem value="shipped">Shipped</SelectItem>
-                          <SelectItem value="delivered">Delivered</SelectItem>
+                          <SelectItem value="in_progress">In Progress</SelectItem>
+                          <SelectItem value="ready">Ready</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
                           <SelectItem value="cancelled">Cancelled</SelectItem>
                         </SelectContent>
                       </Select>
@@ -652,6 +652,7 @@ export default function Admin() {
                         <SelectContent>
                           <SelectItem value="scheduled">Scheduled</SelectItem>
                           <SelectItem value="in-progress">In Progress</SelectItem>
+                          <SelectItem value="ready">Ready</SelectItem>
                           <SelectItem value="completed">Completed</SelectItem>
                           <SelectItem value="cancelled">Cancelled</SelectItem>
                         </SelectContent>
