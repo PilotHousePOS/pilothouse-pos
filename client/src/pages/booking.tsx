@@ -313,7 +313,7 @@ export default function Booking() {
         >
           {createAppointmentMutation.isPending 
             ? "Booking..." 
-            : `Confirm Booking${selectedServiceData ? ` - $${selectedServiceData.price}` : ''}`
+            : "Confirm Booking"
           }
         </Button>
       </form>
