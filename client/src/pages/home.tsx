@@ -224,12 +224,6 @@ export default function Home() {
                         <div className="text-right">
                           <p className="text-2xl font-bold text-brand-red">${pet.price}</p>
                         </div>
-                        <Button 
-                          className="bg-gradient-to-r from-brand-blue to-blue-600 hover:from-blue-600 hover:to-brand-blue text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg"
-                          onClick={() => setLocation('/pets')}
-                        >
-                          Meet {pet.name}
-                        </Button>
                       </div>
                     </div>
                   </div>
