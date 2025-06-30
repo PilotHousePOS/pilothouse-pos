@@ -31,6 +31,12 @@ export default function Booking() {
     type: '',
     notes: '',
   });
+  
+  const [ownerInfo, setOwnerInfo] = useState({
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+  });
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -112,6 +118,7 @@ export default function Booking() {
       setSelectedDate(new Date());
       setSelectedTime('');
       setPetInfo({ name: '', type: '', notes: '' });
+      setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
     },
     onError: (error) => {
@@ -139,10 +146,11 @@ export default function Booking() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedService || !selectedDate || !selectedTime || !petInfo.name || !petInfo.type) {
+    if (!selectedService || !selectedDate || !selectedTime || !petInfo.name || !petInfo.type || 
+        !ownerInfo.firstName || !ownerInfo.lastName || !ownerInfo.phoneNumber) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields.",
+        description: "Please fill in all required fields including owner information.",
         variant: "destructive",
       });
       return;
@@ -158,6 +166,9 @@ export default function Booking() {
       petName: petInfo.name,
       petType: petInfo.type,
       specialNotes: petInfo.notes,
+      ownerFirstName: ownerInfo.firstName,
+      ownerLastName: ownerInfo.lastName,
+      ownerPhoneNumber: ownerInfo.phoneNumber,
       price: serviceData.price.toString(),
     });
   };
@@ -224,6 +235,39 @@ export default function Booking() {
                 {time}
               </Button>
             ))}
+          </div>
+        </div>
+
+        {/* Owner Information */}
+        <div>
+          <Label className="text-sm font-semibold text-gray-900 mb-3 block">Owner Information</Label>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                type="text"
+                placeholder="First Name *"
+                value={ownerInfo.firstName}
+                onChange={(e) => setOwnerInfo({ ...ownerInfo, firstName: e.target.value })}
+                className="border-gray-300 rounded-xl"
+                required
+              />
+              <Input
+                type="text"
+                placeholder="Last Name *"
+                value={ownerInfo.lastName}
+                onChange={(e) => setOwnerInfo({ ...ownerInfo, lastName: e.target.value })}
+                className="border-gray-300 rounded-xl"
+                required
+              />
+            </div>
+            <Input
+              type="tel"
+              placeholder="Phone Number *"
+              value={ownerInfo.phoneNumber}
+              onChange={(e) => setOwnerInfo({ ...ownerInfo, phoneNumber: e.target.value })}
+              className="border-gray-300 rounded-xl"
+              required
+            />
           </div>
         </div>
 
