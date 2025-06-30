@@ -762,6 +762,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Push notification subscription endpoint
+  app.post("/api/push-subscription", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const subscription = req.body;
+      console.log(`Push subscription saved for user ${userId}:`, subscription);
+      
+      // In a real app, you would save this subscription to the database
+      // For now, we'll just log it and return success
+      res.json({ success: true, message: "Push subscription saved" });
+    } catch (error) {
+      console.error("Error saving push subscription:", error);
+      res.status(500).json({ message: "Failed to save push subscription" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

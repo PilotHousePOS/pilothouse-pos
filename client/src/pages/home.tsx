@@ -6,11 +6,40 @@ import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
 import { Bell, ShoppingCart, Heart, Star, ArrowRight, Sparkles } from "lucide-react";
 import animalHouseLogoPath from "@assets/Circle Mascot Logo_1750438195696.jpg";
+import { pushNotificationManager } from "@/lib/pushNotifications";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
   const { user, isLoading } = useAuth();
-  
+  const { toast } = useToast();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
+  const handleNotificationClick = async () => {
+    try {
+      const enabled = await pushNotificationManager.enablePushNotifications();
+      if (enabled) {
+        setNotificationsEnabled(true);
+        toast({
+          title: "Notifications Enabled!",
+          description: "You'll receive updates when your orders are ready.",
+        });
+      } else {
+        toast({
+          title: "Notifications Blocked",
+          description: "Please allow notifications in your browser settings.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Notification setup error:', error);
+      toast({
+        title: "Notification Error",
+        description: "Failed to set up notifications. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
   
   const handleLogout = () => {
     console.log('Logging out...');
@@ -81,9 +110,19 @@ export default function Home() {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <button className="relative p-3 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
-              <Bell className="w-5 h-5 text-gray-600" />
-              <span className="absolute top-1 right-1 bg-brand-red text-white text-xs rounded-full w-3 h-3 flex items-center justify-center text-[10px]">3</span>
+            <button 
+              className={`relative p-3 rounded-full transition-colors ${
+                notificationsEnabled 
+                  ? 'bg-green-100 hover:bg-green-200' 
+                  : 'bg-gray-100 hover:bg-gray-200'
+              }`}
+              onClick={handleNotificationClick}
+              title="Enable notifications for order updates"
+            >
+              <Bell className={`w-5 h-5 ${notificationsEnabled ? 'text-green-600' : 'text-gray-600'}`} />
+              {notificationsEnabled && (
+                <span className="absolute top-1 right-1 bg-green-500 text-white text-xs rounded-full w-3 h-3 flex items-center justify-center text-[10px]">✓</span>
+              )}
             </button>
             <button 
               className="relative p-3 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors" 
