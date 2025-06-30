@@ -179,7 +179,7 @@ export default function Booking() {
                       <RadioGroupItem value={service.id} id={service.id} />
                       <div className="flex-1">
                         <div className="font-semibold text-gray-900">{service.name}</div>
-                        <div className="text-sm text-gray-500">{service.description} - ${service.price}</div>
+                        <div className="text-sm text-gray-500">{service.description}</div>
                       </div>
                     </Label>
                   </CardContent>
