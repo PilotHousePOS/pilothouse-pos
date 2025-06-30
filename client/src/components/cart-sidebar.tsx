@@ -33,7 +33,6 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [shippingAddress, setShippingAddress] = useState("");
 
   const { data: cartItems = [], isLoading } = useQuery({
     queryKey: ["/api/cart"],
@@ -192,15 +191,6 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   };
 
   const handlePlaceOrder = () => {
-    if (!shippingAddress.trim()) {
-      toast({
-        title: "Missing Address",
-        description: "Please enter a shipping address.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     const orderItems = cartItemsWithDetails.map(item => ({
       supplyId: item.supplyId || undefined,
       petId: item.petId || undefined,
@@ -211,7 +201,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     createOrderMutation.mutate({
       orderData: {
         totalAmount: totalAmount.toFixed(2),
-        shippingAddress,
+        shippingAddress: "In-Store Pickup - Animal House Pet Store",
       },
       items: orderItems,
     });
@@ -355,15 +345,17 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                Shipping Address *
+                Pickup Method
               </label>
-              <Textarea
-                placeholder="Enter your complete address..."
-                value={shippingAddress}
-                onChange={(e) => setShippingAddress(e.target.value)}
-                className="h-20 resize-none"
-                required
-              />
+              <div className="p-3 border rounded-lg bg-gray-50">
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 bg-brand-red rounded-full"></div>
+                  <span className="font-medium">In-Store Pickup</span>
+                </div>
+                <p className="text-sm text-gray-600 mt-1">
+                  Available for pickup at Animal House Pet Store
+                </p>
+              </div>
             </div>
 
             <div className="flex space-x-3">
