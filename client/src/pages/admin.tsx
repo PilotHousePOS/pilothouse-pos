@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import type { User } from "@shared/schema";
@@ -28,6 +28,8 @@ import {
   ShoppingBag,
   PawPrint,
   Package,
+  Upload,
+  X,
   Shield
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
@@ -931,6 +933,7 @@ function EditPetForm({ pet, onSubmit }: { pet: any; onSubmit: (data: any) => voi
     age: pet.age || "",
     price: pet.price || "",
     description: pet.description || "",
+    imageUrl: pet.imageUrl || "",
     isAvailable: pet.isAvailable || false,
   });
 
@@ -1000,6 +1003,10 @@ function EditPetForm({ pet, onSubmit }: { pet: any; onSubmit: (data: any) => voi
           rows={3}
         />
       </div>
+      <ImageUpload 
+        imageUrl={formData.imageUrl} 
+        onImageChange={(url) => setFormData({ ...formData, imageUrl: url })} 
+      />
       <div className="flex items-center space-x-2">
         <Switch
           checked={formData.isAvailable}
@@ -1021,6 +1028,7 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
     category: supply.category || "",
     price: supply.price || "",
     description: supply.description || "",
+    imageUrl: supply.imageUrl || "",
     stockQuantity: supply.stockQuantity || 0,
   });
 
@@ -1090,10 +1098,123 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
           rows={3}
         />
       </div>
+      <ImageUpload 
+        imageUrl={formData.imageUrl} 
+        onImageChange={(url) => setFormData({ ...formData, imageUrl: url })} 
+      />
       <Button type="submit" className="w-full bg-brand-blue hover:bg-blue-600">
         Update Supply
       </Button>
     </form>
+  );
+}
+
+// Image Upload Component
+function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageChange: (url: string) => void }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
+
+  const handleFileUpload = async (file: File) => {
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid File",
+        description: "Please select an image file.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      toast({
+        title: "File Too Large",
+        description: "Please select an image under 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const data = await response.json();
+      onImageChange(data.imageUrl);
+      toast({
+        title: "Image Uploaded",
+        description: "Image has been uploaded successfully.",
+      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <Label>Image</Label>
+      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+        {imageUrl ? (
+          <div className="relative">
+            <img src={imageUrl} alt="Preview" className="w-full h-40 object-cover rounded" />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="absolute top-2 right-2"
+              onClick={() => onImageChange('')}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+            <p className="text-sm text-gray-500">Click to upload an image</p>
+          </div>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleFileUpload(file);
+          }}
+          className="hidden"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full mt-3"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+        >
+          {uploading ? 'Uploading...' : imageUrl ? 'Change Image' : 'Upload Image'}
+        </Button>
+      </div>
+    </div>
   );
 }
 
@@ -1179,15 +1300,10 @@ function AddPetForm({ onSubmit }: { onSubmit: (data: any) => void }) {
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         />
       </div>
-      <div>
-        <Label htmlFor="imageUrl">Image URL</Label>
-        <Input
-          id="imageUrl"
-          type="url"
-          value={formData.imageUrl}
-          onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-        />
-      </div>
+      <ImageUpload 
+        imageUrl={formData.imageUrl} 
+        onImageChange={(url) => setFormData({ ...formData, imageUrl: url })} 
+      />
       <div className="flex items-center space-x-2">
         <Switch
           id="isAvailable"
@@ -1291,6 +1407,10 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         />
       </div>
+      <ImageUpload 
+        imageUrl={formData.imageUrl} 
+        onImageChange={(url) => setFormData({ ...formData, imageUrl: url })} 
+      />
       <Button type="submit" className="w-full">Add Supply</Button>
     </form>
   );
