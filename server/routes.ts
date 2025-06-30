@@ -13,6 +13,7 @@ import {
   insertCustomerPetSchema,
 } from "@shared/schema";
 import { z } from "zod";
+import { notificationService } from './notifications';
 
 // Configure multer for file uploads
 const uploadStorage = multer.diskStorage({
@@ -546,7 +547,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const id = parseInt(req.params.id);
       const { status } = req.body;
+      
+      // Get the order before updating to get user info
+      const existingOrder = await storage.getOrder(id);
+      if (!existingOrder) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
+      // Update the order status
       const order = await storage.updateOrderStatus(id, status);
+      
+      // Get the customer information for notifications
+      const customer = await storage.getUser(existingOrder.userId);
+      if (customer && ['in_progress', 'ready'].includes(status)) {
+        // Send notifications (email, push, SMS if available)
+        await notificationService.sendOrderStatusNotifications(
+          customer.email || '',
+          customer.firstName || 'Customer',
+          null, // Phone number - we'll need to add this to user schema later
+          customer.id,
+          order.id,
+          status
+        );
+      }
+      
       res.json(order);
     } catch (error) {
       console.error("Error updating order:", error);
