@@ -483,7 +483,7 @@ export default function Admin() {
                     <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
                       <DialogTitle>Add New Pet</DialogTitle>
                     </DialogHeader>
-                    <div className="pb-safe">
+                    <div className="pb-24 sm:pb-6">
                       <AddPetForm onSubmit={(data) => createPetMutation.mutate(data)} />
                     </div>
                   </DialogContent>
@@ -544,7 +544,7 @@ export default function Admin() {
                     <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
                       <DialogTitle>Add New Supply</DialogTitle>
                     </DialogHeader>
-                    <div className="pb-safe">
+                    <div className="pb-24 sm:pb-6">
                       <AddSupplyForm onSubmit={(data) => createSupplyMutation.mutate(data)} />
                     </div>
                   </DialogContent>
@@ -900,11 +900,11 @@ export default function Admin() {
       {/* Edit Pet Dialog */}
       {editingPet && (
         <Dialog open={!!editingPet} onOpenChange={() => setEditingPet(null)}>
-          <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg max-w-[95vw] m-4">
-            <DialogHeader>
+          <DialogContent className="sm:max-w-lg max-w-[95vw] sm:max-h-[90vh] max-h-screen sm:m-4 m-0 sm:rounded-lg rounded-none sm:top-[50%] top-0 sm:translate-y-[-50%] translate-y-0 overflow-y-auto">
+            <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
               <DialogTitle>Edit Pet</DialogTitle>
             </DialogHeader>
-            <div className="max-h-[70vh] overflow-y-auto pr-2">
+            <div className="pb-24 sm:pb-6">
               <EditPetForm 
                 pet={editingPet}
                 onSubmit={(data) => editPetMutation.mutate({ id: editingPet.id, data })} 
@@ -917,11 +917,11 @@ export default function Admin() {
       {/* Edit Supply Dialog */}
       {editingSupply && (
         <Dialog open={!!editingSupply} onOpenChange={() => setEditingSupply(null)}>
-          <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg max-w-[95vw] m-4">
-            <DialogHeader>
+          <DialogContent className="sm:max-w-lg max-w-[95vw] sm:max-h-[90vh] max-h-screen sm:m-4 m-0 sm:rounded-lg rounded-none sm:top-[50%] top-0 sm:translate-y-[-50%] translate-y-0 overflow-y-auto">
+            <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
               <DialogTitle>Edit Supply</DialogTitle>
             </DialogHeader>
-            <div className="max-h-[70vh] overflow-y-auto pr-2">
+            <div className="pb-24 sm:pb-6">
               <EditSupplyForm 
                 supply={editingSupply}
                 onSubmit={(data) => editSupplyMutation.mutate({ id: editingSupply.id, data })} 
@@ -1186,7 +1186,7 @@ function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageCha
       <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
         {imageUrl ? (
           <div className="relative">
-            <img src={imageUrl} alt="Preview" className="w-full h-40 object-cover rounded" />
+            <img src={imageUrl} alt="Preview" className="w-full sm:h-40 h-24 object-cover rounded" />
             <Button
               type="button"
               variant="outline"
@@ -1198,7 +1198,7 @@ function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageCha
             </Button>
           </div>
         ) : (
-          <div className="text-center py-8">
+          <div className="text-center sm:py-8 py-4">
             <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
             <p className="text-sm text-gray-500">Click to upload an image</p>
           </div>
