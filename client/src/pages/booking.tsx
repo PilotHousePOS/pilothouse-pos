@@ -41,12 +41,12 @@ export default function Booking() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Generate available time slots based on settings
+  // Generate available time slots in 15-minute intervals
   const availableTimeSlots = useMemo(() => {
     const settings = groomingSettings as any[];
     const startTime = settings.find(s => s.setting === 'start_time')?.value || '09:00';
-    const endTime = settings.find(s => s.setting === 'end_time')?.value || '17:00';
-    const duration = parseInt(settings.find(s => s.setting === 'appointment_duration')?.value || '90');
+    // Enforce 1:30 PM cutoff as per user requirements
+    const endTime = '13:30'; // Hard-coded 1:30 PM limit
     
     const slots = [];
     const [startHour, startMin] = startTime.split(':').map(Number);
@@ -58,6 +58,7 @@ export default function Booking() {
     const endDateTime = new Date();
     endDateTime.setHours(endHour, endMin, 0, 0);
     
+    // Generate slots in 15-minute intervals
     while (currentTime < endDateTime) {
       const timeString = currentTime.toLocaleTimeString('en-US', { 
         hour: 'numeric', 
@@ -65,7 +66,7 @@ export default function Booking() {
         hour12: true 
       });
       slots.push(timeString);
-      currentTime.setMinutes(currentTime.getMinutes() + duration);
+      currentTime.setMinutes(currentTime.getMinutes() + 15); // 15-minute intervals
     }
     
     return slots;
@@ -73,6 +74,9 @@ export default function Booking() {
 
   // Check if a date is available for booking
   const isDateAvailable = (date: Date) => {
+    // Enforce no Sunday appointments as per user requirements
+    if (date.getDay() === 0) return false; // Sunday = 0
+    
     const settings = groomingSettings as any[];
     const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
     const dayEnabledSetting = settings.find(s => s.setting === `${dayName}_enabled`);
