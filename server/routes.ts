@@ -762,6 +762,156 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Groomer routes
+  app.get("/api/groomers", async (req, res) => {
+    try {
+      const groomers = await storage.getActiveGroomers();
+      res.json(groomers);
+    } catch (error) {
+      console.error("Error fetching groomers:", error);
+      res.status(500).json({ message: "Failed to fetch groomers" });
+    }
+  });
+
+  app.get("/api/groomers/available/:dayOfWeek", async (req, res) => {
+    try {
+      const dayOfWeek = parseInt(req.params.dayOfWeek);
+      if (isNaN(dayOfWeek) || dayOfWeek < 0 || dayOfWeek > 6) {
+        return res.status(400).json({ message: "Invalid day of week" });
+      }
+      
+      const groomers = await storage.getAvailableGroomersForDay(dayOfWeek);
+      res.json(groomers);
+    } catch (error) {
+      console.error("Error fetching available groomers:", error);
+      res.status(500).json({ message: "Failed to fetch available groomers" });
+    }
+  });
+
+  // Admin groomer management routes
+  app.get("/api/admin/groomers", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const groomers = await storage.getAllGroomers();
+      res.json(groomers);
+    } catch (error) {
+      console.error("Error fetching all groomers:", error);
+      res.status(500).json({ message: "Failed to fetch groomers" });
+    }
+  });
+
+  app.post("/api/admin/groomers", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const groomerData = req.body;
+      const groomer = await storage.createGroomer(groomerData);
+      res.json(groomer);
+    } catch (error) {
+      console.error("Error creating groomer:", error);
+      res.status(500).json({ message: "Failed to create groomer" });
+    }
+  });
+
+  app.put("/api/admin/groomers/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const groomerData = req.body;
+      const groomer = await storage.updateGroomer(id, groomerData);
+      res.json(groomer);
+    } catch (error) {
+      console.error("Error updating groomer:", error);
+      res.status(500).json({ message: "Failed to update groomer" });
+    }
+  });
+
+  app.delete("/api/admin/groomers/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      await storage.deleteGroomer(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting groomer:", error);
+      res.status(500).json({ message: "Failed to delete groomer" });
+    }
+  });
+
+  // Groomer availability routes
+  app.get("/api/admin/groomers/:id/availability", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const groomerId = parseInt(req.params.id);
+      const availability = await storage.getGroomerAvailability(groomerId);
+      res.json(availability);
+    } catch (error) {
+      console.error("Error fetching groomer availability:", error);
+      res.status(500).json({ message: "Failed to fetch groomer availability" });
+    }
+  });
+
+  app.post("/api/admin/groomers/:id/availability", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const groomerId = parseInt(req.params.id);
+      const availabilityData = { ...req.body, groomerId };
+      const availability = await storage.setGroomerAvailability(availabilityData);
+      res.json(availability);
+    } catch (error) {
+      console.error("Error setting groomer availability:", error);
+      res.status(500).json({ message: "Failed to set groomer availability" });
+    }
+  });
+
+  app.put("/api/admin/groomer-availability/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const availabilityData = req.body;
+      const availability = await storage.updateGroomerAvailability(id, availabilityData);
+      res.json(availability);
+    } catch (error) {
+      console.error("Error updating groomer availability:", error);
+      res.status(500).json({ message: "Failed to update groomer availability" });
+    }
+  });
+
+  app.delete("/api/admin/groomer-availability/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      await storage.deleteGroomerAvailability(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting groomer availability:", error);
+      res.status(500).json({ message: "Failed to delete groomer availability" });
+    }
+  });
+
   // Push notification subscription endpoint
   app.post("/api/push-subscription", authMiddleware, async (req: any, res) => {
     try {

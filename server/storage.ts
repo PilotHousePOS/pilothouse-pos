@@ -8,6 +8,8 @@ import {
   appointments,
   customerPets,
   groomingSettings,
+  groomers,
+  groomerAvailability,
   type User,
   type UpsertUser,
   type Pet,
@@ -26,6 +28,10 @@ import {
   type InsertCustomerPet,
   type GroomingSetting,
   type InsertGroomingSetting,
+  type Groomer,
+  type InsertGroomer,
+  type GroomerAvailability,
+  type InsertGroomerAvailability,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, ilike } from "drizzle-orm";
@@ -85,6 +91,21 @@ export interface IStorage {
   getGroomingSettings(): Promise<GroomingSetting[]>;
   getGroomingSetting(setting: string): Promise<GroomingSetting | undefined>;
   upsertGroomingSetting(setting: InsertGroomingSetting): Promise<GroomingSetting>;
+
+  // Groomer operations
+  getAllGroomers(): Promise<Groomer[]>;
+  getActiveGroomers(): Promise<Groomer[]>;
+  getGroomer(id: number): Promise<Groomer | undefined>;
+  createGroomer(groomer: InsertGroomer): Promise<Groomer>;
+  updateGroomer(id: number, groomer: Partial<InsertGroomer>): Promise<Groomer>;
+  deleteGroomer(id: number): Promise<void>;
+
+  // Groomer availability operations
+  getGroomerAvailability(groomerId: number): Promise<GroomerAvailability[]>;
+  getAvailableGroomersForDay(dayOfWeek: number): Promise<Groomer[]>;
+  setGroomerAvailability(availability: InsertGroomerAvailability): Promise<GroomerAvailability>;
+  updateGroomerAvailability(id: number, availability: Partial<InsertGroomerAvailability>): Promise<GroomerAvailability>;
+  deleteGroomerAvailability(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -513,6 +534,87 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return result;
+  }
+
+  // Groomer operations
+  async getAllGroomers(): Promise<Groomer[]> {
+    return await db.select().from(groomers).orderBy(groomers.name);
+  }
+
+  async getActiveGroomers(): Promise<Groomer[]> {
+    return await db.select().from(groomers).where(eq(groomers.isActive, true)).orderBy(groomers.name);
+  }
+
+  async getGroomer(id: number): Promise<Groomer | undefined> {
+    const [groomer] = await db.select().from(groomers).where(eq(groomers.id, id));
+    return groomer;
+  }
+
+  async createGroomer(groomerData: InsertGroomer): Promise<Groomer> {
+    const [groomer] = await db.insert(groomers).values(groomerData).returning();
+    return groomer;
+  }
+
+  async updateGroomer(id: number, groomerData: Partial<InsertGroomer>): Promise<Groomer> {
+    const [groomer] = await db
+      .update(groomers)
+      .set({ ...groomerData, updatedAt: new Date() })
+      .where(eq(groomers.id, id))
+      .returning();
+    return groomer;
+  }
+
+  async deleteGroomer(id: number): Promise<void> {
+    await db.delete(groomers).where(eq(groomers.id, id));
+  }
+
+  // Groomer availability operations
+  async getGroomerAvailability(groomerId: number): Promise<GroomerAvailability[]> {
+    return await db
+      .select()
+      .from(groomerAvailability)
+      .where(eq(groomerAvailability.groomerId, groomerId))
+      .orderBy(groomerAvailability.dayOfWeek);
+  }
+
+  async getAvailableGroomersForDay(dayOfWeek: number): Promise<Groomer[]> {
+    return await db
+      .select({
+        id: groomers.id,
+        name: groomers.name,
+        email: groomers.email,
+        phone: groomers.phone,
+        specialties: groomers.specialties,
+        isActive: groomers.isActive,
+        createdAt: groomers.createdAt,
+        updatedAt: groomers.updatedAt,
+      })
+      .from(groomers)
+      .innerJoin(groomerAvailability, eq(groomers.id, groomerAvailability.groomerId))
+      .where(and(
+        eq(groomers.isActive, true),
+        eq(groomerAvailability.dayOfWeek, dayOfWeek),
+        eq(groomerAvailability.isAvailable, true)
+      ))
+      .orderBy(groomers.name);
+  }
+
+  async setGroomerAvailability(availabilityData: InsertGroomerAvailability): Promise<GroomerAvailability> {
+    const [availability] = await db.insert(groomerAvailability).values(availabilityData).returning();
+    return availability;
+  }
+
+  async updateGroomerAvailability(id: number, availabilityData: Partial<InsertGroomerAvailability>): Promise<GroomerAvailability> {
+    const [availability] = await db
+      .update(groomerAvailability)
+      .set({ ...availabilityData, updatedAt: new Date() })
+      .where(eq(groomerAvailability.id, id))
+      .returning();
+    return availability;
+  }
+
+  async deleteGroomerAvailability(id: number): Promise<void> {
+    await db.delete(groomerAvailability).where(eq(groomerAvailability.id, id));
   }
 }
 

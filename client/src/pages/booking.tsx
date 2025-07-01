@@ -23,9 +23,20 @@ export default function Booking() {
     queryKey: ["/api/admin/grooming-settings"],
     retry: false,
   });
+
+  // Fetch available groomers for selected date
+  const { data: availableGroomers = [] } = useQuery({
+    queryKey: ["/api/groomers/available", selectedDate?.getDay()],
+    queryFn: () => selectedDate ? 
+      fetch(`/api/groomers/available/${selectedDate.getDay()}`).then(res => res.json()) : 
+      [],
+    enabled: !!selectedDate,
+    retry: false,
+  });
   const [selectedService, setSelectedService] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState('');
+  const [selectedGroomer, setSelectedGroomer] = useState('');
   const [petInfo, setPetInfo] = useState({
     name: '',
     type: '',
@@ -150,7 +161,7 @@ export default function Booking() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedService || !selectedDate || !selectedTime || !petInfo.name || !petInfo.type || 
+    if (!selectedService || !selectedDate || !selectedTime || !selectedGroomer || !petInfo.name || !petInfo.type || 
         !ownerInfo.firstName || !ownerInfo.lastName || !ownerInfo.phoneNumber) {
       toast({
         title: "Missing Information",
