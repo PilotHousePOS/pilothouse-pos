@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import AdminNotifications from "@/components/admin-notifications";
 
 export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -405,9 +406,12 @@ export default function Admin() {
     <div className="px-6 py-4 pb-20">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-        <Badge variant="secondary" className="bg-brand-blue text-white">
-          Administrator
-        </Badge>
+        <div className="flex items-center space-x-3">
+          <AdminNotifications />
+          <Badge variant="secondary" className="bg-brand-blue text-white">
+            Administrator
+          </Badge>
+        </div>
       </div>
 
       {/* Stats Cards */}

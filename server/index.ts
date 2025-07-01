@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import NotificationWebSocketServer from "./websocket";
 
 const app = express();
 app.set("trust proxy", 1);
