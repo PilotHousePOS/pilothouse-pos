@@ -472,24 +472,54 @@ export default function Admin() {
                   <PawPrint className="w-5 h-5" />
                   Pets ({(pets as any[]).length})
                 </CardTitle>
-                <Dialog open={isAddPetOpen} onOpenChange={setIsAddPetOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" className="bg-brand-blue hover:bg-blue-600">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Pet
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="fixed inset-0 z-50 bg-background p-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 sm:relative sm:max-w-lg sm:rounded-lg sm:border sm:shadow-lg sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 sm:data-[state=closed]:slide-out-to-left-1/2 sm:data-[state=closed]:slide-out-to-top-[48%] sm:data-[state=open]:slide-in-from-left-1/2 sm:data-[state=open]:slide-in-from-top-[48%]">
-                    <div className="flex h-full flex-col overflow-hidden sm:h-auto">
-                      <DialogHeader className="shrink-0 border-b px-6 py-4 sm:border-none sm:px-6 sm:pb-4">
+                {/* Mobile: Custom Modal, Desktop: Dialog */}
+                <div className="sm:hidden">
+                  <Button 
+                    size="sm" 
+                    className="bg-brand-blue hover:bg-blue-600"
+                    onClick={() => setIsAddPetOpen(true)}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Pet
+                  </Button>
+                </div>
+                <div className="hidden sm:block">
+                  <Dialog open={isAddPetOpen} onOpenChange={setIsAddPetOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" className="bg-brand-blue hover:bg-blue-600">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Pet
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
                         <DialogTitle>Add New Pet</DialogTitle>
                       </DialogHeader>
-                      <div className="flex-1 overflow-y-auto px-6 py-4 sm:overflow-visible sm:px-6 sm:py-0">
+                      <AddPetForm onSubmit={(data) => createPetMutation.mutate(data)} />
+                    </DialogContent>
+                  </Dialog>
+                </div>
+
+                {/* Mobile Full-Screen Modal */}
+                {isAddPetOpen && (
+                  <div className="sm:hidden fixed inset-0 z-50 bg-white">
+                    <div className="flex flex-col h-full">
+                      <div className="flex items-center justify-between p-4 border-b bg-white sticky top-0 z-10">
+                        <h2 className="text-lg font-semibold">Add New Pet</h2>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => setIsAddPetOpen(false)}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <div className="flex-1 overflow-y-auto p-4">
                         <AddPetForm onSubmit={(data) => createPetMutation.mutate(data)} />
                       </div>
                     </div>
-                  </DialogContent>
-                </Dialog>
+                  </div>
+                )}
               </div>
             </CardHeader>
             <CardContent>

@@ -4,6 +4,11 @@
 A mobile-friendly web application for "Animal House" pet store featuring pet browsing, grooming appointment booking, supply purchasing, inventory management, customer accounts with admin functionality, and Animal House branding. The app has a dark, bold design focusing on grooming services (bath and full service), pet adoption, and exotic reptile specialty - no vet care or training services offered.
 
 ## Recent Changes
+- **July 1, 2025**: Fixed critical mobile dialog scrolling issue in admin panel
+  - Implemented dual modal system: custom full-screen modals for mobile, standard dialogs for desktop
+  - Mobile forms now use native scrolling without viewport conflicts
+  - Fixed issue where Add Pet button was unreachable after image uploads on mobile
+  - Ensured all admin forms (Add/Edit Pet, Add/Edit Supply) work properly on mobile devices
 - **June 30, 2025**: Implemented comprehensive customer notification system
   - Added email notifications for order status updates (In Progress, Ready)
   - Integrated SMS notifications via Twilio for real-time updates
