@@ -100,13 +100,6 @@ export default function PetCard({ pet }: PetCardProps) {
                 </Badge>
               </div>
             </div>
-            {pet.isAvailable && (
-              <div className="pt-4">
-                <Button className="w-full bg-brand-blue hover:bg-blue-600 text-white">
-                  Contact About {pet.name}
-                </Button>
-              </div>
-            )}
           </div>
         </DialogContent>
       </Dialog>

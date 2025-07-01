@@ -601,6 +601,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Clear cart after successful order
       await storage.clearCart(userId);
       
+      // Send admin notifications for new order
+      try {
+        const user = req.user;
+        const customerName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+        
+        // Get all admin users
+        const allUsers = await storage.getAllUsers();
+        const adminEmails = allUsers
+          .filter(u => u.isAdmin)
+          .map(u => u.email)
+          .filter((email): email is string => !!email);
+        
+        await notificationService.sendAdminNewOrderNotifications(
+          adminEmails,
+          order.id,
+          customerName,
+          order.totalAmount
+        );
+      } catch (notificationError) {
+        console.error('Failed to send admin notifications for new order:', notificationError);
+        // Don't fail the order if notifications fail
+      }
+      
       res.json(order);
     } catch (error) {
       console.error("Error creating order:", error);
@@ -650,6 +673,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user?.id;
       const appointmentData = insertAppointmentSchema.parse({ ...req.body, userId });
       const appointment = await storage.createAppointment(appointmentData);
+      
+      // Send admin notifications for new appointment
+      try {
+        const customerName = `${appointmentData.ownerFirstName} ${appointmentData.ownerLastName}`;
+        
+        // Get all admin users
+        const allUsers = await storage.getAllUsers();
+        const adminEmails = allUsers
+          .filter(u => u.isAdmin)
+          .map(u => u.email)
+          .filter((email): email is string => !!email);
+        
+        await notificationService.sendAdminNewAppointmentNotifications(
+          adminEmails,
+          appointment.id,
+          customerName,
+          appointmentData.serviceType,
+          appointmentData.appointmentDate,
+          appointmentData.appointmentTime
+        );
+      } catch (notificationError) {
+        console.error('Failed to send admin notifications for new appointment:', notificationError);
+        // Don't fail the appointment if notifications fail
+      }
+      
       res.json(appointment);
     } catch (error) {
       console.error("Error creating appointment:", error);

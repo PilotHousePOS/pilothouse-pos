@@ -11,6 +11,85 @@ class EmailService {
     }
   }
 
+  async sendAdminNewOrderEmail(adminEmail: string, orderId: number, customerName: string, totalAmount: string): Promise<boolean> {
+    if (!process.env.SENDGRID_API_KEY) {
+      console.log('SendGrid not configured, admin email notification skipped');
+      return false;
+    }
+
+    try {
+      const emailContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0;">Animal House Pet Store - Admin Alert</h1>
+          </div>
+          <div style="padding: 30px; background-color: #f9f9f9;">
+            <h2 style="color: #333; margin-bottom: 20px;">🛒 New Order Received #${orderId}</h2>
+            <p style="font-size: 16px; line-height: 1.5;"><strong>Customer:</strong> ${customerName}</p>
+            <p style="font-size: 16px; line-height: 1.5;"><strong>Order Total:</strong> $${totalAmount}</p>
+            <p style="font-size: 16px; line-height: 1.5;"><strong>Status:</strong> Pending</p>
+            <div style="background-color: #dc2626; color: white; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <strong>Action Required:</strong><br>
+              Please review and process this order in the admin dashboard.
+            </div>
+          </div>
+        </div>
+      `;
+
+      await this.mailService.send({
+        to: adminEmail,
+        from: 'noreply@animalhouse.com',
+        subject: `New Order #${orderId} - Animal House Admin Alert`,
+        html: emailContent,
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Failed to send admin new order email:', error);
+      return false;
+    }
+  }
+
+  async sendAdminNewAppointmentEmail(adminEmail: string, appointmentId: number, customerName: string, serviceType: string, appointmentDate: string, appointmentTime: string): Promise<boolean> {
+    if (!process.env.SENDGRID_API_KEY) {
+      console.log('SendGrid not configured, admin email notification skipped');
+      return false;
+    }
+
+    try {
+      const emailContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0;">Animal House Pet Store - Admin Alert</h1>
+          </div>
+          <div style="padding: 30px; background-color: #f9f9f9;">
+            <h2 style="color: #333; margin-bottom: 20px;">📅 New Grooming Appointment #${appointmentId}</h2>
+            <p style="font-size: 16px; line-height: 1.5;"><strong>Customer:</strong> ${customerName}</p>
+            <p style="font-size: 16px; line-height: 1.5;"><strong>Service:</strong> ${serviceType}</p>
+            <p style="font-size: 16px; line-height: 1.5;"><strong>Date:</strong> ${appointmentDate}</p>
+            <p style="font-size: 16px; line-height: 1.5;"><strong>Time:</strong> ${appointmentTime}</p>
+            <div style="background-color: #dc2626; color: white; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <strong>Action Required:</strong><br>
+              Please review and confirm this appointment in the admin dashboard.
+            </div>
+          </div>
+        </div>
+      `;
+
+      await this.mailService.send({
+        to: adminEmail,
+        from: 'noreply@animalhouse.com',
+        subject: `New Appointment #${appointmentId} - Animal House Admin Alert`,
+        html: emailContent,
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Failed to send admin new appointment email:', error);
+      return false;
+    }
+  }
+
   async sendOrderStatusEmail(to: string, firstName: string, orderId: number, status: string): Promise<boolean> {
     if (!process.env.SENDGRID_API_KEY) {
       console.log('SendGrid not configured, email notification skipped');
@@ -73,6 +152,26 @@ class EmailService {
 
 // Push notification service (for web push notifications)
 class PushNotificationService {
+  async sendAdminNewOrderPush(orderId: number, customerName: string): Promise<boolean> {
+    const message = `🛒 New order #${orderId} from ${customerName}`;
+    console.log(`Admin push notification: ${message}`);
+    
+    // TODO: Implement actual push notification service for admin users
+    // This would send to all admin users' registered push endpoints
+    
+    return true;
+  }
+
+  async sendAdminNewAppointmentPush(appointmentId: number, customerName: string, serviceType: string): Promise<boolean> {
+    const message = `📅 New ${serviceType} appointment #${appointmentId} from ${customerName}`;
+    console.log(`Admin push notification: ${message}`);
+    
+    // TODO: Implement actual push notification service for admin users
+    // This would send to all admin users' registered push endpoints
+    
+    return true;
+  }
+
   async sendOrderStatusPush(userId: string, orderId: number, status: string): Promise<boolean> {
     // This would integrate with a service like Firebase Cloud Messaging or web push
     // For now, we'll log the notification that would be sent
@@ -139,6 +238,49 @@ export class NotificationService {
     this.emailService = new EmailService();
     this.pushService = new PushNotificationService();
     this.smsService = new SMSService();
+  }
+
+  async sendAdminNewOrderNotifications(
+    adminEmails: string[],
+    orderId: number,
+    customerName: string,
+    totalAmount: string
+  ): Promise<void> {
+    console.log(`Sending admin notifications for new order ${orderId}`);
+
+    // Send email notifications to all admin users
+    for (const adminEmail of adminEmails) {
+      await this.emailService.sendAdminNewOrderEmail(adminEmail, orderId, customerName, totalAmount);
+    }
+
+    // Send push notification to admin users
+    await this.pushService.sendAdminNewOrderPush(orderId, customerName);
+  }
+
+  async sendAdminNewAppointmentNotifications(
+    adminEmails: string[],
+    appointmentId: number,
+    customerName: string,
+    serviceType: string,
+    appointmentDate: string,
+    appointmentTime: string
+  ): Promise<void> {
+    console.log(`Sending admin notifications for new appointment ${appointmentId}`);
+
+    // Send email notifications to all admin users
+    for (const adminEmail of adminEmails) {
+      await this.emailService.sendAdminNewAppointmentEmail(
+        adminEmail,
+        appointmentId,
+        customerName,
+        serviceType,
+        appointmentDate,
+        appointmentTime
+      );
+    }
+
+    // Send push notification to admin users
+    await this.pushService.sendAdminNewAppointmentPush(appointmentId, customerName, serviceType);
   }
 
   async sendOrderStatusNotifications(
