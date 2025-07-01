@@ -479,7 +479,7 @@ export default function Admin() {
                       Add Pet
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle>Add New Pet</DialogTitle>
                     </DialogHeader>
@@ -538,7 +538,7 @@ export default function Admin() {
                       Add Supply
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle>Add New Supply</DialogTitle>
                     </DialogHeader>
