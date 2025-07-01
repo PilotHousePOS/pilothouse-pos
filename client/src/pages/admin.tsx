@@ -479,11 +479,13 @@ export default function Admin() {
                       Add Pet
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
+                  <DialogContent className="sm:max-w-lg max-w-[95vw] sm:max-h-[90vh] max-h-screen sm:m-4 m-0 sm:rounded-lg rounded-none sm:top-[50%] top-0 sm:translate-y-[-50%] translate-y-0 overflow-y-auto">
+                    <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
                       <DialogTitle>Add New Pet</DialogTitle>
                     </DialogHeader>
-                    <AddPetForm onSubmit={(data) => createPetMutation.mutate(data)} />
+                    <div className="pb-safe">
+                      <AddPetForm onSubmit={(data) => createPetMutation.mutate(data)} />
+                    </div>
                   </DialogContent>
                 </Dialog>
               </div>
@@ -538,11 +540,13 @@ export default function Admin() {
                       Add Supply
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
+                  <DialogContent className="sm:max-w-lg max-w-[95vw] sm:max-h-[90vh] max-h-screen sm:m-4 m-0 sm:rounded-lg rounded-none sm:top-[50%] top-0 sm:translate-y-[-50%] translate-y-0 overflow-y-auto">
+                    <DialogHeader className="sticky top-0 bg-background z-10 pb-4">
                       <DialogTitle>Add New Supply</DialogTitle>
                     </DialogHeader>
-                    <AddSupplyForm onSubmit={(data) => createSupplyMutation.mutate(data)} />
+                    <div className="pb-safe">
+                      <AddSupplyForm onSubmit={(data) => createSupplyMutation.mutate(data)} />
+                    </div>
                   </DialogContent>
                 </Dialog>
               </div>
@@ -896,14 +900,16 @@ export default function Admin() {
       {/* Edit Pet Dialog */}
       {editingPet && (
         <Dialog open={!!editingPet} onOpenChange={() => setEditingPet(null)}>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg max-w-[95vw] m-4">
             <DialogHeader>
               <DialogTitle>Edit Pet</DialogTitle>
             </DialogHeader>
-            <EditPetForm 
-              pet={editingPet}
-              onSubmit={(data) => editPetMutation.mutate({ id: editingPet.id, data })} 
-            />
+            <div className="max-h-[70vh] overflow-y-auto pr-2">
+              <EditPetForm 
+                pet={editingPet}
+                onSubmit={(data) => editPetMutation.mutate({ id: editingPet.id, data })} 
+              />
+            </div>
           </DialogContent>
         </Dialog>
       )}
@@ -911,14 +917,16 @@ export default function Admin() {
       {/* Edit Supply Dialog */}
       {editingSupply && (
         <Dialog open={!!editingSupply} onOpenChange={() => setEditingSupply(null)}>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg max-w-[95vw] m-4">
             <DialogHeader>
               <DialogTitle>Edit Supply</DialogTitle>
             </DialogHeader>
-            <EditSupplyForm 
-              supply={editingSupply}
-              onSubmit={(data) => editSupplyMutation.mutate({ id: editingSupply.id, data })} 
-            />
+            <div className="max-h-[70vh] overflow-y-auto pr-2">
+              <EditSupplyForm 
+                supply={editingSupply}
+                onSubmit={(data) => editSupplyMutation.mutate({ id: editingSupply.id, data })} 
+              />
+            </div>
           </DialogContent>
         </Dialog>
       )}
