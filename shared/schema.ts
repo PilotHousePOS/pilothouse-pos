@@ -106,6 +106,7 @@ export const orderItems = pgTable("order_items", {
 export const appointments = pgTable("appointments", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").notNull().references(() => users.id),
+  groomerId: integer("groomer_id").references(() => groomers.id),
   serviceType: varchar("service_type", { length: 100 }).notNull(), // grooming
   appointmentDate: date("appointment_date").notNull(),
   appointmentTime: varchar("appointment_time", { length: 20 }).notNull(),
@@ -139,6 +140,30 @@ export const groomingSettings = pgTable("grooming_settings", {
   id: serial("id").primaryKey(),
   setting: varchar("setting", { length: 100 }).notNull().unique(), // 'available_days', 'start_time', 'end_time', 'max_appointments_per_day'
   value: text("value").notNull(), // JSON string for complex values
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Groomers
+export const groomers = pgTable("groomers", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }),
+  phone: varchar("phone", { length: 20 }),
+  specialties: text("specialties"), // e.g., "full grooming, bath only"
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Groomer availability by day
+export const groomerAvailability = pgTable("groomer_availability", {
+  id: serial("id").primaryKey(),
+  groomerId: integer("groomer_id").notNull().references(() => groomers.id),
+  dayOfWeek: integer("day_of_week").notNull(), // 0=Sunday, 1=Monday, etc.
+  isAvailable: boolean("is_available").default(true),
+  startTime: varchar("start_time", { length: 10 }), // e.g., "09:00"
+  endTime: varchar("end_time", { length: 10 }), // e.g., "13:30"
+  createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
@@ -179,6 +204,16 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
 
 export const appointmentsRelations = relations(appointments, ({ one }) => ({
   user: one(users, { fields: [appointments.userId], references: [users.id] }),
+  groomer: one(groomers, { fields: [appointments.groomerId], references: [groomers.id] }),
+}));
+
+export const groomersRelations = relations(groomers, ({ many }) => ({
+  appointments: many(appointments),
+  availability: many(groomerAvailability),
+}));
+
+export const groomerAvailabilityRelations = relations(groomerAvailability, ({ one }) => ({
+  groomer: one(groomers, { fields: [groomerAvailability.groomerId], references: [groomers.id] }),
 }));
 
 export const customerPetsRelations = relations(customerPets, ({ one }) => ({
@@ -230,6 +265,18 @@ export const insertGroomingSettingsSchema = createInsertSchema(groomingSettings)
   updatedAt: true,
 });
 
+export const insertGroomerSchema = createInsertSchema(groomers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertGroomerAvailabilitySchema = createInsertSchema(groomerAvailability).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -249,3 +296,7 @@ export type CustomerPet = typeof customerPets.$inferSelect;
 export type InsertCustomerPet = z.infer<typeof insertCustomerPetSchema>;
 export type GroomingSetting = typeof groomingSettings.$inferSelect;
 export type InsertGroomingSetting = z.infer<typeof insertGroomingSettingsSchema>;
+export type Groomer = typeof groomers.$inferSelect;
+export type InsertGroomer = z.infer<typeof insertGroomerSchema>;
+export type GroomerAvailability = typeof groomerAvailability.$inferSelect;
+export type InsertGroomerAvailability = z.infer<typeof insertGroomerAvailabilitySchema>;
