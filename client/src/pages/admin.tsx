@@ -457,6 +457,9 @@ export default function Admin() {
               <span className="hidden md:inline">Grooming Settings</span>
               <span className="md:hidden">Settings</span>
             </TabsTrigger>
+            <TabsTrigger value="groomers" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
+              Groomers
+            </TabsTrigger>
             <TabsTrigger value="users" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
               Users
             </TabsTrigger>

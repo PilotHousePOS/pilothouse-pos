@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,21 +18,6 @@ const SERVICES = [
 ];
 
 export default function Booking() {
-  // Fetch grooming settings
-  const { data: groomingSettings = [] } = useQuery({
-    queryKey: ["/api/admin/grooming-settings"],
-    retry: false,
-  });
-
-  // Fetch available groomers for selected date
-  const { data: availableGroomers = [] } = useQuery({
-    queryKey: ["/api/groomers/available", selectedDate?.getDay()],
-    queryFn: () => selectedDate ? 
-      fetch(`/api/groomers/available/${selectedDate.getDay()}`).then(res => res.json()) : 
-      [],
-    enabled: !!selectedDate,
-    retry: false,
-  });
   const [selectedService, setSelectedService] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState('');
@@ -49,8 +34,29 @@ export default function Booking() {
     phoneNumber: '',
   });
 
+  // Fetch grooming settings
+  const { data: groomingSettings = [] } = useQuery({
+    queryKey: ["/api/admin/grooming-settings"],
+    retry: false,
+  });
+
+  // Fetch available groomers for selected date
+  const { data: availableGroomers = [] } = useQuery({
+    queryKey: ["/api/groomers/available", selectedDate?.getDay()],
+    queryFn: () => selectedDate ? 
+      fetch(`/api/groomers/available/${selectedDate.getDay()}`).then(res => res.json()) : 
+      [],
+    enabled: !!selectedDate,
+    retry: false,
+  });
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Reset groomer selection when date changes
+  useEffect(() => {
+    setSelectedGroomer('');
+  }, [selectedDate]);
 
   // Generate available time slots in 15-minute intervals
   const availableTimeSlots = useMemo(() => {
@@ -132,6 +138,7 @@ export default function Booking() {
       setSelectedService('');
       setSelectedDate(new Date());
       setSelectedTime('');
+      setSelectedGroomer('');
       setPetInfo({ name: '', type: '', notes: '' });
       setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
@@ -178,6 +185,7 @@ export default function Booking() {
       serviceType: selectedService,
       appointmentDate: selectedDate.toISOString().split('T')[0],
       appointmentTime: selectedTime,
+      groomerId: parseInt(selectedGroomer),
       petName: petInfo.name,
       petType: petInfo.type,
       specialNotes: petInfo.notes,
@@ -252,6 +260,36 @@ export default function Booking() {
             ))}
           </div>
         </div>
+
+        {/* Groomer Selection */}
+        {selectedDate && (
+          <div>
+            <Label className="text-sm font-semibold text-gray-900 mb-3 block">Select Groomer</Label>
+            <Select value={selectedGroomer} onValueChange={setSelectedGroomer}>
+              <SelectTrigger className="w-full border-gray-300 rounded-xl">
+                <SelectValue placeholder="Choose a groomer" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableGroomers.length > 0 ? (
+                  availableGroomers.map((groomer: any) => (
+                    <SelectItem key={groomer.id} value={groomer.id.toString()}>
+                      {groomer.name}
+                      {groomer.specialties && (
+                        <span className="text-sm text-gray-500 ml-2">
+                          ({groomer.specialties})
+                        </span>
+                      )}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="no-groomers" disabled>
+                    No groomers available for this day
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         {/* Owner Information */}
         <div>
