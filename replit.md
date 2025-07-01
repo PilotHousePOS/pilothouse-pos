@@ -4,13 +4,11 @@
 A mobile-friendly web application for "Animal House" pet store featuring pet browsing, grooming appointment booking, supply purchasing, inventory management, customer accounts with admin functionality, and Animal House branding. The app has a dark, bold design focusing on grooming services (bath and full service), pet adoption, and exotic reptile specialty - no vet care or training services offered.
 
 ## Recent Changes
-- **July 1, 2025**: Implemented groomer selection system with 15-minute appointment intervals
-  - Added groomer management database tables (groomers, groomer_availability)
-  - Built comprehensive groomer API endpoints for admin management and customer booking
-  - Integrated groomer selection dropdown in booking form based on selected date
-  - Implemented 15-minute appointment intervals replacing configurable durations
-  - Added groomer availability scheduling by day of week
-  - Created sample groomers (Sarah Johnson, Mike Thompson) with Tuesday availability
+- **July 1, 2025**: Implemented 15-minute appointment intervals and groomer backend system
+  - Added 15-minute appointment intervals replacing configurable durations (every 15 minutes 9:00 AM to 1:30 PM)
+  - Built groomer management database tables and API endpoints for future use
+  - Removed groomer selection requirement from booking form per user request
+  - Maintained groomer system in backend for potential future implementation
 - **July 1, 2025**: Fixed critical mobile dialog scrolling issue in admin panel
   - Implemented dual modal system: custom full-screen modals for mobile, standard dialogs for desktop
   - Mobile forms now use native scrolling without viewport conflicts

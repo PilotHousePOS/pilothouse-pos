@@ -168,7 +168,7 @@ export default function Booking() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedService || !selectedDate || !selectedTime || !selectedGroomer || !petInfo.name || !petInfo.type || 
+    if (!selectedService || !selectedDate || !selectedTime || !petInfo.name || !petInfo.type || 
         !ownerInfo.firstName || !ownerInfo.lastName || !ownerInfo.phoneNumber) {
       toast({
         title: "Missing Information",
@@ -185,7 +185,7 @@ export default function Booking() {
       serviceType: selectedService,
       appointmentDate: selectedDate.toISOString().split('T')[0],
       appointmentTime: selectedTime,
-      groomerId: parseInt(selectedGroomer),
+      ...(selectedGroomer && { groomerId: parseInt(selectedGroomer) }),
       petName: petInfo.name,
       petType: petInfo.type,
       specialNotes: petInfo.notes,
@@ -261,35 +261,7 @@ export default function Booking() {
           </div>
         </div>
 
-        {/* Groomer Selection */}
-        {selectedDate && (
-          <div>
-            <Label className="text-sm font-semibold text-gray-900 mb-3 block">Select Groomer</Label>
-            <Select value={selectedGroomer} onValueChange={setSelectedGroomer}>
-              <SelectTrigger className="w-full border-gray-300 rounded-xl">
-                <SelectValue placeholder="Choose a groomer" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableGroomers.length > 0 ? (
-                  availableGroomers.map((groomer: any) => (
-                    <SelectItem key={groomer.id} value={groomer.id.toString()}>
-                      {groomer.name}
-                      {groomer.specialties && (
-                        <span className="text-sm text-gray-500 ml-2">
-                          ({groomer.specialties})
-                        </span>
-                      )}
-                    </SelectItem>
-                  ))
-                ) : (
-                  <SelectItem value="no-groomers" disabled>
-                    No groomers available for this day
-                  </SelectItem>
-                )}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+{/* Groomer selection hidden per user request */}
 
         {/* Owner Information */}
         <div>
