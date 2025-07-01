@@ -4,6 +4,12 @@
 A mobile-friendly web application for "Animal House" pet store featuring pet browsing, grooming appointment booking, supply purchasing, inventory management, customer accounts with admin functionality, and Animal House branding. The app has a dark, bold design focusing on grooming services (bath and full service), pet adoption, and exotic reptile specialty - no vet care or training services offered.
 
 ## Recent Changes
+- **July 1, 2025**: Implemented admin notification system for new orders and appointments
+  - Added comprehensive admin email notifications for new orders with customer details and order totals
+  - Created admin email alerts for new grooming appointments with service details and times
+  - Integrated push notification infrastructure for admin alerts (console logging for now)
+  - All admin users receive notifications when new orders are placed or appointments are booked
+  - Notification system gracefully handles failures without breaking order/appointment creation
 - **July 1, 2025**: Implemented 15-minute appointment intervals and groomer backend system
   - Added 15-minute appointment intervals replacing configurable durations (every 15 minutes 9:00 AM to 1:30 PM)
   - Built groomer management database tables and API endpoints for future use
