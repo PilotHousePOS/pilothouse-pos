@@ -685,10 +685,7 @@ export default function Admin() {
                   <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div 
                       className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
-                      onClick={() => {
-                        console.log('Opening appointment details for:', appointment);
-                        setSelectedAppointment(appointment);
-                      }}
+                      onClick={() => setSelectedAppointment(appointment)}
                     >
                       <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
                       <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
@@ -1007,24 +1004,18 @@ export default function Admin() {
                   </div>
                 </div>
                 <div className="border-t pt-3">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm font-semibold text-gray-700">Status</Label>
-                      <Badge 
-                        variant={
-                          selectedAppointment.status === 'confirmed' ? 'default' : 
-                          selectedAppointment.status === 'rejected' ? 'destructive' : 
-                          'secondary'
-                        }
-                      >
-                        {selectedAppointment.status === 'scheduled' ? 'Pending' : 
-                         selectedAppointment.status.charAt(0).toUpperCase() + selectedAppointment.status.slice(1)}
-                      </Badge>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-semibold text-gray-700">Price</Label>
-                      <p className="text-gray-900">${selectedAppointment.price}</p>
-                    </div>
+                  <div>
+                    <Label className="text-sm font-semibold text-gray-700">Status</Label>
+                    <Badge 
+                      variant={
+                        selectedAppointment.status === 'confirmed' ? 'default' : 
+                        selectedAppointment.status === 'rejected' ? 'destructive' : 
+                        'secondary'
+                      }
+                    >
+                      {selectedAppointment.status === 'scheduled' ? 'Pending' : 
+                       selectedAppointment.status.charAt(0).toUpperCase() + selectedAppointment.status.slice(1)}
+                    </Badge>
                   </div>
                 </div>
               </div>
