@@ -153,21 +153,39 @@ class EmailService {
 // Push notification service (for web push notifications)
 class PushNotificationService {
   async sendAdminNewOrderPush(orderId: number, customerName: string): Promise<boolean> {
-    const message = `🛒 New order #${orderId} from ${customerName}`;
-    console.log(`Admin push notification: ${message}`);
+    const title = `New Order #${orderId}`;
+    const message = `New order from ${customerName}`;
     
-    // TODO: Implement actual push notification service for admin users
-    // This would send to all admin users' registered push endpoints
+    console.log(`Admin push notification: ${title} - ${message}`);
+    
+    // Send real-time WebSocket notification to admin users
+    const wsServer = (global as any).wsServer;
+    if (wsServer) {
+      wsServer.broadcastToAdmins({
+        notificationType: 'order',
+        title,
+        message
+      });
+    }
     
     return true;
   }
 
   async sendAdminNewAppointmentPush(appointmentId: number, customerName: string, serviceType: string): Promise<boolean> {
-    const message = `📅 New ${serviceType} appointment #${appointmentId} from ${customerName}`;
-    console.log(`Admin push notification: ${message}`);
+    const title = `New Appointment #${appointmentId}`;
+    const message = `${serviceType} appointment from ${customerName}`;
     
-    // TODO: Implement actual push notification service for admin users
-    // This would send to all admin users' registered push endpoints
+    console.log(`Admin push notification: ${title} - ${message}`);
+    
+    // Send real-time WebSocket notification to admin users
+    const wsServer = (global as any).wsServer;
+    if (wsServer) {
+      wsServer.broadcastToAdmins({
+        notificationType: 'appointment',
+        title,
+        message
+      });
+    }
     
     return true;
   }

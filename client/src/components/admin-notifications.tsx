@@ -21,7 +21,8 @@ export default function AdminNotifications() {
   useEffect(() => {
     // Connect to WebSocket for real-time notifications
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+    const token = localStorage.getItem('token');
+    const ws = new WebSocket(`${protocol}//${window.location.host}/ws?token=${token}`);
 
     ws.onmessage = (event) => {
       try {
