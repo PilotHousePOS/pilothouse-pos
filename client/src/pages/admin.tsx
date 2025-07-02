@@ -47,6 +47,7 @@ export default function Admin() {
   const [editingSupply, setEditingSupply] = useState<any>(null);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
 
+  // Always call all hooks at the top level
   const { data: pets = [] } = useQuery({
     queryKey: ["/api/pets"],
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
