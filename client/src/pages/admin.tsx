@@ -685,7 +685,10 @@ export default function Admin() {
                   <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div 
                       className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
-                      onClick={() => setSelectedAppointment(appointment)}
+                      onClick={() => {
+                        console.log('Opening appointment details for:', appointment);
+                        setSelectedAppointment(appointment);
+                      }}
                     >
                       <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
                       <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
@@ -948,14 +951,14 @@ export default function Admin() {
       {/* Appointment Details Dialog */}
       {selectedAppointment && (
         <Dialog open={!!selectedAppointment} onOpenChange={() => setSelectedAppointment(null)}>
-          <DialogContent className="fixed inset-0 z-50 bg-background p-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 sm:relative sm:max-w-lg sm:rounded-lg sm:border sm:shadow-lg sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 sm:data-[state=closed]:slide-out-to-left-1/2 sm:data-[state=closed]:slide-out-to-top-[48%] sm:data-[state=open]:slide-in-from-left-1/2 sm:data-[state=open]:slide-in-from-top-[48%]">
-            <DialogHeader className="p-6 pb-2">
+          <DialogContent className="max-w-md mx-auto">
+            <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
                 Appointment Details
               </DialogTitle>
             </DialogHeader>
-            <div className="p-6 pt-2 space-y-4">
+            <div className="space-y-4">
               <div className="space-y-3">
                 <div>
                   <Label className="text-sm font-semibold text-gray-700">Service</Label>
