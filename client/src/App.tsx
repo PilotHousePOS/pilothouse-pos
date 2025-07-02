@@ -26,6 +26,7 @@ function Router() {
           <>
             <Route path="/" component={Landing} />
             <Route path="/auth" component={Auth} />
+            <Route path="*" component={() => <Landing />} />
           </>
         ) : (
           <>
