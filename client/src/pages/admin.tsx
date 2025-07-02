@@ -36,6 +36,124 @@ import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import AdminNotifications from "@/components/admin-notifications";
 
+// Calendar component for confirmed appointments
+function AppointmentCalendar({ appointments }: { appointments: any[] }) {
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  
+  // Filter confirmed appointments for the selected date
+  const confirmedAppointments = appointments.filter((apt: any) => 
+    apt.status === 'confirmed' && 
+    new Date(apt.appointmentDate).toDateString() === selectedDate.toDateString()
+  );
+
+  // Group appointments by time slot
+  const timeSlots = [
+    '9:00 AM', '9:15 AM', '9:30 AM', '9:45 AM',
+    '10:00 AM', '10:15 AM', '10:30 AM', '10:45 AM',
+    '11:00 AM', '11:15 AM', '11:30 AM', '11:45 AM',
+    '12:00 PM', '12:15 PM', '12:30 PM', '12:45 PM',
+    '1:00 PM', '1:15 PM', '1:30 PM'
+  ];
+
+  const getAppointmentForTime = (time: string) => {
+    return confirmedAppointments.find((apt: any) => apt.appointmentTime === time);
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
+
+  const changeDate = (days: number) => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(selectedDate.getDate() + days);
+    setSelectedDate(newDate);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Calendar className="w-5 h-5" />
+          Daily Appointment Calendar
+        </CardTitle>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="sm" onClick={() => changeDate(-1)}>
+              ← Previous Day
+            </Button>
+            <h3 className="text-lg font-semibold">{formatDate(selectedDate)}</h3>
+            <Button variant="outline" size="sm" onClick={() => changeDate(1)}>
+              Next Day →
+            </Button>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setSelectedDate(new Date())}
+          >
+            Today
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <div className="text-sm text-gray-600 mb-4">
+            {confirmedAppointments.length} confirmed appointments for this day
+          </div>
+          
+          {timeSlots.map((time) => {
+            const appointment = getAppointmentForTime(time);
+            return (
+              <div key={time} className="flex items-center gap-4 p-3 border rounded-lg">
+                <div className="w-20 text-sm font-medium text-gray-700">
+                  {time}
+                </div>
+                {appointment ? (
+                  <div className="flex-1 bg-blue-50 p-3 rounded border-l-4 border-blue-500">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-semibold text-gray-900">
+                          {appointment.petName} ({appointment.petType})
+                        </h4>
+                        <p className="text-sm text-gray-600">
+                          Owner: {appointment.ownerFirstName} {appointment.ownerLastName}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Phone: {appointment.ownerPhoneNumber}
+                        </p>
+                        <p className="text-xs text-blue-600">
+                          Service: {appointment.serviceType === 'grooming-full' ? 'Full Grooming' : 'Bath Only'}
+                        </p>
+                      </div>
+                      <Badge variant="default" className="bg-green-600">
+                        Confirmed
+                      </Badge>
+                    </div>
+                    {appointment.specialNotes && (
+                      <p className="text-xs text-gray-500 mt-2">
+                        Notes: {appointment.specialNotes}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex-1 text-gray-400 text-sm italic">
+                    Available
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const typedUser = user as User;
@@ -63,7 +181,7 @@ export default function Admin() {
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
-  const { data: appointments = [] } = useQuery({
+  const { data: appointments = [] } = useQuery<any[]>({
     queryKey: ["/api/appointments"],
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
@@ -469,6 +587,9 @@ export default function Admin() {
             <TabsTrigger value="users" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
               Users
             </TabsTrigger>
+            <TabsTrigger value="calendar" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
+              Calendar
+            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -760,6 +881,10 @@ export default function Admin() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="calendar" className="space-y-6">
+          <AppointmentCalendar appointments={appointments} />
         </TabsContent>
 
         <TabsContent value="grooming">
