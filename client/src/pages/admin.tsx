@@ -45,6 +45,7 @@ export default function Admin() {
   const [isAddSupplyOpen, setIsAddSupplyOpen] = useState(false);
   const [editingPet, setEditingPet] = useState<any>(null);
   const [editingSupply, setEditingSupply] = useState<any>(null);
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
 
   const { data: pets = [] } = useQuery({
     queryKey: ["/api/pets"],
@@ -681,10 +682,15 @@ export default function Admin() {
               <div className="space-y-4">
                 {(appointments as any[]).map((appointment: any) => (
                   <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{appointment.service}</h3>
-                      <p className="text-sm text-gray-600">{appointment.petName}</p>
-                      <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()}</p>
+                    <div 
+                      className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                      onClick={() => setSelectedAppointment(appointment)}
+                    >
+                      <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
+                      <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
+                      <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
+                      <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
+                      <p className="text-xs text-blue-600 mt-1">Click to view details</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Select
@@ -695,9 +701,9 @@ export default function Admin() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="scheduled">Scheduled</SelectItem>
-                          <SelectItem value="in-progress">In Progress</SelectItem>
-                          <SelectItem value="ready">Ready</SelectItem>
+                          <SelectItem value="scheduled">Pending</SelectItem>
+                          <SelectItem value="confirmed">Confirmed</SelectItem>
+                          <SelectItem value="rejected">Rejected</SelectItem>
                           <SelectItem value="completed">Completed</SelectItem>
                           <SelectItem value="cancelled">Cancelled</SelectItem>
                         </SelectContent>
@@ -937,6 +943,91 @@ export default function Admin() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Appointment Details Dialog */}
+      {selectedAppointment && (
+        <Dialog open={!!selectedAppointment} onOpenChange={() => setSelectedAppointment(null)}>
+          <DialogContent className="fixed inset-0 z-50 bg-background p-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 sm:relative sm:max-w-lg sm:rounded-lg sm:border sm:shadow-lg sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 sm:data-[state=closed]:slide-out-to-left-1/2 sm:data-[state=closed]:slide-out-to-top-[48%] sm:data-[state=open]:slide-in-from-left-1/2 sm:data-[state=open]:slide-in-from-top-[48%]">
+            <DialogHeader className="p-6 pb-2">
+              <DialogTitle className="flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                Appointment Details
+              </DialogTitle>
+            </DialogHeader>
+            <div className="p-6 pt-2 space-y-4">
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-sm font-semibold text-gray-700">Service</Label>
+                  <p className="text-gray-900">{selectedAppointment.serviceType}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-semibold text-gray-700">Date</Label>
+                    <p className="text-gray-900">{new Date(selectedAppointment.appointmentDate).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-semibold text-gray-700">Time</Label>
+                    <p className="text-gray-900">{selectedAppointment.appointmentTime}</p>
+                  </div>
+                </div>
+                <div className="border-t pt-3">
+                  <h4 className="font-semibold text-gray-900 mb-2">Pet Information</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-semibold text-gray-700">Pet Name</Label>
+                      <p className="text-gray-900">{selectedAppointment.petName}</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold text-gray-700">Pet Type</Label>
+                      <p className="text-gray-900">{selectedAppointment.petType}</p>
+                    </div>
+                  </div>
+                  {selectedAppointment.specialNotes && (
+                    <div className="mt-3">
+                      <Label className="text-sm font-semibold text-gray-700">Special Notes</Label>
+                      <p className="text-gray-900">{selectedAppointment.specialNotes}</p>
+                    </div>
+                  )}
+                </div>
+                <div className="border-t pt-3">
+                  <h4 className="font-semibold text-gray-900 mb-2">Owner Information</h4>
+                  <div className="space-y-2">
+                    <div>
+                      <Label className="text-sm font-semibold text-gray-700">Name</Label>
+                      <p className="text-gray-900">{selectedAppointment.ownerFirstName} {selectedAppointment.ownerLastName}</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold text-gray-700">Phone Number</Label>
+                      <p className="text-gray-900">{selectedAppointment.ownerPhoneNumber}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="border-t pt-3">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-semibold text-gray-700">Status</Label>
+                      <Badge 
+                        variant={
+                          selectedAppointment.status === 'confirmed' ? 'default' : 
+                          selectedAppointment.status === 'rejected' ? 'destructive' : 
+                          'secondary'
+                        }
+                      >
+                        {selectedAppointment.status === 'scheduled' ? 'Pending' : 
+                         selectedAppointment.status.charAt(0).toUpperCase() + selectedAppointment.status.slice(1)}
+                      </Badge>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold text-gray-700">Price</Label>
+                      <p className="text-gray-900">${selectedAppointment.price}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Edit Pet Dialog */}
       {editingPet && (

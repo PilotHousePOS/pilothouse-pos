@@ -660,7 +660,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const id = parseInt(req.params.id);
       const { status } = req.body;
+      
+      // Get appointment details before updating for customer notification
+      const oldAppointment = await storage.getAppointment(id);
       const appointment = await storage.updateAppointmentStatus(id, status);
+      
+      // Send customer notification for confirmed or rejected appointments
+      if (oldAppointment && (status === 'confirmed' || status === 'rejected')) {
+        const customerUser = await storage.getUser(oldAppointment.userId);
+        if (customerUser) {
+          console.log(`Sending appointment ${status} notification to customer: ${customerUser.email}`);
+          
+          // Send email notification
+          try {
+            if (status === 'confirmed') {
+              await notificationService.sendAppointmentConfirmedNotification(
+                customerUser.email || '',
+                customerUser.firstName || 'Customer',
+                id,
+                oldAppointment.serviceType,
+                oldAppointment.appointmentDate,
+                oldAppointment.appointmentTime
+              );
+            } else if (status === 'rejected') {
+              await notificationService.sendAppointmentRejectedNotification(
+                customerUser.email || '',
+                customerUser.firstName || 'Customer',
+                id,
+                oldAppointment.serviceType,
+                oldAppointment.appointmentDate,
+                oldAppointment.appointmentTime
+              );
+            }
+          } catch (notificationError) {
+            console.error('Failed to send customer notification:', notificationError);
+            // Don't fail the appointment update if notification fails
+          }
+        }
+      }
+      
       res.json(appointment);
     } catch (error) {
       console.error("Error updating appointment:", error);

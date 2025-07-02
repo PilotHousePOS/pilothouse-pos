@@ -148,6 +148,97 @@ class EmailService {
       return false;
     }
   }
+
+  async sendAppointmentConfirmedEmail(to: string, firstName: string, appointmentId: number, serviceType: string, appointmentDate: string, appointmentTime: string): Promise<boolean> {
+    try {
+      const emailContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px;">
+            <h2 style="color: #22c55e; margin-bottom: 20px;">✅ Appointment Confirmed #${appointmentId}</h2>
+            <p style="font-size: 16px; line-height: 1.5;">Hi ${firstName},</p>
+            <p style="font-size: 16px; line-height: 1.5;">Great news! Your grooming appointment has been confirmed.</p>
+            
+            <div style="background-color: #22c55e; color: white; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <strong>📅 Appointment Details:</strong><br>
+              Service: ${serviceType}<br>
+              Date: ${new Date(appointmentDate).toLocaleDateString()}<br>
+              Time: ${appointmentTime}
+            </div>
+            
+            <div style="background-color: #fef3c7; color: #92400e; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <strong>⚠️ Important Reminder:</strong><br>
+              NO Poodles, Doodles, German Shepherds, or Large Mix Breed Dogs after 12:00 PM!<br>
+              Please ensure your appointment time complies with this policy.
+            </div>
+
+            <p style="font-size: 16px; line-height: 1.5;">
+              Please arrive 10 minutes early for your appointment. If you need to reschedule, please call us as soon as possible.
+            </p>
+            
+            <p style="font-size: 14px; color: #666; margin-top: 30px;">
+              Thank you for choosing Animal House Pet Store!
+            </p>
+          </div>
+        </div>
+      `;
+
+      await this.mailService.send({
+        to,
+        from: 'noreply@animalhousepetstore.com',
+        subject: `Appointment Confirmed - ${serviceType} on ${new Date(appointmentDate).toLocaleDateString()}`,
+        html: emailContent,
+      });
+
+      console.log(`Appointment confirmation email sent to ${to} for appointment ${appointmentId}`);
+      return true;
+    } catch (error) {
+      console.error('Appointment confirmation email error:', error);
+      return false;
+    }
+  }
+
+  async sendAppointmentRejectedEmail(to: string, firstName: string, appointmentId: number, serviceType: string, appointmentDate: string, appointmentTime: string): Promise<boolean> {
+    try {
+      const emailContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px;">
+            <h2 style="color: #dc2626; margin-bottom: 20px;">❌ Appointment Declined #${appointmentId}</h2>
+            <p style="font-size: 16px; line-height: 1.5;">Hi ${firstName},</p>
+            <p style="font-size: 16px; line-height: 1.5;">We're sorry, but we cannot accommodate your appointment request at this time.</p>
+            
+            <div style="background-color: #dc2626; color: white; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <strong>📅 Requested Appointment:</strong><br>
+              Service: ${serviceType}<br>
+              Date: ${new Date(appointmentDate).toLocaleDateString()}<br>
+              Time: ${appointmentTime}
+            </div>
+
+            <p style="font-size: 16px; line-height: 1.5;">
+              This may be due to scheduling conflicts, breed restrictions, or capacity limitations. 
+              Please feel free to book a different time that works better with our schedule.
+            </p>
+            
+            <p style="font-size: 14px; color: #666; margin-top: 30px;">
+              Thank you for understanding. We appreciate your business at Animal House Pet Store!
+            </p>
+          </div>
+        </div>
+      `;
+
+      await this.mailService.send({
+        to,
+        from: 'noreply@animalhousepetstore.com',
+        subject: `Appointment Request Declined - ${serviceType} on ${new Date(appointmentDate).toLocaleDateString()}`,
+        html: emailContent,
+      });
+
+      console.log(`Appointment rejection email sent to ${to} for appointment ${appointmentId}`);
+      return true;
+    } catch (error) {
+      console.error('Appointment rejection email error:', error);
+      return false;
+    }
+  }
 }
 
 // Push notification service (for web push notifications)
@@ -326,6 +417,48 @@ export class NotificationService {
     if (userPhoneNumber) {
       await this.smsService.sendOrderStatusSMS(userPhoneNumber, userFirstName, orderId, status);
     }
+  }
+
+  async sendAppointmentConfirmedNotification(
+    userEmail: string,
+    userFirstName: string,
+    appointmentId: number,
+    serviceType: string,
+    appointmentDate: string,
+    appointmentTime: string
+  ): Promise<void> {
+    console.log(`Sending appointment confirmation notification for appointment ${appointmentId}`);
+    
+    // Send email notification
+    await this.emailService.sendAppointmentConfirmedEmail(
+      userEmail, 
+      userFirstName, 
+      appointmentId, 
+      serviceType, 
+      appointmentDate, 
+      appointmentTime
+    );
+  }
+
+  async sendAppointmentRejectedNotification(
+    userEmail: string,
+    userFirstName: string,
+    appointmentId: number,
+    serviceType: string,
+    appointmentDate: string,
+    appointmentTime: string
+  ): Promise<void> {
+    console.log(`Sending appointment rejection notification for appointment ${appointmentId}`);
+    
+    // Send email notification
+    await this.emailService.sendAppointmentRejectedEmail(
+      userEmail, 
+      userFirstName, 
+      appointmentId, 
+      serviceType, 
+      appointmentDate, 
+      appointmentTime
+    );
   }
 }
 
