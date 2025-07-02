@@ -46,54 +46,34 @@ export default function Admin() {
   const [editingPet, setEditingPet] = useState<any>(null);
   const [editingSupply, setEditingSupply] = useState<any>(null);
 
-  if (isLoading) {
-    return (
-      <div className="p-6">
-        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto" />
-      </div>
-    );
-  }
-
-  if (!typedUser?.isAdmin) {
-    return (
-      <div className="p-6">
-        <div className="text-center">
-          <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
-          <p className="text-gray-600">Administrator privileges required</p>
-        </div>
-      </div>
-    );
-  }
-
   const { data: pets = [] } = useQuery({
     queryKey: ["/api/pets"],
-    enabled: isAuthenticated && typedUser?.isAdmin,
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
   const { data: supplies = [] } = useQuery({
     queryKey: ["/api/supplies"],
-    enabled: isAuthenticated && typedUser?.isAdmin,
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
   const { data: orders = [] } = useQuery({
     queryKey: ["/api/orders"],
-    enabled: isAuthenticated && typedUser?.isAdmin,
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
   const { data: appointments = [] } = useQuery({
     queryKey: ["/api/appointments"],
-    enabled: isAuthenticated && typedUser?.isAdmin,
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
   const { data: users = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/users"],
-    enabled: isAuthenticated && typedUser?.isAdmin,
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
   const { data: groomingSettings = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/grooming-settings"],
-    enabled: isAuthenticated && typedUser?.isAdmin,
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
   // Create Pet Mutation
@@ -401,6 +381,26 @@ export default function Admin() {
 
   const pendingAppointments = (appointments as any[]).filter((a: any) => a.status === 'scheduled').length;
   const pendingOrders = (orders as any[]).filter((o: any) => o.status === 'pending').length;
+
+  if (isLoading) {
+    return (
+      <div className="p-6">
+        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto" />
+      </div>
+    );
+  }
+
+  if (!typedUser?.isAdmin) {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
+          <p className="text-gray-600">Administrator privileges required</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-6 py-4 pb-20">

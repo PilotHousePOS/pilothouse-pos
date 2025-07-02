@@ -17,7 +17,7 @@ import BottomNav from "@/components/bottom-nav";
 
 function Router() {
   // Simple approach - just check localStorage directly
-  const hasToken = !!localStorage.getItem('auth_token');
+  const hasToken = !!localStorage.getItem('token');
   
   return (
     <div className="max-w-md mx-auto bg-white min-h-screen relative overflow-hidden">

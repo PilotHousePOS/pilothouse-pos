@@ -19,6 +19,13 @@ export default function AdminNotifications() {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().then(permission => {
+        console.log('Notification permission:', permission);
+      });
+    }
+
     // Connect to WebSocket for real-time notifications
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const token = localStorage.getItem('token');
@@ -79,6 +86,15 @@ export default function AdminNotifications() {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  const enableNotifications = async () => {
+    if ('Notification' in window) {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        console.log('Notifications enabled successfully');
+      }
+    }
+  };
+
   return (
     <div className="relative">
       {/* Notification Bell Button */}
@@ -113,6 +129,24 @@ export default function AdminNotifications() {
                 <X className="h-4 w-4" />
               </Button>
             </div>
+            {Notification.permission === 'denied' && (
+              <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded text-sm">
+                <p className="text-yellow-800 dark:text-yellow-200 mb-2">
+                  Browser notifications are blocked. Please enable them in your browser settings to receive real-time alerts.
+                </p>
+              </div>
+            )}
+            {Notification.permission === 'default' && (
+              <div className="mt-2">
+                <Button
+                  onClick={enableNotifications}
+                  size="sm"
+                  className="w-full"
+                >
+                  Enable Browser Notifications
+                </Button>
+              </div>
+            )}
           </div>
 
           <div className="max-h-80 overflow-y-auto">
