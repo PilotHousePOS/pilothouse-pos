@@ -4,6 +4,10 @@
 A mobile-friendly web application for "Animal House" pet store featuring pet browsing, grooming appointment booking, supply purchasing, inventory management, customer accounts with admin functionality, and Animal House branding. The app has a dark, bold design focusing on grooming services (bath and full service), pet adoption, and exotic reptile specialty - no vet care or training services offered.
 
 ## Recent Changes
+- **July 2, 2025**: Added breed restriction notice for afternoon appointments
+  - Added prominent warning about NO Poodles, Doodles, German Shepherds, or Large Mix Breed Dogs after 12:00 PM
+  - Yellow warning banner displayed before time selection to prevent scheduling conflicts
+  - Clear message that customers will be asked to reschedule if they arrive with restricted breeds
 - **July 1, 2025**: Implemented admin notification system for new orders and appointments
   - Added comprehensive admin email notifications for new orders with customer details and order totals
   - Created admin email alerts for new grooming appointments with service details and times

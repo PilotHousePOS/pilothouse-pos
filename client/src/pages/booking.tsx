@@ -239,6 +239,22 @@ export default function Booking() {
           </Card>
         </div>
 
+        {/* Important Notice */}
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-start space-x-2">
+            <div className="text-yellow-600 font-bold text-lg">⚠️</div>
+            <div>
+              <h4 className="font-bold text-yellow-800 mb-2">IMPORTANT NOTICE</h4>
+              <p className="text-sm text-yellow-700">
+                <strong>NO Poodles, Doodles, German Shepherds, or Large Mix Breed Dogs after 12:00 PM!</strong>
+              </p>
+              <p className="text-xs text-yellow-600 mt-1">
+                If you schedule for after 12:00 PM with a large dog, you will be asked to reschedule when you arrive.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Time Slots */}
         <div>
           <Label className="text-sm font-semibold text-gray-900 mb-3 block">Available Times</Label>
