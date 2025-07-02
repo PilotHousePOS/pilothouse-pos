@@ -19,7 +19,7 @@ import type { User, CustomerPet, Order, Appointment } from "@shared/schema";
 export default function Profile() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const hasToken = !!localStorage.getItem('auth_token');
+  const hasToken = !!localStorage.getItem('token');
 
   const { data: currentUser, isLoading: userLoading, error } = useQuery<User>({
     queryKey: ["/api/auth/user"],
@@ -64,7 +64,7 @@ export default function Profile() {
         description: "Please sign in again.",
         variant: "destructive",
       });
-      localStorage.removeItem('auth_token');
+      localStorage.removeItem('token');
       setTimeout(() => {
         window.location.href = "/";
       }, 1000);
@@ -86,7 +86,7 @@ export default function Profile() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem('token');
     localStorage.clear();
     window.location.href = '/';
   };

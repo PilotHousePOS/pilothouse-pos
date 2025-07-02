@@ -45,7 +45,7 @@ export default function Home() {
     console.log('Logging out...');
     
     // Clear token from localStorage first
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem('token');
     localStorage.clear();
     
     // Force immediate redirect to landing page

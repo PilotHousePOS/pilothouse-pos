@@ -30,7 +30,7 @@ export default function Auth() {
         
         // Store token in localStorage as backup to cookies
         if (userData.token) {
-          localStorage.setItem('auth_token', userData.token);
+          localStorage.setItem('token', userData.token);
           console.log('Token stored in localStorage');
         }
         
@@ -66,7 +66,7 @@ export default function Auth() {
         
         // Store token in localStorage as backup to cookies
         if (userData.token) {
-          localStorage.setItem('auth_token', userData.token);
+          localStorage.setItem('token', userData.token);
           console.log('Token stored in localStorage');
         }
         
