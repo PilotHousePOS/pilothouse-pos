@@ -22,12 +22,6 @@ export default function Landing() {
         <div className="absolute bottom-20 right-12 w-24 h-24 bg-purple-600/20 rounded-full animate-bounce shadow-2xl"></div>
       </div>
 
-      {/* Status Bar */}
-      <div className="bg-black text-white text-xs py-1 px-4 flex justify-between items-center relative z-10 border-b border-gray-700">
-        <span className="font-bold">9:41 AM</span>
-        <span className="font-bold">100% 📶 📶 🔋</span>
-      </div>
-
       {/* Main Content */}
       <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center relative z-10">
         {/* Logo with Bold Design */}
