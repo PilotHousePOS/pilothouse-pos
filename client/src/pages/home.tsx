@@ -78,12 +78,6 @@ export default function Home() {
 
   return (
     <div className="pb-20 bg-gradient-to-b from-gray-50 to-white">
-      {/* Status Bar */}
-      <div className="bg-brand-blue text-white text-xs py-1 px-4 flex justify-between items-center">
-        <span>9:41 AM</span>
-        <span>100% 📶 📶 🔋</span>
-      </div>
-
       {/* Modern Header */}
       <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 px-4 py-4 sticky top-0 z-10">
         <div className="flex items-center justify-between">
