@@ -363,10 +363,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Save token to database
       await storage.createPasswordResetToken(resetToken, user.id, expiresAt);
 
-      // Send password reset email
-      await sendPasswordResetEmail(user.email!, resetToken);
+      // Try to send password reset email (non-fatal if it fails)
+      try {
+        await sendPasswordResetEmail(user.email!, resetToken);
+        console.log(`Password reset email sent to ${user.email}`);
+      } catch (emailError) {
+        // Log the error but don't fail the request
+        // This prevents the password reset flow from breaking if email service is down
+        console.error("Failed to send password reset email (non-fatal):", emailError);
+        console.log(`Password reset token created for ${user.email} but email send failed. Token: ${resetToken}`);
+      }
 
-      console.log(`Password reset email sent to ${user.email}`);
+      // Always return success to prevent user enumeration
       res.json({ message: "If an account exists with this email, you will receive a password reset link." });
     } catch (error) {
       console.error("Error in forgot password:", error);
