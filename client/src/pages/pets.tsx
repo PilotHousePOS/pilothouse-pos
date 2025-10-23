@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Filter } from "lucide-react";
 import PetCard from "@/components/pet-card";
+import { useLocation } from "wouter";
 
 const PET_SPECIES = [
   { id: 'all', label: 'All Pets', emoji: '🐾' },
@@ -15,7 +16,14 @@ const PET_SPECIES = [
 ];
 
 export default function Pets() {
-  const [selectedSpecies, setSelectedSpecies] = useState('all');
+  const [location] = useLocation();
+  const urlParams = new URLSearchParams(location.split('?')[1] || '');
+  const speciesParam = urlParams.get('species') || 'all';
+  const [selectedSpecies, setSelectedSpecies] = useState(speciesParam);
+
+  useEffect(() => {
+    setSelectedSpecies(speciesParam);
+  }, [speciesParam]);
 
   const { data: pets = [], isLoading } = useQuery({
     queryKey: selectedSpecies === 'all' ? ["/api/pets"] : ["/api/pets", `species=${selectedSpecies}`],

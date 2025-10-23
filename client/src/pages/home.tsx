@@ -238,7 +238,7 @@ export default function Home() {
         <div className="grid grid-cols-2 gap-4">
           <Card 
             className="bg-gradient-to-br from-green-50 to-emerald-100 border border-green-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
-            onClick={() => setLocation('/booking')}
+            onClick={() => setLocation('/pets?species=fish')}
           >
             <CardContent className="p-6 text-center">
               <div className="w-12 h-12 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
@@ -252,7 +252,7 @@ export default function Home() {
 
           <Card 
             className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
-            onClick={() => setLocation('/pets')}
+            onClick={() => setLocation('/pets?species=reptile')}
           >
             <CardContent className="p-6 text-center">
               <div className="w-12 h-12 bg-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
