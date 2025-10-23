@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLocation } from "wouter";
-import { ArrowLeft, Mail, Save, User as UserIcon } from "lucide-react";
+import { ArrowLeft, Mail, Save, User as UserIcon, Lock } from "lucide-react";
 import type { User } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { z } from "zod";
@@ -15,11 +15,23 @@ const updateEmailSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
 });
 
+const updatePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+  confirmPassword: z.string().min(1, "Please confirm your password"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
 export default function Settings() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const hasToken = !!localStorage.getItem('token');
   const [email, setEmail] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const { data: currentUser, isLoading: userLoading, error: userError } = useQuery<User>({
     queryKey: ["/api/auth/user"],
@@ -80,6 +92,44 @@ export default function Settings() {
     },
   });
 
+  const updatePasswordMutation = useMutation({
+    mutationFn: async (passwords: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
+      const result = updatePasswordSchema.safeParse(passwords);
+      if (!result.success) {
+        throw new Error(result.error.errors[0].message);
+      }
+      
+      const response = await apiRequest("PATCH", "/api/auth/update-password", {
+        currentPassword: passwords.currentPassword,
+        newPassword: passwords.newPassword,
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Failed to update password: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      return data;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Password updated",
+        description: "Your password has been successfully updated.",
+      });
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update failed",
+        description: error.message || "Failed to update password. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   if (!hasToken) {
     setLocation("/");
     return null;
@@ -116,6 +166,37 @@ export default function Settings() {
     }
 
     updateEmailMutation.mutate(email);
+  };
+
+  const handleUpdatePassword = () => {
+    if (!currentPassword.trim() || !newPassword.trim() || !confirmPassword.trim()) {
+      toast({
+        title: "All fields required",
+        description: "Please fill in all password fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: "Passwords don't match",
+        description: "New password and confirm password must match.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      toast({
+        title: "Password too short",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    updatePasswordMutation.mutate({ currentPassword, newPassword, confirmPassword });
   };
 
   return (
@@ -167,7 +248,7 @@ export default function Settings() {
       </Card>
 
       {/* Update Email */}
-      <Card>
+      <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <Mail className="w-5 h-5" />
@@ -195,6 +276,63 @@ export default function Settings() {
           >
             <Save className="w-4 h-4 mr-2" />
             {updateEmailMutation.isPending ? "Updating..." : "Update Email"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Update Password */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Lock className="w-5 h-5" />
+            Change Password
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label htmlFor="current-password">Current Password</Label>
+            <Input
+              id="current-password"
+              type="password"
+              placeholder="Enter current password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              className="mt-1"
+              data-testid="input-current-password"
+            />
+          </div>
+          <div>
+            <Label htmlFor="new-password">New Password</Label>
+            <Input
+              id="new-password"
+              type="password"
+              placeholder="Enter new password (min 6 characters)"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="mt-1"
+              data-testid="input-new-password"
+            />
+          </div>
+          <div>
+            <Label htmlFor="confirm-password">Confirm New Password</Label>
+            <Input
+              id="confirm-password"
+              type="password"
+              placeholder="Confirm new password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="mt-1"
+              data-testid="input-confirm-password"
+            />
+          </div>
+          <Button
+            onClick={handleUpdatePassword}
+            disabled={updatePasswordMutation.isPending || !currentPassword.trim() || !newPassword.trim() || !confirmPassword.trim()}
+            className="w-full bg-brand-blue hover:bg-blue-600"
+            data-testid="button-update-password"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {updatePasswordMutation.isPending ? "Updating..." : "Update Password"}
           </Button>
         </CardContent>
       </Card>

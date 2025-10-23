@@ -219,6 +219,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user password
+  app.patch('/api/auth/update-password', async (req, res) => {
+    try {
+      // Check both cookies and Authorization header
+      const cookieToken = req.cookies?.auth_token;
+      const authHeader = req.headers.authorization;
+      const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+      
+      const token = headerToken || cookieToken;
+      
+      if (!token) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const user = verifyToken(token);
+      
+      if (!user) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+
+      const { currentPassword, newPassword } = req.body;
+
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: "Current password and new password are required" });
+      }
+
+      // Validate new password length
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "New password must be at least 6 characters" });
+      }
+
+      // Get current user data
+      const currentUser = await storage.getUser(user.id);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Verify current password (In production, use bcrypt.compare)
+      if (currentUser.password !== currentPassword) {
+        return res.status(401).json({ message: "Current password is incorrect" });
+      }
+
+      // Update user with new password (In production, hash the password with bcrypt)
+      const updatedUser = await storage.upsertUser({
+        ...currentUser,
+        password: newPassword,
+        updatedAt: new Date(),
+      });
+
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json({ message: "Password updated successfully", user: userWithoutPassword });
+    } catch (error) {
+      console.error("Error updating password:", error);
+      res.status(500).json({ message: "Failed to update password" });
+    }
+  });
+
   // Pet routes with fallback data
   app.get("/api/pets", async (req, res) => {
     try {
