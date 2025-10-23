@@ -166,14 +166,14 @@ export default function Auth() {
                     {isLoading ? "Signing In..." : "Sign In"}
                   </Button>
                 </form>
-                <div className="text-center mt-4 pb-2">
+                <div className="text-center mt-6 mb-4">
                   <button
                     type="button"
                     onClick={() => setLocation('/forgot-password')}
-                    className="text-base text-blue-300 hover:text-white underline transition-colors font-medium"
+                    className="text-lg text-cyan-400 hover:text-cyan-300 underline transition-colors font-semibold"
                     data-testid="link-forgot-password"
                   >
-                    Forgot Password?
+                    🔐 Forgot Password?
                   </button>
                 </div>
               </TabsContent>
