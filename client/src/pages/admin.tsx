@@ -429,6 +429,27 @@ export default function Admin() {
     },
   });
 
+  const rejectAppointmentMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("PUT", `/api/admin/appointments/${id}/reject`, {});
+    },
+    onSuccess: () => {
+      toast({
+        title: "Appointment Rejected",
+        description: "The customer has been notified via email about the rejection.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments/unapproved"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to reject appointment. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const updateAppointmentMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
       await apiRequest("PUT", `/api/appointments/${id}`, { status });
@@ -813,10 +834,19 @@ export default function Admin() {
                           size="sm"
                           className="bg-green-600 hover:bg-green-700 text-white"
                           onClick={() => approveAppointmentMutation.mutate(appointment.id)}
-                          disabled={approveAppointmentMutation.isPending}
+                          disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending}
                           data-testid={`approve-appointment-${appointment.id}`}
                         >
                           {approveAppointmentMutation.isPending ? 'Approving...' : 'Approve'}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => rejectAppointmentMutation.mutate(appointment.id)}
+                          disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending}
+                          data-testid={`reject-appointment-${appointment.id}`}
+                        >
+                          {rejectAppointmentMutation.isPending ? 'Rejecting...' : 'Reject'}
                         </Button>
                       </div>
                     </div>

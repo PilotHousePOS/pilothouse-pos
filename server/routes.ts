@@ -961,6 +961,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reject an appointment (admin only)
+  app.put("/api/admin/appointments/:id/reject", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const appointment = await storage.getAppointment(id);
+      
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+
+      // Reject the appointment in the database
+      const rejectedAppointment = await storage.rejectAppointment(id);
+      
+      // Get the user's email to send rejection notification
+      const customer = await storage.getUser(appointment.userId);
+      if (customer?.email) {
+        try {
+          const { sendAppointmentRejectionEmail } = await import('./sendgrid');
+          await sendAppointmentRejectionEmail(
+            customer.email,
+            `${appointment.ownerFirstName} ${appointment.ownerLastName}`,
+            appointment.petName,
+            new Date(appointment.appointmentDate).toLocaleDateString(),
+            appointment.appointmentTime
+          );
+        } catch (emailError) {
+          console.error('Failed to send rejection email:', emailError);
+          // Don't fail the rejection if email fails
+        }
+      }
+      
+      res.json(rejectedAppointment);
+    } catch (error) {
+      console.error("Error rejecting appointment:", error);
+      res.status(500).json({ message: "Failed to reject appointment" });
+    }
+  });
+
   app.put("/api/appointments/:id", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
