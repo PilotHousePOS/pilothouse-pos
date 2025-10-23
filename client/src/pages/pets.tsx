@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Filter } from "lucide-react";
 import PetCard from "@/components/pet-card";
-import { useLocation } from "wouter";
 
 const PET_SPECIES = [
   { id: 'all', label: 'All Pets', emoji: '🐾' },
@@ -16,17 +15,29 @@ const PET_SPECIES = [
 ];
 
 export default function Pets() {
-  const [location] = useLocation();
-  const urlParams = new URLSearchParams(location.split('?')[1] || '');
-  const speciesParam = urlParams.get('species') || 'all';
-  const [selectedSpecies, setSelectedSpecies] = useState(speciesParam);
+  const getSpeciesFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('species') || 'all';
+  };
+
+  const [selectedSpecies, setSelectedSpecies] = useState(getSpeciesFromUrl());
 
   useEffect(() => {
-    setSelectedSpecies(speciesParam);
-  }, [speciesParam]);
+    // Update species when URL changes
+    const species = getSpeciesFromUrl();
+    setSelectedSpecies(species);
+  }, []);
 
   const { data: pets = [], isLoading } = useQuery({
-    queryKey: selectedSpecies === 'all' ? ["/api/pets"] : ["/api/pets", `species=${selectedSpecies}`],
+    queryKey: selectedSpecies === 'all' ? ["/api/pets"] : ["/api/pets", selectedSpecies],
+    queryFn: async () => {
+      const url = selectedSpecies === 'all' 
+        ? '/api/pets'
+        : `/api/pets?species=${selectedSpecies}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to fetch pets');
+      return response.json();
+    },
   });
 
   return (
@@ -75,7 +86,7 @@ export default function Pets() {
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4">
-          {pets.map((pet) => (
+          {pets.map((pet: any) => (
             <PetCard key={pet.id} pet={pet} />
           ))}
         </div>
