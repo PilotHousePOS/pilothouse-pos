@@ -4,6 +4,24 @@
 A mobile-friendly web application for "Animal House" pet store featuring pet browsing, grooming appointment booking, supply purchasing, inventory management, customer accounts with admin functionality, and Animal House branding. The app has a dark, bold design focusing on grooming services (bath and full service), pet adoption, and exotic reptile specialty - no vet care or training services offered.
 
 ## Recent Changes
+- **October 23, 2025**: Created dedicated Aquatics and Exotic Reptiles pages
+  - Built `/aquatics` page showing only fish and aquatic supplies
+  - Built `/reptiles` page showing only reptiles and reptile care products
+  - Each page features dedicated header with themed colors (blue for aquatics, green for reptiles)
+  - Filtered displays show only relevant animals and supplies for each category
+  - Updated home page service buttons to navigate to dedicated pages instead of filtered pets page
+  - Clean, focused shopping experience for each animal category
+- **October 23, 2025**: Added appointment rejection functionality with email notifications
+  - Added red "Reject" button next to green "Approve" button in pending approvals section
+  - Created rejection email system with professional HTML template
+  - Email message: "Sorry for the inconvenience, but your Grooming Appointment has been rejected. Please expect a call promptly with an explanation."
+  - Rejected appointments marked with "rejected" status and moved to regular appointments list
+  - Customers automatically notified via email when appointment is rejected
+  - Both approve and reject buttons disabled during processing to prevent double-clicks
+- **October 23, 2025**: Fixed appointment status dropdown display issue
+  - Added dynamic key prop to Select component to force re-render on status changes
+  - Dropdown now correctly shows "Confirmed" immediately after approval instead of staying on "Pending"
+  - Status updates reflect instantly in the UI after admin actions
 - **October 23, 2025**: Added admin approval workflow for grooming appointments
   - Added `isApproved` boolean field to appointments table (defaults to false for new bookings)
   - Created admin-only API endpoints: GET /api/admin/appointments/unapproved and PUT /api/admin/appointments/:id/approve
