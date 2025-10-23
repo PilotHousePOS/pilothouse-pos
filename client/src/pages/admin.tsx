@@ -186,6 +186,11 @@ export default function Admin() {
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
+  const { data: unapprovedAppointments = [] } = useQuery<any[]>({
+    queryKey: ["/api/admin/appointments/unapproved"],
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+  });
+
   const { data: users = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/users"],
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
@@ -403,6 +408,27 @@ export default function Admin() {
   });
 
   // Update Appointment Status Mutation
+  const approveAppointmentMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("PUT", `/api/admin/appointments/${id}/approve`, {});
+    },
+    onSuccess: () => {
+      toast({
+        title: "Appointment Approved",
+        description: "The grooming appointment has been approved successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments/unapproved"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to approve appointment. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const updateAppointmentMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
       await apiRequest("PUT", `/api/appointments/${id}`, { status });
@@ -752,6 +778,54 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="orders" className="space-y-6">
+          {/* Pending Approval Section */}
+          {unapprovedAppointments.length > 0 && (
+            <Card className="border-2 border-orange-200 bg-orange-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-orange-700">
+                  <Calendar className="w-5 h-5" />
+                  Pending Approval ({unapprovedAppointments.length})
+                </CardTitle>
+                <CardDescription className="text-orange-600">
+                  New grooming appointments awaiting admin approval
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {unapprovedAppointments.map((appointment: any) => (
+                    <div key={appointment.id} className="flex items-center justify-between p-4 border border-orange-300 rounded-lg bg-white">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge className="bg-orange-500 text-white">Pending Approval</Badge>
+                        </div>
+                        <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
+                        <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
+                        <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
+                        <p className="text-sm text-gray-600">Phone: {appointment.ownerPhoneNumber}</p>
+                        <p className="text-xs text-gray-500">Date: {new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
+                        {appointment.specialNotes && (
+                          <p className="text-xs text-gray-500 mt-1">Notes: {appointment.specialNotes}</p>
+                        )}
+                        <p className="text-xs text-gray-500">Booked: {new Date(appointment.createdAt).toLocaleString()}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                          onClick={() => approveAppointmentMutation.mutate(appointment.id)}
+                          disabled={approveAppointmentMutation.isPending}
+                          data-testid={`approve-appointment-${appointment.id}`}
+                        >
+                          {approveAppointmentMutation.isPending ? 'Approving...' : 'Approve'}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Orders Section */}
           <Card>
             <CardHeader>

@@ -479,6 +479,23 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
+  async getUnapprovedAppointments(): Promise<Appointment[]> {
+    return await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.isApproved, false))
+      .orderBy(desc(appointments.createdAt));
+  }
+
+  async approveAppointment(id: number): Promise<Appointment> {
+    const [updated] = await db
+      .update(appointments)
+      .set({ isApproved: true, updatedAt: new Date() })
+      .where(eq(appointments.id, id))
+      .returning();
+    return updated;
+  }
+
   // Customer pet operations
   async getCustomerPets(userId: string): Promise<CustomerPet[]> {
     return await db

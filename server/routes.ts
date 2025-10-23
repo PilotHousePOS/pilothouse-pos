@@ -927,6 +927,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get unapproved appointments (admin only)
+  app.get("/api/admin/appointments/unapproved", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const unapprovedAppointments = await storage.getUnapprovedAppointments();
+      res.json(unapprovedAppointments);
+    } catch (error) {
+      console.error("Error fetching unapproved appointments:", error);
+      res.status(500).json({ message: "Failed to fetch unapproved appointments" });
+    }
+  });
+
+  // Approve an appointment (admin only)
+  app.put("/api/admin/appointments/:id/approve", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const appointment = await storage.approveAppointment(id);
+      
+      res.json(appointment);
+    } catch (error) {
+      console.error("Error approving appointment:", error);
+      res.status(500).json({ message: "Failed to approve appointment" });
+    }
+  });
+
   app.put("/api/appointments/:id", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);

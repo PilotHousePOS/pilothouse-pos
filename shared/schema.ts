@@ -127,6 +127,7 @@ export const appointments = pgTable("appointments", {
   ownerLastName: varchar("owner_last_name", { length: 255 }).notNull(),
   ownerPhoneNumber: varchar("owner_phone_number", { length: 20 }).notNull(),
   status: varchar("status", { length: 50 }).default("scheduled"), // scheduled, confirmed, completed, cancelled
+  isApproved: boolean("is_approved").default(false), // pending admin approval
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
