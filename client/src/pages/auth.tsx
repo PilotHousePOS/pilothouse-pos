@@ -136,9 +136,6 @@ export default function Auth() {
               </TabsList>
               
               <TabsContent value="signin" className="space-y-4 mt-6">
-                <div className="bg-yellow-500 text-black p-3 rounded mb-4 text-center font-bold">
-                  ⚠️ VERSION TEST - OCT 23, 2025 - 4:47 PM
-                </div>
                 <form onSubmit={handleSignInSubmit} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-white">Email</Label>
@@ -168,14 +165,14 @@ export default function Auth() {
                   >
                     {isLoading ? "Signing In..." : "Sign In"}
                   </Button>
-                  <div className="text-center mt-6 mb-2">
+                  <div className="text-center mt-4 mb-2">
                     <button
                       type="button"
                       onClick={() => setLocation('/forgot-password')}
-                      className="text-lg text-cyan-400 hover:text-cyan-300 underline transition-colors font-semibold"
+                      className="text-sm text-blue-400 hover:text-blue-300 underline transition-colors"
                       data-testid="link-forgot-password"
                     >
-                      🔐 Forgot Password?
+                      Forgot Password?
                     </button>
                   </div>
                 </form>
