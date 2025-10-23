@@ -136,6 +136,9 @@ export default function Auth() {
               </TabsList>
               
               <TabsContent value="signin" className="space-y-4 mt-6">
+                <div className="bg-yellow-500 text-black p-3 rounded mb-4 text-center font-bold">
+                  ⚠️ VERSION TEST - OCT 23, 2025 - 4:47 PM
+                </div>
                 <form onSubmit={handleSignInSubmit} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-white">Email</Label>
