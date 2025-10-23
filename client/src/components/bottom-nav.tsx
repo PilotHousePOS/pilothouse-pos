@@ -16,6 +16,13 @@ export default function BottomNav() {
     ...((user as any)?.isAdmin ? [{ path: "/admin", icon: Settings, label: "Admin" }] : []),
   ];
 
+  const handleNavClick = (path: string) => {
+    // Always navigate to the path
+    setLocation(path);
+    // Scroll to top of page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <nav className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 px-6 py-2">
       <div className="flex items-center justify-around">
@@ -30,7 +37,8 @@ export default function BottomNav() {
               className={`flex flex-col items-center space-y-1 p-2 h-auto ${
                 isActive ? 'text-brand-blue' : 'text-gray-400'
               }`}
-              onClick={() => setLocation(item.path)}
+              onClick={() => handleNavClick(item.path)}
+              data-testid={`nav-${item.label.toLowerCase()}`}
             >
               <Icon className="w-5 h-5" />
               <span className="text-xs font-medium">{item.label}</span>
