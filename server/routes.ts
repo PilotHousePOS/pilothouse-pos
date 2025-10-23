@@ -2,6 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
+import crypto from "crypto";
 import { storage } from "./storage";
 import { generateToken, verifyToken, authMiddleware, setAuthCookie } from "./auth";
 import {
@@ -14,6 +15,7 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 import { notificationService } from './notifications';
+import { sendPasswordResetEmail } from './sendgrid';
 
 // Configure multer for file uploads
 const uploadStorage = multer.diskStorage({
@@ -330,6 +332,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating name:", error);
       res.status(500).json({ message: "Failed to update name" });
+    }
+  });
+
+  // Request password reset
+  app.post('/api/auth/forgot-password', async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      // Check if user exists
+      const user = await storage.getUserByEmail(email);
+      
+      // Don't reveal if user exists or not (security best practice)
+      // Always return success to prevent user enumeration
+      if (!user) {
+        console.log(`Password reset requested for non-existent email: ${email}`);
+        return res.json({ message: "If an account exists with this email, you will receive a password reset link." });
+      }
+
+      // Generate secure reset token
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      
+      // Token expires in 1 hour
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+      // Save token to database
+      await storage.createPasswordResetToken(resetToken, user.id, expiresAt);
+
+      // Send password reset email
+      await sendPasswordResetEmail(user.email!, resetToken);
+
+      console.log(`Password reset email sent to ${user.email}`);
+      res.json({ message: "If an account exists with this email, you will receive a password reset link." });
+    } catch (error) {
+      console.error("Error in forgot password:", error);
+      res.status(500).json({ message: "Failed to process password reset request" });
+    }
+  });
+
+  // Reset password with token
+  app.post('/api/auth/reset-password', async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+
+      if (!token || !newPassword) {
+        return res.status(400).json({ message: "Token and new password are required" });
+      }
+
+      // Validate new password length
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "New password must be at least 6 characters" });
+      }
+
+      // Get token from database
+      const resetToken = await storage.getPasswordResetToken(token);
+
+      if (!resetToken) {
+        return res.status(400).json({ message: "Invalid or expired reset token" });
+      }
+
+      // Check if token is expired
+      if (new Date() > new Date(resetToken.expiresAt)) {
+        return res.status(400).json({ message: "Reset token has expired" });
+      }
+
+      // Check if token was already used
+      if (resetToken.used) {
+        return res.status(400).json({ message: "Reset token has already been used" });
+      }
+
+      // Get user
+      const user = await storage.getUser(resetToken.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Update password (In production, hash the password with bcrypt)
+      await storage.upsertUser({
+        ...user,
+        password: newPassword,
+        updatedAt: new Date(),
+      });
+
+      // Mark token as used
+      await storage.markTokenAsUsed(token);
+
+      // Clean up expired tokens (housekeeping)
+      await storage.deleteExpiredTokens();
+
+      console.log(`Password successfully reset for user ${user.email}`);
+      res.json({ message: "Password has been successfully reset. You can now log in with your new password." });
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      res.status(500).json({ message: "Failed to reset password" });
     }
   });
 

@@ -161,9 +161,20 @@ export default function Auth() {
                     type="submit"
                     disabled={isLoading}
                     className="w-full bg-gradient-to-r from-brand-blue to-blue-600 hover:from-blue-600 hover:to-brand-blue text-white font-bold py-3"
+                    data-testid="button-signin"
                   >
                     {isLoading ? "Signing In..." : "Sign In"}
                   </Button>
+                  <div className="text-center mt-3">
+                    <button
+                      type="button"
+                      onClick={() => setLocation('/forgot-password')}
+                      className="text-sm text-gray-300 hover:text-white underline transition-colors"
+                      data-testid="link-forgot-password"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
                 </form>
               </TabsContent>
               

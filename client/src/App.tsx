@@ -6,6 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/landing";
 import Auth from "@/pages/auth";
+import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
 import Home from "@/pages/home";
 import Pets from "@/pages/pets";
 import Supplies from "@/pages/supplies";
@@ -27,6 +29,8 @@ function Router() {
           <>
             <Route path="/" component={Landing} />
             <Route path="/auth" component={Auth} />
+            <Route path="/forgot-password" component={ForgotPassword} />
+            <Route path="/reset-password" component={ResetPassword} />
             <Route path="*" component={() => <Landing />} />
           </>
         ) : (
