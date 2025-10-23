@@ -890,6 +890,7 @@ export default function Admin() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Select
+                        key={`appointment-${appointment.id}-${appointment.status}`}
                         value={appointment.status}
                         onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
                       >
