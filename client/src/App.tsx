@@ -11,6 +11,7 @@ import Pets from "@/pages/pets";
 import Supplies from "@/pages/supplies";
 import Booking from "@/pages/booking";
 import Profile from "@/pages/profile";
+import Settings from "@/pages/settings";
 import Admin from "@/pages/admin";
 import NotFound from "@/pages/not-found";
 import BottomNav from "@/components/bottom-nav";
@@ -35,6 +36,7 @@ function Router() {
             <Route path="/supplies" component={Supplies} />
             <Route path="/booking" component={Booking} />
             <Route path="/profile" component={Profile} />
+            <Route path="/settings" component={Settings} />
             <Route path="/admin" component={Admin} />
           </>
         )}

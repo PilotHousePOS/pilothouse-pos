@@ -200,7 +200,7 @@ export default function Profile() {
               </div>
             </CardContent>
           </Card>
-          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setLocation('/settings')}>
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
                 <Settings className="w-5 h-5 text-gray-600" />

@@ -156,6 +156,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user email
+  app.patch('/api/auth/update-email', async (req, res) => {
+    try {
+      // Check both cookies and Authorization header
+      const cookieToken = req.cookies?.auth_token;
+      const authHeader = req.headers.authorization;
+      const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+      
+      const token = headerToken || cookieToken;
+      
+      if (!token) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const user = verifyToken(token);
+      
+      if (!user) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
+
+      // Check if email is already taken by another user
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser && existingUser.id !== user.id) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
+
+      // Get current user data
+      const currentUser = await storage.getUser(user.id);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Update user with new email
+      const updatedUser = await storage.upsertUser({
+        ...currentUser,
+        email,
+        updatedAt: new Date(),
+      });
+
+      // Generate new token with updated email
+      const newToken = generateToken(updatedUser);
+      setAuthCookie(res, newToken);
+
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json({ ...userWithoutPassword, token: newToken });
+    } catch (error) {
+      console.error("Error updating email:", error);
+      res.status(500).json({ message: "Failed to update email" });
+    }
+  });
+
   // Pet routes with fallback data
   app.get("/api/pets", async (req, res) => {
     try {
