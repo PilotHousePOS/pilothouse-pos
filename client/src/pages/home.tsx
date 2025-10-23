@@ -242,11 +242,11 @@ export default function Home() {
           >
             <CardContent className="p-6 text-center">
               <div className="w-12 h-12 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                <span className="text-2xl">✂️</span>
+                <span className="text-2xl">🐠</span>
               </div>
-              <h4 className="font-bold text-gray-900 mb-1">Grooming</h4>
+              <h4 className="font-bold text-gray-900 mb-1">Aquatics</h4>
               <p className="text-green-700 text-sm font-medium">Prices Vary</p>
-              <p className="text-gray-600 text-xs mt-1">Professional styling</p>
+              <p className="text-gray-600 text-xs mt-1">Fish & aquarium care</p>
             </CardContent>
           </Card>
 
