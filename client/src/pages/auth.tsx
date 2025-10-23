@@ -6,10 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Heart } from "lucide-react";
 import { useLocation } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Auth() {
   const [, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleLogin = async (email: string, password: string) => {
     setIsLoading(true);
@@ -39,9 +41,19 @@ export default function Auth() {
       } else {
         const error = await response.json();
         console.error('Login failed:', error.message);
+        toast({
+          title: "Login Failed",
+          description: "Your email or password is incorrect. Please check your information and try again.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Login error:', error);
+      toast({
+        title: "Error",
+        description: "An error occurred during login. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -75,9 +87,19 @@ export default function Auth() {
       } else {
         const error = await response.json();
         console.error('Signup failed:', error.message);
+        toast({
+          title: "Sign Up Failed",
+          description: error.message || "Unable to create account. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Signup error:', error);
+      toast({
+        title: "Error",
+        description: "An error occurred during sign up. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
