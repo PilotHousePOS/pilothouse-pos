@@ -11,6 +11,11 @@ import type { User } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { z } from "zod";
 
+const updateNameSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+});
+
 const updateEmailSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
 });
@@ -28,6 +33,8 @@ export default function Settings() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const hasToken = !!localStorage.getItem('token');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -54,6 +61,44 @@ export default function Settings() {
       }, 1000);
     }
   }, [userError, userLoading, toast]);
+
+  const updateNameMutation = useMutation({
+    mutationFn: async (names: { firstName: string; lastName: string }) => {
+      const result = updateNameSchema.safeParse(names);
+      if (!result.success) {
+        throw new Error(result.error.errors[0].message);
+      }
+      
+      const response = await apiRequest("PATCH", "/api/auth/update-name", names);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Failed to update name: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      return data;
+    },
+    onSuccess: (data) => {
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      toast({
+        title: "Name updated",
+        description: "Your name has been successfully updated.",
+      });
+      setFirstName("");
+      setLastName("");
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update failed",
+        description: error.message || "Failed to update name. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const updateEmailMutation = useMutation({
     mutationFn: async (newEmail: string) => {
@@ -145,6 +190,28 @@ export default function Settings() {
       </div>
     );
   }
+
+  const handleUpdateName = () => {
+    if (!firstName.trim() || !lastName.trim()) {
+      toast({
+        title: "All fields required",
+        description: "Please enter both first and last name.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (firstName === currentUser.firstName && lastName === currentUser.lastName) {
+      toast({
+        title: "No change",
+        description: "The new name is the same as your current name.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    updateNameMutation.mutate({ firstName, lastName });
+  };
 
   const handleUpdateEmail = () => {
     if (!email.trim()) {
@@ -244,6 +311,51 @@ export default function Settings() {
               <p className="text-brand-blue font-semibold" data-testid="text-admin-status">Administrator</p>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Update Name */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <UserIcon className="w-5 h-5" />
+            Update Name
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label htmlFor="first-name">First Name</Label>
+            <Input
+              id="first-name"
+              type="text"
+              placeholder="Enter first name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="mt-1"
+              data-testid="input-first-name"
+            />
+          </div>
+          <div>
+            <Label htmlFor="last-name">Last Name</Label>
+            <Input
+              id="last-name"
+              type="text"
+              placeholder="Enter last name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="mt-1"
+              data-testid="input-last-name"
+            />
+          </div>
+          <Button
+            onClick={handleUpdateName}
+            disabled={updateNameMutation.isPending || !firstName.trim() || !lastName.trim()}
+            className="w-full bg-brand-blue hover:bg-blue-600"
+            data-testid="button-update-name"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {updateNameMutation.isPending ? "Updating..." : "Update Name"}
+          </Button>
         </CardContent>
       </Card>
 

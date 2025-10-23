@@ -276,6 +276,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user name
+  app.patch('/api/auth/update-name', async (req, res) => {
+    try {
+      // Check both cookies and Authorization header
+      const cookieToken = req.cookies?.auth_token;
+      const authHeader = req.headers.authorization;
+      const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+      
+      const token = headerToken || cookieToken;
+      
+      if (!token) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const user = verifyToken(token);
+      
+      if (!user) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+
+      const { firstName, lastName } = req.body;
+
+      if (!firstName || !lastName) {
+        return res.status(400).json({ message: "First name and last name are required" });
+      }
+
+      // Validate name lengths
+      if (firstName.trim().length === 0 || lastName.trim().length === 0) {
+        return res.status(400).json({ message: "Names cannot be empty" });
+      }
+
+      // Get current user data
+      const currentUser = await storage.getUser(user.id);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Update user with new name
+      const updatedUser = await storage.upsertUser({
+        ...currentUser,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        updatedAt: new Date(),
+      });
+
+      // Generate new token with updated name
+      const newToken = generateToken(updatedUser);
+      setAuthCookie(res, newToken);
+
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json({ ...userWithoutPassword, token: newToken });
+    } catch (error) {
+      console.error("Error updating name:", error);
+      res.status(500).json({ message: "Failed to update name" });
+    }
+  });
+
   // Pet routes with fallback data
   app.get("/api/pets", async (req, res) => {
     try {
