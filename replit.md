@@ -4,6 +4,17 @@
 A mobile-friendly web application for "Animal House" pet store featuring pet browsing, grooming appointment booking, supply purchasing, inventory management, customer accounts with admin functionality, and Animal House branding. The app has a dark, bold design focusing on grooming services (bath and full service), pet adoption, and exotic reptile specialty - no vet care or training services offered.
 
 ## Recent Changes
+- **October 23, 2025**: Implemented comprehensive password reset system with email workflow
+  - Added password reset token database table with expiration and single-use tracking
+  - Created SendGrid email integration for password reset links with professional HTML templates
+  - Built backend API endpoints: /api/auth/forgot-password and /api/auth/reset-password
+  - Added /forgot-password page for users to request password reset emails
+  - Created /reset-password page for users to set new password via email link
+  - Tokens expire after 1 hour and are single-use only for security
+  - Prevents user enumeration by returning same message for existing and non-existing emails
+  - Email links are environment-aware (development vs production URLs)
+  - Added "Forgot Password?" link to sign-in page for easy access
+  - Complete end-to-end workflow: request → email → reset → login
 - **October 23, 2025**: Implemented comprehensive user settings page with account management
   - Created /settings route accessible from profile page Settings button
   - Added name change functionality with first name and last name fields
