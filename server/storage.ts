@@ -130,7 +130,7 @@ export class DatabaseStorage implements IStorage {
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     try {
-      const [user] = await db.select().from(users).where(eq(users.email, email));
+      const [user] = await db.select().from(users).where(ilike(users.email, email));
       return user;
     } catch (error) {
       console.error('Database error in getUserByEmail:', error);
