@@ -4,13 +4,15 @@
 A mobile-friendly web application for "Animal House" pet store featuring pet browsing, grooming appointment booking, supply purchasing, inventory management, customer accounts with admin functionality, and Animal House branding. The app has a dark, bold design focusing on grooming services (bath and full service), pet adoption, and exotic reptile specialty - no vet care or training services offered.
 
 ## Recent Changes
-- **October 23, 2025**: Implemented user settings page with email and password management
+- **October 23, 2025**: Implemented comprehensive user settings page with account management
   - Created /settings route accessible from profile page Settings button
-  - Added email change functionality with validation and duplicate checking
-  - Implemented password change with current password verification
-  - Both updates include proper form validation and error handling
-  - Token rotation on email change to keep authentication fresh
+  - Added name change functionality with first name and last name fields
+  - Implemented email change functionality with validation and duplicate checking
+  - Added password change with current password verification
+  - All updates include proper form validation and error handling
+  - Token rotation on email and name changes to keep authentication fresh
   - Password requires minimum 6 characters with confirmation matching
+  - Names validated to prevent empty values and properly trimmed
 - **July 2, 2025**: Added breed restriction notice for afternoon appointments
   - Added prominent warning about NO Poodles, Doodles, German Shepherds, or Large Mix Breed Dogs after 12:00 PM
   - Yellow warning banner displayed before time selection to prevent scheduling conflicts
