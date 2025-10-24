@@ -66,7 +66,7 @@ export default function Landing() {
                 <span className="text-3xl">🐾</span>
               </div>
               <div className="text-lg font-black text-white">ADOPT PETS</div>
-              <div className="text-xs font-bold text-blue-100 mt-2">Sharing The Love Through Astro (Discounts and Specials Available at Checkout)</div>
+              <div className="text-sm font-bold text-blue-100 mt-2">Sharing The Love Through Astro (Discounts and Specials Available at Checkout)</div>
             </CardContent>
           </Card>
 
@@ -76,8 +76,8 @@ export default function Landing() {
                 <span className="text-3xl">🛍️</span>
               </div>
               <div className="text-lg font-black text-white">PREMIUM GEAR</div>
-              <div className="text-xs font-bold text-red-100 mt-2">Top-tier quality</div>
-              <div className="text-xs font-bold text-red-100 mt-1">Bedding Bowls Bones Brushs and So Much More!!!</div>
+              <div className="text-sm font-bold text-red-100 mt-2">Top-tier quality</div>
+              <div className="text-sm font-bold text-red-100 mt-1">Bedding Bowls Bones Brushs and So Much More!!!</div>
             </CardContent>
           </Card>
 
@@ -87,8 +87,8 @@ export default function Landing() {
                 <span className="text-3xl">✂️</span>
               </div>
               <div className="text-lg font-black text-white">GROOMING</div>
-              <div className="text-xs font-bold text-green-100 mt-2">From Baths to Full Grooms and All Your Needs Inbetween</div>
-              <div className="text-xs font-bold text-green-100 mt-1">With Extra Options Like Flea Packages Nail Grinds/Polish and Teeth Brushing</div>
+              <div className="text-sm font-bold text-green-100 mt-2">From Baths to Full Grooms and All Your Needs Inbetween</div>
+              <div className="text-sm font-bold text-green-100 mt-1">With Extra Options Like Flea Packages Nail Grinds/Polish and Teeth Brushing</div>
             </CardContent>
           </Card>
 
@@ -98,7 +98,7 @@ export default function Landing() {
                 <span className="text-3xl">🦎</span>
               </div>
               <div className="text-lg font-black text-white">EXOTIC REPTILES</div>
-              <div className="text-xs font-bold text-orange-100 mt-2">From Leopard Geckos to Leachie Geckos Snakes Frogs and Spiders All Your Reptile Needs</div>
+              <div className="text-sm font-bold text-orange-100 mt-2">From Leopard Geckos to Leachie Geckos Snakes Frogs and Spiders All Your Reptile Needs</div>
             </CardContent>
           </Card>
         </div>
