@@ -96,7 +96,7 @@ export default function Landing() {
                 <span className="text-3xl">🦎</span>
               </div>
               <div className="text-lg font-black text-white">EXOTIC REPTILES</div>
-              <div className="text-sm font-bold text-orange-100 mt-2">Rare species</div>
+              <div className="text-sm font-bold text-orange-100 mt-2">From Leopard Geckos to Leachie Geckos Snakes Frogs and Spiders All Your Reptile Needs</div>
             </CardContent>
           </Card>
         </div>
