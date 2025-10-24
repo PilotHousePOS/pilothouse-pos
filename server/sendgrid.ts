@@ -20,8 +20,8 @@ export async function sendPasswordResetEmail(toEmail: string, resetToken: string
     const { client, fromEmail } = getSendGridClient();
     
     // Get the base URL for the reset link
-    const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-      ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
+    const baseUrl = process.env.REPLIT_DOMAINS 
+      ? `https://${process.env.REPLIT_DOMAINS}` 
       : 'http://localhost:5000';
     
     const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
