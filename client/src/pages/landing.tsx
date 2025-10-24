@@ -88,7 +88,7 @@ export default function Landing() {
               </div>
               <div className="text-lg font-black text-white">GROOMING</div>
               <div className="text-sm font-bold text-green-100 mt-2">From Baths to Full Grooms and All Your Needs Inbetween</div>
-              <div className="text-xs font-bold text-green-100 mt-1">With Extra Options Like Flea Packages and Nail Grinds/Polish</div>
+              <div className="text-xs font-bold text-green-100 mt-1">With Extra Options Like Flea Packages Nail Grinds/Polish and Teeth Brushing</div>
             </CardContent>
           </Card>
 
