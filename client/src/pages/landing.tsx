@@ -86,7 +86,7 @@ export default function Landing() {
                 <span className="text-3xl">✂️</span>
               </div>
               <div className="text-lg font-black text-white">GROOMING</div>
-              <div className="text-sm font-bold text-green-100 mt-2">From $20 baths</div>
+              <div className="text-sm font-bold text-green-100 mt-2">From Baths to Full Grooms and All Your Needs Inbetween</div>
             </CardContent>
           </Card>
 
