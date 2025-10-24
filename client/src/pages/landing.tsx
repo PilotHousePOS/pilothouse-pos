@@ -77,6 +77,7 @@ export default function Landing() {
               </div>
               <div className="text-lg font-black text-white">PREMIUM GEAR</div>
               <div className="text-sm font-bold text-red-100 mt-2">Top-tier quality</div>
+              <div className="text-xs font-bold text-red-100 mt-1">Bedding Bowls Bones Brushs and So Much More!!!</div>
             </CardContent>
           </Card>
 
