@@ -66,7 +66,7 @@ export default function Landing() {
                 <span className="text-3xl">🐾</span>
               </div>
               <div className="text-lg font-black text-white">ADOPT PETS</div>
-              <div className="text-sm font-bold text-blue-100 mt-2">Elite companions</div>
+              <div className="text-sm font-bold text-blue-100 mt-2">Sharing The Love Through Astro (Discounts and Specials Available at Checkout)</div>
             </CardContent>
           </Card>
 
