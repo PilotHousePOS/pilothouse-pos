@@ -27,12 +27,14 @@ function Router() {
   return (
     <div className="max-w-md mx-auto bg-white min-h-screen relative overflow-hidden">
       <Switch>
+        {/* Public routes accessible to everyone */}
+        <Route path="/forgot-password" component={ForgotPassword} />
+        <Route path="/reset-password" component={ResetPassword} />
+        
         {!hasToken ? (
           <>
             <Route path="/" component={Landing} />
             <Route path="/auth" component={Auth} />
-            <Route path="/forgot-password" component={ForgotPassword} />
-            <Route path="/reset-password" component={ResetPassword} />
             <Route path="*" component={() => <Landing />} />
           </>
         ) : (
