@@ -1387,6 +1387,7 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
     price: supply.price || "",
     description: supply.description || "",
     imageUrl: supply.imageUrl || "",
+    imageUrls: supply.imageUrls || [],
     stockQuantity: supply.stockQuantity || 0,
   });
 
@@ -1456,9 +1457,9 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
           rows={3}
         />
       </div>
-      <ImageUpload 
-        imageUrl={formData.imageUrl} 
-        onImageChange={(url) => setFormData({ ...formData, imageUrl: url })} 
+      <MultiImageUpload 
+        imageUrls={formData.imageUrls || []} 
+        onImagesChange={(urls) => setFormData({ ...formData, imageUrls: urls })} 
       />
       <Button type="submit" className="w-full bg-brand-blue hover:bg-blue-600">
         Update Supply
@@ -1570,6 +1571,132 @@ function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageCha
           disabled={uploading}
         >
           {uploading ? 'Uploading...' : imageUrl ? 'Change Image' : 'Upload Image'}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// Multi-Image Upload Component
+function MultiImageUpload({ imageUrls, onImagesChange }: { imageUrls: string[]; onImagesChange: (urls: string[]) => void }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
+
+  const handleFileUpload = async (file: File) => {
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid File",
+        description: "Please select an image file.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please select an image under 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const data = await response.json();
+      // Add new image to the array
+      onImagesChange([...imageUrls, data.imageUrl]);
+      toast({
+        title: "Image Uploaded",
+        description: "Image has been uploaded successfully.",
+      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeImage = (index: number) => {
+    const newUrls = imageUrls.filter((_, i) => i !== index);
+    onImagesChange(newUrls);
+  };
+
+  return (
+    <div className="space-y-3">
+      <Label>Product Images ({imageUrls.length})</Label>
+      
+      {/* Display existing images */}
+      {imageUrls.length > 0 && (
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          {imageUrls.map((url, index) => (
+            <div key={index} className="relative border-2 border-gray-300 rounded-lg overflow-hidden">
+              <img src={url} alt={`Product ${index + 1}`} className="w-full h-32 object-cover" />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="absolute top-2 right-2 bg-white"
+                onClick={() => removeImage(index)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+              <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-xs">
+                Image {index + 1}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add new image button */}
+      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+        <div className="text-center py-4">
+          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+          <p className="text-sm text-gray-500">Click to add another image</p>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleFileUpload(file);
+            e.target.value = ''; // Reset input
+          }}
+          className="hidden"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+        >
+          {uploading ? 'Uploading...' : '+ Add Image'}
         </Button>
       </div>
     </div>
