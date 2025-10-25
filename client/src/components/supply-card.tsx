@@ -194,24 +194,24 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
               data-testid="img-product-modal"
             />
             
-            {/* Modal Zoom Overlay */}
+            {/* Modal Zoom Overlay - Maximum size and clarity */}
             {modalZoom && (
               <div 
-                className="fixed pointer-events-none border-4 border-gray-900 shadow-2xl overflow-hidden bg-white"
+                className="fixed pointer-events-none border-4 border-black shadow-2xl overflow-hidden bg-white rounded-lg"
                 style={{
-                  width: '600px',
-                  height: '600px',
+                  width: '800px',
+                  height: '800px',
                   top: '50%',
                   left: '50%',
                   transform: 'translate(-50%, -50%)',
-                  zIndex: 999999,
+                  zIndex: 9999999,
                 }}
               >
                 <div
                   className="w-full h-full"
                   style={{
                     backgroundImage: `url(${imageUrl})`,
-                    backgroundSize: '500%',
+                    backgroundSize: '800%',
                     backgroundPosition: `${modalZoomPosition.x}% ${modalZoomPosition.y}%`,
                     backgroundRepeat: 'no-repeat',
                   }}
