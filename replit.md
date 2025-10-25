@@ -53,7 +53,7 @@ The application is built as a full-stack web application with a clear separation
 - **Navigation:** 
     - Enhanced bottom navigation with scroll-to-top behavior.
     - Quick action cards on profile page for Order History, My Appointments, Wishlist, and Settings.
-    - Universal back button on all secondary pages (Order History, My Appointments, Wishlist, Settings, Aquatics, Reptiles, Admin, Booking) with smart navigation that prevents users from going back to authentication pages (login/sign-in) using the `safeGoBack` utility.
+    - Universal back button positioned at the top left on all secondary pages (Order History, My Appointments, Wishlist, Settings, Aquatics, Reptiles, Admin, Booking) with smart navigation that prevents users from going back to authentication pages (login/sign-in) using the `safeGoBack` utility.
 
 **System Design Choices:**
 - **Frontend**: React with Vite, TypeScript, Tailwind CSS, shadcn/ui components.

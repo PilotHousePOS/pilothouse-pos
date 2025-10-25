@@ -199,18 +199,22 @@ export default function Booking() {
   };
 
   return (
-    <div className="px-6 py-4 pb-20">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={safeGoBack}
-        className="mb-4 -ml-2"
-        data-testid="button-back"
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Back
-      </Button>
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Book Appointment</h2>
+    <div className="pb-20">
+      {/* Fixed Back Button */}
+      <div className="fixed top-0 left-0 z-50 p-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={safeGoBack}
+          className="bg-white shadow-md hover:bg-gray-100"
+          data-testid="button-back"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </Button>
+      </div>
+
+      <div className="px-6 pt-16 pb-4">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Book Appointment</h2>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Service Selection */}
@@ -370,6 +374,7 @@ export default function Booking() {
           }
         </Button>
       </form>
+      </div>
     </div>
   );
 }

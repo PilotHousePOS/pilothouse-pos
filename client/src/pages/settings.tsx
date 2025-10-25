@@ -268,25 +268,30 @@ export default function Settings() {
   };
 
   return (
-    <div className="px-6 py-4 pb-20">
-      {/* Header */}
-      <div className="mb-6">
+    <div className="pb-20">
+      {/* Fixed Back Button */}
+      <div className="fixed top-0 left-0 z-50 p-4">
         <Button
           variant="ghost"
-          size="sm"
+          size="icon"
           onClick={safeGoBack}
-          className="mb-4 -ml-2"
+          className="bg-white shadow-md hover:bg-gray-100"
           data-testid="button-back"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
+          <ArrowLeft className="w-6 h-6" />
         </Button>
+      </div>
+
+      {/* Header */}
+      <div className="px-6 pt-16 pb-4">
         <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
         <p className="text-sm text-gray-500 mt-1">Manage your account settings</p>
       </div>
 
-      {/* Current User Info */}
-      <Card className="mb-6">
+      <div className="px-6">{/* Content continues */}
+
+        {/* Current User Info */}
+        <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <UserIcon className="w-5 h-5" />
@@ -315,8 +320,8 @@ export default function Settings() {
         </CardContent>
       </Card>
 
-      {/* Update Name */}
-      <Card className="mb-6">
+        {/* Update Name */}
+        <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <UserIcon className="w-5 h-5" />
@@ -449,6 +454,7 @@ export default function Settings() {
           </Button>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

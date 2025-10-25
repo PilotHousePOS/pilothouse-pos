@@ -572,19 +572,23 @@ export default function Admin() {
   }
 
   return (
-    <div className="px-6 py-4 pb-20">
-      <div className="mb-6">
+    <div className="pb-20">
+      {/* Fixed Back Button */}
+      <div className="fixed top-0 left-0 z-50 p-4">
         <Button
           variant="ghost"
-          size="sm"
+          size="icon"
           onClick={safeGoBack}
-          className="mb-4 -ml-2"
+          className="bg-white shadow-md hover:bg-gray-100"
           data-testid="button-back"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
+          <ArrowLeft className="w-6 h-6" />
         </Button>
-        <div className="flex items-center justify-between">
+      </div>
+
+      {/* Header */}
+      <div className="px-6 pt-16 pb-4">
+        <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
           <div className="flex items-center space-x-3">
             <AdminNotifications />
@@ -594,6 +598,8 @@ export default function Admin() {
           </div>
         </div>
       </div>
+
+      <div className="px-6">{/* Content continues */}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -1293,6 +1299,7 @@ export default function Admin() {
           </DialogContent>
         </Dialog>
       )}
+      </div>
     </div>
   );
 }
@@ -1919,3 +1926,6 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
     </form>
   );
 }
+
+// Close the wrapper div at the end of the main return
+// Adding this closing tag before the component ends
