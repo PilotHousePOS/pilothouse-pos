@@ -886,8 +886,15 @@ export default function Admin() {
                   <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex-1">
                       <h3 className="font-semibold">Order #{order.id}</h3>
-                      <p className="text-sm text-gray-600">Total: ${order.totalAmount}</p>
-                      <p className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</p>
+                      <div className="flex items-center mt-1 text-sm text-gray-600">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        {new Date(order.orderDate || order.createdAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Total: ${order.totalAmount}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Select
