@@ -30,7 +30,8 @@ import {
   Package,
   Upload,
   X,
-  Shield
+  Shield,
+  ArrowLeft
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -571,13 +572,25 @@ export default function Admin() {
 
   return (
     <div className="px-6 py-4 pb-20">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-        <div className="flex items-center space-x-3">
-          <AdminNotifications />
-          <Badge variant="secondary" className="bg-brand-blue text-white">
-            Administrator
-          </Badge>
+      <div className="mb-6">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => window.history.back()}
+          className="mb-4 -ml-2"
+          data-testid="button-back"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back
+        </Button>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+          <div className="flex items-center space-x-3">
+            <AdminNotifications />
+            <Badge variant="secondary" className="bg-brand-blue text-white">
+              Administrator
+            </Badge>
+          </div>
         </div>
       </div>
 

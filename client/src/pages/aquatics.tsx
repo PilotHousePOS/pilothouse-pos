@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Fish, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ShoppingCart, Fish, X, ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -66,6 +66,15 @@ export default function AquaticsPage() {
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-8 px-4">
         <div className="max-w-6xl mx-auto">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white hover:bg-white/20 mb-3"
+            onClick={() => window.history.back()}
+            data-testid="button-back"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </Button>
           <div className="flex items-center gap-3 mb-2">
             <Fish className="w-8 h-8" />
             <h1 className="text-3xl font-bold">Aquatics</h1>
