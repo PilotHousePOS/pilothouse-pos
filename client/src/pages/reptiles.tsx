@@ -1,12 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Sparkles } from "lucide-react";
+import { ShoppingCart, Sparkles, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState } from "react";
 
 export default function ReptilesPage() {
   const { toast } = useToast();
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [selectedType, setSelectedType] = useState<"pet" | "supply" | null>(null);
 
   const { data: pets = [], isLoading: petsLoading } = useQuery<any[]>({
     queryKey: ["/api/pets", { species: "reptile" }],
@@ -97,13 +101,20 @@ export default function ReptilesPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-max">
               {pets.map((pet: any) => (
-                <Card key={pet.id} className="overflow-visible hover:shadow-lg transition-shadow flex flex-col min-w-0">
+                <Card 
+                  key={pet.id} 
+                  className="overflow-visible hover:shadow-lg transition-shadow flex flex-col min-w-0 cursor-pointer"
+                  onClick={() => {
+                    setSelectedItem(pet);
+                    setSelectedType("pet");
+                  }}
+                >
                   <div className="h-48 bg-gray-200 overflow-hidden flex-shrink-0">
                     {pet.imageUrl && (
                       <img
                         src={pet.imageUrl}
                         alt={pet.name}
-                        className="w-full h-full object-contain transition-transform duration-300 hover:scale-110 cursor-pointer"
+                        className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
                       />
                     )}
                   </div>
@@ -120,7 +131,10 @@ export default function ReptilesPage() {
                         ${pet.price}
                       </div>
                       <Button
-                        onClick={() => handleAddToCart(pet, "pet")}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(pet, "pet");
+                        }}
                         className="w-full bg-green-600 hover:bg-green-700"
                         data-testid={`add-to-cart-pet-${pet.id}`}
                       >
@@ -160,13 +174,20 @@ export default function ReptilesPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-max">
               {supplies.map((supply: any) => (
-                <Card key={supply.id} className="overflow-visible hover:shadow-lg transition-shadow flex flex-col min-w-0">
+                <Card 
+                  key={supply.id} 
+                  className="overflow-visible hover:shadow-lg transition-shadow flex flex-col min-w-0 cursor-pointer"
+                  onClick={() => {
+                    setSelectedItem(supply);
+                    setSelectedType("supply");
+                  }}
+                >
                   <div className="h-48 bg-gray-200 overflow-hidden flex-shrink-0">
                     {supply.imageUrl && (
                       <img
                         src={supply.imageUrl}
                         alt={supply.name}
-                        className="w-full h-full object-contain transition-transform duration-300 hover:scale-110 cursor-pointer"
+                        className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
                       />
                     )}
                   </div>
@@ -183,7 +204,10 @@ export default function ReptilesPage() {
                         ${supply.price}
                       </div>
                       <Button
-                        onClick={() => handleAddToCart(supply, "supply")}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(supply, "supply");
+                        }}
                         className="w-full bg-green-600 hover:bg-green-700"
                         data-testid={`add-to-cart-supply-${supply.id}`}
                       >
@@ -198,6 +222,68 @@ export default function ReptilesPage() {
           )}
         </section>
       </div>
+
+      {/* Item Details Dialog */}
+      <Dialog open={selectedItem !== null} onOpenChange={() => setSelectedItem(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{selectedItem?.name}</DialogTitle>
+          </DialogHeader>
+          
+          {selectedItem && (
+            <div className="space-y-4">
+              {selectedItem.imageUrl && (
+                <div className="w-full h-64 bg-gray-200 rounded-lg overflow-hidden">
+                  <img
+                    src={selectedItem.imageUrl}
+                    alt={selectedItem.name}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              )}
+              
+              <div className="space-y-2">
+                {selectedType === "pet" && selectedItem.breed && (
+                  <div>
+                    <span className="font-semibold">Breed:</span> {selectedItem.breed}
+                  </div>
+                )}
+                {selectedType === "pet" && selectedItem.species && (
+                  <div>
+                    <span className="font-semibold">Species:</span> {selectedItem.species}
+                  </div>
+                )}
+                {selectedType === "supply" && selectedItem.category && (
+                  <div>
+                    <span className="font-semibold">Category:</span> {selectedItem.category}
+                  </div>
+                )}
+                {selectedItem.description && (
+                  <div>
+                    <span className="font-semibold">Description:</span>
+                    <p className="mt-1 text-gray-700">{selectedItem.description}</p>
+                  </div>
+                )}
+                <div className="text-2xl font-bold text-green-600 pt-2">
+                  ${selectedItem.price}
+                </div>
+              </div>
+
+              <Button
+                onClick={() => {
+                  handleAddToCart(selectedItem, selectedType!);
+                  setSelectedItem(null);
+                }}
+                className="w-full bg-green-600 hover:bg-green-700"
+                data-testid={`dialog-add-to-cart-${selectedItem.id}`}
+              >
+                <ShoppingCart className="w-4 h-4 mr-2" />
+                Add to Cart
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
