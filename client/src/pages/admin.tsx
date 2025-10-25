@@ -156,6 +156,93 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
   );
 }
 
+// Order Details Card Component with Items
+function OrderDetailsCard({ order, onStatusUpdate }: { order: any; onStatusUpdate: (status: string) => void }) {
+  const [showItems, setShowItems] = useState(false);
+  const { data: orderDetails, isLoading } = useQuery({
+    queryKey: ["/api/orders", order.id],
+    queryFn: async () => {
+      const response = await fetch(`/api/orders/${order.id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch order details');
+      return response.json();
+    },
+    enabled: showItems,
+  });
+
+  return (
+    <div className="border rounded-lg">
+      <div className="flex items-center justify-between p-4">
+        <div className="flex-1">
+          <h3 className="font-semibold">Order #{order.id}</h3>
+          <div className="flex items-center mt-1 text-sm text-gray-600">
+            <Calendar className="w-4 h-4 mr-1" />
+            {new Date(order.orderDate || order.createdAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </div>
+          <p className="text-sm text-gray-600 mt-1">Total: ${order.totalAmount}</p>
+          <Button
+            variant="link"
+            size="sm"
+            className="px-0 h-auto mt-1 text-brand-blue"
+            onClick={() => setShowItems(!showItems)}
+          >
+            {showItems ? 'Hide' : 'View'} Items
+          </Button>
+        </div>
+        <div className="flex items-center gap-2">
+          <Select
+            value={order.status}
+            onValueChange={onStatusUpdate}
+          >
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="in_progress">In Progress</SelectItem>
+              <SelectItem value="ready">Ready</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      
+      {showItems && (
+        <div className="border-t p-4 bg-gray-50">
+          {isLoading ? (
+            <p className="text-sm text-gray-500">Loading items...</p>
+          ) : orderDetails?.items && orderDetails.items.length > 0 ? (
+            <div className="space-y-2">
+              <h4 className="font-semibold text-sm mb-2">Order Items:</h4>
+              {orderDetails.items.map((item: any, index: number) => (
+                <div key={item.id || index} className="flex items-center justify-between p-2 bg-white rounded">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">
+                      {item.supplyId ? `Supply #${item.supplyId}` : `Pet #${item.petId}`}
+                    </p>
+                    <p className="text-xs text-gray-500">Quantity: {item.quantity}</p>
+                  </div>
+                  <p className="text-sm font-semibold">${item.price}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">No items found</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const typedUser = user as User;
@@ -883,37 +970,11 @@ export default function Admin() {
             <CardContent>
               <div className="space-y-4">
                 {(orders as any[]).map((order: any) => (
-                  <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex-1">
-                      <h3 className="font-semibold">Order #{order.id}</h3>
-                      <div className="flex items-center mt-1 text-sm text-gray-600">
-                        <Calendar className="w-4 h-4 mr-1" />
-                        {new Date(order.orderDate || order.createdAt).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">Total: ${order.totalAmount}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Select
-                        value={order.status}
-                        onValueChange={(status) => updateOrderMutation.mutate({ id: order.id, status })}
-                      >
-                        <SelectTrigger className="w-32">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="in_progress">In Progress</SelectItem>
-                          <SelectItem value="ready">Ready</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+                  <OrderDetailsCard 
+                    key={order.id} 
+                    order={order} 
+                    onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
+                  />
                 ))}
               </div>
             </CardContent>
