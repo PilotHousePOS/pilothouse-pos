@@ -92,9 +92,9 @@ export default function AquaticsPage() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-max">
               {pets.map((pet: any) => (
-                <Card key={pet.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full">
+                <Card key={pet.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
                   <div className="h-48 bg-gray-200 overflow-hidden flex-shrink-0">
                     {pet.imageUrl && (
                       <img
@@ -156,9 +156,9 @@ export default function AquaticsPage() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-max">
               {supplies.map((supply: any) => (
-                <Card key={supply.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full">
+                <Card key={supply.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
                   <div className="h-48 bg-gray-200 overflow-hidden flex-shrink-0">
                     {supply.imageUrl && (
                       <img
