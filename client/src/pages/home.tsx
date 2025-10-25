@@ -246,7 +246,7 @@ export default function Home() {
               </div>
               <h4 className="font-bold text-gray-900 mb-1">Aquatics</h4>
               <p className="text-green-700 text-sm font-medium">Prices Vary</p>
-              <p className="text-gray-600 text-xs mt-1">Fish & aquarium care</p>
+              <p className="text-gray-600 text-xs mt-1">Fish & Aquarium Care</p>
             </CardContent>
           </Card>
 
@@ -260,7 +260,7 @@ export default function Home() {
               </div>
               <h4 className="font-bold text-gray-900 mb-1">Exotic Reptiles</h4>
               <p className="text-purple-700 text-sm font-medium">Specialty Pets</p>
-              <p className="text-gray-600 text-xs mt-1">Rare species</p>
+              <p className="text-gray-600 text-xs mt-1">Rare & Common Species</p>
             </CardContent>
           </Card>
 
@@ -274,7 +274,7 @@ export default function Home() {
               </div>
               <h4 className="font-bold text-gray-900 mb-1">Book Grooming</h4>
               <p className="text-blue-700 text-sm font-medium">Schedule Now</p>
-              <p className="text-gray-600 text-xs mt-1">Bath & full service</p>
+              <p className="text-gray-600 text-xs mt-1">Bath & Full Service</p>
             </CardContent>
           </Card>
 
