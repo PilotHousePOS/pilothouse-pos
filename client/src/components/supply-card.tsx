@@ -179,45 +179,26 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
           <DialogTitle>{supply.name}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          {/* Image with Zoom */}
+          {/* Large Expandable Image */}
           <div 
-            className="relative w-full h-80 cursor-zoom-in overflow-hidden rounded-lg border-2 border-gray-200"
+            className="relative w-full cursor-zoom-in rounded-lg overflow-visible"
             onMouseEnter={() => setModalZoom(true)}
             onMouseLeave={() => setModalZoom(false)}
-            onMouseMove={handleModalMouseMove}
           >
             <img 
               ref={modalImageRef}
               src={imageUrl}
               alt={supply.name}
-              className="w-full h-full object-contain" 
+              className="w-full h-auto object-contain transition-transform duration-300 ease-in-out rounded-lg shadow-lg"
+              style={{
+                maxHeight: modalZoom ? '90vh' : '500px',
+                transform: modalZoom ? 'scale(1.5)' : 'scale(1)',
+                transformOrigin: 'center center',
+                zIndex: modalZoom ? 9999999 : 1,
+                position: modalZoom ? 'relative' : 'relative',
+              }}
               data-testid="img-product-modal"
             />
-            
-            {/* Modal Zoom Overlay - Maximum size and clarity */}
-            {modalZoom && (
-              <div 
-                className="fixed pointer-events-none border-4 border-black shadow-2xl overflow-hidden bg-white rounded-lg"
-                style={{
-                  width: '800px',
-                  height: '800px',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  zIndex: 9999999,
-                }}
-              >
-                <div
-                  className="w-full h-full"
-                  style={{
-                    backgroundImage: `url(${imageUrl})`,
-                    backgroundSize: '800%',
-                    backgroundPosition: `${modalZoomPosition.x}% ${modalZoomPosition.y}%`,
-                    backgroundRepeat: 'no-repeat',
-                  }}
-                />
-              </div>
-            )}
           </div>
 
           {/* Product Details */}
