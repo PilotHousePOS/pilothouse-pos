@@ -221,6 +221,13 @@ function OrderDetailsCard({ order, onStatusUpdate }: { order: any; onStatusUpdat
             <p className="text-sm text-gray-500">Loading items...</p>
           ) : orderDetails?.items && orderDetails.items.length > 0 ? (
             <div className="space-y-2">
+              {orderDetails.customerName && (
+                <div className="mb-3 pb-2 border-b">
+                  <p className="text-sm font-semibold text-gray-700">
+                    Customer: <span className="text-brand-blue">{orderDetails.customerName}</span>
+                  </p>
+                </div>
+              )}
               <h4 className="font-semibold text-sm mb-2">Order Items:</h4>
               {orderDetails.items.map((item: any, index: number) => (
                 <div key={item.id || index} className="flex items-center justify-between p-2 bg-white rounded">

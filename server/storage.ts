@@ -447,9 +447,13 @@ export class DatabaseStorage implements IStorage {
     return order;
   }
 
-  async getOrderWithItems(id: number): Promise<{ order: Order; items: any[] } | undefined> {
+  async getOrderWithItems(id: number): Promise<{ order: Order; items: any[]; customerName?: string } | undefined> {
     const [order] = await db.select().from(orders).where(eq(orders.id, id));
     if (!order) return undefined;
+    
+    // Get customer information
+    const [customer] = await db.select().from(users).where(eq(users.id, order.userId));
+    const customerName = customer ? `${customer.firstName} ${customer.lastName}` : 'Unknown Customer';
     
     const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
     
@@ -471,7 +475,7 @@ export class DatabaseStorage implements IStorage {
       };
     }));
     
-    return { order, items: enrichedItems };
+    return { order, items: enrichedItems, customerName };
   }
 
   async updateOrderStatus(id: number, status: string): Promise<Order> {
