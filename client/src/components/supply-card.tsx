@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Supply } from "@shared/schema";
 
 interface SupplyCardProps {
@@ -21,6 +22,7 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const [modalZoom, setModalZoom] = useState(false);
   const [modalZoomPosition, setModalZoomPosition] = useState({ x: 0, y: 0 });
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const imageRef = useRef<HTMLImageElement>(null);
   const modalImageRef = useRef<HTMLImageElement>(null);
 
@@ -67,7 +69,10 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
     accessories: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200"
   };
 
-  const imageUrl = supply.imageUrl || defaultImages[supply.category as keyof typeof defaultImages] || defaultImages.food;
+  const images = supply.imageUrls?.filter((url: string) => url) || 
+                (supply.imageUrl ? [supply.imageUrl] : []);
+  const hasMultipleImages = images.length > 1;
+  const imageUrl = images[currentImageIndex] || defaultImages[supply.category as keyof typeof defaultImages] || defaultImages.food;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageRef.current) return;
@@ -173,7 +178,13 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
     </Card>
 
     {/* Supply Details Modal */}
-    <Dialog open={showDetails} onOpenChange={setShowDetails}>
+    <Dialog open={showDetails} onOpenChange={(open) => {
+      setShowDetails(open);
+      if (!open) {
+        setCurrentImageIndex(0);
+        setModalZoom(false);
+      }
+    }}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{supply.name}</DialogTitle>
@@ -181,7 +192,7 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
         <div className="space-y-4">
           {/* Large Expandable Image - Double-click to enlarge */}
           <div 
-            className="relative w-full cursor-pointer rounded-lg overflow-visible"
+            className="relative w-full cursor-pointer rounded-lg overflow-visible group"
             onDoubleClick={() => setModalZoom(!modalZoom)}
           >
             <img 
@@ -198,6 +209,62 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
               }}
               data-testid="img-product-modal"
             />
+
+            {hasMultipleImages && !modalZoom && (
+              <>
+                {/* Previous Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex((prev) => 
+                      prev === 0 ? images.length - 1 : prev - 1
+                    );
+                  }}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                
+                {/* Next Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex((prev) => 
+                      prev === images.length - 1 ? 0 : prev + 1
+                    );
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+                
+                {/* Image Dots */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2">
+                  {images.map((_: any, idx: number) => (
+                    <button
+                      key={idx}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentImageIndex(idx);
+                      }}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        idx === currentImageIndex 
+                          ? 'bg-white w-6' 
+                          : 'bg-white/50 hover:bg-white/75'
+                      }`}
+                      aria-label={`Go to image ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+                
+                {/* Image Counter */}
+                <div className="absolute top-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
+                  {currentImageIndex + 1} / {images.length}
+                </div>
+              </>
+            )}
           </div>
 
           {/* Product Details */}
