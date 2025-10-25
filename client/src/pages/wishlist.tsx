@@ -94,7 +94,7 @@ export default function Wishlist() {
             variant="ghost"
             size="icon"
             className="text-white hover:bg-white/20 mr-3"
-            onClick={() => setLocation("/profile")}
+            onClick={() => window.history.back()}
             data-testid="button-back"
           >
             <ArrowLeft className="w-6 h-6" />

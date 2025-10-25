@@ -273,12 +273,12 @@ export default function Settings() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setLocation('/profile')}
+          onClick={() => window.history.back()}
           className="mb-4 -ml-2"
           data-testid="button-back"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Profile
+          Back
         </Button>
         <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
         <p className="text-sm text-gray-500 mt-1">Manage your account settings</p>
