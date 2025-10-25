@@ -1,0 +1,211 @@
+import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, Calendar, Clock, Dog, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { useLocation } from "wouter";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import type { Appointment } from "@shared/schema";
+
+export default function MyAppointments() {
+  const [, setLocation] = useLocation();
+
+  const { data: appointments, isLoading } = useQuery<Appointment[]>({
+    queryKey: ["/api/appointments"],
+  });
+
+  const getStatusIcon = (appointment: Appointment) => {
+    if (appointment.status === "cancelled") {
+      return <XCircle className="w-5 h-5 text-red-500" />;
+    }
+    if (appointment.isApproved) {
+      return <CheckCircle className="w-5 h-5 text-green-500" />;
+    }
+    return <AlertCircle className="w-5 h-5 text-yellow-500" />;
+  };
+
+  const getStatusBadge = (appointment: Appointment) => {
+    if (appointment.status === "cancelled") {
+      return <Badge className="bg-red-500">Cancelled</Badge>;
+    }
+    if (appointment.status === "completed") {
+      return <Badge className="bg-gray-500">Completed</Badge>;
+    }
+    if (appointment.isApproved) {
+      return <Badge className="bg-green-500">Approved</Badge>;
+    }
+    return <Badge className="bg-yellow-500">Pending Approval</Badge>;
+  };
+
+  const formatDate = (date: string | Date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const isPastAppointment = (appointment: Appointment) => {
+    const appointmentDate = new Date(appointment.appointmentDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return appointmentDate < today;
+  };
+
+  const upcomingAppointments = appointments?.filter(apt => !isPastAppointment(apt) && apt.status !== "cancelled") || [];
+  const pastAppointments = appointments?.filter(apt => isPastAppointment(apt) || apt.status === "cancelled" || apt.status === "completed") || [];
+
+  return (
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-brand-blue to-brand-red text-white p-4 sticky top-0 z-10 shadow-md">
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white hover:bg-white/20 mr-3"
+            onClick={() => setLocation("/profile")}
+            data-testid="button-back"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold">My Appointments</h1>
+            <p className="text-sm text-white/80">Manage your grooming appointments</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-6">
+        {isLoading ? (
+          <div className="text-center py-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-blue"></div>
+            <p className="text-gray-500 mt-2">Loading appointments...</p>
+          </div>
+        ) : !appointments || appointments.length === 0 ? (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <Calendar className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Appointments Yet</h3>
+              <p className="text-gray-500 mb-4">You haven't booked any grooming appointments.</p>
+              <Button
+                onClick={() => setLocation("/booking")}
+                className="bg-brand-blue hover:bg-blue-600"
+                data-testid="button-book-now"
+              >
+                Book Appointment
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            {/* Upcoming Appointments */}
+            {upcomingAppointments.length > 0 && (
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center">
+                  <Calendar className="w-5 h-5 mr-2 text-brand-blue" />
+                  Upcoming Appointments
+                </h2>
+                <div className="space-y-3">
+                  {upcomingAppointments.map((appointment) => (
+                    <Card
+                      key={appointment.id}
+                      className="shadow-sm hover:shadow-md transition-shadow"
+                      data-testid={`card-appointment-${appointment.id}`}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-start space-x-3">
+                            {getStatusIcon(appointment)}
+                            <div>
+                              <h3 className="font-semibold text-gray-900">{appointment.petName}</h3>
+                              <p className="text-sm text-gray-500">{appointment.petType}</p>
+                            </div>
+                          </div>
+                          {getStatusBadge(appointment)}
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Calendar className="w-4 h-4 mr-2" />
+                            {formatDate(appointment.appointmentDate)}
+                          </div>
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Clock className="w-4 h-4 mr-2" />
+                            {appointment.appointmentTime}
+                          </div>
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Dog className="w-4 h-4 mr-2" />
+                            {appointment.serviceType === "grooming" ? "Full Grooming" : appointment.serviceType}
+                          </div>
+                        </div>
+
+                        {appointment.specialNotes && (
+                          <div className="mt-3 p-2 bg-gray-50 rounded">
+                            <p className="text-xs text-gray-500">Special Notes:</p>
+                            <p className="text-sm text-gray-700">{appointment.specialNotes}</p>
+                          </div>
+                        )}
+
+                        <div className="mt-3 pt-3 border-t flex items-center justify-between">
+                          <p className="text-sm text-gray-500">
+                            Price: <span className="font-semibold text-brand-green">${appointment.price}</span>
+                          </p>
+                          {!appointment.isApproved && appointment.status !== "cancelled" && (
+                            <p className="text-xs text-yellow-600">Awaiting admin approval</p>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Past Appointments */}
+            {pastAppointments.length > 0 && (
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center">
+                  <Calendar className="w-5 h-5 mr-2 text-gray-500" />
+                  Past Appointments
+                </h2>
+                <div className="space-y-3">
+                  {pastAppointments.map((appointment) => (
+                    <Card
+                      key={appointment.id}
+                      className="shadow-sm opacity-75"
+                      data-testid={`card-past-appointment-${appointment.id}`}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-start space-x-3">
+                            {getStatusIcon(appointment)}
+                            <div>
+                              <h3 className="font-semibold text-gray-700">{appointment.petName}</h3>
+                              <p className="text-sm text-gray-500">{appointment.petType}</p>
+                            </div>
+                          </div>
+                          {getStatusBadge(appointment)}
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Calendar className="w-4 h-4 mr-2" />
+                            {formatDate(appointment.appointmentDate)}
+                          </div>
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Clock className="w-4 h-4 mr-2" />
+                            {appointment.appointmentTime}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

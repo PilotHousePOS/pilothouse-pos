@@ -148,6 +148,15 @@ export const customerPets = pgTable("customer_pets", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Wishlist items
+export const wishlistItems = pgTable("wishlist_items", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  supplyId: integer("supply_id").references(() => supplies.id),
+  petId: integer("pet_id").references(() => pets.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Grooming settings for admin control
 export const groomingSettings = pgTable("grooming_settings", {
   id: serial("id").primaryKey(),
@@ -186,6 +195,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   orders: many(orders),
   appointments: many(appointments),
   customerPets: many(customerPets),
+  wishlistItems: many(wishlistItems),
 }));
 
 export const petsRelations = relations(pets, ({ many }) => ({
@@ -231,6 +241,12 @@ export const groomerAvailabilityRelations = relations(groomerAvailability, ({ on
 
 export const customerPetsRelations = relations(customerPets, ({ one }) => ({
   user: one(users, { fields: [customerPets.userId], references: [users.id] }),
+}));
+
+export const wishlistItemsRelations = relations(wishlistItems, ({ one }) => ({
+  user: one(users, { fields: [wishlistItems.userId], references: [users.id] }),
+  supply: one(supplies, { fields: [wishlistItems.supplyId], references: [supplies.id] }),
+  pet: one(pets, { fields: [wishlistItems.petId], references: [pets.id] }),
 }));
 
 // Insert schemas
@@ -295,6 +311,11 @@ export const insertPasswordResetTokenSchema = createInsertSchema(passwordResetTo
   createdAt: true,
 });
 
+export const insertWishlistItemSchema = createInsertSchema(wishlistItems).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -320,3 +341,5 @@ export type Groomer = typeof groomers.$inferSelect;
 export type InsertGroomer = z.infer<typeof insertGroomerSchema>;
 export type GroomerAvailability = typeof groomerAvailability.$inferSelect;
 export type InsertGroomerAvailability = z.infer<typeof insertGroomerAvailabilitySchema>;
+export type WishlistItem = typeof wishlistItems.$inferSelect;
+export type InsertWishlistItem = z.infer<typeof insertWishlistItemSchema>;

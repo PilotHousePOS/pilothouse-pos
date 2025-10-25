@@ -918,6 +918,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get order details with items
+  app.get("/api/orders/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const orderId = parseInt(req.params.id);
+      
+      const orderWithItems = await storage.getOrderWithItems(orderId);
+      
+      if (!orderWithItems) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      
+      // Check if user owns this order or is admin
+      const user = await storage.getUser(userId);
+      if (orderWithItems.order.userId !== userId && !user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      res.json(orderWithItems);
+    } catch (error) {
+      console.error("Error fetching order details:", error);
+      res.status(500).json({ message: "Failed to fetch order details" });
+    }
+  });
+
+  // Wishlist routes
+  app.get("/api/wishlist", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const wishlistItems = await storage.getWishlistItems(userId);
+      res.json(wishlistItems);
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+      res.status(500).json({ message: "Failed to fetch wishlist" });
+    }
+  });
+
+  app.post("/api/wishlist", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const { supplyId, petId } = req.body;
+      
+      if (!supplyId && !petId) {
+        return res.status(400).json({ message: "Either supplyId or petId is required" });
+      }
+      
+      const wishlistItem = await storage.addToWishlist({ userId, supplyId, petId });
+      res.json(wishlistItem);
+    } catch (error) {
+      console.error("Error adding to wishlist:", error);
+      res.status(500).json({ message: "Failed to add to wishlist" });
+    }
+  });
+
+  app.delete("/api/wishlist/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const userId = req.user?.id;
+      
+      const removed = await storage.removeFromWishlist(id, userId);
+      
+      if (!removed) {
+        return res.status(404).json({ message: "Wishlist item not found or access denied" });
+      }
+      
+      res.json({ message: "Item removed from wishlist" });
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
+      res.status(500).json({ message: "Failed to remove from wishlist" });
+    }
+  });
+
   // Appointment routes
   app.get("/api/appointments", authMiddleware, async (req: any, res) => {
     try {

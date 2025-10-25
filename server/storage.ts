@@ -11,6 +11,7 @@ import {
   groomers,
   groomerAvailability,
   passwordResetTokens,
+  wishlistItems,
   type User,
   type UpsertUser,
   type Pet,
@@ -34,6 +35,8 @@ import {
   type GroomerAvailability,
   type InsertGroomerAvailability,
   type PasswordResetToken,
+  type WishlistItem,
+  type InsertWishlistItem,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, ilike, lt } from "drizzle-orm";
@@ -75,6 +78,7 @@ export interface IStorage {
   createOrder(order: InsertOrder, items: InsertOrderItem[]): Promise<Order>;
   getOrders(userId?: string): Promise<Order[]>;
   getOrder(id: number): Promise<Order | undefined>;
+  getOrderWithItems(id: number): Promise<{ order: Order; items: OrderItem[] } | undefined>;
   updateOrderStatus(id: number, status: string): Promise<Order>;
 
   // Appointment operations
@@ -114,6 +118,11 @@ export interface IStorage {
   getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined>;
   markTokenAsUsed(token: string): Promise<void>;
   deleteExpiredTokens(): Promise<void>;
+
+  // Wishlist operations
+  getWishlistItems(userId: string): Promise<WishlistItem[]>;
+  addToWishlist(wishlistItem: InsertWishlistItem): Promise<WishlistItem>;
+  removeFromWishlist(id: number, userId: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -438,6 +447,14 @@ export class DatabaseStorage implements IStorage {
     return order;
   }
 
+  async getOrderWithItems(id: number): Promise<{ order: Order; items: OrderItem[] } | undefined> {
+    const [order] = await db.select().from(orders).where(eq(orders.id, id));
+    if (!order) return undefined;
+    
+    const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
+    return { order, items };
+  }
+
   async updateOrderStatus(id: number, status: string): Promise<Order> {
     const [updated] = await db
       .update(orders)
@@ -684,6 +701,23 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(passwordResetTokens)
       .where(lt(passwordResetTokens.expiresAt, new Date()));
+  }
+
+  // Wishlist operations
+  async getWishlistItems(userId: string): Promise<WishlistItem[]> {
+    return await db.select().from(wishlistItems).where(eq(wishlistItems.userId, userId));
+  }
+
+  async addToWishlist(wishlistItem: InsertWishlistItem): Promise<WishlistItem> {
+    const [newItem] = await db.insert(wishlistItems).values(wishlistItem).returning();
+    return newItem;
+  }
+
+  async removeFromWishlist(id: number, userId: string): Promise<boolean> {
+    const result = await db.delete(wishlistItems)
+      .where(and(eq(wishlistItems.id, id), eq(wishlistItems.userId, userId)))
+      .returning();
+    return result.length > 0;
   }
 }
 

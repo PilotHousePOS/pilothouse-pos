@@ -173,7 +173,7 @@ export default function Profile() {
       <div className="mb-8">
         <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
         <div className="space-y-3">
-          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setLocation('/orders')} data-testid="card-order-history">
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
                 <ShoppingBag className="w-5 h-5 text-brand-blue" />
@@ -182,7 +182,7 @@ export default function Profile() {
               </div>
             </CardContent>
           </Card>
-          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setLocation('/appointments')} data-testid="card-my-appointments">
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
                 <Calendar className="w-5 h-5 text-brand-blue" />
@@ -191,7 +191,7 @@ export default function Profile() {
               </div>
             </CardContent>
           </Card>
-          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setLocation('/wishlist')} data-testid="card-wishlist">
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
                 <Heart className="w-5 h-5 text-brand-red" />

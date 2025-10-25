@@ -17,6 +17,9 @@ import Booking from "@/pages/booking";
 import Profile from "@/pages/profile";
 import Settings from "@/pages/settings";
 import Admin from "@/pages/admin";
+import OrderHistory from "@/pages/order-history";
+import MyAppointments from "@/pages/my-appointments";
+import Wishlist from "@/pages/wishlist";
 import NotFound from "@/pages/not-found";
 import BottomNav from "@/components/bottom-nav";
 
@@ -48,6 +51,9 @@ function Router() {
             <Route path="/profile" component={Profile} />
             <Route path="/settings" component={Settings} />
             <Route path="/admin" component={Admin} />
+            <Route path="/orders" component={OrderHistory} />
+            <Route path="/appointments" component={MyAppointments} />
+            <Route path="/wishlist" component={Wishlist} />
           </>
         )}
         <Route component={NotFound} />

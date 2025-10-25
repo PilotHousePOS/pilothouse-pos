@@ -26,23 +26,33 @@ The application is built as a full-stack web application with a clear separation
 - Use of toast notifications for enhanced user feedback (e.g., login errors).
 
 **Technical Implementations & Feature Specifications:**
-- **Pet & Supply Management:** Multi-image support for products and pets, allowing unlimited photo uploads via an admin panel component.
+- **Pet & Supply Management:** 
+    - Multi-image support for products and pets, allowing unlimited photo uploads via an admin panel component.
+    - Amazon-style double-click image enlargement with carousel navigation (arrows, dots, counter) for multiple images.
 - **Appointment System:**
     - 15-minute appointment intervals.
     - Admin approval workflow for grooming appointments with pending approval section and approve/reject functionality.
     - Automated email notifications for appointment rejections with professional templates.
     - Storage of owner contact information with appointments.
+    - Dedicated My Appointments page with upcoming/past appointment sections and status badges.
 - **Order & Notification System:**
     - Admin notification system for new orders and appointments via email and push notifications (console logging).
     - Customer notification system via email, SMS (Twilio), and web push for order status updates.
+    - Order History page with order details modal showing items, shipping address, and status tracking.
 - **Authentication & Authorization:**
     - JWT tokens with secure cookie storage for authentication.
     - Comprehensive password reset system with email workflow (SendGrid integration), token expiration, and single-use tokens.
     - User settings page for name, email, and password changes with validation and token rotation.
     - Admin user management system with `isAdmin` field, secure API endpoints, and toggle switches for privilege management.
     - Robust error handling for authentication processes.
+- **Wishlist System:**
+    - Dedicated Wishlist page for saving items to purchase later.
+    - Add/remove functionality with secure ownership verification.
+    - Quick "Add to Cart" button from wishlist items.
 - **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtering content by species.
-- **Navigation:** Enhanced bottom navigation with scroll-to-top behavior.
+- **Navigation:** 
+    - Enhanced bottom navigation with scroll-to-top behavior.
+    - Quick action cards on profile page for Order History, My Appointments, Wishlist, and Settings.
 
 **System Design Choices:**
 - **Frontend**: React with Vite, TypeScript, Tailwind CSS, shadcn/ui components.
