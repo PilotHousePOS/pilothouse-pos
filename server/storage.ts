@@ -447,12 +447,31 @@ export class DatabaseStorage implements IStorage {
     return order;
   }
 
-  async getOrderWithItems(id: number): Promise<{ order: Order; items: OrderItem[] } | undefined> {
+  async getOrderWithItems(id: number): Promise<{ order: Order; items: any[] } | undefined> {
     const [order] = await db.select().from(orders).where(eq(orders.id, id));
     if (!order) return undefined;
     
     const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
-    return { order, items };
+    
+    // Enrich items with supply and pet names
+    const enrichedItems = await Promise.all(items.map(async (item) => {
+      let itemName = 'Unknown Item';
+      
+      if (item.supplyId) {
+        const [supply] = await db.select().from(supplies).where(eq(supplies.id, item.supplyId));
+        itemName = supply?.name || `Supply #${item.supplyId}`;
+      } else if (item.petId) {
+        const [pet] = await db.select().from(pets).where(eq(pets.id, item.petId));
+        itemName = pet?.name || `Pet #${item.petId}`;
+      }
+      
+      return {
+        ...item,
+        itemName,
+      };
+    }));
+    
+    return { order, items: enrichedItems };
   }
 
   async updateOrderStatus(id: number, status: string): Promise<Order> {

@@ -226,7 +226,7 @@ function OrderDetailsCard({ order, onStatusUpdate }: { order: any; onStatusUpdat
                 <div key={item.id || index} className="flex items-center justify-between p-2 bg-white rounded">
                   <div className="flex-1">
                     <p className="text-sm font-medium">
-                      {item.supplyId ? `Supply #${item.supplyId}` : `Pet #${item.petId}`}
+                      {item.itemName || (item.supplyId ? `Supply #${item.supplyId}` : `Pet #${item.petId}`)}
                     </p>
                     <p className="text-xs text-gray-500">Quantity: {item.quantity}</p>
                   </div>
