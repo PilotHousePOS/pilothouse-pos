@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -15,9 +16,13 @@ interface SupplyCardProps {
 export default function SupplyCard({ supply }: SupplyCardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [showDetails, setShowDetails] = useState(false);
   const [showZoom, setShowZoom] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  const [modalZoom, setModalZoom] = useState(false);
+  const [modalZoomPosition, setModalZoomPosition] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLImageElement>(null);
+  const modalImageRef = useRef<HTMLImageElement>(null);
 
   const addToCartMutation = useMutation({
     mutationFn: async () => {
@@ -74,8 +79,19 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
     setZoomPosition({ x, y });
   };
 
+  const handleModalMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!modalImageRef.current) return;
+    
+    const rect = modalImageRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    
+    setModalZoomPosition({ x, y });
+  };
+
   return (
-    <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+    <>
+    <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => setShowDetails(true)}>
       <CardContent className="p-0">
         <div className="flex">
           <div 
@@ -140,8 +156,12 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
                 <p className="text-sm font-bold text-brand-red">${supply.price}</p>
                 <Button 
                   className="bg-brand-blue hover:bg-blue-600 text-white px-3 py-1 rounded-full text-xs mt-1"
-                  onClick={() => addToCartMutation.mutate()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addToCartMutation.mutate();
+                  }}
                   disabled={supply.stockQuantity === 0 || addToCartMutation.isPending}
+                  data-testid="button-add-to-cart"
                 >
                   {addToCartMutation.isPending ? "Adding..." : "Add to Cart"}
                 </Button>
@@ -151,5 +171,110 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
         </div>
       </CardContent>
     </Card>
+
+    {/* Supply Details Modal */}
+    <Dialog open={showDetails} onOpenChange={setShowDetails}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{supply.name}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          {/* Image with Zoom */}
+          <div 
+            className="relative w-full h-80 cursor-zoom-in overflow-hidden rounded-lg border-2 border-gray-200"
+            onMouseEnter={() => setModalZoom(true)}
+            onMouseLeave={() => setModalZoom(false)}
+            onMouseMove={handleModalMouseMove}
+          >
+            <img 
+              ref={modalImageRef}
+              src={imageUrl}
+              alt={supply.name}
+              className="w-full h-full object-contain" 
+              data-testid="img-product-modal"
+            />
+            
+            {/* Modal Zoom Overlay */}
+            {modalZoom && (
+              <div 
+                className="fixed pointer-events-none border-4 border-gray-900 shadow-2xl overflow-hidden bg-white"
+                style={{
+                  width: '600px',
+                  height: '600px',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 999999,
+                }}
+              >
+                <div
+                  className="w-full h-full"
+                  style={{
+                    backgroundImage: `url(${imageUrl})`,
+                    backgroundSize: '500%',
+                    backgroundPosition: `${modalZoomPosition.x}% ${modalZoomPosition.y}%`,
+                    backgroundRepeat: 'no-repeat',
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Product Details */}
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="font-semibold">Brand:</span>
+              <span>{supply.brand}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-semibold">Category:</span>
+              <span className="capitalize">{supply.category}</span>
+            </div>
+            {supply.weight && (
+              <div className="flex justify-between">
+                <span className="font-semibold">Weight:</span>
+                <span>{supply.weight}</span>
+              </div>
+            )}
+            {supply.size && (
+              <div className="flex justify-between">
+                <span className="font-semibold">Size:</span>
+                <span>{supply.size}</span>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <span className="font-semibold">Price:</span>
+              <span className="text-brand-red font-bold text-lg">${supply.price}</span>
+            </div>
+            {supply.description && (
+              <div>
+                <span className="font-semibold">Description:</span>
+                <p className="text-gray-600 mt-1">{supply.description}</p>
+              </div>
+            )}
+            <div className="flex justify-between items-center">
+              <span className="font-semibold">Stock:</span>
+              <Badge variant={supply.stockQuantity && supply.stockQuantity > 0 ? "default" : "destructive"}>
+                {supply.stockQuantity && supply.stockQuantity > 0 ? `${supply.stockQuantity} in stock` : "Out of Stock"}
+              </Badge>
+            </div>
+          </div>
+
+          {/* Add to Cart in Modal */}
+          <Button 
+            className="w-full bg-brand-blue hover:bg-blue-600 text-white py-3"
+            onClick={() => {
+              addToCartMutation.mutate();
+              setShowDetails(false);
+            }}
+            disabled={supply.stockQuantity === 0 || addToCartMutation.isPending}
+            data-testid="button-modal-add-to-cart"
+          >
+            {addToCartMutation.isPending ? "Adding..." : supply.stockQuantity === 0 ? "Out of Stock" : "Add to Cart"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
