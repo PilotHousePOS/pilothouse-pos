@@ -112,17 +112,16 @@ export default function AquaticsPage() {
                         {pet.description}
                       </p>
                     )}
-                    <div className="flex items-center justify-between mt-auto pt-2">
-                      <span className="text-lg font-bold text-blue-600">
+                    <div className="mt-auto pt-2 space-y-3">
+                      <div className="text-lg font-bold text-blue-600">
                         ${pet.price}
-                      </span>
+                      </div>
                       <Button
-                        size="sm"
                         onClick={() => handleAddToCart(pet, "pet")}
-                        className="bg-blue-600 hover:bg-blue-700 whitespace-nowrap"
+                        className="w-full bg-blue-600 hover:bg-blue-700"
                         data-testid={`add-to-cart-pet-${pet.id}`}
                       >
-                        <ShoppingCart className="w-4 h-4 mr-1" />
+                        <ShoppingCart className="w-4 h-4 mr-2" />
                         Add to Cart
                       </Button>
                     </div>
@@ -176,17 +175,16 @@ export default function AquaticsPage() {
                         {supply.description}
                       </p>
                     )}
-                    <div className="flex items-center justify-between mt-auto pt-2">
-                      <span className="text-lg font-bold text-blue-600">
+                    <div className="mt-auto pt-2 space-y-3">
+                      <div className="text-lg font-bold text-blue-600">
                         ${supply.price}
-                      </span>
+                      </div>
                       <Button
-                        size="sm"
                         onClick={() => handleAddToCart(supply, "supply")}
-                        className="bg-blue-600 hover:bg-blue-700 whitespace-nowrap"
+                        className="w-full bg-blue-600 hover:bg-blue-700"
                         data-testid={`add-to-cart-supply-${supply.id}`}
                       >
-                        <ShoppingCart className="w-4 h-4 mr-1" />
+                        <ShoppingCart className="w-4 h-4 mr-2" />
                         Add to Cart
                       </Button>
                     </div>
