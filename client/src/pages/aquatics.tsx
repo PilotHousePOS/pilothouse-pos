@@ -94,8 +94,8 @@ export default function AquaticsPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {pets.map((pet: any) => (
-                <Card key={pet.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="aspect-video bg-gray-200 overflow-hidden">
+                <Card key={pet.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full">
+                  <div className="h-48 bg-gray-200 overflow-hidden flex-shrink-0">
                     {pet.imageUrl && (
                       <img
                         src={pet.imageUrl}
@@ -104,7 +104,7 @@ export default function AquaticsPage() {
                       />
                     )}
                   </div>
-                  <CardContent className="p-4">
+                  <CardContent className="p-4 flex flex-col flex-grow">
                     <h3 className="font-bold text-lg mb-2">{pet.name}</h3>
                     <p className="text-sm text-gray-600 mb-2">{pet.breed}</p>
                     {pet.description && (
@@ -112,7 +112,7 @@ export default function AquaticsPage() {
                         {pet.description}
                       </p>
                     )}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mt-auto">
                       <span className="text-lg font-bold text-blue-600">
                         ${pet.price}
                       </span>
@@ -158,8 +158,8 @@ export default function AquaticsPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {supplies.map((supply: any) => (
-                <Card key={supply.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="aspect-video bg-gray-200 overflow-hidden">
+                <Card key={supply.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full">
+                  <div className="h-48 bg-gray-200 overflow-hidden flex-shrink-0">
                     {supply.imageUrl && (
                       <img
                         src={supply.imageUrl}
@@ -168,7 +168,7 @@ export default function AquaticsPage() {
                       />
                     )}
                   </div>
-                  <CardContent className="p-4">
+                  <CardContent className="p-4 flex flex-col flex-grow">
                     <h3 className="font-bold text-lg mb-2">{supply.name}</h3>
                     <p className="text-sm text-gray-600 mb-2">{supply.category}</p>
                     {supply.description && (
@@ -176,7 +176,7 @@ export default function AquaticsPage() {
                         {supply.description}
                       </p>
                     )}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mt-auto">
                       <span className="text-lg font-bold text-blue-600">
                         ${supply.price}
                       </span>
