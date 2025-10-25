@@ -4,6 +4,20 @@
 A mobile-friendly web application for "Animal House" pet store featuring pet browsing, grooming appointment booking, supply purchasing, inventory management, customer accounts with admin functionality, and Animal House branding. The app has a dark, bold design focusing on grooming services (bath and full service), pet adoption, and exotic reptile specialty - no vet care or training services offered.
 
 ## Recent Changes
+- **October 25, 2025**: Implemented Amazon-style image zoom for supply products
+  - Added hover-zoom overlay (500x500px at 400% magnification) on supply card thumbnail images
+  - Created clickable supply detail modals showing full product information (brand, category, size, weight, description, stock)
+  - Implemented larger zoom overlay (600x600px at 500% magnification) for modal product images
+  - Zoom follows mouse movement for precise detail viewing with ultra-high z-index (999999)
+  - Modal includes full-width "Add to Cart" button and comprehensive product details
+  - Supply cards remain clickable to open details while "Add to Cart" button prevents modal opening
+- **October 25, 2025**: Added multi-image support for supply products in admin panel
+  - Updated database schema with `imageUrls` array field for both pets and supplies tables
+  - Created `MultiImageUpload` component allowing unlimited photo uploads with add/remove capabilities
+  - Admin can now add multiple product photos to existing supplies (not just replace single image)
+  - Each image displays with numbering and individual remove buttons in 2-column grid
+  - Product detail modals and cards use first image from array as primary display
+  - Image counter shows total number of images uploaded for each product
 - **October 23, 2025**: Created dedicated Aquatics and Exotic Reptiles pages
   - Built `/aquatics` page showing only fish and aquatic supplies
   - Built `/reptiles` page showing only reptiles and reptile care products
