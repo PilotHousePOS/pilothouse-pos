@@ -100,7 +100,7 @@ export default function AquaticsPage() {
                       <img
                         src={pet.imageUrl}
                         alt={pet.name}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain transition-transform duration-300 hover:scale-110 cursor-pointer"
                       />
                     )}
                   </div>
@@ -163,7 +163,7 @@ export default function AquaticsPage() {
                       <img
                         src={supply.imageUrl}
                         alt={supply.name}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain transition-transform duration-300 hover:scale-110 cursor-pointer"
                       />
                     )}
                   </div>
