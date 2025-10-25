@@ -179,11 +179,10 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
           <DialogTitle>{supply.name}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          {/* Large Expandable Image */}
+          {/* Large Expandable Image - Double-click to enlarge */}
           <div 
-            className="relative w-full cursor-zoom-in rounded-lg overflow-visible"
-            onMouseEnter={() => setModalZoom(true)}
-            onMouseLeave={() => setModalZoom(false)}
+            className="relative w-full cursor-pointer rounded-lg overflow-visible"
+            onDoubleClick={() => setModalZoom(!modalZoom)}
           >
             <img 
               ref={modalImageRef}
