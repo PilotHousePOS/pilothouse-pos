@@ -242,7 +242,7 @@ export default function AquaticsPage() {
               <div className="space-y-4">
                 {images.length > 0 && (
                   <div 
-                    className="relative w-full cursor-pointer rounded-lg overflow-visible"
+                    className="relative w-full cursor-pointer rounded-lg overflow-visible group"
                     onDoubleClick={() => setModalZoom(!modalZoom)}
                   >
                     <img
@@ -258,14 +258,17 @@ export default function AquaticsPage() {
                       }}
                     />
                     
-                    {hasMultipleImages && (
+                    {hasMultipleImages && !modalZoom && (
                       <>
                         {/* Previous Button */}
                         <button
-                          onClick={() => setCurrentImageIndex((prev) => 
-                            prev === 0 ? images.length - 1 : prev - 1
-                          )}
-                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentImageIndex((prev) => 
+                              prev === 0 ? images.length - 1 : prev - 1
+                            );
+                          }}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
                           aria-label="Previous image"
                         >
                           <ChevronLeft className="w-6 h-6" />
@@ -273,10 +276,13 @@ export default function AquaticsPage() {
                         
                         {/* Next Button */}
                         <button
-                          onClick={() => setCurrentImageIndex((prev) => 
-                            prev === images.length - 1 ? 0 : prev + 1
-                          )}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentImageIndex((prev) => 
+                              prev === images.length - 1 ? 0 : prev + 1
+                            );
+                          }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
                           aria-label="Next image"
                         >
                           <ChevronRight className="w-6 h-6" />
