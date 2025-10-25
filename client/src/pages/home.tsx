@@ -288,7 +288,7 @@ export default function Home() {
               </div>
               <h4 className="font-bold text-gray-900 mb-1">Supplies</h4>
               <p className="text-orange-700 text-sm font-medium">Best Prices</p>
-              <p className="text-gray-600 text-xs mt-1">All Your Pet Needs</p>
+              <p className="text-gray-600 text-xs mt-1">All Your Pets Needs</p>
             </CardContent>
           </Card>
         </div>
