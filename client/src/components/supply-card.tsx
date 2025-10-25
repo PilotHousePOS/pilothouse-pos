@@ -18,12 +18,8 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showDetails, setShowDetails] = useState(false);
-  const [showZoom, setShowZoom] = useState(false);
-  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const [modalZoom, setModalZoom] = useState(false);
-  const [modalZoomPosition, setModalZoomPosition] = useState({ x: 0, y: 0 });
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const imageRef = useRef<HTMLImageElement>(null);
   const modalImageRef = useRef<HTMLImageElement>(null);
 
   const addToCartMutation = useMutation({
@@ -74,68 +70,17 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
   const hasMultipleImages = images.length > 1;
   const imageUrl = images[currentImageIndex] || defaultImages[supply.category as keyof typeof defaultImages] || defaultImages.food;
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!imageRef.current) return;
-    
-    const rect = imageRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    
-    setZoomPosition({ x, y });
-  };
-
-  const handleModalMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!modalImageRef.current) return;
-    
-    const rect = modalImageRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    
-    setModalZoomPosition({ x, y });
-  };
-
   return (
     <>
     <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => setShowDetails(true)}>
       <CardContent className="p-0">
         <div className="flex">
-          <div 
-            className="relative w-20 h-20 cursor-zoom-in overflow-hidden"
-            onMouseEnter={() => setShowZoom(true)}
-            onMouseLeave={() => setShowZoom(false)}
-            onMouseMove={handleMouseMove}
-          >
+          <div className="relative w-20 h-20 overflow-hidden">
             <img 
-              ref={imageRef}
               src={imageUrl}
               alt={supply.name}
               className="w-full h-full object-cover" 
             />
-            
-            {/* Zoom Overlay */}
-            {showZoom && (
-              <div 
-                className="fixed pointer-events-none border-4 border-gray-800 shadow-2xl rounded-lg overflow-hidden bg-white"
-                style={{
-                  width: '500px',
-                  height: '500px',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  zIndex: 999999,
-                }}
-              >
-                <div
-                  className="w-full h-full"
-                  style={{
-                    backgroundImage: `url(${imageUrl})`,
-                    backgroundSize: '400%',
-                    backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
-                    backgroundRepeat: 'no-repeat',
-                  }}
-                />
-              </div>
-            )}
           </div>
           <div className="p-4 flex-1">
             <div className="flex items-start justify-between">
