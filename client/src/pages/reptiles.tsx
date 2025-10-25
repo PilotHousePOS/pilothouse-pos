@@ -59,7 +59,7 @@ export default function ReptilesPage() {
   const isLoading = petsLoading || suppliesLoading;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 pb-32">
       {/* Header */}
       <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white py-8 px-4">
         <div className="max-w-6xl mx-auto">
@@ -71,7 +71,7 @@ export default function ReptilesPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8 space-y-12">
+      <div className="max-w-6xl mx-auto px-4 py-8 pb-16 space-y-12">
         {/* Reptiles Section */}
         <section>
           <h2 className="text-2xl font-bold mb-6 text-gray-800">Exotic Reptiles</h2>
@@ -107,7 +107,7 @@ export default function ReptilesPage() {
                       />
                     )}
                   </div>
-                  <CardContent className="p-4 flex flex-col flex-grow">
+                  <CardContent className="p-4 pb-6 flex flex-col flex-grow">
                     <h3 className="font-bold text-lg mb-2">{pet.name}</h3>
                     <p className="text-sm text-gray-600 mb-2">{pet.breed}</p>
                     {pet.description && (
@@ -115,14 +115,14 @@ export default function ReptilesPage() {
                         {pet.description}
                       </p>
                     )}
-                    <div className="flex items-center justify-between mt-auto">
+                    <div className="flex items-center justify-between mt-auto pt-2">
                       <span className="text-lg font-bold text-green-600">
                         ${pet.price}
                       </span>
                       <Button
                         size="sm"
                         onClick={() => handleAddToCart(pet, "pet")}
-                        className="bg-green-600 hover:bg-green-700"
+                        className="bg-green-600 hover:bg-green-700 whitespace-nowrap"
                         data-testid={`add-to-cart-pet-${pet.id}`}
                       >
                         <ShoppingCart className="w-4 h-4 mr-1" />
@@ -171,7 +171,7 @@ export default function ReptilesPage() {
                       />
                     )}
                   </div>
-                  <CardContent className="p-4 flex flex-col flex-grow">
+                  <CardContent className="p-4 pb-6 flex flex-col flex-grow">
                     <h3 className="font-bold text-lg mb-2">{supply.name}</h3>
                     <p className="text-sm text-gray-600 mb-2">{supply.category}</p>
                     {supply.description && (
@@ -179,14 +179,14 @@ export default function ReptilesPage() {
                         {supply.description}
                       </p>
                     )}
-                    <div className="flex items-center justify-between mt-auto">
+                    <div className="flex items-center justify-between mt-auto pt-2">
                       <span className="text-lg font-bold text-green-600">
                         ${supply.price}
                       </span>
                       <Button
                         size="sm"
                         onClick={() => handleAddToCart(supply, "supply")}
-                        className="bg-green-600 hover:bg-green-700"
+                        className="bg-green-600 hover:bg-green-700 whitespace-nowrap"
                         data-testid={`add-to-cart-supply-${supply.id}`}
                       >
                         <ShoppingCart className="w-4 h-4 mr-1" />
