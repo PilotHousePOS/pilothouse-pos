@@ -1725,7 +1725,7 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
               <SelectItem value="fish_tanks">Fish Tanks</SelectItem>
               <SelectItem value="reptile_tanks">Reptile Tanks</SelectItem>
               <SelectItem value="bird_cages">Bird Cages</SelectItem>
-              <SelectItem value="dog_cages">Dog Cages</SelectItem>
+              <SelectItem value="dog_cages">Dog Cages/Houses</SelectItem>
               <SelectItem value="small_animal_cages">Small Animal Cages</SelectItem>
             </SelectContent>
           </Select>
