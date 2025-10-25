@@ -270,12 +270,12 @@ export default function Settings() {
   return (
     <div className="pb-20">
       {/* Fixed Back Button */}
-      <div className="fixed top-0 left-0 z-50 p-4">
+      <div className="fixed top-4 left-4 z-50">
         <Button
           variant="ghost"
           size="icon"
           onClick={safeGoBack}
-          className="bg-white shadow-md hover:bg-gray-100"
+          className="bg-white shadow-lg hover:bg-gray-100 rounded-full"
           data-testid="button-back"
         >
           <ArrowLeft className="w-6 h-6" />

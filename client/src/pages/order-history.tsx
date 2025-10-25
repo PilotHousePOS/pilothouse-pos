@@ -68,18 +68,22 @@ export default function OrderHistory() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
+      {/* Fixed Back Button */}
+      <div className="fixed top-4 left-4 z-50">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={safeGoBack}
+          className="bg-white shadow-lg hover:bg-gray-100 rounded-full"
+          data-testid="button-back"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </Button>
+      </div>
+
       {/* Header */}
       <div className="bg-gradient-to-r from-brand-blue to-brand-red text-white p-4 sticky top-0 z-10 shadow-md">
-        <div className="flex items-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-white hover:bg-white/20 mr-3"
-            onClick={safeGoBack}
-            data-testid="button-back"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
+        <div className="flex items-center pl-12">
           <div>
             <h1 className="text-2xl font-bold">Order History</h1>
             <p className="text-sm text-white/80">View your past purchases</p>

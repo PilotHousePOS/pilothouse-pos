@@ -64,18 +64,22 @@ export default function AquaticsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-32">
+      {/* Fixed Back Button */}
+      <div className="fixed top-4 left-4 z-50">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={safeGoBack}
+          className="bg-white shadow-lg hover:bg-gray-100 rounded-full"
+          data-testid="button-back"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </Button>
+      </div>
+
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-8 px-4">
         <div className="max-w-6xl mx-auto">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-white hover:bg-white/20 mb-3"
-            onClick={safeGoBack}
-            data-testid="button-back"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
           <div className="flex items-center gap-3 mb-2">
             <Fish className="w-8 h-8" />
             <h1 className="text-3xl font-bold">Aquatics</h1>
