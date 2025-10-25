@@ -53,6 +53,7 @@ The application is built as a full-stack web application with a clear separation
 - **Navigation:** 
     - Enhanced bottom navigation with scroll-to-top behavior.
     - Quick action cards on profile page for Order History, My Appointments, Wishlist, and Settings.
+    - Universal back button on all secondary pages (Order History, My Appointments, Wishlist, Settings, Aquatics, Reptiles, Admin, Booking) that navigates to the previous page in browser history.
 
 **System Design Choices:**
 - **Frontend**: React with Vite, TypeScript, Tailwind CSS, shadcn/ui components.
