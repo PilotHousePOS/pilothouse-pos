@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Fish, X } from "lucide-react";
+import { ShoppingCart, Fish, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -11,6 +11,7 @@ export default function AquaticsPage() {
   const { toast } = useToast();
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [selectedType, setSelectedType] = useState<"pet" | "supply" | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const { data: pets = [], isLoading: petsLoading } = useQuery<any[]>({
     queryKey: ["/api/pets", { species: "fish" }],
@@ -107,9 +108,9 @@ export default function AquaticsPage() {
                   }}
                 >
                   <div className="h-48 bg-gray-200 overflow-hidden flex-shrink-0">
-                    {pet.imageUrl && (
+                    {(pet.imageUrls?.[0] || pet.imageUrl) && (
                       <img
-                        src={pet.imageUrl}
+                        src={pet.imageUrls?.[0] || pet.imageUrl}
                         alt={pet.name}
                         className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
                       />
@@ -180,9 +181,9 @@ export default function AquaticsPage() {
                   }}
                 >
                   <div className="h-48 bg-gray-200 overflow-hidden flex-shrink-0">
-                    {supply.imageUrl && (
+                    {(supply.imageUrls?.[0] || supply.imageUrl) && (
                       <img
-                        src={supply.imageUrl}
+                        src={supply.imageUrls?.[0] || supply.imageUrl}
                         alt={supply.name}
                         className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
                       />
@@ -221,23 +222,78 @@ export default function AquaticsPage() {
       </div>
 
       {/* Item Details Dialog */}
-      <Dialog open={selectedItem !== null} onOpenChange={() => setSelectedItem(null)}>
+      <Dialog open={selectedItem !== null} onOpenChange={() => {
+        setSelectedItem(null);
+        setCurrentImageIndex(0);
+      }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selectedItem?.name}</DialogTitle>
           </DialogHeader>
           
-          {selectedItem && (
-            <div className="space-y-4">
-              {selectedItem.imageUrl && (
-                <div className="w-full h-64 bg-gray-200 rounded-lg overflow-hidden">
-                  <img
-                    src={selectedItem.imageUrl}
-                    alt={selectedItem.name}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-              )}
+          {selectedItem && (() => {
+            const images = selectedItem.imageUrls?.filter((url: string) => url) || 
+                          (selectedItem.imageUrl ? [selectedItem.imageUrl] : []);
+            const hasMultipleImages = images.length > 1;
+            
+            return (
+              <div className="space-y-4">
+                {images.length > 0 && (
+                  <div className="relative w-full h-64 bg-gray-200 rounded-lg overflow-hidden group">
+                    <img
+                      src={images[currentImageIndex]}
+                      alt={selectedItem.name}
+                      className="w-full h-full object-contain"
+                    />
+                    
+                    {hasMultipleImages && (
+                      <>
+                        {/* Previous Button */}
+                        <button
+                          onClick={() => setCurrentImageIndex((prev) => 
+                            prev === 0 ? images.length - 1 : prev - 1
+                          )}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          aria-label="Previous image"
+                        >
+                          <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        
+                        {/* Next Button */}
+                        <button
+                          onClick={() => setCurrentImageIndex((prev) => 
+                            prev === images.length - 1 ? 0 : prev + 1
+                          )}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          aria-label="Next image"
+                        >
+                          <ChevronRight className="w-6 h-6" />
+                        </button>
+                        
+                        {/* Image Dots */}
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2">
+                          {images.map((_: any, idx: number) => (
+                            <button
+                              key={idx}
+                              onClick={() => setCurrentImageIndex(idx)}
+                              className={`w-2 h-2 rounded-full transition-all ${
+                                idx === currentImageIndex 
+                                  ? 'bg-white w-6' 
+                                  : 'bg-white/50 hover:bg-white/75'
+                              }`}
+                              aria-label={`Go to image ${idx + 1}`}
+                            />
+                          ))}
+                        </div>
+                        
+                        {/* Image Counter */}
+                        <div className="absolute top-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
+                          {currentImageIndex + 1} / {images.length}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
               
               <div className="space-y-2">
                 {selectedType === "pet" && selectedItem.breed && (
@@ -266,19 +322,21 @@ export default function AquaticsPage() {
                 </div>
               </div>
 
-              <Button
-                onClick={() => {
-                  handleAddToCart(selectedItem, selectedType!);
-                  setSelectedItem(null);
-                }}
-                className="w-full bg-blue-600 hover:bg-blue-700"
-                data-testid={`dialog-add-to-cart-${selectedItem.id}`}
-              >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Add to Cart
-              </Button>
-            </div>
-          )}
+                <Button
+                  onClick={() => {
+                    handleAddToCart(selectedItem, selectedType!);
+                    setSelectedItem(null);
+                    setCurrentImageIndex(0);
+                  }}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  data-testid={`dialog-add-to-cart-${selectedItem.id}`}
+                >
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  Add to Cart
+                </Button>
+              </div>
+            );
+          })()}
         </DialogContent>
       </Dialog>
     </div>

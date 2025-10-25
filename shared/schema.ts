@@ -59,6 +59,7 @@ export const pets = pgTable("pets", {
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   description: text("description"),
   imageUrl: varchar("image_url", { length: 500 }),
+  imageUrls: text("image_urls").array(), // Multiple images support
   isAvailable: boolean("is_available").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -73,6 +74,7 @@ export const supplies = pgTable("supplies", {
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   description: text("description"),
   imageUrl: varchar("image_url", { length: 500 }),
+  imageUrls: text("image_urls").array(), // Multiple images support
   stockQuantity: integer("stock_quantity").default(0),
   isActive: boolean("is_active").default(true),
   weight: varchar("weight", { length: 50 }),
