@@ -53,7 +53,7 @@ export const passwordResetTokens = pgTable("password_reset_tokens", {
 export const pets = pgTable("pets", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
-  species: varchar("species", { length: 100 }).notNull(), // dog, cat, bird, fish, reptile
+  species: varchar("species", { length: 100 }).notNull(), // mammals, bird, fish, reptile
   breed: varchar("breed", { length: 255 }).notNull(),
   age: varchar("age", { length: 50 }).notNull(),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),

@@ -19,8 +19,7 @@ export default function PetCard({ pet }: PetCardProps) {
   const modalImageRef = useRef<HTMLImageElement>(null);
 
   const defaultImages = {
-    dog: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
-    cat: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+    mammals: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
     bird: "https://images.unsplash.com/photo-1452570053594-1b985d6ea890?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
     fish: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
     reptile: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200"
@@ -29,7 +28,7 @@ export default function PetCard({ pet }: PetCardProps) {
   const images = pet.imageUrls?.filter((url: string) => url) || 
                 (pet.imageUrl ? [pet.imageUrl] : []);
   const hasMultipleImages = images.length > 1;
-  const imageUrl = images[currentImageIndex] || defaultImages[pet.species as keyof typeof defaultImages] || defaultImages.dog;
+  const imageUrl = images[currentImageIndex] || defaultImages[pet.species as keyof typeof defaultImages] || defaultImages.mammals;
 
   // Minimum swipe distance (in px) required to trigger navigation
   const minSwipeDistance = 50;

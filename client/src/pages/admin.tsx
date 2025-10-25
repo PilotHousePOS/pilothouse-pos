@@ -1335,13 +1335,17 @@ function EditPetForm({ pet, onSubmit }: { pet: any; onSubmit: (data: any) => voi
       </div>
       <div>
         <label className="block text-sm font-medium mb-1">Species</label>
-        <input
-          type="text"
-          value={formData.species}
-          onChange={(e) => setFormData({ ...formData, species: e.target.value })}
-          className="w-full p-2 border rounded"
-          required
-        />
+        <Select value={formData.species} onValueChange={(value) => setFormData({ ...formData, species: value })}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select species" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="mammals">Mammals</SelectItem>
+            <SelectItem value="bird">Bird</SelectItem>
+            <SelectItem value="fish">Fish</SelectItem>
+            <SelectItem value="reptile">Reptile</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       <div>
         <label className="block text-sm font-medium mb-1">Breed</label>
@@ -1759,8 +1763,7 @@ function AddPetForm({ onSubmit }: { onSubmit: (data: any) => void }) {
             <SelectValue placeholder="Select species" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="dog">Dog</SelectItem>
-            <SelectItem value="cat">Cat</SelectItem>
+            <SelectItem value="mammals">Mammals</SelectItem>
             <SelectItem value="bird">Bird</SelectItem>
             <SelectItem value="fish">Fish</SelectItem>
             <SelectItem value="reptile">Reptile</SelectItem>
