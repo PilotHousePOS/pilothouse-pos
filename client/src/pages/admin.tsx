@@ -668,7 +668,7 @@ export default function Admin() {
                         Add Pet
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle>Add New Pet</DialogTitle>
                       </DialogHeader>
@@ -749,15 +749,11 @@ export default function Admin() {
                       Add Supply
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="fixed inset-0 z-50 bg-background p-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 sm:relative sm:max-w-lg sm:rounded-lg sm:border sm:shadow-lg sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 sm:data-[state=closed]:slide-out-to-left-1/2 sm:data-[state=closed]:slide-out-to-top-[48%] sm:data-[state=open]:slide-in-from-left-1/2 sm:data-[state=open]:slide-in-from-top-[48%]">
-                    <div className="flex h-full flex-col overflow-hidden sm:h-auto">
-                      <DialogHeader className="shrink-0 border-b px-6 py-4 sm:border-none sm:px-6 sm:pb-4">
-                        <DialogTitle>Add New Supply</DialogTitle>
-                      </DialogHeader>
-                      <div className="flex-1 overflow-y-auto px-6 py-4 sm:overflow-visible sm:px-6 sm:py-0">
-                        <AddSupplyForm onSubmit={(data) => createSupplyMutation.mutate(data)} />
-                      </div>
-                    </div>
+                  <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Add New Supply</DialogTitle>
+                    </DialogHeader>
+                    <AddSupplyForm onSubmit={(data) => createSupplyMutation.mutate(data)} />
                   </DialogContent>
                 </Dialog>
               </div>
@@ -1257,18 +1253,14 @@ export default function Admin() {
       {/* Edit Pet Dialog */}
       {editingPet && (
         <Dialog open={!!editingPet} onOpenChange={() => setEditingPet(null)}>
-          <DialogContent className="fixed inset-0 z-50 bg-background p-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 sm:relative sm:max-w-lg sm:rounded-lg sm:border sm:shadow-lg sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 sm:data-[state=closed]:slide-out-to-left-1/2 sm:data-[state=closed]:slide-out-to-top-[48%] sm:data-[state=open]:slide-in-from-left-1/2 sm:data-[state=open]:slide-in-from-top-[48%]">
-            <div className="flex h-full flex-col overflow-hidden sm:h-auto">
-              <DialogHeader className="shrink-0 border-b px-6 py-4 sm:border-none sm:px-6 sm:pb-4">
-                <DialogTitle>Edit Pet</DialogTitle>
-              </DialogHeader>
-              <div className="flex-1 overflow-y-auto px-6 py-4 sm:overflow-visible sm:px-6 sm:py-0">
-                <EditPetForm 
-                  pet={editingPet}
-                  onSubmit={(data) => editPetMutation.mutate({ id: editingPet.id, data })} 
-                />
-              </div>
-            </div>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Edit Pet</DialogTitle>
+            </DialogHeader>
+            <EditPetForm 
+              pet={editingPet}
+              onSubmit={(data) => editPetMutation.mutate({ id: editingPet.id, data })} 
+            />
           </DialogContent>
         </Dialog>
       )}
@@ -1276,18 +1268,14 @@ export default function Admin() {
       {/* Edit Supply Dialog */}
       {editingSupply && (
         <Dialog open={!!editingSupply} onOpenChange={() => setEditingSupply(null)}>
-          <DialogContent className="fixed inset-0 z-50 bg-background p-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 sm:relative sm:max-w-lg sm:rounded-lg sm:border sm:shadow-lg sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 sm:data-[state=closed]:slide-out-to-left-1/2 sm:data-[state=closed]:slide-out-to-top-[48%] sm:data-[state=open]:slide-in-from-left-1/2 sm:data-[state=open]:slide-in-from-top-[48%]">
-            <div className="flex h-full flex-col overflow-hidden sm:h-auto">
-              <DialogHeader className="shrink-0 border-b px-6 py-4 sm:border-none sm:px-6 sm:pb-4">
-                <DialogTitle>Edit Supply</DialogTitle>
-              </DialogHeader>
-              <div className="flex-1 overflow-y-auto px-6 py-4 sm:overflow-visible sm:px-6 sm:py-0">
-                <EditSupplyForm 
-                  supply={editingSupply}
-                  onSubmit={(data) => editSupplyMutation.mutate({ id: editingSupply.id, data })} 
-                />
-              </div>
-            </div>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Edit Supply</DialogTitle>
+            </DialogHeader>
+            <EditSupplyForm 
+              supply={editingSupply}
+              onSubmit={(data) => editSupplyMutation.mutate({ id: editingSupply.id, data })} 
+            />
           </DialogContent>
         </Dialog>
       )}
