@@ -1,153 +1,7 @@
 # Animal House Pet Store
 
-## Project Overview
-A mobile-friendly web application for "Animal House" pet store featuring pet browsing, grooming appointment booking, supply purchasing, inventory management, customer accounts with admin functionality, and Animal House branding. The app has a dark, bold design focusing on grooming services (bath and full service), pet adoption, and exotic reptile specialty - no vet care or training services offered.
-
-## Recent Changes
-- **October 25, 2025**: Implemented Amazon-style image enlargement for supply products
-  - Created clickable supply detail modals showing full product information (brand, category, size, weight, description, stock)
-  - Double-click product image in modal to enlarge it to 1.5x size (up to 90% of screen height)
-  - Double-click again to return to normal size - toggle on/off with same action
-  - Smooth 300ms animation for professional scaling effect
-  - Image expands from center with ultra-high z-index to pop out over other content
-  - Modal includes full-width "Add to Cart" button and comprehensive product details
-  - Supply cards remain clickable to open details while "Add to Cart" button prevents modal opening
-- **October 25, 2025**: Added multi-image support for supply products in admin panel
-  - Updated database schema with `imageUrls` array field for both pets and supplies tables
-  - Created `MultiImageUpload` component allowing unlimited photo uploads with add/remove capabilities
-  - Admin can now add multiple product photos to existing supplies (not just replace single image)
-  - Each image displays with numbering and individual remove buttons in 2-column grid
-  - Product detail modals and cards use first image from array as primary display
-  - Image counter shows total number of images uploaded for each product
-- **October 23, 2025**: Created dedicated Aquatics and Exotic Reptiles pages
-  - Built `/aquatics` page showing only fish and aquatic supplies
-  - Built `/reptiles` page showing only reptiles and reptile care products
-  - Each page features dedicated header with themed colors (blue for aquatics, green for reptiles)
-  - Filtered displays show only relevant animals and supplies for each category
-  - Updated home page service buttons to navigate to dedicated pages instead of filtered pets page
-  - Clean, focused shopping experience for each animal category
-- **October 23, 2025**: Added appointment rejection functionality with email notifications
-  - Added red "Reject" button next to green "Approve" button in pending approvals section
-  - Created rejection email system with professional HTML template
-  - Email message: "Sorry for the inconvenience, but your Grooming Appointment has been rejected. Please expect a call promptly with an explanation."
-  - Rejected appointments marked with "rejected" status and moved to regular appointments list
-  - Customers automatically notified via email when appointment is rejected
-  - Both approve and reject buttons disabled during processing to prevent double-clicks
-- **October 23, 2025**: Fixed appointment status dropdown display issue
-  - Added dynamic key prop to Select component to force re-render on status changes
-  - Dropdown now correctly shows "Confirmed" immediately after approval instead of staying on "Pending"
-  - Status updates reflect instantly in the UI after admin actions
-- **October 23, 2025**: Added admin approval workflow for grooming appointments
-  - Added `isApproved` boolean field to appointments table (defaults to false for new bookings)
-  - Created admin-only API endpoints: GET /api/admin/appointments/unapproved and PUT /api/admin/appointments/:id/approve
-  - Built "Pending Approval" section in admin panel Orders & Appointments tab showing all unapproved appointments
-  - Admin can view all appointment details (pet, owner info, contact, date/time, special notes) before approval
-  - Green "Approve" button allows instant approval of appointments with proper error handling
-  - Orange-themed UI section with badges to highlight pending approvals requiring admin action
-  - All new customer bookings now require admin approval before being processed
-  - Approved appointments automatically removed from pending list and added to regular appointments
-- **October 23, 2025**: Updated home page service categories
-  - Changed "Grooming" service card to "Aquatics" with fish emoji and aquarium care description
-  - Updated both Aquatics and Exotic Reptiles cards to filter pets page by species
-  - Clicking Aquatics navigates to /pets?species=fish showing only fish
-  - Clicking Exotic Reptiles navigates to /pets?species=reptile showing only reptiles
-  - Implemented URL parameter handling in pets page for filtered views
-- **October 23, 2025**: Enhanced bottom navigation functionality
-  - Updated all bottom nav icons to reliably redirect to their respective home pages
-  - Added smooth scroll-to-top behavior when clicking navigation icons
-  - Works consistently even when already on the target page
-- **October 23, 2025**: Improved login error handling
-  - Added toast notifications for incorrect login credentials
-  - Shows "Your email or password is incorrect" message for failed login attempts
-  - Maintains security by not revealing which credential failed (prevents user enumeration)
-- **October 23, 2025**: Implemented comprehensive password reset system with email workflow
-  - Added password reset token database table with expiration and single-use tracking
-  - Created SendGrid email integration for password reset links with professional HTML templates
-  - Built backend API endpoints: /api/auth/forgot-password and /api/auth/reset-password
-  - Added /forgot-password page for users to request password reset emails
-  - Created /reset-password page for users to set new password via email link
-  - Tokens expire after 1 hour and are single-use only for security
-  - Prevents user enumeration by returning same message for existing and non-existing emails
-  - Email links are environment-aware (development vs production URLs)
-  - Added "Forgot Password?" link to sign-in page for easy access
-  - Complete end-to-end workflow: request → email → reset → login
-- **October 23, 2025**: Implemented comprehensive user settings page with account management
-  - Created /settings route accessible from profile page Settings button
-  - Added name change functionality with first name and last name fields
-  - Implemented email change functionality with validation and duplicate checking
-  - Added password change with current password verification
-  - All updates include proper form validation and error handling
-  - Token rotation on email and name changes to keep authentication fresh
-  - Password requires minimum 6 characters with confirmation matching
-  - Names validated to prevent empty values and properly trimmed
-- **July 2, 2025**: Added breed restriction notice for afternoon appointments
-  - Added prominent warning about NO Poodles, Doodles, German Shepherds, or Large Mix Breed Dogs after 12:00 PM
-  - Yellow warning banner displayed before time selection to prevent scheduling conflicts
-  - Clear message that customers will be asked to reschedule if they arrive with restricted breeds
-- **July 1, 2025**: Implemented admin notification system for new orders and appointments
-  - Added comprehensive admin email notifications for new orders with customer details and order totals
-  - Created admin email alerts for new grooming appointments with service details and times
-  - Integrated push notification infrastructure for admin alerts (console logging for now)
-  - All admin users receive notifications when new orders are placed or appointments are booked
-  - Notification system gracefully handles failures without breaking order/appointment creation
-- **July 1, 2025**: Implemented 15-minute appointment intervals and groomer backend system
-  - Added 15-minute appointment intervals replacing configurable durations (every 15 minutes 9:00 AM to 1:30 PM)
-  - Built groomer management database tables and API endpoints for future use
-  - Removed groomer selection requirement from booking form per user request
-  - Maintained groomer system in backend for potential future implementation
-- **July 1, 2025**: Fixed critical mobile dialog scrolling issue in admin panel
-  - Implemented dual modal system: custom full-screen modals for mobile, standard dialogs for desktop
-  - Mobile forms now use native scrolling without viewport conflicts
-  - Fixed issue where Add Pet button was unreachable after image uploads on mobile
-  - Ensured all admin forms (Add/Edit Pet, Add/Edit Supply) work properly on mobile devices
-- **June 30, 2025**: Implemented comprehensive customer notification system
-  - Added email notifications for order status updates (In Progress, Ready)
-  - Integrated SMS notifications via Twilio for real-time updates
-  - Built web push notification system with service worker
-  - Created notification service that triggers on admin status changes
-  - Professional email templates with Animal House branding
-- **June 30, 2025**: Enhanced booking form with owner information requirements
-  - Added required owner fields: first name, last name, and phone number
-  - Updated database schema to store owner contact information with appointments
-  - Removed price display from booking confirmation button for cleaner customer experience
-  - Maintained form validation to ensure all owner information is provided before booking
-- **June 25, 2025**: Resolved mobile authentication and caching issues
-  - Added comprehensive cache-busting headers to prevent mobile browser caching
-  - Updated HTML meta tags to force fresh content loading on mobile devices
-  - Fixed authentication display to show current user name and admin status in header
-  - Implemented server-side cache prevention headers for mobile compatibility
-  - Authentication working correctly: Falen Spears account shows admin privileges
-- **June 25, 2025**: Resolved critical type mismatches and authentication system stability
-  - Fixed type conflicts between JWT User type and database schema types by creating separate JWTUser type
-  - Systematically resolved admin page errors and user authentication checks throughout application
-  - Updated authentication middleware to properly handle null-safety and type casting
-  - Fixed TypeScript compilation errors in all route handlers (supplies, cart, orders, appointments)
-  - Implemented proper type handling for Express route handlers to resolve type conflicts
-  - Application now fully functional with authentication, admin panel, and inventory management working correctly
-- **June 25, 2025**: Fixed admin dashboard layout and overlapping issues
-  - Resolved tab overlapping problem with responsive design improvements
-  - Added horizontal scrolling for tab navigation on mobile devices
-  - Improved stats card layout with proper spacing and minimum heights
-  - Fixed CardDescription import error in admin panel
-  - Enhanced mobile responsiveness with adaptive text labels
-- **June 25, 2025**: Fixed admin panel access and authentication display
-  - Resolved admin page loading issues by removing problematic redirect loops
-  - Updated authentication system to fetch fresh user data from database
-  - Added admin status display in profile page and bottom navigation
-  - Fixed syntax errors in navigation component that prevented app loading
-  - Confirmed admin privileges working for Falen Spears account
-- **June 25, 2025**: Added comprehensive admin user management system
-  - Added isAdmin field to user database schema with proper migrations
-  - Built complete admin panel with user management tab
-  - Created secure API endpoints for fetching users and updating admin status
-  - Implemented proper admin access controls with authentication checks
-  - Added toggle switches for easy admin privilege management
-- **June 25, 2025**: Simplified authentication system implementation
-  - Implemented localStorage-based token authentication
-  - Fixed redirect loop issues that prevented app loading
-  - Created clear landing page → auth → authenticated home flow
-  - Added proper logout functionality that clears tokens and redirects
-  - Simple token presence check determines authentication state
+## Overview
+A mobile-friendly web application for "Animal House" pet store, specializing in pet browsing, grooming appointment booking, and pet supply purchasing. The application includes inventory management and customer accounts with administrative functionalities. It features a dark, bold design focused on grooming services (bath and full service), pet adoption, and exotic reptile specialties, explicitly excluding vet care or training services. The business vision is to provide a streamlined, branded online presence for pet owners, enhancing service accessibility and product sales for "Animal House."
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -160,23 +14,54 @@ A mobile-friendly web application for "Animal House" pet store featuring pet bro
 - Grooming services: Only "Bath Only" and "Full Grooming" options
 - Mobile authentication consistency: Same account should show identical admin access across devices
 
-## Project Architecture
-- **Frontend**: React with Vite, TypeScript, Tailwind CSS, shadcn/ui components
-- **Backend**: Express.js with TypeScript
-- **Database**: PostgreSQL with Drizzle ORM
-- **Authentication**: JWT tokens with secure cookie storage (replaced session-based auth)
-- **State Management**: TanStack Query for server state
-- **Routing**: Wouter for client-side routing
+## System Architecture
+The application is built as a full-stack web application with a clear separation of concerns.
 
-## Technical Decisions
-- JWT authentication chosen over sessions due to session ID inconsistency issues
-- Cookie-based token storage for reliable persistence across requests
-- All authentication routes return proper HTTP status codes and error messages
-- Token verification includes proper error handling and debugging logs
+**UI/UX Decisions:**
+- Dark, bold design with strong contrast, consistent with "Animal House" branding.
+- Mobile-friendly and responsive design, utilizing full-screen modals for mobile forms.
+- Amazon-style image enlargement functionality for product and pet cards, including clickable detail modals with smooth animations.
+- Themed headers for dedicated Aquatics (blue) and Exotic Reptiles (green) pages.
+- Prominent warning banners for breed restrictions in appointment booking.
+- Use of toast notifications for enhanced user feedback (e.g., login errors).
 
-## Current Status
-- Database schema implemented with all necessary tables
-- JWT authentication system fully functional on backend
-- Login/signup generate proper tokens and set cookies
-- Frontend authentication redirect mechanism implemented
-- All Animal House branding and pricing requirements met
+**Technical Implementations & Feature Specifications:**
+- **Pet & Supply Management:** Multi-image support for products and pets, allowing unlimited photo uploads via an admin panel component.
+- **Appointment System:**
+    - 15-minute appointment intervals.
+    - Admin approval workflow for grooming appointments with pending approval section and approve/reject functionality.
+    - Automated email notifications for appointment rejections with professional templates.
+    - Storage of owner contact information with appointments.
+- **Order & Notification System:**
+    - Admin notification system for new orders and appointments via email and push notifications (console logging).
+    - Customer notification system via email, SMS (Twilio), and web push for order status updates.
+- **Authentication & Authorization:**
+    - JWT tokens with secure cookie storage for authentication.
+    - Comprehensive password reset system with email workflow (SendGrid integration), token expiration, and single-use tokens.
+    - User settings page for name, email, and password changes with validation and token rotation.
+    - Admin user management system with `isAdmin` field, secure API endpoints, and toggle switches for privilege management.
+    - Robust error handling for authentication processes.
+- **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtering content by species.
+- **Navigation:** Enhanced bottom navigation with scroll-to-top behavior.
+
+**System Design Choices:**
+- **Frontend**: React with Vite, TypeScript, Tailwind CSS, shadcn/ui components.
+- **Backend**: Express.js with TypeScript.
+- **Database**: PostgreSQL with Drizzle ORM.
+- **Authentication**: JWT tokens stored in cookies, chosen for consistency and security over session-based methods.
+- **State Management**: TanStack Query for server state management.
+- **Routing**: Wouter for client-side routing.
+- **Development Practices**: Strict TypeScript usage for type safety, proper HTTP status codes for API responses, environment-aware configurations.
+
+## External Dependencies
+-   **Database**: PostgreSQL
+-   **ORM**: Drizzle ORM
+-   **Email Service**: SendGrid (for password reset and appointment rejection emails)
+-   **SMS Service**: Twilio (for customer order status updates)
+-   **Frontend Framework**: React
+-   **Build Tool**: Vite
+-   **Styling**: Tailwind CSS
+-   **UI Component Library**: shadcn/ui
+-   **Server-Side Framework**: Express.js
+-   **Query Library**: TanStack Query
+-   **Client-Side Router**: Wouter

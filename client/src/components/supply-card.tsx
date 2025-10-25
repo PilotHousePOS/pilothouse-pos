@@ -141,12 +141,12 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
                   {supply.weight && `${supply.weight} • `}
                   {supply.size && supply.size}
                 </p>
-                {supply.stockQuantity <= 5 && supply.stockQuantity > 0 && (
+                {supply.stockQuantity !== null && supply.stockQuantity <= 5 && supply.stockQuantity > 0 && (
                   <Badge variant="destructive" className="text-xs mt-1">
                     Low Stock
                   </Badge>
                 )}
-                {supply.stockQuantity === 0 && (
+                {supply.stockQuantity !== null && supply.stockQuantity === 0 && (
                   <Badge variant="secondary" className="text-xs mt-1">
                     Out of Stock
                   </Badge>

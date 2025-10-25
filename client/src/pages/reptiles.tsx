@@ -12,6 +12,7 @@ export default function ReptilesPage() {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [selectedType, setSelectedType] = useState<"pet" | "supply" | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [modalZoom, setModalZoom] = useState(false);
 
   const { data: pets = [], isLoading: petsLoading } = useQuery<any[]>({
     queryKey: ["/api/pets", { species: "reptile" }],
@@ -228,6 +229,7 @@ export default function ReptilesPage() {
       <Dialog open={selectedItem !== null} onOpenChange={() => {
         setSelectedItem(null);
         setCurrentImageIndex(0);
+        setModalZoom(false);
       }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -242,11 +244,21 @@ export default function ReptilesPage() {
             return (
               <div className="space-y-4">
                 {images.length > 0 && (
-                  <div className="relative w-full h-64 bg-gray-200 rounded-lg overflow-hidden group">
+                  <div 
+                    className="relative w-full cursor-pointer rounded-lg overflow-visible"
+                    onDoubleClick={() => setModalZoom(!modalZoom)}
+                  >
                     <img
                       src={images[currentImageIndex]}
                       alt={selectedItem.name}
-                      className="w-full h-full object-contain"
+                      className="w-full h-auto object-contain transition-transform duration-300 ease-in-out rounded-lg shadow-lg"
+                      style={{
+                        maxHeight: modalZoom ? '90vh' : '500px',
+                        transform: modalZoom ? 'scale(1.5)' : 'scale(1)',
+                        transformOrigin: 'center center',
+                        zIndex: modalZoom ? 9999999 : 1,
+                        position: modalZoom ? 'relative' : 'relative',
+                      }}
                     />
                     
                     {hasMultipleImages && (
