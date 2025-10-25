@@ -103,7 +103,7 @@ export default function ReptilesPage() {
                       <img
                         src={pet.imageUrl}
                         alt={pet.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     )}
                   </div>
@@ -166,7 +166,7 @@ export default function ReptilesPage() {
                       <img
                         src={supply.imageUrl}
                         alt={supply.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     )}
                   </div>
