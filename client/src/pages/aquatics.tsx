@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
+import { safeGoBack } from "@/lib/navigation";
 
 export default function AquaticsPage() {
   const { toast } = useToast();
@@ -70,7 +71,7 @@ export default function AquaticsPage() {
             variant="ghost"
             size="icon"
             className="text-white hover:bg-white/20 mb-3"
-            onClick={() => window.history.back()}
+            onClick={safeGoBack}
             data-testid="button-back"
           >
             <ArrowLeft className="w-6 h-6" />

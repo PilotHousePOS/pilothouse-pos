@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Appointment } from "@shared/schema";
+import { safeGoBack } from "@/lib/navigation";
 
 export default function MyAppointments() {
   const [, setLocation] = useLocation();
@@ -63,7 +64,7 @@ export default function MyAppointments() {
             variant="ghost"
             size="icon"
             className="text-white hover:bg-white/20 mr-3"
-            onClick={() => window.history.back()}
+            onClick={safeGoBack}
             data-testid="button-back"
           >
             <ArrowLeft className="w-6 h-6" />

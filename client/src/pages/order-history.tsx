@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Order, OrderItem, Supply, Pet } from "@shared/schema";
+import { safeGoBack } from "@/lib/navigation";
 
 interface OrderWithDetails extends Order {
   items?: OrderItem[];
@@ -74,7 +75,7 @@ export default function OrderHistory() {
             variant="ghost"
             size="icon"
             className="text-white hover:bg-white/20 mr-3"
-            onClick={() => window.history.back()}
+            onClick={safeGoBack}
             data-testid="button-back"
           >
             <ArrowLeft className="w-6 h-6" />

@@ -10,6 +10,7 @@ import { ArrowLeft, Mail, Save, User as UserIcon, Lock } from "lucide-react";
 import type { User } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { z } from "zod";
+import { safeGoBack } from "@/lib/navigation";
 
 const updateNameSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -273,7 +274,7 @@ export default function Settings() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => window.history.back()}
+          onClick={safeGoBack}
           className="mb-4 -ml-2"
           data-testid="button-back"
         >

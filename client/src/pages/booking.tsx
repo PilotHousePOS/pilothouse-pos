@@ -12,6 +12,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { safeGoBack } from "@/lib/navigation";
 
 const SERVICES = [
   { id: 'grooming-full', name: 'Full Grooming', description: 'Complete grooming service', price: 35 },
@@ -202,7 +203,7 @@ export default function Booking() {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => window.history.back()}
+        onClick={safeGoBack}
         className="mb-4 -ml-2"
         data-testid="button-back"
       >

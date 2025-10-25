@@ -36,6 +36,7 @@ import {
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import AdminNotifications from "@/components/admin-notifications";
+import { safeGoBack } from "@/lib/navigation";
 
 // Calendar component for confirmed appointments
 function AppointmentCalendar({ appointments }: { appointments: any[] }) {
@@ -576,7 +577,7 @@ export default function Admin() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => window.history.back()}
+          onClick={safeGoBack}
           className="mb-4 -ml-2"
           data-testid="button-back"
         >

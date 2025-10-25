@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { WishlistItem, Supply, Pet } from "@shared/schema";
+import { safeGoBack } from "@/lib/navigation";
 
 interface WishlistItemWithDetails extends WishlistItem {
   supply?: Supply;
@@ -94,7 +95,7 @@ export default function Wishlist() {
             variant="ghost"
             size="icon"
             className="text-white hover:bg-white/20 mr-3"
-            onClick={() => window.history.back()}
+            onClick={safeGoBack}
             data-testid="button-back"
           >
             <ArrowLeft className="w-6 h-6" />
