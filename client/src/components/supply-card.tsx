@@ -21,6 +21,8 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
   const [modalZoom, setModalZoom] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const modalImageRef = useRef<HTMLImageElement>(null);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   const addToCartMutation = useMutation({
     mutationFn: async () => {
@@ -69,6 +71,40 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
                 (supply.imageUrl ? [supply.imageUrl] : []);
   const hasMultipleImages = images.length > 1;
   const imageUrl = images[currentImageIndex] || defaultImages[supply.category as keyof typeof defaultImages] || defaultImages.food;
+
+  // Minimum swipe distance (in px) required to trigger navigation
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe && hasMultipleImages) {
+      // Swipe left - next image
+      setCurrentImageIndex((prev) => 
+        prev === images.length - 1 ? 0 : prev + 1
+      );
+    }
+    
+    if (isRightSwipe && hasMultipleImages) {
+      // Swipe right - previous image
+      setCurrentImageIndex((prev) => 
+        prev === 0 ? images.length - 1 : prev - 1
+      );
+    }
+  };
 
   return (
     <>
@@ -135,10 +171,13 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
           <DialogTitle>{supply.name}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          {/* Large Expandable Image - Double-click to enlarge */}
+          {/* Large Expandable Image - Double-click to enlarge, swipable on mobile */}
           <div 
             className="relative w-full cursor-pointer rounded-lg overflow-visible group"
             onDoubleClick={() => setModalZoom(!modalZoom)}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
           >
             <img 
               ref={modalImageRef}

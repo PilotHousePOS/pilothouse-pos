@@ -21,6 +21,7 @@ The application is built as a full-stack web application with a clear separation
 - Dark, bold design with strong contrast, consistent with "Animal House" branding.
 - Mobile-friendly and responsive design, utilizing full-screen modals for mobile forms.
 - Amazon-style image enlargement functionality for product and pet cards, including clickable detail modals with smooth animations.
+- Touch-friendly image carousels with swipe gesture support for mobile devices (minimum 50px swipe distance to navigate).
 - Themed headers for dedicated Aquatics (blue) and Exotic Reptiles (green) pages.
 - Prominent warning banners for breed restrictions in appointment booking.
 - Use of toast notifications for enhanced user feedback (e.g., login errors).
@@ -29,6 +30,7 @@ The application is built as a full-stack web application with a clear separation
 - **Pet & Supply Management:** 
     - Multi-image support for products and pets, allowing unlimited photo uploads via an admin panel component.
     - Amazon-style double-click image enlargement with carousel navigation (arrows, dots, counter) for multiple images.
+    - Mobile-friendly swipe gestures for image navigation (swipe left for next, swipe right for previous) in addition to click/tap controls.
 - **Appointment System:**
     - 15-minute appointment intervals.
     - Admin approval workflow for grooming appointments with pending approval section and approve/reject functionality.
@@ -53,7 +55,8 @@ The application is built as a full-stack web application with a clear separation
 - **Navigation:** 
     - Enhanced bottom navigation with scroll-to-top behavior.
     - Quick action cards on profile page for Order History, My Appointments, Wishlist, and Settings.
-    - Universal back button positioned at the top left on all secondary pages (Order History, My Appointments, Wishlist, Settings, Aquatics, Reptiles, Admin, Booking) with smart navigation that prevents users from going back to authentication pages (login/sign-in) using the `safeGoBack` utility.
+    - Universal back button positioned at the fixed top-left corner (top-4 left-4) on all secondary pages (Order History, My Appointments, Wishlist, Settings, Aquatics, Reptiles, Admin, Booking) with white circular styling, shadow-lg, and z-index 50 for clear visibility.
+    - Smart navigation using the `safeGoBack` utility that prevents users from going back to authentication pages (login/sign-in), redirecting to home instead.
 
 **System Design Choices:**
 - **Frontend**: React with Vite, TypeScript, Tailwind CSS, shadcn/ui components.
