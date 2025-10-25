@@ -98,7 +98,7 @@ export default function ReptilesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {pets.map((pet: any) => (
                 <Card key={pet.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="aspect-[4/3] bg-gray-200 overflow-hidden">
+                  <div className="aspect-video bg-gray-200 overflow-hidden">
                     {pet.imageUrl && (
                       <img
                         src={pet.imageUrl}
@@ -162,7 +162,7 @@ export default function ReptilesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {supplies.map((supply: any) => (
                 <Card key={supply.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="aspect-[4/3] bg-gray-200 overflow-hidden">
+                  <div className="aspect-video bg-gray-200 overflow-hidden">
                     {supply.imageUrl && (
                       <img
                         src={supply.imageUrl}
