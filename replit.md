@@ -51,19 +51,42 @@ The application is built as a full-stack web application with a clear separation
     - Dedicated Wishlist page for saving items to purchase later.
     - Add/remove functionality with secure ownership verification.
     - Quick "Add to Cart" button from wishlist items.
-- **Google Calendar Integration:**
+- **Google Calendar Integration & Contact Management:**
     - Connected Google Calendar via Replit integration for event and contact management.
     - Unified calendar view displaying both database appointments and Google Calendar events side-by-side.
     - Color-coded events: Blue for grooming appointments, purple for Google Calendar events.
     - Date-specific event fetching to show all events for a selected day.
     - Admin panel displays upcoming Google Calendar events with attendees and event details.
-    - Contact management extracts attendees from calendar events (Note: Full Google Contacts integration via People API is not available due to OAuth scope limitations in the Replit Google Calendar connector).
-    - Searchable contacts list with real-time filtering by name or email.
-    - Contact cards display name and email address.
-    - Create calendar events directly from contacts interface with multi-contact selection.
-    - Event creation form with title, description, date, start/end time, and attendee management.
-    - API endpoints for fetching events, contacts, and creating new calendar events.
+    - **Hybrid Contact System:**
+        - Manual contact database with full CRUD operations for contacts with phone numbers
+        - Database schema includes: name, email, phoneNumber, notes, timestamps
+        - Google Calendar contacts extracted from event attendees (email and name only)
+        - Unified contact list merging both manual and Google Calendar contacts
+        - Contact cards display name, email, phone number (manual contacts only), and notes
+        - Visual badges distinguish between "Manual" (green) and "Google" (purple) contacts
+        - Edit/delete functionality available only for manual contacts
+        - Search functionality across all contact fields including phone numbers
+    - **Contact Management UI:**
+        - Add Contact button opens dialog for creating new contacts with phone number field
+        - Edit Contact dialog pre-fills data for updating manual contacts
+        - Delete Contact with confirmation dialog for removing manual contacts
+        - Real-time search filtering by name, email, or phone number
+        - Contact cards show all available information with proper formatting
+    - **Event Creation Integration:**
+        - Create calendar events directly from contacts interface with multi-contact selection
+        - Searchable dropdown combines both manual and Google Calendar contacts
+        - Event creation form with title, description, date, start/end time, and attendee management
+        - Selected contacts displayed with badges and removal buttons
+    - **API Endpoints:**
+        - GET /api/contacts - Fetch all manual contacts (admin only)
+        - POST /api/contacts - Create new manual contact (admin only)
+        - PUT /api/contacts/:id - Update manual contact (admin only)
+        - DELETE /api/contacts/:id - Delete manual contact (admin only)
+        - GET /api/admin/calendar/events - Fetch Google Calendar events
+        - GET /api/admin/calendar/contacts - Extract contacts from calendar event attendees
+        - POST /api/admin/calendar/events - Create new calendar events
     - Error handling for cases when Google Calendar is not connected.
+    - **Note:** Full Google Contacts integration via People API is not available due to OAuth scope limitations in the Replit Google Calendar connector. Manual contact database serves as workaround for phone number storage.
 - **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtering content by species.
 - **Admin Order Management:**
     - Order details display showing actual product/pet names instead of IDs.

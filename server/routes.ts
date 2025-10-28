@@ -1511,11 +1511,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { name, email, phoneNumber, notes } = req.body;
-      if (!name) {
+      const trimmedName = name?.trim();
+      const trimmedEmail = email?.trim();
+      
+      if (!trimmedName) {
         return res.status(400).json({ message: "Name is required" });
       }
+      if (!trimmedEmail || !trimmedEmail.includes('@')) {
+        return res.status(400).json({ message: "A valid email address is required for calendar event integration" });
+      }
 
-      const contact = await storage.createContact({ name, email, phoneNumber, notes });
+      const contact = await storage.createContact({ 
+        name: trimmedName, 
+        email: trimmedEmail, 
+        phoneNumber, 
+        notes 
+      });
       res.json(contact);
     } catch (error) {
       console.error("Error creating contact:", error);
@@ -1532,8 +1543,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const id = parseInt(req.params.id);
       const { name, email, phoneNumber, notes } = req.body;
+      const trimmedName = name?.trim();
+      const trimmedEmail = email?.trim();
       
-      const contact = await storage.updateContact(id, { name, email, phoneNumber, notes });
+      if (trimmedName !== undefined && !trimmedName) {
+        return res.status(400).json({ message: "Name cannot be empty" });
+      }
+      if (trimmedEmail !== undefined && (!trimmedEmail || !trimmedEmail.includes('@'))) {
+        return res.status(400).json({ message: "A valid email address is required" });
+      }
+      
+      const contact = await storage.updateContact(id, { 
+        name: trimmedName, 
+        email: trimmedEmail, 
+        phoneNumber, 
+        notes 
+      });
       res.json(contact);
     } catch (error) {
       console.error("Error updating contact:", error);
@@ -1571,12 +1596,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required fields" });
       }
 
+      // Filter out attendees with invalid or missing emails
+      const validAttendees = (attendees || []).filter((attendee: any) => {
+        const email = attendee?.email?.trim();
+        return email && email.includes('@');
+      });
+
       const event = await createCalendarEvent({
         summary,
         description,
         startDateTime,
         endDateTime,
-        attendees,
+        attendees: validAttendees,
       });
 
       res.json(event);

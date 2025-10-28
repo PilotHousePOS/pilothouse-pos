@@ -248,8 +248,93 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
     startTime: '',
     endTime: '',
   });
+  const [isAddContactOpen, setIsAddContactOpen] = useState(false);
+  const [editingContact, setEditingContact] = useState<any>(null);
+  const [contactFormData, setContactFormData] = useState({
+    name: '',
+    email: '',
+    phoneNumber: '',
+    notes: '',
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Fetch manual contacts from database
+  const { data: manualContacts = [], isLoading: loadingManualContacts } = useQuery({
+    queryKey: ["/api/contacts"],
+    queryFn: async () => {
+      const response = await fetch('/api/contacts', {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch contacts');
+      return response.json();
+    },
+  });
+
+  // Manual contact mutations
+  const createContactMutation = useMutation({
+    mutationFn: async (contactData: any) => {
+      await apiRequest("POST", "/api/contacts", contactData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Contact Added",
+        description: "Contact has been added successfully.",
+      });
+      setIsAddContactOpen(false);
+      setContactFormData({ name: '', email: '', phoneNumber: '', notes: '' });
+      queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to add contact.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateContactMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      await apiRequest("PUT", `/api/contacts/${id}`, data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Contact Updated",
+        description: "Contact has been updated successfully.",
+      });
+      setEditingContact(null);
+      setContactFormData({ name: '', email: '', phoneNumber: '', notes: '' });
+      queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update contact.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteContactMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/contacts/${id}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Contact Deleted",
+        description: "Contact has been deleted successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete contact.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const createEventMutation = useMutation({
     mutationFn: async (eventData: any) => {
@@ -282,17 +367,93 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
     },
   });
 
-  const filteredContacts = calendarContacts.filter(contact => 
+  // Combine manual contacts and Google Calendar contacts
+  const allContacts = [
+    ...manualContacts.map((c: any) => ({
+      ...c,
+      displayName: c.name,
+      isManual: true,
+    })),
+    ...calendarContacts.map((c: any) => ({
+      ...c,
+      isManual: false,
+    })),
+  ];
+
+  const filteredContacts = allContacts.filter(contact => 
     contact.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.email?.toLowerCase().includes(searchQuery.toLowerCase())
+    contact.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    contact.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    contact.phoneNumber?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const toggleContactSelection = (contact: any) => {
-    const contactId = contact.resourceName || contact.email;
-    if (selectedContacts.find(c => (c.resourceName || c.email) === contactId)) {
-      setSelectedContacts(selectedContacts.filter(c => (c.resourceName || c.email) !== contactId));
+    const contactId = contact.resourceName || contact.email || contact.id;
+    if (selectedContacts.find(c => (c.resourceName || c.email || c.id) === contactId)) {
+      setSelectedContacts(selectedContacts.filter(c => (c.resourceName || c.email || c.id) !== contactId));
     } else {
       setSelectedContacts([...selectedContacts, contact]);
+    }
+  };
+
+  const handleAddContact = () => {
+    const trimmedEmail = contactFormData.email.trim();
+    if (!contactFormData.name.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Name is required.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!trimmedEmail || !trimmedEmail.includes('@')) {
+      toast({
+        title: "Validation Error",
+        description: "A valid email address is required for calendar event integration.",
+        variant: "destructive",
+      });
+      return;
+    }
+    createContactMutation.mutate({ ...contactFormData, email: trimmedEmail, name: contactFormData.name.trim() });
+  };
+
+  const handleEditContact = (contact: any) => {
+    setEditingContact(contact);
+    setContactFormData({
+      name: contact.name || '',
+      email: contact.email || '',
+      phoneNumber: contact.phoneNumber || '',
+      notes: contact.notes || '',
+    });
+  };
+
+  const handleUpdateContact = () => {
+    const trimmedEmail = contactFormData.email.trim();
+    if (!contactFormData.name.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Name is required.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!trimmedEmail || !trimmedEmail.includes('@')) {
+      toast({
+        title: "Validation Error",
+        description: "A valid email address is required for calendar event integration.",
+        variant: "destructive",
+      });
+      return;
+    }
+    updateContactMutation.mutate({
+      id: editingContact.id,
+      data: { ...contactFormData, email: trimmedEmail, name: contactFormData.name.trim() },
+    });
+  };
+
+  const handleDeleteContact = (id: number) => {
+    if (confirm('Are you sure you want to delete this contact?')) {
+      deleteContactMutation.mutate(id);
     }
   };
 
@@ -309,12 +470,17 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
     const startDateTime = `${eventFormData.date}T${eventFormData.startTime}:00`;
     const endDateTime = `${eventFormData.date}T${eventFormData.endTime}:00`;
 
+    // Filter out contacts without email addresses
+    const validAttendees = selectedContacts
+      .filter(c => c.email)
+      .map(c => ({ email: c.email, displayName: c.displayName || c.name }));
+
     createEventMutation.mutate({
       summary: eventFormData.summary,
       description: eventFormData.description,
       startDateTime,
       endDateTime,
-      attendees: selectedContacts.map(c => ({ email: c.email, displayName: c.displayName })),
+      attendees: validAttendees,
     });
   };
 
@@ -342,16 +508,145 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
               Contact Management
             </CardTitle>
             <CardDescription>
-              Search contacts and create calendar events
+              Manage contacts with phone numbers and create calendar events
             </CardDescription>
           </div>
-          <Dialog open={isCreateEventOpen} onOpenChange={handleDialogChange}>
-            <DialogTrigger asChild>
-              <Button data-testid="button-create-event">
-                <Calendar className="w-4 h-4 mr-2" />
-                Create Event
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <Dialog open={isAddContactOpen} onOpenChange={setIsAddContactOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" data-testid="button-add-contact">
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Add Contact
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Add New Contact</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="contact-name">Name *</Label>
+                    <Input
+                      id="contact-name"
+                      data-testid="input-contact-name"
+                      placeholder="John Doe"
+                      value={contactFormData.name}
+                      onChange={(e) => setContactFormData({ ...contactFormData, name: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="contact-email">Email *</Label>
+                    <Input
+                      id="contact-email"
+                      data-testid="input-contact-email"
+                      type="email"
+                      placeholder="john@example.com"
+                      value={contactFormData.email}
+                      onChange={(e) => setContactFormData({ ...contactFormData, email: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="contact-phone">Phone Number</Label>
+                    <Input
+                      id="contact-phone"
+                      data-testid="input-contact-phone"
+                      type="tel"
+                      placeholder="(555) 123-4567"
+                      value={contactFormData.phoneNumber}
+                      onChange={(e) => setContactFormData({ ...contactFormData, phoneNumber: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="contact-notes">Notes</Label>
+                    <Textarea
+                      id="contact-notes"
+                      data-testid="input-contact-notes"
+                      placeholder="Optional notes about this contact"
+                      value={contactFormData.notes}
+                      onChange={(e) => setContactFormData({ ...contactFormData, notes: e.target.value })}
+                      rows={3}
+                    />
+                  </div>
+                  <Button 
+                    onClick={handleAddContact} 
+                    className="w-full"
+                    disabled={createContactMutation.isPending}
+                    data-testid="button-submit-contact"
+                  >
+                    {createContactMutation.isPending ? 'Adding...' : 'Add Contact'}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+            <Dialog open={!!editingContact} onOpenChange={(open) => !open && setEditingContact(null)}>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Edit Contact</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="edit-contact-name">Name *</Label>
+                    <Input
+                      id="edit-contact-name"
+                      data-testid="input-edit-contact-name"
+                      placeholder="John Doe"
+                      value={contactFormData.name}
+                      onChange={(e) => setContactFormData({ ...contactFormData, name: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-contact-email">Email *</Label>
+                    <Input
+                      id="edit-contact-email"
+                      data-testid="input-edit-contact-email"
+                      type="email"
+                      placeholder="john@example.com"
+                      value={contactFormData.email}
+                      onChange={(e) => setContactFormData({ ...contactFormData, email: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-contact-phone">Phone Number</Label>
+                    <Input
+                      id="edit-contact-phone"
+                      data-testid="input-edit-contact-phone"
+                      type="tel"
+                      placeholder="(555) 123-4567"
+                      value={contactFormData.phoneNumber}
+                      onChange={(e) => setContactFormData({ ...contactFormData, phoneNumber: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-contact-notes">Notes</Label>
+                    <Textarea
+                      id="edit-contact-notes"
+                      data-testid="input-edit-contact-notes"
+                      placeholder="Optional notes about this contact"
+                      value={contactFormData.notes}
+                      onChange={(e) => setContactFormData({ ...contactFormData, notes: e.target.value })}
+                      rows={3}
+                    />
+                  </div>
+                  <Button 
+                    onClick={handleUpdateContact} 
+                    className="w-full"
+                    disabled={updateContactMutation.isPending}
+                    data-testid="button-update-contact"
+                  >
+                    {updateContactMutation.isPending ? 'Updating...' : 'Update Contact'}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+            <Dialog open={isCreateEventOpen} onOpenChange={handleDialogChange}>
+              <DialogTrigger asChild>
+                <Button data-testid="button-create-event">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Create Event
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>Create Calendar Event</DialogTitle>
@@ -425,18 +720,19 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
                         data-testid="input-contact-search"
                       />
                     </div>
-                    {showContactDropdown && calendarContacts.length > 0 && (
+                    {showContactDropdown && allContacts.length > 0 && (
                       <div className="absolute z-50 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                        {calendarContacts
+                        {allContacts
                           .filter(contact => 
                             contact.displayName?.toLowerCase().includes(eventContactSearch.toLowerCase()) ||
+                            contact.name?.toLowerCase().includes(eventContactSearch.toLowerCase()) ||
                             contact.email?.toLowerCase().includes(eventContactSearch.toLowerCase())
                           )
                           .map((contact, index) => {
-                            const isAlreadySelected = selectedContacts.find(c => c.email === contact.email);
+                            const isAlreadySelected = selectedContacts.find(c => (c.email === contact.email || c.id === contact.id));
                             return (
                               <div
-                                key={contact.email || index}
+                                key={contact.email || contact.id || index}
                                 className={`flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 ${
                                   isAlreadySelected ? 'bg-blue-50' : ''
                                 }`}
@@ -447,7 +743,7 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
                                 data-testid={`dropdown-contact-${index}`}
                               >
                                 <div className="flex-1">
-                                  <p className="text-sm font-medium">{contact.displayName}</p>
+                                  <p className="text-sm font-medium">{contact.displayName || contact.name}</p>
                                   <p className="text-xs text-gray-500">{contact.email}</p>
                                 </div>
                                 {isAlreadySelected && (
@@ -458,7 +754,7 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
                               </div>
                             );
                           })}
-                        {calendarContacts.filter(contact => 
+                        {allContacts.filter(contact => 
                           contact.displayName?.toLowerCase().includes(eventContactSearch.toLowerCase()) ||
                           contact.email?.toLowerCase().includes(eventContactSearch.toLowerCase())
                         ).length === 0 && (
@@ -511,6 +807,7 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
             </DialogContent>
           </Dialog>
         </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="mb-4">
@@ -526,57 +823,99 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
           </div>
         </div>
 
-        {calendarContactsError ? (
-          <div className="text-center py-8">
-            <p className="text-sm text-gray-500 mb-2">
-              Google Calendar not connected or error fetching contacts
-            </p>
-            <p className="text-xs text-gray-400">
-              Make sure your Google Calendar is properly connected
-            </p>
-          </div>
-        ) : filteredContacts.length === 0 ? (
+        {filteredContacts.length === 0 ? (
           <div className="text-center py-8">
             <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-sm text-gray-500">
               {searchQuery ? 'No contacts found matching your search' : 'No contacts found'}
             </p>
+            <p className="text-xs text-gray-400 mt-1">
+              {loadingManualContacts ? 'Loading...' : 'Click "Add Contact" to create a new contact'}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {filteredContacts.map((contact: any, index: number) => {
-              const isSelected = selectedContacts.find(c => c.email === contact.email || c.resourceName === contact.resourceName);
+              const isSelected = selectedContacts.find(c => (c.email === contact.email && c.email) || c.resourceName === contact.resourceName || c.id === contact.id);
               return (
                 <div 
-                  key={contact.resourceName || contact.email || index} 
-                  className={`border rounded-lg p-4 cursor-pointer transition-all ${
-                    isSelected ? 'bg-blue-50 border-blue-500' : 'hover:bg-gray-50'
-                  }`}
-                  onClick={() => toggleContactSelection(contact)}
+                  key={contact.resourceName || contact.email || contact.id || index} 
+                  className={`border rounded-lg p-4 transition-all ${
+                    contact.isManual ? '' : 'cursor-pointer hover:bg-gray-50'
+                  } ${isSelected ? 'bg-blue-50 border-blue-500' : ''}`}
+                  onClick={() => !contact.isManual && toggleContactSelection(contact)}
                   data-testid={`contact-card-${index}`}
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
                       <p className="font-semibold text-sm mb-1">
-                        {contact.displayName}
+                        {contact.displayName || contact.name}
                       </p>
                       {contact.email && (
-                        <div className="flex items-center gap-1 text-xs text-gray-600">
+                        <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
                           <Mail className="w-3 h-3" />
                           <span>{contact.email}</span>
                         </div>
                       )}
+                      {contact.phoneNumber && (
+                        <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
+                          <span className="font-medium">📱</span>
+                          <span>{contact.phoneNumber}</span>
+                        </div>
+                      )}
+                      {contact.notes && (
+                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">{contact.notes}</p>
+                      )}
                     </div>
                     <div className="flex flex-col items-end gap-1">
-                      {contact.isOrganizer && (
-                        <Badge variant="secondary" className="text-xs">
-                          Organizer
-                        </Badge>
-                      )}
-                      {isSelected && (
-                        <Badge variant="default" className="bg-blue-600 text-xs">
-                          Selected
-                        </Badge>
+                      {contact.isManual ? (
+                        <>
+                          <Badge variant="outline" className="text-xs bg-green-50 border-green-300 text-green-700">
+                            Manual
+                          </Badge>
+                          <div className="flex gap-1 mt-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditContact(contact);
+                              }}
+                              data-testid={`button-edit-contact-${index}`}
+                            >
+                              <Edit className="w-3 h-3" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2 hover:text-red-600"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteContact(contact.id);
+                              }}
+                              data-testid={`button-delete-contact-${index}`}
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <Badge variant="outline" className="text-xs bg-purple-50 border-purple-300 text-purple-700">
+                            Google
+                          </Badge>
+                          {contact.isOrganizer && (
+                            <Badge variant="secondary" className="text-xs">
+                              Organizer
+                            </Badge>
+                          )}
+                          {isSelected && (
+                            <Badge variant="default" className="bg-blue-600 text-xs">
+                              Selected
+                            </Badge>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
