@@ -53,9 +53,14 @@ The application is built as a full-stack web application with a clear separation
     - Quick "Add to Cart" button from wishlist items.
 - **Google Calendar Integration:**
     - Connected Google Calendar via Replit integration for event and contact management.
+    - Unified calendar view displaying both database appointments and Google Calendar events side-by-side.
+    - Color-coded events: Blue for grooming appointments, purple for Google Calendar events.
+    - Date-specific event fetching to show all events for a selected day.
     - Admin panel displays upcoming Google Calendar events with attendees and event details.
-    - Contacts list extracted from calendar events showing all attendees and organizers.
-    - API endpoints to fetch calendar events and contacts with admin authentication.
+    - Searchable contacts list with real-time filtering by name or email.
+    - Create calendar events directly from contacts interface with multi-contact selection.
+    - Event creation form with title, description, date, start/end time, and attendee management.
+    - API endpoints for fetching events, contacts, and creating new calendar events.
     - Error handling for cases when Google Calendar is not connected.
 - **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtering content by species.
 - **Admin Order Management:**

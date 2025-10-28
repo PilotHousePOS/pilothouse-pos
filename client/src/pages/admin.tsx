@@ -266,7 +266,9 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
         startTime: '',
         endTime: '',
       });
+      // Invalidate both the general events list and all date-specific queries
       queryClient.invalidateQueries({ queryKey: ["/api/admin/calendar/events"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/calendar/events/date"] });
     },
     onError: (error) => {
       toast({
