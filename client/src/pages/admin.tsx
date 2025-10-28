@@ -297,6 +297,18 @@ export default function Admin() {
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
+  const { data: calendarEvents = [], isError: calendarEventsError } = useQuery<any[]>({
+    queryKey: ["/api/admin/calendar/events"],
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+    retry: false,
+  });
+
+  const { data: calendarContacts = [], isError: calendarContactsError } = useQuery<any[]>({
+    queryKey: ["/api/admin/calendar/contacts"],
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+    retry: false,
+  });
+
   // Create Pet Mutation
   const createPetMutation = useMutation({
     mutationFn: async (petData: any) => {
@@ -1080,7 +1092,152 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="calendar" className="space-y-6">
+          {/* Appointment Calendar */}
           <AppointmentCalendar appointments={appointments} />
+          
+          {/* Google Calendar Events */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                Google Calendar Events
+              </CardTitle>
+              <CardDescription>
+                Upcoming events from your connected Google Calendar
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {calendarEventsError ? (
+                <div className="text-center py-8">
+                  <p className="text-sm text-gray-500 mb-2">
+                    Google Calendar not connected or error fetching events
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Make sure your Google Calendar is properly connected
+                  </p>
+                </div>
+              ) : calendarEvents.length === 0 ? (
+                <div className="text-center py-8">
+                  <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500">No upcoming events found</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {calendarEvents.map((event: any, index: number) => (
+                    <div 
+                      key={event.id || index} 
+                      className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-sm mb-1">
+                            {event.summary || 'Untitled Event'}
+                          </h4>
+                          {event.start && (
+                            <p className="text-xs text-gray-600 mb-1">
+                              {new Date(event.start.dateTime || event.start.date).toLocaleString('en-US', {
+                                weekday: 'short',
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: event.start.dateTime ? 'numeric' : undefined,
+                                minute: event.start.dateTime ? 'numeric' : undefined,
+                              })}
+                            </p>
+                          )}
+                          {event.description && (
+                            <p className="text-xs text-gray-500 line-clamp-2 mt-1">
+                              {event.description}
+                            </p>
+                          )}
+                          {event.attendees && event.attendees.length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-1">
+                              {event.attendees.slice(0, 3).map((attendee: any, i: number) => (
+                                <Badge key={i} variant="outline" className="text-xs">
+                                  {attendee.displayName || attendee.email}
+                                </Badge>
+                              ))}
+                              {event.attendees.length > 3 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{event.attendees.length - 3} more
+                                </Badge>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        {event.htmlLink && (
+                          <a
+                            href={event.htmlLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-brand-blue text-xs hover:underline ml-2"
+                          >
+                            View
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Calendar Contacts */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Calendar Contacts
+              </CardTitle>
+              <CardDescription>
+                Contacts from your Google Calendar events
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {calendarContactsError ? (
+                <div className="text-center py-8">
+                  <p className="text-sm text-gray-500 mb-2">
+                    Google Calendar not connected or error fetching contacts
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Make sure your Google Calendar is properly connected
+                  </p>
+                </div>
+              ) : calendarContacts.length === 0 ? (
+                <div className="text-center py-8">
+                  <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500">No contacts found</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {calendarContacts.map((contact: any, index: number) => (
+                    <div 
+                      key={contact.email || index} 
+                      className="border rounded-lg p-3 hover:bg-gray-50 transition-colors"
+                      data-testid={`contact-${index}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">
+                            {contact.displayName}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {contact.email}
+                          </p>
+                        </div>
+                        {contact.isOrganizer && (
+                          <Badge variant="secondary" className="text-xs ml-2">
+                            Organizer
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="grooming">
