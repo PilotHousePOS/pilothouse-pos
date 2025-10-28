@@ -122,3 +122,66 @@ export async function getAllCalendarContacts() {
     throw error;
   }
 }
+
+// Create a new calendar event
+export async function createCalendarEvent(eventData: {
+  summary: string;
+  description?: string;
+  startDateTime: string;
+  endDateTime: string;
+  attendees?: Array<{ email: string; displayName?: string }>;
+}) {
+  try {
+    const calendar = await getUncachableGoogleCalendarClient();
+    
+    const event = {
+      summary: eventData.summary,
+      description: eventData.description,
+      start: {
+        dateTime: eventData.startDateTime,
+        timeZone: 'America/New_York', // Adjust as needed
+      },
+      end: {
+        dateTime: eventData.endDateTime,
+        timeZone: 'America/New_York', // Adjust as needed
+      },
+      attendees: eventData.attendees?.map(a => ({ email: a.email, displayName: a.displayName })),
+    };
+
+    const response = await calendar.events.insert({
+      calendarId: 'primary',
+      requestBody: event,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error creating calendar event:', error);
+    throw error;
+  }
+}
+
+// Get calendar events for a specific date
+export async function getEventsForDate(date: Date) {
+  try {
+    const calendar = await getUncachableGoogleCalendarClient();
+    
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const response = await calendar.events.list({
+      calendarId: 'primary',
+      timeMin: startOfDay.toISOString(),
+      timeMax: endOfDay.toISOString(),
+      singleEvents: true,
+      orderBy: 'startTime',
+    });
+
+    return response.data.items || [];
+  } catch (error) {
+    console.error('Error fetching events for date:', error);
+    throw error;
+  }
+}

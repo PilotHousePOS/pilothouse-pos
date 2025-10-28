@@ -16,7 +16,7 @@ import {
 import { z } from "zod";
 import { notificationService } from './notifications';
 import { sendPasswordResetEmail } from './sendgrid';
-import { getUpcomingEvents, getAllCalendarContacts } from './googleCalendar';
+import { getUpcomingEvents, getAllCalendarContacts, createCalendarEvent, getEventsForDate } from './googleCalendar';
 
 // Configure multer for file uploads
 const uploadStorage = multer.diskStorage({
@@ -1481,6 +1481,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching calendar contacts:", error);
       res.status(500).json({ message: "Failed to fetch calendar contacts", error: (error as Error).message });
+    }
+  });
+
+  // Create a new calendar event
+  app.post("/api/admin/calendar/events", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { summary, description, startDateTime, endDateTime, attendees } = req.body;
+      
+      if (!summary || !startDateTime || !endDateTime) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      const event = await createCalendarEvent({
+        summary,
+        description,
+        startDateTime,
+        endDateTime,
+        attendees,
+      });
+
+      res.json(event);
+    } catch (error) {
+      console.error("Error creating calendar event:", error);
+      res.status(500).json({ message: "Failed to create calendar event", error: (error as Error).message });
+    }
+  });
+
+  // Get calendar events for a specific date
+  app.get("/api/admin/calendar/events/date", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const dateStr = req.query.date as string;
+      if (!dateStr) {
+        return res.status(400).json({ message: "Date parameter is required" });
+      }
+
+      const date = new Date(dateStr);
+      const events = await getEventsForDate(date);
+      res.json(events);
+    } catch (error) {
+      console.error("Error fetching events for date:", error);
+      res.status(500).json({ message: "Failed to fetch events for date", error: (error as Error).message });
     }
   });
 
