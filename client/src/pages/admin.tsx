@@ -511,7 +511,7 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
               Manage contacts with phone numbers and create calendar events
             </CardDescription>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2">
             <Dialog open={isAddContactOpen} onOpenChange={setIsAddContactOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" data-testid="button-add-contact">
