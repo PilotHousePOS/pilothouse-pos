@@ -59,7 +59,9 @@ The application is built as a full-stack web application with a clear separation
     - Admin panel displays upcoming Google Calendar events with attendees and event details.
     - **Hybrid Contact System:**
         - Manual contact database with full CRUD operations for contacts with phone numbers
-        - Database schema includes: name, email, phoneNumber, notes, timestamps
+        - Database schema includes: name (required), email (required), phoneNumber (optional), notes (optional), timestamps
+        - Multi-layer email validation: Client-side and server-side validation with trimming and @ symbol check to ensure data integrity
+        - Defensive filtering in calendar event creation to prevent invalid emails from breaking Google Calendar API calls
         - Google Calendar contacts extracted from event attendees (email and name only)
         - Unified contact list merging both manual and Google Calendar contacts
         - Contact cards display name, email, phone number (manual contacts only), and notes
