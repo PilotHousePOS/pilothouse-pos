@@ -33,7 +33,9 @@ import {
   Shield,
   ArrowLeft,
   Search,
-  UserPlus
+  UserPlus,
+  Phone,
+  Mail
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -280,13 +282,15 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
   });
 
   const filteredContacts = calendarContacts.filter(contact => 
-    contact.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.displayName.toLowerCase().includes(searchQuery.toLowerCase())
+    contact.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    contact.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    contact.phoneNumber?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const toggleContactSelection = (contact: any) => {
-    if (selectedContacts.find(c => c.email === contact.email)) {
-      setSelectedContacts(selectedContacts.filter(c => c.email !== contact.email));
+    const contactId = contact.resourceName || contact.email;
+    if (selectedContacts.find(c => (c.resourceName || c.email) === contactId)) {
+      setSelectedContacts(selectedContacts.filter(c => (c.resourceName || c.email) !== contactId));
     } else {
       setSelectedContacts([...selectedContacts, contact]);
     }
@@ -452,26 +456,38 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {filteredContacts.map((contact: any, index: number) => {
-              const isSelected = selectedContacts.find(c => c.email === contact.email);
+              const isSelected = selectedContacts.find(c => c.email === contact.email || c.resourceName === contact.resourceName);
               return (
                 <div 
-                  key={contact.email || index} 
-                  className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                  key={contact.resourceName || contact.email || index} 
+                  className={`border rounded-lg p-4 cursor-pointer transition-all ${
                     isSelected ? 'bg-blue-50 border-blue-500' : 'hover:bg-gray-50'
                   }`}
                   onClick={() => toggleContactSelection(contact)}
                   data-testid={`contact-card-${index}`}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <p className="font-medium text-sm">
+                      <p className="font-semibold text-sm mb-1">
                         {contact.displayName}
                       </p>
-                      <p className="text-xs text-gray-500">
-                        {contact.email}
-                      </p>
+                      {contact.email && (
+                        <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
+                          <Mail className="w-3 h-3" />
+                          <span>{contact.email}</span>
+                        </div>
+                      )}
+                      {contact.phoneNumber && (
+                        <div className="flex items-center gap-1 text-xs text-gray-600">
+                          <Phone className="w-3 h-3" />
+                          <span>{contact.phoneNumber}</span>
+                          {contact.phoneType && (
+                            <span className="text-gray-400">({contact.phoneType})</span>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col items-end gap-1">
                       {contact.isOrganizer && (
                         <Badge variant="secondary" className="text-xs">
                           Organizer
@@ -1541,61 +1557,6 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          {/* Calendar Contacts */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Calendar Contacts
-              </CardTitle>
-              <CardDescription>
-                Contacts from your Google Calendar events
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {calendarContactsError ? (
-                <div className="text-center py-8">
-                  <p className="text-sm text-gray-500 mb-2">
-                    Google Calendar not connected or error fetching contacts
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    Make sure your Google Calendar is properly connected
-                  </p>
-                </div>
-              ) : calendarContacts.length === 0 ? (
-                <div className="text-center py-8">
-                  <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500">No contacts found</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {calendarContacts.map((contact: any, index: number) => (
-                    <div 
-                      key={contact.email || index} 
-                      className="border rounded-lg p-3 hover:bg-gray-50 transition-colors"
-                      data-testid={`contact-${index}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <p className="font-medium text-sm">
-                            {contact.displayName}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {contact.email}
-                          </p>
-                        </div>
-                        {contact.isOrganizer && (
-                          <Badge variant="secondary" className="text-xs ml-2">
-                            Organizer
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </TabsContent>
 
         <TabsContent value="contacts" className="space-y-6">

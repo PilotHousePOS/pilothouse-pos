@@ -57,7 +57,9 @@ The application is built as a full-stack web application with a clear separation
     - Color-coded events: Blue for grooming appointments, purple for Google Calendar events.
     - Date-specific event fetching to show all events for a selected day.
     - Admin panel displays upcoming Google Calendar events with attendees and event details.
-    - Searchable contacts list with real-time filtering by name or email.
+    - Real Google Contacts integration using Google People API for accessing actual contact information.
+    - Searchable contacts list with real-time filtering by name, email, or phone number.
+    - Contact cards display name, email, and phone numbers with type indicators.
     - Create calendar events directly from contacts interface with multi-contact selection.
     - Event creation form with title, description, date, start/end time, and attendee management.
     - API endpoints for fetching events, contacts, and creating new calendar events.
