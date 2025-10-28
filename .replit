@@ -30,6 +30,10 @@ externalPort = 3003
 localPort = 39375
 externalPort = 3001
 
+[[ports]]
+localPort = 44499
+externalPort = 4200
+
 [workflows]
 runButton = "Project"
 
@@ -52,4 +56,4 @@ args = "npm run dev"
 waitForPort = 5000
 
 [agent]
-integrations = ["javascript_log_in_with_replit:1.0.0", "sendgrid:1.0.0"]
+integrations = ["javascript_log_in_with_replit:1.0.0", "sendgrid:1.0.0", "google-calendar:1.0.0"]

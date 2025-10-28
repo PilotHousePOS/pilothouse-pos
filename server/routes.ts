@@ -16,6 +16,7 @@ import {
 import { z } from "zod";
 import { notificationService } from './notifications';
 import { sendPasswordResetEmail } from './sendgrid';
+import { getUpcomingEvents, getAllCalendarContacts } from './googleCalendar';
 
 // Configure multer for file uploads
 const uploadStorage = multer.diskStorage({
@@ -1448,6 +1449,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error saving push subscription:", error);
       res.status(500).json({ message: "Failed to save push subscription" });
+    }
+  });
+
+  // Google Calendar routes
+  app.get("/api/admin/calendar/events", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const maxResults = req.query.maxResults ? parseInt(req.query.maxResults as string) : 10;
+      const events = await getUpcomingEvents(maxResults);
+      res.json(events);
+    } catch (error) {
+      console.error("Error fetching calendar events:", error);
+      res.status(500).json({ message: "Failed to fetch calendar events", error: (error as Error).message });
+    }
+  });
+
+  app.get("/api/admin/calendar/contacts", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const contacts = await getAllCalendarContacts();
+      res.json(contacts);
+    } catch (error) {
+      console.error("Error fetching calendar contacts:", error);
+      res.status(500).json({ message: "Failed to fetch calendar contacts", error: (error as Error).message });
     }
   });
 
