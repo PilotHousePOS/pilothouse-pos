@@ -239,6 +239,8 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedContacts, setSelectedContacts] = useState<any[]>([]);
   const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
+  const [eventContactSearch, setEventContactSearch] = useState('');
+  const [showContactDropdown, setShowContactDropdown] = useState(false);
   const [eventFormData, setEventFormData] = useState({
     summary: '',
     description: '',
@@ -316,6 +318,20 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
     });
   };
 
+  // Close contact dropdown when clicking outside or when dialog closes
+  const handleCloseContactDropdown = () => {
+    setShowContactDropdown(false);
+  };
+
+  // Reset form when dialog closes
+  const handleDialogChange = (open: boolean) => {
+    setIsCreateEventOpen(open);
+    if (!open) {
+      setShowContactDropdown(false);
+      setEventContactSearch('');
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -329,7 +345,7 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
               Search contacts and create calendar events
             </CardDescription>
           </div>
-          <Dialog open={isCreateEventOpen} onOpenChange={setIsCreateEventOpen}>
+          <Dialog open={isCreateEventOpen} onOpenChange={handleDialogChange}>
             <DialogTrigger asChild>
               <Button data-testid="button-create-event">
                 <Calendar className="w-4 h-4 mr-2" />
@@ -395,17 +411,92 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
                   </div>
                 </div>
                 <div>
-                  <Label>Selected Attendees ({selectedContacts.length})</Label>
-                  {selectedContacts.length > 0 ? (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {selectedContacts.map(contact => (
-                        <Badge key={contact.email} variant="secondary" className="text-xs">
-                          {contact.displayName}
-                        </Badge>
-                      ))}
+                  <Label htmlFor="contact-selector">Add Attendees</Label>
+                  <div className="relative mt-2">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        id="contact-selector"
+                        placeholder="Search contacts to add..."
+                        value={eventContactSearch}
+                        onChange={(e) => setEventContactSearch(e.target.value)}
+                        onFocus={() => setShowContactDropdown(true)}
+                        className="pl-10"
+                        data-testid="input-contact-search"
+                      />
                     </div>
-                  ) : (
-                    <p className="text-xs text-gray-500 mt-2">Select contacts from the list below</p>
+                    {showContactDropdown && calendarContacts.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {calendarContacts
+                          .filter(contact => 
+                            contact.displayName?.toLowerCase().includes(eventContactSearch.toLowerCase()) ||
+                            contact.email?.toLowerCase().includes(eventContactSearch.toLowerCase())
+                          )
+                          .map((contact, index) => {
+                            const isAlreadySelected = selectedContacts.find(c => c.email === contact.email);
+                            return (
+                              <div
+                                key={contact.email || index}
+                                className={`flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 ${
+                                  isAlreadySelected ? 'bg-blue-50' : ''
+                                }`}
+                                onClick={() => {
+                                  toggleContactSelection(contact);
+                                  setEventContactSearch('');
+                                }}
+                                data-testid={`dropdown-contact-${index}`}
+                              >
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium">{contact.displayName}</p>
+                                  <p className="text-xs text-gray-500">{contact.email}</p>
+                                </div>
+                                {isAlreadySelected && (
+                                  <Badge variant="default" className="bg-blue-600 text-xs">
+                                    Selected
+                                  </Badge>
+                                )}
+                              </div>
+                            );
+                          })}
+                        {calendarContacts.filter(contact => 
+                          contact.displayName?.toLowerCase().includes(eventContactSearch.toLowerCase()) ||
+                          contact.email?.toLowerCase().includes(eventContactSearch.toLowerCase())
+                        ).length === 0 && (
+                          <div className="p-4 text-center text-sm text-gray-500">
+                            No contacts found
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {selectedContacts.length > 0 && (
+                    <div className="mt-3">
+                      <p className="text-xs text-gray-600 mb-2">Selected Attendees ({selectedContacts.length})</p>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedContacts.map((contact, idx) => (
+                          <Badge 
+                            key={contact.email} 
+                            variant="secondary" 
+                            className="text-xs flex items-center gap-1 relative"
+                          >
+                            <span className="pointer-events-none">{contact.displayName}</span>
+                            <button
+                              type="button"
+                              className="w-3 h-3 cursor-pointer hover:text-red-600 inline-flex items-center justify-center"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleContactSelection(contact);
+                              }}
+                              aria-label={`Remove ${contact.displayName}`}
+                              data-testid={`remove-contact-${idx}`}
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
                 <Button 
