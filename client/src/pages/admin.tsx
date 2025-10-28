@@ -31,17 +31,38 @@ import {
   Upload,
   X,
   Shield,
-  ArrowLeft
+  ArrowLeft,
+  Search,
+  UserPlus
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import AdminNotifications from "@/components/admin-notifications";
 import { safeGoBack } from "@/lib/navigation";
 
-// Calendar component for confirmed appointments
+// Calendar component for confirmed appointments and Google Calendar events
 function AppointmentCalendar({ appointments }: { appointments: any[] }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   
+  // Fetch Google Calendar events for the selected date
+  const { data: googleEvents = [] } = useQuery({
+    queryKey: ["/api/admin/calendar/events/date", selectedDate.toISOString().split('T')[0]],
+    queryFn: async () => {
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      const response = await fetch(`/api/admin/calendar/events/date?date=${dateStr}`, {
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          return [];
+        }
+        throw new Error('Failed to fetch calendar events');
+      }
+      return response.json();
+    },
+    retry: false,
+  });
+
   // Filter confirmed appointments for the selected date
   const confirmedAppointments = appointments.filter((apt: any) => 
     apt.status === 'confirmed' && 
@@ -59,6 +80,19 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
 
   const getAppointmentForTime = (time: string) => {
     return confirmedAppointments.find((apt: any) => apt.appointmentTime === time);
+  };
+
+  const getGoogleEventsForTime = (time: string) => {
+    return googleEvents.filter((event: any) => {
+      if (!event.start?.dateTime) return false;
+      const eventStart = new Date(event.start.dateTime);
+      const eventTimeStr = eventStart.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      });
+      return eventTimeStr === time;
+    });
   };
 
   const formatDate = (date: Date) => {
@@ -105,52 +139,371 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
       <CardContent>
         <div className="space-y-2">
           <div className="text-sm text-gray-600 mb-4">
-            {confirmedAppointments.length} confirmed appointments for this day
+            {confirmedAppointments.length} confirmed appointments + {googleEvents.length} calendar events for this day
           </div>
           
           {timeSlots.map((time) => {
             const appointment = getAppointmentForTime(time);
+            const googleEventsList = getGoogleEventsForTime(time);
+            const hasAny = appointment || googleEventsList.length > 0;
+            
             return (
-              <div key={time} className="flex items-center gap-4 p-3 border rounded-lg">
-                <div className="w-20 text-sm font-medium text-gray-700">
+              <div key={time} className="flex items-start gap-4 p-3 border rounded-lg">
+                <div className="w-20 text-sm font-medium text-gray-700 pt-2">
                   {time}
                 </div>
-                {appointment ? (
-                  <div className="flex-1 bg-blue-50 p-3 rounded border-l-4 border-blue-500">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-semibold text-gray-900">
-                          {appointment.petName} ({appointment.petType})
-                        </h4>
-                        <p className="text-sm text-gray-600">
-                          Owner: {appointment.ownerFirstName} {appointment.ownerLastName}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Phone: {appointment.ownerPhoneNumber}
-                        </p>
-                        <p className="text-xs text-blue-600">
-                          Service: {appointment.serviceType === 'grooming-full' ? 'Full Grooming' : 'Bath Only'}
-                        </p>
+                <div className="flex-1 space-y-2">
+                  {appointment && (
+                    <div className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-semibold text-gray-900">
+                            {appointment.petName} ({appointment.petType})
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            Owner: {appointment.ownerFirstName} {appointment.ownerLastName}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Phone: {appointment.ownerPhoneNumber}
+                          </p>
+                          <p className="text-xs text-blue-600">
+                            Service: {appointment.serviceType === 'grooming-full' ? 'Full Grooming' : 'Bath Only'}
+                          </p>
+                        </div>
+                        <Badge variant="default" className="bg-green-600">
+                          Grooming
+                        </Badge>
                       </div>
-                      <Badge variant="default" className="bg-green-600">
-                        Confirmed
-                      </Badge>
+                      {appointment.specialNotes && (
+                        <p className="text-xs text-gray-500 mt-2">
+                          Notes: {appointment.specialNotes}
+                        </p>
+                      )}
                     </div>
-                    {appointment.specialNotes && (
-                      <p className="text-xs text-gray-500 mt-2">
-                        Notes: {appointment.specialNotes}
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex-1 text-gray-400 text-sm italic">
-                    Available
-                  </div>
-                )}
+                  )}
+                  
+                  {googleEventsList.map((event: any, idx: number) => (
+                    <div key={event.id || idx} className="bg-purple-50 p-3 rounded border-l-4 border-purple-500">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-semibold text-gray-900">
+                            {event.summary || 'Untitled Event'}
+                          </h4>
+                          {event.description && (
+                            <p className="text-sm text-gray-600 mt-1">
+                              {event.description}
+                            </p>
+                          )}
+                          {event.attendees && event.attendees.length > 0 && (
+                            <p className="text-xs text-purple-600 mt-1">
+                              Attendees: {event.attendees.slice(0, 2).map((a: any) => a.displayName || a.email).join(', ')}
+                              {event.attendees.length > 2 && ` +${event.attendees.length - 2} more`}
+                            </p>
+                          )}
+                        </div>
+                        <Badge variant="default" className="bg-purple-600">
+                          Calendar
+                        </Badge>
+                      </div>
+                      {event.htmlLink && (
+                        <a
+                          href={event.htmlLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-purple-600 hover:underline mt-2 inline-block"
+                        >
+                          View in Google Calendar
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {!hasAny && (
+                    <div className="text-gray-400 text-sm italic pt-2">
+                      Available
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Contacts Manager Component with Search and Event Creation
+function ContactsManager({ calendarContacts, calendarContactsError }: { calendarContacts: any[]; calendarContactsError: boolean }) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedContacts, setSelectedContacts] = useState<any[]>([]);
+  const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
+  const [eventFormData, setEventFormData] = useState({
+    summary: '',
+    description: '',
+    date: '',
+    startTime: '',
+    endTime: '',
+  });
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const createEventMutation = useMutation({
+    mutationFn: async (eventData: any) => {
+      await apiRequest("POST", "/api/admin/calendar/events", eventData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Event Created",
+        description: "Calendar event has been created successfully.",
+      });
+      setIsCreateEventOpen(false);
+      setSelectedContacts([]);
+      setEventFormData({
+        summary: '',
+        description: '',
+        date: '',
+        startTime: '',
+        endTime: '',
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/calendar/events"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to create calendar event.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const filteredContacts = calendarContacts.filter(contact => 
+    contact.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    contact.displayName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const toggleContactSelection = (contact: any) => {
+    if (selectedContacts.find(c => c.email === contact.email)) {
+      setSelectedContacts(selectedContacts.filter(c => c.email !== contact.email));
+    } else {
+      setSelectedContacts([...selectedContacts, contact]);
+    }
+  };
+
+  const handleCreateEvent = () => {
+    if (!eventFormData.summary || !eventFormData.date || !eventFormData.startTime || !eventFormData.endTime) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const startDateTime = `${eventFormData.date}T${eventFormData.startTime}:00`;
+    const endDateTime = `${eventFormData.date}T${eventFormData.endTime}:00`;
+
+    createEventMutation.mutate({
+      summary: eventFormData.summary,
+      description: eventFormData.description,
+      startDateTime,
+      endDateTime,
+      attendees: selectedContacts.map(c => ({ email: c.email, displayName: c.displayName })),
+    });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Contact Management
+            </CardTitle>
+            <CardDescription>
+              Search contacts and create calendar events
+            </CardDescription>
+          </div>
+          <Dialog open={isCreateEventOpen} onOpenChange={setIsCreateEventOpen}>
+            <DialogTrigger asChild>
+              <Button data-testid="button-create-event">
+                <Calendar className="w-4 h-4 mr-2" />
+                Create Event
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Create Calendar Event</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="event-summary">Event Title *</Label>
+                  <Input
+                    id="event-summary"
+                    data-testid="input-event-summary"
+                    placeholder="Meeting with client"
+                    value={eventFormData.summary}
+                    onChange={(e) => setEventFormData({ ...eventFormData, summary: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="event-description">Description</Label>
+                  <Textarea
+                    id="event-description"
+                    data-testid="input-event-description"
+                    placeholder="Optional event description"
+                    value={eventFormData.description}
+                    onChange={(e) => setEventFormData({ ...eventFormData, description: e.target.value })}
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="event-date">Date *</Label>
+                  <Input
+                    id="event-date"
+                    data-testid="input-event-date"
+                    type="date"
+                    value={eventFormData.date}
+                    onChange={(e) => setEventFormData({ ...eventFormData, date: e.target.value })}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="event-start-time">Start Time *</Label>
+                    <Input
+                      id="event-start-time"
+                      data-testid="input-event-start-time"
+                      type="time"
+                      value={eventFormData.startTime}
+                      onChange={(e) => setEventFormData({ ...eventFormData, startTime: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="event-end-time">End Time *</Label>
+                    <Input
+                      id="event-end-time"
+                      data-testid="input-event-end-time"
+                      type="time"
+                      value={eventFormData.endTime}
+                      onChange={(e) => setEventFormData({ ...eventFormData, endTime: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Selected Attendees ({selectedContacts.length})</Label>
+                  {selectedContacts.length > 0 ? (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {selectedContacts.map(contact => (
+                        <Badge key={contact.email} variant="secondary" className="text-xs">
+                          {contact.displayName}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-500 mt-2">Select contacts from the list below</p>
+                  )}
+                </div>
+                <Button 
+                  onClick={handleCreateEvent} 
+                  className="w-full"
+                  disabled={createEventMutation.isPending}
+                  data-testid="button-submit-event"
+                >
+                  {createEventMutation.isPending ? 'Creating...' : 'Create Event'}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search contacts by name or email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+              data-testid="input-search-contacts"
+            />
+          </div>
+        </div>
+
+        {calendarContactsError ? (
+          <div className="text-center py-8">
+            <p className="text-sm text-gray-500 mb-2">
+              Google Calendar not connected or error fetching contacts
+            </p>
+            <p className="text-xs text-gray-400">
+              Make sure your Google Calendar is properly connected
+            </p>
+          </div>
+        ) : filteredContacts.length === 0 ? (
+          <div className="text-center py-8">
+            <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-sm text-gray-500">
+              {searchQuery ? 'No contacts found matching your search' : 'No contacts found'}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {filteredContacts.map((contact: any, index: number) => {
+              const isSelected = selectedContacts.find(c => c.email === contact.email);
+              return (
+                <div 
+                  key={contact.email || index} 
+                  className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                    isSelected ? 'bg-blue-50 border-blue-500' : 'hover:bg-gray-50'
+                  }`}
+                  onClick={() => toggleContactSelection(contact)}
+                  data-testid={`contact-card-${index}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <p className="font-medium text-sm">
+                        {contact.displayName}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {contact.email}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {contact.isOrganizer && (
+                        <Badge variant="secondary" className="text-xs">
+                          Organizer
+                        </Badge>
+                      )}
+                      {isSelected && (
+                        <Badge variant="default" className="bg-blue-600 text-xs">
+                          Selected
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        
+        {selectedContacts.length > 0 && (
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-sm font-medium text-blue-900 mb-2">
+              {selectedContacts.length} contact{selectedContacts.length > 1 ? 's' : ''} selected
+            </p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setIsCreateEventOpen(true)}
+              className="w-full"
+            >
+              <Calendar className="w-4 h-4 mr-2" />
+              Create Event with Selected Contacts
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -763,6 +1116,9 @@ export default function Admin() {
             <TabsTrigger value="calendar" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
               Calendar
             </TabsTrigger>
+            <TabsTrigger value="contacts" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
+              Contacts
+            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -1238,6 +1594,10 @@ export default function Admin() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="contacts" className="space-y-6">
+          <ContactsManager calendarContacts={calendarContacts} calendarContactsError={calendarContactsError} />
         </TabsContent>
 
         <TabsContent value="grooming">
