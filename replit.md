@@ -51,7 +51,16 @@ The application is built as a full-stack web application with a clear separation
     - Dedicated Wishlist page for saving items to purchase later.
     - Add/remove functionality with secure ownership verification.
     - Quick "Add to Cart" button from wishlist items.
+- **Google Calendar Integration:**
+    - Connected Google Calendar via Replit integration for event and contact management.
+    - Admin panel displays upcoming Google Calendar events with attendees and event details.
+    - Contacts list extracted from calendar events showing all attendees and organizers.
+    - API endpoints to fetch calendar events and contacts with admin authentication.
+    - Error handling for cases when Google Calendar is not connected.
 - **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtering content by species.
+- **Admin Order Management:**
+    - Order details display showing actual product/pet names instead of IDs.
+    - Customer names displayed in order item details for admin reference.
 - **Navigation:** 
     - Enhanced bottom navigation with scroll-to-top behavior.
     - Quick action cards on profile page for Order History, My Appointments, Wishlist, and Settings.
@@ -72,6 +81,7 @@ The application is built as a full-stack web application with a clear separation
 -   **ORM**: Drizzle ORM
 -   **Email Service**: SendGrid (for password reset and appointment rejection emails)
 -   **SMS Service**: Twilio (for customer order status updates)
+-   **Calendar Integration**: Google Calendar (for event and contact management in admin panel)
 -   **Frontend Framework**: React
 -   **Build Tool**: Vite
 -   **Styling**: Tailwind CSS
