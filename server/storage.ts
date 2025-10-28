@@ -12,6 +12,7 @@ import {
   groomerAvailability,
   passwordResetTokens,
   wishlistItems,
+  contacts,
   type User,
   type UpsertUser,
   type Pet,
@@ -37,6 +38,8 @@ import {
   type PasswordResetToken,
   type WishlistItem,
   type InsertWishlistItem,
+  type Contact,
+  type InsertContact,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, ilike, lt } from "drizzle-orm";
@@ -123,6 +126,13 @@ export interface IStorage {
   getWishlistItems(userId: string): Promise<WishlistItem[]>;
   addToWishlist(wishlistItem: InsertWishlistItem): Promise<WishlistItem>;
   removeFromWishlist(id: number, userId: string): Promise<boolean>;
+
+  // Contact operations
+  getAllContacts(): Promise<Contact[]>;
+  getContact(id: number): Promise<Contact | undefined>;
+  createContact(contact: InsertContact): Promise<Contact>;
+  updateContact(id: number, contact: Partial<InsertContact>): Promise<Contact>;
+  deleteContact(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -741,6 +751,34 @@ export class DatabaseStorage implements IStorage {
       .where(and(eq(wishlistItems.id, id), eq(wishlistItems.userId, userId)))
       .returning();
     return result.length > 0;
+  }
+
+  // Contact operations
+  async getAllContacts(): Promise<Contact[]> {
+    return await db.select().from(contacts).orderBy(desc(contacts.createdAt));
+  }
+
+  async getContact(id: number): Promise<Contact | undefined> {
+    const [contact] = await db.select().from(contacts).where(eq(contacts.id, id));
+    return contact;
+  }
+
+  async createContact(contact: InsertContact): Promise<Contact> {
+    const [newContact] = await db.insert(contacts).values(contact).returning();
+    return newContact;
+  }
+
+  async updateContact(id: number, contact: Partial<InsertContact>): Promise<Contact> {
+    const [updatedContact] = await db
+      .update(contacts)
+      .set({ ...contact, updatedAt: new Date() })
+      .where(eq(contacts.id, id))
+      .returning();
+    return updatedContact;
+  }
+
+  async deleteContact(id: number): Promise<void> {
+    await db.delete(contacts).where(eq(contacts.id, id));
   }
 }
 
