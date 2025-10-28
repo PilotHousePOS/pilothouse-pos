@@ -16,7 +16,7 @@ import {
 import { z } from "zod";
 import { notificationService } from './notifications';
 import { sendPasswordResetEmail } from './sendgrid';
-import { getUpcomingEvents, getAllCalendarContacts, createCalendarEvent, getEventsForDate } from './googleCalendar';
+import { getUpcomingEvents, getAllCalendarContacts, createCalendarEvent, getEventsForDate, getGoogleContacts } from './googleCalendar';
 
 // Configure multer for file uploads
 const uploadStorage = multer.diskStorage({
@@ -1476,11 +1476,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      const contacts = await getAllCalendarContacts();
+      // Fetch real Google Contacts with phone numbers
+      const contacts = await getGoogleContacts();
       res.json(contacts);
     } catch (error) {
-      console.error("Error fetching calendar contacts:", error);
-      res.status(500).json({ message: "Failed to fetch calendar contacts", error: (error as Error).message });
+      console.error("Error fetching Google contacts:", error);
+      res.status(500).json({ message: "Failed to fetch Google contacts", error: (error as Error).message });
     }
   });
 

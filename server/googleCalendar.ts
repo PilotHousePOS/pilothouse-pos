@@ -50,6 +50,18 @@ export async function getUncachableGoogleCalendarClient() {
   return google.calendar({ version: 'v3', auth: oauth2Client });
 }
 
+// Get Google People API client for contacts
+export async function getUncachableGooglePeopleClient() {
+  const accessToken = await getAccessToken();
+
+  const oauth2Client = new google.auth.OAuth2();
+  oauth2Client.setCredentials({
+    access_token: accessToken
+  });
+
+  return google.people({ version: 'v1', auth: oauth2Client });
+}
+
 // Fetch upcoming calendar events
 export async function getUpcomingEvents(maxResults: number = 10) {
   try {
@@ -182,6 +194,42 @@ export async function getEventsForDate(date: Date) {
     return response.data.items || [];
   } catch (error) {
     console.error('Error fetching events for date:', error);
+    throw error;
+  }
+}
+
+// Get real Google Contacts with phone numbers
+export async function getGoogleContacts(maxResults: number = 1000) {
+  try {
+    const people = await getUncachableGooglePeopleClient();
+    
+    const response = await people.people.connections.list({
+      resourceName: 'people/me',
+      pageSize: maxResults,
+      personFields: 'names,emailAddresses,phoneNumbers,photos',
+    });
+
+    const contacts = (response.data.connections || []).map((person: any) => {
+      const name = person.names?.[0];
+      const email = person.emailAddresses?.[0];
+      const phone = person.phoneNumbers?.[0];
+      const photo = person.photos?.[0];
+
+      return {
+        resourceName: person.resourceName,
+        displayName: name?.displayName || email?.value || 'Unknown',
+        givenName: name?.givenName,
+        familyName: name?.familyName,
+        email: email?.value || null,
+        phoneNumber: phone?.value || null,
+        phoneType: phone?.type || null,
+        photoUrl: photo?.url || null,
+      };
+    }).filter((contact: any) => contact.email || contact.phoneNumber); // Only include contacts with email or phone
+
+    return contacts;
+  } catch (error) {
+    console.error('Error fetching Google contacts:', error);
     throw error;
   }
 }
