@@ -1476,12 +1476,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      // Fetch real Google Contacts with phone numbers
-      const contacts = await getGoogleContacts();
+      // Note: The Google Calendar connector does not include People API scopes,
+      // so we cannot fetch real Google Contacts. Instead, we extract contacts
+      // from calendar event attendees which works with existing OAuth scopes.
+      const contacts = await getAllCalendarContacts();
       res.json(contacts);
     } catch (error) {
-      console.error("Error fetching Google contacts:", error);
-      res.status(500).json({ message: "Failed to fetch Google contacts", error: (error as Error).message });
+      console.error("Error fetching calendar contacts:", error);
+      res.status(500).json({ message: "Failed to fetch calendar contacts", error: (error as Error).message });
     }
   });
 

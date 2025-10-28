@@ -34,7 +34,6 @@ import {
   ArrowLeft,
   Search,
   UserPlus,
-  Phone,
   Mail
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
@@ -283,8 +282,7 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
 
   const filteredContacts = calendarContacts.filter(contact => 
     contact.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.phoneNumber?.toLowerCase().includes(searchQuery.toLowerCase())
+    contact.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const toggleContactSelection = (contact: any) => {
@@ -472,18 +470,9 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
                         {contact.displayName}
                       </p>
                       {contact.email && (
-                        <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
+                        <div className="flex items-center gap-1 text-xs text-gray-600">
                           <Mail className="w-3 h-3" />
                           <span>{contact.email}</span>
-                        </div>
-                      )}
-                      {contact.phoneNumber && (
-                        <div className="flex items-center gap-1 text-xs text-gray-600">
-                          <Phone className="w-3 h-3" />
-                          <span>{contact.phoneNumber}</span>
-                          {contact.phoneType && (
-                            <span className="text-gray-400">({contact.phoneType})</span>
-                          )}
                         </div>
                       )}
                     </div>
