@@ -519,7 +519,7 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
                   Add Contact
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Add New Contact</DialogTitle>
                 </DialogHeader>
@@ -580,7 +580,7 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
               </DialogContent>
             </Dialog>
             <Dialog open={!!editingContact} onOpenChange={(open) => !open && setEditingContact(null)}>
-              <DialogContent className="max-w-md">
+              <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Edit Contact</DialogTitle>
                 </DialogHeader>
@@ -647,7 +647,7 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
                   Create Event
                 </Button>
               </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Create Calendar Event</DialogTitle>
               </DialogHeader>
