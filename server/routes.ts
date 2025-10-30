@@ -53,8 +53,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password, firstName, lastName, phoneNumber } = req.body;
       
-      if (!email || !password || !firstName || !lastName) {
-        return res.status(400).json({ message: "All fields are required" });
+      if (!email || !password || !firstName || !lastName || !phoneNumber) {
+        return res.status(400).json({ message: "All fields including phone number are required" });
       }
 
       // Check if user already exists
@@ -71,22 +71,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastName,
       });
 
-      // If phone number provided, update user and link to any existing contacts
-      if (phoneNumber) {
-        const { phoneNumbersMatch } = await import("./phoneUtils");
-        
-        // Update user with phone number
-        await db.update(users).set({ phoneNumber }).where(eq(users.id, newUser.id));
-        
-        // Find and link any existing contacts with matching phone number
-        const matchingContacts = await storage.findUnlinkedContactsByPhoneNumber(phoneNumber);
-        
-        for (const contact of matchingContacts) {
-          await storage.linkContactToUser(contact.id, newUser.id);
-        }
-
-        console.log(`Linked ${matchingContacts.length} contacts to new user ${newUser.id}`);
+      // Phone number is now required - update user and link to any existing contacts
+      const { phoneNumbersMatch } = await import("./phoneUtils");
+      
+      // Update user with phone number
+      await db.update(users).set({ phoneNumber }).where(eq(users.id, newUser.id));
+      
+      // Find and link any existing contacts with matching phone number
+      // This will also replace temp emails with user's real email
+      const matchingContacts = await storage.findUnlinkedContactsByPhoneNumber(phoneNumber);
+      
+      for (const contact of matchingContacts) {
+        await storage.linkContactToUser(contact.id, newUser.id);
+        console.log(`Linked contact ${contact.id} to user ${newUser.id}, replaced temp email with ${email}`);
       }
+
+      console.log(`Linked ${matchingContacts.length} contacts to new user ${newUser.id}`)
 
       // Generate JWT token
       const token = generateToken(newUser);

@@ -59,7 +59,7 @@ export default function Auth() {
     }
   };
 
-  const handleSignUp = async (email: string, password: string, firstName: string, lastName: string) => {
+  const handleSignUp = async (email: string, password: string, firstName: string, lastName: string, phoneNumber: string) => {
     setIsLoading(true);
     try {
       const response = await fetch('/api/auth/signup', {
@@ -68,7 +68,7 @@ export default function Auth() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, firstName, lastName }),
+        body: JSON.stringify({ email, password, firstName, lastName, phoneNumber }),
       });
       
       if (response.ok) {
@@ -112,8 +112,9 @@ export default function Auth() {
     const password = formData.get('password') as string;
     const firstName = formData.get('firstName') as string;
     const lastName = formData.get('lastName') as string;
+    const phoneNumber = formData.get('phoneNumber') as string;
     
-    await handleSignUp(email, password, firstName, lastName);
+    await handleSignUp(email, password, firstName, lastName, phoneNumber);
   };
 
   const handleSignInSubmit = async (e: React.FormEvent) => {
@@ -230,6 +231,17 @@ export default function Auth() {
                       placeholder="Enter your email"
                       className="bg-white/10 border-white/30 text-white placeholder:text-gray-400"
                       required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phoneNumber" className="text-white">Phone Number</Label>
+                    <Input
+                      name="phoneNumber"
+                      type="tel"
+                      placeholder="(555) 123-4567"
+                      className="bg-white/10 border-white/30 text-white placeholder:text-gray-400"
+                      required
+                      data-testid="input-phone-number"
                     />
                   </div>
                   <div className="space-y-2">
