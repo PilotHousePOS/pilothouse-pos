@@ -265,7 +265,7 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
 }
 
 // Contacts Manager Component with Search and Event Creation
-function ContactsManager({ calendarContacts, calendarContactsError }: { calendarContacts: any[]; calendarContactsError: boolean }) {
+function ContactsManager() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedContacts, setSelectedContacts] = useState<any[]>([]);
   const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
@@ -890,12 +890,12 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
                     {showContactDropdown && allContacts.length > 0 && (
                       <div className="absolute z-50 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
                         {allContacts
-                          .filter(contact => 
+                          .filter((contact: any) => 
                             contact.displayName?.toLowerCase().includes(eventContactSearch.toLowerCase()) ||
                             contact.name?.toLowerCase().includes(eventContactSearch.toLowerCase()) ||
                             contact.email?.toLowerCase().includes(eventContactSearch.toLowerCase())
                           )
-                          .map((contact, index) => {
+                          .map((contact: any, index: number) => {
                             const isAlreadySelected = selectedContacts.find(c => (c.email === contact.email || c.id === contact.id));
                             return (
                               <div
@@ -921,7 +921,7 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
                               </div>
                             );
                           })}
-                        {allContacts.filter(contact => 
+                        {allContacts.filter((contact: any) => 
                           contact.displayName?.toLowerCase().includes(eventContactSearch.toLowerCase()) ||
                           contact.email?.toLowerCase().includes(eventContactSearch.toLowerCase())
                         ).length === 0 && (
