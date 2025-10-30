@@ -669,9 +669,10 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
             <CardTitle className="flex items-center gap-2">
               <Users className="w-5 h-5" />
               Contact Management
+              <Badge variant="secondary" className="ml-2 text-xs">Shared Across All Admins</Badge>
             </CardTitle>
             <CardDescription>
-              Manage contacts with phone numbers and create calendar events
+              All admin accounts can view and manage the same workspace contacts
             </CardDescription>
           </div>
           <div className="flex flex-col gap-2">
@@ -2128,9 +2129,10 @@ export default function Admin() {
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
                 Google Calendar Events
+                <Badge variant="secondary" className="ml-2 text-xs">Shared Across All Admins</Badge>
               </CardTitle>
               <CardDescription>
-                Upcoming events from your connected Google Calendar
+                All admin accounts have access to the same workspace Google Calendar
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -2139,8 +2141,11 @@ export default function Admin() {
                   <p className="text-sm text-gray-500 mb-2">
                     Google Calendar not connected or error fetching events
                   </p>
-                  <p className="text-xs text-gray-400">
-                    Make sure your Google Calendar is properly connected
+                  <p className="text-xs text-gray-400 mb-3">
+                    Make sure your Google Calendar is properly connected in the integrations
+                  </p>
+                  <p className="text-xs text-blue-600 font-medium">
+                    ℹ️ All admin accounts share the same workspace calendar
                   </p>
                 </div>
               ) : calendarEvents.length === 0 ? (

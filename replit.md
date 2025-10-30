@@ -53,6 +53,7 @@ The application is built as a full-stack web application with a clear separation
     - Quick "Add to Cart" button from wishlist items.
 - **Google Calendar Integration & Contact Management:**
     - Connected Google Calendar via Replit integration for event and contact management.
+    - **Shared Workspace Access:** All admin accounts have access to the same Google Calendar events and contacts (workspace-level, not user-specific).
     - Unified calendar view displaying both database appointments and Google Calendar events side-by-side.
     - Color-coded events: Blue for grooming appointments, purple for Google Calendar events.
     - Date-specific event fetching to show all events for a selected day.
