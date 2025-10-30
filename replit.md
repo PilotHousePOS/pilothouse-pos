@@ -59,12 +59,22 @@ The application is built as a full-stack web application with a clear separation
     - Admin panel displays upcoming Google Calendar events with attendees and event details.
     - **Hybrid Contact System:**
         - Manual contact database with full CRUD operations for contacts with phone numbers
-        - Database schema includes: name (required), email (required), phoneNumber (optional), notes (optional), timestamps
+        - Database schema includes: name (required), email (required), phoneNumber (optional), notes (optional), timestamps, source (manual/google_calendar), linkedUserId (nullable)
         - Multi-layer email validation: Client-side and server-side validation with trimming and @ symbol check to ensure data integrity
         - Defensive filtering in calendar event creation to prevent invalid emails from breaking Google Calendar API calls
         - Google Calendar contacts extracted from event attendees (email and name only)
+        - **Automatic Phone Number Extraction & Syncing:**
+            - Phone numbers automatically extracted from Google Calendar event descriptions using regex patterns
+            - "Sync Contacts from Calendar" button in admin panel to manually trigger contact sync
+            - Prevents duplicate contacts using normalized phone number comparison (digits-only)
+            - Contact source tracking: "manual" for user-created, "google_calendar" for auto-synced
+        - **User-Contact Auto-Linking System:**
+            - When users sign up with a phone number, system automatically searches for matching unlinked contacts
+            - Phone number normalization ensures reliable matching regardless of format differences (e.g., "(555) 123-4567" vs "555-123-4567")
+            - Two-way relationship: contacts.linkedUserId points to users.id, users.phoneNumber enables matching
+            - Unlinked contacts can be linked to user accounts through normalized phone number comparison
         - Unified contact list merging both manual and Google Calendar contacts
-        - Contact cards display name, email, phone number (manual contacts only), and notes
+        - Contact cards display name, email, phone number (manual contacts only), notes, and linked user status
         - Visual badges distinguish between "Manual" (green) and "Google" (purple) contacts
         - Edit/delete functionality available only for manual contacts
         - Search functionality across all contact fields including phone numbers
@@ -87,6 +97,7 @@ The application is built as a full-stack web application with a clear separation
         - GET /api/admin/calendar/events - Fetch Google Calendar events
         - GET /api/admin/calendar/contacts - Extract contacts from calendar event attendees
         - POST /api/admin/calendar/events - Create new calendar events
+        - POST /api/admin/calendar/sync-contacts - Sync contacts from calendar events with phone number extraction
     - Error handling for cases when Google Calendar is not connected.
     - **Note:** Full Google Contacts integration via People API is not available due to OAuth scope limitations in the Replit Google Calendar connector. Manual contact database serves as workaround for phone number storage.
 - **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtering content by species.
