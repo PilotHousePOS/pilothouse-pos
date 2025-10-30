@@ -1674,14 +1674,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { phoneNumbersMatch } = await import("./phoneUtils");
 
       for (const contactData of extractedContacts) {
-        // Check if contact already exists by phone number
-        const existingContact = await storage.getContactByPhoneNumber(contactData.phoneNumber);
+        let existingContact = null;
+        
+        // Check if contact already exists by phone number (if available)
+        if (contactData.phoneNumber) {
+          existingContact = await storage.getContactByPhoneNumber(contactData.phoneNumber);
+        }
+        
+        // If no phone match, check by email
+        if (!existingContact && contactData.email) {
+          const allContacts = await storage.getAllContacts();
+          existingContact = allContacts.find((c: any) => 
+            c.email?.toLowerCase() === contactData.email.toLowerCase() && 
+            c.source === 'google_calendar'
+          );
+        }
         
         if (!existingContact) {
           const newContact = await storage.createContact({
             name: contactData.name,
             email: contactData.email,
-            phoneNumber: contactData.phoneNumber,
+            phoneNumber: contactData.phoneNumber || null,
             notes: contactData.notes,
             source: 'google_calendar',
           });

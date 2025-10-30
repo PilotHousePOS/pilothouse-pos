@@ -268,29 +268,50 @@ export async function syncContactsFromCalendarEvents() {
       const description = event.description || '';
       const combinedText = `${summary} ${description}`;
 
-      // Extract phone numbers
+      // Extract phone numbers (optional)
       const phoneNumbers = extractPhoneNumbers(combinedText);
 
-      if (phoneNumbers.length > 0) {
-        // Try to extract name from attendees or summary
-        let name = summary;
-        
-        // If there are attendees, use the first one's name
-        if (event.attendees && event.attendees.length > 0) {
-          const attendee = event.attendees[0];
-          if (attendee.displayName) {
-            name = attendee.displayName;
-          } else if (attendee.email) {
-            // Use email name part if no display name
-            name = attendee.email.split('@')[0];
+      // Process attendees if available
+      if (event.attendees && event.attendees.length > 0) {
+        for (const attendee of event.attendees) {
+          // Skip if attendee has no email
+          if (!attendee.email) continue;
+
+          // Get name from attendee or use email username
+          let name = attendee.displayName || attendee.email.split('@')[0];
+          
+          // If we found phone numbers, create one contact per phone number
+          if (phoneNumbers.length > 0) {
+            for (const phoneNumber of phoneNumbers) {
+              extractedContacts.push({
+                name: `${name} ${phoneNumber}`,
+                email: attendee.email,
+                phoneNumber,
+                notes: `Auto-synced from calendar event: ${summary}`,
+                source: 'google_calendar',
+                eventId: event.id,
+                eventSummary: summary,
+              });
+            }
+          } else {
+            // No phone number found, create contact without phone
+            extractedContacts.push({
+              name,
+              email: attendee.email,
+              phoneNumber: null,
+              notes: `Auto-synced from calendar event: ${summary}`,
+              source: 'google_calendar',
+              eventId: event.id,
+              eventSummary: summary,
+            });
           }
         }
-
-        // Create contact object
+      } else if (phoneNumbers.length > 0) {
+        // No attendees but has phone numbers - use summary as name
         for (const phoneNumber of phoneNumbers) {
           extractedContacts.push({
-            name: name || 'Calendar Contact',
-            email: event.attendees?.[0]?.email || `calendar-${Date.now()}@temp.com`,
+            name: `${summary} ${phoneNumber}`,
+            email: `calendar-${Date.now()}@temp.com`,
             phoneNumber,
             notes: `Auto-synced from calendar event: ${summary}`,
             source: 'google_calendar',
