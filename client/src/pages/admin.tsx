@@ -435,15 +435,6 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
     })),
   ];
 
-  // Debug: Log all contacts before filtering
-  if (searchQuery.trim()) {
-    console.log('=== SEARCH DEBUG ===');
-    console.log('Search query:', searchQuery);
-    console.log('Total contacts before filter:', allContacts.length);
-    console.log('Manual contacts:', manualContacts.length);
-    console.log('Calendar contacts:', calendarContacts.length);
-  }
-
   const filteredContacts = searchQuery.trim() === '' 
     ? [...allContacts].sort((a, b) => {
         const nameA = (a.displayName || a.name || '').toLowerCase();
@@ -460,39 +451,16 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
           
           const nameMatch = name.startsWith(query);
           const emailMatch = email.includes(query);
-          const phoneMatch = searchDigits && phone.includes(searchDigits);
+          // Exact phone match: search digits must exactly match the phone number
+          const phoneMatch = searchDigits && phone === searchDigits;
           
-          const matches = nameMatch || emailMatch || phoneMatch;
-          
-          // Debug logging for each contact
-          console.log('Contact:', contact.displayName || contact.name, {
-            email: contact.email,
-            phone,
-            searchDigits,
-            phoneMatch,
-            nameMatch,
-            emailMatch,
-            MATCHES: matches
-          });
-          
-          return matches;
+          return nameMatch || emailMatch || phoneMatch;
         })
         .sort((a, b) => {
           const nameA = (a.displayName || a.name || '').toLowerCase();
           const nameB = (b.displayName || b.name || '').toLowerCase();
           return nameA.localeCompare(nameB);
         });
-  
-  // Debug: Log filtered results
-  if (searchQuery.trim()) {
-    console.log('Filtered contacts count:', filteredContacts.length);
-    console.log('Filtered contacts:', filteredContacts.map(c => ({
-      name: c.displayName || c.name,
-      email: c.email,
-      phone: c.phoneNumber
-    })));
-    console.log('===================');
-  }
 
   // Reset to page 0 when search changes
   useEffect(() => {

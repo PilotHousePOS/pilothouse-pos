@@ -85,7 +85,7 @@ The application is built as a full-stack web application with a clear separation
         - Real-time search filtering by name, email, or phone number:
             - Name: starts-with matching (case-insensitive)
             - Email: contains matching (case-insensitive)
-            - Phone: digit-only matching (ignores formatting like dashes, parentheses, spaces)
+            - Phone: exact match only - must type complete phone number digits (e.g., "3182675975")
             - Results alphabetically sorted by name
         - Contact cards show all available information with proper formatting
         - **Pagination System:**
