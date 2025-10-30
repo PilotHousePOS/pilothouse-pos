@@ -877,32 +877,37 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
                   data-testid={`contact-card-${index}`}
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm mb-1">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm mb-1 break-words">
                         {contact.displayName || contact.name}
                       </p>
                       {contact.email && (
-                        <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
-                          <Mail className="w-3 h-3" />
-                          <span>{contact.email}</span>
+                        <div className="flex items-start gap-1 text-xs text-gray-600 mb-1">
+                          <Mail className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                          <span className="break-all">{contact.email}</span>
                         </div>
                       )}
                       {contact.phoneNumber && (
-                        <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
-                          <span className="font-medium">📱</span>
-                          <span>{contact.phoneNumber}</span>
+                        <div className="flex items-start gap-1 text-xs text-gray-600 mb-1">
+                          <span className="font-medium flex-shrink-0">📱</span>
+                          <span className="break-all">{contact.phoneNumber}</span>
                         </div>
                       )}
                       {contact.notes && (
-                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">{contact.notes}</p>
+                        <p className="text-xs text-gray-500 mt-1 line-clamp-2 break-words">{contact.notes}</p>
                       )}
                     </div>
-                    <div className="flex flex-col items-end gap-1">
+                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
                       {contact.isManual ? (
                         <>
-                          <Badge variant="outline" className="text-xs bg-green-50 border-green-300 text-green-700">
+                          <Badge variant="outline" className="text-xs bg-green-50 border-green-300 text-green-700 whitespace-nowrap">
                             Manual
                           </Badge>
+                          {contact.linkedUserId && (
+                            <Badge variant="outline" className="text-xs bg-blue-50 border-blue-300 text-blue-700 whitespace-nowrap">
+                              👤 Linked
+                            </Badge>
+                          )}
                           <div className="flex gap-1 mt-2">
                             <Button
                               variant="ghost"
@@ -932,16 +937,16 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
                         </>
                       ) : (
                         <>
-                          <Badge variant="outline" className="text-xs bg-purple-50 border-purple-300 text-purple-700">
+                          <Badge variant="outline" className="text-xs bg-purple-50 border-purple-300 text-purple-700 whitespace-nowrap">
                             Google
                           </Badge>
                           {contact.isOrganizer && (
-                            <Badge variant="secondary" className="text-xs">
+                            <Badge variant="secondary" className="text-xs whitespace-nowrap">
                               Organizer
                             </Badge>
                           )}
                           {isSelected && (
-                            <Badge variant="default" className="bg-blue-600 text-xs">
+                            <Badge variant="default" className="bg-blue-600 text-xs whitespace-nowrap">
                               Selected
                             </Badge>
                           )}
