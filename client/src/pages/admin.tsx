@@ -34,7 +34,8 @@ import {
   ArrowLeft,
   Search,
   UserPlus,
-  Mail
+  Mail,
+  RefreshCw
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -336,6 +337,26 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
     },
   });
 
+  const syncContactsMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/admin/calendar/sync-contacts");
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Sync Complete",
+        description: data.message || "Contacts synced successfully from calendar.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Sync Failed",
+        description: "Failed to sync contacts from calendar.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const createEventMutation = useMutation({
     mutationFn: async (eventData: any) => {
       await apiRequest("POST", "/api/admin/calendar/events", eventData);
@@ -512,6 +533,15 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
             </CardDescription>
           </div>
           <div className="flex flex-col gap-2">
+            <Button 
+              variant="secondary" 
+              onClick={() => syncContactsMutation.mutate()}
+              disabled={syncContactsMutation.isPending}
+              data-testid="button-sync-contacts"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${syncContactsMutation.isPending ? 'animate-spin' : ''}`} />
+              {syncContactsMutation.isPending ? 'Syncing...' : 'Sync from Calendar'}
+            </Button>
             <Dialog open={isAddContactOpen} onOpenChange={setIsAddContactOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" data-testid="button-add-contact">

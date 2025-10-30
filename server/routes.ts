@@ -12,11 +12,14 @@ import {
   insertOrderSchema,
   insertAppointmentSchema,
   insertCustomerPetSchema,
+  users,
 } from "@shared/schema";
 import { z } from "zod";
 import { notificationService } from './notifications';
 import { sendPasswordResetEmail } from './sendgrid';
 import { getUpcomingEvents, getAllCalendarContacts, createCalendarEvent, getEventsForDate, getGoogleContacts } from './googleCalendar';
+import { db } from './db';
+import { eq } from 'drizzle-orm';
 
 // Configure multer for file uploads
 const uploadStorage = multer.diskStorage({
@@ -48,7 +51,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Customer signup
   app.post('/api/auth/signup', async (req, res) => {
     try {
-      const { email, password, firstName, lastName } = req.body;
+      const { email, password, firstName, lastName, phoneNumber } = req.body;
       
       if (!email || !password || !firstName || !lastName) {
         return res.status(400).json({ message: "All fields are required" });
@@ -67,6 +70,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         firstName,
         lastName,
       });
+
+      // If phone number provided, update user and link to any existing contacts
+      if (phoneNumber) {
+        const { phoneNumbersMatch } = await import("./phoneUtils");
+        
+        // Update user with phone number
+        await db.update(users).set({ phoneNumber }).where(eq(users.id, newUser.id));
+        
+        // Find and link any existing contacts with matching phone number
+        const matchingContacts = await storage.findUnlinkedContactsByPhoneNumber(phoneNumber);
+        
+        for (const contact of matchingContacts) {
+          await storage.linkContactToUser(contact.id, newUser.id);
+        }
+
+        console.log(`Linked ${matchingContacts.length} contacts to new user ${newUser.id}`);
+      }
 
       // Generate JWT token
       const token = generateToken(newUser);
@@ -1636,6 +1656,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching events for date:", error);
       res.status(500).json({ message: "Failed to fetch events for date", error: (error as Error).message });
+    }
+  });
+
+  // Sync contacts from Google Calendar events
+  app.post("/api/admin/calendar/sync-contacts", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { syncContactsFromCalendarEvents } = await import("./googleCalendar");
+      const extractedContacts = await syncContactsFromCalendarEvents();
+      
+      const createdContacts = [];
+      const { phoneNumbersMatch } = await import("./phoneUtils");
+
+      for (const contactData of extractedContacts) {
+        // Check if contact already exists by phone number
+        const existingContact = await storage.getContactByPhoneNumber(contactData.phoneNumber);
+        
+        if (!existingContact) {
+          const newContact = await storage.createContact({
+            name: contactData.name,
+            email: contactData.email,
+            phoneNumber: contactData.phoneNumber,
+            notes: contactData.notes,
+            source: 'google_calendar',
+          });
+          createdContacts.push(newContact);
+        }
+      }
+
+      res.json({ 
+        message: `Synced ${createdContacts.length} new contacts from calendar`,
+        contacts: createdContacts 
+      });
+    } catch (error) {
+      console.error("Error syncing contacts from calendar:", error);
+      res.status(500).json({ message: "Failed to sync contacts", error: (error as Error).message });
     }
   });
 

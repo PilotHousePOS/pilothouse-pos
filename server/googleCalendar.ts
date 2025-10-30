@@ -1,4 +1,5 @@
 import { google } from 'googleapis';
+import { extractPhoneNumbers } from './phoneUtils';
 
 let connectionSettings: any;
 
@@ -230,6 +231,79 @@ export async function getGoogleContacts(maxResults: number = 1000) {
     return contacts;
   } catch (error) {
     console.error('Error fetching Google contacts:', error);
+    throw error;
+  }
+}
+
+/**
+ * Sync contacts from Google Calendar events
+ * Extracts name and phone numbers from event descriptions
+ * Returns contacts that were created or updated
+ */
+export async function syncContactsFromCalendarEvents() {
+  try {
+    const calendar = await getUncachableGoogleCalendarClient();
+    
+    // Fetch events from the past 30 days and next 90 days
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 30);
+    
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 90);
+
+    const response = await calendar.events.list({
+      calendarId: 'primary',
+      timeMin: pastDate.toISOString(),
+      timeMax: futureDate.toISOString(),
+      maxResults: 500,
+      singleEvents: true,
+    });
+
+    const events = response.data.items || [];
+    const extractedContacts = [];
+
+    for (const event of events) {
+      // Extract data from event
+      const summary = event.summary || '';
+      const description = event.description || '';
+      const combinedText = `${summary} ${description}`;
+
+      // Extract phone numbers
+      const phoneNumbers = extractPhoneNumbers(combinedText);
+
+      if (phoneNumbers.length > 0) {
+        // Try to extract name from attendees or summary
+        let name = summary;
+        
+        // If there are attendees, use the first one's name
+        if (event.attendees && event.attendees.length > 0) {
+          const attendee = event.attendees[0];
+          if (attendee.displayName) {
+            name = attendee.displayName;
+          } else if (attendee.email) {
+            // Use email name part if no display name
+            name = attendee.email.split('@')[0];
+          }
+        }
+
+        // Create contact object
+        for (const phoneNumber of phoneNumbers) {
+          extractedContacts.push({
+            name: name || 'Calendar Contact',
+            email: event.attendees?.[0]?.email || `calendar-${Date.now()}@temp.com`,
+            phoneNumber,
+            notes: `Auto-synced from calendar event: ${summary}`,
+            source: 'google_calendar',
+            eventId: event.id,
+            eventSummary: summary,
+          });
+        }
+      }
+    }
+
+    return extractedContacts;
+  } catch (error) {
+    console.error('Error syncing contacts from calendar:', error);
     throw error;
   }
 }

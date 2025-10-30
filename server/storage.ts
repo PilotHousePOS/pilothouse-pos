@@ -42,7 +42,7 @@ import {
   type InsertContact,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, or, ilike, lt } from "drizzle-orm";
+import { eq, desc, and, or, ilike, lt, isNull } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -130,9 +130,12 @@ export interface IStorage {
   // Contact operations
   getAllContacts(): Promise<Contact[]>;
   getContact(id: number): Promise<Contact | undefined>;
+  getContactByPhoneNumber(phoneNumber: string): Promise<Contact | undefined>;
   createContact(contact: InsertContact): Promise<Contact>;
   updateContact(id: number, contact: Partial<InsertContact>): Promise<Contact>;
   deleteContact(id: number): Promise<void>;
+  linkContactToUser(contactId: number, userId: string): Promise<void>;
+  findUnlinkedContactsByPhoneNumber(phoneNumber: string): Promise<Contact[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -779,6 +782,36 @@ export class DatabaseStorage implements IStorage {
 
   async deleteContact(id: number): Promise<void> {
     await db.delete(contacts).where(eq(contacts.id, id));
+  }
+
+  async getContactByPhoneNumber(phoneNumber: string): Promise<Contact | undefined> {
+    // Get all contacts with phone numbers and compare using normalization
+    const { normalizePhoneNumber } = await import("./phoneUtils");
+    const normalizedSearch = normalizePhoneNumber(phoneNumber);
+    
+    const allContacts = await db.select().from(contacts);
+    return allContacts.find(c => 
+      c.phoneNumber && normalizePhoneNumber(c.phoneNumber) === normalizedSearch
+    );
+  }
+
+  async linkContactToUser(contactId: number, userId: string): Promise<void> {
+    await db.update(contacts).set({ linkedUserId: userId }).where(eq(contacts.id, contactId));
+  }
+
+  async findUnlinkedContactsByPhoneNumber(phoneNumber: string): Promise<Contact[]> {
+    // Get all unlinked contacts and compare using normalization
+    const { normalizePhoneNumber } = await import("./phoneUtils");
+    const normalizedSearch = normalizePhoneNumber(phoneNumber);
+    
+    const unlinkedContacts = await db
+      .select()
+      .from(contacts)
+      .where(isNull(contacts.linkedUserId));
+    
+    return unlinkedContacts.filter(c =>
+      c.phoneNumber && normalizePhoneNumber(c.phoneNumber) === normalizedSearch
+    );
   }
 }
 
