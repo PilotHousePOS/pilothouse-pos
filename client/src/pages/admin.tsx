@@ -658,30 +658,32 @@ function ContactsManager() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex-1">
+            <CardTitle className="flex flex-wrap items-center gap-2">
               <Users className="w-5 h-5" />
-              Contact Management
-              <Badge variant="secondary" className="ml-2 text-xs">Shared Across All Admins</Badge>
+              <span>Contact Management</span>
+              <Badge variant="secondary" className="text-xs hidden sm:inline-flex">Shared Across All Admins</Badge>
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="mt-2">
               All admin accounts can view and manage the same workspace contacts
             </CardDescription>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 sm:flex-shrink-0">
             <Button 
               variant="secondary" 
               onClick={() => syncContactsMutation.mutate()}
               disabled={syncContactsMutation.isPending}
               data-testid="button-sync-contacts"
+              className="w-full sm:w-auto"
+              size="sm"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${syncContactsMutation.isPending ? 'animate-spin' : ''}`} />
-              {syncContactsMutation.isPending ? 'Syncing...' : 'Sync from Calendar'}
+              <span className="truncate">{syncContactsMutation.isPending ? 'Syncing...' : 'Sync from Calendar'}</span>
             </Button>
             <Dialog open={isAddContactOpen} onOpenChange={setIsAddContactOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" data-testid="button-add-contact">
+                <Button variant="outline" data-testid="button-add-contact" className="w-full sm:w-auto" size="sm">
                   <UserPlus className="w-4 h-4 mr-2" />
                   Add Contact
                 </Button>
@@ -809,7 +811,7 @@ function ContactsManager() {
             </Dialog>
             <Dialog open={isCreateEventOpen} onOpenChange={handleDialogChange}>
               <DialogTrigger asChild>
-                <Button data-testid="button-create-event">
+                <Button data-testid="button-create-event" className="w-full sm:w-auto" size="sm">
                   <Calendar className="w-4 h-4 mr-2" />
                   Create Event
                 </Button>
