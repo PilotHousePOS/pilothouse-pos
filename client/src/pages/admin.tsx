@@ -2715,6 +2715,68 @@ export default function Admin() {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Add Groomer Dialog */}
+      <Dialog open={isAddGroomerOpen} onOpenChange={setIsAddGroomerOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Groomer</DialogTitle>
+          </DialogHeader>
+          <GroomerForm 
+            onSubmit={(data) => createGroomerMutation.mutate(data)}
+            isPending={createGroomerMutation.isPending}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Groomer Dialog */}
+      {editingGroomer && (
+        <Dialog open={!!editingGroomer} onOpenChange={() => setEditingGroomer(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Edit Groomer</DialogTitle>
+            </DialogHeader>
+            <GroomerForm 
+              groomer={editingGroomer}
+              onSubmit={(data) => updateGroomerMutation.mutate({ id: editingGroomer.id, data })}
+              isPending={updateGroomerMutation.isPending}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Delete Groomer Confirmation Dialog */}
+      {groomerToDelete && (
+        <Dialog open={!!groomerToDelete} onOpenChange={() => setGroomerToDelete(null)}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Delete Groomer</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Are you sure you want to delete <strong>{groomerToDelete.name}</strong>? This action cannot be undone.
+              </p>
+              <div className="flex gap-2 justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => setGroomerToDelete(null)}
+                  data-testid="button-cancel-delete-groomer"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => deleteGroomerMutation.mutate(groomerToDelete.id)}
+                  disabled={deleteGroomerMutation.isPending}
+                  data-testid="button-confirm-delete-groomer"
+                >
+                  {deleteGroomerMutation.isPending ? "Deleting..." : "Delete"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
       </div>
     </div>
   );
@@ -3342,6 +3404,85 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
         onImageChange={(url) => setFormData({ ...formData, imageUrl: url })} 
       />
       <Button type="submit" className="w-full">Add Supply</Button>
+    </form>
+  );
+}
+
+function GroomerForm({ groomer, onSubmit, isPending }: { groomer?: any; onSubmit: (data: any) => void; isPending: boolean }) {
+  const [formData, setFormData] = useState({
+    name: groomer?.name || "",
+    email: groomer?.email || "",
+    phone: groomer?.phone || "",
+    specialties: groomer?.specialties || "",
+    isActive: groomer?.isActive !== undefined ? groomer.isActive : true,
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label htmlFor="name">Name *</Label>
+        <Input
+          id="name"
+          type="text"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          required
+          data-testid="input-groomer-name"
+        />
+      </div>
+      <div>
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          data-testid="input-groomer-email"
+        />
+      </div>
+      <div>
+        <Label htmlFor="phone">Phone</Label>
+        <Input
+          id="phone"
+          type="tel"
+          value={formData.phone}
+          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+          placeholder="(555) 123-4567"
+          data-testid="input-groomer-phone"
+        />
+      </div>
+      <div>
+        <Label htmlFor="specialties">Specialties</Label>
+        <Textarea
+          id="specialties"
+          value={formData.specialties}
+          onChange={(e) => setFormData({ ...formData, specialties: e.target.value })}
+          placeholder="e.g., Full Grooming, Bath Only, Large Breeds"
+          rows={3}
+          data-testid="input-groomer-specialties"
+        />
+      </div>
+      <div className="flex items-center space-x-2">
+        <Switch
+          checked={formData.isActive}
+          onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
+          data-testid="switch-groomer-active"
+        />
+        <Label>Active</Label>
+      </div>
+      <Button 
+        type="submit" 
+        className="w-full bg-brand-blue hover:bg-blue-600"
+        disabled={isPending}
+        data-testid="button-submit-groomer"
+      >
+        {isPending ? "Saving..." : (groomer ? "Update Groomer" : "Add Groomer")}
+      </Button>
     </form>
   );
 }
