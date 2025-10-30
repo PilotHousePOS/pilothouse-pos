@@ -453,13 +453,39 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
           const emailMatch = email.startsWith(query);
           const phoneMatch = searchDigits.length > 0 && phone.startsWith(searchDigits);
           
-          return nameMatch || emailMatch || phoneMatch;
+          const result = nameMatch || emailMatch || phoneMatch;
+          
+          // Diagnostic logging for "318267" search
+          if (searchQuery === '318267') {
+            console.log('FILTER CHECK:', {
+              contactName: contact.displayName || contact.name,
+              name,
+              email,
+              phone,
+              query,
+              searchDigits,
+              nameMatch,
+              emailMatch,
+              phoneMatch,
+              RESULT: result
+            });
+          }
+          
+          return result;
         })
         .sort((a, b) => {
           const nameA = (a.displayName || a.name || '').toLowerCase();
           const nameB = (b.displayName || b.name || '').toLowerCase();
           return nameA.localeCompare(nameB);
         });
+  
+  // Additional diagnostic logging
+  if (searchQuery === '318267') {
+    console.log('=== SEARCH RESULTS ===');
+    console.log('Total contacts:', allContacts.length);
+    console.log('Filtered contacts:', filteredContacts.length);
+    console.log('Filtered contact names:', filteredContacts.map((c: any) => c.displayName || c.name));
+  }
 
   // Reset to page 0 when search changes
   useEffect(() => {
