@@ -1022,6 +1022,7 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
             
             {/* Contact grid with swipe support */}
             <div 
+              key={`contacts-${searchQuery}-${currentPage}`}
               className="grid grid-cols-1 md:grid-cols-2 gap-3"
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
