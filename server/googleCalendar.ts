@@ -280,12 +280,14 @@ export async function syncContactsFromCalendarEvents() {
           // Get name from attendee or use email username
           let name = attendee.displayName || attendee.email.split('@')[0];
           
-          // If we found phone numbers, create one contact per phone number
+          // If we found phone numbers, create one contact per phone number with unique temp email
           if (phoneNumbers.length > 0) {
             for (const phoneNumber of phoneNumbers) {
+              // Create unique temp email for each phone number
+              const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
               extractedContacts.push({
                 name: `${name} ${phoneNumber}`,
-                email: attendee.email,
+                email: `calendar-${uniqueId}@temp.com`,
                 phoneNumber,
                 notes: `Auto-synced from calendar event: ${summary}`,
                 source: 'google_calendar',
@@ -294,7 +296,7 @@ export async function syncContactsFromCalendarEvents() {
               });
             }
           } else {
-            // No phone number found, create contact without phone
+            // No phone number found, create contact with attendee's real email
             extractedContacts.push({
               name,
               email: attendee.email,
