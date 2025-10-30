@@ -64,10 +64,13 @@ export function authMiddleware(req: any, res: Response, next: NextFunction) {
 
 export function setAuthCookie(res: Response, token: string) {
   console.log('Setting auth cookie with token length:', token.length);
+  
+  const isProduction = process.env.NODE_ENV === 'production';
+  
   res.cookie('auth_token', token, {
     httpOnly: false,
-    secure: false,
-    sameSite: 'none', // Allow cross-site cookies
+    secure: isProduction, // true in production (HTTPS), false in development
+    sameSite: isProduction ? 'none' : 'lax', // 'none' requires secure=true
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/'
   });
