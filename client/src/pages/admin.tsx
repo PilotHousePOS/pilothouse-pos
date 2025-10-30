@@ -294,8 +294,8 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
   
   const CONTACTS_PER_PAGE = 4;
 
-  // Fetch manual contacts from database
-  const { data: manualContacts = [], isLoading: loadingManualContacts } = useQuery({
+  // Fetch ALL contacts from database (includes both manual and google_calendar synced contacts)
+  const { data: allDatabaseContacts = [], isLoading: loadingContacts } = useQuery({
     queryKey: ["/api/contacts"],
     queryFn: async () => {
       const response = await fetch('/api/contacts', {
@@ -422,18 +422,12 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
     },
   });
 
-  // Combine manual contacts and Google Calendar contacts
-  const allContacts = [
-    ...manualContacts.map((c: any) => ({
-      ...c,
-      displayName: c.name,
-      isManual: true,
-    })),
-    ...calendarContacts.map((c: any) => ({
-      ...c,
-      isManual: false,
-    })),
-  ];
+  // Map database contacts and mark them as manual or google based on source field
+  const allContacts = allDatabaseContacts.map((c: any) => ({
+    ...c,
+    displayName: c.name,
+    isManual: c.source === 'manual',
+  }));
 
   const filteredContacts = searchQuery.trim() === '' 
     ? [...allContacts].sort((a, b) => {
@@ -1003,7 +997,7 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
               {searchQuery ? 'No contacts found matching your search' : 'No contacts found'}
             </p>
             <p className="text-xs text-gray-400 mt-1">
-              {loadingManualContacts ? 'Loading...' : 'Click "Add Contact" to create a new contact'}
+              {loadingContacts ? 'Loading...' : 'Click "Add Contact" to create a new contact'}
             </p>
           </div>
         ) : (
@@ -1324,12 +1318,6 @@ export default function Admin() {
 
   const { data: calendarEvents = [], isError: calendarEventsError } = useQuery<any[]>({
     queryKey: ["/api/admin/calendar/events"],
-    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
-    retry: false,
-  });
-
-  const { data: calendarContacts = [], isError: calendarContactsError } = useQuery<any[]>({
-    queryKey: ["/api/admin/calendar/contacts"],
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
     retry: false,
   });
@@ -2218,7 +2206,7 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="contacts" className="space-y-6">
-          <ContactsManager calendarContacts={calendarContacts} calendarContactsError={calendarContactsError} />
+          <ContactsManager />
         </TabsContent>
 
         <TabsContent value="grooming">
