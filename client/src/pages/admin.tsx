@@ -257,8 +257,13 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
     phoneNumber: '',
     notes: '',
   });
+  const [currentPage, setCurrentPage] = useState(0);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  const CONTACTS_PER_PAGE = 4;
 
   // Fetch manual contacts from database
   const { data: manualContacts = [], isLoading: loadingManualContacts } = useQuery({
@@ -417,6 +422,58 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
           const nameB = (b.displayName || b.name || '').toLowerCase();
           return nameA.localeCompare(nameB);
         });
+
+  // Reset to page 0 when search changes
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [searchQuery]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredContacts.length / CONTACTS_PER_PAGE);
+  const startIndex = currentPage * CONTACTS_PER_PAGE;
+  const endIndex = startIndex + CONTACTS_PER_PAGE;
+  const paginatedContacts = filteredContacts.slice(startIndex, endIndex);
+
+  // Swipe handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const minSwipeDistance = 50;
+    
+    if (distance > minSwipeDistance && currentPage < totalPages - 1) {
+      // Swipe left - next page
+      setCurrentPage(prev => prev + 1);
+    }
+    
+    if (distance < -minSwipeDistance && currentPage > 0) {
+      // Swipe right - previous page
+      setCurrentPage(prev => prev - 1);
+    }
+    
+    setTouchStart(0);
+    setTouchEnd(0);
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
 
   const toggleContactSelection = (contact: any) => {
     const contactId = contact.resourceName || contact.email || contact.id;
@@ -874,8 +931,29 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {filteredContacts.map((contact: any, index: number) => {
+          <>
+            <div className="relative">
+              {/* Previous button */}
+              {totalPages > 1 && currentPage > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={goToPreviousPage}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md hover:bg-gray-100"
+                  data-testid="button-previous-page"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </Button>
+              )}
+              
+              {/* Contact grid with swipe support */}
+              <div 
+                className="grid grid-cols-1 md:grid-cols-2 gap-3 px-10"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
+                {paginatedContacts.map((contact: any, index: number) => {
               const isSelected = selectedContacts.find(c => (c.email === contact.email && c.email) || c.resourceName === contact.resourceName || c.id === contact.id);
               return (
                 <div 
@@ -968,6 +1046,43 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
               );
             })}
           </div>
+          
+          {/* Next button */}
+          {totalPages > 1 && currentPage < totalPages - 1 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goToNextPage}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md hover:bg-gray-100"
+              data-testid="button-next-page"
+            >
+              <ArrowLeft className="w-4 h-4 rotate-180" />
+            </Button>
+          )}
+        </div>
+        
+        {/* Page indicators */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-4">
+            <span className="text-xs text-gray-500">
+              Page {currentPage + 1} of {totalPages}
+            </span>
+            <div className="flex gap-1">
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    i === currentPage ? 'bg-blue-600 w-6' : 'bg-gray-300'
+                  }`}
+                  aria-label={`Go to page ${i + 1}`}
+                  data-testid={`page-indicator-${i}`}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </>
         )}
         
         {selectedContacts.length > 0 && (
