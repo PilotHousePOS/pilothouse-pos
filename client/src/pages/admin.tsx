@@ -2564,11 +2564,11 @@ export default function Admin() {
                             </div>
                           )}
                         </div>
-                        <div className="flex gap-2 mt-4">
+                        <div className="flex flex-wrap gap-2 mt-4">
                           <Button
                             variant="outline"
                             size="sm"
-                            className="flex-1"
+                            className="flex-1 min-w-[80px]"
                             onClick={() => setEditingGroomer(groomer)}
                             data-testid={`button-edit-groomer-${groomer.id}`}
                           >
@@ -2578,6 +2578,7 @@ export default function Admin() {
                           <Button
                             variant="outline"
                             size="sm"
+                            className="flex-1 min-w-[100px]"
                             onClick={() => toggleGroomerActiveMutation.mutate({ 
                               id: groomer.id, 
                               isActive: !groomer.isActive 
@@ -2591,6 +2592,7 @@ export default function Admin() {
                           <Button
                             variant="destructive"
                             size="sm"
+                            className="min-w-[40px]"
                             onClick={() => setGroomerToDelete(groomer)}
                             data-testid={`button-delete-groomer-${groomer.id}`}
                           >
