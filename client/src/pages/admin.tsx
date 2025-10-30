@@ -35,7 +35,11 @@ import {
   Search,
   UserPlus,
   Mail,
-  RefreshCw
+  RefreshCw,
+  Phone,
+  Pencil,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -1281,6 +1285,9 @@ export default function Admin() {
   const [editingPet, setEditingPet] = useState<any>(null);
   const [editingSupply, setEditingSupply] = useState<any>(null);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+  const [isAddGroomerOpen, setIsAddGroomerOpen] = useState(false);
+  const [editingGroomer, setEditingGroomer] = useState<any>(null);
+  const [groomerToDelete, setGroomerToDelete] = useState<any>(null);
 
   // Always call all hooks at the top level
   const { data: pets = [] } = useQuery({
@@ -1322,6 +1329,11 @@ export default function Admin() {
     queryKey: ["/api/admin/calendar/events"],
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
     retry: false,
+  });
+
+  const groomersQuery = useQuery<any[]>({
+    queryKey: ["/api/admin/groomers"],
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
   // Create Pet Mutation
@@ -1666,6 +1678,101 @@ export default function Admin() {
     onSettled: () => {
       // Always refetch after error or success
       queryClient.invalidateQueries({ queryKey: ["/api/admin/grooming-settings"] });
+    },
+  });
+
+  // Groomer Mutations
+  const createGroomerMutation = useMutation({
+    mutationFn: async (groomerData: any) => {
+      await apiRequest("POST", "/api/admin/groomers", groomerData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Groomer Added",
+        description: "Groomer has been added successfully.",
+      });
+      setIsAddGroomerOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/groomers"] });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to add groomer.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateGroomerMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      await apiRequest("PUT", `/api/admin/groomers/${id}`, data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Groomer Updated",
+        description: "Groomer has been updated successfully.",
+      });
+      setEditingGroomer(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/groomers"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update groomer.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteGroomerMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/admin/groomers/${id}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Groomer Deleted",
+        description: "Groomer has been deleted successfully.",
+      });
+      setGroomerToDelete(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/groomers"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete groomer.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const toggleGroomerActiveMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
+      await apiRequest("PUT", `/api/admin/groomers/${id}`, { isActive });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Status Updated",
+        description: "Groomer status has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/groomers"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update groomer status.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -2387,6 +2494,112 @@ export default function Admin() {
                 <div className="text-center">
                   <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
                   <p className="text-sm text-gray-500 mt-2">Updating settings...</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="groomers">
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Groomers ({groomersQuery.data?.length || 0})
+                </CardTitle>
+                <Button 
+                  onClick={() => setIsAddGroomerOpen(true)}
+                  className="w-full sm:w-auto bg-brand-blue hover:bg-blue-600"
+                  data-testid="button-add-groomer"
+                >
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Add New Groomer
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {groomersQuery.isLoading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
+                  <p className="text-sm text-gray-500 mt-2">Loading groomers...</p>
+                </div>
+              ) : groomersQuery.data?.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                  <p>No groomers found</p>
+                  <p className="text-sm mt-1">Click "Add New Groomer" to create one</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {groomersQuery.data?.map((groomer: any) => (
+                    <Card key={groomer.id} className="border shadow-sm">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <CardTitle className="text-lg flex items-center gap-2">
+                              {groomer.name}
+                              <Badge variant={groomer.isActive ? "default" : "secondary"}>
+                                {groomer.isActive ? "Active" : "Inactive"}
+                              </Badge>
+                            </CardTitle>
+                            {groomer.specialties && (
+                              <p className="text-sm text-gray-600 mt-1">{groomer.specialties}</p>
+                            )}
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="space-y-2 text-sm">
+                          {groomer.email && (
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <Mail className="w-4 h-4" />
+                              <span>{groomer.email}</span>
+                            </div>
+                          )}
+                          {groomer.phone && (
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <Phone className="w-4 h-4" />
+                              <span>{groomer.phone}</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex gap-2 mt-4">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => setEditingGroomer(groomer)}
+                            data-testid={`button-edit-groomer-${groomer.id}`}
+                          >
+                            <Pencil className="w-3 h-3 mr-1" />
+                            Edit
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => toggleGroomerActiveMutation.mutate({ 
+                              id: groomer.id, 
+                              isActive: !groomer.isActive 
+                            })}
+                            disabled={toggleGroomerActiveMutation.isPending}
+                            data-testid={`button-toggle-groomer-${groomer.id}`}
+                          >
+                            {groomer.isActive ? <EyeOff className="w-3 h-3 mr-1" /> : <Eye className="w-3 h-3 mr-1" />}
+                            {groomer.isActive ? "Deactivate" : "Activate"}
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => setGroomerToDelete(groomer)}
+                            data-testid={`button-delete-groomer-${groomer.id}`}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               )}
             </CardContent>
