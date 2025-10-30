@@ -452,9 +452,24 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
           // All fields use starts-with matching for exact sequence from the beginning
           const nameMatch = name.startsWith(query);
           const emailMatch = email.startsWith(query);
-          const phoneMatch = searchDigits && phone.startsWith(searchDigits);
+          const phoneMatch = searchDigits.length > 0 && phone.startsWith(searchDigits);
           
-          return nameMatch || emailMatch || phoneMatch;
+          const matches = nameMatch || emailMatch || phoneMatch;
+          
+          // Debug logging
+          if (searchDigits === '318267') {
+            console.log('SEARCH DEBUG:', {
+              contactName: contact.displayName || contact.name,
+              phone,
+              searchDigits,
+              phoneMatch,
+              nameMatch,
+              emailMatch,
+              RESULT: matches
+            });
+          }
+          
+          return matches;
         })
         .sort((a, b) => {
           const nameA = (a.displayName || a.name || '').toLowerCase();
