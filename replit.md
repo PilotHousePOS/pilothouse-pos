@@ -116,6 +116,20 @@ The application is built as a full-stack web application with a clear separation
         - POST /api/admin/calendar/sync-contacts - Sync contacts from calendar events with phone number extraction
     - Error handling for cases when Google Calendar is not connected.
     - **Note:** Full Google Contacts integration via People API is not available due to OAuth scope limitations in the Replit Google Calendar connector. Manual contact database serves as workaround for phone number storage.
+- **Groomer Management System:**
+    - Dedicated "Groomers" tab in admin panel for managing grooming staff.
+    - Full CRUD operations: Add, edit, delete, and view groomers.
+    - Groomer form fields: name (required), email (optional), phone (optional), specialties (optional), active status (toggle).
+    - Active/Inactive toggle for each groomer to manage availability.
+    - Responsive groomer cards with proper button layout and wrapping to prevent text truncation.
+    - Delete confirmation dialog to prevent accidental deletions.
+    - Real-time updates with toast notifications for all operations (add, edit, delete, status change).
+    - Search functionality to filter groomers by name, email, or specialties.
+    - **API Endpoints:**
+        - GET /api/admin/groomers - Fetch all groomers (admin only)
+        - POST /api/admin/groomers - Create new groomer (admin only)
+        - PUT /api/admin/groomers/:id - Update groomer (admin only)
+        - DELETE /api/admin/groomers/:id - Delete groomer (admin only)
 - **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtering content by species.
 - **Admin Order Management:**
     - Order details display showing actual product/pet names instead of IDs.
