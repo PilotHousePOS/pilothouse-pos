@@ -402,12 +402,12 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
   ];
 
   const filteredContacts = searchQuery.trim() === '' 
-    ? allContacts.sort((a, b) => {
+    ? [...allContacts].sort((a, b) => {
         const nameA = (a.displayName || a.name || '').toLowerCase();
         const nameB = (b.displayName || b.name || '').toLowerCase();
         return nameA.localeCompare(nameB);
       })
-    : allContacts
+    : [...allContacts]
         .filter(contact => {
           const name = (contact.displayName || contact.name || '').toLowerCase();
           return name.startsWith(searchQuery.toLowerCase());
