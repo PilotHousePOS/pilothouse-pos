@@ -449,7 +449,7 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
           const phone = (contact.phoneNumber || '').replace(/\D/g, '');
           const searchDigits = searchQuery.replace(/\D/g, '');
           
-          const nameMatch = name.startsWith(query);
+          const nameMatch = name.includes(query);
           const emailMatch = email.includes(query);
           // Exact phone match: search digits must exactly match the phone number
           const phoneMatch = searchDigits && phone === searchDigits;
