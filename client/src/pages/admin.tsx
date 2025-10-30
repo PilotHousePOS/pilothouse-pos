@@ -932,27 +932,26 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
           </div>
         ) : (
           <>
-            <div className="relative">
-              {/* Previous button */}
-              {totalPages > 1 && currentPage > 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={goToPreviousPage}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md hover:bg-gray-100"
-                  data-testid="button-previous-page"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                </Button>
-              )}
-              
-              {/* Contact grid with swipe support */}
-              <div 
-                className="grid grid-cols-1 md:grid-cols-2 gap-3 px-10"
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
+            {/* Previous button */}
+            {totalPages > 1 && currentPage > 0 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={goToPreviousPage}
+                className="fixed left-4 top-1/2 -translate-y-1/2 z-50 bg-white shadow-lg hover:bg-gray-100 rounded-full"
+                data-testid="button-previous-page"
               >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            )}
+            
+            {/* Contact grid with swipe support */}
+            <div 
+              className="grid grid-cols-1 md:grid-cols-2 gap-3"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
                 {paginatedContacts.map((contact: any, index: number) => {
               const isSelected = selectedContacts.find(c => (c.email === contact.email && c.email) || c.resourceName === contact.resourceName || c.id === contact.id);
               return (
@@ -1051,15 +1050,14 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
           {totalPages > 1 && currentPage < totalPages - 1 && (
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={goToNextPage}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md hover:bg-gray-100"
+              className="fixed right-4 top-1/2 -translate-y-1/2 z-50 bg-white shadow-lg hover:bg-gray-100 rounded-full"
               data-testid="button-next-page"
             >
-              <ArrowLeft className="w-4 h-4 rotate-180" />
+              <ArrowLeft className="w-5 h-5 rotate-180" />
             </Button>
           )}
-        </div>
         
         {/* Page indicators */}
         {totalPages > 1 && (
