@@ -443,8 +443,15 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
       })
     : [...allContacts]
         .filter(contact => {
+          const query = searchQuery.toLowerCase();
           const name = (contact.displayName || contact.name || '').toLowerCase();
-          return name.startsWith(searchQuery.toLowerCase());
+          const email = (contact.email || '').toLowerCase();
+          const phone = (contact.phoneNumber || '').replace(/\D/g, '');
+          const searchDigits = searchQuery.replace(/\D/g, '');
+          
+          return name.startsWith(query) || 
+                 email.includes(query) || 
+                 (searchDigits && phone.includes(searchDigits));
         })
         .sort((a, b) => {
           const nameA = (a.displayName || a.name || '').toLowerCase();
@@ -940,7 +947,7 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
-              placeholder="Search contacts by name or email..."
+              placeholder="Search contacts by name, email, or phone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
