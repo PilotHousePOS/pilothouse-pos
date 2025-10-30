@@ -451,8 +451,8 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
           
           const nameMatch = name.includes(query);
           const emailMatch = email.includes(query);
-          // Exact phone match: search digits must exactly match the phone number
-          const phoneMatch = searchDigits && phone === searchDigits;
+          // Phone starts-with match: search digits must match from the beginning
+          const phoneMatch = searchDigits && phone.startsWith(searchDigits);
           
           return nameMatch || emailMatch || phoneMatch;
         })

@@ -85,7 +85,7 @@ The application is built as a full-stack web application with a clear separation
         - Real-time search filtering by name, email, or phone number:
             - Name: contains matching (case-insensitive) - finds "oreo" in "Cookie Oreo" or "Oreo Smith"
             - Email: contains matching (case-insensitive)
-            - Phone: exact match only - must type complete phone number digits (e.g., "3182675975")
+            - Phone: starts-with matching on digits - "318267" finds "3182675975", "3182671234", etc.
             - Results alphabetically sorted by name
         - Contact cards show all available information with proper formatting
         - **Pagination System:**
