@@ -309,9 +309,11 @@ export async function syncContactsFromCalendarEvents() {
       } else if (phoneNumbers.length > 0) {
         // No attendees but has phone numbers - use summary as name
         for (const phoneNumber of phoneNumbers) {
+          // Create unique temp email using timestamp + random string
+          const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
           extractedContacts.push({
             name: `${summary} ${phoneNumber}`,
-            email: `calendar-${Date.now()}@temp.com`,
+            email: `calendar-${uniqueId}@temp.com`,
             phoneNumber,
             notes: `Auto-synced from calendar event: ${summary}`,
             source: 'google_calendar',

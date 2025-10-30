@@ -796,7 +796,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async linkContactToUser(contactId: number, userId: string): Promise<void> {
-    await db.update(contacts).set({ linkedUserId: userId }).where(eq(contacts.id, contactId));
+    // Get the user's email to replace temp email if needed
+    const user = await this.getUser(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Get the contact to check if it has a temp email
+    const [contact] = await db.select().from(contacts).where(eq(contacts.id, contactId));
+    if (!contact) {
+      throw new Error('Contact not found');
+    }
+
+    // If contact has a temp email (calendar-*@temp.com), replace with user's real email
+    const updateData: any = { linkedUserId: userId };
+    if (contact.email && contact.email.includes('@temp.com')) {
+      updateData.email = user.email;
+    }
+
+    await db.update(contacts).set(updateData).where(eq(contacts.id, contactId));
   }
 
   async findUnlinkedContactsByPhoneNumber(phoneNumber: string): Promise<Contact[]> {
