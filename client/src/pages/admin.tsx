@@ -449,27 +449,11 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
           const phone = (contact.phoneNumber || '').replace(/\D/g, '');
           const searchDigits = searchQuery.replace(/\D/g, '');
           
-          // All fields use starts-with matching for exact sequence from the beginning
           const nameMatch = name.startsWith(query);
           const emailMatch = email.startsWith(query);
           const phoneMatch = searchDigits.length > 0 && phone.startsWith(searchDigits);
           
-          const matches = nameMatch || emailMatch || phoneMatch;
-          
-          // Debug logging
-          if (searchDigits === '318267') {
-            console.log('SEARCH DEBUG:', {
-              contactName: contact.displayName || contact.name,
-              phone,
-              searchDigits,
-              phoneMatch,
-              nameMatch,
-              emailMatch,
-              RESULT: matches
-            });
-          }
-          
-          return matches;
+          return nameMatch || emailMatch || phoneMatch;
         })
         .sort((a, b) => {
           const nameA = (a.displayName || a.name || '').toLowerCase();
