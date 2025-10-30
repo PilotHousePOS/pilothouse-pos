@@ -497,6 +497,17 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
   const startIndex = currentPage * CONTACTS_PER_PAGE;
   const endIndex = startIndex + CONTACTS_PER_PAGE;
   const paginatedContacts = filteredContacts.slice(startIndex, endIndex);
+  
+  // Debug pagination
+  if (searchQuery === '318267') {
+    console.log('=== PAGINATION DEBUG ===');
+    console.log('Current page:', currentPage);
+    console.log('Total pages:', totalPages);
+    console.log('Start index:', startIndex);
+    console.log('End index:', endIndex);
+    console.log('Paginated contacts:', paginatedContacts.length);
+    console.log('Paginated contact names:', paginatedContacts.map((c: any) => c.displayName || c.name));
+  }
 
   // Swipe handlers
   const handleTouchStart = (e: React.TouchEvent) => {
