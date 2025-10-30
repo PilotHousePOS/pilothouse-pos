@@ -83,8 +83,8 @@ The application is built as a full-stack web application with a clear separation
         - Edit Contact dialog pre-fills data for updating manual contacts
         - Delete Contact with confirmation dialog for removing manual contacts
         - Real-time search filtering by name, email, or phone number:
-            - Name: contains matching (case-insensitive) - finds "oreo" in "Cookie Oreo" or "Oreo Smith"
-            - Email: contains matching (case-insensitive)
+            - Name: starts-with matching (case-insensitive) - "oreo" finds "Oreo Smith" but not "Cookie Oreo"
+            - Email: starts-with matching (case-insensitive) - "calendar" finds "calendar@temp.com"
             - Phone: starts-with matching on digits - "318267" finds "3182675975", "3182671234", etc.
             - Results alphabetically sorted by name
         - Contact cards show all available information with proper formatting

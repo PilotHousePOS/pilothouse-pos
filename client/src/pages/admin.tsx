@@ -449,9 +449,9 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
           const phone = (contact.phoneNumber || '').replace(/\D/g, '');
           const searchDigits = searchQuery.replace(/\D/g, '');
           
-          const nameMatch = name.includes(query);
-          const emailMatch = email.includes(query);
-          // Phone starts-with match: search digits must match from the beginning
+          // All fields use starts-with matching for exact sequence from the beginning
+          const nameMatch = name.startsWith(query);
+          const emailMatch = email.startsWith(query);
           const phoneMatch = searchDigits && phone.startsWith(searchDigits);
           
           return nameMatch || emailMatch || phoneMatch;
