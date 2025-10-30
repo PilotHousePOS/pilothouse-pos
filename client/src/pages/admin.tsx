@@ -401,12 +401,22 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
     })),
   ];
 
-  const filteredContacts = allContacts.filter(contact => 
-    contact.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contact.phoneNumber?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredContacts = searchQuery.trim() === '' 
+    ? allContacts.sort((a, b) => {
+        const nameA = (a.displayName || a.name || '').toLowerCase();
+        const nameB = (b.displayName || b.name || '').toLowerCase();
+        return nameA.localeCompare(nameB);
+      })
+    : allContacts
+        .filter(contact => {
+          const name = (contact.displayName || contact.name || '').toLowerCase();
+          return name.startsWith(searchQuery.toLowerCase());
+        })
+        .sort((a, b) => {
+          const nameA = (a.displayName || a.name || '').toLowerCase();
+          const nameB = (b.displayName || b.name || '').toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
 
   const toggleContactSelection = (contact: any) => {
     const contactId = contact.resourceName || contact.email || contact.id;
