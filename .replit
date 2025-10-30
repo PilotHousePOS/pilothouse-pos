@@ -35,10 +35,6 @@ localPort = 39375
 externalPort = 3001
 
 [[ports]]
-localPort = 39479
-externalPort = 6800
-
-[[ports]]
 localPort = 39913
 externalPort = 6000
 
@@ -73,3 +69,9 @@ waitForPort = 5000
 
 [agent]
 integrations = ["javascript_log_in_with_replit:1.0.0", "sendgrid:1.0.0", "google-calendar:1.0.0"]
+
+[userenv]
+
+[userenv.shared]
+TESTING_VITE_STRIPE_PUBLIC_KEY = "jumproof123"
+TESTING_STRIPE_SECRET_KEY = "jumproof123"
