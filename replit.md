@@ -82,8 +82,19 @@ The application is built as a full-stack web application with a clear separation
         - Add Contact button opens dialog for creating new contacts with phone number field
         - Edit Contact dialog pre-fills data for updating manual contacts
         - Delete Contact with confirmation dialog for removing manual contacts
-        - Real-time search filtering by name, email, or phone number
+        - Real-time search filtering by name, email, or phone number (name starts-with matching, alphabetically sorted)
         - Contact cards show all available information with proper formatting
+        - **Pagination System:**
+            - 4 contacts per page in 2x2 grid (desktop) or vertical stack (mobile)
+            - Fixed circular navigation arrows positioned at screen edges (left-4/right-4)
+            - Swipe gesture support for mobile (50px minimum swipe distance)
+            - Page indicators with dots and "Page X of Y" counter
+            - Auto-reset to page 1 when searching
+        - **Smart Phone Number Display:**
+            - Responsive formatting: inline (555) 123-4567 on larger screens (sm breakpoint and up)
+            - Vertical stacking on mobile: (555) on top, 123 in middle, 4567 on bottom
+            - Automatic digit extraction handles various input formats
+            - Fallback display for non-standard phone numbers
     - **Event Creation Integration:**
         - Create calendar events directly from contacts interface with multi-contact selection
         - Searchable dropdown combines both manual and Google Calendar contacts

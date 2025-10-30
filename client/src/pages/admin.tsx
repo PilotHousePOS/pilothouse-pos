@@ -42,6 +42,35 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import AdminNotifications from "@/components/admin-notifications";
 import { safeGoBack } from "@/lib/navigation";
 
+// Phone Number Display Component
+function PhoneNumberDisplay({ phoneNumber }: { phoneNumber: string }) {
+  const digits = phoneNumber.replace(/\D/g, '');
+  
+  if (digits.length === 10) {
+    const areaCode = digits.slice(0, 3);
+    const middle = digits.slice(3, 6);
+    const last = digits.slice(6, 10);
+    
+    return (
+      <>
+        {/* Inline display for larger screens */}
+        <span className="hidden sm:inline">
+          ({areaCode}) {middle}-{last}
+        </span>
+        {/* Stacked display for smaller screens */}
+        <span className="sm:hidden flex flex-col text-xs leading-tight">
+          <span>({areaCode})</span>
+          <span>{middle}</span>
+          <span>{last}</span>
+        </span>
+      </>
+    );
+  }
+  
+  // Fallback for non-standard phone numbers
+  return <span className="break-all">{phoneNumber}</span>;
+}
+
 // Calendar component for confirmed appointments and Google Calendar events
 function AppointmentCalendar({ appointments }: { appointments: any[] }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -977,7 +1006,7 @@ function ContactsManager({ calendarContacts, calendarContactsError }: { calendar
                       {contact.phoneNumber && (
                         <div className="flex items-start gap-1 text-xs text-gray-600 mb-1">
                           <span className="font-medium flex-shrink-0">📱</span>
-                          <span className="break-all">{contact.phoneNumber}</span>
+                          <PhoneNumberDisplay phoneNumber={contact.phoneNumber} />
                         </div>
                       )}
                       {contact.notes && (
