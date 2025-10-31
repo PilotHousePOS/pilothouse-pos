@@ -28,9 +28,19 @@ The application is a full-stack web application with a clear separation of conce
 
 **Technical Implementations & Feature Specifications:**
 - **Pet & Supply Management:** Multi-image support with Amazon-style enlargement and mobile swipe gestures.
-- **Appointment System:** 15-minute intervals, admin approval workflow, automated email notifications, "My Appointments" page. Includes Google Calendar appointment sync, destructively importing events and intelligently parsing details.
+- **Appointment System:** 
+    - 15-minute intervals with admin approval workflow and automated email notifications
+    - "My Appointments" page for customers
+    - Google Calendar appointment sync with destructive imports and intelligent parsing
+    - **Collapsible UI**: Pending appointments visible by default; Approved and Denied appointments behind expandable buttons
+    - Role-based access: Groomers see only approved appointments (read-only), admins see all
 - **Order & Notification System:** Admin email/push notifications for new orders/appointments. Customer email/SMS/web push for order status. Order History page with detailed modals.
-- **Authentication & Authorization:** JWT tokens in secure cookies, comprehensive password reset, user settings, admin user management with `isAdmin` field.
+- **Authentication & Authorization:** 
+    - JWT tokens in secure cookies with comprehensive password reset
+    - User settings and admin user management
+    - Three-tier role system: Customer (default), Groomer (`isGroomer`), Admin (`isAdmin`)
+    - Groomer role: Read-only access to approved appointments (confirmed/completed status)
+    - Admin role: Full access to all appointments and user management
 - **Wishlist System:** Dedicated page for saving items, add/remove functionality, and quick "Add to Cart."
 - **Google Calendar & Contact Management:**
     - Connected Google Calendar via Replit integration for workspace-level event and contact management.

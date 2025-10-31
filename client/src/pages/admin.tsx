@@ -1403,6 +1403,8 @@ export default function Admin() {
   const [editingGroomer, setEditingGroomer] = useState<any>(null);
   const [groomerToDelete, setGroomerToDelete] = useState<any>(null);
   const [isSyncAppointmentsConfirmOpen, setIsSyncAppointmentsConfirmOpen] = useState(false);
+  const [showApprovedAppointments, setShowApprovedAppointments] = useState(false);
+  const [showDeniedAppointments, setShowDeniedAppointments] = useState(false);
   
   // Pagination state for appointments
   const [appointmentsPage, setAppointmentsPage] = useState(0);
@@ -2368,18 +2370,18 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          {/* Approved Appointments Section */}
-          <Card className="border-2 border-green-200 bg-green-50/30">
+          {/* Pending Appointments Section - Always Visible */}
+          <Card className="border-2 border-yellow-200 bg-yellow-50/30">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-green-700">
+              <CardTitle className="flex items-center gap-2 text-yellow-700">
                 <Calendar className="w-5 h-5" />
-                Approved Appointments ({(appointments as any[]).filter((a: any) => a.status === 'confirmed' || a.status === 'completed').length})
+                Pending Appointments ({(appointments as any[]).filter((a: any) => a.status === 'scheduled').length})
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {(appointments as any[])
-                  .filter((a: any) => a.status === 'confirmed' || a.status === 'completed')
+                  .filter((a: any) => a.status === 'scheduled')
                   .map((appointment: any) => (
                     <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
                       <div 
@@ -2426,63 +2428,143 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          {/* Denied Appointments Section - Only visible to admins */}
+          {/* Approved Appointments - Collapsible Button */}
+          <div className="space-y-2">
+            <Button
+              variant="outline"
+              className="w-full justify-between border-2 border-green-200 bg-green-50 hover:bg-green-100 text-green-700"
+              onClick={() => setShowApprovedAppointments(!showApprovedAppointments)}
+              data-testid="button-toggle-approved"
+            >
+              <span className="flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                Approved Appointments ({(appointments as any[]).filter((a: any) => a.status === 'confirmed' || a.status === 'completed').length})
+              </span>
+              {showApprovedAppointments ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+            </Button>
+
+            {showApprovedAppointments && (
+              <Card className="border-2 border-green-200 bg-green-50/30">
+                <CardContent className="pt-4">
+                  <div className="space-y-4">
+                    {(appointments as any[])
+                      .filter((a: any) => a.status === 'confirmed' || a.status === 'completed')
+                      .map((appointment: any) => (
+                        <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
+                          <div 
+                            className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                            onClick={() => setSelectedAppointment(appointment)}
+                          >
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
+                              {appointment.source === 'google_calendar' && (
+                                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
+                                  <Calendar className="w-3 h-3 mr-1" />
+                                  Synced
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
+                            <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
+                            <p className="text-sm text-gray-600">Phone: {appointment.ownerPhoneNumber}</p>
+                            <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
+                            <p className="text-xs text-blue-600 mt-1">Click to view details</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Select
+                              key={`appointment-${appointment.id}-${appointment.status}`}
+                              value={appointment.status}
+                              onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
+                              disabled={!!typedUser?.isGroomer && !typedUser?.isAdmin}
+                            >
+                              <SelectTrigger className="w-32">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="scheduled">Pending</SelectItem>
+                                <SelectItem value="confirmed">Confirmed</SelectItem>
+                                <SelectItem value="rejected">Rejected</SelectItem>
+                                <SelectItem value="completed">Completed</SelectItem>
+                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Denied Appointments - Collapsible Button (Only visible to admins) */}
           {typedUser?.isAdmin && (
-            <Card className="border-2 border-red-200 bg-red-50/30">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-red-700">
+            <div className="space-y-2">
+              <Button
+                variant="outline"
+                className="w-full justify-between border-2 border-red-200 bg-red-50 hover:bg-red-100 text-red-700"
+                onClick={() => setShowDeniedAppointments(!showDeniedAppointments)}
+                data-testid="button-toggle-denied"
+              >
+                <span className="flex items-center gap-2">
                   <Calendar className="w-5 h-5" />
                   Denied Appointments ({(appointments as any[]).filter((a: any) => a.status === 'rejected' || a.status === 'cancelled').length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {(appointments as any[])
-                    .filter((a: any) => a.status === 'rejected' || a.status === 'cancelled')
-                    .map((appointment: any) => (
-                      <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
-                        <div 
-                          className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
-                          onClick={() => setSelectedAppointment(appointment)}
-                        >
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
-                            {appointment.source === 'google_calendar' && (
-                              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
-                                <Calendar className="w-3 h-3 mr-1" />
-                                Synced
-                              </Badge>
-                            )}
+                </span>
+                {showDeniedAppointments ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+              </Button>
+
+              {showDeniedAppointments && (
+                <Card className="border-2 border-red-200 bg-red-50/30">
+                  <CardContent className="pt-4">
+                    <div className="space-y-4">
+                      {(appointments as any[])
+                        .filter((a: any) => a.status === 'rejected' || a.status === 'cancelled')
+                        .map((appointment: any) => (
+                          <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
+                            <div 
+                              className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                              onClick={() => setSelectedAppointment(appointment)}
+                            >
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
+                                {appointment.source === 'google_calendar' && (
+                                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
+                                    <Calendar className="w-3 h-3 mr-1" />
+                                    Synced
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
+                              <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
+                              <p className="text-sm text-gray-600">Phone: {appointment.ownerPhoneNumber}</p>
+                              <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
+                              <p className="text-xs text-blue-600 mt-1">Click to view details</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Select
+                                key={`appointment-${appointment.id}-${appointment.status}`}
+                                value={appointment.status}
+                                onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
+                              >
+                                <SelectTrigger className="w-32">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="scheduled">Pending</SelectItem>
+                                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                                  <SelectItem value="rejected">Rejected</SelectItem>
+                                  <SelectItem value="completed">Completed</SelectItem>
+                                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
-                          <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
-                          <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
-                          <p className="text-sm text-gray-600">Phone: {appointment.ownerPhoneNumber}</p>
-                          <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
-                          <p className="text-xs text-blue-600 mt-1">Click to view details</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Select
-                            key={`appointment-${appointment.id}-${appointment.status}`}
-                            value={appointment.status}
-                            onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
-                          >
-                            <SelectTrigger className="w-32">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="scheduled">Pending</SelectItem>
-                              <SelectItem value="confirmed">Confirmed</SelectItem>
-                              <SelectItem value="rejected">Rejected</SelectItem>
-                              <SelectItem value="completed">Completed</SelectItem>
-                              <SelectItem value="cancelled">Cancelled</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </CardContent>
-            </Card>
+                        ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           )}
 
           {/* Google Calendar Events Section */}
