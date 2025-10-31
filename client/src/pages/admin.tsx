@@ -1516,33 +1516,54 @@ export default function Admin() {
     let lastName = '';
     let petName = '';
     
-    // Check if this is a Google Calendar contact with event summary
-    if (contact.source === 'google_calendar' && contact.eventSummary) {
-      // Format: LastName PetName PhoneNumber Groomer
-      // Contact name is now just the last name
-      lastName = contact.name || '';
+    // Check if this is a Google Calendar contact
+    if (contact.source === 'google_calendar') {
+      // Parse the contact name which may contain: LastName PetName PhoneNumber Groomer
+      // The name field might have the full summary or just the last name (depending on when it was synced)
+      const nameWords = (contact.name || '').trim().split(/\s+/);
       
-      // Parse event summary to extract pet name
-      const summaryWords = contact.eventSummary.trim().split(/\s+/);
-      
-      if (summaryWords.length > 1) {
-        // Find phone number position
-        let phoneIndex = -1;
-        for (let i = 0; i < summaryWords.length; i++) {
-          // Check if word looks like a phone number (10+ digits)
-          if (/[\d\(\)\-]+/.test(summaryWords[i]) && summaryWords[i].replace(/[\(\)\-\s]/g, '').length >= 10) {
-            phoneIndex = i;
-            break;
-          }
+      // Find phone number position in the name
+      let phoneIndex = -1;
+      for (let i = 0; i < nameWords.length; i++) {
+        // Check if word looks like a phone number (10+ digits)
+        const cleanedWord = nameWords[i].replace(/[\(\)\-\s]/g, '');
+        if (/^\d+$/.test(cleanedWord) && cleanedWord.length >= 10) {
+          phoneIndex = i;
+          break;
         }
+      }
+      
+      if (phoneIndex > 0) {
+        // Old format: name contains full summary "Diaz Oreo 3183344619"
+        // Extract: LastName = first word, PetName = words between first and phone
+        lastName = nameWords[0];
         
-        // Pet name is between last name (index 0) and phone number
         if (phoneIndex > 1) {
-          const petNameWords = summaryWords.slice(1, phoneIndex);
+          // Pet name is between last name and phone number
+          const petNameWords = nameWords.slice(1, phoneIndex);
           petName = petNameWords.join(' ');
-        } else if (summaryWords.length > 1) {
-          // Fallback: just take second word
-          petName = summaryWords[1];
+        }
+      } else {
+        // New format: name is just the last name
+        lastName = contact.name || '';
+        
+        // Try to get pet name from event summary if available
+        if (contact.eventSummary) {
+          const summaryWords = contact.eventSummary.trim().split(/\s+/);
+          let summaryPhoneIndex = -1;
+          
+          for (let i = 0; i < summaryWords.length; i++) {
+            const cleanedWord = summaryWords[i].replace(/[\(\)\-\s]/g, '');
+            if (/^\d+$/.test(cleanedWord) && cleanedWord.length >= 10) {
+              summaryPhoneIndex = i;
+              break;
+            }
+          }
+          
+          if (summaryPhoneIndex > 1) {
+            const petNameWords = summaryWords.slice(1, summaryPhoneIndex);
+            petName = petNameWords.join(' ');
+          }
         }
       }
     } else {
