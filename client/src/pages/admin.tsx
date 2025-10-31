@@ -1739,13 +1739,13 @@ export default function Admin() {
     mutationFn: async (id: number) => {
       await apiRequest("DELETE", `/api/admin/groomers/${id}`);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast({
         title: "Groomer Deleted",
         description: "Groomer has been deleted successfully.",
       });
       setGroomerToDelete(null);
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/groomers"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/admin/groomers"] });
     },
     onError: () => {
       toast({
