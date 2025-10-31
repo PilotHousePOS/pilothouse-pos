@@ -330,22 +330,42 @@ export async function syncAppointmentsFromCalendarEvents() {
         }
       }
 
-      // Extract pet name from summary - second word onwards (excluding phone numbers)
+      // Extract pet name and groomer tag from summary
+      // Format: LastName PetName PhoneNumber GroomerTag
       let petName = 'Pet';
       let petType = 'Dog';
+      let groomerTag = null;
       
       if (summaryWords.length > 1) {
-        // Get all words after the first (owner last name)
-        const potentialPetWords = summaryWords.slice(1);
+        // Find the position of the phone number in the words
+        let phoneIndex = -1;
+        for (let i = 0; i < summaryWords.length; i++) {
+          // Check if this word looks like a phone number
+          if (/[\d\(\)\-]+/.test(summaryWords[i]) && summaryWords[i].replace(/[\(\)\-\s]/g, '').length >= 10) {
+            phoneIndex = i;
+            break;
+          }
+        }
         
-        // Filter out phone numbers and collect pet name words
-        const petNameWords = potentialPetWords.filter(word => {
-          // Remove phone number patterns (digits with optional dashes, parens, spaces)
-          return !/^[\d\(\)\-\s]+$/.test(word);
-        });
-        
-        if (petNameWords.length > 0) {
+        if (phoneIndex > 1) {
+          // Pet name is from word 2 to the phone number (excluding owner last name and phone)
+          const petNameWords = summaryWords.slice(1, phoneIndex);
           petName = petNameWords.join(' ');
+          
+          // Groomer tag is everything after the phone number
+          if (phoneIndex < summaryWords.length - 1) {
+            const groomerWords = summaryWords.slice(phoneIndex + 1);
+            groomerTag = groomerWords.join(' ');
+          }
+        } else {
+          // If no phone found in expected position, use all words after first (old behavior)
+          const potentialPetWords = summaryWords.slice(1);
+          const petNameWords = potentialPetWords.filter(word => {
+            return !/^[\d\(\)\-\s]+$/.test(word);
+          });
+          if (petNameWords.length > 0) {
+            petName = petNameWords.join(' ');
+          }
         }
       }
 
@@ -367,6 +387,7 @@ export async function syncAppointmentsFromCalendarEvents() {
         ownerFirstName,
         ownerLastName,
         ownerPhoneNumber: phoneNumber,
+        groomerTag,
         status: 'scheduled',
         isApproved: false, // Require admin approval for calendar synced appointments
         price: serviceType === 'Bath Only' ? '45.00' : '75.00', // Default pricing

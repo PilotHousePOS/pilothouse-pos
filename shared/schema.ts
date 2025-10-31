@@ -135,6 +135,7 @@ export const appointments = pgTable("appointments", {
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   source: varchar("source", { length: 50 }).default("manual"), // manual or google_calendar
   googleEventId: varchar("google_event_id", { length: 255 }), // Google Calendar event ID
+  groomerTag: varchar("groomer_tag", { length: 100 }), // Groomer name/tag from calendar event
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

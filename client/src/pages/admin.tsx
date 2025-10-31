@@ -2335,6 +2335,11 @@ export default function Admin() {
                               Google Calendar
                             </Badge>
                           )}
+                          {appointment.groomerTag && (
+                            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300">
+                              Groomer: {appointment.groomerTag}
+                            </Badge>
+                          )}
                         </div>
                         <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
                         <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
