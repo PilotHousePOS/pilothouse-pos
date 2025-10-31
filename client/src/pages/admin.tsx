@@ -312,6 +312,7 @@ function ContactsManager() {
     breed: '',
   });
   const [currentPage, setCurrentPage] = useState(0);
+  const [expandedContactId, setExpandedContactId] = useState<string | number | null>(null);
 
   // Dog breeds list for the breed selector
   const dogBreeds = [
@@ -1144,83 +1145,52 @@ function ContactsManager() {
             >
                 {paginatedContacts.map((contact: any, index: number) => {
               const isSelected = selectedContacts.find(c => (c.email === contact.email && c.email) || c.resourceName === contact.resourceName || c.id === contact.id);
+              const isExpanded = expandedContactId === (contact.id || contact.resourceName || contact.email);
+              
               return (
                 <div 
                   key={contact.resourceName || contact.email || contact.id || index} 
-                  className={`border rounded-lg p-4 transition-all ${
-                    contact.isDatabaseContact ? '' : 'cursor-pointer hover:bg-gray-50'
-                  } ${isSelected ? 'bg-blue-50 border-blue-500' : ''}`}
-                  onClick={() => !contact.isDatabaseContact && toggleContactSelection(contact)}
+                  className={`border rounded-lg p-4 transition-all cursor-pointer hover:bg-gray-50 ${
+                    isSelected ? 'bg-blue-50 border-blue-500' : ''
+                  } ${isExpanded ? 'ring-2 ring-blue-400' : ''}`}
+                  onClick={() => {
+                    if (contact.isDatabaseContact) {
+                      // Toggle expand/collapse for database contacts
+                      setExpandedContactId(isExpanded ? null : (contact.id || contact.resourceName || contact.email));
+                    } else {
+                      // For Google Calendar contacts, select them
+                      toggleContactSelection(contact);
+                    }
+                  }}
                   data-testid={`contact-card-${index}`}
                 >
-                  <div className="flex flex-col gap-3">
-                    {/* Top section with badges */}
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="font-semibold text-base truncate flex-1" title={contact.displayName || contact.name}>
-                        {contact.displayName || contact.name}
-                      </p>
-                      <div className="flex flex-col gap-1 flex-shrink-0">
-                        {contact.isDatabaseContact ? (
-                          <Badge variant="outline" className={`text-xs whitespace-nowrap ${
-                            contact.isManual 
-                              ? 'bg-green-50 border-green-300 text-green-700'
-                              : 'bg-purple-50 border-purple-300 text-purple-700'
-                          }`}>
-                            {contact.isManual ? 'Manual' : 'Calendar'}
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-xs bg-purple-50 border-purple-300 text-purple-700 whitespace-nowrap">
-                            Google
-                          </Badge>
-                        )}
-                        {contact.linkedUserId && (
-                          <Badge variant="outline" className="text-xs bg-blue-50 border-blue-300 text-blue-700 whitespace-nowrap">
-                            👤 Linked
-                          </Badge>
-                        )}
-                        {contact.isOrganizer && (
-                          <Badge variant="secondary" className="text-xs whitespace-nowrap">
-                            Organizer
-                          </Badge>
-                        )}
-                        {isSelected && (
-                          <Badge variant="default" className="bg-blue-600 text-xs whitespace-nowrap">
-                            Selected
-                          </Badge>
-                        )}
+                  <div className="flex flex-col gap-2">
+                    {/* Name */}
+                    <p className="font-semibold text-base truncate" title={contact.displayName || contact.name}>
+                      {contact.displayName || contact.name}
+                    </p>
+                    
+                    {/* Phone Number */}
+                    {contact.phoneNumber && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className="text-base">📱</span>
+                        <PhoneNumberDisplay phoneNumber={contact.phoneNumber} />
                       </div>
-                    </div>
+                    )}
                     
-                    {/* Contact details */}
-                    <div className="space-y-2">
-                      {contact.email && (
-                        <div className="flex items-start gap-2 text-sm text-gray-600">
-                          <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                          <span className="truncate" title={contact.email}>{contact.email}</span>
-                        </div>
-                      )}
-                      {contact.phoneNumber && (
-                        <div className="flex items-start gap-2 text-sm text-gray-600">
-                          <span className="text-base flex-shrink-0">📱</span>
-                          <PhoneNumberDisplay phoneNumber={contact.phoneNumber} />
-                        </div>
-                      )}
-                      {contact.animalType && (
-                        <div className="flex items-start gap-2 text-sm text-gray-600">
-                          <span className="text-base flex-shrink-0">🐾</span>
-                          <span className="capitalize truncate" title={`${contact.animalType.replace('_', ' ')}${contact.breed && contact.animalType === 'dog' ? ` - ${contact.breed}` : ''}`}>
-                            {contact.animalType.replace('_', ' ')}{contact.breed && contact.animalType === 'dog' ? ` - ${contact.breed}` : ''}
-                          </span>
-                        </div>
-                      )}
-                      {contact.notes && (
-                        <p className="text-sm text-gray-500 line-clamp-2" title={contact.notes}>{contact.notes}</p>
-                      )}
-                    </div>
+                    {/* Animal Type/Breed */}
+                    {contact.animalType && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className="text-base">🐾</span>
+                        <span className="capitalize truncate" title={`${contact.animalType.replace('_', ' ')}${contact.breed && contact.animalType === 'dog' ? ` - ${contact.breed}` : ''}`}>
+                          {contact.animalType.replace('_', ' ')}{contact.breed && contact.animalType === 'dog' ? ` - ${contact.breed}` : ''}
+                        </span>
+                      </div>
+                    )}
                     
-                    {/* Action buttons */}
-                    {contact.isDatabaseContact && (
-                      <div className="flex gap-2 pt-2 border-t border-gray-200">
+                    {/* Edit/Delete buttons - only visible when expanded */}
+                    {contact.isDatabaseContact && isExpanded && (
+                      <div className="flex gap-2 pt-2 mt-1 border-t border-gray-200">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -1247,6 +1217,13 @@ function ContactsManager() {
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
+                    )}
+                    
+                    {/* Selection indicator for Google Calendar contacts */}
+                    {!contact.isDatabaseContact && isSelected && (
+                      <Badge variant="default" className="bg-blue-600 text-xs self-start mt-1">
+                        Selected
+                      </Badge>
                     )}
                   </div>
                 </div>
