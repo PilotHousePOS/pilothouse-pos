@@ -1425,6 +1425,7 @@ export default function Admin() {
     lastName: '',
     phoneNumber: '',
   });
+  const [bookingPrice, setBookingPrice] = useState('');
   
   // Pagination state for appointments
   const [appointmentsPage, setAppointmentsPage] = useState(0);
@@ -1966,6 +1967,7 @@ export default function Admin() {
       setBookingSelectedTime('');
       setBookingPetInfo({ name: '', type: '', notes: '' });
       setBookingOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
+      setBookingPrice('');
       // Refresh appointments
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
     },
@@ -1981,18 +1983,18 @@ export default function Admin() {
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!bookingSelectedService || !bookingSelectedDate || !bookingSelectedTime) {
+    if (!bookingSelectedService || !bookingSelectedDate || !bookingSelectedTime || !bookingPrice) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields.",
+        description: "Please fill in all required fields including price.",
         variant: "destructive",
       });
       return;
     }
 
     const SERVICES = [
-      { id: 'grooming-full', name: 'Full Grooming', price: 35 },
-      { id: 'grooming-bath', name: 'Bath Only', price: 20 },
+      { id: 'grooming-full', name: 'Full Grooming' },
+      { id: 'grooming-bath', name: 'Bath Only' },
     ];
 
     const serviceData = SERVICES.find(s => s.id === bookingSelectedService);
@@ -2009,7 +2011,7 @@ export default function Admin() {
       ownerFirstName: bookingOwnerInfo.firstName,
       ownerLastName: bookingOwnerInfo.lastName,
       ownerPhoneNumber: bookingOwnerInfo.phoneNumber,
-      price: serviceData.price.toString(),
+      price: bookingPrice,
     };
 
     createAppointmentMutation.mutate(appointmentData);
@@ -3843,19 +3845,50 @@ export default function Admin() {
             {/* Service Selection */}
             <div>
               <Label>Select Service *</Label>
-              <RadioGroup value={bookingSelectedService} onValueChange={setBookingSelectedService}>
+              <RadioGroup 
+                value={bookingSelectedService} 
+                onValueChange={(value) => {
+                  setBookingSelectedService(value);
+                  // Set default price based on service
+                  if (value === 'grooming-full') {
+                    setBookingPrice('35');
+                  } else if (value === 'grooming-bath') {
+                    setBookingPrice('20');
+                  }
+                }}
+              >
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="grooming-full" id="booking-full" />
-                    <Label htmlFor="booking-full" className="cursor-pointer">Full Grooming - $35</Label>
+                    <Label htmlFor="booking-full" className="cursor-pointer">Full Grooming</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="grooming-bath" id="booking-bath" />
-                    <Label htmlFor="booking-bath" className="cursor-pointer">Bath Only - $20</Label>
+                    <Label htmlFor="booking-bath" className="cursor-pointer">Bath Only</Label>
                   </div>
                 </div>
               </RadioGroup>
             </div>
+
+            {/* Price Selection */}
+            {bookingSelectedService && (
+              <div>
+                <Label>Price (USD) *</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={bookingPrice}
+                  onChange={(e) => setBookingPrice(e.target.value)}
+                  placeholder="Enter price"
+                  required
+                  data-testid="input-booking-price"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {bookingSelectedService === 'grooming-full' ? 'Suggested: $35' : 'Suggested: $20'}
+                </p>
+              </div>
+            )}
 
             {/* Date Selection */}
             <div>
