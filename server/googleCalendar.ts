@@ -307,22 +307,27 @@ export async function syncAppointmentsFromCalendarEvents() {
         hour12: false 
       }); // HH:MM format
 
-      // Extract owner name - prioritize contact name that matches the phone number
+      // Extract owner name - first word in event summary is the customer's last name
       let ownerFirstName = 'Guest';
       let ownerLastName = 'Customer';
       
+      // Extract first word from summary as last name
+      const summaryWords = summary.trim().split(/\s+/);
+      if (summaryWords.length > 0 && summaryWords[0]) {
+        ownerLastName = summaryWords[0];
+      }
+      
+      // Try to get first name from contact if available
       if (eventContact?.name) {
-        // Use the contact's name if we found a matching contact
         const nameParts = eventContact.name.split(' ');
         ownerFirstName = nameParts[0] || 'Guest';
-        ownerLastName = nameParts.slice(1).join(' ') || 'Customer';
       } else if (event.attendees && event.attendees.length > 0) {
-        // Fall back to attendee name if no contact found
         const firstAttendee = event.attendees[0];
-        const displayName = firstAttendee.displayName || firstAttendee.email?.split('@')[0] || 'Guest Customer';
-        const nameParts = displayName.split(' ');
-        ownerFirstName = nameParts[0] || 'Guest';
-        ownerLastName = nameParts.slice(1).join(' ') || 'Customer';
+        const displayName = firstAttendee.displayName || firstAttendee.email?.split('@')[0];
+        if (displayName) {
+          const nameParts = displayName.split(' ');
+          ownerFirstName = nameParts[0] || 'Guest';
+        }
       }
 
       // Determine service type from summary (default to 'Full Grooming')
