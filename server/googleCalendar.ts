@@ -299,11 +299,17 @@ export async function syncAppointmentsFromCalendarEvents() {
         hour12: false 
       }); // HH:MM format
 
-      // Extract owner name from attendees or use summary
+      // Extract owner name - prioritize contact name that matches the phone number
       let ownerFirstName = 'Guest';
       let ownerLastName = 'Customer';
       
-      if (event.attendees && event.attendees.length > 0) {
+      if (eventContact?.name) {
+        // Use the contact's name if we found a matching contact
+        const nameParts = eventContact.name.split(' ');
+        ownerFirstName = nameParts[0] || 'Guest';
+        ownerLastName = nameParts.slice(1).join(' ') || 'Customer';
+      } else if (event.attendees && event.attendees.length > 0) {
+        // Fall back to attendee name if no contact found
         const firstAttendee = event.attendees[0];
         const displayName = firstAttendee.displayName || firstAttendee.email?.split('@')[0] || 'Guest Customer';
         const nameParts = displayName.split(' ');
