@@ -32,9 +32,9 @@ The application is a full-stack web application with a clear separation of conce
     - 15-minute intervals with admin approval workflow and automated email notifications
     - "My Appointments" page for customers
     - Google Calendar appointment sync with incremental imports (no duplicates) and intelligent parsing
-    - **Google Calendar Integration**: Newly synced events appear in pending appointments requiring admin approval; once approved, visible to groomers
+    - **Google Calendar Integration**: Newly synced events appear in pending appointments requiring admin approval
     - **Collapsible UI**: Pending appointments visible by default; Approved and Denied appointments behind expandable buttons
-    - Role-based access: Groomers see only approved appointments (read-only), admins see all
+    - Role-based access: Groomers can view all appointments including pending, approved, and completed (read-only status updates), admins have full modification access
     - Visual indicators: Google Calendar appointments display "Synced" badge throughout workflow
 - **Order & Notification System:** Admin email/push notifications for new orders/appointments. Customer email/SMS/web push for order status. Order History page with detailed modals.
 - **Authentication & Authorization:** 
