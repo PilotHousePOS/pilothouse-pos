@@ -24,8 +24,16 @@ import NotFound from "@/pages/not-found";
 import BottomNav from "@/components/bottom-nav";
 
 function Router() {
-  // Simple approach - just check localStorage directly
-  const hasToken = !!localStorage.getItem('token');
+  const { user, isLoading } = useAuth();
+  const isAuthenticated = !!user;
+  
+  if (isLoading) {
+    return (
+      <div className="max-w-md mx-auto bg-white min-h-screen flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
   
   return (
     <div className="max-w-md mx-auto bg-white min-h-screen relative overflow-hidden">
@@ -34,7 +42,7 @@ function Router() {
         <Route path="/forgot-password" component={ForgotPassword} />
         <Route path="/reset-password" component={ResetPassword} />
         
-        {!hasToken ? (
+        {!isAuthenticated ? (
           <>
             <Route path="/" component={Landing} />
             <Route path="/auth" component={Auth} />
@@ -58,7 +66,7 @@ function Router() {
         )}
         <Route component={NotFound} />
       </Switch>
-      {hasToken && <BottomNav />}
+      {isAuthenticated && <BottomNav />}
     </div>
   );
 }

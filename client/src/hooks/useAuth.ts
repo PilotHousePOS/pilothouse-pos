@@ -6,7 +6,8 @@ export function useAuth() {
   const { data: user, isLoading } = useQuery({
     queryKey: ["/api/auth/user"],
     retry: false,
-    enabled: !!token,
+    // Always try to fetch user - cookies might be set even without localStorage token
+    enabled: true,
     staleTime: 0, // Always fetch fresh data to get latest admin status
     refetchOnMount: true,
     refetchOnWindowFocus: true,
@@ -17,6 +18,7 @@ export function useAuth() {
   return {
     user,
     isLoading,
-    isAuthenticated: !!user && !!token,
+    // User is authenticated if we have user data (either from localStorage token or cookies)
+    isAuthenticated: !!user,
   };
 }
