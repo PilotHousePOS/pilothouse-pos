@@ -252,6 +252,8 @@ export async function syncAppointmentsFromCalendarEvents() {
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 90);
 
+    console.log(`[SYNC] Fetching calendar events from ${startOfToday.toISOString()} to ${futureDate.toISOString()}`);
+
     const response = await calendar.events.list({
       calendarId: 'primary',
       timeMin: startOfToday.toISOString(),
@@ -262,11 +264,15 @@ export async function syncAppointmentsFromCalendarEvents() {
     });
 
     const events = response.data.items || [];
+    console.log(`[SYNC] Found ${events.length} total calendar events`);
     const appointments = [];
 
     for (const event of events) {
       // Skip events without start time or summary
-      if (!event.start?.dateTime || !event.summary) continue;
+      if (!event.start?.dateTime || !event.summary) {
+        console.log(`[SYNC] Skipping event without start time or summary: ${event.id}`);
+        continue;
+      }
 
       const summary = event.summary || '';
       const description = event.description || '';
@@ -317,7 +323,7 @@ export async function syncAppointmentsFromCalendarEvents() {
         }
       }
 
-      appointments.push({
+      const appointmentData = {
         googleEventId: event.id,
         serviceType,
         appointmentDate,
@@ -332,9 +338,13 @@ export async function syncAppointmentsFromCalendarEvents() {
         isApproved: false, // Require admin approval for calendar synced appointments
         price: serviceType === 'Bath Only' ? '45.00' : '75.00', // Default pricing
         source: 'google_calendar',
-      });
+      };
+      
+      console.log(`[SYNC] Parsed appointment from event "${summary}":`, JSON.stringify(appointmentData, null, 2));
+      appointments.push(appointmentData);
     }
 
+    console.log(`[SYNC] Returning ${appointments.length} appointments to sync`);
     return appointments;
   } catch (error) {
     console.error('Error syncing appointments from calendar:', error);
