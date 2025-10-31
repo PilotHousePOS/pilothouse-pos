@@ -1261,9 +1261,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { password, ...safeUser } = updatedUser;
       
       res.json(safeUser);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating user admin status:", error);
+      if (error.message === 'User not found') {
+        return res.status(404).json({ message: "User not found" });
+      }
       res.status(500).json({ message: "Failed to update user admin status" });
+    }
+  });
+
+  app.post("/api/admin/users/:userId/groomer", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { userId } = req.params;
+      const { isGroomer } = req.body;
+
+      if (typeof isGroomer !== 'boolean') {
+        return res.status(400).json({ message: "isGroomer must be a boolean" });
+      }
+
+      const updatedUser = await storage.updateUserGroomer(userId, isGroomer);
+      const { password, ...safeUser } = updatedUser;
+      
+      res.json(safeUser);
+    } catch (error: any) {
+      console.error("Error updating user groomer status:", error);
+      if (error.message === 'User not found') {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.status(500).json({ message: "Failed to update user groomer status" });
     }
   });
 

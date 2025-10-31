@@ -1774,6 +1774,28 @@ export default function Admin() {
     },
   });
 
+  // Groomer Role User Management Mutation
+  const updateUserGroomerRoleMutation = useMutation({
+    mutationFn: async ({ userId, isGroomer }: { userId: string; isGroomer: boolean }) => {
+      const res = await apiRequest("POST", `/api/admin/users/${userId}/groomer`, { isGroomer });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({
+        title: "Success",
+        description: "User groomer status updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error", 
+        description: error.message || "Failed to update groomer status",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Grooming Settings Mutation
   const updateGroomingSettingMutation = useMutation({
     mutationFn: async ({ setting, value }: { setting: string; value: string }) => {
@@ -2346,38 +2368,20 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          {/* Appointments Section */}
-          <Card>
+          {/* Approved Appointments Section */}
+          <Card className="border-2 border-green-200 bg-green-50/30">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-green-700">
                 <Calendar className="w-5 h-5" />
-                Appointments ({(appointments as any[]).length})
+                Approved Appointments ({(appointments as any[]).filter((a: any) => a.status === 'confirmed' || a.status === 'completed').length})
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="relative">
-                {/* Previous page button */}
-                {appointmentsPage > 0 && (
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg"
-                    onClick={() => setAppointmentsPage(prev => prev - 1)}
-                  >
-                    <ArrowLeft className="w-5 h-5" />
-                  </Button>
-                )}
-
-                {/* Appointments grid with swipe support */}
-                <div
-                  key={`appointments-${appointmentsPage}`}
-                  className="space-y-4"
-                  onTouchStart={handleAppointmentsTouchStart}
-                  onTouchMove={handleAppointmentsTouchMove}
-                  onTouchEnd={handleAppointmentsTouchEnd}
-                >
-                  {paginatedAppointments.map((appointment: any) => (
-                    <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg">
+              <div className="space-y-4">
+                {(appointments as any[])
+                  .filter((a: any) => a.status === 'confirmed' || a.status === 'completed')
+                  .map((appointment: any) => (
+                    <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
                       <div 
                         className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
                         onClick={() => setSelectedAppointment(appointment)}
@@ -2402,6 +2406,7 @@ export default function Admin() {
                           key={`appointment-${appointment.id}-${appointment.status}`}
                           value={appointment.status}
                           onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
+                          disabled={!!typedUser?.isGroomer && !typedUser?.isAdmin}
                         >
                           <SelectTrigger className="w-32">
                             <SelectValue />
@@ -2417,41 +2422,68 @@ export default function Admin() {
                       </div>
                     </div>
                   ))}
-                </div>
-
-                {/* Next page button */}
-                {appointmentsPage < totalAppointmentPages - 1 && (
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg"
-                    onClick={() => setAppointmentsPage(prev => prev + 1)}
-                  >
-                    <ArrowLeft className="w-5 h-5 rotate-180" />
-                  </Button>
-                )}
               </div>
-
-              {/* Page indicators */}
-              {totalAppointmentPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-4">
-                  <span className="text-xs text-gray-500">
-                    Page {appointmentsPage + 1} of {totalAppointmentPages}
-                  </span>
-                  <div className="flex gap-1">
-                    {Array.from({ length: totalAppointmentPages }).map((_, i) => (
-                      <div
-                        key={i}
-                        className={`h-2 w-2 rounded-full ${
-                          i === appointmentsPage ? 'bg-brand-blue' : 'bg-gray-300'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
+
+          {/* Denied Appointments Section - Only visible to admins */}
+          {typedUser?.isAdmin && (
+            <Card className="border-2 border-red-200 bg-red-50/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-red-700">
+                  <Calendar className="w-5 h-5" />
+                  Denied Appointments ({(appointments as any[]).filter((a: any) => a.status === 'rejected' || a.status === 'cancelled').length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {(appointments as any[])
+                    .filter((a: any) => a.status === 'rejected' || a.status === 'cancelled')
+                    .map((appointment: any) => (
+                      <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
+                        <div 
+                          className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                          onClick={() => setSelectedAppointment(appointment)}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
+                            {appointment.source === 'google_calendar' && (
+                              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
+                                <Calendar className="w-3 h-3 mr-1" />
+                                Synced
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
+                          <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
+                          <p className="text-sm text-gray-600">Phone: {appointment.ownerPhoneNumber}</p>
+                          <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
+                          <p className="text-xs text-blue-600 mt-1">Click to view details</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Select
+                            key={`appointment-${appointment.id}-${appointment.status}`}
+                            value={appointment.status}
+                            onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="scheduled">Pending</SelectItem>
+                              <SelectItem value="confirmed">Confirmed</SelectItem>
+                              <SelectItem value="rejected">Rejected</SelectItem>
+                              <SelectItem value="completed">Completed</SelectItem>
+                              <SelectItem value="cancelled">Cancelled</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Google Calendar Events Section */}
           {calendarEvents && calendarEvents.length > 0 && (
@@ -2602,21 +2634,45 @@ export default function Admin() {
                           <p className="text-xs text-gray-500">
                             Joined: {new Date(userItem.createdAt).toLocaleDateString()}
                           </p>
+                          <div className="flex gap-2 mt-2">
+                            {userItem.isAdmin && (
+                              <Badge variant="default" className="text-xs">Admin</Badge>
+                            )}
+                            {userItem.isGroomer && (
+                              <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">Groomer</Badge>
+                            )}
+                            {!userItem.isAdmin && !userItem.isGroomer && (
+                              <Badge variant="outline" className="text-xs">Customer</Badge>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <Badge variant={userItem.isAdmin ? "default" : "secondary"}>
-                            {userItem.isAdmin ? "Admin" : "User"}
-                          </Badge>
-                          <Switch
-                            checked={userItem.isAdmin}
-                            onCheckedChange={(checked) => {
-                              updateAdminMutation.mutate({
-                                userId: userItem.id,
-                                isAdmin: checked
-                              });
-                            }}
-                            disabled={updateAdminMutation.isPending}
-                          />
+                        <div className="flex flex-col gap-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-sm font-medium">Admin</span>
+                            <Switch
+                              checked={userItem.isAdmin}
+                              onCheckedChange={(checked) => {
+                                updateAdminMutation.mutate({
+                                  userId: userItem.id,
+                                  isAdmin: checked
+                                });
+                              }}
+                              disabled={updateAdminMutation.isPending}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-sm font-medium">Groomer</span>
+                            <Switch
+                              checked={userItem.isGroomer}
+                              onCheckedChange={(checked) => {
+                                updateUserGroomerRoleMutation.mutate({
+                                  userId: userItem.id,
+                                  isGroomer: checked
+                                });
+                              }}
+                              disabled={updateUserGroomerRoleMutation.isPending}
+                            />
+                          </div>
                         </div>
                       </div>
                     </CardContent>

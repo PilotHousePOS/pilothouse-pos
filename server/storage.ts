@@ -51,6 +51,7 @@ export interface IStorage {
   createUser(user: { email: string; password: string; firstName: string; lastName: string }): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserAdmin(id: string, isAdmin: boolean): Promise<User>;
+  updateUserGroomer(id: string, isGroomer: boolean): Promise<User>;
   getAllUsers(): Promise<User[]>;
 
   // Pet operations
@@ -603,6 +604,21 @@ export class DatabaseStorage implements IStorage {
       .set({ isAdmin, updatedAt: new Date() })
       .where(eq(users.id, id))
       .returning();
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
+  }
+
+  async updateUserGroomer(id: string, isGroomer: boolean): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ isGroomer, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    if (!user) {
+      throw new Error('User not found');
+    }
     return user;
   }
 
