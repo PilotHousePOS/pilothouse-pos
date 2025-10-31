@@ -1512,9 +1512,45 @@ export default function Admin() {
 
   // Handle booking contact selection
   const handleBookingSelectContact = (contact: any) => {
-    const nameParts = (contact.name || '').split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || '';
+    let firstName = '';
+    let lastName = '';
+    let petName = '';
+    
+    // Check if this is a Google Calendar contact with event summary
+    if (contact.source === 'google_calendar' && contact.eventSummary) {
+      // Format: LastName PetName PhoneNumber Groomer
+      // Contact name is now just the last name
+      lastName = contact.name || '';
+      
+      // Parse event summary to extract pet name
+      const summaryWords = contact.eventSummary.trim().split(/\s+/);
+      
+      if (summaryWords.length > 1) {
+        // Find phone number position
+        let phoneIndex = -1;
+        for (let i = 0; i < summaryWords.length; i++) {
+          // Check if word looks like a phone number (10+ digits)
+          if (/[\d\(\)\-]+/.test(summaryWords[i]) && summaryWords[i].replace(/[\(\)\-\s]/g, '').length >= 10) {
+            phoneIndex = i;
+            break;
+          }
+        }
+        
+        // Pet name is between last name (index 0) and phone number
+        if (phoneIndex > 1) {
+          const petNameWords = summaryWords.slice(1, phoneIndex);
+          petName = petNameWords.join(' ');
+        } else if (summaryWords.length > 1) {
+          // Fallback: just take second word
+          petName = summaryWords[1];
+        }
+      }
+    } else {
+      // Regular contact - split name normally
+      const nameParts = (contact.name || '').split(' ');
+      firstName = nameParts[0] || '';
+      lastName = nameParts.slice(1).join(' ') || '';
+    }
     
     setBookingOwnerInfo({
       firstName,
@@ -1522,12 +1558,22 @@ export default function Admin() {
       phoneNumber: contact.phoneNumber || '',
     });
     
+    // Auto-populate pet name if extracted from calendar event
+    if (petName) {
+      setBookingPetInfo(prev => ({
+        ...prev,
+        name: petName,
+      }));
+    }
+    
     setBookingContactSearch(contact.name || '');
     setShowBookingContactDropdown(false);
     
     toast({
       title: "Contact Selected",
-      description: `Information populated for ${contact.name}`,
+      description: petName 
+        ? `Information populated for ${lastName} - Pet: ${petName}`
+        : `Information populated for ${contact.name}`,
     });
   };
 
