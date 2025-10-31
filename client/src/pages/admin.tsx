@@ -1406,6 +1406,24 @@ export default function Admin() {
   const [showApprovedAppointments, setShowApprovedAppointments] = useState(false);
   const [showDeniedAppointments, setShowDeniedAppointments] = useState(false);
   
+  // Book Appointment Modal State
+  const [isBookAppointmentOpen, setIsBookAppointmentOpen] = useState(false);
+  const [bookingContactSearch, setBookingContactSearch] = useState('');
+  const [showBookingContactDropdown, setShowBookingContactDropdown] = useState(false);
+  const [bookingSelectedService, setBookingSelectedService] = useState('');
+  const [bookingSelectedDate, setBookingSelectedDate] = useState<Date | undefined>(new Date());
+  const [bookingSelectedTime, setBookingSelectedTime] = useState('');
+  const [bookingPetInfo, setBookingPetInfo] = useState({
+    name: '',
+    type: '',
+    notes: '',
+  });
+  const [bookingOwnerInfo, setBookingOwnerInfo] = useState({
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+  });
+  
   // Pagination state for appointments
   const [appointmentsPage, setAppointmentsPage] = useState(0);
   const [appointmentsTouchStart, setAppointmentsTouchStart] = useState(0);
@@ -1464,6 +1482,113 @@ export default function Admin() {
     queryKey: ["/api/admin/groomers"],
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
+
+  // Fetch contacts for booking search
+  const { data: allBookingContacts = [] } = useQuery({
+    queryKey: ["/api/contacts"],
+    enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
+    retry: false,
+  });
+
+  // Filter contacts for booking modal
+  const filteredBookingContacts = useMemo(() => {
+    if (!bookingContactSearch.trim()) return [];
+    
+    const query = bookingContactSearch.toLowerCase();
+    const searchDigits = bookingContactSearch.replace(/\D/g, '');
+    
+    return (allBookingContacts as any[]).filter(contact => {
+      const name = (contact.name || '').toLowerCase();
+      const phone = (contact.phoneNumber || '').replace(/\D/g, '');
+      
+      const nameMatch = name.includes(query);
+      const phoneMatch = searchDigits.length > 0 && phone.includes(searchDigits);
+      
+      return nameMatch || phoneMatch;
+    }).slice(0, 10);
+  }, [bookingContactSearch, allBookingContacts]);
+
+  // Handle booking contact selection
+  const handleBookingSelectContact = (contact: any) => {
+    const nameParts = (contact.name || '').split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+    
+    setBookingOwnerInfo({
+      firstName,
+      lastName,
+      phoneNumber: contact.phoneNumber || '',
+    });
+    
+    setBookingContactSearch(contact.name || '');
+    setShowBookingContactDropdown(false);
+    
+    toast({
+      title: "Contact Selected",
+      description: `Information populated for ${contact.name}`,
+    });
+  };
+
+  // Generate available time slots for booking
+  const bookingAvailableTimeSlots = useMemo(() => {
+    const settings = groomingSettings as any[];
+    const startTime = settings.find(s => s.setting === 'start_time')?.value || '09:00';
+    const endTime = '13:30'; // Hard-coded 1:30 PM limit
+    
+    const slots = [];
+    const [startHour, startMin] = startTime.split(':').map(Number);
+    const [endHour, endMin] = endTime.split(':').map(Number);
+    
+    let currentTime = new Date();
+    currentTime.setHours(startHour, startMin, 0, 0);
+    
+    const endDateTime = new Date();
+    endDateTime.setHours(endHour, endMin, 0, 0);
+    
+    while (currentTime < endDateTime) {
+      const timeString = currentTime.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit', 
+        hour12: true 
+      });
+      slots.push(timeString);
+      currentTime.setMinutes(currentTime.getMinutes() + 15);
+    }
+    
+    return slots;
+  }, [groomingSettings]);
+
+  // Check if a date is available for booking
+  const isBookingDateAvailable = (date: Date) => {
+    if (date.getDay() === 0) return false; // No Sundays
+    
+    const settings = groomingSettings as any[];
+    const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    const dayEnabledSetting = settings.find(s => s.setting === `${dayName}_enabled`);
+    const isDayEnabled = dayEnabledSetting ? dayEnabledSetting.value === 'true' : true;
+    
+    if (!isDayEnabled) return false;
+    
+    const blockedDates = settings.find(s => s.setting === 'blocked_dates')?.value || '';
+    const dateString = date.toISOString().split('T')[0];
+    const blockedList = blockedDates.split(',').map((d: string) => d.trim()).filter((d: string) => d);
+    
+    if (blockedList.includes(dateString)) return false;
+    
+    const advanceBookingDays = parseInt(settings.find(s => s.setting === 'advance_booking_days')?.value || '30');
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + advanceBookingDays);
+    
+    if (date > maxDate) return false;
+    
+    const minimumNoticeHours = parseInt(settings.find(s => s.setting === 'minimum_notice_hours')?.value || '24');
+    const minDate = new Date();
+    minDate.setHours(minDate.getHours() + minimumNoticeHours);
+    
+    if (date < minDate) return false;
+    
+    return true;
+  };
 
   // Create Pet Mutation
   const createPetMutation = useMutation({
@@ -1753,6 +1878,73 @@ export default function Admin() {
       });
     },
   });
+
+  // Create Appointment from Admin Booking Modal
+  const createAppointmentMutation = useMutation({
+    mutationFn: async (appointmentData: any) => {
+      await apiRequest("POST", "/api/appointments", appointmentData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Appointment Created",
+        description: "The appointment has been created successfully.",
+      });
+      setIsBookAppointmentOpen(false);
+      // Reset form
+      setBookingContactSearch('');
+      setBookingSelectedService('');
+      setBookingSelectedDate(new Date());
+      setBookingSelectedTime('');
+      setBookingPetInfo({ name: '', type: '', notes: '' });
+      setBookingOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
+      // Refresh appointments
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to create appointment.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleBookingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!bookingSelectedService || !bookingSelectedDate || !bookingSelectedTime) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const SERVICES = [
+      { id: 'grooming-full', name: 'Full Grooming', price: 35 },
+      { id: 'grooming-bath', name: 'Bath Only', price: 20 },
+    ];
+
+    const serviceData = SERVICES.find(s => s.id === bookingSelectedService);
+    if (!serviceData) return;
+
+    const appointmentData = {
+      serviceType: serviceData.name,
+      service: serviceData.name,
+      appointmentDate: bookingSelectedDate.toISOString().split('T')[0],
+      appointmentTime: bookingSelectedTime,
+      petName: bookingPetInfo.name,
+      petType: bookingPetInfo.type,
+      specialNotes: bookingPetInfo.notes,
+      ownerFirstName: bookingOwnerInfo.firstName,
+      ownerLastName: bookingOwnerInfo.lastName,
+      ownerPhoneNumber: bookingOwnerInfo.phoneNumber,
+      price: serviceData.price.toString(),
+    };
+
+    createAppointmentMutation.mutate(appointmentData);
+  };
 
   // Admin User Management Mutation
   const updateAdminMutation = useMutation({
@@ -2310,6 +2502,19 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="orders" className="space-y-6">
+          {/* Book Appointment Button */}
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold">Orders & Appointments</h2>
+            <Button 
+              onClick={() => setIsBookAppointmentOpen(true)}
+              className="bg-brand-blue hover:bg-blue-700 text-white"
+              data-testid="button-book-appointment-admin"
+            >
+              <Calendar className="w-4 h-4 mr-2" />
+              Book Appointment
+            </Button>
+          </div>
+
           {/* Pending Approval Section */}
           {unapprovedAppointments.length > 0 && (
             <Card className="border-2 border-orange-200 bg-orange-50">
@@ -3446,6 +3651,195 @@ export default function Admin() {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Book Appointment Modal */}
+      <Dialog open={isBookAppointmentOpen} onOpenChange={setIsBookAppointmentOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Book New Appointment</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleBookingSubmit} className="space-y-4">
+            {/* Contact Search */}
+            <div className="relative">
+              <Label>Search Existing Contact</Label>
+              <Input
+                type="text"
+                placeholder="Search by name or phone number..."
+                value={bookingContactSearch}
+                onChange={(e) => {
+                  setBookingContactSearch(e.target.value);
+                  setShowBookingContactDropdown(e.target.value.trim().length > 0);
+                }}
+                onFocus={() => bookingContactSearch.trim().length > 0 && setShowBookingContactDropdown(true)}
+                data-testid="input-booking-contact-search"
+              />
+              
+              {showBookingContactDropdown && filteredBookingContacts.length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">
+                  {filteredBookingContacts.map((contact: any, index: number) => (
+                    <div
+                      key={contact.id || index}
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
+                      onClick={() => handleBookingSelectContact(contact)}
+                      data-testid={`booking-contact-option-${index}`}
+                    >
+                      <div className="font-medium">{contact.name}</div>
+                      {contact.phoneNumber && (
+                        <div className="text-sm text-gray-600">{contact.phoneNumber}</div>
+                      )}
+                      {contact.email && (
+                        <div className="text-xs text-gray-500">{contact.email}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Owner Information */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>First Name *</Label>
+                <Input
+                  type="text"
+                  value={bookingOwnerInfo.firstName}
+                  onChange={(e) => setBookingOwnerInfo({ ...bookingOwnerInfo, firstName: e.target.value })}
+                  required
+                  data-testid="input-booking-firstname"
+                />
+              </div>
+              <div>
+                <Label>Last Name *</Label>
+                <Input
+                  type="text"
+                  value={bookingOwnerInfo.lastName}
+                  onChange={(e) => setBookingOwnerInfo({ ...bookingOwnerInfo, lastName: e.target.value })}
+                  required
+                  data-testid="input-booking-lastname"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label>Phone Number *</Label>
+              <Input
+                type="tel"
+                value={bookingOwnerInfo.phoneNumber}
+                onChange={(e) => setBookingOwnerInfo({ ...bookingOwnerInfo, phoneNumber: e.target.value })}
+                required
+                data-testid="input-booking-phone"
+              />
+            </div>
+
+            {/* Pet Information */}
+            <div>
+              <Label>Pet Name *</Label>
+              <Input
+                type="text"
+                value={bookingPetInfo.name}
+                onChange={(e) => setBookingPetInfo({ ...bookingPetInfo, name: e.target.value })}
+                required
+                data-testid="input-booking-pet-name"
+              />
+            </div>
+
+            <div>
+              <Label>Pet Type *</Label>
+              <Select 
+                value={bookingPetInfo.type} 
+                onValueChange={(value) => setBookingPetInfo({ ...bookingPetInfo, type: value })}
+              >
+                <SelectTrigger data-testid="select-booking-pet-type">
+                  <SelectValue placeholder="Select pet type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Dog">Dog</SelectItem>
+                  <SelectItem value="Cat">Cat</SelectItem>
+                  <SelectItem value="Bird">Bird</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label>Special Notes</Label>
+              <Textarea
+                value={bookingPetInfo.notes}
+                onChange={(e) => setBookingPetInfo({ ...bookingPetInfo, notes: e.target.value })}
+                placeholder="Any special instructions or requirements..."
+                data-testid="input-booking-notes"
+              />
+            </div>
+
+            {/* Service Selection */}
+            <div>
+              <Label>Select Service *</Label>
+              <RadioGroup value={bookingSelectedService} onValueChange={setBookingSelectedService}>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="grooming-full" id="booking-full" />
+                    <Label htmlFor="booking-full" className="cursor-pointer">Full Grooming - $35</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="grooming-bath" id="booking-bath" />
+                    <Label htmlFor="booking-bath" className="cursor-pointer">Bath Only - $20</Label>
+                  </div>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {/* Date Selection */}
+            <div>
+              <Label>Select Date *</Label>
+              <Calendar
+                mode="single"
+                selected={bookingSelectedDate}
+                onSelect={setBookingSelectedDate}
+                disabled={(date) => !isBookingDateAvailable(date)}
+                className="rounded-md border"
+              />
+            </div>
+
+            {/* Time Selection */}
+            <div>
+              <Label>Select Time *</Label>
+              <div className="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto p-2 border rounded">
+                {bookingAvailableTimeSlots.map((time) => (
+                  <Button
+                    key={time}
+                    type="button"
+                    variant={bookingSelectedTime === time ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setBookingSelectedTime(time)}
+                    data-testid={`time-slot-${time.replace(/[:\s]/g, '-')}`}
+                  >
+                    {time}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Submit Buttons */}
+            <div className="flex gap-2 justify-end pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsBookAppointmentOpen(false)}
+                data-testid="button-cancel-booking"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={createAppointmentMutation.isPending}
+                data-testid="button-submit-booking"
+              >
+                {createAppointmentMutation.isPending ? "Creating..." : "Create Appointment"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
       </div>
     </div>
   );
