@@ -2393,6 +2393,7 @@ export default function Admin() {
                         </div>
                         <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
                         <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
+                        <p className="text-sm text-gray-600">Phone: {appointment.ownerPhoneNumber}</p>
                         <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
                         <p className="text-xs text-blue-600 mt-1">Click to view details</p>
                       </div>
