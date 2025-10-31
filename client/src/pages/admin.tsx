@@ -395,6 +395,26 @@ function ContactsManager() {
     },
   });
 
+  const syncAppointmentsMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/admin/calendar/sync-appointments");
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Appointments Synced",
+        description: data.message || "All appointments replaced with Google Calendar events.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Sync Failed",
+        description: "Failed to sync appointments from calendar.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const createEventMutation = useMutation({
     mutationFn: async (eventData: any) => {
       await apiRequest("POST", "/api/admin/calendar/events", eventData);
@@ -1288,6 +1308,7 @@ export default function Admin() {
   const [isAddGroomerOpen, setIsAddGroomerOpen] = useState(false);
   const [editingGroomer, setEditingGroomer] = useState<any>(null);
   const [groomerToDelete, setGroomerToDelete] = useState<any>(null);
+  const [isSyncAppointmentsConfirmOpen, setIsSyncAppointmentsConfirmOpen] = useState(false);
 
   // Always call all hooks at the top level
   const { data: pets = [] } = useQuery({
@@ -2065,6 +2086,12 @@ export default function Admin() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <Badge className="bg-orange-500 text-white">Pending Approval</Badge>
+                          {appointment.source === 'google_calendar' && (
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
+                              <Calendar className="w-3 h-3 mr-1" />
+                              Google Calendar
+                            </Badge>
+                          )}
                         </div>
                         <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
                         <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
@@ -2140,7 +2167,15 @@ export default function Admin() {
                       className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
                       onClick={() => setSelectedAppointment(appointment)}
                     >
-                      <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
+                        {appointment.source === 'google_calendar' && (
+                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
+                            <Calendar className="w-3 h-3 mr-1" />
+                            Synced
+                          </Badge>
+                        )}
+                      </div>
                       <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
                       <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
                       <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
@@ -2327,6 +2362,27 @@ export default function Admin() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Google Calendar Sync */}
+              <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                  <Calendar className="w-5 h-5" />
+                  Google Calendar Integration
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Sync appointments from your Google Calendar. This will clear all existing appointments and replace them with calendar events.
+                </p>
+                <Button 
+                  variant="default"
+                  onClick={() => setIsSyncAppointmentsConfirmOpen(true)}
+                  disabled={syncAppointmentsMutation.isPending}
+                  data-testid="button-sync-appointments"
+                  className="w-full sm:w-auto"
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2`} />
+                  Sync Appointments from Calendar
+                </Button>
+              </div>
+
               {/* Operating Hours */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Operating Hours</h3>
@@ -2748,6 +2804,57 @@ export default function Admin() {
       )}
 
       {/* Delete Groomer Confirmation Dialog */}
+      <Dialog open={isSyncAppointmentsConfirmOpen} onOpenChange={setIsSyncAppointmentsConfirmOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-orange-500" />
+              Sync Appointments from Google Calendar
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="p-4 bg-orange-50 dark:bg-orange-950 rounded-lg border border-orange-200 dark:border-orange-800">
+              <p className="text-sm text-orange-800 dark:text-orange-200 font-semibold mb-2">
+                ⚠️ Warning: This action cannot be undone!
+              </p>
+              <p className="text-sm text-orange-700 dark:text-orange-300">
+                This will permanently delete <strong>ALL existing appointments</strong> and replace them with events from your Google Calendar.
+              </p>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Calendar events will be converted to appointments with:
+            </p>
+            <ul className="text-sm text-gray-600 dark:text-gray-400 list-disc list-inside space-y-1">
+              <li>Pet and owner info extracted from event details</li>
+              <li>Service type determined from event title</li>
+              <li>Phone numbers parsed from descriptions</li>
+              <li>Automatic approval for synced appointments</li>
+            </ul>
+            <div className="flex gap-2 justify-end pt-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsSyncAppointmentsConfirmOpen(false)}
+                data-testid="button-cancel-sync-appointments"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  syncAppointmentsMutation.mutate();
+                  setIsSyncAppointmentsConfirmOpen(false);
+                }}
+                disabled={syncAppointmentsMutation.isPending}
+                data-testid="button-confirm-sync-appointments"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${syncAppointmentsMutation.isPending ? 'animate-spin' : ''}`} />
+                {syncAppointmentsMutation.isPending ? "Syncing..." : "Yes, Sync Now"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {groomerToDelete && (
         <Dialog open={!!groomerToDelete} onOpenChange={() => setGroomerToDelete(null)}>
           <DialogContent className="max-w-sm">

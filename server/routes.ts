@@ -1712,6 +1712,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Sync appointments from Google Calendar
+  app.post("/api/admin/calendar/sync-appointments", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { syncAppointmentsFromCalendarEvents } = await import("./googleCalendar");
+      
+      // Fetch calendar appointments BEFORE starting transaction (preflight validation)
+      console.log('Fetching Google Calendar events...');
+      const calendarAppointments = await syncAppointmentsFromCalendarEvents();
+      
+      // Preflight validation: ensure we have valid appointments before clearing database
+      if (!Array.isArray(calendarAppointments)) {
+        throw new Error('Invalid calendar data: expected array of appointments');
+      }
+
+      console.log(`Found ${calendarAppointments.length} calendar events to sync`);
+
+      // Prepare appointments with user ID
+      const appointmentsToCreate = calendarAppointments.map((apt: any) => ({
+        ...apt,
+        userId: user.id, // Associate with the admin user performing the sync
+      }));
+
+      // Validate that all required fields are present
+      for (const apt of appointmentsToCreate) {
+        if (!apt.userId || !apt.appointmentDate || !apt.appointmentTime || !apt.serviceType) {
+          throw new Error(`Invalid appointment data: missing required fields in appointment: ${JSON.stringify(apt)}`);
+        }
+      }
+      
+      // Import appointments table
+      const { appointments } = await import('./db');
+      
+      // Execute the sync operation in a transaction for atomicity
+      const createdAppointments = await db.transaction(async (tx) => {
+        // Clear all existing appointments within transaction
+        await tx.delete(appointments);
+        console.log('Cleared all existing appointments (in transaction)');
+
+        // Bulk create new appointments from calendar
+        if (appointmentsToCreate.length > 0) {
+          const newAppointments = await tx.insert(appointments).values(appointmentsToCreate).returning();
+          console.log(`Created ${newAppointments.length} appointments from calendar (in transaction)`);
+          return newAppointments;
+        }
+        return [];
+      });
+
+      res.json({ 
+        message: `Successfully synced ${createdAppointments.length} appointments from Google Calendar`,
+        appointments: createdAppointments,
+        cleared: true,
+      });
+    } catch (error) {
+      console.error("Error syncing appointments from calendar:", error);
+      res.status(500).json({ 
+        message: "Failed to sync appointments. No changes were made to your existing appointments.", 
+        error: (error as Error).message 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

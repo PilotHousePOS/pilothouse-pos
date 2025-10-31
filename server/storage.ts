@@ -89,6 +89,8 @@ export interface IStorage {
   getAppointments(userId?: string): Promise<Appointment[]>;
   getAppointment(id: number): Promise<Appointment | undefined>;
   updateAppointmentStatus(id: number, status: string): Promise<Appointment>;
+  clearAllAppointments(): Promise<void>;
+  bulkCreateAppointments(appointments: InsertAppointment[]): Promise<Appointment[]>;
 
   // Customer pet operations
   getCustomerPets(userId: string): Promise<CustomerPet[]>;
@@ -530,6 +532,16 @@ export class DatabaseStorage implements IStorage {
       .where(eq(appointments.id, id))
       .returning();
     return updated;
+  }
+
+  async clearAllAppointments(): Promise<void> {
+    await db.delete(appointments);
+  }
+
+  async bulkCreateAppointments(appointmentList: InsertAppointment[]): Promise<Appointment[]> {
+    if (appointmentList.length === 0) return [];
+    const newAppointments = await db.insert(appointments).values(appointmentList).returning();
+    return newAppointments;
   }
 
   async getUnapprovedAppointments(): Promise<Appointment[]> {

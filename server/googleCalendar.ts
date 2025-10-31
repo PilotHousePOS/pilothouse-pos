@@ -236,6 +236,109 @@ export async function getGoogleContacts(maxResults: number = 1000) {
 }
 
 /**
+ * Sync appointments from Google Calendar events
+ * Converts Google Calendar events to appointment records
+ * Returns appointment data extracted from calendar events
+ */
+export async function syncAppointmentsFromCalendarEvents() {
+  try {
+    const calendar = await getUncachableGoogleCalendarClient();
+    
+    // Fetch upcoming events (next 90 days)
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 90);
+
+    const response = await calendar.events.list({
+      calendarId: 'primary',
+      timeMin: new Date().toISOString(),
+      timeMax: futureDate.toISOString(),
+      maxResults: 500,
+      singleEvents: true,
+      orderBy: 'startTime',
+    });
+
+    const events = response.data.items || [];
+    const appointments = [];
+
+    for (const event of events) {
+      // Skip events without start time or summary
+      if (!event.start?.dateTime || !event.summary) continue;
+
+      const summary = event.summary || '';
+      const description = event.description || '';
+      const combinedText = `${summary} ${description}`;
+
+      // Extract phone numbers from description
+      const phoneNumbers = extractPhoneNumbers(combinedText);
+      const phoneNumber = phoneNumbers[0] || '(555) 000-0000'; // Default if no phone found
+
+      // Parse date and time
+      const startDateTime = new Date(event.start.dateTime);
+      const appointmentDate = startDateTime.toISOString().split('T')[0]; // YYYY-MM-DD
+      const appointmentTime = startDateTime.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
+      }); // HH:MM format
+
+      // Extract owner name from attendees or use summary
+      let ownerFirstName = 'Guest';
+      let ownerLastName = 'Customer';
+      
+      if (event.attendees && event.attendees.length > 0) {
+        const firstAttendee = event.attendees[0];
+        const displayName = firstAttendee.displayName || firstAttendee.email?.split('@')[0] || 'Guest Customer';
+        const nameParts = displayName.split(' ');
+        ownerFirstName = nameParts[0] || 'Guest';
+        ownerLastName = nameParts.slice(1).join(' ') || 'Customer';
+      }
+
+      // Determine service type from summary (default to 'Full Grooming')
+      let serviceType = 'Full Grooming';
+      const summaryLower = summary.toLowerCase();
+      if (summaryLower.includes('bath') && !summaryLower.includes('full')) {
+        serviceType = 'Bath Only';
+      }
+
+      // Extract pet name and type from summary or description
+      let petName = 'Pet';
+      let petType = 'Dog';
+      
+      // Try to extract pet info from summary
+      const petMatch = summary.match(/(?:for |appointment for )?([A-Z][a-z]+)(?:'s)?(?:\s+\(([^)]+)\))?/i);
+      if (petMatch) {
+        petName = petMatch[1];
+        if (petMatch[2]) {
+          petType = petMatch[2];
+        }
+      }
+
+      appointments.push({
+        googleEventId: event.id,
+        serviceType,
+        appointmentDate,
+        appointmentTime,
+        petName,
+        petType,
+        specialNotes: description || `Synced from Google Calendar: ${summary}`,
+        ownerFirstName,
+        ownerLastName,
+        ownerPhoneNumber: phoneNumber,
+        status: 'scheduled',
+        isApproved: true, // Auto-approve calendar synced appointments
+        price: serviceType === 'Bath Only' ? '45.00' : '75.00', // Default pricing
+        source: 'google_calendar',
+      });
+    }
+
+    return appointments;
+  } catch (error) {
+    console.error('Error syncing appointments from calendar:', error);
+    throw error;
+  }
+}
+
+/**
  * Sync contacts from Google Calendar events
  * Extracts name and phone numbers from event descriptions
  * Returns contacts that were created or updated
