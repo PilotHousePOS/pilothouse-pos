@@ -2402,10 +2402,23 @@ export default function Admin() {
           {/* Pending Appointments Section - Always Visible */}
           <Card className="border-2 border-yellow-200 bg-yellow-50/30">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-yellow-700">
-                <Calendar className="w-5 h-5" />
-                Pending Appointments ({(appointments as any[]).filter((a: any) => a.status === 'scheduled' && a.isApproved !== false).length})
-              </CardTitle>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <CardTitle className="flex items-center gap-2 text-yellow-700">
+                  <Calendar className="w-5 h-5" />
+                  Pending Appointments ({(appointments as any[]).filter((a: any) => a.status === 'scheduled' && a.isApproved !== false).length})
+                </CardTitle>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsSyncAppointmentsConfirmOpen(true)}
+                  disabled={syncAppointmentsMutation.isPending}
+                  data-testid="button-sync-appointments-groomer"
+                  className="w-full sm:w-auto bg-blue-50 border-blue-200 hover:bg-blue-100 text-blue-700"
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${syncAppointmentsMutation.isPending ? 'animate-spin' : ''}`} />
+                  {syncAppointmentsMutation.isPending ? 'Syncing...' : 'Sync from Calendar'}
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">

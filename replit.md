@@ -41,8 +41,9 @@ The application is a full-stack web application with a clear separation of conce
     - JWT tokens in secure cookies with comprehensive password reset
     - User settings and admin user management
     - Three-tier role system: Customer (default), Groomer (`isGroomer`), Admin (`isAdmin`)
-    - Groomer role: Read-only access to admin panel with full view permissions, can sync Google Calendar events/contacts
+    - Groomer role: Read-only access to admin panel with full view permissions, can sync Google Calendar appointments directly from Orders tab
     - Admin role: Full access to all appointments, user management, and modification capabilities
+    - Both groomers and admins can trigger Google Calendar sync from the Pending Appointments section
 - **Wishlist System:** Dedicated page for saving items, add/remove functionality, and quick "Add to Cart."
 - **Google Calendar & Contact Management:**
     - Connected Google Calendar via Replit integration for workspace-level event and contact management.
