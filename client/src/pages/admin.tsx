@@ -1290,6 +1290,18 @@ export default function Admin() {
   const [editingGroomer, setEditingGroomer] = useState<any>(null);
   const [groomerToDelete, setGroomerToDelete] = useState<any>(null);
   const [isSyncAppointmentsConfirmOpen, setIsSyncAppointmentsConfirmOpen] = useState(false);
+  
+  // Pagination state for appointments
+  const [appointmentsPage, setAppointmentsPage] = useState(0);
+  const [appointmentsTouchStart, setAppointmentsTouchStart] = useState(0);
+  const [appointmentsTouchEnd, setAppointmentsTouchEnd] = useState(0);
+  
+  // Pagination state for calendar events
+  const [calendarEventsPage, setCalendarEventsPage] = useState(0);
+  const [calendarEventsTouchStart, setCalendarEventsTouchStart] = useState(0);
+  const [calendarEventsTouchEnd, setCalendarEventsTouchEnd] = useState(0);
+  
+  const ITEMS_PER_PAGE = 4;
 
   // Always call all hooks at the top level
   const { data: pets = [] } = useQuery({
@@ -1801,6 +1813,75 @@ export default function Admin() {
   const pendingAppointments = (appointments as any[]).filter((a: any) => a.status === 'scheduled').length;
   const pendingOrders = (orders as any[]).filter((o: any) => o.status === 'pending').length;
 
+  // Appointments pagination handlers
+  const handleAppointmentsTouchStart = (e: React.TouchEvent) => {
+    setAppointmentsTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleAppointmentsTouchMove = (e: React.TouchEvent) => {
+    setAppointmentsTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleAppointmentsTouchEnd = () => {
+    if (!appointmentsTouchStart || !appointmentsTouchEnd) return;
+    
+    const distance = appointmentsTouchStart - appointmentsTouchEnd;
+    const minSwipeDistance = 50;
+    const totalAppointmentPages = Math.ceil((appointments as any[]).length / ITEMS_PER_PAGE);
+    
+    if (distance > minSwipeDistance && appointmentsPage < totalAppointmentPages - 1) {
+      setAppointmentsPage(prev => prev + 1);
+    }
+    
+    if (distance < -minSwipeDistance && appointmentsPage > 0) {
+      setAppointmentsPage(prev => prev - 1);
+    }
+    
+    setAppointmentsTouchStart(0);
+    setAppointmentsTouchEnd(0);
+  };
+
+  // Calendar events pagination handlers
+  const handleCalendarEventsTouchStart = (e: React.TouchEvent) => {
+    setCalendarEventsTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleCalendarEventsTouchMove = (e: React.TouchEvent) => {
+    setCalendarEventsTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleCalendarEventsTouchEnd = () => {
+    if (!calendarEventsTouchStart || !calendarEventsTouchEnd) return;
+    
+    const distance = calendarEventsTouchStart - calendarEventsTouchEnd;
+    const minSwipeDistance = 50;
+    const totalCalendarPages = Math.ceil((calendarEvents as any[]).length / ITEMS_PER_PAGE);
+    
+    if (distance > minSwipeDistance && calendarEventsPage < totalCalendarPages - 1) {
+      setCalendarEventsPage(prev => prev + 1);
+    }
+    
+    if (distance < -minSwipeDistance && calendarEventsPage > 0) {
+      setCalendarEventsPage(prev => prev - 1);
+    }
+    
+    setCalendarEventsTouchStart(0);
+    setCalendarEventsTouchEnd(0);
+  };
+
+  // Calculate paginated data
+  const totalAppointmentPages = Math.ceil((appointments as any[]).length / ITEMS_PER_PAGE);
+  const paginatedAppointments = (appointments as any[]).slice(
+    appointmentsPage * ITEMS_PER_PAGE,
+    (appointmentsPage + 1) * ITEMS_PER_PAGE
+  );
+
+  const totalCalendarPages = Math.ceil((calendarEvents as any[]).length / ITEMS_PER_PAGE);
+  const paginatedCalendarEvents = (calendarEvents as any[]).slice(
+    calendarEventsPage * ITEMS_PER_PAGE,
+    (calendarEventsPage + 1) * ITEMS_PER_PAGE
+  );
+
   if (isLoading) {
     return (
       <div className="p-6">
@@ -2161,48 +2242,100 @@ export default function Admin() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {(appointments as any[]).map((appointment: any) => (
-                  <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div 
-                      className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
-                      onClick={() => setSelectedAppointment(appointment)}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
-                        {appointment.source === 'google_calendar' && (
-                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
-                            <Calendar className="w-3 h-3 mr-1" />
-                            Synced
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
-                      <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
-                      <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
-                      <p className="text-xs text-blue-600 mt-1">Click to view details</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Select
-                        key={`appointment-${appointment.id}-${appointment.status}`}
-                        value={appointment.status}
-                        onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
+              <div className="relative">
+                {/* Previous page button */}
+                {appointmentsPage > 0 && (
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg"
+                    onClick={() => setAppointmentsPage(prev => prev - 1)}
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                  </Button>
+                )}
+
+                {/* Appointments grid with swipe support */}
+                <div
+                  key={`appointments-${appointmentsPage}`}
+                  className="space-y-4"
+                  onTouchStart={handleAppointmentsTouchStart}
+                  onTouchMove={handleAppointmentsTouchMove}
+                  onTouchEnd={handleAppointmentsTouchEnd}
+                >
+                  {paginatedAppointments.map((appointment: any) => (
+                    <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div 
+                        className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                        onClick={() => setSelectedAppointment(appointment)}
                       >
-                        <SelectTrigger className="w-32">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="scheduled">Pending</SelectItem>
-                          <SelectItem value="confirmed">Confirmed</SelectItem>
-                          <SelectItem value="rejected">Rejected</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
+                          {appointment.source === 'google_calendar' && (
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
+                              <Calendar className="w-3 h-3 mr-1" />
+                              Synced
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
+                        <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
+                        <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
+                        <p className="text-xs text-blue-600 mt-1">Click to view details</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Select
+                          key={`appointment-${appointment.id}-${appointment.status}`}
+                          value={appointment.status}
+                          onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
+                        >
+                          <SelectTrigger className="w-32">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="scheduled">Pending</SelectItem>
+                            <SelectItem value="confirmed">Confirmed</SelectItem>
+                            <SelectItem value="rejected">Rejected</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+
+                {/* Next page button */}
+                {appointmentsPage < totalAppointmentPages - 1 && (
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg"
+                    onClick={() => setAppointmentsPage(prev => prev + 1)}
+                  >
+                    <ArrowLeft className="w-5 h-5 rotate-180" />
+                  </Button>
+                )}
               </div>
+
+              {/* Page indicators */}
+              {totalAppointmentPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-4">
+                  <span className="text-xs text-gray-500">
+                    Page {appointmentsPage + 1} of {totalAppointmentPages}
+                  </span>
+                  <div className="flex gap-1">
+                    {Array.from({ length: totalAppointmentPages }).map((_, i) => (
+                      <div
+                        key={i}
+                        className={`h-2 w-2 rounded-full ${
+                          i === appointmentsPage ? 'bg-brand-blue' : 'bg-gray-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -2219,47 +2352,99 @@ export default function Admin() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {calendarEvents.map((event: any) => (
-                    <div key={event.id} className="flex items-center justify-between p-4 border-2 border-purple-200 rounded-lg bg-white">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge className="bg-purple-600 text-white">
-                            <Calendar className="w-3 h-3 mr-1" />
-                            Google Calendar
-                          </Badge>
-                        </div>
-                        <h3 className="font-semibold text-purple-900">{event.summary || 'Untitled Event'}</h3>
-                        {event.description && (
-                          <p className="text-sm text-gray-600 mt-1">{event.description}</p>
-                        )}
-                        <div className="mt-2 space-y-1">
-                          <p className="text-sm text-gray-600">
-                            <strong>Start:</strong> {new Date(event.start?.dateTime || event.start?.date).toLocaleString()}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            <strong>End:</strong> {new Date(event.end?.dateTime || event.end?.date).toLocaleString()}
-                          </p>
-                          {event.attendees && event.attendees.length > 0 && (
+                <div className="relative">
+                  {/* Previous page button */}
+                  {calendarEventsPage > 0 && (
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg"
+                      onClick={() => setCalendarEventsPage(prev => prev - 1)}
+                    >
+                      <ArrowLeft className="w-5 h-5" />
+                    </Button>
+                  )}
+
+                  {/* Calendar events grid with swipe support */}
+                  <div
+                    key={`calendar-events-${calendarEventsPage}`}
+                    className="space-y-4"
+                    onTouchStart={handleCalendarEventsTouchStart}
+                    onTouchMove={handleCalendarEventsTouchMove}
+                    onTouchEnd={handleCalendarEventsTouchEnd}
+                  >
+                    {paginatedCalendarEvents.map((event: any) => (
+                      <div key={event.id} className="flex items-center justify-between p-4 border-2 border-purple-200 rounded-lg bg-white">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge className="bg-purple-600 text-white">
+                              <Calendar className="w-3 h-3 mr-1" />
+                              Google Calendar
+                            </Badge>
+                          </div>
+                          <h3 className="font-semibold text-purple-900">{event.summary || 'Untitled Event'}</h3>
+                          {event.description && (
+                            <p className="text-sm text-gray-600 mt-1">{event.description}</p>
+                          )}
+                          <div className="mt-2 space-y-1">
                             <p className="text-sm text-gray-600">
-                              <strong>Attendees:</strong> {event.attendees.map((a: any) => a.email).join(', ')}
+                              <strong>Start:</strong> {new Date(event.start?.dateTime || event.start?.date).toLocaleString()}
                             </p>
+                            <p className="text-sm text-gray-600">
+                              <strong>End:</strong> {new Date(event.end?.dateTime || event.end?.date).toLocaleString()}
+                            </p>
+                            {event.attendees && event.attendees.length > 0 && (
+                              <p className="text-sm text-gray-600">
+                                <strong>Attendees:</strong> {event.attendees.map((a: any) => a.email).join(', ')}
+                              </p>
+                            )}
+                          </div>
+                          {event.htmlLink && (
+                            <a
+                              href={event.htmlLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-purple-600 hover:underline mt-2 inline-block"
+                            >
+                              View in Google Calendar →
+                            </a>
                           )}
                         </div>
-                        {event.htmlLink && (
-                          <a
-                            href={event.htmlLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-purple-600 hover:underline mt-2 inline-block"
-                          >
-                            View in Google Calendar →
-                          </a>
-                        )}
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+
+                  {/* Next page button */}
+                  {calendarEventsPage < totalCalendarPages - 1 && (
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg"
+                      onClick={() => setCalendarEventsPage(prev => prev + 1)}
+                    >
+                      <ArrowLeft className="w-5 h-5 rotate-180" />
+                    </Button>
+                  )}
                 </div>
+
+                {/* Page indicators */}
+                {totalCalendarPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-4">
+                    <span className="text-xs text-gray-500">
+                      Page {calendarEventsPage + 1} of {totalCalendarPages}
+                    </span>
+                    <div className="flex gap-1">
+                      {Array.from({ length: totalCalendarPages }).map((_, i) => (
+                        <div
+                          key={i}
+                          className={`h-2 w-2 rounded-full ${
+                            i === calendarEventsPage ? 'bg-purple-600' : 'bg-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
