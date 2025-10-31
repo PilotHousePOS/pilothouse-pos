@@ -1022,7 +1022,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? await storage.getAppointments()
         : await storage.getAppointments(userId);
       
-      res.json(appointments);
+      // Filter out approved/completed/cancelled appointments older than 30 days
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      const filteredAppointments = appointments.filter((apt: any) => {
+        // Keep all pending/scheduled appointments regardless of age
+        if (apt.status === 'scheduled' && apt.isApproved !== true && apt.isApproved !== false) {
+          return true;
+        }
+        
+        // Filter old approved, confirmed, completed, or cancelled appointments
+        const isOldStatus = apt.status === 'confirmed' || 
+                           apt.status === 'completed' || 
+                           apt.status === 'cancelled' ||
+                           apt.isApproved === true ||
+                           apt.isApproved === false;
+        
+        if (isOldStatus) {
+          const appointmentDate = new Date(apt.appointmentDate);
+          return appointmentDate >= thirtyDaysAgo;
+        }
+        
+        // Keep all other appointments
+        return true;
+      });
+      
+      res.json(filteredAppointments);
     } catch (error) {
       console.error("Error fetching appointments:", error);
       res.status(500).json({ message: "Failed to fetch appointments" });
@@ -1168,6 +1194,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user is admin - auto-approve admin-created appointments
       const user = await storage.getUser(userId);
       const isAdminCreated = user?.isAdmin || user?.isGroomer;
+      
+      // Validate same-day booking restriction for customers (not admins/groomers)
+      if (!isAdminCreated) {
+        const appointmentDate = new Date(req.body.appointmentDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        appointmentDate.setHours(0, 0, 0, 0);
+        
+        if (appointmentDate <= today) {
+          return res.status(400).json({ 
+            message: "Same-day appointments are not allowed. Please book for tomorrow or later." 
+          });
+        }
+      }
       
       const appointmentData = insertAppointmentSchema.parse({ 
         ...req.body, 

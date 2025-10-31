@@ -165,12 +165,16 @@ export default function Booking() {
     
     if (date > maxDate) return false;
     
-    // Check minimum notice
-    const minimumNoticeHours = parseInt(settings.find(s => s.setting === 'minimum_notice_hours')?.value || '24');
-    const minDate = new Date();
-    minDate.setHours(minDate.getHours() + minimumNoticeHours);
+    // Prevent same-day bookings - customers can only book starting from tomorrow
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
     
-    if (date < minDate) return false;
+    const selectedDate = new Date(date);
+    selectedDate.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < tomorrow) return false;
     
     return true;
   };
