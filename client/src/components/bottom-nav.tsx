@@ -13,7 +13,7 @@ export default function BottomNav() {
     { path: "/supplies", icon: ShoppingBag, label: "Supplies" },
     { path: "/booking", icon: Calendar, label: "Book" },
     { path: "/profile", icon: User, label: "Profile" },
-    ...((user as any)?.isAdmin ? [{ path: "/admin", icon: Settings, label: "Admin" }] : []),
+    ...((user as any)?.isAdmin || (user as any)?.isGroomer ? [{ path: "/admin", icon: Settings, label: "Admin" }] : []),
   ];
 
   const handleNavClick = (path: string) => {
