@@ -13,6 +13,7 @@ export interface JWTUser {
   lastName: string | null;
   profileImageUrl: string | null;
   isAdmin: boolean | null;
+  isGroomer: boolean | null;
   createdAt: Date | null;
   updatedAt: Date | null;
 }
