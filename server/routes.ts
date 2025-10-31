@@ -1756,8 +1756,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/calendar/sync-contacts", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
-      if (!user?.isAdmin) {
-        return res.status(403).json({ message: "Admin access required" });
+      if (!user?.isAdmin && !user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or Groomer access required" });
       }
 
       const { syncContactsFromCalendarEvents } = await import("./googleCalendar");
@@ -1809,8 +1809,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/calendar/sync-appointments", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
-      if (!user?.isAdmin) {
-        return res.status(403).json({ message: "Admin access required" });
+      if (!user?.isAdmin && !user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or Groomer access required" });
       }
 
       const { syncAppointmentsFromCalendarEvents } = await import("./googleCalendar");
