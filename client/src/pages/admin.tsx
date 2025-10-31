@@ -1166,23 +1166,23 @@ function ContactsManager() {
                 >
                   <div className="flex flex-col gap-2">
                     {/* Name */}
-                    <p className="font-semibold text-base truncate" title={contact.displayName || contact.name}>
+                    <p className="font-semibold text-base break-words">
                       {contact.displayName || contact.name}
                     </p>
                     
                     {/* Phone Number */}
                     {contact.phoneNumber && (
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <span className="text-base">📱</span>
+                      <div className="flex items-start gap-2 text-sm text-gray-600">
+                        <span className="text-base flex-shrink-0">📱</span>
                         <PhoneNumberDisplay phoneNumber={contact.phoneNumber} />
                       </div>
                     )}
                     
                     {/* Animal Type/Breed */}
                     {contact.animalType && (
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <span className="text-base">🐾</span>
-                        <span className="capitalize truncate" title={`${contact.animalType.replace('_', ' ')}${contact.breed && contact.animalType === 'dog' ? ` - ${contact.breed}` : ''}`}>
+                      <div className="flex items-start gap-2 text-sm text-gray-600">
+                        <span className="text-base flex-shrink-0">🐾</span>
+                        <span className="capitalize break-words">
                           {contact.animalType.replace('_', ' ')}{contact.breed && contact.animalType === 'dog' ? ` - ${contact.breed}` : ''}
                         </span>
                       </div>
