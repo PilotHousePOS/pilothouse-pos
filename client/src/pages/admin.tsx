@@ -2497,6 +2497,24 @@ export default function Admin() {
                                 <strong>Attendees:</strong> {event.attendees.map((a: any) => a.email).join(', ')}
                               </p>
                             )}
+                            {event.linkedContacts && event.linkedContacts.length > 0 && (
+                              <div className="mt-2 p-2 bg-purple-50 rounded border border-purple-200">
+                                <p className="text-xs font-semibold text-purple-700 mb-1">Linked Contacts:</p>
+                                {event.linkedContacts.map((contact: any, idx: number) => (
+                                  <div key={idx} className="text-xs text-gray-700 ml-2">
+                                    <span className="font-medium">{contact.name}</span>
+                                    {contact.animalType && (
+                                      <span className="ml-2">
+                                        🐾 <span className="capitalize">{contact.animalType.replace('_', ' ')}</span>
+                                        {contact.breed && contact.animalType === 'dog' && (
+                                          <span> - {contact.breed}</span>
+                                        )}
+                                      </span>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                           {event.htmlLink && (
                             <a

@@ -1482,7 +1482,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const maxResults = req.query.maxResults ? parseInt(req.query.maxResults as string) : 10;
       const events = await getUpcomingEvents(maxResults);
-      res.json(events);
+      
+      // Fetch all contacts to link with event attendees
+      const allContacts = await storage.getAllContacts();
+      
+      // Enhance events with contact information
+      const eventsWithContacts = events.map((event: any) => {
+        // Find contacts that match event attendees
+        const linkedContacts: any[] = [];
+        if (event.attendees && Array.isArray(event.attendees)) {
+          event.attendees.forEach((attendee: any) => {
+            const matchingContact = allContacts.find((c: any) => 
+              c.email?.toLowerCase() === attendee.email?.toLowerCase()
+            );
+            if (matchingContact) {
+              linkedContacts.push({
+                name: matchingContact.name,
+                email: matchingContact.email,
+                animalType: matchingContact.animalType,
+                breed: matchingContact.breed,
+              });
+            }
+          });
+        }
+        
+        return {
+          ...event,
+          linkedContacts,
+        };
+      });
+      
+      res.json(eventsWithContacts);
     } catch (error) {
       console.error("Error fetching calendar events:", error);
       res.status(500).json({ message: "Failed to fetch calendar events", error: (error as Error).message });
@@ -1530,7 +1560,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      const { name, email, phoneNumber, notes } = req.body;
+      const { name, email, phoneNumber, notes, animalType, breed } = req.body;
       const trimmedName = name?.trim();
       const trimmedEmail = email?.trim();
       
@@ -1545,7 +1575,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name: trimmedName, 
         email: trimmedEmail, 
         phoneNumber, 
-        notes 
+        notes,
+        animalType,
+        breed 
       });
       res.json(contact);
     } catch (error) {
@@ -1562,7 +1594,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const id = parseInt(req.params.id);
-      const { name, email, phoneNumber, notes } = req.body;
+      const { name, email, phoneNumber, notes, animalType, breed } = req.body;
       const trimmedName = name?.trim();
       const trimmedEmail = email?.trim();
       
@@ -1577,7 +1609,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name: trimmedName, 
         email: trimmedEmail, 
         phoneNumber, 
-        notes 
+        notes,
+        animalType,
+        breed 
       });
       res.json(contact);
     } catch (error) {
