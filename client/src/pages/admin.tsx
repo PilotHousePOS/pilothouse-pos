@@ -1421,27 +1421,27 @@ export default function Admin() {
   // Always call all hooks at the top level
   const { data: pets = [] } = useQuery({
     queryKey: ["/api/pets"],
-    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+    enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
 
   const { data: supplies = [] } = useQuery({
     queryKey: ["/api/supplies"],
-    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+    enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
 
   const { data: orders = [] } = useQuery({
     queryKey: ["/api/orders"],
-    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+    enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
 
   const { data: appointments = [] } = useQuery<any[]>({
     queryKey: ["/api/appointments"],
-    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+    enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
 
   const { data: unapprovedAppointments = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/appointments/unapproved"],
-    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+    enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
 
   const { data: users = [] } = useQuery<any[]>({
@@ -1456,13 +1456,13 @@ export default function Admin() {
 
   const { data: calendarEvents = [], isError: calendarEventsError } = useQuery<any[]>({
     queryKey: ["/api/admin/calendar/events"],
-    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+    enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
     retry: false,
   });
 
   const groomersQuery = useQuery<any[]>({
     queryKey: ["/api/admin/groomers"],
-    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+    enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
 
   // Create Pet Mutation
@@ -2027,13 +2027,13 @@ export default function Admin() {
     );
   }
 
-  if (!typedUser?.isAdmin) {
+  if (!typedUser?.isAdmin && !typedUser?.isGroomer) {
     return (
       <div className="p-6">
         <div className="text-center">
           <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
-          <p className="text-gray-600">Administrator privileges required</p>
+          <p className="text-gray-600">Administrator or Groomer privileges required</p>
         </div>
       </div>
     );
@@ -2060,9 +2060,15 @@ export default function Admin() {
           <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
           <div className="flex items-center space-x-3">
             <AdminNotifications />
-            <Badge variant="secondary" className="bg-brand-blue text-white">
-              Administrator
-            </Badge>
+            {typedUser?.isAdmin ? (
+              <Badge variant="secondary" className="bg-brand-blue text-white">
+                Administrator
+              </Badge>
+            ) : typedUser?.isGroomer ? (
+              <Badge variant="secondary" className="bg-purple-600 text-white">
+                Groomer
+              </Badge>
+            ) : null}
           </div>
         </div>
       </div>
@@ -2112,16 +2118,20 @@ export default function Admin() {
               <span className="hidden md:inline">Orders & Appointments</span>
               <span className="md:hidden">Orders</span>
             </TabsTrigger>
-            <TabsTrigger value="grooming" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
-              <span className="hidden md:inline">Grooming Settings</span>
-              <span className="md:hidden">Settings</span>
-            </TabsTrigger>
+            {typedUser?.isAdmin && (
+              <TabsTrigger value="grooming" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
+                <span className="hidden md:inline">Grooming Settings</span>
+                <span className="md:hidden">Settings</span>
+              </TabsTrigger>
+            )}
             <TabsTrigger value="groomers" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
               Groomers
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
-              Users
-            </TabsTrigger>
+            {typedUser?.isAdmin && (
+              <TabsTrigger value="users" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
+                Users
+              </TabsTrigger>
+            )}
             <TabsTrigger value="calendar" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
               Calendar
             </TabsTrigger>
@@ -2141,35 +2151,39 @@ export default function Admin() {
                   Pets ({(pets as any[]).length})
                 </CardTitle>
                 {/* Mobile: Custom Modal, Desktop: Dialog */}
-                <div className="sm:hidden">
-                  <Button 
-                    size="sm" 
-                    className="bg-brand-blue hover:bg-blue-600"
-                    onClick={() => setIsAddPetOpen(true)}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Pet
-                  </Button>
-                </div>
-                <div className="hidden sm:block">
-                  <Dialog open={isAddPetOpen} onOpenChange={setIsAddPetOpen}>
-                    <DialogTrigger asChild>
-                      <Button size="sm" className="bg-brand-blue hover:bg-blue-600">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Pet
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Add New Pet</DialogTitle>
-                      </DialogHeader>
-                      <AddPetForm onSubmit={(data) => createPetMutation.mutate(data)} />
-                    </DialogContent>
-                  </Dialog>
-                </div>
+                {typedUser?.isAdmin && (
+                  <div className="sm:hidden">
+                    <Button 
+                      size="sm" 
+                      className="bg-brand-blue hover:bg-blue-600"
+                      onClick={() => setIsAddPetOpen(true)}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Pet
+                    </Button>
+                  </div>
+                )}
+                {typedUser?.isAdmin && (
+                  <div className="hidden sm:block">
+                    <Dialog open={isAddPetOpen} onOpenChange={setIsAddPetOpen}>
+                      <DialogTrigger asChild>
+                        <Button size="sm" className="bg-brand-blue hover:bg-blue-600">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add Pet
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>Add New Pet</DialogTitle>
+                        </DialogHeader>
+                        <AddPetForm onSubmit={(data) => createPetMutation.mutate(data)} />
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                )}
 
                 {/* Mobile Full-Screen Modal */}
-                {isAddPetOpen && (
+                {typedUser?.isAdmin && isAddPetOpen && (
                   <div className="sm:hidden fixed inset-0 z-50 bg-white">
                     <div className="flex flex-col h-full">
                       <div className="flex items-center justify-between p-4 border-b bg-white sticky top-0 z-10">
@@ -2203,21 +2217,25 @@ export default function Admin() {
                       <Badge variant={pet.isAvailable ? "default" : "secondary"}>
                         {pet.isAvailable ? "Available" : "Adopted"}
                       </Badge>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setEditingPet(pet)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => deletePetMutation.mutate(pet.id)}
-                        disabled={deletePetMutation.isPending}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      {typedUser?.isAdmin && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEditingPet(pet)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deletePetMutation.mutate(pet.id)}
+                            disabled={deletePetMutation.isPending}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -2233,20 +2251,22 @@ export default function Admin() {
                   <Package className="w-5 h-5" />
                   Supplies ({(supplies as any[]).length})
                 </CardTitle>
-                <Dialog open={isAddSupplyOpen} onOpenChange={setIsAddSupplyOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" className="bg-brand-orange hover:bg-orange-600">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Supply
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Add New Supply</DialogTitle>
-                    </DialogHeader>
-                    <AddSupplyForm onSubmit={(data) => createSupplyMutation.mutate(data)} />
-                  </DialogContent>
-                </Dialog>
+                {typedUser?.isAdmin && (
+                  <Dialog open={isAddSupplyOpen} onOpenChange={setIsAddSupplyOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" className="bg-brand-orange hover:bg-orange-600">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Supply
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Add New Supply</DialogTitle>
+                      </DialogHeader>
+                      <AddSupplyForm onSubmit={(data) => createSupplyMutation.mutate(data)} />
+                    </DialogContent>
+                  </Dialog>
+                )}
               </div>
             </CardHeader>
             <CardContent>
@@ -2262,21 +2282,25 @@ export default function Admin() {
                       <Badge variant={supply.stockQuantity > 0 ? "default" : "destructive"}>
                         {supply.stockQuantity > 0 ? "In Stock" : "Out of Stock"}
                       </Badge>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setEditingSupply(supply)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => deleteSupplyMutation.mutate(supply.id)}
-                        disabled={deleteSupplyMutation.isPending}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      {typedUser?.isAdmin && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEditingSupply(supply)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deleteSupplyMutation.mutate(supply.id)}
+                            disabled={deleteSupplyMutation.isPending}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -3078,14 +3102,16 @@ export default function Admin() {
                   <Users className="w-5 h-5" />
                   Groomers ({groomersQuery.data?.length || 0})
                 </CardTitle>
-                <Button 
-                  onClick={() => setIsAddGroomerOpen(true)}
-                  className="w-full sm:w-auto bg-brand-blue hover:bg-blue-600"
-                  data-testid="button-add-groomer"
-                >
-                  <UserPlus className="w-4 h-4 mr-2" />
-                  Add New Groomer
-                </Button>
+                {typedUser?.isAdmin && (
+                  <Button 
+                    onClick={() => setIsAddGroomerOpen(true)}
+                    className="w-full sm:w-auto bg-brand-blue hover:bg-blue-600"
+                    data-testid="button-add-groomer"
+                  >
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Add New Groomer
+                  </Button>
+                )}
               </div>
             </CardHeader>
             <CardContent>
@@ -3134,41 +3160,43 @@ export default function Admin() {
                             </div>
                           )}
                         </div>
-                        <div className="flex flex-wrap gap-2 mt-4">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 min-w-[80px]"
-                            onClick={() => setEditingGroomer(groomer)}
-                            data-testid={`button-edit-groomer-${groomer.id}`}
-                          >
-                            <Pencil className="w-3 h-3 mr-1" />
-                            Edit
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 min-w-[100px]"
-                            onClick={() => toggleGroomerActiveMutation.mutate({ 
-                              id: groomer.id, 
-                              isActive: !groomer.isActive 
-                            })}
-                            disabled={toggleGroomerActiveMutation.isPending}
-                            data-testid={`button-toggle-groomer-${groomer.id}`}
-                          >
-                            {groomer.isActive ? <EyeOff className="w-3 h-3 mr-1" /> : <Eye className="w-3 h-3 mr-1" />}
-                            {groomer.isActive ? "Deactivate" : "Activate"}
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="min-w-[40px]"
-                            onClick={() => setGroomerToDelete(groomer)}
-                            data-testid={`button-delete-groomer-${groomer.id}`}
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
-                        </div>
+                        {typedUser?.isAdmin && (
+                          <div className="flex flex-wrap gap-2 mt-4">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 min-w-[80px]"
+                              onClick={() => setEditingGroomer(groomer)}
+                              data-testid={`button-edit-groomer-${groomer.id}`}
+                            >
+                              <Pencil className="w-3 h-3 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 min-w-[100px]"
+                              onClick={() => toggleGroomerActiveMutation.mutate({ 
+                                id: groomer.id, 
+                                isActive: !groomer.isActive 
+                              })}
+                              disabled={toggleGroomerActiveMutation.isPending}
+                              data-testid={`button-toggle-groomer-${groomer.id}`}
+                            >
+                              {groomer.isActive ? <EyeOff className="w-3 h-3 mr-1" /> : <Eye className="w-3 h-3 mr-1" />}
+                              {groomer.isActive ? "Deactivate" : "Activate"}
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="min-w-[40px]"
+                              onClick={() => setGroomerToDelete(groomer)}
+                              data-testid={`button-delete-groomer-${groomer.id}`}
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   ))}
