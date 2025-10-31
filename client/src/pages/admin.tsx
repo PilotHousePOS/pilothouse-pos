@@ -395,26 +395,6 @@ function ContactsManager() {
     },
   });
 
-  const syncAppointmentsMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest("POST", "/api/admin/calendar/sync-appointments");
-    },
-    onSuccess: (data: any) => {
-      toast({
-        title: "Appointments Synced",
-        description: data.message || "All appointments replaced with Google Calendar events.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
-    },
-    onError: (error) => {
-      toast({
-        title: "Sync Failed",
-        description: "Failed to sync appointments from calendar.",
-        variant: "destructive",
-      });
-    },
-  });
-
   const createEventMutation = useMutation({
     mutationFn: async (eventData: any) => {
       await apiRequest("POST", "/api/admin/calendar/events", eventData);
@@ -1621,6 +1601,26 @@ export default function Admin() {
       toast({
         title: "Error",
         description: "Failed to update appointment.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const syncAppointmentsMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/admin/calendar/sync-appointments");
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Appointments Synced",
+        description: data.message || "All appointments replaced with Google Calendar events.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Sync Failed",
+        description: "Failed to sync appointments from calendar.",
         variant: "destructive",
       });
     },
