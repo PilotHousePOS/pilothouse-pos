@@ -1137,7 +1137,7 @@ function ContactsManager() {
             {/* Contact grid with swipe support */}
             <div 
               key={`contacts-${searchQuery}-${currentPage}`}
-              className="grid grid-cols-1 md:grid-cols-2 gap-3"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
@@ -1147,99 +1147,107 @@ function ContactsManager() {
               return (
                 <div 
                   key={contact.resourceName || contact.email || contact.id || index} 
-                  className={`border rounded-lg p-4 transition-all ${
+                  className={`border rounded-lg p-3 transition-all ${
                     contact.isDatabaseContact ? '' : 'cursor-pointer hover:bg-gray-50'
                   } ${isSelected ? 'bg-blue-50 border-blue-500' : ''}`}
                   onClick={() => !contact.isDatabaseContact && toggleContactSelection(contact)}
                   data-testid={`contact-card-${index}`}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm mb-1 break-words">
+                  <div className="flex flex-col gap-2">
+                    {/* Top section with badges */}
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="font-semibold text-sm truncate flex-1" title={contact.displayName || contact.name}>
                         {contact.displayName || contact.name}
                       </p>
-                      {contact.email && (
-                        <div className="flex items-start gap-1 text-xs text-gray-600 mb-1">
-                          <Mail className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                          <span className="break-all">{contact.email}</span>
-                        </div>
-                      )}
-                      {contact.phoneNumber && (
-                        <div className="flex items-start gap-1 text-xs text-gray-600 mb-1">
-                          <span className="font-medium flex-shrink-0">📱</span>
-                          <PhoneNumberDisplay phoneNumber={contact.phoneNumber} />
-                        </div>
-                      )}
-                      {contact.animalType && (
-                        <div className="flex items-start gap-1 text-xs text-gray-600 mb-1">
-                          <span className="font-medium flex-shrink-0">🐾</span>
-                          <span className="capitalize">{contact.animalType.replace('_', ' ')}{contact.breed && contact.animalType === 'dog' ? ` - ${contact.breed}` : ''}</span>
-                        </div>
-                      )}
-                      {contact.notes && (
-                        <p className="text-xs text-gray-500 mt-1 line-clamp-2 break-words">{contact.notes}</p>
-                      )}
-                    </div>
-                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                      {contact.isDatabaseContact ? (
-                        <>
+                      <div className="flex flex-col gap-1 flex-shrink-0">
+                        {contact.isDatabaseContact ? (
                           <Badge variant="outline" className={`text-xs whitespace-nowrap ${
                             contact.isManual 
                               ? 'bg-green-50 border-green-300 text-green-700'
                               : 'bg-purple-50 border-purple-300 text-purple-700'
                           }`}>
-                            {contact.isManual ? 'Manual' : 'Google Calendar'}
+                            {contact.isManual ? 'Manual' : 'Calendar'}
                           </Badge>
-                          {contact.linkedUserId && (
-                            <Badge variant="outline" className="text-xs bg-blue-50 border-blue-300 text-blue-700 whitespace-nowrap">
-                              👤 Linked
-                            </Badge>
-                          )}
-                          <div className="flex gap-1 mt-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 px-2"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditContact(contact);
-                              }}
-                              data-testid={`button-edit-contact-${index}`}
-                            >
-                              <Edit className="w-3 h-3" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 px-2 hover:text-red-600"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteContact(contact.id);
-                              }}
-                              data-testid={`button-delete-contact-${index}`}
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
-                          </div>
-                        </>
-                      ) : (
-                        <>
+                        ) : (
                           <Badge variant="outline" className="text-xs bg-purple-50 border-purple-300 text-purple-700 whitespace-nowrap">
                             Google
                           </Badge>
-                          {contact.isOrganizer && (
-                            <Badge variant="secondary" className="text-xs whitespace-nowrap">
-                              Organizer
-                            </Badge>
-                          )}
-                          {isSelected && (
-                            <Badge variant="default" className="bg-blue-600 text-xs whitespace-nowrap">
-                              Selected
-                            </Badge>
-                          )}
-                        </>
+                        )}
+                        {contact.linkedUserId && (
+                          <Badge variant="outline" className="text-xs bg-blue-50 border-blue-300 text-blue-700 whitespace-nowrap">
+                            👤 Linked
+                          </Badge>
+                        )}
+                        {contact.isOrganizer && (
+                          <Badge variant="secondary" className="text-xs whitespace-nowrap">
+                            Organizer
+                          </Badge>
+                        )}
+                        {isSelected && (
+                          <Badge variant="default" className="bg-blue-600 text-xs whitespace-nowrap">
+                            Selected
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Contact details */}
+                    <div className="space-y-1">
+                      {contact.email && (
+                        <div className="flex items-start gap-1 text-xs text-gray-600">
+                          <Mail className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                          <span className="truncate" title={contact.email}>{contact.email}</span>
+                        </div>
+                      )}
+                      {contact.phoneNumber && (
+                        <div className="flex items-start gap-1 text-xs text-gray-600">
+                          <span className="font-medium flex-shrink-0">📱</span>
+                          <PhoneNumberDisplay phoneNumber={contact.phoneNumber} />
+                        </div>
+                      )}
+                      {contact.animalType && (
+                        <div className="flex items-start gap-1 text-xs text-gray-600">
+                          <span className="font-medium flex-shrink-0">🐾</span>
+                          <span className="capitalize truncate" title={`${contact.animalType.replace('_', ' ')}${contact.breed && contact.animalType === 'dog' ? ` - ${contact.breed}` : ''}`}>
+                            {contact.animalType.replace('_', ' ')}{contact.breed && contact.animalType === 'dog' ? ` - ${contact.breed}` : ''}
+                          </span>
+                        </div>
+                      )}
+                      {contact.notes && (
+                        <p className="text-xs text-gray-500 line-clamp-2" title={contact.notes}>{contact.notes}</p>
                       )}
                     </div>
+                    
+                    {/* Action buttons */}
+                    {contact.isDatabaseContact && (
+                      <div className="flex gap-1 pt-1 border-t border-gray-100">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 flex-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditContact(contact);
+                          }}
+                          data-testid={`button-edit-contact-${index}`}
+                        >
+                          <Edit className="w-3 h-3 mr-1" />
+                          <span className="text-xs">Edit</span>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 hover:text-red-600"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteContact(contact.id);
+                          }}
+                          data-testid={`button-delete-contact-${index}`}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
