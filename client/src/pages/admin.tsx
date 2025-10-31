@@ -221,7 +221,7 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                   {googleEventsList.map((event: any, idx: number) => (
                     <div key={event.id || idx} className="bg-purple-50 p-3 rounded border-l-4 border-purple-500">
                       <div className="flex items-center justify-between">
-                        <div>
+                        <div className="flex-1">
                           <h4 className="font-semibold text-gray-900">
                             {event.summary || 'Untitled Event'}
                           </h4>
@@ -235,6 +235,24 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                               Attendees: {event.attendees.slice(0, 2).map((a: any) => a.displayName || a.email).join(', ')}
                               {event.attendees.length > 2 && ` +${event.attendees.length - 2} more`}
                             </p>
+                          )}
+                          {event.linkedContacts && event.linkedContacts.length > 0 && (
+                            <div className="mt-2 p-2 bg-white rounded border border-purple-200">
+                              <p className="text-xs font-semibold text-purple-700 mb-1">Pet Info:</p>
+                              {event.linkedContacts.map((contact: any, contactIdx: number) => (
+                                <div key={contactIdx} className="text-xs text-gray-700 ml-2">
+                                  <span className="font-medium">{contact.name}:</span>
+                                  {contact.animalType && (
+                                    <span className="ml-2">
+                                      🐾 <span className="capitalize">{contact.animalType.replace('_', ' ')}</span>
+                                      {contact.breed && contact.animalType === 'dog' && (
+                                        <span> - {contact.breed}</span>
+                                      )}
+                                    </span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
                           )}
                         </div>
                         <Badge variant="default" className="bg-purple-600">

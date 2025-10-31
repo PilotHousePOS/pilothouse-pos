@@ -1686,7 +1686,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const date = new Date(dateStr);
       const events = await getEventsForDate(date);
-      res.json(events);
+      
+      // Fetch all contacts to link with event attendees
+      const allContacts = await storage.getAllContacts();
+      
+      // Enhance events with contact information
+      const eventsWithContacts = events.map((event: any) => {
+        // Find contacts that match event attendees
+        const linkedContacts: any[] = [];
+        if (event.attendees && Array.isArray(event.attendees)) {
+          event.attendees.forEach((attendee: any) => {
+            const matchingContact = allContacts.find((c: any) => 
+              c.email?.toLowerCase() === attendee.email?.toLowerCase()
+            );
+            if (matchingContact) {
+              linkedContacts.push({
+                name: matchingContact.name,
+                email: matchingContact.email,
+                animalType: matchingContact.animalType,
+                breed: matchingContact.breed,
+              });
+            }
+          });
+        }
+        
+        return {
+          ...event,
+          linkedContacts,
+        };
+      });
+      
+      res.json(eventsWithContacts);
     } catch (error) {
       console.error("Error fetching events for date:", error);
       res.status(500).json({ message: "Failed to fetch events for date", error: (error as Error).message });
