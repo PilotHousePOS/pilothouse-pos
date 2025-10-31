@@ -1163,7 +1163,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/appointments", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;
-      const appointmentData = insertAppointmentSchema.parse({ ...req.body, userId });
+      
+      // Check if user is admin - auto-approve admin-created appointments
+      const user = await storage.getUser(userId);
+      const isAdminCreated = user?.isAdmin || user?.isGroomer;
+      
+      const appointmentData = insertAppointmentSchema.parse({ 
+        ...req.body, 
+        userId,
+        isApproved: isAdminCreated ? true : (req.body.isApproved ?? false)
+      });
       const appointment = await storage.createAppointment(appointmentData);
       
       // Send admin notifications for new appointment
