@@ -325,7 +325,7 @@ export async function syncAppointmentsFromCalendarEvents() {
         ownerLastName,
         ownerPhoneNumber: phoneNumber,
         status: 'scheduled',
-        isApproved: true, // Auto-approve calendar synced appointments
+        isApproved: false, // Require admin approval for calendar synced appointments
         price: serviceType === 'Bath Only' ? '45.00' : '75.00', // Default pricing
         source: 'google_calendar',
       });

@@ -1805,7 +1805,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Sync appointments from Google Calendar
+  // Sync appointments from Google Calendar (incremental sync)
   app.post("/api/admin/calendar/sync-appointments", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
@@ -1815,19 +1815,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { syncAppointmentsFromCalendarEvents } = await import("./googleCalendar");
       
-      // Fetch calendar appointments BEFORE starting transaction (preflight validation)
+      // Fetch calendar appointments
       console.log('Fetching Google Calendar events...');
       const calendarAppointments = await syncAppointmentsFromCalendarEvents();
       
-      // Preflight validation: ensure we have valid appointments before clearing database
+      // Validate appointments data
       if (!Array.isArray(calendarAppointments)) {
         throw new Error('Invalid calendar data: expected array of appointments');
       }
 
-      console.log(`Found ${calendarAppointments.length} calendar events to sync`);
+      console.log(`Found ${calendarAppointments.length} calendar events`);
 
-      // Prepare appointments with user ID
-      const appointmentsToCreate = calendarAppointments.map((apt: any) => ({
+      // Get all existing appointments from Google Calendar (by googleEventId)
+      const allAppointments = await storage.getAllAppointments();
+      const existingGoogleEventIds = new Set(
+        allAppointments
+          .filter((apt: any) => apt.googleEventId)
+          .map((apt: any) => apt.googleEventId)
+      );
+
+      // Filter out appointments that already exist
+      const newAppointments = calendarAppointments.filter((apt: any) => 
+        !existingGoogleEventIds.has(apt.googleEventId)
+      );
+
+      console.log(`${newAppointments.length} new appointments to import, ${calendarAppointments.length - newAppointments.length} already exist`);
+
+      // Prepare new appointments with user ID
+      const appointmentsToCreate = newAppointments.map((apt: any) => ({
         ...apt,
         userId: user.id, // Associate with the admin user performing the sync
       }));
@@ -1838,34 +1853,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           throw new Error(`Invalid appointment data: missing required fields in appointment: ${JSON.stringify(apt)}`);
         }
       }
-      
-      // Import appointments table
-      const { appointments } = await import('./db');
-      
-      // Execute the sync operation in a transaction for atomicity
-      const createdAppointments = await db.transaction(async (tx) => {
-        // Clear all existing appointments within transaction
-        await tx.delete(appointments);
-        console.log('Cleared all existing appointments (in transaction)');
 
-        // Bulk create new appointments from calendar
-        if (appointmentsToCreate.length > 0) {
-          const newAppointments = await tx.insert(appointments).values(appointmentsToCreate).returning();
-          console.log(`Created ${newAppointments.length} appointments from calendar (in transaction)`);
-          return newAppointments;
-        }
-        return [];
-      });
+      // Create new appointments
+      let createdAppointments = [];
+      if (appointmentsToCreate.length > 0) {
+        createdAppointments = await storage.bulkCreateAppointments(appointmentsToCreate);
+        console.log(`Created ${createdAppointments.length} new appointments from calendar`);
+      }
 
       res.json({ 
-        message: `Successfully synced ${createdAppointments.length} appointments from Google Calendar`,
+        message: `Successfully imported ${createdAppointments.length} new appointments from Google Calendar`,
         appointments: createdAppointments,
-        cleared: true,
+        newCount: createdAppointments.length,
+        skippedCount: calendarAppointments.length - newAppointments.length,
       });
     } catch (error) {
       console.error("Error syncing appointments from calendar:", error);
       res.status(500).json({ 
-        message: "Failed to sync appointments. No changes were made to your existing appointments.", 
+        message: "Failed to sync appointments from calendar.", 
         error: (error as Error).message 
       });
     }
