@@ -266,6 +266,10 @@ export async function syncAppointmentsFromCalendarEvents() {
     console.log(`[SYNC] Found ${events.length} total calendar events`);
     const appointments = [];
 
+    // Get all contacts to match with events
+    const { storage } = await import('./storage');
+    const allContacts = await storage.getAllContacts();
+
     for (const event of events) {
       // Skip events without start time or summary
       if (!event.start?.dateTime || !event.summary) {
@@ -277,9 +281,14 @@ export async function syncAppointmentsFromCalendarEvents() {
       const description = event.description || '';
       const combinedText = `${summary} ${description}`;
 
-      // Extract phone numbers from description
+      // First, try to find phone number from contact associated with this event
+      const eventContact = allContacts.find((contact: any) => 
+        contact.source === 'google_calendar' && contact.eventId === event.id && contact.phoneNumber
+      );
+      
+      // Extract phone numbers from description as fallback
       const phoneNumbers = extractPhoneNumbers(combinedText);
-      const phoneNumber = phoneNumbers[0] || '(555) 000-0000'; // Default if no phone found
+      const phoneNumber = eventContact?.phoneNumber || phoneNumbers[0] || '(555) 000-0000';
 
       // Parse date and time
       const startDateTime = new Date(event.start.dateTime);
