@@ -2399,13 +2399,13 @@ export default function Admin() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-yellow-700">
                 <Calendar className="w-5 h-5" />
-                Pending Appointments ({(appointments as any[]).filter((a: any) => a.status === 'scheduled').length})
+                Pending Appointments ({(appointments as any[]).filter((a: any) => a.status === 'scheduled' && a.isApproved !== false).length})
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {(appointments as any[])
-                  .filter((a: any) => a.status === 'scheduled')
+                  .filter((a: any) => a.status === 'scheduled' && a.isApproved !== false)
                   .map((appointment: any) => (
                     <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
                       <div 
