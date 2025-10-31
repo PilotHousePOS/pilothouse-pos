@@ -330,24 +330,30 @@ export async function syncAppointmentsFromCalendarEvents() {
         }
       }
 
+      // Extract pet name from summary - second word onwards (excluding phone numbers)
+      let petName = 'Pet';
+      let petType = 'Dog';
+      
+      if (summaryWords.length > 1) {
+        // Get all words after the first (owner last name)
+        const potentialPetWords = summaryWords.slice(1);
+        
+        // Filter out phone numbers and collect pet name words
+        const petNameWords = potentialPetWords.filter(word => {
+          // Remove phone number patterns (digits with optional dashes, parens, spaces)
+          return !/^[\d\(\)\-\s]+$/.test(word);
+        });
+        
+        if (petNameWords.length > 0) {
+          petName = petNameWords.join(' ');
+        }
+      }
+
       // Determine service type from summary (default to 'Full Grooming')
       let serviceType = 'Full Grooming';
       const summaryLower = summary.toLowerCase();
       if (summaryLower.includes('bath') && !summaryLower.includes('full')) {
         serviceType = 'Bath Only';
-      }
-
-      // Extract pet name and type from summary or description
-      let petName = 'Pet';
-      let petType = 'Dog';
-      
-      // Try to extract pet info from summary
-      const petMatch = summary.match(/(?:for |appointment for )?([A-Z][a-z]+)(?:'s)?(?:\s+\(([^)]+)\))?/i);
-      if (petMatch) {
-        petName = petMatch[1];
-        if (petMatch[2]) {
-          petType = petMatch[2];
-        }
       }
 
       const appointmentData = {
