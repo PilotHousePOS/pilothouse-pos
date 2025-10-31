@@ -1151,6 +1151,12 @@ function ContactsManager() {
                           <PhoneNumberDisplay phoneNumber={contact.phoneNumber} />
                         </div>
                       )}
+                      {contact.animalType && (
+                        <div className="flex items-start gap-1 text-xs text-gray-600 mb-1">
+                          <span className="font-medium flex-shrink-0">🐾</span>
+                          <span className="capitalize">{contact.animalType.replace('_', ' ')}{contact.breed && contact.animalType === 'dog' ? ` - ${contact.breed}` : ''}</span>
+                        </div>
+                      )}
                       {contact.notes && (
                         <p className="text-xs text-gray-500 mt-1 line-clamp-2 break-words">{contact.notes}</p>
                       )}
