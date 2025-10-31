@@ -546,11 +546,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUnapprovedAppointments(): Promise<Appointment[]> {
-    return await db
+    const allUnapproved = await db
       .select()
       .from(appointments)
       .where(eq(appointments.isApproved, false))
       .orderBy(desc(appointments.createdAt));
+    
+    // Filter out past appointments (only show future appointments)
+    const now = new Date();
+    return allUnapproved.filter(apt => {
+      const aptDateTime = new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
+      return aptDateTime >= now;
+    });
   }
 
   async approveAppointment(id: number): Promise<Appointment> {
