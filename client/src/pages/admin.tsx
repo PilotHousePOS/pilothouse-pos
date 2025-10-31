@@ -369,14 +369,14 @@ function ContactsManager() {
     mutationFn: async ({ id, data }: { id: number; data: any }) => {
       await apiRequest("PUT", `/api/contacts/${id}`, data);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast({
         title: "Contact Updated",
         description: "Contact has been updated successfully.",
       });
       setEditingContact(null);
       setContactFormData({ name: '', email: '', phoneNumber: '', notes: '', animalType: '', breed: '' });
-      queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/contacts"] });
     },
     onError: () => {
       toast({
@@ -458,11 +458,12 @@ function ContactsManager() {
     },
   });
 
-  // Map database contacts and mark them as manual or google based on source field
+  // Map database contacts - all database contacts are editable (both manual and google_calendar sourced)
   const allContacts = allDatabaseContacts.map((c: any) => ({
     ...c,
     displayName: c.name,
     isManual: c.source === 'manual',
+    isDatabaseContact: true, // All contacts from database are editable
   }));
 
   const filteredContacts = searchQuery.trim() === '' 
@@ -1147,9 +1148,9 @@ function ContactsManager() {
                 <div 
                   key={contact.resourceName || contact.email || contact.id || index} 
                   className={`border rounded-lg p-4 transition-all ${
-                    contact.isManual ? '' : 'cursor-pointer hover:bg-gray-50'
+                    contact.isDatabaseContact ? '' : 'cursor-pointer hover:bg-gray-50'
                   } ${isSelected ? 'bg-blue-50 border-blue-500' : ''}`}
-                  onClick={() => !contact.isManual && toggleContactSelection(contact)}
+                  onClick={() => !contact.isDatabaseContact && toggleContactSelection(contact)}
                   data-testid={`contact-card-${index}`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -1180,10 +1181,14 @@ function ContactsManager() {
                       )}
                     </div>
                     <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                      {contact.isManual ? (
+                      {contact.isDatabaseContact ? (
                         <>
-                          <Badge variant="outline" className="text-xs bg-green-50 border-green-300 text-green-700 whitespace-nowrap">
-                            Manual
+                          <Badge variant="outline" className={`text-xs whitespace-nowrap ${
+                            contact.isManual 
+                              ? 'bg-green-50 border-green-300 text-green-700'
+                              : 'bg-purple-50 border-purple-300 text-purple-700'
+                          }`}>
+                            {contact.isManual ? 'Manual' : 'Google Calendar'}
                           </Badge>
                           {contact.linkedUserId && (
                             <Badge variant="outline" className="text-xs bg-blue-50 border-blue-300 text-blue-700 whitespace-nowrap">
