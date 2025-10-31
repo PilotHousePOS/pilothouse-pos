@@ -1146,10 +1146,16 @@ function ContactsManager() {
                 {paginatedContacts.map((contact: any, index: number) => {
               const isSelected = selectedContacts.find(c => (c.email === contact.email && c.email) || c.resourceName === contact.resourceName || c.id === contact.id);
               const isExpanded = expandedContactId === (contact.id || contact.resourceName || contact.email);
+              // Create a unique key combining multiple fields to avoid duplicates
+              const uniqueKey = contact.id 
+                ? `db-${contact.id}` 
+                : contact.resourceName 
+                ? `gcal-${contact.resourceName}` 
+                : `email-${contact.email}-${index}`;
               
               return (
                 <div 
-                  key={contact.resourceName || contact.email || contact.id || index} 
+                  key={uniqueKey} 
                   className={`border rounded-lg p-4 transition-all cursor-pointer hover:bg-gray-50 ${
                     isSelected ? 'bg-blue-50 border-blue-500' : ''
                   } ${isExpanded ? 'ring-2 ring-blue-400' : ''}`}

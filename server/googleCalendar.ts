@@ -376,7 +376,8 @@ export async function syncContactsFromCalendarEvents() {
 
       // Process attendees if available
       if (event.attendees && event.attendees.length > 0) {
-        for (const attendee of event.attendees) {
+        for (let attendeeIndex = 0; attendeeIndex < event.attendees.length; attendeeIndex++) {
+          const attendee = event.attendees[attendeeIndex];
           // Skip if attendee has no email
           if (!attendee.email) continue;
 
@@ -385,11 +386,12 @@ export async function syncContactsFromCalendarEvents() {
           
           // If we found phone numbers, create one contact per phone number with unique temp email
           if (phoneNumbers.length > 0) {
-            for (const phoneNumber of phoneNumbers) {
-              // Create unique temp email for each phone number
-              const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+            for (let i = 0; i < phoneNumbers.length; i++) {
+              const phoneNumber = phoneNumbers[i];
+              // Create unique temp email using event ID, attendee index, and phone index
+              const uniqueId = `${event.id}-${attendeeIndex}-${i}`.replace(/[^a-zA-Z0-9-]/g, '-');
               extractedContacts.push({
-                name: `${name} ${phoneNumber}`,
+                name,
                 email: `calendar-${uniqueId}@temp.com`,
                 phoneNumber,
                 notes: `Auto-synced from calendar event: ${summary}`,
@@ -412,12 +414,13 @@ export async function syncContactsFromCalendarEvents() {
           }
         }
       } else if (phoneNumbers.length > 0) {
-        // No attendees but has phone numbers - use summary as name
-        for (const phoneNumber of phoneNumbers) {
-          // Create unique temp email using timestamp + random string
-          const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+        // No attendees but has phone numbers - use event ID for uniqueness
+        for (let i = 0; i < phoneNumbers.length; i++) {
+          const phoneNumber = phoneNumbers[i];
+          // Create unique temp email using event ID and phone index
+          const uniqueId = `${event.id}-${i}`.replace(/[^a-zA-Z0-9-]/g, '-');
           extractedContacts.push({
-            name: `${summary} ${phoneNumber}`,
+            name: summary,
             email: `calendar-${uniqueId}@temp.com`,
             phoneNumber,
             notes: `Auto-synced from calendar event: ${summary}`,
