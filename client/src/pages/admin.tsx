@@ -39,7 +39,8 @@ import {
   Phone,
   Pencil,
   Eye,
-  EyeOff
+  EyeOff,
+  AlertTriangle
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
