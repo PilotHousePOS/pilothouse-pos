@@ -199,6 +199,8 @@ export const contacts = pgTable("contacts", {
   email: varchar("email", { length: 255 }).notNull(),
   phoneNumber: varchar("phone_number", { length: 20 }),
   notes: text("notes"),
+  animalType: varchar("animal_type", { length: 100 }), // dog, cat, bird, reptile, etc.
+  breed: varchar("breed", { length: 255 }), // specific breed (especially for dogs)
   linkedUserId: varchar("linked_user_id").references(() => users.id),
   source: varchar("source", { length: 50 }).default("manual"), // manual, google_calendar
   createdAt: timestamp("created_at").defaultNow(),

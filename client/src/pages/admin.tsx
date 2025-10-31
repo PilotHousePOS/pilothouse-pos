@@ -290,8 +290,21 @@ function ContactsManager() {
     email: '',
     phoneNumber: '',
     notes: '',
+    animalType: '',
+    breed: '',
   });
   const [currentPage, setCurrentPage] = useState(0);
+
+  // Dog breeds list for the breed selector
+  const dogBreeds = [
+    'Golden Retriever', 'Labrador Retriever', 'German Shepherd', 'French Bulldog',
+    'Bulldog', 'Poodle', 'Beagle', 'Rottweiler', 'Yorkshire Terrier', 'Boxer',
+    'Dachshund', 'Siberian Husky', 'Great Dane', 'Doberman Pinscher', 'Shih Tzu',
+    'Boston Terrier', 'Pomeranian', 'Havanese', 'Cavalier King Charles Spaniel',
+    'Shetland Sheepdog', 'Miniature Schnauzer', 'Pembroke Welsh Corgi', 'Chihuahua',
+    'Australian Shepherd', 'Mastiff', 'Cocker Spaniel', 'Border Collie', 'Pug',
+    'Other/Mixed Breed'
+  ].sort();
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const { toast } = useToast();
@@ -322,7 +335,7 @@ function ContactsManager() {
         description: "Contact has been added successfully.",
       });
       setIsAddContactOpen(false);
-      setContactFormData({ name: '', email: '', phoneNumber: '', notes: '' });
+      setContactFormData({ name: '', email: '', phoneNumber: '', notes: '', animalType: '', breed: '' });
       queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
     },
     onError: () => {
@@ -344,7 +357,7 @@ function ContactsManager() {
         description: "Contact has been updated successfully.",
       });
       setEditingContact(null);
-      setContactFormData({ name: '', email: '', phoneNumber: '', notes: '' });
+      setContactFormData({ name: '', email: '', phoneNumber: '', notes: '', animalType: '', breed: '' });
       queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
     },
     onError: () => {
@@ -586,6 +599,8 @@ function ContactsManager() {
       email: contact.email || '',
       phoneNumber: contact.phoneNumber || '',
       notes: contact.notes || '',
+      animalType: contact.animalType || '',
+      breed: contact.breed || '',
     });
   };
 
@@ -732,6 +747,45 @@ function ContactsManager() {
                     />
                   </div>
                   <div>
+                    <Label htmlFor="contact-animal-type">Animal Type</Label>
+                    <Select
+                      value={contactFormData.animalType}
+                      onValueChange={(value) => setContactFormData({ ...contactFormData, animalType: value, breed: value !== 'dog' ? '' : contactFormData.breed })}
+                    >
+                      <SelectTrigger id="contact-animal-type" data-testid="select-animal-type">
+                        <SelectValue placeholder="Select animal type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="dog">Dog</SelectItem>
+                        <SelectItem value="cat">Cat</SelectItem>
+                        <SelectItem value="bird">Bird</SelectItem>
+                        <SelectItem value="reptile">Reptile</SelectItem>
+                        <SelectItem value="small_mammal">Small Mammal</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {contactFormData.animalType === 'dog' && (
+                    <div>
+                      <Label htmlFor="contact-breed">Dog Breed</Label>
+                      <Select
+                        value={contactFormData.breed}
+                        onValueChange={(value) => setContactFormData({ ...contactFormData, breed: value })}
+                      >
+                        <SelectTrigger id="contact-breed" data-testid="select-dog-breed">
+                          <SelectValue placeholder="Select dog breed" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[300px]">
+                          {dogBreeds.map((breed) => (
+                            <SelectItem key={breed} value={breed}>
+                              {breed}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                  <div>
                     <Label htmlFor="contact-notes">Notes</Label>
                     <Textarea
                       id="contact-notes"
@@ -792,6 +846,45 @@ function ContactsManager() {
                       onChange={(e) => setContactFormData({ ...contactFormData, phoneNumber: e.target.value })}
                     />
                   </div>
+                  <div>
+                    <Label htmlFor="edit-contact-animal-type">Animal Type</Label>
+                    <Select
+                      value={contactFormData.animalType}
+                      onValueChange={(value) => setContactFormData({ ...contactFormData, animalType: value, breed: value !== 'dog' ? '' : contactFormData.breed })}
+                    >
+                      <SelectTrigger id="edit-contact-animal-type" data-testid="select-edit-animal-type">
+                        <SelectValue placeholder="Select animal type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="dog">Dog</SelectItem>
+                        <SelectItem value="cat">Cat</SelectItem>
+                        <SelectItem value="bird">Bird</SelectItem>
+                        <SelectItem value="reptile">Reptile</SelectItem>
+                        <SelectItem value="small_mammal">Small Mammal</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {contactFormData.animalType === 'dog' && (
+                    <div>
+                      <Label htmlFor="edit-contact-breed">Dog Breed</Label>
+                      <Select
+                        value={contactFormData.breed}
+                        onValueChange={(value) => setContactFormData({ ...contactFormData, breed: value })}
+                      >
+                        <SelectTrigger id="edit-contact-breed" data-testid="select-edit-dog-breed">
+                          <SelectValue placeholder="Select dog breed" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[300px]">
+                          {dogBreeds.map((breed) => (
+                            <SelectItem key={breed} value={breed}>
+                              {breed}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                   <div>
                     <Label htmlFor="edit-contact-notes">Notes</Label>
                     <Textarea
