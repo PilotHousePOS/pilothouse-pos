@@ -19,12 +19,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Calendar } from "@/components/ui/calendar";
 import { 
   Plus,
   Edit,
   Trash2,
   Users,
-  Calendar,
+  Calendar as CalendarIcon,
   ShoppingBag,
   PawPrint,
   Package,
@@ -150,7 +152,7 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Calendar className="w-5 h-5" />
+          <CalendarIcon className="w-5 h-5" />
           Daily Appointment Calendar
         </CardTitle>
         <div className="flex items-center justify-between">
@@ -930,7 +932,7 @@ function ContactsManager() {
             <Dialog open={isCreateEventOpen} onOpenChange={handleDialogChange}>
               <DialogTrigger asChild>
                 <Button data-testid="button-create-event" className="w-full sm:w-auto" size="sm">
-                  <Calendar className="w-4 h-4 mr-2" />
+                  <CalendarIcon className="w-4 h-4 mr-2" />
                   Create Event
                 </Button>
               </DialogTrigger>
@@ -1285,7 +1287,7 @@ function ContactsManager() {
               onClick={() => setIsCreateEventOpen(true)}
               className="w-full"
             >
-              <Calendar className="w-4 h-4 mr-2" />
+              <CalendarIcon className="w-4 h-4 mr-2" />
               Create Event with Selected Contacts
             </Button>
           </div>
@@ -1318,7 +1320,7 @@ function OrderDetailsCard({ order, onStatusUpdate }: { order: any; onStatusUpdat
         <div className="flex-1">
           <h3 className="font-semibold">Order #{order.id}</h3>
           <div className="flex items-center mt-1 text-sm text-gray-600">
-            <Calendar className="w-4 h-4 mr-1" />
+            <CalendarIcon className="w-4 h-4 mr-1" />
             {new Date(order.orderDate || order.createdAt).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
@@ -2292,7 +2294,7 @@ export default function Admin() {
         </Card>
         <Card className="min-h-[120px]">
           <CardContent className="p-6 text-center flex flex-col justify-center h-full">
-            <Calendar className="w-8 h-8 mx-auto mb-3 text-green-600" />
+            <CalendarIcon className="w-8 h-8 mx-auto mb-3 text-green-600" />
             <div className="text-2xl font-bold mb-1">{pendingAppointments}</div>
             <div className="text-sm text-gray-500">Pending Appts</div>
           </CardContent>
@@ -2510,7 +2512,7 @@ export default function Admin() {
               className="bg-brand-blue hover:bg-blue-700 text-white"
               data-testid="button-book-appointment-admin"
             >
-              <Calendar className="w-4 h-4 mr-2" />
+              <CalendarIcon className="w-4 h-4 mr-2" />
               Book Appointment
             </Button>
           </div>
@@ -2520,7 +2522,7 @@ export default function Admin() {
             <Card className="border-2 border-orange-200 bg-orange-50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-orange-700">
-                  <Calendar className="w-5 h-5" />
+                  <CalendarIcon className="w-5 h-5" />
                   Pending Approval ({unapprovedAppointments.length})
                 </CardTitle>
                 <CardDescription className="text-orange-600">
@@ -2536,7 +2538,7 @@ export default function Admin() {
                           <Badge className="bg-orange-500 text-white">Pending Approval</Badge>
                           {appointment.source === 'google_calendar' && (
                             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
-                              <Calendar className="w-3 h-3 mr-1" />
+                              <CalendarIcon className="w-3 h-3 mr-1" />
                               Google Calendar
                             </Badge>
                           )}
@@ -2609,7 +2611,7 @@ export default function Admin() {
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <CardTitle className="flex items-center gap-2 text-yellow-700">
-                  <Calendar className="w-5 h-5" />
+                  <CalendarIcon className="w-5 h-5" />
                   Pending Appointments ({(appointments as any[]).filter((a: any) => a.status === 'scheduled' && a.isApproved !== false).length})
                 </CardTitle>
                 <Button 
@@ -2639,7 +2641,7 @@ export default function Admin() {
                           <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
                           {appointment.source === 'google_calendar' && (
                             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
-                              <Calendar className="w-3 h-3 mr-1" />
+                              <CalendarIcon className="w-3 h-3 mr-1" />
                               Synced
                             </Badge>
                           )}
@@ -2684,7 +2686,7 @@ export default function Admin() {
               data-testid="button-toggle-approved"
             >
               <span className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
+                <CalendarIcon className="w-5 h-5" />
                 Approved Appointments ({(appointments as any[]).filter((a: any) => a.status === 'confirmed' || a.status === 'completed').length})
               </span>
               {showApprovedAppointments ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
@@ -2706,7 +2708,7 @@ export default function Admin() {
                               <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
                               {appointment.source === 'google_calendar' && (
                                 <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
-                                  <Calendar className="w-3 h-3 mr-1" />
+                                  <CalendarIcon className="w-3 h-3 mr-1" />
                                   Synced
                                 </Badge>
                               )}
@@ -2754,7 +2756,7 @@ export default function Admin() {
                 data-testid="button-toggle-denied"
               >
                 <span className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
+                  <CalendarIcon className="w-5 h-5" />
                   Denied Appointments ({(appointments as any[]).filter((a: any) => a.status === 'rejected' || a.status === 'cancelled').length})
                 </span>
                 {showDeniedAppointments ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
@@ -2776,7 +2778,7 @@ export default function Admin() {
                                 <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
                                 {appointment.source === 'google_calendar' && (
                                   <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
-                                    <Calendar className="w-3 h-3 mr-1" />
+                                    <CalendarIcon className="w-3 h-3 mr-1" />
                                     Synced
                                   </Badge>
                                 )}
@@ -2819,7 +2821,7 @@ export default function Admin() {
             <Card className="border-2 border-purple-200 bg-purple-50/30">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-purple-700">
-                  <Calendar className="w-5 h-5" />
+                  <CalendarIcon className="w-5 h-5" />
                   Google Calendar Events ({calendarEvents.length})
                 </CardTitle>
                 <CardDescription className="text-purple-600">
@@ -2853,7 +2855,7 @@ export default function Admin() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             <Badge className="bg-purple-600 text-white">
-                              <Calendar className="w-3 h-3 mr-1" />
+                              <CalendarIcon className="w-3 h-3 mr-1" />
                               Google Calendar
                             </Badge>
                           </div>
@@ -3020,7 +3022,7 @@ export default function Admin() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
+                <CalendarIcon className="w-5 h-5" />
                 Google Calendar Events
                 <Badge variant="secondary" className="ml-2 text-xs">Shared Across All Admins</Badge>
               </CardTitle>
@@ -3043,7 +3045,7 @@ export default function Admin() {
                 </div>
               ) : calendarEvents.length === 0 ? (
                 <div className="text-center py-8">
-                  <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <CalendarIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                   <p className="text-sm text-gray-500">No upcoming events found</p>
                 </div>
               ) : (
@@ -3126,7 +3128,7 @@ export default function Admin() {
               {/* Google Calendar Sync */}
               <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
                 <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
+                  <CalendarIcon className="w-5 h-5" />
                   Google Calendar Integration
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
@@ -3436,7 +3438,7 @@ export default function Admin() {
           <DialogContent className="max-w-md mx-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
+                <CalendarIcon className="w-5 h-5" />
                 Appointment Details
               </DialogTitle>
             </DialogHeader>
