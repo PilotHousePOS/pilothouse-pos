@@ -36,6 +36,9 @@ export default function Booking() {
     phoneNumber: '',
   });
 
+  const [contactSearch, setContactSearch] = useState('');
+  const [showContactDropdown, setShowContactDropdown] = useState(false);
+
   // Fetch grooming settings
   const { data: groomingSettings = [] } = useQuery({
     queryKey: ["/api/admin/grooming-settings"],
@@ -52,8 +55,53 @@ export default function Booking() {
     retry: false,
   });
 
+  // Fetch contacts for search
+  const { data: allContacts = [] } = useQuery({
+    queryKey: ["/api/contacts"],
+    retry: false,
+  });
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Filter contacts based on search query
+  const filteredContacts = useMemo(() => {
+    if (!contactSearch.trim()) return [];
+    
+    const query = contactSearch.toLowerCase();
+    const searchDigits = contactSearch.replace(/\D/g, '');
+    
+    return (allContacts as any[]).filter(contact => {
+      const name = (contact.name || '').toLowerCase();
+      const phone = (contact.phoneNumber || '').replace(/\D/g, '');
+      
+      const nameMatch = name.includes(query);
+      const phoneMatch = searchDigits.length > 0 && phone.includes(searchDigits);
+      
+      return nameMatch || phoneMatch;
+    }).slice(0, 10); // Limit to 10 results
+  }, [contactSearch, allContacts]);
+
+  // Handle contact selection
+  const handleSelectContact = (contact: any) => {
+    const nameParts = (contact.name || '').split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+    
+    setOwnerInfo({
+      firstName,
+      lastName,
+      phoneNumber: contact.phoneNumber || '',
+    });
+    
+    setContactSearch(contact.name || '');
+    setShowContactDropdown(false);
+    
+    toast({
+      title: "Contact Selected",
+      description: `Information populated for ${contact.name}`,
+    });
+  };
 
   // Reset groomer selection when date changes
   useEffect(() => {
@@ -295,6 +343,50 @@ export default function Booking() {
 
 {/* Groomer selection hidden per user request */}
 
+        {/* Contact Search */}
+        <div className="relative">
+          <Label className="text-sm font-semibold text-gray-900 mb-3 block">Search Existing Contact</Label>
+          <Input
+            type="text"
+            placeholder="Search by name or phone number..."
+            value={contactSearch}
+            onChange={(e) => {
+              setContactSearch(e.target.value);
+              setShowContactDropdown(e.target.value.trim().length > 0);
+            }}
+            onFocus={() => contactSearch.trim().length > 0 && setShowContactDropdown(true)}
+            className="border-gray-300 rounded-xl"
+            data-testid="input-contact-search"
+          />
+          
+          {showContactDropdown && filteredContacts.length > 0 && (
+            <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+              {filteredContacts.map((contact: any, index: number) => (
+                <div
+                  key={contact.id || index}
+                  className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
+                  onClick={() => handleSelectContact(contact)}
+                  data-testid={`contact-option-${index}`}
+                >
+                  <div className="font-medium text-gray-900">{contact.name}</div>
+                  {contact.phoneNumber && (
+                    <div className="text-sm text-gray-600">{contact.phoneNumber}</div>
+                  )}
+                  {contact.email && (
+                    <div className="text-xs text-gray-500">{contact.email}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {showContactDropdown && contactSearch.trim().length > 0 && filteredContacts.length === 0 && (
+            <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-xl shadow-lg p-4 text-center text-sm text-gray-500">
+              No contacts found matching "{contactSearch}"
+            </div>
+          )}
+        </div>
+
         {/* Owner Information */}
         <div>
           <Label className="text-sm font-semibold text-gray-900 mb-3 block">Owner Information</Label>
@@ -307,6 +399,7 @@ export default function Booking() {
                 onChange={(e) => setOwnerInfo({ ...ownerInfo, firstName: e.target.value })}
                 className="border-gray-300 rounded-xl"
                 required
+                data-testid="input-owner-firstname"
               />
               <Input
                 type="text"
@@ -315,6 +408,7 @@ export default function Booking() {
                 onChange={(e) => setOwnerInfo({ ...ownerInfo, lastName: e.target.value })}
                 className="border-gray-300 rounded-xl"
                 required
+                data-testid="input-owner-lastname"
               />
             </div>
             <Input
@@ -324,6 +418,7 @@ export default function Booking() {
               onChange={(e) => setOwnerInfo({ ...ownerInfo, phoneNumber: e.target.value })}
               className="border-gray-300 rounded-xl"
               required
+              data-testid="input-owner-phone"
             />
           </div>
         </div>
