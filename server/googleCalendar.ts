@@ -487,8 +487,15 @@ export async function syncContactsFromCalendarEvents() {
           const phoneNumber = phoneNumbers[i];
           // Create unique temp email using event ID and phone index
           const uniqueId = `${event.id}-${i}`.replace(/[^a-zA-Z0-9-]/g, '-');
+          
+          // Parse contact name from event summary
+          // Format: LastName PetName PhoneNumber Groomer
+          // Extract just the last name (first word) for the contact
+          const summaryWords = summary.trim().split(/\s+/);
+          const contactName = summaryWords.length > 0 ? summaryWords[0] : summary;
+          
           extractedContacts.push({
-            name: summary,
+            name: contactName,
             email: `calendar-${uniqueId}@temp.com`,
             phoneNumber,
             notes: `Auto-synced from calendar event: ${summary}`,
