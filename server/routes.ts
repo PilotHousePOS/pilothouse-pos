@@ -1827,7 +1827,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`Found ${calendarAppointments.length} calendar events`);
 
       // Get all existing appointments from Google Calendar (by googleEventId)
-      const allAppointments = await storage.getAllAppointments();
+      const allAppointments = await storage.getAppointments(); // Get all appointments (no userId filter)
       const existingGoogleEventIds = new Set(
         allAppointments
           .filter((apt: any) => apt.googleEventId)
