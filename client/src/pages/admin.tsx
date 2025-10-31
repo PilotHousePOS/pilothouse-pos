@@ -2205,6 +2205,64 @@ export default function Admin() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Google Calendar Events Section */}
+          {calendarEvents && calendarEvents.length > 0 && (
+            <Card className="border-2 border-purple-200 bg-purple-50/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-purple-700">
+                  <Calendar className="w-5 h-5" />
+                  Google Calendar Events ({calendarEvents.length})
+                </CardTitle>
+                <CardDescription className="text-purple-600">
+                  Events from your connected Google Calendar (Read-only)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {calendarEvents.map((event: any) => (
+                    <div key={event.id} className="flex items-center justify-between p-4 border-2 border-purple-200 rounded-lg bg-white">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge className="bg-purple-600 text-white">
+                            <Calendar className="w-3 h-3 mr-1" />
+                            Google Calendar
+                          </Badge>
+                        </div>
+                        <h3 className="font-semibold text-purple-900">{event.summary || 'Untitled Event'}</h3>
+                        {event.description && (
+                          <p className="text-sm text-gray-600 mt-1">{event.description}</p>
+                        )}
+                        <div className="mt-2 space-y-1">
+                          <p className="text-sm text-gray-600">
+                            <strong>Start:</strong> {new Date(event.start?.dateTime || event.start?.date).toLocaleString()}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            <strong>End:</strong> {new Date(event.end?.dateTime || event.end?.date).toLocaleString()}
+                          </p>
+                          {event.attendees && event.attendees.length > 0 && (
+                            <p className="text-sm text-gray-600">
+                              <strong>Attendees:</strong> {event.attendees.map((a: any) => a.email).join(', ')}
+                            </p>
+                          )}
+                        </div>
+                        {event.htmlLink && (
+                          <a
+                            href={event.htmlLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-purple-600 hover:underline mt-2 inline-block"
+                          >
+                            View in Google Calendar →
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="users" className="space-y-6">
