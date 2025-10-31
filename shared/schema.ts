@@ -36,6 +36,7 @@ export const users = pgTable("users", {
   profileImageUrl: varchar("profile_image_url"),
   phoneNumber: varchar("phone_number", { length: 20 }),
   isAdmin: boolean("is_admin").default(false),
+  isGroomer: boolean("is_groomer").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
