@@ -288,7 +288,13 @@ export async function syncAppointmentsFromCalendarEvents() {
       
       // Extract phone numbers from description as fallback
       const phoneNumbers = extractPhoneNumbers(combinedText);
-      const phoneNumber = eventContact?.phoneNumber || phoneNumbers[0] || '(555) 000-0000';
+      const phoneNumber = eventContact?.phoneNumber || phoneNumbers[0];
+      
+      // Skip events without a phone number
+      if (!phoneNumber) {
+        console.log(`[SYNC] Skipping event without phone number: ${event.id} - "${summary}"`);
+        continue;
+      }
 
       // Parse date and time
       const startDateTime = new Date(event.start.dateTime);
