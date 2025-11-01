@@ -4,6 +4,7 @@ import path from "path";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import NotificationWebSocketServer from "./websocket";
+import { initializeScheduledTasks } from "./scheduler";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -74,6 +75,9 @@ app.use((req, res, next) => {
   
   // Make WebSocket server available globally for notifications
   (global as any).wsServer = wsServer;
+
+  // Initialize scheduled tasks
+  initializeScheduledTasks();
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
