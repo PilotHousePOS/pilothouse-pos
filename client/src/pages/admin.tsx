@@ -318,6 +318,14 @@ function ContactAppointmentHistory({ contactId }: { contactId: number }) {
     return <div className="text-sm text-gray-500">No grooming history found</div>;
   }
 
+  // Helper function to format service type
+  const formatService = (serviceType: string) => {
+    if (!serviceType) return 'Grooming';
+    if (serviceType.includes('bath')) return 'Bath';
+    if (serviceType.includes('full') || serviceType.includes('grooming')) return 'Full Grooming';
+    return serviceType;
+  };
+
   return (
     <div className="space-y-2">
       <p className="text-sm font-medium text-gray-700">Grooming History ({completedAppointments.length})</p>
@@ -326,7 +334,7 @@ function ContactAppointmentHistory({ contactId }: { contactId: number }) {
           <div key={apt.id} className="bg-gray-50 rounded p-2 text-xs" data-testid={`appointment-history-${apt.id}`}>
             <div className="flex justify-between items-start">
               <div>
-                <p className="font-medium">{formatServiceType(apt.serviceType || apt.service)}</p>
+                <p className="font-medium">{formatService(apt.serviceType || apt.service)}</p>
                 <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
                 <p className="text-gray-500">{new Date(apt.appointmentDate).toLocaleDateString()}</p>
               </div>
