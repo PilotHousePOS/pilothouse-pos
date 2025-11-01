@@ -1533,6 +1533,9 @@ export default function Admin() {
   const [showCompletedOrders, setShowCompletedOrders] = useState(false);
   const [showCancelledOrders, setShowCancelledOrders] = useState(false);
   
+  // Orders search state
+  const [orderSearch, setOrderSearch] = useState('');
+  
   // Pagination for in progress orders (confirmed)
   const [inProgressOrdersPage, setInProgressOrdersPage] = useState(0);
   const [inProgressOrdersTouchStart, setInProgressOrdersTouchStart] = useState(0);
@@ -1658,6 +1661,28 @@ export default function Admin() {
       return nameMatch || phoneMatch;
     }).slice(0, 10);
   }, [bookingContactSearch, allBookingContacts]);
+
+  // Filter orders by customer name or phone number
+  const filteredOrders = useMemo(() => {
+    if (!orderSearch.trim()) return orders as any[];
+    
+    const query = orderSearch.toLowerCase();
+    const searchDigits = orderSearch.replace(/\D/g, '');
+    
+    return (orders as any[]).filter(order => {
+      // Find the user for this order
+      const customer = (users as any[]).find(u => u.id === order.userId);
+      if (!customer) return false;
+      
+      const fullName = `${customer.firstName || ''} ${customer.lastName || ''}`.toLowerCase();
+      const phone = (customer.phoneNumber || '').replace(/\D/g, '');
+      
+      const nameMatch = fullName.includes(query);
+      const phoneMatch = searchDigits.length > 0 && phone.includes(searchDigits);
+      
+      return nameMatch || phoneMatch;
+    });
+  }, [orderSearch, orders, users]);
 
   // Handle booking contact selection
   const handleBookingSelectContact = (contact: any) => {
