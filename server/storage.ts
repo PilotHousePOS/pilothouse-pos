@@ -53,6 +53,7 @@ export interface IStorage {
   updateUserAdmin(id: string, isAdmin: boolean): Promise<User>;
   updateUserGroomer(id: string, isGroomer: boolean): Promise<User>;
   getAllUsers(): Promise<User[]>;
+  deleteUser(id: string): Promise<void>;
 
   // Pet operations
   getAllPets(): Promise<Pet[]>;
@@ -687,6 +688,13 @@ export class DatabaseStorage implements IStorage {
 
   async getAllUsers(): Promise<User[]> {
     return await db.select().from(users);
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    const result = await db.delete(users).where(eq(users.id, id));
+    if (!result.rowCount || result.rowCount === 0) {
+      throw new Error('User not found');
+    }
   }
 
   // Grooming settings operations
