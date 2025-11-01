@@ -91,7 +91,15 @@ export interface IStorage {
   getAppointment(id: number): Promise<Appointment | undefined>;
   getAppointmentsByPhoneNumber(phoneNumber: string): Promise<Appointment[]>;
   updateAppointmentStatus(id: number, status: string): Promise<Appointment>;
-  updateAppointmentDetails(id: number, updates: { specialNotes?: string; price?: string }): Promise<Appointment>;
+  updateAppointmentDetails(id: number, updates: { 
+    ownerFirstName?: string; 
+    ownerLastName?: string; 
+    ownerPhoneNumber?: string; 
+    petName?: string; 
+    petType?: string; 
+    specialNotes?: string; 
+    price?: string;
+  }): Promise<Appointment>;
   clearAllAppointments(): Promise<void>;
   bulkCreateAppointments(appointments: InsertAppointment[]): Promise<Appointment[]>;
 
@@ -599,15 +607,24 @@ export class DatabaseStorage implements IStorage {
     await db.delete(appointments).where(eq(appointments.id, id));
   }
 
-  async updateAppointmentDetails(id: number, updates: { specialNotes?: string; price?: string }): Promise<Appointment> {
+  async updateAppointmentDetails(id: number, updates: { 
+    ownerFirstName?: string; 
+    ownerLastName?: string; 
+    ownerPhoneNumber?: string; 
+    petName?: string; 
+    petType?: string; 
+    specialNotes?: string; 
+    price?: string;
+  }): Promise<Appointment> {
     const updateData: any = { updatedAt: new Date() };
     
-    if (updates.specialNotes !== undefined) {
-      updateData.specialNotes = updates.specialNotes;
-    }
-    if (updates.price !== undefined) {
-      updateData.price = updates.price;
-    }
+    if (updates.ownerFirstName !== undefined) updateData.ownerFirstName = updates.ownerFirstName;
+    if (updates.ownerLastName !== undefined) updateData.ownerLastName = updates.ownerLastName;
+    if (updates.ownerPhoneNumber !== undefined) updateData.ownerPhoneNumber = updates.ownerPhoneNumber;
+    if (updates.petName !== undefined) updateData.petName = updates.petName;
+    if (updates.petType !== undefined) updateData.petType = updates.petType;
+    if (updates.specialNotes !== undefined) updateData.specialNotes = updates.specialNotes;
+    if (updates.price !== undefined) updateData.price = updates.price;
     
     const [updated] = await db
       .update(appointments)

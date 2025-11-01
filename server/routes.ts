@@ -18,6 +18,7 @@ import { z } from "zod";
 import { notificationService } from './notifications';
 import { sendPasswordResetEmail } from './sendgrid';
 import { getUpcomingEvents, getAllCalendarContacts, createCalendarEvent, getEventsForDate, getGoogleContacts } from './googleCalendar';
+import { normalizePhoneNumber } from './phoneUtils';
 import { db } from './db';
 import { eq } from 'drizzle-orm';
 
@@ -1159,11 +1160,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const id = parseInt(req.params.id);
-      const { specialNotes, price } = req.body;
+      const { ownerFirstName, ownerLastName, ownerPhoneNumber, petName, petType, specialNotes, price } = req.body;
 
-      // Validate that at least one field is provided
-      if (specialNotes === undefined && price === undefined) {
-        return res.status(400).json({ message: "At least one field (specialNotes or price) is required" });
+      // Get the current appointment to get the old phone number
+      const currentAppointment = await storage.getAppointment(id);
+      if (!currentAppointment) {
+        return res.status(404).json({ message: "Appointment not found" });
       }
 
       // Validate price if provided
@@ -1175,15 +1177,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Build update object with only provided fields
-      const updates: { specialNotes?: string; price?: string } = {};
-      if (specialNotes !== undefined) {
-        updates.specialNotes = specialNotes;
-      }
-      if (price !== undefined) {
-        updates.price = price;
-      }
+      const updates: { 
+        ownerFirstName?: string; 
+        ownerLastName?: string; 
+        ownerPhoneNumber?: string; 
+        petName?: string; 
+        petType?: string;
+        specialNotes?: string; 
+        price?: string;
+      } = {};
+      
+      if (ownerFirstName !== undefined) updates.ownerFirstName = ownerFirstName;
+      if (ownerLastName !== undefined) updates.ownerLastName = ownerLastName;
+      if (ownerPhoneNumber !== undefined) updates.ownerPhoneNumber = ownerPhoneNumber;
+      if (petName !== undefined) updates.petName = petName;
+      if (petType !== undefined) updates.petType = petType;
+      if (specialNotes !== undefined) updates.specialNotes = specialNotes;
+      if (price !== undefined) updates.price = price;
 
       const appointment = await storage.updateAppointmentDetails(id, updates);
+      
+      // Update corresponding contact if phone number fields were changed
+      if (ownerFirstName !== undefined || ownerLastName !== undefined || ownerPhoneNumber !== undefined || petName !== undefined || petType !== undefined) {
+        try {
+          // Determine which phone number to use for finding the contact
+          const oldPhone = currentAppointment.ownerPhoneNumber;
+          const newPhone = ownerPhoneNumber || currentAppointment.ownerPhoneNumber;
+          
+          // Try to find contact by old phone number first
+          const normalizedOldPhone = normalizePhoneNumber(oldPhone);
+          const allContacts = await storage.getAllContacts();
+          let contact = allContacts.find((c: any) => normalizePhoneNumber(c.phoneNumber || '') === normalizedOldPhone);
+          
+          if (contact) {
+            // Update the contact with new information
+            const contactUpdates: any = {};
+            
+            if (ownerFirstName !== undefined || ownerLastName !== undefined) {
+              const firstName = ownerFirstName || currentAppointment.ownerFirstName;
+              const lastName = ownerLastName || currentAppointment.ownerLastName;
+              contactUpdates.name = `${firstName} ${lastName}`;
+            }
+            
+            if (ownerPhoneNumber !== undefined) {
+              contactUpdates.phoneNumber = ownerPhoneNumber;
+            }
+            
+            if (petType !== undefined) {
+              contactUpdates.animalType = petType;
+            }
+            
+            if (Object.keys(contactUpdates).length > 0) {
+              await storage.updateContact(contact.id, contactUpdates);
+              console.log(`Updated contact ${contact.id} based on appointment ${id} changes`);
+            }
+          }
+        } catch (contactError) {
+          console.error("Error updating corresponding contact:", contactError);
+          // Don't fail the appointment update if contact update fails
+        }
+      }
       
       res.json(appointment);
     } catch (error) {

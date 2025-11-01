@@ -1493,6 +1493,11 @@ export default function Admin() {
   const [editingAppointment, setEditingAppointment] = useState<any>(null);
   const [editNotes, setEditNotes] = useState('');
   const [editPrice, setEditPrice] = useState('');
+  const [editOwnerFirstName, setEditOwnerFirstName] = useState('');
+  const [editOwnerLastName, setEditOwnerLastName] = useState('');
+  const [editOwnerPhone, setEditOwnerPhone] = useState('');
+  const [editPetName, setEditPetName] = useState('');
+  const [editPetType, setEditPetType] = useState('');
   
   // Pagination for approved appointments
   const [approvedAppointmentsPage, setApprovedAppointmentsPage] = useState(0);
@@ -2008,27 +2013,53 @@ export default function Admin() {
   });
 
   const updateAppointmentDetailsMutation = useMutation({
-    mutationFn: async ({ id, specialNotes, price }: { id: number; specialNotes: string; price: string }) => {
-      // Build request body with only non-empty fields for partial updates
+    mutationFn: async ({ 
+      id, 
+      ownerFirstName, 
+      ownerLastName, 
+      ownerPhoneNumber, 
+      petName, 
+      petType, 
+      specialNotes, 
+      price 
+    }: { 
+      id: number; 
+      ownerFirstName?: string;
+      ownerLastName?: string;
+      ownerPhoneNumber?: string;
+      petName?: string;
+      petType?: string;
+      specialNotes?: string; 
+      price?: string;
+    }) => {
+      // Build request body with all provided fields
       const updates: any = {};
-      if (specialNotes !== undefined && specialNotes !== '') {
-        updates.specialNotes = specialNotes;
-      }
-      if (price !== undefined && price !== '') {
-        updates.price = price;
-      }
+      if (ownerFirstName !== undefined && ownerFirstName !== '') updates.ownerFirstName = ownerFirstName;
+      if (ownerLastName !== undefined && ownerLastName !== '') updates.ownerLastName = ownerLastName;
+      if (ownerPhoneNumber !== undefined && ownerPhoneNumber !== '') updates.ownerPhoneNumber = ownerPhoneNumber;
+      if (petName !== undefined && petName !== '') updates.petName = petName;
+      if (petType !== undefined && petType !== '') updates.petType = petType;
+      if (specialNotes !== undefined && specialNotes !== '') updates.specialNotes = specialNotes;
+      if (price !== undefined && price !== '') updates.price = price;
+      
       await apiRequest("PATCH", `/api/admin/appointments/${id}/details`, updates);
     },
     onSuccess: async () => {
       toast({
         title: "Appointment Updated",
-        description: "Notes and price have been updated successfully.",
+        description: "Appointment details have been updated successfully.",
       });
       // Wait for refetch to complete before closing dialog
       await queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
       setEditingAppointment(null);
       setEditNotes('');
       setEditPrice('');
+      setEditOwnerFirstName('');
+      setEditOwnerLastName('');
+      setEditOwnerPhone('');
+      setEditPetName('');
+      setEditPetType('');
     },
     onError: () => {
       toast({
@@ -3016,6 +3047,11 @@ export default function Admin() {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setEditingAppointment(appointment);
+                                setEditOwnerFirstName(appointment.ownerFirstName || '');
+                                setEditOwnerLastName(appointment.ownerLastName || '');
+                                setEditOwnerPhone(appointment.ownerPhoneNumber || '');
+                                setEditPetName(appointment.petName || '');
+                                setEditPetType(appointment.petType || '');
                                 setEditNotes(appointment.specialNotes || '');
                                 setEditPrice(appointment.price || '');
                               }}
@@ -3969,20 +4005,79 @@ export default function Admin() {
           setEditingAppointment(null);
           setEditNotes('');
           setEditPrice('');
+          setEditOwnerFirstName('');
+          setEditOwnerLastName('');
+          setEditOwnerPhone('');
+          setEditPetName('');
+          setEditPetType('');
         }}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit Appointment Details</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit-owner-first-name">Owner First Name</Label>
+                  <Input
+                    id="edit-owner-first-name"
+                    value={editOwnerFirstName}
+                    onChange={(e) => setEditOwnerFirstName(e.target.value)}
+                    placeholder="John"
+                    data-testid="input-edit-owner-first-name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-owner-last-name">Owner Last Name</Label>
+                  <Input
+                    id="edit-owner-last-name"
+                    value={editOwnerLastName}
+                    onChange={(e) => setEditOwnerLastName(e.target.value)}
+                    placeholder="Doe"
+                    data-testid="input-edit-owner-last-name"
+                  />
+                </div>
+              </div>
               <div>
-                <Label htmlFor="edit-notes">Notes</Label>
+                <Label htmlFor="edit-owner-phone">Owner Phone Number</Label>
+                <Input
+                  id="edit-owner-phone"
+                  value={editOwnerPhone}
+                  onChange={(e) => setEditOwnerPhone(e.target.value)}
+                  placeholder="(555) 123-4567"
+                  data-testid="input-edit-owner-phone"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit-pet-name">Pet Name</Label>
+                  <Input
+                    id="edit-pet-name"
+                    value={editPetName}
+                    onChange={(e) => setEditPetName(e.target.value)}
+                    placeholder="Buddy"
+                    data-testid="input-edit-pet-name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-pet-type">Pet Type</Label>
+                  <Input
+                    id="edit-pet-type"
+                    value={editPetType}
+                    onChange={(e) => setEditPetType(e.target.value)}
+                    placeholder="Dog"
+                    data-testid="input-edit-pet-type"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="edit-notes">Special Notes</Label>
                 <Textarea
                   id="edit-notes"
                   value={editNotes}
                   onChange={(e) => setEditNotes(e.target.value)}
                   placeholder="Add special notes or instructions for the grooming appointment..."
-                  rows={4}
+                  rows={3}
                   data-testid="input-edit-notes"
                 />
               </div>
@@ -4006,6 +4101,11 @@ export default function Admin() {
                     setEditingAppointment(null);
                     setEditNotes('');
                     setEditPrice('');
+                    setEditOwnerFirstName('');
+                    setEditOwnerLastName('');
+                    setEditOwnerPhone('');
+                    setEditPetName('');
+                    setEditPetType('');
                   }}
                   data-testid="button-cancel-edit"
                 >
@@ -4014,6 +4114,11 @@ export default function Admin() {
                 <Button
                   onClick={() => updateAppointmentDetailsMutation.mutate({
                     id: editingAppointment.id,
+                    ownerFirstName: editOwnerFirstName,
+                    ownerLastName: editOwnerLastName,
+                    ownerPhoneNumber: editOwnerPhone,
+                    petName: editPetName,
+                    petType: editPetType,
                     specialNotes: editNotes,
                     price: editPrice
                   })}
