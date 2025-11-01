@@ -55,7 +55,8 @@ The application is a full-stack web application with a clear separation of conce
     - Hybrid contact system: manual database (CRUD, phone numbers, email validation) merged with Google Calendar contacts (extracted from event attendees).
     - Automatic phone number extraction from Google Calendar event descriptions and syncing with duplicate prevention.
     - User-contact auto-linking system based on normalized phone numbers.
-    - Contact management UI with add/edit/delete, real-time search (name, email, phone), pagination, and smart phone number display.
+    - Contact management UI with add/edit/delete, real-time search (name, email, phone), and smart phone number display.
+    - **Pagination System**: Contacts display 4 items per page with inline pagination controls (ChevronLeft/ChevronRight arrows, page indicators). Automatic page clamping prevents blank sections when filtered list shrinks. Mobile swipe gesture support included.
     - Event creation from contacts interface with multi-contact selection.
 - **Groomer Management System:** Dedicated admin tab for CRUD operations on groomers (name, email, phone, specialties, active status). Includes active/inactive toggle, search, and real-time updates.
 - **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtering content by species.

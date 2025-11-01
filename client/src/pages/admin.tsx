@@ -551,39 +551,13 @@ function ContactsManager() {
           const emailMatch = email.startsWith(query);
           const phoneMatch = searchDigits.length > 0 && phone.startsWith(searchDigits);
           
-          const result = nameMatch || emailMatch || phoneMatch;
-          
-          // Diagnostic logging for "318267" search
-          if (searchQuery === '318267') {
-            console.log('FILTER CHECK:', {
-              contactName: contact.displayName || contact.name,
-              name,
-              email,
-              phone,
-              query,
-              searchDigits,
-              nameMatch,
-              emailMatch,
-              phoneMatch,
-              RESULT: result
-            });
-          }
-          
-          return result;
+          return nameMatch || emailMatch || phoneMatch;
         })
         .sort((a, b) => {
           const nameA = (a.displayName || a.name || '').toLowerCase();
           const nameB = (b.displayName || b.name || '').toLowerCase();
           return nameA.localeCompare(nameB);
         });
-  
-  // Additional diagnostic logging
-  if (searchQuery === '318267') {
-    console.log('=== SEARCH RESULTS ===');
-    console.log('Total contacts:', allContacts.length);
-    console.log('Filtered contacts:', filteredContacts.length);
-    console.log('Filtered contact names:', filteredContacts.map((c: any) => c.displayName || c.name));
-  }
 
   // Reset to page 0 when search changes
   useEffect(() => {
@@ -596,16 +570,14 @@ function ContactsManager() {
   const endIndex = startIndex + CONTACTS_PER_PAGE;
   const paginatedContacts = filteredContacts.slice(startIndex, endIndex);
   
-  // Debug pagination
-  if (searchQuery === '318267') {
-    console.log('=== PAGINATION DEBUG ===');
-    console.log('Current page:', currentPage);
-    console.log('Total pages:', totalPages);
-    console.log('Start index:', startIndex);
-    console.log('End index:', endIndex);
-    console.log('Paginated contacts:', paginatedContacts.length);
-    console.log('Paginated contact names:', paginatedContacts.map((c: any) => c.displayName || c.name));
-  }
+  // Clamp page when filtered contacts list shrinks
+  useEffect(() => {
+    if (filteredContacts.length === 0) return;
+    const totalPages = Math.ceil(filteredContacts.length / CONTACTS_PER_PAGE);
+    if (totalPages > 0 && currentPage >= totalPages) {
+      setCurrentPage(Math.max(0, totalPages - 1));
+    }
+  }, [filteredContacts.length, currentPage]);
 
   // Swipe handlers
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -1188,19 +1160,6 @@ function ContactsManager() {
           </div>
         ) : (
           <>
-            {/* Previous button */}
-            {totalPages > 1 && currentPage > 0 && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={goToPreviousPage}
-                className="fixed left-4 top-1/2 -translate-y-1/2 z-50 bg-white shadow-lg hover:bg-gray-100 rounded-full"
-                data-testid="button-previous-page"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            )}
-            
             {/* Contact grid with swipe support */}
             <div 
               key={`contacts-${searchQuery}-${currentPage}`}
@@ -1310,41 +1269,52 @@ function ContactsManager() {
             })}
           </div>
           
-          {/* Next button */}
-          {totalPages > 1 && currentPage < totalPages - 1 && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={goToNextPage}
-              className="fixed right-4 top-1/2 -translate-y-1/2 z-50 bg-white shadow-lg hover:bg-gray-100 rounded-full"
-              data-testid="button-next-page"
-            >
-              <ArrowLeft className="w-5 h-5 rotate-180" />
-            </Button>
-          )}
-        
-        {/* Page indicators */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-4">
-            <span className="text-xs text-gray-500">
-              Page {currentPage + 1} of {totalPages}
-            </span>
-            <div className="flex gap-1">
-              {Array.from({ length: totalPages }).map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentPage(i)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    i === currentPage ? 'bg-blue-600 w-6' : 'bg-gray-300'
-                  }`}
-                  aria-label={`Go to page ${i + 1}`}
-                  data-testid={`page-indicator-${i}`}
-                />
-              ))}
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={goToPreviousPage}
+                disabled={currentPage === 0}
+                className="text-blue-600 hover:text-blue-800"
+                data-testid="button-previous-page"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+              
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-gray-600">
+                  Page {currentPage + 1} of {totalPages}
+                </span>
+                <div className="flex gap-2">
+                  {Array.from({ length: totalPages }).map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentPage(i)}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        i === currentPage ? 'bg-blue-600 w-6' : 'bg-gray-300 hover:bg-gray-400'
+                      }`}
+                      aria-label={`Go to page ${i + 1}`}
+                      data-testid={`page-indicator-${i}`}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages - 1}
+                className="text-blue-600 hover:text-blue-800"
+                data-testid="button-next-page"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </Button>
             </div>
-          </div>
-        )}
-      </>
+          )}
+        </>
         )}
         
         {selectedContacts.length > 0 && (
