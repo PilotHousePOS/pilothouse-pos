@@ -2634,9 +2634,9 @@ export default function Admin() {
               <CardContent>
                 <div className="space-y-4">
                   {unapprovedAppointments.map((appointment: any) => (
-                    <div key={appointment.id} className="flex items-center justify-between p-4 border border-orange-300 rounded-lg bg-white">
+                    <div key={appointment.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border border-orange-300 rounded-lg bg-white gap-3">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
                           <Badge className="bg-orange-500 text-white">Pending Approval</Badge>
                           {appointment.source === 'google_calendar' && (
                             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
@@ -2660,10 +2660,10 @@ export default function Admin() {
                         )}
                         <p className="text-xs text-gray-500">Booked: {new Date(appointment.createdAt).toLocaleString()}</p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
                         <Button
                           size="sm"
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-none"
                           onClick={() => approveAppointmentMutation.mutate(appointment.id)}
                           disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending}
                           data-testid={`approve-appointment-${appointment.id}`}
@@ -2673,6 +2673,7 @@ export default function Admin() {
                         <Button
                           size="sm"
                           variant="destructive"
+                          className="flex-1 sm:flex-none"
                           onClick={() => rejectAppointmentMutation.mutate(appointment.id)}
                           disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending}
                           data-testid={`reject-appointment-${appointment.id}`}
