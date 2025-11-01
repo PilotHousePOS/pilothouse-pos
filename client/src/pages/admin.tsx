@@ -1509,10 +1509,31 @@ export default function Admin() {
   const [deniedTouchStart, setDeniedTouchStart] = useState(0);
   const [deniedTouchEnd, setDeniedTouchEnd] = useState(0);
   
-  // Pagination for orders
-  const [ordersPage, setOrdersPage] = useState(0);
-  const [ordersTouchStart, setOrdersTouchStart] = useState(0);
-  const [ordersTouchEnd, setOrdersTouchEnd] = useState(0);
+  // Orders section collapsible states
+  const [showInProgressOrders, setShowInProgressOrders] = useState(false);
+  const [showReadyOrders, setShowReadyOrders] = useState(false);
+  const [showCompletedOrders, setShowCompletedOrders] = useState(false);
+  const [showCancelledOrders, setShowCancelledOrders] = useState(false);
+  
+  // Pagination for in progress orders (confirmed)
+  const [inProgressOrdersPage, setInProgressOrdersPage] = useState(0);
+  const [inProgressOrdersTouchStart, setInProgressOrdersTouchStart] = useState(0);
+  const [inProgressOrdersTouchEnd, setInProgressOrdersTouchEnd] = useState(0);
+  
+  // Pagination for ready orders (shipped)
+  const [readyOrdersPage, setReadyOrdersPage] = useState(0);
+  const [readyOrdersTouchStart, setReadyOrdersTouchStart] = useState(0);
+  const [readyOrdersTouchEnd, setReadyOrdersTouchEnd] = useState(0);
+  
+  // Pagination for completed orders (delivered)
+  const [completedOrdersPage, setCompletedOrdersPage] = useState(0);
+  const [completedOrdersTouchStart, setCompletedOrdersTouchStart] = useState(0);
+  const [completedOrdersTouchEnd, setCompletedOrdersTouchEnd] = useState(0);
+  
+  // Pagination for cancelled orders
+  const [cancelledOrdersPage, setCancelledOrdersPage] = useState(0);
+  const [cancelledOrdersTouchStart, setCancelledOrdersTouchStart] = useState(0);
+  const [cancelledOrdersTouchEnd, setCancelledOrdersTouchEnd] = useState(0);
   
   const APPOINTMENTS_PER_PAGE = 4;
   const ORDERS_PER_PAGE = 4;
@@ -2160,16 +2181,53 @@ export default function Admin() {
     }
   }, [appointments, deniedAppointmentsPage]);
 
-  // Clamp orders pagination when list shrinks
+  // Clamp in progress orders pagination when list shrinks
   useEffect(() => {
     if (!orders) return;
     
-    const totalPages = Math.ceil((orders as any[]).length / ORDERS_PER_PAGE);
+    const inProgressOrders = (orders as any[]).filter((o: any) => o.status === 'confirmed');
+    const totalPages = Math.ceil(inProgressOrders.length / ORDERS_PER_PAGE);
     
-    if (totalPages > 0 && ordersPage >= totalPages) {
-      setOrdersPage(Math.max(0, totalPages - 1));
+    if (totalPages > 0 && inProgressOrdersPage >= totalPages) {
+      setInProgressOrdersPage(Math.max(0, totalPages - 1));
     }
-  }, [orders, ordersPage]);
+  }, [orders, inProgressOrdersPage]);
+  
+  // Clamp ready orders pagination when list shrinks
+  useEffect(() => {
+    if (!orders) return;
+    
+    const readyOrders = (orders as any[]).filter((o: any) => o.status === 'shipped');
+    const totalPages = Math.ceil(readyOrders.length / ORDERS_PER_PAGE);
+    
+    if (totalPages > 0 && readyOrdersPage >= totalPages) {
+      setReadyOrdersPage(Math.max(0, totalPages - 1));
+    }
+  }, [orders, readyOrdersPage]);
+  
+  // Clamp completed orders pagination when list shrinks
+  useEffect(() => {
+    if (!orders) return;
+    
+    const completedOrders = (orders as any[]).filter((o: any) => o.status === 'delivered');
+    const totalPages = Math.ceil(completedOrders.length / ORDERS_PER_PAGE);
+    
+    if (totalPages > 0 && completedOrdersPage >= totalPages) {
+      setCompletedOrdersPage(Math.max(0, totalPages - 1));
+    }
+  }, [orders, completedOrdersPage]);
+  
+  // Clamp cancelled orders pagination when list shrinks
+  useEffect(() => {
+    if (!orders) return;
+    
+    const cancelledOrders = (orders as any[]).filter((o: any) => o.status === 'cancelled');
+    const totalPages = Math.ceil(cancelledOrders.length / ORDERS_PER_PAGE);
+    
+    if (totalPages > 0 && cancelledOrdersPage >= totalPages) {
+      setCancelledOrdersPage(Math.max(0, totalPages - 1));
+    }
+  }, [orders, cancelledOrdersPage]);
 
   // Create Appointment from Admin Booking Modal
   const createAppointmentMutation = useMutation({
