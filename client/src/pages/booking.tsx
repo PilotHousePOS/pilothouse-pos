@@ -84,22 +84,47 @@ export default function Booking() {
 
   // Handle contact selection
   const handleSelectContact = (contact: any) => {
-    const nameParts = (contact.name || '').split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || '';
+    // Pattern: "LastName PetName PhoneNumber GroomerTag"
+    // Example: "Diaz Oreo 3183344619"
     
+    let contactName = contact.name || '';
+    
+    // Remove phone number from the name if present
+    const phoneDigits = (contact.phoneNumber || '').replace(/\D/g, '');
+    if (phoneDigits) {
+      contactName = contactName.replace(phoneDigits, '').trim();
+    }
+    
+    // Split remaining parts
+    const nameParts = contactName.split(/\s+/).filter(Boolean);
+    
+    // First word is Last Name
+    const lastName = nameParts[0] || '';
+    
+    // Remaining words (before phone/groomer tag) are Pet Name(s)
+    const petName = nameParts.slice(1).join(' ') || '';
+    
+    // Update owner info with last name only (no first name in this pattern)
     setOwnerInfo({
-      firstName,
+      firstName: '',
       lastName,
       phoneNumber: contact.phoneNumber || '',
     });
+    
+    // Auto-fill pet name if extracted
+    if (petName) {
+      setPetInfo(prev => ({
+        ...prev,
+        name: petName,
+      }));
+    }
     
     setContactSearch(contact.name || '');
     setShowContactDropdown(false);
     
     toast({
       title: "Contact Selected",
-      description: `Information populated for ${contact.name}`,
+      description: `Information populated for ${lastName}${petName ? ` - ${petName}` : ''}`,
     });
   };
 
