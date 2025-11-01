@@ -1883,6 +1883,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { syncAppointmentsFromCalendarEvents } = await import("./googleCalendar");
       
+      // First, clean up old Google Calendar appointments with "Not provided" phone numbers
+      const allAppointments = await storage.getAppointments(); // Get all appointments (no userId filter)
+      const appointmentsToDelete = allAppointments.filter((apt: any) => 
+        apt.source === 'google_calendar' && 
+        apt.ownerPhoneNumber === 'Not provided'
+      );
+      
+      console.log(`Cleaning up ${appointmentsToDelete.length} old Google Calendar appointments with "Not provided" phone numbers`);
+      for (const apt of appointmentsToDelete) {
+        await storage.deleteAppointment(apt.id);
+      }
+      
       // Fetch calendar appointments
       console.log('Fetching Google Calendar events...');
       const calendarAppointments = await syncAppointmentsFromCalendarEvents();
@@ -1895,9 +1907,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`Found ${calendarAppointments.length} calendar events`);
 
       // Get all existing appointments from Google Calendar (by googleEventId)
-      const allAppointments = await storage.getAppointments(); // Get all appointments (no userId filter)
+      const remainingAppointments = await storage.getAppointments(); // Get all appointments (no userId filter)
       const existingGoogleEventIds = new Set(
-        allAppointments
+        remainingAppointments
           .filter((apt: any) => apt.googleEventId)
           .map((apt: any) => apt.googleEventId)
       );
