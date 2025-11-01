@@ -1270,50 +1270,53 @@ function ContactsManager() {
           </div>
           
           {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={goToPreviousPage}
-                disabled={currentPage === 0}
-                className="text-blue-600 hover:text-blue-800"
-                data-testid="button-previous-page"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </Button>
-              
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-gray-600">
-                  Page {currentPage + 1} of {totalPages}
-                </span>
-                <div className="flex gap-2">
-                  {Array.from({ length: totalPages }).map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentPage(i)}
-                      className={`w-2 h-2 rounded-full transition-all ${
-                        i === currentPage ? 'bg-blue-600 w-6' : 'bg-gray-300 hover:bg-gray-400'
-                      }`}
-                      aria-label={`Go to page ${i + 1}`}
-                      data-testid={`page-indicator-${i}`}
-                    />
-                  ))}
+          {totalPages > 1 && (() => {
+            const pageIndicators = getPageIndicators(currentPage, totalPages);
+            return (
+              <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 0}
+                  className="text-blue-600 hover:text-blue-800"
+                  data-testid="button-previous-page"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </Button>
+                
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-gray-600">
+                    Page {currentPage + 1} of {totalPages}
+                  </span>
+                  <div className="flex gap-2">
+                    {pageIndicators.map((i) => (
+                      <button
+                        key={i}
+                        onClick={() => setCurrentPage(i)}
+                        className={`w-2 h-2 rounded-full transition-all ${
+                          i === currentPage ? 'bg-blue-600 w-6' : 'bg-gray-300 hover:bg-gray-400'
+                        }`}
+                        aria-label={`Go to page ${i + 1}`}
+                        data-testid={`page-indicator-${i}`}
+                      />
+                    ))}
+                  </div>
                 </div>
+                
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages - 1}
+                  className="text-blue-600 hover:text-blue-800"
+                  data-testid="button-next-page"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </Button>
               </div>
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={goToNextPage}
-                disabled={currentPage === totalPages - 1}
-                className="text-blue-600 hover:text-blue-800"
-                data-testid="button-next-page"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </Button>
-            </div>
-          )}
+            );
+          })()}
         </>
         )}
         
@@ -1430,6 +1433,28 @@ function OrderDetailsCard({ order, onStatusUpdate }: { order: any; onStatusUpdat
       )}
     </div>
   );
+}
+
+// Helper function to calculate which page indicators to display (max 5)
+function getPageIndicators(currentPage: number, totalPages: number): number[] {
+  const MAX_INDICATORS = 5;
+  
+  if (totalPages <= MAX_INDICATORS) {
+    // Show all pages if total is 5 or less
+    return Array.from({ length: totalPages }, (_, i) => i);
+  }
+  
+  // Calculate the range to show
+  let startPage = Math.max(0, currentPage - Math.floor(MAX_INDICATORS / 2));
+  let endPage = startPage + MAX_INDICATORS;
+  
+  // Adjust if we're near the end
+  if (endPage > totalPages) {
+    endPage = totalPages;
+    startPage = Math.max(0, endPage - MAX_INDICATORS);
+  }
+  
+  return Array.from({ length: endPage - startPage }, (_, i) => startPage + i);
 }
 
 // Helper function to format service type display
@@ -3020,44 +3045,52 @@ export default function Admin() {
                     </div>
 
                     {/* Pagination Controls */}
-                    {totalPages > 1 && (
-                      <div className="flex items-center justify-between mt-4 pt-4 border-t border-green-200">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setApprovedAppointmentsPage(prev => Math.max(0, prev - 1))}
-                          disabled={approvedAppointmentsPage === 0}
-                          className="text-green-700 hover:text-green-900"
-                        >
-                          <ChevronLeft className="w-5 h-5" />
-                        </Button>
-                        
-                        <div className="flex gap-2">
-                          {Array.from({ length: totalPages }).map((_, idx) => (
-                            <button
-                              key={idx}
-                              onClick={() => setApprovedAppointmentsPage(idx)}
-                              className={`w-2 h-2 rounded-full transition-all ${
-                                idx === approvedAppointmentsPage 
-                                  ? 'bg-green-700 w-6' 
-                                  : 'bg-green-300 hover:bg-green-500'
-                              }`}
-                              aria-label={`Page ${idx + 1}`}
-                            />
-                          ))}
+                    {totalPages > 1 && (() => {
+                      const pageIndicators = getPageIndicators(approvedAppointmentsPage, totalPages);
+                      return (
+                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-green-200">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setApprovedAppointmentsPage(prev => Math.max(0, prev - 1))}
+                            disabled={approvedAppointmentsPage === 0}
+                            className="text-green-700 hover:text-green-900"
+                          >
+                            <ChevronLeft className="w-5 h-5" />
+                          </Button>
+                          
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs text-green-700">
+                              Page {approvedAppointmentsPage + 1} of {totalPages}
+                            </span>
+                            <div className="flex gap-2">
+                              {pageIndicators.map((idx) => (
+                                <button
+                                  key={idx}
+                                  onClick={() => setApprovedAppointmentsPage(idx)}
+                                  className={`w-2 h-2 rounded-full transition-all ${
+                                    idx === approvedAppointmentsPage 
+                                      ? 'bg-green-700 w-6' 
+                                      : 'bg-green-300 hover:bg-green-500'
+                                  }`}
+                                  aria-label={`Page ${idx + 1}`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setApprovedAppointmentsPage(prev => Math.min(totalPages - 1, prev + 1))}
+                            disabled={approvedAppointmentsPage === totalPages - 1}
+                            className="text-green-700 hover:text-green-900"
+                          >
+                            <ChevronRight className="w-5 h-5" />
+                          </Button>
                         </div>
-                        
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setApprovedAppointmentsPage(prev => Math.min(totalPages - 1, prev + 1))}
-                          disabled={approvedAppointmentsPage === totalPages - 1}
-                          className="text-green-700 hover:text-green-900"
-                        >
-                          <ChevronRight className="w-5 h-5" />
-                        </Button>
-                      </div>
-                    )}
+                      );
+                    })()}
                   </CardContent>
                 </Card>
               );
@@ -3177,44 +3210,52 @@ export default function Admin() {
                       </div>
 
                       {/* Pagination Controls */}
-                      {totalPages > 1 && (
-                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-red-200">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setDeniedAppointmentsPage(prev => Math.max(0, prev - 1))}
-                            disabled={deniedAppointmentsPage === 0}
-                            className="text-red-700 hover:text-red-900"
-                          >
-                            <ChevronLeft className="w-5 h-5" />
-                          </Button>
-                          
-                          <div className="flex gap-2">
-                            {Array.from({ length: totalPages }).map((_, idx) => (
-                              <button
-                                key={idx}
-                                onClick={() => setDeniedAppointmentsPage(idx)}
-                                className={`w-2 h-2 rounded-full transition-all ${
-                                  idx === deniedAppointmentsPage 
-                                    ? 'bg-red-700 w-6' 
-                                    : 'bg-red-300 hover:bg-red-500'
-                                }`}
-                                aria-label={`Page ${idx + 1}`}
-                              />
-                            ))}
+                      {totalPages > 1 && (() => {
+                        const pageIndicators = getPageIndicators(deniedAppointmentsPage, totalPages);
+                        return (
+                          <div className="flex items-center justify-between mt-4 pt-4 border-t border-red-200">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDeniedAppointmentsPage(prev => Math.max(0, prev - 1))}
+                              disabled={deniedAppointmentsPage === 0}
+                              className="text-red-700 hover:text-red-900"
+                            >
+                              <ChevronLeft className="w-5 h-5" />
+                            </Button>
+                            
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs text-red-700">
+                                Page {deniedAppointmentsPage + 1} of {totalPages}
+                              </span>
+                              <div className="flex gap-2">
+                                {pageIndicators.map((idx) => (
+                                  <button
+                                    key={idx}
+                                    onClick={() => setDeniedAppointmentsPage(idx)}
+                                    className={`w-2 h-2 rounded-full transition-all ${
+                                      idx === deniedAppointmentsPage 
+                                        ? 'bg-red-700 w-6' 
+                                        : 'bg-red-300 hover:bg-red-500'
+                                    }`}
+                                    aria-label={`Page ${idx + 1}`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDeniedAppointmentsPage(prev => Math.min(totalPages - 1, prev + 1))}
+                              disabled={deniedAppointmentsPage === totalPages - 1}
+                              className="text-red-700 hover:text-red-900"
+                            >
+                              <ChevronRight className="w-5 h-5" />
+                            </Button>
                           </div>
-                          
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setDeniedAppointmentsPage(prev => Math.min(totalPages - 1, prev + 1))}
-                            disabled={deniedAppointmentsPage === totalPages - 1}
-                            className="text-red-700 hover:text-red-900"
-                          >
-                            <ChevronRight className="w-5 h-5" />
-                          </Button>
-                        </div>
-                      )}
+                        );
+                      })()}
                     </CardContent>
                   </Card>
                 );

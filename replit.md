@@ -35,7 +35,7 @@ The application is a full-stack web application with a clear separation of conce
     - **Google Calendar Integration**: ALL calendar events sync to appointments (phone numbers optional, syncs from today onwards). Newly synced events appear in pending appointments requiring admin approval
     - **Service Type Detection**: Events with "bath" in title marked as "Bath Only", all others as "Full Grooming"
     - **Collapsible UI**: Pending appointments visible by default; Approved and Denied appointments behind expandable buttons
-    - **Pagination System**: Approved and Denied appointments display 4 items per page with mobile swipe gestures and arrow navigation. Automatic page clamping prevents blank sections when lists shrink after status changes
+    - **Pagination System**: Approved and Denied appointments display 4 items per page with mobile swipe gestures and arrow navigation. Sliding window shows max 5 page indicators to prevent overflow. Automatic page clamping prevents blank sections when lists shrink after status changes
     - Role-based access: Groomers can view all appointments including pending, approved, and completed (read-only status updates), admins have full modification access
     - Visual indicators: Google Calendar appointments display "Synced" badge throughout workflow
     - **Automatic Cleanup**: Approved, completed, cancelled, and rejected appointments older than 30 days are automatically filtered from the appointments list to maintain database efficiency
@@ -56,7 +56,7 @@ The application is a full-stack web application with a clear separation of conce
     - Automatic phone number extraction from Google Calendar event descriptions and syncing with duplicate prevention.
     - User-contact auto-linking system based on normalized phone numbers.
     - Contact management UI with add/edit/delete, real-time search (name, email, phone), and smart phone number display.
-    - **Pagination System**: Contacts display 4 items per page with inline pagination controls (ChevronLeft/ChevronRight arrows, page indicators). Automatic page clamping prevents blank sections when filtered list shrinks. Mobile swipe gesture support included.
+    - **Pagination System**: Contacts display 4 items per page with inline pagination controls (ChevronLeft/ChevronRight arrows, page indicators). Sliding window shows max 5 page indicators to prevent overflow. Automatic page clamping prevents blank sections when filtered list shrinks. Mobile swipe gesture support included.
     - Event creation from contacts interface with multi-contact selection.
 - **Groomer Management System:** Dedicated admin tab for CRUD operations on groomers (name, email, phone, specialties, active status). Includes active/inactive toggle, search, and real-time updates.
 - **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtering content by species.
