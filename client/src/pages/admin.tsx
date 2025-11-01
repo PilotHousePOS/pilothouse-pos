@@ -2938,112 +2938,552 @@ export default function Admin() {
             </Card>
           )}
 
-          {/* Orders Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ShoppingBag className="w-5 h-5" />
-                Orders ({(orders as any[]).length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {(() => {
-                const totalPages = Math.ceil((orders as any[]).length / ORDERS_PER_PAGE);
-                const startIndex = ordersPage * ORDERS_PER_PAGE;
-                const paginatedOrders = (orders as any[]).slice(startIndex, startIndex + ORDERS_PER_PAGE);
-                const pageIndicators = getPageIndicators(ordersPage, totalPages);
+          {/* Pending Orders Section - Always Visible */}
+          {(() => {
+            const pendingOrders = (orders as any[]).filter((o: any) => o.status === 'pending');
+            
+            return pendingOrders.length > 0 ? (
+              <Card className="border-2 border-yellow-200 bg-yellow-50/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-yellow-700">
+                    <ShoppingBag className="w-5 h-5" />
+                    Pending Orders ({pendingOrders.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {pendingOrders.map((order: any) => (
+                      <OrderDetailsCard 
+                        key={order.id} 
+                        order={order} 
+                        onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
+                      />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : null;
+          })()}
 
-                const handleOrdersTouchStart = (e: React.TouchEvent) => {
-                  setOrdersTouchStart(e.targetTouches[0].clientX);
-                };
+          {/* In Progress Orders Section - Collapsible */}
+          {(() => {
+            const inProgressOrders = (orders as any[]).filter((o: any) => o.status === 'confirmed');
+            
+            if (inProgressOrders.length === 0) return null;
 
-                const handleOrdersTouchMove = (e: React.TouchEvent) => {
-                  setOrdersTouchEnd(e.targetTouches[0].clientX);
-                };
+            return (
+              <Card className="border-2 border-blue-200 bg-blue-50/30">
+                <CardHeader>
+                  <Button
+                    variant="ghost"
+                    className="w-full flex items-center justify-between p-0 hover:bg-transparent"
+                    onClick={() => setShowInProgressOrders(!showInProgressOrders)}
+                    data-testid="toggle-in-progress-orders"
+                  >
+                    <CardTitle className="flex items-center gap-2 text-blue-700">
+                      <ShoppingBag className="w-5 h-5" />
+                      In Progress Orders ({inProgressOrders.length})
+                    </CardTitle>
+                    {showInProgressOrders ? (
+                      <ChevronUp className="w-5 h-5 text-blue-700" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-blue-700" />
+                    )}
+                  </Button>
+                </CardHeader>
+                {showInProgressOrders && (
+                  <CardContent className="pt-3 pb-3">
+                    {(() => {
+                      const totalPages = Math.ceil(inProgressOrders.length / ORDERS_PER_PAGE);
+                      const startIndex = inProgressOrdersPage * ORDERS_PER_PAGE;
+                      const paginatedOrders = inProgressOrders.slice(startIndex, startIndex + ORDERS_PER_PAGE);
+                      const pageIndicators = getPageIndicators(inProgressOrdersPage, totalPages);
 
-                const handleOrdersTouchEnd = () => {
-                  if (!ordersTouchStart || !ordersTouchEnd) return;
-                  const distance = ordersTouchStart - ordersTouchEnd;
-                  const minSwipeDistance = 50;
-                  
-                  if (distance > minSwipeDistance && ordersPage < totalPages - 1) {
-                    setOrdersPage(prev => prev + 1);
-                  }
-                  if (distance < -minSwipeDistance && ordersPage > 0) {
-                    setOrdersPage(prev => prev - 1);
-                  }
-                  
-                  setOrdersTouchStart(0);
-                  setOrdersTouchEnd(0);
-                };
+                      const handleTouchStart = (e: React.TouchEvent) => {
+                        setInProgressOrdersTouchStart(e.targetTouches[0].clientX);
+                      };
 
-                return (
-                  <>
-                    <div 
-                      className="space-y-4"
-                      onTouchStart={handleOrdersTouchStart}
-                      onTouchMove={handleOrdersTouchMove}
-                      onTouchEnd={handleOrdersTouchEnd}
-                    >
-                      {paginatedOrders.map((order: any) => (
-                        <OrderDetailsCard 
-                          key={order.id} 
-                          order={order} 
-                          onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
-                        />
-                      ))}
-                    </div>
-                    
-                    {/* Pagination Controls */}
-                    {totalPages > 1 && (
-                      <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setOrdersPage(prev => Math.max(0, prev - 1))}
-                          disabled={ordersPage === 0}
-                          data-testid="button-orders-prev"
-                        >
-                          <ChevronLeft className="w-5 h-5" />
-                        </Button>
+                      const handleTouchMove = (e: React.TouchEvent) => {
+                        setInProgressOrdersTouchEnd(e.targetTouches[0].clientX);
+                      };
+
+                      const handleTouchEnd = () => {
+                        if (!inProgressOrdersTouchStart || !inProgressOrdersTouchEnd) return;
+                        const distance = inProgressOrdersTouchStart - inProgressOrdersTouchEnd;
+                        const minSwipeDistance = 50;
                         
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs text-gray-600">
-                            Page {ordersPage + 1} of {totalPages}
-                          </span>
-                          <div className="flex gap-2">
-                            {pageIndicators.map((idx) => (
-                              <button
-                                key={idx}
-                                onClick={() => setOrdersPage(idx)}
-                                className={`w-2 h-2 rounded-full transition-all ${
-                                  idx === ordersPage 
-                                    ? 'bg-brand-blue w-6' 
-                                    : 'bg-gray-300 hover:bg-gray-500'
-                                }`}
-                                aria-label={`Page ${idx + 1}`}
-                                data-testid={`button-orders-page-${idx}`}
+                        if (distance > minSwipeDistance && inProgressOrdersPage < totalPages - 1) {
+                          setInProgressOrdersPage(prev => prev + 1);
+                        }
+                        if (distance < -minSwipeDistance && inProgressOrdersPage > 0) {
+                          setInProgressOrdersPage(prev => prev - 1);
+                        }
+                        
+                        setInProgressOrdersTouchStart(0);
+                        setInProgressOrdersTouchEnd(0);
+                      };
+
+                      return (
+                        <>
+                          <div 
+                            className="space-y-2"
+                            onTouchStart={handleTouchStart}
+                            onTouchMove={handleTouchMove}
+                            onTouchEnd={handleTouchEnd}
+                          >
+                            {paginatedOrders.map((order: any) => (
+                              <OrderDetailsCard 
+                                key={order.id} 
+                                order={order} 
+                                onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
                               />
                             ))}
                           </div>
-                        </div>
-                        
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setOrdersPage(prev => Math.min(totalPages - 1, prev + 1))}
-                          disabled={ordersPage === totalPages - 1}
-                          data-testid="button-orders-next"
-                        >
-                          <ChevronRight className="w-5 h-5" />
-                        </Button>
-                      </div>
+                          
+                          {totalPages > 1 && (
+                            <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-blue-200">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setInProgressOrdersPage(prev => Math.max(0, prev - 1))}
+                                disabled={inProgressOrdersPage === 0}
+                                className="text-blue-700 hover:text-blue-900"
+                                data-testid="button-in-progress-orders-prev"
+                              >
+                                <ChevronLeft className="w-5 h-5" />
+                              </Button>
+                              
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs text-blue-700">
+                                  Page {inProgressOrdersPage + 1} of {totalPages}
+                                </span>
+                                <div className="flex gap-2">
+                                  {pageIndicators.map((idx) => (
+                                    <button
+                                      key={idx}
+                                      onClick={() => setInProgressOrdersPage(idx)}
+                                      className={`w-2 h-2 rounded-full transition-all ${
+                                        idx === inProgressOrdersPage 
+                                          ? 'bg-blue-700 w-6' 
+                                          : 'bg-blue-300 hover:bg-blue-500'
+                                      }`}
+                                      aria-label={`Page ${idx + 1}`}
+                                      data-testid={`button-in-progress-orders-page-${idx}`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                              
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setInProgressOrdersPage(prev => Math.min(totalPages - 1, prev + 1))}
+                                disabled={inProgressOrdersPage === totalPages - 1}
+                                className="text-blue-700 hover:text-blue-900"
+                                data-testid="button-in-progress-orders-next"
+                              >
+                                <ChevronRight className="w-5 h-5" />
+                              </Button>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </CardContent>
+                )}
+              </Card>
+            );
+          })()}
+
+          {/* Ready Orders Section - Collapsible */}
+          {(() => {
+            const readyOrders = (orders as any[]).filter((o: any) => o.status === 'shipped');
+            
+            if (readyOrders.length === 0) return null;
+
+            return (
+              <Card className="border-2 border-purple-200 bg-purple-50/30">
+                <CardHeader>
+                  <Button
+                    variant="ghost"
+                    className="w-full flex items-center justify-between p-0 hover:bg-transparent"
+                    onClick={() => setShowReadyOrders(!showReadyOrders)}
+                    data-testid="toggle-ready-orders"
+                  >
+                    <CardTitle className="flex items-center gap-2 text-purple-700">
+                      <ShoppingBag className="w-5 h-5" />
+                      Ready Orders ({readyOrders.length})
+                    </CardTitle>
+                    {showReadyOrders ? (
+                      <ChevronUp className="w-5 h-5 text-purple-700" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-purple-700" />
                     )}
-                  </>
-                );
-              })()}
-            </CardContent>
-          </Card>
+                  </Button>
+                </CardHeader>
+                {showReadyOrders && (
+                  <CardContent className="pt-3 pb-3">
+                    {(() => {
+                      const totalPages = Math.ceil(readyOrders.length / ORDERS_PER_PAGE);
+                      const startIndex = readyOrdersPage * ORDERS_PER_PAGE;
+                      const paginatedOrders = readyOrders.slice(startIndex, startIndex + ORDERS_PER_PAGE);
+                      const pageIndicators = getPageIndicators(readyOrdersPage, totalPages);
+
+                      const handleTouchStart = (e: React.TouchEvent) => {
+                        setReadyOrdersTouchStart(e.targetTouches[0].clientX);
+                      };
+
+                      const handleTouchMove = (e: React.TouchEvent) => {
+                        setReadyOrdersTouchEnd(e.targetTouches[0].clientX);
+                      };
+
+                      const handleTouchEnd = () => {
+                        if (!readyOrdersTouchStart || !readyOrdersTouchEnd) return;
+                        const distance = readyOrdersTouchStart - readyOrdersTouchEnd;
+                        const minSwipeDistance = 50;
+                        
+                        if (distance > minSwipeDistance && readyOrdersPage < totalPages - 1) {
+                          setReadyOrdersPage(prev => prev + 1);
+                        }
+                        if (distance < -minSwipeDistance && readyOrdersPage > 0) {
+                          setReadyOrdersPage(prev => prev - 1);
+                        }
+                        
+                        setReadyOrdersTouchStart(0);
+                        setReadyOrdersTouchEnd(0);
+                      };
+
+                      return (
+                        <>
+                          <div 
+                            className="space-y-2"
+                            onTouchStart={handleTouchStart}
+                            onTouchMove={handleTouchMove}
+                            onTouchEnd={handleTouchEnd}
+                          >
+                            {paginatedOrders.map((order: any) => (
+                              <OrderDetailsCard 
+                                key={order.id} 
+                                order={order} 
+                                onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
+                              />
+                            ))}
+                          </div>
+                          
+                          {totalPages > 1 && (
+                            <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-purple-200">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setReadyOrdersPage(prev => Math.max(0, prev - 1))}
+                                disabled={readyOrdersPage === 0}
+                                className="text-purple-700 hover:text-purple-900"
+                                data-testid="button-ready-orders-prev"
+                              >
+                                <ChevronLeft className="w-5 h-5" />
+                              </Button>
+                              
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs text-purple-700">
+                                  Page {readyOrdersPage + 1} of {totalPages}
+                                </span>
+                                <div className="flex gap-2">
+                                  {pageIndicators.map((idx) => (
+                                    <button
+                                      key={idx}
+                                      onClick={() => setReadyOrdersPage(idx)}
+                                      className={`w-2 h-2 rounded-full transition-all ${
+                                        idx === readyOrdersPage 
+                                          ? 'bg-purple-700 w-6' 
+                                          : 'bg-purple-300 hover:bg-purple-500'
+                                      }`}
+                                      aria-label={`Page ${idx + 1}`}
+                                      data-testid={`button-ready-orders-page-${idx}`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                              
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setReadyOrdersPage(prev => Math.min(totalPages - 1, prev + 1))}
+                                disabled={readyOrdersPage === totalPages - 1}
+                                className="text-purple-700 hover:text-purple-900"
+                                data-testid="button-ready-orders-next"
+                              >
+                                <ChevronRight className="w-5 h-5" />
+                              </Button>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </CardContent>
+                )}
+              </Card>
+            );
+          })()}
+
+          {/* Completed Orders Section - Collapsible */}
+          {(() => {
+            const completedOrders = (orders as any[]).filter((o: any) => o.status === 'delivered');
+            
+            if (completedOrders.length === 0) return null;
+
+            return (
+              <Card className="border-2 border-green-200 bg-green-50/30">
+                <CardHeader>
+                  <Button
+                    variant="ghost"
+                    className="w-full flex items-center justify-between p-0 hover:bg-transparent"
+                    onClick={() => setShowCompletedOrders(!showCompletedOrders)}
+                    data-testid="toggle-completed-orders"
+                  >
+                    <CardTitle className="flex items-center gap-2 text-green-700">
+                      <ShoppingBag className="w-5 h-5" />
+                      Completed Orders ({completedOrders.length})
+                    </CardTitle>
+                    {showCompletedOrders ? (
+                      <ChevronUp className="w-5 h-5 text-green-700" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-green-700" />
+                    )}
+                  </Button>
+                </CardHeader>
+                {showCompletedOrders && (
+                  <CardContent className="pt-3 pb-3">
+                    {(() => {
+                      const totalPages = Math.ceil(completedOrders.length / ORDERS_PER_PAGE);
+                      const startIndex = completedOrdersPage * ORDERS_PER_PAGE;
+                      const paginatedOrders = completedOrders.slice(startIndex, startIndex + ORDERS_PER_PAGE);
+                      const pageIndicators = getPageIndicators(completedOrdersPage, totalPages);
+
+                      const handleTouchStart = (e: React.TouchEvent) => {
+                        setCompletedOrdersTouchStart(e.targetTouches[0].clientX);
+                      };
+
+                      const handleTouchMove = (e: React.TouchEvent) => {
+                        setCompletedOrdersTouchEnd(e.targetTouches[0].clientX);
+                      };
+
+                      const handleTouchEnd = () => {
+                        if (!completedOrdersTouchStart || !completedOrdersTouchEnd) return;
+                        const distance = completedOrdersTouchStart - completedOrdersTouchEnd;
+                        const minSwipeDistance = 50;
+                        
+                        if (distance > minSwipeDistance && completedOrdersPage < totalPages - 1) {
+                          setCompletedOrdersPage(prev => prev + 1);
+                        }
+                        if (distance < -minSwipeDistance && completedOrdersPage > 0) {
+                          setCompletedOrdersPage(prev => prev - 1);
+                        }
+                        
+                        setCompletedOrdersTouchStart(0);
+                        setCompletedOrdersTouchEnd(0);
+                      };
+
+                      return (
+                        <>
+                          <div 
+                            className="space-y-2"
+                            onTouchStart={handleTouchStart}
+                            onTouchMove={handleTouchMove}
+                            onTouchEnd={handleTouchEnd}
+                          >
+                            {paginatedOrders.map((order: any) => (
+                              <OrderDetailsCard 
+                                key={order.id} 
+                                order={order} 
+                                onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
+                              />
+                            ))}
+                          </div>
+                          
+                          {totalPages > 1 && (
+                            <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-green-200">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setCompletedOrdersPage(prev => Math.max(0, prev - 1))}
+                                disabled={completedOrdersPage === 0}
+                                className="text-green-700 hover:text-green-900"
+                                data-testid="button-completed-orders-prev"
+                              >
+                                <ChevronLeft className="w-5 h-5" />
+                              </Button>
+                              
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs text-green-700">
+                                  Page {completedOrdersPage + 1} of {totalPages}
+                                </span>
+                                <div className="flex gap-2">
+                                  {pageIndicators.map((idx) => (
+                                    <button
+                                      key={idx}
+                                      onClick={() => setCompletedOrdersPage(idx)}
+                                      className={`w-2 h-2 rounded-full transition-all ${
+                                        idx === completedOrdersPage 
+                                          ? 'bg-green-700 w-6' 
+                                          : 'bg-green-300 hover:bg-green-500'
+                                      }`}
+                                      aria-label={`Page ${idx + 1}`}
+                                      data-testid={`button-completed-orders-page-${idx}`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                              
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setCompletedOrdersPage(prev => Math.min(totalPages - 1, prev + 1))}
+                                disabled={completedOrdersPage === totalPages - 1}
+                                className="text-green-700 hover:text-green-900"
+                                data-testid="button-completed-orders-next"
+                              >
+                                <ChevronRight className="w-5 h-5" />
+                              </Button>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </CardContent>
+                )}
+              </Card>
+            );
+          })()}
+
+          {/* Cancelled Orders Section - Collapsible */}
+          {(() => {
+            const cancelledOrders = (orders as any[]).filter((o: any) => o.status === 'cancelled');
+            
+            if (cancelledOrders.length === 0) return null;
+
+            return (
+              <Card className="border-2 border-red-200 bg-red-50/30">
+                <CardHeader>
+                  <Button
+                    variant="ghost"
+                    className="w-full flex items-center justify-between p-0 hover:bg-transparent"
+                    onClick={() => setShowCancelledOrders(!showCancelledOrders)}
+                    data-testid="toggle-cancelled-orders"
+                  >
+                    <CardTitle className="flex items-center gap-2 text-red-700">
+                      <ShoppingBag className="w-5 h-5" />
+                      Cancelled Orders ({cancelledOrders.length})
+                    </CardTitle>
+                    {showCancelledOrders ? (
+                      <ChevronUp className="w-5 h-5 text-red-700" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-red-700" />
+                    )}
+                  </Button>
+                </CardHeader>
+                {showCancelledOrders && (
+                  <CardContent className="pt-3 pb-3">
+                    {(() => {
+                      const totalPages = Math.ceil(cancelledOrders.length / ORDERS_PER_PAGE);
+                      const startIndex = cancelledOrdersPage * ORDERS_PER_PAGE;
+                      const paginatedOrders = cancelledOrders.slice(startIndex, startIndex + ORDERS_PER_PAGE);
+                      const pageIndicators = getPageIndicators(cancelledOrdersPage, totalPages);
+
+                      const handleTouchStart = (e: React.TouchEvent) => {
+                        setCancelledOrdersTouchStart(e.targetTouches[0].clientX);
+                      };
+
+                      const handleTouchMove = (e: React.TouchEvent) => {
+                        setCancelledOrdersTouchEnd(e.targetTouches[0].clientX);
+                      };
+
+                      const handleTouchEnd = () => {
+                        if (!cancelledOrdersTouchStart || !cancelledOrdersTouchEnd) return;
+                        const distance = cancelledOrdersTouchStart - cancelledOrdersTouchEnd;
+                        const minSwipeDistance = 50;
+                        
+                        if (distance > minSwipeDistance && cancelledOrdersPage < totalPages - 1) {
+                          setCancelledOrdersPage(prev => prev + 1);
+                        }
+                        if (distance < -minSwipeDistance && cancelledOrdersPage > 0) {
+                          setCancelledOrdersPage(prev => prev - 1);
+                        }
+                        
+                        setCancelledOrdersTouchStart(0);
+                        setCancelledOrdersTouchEnd(0);
+                      };
+
+                      return (
+                        <>
+                          <div 
+                            className="space-y-2"
+                            onTouchStart={handleTouchStart}
+                            onTouchMove={handleTouchMove}
+                            onTouchEnd={handleTouchEnd}
+                          >
+                            {paginatedOrders.map((order: any) => (
+                              <OrderDetailsCard 
+                                key={order.id} 
+                                order={order} 
+                                onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
+                              />
+                            ))}
+                          </div>
+                          
+                          {totalPages > 1 && (
+                            <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-red-200">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setCancelledOrdersPage(prev => Math.max(0, prev - 1))}
+                                disabled={cancelledOrdersPage === 0}
+                                className="text-red-700 hover:text-red-900"
+                                data-testid="button-cancelled-orders-prev"
+                              >
+                                <ChevronLeft className="w-5 h-5" />
+                              </Button>
+                              
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs text-red-700">
+                                  Page {cancelledOrdersPage + 1} of {totalPages}
+                                </span>
+                                <div className="flex gap-2">
+                                  {pageIndicators.map((idx) => (
+                                    <button
+                                      key={idx}
+                                      onClick={() => setCancelledOrdersPage(idx)}
+                                      className={`w-2 h-2 rounded-full transition-all ${
+                                        idx === cancelledOrdersPage 
+                                          ? 'bg-red-700 w-6' 
+                                          : 'bg-red-300 hover:bg-red-500'
+                                      }`}
+                                      aria-label={`Page ${idx + 1}`}
+                                      data-testid={`button-cancelled-orders-page-${idx}`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                              
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setCancelledOrdersPage(prev => Math.min(totalPages - 1, prev + 1))}
+                                disabled={cancelledOrdersPage === totalPages - 1}
+                                className="text-red-700 hover:text-red-900"
+                                data-testid="button-cancelled-orders-next"
+                              >
+                                <ChevronRight className="w-5 h-5" />
+                              </Button>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </CardContent>
+                )}
+              </Card>
+            );
+          })()}
 
           {/* Pending Appointments Section - Always Visible */}
           <Card className="border-2 border-yellow-200 bg-yellow-50/30">
