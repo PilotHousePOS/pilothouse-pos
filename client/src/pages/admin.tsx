@@ -2991,7 +2991,7 @@ export default function Admin() {
 
           {/* In Progress Orders Section - Collapsible */}
           {(() => {
-            const inProgressOrders = (orders as any[]).filter((o: any) => o.status === 'confirmed');
+            const inProgressOrders = (orders as any[]).filter((o: any) => o.status === 'in_progress');
             
             if (inProgressOrders.length === 0) return null;
 
@@ -3118,7 +3118,7 @@ export default function Admin() {
 
           {/* Ready Orders Section - Collapsible */}
           {(() => {
-            const readyOrders = (orders as any[]).filter((o: any) => o.status === 'shipped');
+            const readyOrders = (orders as any[]).filter((o: any) => o.status === 'ready');
             
             if (readyOrders.length === 0) return null;
 
@@ -3245,7 +3245,7 @@ export default function Admin() {
 
           {/* Completed Orders Section - Collapsible */}
           {(() => {
-            const completedOrders = (orders as any[]).filter((o: any) => o.status === 'delivered');
+            const completedOrders = (orders as any[]).filter((o: any) => o.status === 'completed');
             
             if (completedOrders.length === 0) return null;
 
