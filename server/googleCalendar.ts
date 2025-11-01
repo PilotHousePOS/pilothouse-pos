@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import { extractPhoneNumbers } from './phoneUtils';
+import { capitalizeWords } from './utils/stringCase';
 
 let connectionSettings: any;
 
@@ -313,19 +314,19 @@ export async function syncAppointmentsFromCalendarEvents() {
       // Extract first word from summary as last name
       const summaryWords = summary.trim().split(/\s+/);
       if (summaryWords.length > 0 && summaryWords[0]) {
-        ownerLastName = summaryWords[0];
+        ownerLastName = capitalizeWords(summaryWords[0]);
       }
       
       // Try to get first name from contact if available
       if (eventContact?.name) {
         const nameParts = eventContact.name.split(' ');
-        ownerFirstName = nameParts[0] || 'Guest';
+        ownerFirstName = capitalizeWords(nameParts[0]) || 'Guest';
       } else if (event.attendees && event.attendees.length > 0) {
         const firstAttendee = event.attendees[0];
         const displayName = firstAttendee.displayName || firstAttendee.email?.split('@')[0];
         if (displayName) {
           const nameParts = displayName.split(' ');
-          ownerFirstName = nameParts[0] || 'Guest';
+          ownerFirstName = capitalizeWords(nameParts[0]) || 'Guest';
         }
       }
 
@@ -349,12 +350,12 @@ export async function syncAppointmentsFromCalendarEvents() {
         if (phoneIndex > 1) {
           // Pet name is from word 2 to the phone number (excluding owner last name and phone)
           const petNameWords = summaryWords.slice(1, phoneIndex);
-          petName = petNameWords.join(' ');
+          petName = capitalizeWords(petNameWords.join(' '));
           
           // Groomer tag is everything after the phone number
           if (phoneIndex < summaryWords.length - 1) {
             const groomerWords = summaryWords.slice(phoneIndex + 1);
-            groomerTag = groomerWords.join(' ');
+            groomerTag = capitalizeWords(groomerWords.join(' '));
           }
         } else {
           // If no phone found in expected position, use all words after first (old behavior)
@@ -363,7 +364,7 @@ export async function syncAppointmentsFromCalendarEvents() {
             return !/^[\d\(\)\-\s]+$/.test(word);
           });
           if (petNameWords.length > 0) {
-            petName = petNameWords.join(' ');
+            petName = capitalizeWords(petNameWords.join(' '));
           }
         }
       }
@@ -449,7 +450,7 @@ export async function syncContactsFromCalendarEvents() {
           if (!attendee.email) continue;
 
           // Get name from attendee or use email username
-          let name = attendee.displayName || attendee.email.split('@')[0];
+          let name = capitalizeWords(attendee.displayName || attendee.email.split('@')[0]);
           
           // If we found phone numbers, create one contact per phone number with unique temp email
           if (phoneNumbers.length > 0) {
@@ -491,7 +492,7 @@ export async function syncContactsFromCalendarEvents() {
           // Format: LastName PetName PhoneNumber Groomer
           // Extract just the last name (first word) for the contact
           const summaryWords = summary.trim().split(/\s+/);
-          const contactName = summaryWords.length > 0 ? summaryWords[0] : summary;
+          const contactName = summaryWords.length > 0 ? capitalizeWords(summaryWords[0]) : capitalizeWords(summary);
           
           extractedContacts.push({
             name: contactName,

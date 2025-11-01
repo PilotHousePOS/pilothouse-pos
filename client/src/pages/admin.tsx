@@ -48,6 +48,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import AdminNotifications from "@/components/admin-notifications";
 import { safeGoBack } from "@/lib/navigation";
+import { capitalizeWords } from "@/lib/stringUtils";
 
 // Phone Number Display Component
 function PhoneNumberDisplay({ phoneNumber }: { phoneNumber: string }) {
@@ -2646,11 +2647,11 @@ export default function Admin() {
                           )}
                           {appointment.groomerTag && (
                             <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300">
-                              Groomer: {appointment.groomerTag}
+                              Groomer: {capitalizeWords(appointment.groomerTag)}
                             </Badge>
                           )}
                         </div>
-                        <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
+                        <h3 className="font-semibold">{formatServiceType(appointment.serviceType || appointment.service)}</h3>
                         <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
                         <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
                         <p className="text-sm text-gray-600">Phone: {appointment.ownerPhoneNumber}</p>
@@ -2660,10 +2661,10 @@ export default function Admin() {
                         )}
                         <p className="text-xs text-gray-500">Booked: {new Date(appointment.createdAt).toLocaleString()}</p>
                       </div>
-                      <div className="flex items-center gap-2 w-full sm:w-auto">
+                      <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
                         <Button
                           size="sm"
-                          className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-none"
+                          className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
                           onClick={() => approveAppointmentMutation.mutate(appointment.id)}
                           disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending}
                           data-testid={`approve-appointment-${appointment.id}`}
@@ -2673,7 +2674,7 @@ export default function Admin() {
                         <Button
                           size="sm"
                           variant="destructive"
-                          className="flex-1 sm:flex-none"
+                          className="w-full sm:w-auto"
                           onClick={() => rejectAppointmentMutation.mutate(appointment.id)}
                           disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending}
                           data-testid={`reject-appointment-${appointment.id}`}
@@ -2808,7 +2809,7 @@ export default function Admin() {
                             onClick={() => setSelectedAppointment(appointment)}
                           >
                             <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
+                              <h3 className="font-semibold">{formatServiceType(appointment.serviceType || appointment.service)}</h3>
                               {appointment.source === 'google_calendar' && (
                                 <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
                                   <CalendarIcon className="w-3 h-3 mr-1" />
