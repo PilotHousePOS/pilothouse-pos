@@ -2968,49 +2968,51 @@ export default function Admin() {
 
               return (
                 <Card className="border-2 border-green-200 bg-green-50/30">
-                  <CardContent className="pt-4">
+                  <CardContent className="pt-3 pb-3">
                     <div 
-                      className="space-y-4"
+                      className="space-y-2"
                       onTouchStart={handleApprovedTouchStart}
                       onTouchMove={handleApprovedTouchMove}
                       onTouchEnd={handleApprovedTouchEnd}
                     >
                       {paginatedAppointments.map((appointment: any) => (
-                        <div key={appointment.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg bg-white gap-3">
+                        <div key={appointment.id} className="flex flex-col sm:flex-row sm:items-start sm:justify-between p-3 border rounded-lg bg-white gap-2">
                           <div 
-                            className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                            className="flex-1 cursor-pointer hover:bg-gray-50 p-1.5 rounded min-w-0"
                             onClick={() => setSelectedAppointment(appointment)}
                           >
-                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <h3 className="font-semibold">{formatServiceType(appointment.serviceType || appointment.service)}</h3>
+                            <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                              <h3 className="font-semibold text-sm">{formatServiceType(appointment.serviceType || appointment.service)}</h3>
                               {appointment.source === 'google_calendar' && (
-                                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
-                                  <CalendarIcon className="w-3 h-3 mr-1" />
+                                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs px-1.5 py-0">
+                                  <CalendarIcon className="w-3 h-3 mr-0.5" />
                                   Synced
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
-                            <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
-                            <p className="text-sm text-gray-600">Phone: {appointment.ownerPhoneNumber}</p>
-                            <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
+                            <div className="text-xs text-gray-600 space-y-0.5">
+                              <p>Pet: {appointment.petName} ({appointment.petType})</p>
+                              <p>Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
+                              <p>Phone: {appointment.ownerPhoneNumber}</p>
+                              <p className="text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
+                            </div>
                             {appointment.specialNotes && (
-                              <p className="text-sm text-gray-700 mt-2 break-words" data-testid={`appointment-notes-${appointment.id}`}>
+                              <p className="text-xs text-gray-700 mt-1.5 break-words" data-testid={`appointment-notes-${appointment.id}`}>
                                 <span className="font-medium">Notes:</span> {appointment.specialNotes}
                               </p>
                             )}
                             {appointment.price && (
-                              <p className="text-sm text-green-700 font-medium mt-1" data-testid={`appointment-price-${appointment.id}`}>
+                              <p className="text-xs text-green-700 font-medium mt-1" data-testid={`appointment-price-${appointment.id}`}>
                                 Price: ${appointment.price}
                               </p>
                             )}
-                            <p className="text-xs text-blue-600 mt-1">Click to view details</p>
+                            <p className="text-xs text-blue-600 mt-0.5">Click to view details</p>
                           </div>
-                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 w-full sm:w-auto flex-shrink-0">
                             <Button
                               size="sm"
                               variant="outline"
-                              className="text-blue-600 border-blue-300 hover:bg-blue-50 w-full sm:w-auto"
+                              className="text-blue-600 border-blue-300 hover:bg-blue-50 w-full sm:w-auto h-8 text-xs"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setEditingAppointment(appointment);
@@ -3019,7 +3021,7 @@ export default function Admin() {
                               }}
                               data-testid={`edit-appointment-${appointment.id}`}
                             >
-                              <Edit className="w-4 h-4 mr-1" />
+                              <Edit className="w-3.5 h-3.5 mr-1" />
                               Edit
                             </Button>
                             <Select
@@ -3028,7 +3030,7 @@ export default function Admin() {
                               onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
                               disabled={!!typedUser?.isGroomer && !typedUser?.isAdmin}
                             >
-                              <SelectTrigger className="w-full sm:w-32">
+                              <SelectTrigger className="w-full sm:w-28 h-8 text-xs">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
@@ -3048,7 +3050,7 @@ export default function Admin() {
                     {totalPages > 1 && (() => {
                       const pageIndicators = getPageIndicators(approvedAppointmentsPage, totalPages);
                       return (
-                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-green-200">
+                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-green-200">
                           <Button
                             variant="ghost"
                             size="sm"
@@ -3145,41 +3147,43 @@ export default function Admin() {
 
                 return (
                   <Card className="border-2 border-red-200 bg-red-50/30">
-                    <CardContent className="pt-4">
+                    <CardContent className="pt-3 pb-3">
                       <div 
-                        className="space-y-4"
+                        className="space-y-2"
                         onTouchStart={handleDeniedTouchStart}
                         onTouchMove={handleDeniedTouchMove}
                         onTouchEnd={handleDeniedTouchEnd}
                       >
                         {paginatedAppointments.map((appointment: any) => (
-                          <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
+                          <div key={appointment.id} className="flex flex-col sm:flex-row sm:items-start justify-between p-3 border rounded-lg bg-white gap-2">
                             <div 
-                              className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                              className="flex-1 cursor-pointer hover:bg-gray-50 p-1.5 rounded min-w-0"
                               onClick={() => setSelectedAppointment(appointment)}
                             >
-                              <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
+                              <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                                <h3 className="font-semibold text-sm">{formatServiceType(appointment.serviceType || appointment.service)}</h3>
                                 {appointment.source === 'google_calendar' && (
-                                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
-                                    <CalendarIcon className="w-3 h-3 mr-1" />
+                                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs px-1.5 py-0">
+                                    <CalendarIcon className="w-3 h-3 mr-0.5" />
                                     Synced
                                   </Badge>
                                 )}
                               </div>
-                              <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
-                              <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
-                              <p className="text-sm text-gray-600">Phone: {appointment.ownerPhoneNumber}</p>
-                              <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
-                              <p className="text-xs text-blue-600 mt-1">Click to view details</p>
+                              <div className="text-xs text-gray-600 space-y-0.5">
+                                <p>Pet: {appointment.petName} ({appointment.petType})</p>
+                                <p>Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
+                                <p>Phone: {appointment.ownerPhoneNumber}</p>
+                                <p className="text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
+                              </div>
+                              <p className="text-xs text-blue-600 mt-0.5">Click to view details</p>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 w-full sm:w-auto flex-shrink-0">
                               <Select
                                 key={`appointment-${appointment.id}-${appointment.status}`}
                                 value={appointment.status}
                                 onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
                               >
-                                <SelectTrigger className="w-32">
+                                <SelectTrigger className="w-full sm:w-28 h-8 text-xs">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -3191,7 +3195,7 @@ export default function Admin() {
                                 </SelectContent>
                               </Select>
                               <Button
-                                size="icon"
+                                size="sm"
                                 variant="destructive"
                                 onClick={() => {
                                   if (confirm('Are you sure you want to permanently delete this appointment?')) {
@@ -3201,8 +3205,9 @@ export default function Admin() {
                                 disabled={deleteAppointmentMutation.isPending}
                                 data-testid={`button-delete-appointment-${appointment.id}`}
                                 title="Delete appointment"
+                                className="w-full sm:w-auto h-8"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3.5 h-3.5" />
                               </Button>
                             </div>
                           </div>
@@ -3213,7 +3218,7 @@ export default function Admin() {
                       {totalPages > 1 && (() => {
                         const pageIndicators = getPageIndicators(deniedAppointmentsPage, totalPages);
                         return (
-                          <div className="flex items-center justify-between mt-4 pt-4 border-t border-red-200">
+                          <div className="flex items-center justify-between mt-3 pt-3 border-t border-red-200">
                             <Button
                               variant="ghost"
                               size="sm"
