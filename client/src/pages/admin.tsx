@@ -1509,7 +1509,13 @@ export default function Admin() {
   const [deniedTouchStart, setDeniedTouchStart] = useState(0);
   const [deniedTouchEnd, setDeniedTouchEnd] = useState(0);
   
+  // Pagination for orders
+  const [ordersPage, setOrdersPage] = useState(0);
+  const [ordersTouchStart, setOrdersTouchStart] = useState(0);
+  const [ordersTouchEnd, setOrdersTouchEnd] = useState(0);
+  
   const APPOINTMENTS_PER_PAGE = 4;
+  const ORDERS_PER_PAGE = 4;
   
   // Book Appointment Modal State
   const [isBookAppointmentOpen, setIsBookAppointmentOpen] = useState(false);
@@ -2153,6 +2159,17 @@ export default function Admin() {
       setDeniedAppointmentsPage(Math.max(0, totalPages - 1));
     }
   }, [appointments, deniedAppointmentsPage]);
+
+  // Clamp orders pagination when list shrinks
+  useEffect(() => {
+    if (!orders) return;
+    
+    const totalPages = Math.ceil((orders as any[]).length / ORDERS_PER_PAGE);
+    
+    if (totalPages > 0 && ordersPage >= totalPages) {
+      setOrdersPage(Math.max(0, totalPages - 1));
+    }
+  }, [orders, ordersPage]);
 
   // Create Appointment from Admin Booking Modal
   const createAppointmentMutation = useMutation({
