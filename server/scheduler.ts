@@ -47,8 +47,62 @@ export function initializeScheduledTasks() {
       }
       
       // Sync new appointments from Google Calendar
-      const appointmentResult = await syncAppointmentsFromCalendarEvents(storage);
-      console.log('Auto-sync appointments completed:', appointmentResult);
+      const calendarAppointments = await syncAppointmentsFromCalendarEvents();
+      
+      // Get all existing appointments to check for duplicates
+      const remainingAppointments = await storage.getAppointments();
+      const existingGoogleEventIds = new Set(
+        remainingAppointments
+          .filter((apt: any) => apt.googleEventId)
+          .map((apt: any) => apt.googleEventId)
+      );
+      
+      // Filter out appointments that already exist
+      const newAppointments = calendarAppointments.filter((apt: any) => 
+        !existingGoogleEventIds.has(apt.googleEventId)
+      );
+      
+      console.log(`${newAppointments.length} new appointments to import, ${calendarAppointments.length - newAppointments.length} already exist`);
+      
+      // Get all users to match phone numbers
+      const allUsers = await storage.getAllUsers();
+      
+      // Get first admin user as fallback for unmatched appointments
+      const adminUser = allUsers.find((u: any) => u.isAdmin);
+      if (!adminUser) {
+        console.error('No admin user found for fallback assignment');
+        return;
+      }
+      
+      // Prepare new appointments with user ID matched by phone number
+      const appointmentsToCreate = newAppointments.map((apt: any) => {
+        // Try to find the user by matching phone number
+        let matchedUser = allUsers.find((u: any) => 
+          u.phoneNumber && phoneNumbersMatch(u.phoneNumber, apt.ownerPhoneNumber)
+        );
+        
+        // If no user found by phone, assign to admin user
+        // Admin can later reassign to correct customer if needed
+        const assignedUserId = matchedUser?.id || adminUser.id;
+        
+        return {
+          ...apt,
+          userId: assignedUserId,
+        };
+      });
+      
+      // Create new appointments
+      let createdAppointments = [];
+      if (appointmentsToCreate.length > 0) {
+        createdAppointments = await storage.bulkCreateAppointments(appointmentsToCreate);
+        console.log(`Created ${createdAppointments.length} new appointments from calendar`);
+      }
+      
+      console.log('Auto-sync appointments completed:', { 
+        total: calendarAppointments.length,
+        new: createdAppointments.length,
+        skipped: calendarAppointments.length - newAppointments.length 
+      });
       
       // Sync contacts from Google Calendar events
       const extractedContacts = await syncContactsFromCalendarEvents();

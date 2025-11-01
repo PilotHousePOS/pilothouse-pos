@@ -2120,10 +2120,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`${newAppointments.length} new appointments to import, ${calendarAppointments.length - newAppointments.length} already exist`);
 
-      // Prepare new appointments with user ID
-      const appointmentsToCreate = newAppointments.map((apt: any) => ({
-        ...apt,
-        userId: user.id, // Associate with the admin user performing the sync
+      // Prepare new appointments with user ID matched by phone number
+      const { phoneNumbersMatch } = await import("./phoneUtils");
+      const allUsers = await storage.getAllUsers();
+      
+      const appointmentsToCreate = await Promise.all(newAppointments.map(async (apt: any) => {
+        // Try to find the user by matching phone number
+        let matchedUser = allUsers.find((u: any) => 
+          u.phoneNumber && phoneNumbersMatch(u.phoneNumber, apt.ownerPhoneNumber)
+        );
+        
+        // If no user found by phone, assign to admin (the user performing the sync)
+        // This ensures appointments can still be created even if customer isn't registered
+        const assignedUserId = matchedUser?.id || user.id;
+        
+        return {
+          ...apt,
+          userId: assignedUserId,
+        };
       }));
 
       // Validate that all required fields are present
