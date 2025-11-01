@@ -2906,12 +2906,12 @@ export default function Admin() {
                     {(appointments as any[])
                       .filter((a: any) => a.status === 'confirmed' || a.status === 'completed')
                       .map((appointment: any) => (
-                        <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
+                        <div key={appointment.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg bg-white gap-3">
                           <div 
                             className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
                             onClick={() => setSelectedAppointment(appointment)}
                           >
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <h3 className="font-semibold">{formatServiceType(appointment.serviceType || appointment.service)}</h3>
                               {appointment.source === 'google_calendar' && (
                                 <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
@@ -2925,7 +2925,7 @@ export default function Admin() {
                             <p className="text-sm text-gray-600">Phone: {appointment.ownerPhoneNumber}</p>
                             <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
                             {appointment.specialNotes && (
-                              <p className="text-sm text-gray-700 mt-2" data-testid={`appointment-notes-${appointment.id}`}>
+                              <p className="text-sm text-gray-700 mt-2 break-words" data-testid={`appointment-notes-${appointment.id}`}>
                                 <span className="font-medium">Notes:</span> {appointment.specialNotes}
                               </p>
                             )}
@@ -2936,12 +2936,13 @@ export default function Admin() {
                             )}
                             <p className="text-xs text-blue-600 mt-1">Click to view details</p>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                             <Button
                               size="sm"
                               variant="outline"
-                              className="text-blue-600 border-blue-300 hover:bg-blue-50"
-                              onClick={() => {
+                              className="text-blue-600 border-blue-300 hover:bg-blue-50 w-full sm:w-auto"
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 setEditingAppointment(appointment);
                                 setEditNotes(appointment.specialNotes || '');
                                 setEditPrice(appointment.price || '');
@@ -2957,7 +2958,7 @@ export default function Admin() {
                               onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
                               disabled={!!typedUser?.isGroomer && !typedUser?.isAdmin}
                             >
-                              <SelectTrigger className="w-32">
+                              <SelectTrigger className="w-full sm:w-32">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
