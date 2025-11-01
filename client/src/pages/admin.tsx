@@ -1920,10 +1920,24 @@ export default function Admin() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
     },
-    onError: (error) => {
+  });
+
+  const deleteAppointmentMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/admin/appointments/${id}`, {});
+    },
+    onSuccess: () => {
+      toast({
+        title: "Appointment Deleted",
+        description: "The appointment has been permanently deleted.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments/unapproved"] });
+    },
+    onError: () => {
       toast({
         title: "Error",
-        description: "Failed to update appointment.",
+        description: "Failed to delete appointment. Please try again.",
         variant: "destructive",
       });
     },
@@ -2875,6 +2889,20 @@ export default function Admin() {
                                   <SelectItem value="cancelled">Cancelled</SelectItem>
                                 </SelectContent>
                               </Select>
+                              <Button
+                                size="icon"
+                                variant="destructive"
+                                onClick={() => {
+                                  if (confirm('Are you sure you want to permanently delete this appointment?')) {
+                                    deleteAppointmentMutation.mutate(appointment.id);
+                                  }
+                                }}
+                                disabled={deleteAppointmentMutation.isPending}
+                                data-testid={`button-delete-appointment-${appointment.id}`}
+                                title="Delete appointment"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
                             </div>
                           </div>
                         ))}
