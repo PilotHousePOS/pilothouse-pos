@@ -2889,15 +2889,101 @@ export default function Admin() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {(orders as any[]).map((order: any) => (
-                  <OrderDetailsCard 
-                    key={order.id} 
-                    order={order} 
-                    onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
-                  />
-                ))}
-              </div>
+              {(() => {
+                const totalPages = Math.ceil((orders as any[]).length / ORDERS_PER_PAGE);
+                const startIndex = ordersPage * ORDERS_PER_PAGE;
+                const paginatedOrders = (orders as any[]).slice(startIndex, startIndex + ORDERS_PER_PAGE);
+                const pageIndicators = getPageIndicators(ordersPage, totalPages);
+
+                const handleOrdersTouchStart = (e: React.TouchEvent) => {
+                  setOrdersTouchStart(e.targetTouches[0].clientX);
+                };
+
+                const handleOrdersTouchMove = (e: React.TouchEvent) => {
+                  setOrdersTouchEnd(e.targetTouches[0].clientX);
+                };
+
+                const handleOrdersTouchEnd = () => {
+                  if (!ordersTouchStart || !ordersTouchEnd) return;
+                  const distance = ordersTouchStart - ordersTouchEnd;
+                  const minSwipeDistance = 50;
+                  
+                  if (distance > minSwipeDistance && ordersPage < totalPages - 1) {
+                    setOrdersPage(prev => prev + 1);
+                  }
+                  if (distance < -minSwipeDistance && ordersPage > 0) {
+                    setOrdersPage(prev => prev - 1);
+                  }
+                  
+                  setOrdersTouchStart(0);
+                  setOrdersTouchEnd(0);
+                };
+
+                return (
+                  <>
+                    <div 
+                      className="space-y-4"
+                      onTouchStart={handleOrdersTouchStart}
+                      onTouchMove={handleOrdersTouchMove}
+                      onTouchEnd={handleOrdersTouchEnd}
+                    >
+                      {paginatedOrders.map((order: any) => (
+                        <OrderDetailsCard 
+                          key={order.id} 
+                          order={order} 
+                          onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
+                        />
+                      ))}
+                    </div>
+                    
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                      <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setOrdersPage(prev => Math.max(0, prev - 1))}
+                          disabled={ordersPage === 0}
+                          data-testid="button-orders-prev"
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </Button>
+                        
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs text-gray-600">
+                            Page {ordersPage + 1} of {totalPages}
+                          </span>
+                          <div className="flex gap-2">
+                            {pageIndicators.map((idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => setOrdersPage(idx)}
+                                className={`w-2 h-2 rounded-full transition-all ${
+                                  idx === ordersPage 
+                                    ? 'bg-brand-blue w-6' 
+                                    : 'bg-gray-300 hover:bg-gray-500'
+                                }`}
+                                aria-label={`Page ${idx + 1}`}
+                                data-testid={`button-orders-page-${idx}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setOrdersPage(prev => Math.min(totalPages - 1, prev + 1))}
+                          disabled={ordersPage === totalPages - 1}
+                          data-testid="button-orders-next"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </CardContent>
           </Card>
 
