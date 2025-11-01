@@ -2576,35 +2576,38 @@ export default function Admin() {
       </div>
 
       <Tabs defaultValue="inventory" className="w-full">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
           <TabsList className="inline-flex w-max min-w-full gap-1 h-auto p-1">
-            <TabsTrigger value="inventory" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
+            <TabsTrigger value="inventory" className="flex-1 text-xs py-3 px-2 md:px-3 whitespace-nowrap">
               <span className="hidden md:inline">Inventory</span>
               <span className="md:hidden">Stock</span>
             </TabsTrigger>
-            <TabsTrigger value="orders" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
+            <TabsTrigger value="orders" className="flex-1 text-xs py-3 px-2 md:px-3 whitespace-nowrap">
               <span className="hidden md:inline">Orders & Appointments</span>
               <span className="md:hidden">Orders</span>
             </TabsTrigger>
             {typedUser?.isAdmin && (
-              <TabsTrigger value="grooming" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
-                <span className="hidden md:inline">Grooming Settings</span>
-                <span className="md:hidden">Settings</span>
+              <TabsTrigger value="grooming" className="flex-1 text-xs py-3 px-2 md:px-3 whitespace-nowrap">
+                <span className="hidden sm:inline">Grooming Settings</span>
+                <span className="sm:hidden">Groom</span>
               </TabsTrigger>
             )}
-            <TabsTrigger value="groomers" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
-              Groomers
+            <TabsTrigger value="groomers" className="flex-1 text-xs py-3 px-2 md:px-3 whitespace-nowrap">
+              <span className="hidden sm:inline">Groomers</span>
+              <span className="sm:hidden">Staff</span>
             </TabsTrigger>
             {typedUser?.isAdmin && (
-              <TabsTrigger value="users" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
+              <TabsTrigger value="users" className="flex-1 text-xs py-3 px-2 md:px-3 whitespace-nowrap">
                 Users
               </TabsTrigger>
             )}
-            <TabsTrigger value="calendar" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
-              Calendar
+            <TabsTrigger value="calendar" className="flex-1 text-xs py-3 px-2 md:px-3 whitespace-nowrap">
+              <span className="hidden sm:inline">Calendar</span>
+              <span className="sm:hidden">Cal</span>
             </TabsTrigger>
-            <TabsTrigger value="contacts" className="flex-1 text-xs py-3 px-3 whitespace-nowrap">
-              Contacts
+            <TabsTrigger value="contacts" className="flex-1 text-xs py-3 px-2 md:px-3 whitespace-nowrap">
+              <span className="hidden sm:inline">Contacts</span>
+              <span className="sm:hidden">Cont</span>
             </TabsTrigger>
           </TabsList>
         </div>

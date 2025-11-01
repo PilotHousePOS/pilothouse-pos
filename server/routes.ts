@@ -1894,8 +1894,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/admin/calendar/events/date", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
-      if (!user?.isAdmin) {
-        return res.status(403).json({ message: "Admin access required" });
+      if (!user?.isAdmin && !user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or Groomer access required" });
       }
 
       const dateStr = req.query.date as string;
