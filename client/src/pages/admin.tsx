@@ -1952,7 +1952,9 @@ export default function Admin() {
         title: "Appointments Synced",
         description: data.message || "All appointments replaced with Google Calendar events.",
       });
+      // Invalidate both appointments and unapproved appointments to refresh the UI
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments/unapproved"] });
     },
     onError: (error) => {
       toast({

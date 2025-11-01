@@ -1942,10 +1942,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       res.json({ 
-        message: `Successfully imported ${createdAppointments.length} new appointments from Google Calendar`,
+        message: appointmentsToDelete.length > 0 
+          ? `Cleaned up ${appointmentsToDelete.length} old appointments and imported ${createdAppointments.length} new appointments from Google Calendar`
+          : `Successfully imported ${createdAppointments.length} new appointments from Google Calendar`,
         appointments: createdAppointments,
         newCount: createdAppointments.length,
         skippedCount: calendarAppointments.length - newAppointments.length,
+        deletedCount: appointmentsToDelete.length,
       });
     } catch (error) {
       console.error("Error syncing appointments from calendar:", error);
