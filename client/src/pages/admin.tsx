@@ -2349,6 +2349,18 @@ export default function Admin() {
     }
   }, [orders, cancelledOrdersPage]);
 
+  // Auto-expand collapsible sections when searching
+  useEffect(() => {
+    if (search.trim()) {
+      setShowApprovedAppointments(true);
+      setShowDeniedAppointments(true);
+      setShowInProgressOrders(true);
+      setShowReadyOrders(true);
+      setShowCompletedOrders(true);
+      setShowCancelledOrders(true);
+    }
+  }, [search]);
+
   // Create Appointment from Admin Booking Modal
   const createAppointmentMutation = useMutation({
     mutationFn: async (appointmentData: any) => {
