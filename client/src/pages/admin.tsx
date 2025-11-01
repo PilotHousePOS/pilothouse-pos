@@ -1391,6 +1391,23 @@ function OrderDetailsCard({ order, onStatusUpdate }: { order: any; onStatusUpdat
   );
 }
 
+// Helper function to format service type display
+function formatServiceType(serviceType: string): string {
+  if (!serviceType) return '';
+  
+  // Handle various formats
+  const normalized = serviceType.toLowerCase();
+  
+  if (normalized.includes('bath') && !normalized.includes('full')) {
+    return 'Bath';
+  } else if (normalized.includes('full') || normalized.includes('grooming')) {
+    return 'Full Grooming';
+  }
+  
+  // Default: return as-is for any unknown formats
+  return serviceType;
+}
+
 export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const typedUser = user as User;
@@ -2723,7 +2740,7 @@ export default function Admin() {
                         onClick={() => setSelectedAppointment(appointment)}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold">{appointment.serviceType || appointment.service}</h3>
+                          <h3 className="font-semibold">{formatServiceType(appointment.serviceType || appointment.service)}</h3>
                           {appointment.source === 'google_calendar' && (
                             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
                               <CalendarIcon className="w-3 h-3 mr-1" />
@@ -3545,7 +3562,7 @@ export default function Admin() {
               <div className="space-y-3">
                 <div>
                   <Label className="text-sm font-semibold text-gray-700">Service</Label>
-                  <p className="text-gray-900">{selectedAppointment.serviceType}</p>
+                  <p className="text-gray-900">{formatServiceType(selectedAppointment.serviceType)}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
