@@ -3016,7 +3016,7 @@ export default function Admin() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               type="text"
-              placeholder="Search by customer name, phone number, or pet name..."
+              placeholder="Search orders and appointments by customer name, phone, or pet name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 border-gray-300 rounded-xl"
