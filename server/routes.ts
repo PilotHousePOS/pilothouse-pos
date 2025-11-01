@@ -1132,6 +1132,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete an appointment (admin only)
+  app.delete("/api/admin/appointments/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      await storage.deleteAppointment(id);
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting appointment:", error);
+      res.status(500).json({ message: "Failed to delete appointment" });
+    }
+  });
+
   app.put("/api/appointments/:id", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
