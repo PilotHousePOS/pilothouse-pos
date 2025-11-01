@@ -552,11 +552,14 @@ export class DatabaseStorage implements IStorage {
       .where(eq(appointments.isApproved, false))
       .orderBy(desc(appointments.createdAt));
     
-    // Filter out past appointments (only show future appointments)
-    const now = new Date();
+    // Filter out past dates (only show today and future appointments)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of day
+    
     return allUnapproved.filter(apt => {
-      const aptDateTime = new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
-      return aptDateTime >= now;
+      const aptDate = new Date(apt.appointmentDate);
+      aptDate.setHours(0, 0, 0, 0); // Set to start of day for comparison
+      return aptDate >= today;
     });
   }
 
