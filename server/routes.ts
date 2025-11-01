@@ -1150,6 +1150,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update appointment notes and price (admin only)
+  app.patch("/api/admin/appointments/:id/details", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const { specialNotes, price } = req.body;
+
+      // Validate that at least one field is provided
+      if (specialNotes === undefined && price === undefined) {
+        return res.status(400).json({ message: "At least one field (specialNotes or price) is required" });
+      }
+
+      // Validate price if provided
+      if (price !== undefined) {
+        const priceNum = parseFloat(price);
+        if (isNaN(priceNum) || priceNum < 0) {
+          return res.status(400).json({ message: "Price must be a valid positive number" });
+        }
+      }
+
+      // Build update object with only provided fields
+      const updates: { specialNotes?: string; price?: string } = {};
+      if (specialNotes !== undefined) {
+        updates.specialNotes = specialNotes;
+      }
+      if (price !== undefined) {
+        updates.price = price;
+      }
+
+      const appointment = await storage.updateAppointmentDetails(id, updates);
+      
+      res.json(appointment);
+    } catch (error) {
+      console.error("Error updating appointment details:", error);
+      res.status(500).json({ message: "Failed to update appointment details" });
+    }
+  });
+
   app.put("/api/appointments/:id", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);

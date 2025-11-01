@@ -1425,6 +1425,9 @@ export default function Admin() {
   const [isSyncAppointmentsConfirmOpen, setIsSyncAppointmentsConfirmOpen] = useState(false);
   const [showApprovedAppointments, setShowApprovedAppointments] = useState(false);
   const [showDeniedAppointments, setShowDeniedAppointments] = useState(false);
+  const [editingAppointment, setEditingAppointment] = useState<any>(null);
+  const [editNotes, setEditNotes] = useState('');
+  const [editPrice, setEditPrice] = useState('');
   
   // Book Appointment Modal State
   const [isBookAppointmentOpen, setIsBookAppointmentOpen] = useState(false);
@@ -1922,6 +1925,29 @@ export default function Admin() {
       toast({
         title: "Error",
         description: "Failed to reject appointment. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateAppointmentDetailsMutation = useMutation({
+    mutationFn: async ({ id, specialNotes, price }: { id: number; specialNotes: string; price: string }) => {
+      await apiRequest("PATCH", `/api/admin/appointments/${id}/details`, { specialNotes, price });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Appointment Updated",
+        description: "Notes and price have been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      setEditingAppointment(null);
+      setEditNotes('');
+      setEditPrice('');
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update appointment. Please try again.",
         variant: "destructive",
       });
     },
@@ -2824,6 +2850,20 @@ export default function Admin() {
                             <p className="text-xs text-blue-600 mt-1">Click to view details</p>
                           </div>
                           <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-blue-600 border-blue-300 hover:bg-blue-50"
+                              onClick={() => {
+                                setEditingAppointment(appointment);
+                                setEditNotes(appointment.specialNotes || '');
+                                setEditPrice(appointment.price || '');
+                              }}
+                              data-testid={`edit-appointment-${appointment.id}`}
+                            >
+                              <Edit className="w-4 h-4 mr-1" />
+                              Edit
+                            </Button>
                             <Select
                               key={`appointment-${appointment.id}-${appointment.status}`}
                               value={appointment.status}
@@ -3623,6 +3663,72 @@ export default function Admin() {
                     </Badge>
                   </div>
                 </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Edit Appointment Dialog */}
+      {editingAppointment && (
+        <Dialog open={!!editingAppointment} onOpenChange={() => {
+          setEditingAppointment(null);
+          setEditNotes('');
+          setEditPrice('');
+        }}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Edit Appointment Details</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-notes">Notes</Label>
+                <Textarea
+                  id="edit-notes"
+                  value={editNotes}
+                  onChange={(e) => setEditNotes(e.target.value)}
+                  placeholder="Add special notes or instructions for the grooming appointment..."
+                  rows={4}
+                  data-testid="input-edit-notes"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-price">Price ($)</Label>
+                <Input
+                  id="edit-price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={editPrice}
+                  onChange={(e) => setEditPrice(e.target.value)}
+                  placeholder="45.00"
+                  data-testid="input-edit-price"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setEditingAppointment(null);
+                    setEditNotes('');
+                    setEditPrice('');
+                  }}
+                  data-testid="button-cancel-edit"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => updateAppointmentDetailsMutation.mutate({
+                    id: editingAppointment.id,
+                    specialNotes: editNotes,
+                    price: editPrice
+                  })}
+                  disabled={updateAppointmentDetailsMutation.isPending}
+                  className="bg-brand-blue hover:bg-blue-700"
+                  data-testid="button-save-edit"
+                >
+                  {updateAppointmentDetailsMutation.isPending ? 'Saving...' : 'Save Changes'}
+                </Button>
               </div>
             </div>
           </DialogContent>
