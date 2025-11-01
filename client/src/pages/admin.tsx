@@ -42,7 +42,9 @@ import {
   Pencil,
   Eye,
   EyeOff,
-  AlertTriangle
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -1497,6 +1499,18 @@ export default function Admin() {
   const [editNotes, setEditNotes] = useState('');
   const [editPrice, setEditPrice] = useState('');
   
+  // Pagination for approved appointments
+  const [approvedAppointmentsPage, setApprovedAppointmentsPage] = useState(0);
+  const [approvedTouchStart, setApprovedTouchStart] = useState(0);
+  const [approvedTouchEnd, setApprovedTouchEnd] = useState(0);
+  
+  // Pagination for denied appointments
+  const [deniedAppointmentsPage, setDeniedAppointmentsPage] = useState(0);
+  const [deniedTouchStart, setDeniedTouchStart] = useState(0);
+  const [deniedTouchEnd, setDeniedTouchEnd] = useState(0);
+  
+  const APPOINTMENTS_PER_PAGE = 4;
+  
   // Book Appointment Modal State
   const [isBookAppointmentOpen, setIsBookAppointmentOpen] = useState(false);
   const [bookingContactSearch, setBookingContactSearch] = useState('');
@@ -2085,6 +2099,34 @@ export default function Admin() {
       });
     },
   });
+
+  // Clamp approved appointments pagination when list shrinks
+  useEffect(() => {
+    if (!appointments) return;
+    
+    const approvedAppointments = (appointments as any[]).filter(
+      (a: any) => a.status === 'confirmed' || a.status === 'completed'
+    );
+    const totalPages = Math.ceil(approvedAppointments.length / APPOINTMENTS_PER_PAGE);
+    
+    if (totalPages > 0 && approvedAppointmentsPage >= totalPages) {
+      setApprovedAppointmentsPage(Math.max(0, totalPages - 1));
+    }
+  }, [appointments, approvedAppointmentsPage]);
+
+  // Clamp denied appointments pagination when list shrinks
+  useEffect(() => {
+    if (!appointments) return;
+    
+    const deniedAppointments = (appointments as any[]).filter(
+      (a: any) => a.status === 'rejected' || a.status === 'cancelled'
+    );
+    const totalPages = Math.ceil(deniedAppointments.length / APPOINTMENTS_PER_PAGE);
+    
+    if (totalPages > 0 && deniedAppointmentsPage >= totalPages) {
+      setDeniedAppointmentsPage(Math.max(0, totalPages - 1));
+    }
+  }, [appointments, deniedAppointmentsPage]);
 
   // Create Appointment from Admin Booking Modal
   const createAppointmentMutation = useMutation({
@@ -2899,13 +2941,46 @@ export default function Admin() {
               {showApprovedAppointments ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
             </Button>
 
-            {showApprovedAppointments && (
-              <Card className="border-2 border-green-200 bg-green-50/30">
-                <CardContent className="pt-4">
-                  <div className="space-y-4">
-                    {(appointments as any[])
-                      .filter((a: any) => a.status === 'confirmed' || a.status === 'completed')
-                      .map((appointment: any) => (
+            {showApprovedAppointments && (() => {
+              const approvedAppointments = (appointments as any[]).filter((a: any) => a.status === 'confirmed' || a.status === 'completed');
+              const totalPages = Math.ceil(approvedAppointments.length / APPOINTMENTS_PER_PAGE);
+              const startIdx = approvedAppointmentsPage * APPOINTMENTS_PER_PAGE;
+              const paginatedAppointments = approvedAppointments.slice(startIdx, startIdx + APPOINTMENTS_PER_PAGE);
+
+              const handleApprovedTouchStart = (e: React.TouchEvent) => {
+                setApprovedTouchStart(e.targetTouches[0].clientX);
+              };
+
+              const handleApprovedTouchMove = (e: React.TouchEvent) => {
+                setApprovedTouchEnd(e.targetTouches[0].clientX);
+              };
+
+              const handleApprovedTouchEnd = () => {
+                if (!approvedTouchStart || !approvedTouchEnd) return;
+                const distance = approvedTouchStart - approvedTouchEnd;
+                const minSwipeDistance = 50;
+                
+                if (distance > minSwipeDistance && approvedAppointmentsPage < totalPages - 1) {
+                  setApprovedAppointmentsPage(prev => prev + 1);
+                }
+                if (distance < -minSwipeDistance && approvedAppointmentsPage > 0) {
+                  setApprovedAppointmentsPage(prev => prev - 1);
+                }
+                
+                setApprovedTouchStart(0);
+                setApprovedTouchEnd(0);
+              };
+
+              return (
+                <Card className="border-2 border-green-200 bg-green-50/30">
+                  <CardContent className="pt-4">
+                    <div 
+                      className="space-y-4"
+                      onTouchStart={handleApprovedTouchStart}
+                      onTouchMove={handleApprovedTouchMove}
+                      onTouchEnd={handleApprovedTouchEnd}
+                    >
+                      {paginatedAppointments.map((appointment: any) => (
                         <div key={appointment.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg bg-white gap-3">
                           <div 
                             className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
@@ -2972,10 +3047,51 @@ export default function Admin() {
                           </div>
                         </div>
                       ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                    </div>
+
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                      <div className="flex items-center justify-between mt-4 pt-4 border-t border-green-200">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setApprovedAppointmentsPage(prev => Math.max(0, prev - 1))}
+                          disabled={approvedAppointmentsPage === 0}
+                          className="text-green-700 hover:text-green-900"
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </Button>
+                        
+                        <div className="flex gap-2">
+                          {Array.from({ length: totalPages }).map((_, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => setApprovedAppointmentsPage(idx)}
+                              className={`w-2 h-2 rounded-full transition-all ${
+                                idx === approvedAppointmentsPage 
+                                  ? 'bg-green-700 w-6' 
+                                  : 'bg-green-300 hover:bg-green-500'
+                              }`}
+                              aria-label={`Page ${idx + 1}`}
+                            />
+                          ))}
+                        </div>
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setApprovedAppointmentsPage(prev => Math.min(totalPages - 1, prev + 1))}
+                          disabled={approvedAppointmentsPage === totalPages - 1}
+                          className="text-green-700 hover:text-green-900"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })()}
           </div>
 
           {/* Denied Appointments - Collapsible Button (Only visible to admins) */}
@@ -2994,13 +3110,46 @@ export default function Admin() {
                 {showDeniedAppointments ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
               </Button>
 
-              {showDeniedAppointments && (
-                <Card className="border-2 border-red-200 bg-red-50/30">
-                  <CardContent className="pt-4">
-                    <div className="space-y-4">
-                      {(appointments as any[])
-                        .filter((a: any) => a.status === 'rejected' || a.status === 'cancelled')
-                        .map((appointment: any) => (
+              {showDeniedAppointments && (() => {
+                const deniedAppointments = (appointments as any[]).filter((a: any) => a.status === 'rejected' || a.status === 'cancelled');
+                const totalPages = Math.ceil(deniedAppointments.length / APPOINTMENTS_PER_PAGE);
+                const startIdx = deniedAppointmentsPage * APPOINTMENTS_PER_PAGE;
+                const paginatedAppointments = deniedAppointments.slice(startIdx, startIdx + APPOINTMENTS_PER_PAGE);
+
+                const handleDeniedTouchStart = (e: React.TouchEvent) => {
+                  setDeniedTouchStart(e.targetTouches[0].clientX);
+                };
+
+                const handleDeniedTouchMove = (e: React.TouchEvent) => {
+                  setDeniedTouchEnd(e.targetTouches[0].clientX);
+                };
+
+                const handleDeniedTouchEnd = () => {
+                  if (!deniedTouchStart || !deniedTouchEnd) return;
+                  const distance = deniedTouchStart - deniedTouchEnd;
+                  const minSwipeDistance = 50;
+                  
+                  if (distance > minSwipeDistance && deniedAppointmentsPage < totalPages - 1) {
+                    setDeniedAppointmentsPage(prev => prev + 1);
+                  }
+                  if (distance < -minSwipeDistance && deniedAppointmentsPage > 0) {
+                    setDeniedAppointmentsPage(prev => prev - 1);
+                  }
+                  
+                  setDeniedTouchStart(0);
+                  setDeniedTouchEnd(0);
+                };
+
+                return (
+                  <Card className="border-2 border-red-200 bg-red-50/30">
+                    <CardContent className="pt-4">
+                      <div 
+                        className="space-y-4"
+                        onTouchStart={handleDeniedTouchStart}
+                        onTouchMove={handleDeniedTouchMove}
+                        onTouchEnd={handleDeniedTouchEnd}
+                      >
+                        {paginatedAppointments.map((appointment: any) => (
                           <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
                             <div 
                               className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
@@ -3055,10 +3204,51 @@ export default function Admin() {
                             </div>
                           </div>
                         ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                      </div>
+
+                      {/* Pagination Controls */}
+                      {totalPages > 1 && (
+                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-red-200">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setDeniedAppointmentsPage(prev => Math.max(0, prev - 1))}
+                            disabled={deniedAppointmentsPage === 0}
+                            className="text-red-700 hover:text-red-900"
+                          >
+                            <ChevronLeft className="w-5 h-5" />
+                          </Button>
+                          
+                          <div className="flex gap-2">
+                            {Array.from({ length: totalPages }).map((_, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => setDeniedAppointmentsPage(idx)}
+                                className={`w-2 h-2 rounded-full transition-all ${
+                                  idx === deniedAppointmentsPage 
+                                    ? 'bg-red-700 w-6' 
+                                    : 'bg-red-300 hover:bg-red-500'
+                                }`}
+                                aria-label={`Page ${idx + 1}`}
+                              />
+                            ))}
+                          </div>
+                          
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setDeniedAppointmentsPage(prev => Math.min(totalPages - 1, prev + 1))}
+                            disabled={deniedAppointmentsPage === totalPages - 1}
+                            className="text-red-700 hover:text-red-900"
+                          >
+                            <ChevronRight className="w-5 h-5" />
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })()}
             </div>
           )}
 

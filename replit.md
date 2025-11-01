@@ -35,6 +35,7 @@ The application is a full-stack web application with a clear separation of conce
     - **Google Calendar Integration**: ALL calendar events sync to appointments (phone numbers optional, syncs from today onwards). Newly synced events appear in pending appointments requiring admin approval
     - **Service Type Detection**: Events with "bath" in title marked as "Bath Only", all others as "Full Grooming"
     - **Collapsible UI**: Pending appointments visible by default; Approved and Denied appointments behind expandable buttons
+    - **Pagination System**: Approved and Denied appointments display 4 items per page with mobile swipe gestures and arrow navigation. Automatic page clamping prevents blank sections when lists shrink after status changes
     - Role-based access: Groomers can view all appointments including pending, approved, and completed (read-only status updates), admins have full modification access
     - Visual indicators: Google Calendar appointments display "Synced" badge throughout workflow
     - **Automatic Cleanup**: Approved, completed, cancelled, and rejected appointments older than 30 days are automatically filtered from the appointments list to maintain database efficiency
