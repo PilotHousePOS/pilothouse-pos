@@ -3126,7 +3126,7 @@ export default function Admin() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {(appointments as any[])
+                {((search.trim() ? filteredAppointments : appointments) as any[])
                   .filter((a: any) => a.status === 'scheduled')
                   .map((appointment: any) => {
                     const isHighlighted = matchesSearch(appointment, 'appointment');
@@ -3745,7 +3745,7 @@ export default function Admin() {
             </Button>
 
             {showApprovedAppointments && (() => {
-              const approvedAppointments = (appointments as any[]).filter((a: any) => a.status === 'confirmed' || a.status === 'completed');
+              const approvedAppointments = ((search.trim() ? filteredAppointments : appointments) as any[]).filter((a: any) => a.status === 'confirmed' || a.status === 'completed');
               const totalPages = Math.ceil(approvedAppointments.length / APPOINTMENTS_PER_PAGE);
               const startIdx = approvedAppointmentsPage * APPOINTMENTS_PER_PAGE;
               const paginatedAppointments = approvedAppointments.slice(startIdx, startIdx + APPOINTMENTS_PER_PAGE);
@@ -3939,7 +3939,7 @@ export default function Admin() {
               </Button>
 
               {showDeniedAppointments && (() => {
-                const deniedAppointments = (appointments as any[]).filter((a: any) => a.status === 'rejected' || a.status === 'cancelled');
+                const deniedAppointments = ((search.trim() ? filteredAppointments : appointments) as any[]).filter((a: any) => a.status === 'rejected' || a.status === 'cancelled');
                 const totalPages = Math.ceil(deniedAppointments.length / APPOINTMENTS_PER_PAGE);
                 const startIdx = deniedAppointmentsPage * APPOINTMENTS_PER_PAGE;
                 const paginatedAppointments = deniedAppointments.slice(startIdx, startIdx + APPOINTMENTS_PER_PAGE);

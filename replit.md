@@ -61,6 +61,7 @@ The application is a full-stack web application with a clear separation of conce
 - **Groomer Management System:** Dedicated admin tab for CRUD operations on groomers (name, email, phone, specialties, active status). Includes active/inactive toggle, search, and real-time updates.
 - **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtering content by species.
 - **Admin Order Management:** Displays actual product/pet names and customer names in order details.
+- **Orders & Appointments Search:** Unified search bar at top of Orders & Appointments tab filters both database appointments (all statuses) and orders (all statuses) by customer name, phone number, or pet name. Matching cards are visually highlighted with amber border (border-2 border-amber-400) and amber background (bg-amber-50) for easy identification. Note: Google Calendar events displayed in the Calendar tab are separate and not included in this search.
 
 **System Design Choices:**
 - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
