@@ -244,20 +244,19 @@ export async function syncAppointmentsFromCalendarEvents() {
   try {
     const calendar = await getUncachableGoogleCalendarClient();
     
-    // Start from tomorrow at midnight to only sync future appointments (exclude today)
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0); // Set to midnight
+    // Start from today at midnight to sync all current and future appointments
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to midnight
     
-    // Fetch events from tomorrow through next 90 days
+    // Fetch events from today through next 90 days
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 90);
 
-    console.log(`[SYNC] Fetching future calendar events from ${tomorrow.toISOString()} to ${futureDate.toISOString()}`);
+    console.log(`[SYNC] Fetching calendar events from ${today.toISOString()} to ${futureDate.toISOString()}`);
 
     const response = await calendar.events.list({
       calendarId: 'primary',
-      timeMin: tomorrow.toISOString(),
+      timeMin: today.toISOString(),
       timeMax: futureDate.toISOString(),
       maxResults: 500,
       singleEvents: true,
@@ -290,12 +289,11 @@ export async function syncAppointmentsFromCalendarEvents() {
       
       // Extract phone numbers from description as fallback
       const phoneNumbers = extractPhoneNumbers(combinedText);
-      const phoneNumber = eventContact?.phoneNumber || phoneNumbers[0];
+      const phoneNumber = eventContact?.phoneNumber || phoneNumbers[0] || 'Not provided';
       
-      // Skip events without a phone number
-      if (!phoneNumber) {
-        console.log(`[SYNC] Skipping event without phone number: ${event.id} - "${summary}"`);
-        continue;
+      // No longer skip events without phone numbers - use placeholder instead
+      if (!phoneNumber || phoneNumber === 'Not provided') {
+        console.log(`[SYNC] Event has no phone number, using placeholder: ${event.id} - "${summary}"`);
       }
 
       // Parse date and time
