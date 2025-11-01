@@ -3616,27 +3616,6 @@ export default function Admin() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Google Calendar Sync */}
-              <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
-                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                  <CalendarIcon className="w-5 h-5" />
-                  Google Calendar Integration
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Sync appointments from your Google Calendar. This will clear all existing appointments and replace them with calendar events.
-                </p>
-                <Button 
-                  variant="default"
-                  onClick={() => setIsSyncAppointmentsConfirmOpen(true)}
-                  disabled={syncAppointmentsMutation.isPending}
-                  data-testid="button-sync-appointments"
-                  className="w-full sm:w-auto"
-                >
-                  <RefreshCw className={`w-4 h-4 mr-2`} />
-                  Sync Appointments from Calendar
-                </Button>
-              </div>
-
               {/* Operating Hours */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Operating Hours</h3>

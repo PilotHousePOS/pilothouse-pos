@@ -1543,6 +1543,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const groomerData = req.body;
       const groomer = await storage.createGroomer(groomerData);
+      
+      // Try to link groomer with existing user account by email or phone
+      if (groomerData.email || groomerData.phone) {
+        try {
+          const allUsers = await storage.getAllUsers();
+          let matchingUser = null;
+          
+          // Find user by email or phone
+          if (groomerData.email) {
+            matchingUser = allUsers.find((u: any) => 
+              u.email?.toLowerCase() === groomerData.email.toLowerCase()
+            );
+          }
+          
+          if (!matchingUser && groomerData.phone) {
+            const normalizedGroomerPhone = normalizePhoneNumber(groomerData.phone);
+            matchingUser = allUsers.find((u: any) => 
+              u.phone && normalizePhoneNumber(u.phone) === normalizedGroomerPhone
+            );
+          }
+          
+          // If matching user found, grant them groomer privileges
+          if (matchingUser && !matchingUser.isGroomer) {
+            await storage.updateUser(matchingUser.id, { isGroomer: true });
+            console.log(`Linked groomer ${groomer.id} to user account ${matchingUser.id} (${matchingUser.email})`);
+          }
+        } catch (linkError) {
+          console.error("Error linking groomer to user account:", linkError);
+          // Don't fail the groomer creation if linking fails
+        }
+      }
+      
       res.json(groomer);
     } catch (error) {
       console.error("Error creating groomer:", error);
