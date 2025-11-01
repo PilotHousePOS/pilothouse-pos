@@ -89,6 +89,7 @@ export interface IStorage {
   createAppointment(appointment: InsertAppointment): Promise<Appointment>;
   getAppointments(userId?: string): Promise<Appointment[]>;
   getAppointment(id: number): Promise<Appointment | undefined>;
+  getAppointmentsByPhoneNumber(phoneNumber: string): Promise<Appointment[]>;
   updateAppointmentStatus(id: number, status: string): Promise<Appointment>;
   updateAppointmentDetails(id: number, updates: { specialNotes?: string; price?: string }): Promise<Appointment>;
   clearAllAppointments(): Promise<void>;
@@ -525,6 +526,18 @@ export class DatabaseStorage implements IStorage {
   async getAppointment(id: number): Promise<Appointment | undefined> {
     const [appointment] = await db.select().from(appointments).where(eq(appointments.id, id));
     return appointment;
+  }
+
+  async getAppointmentsByPhoneNumber(phoneNumber: string): Promise<Appointment[]> {
+    // Normalize the phone number by removing all non-digit characters
+    const normalizedPhone = phoneNumber.replace(/\D/g, '');
+    
+    // Get all appointments and filter by normalized phone number
+    const allAppointments = await db.select().from(appointments);
+    return allAppointments.filter(apt => {
+      const aptPhone = apt.ownerPhoneNumber.replace(/\D/g, '');
+      return aptPhone === normalizedPhone;
+    }).sort((a, b) => new Date(b.appointmentDate).getTime() - new Date(a.appointmentDate).getTime());
   }
 
   async updateAppointmentStatus(id: number, status: string): Promise<Appointment> {

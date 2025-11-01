@@ -1759,6 +1759,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get appointment history for a contact
+  app.get("/api/contacts/:id/appointments", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin && !user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
+      }
+
+      const contactId = parseInt(req.params.id);
+      const contact = await storage.getContact(contactId);
+      
+      if (!contact) {
+        return res.status(404).json({ message: "Contact not found" });
+      }
+
+      if (!contact.phoneNumber) {
+        return res.json([]);
+      }
+
+      const appointments = await storage.getAppointmentsByPhoneNumber(contact.phoneNumber);
+      res.json(appointments);
+    } catch (error) {
+      console.error("Error fetching contact appointments:", error);
+      res.status(500).json({ message: "Failed to fetch contact appointments" });
+    }
+  });
+
   app.delete("/api/contacts/:id", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
