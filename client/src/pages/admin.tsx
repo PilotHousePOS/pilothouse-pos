@@ -197,10 +197,10 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-semibold text-gray-900">
-                            {appointment.petName} ({appointment.petType})
+                            {capitalizeWords(appointment.petName)} ({appointment.petType})
                           </h4>
                           <p className="text-sm text-gray-600">
-                            Owner: {appointment.ownerFirstName} {appointment.ownerLastName}
+                            Owner: {capitalizeWords(appointment.ownerFirstName)} {capitalizeWords(appointment.ownerLastName)}
                           </p>
                           <p className="text-sm text-gray-600">
                             Phone: {appointment.ownerPhoneNumber}
@@ -2652,8 +2652,8 @@ export default function Admin() {
                           )}
                         </div>
                         <h3 className="font-semibold">{formatServiceType(appointment.serviceType || appointment.service)}</h3>
-                        <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
-                        <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
+                        <p className="text-sm text-gray-600">Pet: {capitalizeWords(appointment.petName)} ({appointment.petType})</p>
+                        <p className="text-sm text-gray-600">Owner: {capitalizeWords(appointment.ownerFirstName)} {capitalizeWords(appointment.ownerLastName)}</p>
                         <p className="text-sm text-gray-600">Phone: {appointment.ownerPhoneNumber}</p>
                         <p className="text-xs text-gray-500">Date: {new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
                         {appointment.specialNotes && (
@@ -2750,8 +2750,8 @@ export default function Admin() {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-gray-600">Pet: {appointment.petName} ({appointment.petType})</p>
-                        <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
+                        <p className="text-sm text-gray-600">Pet: {capitalizeWords(appointment.petName)} ({appointment.petType})</p>
+                        <p className="text-sm text-gray-600">Owner: {capitalizeWords(appointment.ownerFirstName)} {capitalizeWords(appointment.ownerLastName)}</p>
                         <p className="text-sm text-gray-600">Phone: {appointment.ownerPhoneNumber}</p>
                         <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
                         <p className="text-xs text-blue-600 mt-1">Click to view details</p>
@@ -3581,7 +3581,7 @@ export default function Admin() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-sm font-semibold text-gray-700">Pet Name</Label>
-                      <p className="text-gray-900">{selectedAppointment.petName}</p>
+                      <p className="text-gray-900">{capitalizeWords(selectedAppointment.petName)}</p>
                     </div>
                     <div>
                       <Label className="text-sm font-semibold text-gray-700">Pet Type</Label>
@@ -3600,7 +3600,7 @@ export default function Admin() {
                   <div className="space-y-2">
                     <div>
                       <Label className="text-sm font-semibold text-gray-700">Name</Label>
-                      <p className="text-gray-900">{selectedAppointment.ownerFirstName} {selectedAppointment.ownerLastName}</p>
+                      <p className="text-gray-900">{capitalizeWords(selectedAppointment.ownerFirstName)} {capitalizeWords(selectedAppointment.ownerLastName)}</p>
                     </div>
                     <div>
                       <Label className="text-sm font-semibold text-gray-700">Phone Number</Label>
