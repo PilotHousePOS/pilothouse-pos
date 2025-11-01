@@ -289,11 +289,12 @@ export async function syncAppointmentsFromCalendarEvents() {
       
       // Extract phone numbers from description as fallback
       const phoneNumbers = extractPhoneNumbers(combinedText);
-      const phoneNumber = eventContact?.phoneNumber || phoneNumbers[0] || 'Not provided';
+      const phoneNumber = eventContact?.phoneNumber || phoneNumbers[0] || null;
       
-      // No longer skip events without phone numbers - use placeholder instead
-      if (!phoneNumber || phoneNumber === 'Not provided') {
-        console.log(`[SYNC] Event has no phone number, using placeholder: ${event.id} - "${summary}"`);
+      // Skip events without phone numbers
+      if (!phoneNumber) {
+        console.log(`[SYNC] Skipping event without phone number: ${event.id} - "${summary}"`);
+        continue;
       }
 
       // Parse date and time
