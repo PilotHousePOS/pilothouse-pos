@@ -1344,7 +1344,7 @@ function ContactsManager() {
 }
 
 // Order Details Card Component with Items
-function OrderDetailsCard({ order, onStatusUpdate }: { order: any; onStatusUpdate: (status: string) => void }) {
+function OrderDetailsCard({ order, onStatusUpdate, onDelete }: { order: any; onStatusUpdate: (status: string) => void; onDelete?: (orderId: number) => void }) {
   const [showItems, setShowItems] = useState(false);
   const { data: orderDetails, isLoading } = useQuery({
     queryKey: ["/api/orders", order.id],
@@ -1359,6 +1359,12 @@ function OrderDetailsCard({ order, onStatusUpdate }: { order: any; onStatusUpdat
     },
     enabled: showItems,
   });
+
+  const handleDelete = () => {
+    if (confirm(`Are you sure you want to delete Order #${order.id}? This action cannot be undone.`)) {
+      onDelete?.(order.id);
+    }
+  };
 
   return (
     <div className="border rounded-lg bg-white">
@@ -1399,6 +1405,16 @@ function OrderDetailsCard({ order, onStatusUpdate }: { order: any; onStatusUpdat
               <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
+          {onDelete && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDelete}
+              data-testid={`button-delete-order-${order.id}`}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       </div>
       
@@ -3003,6 +3019,7 @@ export default function Admin() {
                         key={order.id} 
                         order={order} 
                         onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
+                        onDelete={(orderId) => deleteOrderMutation.mutate(orderId)}
                       />
                     ))}
                   </div>
@@ -3078,6 +3095,7 @@ export default function Admin() {
                                 key={order.id} 
                                 order={order} 
                                 onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
+                                onDelete={(orderId) => deleteOrderMutation.mutate(orderId)}
                               />
                             ))}
                           </div>
@@ -3205,6 +3223,7 @@ export default function Admin() {
                                 key={order.id} 
                                 order={order} 
                                 onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
+                                onDelete={(orderId) => deleteOrderMutation.mutate(orderId)}
                               />
                             ))}
                           </div>
@@ -3332,6 +3351,7 @@ export default function Admin() {
                                 key={order.id} 
                                 order={order} 
                                 onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
+                                onDelete={(orderId) => deleteOrderMutation.mutate(orderId)}
                               />
                             ))}
                           </div>
@@ -3459,6 +3479,7 @@ export default function Admin() {
                                 key={order.id} 
                                 order={order} 
                                 onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
+                                onDelete={(orderId) => deleteOrderMutation.mutate(orderId)}
                               />
                             ))}
                           </div>
