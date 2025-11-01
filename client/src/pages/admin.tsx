@@ -1361,7 +1361,7 @@ function OrderDetailsCard({ order, onStatusUpdate }: { order: any; onStatusUpdat
   });
 
   return (
-    <div className="border rounded-lg">
+    <div className="border rounded-lg bg-white">
       <div className="flex items-center justify-between p-4">
         <div className="flex-1">
           <h3 className="font-semibold">Order #{order.id}</h3>
@@ -2974,27 +2974,23 @@ export default function Admin() {
             if (inProgressOrders.length === 0) return null;
 
             return (
-              <Card className="border-2 border-blue-200 bg-blue-50/30">
-                <CardHeader>
-                  <Button
-                    variant="ghost"
-                    className="w-full flex items-center justify-between p-0 hover:bg-transparent"
-                    onClick={() => setShowInProgressOrders(!showInProgressOrders)}
-                    data-testid="toggle-in-progress-orders"
-                  >
-                    <CardTitle className="flex items-center gap-2 text-blue-700">
-                      <ShoppingBag className="w-5 h-5" />
-                      In Progress Orders ({inProgressOrders.length})
-                    </CardTitle>
-                    {showInProgressOrders ? (
-                      <ChevronUp className="w-5 h-5 text-blue-700" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-blue-700" />
-                    )}
-                  </Button>
-                </CardHeader>
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  className="w-full justify-between border-2 border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700"
+                  onClick={() => setShowInProgressOrders(!showInProgressOrders)}
+                  data-testid="toggle-in-progress-orders"
+                >
+                  <span className="flex items-center gap-2">
+                    <ShoppingBag className="w-5 h-5" />
+                    In Progress Orders ({inProgressOrders.length})
+                  </span>
+                  {showInProgressOrders ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                </Button>
+
                 {showInProgressOrders && (
-                  <CardContent className="pt-3 pb-3">
+                  <Card className="border-2 border-blue-200 bg-blue-50/30">
+                    <CardContent className="pt-3 pb-3">
                     {(() => {
                       const totalPages = Math.ceil(inProgressOrders.length / ORDERS_PER_PAGE);
                       const startIndex = inProgressOrdersPage * ORDERS_PER_PAGE;
@@ -3091,9 +3087,10 @@ export default function Admin() {
                         </>
                       );
                     })()}
-                  </CardContent>
+                    </CardContent>
+                  </Card>
                 )}
-              </Card>
+              </div>
             );
           })()}
 
@@ -3104,26 +3101,22 @@ export default function Admin() {
             if (readyOrders.length === 0) return null;
 
             return (
-              <Card className="border-2 border-purple-200 bg-purple-50/30">
-                <CardHeader>
-                  <Button
-                    variant="ghost"
-                    className="w-full flex items-center justify-between p-0 hover:bg-transparent"
-                    onClick={() => setShowReadyOrders(!showReadyOrders)}
-                    data-testid="toggle-ready-orders"
-                  >
-                    <CardTitle className="flex items-center gap-2 text-purple-700">
-                      <ShoppingBag className="w-5 h-5" />
-                      Ready Orders ({readyOrders.length})
-                    </CardTitle>
-                    {showReadyOrders ? (
-                      <ChevronUp className="w-5 h-5 text-purple-700" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-purple-700" />
-                    )}
-                  </Button>
-                </CardHeader>
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  className="w-full justify-between border-2 border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-700"
+                  onClick={() => setShowReadyOrders(!showReadyOrders)}
+                  data-testid="toggle-ready-orders"
+                >
+                  <span className="flex items-center gap-2">
+                    <ShoppingBag className="w-5 h-5" />
+                    Ready Orders ({readyOrders.length})
+                  </span>
+                  {showReadyOrders ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                </Button>
+
                 {showReadyOrders && (
+                  <Card className="border-2 border-purple-200 bg-purple-50/30">
                   <CardContent className="pt-3 pb-3">
                     {(() => {
                       const totalPages = Math.ceil(readyOrders.length / ORDERS_PER_PAGE);
@@ -3221,9 +3214,10 @@ export default function Admin() {
                         </>
                       );
                     })()}
-                  </CardContent>
+                    </CardContent>
+                  </Card>
                 )}
-              </Card>
+              </div>
             );
           })()}
 
@@ -3234,26 +3228,22 @@ export default function Admin() {
             if (completedOrders.length === 0) return null;
 
             return (
-              <Card className="border-2 border-green-200 bg-green-50/30">
-                <CardHeader>
-                  <Button
-                    variant="ghost"
-                    className="w-full flex items-center justify-between p-0 hover:bg-transparent"
-                    onClick={() => setShowCompletedOrders(!showCompletedOrders)}
-                    data-testid="toggle-completed-orders"
-                  >
-                    <CardTitle className="flex items-center gap-2 text-green-700">
-                      <ShoppingBag className="w-5 h-5" />
-                      Completed Orders ({completedOrders.length})
-                    </CardTitle>
-                    {showCompletedOrders ? (
-                      <ChevronUp className="w-5 h-5 text-green-700" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-green-700" />
-                    )}
-                  </Button>
-                </CardHeader>
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  className="w-full justify-between border-2 border-green-200 bg-green-50 hover:bg-green-100 text-green-700"
+                  onClick={() => setShowCompletedOrders(!showCompletedOrders)}
+                  data-testid="toggle-completed-orders"
+                >
+                  <span className="flex items-center gap-2">
+                    <ShoppingBag className="w-5 h-5" />
+                    Completed Orders ({completedOrders.length})
+                  </span>
+                  {showCompletedOrders ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                </Button>
+
                 {showCompletedOrders && (
+                  <Card className="border-2 border-green-200 bg-green-50/30">
                   <CardContent className="pt-3 pb-3">
                     {(() => {
                       const totalPages = Math.ceil(completedOrders.length / ORDERS_PER_PAGE);
@@ -3351,9 +3341,10 @@ export default function Admin() {
                         </>
                       );
                     })()}
-                  </CardContent>
+                    </CardContent>
+                  </Card>
                 )}
-              </Card>
+              </div>
             );
           })()}
 
@@ -3364,26 +3355,22 @@ export default function Admin() {
             if (cancelledOrders.length === 0) return null;
 
             return (
-              <Card className="border-2 border-red-200 bg-red-50/30">
-                <CardHeader>
-                  <Button
-                    variant="ghost"
-                    className="w-full flex items-center justify-between p-0 hover:bg-transparent"
-                    onClick={() => setShowCancelledOrders(!showCancelledOrders)}
-                    data-testid="toggle-cancelled-orders"
-                  >
-                    <CardTitle className="flex items-center gap-2 text-red-700">
-                      <ShoppingBag className="w-5 h-5" />
-                      Cancelled Orders ({cancelledOrders.length})
-                    </CardTitle>
-                    {showCancelledOrders ? (
-                      <ChevronUp className="w-5 h-5 text-red-700" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-red-700" />
-                    )}
-                  </Button>
-                </CardHeader>
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  className="w-full justify-between border-2 border-red-200 bg-red-50 hover:bg-red-100 text-red-700"
+                  onClick={() => setShowCancelledOrders(!showCancelledOrders)}
+                  data-testid="toggle-cancelled-orders"
+                >
+                  <span className="flex items-center gap-2">
+                    <ShoppingBag className="w-5 h-5" />
+                    Cancelled Orders ({cancelledOrders.length})
+                  </span>
+                  {showCancelledOrders ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                </Button>
+
                 {showCancelledOrders && (
+                  <Card className="border-2 border-red-200 bg-red-50/30">
                   <CardContent className="pt-3 pb-3">
                     {(() => {
                       const totalPages = Math.ceil(cancelledOrders.length / ORDERS_PER_PAGE);
@@ -3481,9 +3468,10 @@ export default function Admin() {
                         </>
                       );
                     })()}
-                  </CardContent>
+                    </CardContent>
+                  </Card>
                 )}
-              </Card>
+              </div>
             );
           })()}
 
