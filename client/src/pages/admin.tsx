@@ -1998,6 +1998,28 @@ export default function Admin() {
     },
   });
 
+  // Delete Order Mutation
+  const deleteOrderMutation = useMutation({
+    mutationFn: async (orderId: number) => {
+      const res = await apiRequest("DELETE", `/api/admin/orders/${orderId}`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+      toast({
+        title: "Success",
+        description: "Order deleted successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete order",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Update Appointment Status Mutation
   const approveAppointmentMutation = useMutation({
     mutationFn: async (id: number) => {
