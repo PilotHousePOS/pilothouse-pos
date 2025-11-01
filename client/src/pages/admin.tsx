@@ -291,6 +291,59 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
 }
 
 // Contacts Manager Component with Search and Event Creation
+// Helper component to display appointment history for a contact
+function ContactAppointmentHistory({ contactId }: { contactId: number }) {
+  const { data: appointments = [], isLoading } = useQuery<any[]>({
+    queryKey: ["/api/contacts", contactId, "appointments"],
+    queryFn: async () => {
+      const response = await fetch(`/api/contacts/${contactId}/appointments`, {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch contact appointments');
+      return response.json();
+    },
+    enabled: !!contactId,
+  });
+
+  // Filter for completed and confirmed appointments only
+  const completedAppointments = appointments.filter(apt => 
+    apt.status === 'confirmed' || apt.status === 'completed'
+  );
+
+  if (isLoading) {
+    return <div className="text-sm text-gray-500">Loading appointment history...</div>;
+  }
+
+  if (completedAppointments.length === 0) {
+    return <div className="text-sm text-gray-500">No grooming history found</div>;
+  }
+
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-medium text-gray-700">Grooming History ({completedAppointments.length})</p>
+      <div className="space-y-2 max-h-48 overflow-y-auto">
+        {completedAppointments.map((apt: any) => (
+          <div key={apt.id} className="bg-gray-50 rounded p-2 text-xs" data-testid={`appointment-history-${apt.id}`}>
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="font-medium">{formatServiceType(apt.serviceType || apt.service)}</p>
+                <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
+                <p className="text-gray-500">{new Date(apt.appointmentDate).toLocaleDateString()}</p>
+              </div>
+              {apt.price && (
+                <p className="text-green-700 font-semibold">${apt.price}</p>
+              )}
+            </div>
+            {apt.specialNotes && (
+              <p className="text-gray-600 mt-1 italic">{apt.specialNotes}</p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ContactsManager() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedContacts, setSelectedContacts] = useState<any[]>([]);
@@ -1194,6 +1247,13 @@ function ContactsManager() {
                         <span className="capitalize break-words">
                           {contact.animalType.replace('_', ' ')}{contact.breed && contact.animalType === 'dog' ? ` - ${contact.breed}` : ''}
                         </span>
+                      </div>
+                    )}
+                    
+                    {/* Appointment History - visible when expanded */}
+                    {contact.isDatabaseContact && isExpanded && contact.phoneNumber && (
+                      <div className="pt-2 mt-1 border-t border-gray-200">
+                        <ContactAppointmentHistory contactId={contact.id} />
                       </div>
                     )}
                     
