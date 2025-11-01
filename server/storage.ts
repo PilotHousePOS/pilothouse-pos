@@ -581,6 +581,10 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
+  async deleteAppointment(id: number): Promise<void> {
+    await db.delete(appointments).where(eq(appointments.id, id));
+  }
+
   // Customer pet operations
   async getCustomerPets(userId: string): Promise<CustomerPet[]> {
     return await db
