@@ -4108,6 +4108,21 @@ export default function Admin() {
                               disabled={updateUserGroomerRoleMutation.isPending}
                             />
                           </div>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="w-full mt-2"
+                            onClick={() => {
+                              if (confirm(`Are you sure you want to delete ${userItem.firstName} ${userItem.lastName}'s account? This action cannot be undone.`)) {
+                                deleteUserMutation.mutate(userItem.id);
+                              }
+                            }}
+                            disabled={deleteUserMutation.isPending || userItem.id === typedUser?.id}
+                            data-testid={`button-delete-user-${userItem.id}`}
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete Account
+                          </Button>
                         </div>
                       </div>
                     </CardContent>
