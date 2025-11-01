@@ -884,6 +884,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/admin/orders/:orderId", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const orderId = parseInt(req.params.orderId);
+      await storage.deleteOrder(orderId);
+      
+      res.json({ message: "Order deleted successfully" });
+    } catch (error: any) {
+      console.error("Error deleting order:", error);
+      if (error.message === 'Order not found') {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      res.status(500).json({ message: "Failed to delete order" });
+    }
+  });
+
   app.post("/api/orders", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;
