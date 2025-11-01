@@ -2343,6 +2343,28 @@ export default function Admin() {
     },
   });
 
+  // Delete User Mutation
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const res = await apiRequest("DELETE", `/api/admin/users/${userId}`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({
+        title: "Success",
+        description: "User account deleted successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error", 
+        description: error.message || "Failed to delete user account",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Grooming Settings Mutation
   const updateGroomingSettingMutation = useMutation({
     mutationFn: async ({ setting, value }: { setting: string; value: string }) => {
