@@ -1932,14 +1932,23 @@ export default function Admin() {
 
   const updateAppointmentDetailsMutation = useMutation({
     mutationFn: async ({ id, specialNotes, price }: { id: number; specialNotes: string; price: string }) => {
-      await apiRequest("PATCH", `/api/admin/appointments/${id}/details`, { specialNotes, price });
+      // Build request body with only non-empty fields for partial updates
+      const updates: any = {};
+      if (specialNotes !== undefined && specialNotes !== '') {
+        updates.specialNotes = specialNotes;
+      }
+      if (price !== undefined && price !== '') {
+        updates.price = price;
+      }
+      await apiRequest("PATCH", `/api/admin/appointments/${id}/details`, updates);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast({
         title: "Appointment Updated",
         description: "Notes and price have been updated successfully.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      // Wait for refetch to complete before closing dialog
+      await queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       setEditingAppointment(null);
       setEditNotes('');
       setEditPrice('');
@@ -2847,6 +2856,16 @@ export default function Admin() {
                             <p className="text-sm text-gray-600">Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
                             <p className="text-sm text-gray-600">Phone: {appointment.ownerPhoneNumber}</p>
                             <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
+                            {appointment.specialNotes && (
+                              <p className="text-sm text-gray-700 mt-2" data-testid={`appointment-notes-${appointment.id}`}>
+                                <span className="font-medium">Notes:</span> {appointment.specialNotes}
+                              </p>
+                            )}
+                            {appointment.price && (
+                              <p className="text-sm text-green-700 font-medium mt-1" data-testid={`appointment-price-${appointment.id}`}>
+                                Price: ${appointment.price}
+                              </p>
+                            )}
                             <p className="text-xs text-blue-600 mt-1">Click to view details</p>
                           </div>
                           <div className="flex items-center gap-2">
