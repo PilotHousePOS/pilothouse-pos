@@ -43,6 +43,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, ilike, lt, isNull } from "drizzle-orm";
+import { phoneNumbersMatch } from "./phoneUtils";
 
 export interface IStorage {
   // User operations
@@ -533,11 +534,27 @@ export class DatabaseStorage implements IStorage {
 
   async getAppointments(userId?: string): Promise<Appointment[]> {
     if (userId) {
-      return await db
-        .select()
-        .from(appointments)
-        .where(eq(appointments.userId, userId))
-        .orderBy(desc(appointments.appointmentDate));
+      // Get the user to access their phone number
+      const user = await this.getUser(userId);
+      if (!user) {
+        return [];
+      }
+
+      // If user has no phone number, return empty array
+      if (!user.phoneNumber) {
+        return [];
+      }
+
+      // Get all appointments
+      const allAppointments = await db.select().from(appointments).orderBy(desc(appointments.appointmentDate));
+      
+      // Filter by matching phone number
+      return allAppointments.filter(apt => {
+        if (apt.ownerPhoneNumber) {
+          return phoneNumbersMatch(user.phoneNumber!, apt.ownerPhoneNumber);
+        }
+        return false;
+      });
     } else {
       return await db.select().from(appointments).orderBy(desc(appointments.appointmentDate));
     }
