@@ -1344,7 +1344,7 @@ function ContactsManager() {
 }
 
 // Order Details Card Component with Items
-function OrderDetailsCard({ order, onStatusUpdate, onDelete }: { order: any; onStatusUpdate: (status: string) => void; onDelete?: (orderId: number) => void }) {
+function OrderDetailsCard({ order, onStatusUpdate, onDelete, isHighlighted }: { order: any; onStatusUpdate: (status: string) => void; onDelete?: (orderId: number) => void; isHighlighted?: boolean }) {
   const [showItems, setShowItems] = useState(false);
   const { data: orderDetails, isLoading } = useQuery({
     queryKey: ["/api/orders", order.id],
@@ -1367,7 +1367,11 @@ function OrderDetailsCard({ order, onStatusUpdate, onDelete }: { order: any; onS
   };
 
   return (
-    <div className="border rounded-lg bg-white">
+    <div className={`border rounded-lg ${
+      isHighlighted 
+        ? 'border-2 border-amber-400 bg-amber-50 shadow-md' 
+        : 'border bg-white'
+    }`}>
       <div className="flex items-center justify-between p-4">
         <div className="flex-1">
           <h3 className="font-semibold">Order #{order.id}</h3>
@@ -1533,8 +1537,8 @@ export default function Admin() {
   const [showCompletedOrders, setShowCompletedOrders] = useState(false);
   const [showCancelledOrders, setShowCancelledOrders] = useState(false);
   
-  // Orders search state
-  const [orderSearch, setOrderSearch] = useState('');
+  // Search state for orders and appointments
+  const [search, setSearch] = useState('');
   
   // Pagination for in progress orders (confirmed)
   const [inProgressOrdersPage, setInProgressOrdersPage] = useState(0);
@@ -1663,11 +1667,43 @@ export default function Admin() {
   }, [bookingContactSearch, allBookingContacts]);
 
   // Filter orders by customer name or phone number
-  const filteredOrders = useMemo(() => {
-    if (!orderSearch.trim()) return orders as any[];
+  // Helper function to check if appointment/order matches search
+  const matchesSearch = (item: any, type: 'appointment' | 'order') => {
+    if (!search.trim()) return false;
     
-    const query = orderSearch.toLowerCase();
-    const searchDigits = orderSearch.replace(/\D/g, '');
+    const query = search.toLowerCase();
+    const searchDigits = search.replace(/\D/g, '');
+    
+    if (type === 'appointment') {
+      const fullName = `${item.ownerFirstName || ''} ${item.ownerLastName || ''}`.toLowerCase();
+      const phone = (item.ownerPhoneNumber || '').replace(/\D/g, '');
+      const petName = (item.petName || '').toLowerCase();
+      
+      const nameMatch = fullName.includes(query);
+      const phoneMatch = searchDigits.length > 0 && phone.includes(searchDigits);
+      const petMatch = petName.includes(query);
+      
+      return nameMatch || phoneMatch || petMatch;
+    } else {
+      // For orders, find the customer
+      const customer = (users as any[]).find(u => u.id === item.userId);
+      if (!customer) return false;
+      
+      const fullName = `${customer.firstName || ''} ${customer.lastName || ''}`.toLowerCase();
+      const phone = (customer.phoneNumber || '').replace(/\D/g, '');
+      
+      const nameMatch = fullName.includes(query);
+      const phoneMatch = searchDigits.length > 0 && phone.includes(searchDigits);
+      
+      return nameMatch || phoneMatch;
+    }
+  };
+
+  const filteredOrders = useMemo(() => {
+    if (!search.trim()) return orders as any[];
+    
+    const query = search.toLowerCase();
+    const searchDigits = search.replace(/\D/g, '');
     
     return (orders as any[]).filter(order => {
       // Find the user for this order
@@ -1682,7 +1718,26 @@ export default function Admin() {
       
       return nameMatch || phoneMatch;
     });
-  }, [orderSearch, orders, users]);
+  }, [search, orders, users]);
+
+  const filteredAppointments = useMemo(() => {
+    if (!search.trim()) return appointments as any[];
+    
+    const query = search.toLowerCase();
+    const searchDigits = search.replace(/\D/g, '');
+    
+    return (appointments as any[]).filter(appointment => {
+      const fullName = `${appointment.ownerFirstName || ''} ${appointment.ownerLastName || ''}`.toLowerCase();
+      const phone = (appointment.ownerPhoneNumber || '').replace(/\D/g, '');
+      const petName = (appointment.petName || '').toLowerCase();
+      
+      const nameMatch = fullName.includes(query);
+      const phoneMatch = searchDigits.length > 0 && phone.includes(searchDigits);
+      const petMatch = petName.includes(query);
+      
+      return nameMatch || phoneMatch || petMatch;
+    });
+  }, [search, appointments]);
 
   // Handle booking contact selection
   const handleBookingSelectContact = (contact: any) => {
@@ -2956,6 +3011,19 @@ export default function Admin() {
             </Button>
           </div>
 
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Input
+              type="text"
+              placeholder="Search by customer name, phone number, or pet name..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10 border-gray-300 rounded-xl"
+              data-testid="input-search"
+            />
+          </div>
+
           {/* Pending Approval Section */}
           {unapprovedAppointments.length > 0 && (
             <Card className="border-2 border-orange-200 bg-orange-50">
@@ -2970,8 +3038,17 @@ export default function Admin() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {unapprovedAppointments.map((appointment: any) => (
-                    <div key={appointment.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border border-orange-300 rounded-lg bg-white gap-3">
+                  {unapprovedAppointments.map((appointment: any) => {
+                    const isHighlighted = matchesSearch(appointment, 'appointment');
+                    return (
+                    <div 
+                      key={appointment.id} 
+                      className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-3 ${
+                        isHighlighted 
+                          ? 'border-2 border-amber-400 bg-amber-50 shadow-md' 
+                          : 'border-orange-300 bg-white'
+                      }`}
+                    >
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2 flex-wrap">
                           <Badge className="bg-orange-500 text-white">Pending Approval</Badge>
@@ -3019,7 +3096,8 @@ export default function Admin() {
                         </Button>
                       </div>
                     </div>
-                  ))}
+                  );
+                })}
                 </div>
               </CardContent>
             </Card>
@@ -3050,8 +3128,17 @@ export default function Admin() {
               <div className="space-y-4">
                 {(appointments as any[])
                   .filter((a: any) => a.status === 'scheduled')
-                  .map((appointment: any) => (
-                    <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
+                  .map((appointment: any) => {
+                    const isHighlighted = matchesSearch(appointment, 'appointment');
+                    return (
+                    <div 
+                      key={appointment.id} 
+                      className={`flex items-center justify-between p-4 border rounded-lg ${
+                        isHighlighted 
+                          ? 'border-2 border-amber-400 bg-amber-50 shadow-md' 
+                          : 'border bg-white'
+                      }`}
+                    >
                       <div 
                         className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
                         onClick={() => setSelectedAppointment(appointment)}
@@ -3091,26 +3178,11 @@ export default function Admin() {
                         </Select>
                       </div>
                     </div>
-                  ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
-
-          {/* Orders Section Header with Search */}
-          <div className="flex flex-col gap-4 mt-8">
-            <h3 className="text-lg font-semibold">Orders</h3>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input
-                type="text"
-                placeholder="Search orders by customer name or phone number..."
-                value={orderSearch}
-                onChange={(e) => setOrderSearch(e.target.value)}
-                className="pl-10 border-gray-300 rounded-xl"
-                data-testid="input-search-orders"
-              />
-            </div>
-          </div>
 
           {/* Pending Orders Section - Always Visible */}
           {(() => {
@@ -3132,6 +3204,7 @@ export default function Admin() {
                         order={order} 
                         onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
                         onDelete={(orderId) => deleteOrderMutation.mutate(orderId)}
+                        isHighlighted={matchesSearch(order, 'order')}
                       />
                     ))}
                   </div>
@@ -3208,6 +3281,7 @@ export default function Admin() {
                                 order={order} 
                                 onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
                                 onDelete={(orderId) => deleteOrderMutation.mutate(orderId)}
+                                isHighlighted={matchesSearch(order, 'order')}
                               />
                             ))}
                           </div>
@@ -3336,6 +3410,7 @@ export default function Admin() {
                                 order={order} 
                                 onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
                                 onDelete={(orderId) => deleteOrderMutation.mutate(orderId)}
+                                isHighlighted={matchesSearch(order, 'order')}
                               />
                             ))}
                           </div>
@@ -3464,6 +3539,7 @@ export default function Admin() {
                                 order={order} 
                                 onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
                                 onDelete={(orderId) => deleteOrderMutation.mutate(orderId)}
+                                isHighlighted={matchesSearch(order, 'order')}
                               />
                             ))}
                           </div>
@@ -3592,6 +3668,7 @@ export default function Admin() {
                                 order={order} 
                                 onStatusUpdate={(status) => updateOrderMutation.mutate({ id: order.id, status })}
                                 onDelete={(orderId) => deleteOrderMutation.mutate(orderId)}
+                                isHighlighted={matchesSearch(order, 'order')}
                               />
                             ))}
                           </div>
@@ -3706,8 +3783,17 @@ export default function Admin() {
                       onTouchMove={handleApprovedTouchMove}
                       onTouchEnd={handleApprovedTouchEnd}
                     >
-                      {paginatedAppointments.map((appointment: any) => (
-                        <div key={appointment.id} className="flex flex-col sm:flex-row sm:items-start sm:justify-between p-3 border rounded-lg bg-white gap-2">
+                      {paginatedAppointments.map((appointment: any) => {
+                        const isHighlighted = matchesSearch(appointment, 'appointment');
+                        return (
+                        <div 
+                          key={appointment.id} 
+                          className={`flex flex-col sm:flex-row sm:items-start sm:justify-between p-3 border rounded-lg gap-2 ${
+                            isHighlighted 
+                              ? 'border-2 border-amber-400 bg-amber-50 shadow-md' 
+                              : 'border bg-white'
+                          }`}
+                        >
                           <div 
                             className="flex-1 cursor-pointer hover:bg-gray-50 p-1.5 rounded min-w-0"
                             onClick={() => setSelectedAppointment(appointment)}
@@ -3779,7 +3865,8 @@ export default function Admin() {
                             </Select>
                           </div>
                         </div>
-                      ))}
+                      );
+                    })}
                     </div>
 
                     {/* Pagination Controls */}
@@ -3890,8 +3977,17 @@ export default function Admin() {
                         onTouchMove={handleDeniedTouchMove}
                         onTouchEnd={handleDeniedTouchEnd}
                       >
-                        {paginatedAppointments.map((appointment: any) => (
-                          <div key={appointment.id} className="flex flex-col sm:flex-row sm:items-start justify-between p-3 border rounded-lg bg-white gap-2">
+                        {paginatedAppointments.map((appointment: any) => {
+                          const isHighlighted = matchesSearch(appointment, 'appointment');
+                          return (
+                          <div 
+                            key={appointment.id} 
+                            className={`flex flex-col sm:flex-row sm:items-start justify-between p-3 border rounded-lg gap-2 ${
+                              isHighlighted 
+                                ? 'border-2 border-amber-400 bg-amber-50 shadow-md' 
+                                : 'border bg-white'
+                            }`}
+                          >
                             <div 
                               className="flex-1 cursor-pointer hover:bg-gray-50 p-1.5 rounded min-w-0"
                               onClick={() => setSelectedAppointment(appointment)}
@@ -3947,7 +4043,8 @@ export default function Admin() {
                               </Button>
                             </div>
                           </div>
-                        ))}
+                        );
+                      })}
                       </div>
 
                       {/* Pagination Controls */}
