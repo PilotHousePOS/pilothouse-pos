@@ -4,7 +4,13 @@ function getSendGridClient() {
   const apiKey = process.env.SENDGRID_API_KEY;
   const fromEmail = process.env.SENDGRID_FROM_EMAIL;
 
+  console.log('[SendGrid] Checking credentials...');
+  console.log('[SendGrid] API Key exists:', !!apiKey);
+  console.log('[SendGrid] From Email exists:', !!fromEmail);
+  console.log('[SendGrid] From Email value:', fromEmail);
+
   if (!apiKey || !fromEmail) {
+    console.error('[SendGrid] Missing credentials - API Key:', !!apiKey, 'From Email:', !!fromEmail);
     throw new Error('SendGrid credentials not configured. Please set SENDGRID_API_KEY and SENDGRID_FROM_EMAIL in Replit Secrets.');
   }
 
