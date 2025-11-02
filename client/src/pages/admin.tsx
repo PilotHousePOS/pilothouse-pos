@@ -2283,6 +2283,26 @@ export default function Admin() {
     },
   });
 
+  const deleteCalendarEventMutation = useMutation({
+    mutationFn: async (eventId: string) => {
+      return await apiRequest("DELETE", `/api/admin/calendar/events/${eventId}`, {});
+    },
+    onSuccess: () => {
+      toast({
+        title: "Event Deleted",
+        description: "Calendar event has been deleted successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/calendar/events"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Delete Failed",
+        description: error.message || "Failed to delete calendar event",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Clamp approved appointments pagination when list shrinks
   useEffect(() => {
     if (!appointments) return;
@@ -4414,16 +4434,36 @@ export default function Admin() {
                             </div>
                           )}
                         </div>
-                        {event.htmlLink && (
-                          <a
-                            href={event.htmlLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-brand-blue text-xs hover:underline ml-2"
-                          >
-                            View
-                          </a>
-                        )}
+                        <div className="flex flex-col gap-2 items-end">
+                          {event.htmlLink && (
+                            <a
+                              href={event.htmlLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-brand-blue text-xs hover:underline"
+                              data-testid={`link-view-event-${event.id}`}
+                            >
+                              View
+                            </a>
+                          )}
+                          {typedUser?.isAdmin && (
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => {
+                                if (confirm('Are you sure you want to delete this calendar event? This action cannot be undone.')) {
+                                  deleteCalendarEventMutation.mutate(event.id);
+                                }
+                              }}
+                              disabled={deleteCalendarEventMutation.isPending}
+                              data-testid={`button-delete-event-${event.id}`}
+                              className="h-7 text-xs"
+                            >
+                              <Trash2 className="w-3 h-3 mr-1" />
+                              Delete
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}

@@ -1963,6 +1963,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete a calendar event
+  app.delete("/api/admin/calendar/events/:eventId", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { eventId } = req.params;
+      
+      if (!eventId) {
+        return res.status(400).json({ message: "Event ID is required" });
+      }
+
+      const { deleteCalendarEvent } = await import('./googleCalendar');
+      const result = await deleteCalendarEvent(eventId);
+
+      res.json(result);
+    } catch (error) {
+      console.error("Error deleting calendar event:", error);
+      res.status(500).json({ message: "Failed to delete calendar event", error: (error as Error).message });
+    }
+  });
+
   // Get calendar events for a specific date
   app.get("/api/admin/calendar/events/date", authMiddleware, async (req: any, res) => {
     try {

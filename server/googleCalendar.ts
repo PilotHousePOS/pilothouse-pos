@@ -513,3 +513,21 @@ export async function syncContactsFromCalendarEvents() {
     throw error;
   }
 }
+
+// Delete a calendar event by ID
+export async function deleteCalendarEvent(eventId: string) {
+  try {
+    const calendar = await getUncachableGoogleCalendarClient();
+    
+    await calendar.events.delete({
+      calendarId: 'primary',
+      eventId: eventId,
+    });
+
+    console.log(`Successfully deleted calendar event: ${eventId}`);
+    return { success: true, message: 'Event deleted successfully' };
+  } catch (error) {
+    console.error('Error deleting calendar event:', error);
+    throw error;
+  }
+}
