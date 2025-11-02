@@ -1043,24 +1043,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? await storage.getAppointments()
         : await storage.getAppointments(userId);
       
-      // Filter out approved/completed/cancelled appointments older than 30 days
+      // Filter out old approved/completed/cancelled/rejected appointments (older than 30 days)
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       
       const filteredAppointments = appointments.filter((apt: any) => {
-        // Keep all pending/scheduled appointments regardless of age
-        if (apt.status === 'scheduled' && apt.isApproved !== true && apt.isApproved !== false) {
+        // Keep all scheduled appointments regardless of isApproved value
+        if (apt.status === 'scheduled') {
           return true;
         }
         
-        // Filter old approved, confirmed, completed, or cancelled appointments
-        const isOldStatus = apt.status === 'confirmed' || 
-                           apt.status === 'completed' || 
-                           apt.status === 'cancelled' ||
-                           apt.isApproved === true ||
-                           apt.isApproved === false;
-        
-        if (isOldStatus) {
+        // For confirmed, completed, cancelled, or rejected appointments: only keep recent ones (within 30 days)
+        if (apt.status === 'confirmed' || apt.status === 'completed' || apt.status === 'cancelled' || apt.status === 'rejected') {
           const appointmentDate = new Date(apt.appointmentDate);
           return appointmentDate >= thirtyDaysAgo;
         }
@@ -1324,8 +1318,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user?.id;
       
-      // Check if user is admin for same-day booking validation
+      // Check if user is admin
       const user = await storage.getUser(userId);
+      const isAdmin = user?.isAdmin;
       const isAdminOrGroomer = user?.isAdmin || user?.isGroomer;
       
       // Validate same-day booking restriction for customers (not admins/groomers)
@@ -1342,11 +1337,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // All appointments require approval (same as Google Calendar appointments)
+      // Admin-created appointments bypass approval, others require approval
       const appointmentData = insertAppointmentSchema.parse({ 
         ...req.body, 
         userId,
-        isApproved: false
+        isApproved: isAdmin ? true : false
       });
       const appointment = await storage.createAppointment(appointmentData);
       
