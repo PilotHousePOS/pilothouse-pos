@@ -1126,23 +1126,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const customer = await storage.getUser(appointment.userId);
       if (customer?.email) {
         try {
-          // Use notificationService which has proper email configuration
-          await notificationService.sendAppointmentRejectedNotification(
+          // Use sendgrid.ts directly like password reset does
+          const { sendAppointmentRejectionEmail } = await import('./sendgrid');
+          const ownerName = appointment.ownerFirstName 
+            ? `${appointment.ownerFirstName} ${appointment.ownerLastName}`
+            : appointment.ownerLastName;
+          
+          await sendAppointmentRejectionEmail(
             customer.email,
-            customer.firstName || appointment.ownerLastName,
-            id,
-            appointment.serviceType,
-            appointment.appointmentDate,
+            ownerName,
+            appointment.petName,
+            new Date(appointment.appointmentDate).toLocaleDateString(),
             appointment.appointmentTime
           );
           console.log(`Rejection email sent successfully to ${customer.email} for appointment #${id}`);
         } catch (emailError) {
           console.error(`Failed to send rejection email for appointment #${id}:`, emailError);
-          console.error('Email details:', {
-            to: customer.email,
-            firstName: customer.firstName || appointment.ownerLastName,
-            appointmentId: id
-          });
           // Don't fail the rejection if email fails
         }
       } else {
@@ -1177,13 +1176,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No customer email found for this appointment" });
       }
 
-      // Use notificationService which has proper email configuration
-      await notificationService.sendAppointmentRejectedNotification(
+      // Use sendgrid.ts directly like password reset does
+      const { sendAppointmentRejectionEmail } = await import('./sendgrid');
+      const ownerName = appointment.ownerFirstName 
+        ? `${appointment.ownerFirstName} ${appointment.ownerLastName}`
+        : appointment.ownerLastName;
+      
+      await sendAppointmentRejectionEmail(
         customer.email,
-        customer.firstName || appointment.ownerLastName,
-        id,
-        appointment.serviceType,
-        appointment.appointmentDate,
+        ownerName,
+        appointment.petName,
+        new Date(appointment.appointmentDate).toLocaleDateString(),
         appointment.appointmentTime
       );
       
