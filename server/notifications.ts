@@ -36,9 +36,11 @@ class EmailService {
         </div>
       `;
 
+      const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@animalhouse.com';
+      
       await this.mailService.send({
         to: adminEmail,
-        from: 'noreply@animalhouse.com',
+        from: fromEmail,
         subject: `New Order #${orderId} - Animal House Admin Alert`,
         html: emailContent,
       });
@@ -76,9 +78,11 @@ class EmailService {
         </div>
       `;
 
+      const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@animalhouse.com';
+      
       await this.mailService.send({
         to: adminEmail,
-        from: 'noreply@animalhouse.com',
+        from: fromEmail,
         subject: `New Appointment #${appointmentId} - Animal House Admin Alert`,
         html: emailContent,
       });
@@ -134,9 +138,11 @@ class EmailService {
         </div>
       `;
 
+      const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@animalhousepetstore.com';
+      
       await this.mailService.send({
         to,
-        from: 'noreply@animalhousepetstore.com',
+        from: fromEmail,
         subject: statusInfo.subject,
         html: emailContent,
       });
@@ -182,9 +188,11 @@ class EmailService {
         </div>
       `;
 
+      const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@animalhousepetstore.com';
+      
       await this.mailService.send({
         to,
-        from: 'noreply@animalhousepetstore.com',
+        from: fromEmail,
         subject: `Appointment Confirmed - ${serviceType} on ${new Date(appointmentDate).toLocaleDateString()}`,
         html: emailContent,
       });
@@ -217,9 +225,11 @@ class EmailService {
         </div>
       `;
 
+      const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@animalhousepetstore.com';
+      
       await this.mailService.send({
         to,
-        from: 'noreply@animalhousepetstore.com',
+        from: fromEmail,
         subject: 'Animal House - Appointment Update',
         html: emailContent,
       });
