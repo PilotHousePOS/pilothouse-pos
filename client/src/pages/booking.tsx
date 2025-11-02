@@ -15,8 +15,8 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { safeGoBack } from "@/lib/navigation";
 
 const SERVICES = [
-  { id: 'grooming-full', name: 'Full Grooming', description: 'Complete grooming service', price: 35 },
-  { id: 'grooming-bath', name: 'Bath Only', description: 'Professional bath and dry', price: 20 },
+  { id: 'grooming-full', name: 'Full Grooming', description: 'Complete grooming service', price: 75 },
+  { id: 'grooming-bath', name: 'Bath Only', description: 'Professional bath and dry', price: 45 },
 ];
 
 export default function Booking() {
@@ -38,6 +38,12 @@ export default function Booking() {
 
   const [contactSearch, setContactSearch] = useState('');
   const [showContactDropdown, setShowContactDropdown] = useState(false);
+
+  // Fetch current user data to check if admin/groomer
+  const { data: currentUser } = useQuery({
+    queryKey: ["/api/auth/user"],
+    retry: false,
+  });
 
   // Fetch grooming settings
   const { data: groomingSettings = [] } = useQuery({
@@ -190,16 +196,21 @@ export default function Booking() {
     
     if (date > maxDate) return false;
     
-    // Prevent same-day bookings - customers can only book starting from tomorrow
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Prevent same-day bookings for customers only (admins/groomers can book same-day)
+    const user = currentUser as any;
+    const isAdminOrGroomer = user?.isAdmin || user?.isGroomer;
     
-    const selectedDate = new Date(date);
-    selectedDate.setHours(0, 0, 0, 0);
-    
-    if (selectedDate < tomorrow) return false;
+    if (!isAdminOrGroomer) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      const selectedDate = new Date(date);
+      selectedDate.setHours(0, 0, 0, 0);
+      
+      if (selectedDate < tomorrow) return false;
+    }
     
     return true;
   };
