@@ -1126,12 +1126,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const customer = await storage.getUser(appointment.userId);
       if (customer?.email) {
         try {
-          // Use notificationService (uses env var-based SendGrid, not connector)
-          await notificationService.sendAppointmentRejectedNotification(
+          // Use sendgrid.ts (same as password reset - uses connector)
+          const { sendAppointmentRejectionEmail } = await import('./sendgrid');
+          const ownerName = appointment.ownerFirstName 
+            ? `${appointment.ownerFirstName} ${appointment.ownerLastName}`
+            : appointment.ownerLastName;
+          
+          await sendAppointmentRejectionEmail(
             customer.email,
-            customer.firstName || 'Customer',
-            id,
-            appointment.serviceType,
+            ownerName,
+            appointment.petName,
             new Date(appointment.appointmentDate).toLocaleDateString(),
             appointment.appointmentTime
           );
@@ -1172,12 +1176,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No customer email found for this appointment" });
       }
 
-      // Use notificationService (uses env var-based SendGrid, not connector)
-      await notificationService.sendAppointmentRejectedNotification(
+      // Use sendgrid.ts (same as password reset - uses connector)
+      const { sendAppointmentRejectionEmail } = await import('./sendgrid');
+      const ownerName = appointment.ownerFirstName 
+        ? `${appointment.ownerFirstName} ${appointment.ownerLastName}`
+        : appointment.ownerLastName;
+      
+      await sendAppointmentRejectionEmail(
         customer.email,
-        customer.firstName || 'Customer',
-        id,
-        appointment.serviceType,
+        ownerName,
+        appointment.petName,
         new Date(appointment.appointmentDate).toLocaleDateString(),
         appointment.appointmentTime
       );
