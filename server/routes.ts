@@ -1126,16 +1126,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const customer = await storage.getUser(appointment.userId);
       if (customer?.email) {
         try {
-          // Use sendgrid.ts directly like password reset does
-          const { sendAppointmentRejectionEmail } = await import('./sendgrid');
-          const ownerName = appointment.ownerFirstName 
-            ? `${appointment.ownerFirstName} ${appointment.ownerLastName}`
-            : appointment.ownerLastName;
-          
-          await sendAppointmentRejectionEmail(
+          // Use notificationService (uses env var-based SendGrid, not connector)
+          await notificationService.sendAppointmentRejectedNotification(
             customer.email,
-            ownerName,
-            appointment.petName,
+            customer.firstName || 'Customer',
+            id,
+            appointment.serviceType,
             new Date(appointment.appointmentDate).toLocaleDateString(),
             appointment.appointmentTime
           );
@@ -1176,16 +1172,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No customer email found for this appointment" });
       }
 
-      // Use sendgrid.ts directly like password reset does
-      const { sendAppointmentRejectionEmail } = await import('./sendgrid');
-      const ownerName = appointment.ownerFirstName 
-        ? `${appointment.ownerFirstName} ${appointment.ownerLastName}`
-        : appointment.ownerLastName;
-      
-      await sendAppointmentRejectionEmail(
+      // Use notificationService (uses env var-based SendGrid, not connector)
+      await notificationService.sendAppointmentRejectedNotification(
         customer.email,
-        ownerName,
-        appointment.petName,
+        customer.firstName || 'Customer',
+        id,
+        appointment.serviceType,
         new Date(appointment.appointmentDate).toLocaleDateString(),
         appointment.appointmentTime
       );

@@ -206,15 +206,12 @@ class EmailService {
   }
 
   async sendAppointmentRejectedEmail(to: string, firstName: string, appointmentId: number, serviceType: string, appointmentDate: string, appointmentTime: string): Promise<boolean> {
+    if (!process.env.SENDGRID_API_KEY) {
+      console.log('SendGrid not configured, email notification skipped');
+      return false;
+    }
+
     try {
-      // Use SendGrid integration for fresh credentials
-      const { getUncachableSendGridClient } = await import('./sendgridIntegration');
-      const { client, fromEmail } = await getUncachableSendGridClient();
-      
-      console.log('[DEBUG] Rejection Email Details (using integration):');
-      console.log('  To:', to);
-      console.log('  From:', fromEmail);
-      
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #1e40af; color: white; padding: 20px; text-align: center;">
@@ -232,25 +229,20 @@ class EmailService {
           </div>
         </div>
       `;
+
+      const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@animalhousepetstore.com';
       
-      const result = await client.send({
+      await this.mailService.send({
         to,
         from: fromEmail,
         subject: 'Animal House - Appointment Update',
         html: emailContent,
       });
-      
-      console.log('[DEBUG] SendGrid response:', result);
+
       console.log(`Appointment rejection email sent to ${to} for appointment ${appointmentId}`);
       return true;
     } catch (error: any) {
       console.error('Appointment rejection email error:', error);
-      console.error('[DEBUG] Error details:', {
-        message: error.message,
-        code: error.code,
-        responseBody: error.response?.body,
-        responseBodyErrors: JSON.stringify(error.response?.body?.errors, null, 2)
-      });
       return false;
     }
   }
