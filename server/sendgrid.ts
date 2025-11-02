@@ -1,29 +1,8 @@
-import sgMail from '@sendgrid/mail';
-
-function getSendGridClient() {
-  const apiKey = process.env.SENDGRID_API_KEY;
-  const fromEmail = process.env.SENDGRID_FROM_EMAIL;
-
-  console.log('[SendGrid] Checking credentials...');
-  console.log('[SendGrid] API Key exists:', !!apiKey);
-  console.log('[SendGrid] From Email exists:', !!fromEmail);
-  console.log('[SendGrid] From Email value:', fromEmail);
-
-  if (!apiKey || !fromEmail) {
-    console.error('[SendGrid] Missing credentials - API Key:', !!apiKey, 'From Email:', !!fromEmail);
-    throw new Error('SendGrid credentials not configured. Please set SENDGRID_API_KEY and SENDGRID_FROM_EMAIL in Replit Secrets.');
-  }
-
-  sgMail.setApiKey(apiKey);
-  return {
-    client: sgMail,
-    fromEmail: fromEmail
-  };
-}
+import { getUncachableSendGridClient } from './sendgridIntegration';
 
 export async function sendPasswordResetEmail(toEmail: string, resetToken: string): Promise<void> {
   try {
-    const { client, fromEmail } = getSendGridClient();
+    const { client, fromEmail } = await getUncachableSendGridClient();
     
     // Get the base URL for the reset link
     const baseUrl = process.env.REPLIT_DOMAINS 
@@ -84,7 +63,7 @@ export async function sendAppointmentRejectionEmail(
   appointmentTime: string
 ): Promise<void> {
   try {
-    const { client, fromEmail } = getSendGridClient();
+    const { client, fromEmail } = await getUncachableSendGridClient();
     
     const msg = {
       to: toEmail,
