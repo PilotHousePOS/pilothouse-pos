@@ -127,7 +127,7 @@ export const appointments = pgTable("appointments", {
   petName: varchar("pet_name", { length: 255 }).notNull(),
   petType: varchar("pet_type", { length: 100 }).notNull(),
   specialNotes: text("special_notes"),
-  ownerFirstName: varchar("owner_first_name", { length: 255 }).notNull(),
+  ownerFirstName: varchar("owner_first_name", { length: 255 }),
   ownerLastName: varchar("owner_last_name", { length: 255 }).notNull(),
   ownerPhoneNumber: varchar("owner_phone_number", { length: 20 }).notNull(),
   status: varchar("status", { length: 50 }).default("scheduled"), // scheduled, confirmed, completed, cancelled

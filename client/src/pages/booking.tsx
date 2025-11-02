@@ -423,11 +423,10 @@ export default function Booking() {
             <div className="grid grid-cols-2 gap-3">
               <Input
                 type="text"
-                placeholder="First Name *"
+                placeholder="First Name"
                 value={ownerInfo.firstName}
                 onChange={(e) => setOwnerInfo({ ...ownerInfo, firstName: e.target.value })}
                 className="border-gray-300 rounded-xl"
-                required
                 data-testid="input-owner-firstname"
               />
               <Input
