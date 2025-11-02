@@ -15,9 +15,11 @@ export default function ForgotPassword() {
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('[ForgotPassword] handleSubmit called', { email });
     e.preventDefault();
     
     if (!email.trim()) {
+      console.log('[ForgotPassword] Email validation failed - empty email');
       toast({
         title: "Email required",
         description: "Please enter your email address.",
@@ -26,8 +28,10 @@ export default function ForgotPassword() {
       return;
     }
 
+    console.log('[ForgotPassword] Setting loading state and making request');
     setIsLoading(true);
     try {
+      console.log('[ForgotPassword] Sending POST to /api/auth/forgot-password');
       const response = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: {
@@ -36,15 +40,19 @@ export default function ForgotPassword() {
         body: JSON.stringify({ email }),
       });
 
+      console.log('[ForgotPassword] Response received:', response.status);
       const data = await response.json();
+      console.log('[ForgotPassword] Response data:', data);
 
       if (response.ok) {
+        console.log('[ForgotPassword] Success - marking as submitted');
         setSubmitted(true);
         toast({
           title: "Email sent",
           description: data.message || "If an account exists with this email, you will receive a password reset link.",
         });
       } else {
+        console.log('[ForgotPassword] Error response');
         toast({
           title: "Error",
           description: data.message || "Failed to process request. Please try again.",
@@ -52,13 +60,14 @@ export default function ForgotPassword() {
         });
       }
     } catch (error) {
-      console.error('Forgot password error:', error);
+      console.error('[ForgotPassword] Caught error:', error);
       toast({
         title: "Error",
         description: "An error occurred. Please try again later.",
         variant: "destructive",
       });
     } finally {
+      console.log('[ForgotPassword] Resetting loading state');
       setIsLoading(false);
     }
   };
