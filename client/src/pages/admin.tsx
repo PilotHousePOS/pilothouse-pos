@@ -153,6 +153,15 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
     setSelectedDate(newDate);
   };
 
+  // Find time slots that have appointments
+  const occupiedSlots = timeSlots.filter((time) => {
+    const appointment = getAppointmentForTime(time);
+    const googleEventsList = getGoogleEventsForTime(time);
+    return appointment || googleEventsList.length > 0;
+  });
+
+  const totalAppointments = confirmedAppointments.length + googleEvents.length;
+
   return (
     <Card>
       <CardHeader>
@@ -180,115 +189,116 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
-          <div className="text-sm text-gray-600 mb-4">
-            {confirmedAppointments.length} confirmed appointments + {googleEvents.length} calendar events for this day
+        {totalAppointments === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <CalendarIcon className="w-12 h-12 mx-auto mb-2 opacity-30" />
+            <p className="text-lg font-medium">No appointments scheduled</p>
+            <p className="text-sm">This day is completely open</p>
           </div>
-          
-          {timeSlots.map((time) => {
-            const appointment = getAppointmentForTime(time);
-            const googleEventsList = getGoogleEventsForTime(time);
-            const hasAny = appointment || googleEventsList.length > 0;
+        ) : (
+          <div className="space-y-2">
+            <div className="text-sm text-gray-600 mb-4">
+              {confirmedAppointments.length} confirmed appointments + {googleEvents.length} calendar events for this day
+            </div>
             
-            return (
-              <div key={time} className="flex items-start gap-4 p-3 border rounded-lg">
-                <div className="w-20 text-sm font-medium text-gray-700 pt-2">
-                  {time}
-                </div>
-                <div className="flex-1 space-y-2">
-                  {appointment && (
-                    <div className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-semibold text-gray-900">
-                            {capitalizeWords(appointment.petName)} ({appointment.petType})
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            Owner: {capitalizeWords(appointment.ownerFirstName)} {capitalizeWords(appointment.ownerLastName)}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Phone: {appointment.ownerPhoneNumber}
-                          </p>
-                          <p className="text-xs text-blue-600">
-                            Service: {appointment.serviceType === 'grooming-full' ? 'Full Grooming' : 'Bath Only'}
-                          </p>
-                        </div>
-                        <Badge variant="default" className="bg-green-600">
-                          Grooming
-                        </Badge>
-                      </div>
-                      {appointment.specialNotes && (
-                        <p className="text-xs text-gray-500 mt-2">
-                          Notes: {appointment.specialNotes}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                  
-                  {googleEventsList.map((event: any, idx: number) => (
-                    <div key={event.id || idx} className="bg-purple-50 p-3 rounded border-l-4 border-purple-500">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-gray-900">
-                            {event.summary || 'Untitled Event'}
-                          </h4>
-                          {event.description && (
-                            <p className="text-sm text-gray-600 mt-1">
-                              {event.description}
+            {occupiedSlots.map((time) => {
+              const appointment = getAppointmentForTime(time);
+              const googleEventsList = getGoogleEventsForTime(time);
+              
+              return (
+                <div key={time} className="flex items-start gap-4 p-3 border rounded-lg">
+                  <div className="w-20 text-sm font-medium text-gray-700 pt-2">
+                    {time}
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    {appointment && (
+                      <div className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-semibold text-gray-900">
+                              {capitalizeWords(appointment.petName)} ({appointment.petType})
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              Owner: {capitalizeWords(appointment.ownerFirstName)} {capitalizeWords(appointment.ownerLastName)}
                             </p>
-                          )}
-                          {event.attendees && event.attendees.length > 0 && (
-                            <p className="text-xs text-purple-600 mt-1">
-                              Attendees: {event.attendees.slice(0, 2).map((a: any) => a.displayName || a.email).join(', ')}
-                              {event.attendees.length > 2 && ` +${event.attendees.length - 2} more`}
+                            <p className="text-sm text-gray-600">
+                              Phone: {appointment.ownerPhoneNumber}
                             </p>
-                          )}
-                          {event.linkedContacts && event.linkedContacts.length > 0 && (
-                            <div className="mt-2 p-2 bg-white rounded border border-purple-200">
-                              <p className="text-xs font-semibold text-purple-700 mb-1">Pet Info:</p>
-                              {event.linkedContacts.map((contact: any, contactIdx: number) => (
-                                <div key={contactIdx} className="text-xs text-gray-700 ml-2">
-                                  <span className="font-medium">{contact.name}:</span>
-                                  {contact.animalType && (
-                                    <span className="ml-2">
-                                      🐾 <span className="capitalize">{contact.animalType.replace('_', ' ')}</span>
-                                      {contact.breed && contact.animalType === 'dog' && (
-                                        <span> - {contact.breed}</span>
-                                      )}
-                                    </span>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                            <p className="text-xs text-blue-600">
+                              Service: {appointment.serviceType === 'grooming-full' ? 'Full Grooming' : 'Bath Only'}
+                            </p>
+                          </div>
+                          <Badge variant="default" className="bg-green-600">
+                            Grooming
+                          </Badge>
                         </div>
-                        <Badge variant="default" className="bg-purple-600">
-                          Calendar
-                        </Badge>
+                        {appointment.specialNotes && (
+                          <p className="text-xs text-gray-500 mt-2">
+                            Notes: {appointment.specialNotes}
+                          </p>
+                        )}
                       </div>
-                      {event.htmlLink && (
-                        <a
-                          href={event.htmlLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-purple-600 hover:underline mt-2 inline-block"
-                        >
-                          View in Google Calendar
-                        </a>
-                      )}
-                    </div>
-                  ))}
-                  
-                  {!hasAny && (
-                    <div className="text-gray-400 text-sm italic pt-2">
-                      Available
-                    </div>
-                  )}
+                    )}
+                    
+                    {googleEventsList.map((event: any, idx: number) => (
+                      <div key={event.id || idx} className="bg-purple-50 p-3 rounded border-l-4 border-purple-500">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-gray-900">
+                              {event.summary || 'Untitled Event'}
+                            </h4>
+                            {event.description && (
+                              <p className="text-sm text-gray-600 mt-1">
+                                {event.description}
+                              </p>
+                            )}
+                            {event.attendees && event.attendees.length > 0 && (
+                              <p className="text-xs text-purple-600 mt-1">
+                                Attendees: {event.attendees.slice(0, 2).map((a: any) => a.displayName || a.email).join(', ')}
+                                {event.attendees.length > 2 && ` +${event.attendees.length - 2} more`}
+                              </p>
+                            )}
+                            {event.linkedContacts && event.linkedContacts.length > 0 && (
+                              <div className="mt-2 p-2 bg-white rounded border border-purple-200">
+                                <p className="text-xs font-semibold text-purple-700 mb-1">Pet Info:</p>
+                                {event.linkedContacts.map((contact: any, contactIdx: number) => (
+                                  <div key={contactIdx} className="text-xs text-gray-700 ml-2">
+                                    <span className="font-medium">{contact.name}:</span>
+                                    {contact.animalType && (
+                                      <span className="ml-2">
+                                        🐾 <span className="capitalize">{contact.animalType.replace('_', ' ')}</span>
+                                        {contact.breed && contact.animalType === 'dog' && (
+                                          <span> - {contact.breed}</span>
+                                        )}
+                                      </span>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          <Badge variant="default" className="bg-purple-600">
+                            Calendar
+                          </Badge>
+                        </div>
+                        {event.htmlLink && (
+                          <a
+                            href={event.htmlLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-purple-600 hover:underline mt-2 inline-block"
+                          >
+                            View in Google Calendar
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
