@@ -1127,23 +1127,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (customer?.email) {
         try {
           const { sendAppointmentRejectionEmail } = await import('./sendgrid');
+          // Handle null first name gracefully
+          const ownerName = appointment.ownerFirstName 
+            ? `${appointment.ownerFirstName} ${appointment.ownerLastName}`
+            : appointment.ownerLastName;
+          
           await sendAppointmentRejectionEmail(
             customer.email,
-            `${appointment.ownerFirstName} ${appointment.ownerLastName}`,
+            ownerName,
             appointment.petName,
             new Date(appointment.appointmentDate).toLocaleDateString(),
             appointment.appointmentTime
           );
+          console.log(`Rejection email sent successfully to ${customer.email} for appointment #${id}`);
         } catch (emailError) {
-          console.error('Failed to send rejection email:', emailError);
+          console.error(`Failed to send rejection email for appointment #${id}:`, emailError);
+          console.error('Email details:', {
+            to: customer.email,
+            ownerName: appointment.ownerFirstName 
+              ? `${appointment.ownerFirstName} ${appointment.ownerLastName}`
+              : appointment.ownerLastName,
+            petName: appointment.petName
+          });
           // Don't fail the rejection if email fails
         }
+      } else {
+        console.warn(`No customer email found for appointment #${id} (userId: ${appointment.userId})`);
       }
       
       res.json(rejectedAppointment);
     } catch (error) {
       console.error("Error rejecting appointment:", error);
       res.status(500).json({ message: "Failed to reject appointment" });
+    }
+  });
+
+  // Retry sending rejection email for an appointment (admin only)
+  app.post("/api/admin/appointments/:id/resend-rejection-email", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const appointment = await storage.getAppointment(id);
+      
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+
+      // Get the user's email
+      const customer = await storage.getUser(appointment.userId);
+      if (!customer?.email) {
+        return res.status(400).json({ message: "No customer email found for this appointment" });
+      }
+
+      const { sendAppointmentRejectionEmail } = await import('./sendgrid');
+      // Handle null first name gracefully
+      const ownerName = appointment.ownerFirstName 
+        ? `${appointment.ownerFirstName} ${appointment.ownerLastName}`
+        : appointment.ownerLastName;
+      
+      await sendAppointmentRejectionEmail(
+        customer.email,
+        ownerName,
+        appointment.petName,
+        new Date(appointment.appointmentDate).toLocaleDateString(),
+        appointment.appointmentTime
+      );
+      
+      console.log(`Rejection email resent successfully to ${customer.email} for appointment #${id}`);
+      res.json({ message: "Rejection email sent successfully", email: customer.email });
+    } catch (error) {
+      console.error("Error resending rejection email:", error);
+      res.status(500).json({ message: "Failed to send rejection email", error: (error as Error).message });
     }
   });
 
