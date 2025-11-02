@@ -201,25 +201,17 @@ class EmailService {
     try {
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px;">
-            <h2 style="color: #dc2626; margin-bottom: 20px;">❌ Appointment Declined #${appointmentId}</h2>
-            <p style="font-size: 16px; line-height: 1.5;">Hi ${firstName},</p>
-            <p style="font-size: 16px; line-height: 1.5;">We're sorry, but we cannot accommodate your appointment request at this time.</p>
-            
-            <div style="background-color: #dc2626; color: white; padding: 15px; border-radius: 5px; margin: 20px 0;">
-              <strong>📅 Requested Appointment:</strong><br>
-              Service: ${serviceType}<br>
-              Date: ${new Date(appointmentDate).toLocaleDateString()}<br>
-              Time: ${appointmentTime}
-            </div>
-
-            <p style="font-size: 16px; line-height: 1.5;">
-              This may be due to scheduling conflicts, breed restrictions, or capacity limitations. 
-              Please feel free to book a different time that works better with our schedule.
+          <div style="background-color: #1e40af; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0;">Animal House Pet Store</h1>
+          </div>
+          <div style="padding: 30px; background-color: #f9fafb;">
+            <h2 style="color: #dc2626;">Appointment Update</h2>
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">
+              The Animal House regrets to inform you that we could not accept your appointment. This may have been due to several reasons. If you have any questions about this please contact us at <strong>318-323-6090</strong>.
             </p>
-            
-            <p style="font-size: 14px; color: #666; margin-top: 30px;">
-              Thank you for understanding. We appreciate your business at Animal House Pet Store!
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+            <p style="color: #9ca3af; font-size: 12px; text-align: center;">
+              Animal House Pet Store - Your trusted pet care partner
             </p>
           </div>
         </div>
@@ -228,7 +220,7 @@ class EmailService {
       await this.mailService.send({
         to,
         from: 'noreply@animalhousepetstore.com',
-        subject: `Appointment Request Declined - ${serviceType} on ${new Date(appointmentDate).toLocaleDateString()}`,
+        subject: 'Animal House - Appointment Update',
         html: emailContent,
       });
 
