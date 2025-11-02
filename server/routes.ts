@@ -1324,12 +1324,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user?.id;
       
-      // Check if user is admin - auto-approve admin-created appointments
+      // Check if user is admin for same-day booking validation
       const user = await storage.getUser(userId);
-      const isAdminCreated = user?.isAdmin || user?.isGroomer;
+      const isAdminOrGroomer = user?.isAdmin || user?.isGroomer;
       
       // Validate same-day booking restriction for customers (not admins/groomers)
-      if (!isAdminCreated) {
+      if (!isAdminOrGroomer) {
         const appointmentDate = new Date(req.body.appointmentDate);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -1342,10 +1342,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // All appointments require approval (same as Google Calendar appointments)
       const appointmentData = insertAppointmentSchema.parse({ 
         ...req.body, 
         userId,
-        isApproved: isAdminCreated ? true : (req.body.isApproved ?? false)
+        isApproved: false
       });
       const appointment = await storage.createAppointment(appointmentData);
       
