@@ -41,14 +41,22 @@ export default function Home() {
     }
   };
   
-  const handleLogout = () => {
+  const handleLogout = async () => {
     console.log('Logging out...');
     
-    // Clear token from localStorage first
-    localStorage.removeItem('token');
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    
+    // Clear any localStorage (legacy)
     localStorage.clear();
     
-    // Force immediate redirect to landing page
+    // Redirect to landing page
     window.location.href = '/';
   };
   const [, setLocation] = useLocation();
