@@ -19,44 +19,30 @@ import type { User, CustomerPet, Order, Appointment } from "@shared/schema";
 export default function Profile() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const hasToken = !!localStorage.getItem('token');
 
   const { data: currentUser, isLoading: userLoading, error } = useQuery<User>({
     queryKey: ["/api/auth/user"],
-    enabled: hasToken,
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const { data: customerPets = [] } = useQuery<CustomerPet[]>({
     queryKey: ["/api/customer-pets"],
-    enabled: hasToken && !!currentUser,
+    enabled: !!currentUser,
   });
 
   const { data: orders = [] } = useQuery<Order[]>({
     queryKey: ["/api/orders"],
-    enabled: hasToken && !!currentUser,
+    enabled: !!currentUser,
   });
 
   const { data: appointments = [] } = useQuery<Appointment[]>({
     queryKey: ["/api/appointments"],
-    enabled: hasToken && !!currentUser,
+    enabled: !!currentUser,
   });
 
   // Handle authentication errors and redirects
   useEffect(() => {
-    if (!hasToken) {
-      toast({
-        title: "Please sign in",
-        description: "You need to be logged in to view your profile.",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 1000);
-      return;
-    }
-
     if (error && !userLoading) {
       console.error("Profile authentication error:", error);
       toast({
@@ -64,14 +50,11 @@ export default function Profile() {
         description: "Please sign in again.",
         variant: "destructive",
       });
-      localStorage.removeItem('token');
       setTimeout(() => {
         window.location.href = "/";
       }, 1000);
     }
-  }, [hasToken, error, userLoading, toast]);
-
-  if (!hasToken) return null;
+  }, [error, userLoading, toast]);
 
   if (userLoading || !currentUser) {
     return (
@@ -85,9 +68,15 @@ export default function Profile() {
     );
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.clear();
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
     window.location.href = '/';
   };
 
