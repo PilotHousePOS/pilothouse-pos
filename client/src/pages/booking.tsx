@@ -248,7 +248,7 @@ export default function Booking() {
     e.preventDefault();
     
     if (!selectedService || !selectedDate || !selectedTime || !petInfo.name || !petInfo.type || 
-        !ownerInfo.firstName || !ownerInfo.lastName || !ownerInfo.phoneNumber) {
+        !ownerInfo.lastName || !ownerInfo.phoneNumber) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields including owner information.",
