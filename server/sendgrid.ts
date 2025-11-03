@@ -49,8 +49,11 @@ export async function sendPasswordResetEmail(toEmail: string, resetToken: string
     
     await client.send(msg);
     console.log(`Password reset email sent to ${toEmail}`);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error sending password reset email:', error);
+    if (error.response?.body) {
+      console.error('SendGrid error details:', JSON.stringify(error.response.body, null, 2));
+    }
     throw new Error('Failed to send password reset email');
   }
 }
