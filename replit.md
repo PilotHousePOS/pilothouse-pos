@@ -41,8 +41,9 @@ The application is a full-stack web application with a clear separation of conce
     - **Automatic Cleanup**: Approved, completed, cancelled, and rejected appointments older than 30 days are automatically filtered from the appointments list to maintain database efficiency
     - **Booking Restrictions**: Customers can only book appointments starting from tomorrow (same-day booking prevention) with frontend and backend validation, while admins and groomers retain flexibility to book same-day appointments
     - **Scheduled Tasks**: Automated daily maintenance tasks using node-cron
-      - Clear all approved appointments daily at 12:00 AM (EST)
+      - Clear past approved appointments (confirmed/completed) daily at 12:00 AM (EST)
       - Auto-sync Google Calendar appointments and contacts daily at 7:30 AM (EST)
+    - **Manual Cleanup**: Section-specific "Clear Past" buttons available for admins in Approved, Pending, and Denied appointment sections. Each button only deletes past appointments from its respective section (Approved: confirmed/completed, Pending: scheduled, Denied: rejected/cancelled)
 - **Order & Notification System:** Admin email/push notifications for new orders/appointments. Customer email/SMS/web push for order status. Order History page with detailed modals.
 - **Authentication & Authorization:** 
     - JWT tokens in secure cookies with comprehensive password reset
