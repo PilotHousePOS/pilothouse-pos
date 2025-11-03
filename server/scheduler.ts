@@ -5,22 +5,35 @@ export function initializeScheduledTasks() {
   // Clear approved appointments every day at 12:00 AM
   cron.schedule('0 0 * * *', async () => {
     try {
-      console.log('Running scheduled task: Clearing approved appointments at midnight');
+      console.log('Running scheduled task: Clearing past approved appointments at midnight');
       
       const allAppointments = await storage.getAppointments();
-      const approvedAppointments = allAppointments.filter(
-        (apt: any) => apt.status === 'confirmed'
-      );
       
-      console.log(`Deleting ${approvedAppointments.length} approved appointments`);
+      // Get today's date at start of day for comparison
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
       
-      for (const appointment of approvedAppointments) {
+      // Filter for approved appointments (confirmed or completed) that have already passed
+      const pastApprovedAppointments = allAppointments.filter((apt: any) => {
+        // Include both confirmed and completed as "approved" statuses
+        if (apt.status !== 'confirmed' && apt.status !== 'completed') return false;
+        
+        const appointmentDate = new Date(apt.appointmentDate);
+        appointmentDate.setHours(0, 0, 0, 0);
+        
+        return appointmentDate < today;
+      });
+      
+      console.log(`Deleting ${pastApprovedAppointments.length} past approved appointments`);
+      
+      for (const appointment of pastApprovedAppointments) {
         await storage.deleteAppointment(appointment.id);
+        console.log(`Deleted past appointment: ${appointment.id} from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
       }
       
-      console.log('Successfully cleared all approved appointments');
+      console.log('Successfully cleared past approved appointments');
     } catch (error) {
-      console.error('Error clearing approved appointments:', error);
+      console.error('Error clearing past approved appointments:', error);
     }
   }, {
     timezone: "America/New_York"

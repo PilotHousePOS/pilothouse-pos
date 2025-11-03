@@ -2297,6 +2297,27 @@ export default function Admin() {
     },
   });
 
+  const cleanupPastAppointmentsMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/admin/appointments/cleanup-past");
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Cleanup Complete",
+        description: data.message || "Past approved appointments have been deleted.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments/unapproved"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Cleanup Failed",
+        description: "Failed to cleanup past appointments.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const deleteCalendarEventMutation = useMutation({
     mutationFn: async (eventId: string) => {
       return await apiRequest("DELETE", `/api/admin/calendar/events/${eventId}`, {});
@@ -3457,17 +3478,36 @@ export default function Admin() {
                   <CalendarIcon className="w-5 h-5" />
                   Pending Appointments ({(appointments as any[]).filter((a: any) => a.status === 'scheduled').length})
                 </CardTitle>
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsSyncAppointmentsConfirmOpen(true)}
-                  disabled={syncAppointmentsMutation.isPending}
-                  data-testid="button-sync-appointments-groomer"
-                  className="w-full sm:w-auto bg-blue-50 border-blue-200 hover:bg-blue-100 text-blue-700"
-                >
-                  <RefreshCw className={`w-4 h-4 mr-2 ${syncAppointmentsMutation.isPending ? 'animate-spin' : ''}`} />
-                  {syncAppointmentsMutation.isPending ? 'Syncing...' : 'Sync from Calendar'}
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsSyncAppointmentsConfirmOpen(true)}
+                    disabled={syncAppointmentsMutation.isPending}
+                    data-testid="button-sync-appointments-groomer"
+                    className="w-full sm:w-auto bg-blue-50 border-blue-200 hover:bg-blue-100 text-blue-700"
+                  >
+                    <RefreshCw className={`w-4 h-4 mr-2 ${syncAppointmentsMutation.isPending ? 'animate-spin' : ''}`} />
+                    {syncAppointmentsMutation.isPending ? 'Syncing...' : 'Sync from Calendar'}
+                  </Button>
+                  {typedUser?.isAdmin && (
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        if (confirm('This will delete all approved appointments with dates in the past. Continue?')) {
+                          cleanupPastAppointmentsMutation.mutate();
+                        }
+                      }}
+                      disabled={cleanupPastAppointmentsMutation.isPending}
+                      data-testid="button-cleanup-past-appointments"
+                      className="w-full sm:w-auto bg-red-50 border-red-200 hover:bg-red-100 text-red-700"
+                    >
+                      <Trash2 className={`w-4 h-4 mr-2`} />
+                      {cleanupPastAppointmentsMutation.isPending ? 'Cleaning...' : 'Clear Past'}
+                    </Button>
+                  )}
+                </div>
               </div>
             </CardHeader>
             <CardContent>

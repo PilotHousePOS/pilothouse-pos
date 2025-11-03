@@ -2243,6 +2243,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Manual cleanup of past approved appointments
+  app.post("/api/admin/appointments/cleanup-past", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      console.log('Running manual cleanup: Clearing past approved appointments');
+      
+      const allAppointments = await storage.getAppointments();
+      
+      // Get today's date at start of day for comparison
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Filter for approved appointments (confirmed or completed) that have already passed
+      const pastApprovedAppointments = allAppointments.filter((apt: any) => {
+        // Include both confirmed and completed as "approved" statuses
+        if (apt.status !== 'confirmed' && apt.status !== 'completed') return false;
+        
+        const appointmentDate = new Date(apt.appointmentDate);
+        appointmentDate.setHours(0, 0, 0, 0);
+        
+        return appointmentDate < today;
+      });
+      
+      console.log(`Deleting ${pastApprovedAppointments.length} past approved appointments`);
+      
+      for (const appointment of pastApprovedAppointments) {
+        await storage.deleteAppointment(appointment.id);
+        console.log(`Deleted past appointment: ${appointment.id} from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
+      }
+      
+      res.json({ 
+        message: `Successfully deleted ${pastApprovedAppointments.length} past approved appointments`,
+        deletedCount: pastApprovedAppointments.length
+      });
+    } catch (error) {
+      console.error('Error cleaning up past appointments:', error);
+      res.status(500).json({ 
+        message: "Failed to cleanup past appointments", 
+        error: (error as Error).message 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
