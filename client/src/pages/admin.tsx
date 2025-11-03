@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { 
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -781,6 +782,7 @@ function ContactsManager() {
               <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Add New Contact</DialogTitle>
+                  <DialogDescription>Add a new contact to your database.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
@@ -881,6 +883,7 @@ function ContactsManager() {
               <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Edit Contact</DialogTitle>
+                  <DialogDescription>Update contact information.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
@@ -987,6 +990,7 @@ function ContactsManager() {
             <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Create Calendar Event</DialogTitle>
+                <DialogDescription>Create a new event in Google Calendar.</DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
@@ -1578,6 +1582,7 @@ export default function Admin() {
   const [bookingContactSearch, setBookingContactSearch] = useState('');
   const [showBookingContactDropdown, setShowBookingContactDropdown] = useState(false);
   const [bookingSelectedService, setBookingSelectedService] = useState('');
+  const [bookingSelectedGroomer, setBookingSelectedGroomer] = useState('');
   const [bookingSelectedDate, setBookingSelectedDate] = useState<Date | undefined>(new Date());
   const [bookingSelectedTime, setBookingSelectedTime] = useState('');
   const [bookingPetInfo, setBookingPetInfo] = useState({
@@ -1630,6 +1635,11 @@ export default function Admin() {
 
   const { data: unapprovedAppointments = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/appointments/unapproved"],
+    enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
+  });
+
+  const { data: groomers = [] } = useQuery<any[]>({
+    queryKey: ["/api/groomers"],
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
 
@@ -2408,6 +2418,7 @@ export default function Admin() {
       // Reset form
       setBookingContactSearch('');
       setBookingSelectedService('');
+      setBookingSelectedGroomer('');
       setBookingSelectedDate(new Date());
       setBookingSelectedTime('');
       setBookingPetInfo({ name: '', type: '', notes: '' });
@@ -2457,6 +2468,7 @@ export default function Admin() {
       ownerLastName: bookingOwnerInfo.lastName,
       ownerPhoneNumber: bookingOwnerInfo.phoneNumber,
       price: bookingPrice,
+      groomerId: bookingSelectedGroomer ? parseInt(bookingSelectedGroomer) : null,
     };
 
     createAppointmentMutation.mutate(appointmentData);
@@ -2965,6 +2977,7 @@ export default function Admin() {
                       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
                           <DialogTitle>Add New Pet</DialogTitle>
+                          <DialogDescription>Add a new pet to your inventory.</DialogDescription>
                         </DialogHeader>
                         <AddPetForm onSubmit={(data) => createPetMutation.mutate(data)} />
                       </DialogContent>
@@ -3052,6 +3065,7 @@ export default function Admin() {
                     <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle>Add New Supply</DialogTitle>
+                        <DialogDescription>Add a new supply item to your inventory.</DialogDescription>
                       </DialogHeader>
                       <AddSupplyForm onSubmit={(data) => createSupplyMutation.mutate(data)} />
                     </DialogContent>
@@ -4900,6 +4914,7 @@ export default function Admin() {
                 <CalendarIcon className="w-5 h-5" />
                 Appointment Details
               </DialogTitle>
+              <DialogDescription>View appointment information.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-3">
@@ -4985,6 +5000,7 @@ export default function Admin() {
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit Appointment Details</DialogTitle>
+              <DialogDescription>Update appointment information and status.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -5111,6 +5127,7 @@ export default function Admin() {
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit Pet</DialogTitle>
+              <DialogDescription>Update pet information.</DialogDescription>
             </DialogHeader>
             <EditPetForm 
               pet={editingPet}
@@ -5126,6 +5143,7 @@ export default function Admin() {
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit Supply</DialogTitle>
+              <DialogDescription>Update supply information.</DialogDescription>
             </DialogHeader>
             <EditSupplyForm 
               supply={editingSupply}
@@ -5140,6 +5158,7 @@ export default function Admin() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Add New Groomer</DialogTitle>
+            <DialogDescription>Add a new groomer to your team.</DialogDescription>
           </DialogHeader>
           <GroomerForm 
             onSubmit={(data) => createGroomerMutation.mutate(data)}
@@ -5154,6 +5173,7 @@ export default function Admin() {
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Edit Groomer</DialogTitle>
+              <DialogDescription>Update groomer information.</DialogDescription>
             </DialogHeader>
             <GroomerForm 
               groomer={editingGroomer}
@@ -5172,6 +5192,7 @@ export default function Admin() {
               <AlertTriangle className="w-5 h-5 text-orange-500" />
               Sync Appointments from Google Calendar
             </DialogTitle>
+            <DialogDescription>Confirm syncing appointments from Google Calendar.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="p-4 bg-orange-50 dark:bg-orange-950 rounded-lg border border-orange-200 dark:border-orange-800">
@@ -5221,6 +5242,7 @@ export default function Admin() {
           <DialogContent className="max-w-sm">
             <DialogHeader>
               <DialogTitle>Delete Groomer</DialogTitle>
+              <DialogDescription>Confirm deletion of groomer from your team.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <p className="text-sm text-gray-600">
@@ -5253,6 +5275,7 @@ export default function Admin() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Book New Appointment</DialogTitle>
+            <DialogDescription>Fill in the form below to book a new grooming appointment.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleBookingSubmit} className="space-y-4">
             {/* Contact Search */}
@@ -5393,6 +5416,30 @@ export default function Admin() {
                   </div>
                 </div>
               </RadioGroup>
+            </div>
+
+            {/* Groomer Selection */}
+            <div>
+              <Label>Select Groomer (Optional)</Label>
+              <Select 
+                value={bookingSelectedGroomer} 
+                onValueChange={(value) => setBookingSelectedGroomer(value)}
+              >
+                <SelectTrigger data-testid="select-booking-groomer">
+                  <SelectValue placeholder="Select a groomer (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No Preference</SelectItem>
+                  {Array.isArray(groomers) && groomers.map((groomer: any) => (
+                    <SelectItem key={groomer.id} value={groomer.id.toString()}>
+                      {groomer.specialties ? `${groomer.name} (${groomer.specialties})` : groomer.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-1">
+                Choose a preferred groomer or leave as "No Preference"
+              </p>
             </div>
 
             {/* Price Selection */}
