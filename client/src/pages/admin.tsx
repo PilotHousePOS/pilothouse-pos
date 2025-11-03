@@ -5428,14 +5428,14 @@ export default function Admin() {
             <div>
               <Label>Select Groomer (Optional)</Label>
               <Select 
-                value={bookingSelectedGroomer} 
-                onValueChange={(value) => setBookingSelectedGroomer(value)}
+                value={bookingSelectedGroomer || "none"} 
+                onValueChange={(value) => setBookingSelectedGroomer(value === "none" ? "" : value)}
               >
                 <SelectTrigger data-testid="select-booking-groomer">
                   <SelectValue placeholder="Select a groomer (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No Preference</SelectItem>
+                  <SelectItem value="none">No Preference</SelectItem>
                   {Array.isArray(groomers) && groomers.map((groomer: any) => (
                     <SelectItem key={groomer.id} value={groomer.id.toString()}>
                       {groomer.specialties ? `${groomer.name} (${groomer.specialties})` : groomer.name}
