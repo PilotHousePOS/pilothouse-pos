@@ -2800,6 +2800,11 @@ export default function Admin() {
     return appointments[currentIndex] || appointments[0];
   };
 
+  // Group unapproved appointments by phone number
+  const groupedUnapprovedAppointments = useMemo(() => {
+    return groupAppointmentsByPhone(unapprovedAppointments);
+  }, [unapprovedAppointments]);
+
   // Group pending appointments by phone number
   const groupedPendingAppointments = useMemo(() => {
     const pendingAppts = ((search.trim() ? filteredAppointments : appointments) as any[])
@@ -3135,49 +3140,67 @@ export default function Admin() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {unapprovedAppointments.map((appointment: any) => {
-                    const isHighlighted = matchesSearch(appointment, 'appointment');
+                  {Object.entries(groupedUnapprovedAppointments).map(([phone, phoneAppointments]) => {
+                    const currentAppointment = getCurrentAppointment(phone, phoneAppointments);
+                    const isHighlighted = matchesSearch(currentAppointment, 'appointment');
+                    const hasMultiple = phoneAppointments.length > 1;
+                    
                     return (
                     <div 
-                      key={appointment.id} 
+                      key={`${phone}-${currentAppointment.id}`} 
                       className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg gap-3 ${
                         isHighlighted 
                           ? 'border-2 border-amber-400 bg-amber-50 shadow-md' 
                           : 'border-orange-300 bg-white'
                       }`}
                     >
-                      <div className="flex-1">
+                      <div 
+                        className={`flex-1 ${hasMultiple ? 'cursor-pointer hover:bg-gray-50 rounded p-2' : ''}`}
+                        onClick={() => {
+                          if (hasMultiple) {
+                            cycleAppointmentGroup(phone, groupedUnapprovedAppointments);
+                          }
+                        }}
+                      >
                         <div className="flex items-center gap-2 mb-2 flex-wrap">
                           <Badge className="bg-orange-500 text-white">Pending Approval</Badge>
-                          {appointment.source === 'google_calendar' && (
+                          {currentAppointment.source === 'google_calendar' && (
                             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
                               <CalendarIcon className="w-3 h-3 mr-1" />
                               Google Calendar
                             </Badge>
                           )}
-                          {appointment.groomerTag && (
+                          {currentAppointment.groomerTag && (
                             <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300">
-                              Groomer: {capitalizeWords(appointment.groomerTag)}
+                              Groomer: {capitalizeWords(currentAppointment.groomerTag)}
+                            </Badge>
+                          )}
+                          {hasMultiple && (
+                            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300">
+                              {appointmentGroupIndexes[phone] !== undefined ? appointmentGroupIndexes[phone] + 1 : 1} / {phoneAppointments.length}
                             </Badge>
                           )}
                         </div>
-                        <h3 className="font-semibold">{formatServiceType(appointment.serviceType || appointment.service)}</h3>
-                        <p className="text-sm text-gray-600">Pet: {capitalizeWords(appointment.petName)} ({appointment.petType})</p>
-                        <p className="text-sm text-gray-600">Owner: {capitalizeWords(appointment.ownerFirstName)} {capitalizeWords(appointment.ownerLastName)}</p>
-                        <p className="text-sm text-gray-600">Phone: {appointment.ownerPhoneNumber}</p>
-                        <p className="text-xs text-gray-500">Date: {new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
-                        {appointment.specialNotes && (
-                          <p className="text-xs text-gray-500 mt-1">Notes: {appointment.specialNotes}</p>
+                        <h3 className="font-semibold">{formatServiceType(currentAppointment.serviceType || currentAppointment.service)}</h3>
+                        <p className="text-sm text-gray-600">Pet: {capitalizeWords(currentAppointment.petName)} ({currentAppointment.petType})</p>
+                        <p className="text-sm text-gray-600">Owner: {capitalizeWords(currentAppointment.ownerFirstName)} {capitalizeWords(currentAppointment.ownerLastName)}</p>
+                        <p className="text-sm text-gray-600">Phone: {currentAppointment.ownerPhoneNumber}</p>
+                        <p className="text-xs text-gray-500">Date: {new Date(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
+                        {currentAppointment.specialNotes && (
+                          <p className="text-xs text-gray-500 mt-1">Notes: {currentAppointment.specialNotes}</p>
                         )}
-                        <p className="text-xs text-gray-500">Booked: {new Date(appointment.createdAt).toLocaleString()}</p>
+                        <p className="text-xs text-gray-500">Booked: {new Date(currentAppointment.createdAt).toLocaleString()}</p>
+                        {hasMultiple && (
+                          <p className="text-xs text-blue-600 mt-1">Click to cycle through {phoneAppointments.length} appointments</p>
+                        )}
                       </div>
                       <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
                         <Button
                           size="sm"
                           className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
-                          onClick={() => approveAppointmentMutation.mutate(appointment.id)}
+                          onClick={() => approveAppointmentMutation.mutate(currentAppointment.id)}
                           disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending}
-                          data-testid={`approve-appointment-${appointment.id}`}
+                          data-testid={`approve-appointment-${currentAppointment.id}`}
                         >
                           {approveAppointmentMutation.isPending ? 'Approving...' : 'Approve'}
                         </Button>
@@ -3185,9 +3208,9 @@ export default function Admin() {
                           size="sm"
                           variant="destructive"
                           className="w-full sm:w-auto"
-                          onClick={() => rejectAppointmentMutation.mutate(appointment.id)}
+                          onClick={() => rejectAppointmentMutation.mutate(currentAppointment.id)}
                           disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending}
-                          data-testid={`reject-appointment-${appointment.id}`}
+                          data-testid={`reject-appointment-${currentAppointment.id}`}
                         >
                           {rejectAppointmentMutation.isPending ? 'Rejecting...' : 'Reject'}
                         </Button>
