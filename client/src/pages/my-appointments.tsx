@@ -157,8 +157,6 @@ export default function MyAppointments() {
                       key={`${phone}-${appointment.id}`}
                       className="shadow-sm hover:shadow-md transition-shadow"
                       data-testid={`card-appointment-${appointment.id}`}
-                      onClick={() => hasMultiple && cycleAppointmentGroup(phone, groupedUpcomingAppointments)}
-                      style={{ cursor: hasMultiple ? 'pointer' : 'default' }}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-3">
@@ -168,7 +166,11 @@ export default function MyAppointments() {
                               <h3 className="font-semibold text-gray-900">{appointment.petName}</h3>
                               <p className="text-sm text-gray-500">{appointment.petType}</p>
                               {hasMultiple && (
-                                <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300 text-xs mt-1">
+                                <Badge 
+                                  variant="outline" 
+                                  className="bg-purple-500 text-white border-purple-600 text-xs mt-1 cursor-pointer hover:bg-purple-600"
+                                  onClick={() => cycleAppointmentGroup(phone, groupedUpcomingAppointments)}
+                                >
                                   {appointmentGroupIndexes[phone] !== undefined ? appointmentGroupIndexes[phone] + 1 : 1} / {phoneAppointments.length}
                                 </Badge>
                               )}
@@ -209,8 +211,8 @@ export default function MyAppointments() {
                         </div>
                         
                         {hasMultiple && (
-                          <div className="mt-2 text-xs text-center text-blue-600">
-                            Tap to cycle through {phoneAppointments.length} appointments
+                          <div className="mt-2 text-xs text-center text-purple-600 font-medium">
+                            Click purple badge to cycle through {phoneAppointments.length} appointments
                           </div>
                         )}
                       </CardContent>
@@ -237,8 +239,6 @@ export default function MyAppointments() {
                       key={`${phone}-${appointment.id}`}
                       className="shadow-sm opacity-75"
                       data-testid={`card-past-appointment-${appointment.id}`}
-                      onClick={() => hasMultiple && cycleAppointmentGroup(phone, groupedPastAppointments)}
-                      style={{ cursor: hasMultiple ? 'pointer' : 'default' }}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-2">
@@ -248,7 +248,11 @@ export default function MyAppointments() {
                               <h3 className="font-semibold text-gray-700">{appointment.petName}</h3>
                               <p className="text-sm text-gray-500">{appointment.petType}</p>
                               {hasMultiple && (
-                                <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300 text-xs mt-1">
+                                <Badge 
+                                  variant="outline" 
+                                  className="bg-purple-500 text-white border-purple-600 text-xs mt-1 cursor-pointer hover:bg-purple-600"
+                                  onClick={() => cycleAppointmentGroup(phone, groupedPastAppointments)}
+                                >
                                   {appointmentGroupIndexes[phone] !== undefined ? appointmentGroupIndexes[phone] + 1 : 1} / {phoneAppointments.length}
                                 </Badge>
                               )}
@@ -269,8 +273,8 @@ export default function MyAppointments() {
                         </div>
                         
                         {hasMultiple && (
-                          <div className="mt-2 text-xs text-center text-blue-600">
-                            Tap to cycle through {phoneAppointments.length} appointments
+                          <div className="mt-2 text-xs text-center text-purple-600 font-medium">
+                            Click purple badge to cycle through {phoneAppointments.length} appointments
                           </div>
                         )}
                       </CardContent>

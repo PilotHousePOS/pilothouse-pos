@@ -3169,12 +3169,8 @@ export default function Admin() {
                       }`}
                     >
                       <div 
-                        className={`flex-1 ${hasMultiple ? 'cursor-pointer hover:bg-gray-50 rounded p-2' : ''}`}
-                        onClick={() => {
-                          if (hasMultiple) {
-                            cycleAppointmentGroup(phone, groupedUnapprovedAppointments);
-                          }
-                        }}
+                        className="flex-1 cursor-pointer hover:bg-gray-50 rounded p-2"
+                        onClick={() => setSelectedAppointment(currentAppointment)}
                       >
                         <div className="flex items-center gap-2 mb-2 flex-wrap">
                           <Badge className="bg-orange-500 text-white">Pending Approval</Badge>
@@ -3190,7 +3186,14 @@ export default function Admin() {
                             </Badge>
                           )}
                           {hasMultiple && (
-                            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300">
+                            <Badge 
+                              variant="outline" 
+                              className="bg-purple-500 text-white border-purple-600 cursor-pointer hover:bg-purple-600"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                cycleAppointmentGroup(phone, groupedUnapprovedAppointments);
+                              }}
+                            >
                               {appointmentGroupIndexes[phone] !== undefined ? appointmentGroupIndexes[phone] + 1 : 1} / {phoneAppointments.length}
                             </Badge>
                           )}
@@ -3205,7 +3208,7 @@ export default function Admin() {
                         )}
                         <p className="text-xs text-gray-500">Booked: {new Date(currentAppointment.createdAt).toLocaleString()}</p>
                         {hasMultiple && (
-                          <p className="text-xs text-blue-600 mt-1">Click to cycle through {phoneAppointments.length} appointments</p>
+                          <p className="text-xs text-purple-600 mt-1 font-medium">Click purple badge to cycle through {phoneAppointments.length} appointments</p>
                         )}
                       </div>
                       <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
@@ -3275,14 +3278,8 @@ export default function Admin() {
                       }`}
                     >
                       <div 
-                        className={`flex-1 p-2 rounded ${hasMultiple ? 'cursor-pointer hover:bg-gray-50' : ''}`}
-                        onClick={() => {
-                          if (hasMultiple) {
-                            cycleAppointmentGroup(phone, groupedPendingAppointments);
-                          } else {
-                            setSelectedAppointment(currentAppointment);
-                          }
-                        }}
+                        className="flex-1 p-2 rounded cursor-pointer hover:bg-gray-50"
+                        onClick={() => setSelectedAppointment(currentAppointment)}
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-semibold">{formatServiceType(currentAppointment.serviceType || currentAppointment.service)}</h3>
@@ -3293,7 +3290,14 @@ export default function Admin() {
                             </Badge>
                           )}
                           {hasMultiple && (
-                            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300 text-xs">
+                            <Badge 
+                              variant="outline" 
+                              className="bg-purple-500 text-white border-purple-600 text-xs cursor-pointer hover:bg-purple-600"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                cycleAppointmentGroup(phone, groupedPendingAppointments);
+                              }}
+                            >
                               {appointmentGroupIndexes[phone] !== undefined ? appointmentGroupIndexes[phone] + 1 : 1} / {phoneAppointments.length}
                             </Badge>
                           )}
@@ -3302,7 +3306,7 @@ export default function Admin() {
                         <p className="text-sm text-gray-600">Owner: {capitalizeWords(currentAppointment.ownerFirstName)} {capitalizeWords(currentAppointment.ownerLastName)}</p>
                         <p className="text-sm text-gray-600">Phone: {currentAppointment.ownerPhoneNumber}</p>
                         <p className="text-xs text-gray-500">{new Date(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
-                        <p className="text-xs text-blue-600 mt-1">{hasMultiple ? 'Click to cycle through dates' : 'Click to view details'}</p>
+                        <p className="text-xs text-purple-600 mt-1 font-medium">{hasMultiple ? 'Click purple badge to cycle through dates' : 'Click to view details'}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Select
@@ -3944,14 +3948,8 @@ export default function Admin() {
                           }`}
                         >
                           <div 
-                            className={`flex-1 p-1.5 rounded min-w-0 ${hasMultiple ? 'cursor-pointer hover:bg-gray-50' : ''}`}
-                            onClick={() => {
-                              if (hasMultiple) {
-                                cycleAppointmentGroup(phone, groupedApprovedAppointments);
-                              } else {
-                                setSelectedAppointment(currentAppointment);
-                              }
-                            }}
+                            className="flex-1 p-1.5 rounded min-w-0 cursor-pointer hover:bg-gray-50"
+                            onClick={() => setSelectedAppointment(currentAppointment)}
                           >
                             <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
                               <h3 className="font-semibold text-sm">{formatServiceType(currentAppointment.serviceType || currentAppointment.service)}</h3>
@@ -3962,7 +3960,14 @@ export default function Admin() {
                                 </Badge>
                               )}
                               {hasMultiple && (
-                                <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300 text-xs">
+                                <Badge 
+                                  variant="outline" 
+                                  className="bg-purple-500 text-white border-purple-600 text-xs cursor-pointer hover:bg-purple-600"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    cycleAppointmentGroup(phone, groupedApprovedAppointments);
+                                  }}
+                                >
                                   {appointmentGroupIndexes[phone] !== undefined ? appointmentGroupIndexes[phone] + 1 : 1} / {phoneAppointments.length}
                                 </Badge>
                               )}
@@ -3983,7 +3988,7 @@ export default function Admin() {
                                 Price: ${currentAppointment.price}
                               </p>
                             )}
-                            <p className="text-xs text-blue-600 mt-0.5">{hasMultiple ? 'Click to cycle through dates' : 'Click to view details'}</p>
+                            <p className="text-xs text-purple-600 mt-0.5 font-medium">{hasMultiple ? 'Click purple badge to cycle through dates' : 'Click to view details'}</p>
                           </div>
                           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 w-full sm:w-auto flex-shrink-0">
                             <Button
@@ -4152,14 +4157,8 @@ export default function Admin() {
                             }`}
                           >
                             <div 
-                              className={`flex-1 p-1.5 rounded min-w-0 ${hasMultiple ? 'cursor-pointer hover:bg-gray-50' : ''}`}
-                              onClick={() => {
-                                if (hasMultiple) {
-                                  cycleAppointmentGroup(phone, groupedDeniedAppointments);
-                                } else {
-                                  setSelectedAppointment(currentAppointment);
-                                }
-                              }}
+                              className="flex-1 p-1.5 rounded min-w-0 cursor-pointer hover:bg-gray-50"
+                              onClick={() => setSelectedAppointment(currentAppointment)}
                             >
                               <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
                                 <h3 className="font-semibold text-sm">{formatServiceType(currentAppointment.serviceType || currentAppointment.service)}</h3>
@@ -4170,7 +4169,14 @@ export default function Admin() {
                                   </Badge>
                                 )}
                                 {hasMultiple && (
-                                  <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300 text-xs">
+                                  <Badge 
+                                    variant="outline" 
+                                    className="bg-purple-500 text-white border-purple-600 text-xs cursor-pointer hover:bg-purple-600"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      cycleAppointmentGroup(phone, groupedDeniedAppointments);
+                                    }}
+                                  >
                                     {appointmentGroupIndexes[phone] !== undefined ? appointmentGroupIndexes[phone] + 1 : 1} / {phoneAppointments.length}
                                   </Badge>
                                 )}
@@ -4181,7 +4187,7 @@ export default function Admin() {
                                 <p>Phone: {currentAppointment.ownerPhoneNumber}</p>
                                 <p className="text-gray-500">{new Date(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
                               </div>
-                              <p className="text-xs text-blue-600 mt-0.5">{hasMultiple ? 'Click to cycle through dates' : 'Click to view details'}</p>
+                              <p className="text-xs text-purple-600 mt-0.5 font-medium">{hasMultiple ? 'Click purple badge to cycle through dates' : 'Click to view details'}</p>
                             </div>
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 w-full sm:w-auto flex-shrink-0">
                               <Select
