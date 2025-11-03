@@ -2810,7 +2810,7 @@ export default function Admin() {
   // Group approved appointments by phone number
   const groupedApprovedAppointments = useMemo(() => {
     const approvedAppts = ((search.trim() ? filteredAppointments : appointments) as any[])
-      .filter((a: any) => a.status === 'confirmed');
+      .filter((a: any) => a.status === 'confirmed' || a.status === 'completed');
     return groupAppointmentsByPhone(approvedAppts);
   }, [appointments, filteredAppointments, search]);
 
