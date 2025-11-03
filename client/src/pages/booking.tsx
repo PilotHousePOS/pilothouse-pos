@@ -51,13 +51,9 @@ export default function Booking() {
     retry: false,
   });
 
-  // Fetch available groomers for selected date
+  // Fetch active groomers
   const { data: availableGroomers = [] } = useQuery({
-    queryKey: ["/api/groomers/available", selectedDate?.getDay()],
-    queryFn: () => selectedDate ? 
-      fetch(`/api/groomers/available/${selectedDate.getDay()}`).then(res => res.json()) : 
-      [],
-    enabled: !!selectedDate,
+    queryKey: ["/api/groomers"],
     retry: false,
   });
 
@@ -134,10 +130,6 @@ export default function Booking() {
     });
   };
 
-  // Reset groomer selection when date changes
-  useEffect(() => {
-    setSelectedGroomer('');
-  }, [selectedDate]);
 
   // Generate available time slots in 15-minute intervals
   const availableTimeSlots = useMemo(() => {
