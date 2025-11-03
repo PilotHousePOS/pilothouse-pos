@@ -2243,7 +2243,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Manual cleanup of past approved appointments
+  // Manual cleanup of past appointments (with optional status filter)
   app.post("/api/admin/appointments/cleanup-past", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
@@ -2251,7 +2251,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      console.log('Running manual cleanup: Clearing past approved appointments');
+      const { statuses } = req.body; // Optional array of statuses to filter
+      
+      console.log('Running manual cleanup: Clearing past appointments', statuses ? `for statuses: ${statuses.join(', ')}` : 'for all statuses');
       
       const allAppointments = await storage.getAppointments();
       
@@ -2259,10 +2261,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      // Filter for approved appointments (confirmed or completed) that have already passed
-      const pastApprovedAppointments = allAppointments.filter((apt: any) => {
-        // Include both confirmed and completed as "approved" statuses
-        if (apt.status !== 'confirmed' && apt.status !== 'completed') return false;
+      // Filter for appointments that have already passed
+      const pastAppointments = allAppointments.filter((apt: any) => {
+        // If statuses filter is provided, check if appointment matches
+        if (statuses && Array.isArray(statuses) && statuses.length > 0) {
+          if (!statuses.includes(apt.status)) return false;
+        }
         
         const appointmentDate = new Date(apt.appointmentDate);
         appointmentDate.setHours(0, 0, 0, 0);
@@ -2270,16 +2274,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return appointmentDate < today;
       });
       
-      console.log(`Deleting ${pastApprovedAppointments.length} past approved appointments`);
+      console.log(`Deleting ${pastAppointments.length} past appointments`);
       
-      for (const appointment of pastApprovedAppointments) {
+      for (const appointment of pastAppointments) {
         await storage.deleteAppointment(appointment.id);
-        console.log(`Deleted past appointment: ${appointment.id} from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
+        console.log(`Deleted past appointment: ${appointment.id} (${appointment.status}) from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
       }
       
       res.json({ 
-        message: `Successfully deleted ${pastApprovedAppointments.length} past approved appointments`,
-        deletedCount: pastApprovedAppointments.length
+        message: `Successfully deleted ${pastAppointments.length} past appointments`,
+        deletedCount: pastAppointments.length
       });
     } catch (error) {
       console.error('Error cleaning up past appointments:', error);

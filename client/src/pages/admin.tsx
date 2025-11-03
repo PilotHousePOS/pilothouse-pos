@@ -2298,13 +2298,13 @@ export default function Admin() {
   });
 
   const cleanupPastAppointmentsMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest("POST", "/api/admin/appointments/cleanup-past");
+    mutationFn: async (statuses?: string[]) => {
+      return await apiRequest("POST", "/api/admin/appointments/cleanup-past", { statuses });
     },
     onSuccess: (data: any) => {
       toast({
         title: "Cleanup Complete",
-        description: data.message || "Past approved appointments have been deleted.",
+        description: data.message || "Past appointments have been deleted.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments/unapproved"] });
@@ -3164,18 +3164,37 @@ export default function Admin() {
 
           {/* Approved Appointments - Collapsible Button */}
           <div className="space-y-2">
-            <Button
-              variant="outline"
-              className="w-full justify-between border-2 border-green-200 bg-green-50 hover:bg-green-100 text-green-700"
-              onClick={() => setShowApprovedAppointments(!showApprovedAppointments)}
-              data-testid="button-toggle-approved"
-            >
-              <span className="flex items-center gap-2">
-                <CalendarIcon className="w-5 h-5" />
-                Approved Appointments ({(appointments as any[]).filter((a: any) => a.status === 'confirmed' || a.status === 'completed').length})
-              </span>
-              {showApprovedAppointments ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+              <Button
+                variant="outline"
+                className="flex-1 justify-between border-2 border-green-200 bg-green-50 hover:bg-green-100 text-green-700"
+                onClick={() => setShowApprovedAppointments(!showApprovedAppointments)}
+                data-testid="button-toggle-approved"
+              >
+                <span className="flex items-center gap-2">
+                  <CalendarIcon className="w-5 h-5" />
+                  Approved Appointments ({(appointments as any[]).filter((a: any) => a.status === 'confirmed' || a.status === 'completed').length})
+                </span>
+                {showApprovedAppointments ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+              </Button>
+              {typedUser?.isAdmin && (
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (confirm('This will delete all approved appointments with dates in the past. Continue?')) {
+                      cleanupPastAppointmentsMutation.mutate(['confirmed', 'completed']);
+                    }
+                  }}
+                  disabled={cleanupPastAppointmentsMutation.isPending}
+                  data-testid="button-cleanup-past-approved"
+                  className="bg-red-50 border-red-200 hover:bg-red-100 text-red-700 sm:w-auto"
+                >
+                  <Trash2 className={`w-4 h-4 mr-2`} />
+                  {cleanupPastAppointmentsMutation.isPending ? 'Cleaning...' : 'Clear Past'}
+                </Button>
+              )}
+            </div>
 
             {showApprovedAppointments && (() => {
               const phoneGroups = Object.entries(groupedApprovedAppointments);
@@ -3495,8 +3514,8 @@ export default function Admin() {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        if (confirm('This will delete all approved appointments with dates in the past. Continue?')) {
-                          cleanupPastAppointmentsMutation.mutate();
+                        if (confirm('This will delete all pending appointments with dates in the past. Continue?')) {
+                          cleanupPastAppointmentsMutation.mutate(['scheduled']);
                         }
                       }}
                       disabled={cleanupPastAppointmentsMutation.isPending}
@@ -3586,18 +3605,35 @@ export default function Admin() {
           {/* Denied Appointments - Collapsible Button (Only visible to admins) */}
           {typedUser?.isAdmin && (
             <div className="space-y-2">
-              <Button
-                variant="outline"
-                className="w-full justify-between border-2 border-red-200 bg-red-50 hover:bg-red-100 text-red-700"
-                onClick={() => setShowDeniedAppointments(!showDeniedAppointments)}
-                data-testid="button-toggle-denied"
-              >
-                <span className="flex items-center gap-2">
-                  <CalendarIcon className="w-5 h-5" />
-                  Denied Appointments ({(appointments as any[]).filter((a: any) => a.status === 'rejected' || a.status === 'cancelled').length})
-                </span>
-                {showDeniedAppointments ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+                <Button
+                  variant="outline"
+                  className="flex-1 justify-between border-2 border-red-200 bg-red-50 hover:bg-red-100 text-red-700"
+                  onClick={() => setShowDeniedAppointments(!showDeniedAppointments)}
+                  data-testid="button-toggle-denied"
+                >
+                  <span className="flex items-center gap-2">
+                    <CalendarIcon className="w-5 h-5" />
+                    Denied Appointments ({(appointments as any[]).filter((a: any) => a.status === 'rejected' || a.status === 'cancelled').length})
+                  </span>
+                  {showDeniedAppointments ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                </Button>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (confirm('This will delete all denied appointments with dates in the past. Continue?')) {
+                      cleanupPastAppointmentsMutation.mutate(['rejected', 'cancelled']);
+                    }
+                  }}
+                  disabled={cleanupPastAppointmentsMutation.isPending}
+                  data-testid="button-cleanup-past-denied"
+                  className="bg-red-50 border-red-200 hover:bg-red-100 text-red-700 sm:w-auto"
+                >
+                  <Trash2 className={`w-4 h-4 mr-2`} />
+                  {cleanupPastAppointmentsMutation.isPending ? 'Cleaning...' : 'Clear Past'}
+                </Button>
+              </div>
 
               {showDeniedAppointments && (() => {
                 const phoneGroups = Object.entries(groupedDeniedAppointments);
