@@ -11,6 +11,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -4987,6 +4988,25 @@ export default function Admin() {
                 </div>
               </div>
             </div>
+            {selectedAppointment.status === 'confirmed' && typedUser?.isAdmin && (
+              <DialogFooter className="border-t pt-4">
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    if (confirm('Are you sure you want to permanently delete this approved appointment?')) {
+                      deleteAppointmentMutation.mutate(selectedAppointment.id);
+                      setSelectedAppointment(null);
+                    }
+                  }}
+                  disabled={deleteAppointmentMutation.isPending}
+                  data-testid={`button-delete-appointment-details-${selectedAppointment.id}`}
+                  className="w-full"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete Appointment
+                </Button>
+              </DialogFooter>
+            )}
           </DialogContent>
         </Dialog>
       )}
