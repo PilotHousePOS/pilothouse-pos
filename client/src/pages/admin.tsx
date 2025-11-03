@@ -3492,12 +3492,12 @@ export default function Admin() {
           {/* Pending Appointments Section - Always Visible */}
           <Card className="border-2 border-yellow-200 bg-yellow-50/30">
             <CardHeader>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                 <CardTitle className="flex items-center gap-2 text-yellow-700">
                   <CalendarIcon className="w-5 h-5" />
                   Pending Appointments ({(appointments as any[]).filter((a: any) => a.status === 'scheduled').length})
                 </CardTitle>
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <div className="flex flex-col gap-2 w-full sm:w-auto">
                   <Button 
                     variant="outline"
                     size="sm"
