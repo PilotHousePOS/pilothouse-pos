@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, Clock, Dog, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { useLocation } from "wouter";
@@ -9,6 +10,7 @@ import { safeGoBack } from "@/lib/navigation";
 
 export default function MyAppointments() {
   const [, setLocation] = useLocation();
+  const [appointmentGroupIndexes, setAppointmentGroupIndexes] = useState<Record<string, number>>({});
 
   const { data: appointments, isLoading } = useQuery<Appointment[]>({
     queryKey: ["/api/appointments"],
@@ -54,6 +56,41 @@ export default function MyAppointments() {
 
   const upcomingAppointments = appointments?.filter(apt => !isPastAppointment(apt) && apt.status !== "cancelled") || [];
   const pastAppointments = appointments?.filter(apt => isPastAppointment(apt) || apt.status === "cancelled" || apt.status === "completed") || [];
+
+  // Helper functions for grouping and cycling
+  const groupAppointmentsByPhone = (appointmentList: Appointment[]) => {
+    const grouped: Record<string, Appointment[]> = {};
+    appointmentList.forEach((appointment) => {
+      const phone = appointment.ownerPhoneNumber || '';
+      if (!grouped[phone]) {
+        grouped[phone] = [];
+      }
+      grouped[phone].push(appointment);
+    });
+    // Sort each group by date
+    Object.keys(grouped).forEach(phone => {
+      grouped[phone].sort((a, b) => new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime());
+    });
+    return grouped;
+  };
+
+  const cycleAppointmentGroup = (phone: string, groupedAppts: Record<string, Appointment[]>) => {
+    setAppointmentGroupIndexes(prev => {
+      const currentIndex = prev[phone] || 0;
+      const groupSize = groupedAppts[phone]?.length || 1;
+      const nextIndex = (currentIndex + 1) % groupSize;
+      return { ...prev, [phone]: nextIndex };
+    });
+  };
+
+  const getCurrentAppointment = (phone: string, appointments: Appointment[]) => {
+    const currentIndex = appointmentGroupIndexes[phone] || 0;
+    return appointments[currentIndex] || appointments[0];
+  };
+
+  // Group upcoming and past appointments by phone number
+  const groupedUpcomingAppointments = useMemo(() => groupAppointmentsByPhone(upcomingAppointments), [upcomingAppointments]);
+  const groupedPastAppointments = useMemo(() => groupAppointmentsByPhone(pastAppointments), [pastAppointments]);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -104,18 +141,24 @@ export default function MyAppointments() {
         ) : (
           <>
             {/* Upcoming Appointments */}
-            {upcomingAppointments.length > 0 && (
+            {Object.keys(groupedUpcomingAppointments).length > 0 && (
               <div>
                 <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center">
                   <Calendar className="w-5 h-5 mr-2 text-brand-blue" />
                   Upcoming Appointments
                 </h2>
                 <div className="space-y-3">
-                  {upcomingAppointments.map((appointment) => (
+                  {Object.entries(groupedUpcomingAppointments).map(([phone, phoneAppointments]) => {
+                    const appointment = getCurrentAppointment(phone, phoneAppointments);
+                    const hasMultiple = phoneAppointments.length > 1;
+                    
+                    return (
                     <Card
-                      key={appointment.id}
+                      key={`${phone}-${appointment.id}`}
                       className="shadow-sm hover:shadow-md transition-shadow"
                       data-testid={`card-appointment-${appointment.id}`}
+                      onClick={() => hasMultiple && cycleAppointmentGroup(phone, groupedUpcomingAppointments)}
+                      style={{ cursor: hasMultiple ? 'pointer' : 'default' }}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-3">
@@ -124,6 +167,11 @@ export default function MyAppointments() {
                             <div>
                               <h3 className="font-semibold text-gray-900">{appointment.petName}</h3>
                               <p className="text-sm text-gray-500">{appointment.petType}</p>
+                              {hasMultiple && (
+                                <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300 text-xs mt-1">
+                                  {appointmentGroupIndexes[phone] !== undefined ? appointmentGroupIndexes[phone] + 1 : 1} / {phoneAppointments.length}
+                                </Badge>
+                              )}
                             </div>
                           </div>
                           {getStatusBadge(appointment)}
@@ -159,26 +207,38 @@ export default function MyAppointments() {
                             <p className="text-xs text-yellow-600">Awaiting admin approval</p>
                           )}
                         </div>
+                        
+                        {hasMultiple && (
+                          <div className="mt-2 text-xs text-center text-blue-600">
+                            Tap to cycle through {phoneAppointments.length} appointments
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
-                  ))}
+                  )})}
                 </div>
               </div>
             )}
 
             {/* Past Appointments */}
-            {pastAppointments.length > 0 && (
+            {Object.keys(groupedPastAppointments).length > 0 && (
               <div>
                 <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center">
                   <Calendar className="w-5 h-5 mr-2 text-gray-500" />
                   Past Appointments
                 </h2>
                 <div className="space-y-3">
-                  {pastAppointments.map((appointment) => (
+                  {Object.entries(groupedPastAppointments).map(([phone, phoneAppointments]) => {
+                    const appointment = getCurrentAppointment(phone, phoneAppointments);
+                    const hasMultiple = phoneAppointments.length > 1;
+                    
+                    return (
                     <Card
-                      key={appointment.id}
+                      key={`${phone}-${appointment.id}`}
                       className="shadow-sm opacity-75"
                       data-testid={`card-past-appointment-${appointment.id}`}
+                      onClick={() => hasMultiple && cycleAppointmentGroup(phone, groupedPastAppointments)}
+                      style={{ cursor: hasMultiple ? 'pointer' : 'default' }}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-2">
@@ -187,6 +247,11 @@ export default function MyAppointments() {
                             <div>
                               <h3 className="font-semibold text-gray-700">{appointment.petName}</h3>
                               <p className="text-sm text-gray-500">{appointment.petType}</p>
+                              {hasMultiple && (
+                                <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300 text-xs mt-1">
+                                  {appointmentGroupIndexes[phone] !== undefined ? appointmentGroupIndexes[phone] + 1 : 1} / {phoneAppointments.length}
+                                </Badge>
+                              )}
                             </div>
                           </div>
                           {getStatusBadge(appointment)}
@@ -202,9 +267,15 @@ export default function MyAppointments() {
                             {appointment.appointmentTime}
                           </div>
                         </div>
+                        
+                        {hasMultiple && (
+                          <div className="mt-2 text-xs text-center text-blue-600">
+                            Tap to cycle through {phoneAppointments.length} appointments
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
-                  ))}
+                  )})}
                 </div>
               </div>
             )}

@@ -1601,6 +1601,9 @@ export default function Admin() {
   const [calendarEventsPage, setCalendarEventsPage] = useState(0);
   const [calendarEventsTouchStart, setCalendarEventsTouchStart] = useState(0);
   const [calendarEventsTouchEnd, setCalendarEventsTouchEnd] = useState(0);
+
+  // Track current index for each phone number group (for cycling through appointments)
+  const [appointmentGroupIndexes, setAppointmentGroupIndexes] = useState<Record<string, number>>({});
   
   const ITEMS_PER_PAGE = 4;
 
@@ -2766,6 +2769,58 @@ export default function Admin() {
     );
   }
 
+  // Helper functions for appointment grouping and cycling
+  const groupAppointmentsByPhone = (appointmentList: any[]) => {
+    const grouped: Record<string, any[]> = {};
+    appointmentList.forEach((appointment) => {
+      const phone = appointment.ownerPhoneNumber || '';
+      if (!grouped[phone]) {
+        grouped[phone] = [];
+      }
+      grouped[phone].push(appointment);
+    });
+    // Sort each group by date
+    Object.keys(grouped).forEach(phone => {
+      grouped[phone].sort((a, b) => new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime());
+    });
+    return grouped;
+  };
+
+  const cycleAppointmentGroup = (phone: string, groupedAppts: Record<string, any[]>) => {
+    setAppointmentGroupIndexes(prev => {
+      const currentIndex = prev[phone] || 0;
+      const groupSize = groupedAppts[phone]?.length || 1;
+      const nextIndex = (currentIndex + 1) % groupSize;
+      return { ...prev, [phone]: nextIndex };
+    });
+  };
+
+  const getCurrentAppointment = (phone: string, appointments: any[]) => {
+    const currentIndex = appointmentGroupIndexes[phone] || 0;
+    return appointments[currentIndex] || appointments[0];
+  };
+
+  // Group pending appointments by phone number
+  const groupedPendingAppointments = useMemo(() => {
+    const pendingAppts = ((search.trim() ? filteredAppointments : appointments) as any[])
+      .filter((a: any) => a.status === 'scheduled');
+    return groupAppointmentsByPhone(pendingAppts);
+  }, [appointments, filteredAppointments, search]);
+
+  // Group approved appointments by phone number
+  const groupedApprovedAppointments = useMemo(() => {
+    const approvedAppts = ((search.trim() ? filteredAppointments : appointments) as any[])
+      .filter((a: any) => a.status === 'confirmed');
+    return groupAppointmentsByPhone(approvedAppts);
+  }, [appointments, filteredAppointments, search]);
+
+  // Group denied appointments by phone number
+  const groupedDeniedAppointments = useMemo(() => {
+    const deniedAppts = ((search.trim() ? filteredAppointments : appointments) as any[])
+      .filter((a: any) => a.status === 'rejected' || a.status === 'cancelled');
+    return groupAppointmentsByPhone(deniedAppts);
+  }, [appointments, filteredAppointments, search]);
+
   return (
     <div className="pb-20">
       {/* Fixed Back Button */}
@@ -3168,13 +3223,14 @@ export default function Admin() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {((search.trim() ? filteredAppointments : appointments) as any[])
-                  .filter((a: any) => a.status === 'scheduled')
-                  .map((appointment: any) => {
-                    const isHighlighted = matchesSearch(appointment, 'appointment');
-                    return (
+                {Object.entries(groupedPendingAppointments).map(([phone, phoneAppointments]) => {
+                  const currentAppointment = getCurrentAppointment(phone, phoneAppointments);
+                  const isHighlighted = matchesSearch(currentAppointment, 'appointment');
+                  const hasMultiple = phoneAppointments.length > 1;
+                  
+                  return (
                     <div 
-                      key={appointment.id} 
+                      key={`${phone}-${currentAppointment.id}`} 
                       className={`flex items-center justify-between p-4 border rounded-lg ${
                         isHighlighted 
                           ? 'border-2 border-amber-400 bg-amber-50 shadow-md' 
@@ -3182,29 +3238,40 @@ export default function Admin() {
                       }`}
                     >
                       <div 
-                        className="flex-1 cursor-pointer hover:bg-gray-50 p-2 rounded"
-                        onClick={() => setSelectedAppointment(appointment)}
+                        className={`flex-1 p-2 rounded ${hasMultiple ? 'cursor-pointer hover:bg-gray-50' : ''}`}
+                        onClick={() => {
+                          if (hasMultiple) {
+                            cycleAppointmentGroup(phone, groupedPendingAppointments);
+                          } else {
+                            setSelectedAppointment(currentAppointment);
+                          }
+                        }}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold">{formatServiceType(appointment.serviceType || appointment.service)}</h3>
-                          {appointment.source === 'google_calendar' && (
+                          <h3 className="font-semibold">{formatServiceType(currentAppointment.serviceType || currentAppointment.service)}</h3>
+                          {currentAppointment.source === 'google_calendar' && (
                             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs">
                               <CalendarIcon className="w-3 h-3 mr-1" />
                               Synced
                             </Badge>
                           )}
+                          {hasMultiple && (
+                            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300 text-xs">
+                              {appointmentGroupIndexes[phone] !== undefined ? appointmentGroupIndexes[phone] + 1 : 1} / {phoneAppointments.length}
+                            </Badge>
+                          )}
                         </div>
-                        <p className="text-sm text-gray-600">Pet: {capitalizeWords(appointment.petName)} ({appointment.petType})</p>
-                        <p className="text-sm text-gray-600">Owner: {capitalizeWords(appointment.ownerFirstName)} {capitalizeWords(appointment.ownerLastName)}</p>
-                        <p className="text-sm text-gray-600">Phone: {appointment.ownerPhoneNumber}</p>
-                        <p className="text-xs text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
-                        <p className="text-xs text-blue-600 mt-1">Click to view details</p>
+                        <p className="text-sm text-gray-600">Pet: {capitalizeWords(currentAppointment.petName)} ({currentAppointment.petType})</p>
+                        <p className="text-sm text-gray-600">Owner: {capitalizeWords(currentAppointment.ownerFirstName)} {capitalizeWords(currentAppointment.ownerLastName)}</p>
+                        <p className="text-sm text-gray-600">Phone: {currentAppointment.ownerPhoneNumber}</p>
+                        <p className="text-xs text-gray-500">{new Date(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
+                        <p className="text-xs text-blue-600 mt-1">{hasMultiple ? 'Click to cycle through dates' : 'Click to view details'}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Select
-                          key={`appointment-${appointment.id}-${appointment.status}`}
-                          value={appointment.status}
-                          onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
+                          key={`appointment-${currentAppointment.id}-${currentAppointment.status}`}
+                          value={currentAppointment.status}
+                          onValueChange={(status) => updateAppointmentMutation.mutate({ id: currentAppointment.id, status })}
                           disabled={!!typedUser?.isGroomer && !typedUser?.isAdmin}
                         >
                           <SelectTrigger className="w-32">
@@ -3787,10 +3854,10 @@ export default function Admin() {
             </Button>
 
             {showApprovedAppointments && (() => {
-              const approvedAppointments = ((search.trim() ? filteredAppointments : appointments) as any[]).filter((a: any) => a.status === 'confirmed' || a.status === 'completed');
-              const totalPages = Math.ceil(approvedAppointments.length / APPOINTMENTS_PER_PAGE);
+              const phoneGroups = Object.entries(groupedApprovedAppointments);
+              const totalPages = Math.ceil(phoneGroups.length / APPOINTMENTS_PER_PAGE);
               const startIdx = approvedAppointmentsPage * APPOINTMENTS_PER_PAGE;
-              const paginatedAppointments = approvedAppointments.slice(startIdx, startIdx + APPOINTMENTS_PER_PAGE);
+              const paginatedPhoneGroups = phoneGroups.slice(startIdx, startIdx + APPOINTMENTS_PER_PAGE);
 
               const handleApprovedTouchStart = (e: React.TouchEvent) => {
                 setApprovedTouchStart(e.targetTouches[0].clientX);
@@ -3825,11 +3892,14 @@ export default function Admin() {
                       onTouchMove={handleApprovedTouchMove}
                       onTouchEnd={handleApprovedTouchEnd}
                     >
-                      {paginatedAppointments.map((appointment: any) => {
-                        const isHighlighted = matchesSearch(appointment, 'appointment');
+                      {paginatedPhoneGroups.map(([phone, phoneAppointments]) => {
+                        const currentAppointment = getCurrentAppointment(phone, phoneAppointments);
+                        const isHighlighted = matchesSearch(currentAppointment, 'appointment');
+                        const hasMultiple = phoneAppointments.length > 1;
+                        
                         return (
                         <div 
-                          key={appointment.id} 
+                          key={`${phone}-${currentAppointment.id}`}
                           className={`flex flex-col sm:flex-row sm:items-start sm:justify-between p-3 border rounded-lg gap-2 ${
                             isHighlighted 
                               ? 'border-2 border-amber-400 bg-amber-50 shadow-md' 
@@ -3837,35 +3907,46 @@ export default function Admin() {
                           }`}
                         >
                           <div 
-                            className="flex-1 cursor-pointer hover:bg-gray-50 p-1.5 rounded min-w-0"
-                            onClick={() => setSelectedAppointment(appointment)}
+                            className={`flex-1 p-1.5 rounded min-w-0 ${hasMultiple ? 'cursor-pointer hover:bg-gray-50' : ''}`}
+                            onClick={() => {
+                              if (hasMultiple) {
+                                cycleAppointmentGroup(phone, groupedApprovedAppointments);
+                              } else {
+                                setSelectedAppointment(currentAppointment);
+                              }
+                            }}
                           >
                             <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-                              <h3 className="font-semibold text-sm">{formatServiceType(appointment.serviceType || appointment.service)}</h3>
-                              {appointment.source === 'google_calendar' && (
+                              <h3 className="font-semibold text-sm">{formatServiceType(currentAppointment.serviceType || currentAppointment.service)}</h3>
+                              {currentAppointment.source === 'google_calendar' && (
                                 <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs px-1.5 py-0">
                                   <CalendarIcon className="w-3 h-3 mr-0.5" />
                                   Synced
                                 </Badge>
                               )}
+                              {hasMultiple && (
+                                <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300 text-xs">
+                                  {appointmentGroupIndexes[phone] !== undefined ? appointmentGroupIndexes[phone] + 1 : 1} / {phoneAppointments.length}
+                                </Badge>
+                              )}
                             </div>
                             <div className="text-xs text-gray-600 space-y-0.5">
-                              <p>Pet: {appointment.petName} ({appointment.petType})</p>
-                              <p>Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
-                              <p>Phone: {appointment.ownerPhoneNumber}</p>
-                              <p className="text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
+                              <p>Pet: {currentAppointment.petName} ({currentAppointment.petType})</p>
+                              <p>Owner: {currentAppointment.ownerFirstName} {currentAppointment.ownerLastName}</p>
+                              <p>Phone: {currentAppointment.ownerPhoneNumber}</p>
+                              <p className="text-gray-500">{new Date(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
                             </div>
-                            {appointment.specialNotes && (
-                              <p className="text-xs text-gray-700 mt-1.5 break-words" data-testid={`appointment-notes-${appointment.id}`}>
-                                <span className="font-medium">Notes:</span> {appointment.specialNotes}
+                            {currentAppointment.specialNotes && (
+                              <p className="text-xs text-gray-700 mt-1.5 break-words" data-testid={`appointment-notes-${currentAppointment.id}`}>
+                                <span className="font-medium">Notes:</span> {currentAppointment.specialNotes}
                               </p>
                             )}
-                            {appointment.price && (
-                              <p className="text-xs text-green-700 font-medium mt-1" data-testid={`appointment-price-${appointment.id}`}>
-                                Price: ${appointment.price}
+                            {currentAppointment.price && (
+                              <p className="text-xs text-green-700 font-medium mt-1" data-testid={`appointment-price-${currentAppointment.id}`}>
+                                Price: ${currentAppointment.price}
                               </p>
                             )}
-                            <p className="text-xs text-blue-600 mt-0.5">Click to view details</p>
+                            <p className="text-xs text-blue-600 mt-0.5">{hasMultiple ? 'Click to cycle through dates' : 'Click to view details'}</p>
                           </div>
                           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 w-full sm:w-auto flex-shrink-0">
                             <Button
@@ -3874,24 +3955,24 @@ export default function Admin() {
                               className="text-blue-600 border-blue-300 hover:bg-blue-50 w-full sm:w-auto h-8 text-xs"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setEditingAppointment(appointment);
-                                setEditOwnerFirstName(appointment.ownerFirstName || '');
-                                setEditOwnerLastName(appointment.ownerLastName || '');
-                                setEditOwnerPhone(appointment.ownerPhoneNumber || '');
-                                setEditPetName(appointment.petName || '');
-                                setEditPetType(appointment.petType || '');
-                                setEditNotes(appointment.specialNotes || '');
-                                setEditPrice(appointment.price || '');
+                                setEditingAppointment(currentAppointment);
+                                setEditOwnerFirstName(currentAppointment.ownerFirstName || '');
+                                setEditOwnerLastName(currentAppointment.ownerLastName || '');
+                                setEditOwnerPhone(currentAppointment.ownerPhoneNumber || '');
+                                setEditPetName(currentAppointment.petName || '');
+                                setEditPetType(currentAppointment.petType || '');
+                                setEditNotes(currentAppointment.specialNotes || '');
+                                setEditPrice(currentAppointment.price || '');
                               }}
-                              data-testid={`edit-appointment-${appointment.id}`}
+                              data-testid={`edit-appointment-${currentAppointment.id}`}
                             >
                               <Edit className="w-3.5 h-3.5 mr-1" />
                               Edit
                             </Button>
                             <Select
-                              key={`appointment-${appointment.id}-${appointment.status}`}
-                              value={appointment.status}
-                              onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
+                              key={`appointment-${currentAppointment.id}-${currentAppointment.status}`}
+                              value={currentAppointment.status}
+                              onValueChange={(status) => updateAppointmentMutation.mutate({ id: currentAppointment.id, status })}
                               disabled={!!typedUser?.isGroomer && !typedUser?.isAdmin}
                             >
                               <SelectTrigger className="w-full sm:w-28 h-8 text-xs">
@@ -3981,10 +4062,10 @@ export default function Admin() {
               </Button>
 
               {showDeniedAppointments && (() => {
-                const deniedAppointments = ((search.trim() ? filteredAppointments : appointments) as any[]).filter((a: any) => a.status === 'rejected' || a.status === 'cancelled');
-                const totalPages = Math.ceil(deniedAppointments.length / APPOINTMENTS_PER_PAGE);
+                const phoneGroups = Object.entries(groupedDeniedAppointments);
+                const totalPages = Math.ceil(phoneGroups.length / APPOINTMENTS_PER_PAGE);
                 const startIdx = deniedAppointmentsPage * APPOINTMENTS_PER_PAGE;
-                const paginatedAppointments = deniedAppointments.slice(startIdx, startIdx + APPOINTMENTS_PER_PAGE);
+                const paginatedPhoneGroups = phoneGroups.slice(startIdx, startIdx + APPOINTMENTS_PER_PAGE);
 
                 const handleDeniedTouchStart = (e: React.TouchEvent) => {
                   setDeniedTouchStart(e.targetTouches[0].clientX);
@@ -4019,11 +4100,14 @@ export default function Admin() {
                         onTouchMove={handleDeniedTouchMove}
                         onTouchEnd={handleDeniedTouchEnd}
                       >
-                        {paginatedAppointments.map((appointment: any) => {
-                          const isHighlighted = matchesSearch(appointment, 'appointment');
+                        {paginatedPhoneGroups.map(([phone, phoneAppointments]) => {
+                          const currentAppointment = getCurrentAppointment(phone, phoneAppointments);
+                          const isHighlighted = matchesSearch(currentAppointment, 'appointment');
+                          const hasMultiple = phoneAppointments.length > 1;
+                          
                           return (
                           <div 
-                            key={appointment.id} 
+                            key={`${phone}-${currentAppointment.id}`}
                             className={`flex flex-col sm:flex-row sm:items-start justify-between p-3 border rounded-lg gap-2 ${
                               isHighlighted 
                                 ? 'border-2 border-amber-400 bg-amber-50 shadow-md' 
@@ -4031,31 +4115,42 @@ export default function Admin() {
                             }`}
                           >
                             <div 
-                              className="flex-1 cursor-pointer hover:bg-gray-50 p-1.5 rounded min-w-0"
-                              onClick={() => setSelectedAppointment(appointment)}
+                              className={`flex-1 p-1.5 rounded min-w-0 ${hasMultiple ? 'cursor-pointer hover:bg-gray-50' : ''}`}
+                              onClick={() => {
+                                if (hasMultiple) {
+                                  cycleAppointmentGroup(phone, groupedDeniedAppointments);
+                                } else {
+                                  setSelectedAppointment(currentAppointment);
+                                }
+                              }}
                             >
                               <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-                                <h3 className="font-semibold text-sm">{formatServiceType(appointment.serviceType || appointment.service)}</h3>
-                                {appointment.source === 'google_calendar' && (
+                                <h3 className="font-semibold text-sm">{formatServiceType(currentAppointment.serviceType || currentAppointment.service)}</h3>
+                                {currentAppointment.source === 'google_calendar' && (
                                   <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs px-1.5 py-0">
                                     <CalendarIcon className="w-3 h-3 mr-0.5" />
                                     Synced
                                   </Badge>
                                 )}
+                                {hasMultiple && (
+                                  <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300 text-xs">
+                                    {appointmentGroupIndexes[phone] !== undefined ? appointmentGroupIndexes[phone] + 1 : 1} / {phoneAppointments.length}
+                                  </Badge>
+                                )}
                               </div>
                               <div className="text-xs text-gray-600 space-y-0.5">
-                                <p>Pet: {appointment.petName} ({appointment.petType})</p>
-                                <p>Owner: {appointment.ownerFirstName} {appointment.ownerLastName}</p>
-                                <p>Phone: {appointment.ownerPhoneNumber}</p>
-                                <p className="text-gray-500">{new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.appointmentTime}</p>
+                                <p>Pet: {currentAppointment.petName} ({currentAppointment.petType})</p>
+                                <p>Owner: {currentAppointment.ownerFirstName} {currentAppointment.ownerLastName}</p>
+                                <p>Phone: {currentAppointment.ownerPhoneNumber}</p>
+                                <p className="text-gray-500">{new Date(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
                               </div>
-                              <p className="text-xs text-blue-600 mt-0.5">Click to view details</p>
+                              <p className="text-xs text-blue-600 mt-0.5">{hasMultiple ? 'Click to cycle through dates' : 'Click to view details'}</p>
                             </div>
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 w-full sm:w-auto flex-shrink-0">
                               <Select
-                                key={`appointment-${appointment.id}-${appointment.status}`}
-                                value={appointment.status}
-                                onValueChange={(status) => updateAppointmentMutation.mutate({ id: appointment.id, status })}
+                                key={`appointment-${currentAppointment.id}-${currentAppointment.status}`}
+                                value={currentAppointment.status}
+                                onValueChange={(status) => updateAppointmentMutation.mutate({ id: currentAppointment.id, status })}
                               >
                                 <SelectTrigger className="w-full sm:w-28 h-8 text-xs">
                                   <SelectValue />
@@ -4073,11 +4168,11 @@ export default function Admin() {
                                 variant="destructive"
                                 onClick={() => {
                                   if (confirm('Are you sure you want to permanently delete this appointment?')) {
-                                    deleteAppointmentMutation.mutate(appointment.id);
+                                    deleteAppointmentMutation.mutate(currentAppointment.id);
                                   }
                                 }}
                                 disabled={deleteAppointmentMutation.isPending}
-                                data-testid={`button-delete-appointment-${appointment.id}`}
+                                data-testid={`button-delete-appointment-${currentAppointment.id}`}
                                 title="Delete appointment"
                                 className="w-full sm:w-auto h-8"
                               >
