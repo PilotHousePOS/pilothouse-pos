@@ -2906,16 +2906,16 @@ export default function Admin() {
         </Card>
       </div>
 
-      <Tabs defaultValue="inventory" className="w-full">
+      <Tabs defaultValue="orders" className="w-full">
         <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
           <TabsList className="inline-flex w-max min-w-full gap-1 h-auto p-1">
-            <TabsTrigger value="inventory" className="flex-1 text-xs py-3 px-2 md:px-3 whitespace-nowrap">
-              <span className="hidden md:inline">Inventory</span>
-              <span className="md:hidden">Stock</span>
-            </TabsTrigger>
             <TabsTrigger value="orders" className="flex-1 text-xs py-3 px-2 md:px-3 whitespace-nowrap">
               <span className="hidden md:inline">Orders & Appointments</span>
               <span className="md:hidden">Orders</span>
+            </TabsTrigger>
+            <TabsTrigger value="inventory" className="flex-1 text-xs py-3 px-2 md:px-3 whitespace-nowrap">
+              <span className="hidden md:inline">Inventory</span>
+              <span className="md:hidden">Stock</span>
             </TabsTrigger>
             {typedUser?.isAdmin && (
               <TabsTrigger value="grooming" className="flex-1 text-xs py-3 px-2 md:px-3 whitespace-nowrap">
