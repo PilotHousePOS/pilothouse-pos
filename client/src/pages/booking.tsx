@@ -381,7 +381,26 @@ export default function Booking() {
           </div>
         </div>
 
-{/* Groomer selection hidden per user request */}
+        {/* Groomer Selection */}
+        <div>
+          <Label className="text-sm font-semibold text-gray-900 mb-3 block">Select Groomer (Optional)</Label>
+          <Select value={selectedGroomer} onValueChange={setSelectedGroomer}>
+            <SelectTrigger className="border-gray-300 rounded-xl" data-testid="select-groomer">
+              <SelectValue placeholder="No preference" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">No Preference</SelectItem>
+              {Array.isArray(availableGroomers) && availableGroomers.map((groomer: any) => (
+                <SelectItem key={groomer.id} value={groomer.id.toString()}>
+                  {groomer.specialties ? `${groomer.name} (${groomer.specialties})` : groomer.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-gray-500 mt-1">
+            Choose a preferred groomer or leave as "No Preference"
+          </p>
+        </div>
 
         {/* Contact Search */}
         <div className="relative">
