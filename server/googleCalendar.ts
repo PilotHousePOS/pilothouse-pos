@@ -352,10 +352,16 @@ export async function syncAppointmentsFromCalendarEvents() {
           const petNameWords = summaryWords.slice(1, phoneIndex);
           petName = capitalizeWords(petNameWords.join(' '));
           
-          // Groomer tag is everything after the phone number
+          // Groomer tag is everything after the phone number (excluding the word "bath")
           if (phoneIndex < summaryWords.length - 1) {
             const groomerWords = summaryWords.slice(phoneIndex + 1);
-            groomerTag = capitalizeWords(groomerWords.join(' '));
+            // Filter out "bath" from groomer name
+            const filteredGroomerWords = groomerWords.filter(word => 
+              word.toLowerCase() !== 'bath'
+            );
+            if (filteredGroomerWords.length > 0) {
+              groomerTag = capitalizeWords(filteredGroomerWords.join(' '));
+            }
           }
         } else {
           // If no phone found in expected position, use all words after first (old behavior)
