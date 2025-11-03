@@ -331,15 +331,15 @@ export async function syncAppointmentsFromCalendarEvents() {
       }
 
       // Extract pet name and groomer tag from summary
-      // Format: LastName PetName PhoneNumber GroomerTag
+      // Format can be: LastName PetName PhoneNumber GroomerTag OR LastName PetName GroomerTag PhoneNumber
       let petName = 'Pet';
       let petType = 'Dog';
       let groomerTag = null;
       
       if (summaryWords.length > 1) {
-        // Find the position of the phone number in the words
+        // Find the position of the phone number by searching from the END (most common position)
         let phoneIndex = -1;
-        for (let i = 0; i < summaryWords.length; i++) {
+        for (let i = summaryWords.length - 1; i >= 0; i--) {
           // Check if this word looks like a phone number
           if (/[\d\(\)\-]+/.test(summaryWords[i]) && summaryWords[i].replace(/[\(\)\-\s]/g, '').length >= 10) {
             phoneIndex = i;
@@ -348,16 +348,50 @@ export async function syncAppointmentsFromCalendarEvents() {
         }
         
         if (phoneIndex > 1) {
-          // Pet name is from word 2 to the phone number (excluding owner last name and phone)
-          const petNameWords = summaryWords.slice(1, phoneIndex);
-          petName = capitalizeWords(petNameWords.join(' '));
+          // Phone number found - extract pet names and optional groomer
+          // Everything between first word (last name) and phone is pet names + possibly groomer
+          const middleWords = summaryWords.slice(1, phoneIndex);
           
-          // Groomer tag is everything after the phone number (excluding the word "bath")
-          if (phoneIndex < summaryWords.length - 1) {
-            const groomerWords = summaryWords.slice(phoneIndex + 1);
-            // Filter out "bath" from groomer name
+          // Check if there might be a groomer name (typically 1-2 words before phone)
+          // Look for a word that could be a groomer name (not punctuation, not numbers)
+          let potentialGroomerIndex = -1;
+          
+          // Check last 1-2 words before phone for potential groomer name
+          for (let i = middleWords.length - 1; i >= Math.max(0, middleWords.length - 2); i--) {
+            const word = middleWords[i];
+            // Skip if it's just punctuation or contains ampersand or comma
+            if (/^[,&]+$/.test(word)) continue;
+            // If it's a clean word (letters, possibly hyphenated), it might be groomer
+            if (/^[A-Za-z\-]+$/.test(word) && !word.toLowerCase().includes('bath')) {
+              potentialGroomerIndex = i;
+              break;
+            }
+          }
+          
+          // If we found a potential groomer, split pet names and groomer
+          if (potentialGroomerIndex >= 0 && potentialGroomerIndex > 0) {
+            // Pet names are everything before the groomer
+            const petNameWords = middleWords.slice(0, potentialGroomerIndex);
+            petName = capitalizeWords(petNameWords.join(' ').replace(/[,&]+/g, '').trim());
+            
+            // Groomer is the word(s) after pet names
+            const groomerWords = middleWords.slice(potentialGroomerIndex);
             const filteredGroomerWords = groomerWords.filter(word => 
-              word.toLowerCase() !== 'bath'
+              word.toLowerCase() !== 'bath' && !/^[,&]+$/.test(word)
+            );
+            if (filteredGroomerWords.length > 0) {
+              groomerTag = capitalizeWords(filteredGroomerWords.join(' '));
+            }
+          } else {
+            // No clear groomer - everything is pet names
+            petName = capitalizeWords(middleWords.join(' ').replace(/[,&]+/g, '').trim());
+          }
+          
+          // Check if there's anything after the phone number (old format: phone before groomer)
+          if (phoneIndex < summaryWords.length - 1 && !groomerTag) {
+            const groomerWords = summaryWords.slice(phoneIndex + 1);
+            const filteredGroomerWords = groomerWords.filter(word => 
+              word.toLowerCase() !== 'bath' && !/^[,&]+$/.test(word)
             );
             if (filteredGroomerWords.length > 0) {
               groomerTag = capitalizeWords(filteredGroomerWords.join(' '));
@@ -367,10 +401,10 @@ export async function syncAppointmentsFromCalendarEvents() {
           // If no phone found in expected position, use all words after first (old behavior)
           const potentialPetWords = summaryWords.slice(1);
           const petNameWords = potentialPetWords.filter(word => {
-            return !/^[\d\(\)\-\s]+$/.test(word);
+            return !/^[\d\(\)\-\s]+$/.test(word) && !/^[,&]+$/.test(word);
           });
           if (petNameWords.length > 0) {
-            petName = capitalizeWords(petNameWords.join(' '));
+            petName = capitalizeWords(petNameWords.join(' ').replace(/[,&]+/g, '').trim());
           }
         }
       }
