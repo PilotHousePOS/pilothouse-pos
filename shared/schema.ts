@@ -170,6 +170,16 @@ export const groomingSettings = pgTable("grooming_settings", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Daily appointment limits
+export const dailyAppointmentLimits = pgTable("daily_appointment_limits", {
+  id: serial("id").primaryKey(),
+  date: date("date").notNull().unique(),
+  maxBathAppointments: integer("max_bath_appointments").notNull().default(5),
+  maxGroomAppointments: integer("max_groom_appointments").notNull().default(5),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Groomers
 export const groomers = pgTable("groomers", {
   id: serial("id").primaryKey(),
@@ -342,6 +352,12 @@ export const insertContactSchema = createInsertSchema(contacts).omit({
   updatedAt: true,
 });
 
+export const insertDailyAppointmentLimitSchema = createInsertSchema(dailyAppointmentLimits).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -371,3 +387,5 @@ export type WishlistItem = typeof wishlistItems.$inferSelect;
 export type InsertWishlistItem = z.infer<typeof insertWishlistItemSchema>;
 export type Contact = typeof contacts.$inferSelect;
 export type InsertContact = z.infer<typeof insertContactSchema>;
+export type DailyAppointmentLimit = typeof dailyAppointmentLimits.$inferSelect;
+export type InsertDailyAppointmentLimit = z.infer<typeof insertDailyAppointmentLimitSchema>;

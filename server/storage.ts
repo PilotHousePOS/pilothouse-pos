@@ -13,6 +13,7 @@ import {
   passwordResetTokens,
   wishlistItems,
   contacts,
+  dailyAppointmentLimits,
   type User,
   type UpsertUser,
   type Pet,
@@ -40,6 +41,8 @@ import {
   type InsertWishlistItem,
   type Contact,
   type InsertContact,
+  type DailyAppointmentLimit,
+  type InsertDailyAppointmentLimit,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, ilike, lt, isNull } from "drizzle-orm";
@@ -152,6 +155,12 @@ export interface IStorage {
   deleteContact(id: number): Promise<void>;
   linkContactToUser(contactId: number, userId: string): Promise<void>;
   findUnlinkedContactsByPhoneNumber(phoneNumber: string): Promise<Contact[]>;
+
+  // Daily appointment limit operations
+  getDailyAppointmentLimit(date: string): Promise<DailyAppointmentLimit | undefined>;
+  getAllDailyAppointmentLimits(): Promise<DailyAppointmentLimit[]>;
+  upsertDailyAppointmentLimit(limit: InsertDailyAppointmentLimit): Promise<DailyAppointmentLimit>;
+  deleteDailyAppointmentLimit(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -957,6 +966,36 @@ export class DatabaseStorage implements IStorage {
     return unlinkedContacts.filter(c =>
       c.phoneNumber && normalizePhoneNumber(c.phoneNumber) === normalizedSearch
     );
+  }
+
+  // Daily appointment limit operations
+  async getDailyAppointmentLimit(date: string): Promise<DailyAppointmentLimit | undefined> {
+    const [limit] = await db.select().from(dailyAppointmentLimits).where(eq(dailyAppointmentLimits.date, date));
+    return limit;
+  }
+
+  async getAllDailyAppointmentLimits(): Promise<DailyAppointmentLimit[]> {
+    return await db.select().from(dailyAppointmentLimits).orderBy(dailyAppointmentLimits.date);
+  }
+
+  async upsertDailyAppointmentLimit(limitData: InsertDailyAppointmentLimit): Promise<DailyAppointmentLimit> {
+    const [result] = await db
+      .insert(dailyAppointmentLimits)
+      .values(limitData)
+      .onConflictDoUpdate({
+        target: dailyAppointmentLimits.date,
+        set: {
+          maxBathAppointments: limitData.maxBathAppointments,
+          maxGroomAppointments: limitData.maxGroomAppointments,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return result;
+  }
+
+  async deleteDailyAppointmentLimit(id: number): Promise<void> {
+    await db.delete(dailyAppointmentLimits).where(eq(dailyAppointmentLimits.id, id));
   }
 }
 

@@ -1387,6 +1387,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
       }
+
+      // Check daily appointment limits for the selected date
+      const appointmentDateStr = new Date(req.body.appointmentDate).toISOString().split('T')[0];
+      const dailyLimit = await storage.getDailyAppointmentLimit(appointmentDateStr);
+      
+      if (dailyLimit) {
+        // Count existing appointments for this date by service type
+        // Include all appointments except cancelled/rejected ones
+        const allAppointments = await storage.getAppointments();
+        const appointmentsOnDate = allAppointments.filter((apt: any) => {
+          const aptDateStr = new Date(apt.appointmentDate).toISOString().split('T')[0];
+          return aptDateStr === appointmentDateStr && 
+                 apt.status !== 'cancelled' && 
+                 apt.status !== 'rejected';
+        });
+        
+        const bathAppointments = appointmentsOnDate.filter((apt: any) => apt.serviceType === 'grooming-bath').length;
+        const groomAppointments = appointmentsOnDate.filter((apt: any) => apt.serviceType === 'grooming-full').length;
+        
+        // Check if limit is exceeded
+        const serviceType = req.body.serviceType;
+        if (serviceType === 'grooming-bath' && bathAppointments >= dailyLimit.maxBathAppointments) {
+          return res.status(400).json({
+            message: `Bath appointments are fully booked for this date (limit: ${dailyLimit.maxBathAppointments}). Please select a different date.`
+          });
+        }
+        
+        if (serviceType === 'grooming-full' && groomAppointments >= dailyLimit.maxGroomAppointments) {
+          return res.status(400).json({
+            message: `Full grooming appointments are fully booked for this date (limit: ${dailyLimit.maxGroomAppointments}). Please select a different date.`
+          });
+        }
+      }
       
       // Admin-created appointments bypass approval, others require approval
       const appointmentData = insertAppointmentSchema.parse({ 
@@ -1583,6 +1616,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating grooming setting:", error);
       res.status(500).json({ message: "Failed to update grooming setting" });
+    }
+  });
+
+  // Daily appointment limit routes
+  app.get("/api/admin/daily-limits", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const limits = await storage.getAllDailyAppointmentLimits();
+      res.json(limits);
+    } catch (error) {
+      console.error("Error fetching daily limits:", error);
+      res.status(500).json({ message: "Failed to fetch daily limits" });
+    }
+  });
+
+  app.get("/api/admin/daily-limits/:date", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin && !req.user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
+      }
+
+      const limit = await storage.getDailyAppointmentLimit(req.params.date);
+      res.json(limit || null);
+    } catch (error) {
+      console.error("Error fetching daily limit:", error);
+      res.status(500).json({ message: "Failed to fetch daily limit" });
+    }
+  });
+
+  app.post("/api/admin/daily-limits", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { date, maxBathAppointments, maxGroomAppointments } = req.body;
+      
+      if (!date || maxBathAppointments === undefined || maxGroomAppointments === undefined) {
+        return res.status(400).json({ message: "Date, maxBathAppointments, and maxGroomAppointments are required" });
+      }
+
+      const limit = await storage.upsertDailyAppointmentLimit({
+        date,
+        maxBathAppointments,
+        maxGroomAppointments,
+      });
+      
+      res.json(limit);
+    } catch (error) {
+      console.error("Error upserting daily limit:", error);
+      res.status(500).json({ message: "Failed to update daily limit" });
+    }
+  });
+
+  app.delete("/api/admin/daily-limits/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      await storage.deleteDailyAppointmentLimit(parseInt(req.params.id));
+      res.json({ message: "Daily limit deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting daily limit:", error);
+      res.status(500).json({ message: "Failed to delete daily limit" });
     }
   });
 
