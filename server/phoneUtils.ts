@@ -41,11 +41,14 @@ export function extractPhoneNumbers(text: string): string[] {
 
 /**
  * Normalize phone number to a standard format for comparison
+ * Returns only the last 10 digits (ignores country code)
  */
 export function normalizePhoneNumber(phone: string): string {
   if (!phone) return '';
   // Remove all non-digits
-  return phone.replace(/\D/g, '');
+  const digits = phone.replace(/\D/g, '');
+  // Return only the last 10 digits (strip country code like +1)
+  return digits.slice(-10);
 }
 
 /**
