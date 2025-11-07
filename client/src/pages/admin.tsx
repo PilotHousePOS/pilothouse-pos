@@ -2765,6 +2765,9 @@ export default function Admin() {
 
   const pendingAppointments = (appointments as any[]).filter((a: any) => a.status === 'scheduled').length;
   const pendingOrders = (orders as any[]).filter((o: any) => o.status === 'pending').length;
+  const customersHere = (appointments as any[]).filter((a: any) => 
+    (a.status === 'confirmed' || a.status === 'completed') && a.isHere === true
+  ).length;
 
   // Appointments pagination handlers
   const handleAppointmentsTouchStart = (e: React.TouchEvent) => {
@@ -2949,7 +2952,7 @@ export default function Admin() {
       <div className="px-6">{/* Content continues */}
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <Card className="min-h-[120px]">
           <CardContent className="p-6 text-center flex flex-col justify-center h-full">
             <PawPrint className="w-8 h-8 mx-auto mb-3 text-brand-blue" />
@@ -2976,6 +2979,13 @@ export default function Admin() {
             <CalendarIcon className="w-8 h-8 mx-auto mb-3 text-green-600" />
             <div className="text-2xl font-bold mb-1">{pendingAppointments}</div>
             <div className="text-sm text-gray-500">Pending Appts</div>
+          </CardContent>
+        </Card>
+        <Card className="min-h-[120px]">
+          <CardContent className="p-6 text-center flex flex-col justify-center h-full">
+            <Users className="w-8 h-8 mx-auto mb-3 text-blue-600" />
+            <div className="text-2xl font-bold mb-1" data-testid="dashboard-customers-here">{customersHere}</div>
+            <div className="text-sm text-gray-500">Customers Here</div>
           </CardContent>
         </Card>
       </div>
@@ -3254,11 +3264,6 @@ export default function Admin() {
               const startIdx = approvedAppointmentsPage * APPOINTMENTS_PER_PAGE;
               const paginatedPhoneGroups = phoneGroups.slice(startIdx, startIdx + APPOINTMENTS_PER_PAGE);
 
-              // Count appointments marked as "Here"
-              const hereCount = (appointments as any[])
-                .filter((a: any) => (a.status === 'confirmed' || a.status === 'completed') && a.isHere === true)
-                .length;
-
               const handleApprovedTouchStart = (e: React.TouchEvent) => {
                 setApprovedTouchStart(e.targetTouches[0].clientX);
               };
@@ -3284,35 +3289,14 @@ export default function Admin() {
               };
 
               return (
-                <>
-                  {/* Summary Card - Customers Here */}
-                  <Card className="border-2 border-blue-300 bg-blue-50">
-                    <CardContent className="py-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="bg-blue-500 p-2 rounded-full">
-                            <Users className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-blue-900">Customers Here</p>
-                            <p className="text-xs text-blue-700">Currently arrived for appointments</p>
-                          </div>
-                        </div>
-                        <div className="bg-blue-600 text-white px-4 py-2 rounded-lg">
-                          <p className="text-2xl font-bold" data-testid="customers-here-count">{hereCount}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-2 border-green-200 bg-green-50/30">
-                    <CardContent className="pt-3 pb-3">
-                      <div 
-                        className="space-y-2"
-                        onTouchStart={handleApprovedTouchStart}
-                        onTouchMove={handleApprovedTouchMove}
-                        onTouchEnd={handleApprovedTouchEnd}
-                      >
+                <Card className="border-2 border-green-200 bg-green-50/30">
+                  <CardContent className="pt-3 pb-3">
+                    <div 
+                      className="space-y-2"
+                      onTouchStart={handleApprovedTouchStart}
+                      onTouchMove={handleApprovedTouchMove}
+                      onTouchEnd={handleApprovedTouchEnd}
+                    >
                       {paginatedPhoneGroups.map(([phone, phoneAppointments]) => {
                         const currentAppointment = getCurrentAppointment(phone, phoneAppointments);
                         const isHighlighted = matchesSearch(currentAppointment, 'appointment');
@@ -3484,7 +3468,6 @@ export default function Admin() {
                     })()}
                   </CardContent>
                 </Card>
-                </>
               );
             })()}
           </div>
