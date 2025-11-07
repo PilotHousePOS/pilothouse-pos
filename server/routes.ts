@@ -2005,18 +2005,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { name, email, phoneNumber, notes, animalType, breed } = req.body;
       const trimmedName = name?.trim();
       const trimmedEmail = email?.trim();
+      const trimmedPhone = phoneNumber?.trim();
       
       if (!trimmedName) {
         return res.status(400).json({ message: "Name is required" });
       }
-      if (!trimmedEmail || !trimmedEmail.includes('@')) {
-        return res.status(400).json({ message: "A valid email address is required for calendar event integration" });
+      if (!trimmedPhone) {
+        return res.status(400).json({ message: "Phone number is required" });
       }
+
+      // Use phone as placeholder for email if email is not provided
+      const contactEmail = trimmedEmail && trimmedEmail.includes('@') ? trimmedEmail : trimmedPhone;
 
       const contact = await storage.createContact({ 
         name: trimmedName, 
-        email: trimmedEmail, 
-        phoneNumber, 
+        email: contactEmail, 
+        phoneNumber: trimmedPhone, 
         notes,
         animalType,
         breed 
@@ -2039,18 +2043,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { name, email, phoneNumber, notes, animalType, breed } = req.body;
       const trimmedName = name?.trim();
       const trimmedEmail = email?.trim();
+      const trimmedPhone = phoneNumber?.trim();
       
       if (trimmedName !== undefined && !trimmedName) {
         return res.status(400).json({ message: "Name cannot be empty" });
       }
-      if (trimmedEmail !== undefined && (!trimmedEmail || !trimmedEmail.includes('@'))) {
-        return res.status(400).json({ message: "A valid email address is required" });
+      if (trimmedPhone !== undefined && !trimmedPhone) {
+        return res.status(400).json({ message: "Phone number is required" });
+      }
+      
+      // Use phone as placeholder for email if email is not provided or invalid
+      let contactEmail = trimmedEmail;
+      if (trimmedEmail !== undefined) {
+        contactEmail = trimmedEmail && trimmedEmail.includes('@') ? trimmedEmail : trimmedPhone;
       }
       
       const contact = await storage.updateContact(id, { 
         name: trimmedName, 
-        email: trimmedEmail, 
-        phoneNumber, 
+        email: contactEmail, 
+        phoneNumber: trimmedPhone, 
         notes,
         animalType,
         breed 

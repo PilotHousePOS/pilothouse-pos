@@ -942,21 +942,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async linkContactToUser(contactId: number, userId: string): Promise<void> {
-    // Get the user's email to replace temp email if needed
+    // Get the user's email to replace temp/placeholder email if needed
     const user = await this.getUser(userId);
     if (!user) {
       throw new Error('User not found');
     }
 
-    // Get the contact to check if it has a temp email
+    // Get the contact to check if it has a temp/placeholder email
     const [contact] = await db.select().from(contacts).where(eq(contacts.id, contactId));
     if (!contact) {
       throw new Error('Contact not found');
     }
 
-    // If contact has a temp email (calendar-*@temp.com), replace with user's real email
+    // If contact has a temp email (calendar-*@temp.com) or phone placeholder, replace with user's real email
     const updateData: any = { linkedUserId: userId };
-    if (contact.email && contact.email.includes('@temp.com')) {
+    if (contact.email && 
+        (contact.email.includes('@temp.com') || 
+         (contact.phoneNumber && contact.email === contact.phoneNumber))) {
       updateData.email = user.email;
     }
 

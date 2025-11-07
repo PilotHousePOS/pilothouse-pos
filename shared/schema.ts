@@ -209,7 +209,7 @@ export const groomerAvailability = pgTable("groomer_availability", {
 export const contacts = pgTable("contacts", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }), // Optional - use phone as placeholder if not provided
   phoneNumber: varchar("phone_number", { length: 20 }),
   notes: text("notes"),
   animalType: varchar("animal_type", { length: 100 }), // dog, cat, bird, reptile, etc.

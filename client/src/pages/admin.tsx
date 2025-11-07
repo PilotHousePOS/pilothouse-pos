@@ -799,19 +799,7 @@ function ContactsManager() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="contact-email">Email *</Label>
-                    <Input
-                      id="contact-email"
-                      data-testid="input-contact-email"
-                      type="email"
-                      placeholder="john@example.com"
-                      value={contactFormData.email}
-                      onChange={(e) => setContactFormData({ ...contactFormData, email: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="contact-phone">Phone Number</Label>
+                    <Label htmlFor="contact-phone">Phone Number *</Label>
                     <Input
                       id="contact-phone"
                       data-testid="input-contact-phone"
@@ -819,6 +807,18 @@ function ContactsManager() {
                       placeholder="(555) 123-4567"
                       value={contactFormData.phoneNumber}
                       onChange={(e) => setContactFormData({ ...contactFormData, phoneNumber: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="contact-email">Email</Label>
+                    <Input
+                      id="contact-email"
+                      data-testid="input-contact-email"
+                      type="email"
+                      placeholder="john@example.com (optional)"
+                      value={contactFormData.email}
+                      onChange={(e) => setContactFormData({ ...contactFormData, email: e.target.value })}
                     />
                   </div>
                   <div>
@@ -900,19 +900,7 @@ function ContactsManager() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="edit-contact-email">Email *</Label>
-                    <Input
-                      id="edit-contact-email"
-                      data-testid="input-edit-contact-email"
-                      type="email"
-                      placeholder="john@example.com"
-                      value={contactFormData.email}
-                      onChange={(e) => setContactFormData({ ...contactFormData, email: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-contact-phone">Phone Number</Label>
+                    <Label htmlFor="edit-contact-phone">Phone Number *</Label>
                     <Input
                       id="edit-contact-phone"
                       data-testid="input-edit-contact-phone"
@@ -920,6 +908,18 @@ function ContactsManager() {
                       placeholder="(555) 123-4567"
                       value={contactFormData.phoneNumber}
                       onChange={(e) => setContactFormData({ ...contactFormData, phoneNumber: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-contact-email">Email</Label>
+                    <Input
+                      id="edit-contact-email"
+                      data-testid="input-edit-contact-email"
+                      type="email"
+                      placeholder="john@example.com (optional)"
+                      value={contactFormData.email}
+                      onChange={(e) => setContactFormData({ ...contactFormData, email: e.target.value })}
                     />
                   </div>
                   <div>
