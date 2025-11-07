@@ -1934,7 +1934,7 @@ export default function Admin() {
     if (date > maxDate) return false;
     
     // Admins and groomers can book same-day and next-day appointments (exempt from minimum notice)
-    const isAdminOrGroomer = currentUser?.isAdmin || currentUser?.isGroomer;
+    const isAdminOrGroomer = typedUser?.isAdmin || typedUser?.isGroomer;
     
     if (!isAdminOrGroomer) {
       const minimumNoticeHours = parseInt(settings.find(s => s.setting === 'minimum_notice_hours')?.value || '24');
