@@ -2925,7 +2925,7 @@ export default function Admin() {
     return groupAppointmentsByPhone(pendingAppts);
   }, [appointments, filteredAppointments, search]);
 
-  // Group approved appointments by phone number (only show today and future dates)
+  // Group approved appointments by phone number (only show today and future dates, unless searching)
   const groupedApprovedAppointments = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -2934,7 +2934,10 @@ export default function Admin() {
       .filter((a: any) => {
         if (a.status !== 'confirmed' && a.status !== 'completed') return false;
         
-        // Only show appointments from today onwards
+        // When searching, show all matching appointments regardless of date
+        if (search.trim()) return true;
+        
+        // Otherwise, only show appointments from today onwards
         const appointmentDate = new Date(a.appointmentDate);
         appointmentDate.setHours(0, 0, 0, 0);
         
@@ -2943,7 +2946,7 @@ export default function Admin() {
     return groupAppointmentsByPhone(approvedAppts);
   }, [appointments, filteredAppointments, search]);
 
-  // Group denied appointments by phone number (only show today and future dates)
+  // Group denied appointments by phone number (only show today and future dates, unless searching)
   const groupedDeniedAppointments = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -2952,7 +2955,10 @@ export default function Admin() {
       .filter((a: any) => {
         if (a.status !== 'rejected' && a.status !== 'cancelled') return false;
         
-        // Only show appointments from today onwards
+        // When searching, show all matching appointments regardless of date
+        if (search.trim()) return true;
+        
+        // Otherwise, only show appointments from today onwards
         const appointmentDate = new Date(a.appointmentDate);
         appointmentDate.setHours(0, 0, 0, 0);
         
