@@ -3344,8 +3344,47 @@ export default function Admin() {
                             )}
                             <p className="text-xs text-purple-600 mt-0.5 font-medium">{hasMultiple ? 'Click purple badge to cycle through dates' : 'Click to view details'}</p>
                           </div>
-                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 w-full sm:w-auto flex-shrink-0">
-                            <div className="flex items-center gap-2 p-2 border rounded-lg bg-white">
+                          <div className="flex flex-col gap-2 items-end">
+                            <div className="flex flex-col sm:flex-row gap-1.5 items-stretch sm:items-center">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-blue-600 border-blue-300 hover:bg-blue-50 h-8 text-xs"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingAppointment(currentAppointment);
+                                  setEditOwnerFirstName(currentAppointment.ownerFirstName || '');
+                                  setEditOwnerLastName(currentAppointment.ownerLastName || '');
+                                  setEditOwnerPhone(currentAppointment.ownerPhoneNumber || '');
+                                  setEditPetName(currentAppointment.petName || '');
+                                  setEditPetType(currentAppointment.petType || '');
+                                  setEditNotes(currentAppointment.specialNotes || '');
+                                  setEditPrice(currentAppointment.price || '');
+                                }}
+                                data-testid={`edit-appointment-${currentAppointment.id}`}
+                              >
+                                <Edit className="w-3.5 h-3.5 mr-1" />
+                                Edit
+                              </Button>
+                              <Select
+                                key={`appointment-${currentAppointment.id}-${currentAppointment.status}`}
+                                value={currentAppointment.status}
+                                onValueChange={(status) => updateAppointmentMutation.mutate({ id: currentAppointment.id, status })}
+                                disabled={!!typedUser?.isGroomer && !typedUser?.isAdmin}
+                              >
+                                <SelectTrigger className="w-28 h-8 text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="scheduled">Pending</SelectItem>
+                                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                                  <SelectItem value="rejected">Rejected</SelectItem>
+                                  <SelectItem value="completed">Completed</SelectItem>
+                                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="flex items-center gap-1.5 px-2 py-1 border rounded bg-white">
                               <Checkbox
                                 id={`is-here-${currentAppointment.id}`}
                                 checked={currentAppointment.isHere || false}
@@ -3364,43 +3403,6 @@ export default function Admin() {
                                 Here
                               </label>
                             </div>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="text-blue-600 border-blue-300 hover:bg-blue-50 w-full sm:w-auto h-8 text-xs"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingAppointment(currentAppointment);
-                                setEditOwnerFirstName(currentAppointment.ownerFirstName || '');
-                                setEditOwnerLastName(currentAppointment.ownerLastName || '');
-                                setEditOwnerPhone(currentAppointment.ownerPhoneNumber || '');
-                                setEditPetName(currentAppointment.petName || '');
-                                setEditPetType(currentAppointment.petType || '');
-                                setEditNotes(currentAppointment.specialNotes || '');
-                                setEditPrice(currentAppointment.price || '');
-                              }}
-                              data-testid={`edit-appointment-${currentAppointment.id}`}
-                            >
-                              <Edit className="w-3.5 h-3.5 mr-1" />
-                              Edit
-                            </Button>
-                            <Select
-                              key={`appointment-${currentAppointment.id}-${currentAppointment.status}`}
-                              value={currentAppointment.status}
-                              onValueChange={(status) => updateAppointmentMutation.mutate({ id: currentAppointment.id, status })}
-                              disabled={!!typedUser?.isGroomer && !typedUser?.isAdmin}
-                            >
-                              <SelectTrigger className="w-full sm:w-28 h-8 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="scheduled">Pending</SelectItem>
-                                <SelectItem value="confirmed">Confirmed</SelectItem>
-                                <SelectItem value="rejected">Rejected</SelectItem>
-                                <SelectItem value="completed">Completed</SelectItem>
-                                <SelectItem value="cancelled">Cancelled</SelectItem>
-                              </SelectContent>
-                            </Select>
                           </div>
                         </div>
                       );
