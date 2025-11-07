@@ -1933,11 +1933,16 @@ export default function Admin() {
     
     if (date > maxDate) return false;
     
-    const minimumNoticeHours = parseInt(settings.find(s => s.setting === 'minimum_notice_hours')?.value || '24');
-    const minDate = new Date();
-    minDate.setHours(minDate.getHours() + minimumNoticeHours);
+    // Admins and groomers can book same-day and next-day appointments (exempt from minimum notice)
+    const isAdminOrGroomer = currentUser?.isAdmin || currentUser?.isGroomer;
     
-    if (date < minDate) return false;
+    if (!isAdminOrGroomer) {
+      const minimumNoticeHours = parseInt(settings.find(s => s.setting === 'minimum_notice_hours')?.value || '24');
+      const minDate = new Date();
+      minDate.setHours(minDate.getHours() + minimumNoticeHours);
+      
+      if (date < minDate) return false;
+    }
     
     return true;
   };
