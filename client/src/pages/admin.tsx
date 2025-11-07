@@ -21,6 +21,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Calendar } from "@/components/ui/calendar";
 import { 
@@ -2264,6 +2265,26 @@ export default function Admin() {
     },
   });
 
+  const updateAppointmentIsHereMutation = useMutation({
+    mutationFn: async ({ id, isHere }: { id: number; isHere: boolean }) => {
+      await apiRequest("PATCH", `/api/appointments/${id}/is-here`, { isHere });
+    },
+    onSuccess: (_, variables) => {
+      toast({
+        title: "Arrival Status Updated",
+        description: variables.isHere ? "Customer marked as arrived" : "Customer marked as not arrived",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: () => {
+      toast({
+        title: "Update Failed",
+        description: "Failed to update arrival status. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const deleteAppointmentMutation = useMutation({
     mutationFn: async (id: number) => {
       await apiRequest("DELETE", `/api/admin/appointments/${id}`, {});
@@ -3324,6 +3345,25 @@ export default function Admin() {
                             <p className="text-xs text-purple-600 mt-0.5 font-medium">{hasMultiple ? 'Click purple badge to cycle through dates' : 'Click to view details'}</p>
                           </div>
                           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 w-full sm:w-auto flex-shrink-0">
+                            <div className="flex items-center gap-2 p-2 border rounded-lg bg-white">
+                              <Checkbox
+                                id={`is-here-${currentAppointment.id}`}
+                                checked={currentAppointment.isHere || false}
+                                onCheckedChange={(checked) => {
+                                  updateAppointmentIsHereMutation.mutate({ 
+                                    id: currentAppointment.id, 
+                                    isHere: checked as boolean 
+                                  });
+                                }}
+                                data-testid={`checkbox-is-here-${currentAppointment.id}`}
+                              />
+                              <label 
+                                htmlFor={`is-here-${currentAppointment.id}`}
+                                className="text-xs font-medium cursor-pointer"
+                              >
+                                Here
+                              </label>
+                            </div>
                             <Button
                               size="sm"
                               variant="outline"

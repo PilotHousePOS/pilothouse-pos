@@ -36,6 +36,8 @@ The application is a full-stack web application with a clear separation of conce
     - **Service Type Detection**: Events with "bath" in title marked as "Bath Only", all others as "Full Grooming"
     - **Collapsible UI**: Approved appointments display at the top with inline status controls; Pending Approval section follows; Pending appointments (from Google Calendar sync) come next; Denied appointments behind expandable button. All appointment sections appear before any order sections
     - **Pagination System**: Approved and Denied appointments display 4 items per page with mobile swipe gestures and arrow navigation. Sliding window shows max 5 page indicators to prevent overflow. Automatic page clamping prevents blank sections when lists shrink after status changes
+    - **Customer Arrival Tracking**: "Here" checkbox on approved appointments allows admins and groomers to mark when customers arrive. Updates instantly with toast notifications.
+    - **Daily Appointment Limits**: Admins can set separate daily limits for bath and grooming appointments per date via Grooming Settings tab. System enforces limits during booking with clear error messages.
     - Role-based access: Groomers can view all appointments including pending, approved, and completed (read-only status updates), admins have full modification access
     - Visual indicators: Google Calendar appointments display "Synced" badge throughout workflow
     - **Automatic Cleanup**: Approved, completed, cancelled, and rejected appointments older than 30 days are automatically filtered from the appointments list to maintain database efficiency

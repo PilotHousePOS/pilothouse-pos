@@ -1365,6 +1365,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/appointments/:id/is-here", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin && !user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const { isHere } = req.body;
+      
+      if (typeof isHere !== 'boolean') {
+        return res.status(400).json({ message: "isHere must be a boolean" });
+      }
+
+      const appointment = await storage.updateAppointmentIsHere(id, isHere);
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+      res.json(appointment);
+    } catch (error) {
+      console.error("Error updating appointment arrival status:", error);
+      res.status(500).json({ message: "Failed to update appointment arrival status" });
+    }
+  });
+
   app.post("/api/appointments", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;
