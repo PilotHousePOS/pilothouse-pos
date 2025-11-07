@@ -646,8 +646,11 @@ function ContactsManager() {
   };
 
   const handleAddContact = () => {
+    const trimmedName = contactFormData.name.trim();
+    const trimmedPhone = contactFormData.phoneNumber.trim();
     const trimmedEmail = contactFormData.email.trim();
-    if (!contactFormData.name.trim()) {
+    
+    if (!trimmedName) {
       toast({
         title: "Validation Error",
         description: "Name is required.",
@@ -655,15 +658,21 @@ function ContactsManager() {
       });
       return;
     }
-    if (!trimmedEmail || !trimmedEmail.includes('@')) {
+    if (!trimmedPhone) {
       toast({
         title: "Validation Error",
-        description: "A valid email address is required for calendar event integration.",
+        description: "Phone number is required.",
         variant: "destructive",
       });
       return;
     }
-    createContactMutation.mutate({ ...contactFormData, email: trimmedEmail, name: contactFormData.name.trim() });
+    // Email is optional - no validation needed
+    createContactMutation.mutate({ 
+      ...contactFormData, 
+      name: trimmedName,
+      phoneNumber: trimmedPhone,
+      email: trimmedEmail 
+    });
   };
 
   const handleEditContact = (contact: any) => {
@@ -679,8 +688,11 @@ function ContactsManager() {
   };
 
   const handleUpdateContact = () => {
+    const trimmedName = contactFormData.name.trim();
+    const trimmedPhone = contactFormData.phoneNumber.trim();
     const trimmedEmail = contactFormData.email.trim();
-    if (!contactFormData.name.trim()) {
+    
+    if (!trimmedName) {
       toast({
         title: "Validation Error",
         description: "Name is required.",
@@ -688,17 +700,23 @@ function ContactsManager() {
       });
       return;
     }
-    if (!trimmedEmail || !trimmedEmail.includes('@')) {
+    if (!trimmedPhone) {
       toast({
         title: "Validation Error",
-        description: "A valid email address is required for calendar event integration.",
+        description: "Phone number is required.",
         variant: "destructive",
       });
       return;
     }
+    // Email is optional - no validation needed
     updateContactMutation.mutate({
       id: editingContact.id,
-      data: { ...contactFormData, email: trimmedEmail, name: contactFormData.name.trim() },
+      data: { 
+        ...contactFormData, 
+        name: trimmedName,
+        phoneNumber: trimmedPhone,
+        email: trimmedEmail 
+      },
     });
   };
 
