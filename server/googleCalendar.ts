@@ -1,5 +1,5 @@
 import { google } from 'googleapis';
-import { extractPhoneNumbers } from './phoneUtils';
+import { extractPhoneNumbers, normalizePhoneNumber, phoneNumbersMatch } from './phoneUtils';
 import { capitalizeWords } from './utils/stringCase';
 
 let connectionSettings: any;
@@ -290,11 +290,18 @@ export async function syncAppointmentsFromCalendarEvents() {
       
       // Extract phone numbers from description as fallback
       const phoneNumbers = extractPhoneNumbers(combinedText);
-      const phoneNumber = eventContact?.phoneNumber || phoneNumbers[0] || null;
+      let phoneNumber = eventContact?.phoneNumber || phoneNumbers[0] || null;
       
       // Skip events without phone numbers
       if (!phoneNumber) {
         console.log(`[SYNC] Skipping event without phone number: ${event.id} - "${summary}"`);
+        continue;
+      }
+      
+      // Normalize phone number
+      phoneNumber = normalizePhoneNumber(phoneNumber);
+      if (!phoneNumber || phoneNumber.length < 10) {
+        console.log(`[SYNC] Skipping event with invalid phone number: ${event.id} - "${summary}"`);
         continue;
       }
 
@@ -466,12 +473,16 @@ export async function syncContactsFromCalendarEvents() {
           if (phoneNumbers.length > 0) {
             for (let i = 0; i < phoneNumbers.length; i++) {
               const phoneNumber = phoneNumbers[i];
+              const normalizedPhone = normalizePhoneNumber(phoneNumber);
+              // Skip if normalization failed or phone is too short
+              if (!normalizedPhone || normalizedPhone.length < 10) continue;
+              
               // Create unique temp email using event ID, attendee index, and phone index
               const uniqueId = `${event.id}-${attendeeIndex}-${i}`.replace(/[^a-zA-Z0-9-]/g, '-');
               extractedContacts.push({
                 name,
                 email: `calendar-${uniqueId}@temp.com`,
-                phoneNumber,
+                phoneNumber: normalizedPhone,
                 notes: `Auto-synced from calendar event: ${summary}`,
                 source: 'google_calendar',
                 eventId: event.id,
@@ -495,6 +506,10 @@ export async function syncContactsFromCalendarEvents() {
         // No attendees but has phone numbers - use event ID for uniqueness
         for (let i = 0; i < phoneNumbers.length; i++) {
           const phoneNumber = phoneNumbers[i];
+          const normalizedPhone = normalizePhoneNumber(phoneNumber);
+          // Skip if normalization failed or phone is too short
+          if (!normalizedPhone || normalizedPhone.length < 10) continue;
+          
           // Create unique temp email using event ID and phone index
           const uniqueId = `${event.id}-${i}`.replace(/[^a-zA-Z0-9-]/g, '-');
           
@@ -507,7 +522,7 @@ export async function syncContactsFromCalendarEvents() {
           extractedContacts.push({
             name: contactName,
             email: `calendar-${uniqueId}@temp.com`,
-            phoneNumber,
+            phoneNumber: normalizedPhone,
             notes: `Auto-synced from calendar event: ${summary}`,
             source: 'google_calendar',
             eventId: event.id,

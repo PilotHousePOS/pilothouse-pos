@@ -2269,6 +2269,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Clean up duplicate contacts (by normalized phone number)
+  app.post("/api/admin/contacts/cleanup-duplicates", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { normalizePhoneNumber } = await import("./phoneUtils");
+      const allContacts = await storage.getAllContacts();
+      
+      // Group contacts by normalized phone number
+      const phoneGroups = new Map<string, any[]>();
+      
+      for (const contact of allContacts) {
+        if (!contact.phoneNumber) continue;
+        
+        const normalizedPhone = normalizePhoneNumber(contact.phoneNumber);
+        if (!normalizedPhone || normalizedPhone.length < 10) continue;
+        
+        if (!phoneGroups.has(normalizedPhone)) {
+          phoneGroups.set(normalizedPhone, []);
+        }
+        phoneGroups.get(normalizedPhone)!.push(contact);
+      }
+      
+      // Find and delete duplicates (keep the oldest one)
+      let deletedCount = 0;
+      const duplicateGroups = [];
+      
+      for (const [phone, contacts] of phoneGroups.entries()) {
+        if (contacts.length > 1) {
+          // Sort by creation date (oldest first)
+          contacts.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+          
+          // Keep the first (oldest), delete the rest
+          const toKeep = contacts[0];
+          const toDelete = contacts.slice(1);
+          
+          duplicateGroups.push({
+            phone,
+            kept: { id: toKeep.id, name: toKeep.name, createdAt: toKeep.createdAt },
+            deleted: toDelete.map(c => ({ id: c.id, name: c.name, createdAt: c.createdAt }))
+          });
+          
+          for (const contact of toDelete) {
+            await storage.deleteContact(contact.id);
+            deletedCount++;
+          }
+        }
+      }
+      
+      res.json({ 
+        message: `Cleaned up ${deletedCount} duplicate contacts`,
+        deletedCount,
+        duplicateGroups
+      });
+    } catch (error) {
+      console.error("Error cleaning up duplicate contacts:", error);
+      res.status(500).json({ message: "Failed to cleanup duplicates", error: (error as Error).message });
+    }
+  });
+
   // Sync appointments from Google Calendar (incremental sync)
   app.post("/api/admin/calendar/sync-appointments", authMiddleware, async (req: any, res) => {
     try {
