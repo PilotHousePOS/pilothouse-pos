@@ -2902,46 +2902,38 @@ export default function Admin() {
     return groupAppointmentsByPhone(pendingAppts);
   }, [appointments, filteredAppointments, search]);
 
-  // Group approved appointments by phone number (filter out past appointments older than 30 days)
+  // Group approved appointments by phone number (only show today and future dates)
   const groupedApprovedAppointments = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
-    // Calculate 30 days ago for filtering
-    const thirtyDaysAgo = new Date(today);
-    thirtyDaysAgo.setDate(today.getDate() - 30);
     
     const approvedAppts = ((search.trim() ? filteredAppointments : appointments) as any[])
       .filter((a: any) => {
         if (a.status !== 'confirmed' && a.status !== 'completed') return false;
         
-        // Filter out appointments older than 30 days
+        // Only show appointments from today onwards
         const appointmentDate = new Date(a.appointmentDate);
         appointmentDate.setHours(0, 0, 0, 0);
         
-        return appointmentDate >= thirtyDaysAgo;
+        return appointmentDate >= today;
       });
     return groupAppointmentsByPhone(approvedAppts);
   }, [appointments, filteredAppointments, search]);
 
-  // Group denied appointments by phone number (filter out past appointments older than 30 days)
+  // Group denied appointments by phone number (only show today and future dates)
   const groupedDeniedAppointments = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
-    // Calculate 30 days ago for filtering
-    const thirtyDaysAgo = new Date(today);
-    thirtyDaysAgo.setDate(today.getDate() - 30);
     
     const deniedAppts = ((search.trim() ? filteredAppointments : appointments) as any[])
       .filter((a: any) => {
         if (a.status !== 'rejected' && a.status !== 'cancelled') return false;
         
-        // Filter out appointments older than 30 days
+        // Only show appointments from today onwards
         const appointmentDate = new Date(a.appointmentDate);
         appointmentDate.setHours(0, 0, 0, 0);
         
-        return appointmentDate >= thirtyDaysAgo;
+        return appointmentDate >= today;
       });
     return groupAppointmentsByPhone(deniedAppts);
   }, [appointments, filteredAppointments, search]);

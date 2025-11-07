@@ -40,7 +40,7 @@ The application is a full-stack web application with a clear separation of conce
     - **Daily Appointment Limits**: Admins can set separate daily limits for bath and grooming appointments per date via Grooming Settings tab. System enforces limits during booking with clear error messages.
     - Role-based access: Groomers can view all appointments including pending, approved, and completed (read-only status updates), admins have full modification access
     - Visual indicators: Google Calendar appointments display "Synced" badge throughout workflow
-    - **Automatic Filtering**: Approved and denied appointments older than 30 days are automatically hidden from the UI to maintain clean display (data remains in database until manually deleted or scheduled cleanup)
+    - **Automatic Filtering**: Approved and denied appointments from dates before today are automatically hidden from the UI (only today and future appointments display). Past appointments remain in database until manually deleted via "Clear Past" button or scheduled cleanup
     - **Booking Restrictions**: Customers can only book appointments starting from tomorrow (same-day booking prevention) with frontend and backend validation, while admins and groomers retain flexibility to book same-day appointments
     - **Scheduled Tasks**: Automated daily maintenance tasks using node-cron
       - Clear past approved appointments (confirmed/completed) daily at 12:00 AM (EST)
