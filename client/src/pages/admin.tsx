@@ -3254,7 +3254,7 @@ export default function Admin() {
               >
                 <span className="flex items-center gap-2">
                   <CalendarIcon className="w-5 h-5" />
-                  Approved Appointments ({(appointments as any[]).filter((a: any) => a.status === 'confirmed' || a.status === 'completed').length})
+                  Approved Appointments ({Object.values(groupedApprovedAppointments).flat().length})
                 </span>
                 {showApprovedAppointments ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
               </Button>
@@ -3716,7 +3716,7 @@ export default function Admin() {
                 >
                   <span className="flex items-center gap-2">
                     <CalendarIcon className="w-5 h-5" />
-                    Denied Appointments ({(appointments as any[]).filter((a: any) => a.status === 'rejected' || a.status === 'cancelled').length})
+                    Denied Appointments ({Object.values(groupedDeniedAppointments).flat().length})
                   </span>
                   {showDeniedAppointments ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                 </Button>
