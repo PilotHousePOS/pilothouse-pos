@@ -2954,36 +2954,36 @@ export default function Admin() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <Card className="min-h-[120px]">
-          <CardContent className="p-6 text-center flex flex-col justify-center h-full">
-            <PawPrint className="w-8 h-8 mx-auto mb-3 text-brand-blue" />
+          <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
+            <PawPrint className="w-8 h-8 mb-3 text-brand-blue" />
             <div className="text-2xl font-bold mb-1">{(pets as any[]).length}</div>
             <div className="text-sm text-gray-500">Total Pets</div>
           </CardContent>
         </Card>
         <Card className="min-h-[120px]">
-          <CardContent className="p-6 text-center flex flex-col justify-center h-full">
-            <Package className="w-8 h-8 mx-auto mb-3 text-brand-orange" />
+          <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
+            <Package className="w-8 h-8 mb-3 text-brand-orange" />
             <div className="text-2xl font-bold mb-1">{(supplies as any[]).length}</div>
             <div className="text-sm text-gray-500">Total Supplies</div>
           </CardContent>
         </Card>
         <Card className="min-h-[120px]">
-          <CardContent className="p-6 text-center flex flex-col justify-center h-full">
-            <ShoppingBag className="w-8 h-8 mx-auto mb-3 text-brand-red" />
+          <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
+            <ShoppingBag className="w-8 h-8 mb-3 text-brand-red" />
             <div className="text-2xl font-bold mb-1">{pendingOrders}</div>
             <div className="text-sm text-gray-500">Pending Orders</div>
           </CardContent>
         </Card>
         <Card className="min-h-[120px]">
-          <CardContent className="p-6 text-center flex flex-col justify-center h-full">
-            <CalendarIcon className="w-8 h-8 mx-auto mb-3 text-green-600" />
+          <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
+            <CalendarIcon className="w-8 h-8 mb-3 text-green-600" />
             <div className="text-2xl font-bold mb-1">{pendingAppointments}</div>
             <div className="text-sm text-gray-500">Pending Appts</div>
           </CardContent>
         </Card>
         <Card className="min-h-[120px]">
-          <CardContent className="p-6 text-center flex flex-col justify-center h-full">
-            <Users className="w-8 h-8 mx-auto mb-3 text-blue-600" />
+          <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
+            <Users className="w-8 h-8 mb-3 text-blue-600" />
             <div className="text-2xl font-bold mb-1" data-testid="dashboard-customers-here">{customersHere}</div>
             <div className="text-sm text-gray-500">Customers Here</div>
           </CardContent>
