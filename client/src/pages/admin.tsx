@@ -1555,6 +1555,8 @@ export default function Admin() {
   const [editOwnerPhone, setEditOwnerPhone] = useState('');
   const [editPetName, setEditPetName] = useState('');
   const [editPetType, setEditPetType] = useState('');
+  const [editDate, setEditDate] = useState<Date | undefined>(undefined);
+  const [editTime, setEditTime] = useState('');
   
   // Pagination for approved appointments
   const [approvedAppointmentsPage, setApprovedAppointmentsPage] = useState(0);
@@ -2266,6 +2268,8 @@ export default function Admin() {
       setEditOwnerPhone('');
       setEditPetName('');
       setEditPetType('');
+      setEditDate(undefined);
+      setEditTime('');
     },
     onError: () => {
       toast({
@@ -3418,6 +3422,8 @@ export default function Admin() {
                                   setEditPetType(currentAppointment.petType || '');
                                   setEditNotes(currentAppointment.specialNotes || '');
                                   setEditPrice(currentAppointment.price || '');
+                                  setEditDate(currentAppointment.appointmentDate ? new Date(currentAppointment.appointmentDate) : undefined);
+                                  setEditTime(currentAppointment.appointmentTime || '');
                                 }}
                                 data-testid={`edit-appointment-${currentAppointment.id}`}
                               >
@@ -5330,6 +5336,8 @@ export default function Admin() {
           setEditOwnerPhone('');
           setEditPetName('');
           setEditPetType('');
+          setEditDate(undefined);
+          setEditTime('');
         }}>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -5415,6 +5423,39 @@ export default function Admin() {
                   data-testid="input-edit-price"
                 />
               </div>
+              
+              {/* Date Selection */}
+              <div>
+                <Label>Appointment Date</Label>
+                <Calendar
+                  mode="single"
+                  selected={editDate}
+                  onSelect={setEditDate}
+                  disabled={(date) => !isBookingDateAvailable(date)}
+                  className="rounded-md border"
+                  data-testid="calendar-edit-date"
+                />
+              </div>
+
+              {/* Time Selection */}
+              <div>
+                <Label>Appointment Time</Label>
+                <div className="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto p-2 border rounded">
+                  {bookingAvailableTimeSlots.map((time) => (
+                    <Button
+                      key={time}
+                      type="button"
+                      variant={editTime === time ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setEditTime(time)}
+                      data-testid={`edit-time-slot-${time.replace(/[:\s]/g, '-')}`}
+                    >
+                      {time}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex justify-end gap-2">
                 <Button
                   variant="outline"
@@ -5427,6 +5468,8 @@ export default function Admin() {
                     setEditOwnerPhone('');
                     setEditPetName('');
                     setEditPetType('');
+                    setEditDate(undefined);
+                    setEditTime('');
                   }}
                   data-testid="button-cancel-edit"
                 >
@@ -5441,7 +5484,9 @@ export default function Admin() {
                     petName: editPetName,
                     petType: editPetType,
                     specialNotes: editNotes,
-                    price: editPrice
+                    price: editPrice,
+                    appointmentDate: editDate ? editDate.toISOString().split('T')[0] : undefined,
+                    appointmentTime: editTime || undefined
                   })}
                   disabled={updateAppointmentDetailsMutation.isPending}
                   className="bg-brand-blue hover:bg-blue-700"
