@@ -3254,6 +3254,11 @@ export default function Admin() {
               const startIdx = approvedAppointmentsPage * APPOINTMENTS_PER_PAGE;
               const paginatedPhoneGroups = phoneGroups.slice(startIdx, startIdx + APPOINTMENTS_PER_PAGE);
 
+              // Count appointments marked as "Here"
+              const hereCount = (appointments as any[])
+                .filter((a: any) => (a.status === 'confirmed' || a.status === 'completed') && a.isHere === true)
+                .length;
+
               const handleApprovedTouchStart = (e: React.TouchEvent) => {
                 setApprovedTouchStart(e.targetTouches[0].clientX);
               };
@@ -3279,14 +3284,35 @@ export default function Admin() {
               };
 
               return (
-                <Card className="border-2 border-green-200 bg-green-50/30">
-                  <CardContent className="pt-3 pb-3">
-                    <div 
-                      className="space-y-2"
-                      onTouchStart={handleApprovedTouchStart}
-                      onTouchMove={handleApprovedTouchMove}
-                      onTouchEnd={handleApprovedTouchEnd}
-                    >
+                <>
+                  {/* Summary Card - Customers Here */}
+                  <Card className="border-2 border-blue-300 bg-blue-50">
+                    <CardContent className="py-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="bg-blue-500 p-2 rounded-full">
+                            <Users className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-blue-900">Customers Here</p>
+                            <p className="text-xs text-blue-700">Currently arrived for appointments</p>
+                          </div>
+                        </div>
+                        <div className="bg-blue-600 text-white px-4 py-2 rounded-lg">
+                          <p className="text-2xl font-bold" data-testid="customers-here-count">{hereCount}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-2 border-green-200 bg-green-50/30">
+                    <CardContent className="pt-3 pb-3">
+                      <div 
+                        className="space-y-2"
+                        onTouchStart={handleApprovedTouchStart}
+                        onTouchMove={handleApprovedTouchMove}
+                        onTouchEnd={handleApprovedTouchEnd}
+                      >
                       {paginatedPhoneGroups.map(([phone, phoneAppointments]) => {
                         const currentAppointment = getCurrentAppointment(phone, phoneAppointments);
                         const isHighlighted = matchesSearch(currentAppointment, 'appointment');
@@ -3458,6 +3484,7 @@ export default function Admin() {
                     })()}
                   </CardContent>
                 </Card>
+                </>
               );
             })()}
           </div>
