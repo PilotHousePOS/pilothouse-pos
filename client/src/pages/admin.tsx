@@ -172,12 +172,12 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
           <CalendarIcon className="w-5 h-5" />
           Daily Appointment Calendar
         </CardTitle>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => changeDate(-1)}>
               ← Previous Day
             </Button>
-            <h3 className="text-lg font-semibold">{formatDate(selectedDate)}</h3>
+            <h3 className="text-lg font-semibold whitespace-nowrap">{formatDate(selectedDate)}</h3>
             <Button variant="outline" size="sm" onClick={() => changeDate(1)}>
               Next Day →
             </Button>
@@ -186,6 +186,7 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
             variant="outline" 
             size="sm" 
             onClick={() => setSelectedDate(new Date())}
+            className="shrink-0"
           >
             Today
           </Button>
