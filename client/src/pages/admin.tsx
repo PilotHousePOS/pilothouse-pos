@@ -2991,36 +2991,38 @@ export default function Admin() {
       </div>
 
       <Tabs defaultValue="orders" className="w-full">
-        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-          <TabsList className="inline-flex w-max gap-1 h-auto p-1">
-            <TabsTrigger value="orders" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              <span className="hidden lg:inline">Orders & Appointments</span>
-              <span className="lg:hidden">Orders</span>
-            </TabsTrigger>
-            <TabsTrigger value="inventory" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              Inventory
-            </TabsTrigger>
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="grooming" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                <span className="hidden lg:inline">Grooming Settings</span>
-                <span className="lg:hidden">Grooming</span>
+        <div className="overflow-x-auto">
+          <div className="flex justify-center">
+            <TabsList className="inline-flex gap-1 h-auto p-1">
+              <TabsTrigger value="orders" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                <span className="hidden lg:inline">Orders & Appointments</span>
+                <span className="lg:hidden">Orders</span>
               </TabsTrigger>
-            )}
-            <TabsTrigger value="groomers" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              Groomers
-            </TabsTrigger>
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="users" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                Users
+              <TabsTrigger value="inventory" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                Inventory
               </TabsTrigger>
-            )}
-            <TabsTrigger value="calendar" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              Calendar
-            </TabsTrigger>
-            <TabsTrigger value="contacts" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              Contacts
-            </TabsTrigger>
-          </TabsList>
+              {typedUser?.isAdmin && (
+                <TabsTrigger value="grooming" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                  <span className="hidden lg:inline">Grooming Settings</span>
+                  <span className="lg:hidden">Grooming</span>
+                </TabsTrigger>
+              )}
+              <TabsTrigger value="groomers" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                Groomers
+              </TabsTrigger>
+              {typedUser?.isAdmin && (
+                <TabsTrigger value="users" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                  Users
+                </TabsTrigger>
+              )}
+              <TabsTrigger value="calendar" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                Calendar
+              </TabsTrigger>
+              <TabsTrigger value="contacts" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                Contacts
+              </TabsTrigger>
+            </TabsList>
+          </div>
         </div>
 
         <TabsContent value="inventory" className="space-y-6">
