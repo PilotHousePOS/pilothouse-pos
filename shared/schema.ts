@@ -196,7 +196,7 @@ export const groomers = pgTable("groomers", {
 // Groomer availability by day
 export const groomerAvailability = pgTable("groomer_availability", {
   id: serial("id").primaryKey(),
-  groomerId: integer("groomer_id").notNull().references(() => groomers.id),
+  groomerId: integer("groomer_id").notNull().references(() => groomers.id, { onDelete: "cascade" }),
   dayOfWeek: integer("day_of_week").notNull(), // 0=Sunday, 1=Monday, etc.
   isAvailable: boolean("is_available").default(true),
   startTime: varchar("start_time", { length: 10 }), // e.g., "09:00"
