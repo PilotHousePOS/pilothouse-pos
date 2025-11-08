@@ -5,7 +5,7 @@ export function initializeScheduledTasks() {
   // Clear approved appointments and reset "Here" status every day at 12:00 AM
   cron.schedule('0 0 * * *', async () => {
     try {
-      console.log('Running scheduled task: Clearing past approved appointments and resetting "Here" status at midnight');
+      console.log('Running scheduled task: Clearing past approved appointments and resetting ALL "Here" statuses at midnight');
       
       const allAppointments = await storage.getAppointments();
       
@@ -13,21 +13,14 @@ export function initializeScheduledTasks() {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      // First, reset isHere flag for ALL past appointments (regardless of status)
-      const pastAppointmentsWithHere = allAppointments.filter((apt: any) => {
-        if (!apt.isHere) return false;
-        
-        const appointmentDate = new Date(apt.appointmentDate);
-        appointmentDate.setHours(0, 0, 0, 0);
-        
-        return appointmentDate < today;
-      });
+      // First, reset isHere flag for ALL appointments (regardless of date or status)
+      const appointmentsWithHere = allAppointments.filter((apt: any) => apt.isHere === true);
       
-      console.log(`Resetting "Here" status for ${pastAppointmentsWithHere.length} past appointments`);
+      console.log(`Resetting "Here" status for ${appointmentsWithHere.length} appointments (all appointments, not just past ones)`);
       
-      for (const appointment of pastAppointmentsWithHere) {
+      for (const appointment of appointmentsWithHere) {
         await storage.updateAppointmentIsHere(appointment.id, false);
-        console.log(`Reset "Here" status for appointment: ${appointment.id} from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
+        console.log(`Reset "Here" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
       }
       
       // Then, delete approved appointments (confirmed or completed) that have already passed

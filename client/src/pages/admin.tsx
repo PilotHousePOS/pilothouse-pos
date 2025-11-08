@@ -2229,7 +2229,9 @@ export default function Admin() {
       petName, 
       petType, 
       specialNotes, 
-      price 
+      price,
+      appointmentDate,
+      appointmentTime
     }: { 
       id: number; 
       ownerFirstName?: string;
@@ -2239,6 +2241,8 @@ export default function Admin() {
       petType?: string;
       specialNotes?: string; 
       price?: string;
+      appointmentDate?: Date;
+      appointmentTime?: string;
     }) => {
       // Build request body with all provided fields
       const updates: any = {};
@@ -2249,6 +2253,16 @@ export default function Admin() {
       if (petType !== undefined && petType !== '') updates.petType = petType;
       if (specialNotes !== undefined && specialNotes !== '') updates.specialNotes = specialNotes;
       if (price !== undefined && price !== '') updates.price = price;
+      
+      // Format date to YYYY-MM-DD without timezone conversion
+      if (appointmentDate !== undefined) {
+        const year = appointmentDate.getFullYear();
+        const month = String(appointmentDate.getMonth() + 1).padStart(2, '0');
+        const day = String(appointmentDate.getDate()).padStart(2, '0');
+        updates.appointmentDate = `${year}-${month}-${day}`;
+      }
+      
+      if (appointmentTime !== undefined && appointmentTime !== '') updates.appointmentTime = appointmentTime;
       
       await apiRequest("PATCH", `/api/admin/appointments/${id}/details`, updates);
     },
@@ -5567,7 +5581,9 @@ export default function Admin() {
                     petName: editPetName,
                     petType: editPetType,
                     specialNotes: editNotes,
-                    price: editPrice
+                    price: editPrice,
+                    appointmentDate: editDate,
+                    appointmentTime: editTime
                   })}
                   disabled={updateAppointmentDetailsMutation.isPending}
                   className="bg-brand-blue hover:bg-blue-700"
