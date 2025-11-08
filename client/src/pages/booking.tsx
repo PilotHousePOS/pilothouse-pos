@@ -40,7 +40,7 @@ export default function Booking() {
   const [showContactDropdown, setShowContactDropdown] = useState(false);
 
   // Fetch current user data to check if admin/groomer
-  const { data: currentUser } = useQuery({
+  const { data: currentUser, isLoading: isUserLoading } = useQuery({
     queryKey: ["/api/auth/user"],
     retry: false,
   });
@@ -189,22 +189,19 @@ export default function Booking() {
     if (date > maxDate) return false;
     
     // Prevent same-day bookings for customers only (admins/groomers can book same-day)
-    // Only apply restriction if we have user data and user is NOT admin/groomer
-    if (currentUser) {
-      const user = currentUser as any;
-      const isAdminOrGroomer = user?.isAdmin || user?.isGroomer;
+    const user = currentUser as any;
+    const isAdminOrGroomer = user?.isAdmin || user?.isGroomer;
+    
+    if (!isAdminOrGroomer) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
       
-      if (!isAdminOrGroomer) {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        
-        const selectedDate = new Date(date);
-        selectedDate.setHours(0, 0, 0, 0);
-        
-        if (selectedDate < tomorrow) return false;
-      }
+      const selectedDate = new Date(date);
+      selectedDate.setHours(0, 0, 0, 0);
+      
+      if (selectedDate < tomorrow) return false;
     }
     
     return true;
@@ -298,7 +295,16 @@ export default function Booking() {
 
       <div className="px-6 pt-16 pb-4">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Book Appointment</h2>
-      
+
+      {/* Loading state while checking user role */}
+      {isUserLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading booking options...</p>
+          </div>
+        </div>
+      ) : (
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Service Selection */}
         <div>
@@ -522,6 +528,7 @@ export default function Booking() {
           }
         </Button>
       </form>
+      )}
       </div>
     </div>
   );
