@@ -395,6 +395,7 @@ function ContactsManager() {
     name: '',
     email: '',
     phoneNumber: '',
+    petNames: [] as string[],
     notes: '',
     animalType: '',
     breed: '',
@@ -442,7 +443,7 @@ function ContactsManager() {
         description: "Contact has been added successfully.",
       });
       setIsAddContactOpen(false);
-      setContactFormData({ name: '', email: '', phoneNumber: '', notes: '', animalType: '', breed: '' });
+      setContactFormData({ name: '', email: '', phoneNumber: '', petNames: [], notes: '', animalType: '', breed: '' });
       queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
     },
     onError: () => {
@@ -464,7 +465,7 @@ function ContactsManager() {
         description: "Contact has been updated successfully.",
       });
       setEditingContact(null);
-      setContactFormData({ name: '', email: '', phoneNumber: '', notes: '', animalType: '', breed: '' });
+      setContactFormData({ name: '', email: '', phoneNumber: '', petNames: [], notes: '', animalType: '', breed: '' });
       await queryClient.refetchQueries({ queryKey: ["/api/contacts"] });
     },
     onError: () => {
@@ -687,6 +688,7 @@ function ContactsManager() {
       name: contact.name || '',
       email: contact.email || '',
       phoneNumber: contact.phoneNumber || '',
+      petNames: contact.petNames || [],
       notes: contact.notes || '',
       animalType: contact.animalType || '',
       breed: contact.breed || '',
@@ -835,6 +837,20 @@ function ContactsManager() {
                     />
                   </div>
                   <div>
+                    <Label htmlFor="contact-pet-names">Pet Names</Label>
+                    <Input
+                      id="contact-pet-names"
+                      data-testid="input-contact-pet-names"
+                      type="text"
+                      placeholder="Buddy, Max, Luna (comma separated)"
+                      value={contactFormData.petNames.join(', ')}
+                      onChange={(e) => {
+                        const names = e.target.value.split(',').map(n => n.trim()).filter(Boolean);
+                        setContactFormData({ ...contactFormData, petNames: names });
+                      }}
+                    />
+                  </div>
+                  <div>
                     <Label htmlFor="contact-email">Email</Label>
                     <Input
                       id="contact-email"
@@ -933,6 +949,20 @@ function ContactsManager() {
                       value={contactFormData.phoneNumber}
                       onChange={(e) => setContactFormData({ ...contactFormData, phoneNumber: e.target.value })}
                       required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-contact-pet-names">Pet Names</Label>
+                    <Input
+                      id="edit-contact-pet-names"
+                      data-testid="input-edit-contact-pet-names"
+                      type="text"
+                      placeholder="Buddy, Max, Luna (comma separated)"
+                      value={(contactFormData.petNames || []).join(', ')}
+                      onChange={(e) => {
+                        const names = e.target.value.split(',').map(n => n.trim()).filter(Boolean);
+                        setContactFormData({ ...contactFormData, petNames: names });
+                      }}
                     />
                   </div>
                   <div>
@@ -1249,6 +1279,16 @@ function ContactsManager() {
                       <div className="flex items-start gap-2 text-sm text-gray-600">
                         <span className="text-base flex-shrink-0">📱</span>
                         <PhoneNumberDisplay phoneNumber={contact.phoneNumber} />
+                      </div>
+                    )}
+                    
+                    {/* Pet Names */}
+                    {contact.petNames && contact.petNames.length > 0 && (
+                      <div className="flex items-start gap-2 text-sm text-gray-600">
+                        <span className="text-base flex-shrink-0">🐕</span>
+                        <span className="break-words">
+                          {contact.petNames.join(', ')}
+                        </span>
                       </div>
                     )}
                     
