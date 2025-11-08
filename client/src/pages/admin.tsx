@@ -57,6 +57,12 @@ import AdminNotifications from "@/components/admin-notifications";
 import { safeGoBack } from "@/lib/navigation";
 import { capitalizeWords } from "@/lib/stringUtils";
 
+// Helper function to parse date string as local date (not UTC)
+function parseLocalDate(dateString: string): Date {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
 // Phone Number Display Component
 function PhoneNumberDisplay({ phoneNumber }: { phoneNumber: string }) {
   const digits = phoneNumber.replace(/\D/g, '');
@@ -112,7 +118,7 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
   // Filter confirmed appointments for the selected date
   const confirmedAppointments = appointments.filter((apt: any) => 
     apt.status === 'confirmed' && 
-    new Date(apt.appointmentDate).toDateString() === selectedDate.toDateString()
+    parseLocalDate(apt.appointmentDate).toDateString() === selectedDate.toDateString()
   );
 
   // Group appointments by time slot
@@ -354,7 +360,7 @@ function ContactAppointmentHistory({ contactId }: { contactId: number }) {
               <div>
                 <p className="font-medium">{formatService(apt.serviceType || apt.service)}</p>
                 <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
-                <p className="text-gray-500">{new Date(apt.appointmentDate).toLocaleDateString()}</p>
+                <p className="text-gray-500">{parseLocalDate(apt.appointmentDate).toLocaleDateString()}</p>
               </div>
               {apt.price && (
                 <p className="text-green-700 font-semibold">${apt.price}</p>
@@ -3489,7 +3495,7 @@ export default function Admin() {
                               <p>Pet: {currentAppointment.petName} ({currentAppointment.petType})</p>
                               <p>Owner: {currentAppointment.ownerFirstName} {currentAppointment.ownerLastName}</p>
                               <p>Phone: {currentAppointment.ownerPhoneNumber}</p>
-                              <p className="text-gray-500">{new Date(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
+                              <p className="text-gray-500">{parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
                             </div>
                             {currentAppointment.specialNotes && (
                               <p className="text-xs text-gray-700 mt-1.5 break-words" data-testid={`appointment-notes-${currentAppointment.id}`}>
@@ -3685,7 +3691,7 @@ export default function Admin() {
                         <p className="text-sm text-gray-600">Pet: {capitalizeWords(currentAppointment.petName)} ({currentAppointment.petType})</p>
                         <p className="text-sm text-gray-600">Owner: {capitalizeWords(currentAppointment.ownerFirstName)} {capitalizeWords(currentAppointment.ownerLastName)}</p>
                         <p className="text-sm text-gray-600">Phone: {currentAppointment.ownerPhoneNumber}</p>
-                        <p className="text-xs text-gray-500">Date: {new Date(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
+                        <p className="text-xs text-gray-500">Date: {parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
                         {currentAppointment.specialNotes && (
                           <p className="text-xs text-gray-500 mt-1">Notes: {currentAppointment.specialNotes}</p>
                         )}
@@ -3807,7 +3813,7 @@ export default function Admin() {
                         <p className="text-sm text-gray-600">Pet: {capitalizeWords(currentAppointment.petName)} ({currentAppointment.petType})</p>
                         <p className="text-sm text-gray-600">Owner: {capitalizeWords(currentAppointment.ownerFirstName)} {capitalizeWords(currentAppointment.ownerLastName)}</p>
                         <p className="text-sm text-gray-600">Phone: {currentAppointment.ownerPhoneNumber}</p>
-                        <p className="text-xs text-gray-500">{new Date(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
+                        <p className="text-xs text-gray-500">{parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
                         <p className="text-xs text-purple-600 mt-1 font-medium">{hasMultiple ? 'Click purple badge to cycle through dates' : 'Click to view details'}</p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -3951,7 +3957,7 @@ export default function Admin() {
                                 <p>Pet: {currentAppointment.petName} ({currentAppointment.petType})</p>
                                 <p>Owner: {currentAppointment.ownerFirstName} {currentAppointment.ownerLastName}</p>
                                 <p>Phone: {currentAppointment.ownerPhoneNumber}</p>
-                                <p className="text-gray-500">{new Date(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
+                                <p className="text-gray-500">{parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
                               </div>
                               <p className="text-xs text-purple-600 mt-0.5 font-medium">{hasMultiple ? 'Click purple badge to cycle through dates' : 'Click to view details'}</p>
                             </div>
@@ -5343,7 +5349,7 @@ export default function Admin() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-semibold text-gray-700">Date</Label>
-                    <p className="text-gray-900">{new Date(selectedAppointment.appointmentDate).toLocaleDateString()}</p>
+                    <p className="text-gray-900">{parseLocalDate(selectedAppointment.appointmentDate).toLocaleDateString()}</p>
                   </div>
                   <div>
                     <Label className="text-sm font-semibold text-gray-700">Time</Label>
