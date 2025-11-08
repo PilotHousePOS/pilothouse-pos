@@ -2793,9 +2793,26 @@ export default function Admin() {
 
   const pendingAppointments = (appointments as any[]).filter((a: any) => a.status === 'scheduled').length;
   const pendingOrders = (orders as any[]).filter((o: any) => o.status === 'pending').length;
-  const customersHere = (appointments as any[]).filter((a: any) => 
+  
+  // Calculate customers here - filter appointments with isHere = true
+  const appointmentsHere = (appointments as any[]).filter((a: any) => 
     (a.status === 'confirmed' || a.status === 'completed') && a.isHere === true
-  ).length;
+  );
+  console.log('Customers Here calculation:', {
+    totalAppointments: appointments.length,
+    confirmedOrCompleted: (appointments as any[]).filter((a: any) => 
+      a.status === 'confirmed' || a.status === 'completed'
+    ).length,
+    customersHere: appointmentsHere.length,
+    appointmentsHere: appointmentsHere.map((a: any) => ({
+      id: a.id,
+      status: a.status,
+      isHere: a.isHere,
+      date: a.appointmentDate,
+      customer: a.ownerLastName
+    }))
+  });
+  const customersHere = appointmentsHere.length;
 
   // Appointments pagination handlers
   const handleAppointmentsTouchStart = (e: React.TouchEvent) => {
