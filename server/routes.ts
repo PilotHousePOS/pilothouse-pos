@@ -1428,36 +1428,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Check daily appointment limits for the selected date
-      const appointmentDateStr = new Date(req.body.appointmentDate).toISOString().split('T')[0];
-      const dailyLimit = await storage.getDailyAppointmentLimit(appointmentDateStr);
+      // Check weekly appointment limits for the selected day of week
+      const appointmentDate = new Date(req.body.appointmentDate);
+      const dayOfWeek = appointmentDate.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
+      const appointmentDateStr = appointmentDate.toISOString().split('T')[0];
       
-      if (dailyLimit) {
-        // Count existing appointments for this date by service type
-        // Include all appointments except cancelled/rejected ones
-        const allAppointments = await storage.getAppointments();
-        const appointmentsOnDate = allAppointments.filter((apt: any) => {
-          const aptDateStr = new Date(apt.appointmentDate).toISOString().split('T')[0];
-          return aptDateStr === appointmentDateStr && 
-                 apt.status !== 'cancelled' && 
-                 apt.status !== 'rejected';
-        });
+      // Get weekly limit for this day of week (1-6 for Monday-Saturday)
+      if (dayOfWeek >= 1 && dayOfWeek <= 6) {
+        const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
         
-        const bathAppointments = appointmentsOnDate.filter((apt: any) => apt.serviceType === 'grooming-bath').length;
-        const groomAppointments = appointmentsOnDate.filter((apt: any) => apt.serviceType === 'grooming-full').length;
-        
-        // Check if limit is exceeded
-        const serviceType = req.body.serviceType;
-        if (serviceType === 'grooming-bath' && bathAppointments >= dailyLimit.maxBathAppointments) {
-          return res.status(400).json({
-            message: `Bath appointments are fully booked for this date (limit: ${dailyLimit.maxBathAppointments}). Please select a different date.`
+        if (weeklyLimit) {
+          // Count existing appointments for this date by service type
+          // Include all appointments except cancelled/rejected ones
+          const allAppointments = await storage.getAppointments();
+          const appointmentsOnDate = allAppointments.filter((apt: any) => {
+            const aptDateStr = new Date(apt.appointmentDate).toISOString().split('T')[0];
+            return aptDateStr === appointmentDateStr && 
+                   apt.status !== 'cancelled' && 
+                   apt.status !== 'rejected';
           });
-        }
-        
-        if (serviceType === 'grooming-full' && groomAppointments >= dailyLimit.maxGroomAppointments) {
-          return res.status(400).json({
-            message: `Full grooming appointments are fully booked for this date (limit: ${dailyLimit.maxGroomAppointments}). Please select a different date.`
-          });
+          
+          const bathAppointments = appointmentsOnDate.filter((apt: any) => apt.serviceType === 'grooming-bath').length;
+          const groomAppointments = appointmentsOnDate.filter((apt: any) => apt.serviceType === 'grooming-full').length;
+          
+          // Check if limit is exceeded
+          const serviceType = req.body.serviceType;
+          if (serviceType === 'grooming-bath' && bathAppointments >= weeklyLimit.maxBathAppointments) {
+            return res.status(400).json({
+              message: `Bath appointments are fully booked for this date (limit: ${weeklyLimit.maxBathAppointments}). Please select a different date.`
+            });
+          }
+          
+          if (serviceType === 'grooming-full' && groomAppointments >= weeklyLimit.maxGroomAppointments) {
+            return res.status(400).json({
+              message: `Full grooming appointments are fully booked for this date (limit: ${weeklyLimit.maxGroomAppointments}). Please select a different date.`
+            });
+          }
         }
       }
       
@@ -1724,6 +1730,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting daily limit:", error);
       res.status(500).json({ message: "Failed to delete daily limit" });
+    }
+  });
+
+  // Weekly appointment limit routes (day of week based)
+  app.get("/api/admin/weekly-limits", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin && !req.user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
+      }
+
+      const limits = await storage.getAllWeeklyAppointmentLimits();
+      res.json(limits);
+    } catch (error) {
+      console.error("Error fetching weekly limits:", error);
+      res.status(500).json({ message: "Failed to fetch weekly limits" });
+    }
+  });
+
+  app.get("/api/admin/weekly-limits/:dayOfWeek", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin && !req.user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
+      }
+
+      const dayOfWeek = parseInt(req.params.dayOfWeek);
+      if (isNaN(dayOfWeek) || dayOfWeek < 1 || dayOfWeek > 6) {
+        return res.status(400).json({ message: "Invalid day of week (must be 1-6 for Monday-Saturday)" });
+      }
+
+      const limit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
+      res.json(limit || null);
+    } catch (error) {
+      console.error("Error fetching weekly limit:", error);
+      res.status(500).json({ message: "Failed to fetch weekly limit" });
+    }
+  });
+
+  app.post("/api/admin/weekly-limits", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { dayOfWeek, maxBathAppointments, maxGroomAppointments } = req.body;
+      
+      if (dayOfWeek === undefined || maxBathAppointments === undefined || maxGroomAppointments === undefined) {
+        return res.status(400).json({ message: "dayOfWeek, maxBathAppointments, and maxGroomAppointments are required" });
+      }
+
+      if (dayOfWeek < 1 || dayOfWeek > 6) {
+        return res.status(400).json({ message: "Invalid day of week (must be 1-6 for Monday-Saturday)" });
+      }
+
+      const limit = await storage.upsertWeeklyAppointmentLimit({
+        dayOfWeek,
+        maxBathAppointments,
+        maxGroomAppointments,
+      });
+      
+      res.json(limit);
+    } catch (error) {
+      console.error("Error upserting weekly limit:", error);
+      res.status(500).json({ message: "Failed to update weekly limit" });
+    }
+  });
+
+  app.delete("/api/admin/weekly-limits/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      await storage.deleteWeeklyAppointmentLimit(parseInt(req.params.id));
+      res.json({ message: "Weekly limit deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting weekly limit:", error);
+      res.status(500).json({ message: "Failed to delete weekly limit" });
     }
   });
 
