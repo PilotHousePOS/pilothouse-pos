@@ -1434,10 +1434,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Check weekly appointment limits for the selected day of week
+      // Check special date settings first (overrides weekly limits)
       const appointmentDate = new Date(req.body.appointmentDate);
-      const dayOfWeek = appointmentDate.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
       const appointmentDateStr = appointmentDate.toISOString().split('T')[0];
+      const specialDate = await storage.getSpecialDateWithTimes(appointmentDateStr);
+      
+      if (specialDate) {
+        // This is a special date - only allowed times can be booked
+        const requestedTime = req.body.appointmentTime;
+        const allowedTimes = specialDate.times.map((t: any) => t.allowedTime);
+        
+        if (!allowedTimes.includes(requestedTime)) {
+          return res.status(400).json({
+            message: `This is a special date (${specialDate.setting.name}). Only the following times are available: ${allowedTimes.join(', ')}`
+          });
+        }
+      }
+
+      // Check weekly appointment limits for the selected day of week
+      const dayOfWeek = appointmentDate.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
       
       // Get weekly limit for this day of week (1-6 for Monday-Saturday)
       if (dayOfWeek >= 1 && dayOfWeek <= 6) {
