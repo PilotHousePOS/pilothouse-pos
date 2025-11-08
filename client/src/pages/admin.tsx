@@ -1651,10 +1651,8 @@ export default function Admin() {
   const [bookingContactSearch, setBookingContactSearch] = useState('');
   const [showBookingContactDropdown, setShowBookingContactDropdown] = useState(false);
 
-  // Daily Limit Form State
-  const [dailyLimitDate, setDailyLimitDate] = useState('');
-  const [dailyLimitBath, setDailyLimitBath] = useState(5);
-  const [dailyLimitGroom, setDailyLimitGroom] = useState(5);
+  // Weekly Limit Form State (temporary values for editing)
+  const [editingWeeklyLimit, setEditingWeeklyLimit] = useState<{dayOfWeek: number; bathLimit: number; groomLimit: number} | null>(null);
   const [bookingSelectedService, setBookingSelectedService] = useState('');
   const [bookingSelectedGroomer, setBookingSelectedGroomer] = useState('');
   const [bookingSelectedDate, setBookingSelectedDate] = useState<Date | undefined>(new Date());
@@ -1727,8 +1725,8 @@ export default function Admin() {
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
-  const { data: dailyLimits = [] } = useQuery<any[]>({
-    queryKey: ["/api/admin/daily-limits"],
+  const { data: weeklyLimits = [] } = useQuery<any[]>({
+    queryKey: ["/api/admin/weekly-limits"],
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
@@ -2758,22 +2756,23 @@ export default function Admin() {
     },
   });
 
-  // Daily Limits Mutation
-  const upsertDailyLimitMutation = useMutation({
-    mutationFn: async (data: { date: string; maxBathAppointments: number; maxGroomAppointments: number }) => {
-      return await apiRequest("POST", "/api/admin/daily-limits", data);
+  // Weekly Limits Mutation
+  const upsertWeeklyLimitMutation = useMutation({
+    mutationFn: async (data: { dayOfWeek: number; maxBathAppointments: number; maxGroomAppointments: number }) => {
+      return await apiRequest("POST", "/api/admin/weekly-limits", data);
     },
     onSuccess: () => {
       toast({
-        title: "Daily Limit Updated",
-        description: "Daily appointment limit has been set successfully",
+        title: "Weekly Limit Updated",
+        description: "Weekly appointment limit has been set successfully",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/daily-limits"] });
+      setEditingWeeklyLimit(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/weekly-limits"] });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to update daily limit",
+        description: "Failed to update weekly limit",
         variant: "destructive",
       });
     },
@@ -5099,104 +5098,78 @@ export default function Admin() {
                 </div>
               </div>
 
-              {/* Daily Appointment Limits */}
+              {/* Weekly Appointment Limits */}
               <div className="space-y-4 border-t pt-6">
-                <h3 className="text-lg font-semibold">Daily Appointment Limits</h3>
-                <p className="text-sm text-gray-600 mb-3">Set different limits for Bath and Full Grooming appointments on specific dates</p>
+                <h3 className="text-lg font-semibold">Weekly Appointment Limits</h3>
+                <p className="text-sm text-gray-600 mb-3">Set appointment limits for each day of the week (Monday through Saturday)</p>
                 
-                {/* Add New Daily Limit Form */}
-                <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-                  <h4 className="font-medium text-sm">Set Limit for Specific Date</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Date</label>
-                      <input
-                        type="date"
-                        value={dailyLimitDate}
-                        onChange={(e) => setDailyLimitDate(e.target.value)}
-                        className="w-full p-2 border rounded text-sm"
-                        data-testid="input-daily-limit-date"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Max Bath Appointments</label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="50"
-                        value={dailyLimitBath}
-                        onChange={(e) => setDailyLimitBath(parseInt(e.target.value))}
-                        className="w-full p-2 border rounded text-sm"
-                        data-testid="input-daily-limit-bath"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Max Full Groom Appointments</label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="50"
-                        value={dailyLimitGroom}
-                        onChange={(e) => setDailyLimitGroom(parseInt(e.target.value))}
-                        className="w-full p-2 border rounded text-sm"
-                        data-testid="input-daily-limit-groom"
-                      />
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => {
-                      if (!dailyLimitDate) {
-                        toast({ title: "Error", description: "Please select a date", variant: "destructive" });
-                        return;
-                      }
-                      upsertDailyLimitMutation.mutate({
-                        date: dailyLimitDate,
-                        maxBathAppointments: dailyLimitBath,
-                        maxGroomAppointments: dailyLimitGroom,
-                      });
-                    }}
-                    disabled={upsertDailyLimitMutation.isPending}
-                    className="w-full md:w-auto"
-                    size="sm"
-                    data-testid="button-save-daily-limit"
-                  >
-                    {upsertDailyLimitMutation.isPending ? 'Saving...' : 'Save Daily Limit'}
-                  </Button>
-                </div>
+                {/* Weekly Limits Grid */}
+                <div className="space-y-3">
+                  {[
+                    { day: 1, name: 'Monday' },
+                    { day: 2, name: 'Tuesday' },
+                    { day: 3, name: 'Wednesday' },
+                    { day: 4, name: 'Thursday' },
+                    { day: 5, name: 'Friday' },
+                    { day: 6, name: 'Saturday' },
+                  ].map(({ day, name }) => {
+                    const existingLimit = weeklyLimits.find((l: any) => l.dayOfWeek === day);
+                    const isEditing = editingWeeklyLimit?.dayOfWeek === day;
+                    const bathLimit = isEditing ? editingWeeklyLimit.bathLimit : (existingLimit?.maxBathAppointments ?? 5);
+                    const groomLimit = isEditing ? editingWeeklyLimit.groomLimit : (existingLimit?.maxGroomAppointments ?? 5);
 
-                {/* Display Existing Daily Limits */}
-                {dailyLimits.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-sm">Configured Daily Limits</h4>
-                    <div className="max-h-64 overflow-y-auto space-y-2">
-                      {dailyLimits
-                        .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                        .map((limit: any) => (
-                          <div key={limit.id} className="flex items-center justify-between p-3 bg-white border rounded text-sm">
-                            <div className="flex-1">
-                              <span className="font-medium">{new Date(limit.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                              <span className="mx-3 text-gray-400">|</span>
-                              <span className="text-blue-600">Bath: {limit.maxBathAppointments}</span>
-                              <span className="mx-2 text-gray-400">•</span>
-                              <span className="text-green-600">Groom: {limit.maxGroomAppointments}</span>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setDailyLimitDate(limit.date);
-                                setDailyLimitBath(limit.maxBathAppointments);
-                                setDailyLimitGroom(limit.maxGroomAppointments);
-                              }}
-                              data-testid={`button-edit-daily-limit-${limit.id}`}
-                            >
-                              Edit
-                            </Button>
+                    return (
+                      <div key={day} className="p-4 bg-gray-50 rounded-lg">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                          <div className="flex-shrink-0 w-24">
+                            <span className="font-medium text-sm">{name}</span>
                           </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
+                          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-xs font-medium mb-1 text-gray-600">Max Bath</label>
+                              <input
+                                type="number"
+                                min="0"
+                                max="50"
+                                value={bathLimit}
+                                onChange={(e) => setEditingWeeklyLimit({ dayOfWeek: day, bathLimit: parseInt(e.target.value), groomLimit })}
+                                className="w-full p-2 border rounded text-sm"
+                                data-testid={`input-weekly-limit-bath-${day}`}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium mb-1 text-gray-600">Max Full Groom</label>
+                              <input
+                                type="number"
+                                min="0"
+                                max="50"
+                                value={groomLimit}
+                                onChange={(e) => setEditingWeeklyLimit({ dayOfWeek: day, bathLimit, groomLimit: parseInt(e.target.value) })}
+                                className="w-full p-2 border rounded text-sm"
+                                data-testid={`input-weekly-limit-groom-${day}`}
+                              />
+                            </div>
+                          </div>
+                          <Button
+                            onClick={() => {
+                              upsertWeeklyLimitMutation.mutate({
+                                dayOfWeek: day,
+                                maxBathAppointments: bathLimit,
+                                maxGroomAppointments: groomLimit,
+                              });
+                            }}
+                            disabled={upsertWeeklyLimitMutation.isPending}
+                            className="w-full sm:w-auto"
+                            size="sm"
+                            data-testid={`button-save-weekly-limit-${day}`}
+                          >
+                            {upsertWeeklyLimitMutation.isPending && editingWeeklyLimit?.dayOfWeek === day ? 'Saving...' : 'Save'}
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Booking Restrictions */}
