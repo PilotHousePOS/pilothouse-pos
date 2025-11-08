@@ -117,6 +117,8 @@ export interface IStorage {
     price?: string;
     appointmentDate?: string;
     appointmentTime?: string;
+    groomerId?: number | null;
+    serviceType?: string;
   }): Promise<Appointment>;
   clearAllAppointments(): Promise<void>;
   bulkCreateAppointments(appointments: InsertAppointment[]): Promise<Appointment[]>;
@@ -693,6 +695,8 @@ export class DatabaseStorage implements IStorage {
     price?: string;
     appointmentDate?: string;
     appointmentTime?: string;
+    groomerId?: number | null;
+    serviceType?: string;
   }): Promise<Appointment> {
     const updateData: any = { updatedAt: new Date() };
     
@@ -705,6 +709,8 @@ export class DatabaseStorage implements IStorage {
     if (updates.price !== undefined) updateData.price = updates.price;
     if (updates.appointmentDate !== undefined) updateData.appointmentDate = updates.appointmentDate;
     if (updates.appointmentTime !== undefined) updateData.appointmentTime = updates.appointmentTime;
+    if (updates.groomerId !== undefined) updateData.groomerId = updates.groomerId;
+    if (updates.serviceType !== undefined) updateData.serviceType = updates.serviceType;
     
     const [updated] = await db
       .update(appointments)
