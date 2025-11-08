@@ -63,8 +63,17 @@ export default function Booking() {
     retry: false,
   });
 
+  // Fetch all special dates for calendar availability checking
+  const { data: allSpecialDates = [] } = useQuery({
+    queryKey: ["/api/admin/special-dates"],
+    retry: false,
+  });
+
   // Fetch special date settings for selected date
-  const selectedDateStr = selectedDate ? selectedDate.toISOString().split('T')[0] : '';
+  // Use local date string to avoid timezone issues (e.g., UTC+5 would shift dates)
+  const selectedDateStr = selectedDate 
+    ? `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
+    : '';
   const { data: specialDate } = useQuery({
     queryKey: ["/api/special-dates", selectedDateStr],
     queryFn: async () => {
@@ -144,9 +153,67 @@ export default function Booking() {
     });
   };
 
+  // Check if a date is available for booking
+  const isDateAvailable = (date: Date) => {
+    // Use local date string to avoid timezone issues
+    const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    
+    // Check if this is a special date - special dates override normal restrictions
+    const hasSpecialDate = (allSpecialDates as any[]).some(sd => sd.date === dateString);
+    if (hasSpecialDate) {
+      // Special dates are always available regardless of other settings
+      return true;
+    }
+    
+    // Enforce no Sunday appointments as per user requirements
+    if (date.getDay() === 0) return false; // Sunday = 0
+    
+    const settings = groomingSettings as any[];
+    const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    const dayEnabledSetting = settings.find(s => s.setting === `${dayName}_enabled`);
+    const isDayEnabled = dayEnabledSetting ? dayEnabledSetting.value === 'true' : true;
+    
+    if (!isDayEnabled) return false;
+    
+    // Check blocked dates
+    const blockedDates = settings.find(s => s.setting === 'blocked_dates')?.value || '';
+    const blockedList = blockedDates.split(',').map((d: string) => d.trim()).filter((d: string) => d);
+    
+    if (blockedList.includes(dateString)) return false;
+    
+    // Check advance booking limit
+    const advanceBookingDays = parseInt(settings.find(s => s.setting === 'advance_booking_days')?.value || '30');
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + advanceBookingDays);
+    
+    if (date > maxDate) return false;
+    
+    // Prevent same-day bookings for customers only (admins/groomers can book same-day)
+    const user = currentUser as any;
+    const isAdminOrGroomer = user?.isAdmin || user?.isGroomer;
+    
+    if (!isAdminOrGroomer) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      const selectedDate = new Date(date);
+      selectedDate.setHours(0, 0, 0, 0);
+      
+      if (selectedDate < tomorrow) return false;
+    }
+    
+    return true;
+  };
 
   // Generate available time slots in 15-minute intervals
   const availableTimeSlots = useMemo(() => {
+    // If selected date is not available, don't show any time slots
+    if (selectedDate && !isDateAvailable(selectedDate)) {
+      return [];
+    }
+    
     // If there's a special date with custom times, use those instead
     if (specialDate && specialDate.allowedTimes && specialDate.allowedTimes.length > 0) {
       return specialDate.allowedTimes.map((t: any) => t.allowedTime).sort();
@@ -180,52 +247,7 @@ export default function Booking() {
     }
     
     return slots;
-  }, [groomingSettings, specialDate]);
-
-  // Check if a date is available for booking
-  const isDateAvailable = (date: Date) => {
-    // Enforce no Sunday appointments as per user requirements
-    if (date.getDay() === 0) return false; // Sunday = 0
-    
-    const settings = groomingSettings as any[];
-    const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-    const dayEnabledSetting = settings.find(s => s.setting === `${dayName}_enabled`);
-    const isDayEnabled = dayEnabledSetting ? dayEnabledSetting.value === 'true' : true;
-    
-    if (!isDayEnabled) return false;
-    
-    // Check blocked dates
-    const blockedDates = settings.find(s => s.setting === 'blocked_dates')?.value || '';
-    const dateString = date.toISOString().split('T')[0];
-    const blockedList = blockedDates.split(',').map((d: string) => d.trim()).filter((d: string) => d);
-    
-    if (blockedList.includes(dateString)) return false;
-    
-    // Check advance booking limit
-    const advanceBookingDays = parseInt(settings.find(s => s.setting === 'advance_booking_days')?.value || '30');
-    const maxDate = new Date();
-    maxDate.setDate(maxDate.getDate() + advanceBookingDays);
-    
-    if (date > maxDate) return false;
-    
-    // Prevent same-day bookings for customers only (admins/groomers can book same-day)
-    const user = currentUser as any;
-    const isAdminOrGroomer = user?.isAdmin || user?.isGroomer;
-    
-    if (!isAdminOrGroomer) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      
-      const selectedDate = new Date(date);
-      selectedDate.setHours(0, 0, 0, 0);
-      
-      if (selectedDate < tomorrow) return false;
-    }
-    
-    return true;
-  };
+  }, [groomingSettings, specialDate, selectedDate, allSpecialDates]);
 
   const createAppointmentMutation = useMutation({
     mutationFn: async (appointmentData: any) => {
