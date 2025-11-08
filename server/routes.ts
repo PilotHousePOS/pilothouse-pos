@@ -1216,12 +1216,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update appointment notes and price (admin only)
+  // Update appointment notes and price (admin and groomer)
   app.patch("/api/admin/appointments/:id/details", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
-      if (!user?.isAdmin) {
-        return res.status(403).json({ message: "Admin access required" });
+      if (!user?.isAdmin && !user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
       }
 
       const id = parseInt(req.params.id);
@@ -1328,8 +1328,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/appointments/:id", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
-      if (!user?.isAdmin) {
-        return res.status(403).json({ message: "Admin access required" });
+      if (!user?.isAdmin && !user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
       }
 
       const id = parseInt(req.params.id);
@@ -2134,8 +2134,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/contacts/:id", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
-      if (!user?.isAdmin) {
-        return res.status(403).json({ message: "Admin access required" });
+      if (!user?.isAdmin && !user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
       }
 
       const id = parseInt(req.params.id);

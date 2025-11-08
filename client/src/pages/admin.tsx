@@ -3576,7 +3576,6 @@ export default function Admin() {
                                 key={`appointment-${currentAppointment.id}-${currentAppointment.status}`}
                                 value={currentAppointment.status}
                                 onValueChange={(status) => updateAppointmentMutation.mutate({ id: currentAppointment.id, status })}
-                                disabled={!!typedUser?.isGroomer && !typedUser?.isAdmin}
                               >
                                 <SelectTrigger className="w-28 h-8 text-xs">
                                   <SelectValue />
