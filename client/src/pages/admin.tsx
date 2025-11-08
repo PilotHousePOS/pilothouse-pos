@@ -1603,6 +1603,7 @@ export default function Admin() {
   const [editPetType, setEditPetType] = useState('');
   const [editDate, setEditDate] = useState<Date | undefined>(undefined);
   const [editTime, setEditTime] = useState('');
+  const [editGroomerId, setEditGroomerId] = useState<number | null>(null);
   
   // Pagination for approved appointments
   const [approvedAppointmentsPage, setApprovedAppointmentsPage] = useState(0);
@@ -2291,7 +2292,8 @@ export default function Admin() {
       specialNotes, 
       price,
       appointmentDate,
-      appointmentTime
+      appointmentTime,
+      groomerId
     }: { 
       id: number; 
       ownerFirstName?: string;
@@ -2303,6 +2305,7 @@ export default function Admin() {
       price?: string;
       appointmentDate?: Date;
       appointmentTime?: string;
+      groomerId?: number | null;
     }) => {
       // Build request body with all provided fields
       const updates: any = {};
@@ -2313,6 +2316,7 @@ export default function Admin() {
       if (petType !== undefined && petType !== '') updates.petType = petType;
       if (specialNotes !== undefined && specialNotes !== '') updates.specialNotes = specialNotes;
       if (price !== undefined && price !== '') updates.price = price;
+      if (groomerId !== undefined) updates.groomerId = groomerId;
       
       // Format date to YYYY-MM-DD without timezone conversion
       if (appointmentDate !== undefined) {
@@ -2344,6 +2348,7 @@ export default function Admin() {
       setEditPetType('');
       setEditDate(undefined);
       setEditTime('');
+      setEditGroomerId(null);
     },
     onError: () => {
       toast({
@@ -3647,6 +3652,7 @@ export default function Admin() {
                                   setEditPrice(currentAppointment.price || '');
                                   setEditDate(currentAppointment.appointmentDate ? new Date(currentAppointment.appointmentDate) : undefined);
                                   setEditTime(currentAppointment.appointmentTime || '');
+                                  setEditGroomerId(currentAppointment.groomerId || null);
                                 }}
                                 data-testid={`edit-appointment-${currentAppointment.id}`}
                               >
@@ -5718,6 +5724,7 @@ export default function Admin() {
           setEditPetType('');
           setEditDate(undefined);
           setEditTime('');
+          setEditGroomerId(null);
         }}>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -5803,6 +5810,29 @@ export default function Admin() {
                   data-testid="input-edit-price"
                 />
               </div>
+
+              {/* Groomer Selection */}
+              <div>
+                <Label htmlFor="edit-groomer">Assign Groomer (Optional)</Label>
+                <Select
+                  value={editGroomerId?.toString() || ''}
+                  onValueChange={(value) => setEditGroomerId(value ? parseInt(value) : null)}
+                >
+                  <SelectTrigger id="edit-groomer" data-testid="select-edit-groomer">
+                    <SelectValue placeholder="Select a groomer (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No groomer assigned</SelectItem>
+                    {(groomers as any[])
+                      .filter((g) => g.isActive)
+                      .map((groomer) => (
+                        <SelectItem key={groomer.id} value={groomer.id.toString()}>
+                          {groomer.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
               
               {/* Date Selection */}
               <div>
@@ -5850,6 +5880,7 @@ export default function Admin() {
                     setEditPetType('');
                     setEditDate(undefined);
                     setEditTime('');
+                    setEditGroomerId(null);
                   }}
                   data-testid="button-cancel-edit"
                 >
@@ -5866,7 +5897,8 @@ export default function Admin() {
                     specialNotes: editNotes,
                     price: editPrice,
                     appointmentDate: editDate,
-                    appointmentTime: editTime
+                    appointmentTime: editTime,
+                    groomerId: editGroomerId
                   })}
                   disabled={updateAppointmentDetailsMutation.isPending}
                   className="bg-brand-blue hover:bg-blue-700"

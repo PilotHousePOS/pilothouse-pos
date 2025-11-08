@@ -1225,7 +1225,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const id = parseInt(req.params.id);
-      const { ownerFirstName, ownerLastName, ownerPhoneNumber, petName, petType, specialNotes, price, appointmentDate, appointmentTime } = req.body;
+      const { ownerFirstName, ownerLastName, ownerPhoneNumber, petName, petType, specialNotes, price, appointmentDate, appointmentTime, groomerId } = req.body;
       console.log(`Updating appointment ${id} - Date: ${appointmentDate}, Time: ${appointmentTime}`);
 
       // Get the current appointment to get the old phone number
@@ -1253,6 +1253,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         price?: string;
         appointmentDate?: string;
         appointmentTime?: string;
+        groomerId?: number | null;
       } = {};
       
       if (ownerFirstName !== undefined) updates.ownerFirstName = ownerFirstName;
@@ -1264,6 +1265,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (price !== undefined) updates.price = price;
       if (appointmentDate !== undefined) updates.appointmentDate = appointmentDate;
       if (appointmentTime !== undefined) updates.appointmentTime = appointmentTime;
+      if (groomerId !== undefined) updates.groomerId = groomerId;
 
       const appointment = await storage.updateAppointmentDetails(id, updates);
       
