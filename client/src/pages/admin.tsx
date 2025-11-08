@@ -235,7 +235,7 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                               Phone: {appointment.ownerPhoneNumber}
                             </p>
                             <p className="text-xs text-blue-600">
-                              Service: {appointment.serviceType === 'grooming-full' ? 'Full Grooming' : 'Bath Only'}
+                              Service: {formatServiceType(appointment.serviceType)}
                             </p>
                           </div>
                           <Badge variant="default" className="bg-green-600">
