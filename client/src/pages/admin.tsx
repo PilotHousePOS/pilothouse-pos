@@ -3814,6 +3814,11 @@ export default function Admin() {
                         <p className="text-sm text-gray-600">Owner: {capitalizeWords(currentAppointment.ownerFirstName)} {capitalizeWords(currentAppointment.ownerLastName)}</p>
                         <p className="text-sm text-gray-600">Phone: {currentAppointment.ownerPhoneNumber}</p>
                         <p className="text-xs text-gray-500">{parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
+                        {currentAppointment.price && (
+                          <p className="text-xs text-green-700 font-medium mt-1">
+                            Price: ${currentAppointment.price}
+                          </p>
+                        )}
                         <p className="text-xs text-purple-600 mt-1 font-medium">{hasMultiple ? 'Click purple badge to cycle through dates' : 'Click to view details'}</p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -3959,6 +3964,11 @@ export default function Admin() {
                                 <p>Phone: {currentAppointment.ownerPhoneNumber}</p>
                                 <p className="text-gray-500">{parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
                               </div>
+                              {currentAppointment.price && (
+                                <p className="text-xs text-green-700 font-medium mt-1">
+                                  Price: ${currentAppointment.price}
+                                </p>
+                              )}
                               <p className="text-xs text-purple-600 mt-0.5 font-medium">{hasMultiple ? 'Click purple badge to cycle through dates' : 'Click to view details'}</p>
                             </div>
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 w-full sm:w-auto flex-shrink-0">
