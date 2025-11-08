@@ -1297,6 +1297,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
               contactUpdates.animalType = petType;
             }
             
+            // Collect all unique pet names from appointments with this phone number
+            if (petName !== undefined || ownerPhoneNumber !== undefined) {
+              const phoneToCheck = newPhone;
+              const appointmentsForPhone = await storage.getAppointmentsByPhoneNumber(phoneToCheck);
+              const uniquePetNames = [...new Set(appointmentsForPhone.map((apt: any) => apt.petName).filter(Boolean))];
+              if (uniquePetNames.length > 0) {
+                contactUpdates.petNames = uniquePetNames;
+              }
+            }
+            
             if (Object.keys(contactUpdates).length > 0) {
               await storage.updateContact(contact.id, contactUpdates);
               console.log(`Updated contact ${contact.id} based on appointment ${id} changes`);
@@ -2007,7 +2017,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      const { name, email, phoneNumber, notes, animalType, breed } = req.body;
+      const { name, email, phoneNumber, petNames, notes, animalType, breed } = req.body;
       const trimmedName = name?.trim();
       const trimmedEmail = email?.trim();
       const trimmedPhone = phoneNumber?.trim();
@@ -2025,7 +2035,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const contact = await storage.createContact({ 
         name: trimmedName, 
         email: contactEmail, 
-        phoneNumber: trimmedPhone, 
+        phoneNumber: trimmedPhone,
+        petNames: petNames || null,
         notes,
         animalType,
         breed 
@@ -2045,7 +2056,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const id = parseInt(req.params.id);
-      const { name, email, phoneNumber, notes, animalType, breed } = req.body;
+      const { name, email, phoneNumber, petNames, notes, animalType, breed } = req.body;
       const trimmedName = name?.trim();
       const trimmedEmail = email?.trim();
       const trimmedPhone = phoneNumber?.trim();
@@ -2066,7 +2077,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const contact = await storage.updateContact(id, { 
         name: trimmedName, 
         email: contactEmail, 
-        phoneNumber: trimmedPhone, 
+        phoneNumber: trimmedPhone,
+        petNames: petNames !== undefined ? petNames : undefined,
         notes,
         animalType,
         breed 
