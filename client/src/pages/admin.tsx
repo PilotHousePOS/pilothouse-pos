@@ -1653,6 +1653,17 @@ export default function Admin() {
 
   // Weekly Limit Form State (temporary values for editing)
   const [editingWeeklyLimit, setEditingWeeklyLimit] = useState<{dayOfWeek: number; bathLimit: number; groomLimit: number} | null>(null);
+  const [specialDateForm, setSpecialDateForm] = useState<{
+    id?: number;
+    date: string;
+    name: string;
+    allowedTimes: string[];
+  }>({
+    date: '',
+    name: '',
+    allowedTimes: [],
+  });
+  const [newAllowedTime, setNewAllowedTime] = useState('');
   const [bookingSelectedService, setBookingSelectedService] = useState('');
   const [bookingSelectedGroomer, setBookingSelectedGroomer] = useState('');
   const [bookingSelectedDate, setBookingSelectedDate] = useState<Date | undefined>(new Date());
@@ -1728,6 +1739,11 @@ export default function Admin() {
   const { data: weeklyLimits = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/weekly-limits"],
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+  });
+
+  const { data: specialDates = [] } = useQuery<any[]>({
+    queryKey: ["/api/admin/special-dates"],
+    enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
 
   const { data: calendarEvents = [], isError: calendarEventsError } = useQuery<any[]>({
@@ -2773,6 +2789,71 @@ export default function Admin() {
       toast({
         title: "Error",
         description: "Failed to update weekly limit",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Special Date Mutations
+  const createSpecialDateMutation = useMutation({
+    mutationFn: async (data: { date: string; name: string; allowedTimes: string[] }) => {
+      return await apiRequest("POST", "/api/admin/special-dates", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Special Date Created",
+        description: "Special date has been created successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/special-dates"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create special date",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateSpecialDateMutation = useMutation({
+    mutationFn: async (data: { id: number; date: string; name: string; allowedTimes: string[] }) => {
+      return await apiRequest("PUT", `/api/admin/special-dates/${data.id}`, {
+        date: data.date,
+        name: data.name,
+        allowedTimes: data.allowedTimes,
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Special Date Updated",
+        description: "Special date has been updated successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/special-dates"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update special date",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteSpecialDateMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest("DELETE", `/api/admin/special-dates/${id}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Special Date Deleted",
+        description: "Special date has been deleted successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/special-dates"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete special date",
         variant: "destructive",
       });
     },
@@ -5168,6 +5249,180 @@ export default function Admin() {
                       </div>
                     );
                   })}
+                </div>
+              </div>
+
+              {/* Special Date Time Slots */}
+              <div className="space-y-4 border-t pt-6">
+                <h3 className="text-lg font-semibold">Special Date Time Slots</h3>
+                <p className="text-sm text-gray-600 mb-3">Configure specific dates (like holidays) with custom booking times</p>
+                
+                {/* Add/Edit Special Date Form */}
+                <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Date</label>
+                      <Input
+                        type="date"
+                        value={specialDateForm.date}
+                        onChange={(e) => setSpecialDateForm({ ...specialDateForm, date: e.target.value })}
+                        className="w-full"
+                        data-testid="input-special-date-date"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Name (e.g., Thanksgiving)</label>
+                      <Input
+                        type="text"
+                        value={specialDateForm.name}
+                        onChange={(e) => setSpecialDateForm({ ...specialDateForm, name: e.target.value })}
+                        placeholder="Holiday name"
+                        className="w-full"
+                        data-testid="input-special-date-name"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Allowed Times */}
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Allowed Times</label>
+                    <div className="flex gap-2 mb-2">
+                      <Input
+                        type="time"
+                        value={newAllowedTime}
+                        onChange={(e) => setNewAllowedTime(e.target.value)}
+                        className="flex-1"
+                        data-testid="input-new-allowed-time"
+                      />
+                      <Button
+                        onClick={() => {
+                          if (newAllowedTime) {
+                            // Convert 24-hour to 12-hour format
+                            const [hours, minutes] = newAllowedTime.split(':');
+                            const hour = parseInt(hours);
+                            const ampm = hour >= 12 ? 'PM' : 'AM';
+                            const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+                            const formattedTime = `${displayHour}:${minutes} ${ampm}`;
+                            
+                            if (!specialDateForm.allowedTimes.includes(formattedTime)) {
+                              setSpecialDateForm({
+                                ...specialDateForm,
+                                allowedTimes: [...specialDateForm.allowedTimes, formattedTime].sort()
+                              });
+                            }
+                            setNewAllowedTime('');
+                          }
+                        }}
+                        size="sm"
+                        data-testid="button-add-time-slot"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    
+                    {/* Display allowed times */}
+                    <div className="flex flex-wrap gap-2">
+                      {specialDateForm.allowedTimes.map((time, index) => (
+                        <Badge key={index} variant="secondary" className="gap-1">
+                          {time}
+                          <button
+                            onClick={() => {
+                              setSpecialDateForm({
+                                ...specialDateForm,
+                                allowedTimes: specialDateForm.allowedTimes.filter((_, i) => i !== index)
+                              });
+                            }}
+                            data-testid={`button-remove-time-${index}`}
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => {
+                        if (specialDateForm.id) {
+                          updateSpecialDateMutation.mutate(specialDateForm as any);
+                        } else {
+                          createSpecialDateMutation.mutate(specialDateForm);
+                        }
+                        setSpecialDateForm({ date: '', name: '', allowedTimes: [] });
+                      }}
+                      disabled={!specialDateForm.date || !specialDateForm.name || specialDateForm.allowedTimes.length === 0}
+                      data-testid="button-save-special-date"
+                    >
+                      {specialDateForm.id ? 'Update' : 'Add'} Special Date
+                    </Button>
+                    {specialDateForm.id && (
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setSpecialDateForm({ date: '', name: '', allowedTimes: [] });
+                        }}
+                        data-testid="button-cancel-edit-special-date"
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {/* List of Special Dates */}
+                <div className="space-y-2">
+                  {specialDates.map((specialDate: any) => (
+                    <div key={specialDate.id} className="p-4 bg-white dark:bg-gray-900 border rounded-lg">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium">{specialDate.name}</span>
+                            <Badge variant="outline">{new Date(specialDate.date).toLocaleDateString()}</Badge>
+                          </div>
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {(specialDate.allowedTimes || []).map((time: any, index: number) => (
+                              <Badge key={index} variant="secondary" className="text-xs">
+                                {time.allowedTime}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSpecialDateForm({
+                                id: specialDate.id,
+                                date: specialDate.date,
+                                name: specialDate.name,
+                                allowedTimes: (specialDate.allowedTimes || []).map((t: any) => t.allowedTime)
+                              });
+                            }}
+                            data-testid={`button-edit-special-date-${specialDate.id}`}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => {
+                              if (confirm(`Delete ${specialDate.name}?`)) {
+                                deleteSpecialDateMutation.mutate(specialDate.id);
+                              }
+                            }}
+                            data-testid={`button-delete-special-date-${specialDate.id}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {specialDates.length === 0 && (
+                    <p className="text-sm text-gray-500 text-center py-4">No special dates configured</p>
+                  )}
                 </div>
               </div>
 
