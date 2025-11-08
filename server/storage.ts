@@ -14,6 +14,7 @@ import {
   wishlistItems,
   contacts,
   dailyAppointmentLimits,
+  weeklyAppointmentLimits,
   type User,
   type UpsertUser,
   type Pet,
@@ -43,6 +44,8 @@ import {
   type InsertContact,
   type DailyAppointmentLimit,
   type InsertDailyAppointmentLimit,
+  type WeeklyAppointmentLimit,
+  type InsertWeeklyAppointmentLimit,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, ilike, lt, isNull } from "drizzle-orm";
@@ -159,11 +162,17 @@ export interface IStorage {
   linkContactToUser(contactId: number, userId: string): Promise<void>;
   findUnlinkedContactsByPhoneNumber(phoneNumber: string): Promise<Contact[]>;
 
-  // Daily appointment limit operations
+  // Daily appointment limit operations (deprecated, use weekly limits)
   getDailyAppointmentLimit(date: string): Promise<DailyAppointmentLimit | undefined>;
   getAllDailyAppointmentLimits(): Promise<DailyAppointmentLimit[]>;
   upsertDailyAppointmentLimit(limit: InsertDailyAppointmentLimit): Promise<DailyAppointmentLimit>;
   deleteDailyAppointmentLimit(id: number): Promise<void>;
+
+  // Weekly appointment limit operations (day of week based)
+  getWeeklyAppointmentLimit(dayOfWeek: number): Promise<WeeklyAppointmentLimit | undefined>;
+  getAllWeeklyAppointmentLimits(): Promise<WeeklyAppointmentLimit[]>;
+  upsertWeeklyAppointmentLimit(limit: InsertWeeklyAppointmentLimit): Promise<WeeklyAppointmentLimit>;
+  deleteWeeklyAppointmentLimit(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1014,6 +1023,36 @@ export class DatabaseStorage implements IStorage {
 
   async deleteDailyAppointmentLimit(id: number): Promise<void> {
     await db.delete(dailyAppointmentLimits).where(eq(dailyAppointmentLimits.id, id));
+  }
+
+  // Weekly appointment limit operations
+  async getWeeklyAppointmentLimit(dayOfWeek: number): Promise<WeeklyAppointmentLimit | undefined> {
+    const [limit] = await db.select().from(weeklyAppointmentLimits).where(eq(weeklyAppointmentLimits.dayOfWeek, dayOfWeek));
+    return limit;
+  }
+
+  async getAllWeeklyAppointmentLimits(): Promise<WeeklyAppointmentLimit[]> {
+    return await db.select().from(weeklyAppointmentLimits).orderBy(weeklyAppointmentLimits.dayOfWeek);
+  }
+
+  async upsertWeeklyAppointmentLimit(limitData: InsertWeeklyAppointmentLimit): Promise<WeeklyAppointmentLimit> {
+    const [result] = await db
+      .insert(weeklyAppointmentLimits)
+      .values(limitData)
+      .onConflictDoUpdate({
+        target: weeklyAppointmentLimits.dayOfWeek,
+        set: {
+          maxBathAppointments: limitData.maxBathAppointments,
+          maxGroomAppointments: limitData.maxGroomAppointments,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return result;
+  }
+
+  async deleteWeeklyAppointmentLimit(id: number): Promise<void> {
+    await db.delete(weeklyAppointmentLimits).where(eq(weeklyAppointmentLimits.id, id));
   }
 }
 

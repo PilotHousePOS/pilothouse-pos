@@ -171,7 +171,17 @@ export const groomingSettings = pgTable("grooming_settings", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Daily appointment limits
+// Weekly appointment limits (by day of week)
+export const weeklyAppointmentLimits = pgTable("weekly_appointment_limits", {
+  id: serial("id").primaryKey(),
+  dayOfWeek: integer("day_of_week").notNull().unique(), // 1=Monday, 2=Tuesday, ..., 6=Saturday (0=Sunday not used)
+  maxBathAppointments: integer("max_bath_appointments").notNull().default(5),
+  maxGroomAppointments: integer("max_groom_appointments").notNull().default(5),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Keep old table for backward compatibility during migration
 export const dailyAppointmentLimits = pgTable("daily_appointment_limits", {
   id: serial("id").primaryKey(),
   date: date("date").notNull().unique(),
@@ -356,6 +366,12 @@ export const insertContactSchema = createInsertSchema(contacts).omit({
   updatedAt: true,
 });
 
+export const insertWeeklyAppointmentLimitSchema = createInsertSchema(weeklyAppointmentLimits).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertDailyAppointmentLimitSchema = createInsertSchema(dailyAppointmentLimits).omit({
   id: true,
   createdAt: true,
@@ -391,5 +407,7 @@ export type WishlistItem = typeof wishlistItems.$inferSelect;
 export type InsertWishlistItem = z.infer<typeof insertWishlistItemSchema>;
 export type Contact = typeof contacts.$inferSelect;
 export type InsertContact = z.infer<typeof insertContactSchema>;
+export type WeeklyAppointmentLimit = typeof weeklyAppointmentLimits.$inferSelect;
+export type InsertWeeklyAppointmentLimit = z.infer<typeof insertWeeklyAppointmentLimitSchema>;
 export type DailyAppointmentLimit = typeof dailyAppointmentLimits.$inferSelect;
 export type InsertDailyAppointmentLimit = z.infer<typeof insertDailyAppointmentLimitSchema>;
