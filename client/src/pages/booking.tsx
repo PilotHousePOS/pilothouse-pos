@@ -63,6 +63,20 @@ export default function Booking() {
     retry: false,
   });
 
+  // Fetch special date settings for selected date
+  const selectedDateStr = selectedDate ? selectedDate.toISOString().split('T')[0] : '';
+  const { data: specialDate } = useQuery({
+    queryKey: ["/api/special-dates", selectedDateStr],
+    queryFn: async () => {
+      if (!selectedDateStr) return null;
+      const response = await fetch(`/api/special-dates/${selectedDateStr}`);
+      if (!response.ok) return null;
+      return response.json();
+    },
+    enabled: !!selectedDateStr,
+    retry: false,
+  });
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -133,6 +147,12 @@ export default function Booking() {
 
   // Generate available time slots in 15-minute intervals
   const availableTimeSlots = useMemo(() => {
+    // If there's a special date with custom times, use those instead
+    if (specialDate && specialDate.allowedTimes && specialDate.allowedTimes.length > 0) {
+      return specialDate.allowedTimes.map((t: any) => t.allowedTime).sort();
+    }
+    
+    // Otherwise, generate regular time slots
     const settings = groomingSettings as any[];
     const startTime = settings.find(s => s.setting === 'start_time')?.value || '09:00';
     // Enforce 1:30 PM cutoff as per user requirements
@@ -160,7 +180,7 @@ export default function Booking() {
     }
     
     return slots;
-  }, [groomingSettings]);
+  }, [groomingSettings, specialDate]);
 
   // Check if a date is available for booking
   const isDateAvailable = (date: Date) => {
@@ -359,6 +379,21 @@ export default function Booking() {
             </div>
           </div>
         </div>
+
+        {/* Special Date Notice */}
+        {specialDate && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-start space-x-2">
+              <div className="text-blue-600 font-bold text-lg">ℹ️</div>
+              <div>
+                <h4 className="font-bold text-blue-800 mb-1">Special Date: {specialDate.name}</h4>
+                <p className="text-sm text-blue-700">
+                  Limited time slots available for this date.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Time Slots */}
         <div>
