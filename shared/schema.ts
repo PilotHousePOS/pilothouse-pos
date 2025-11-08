@@ -191,6 +191,23 @@ export const dailyAppointmentLimits = pgTable("daily_appointment_limits", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Special date settings (holidays/special days with custom time slots)
+export const specialDateSettings = pgTable("special_date_settings", {
+  id: serial("id").primaryKey(),
+  date: date("date").notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull(), // e.g., "Thanksgiving", "Christmas Eve"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Allowed times for special dates (normalized child table)
+export const specialDateAllowedTimes = pgTable("special_date_allowed_times", {
+  id: serial("id").primaryKey(),
+  specialDateId: integer("special_date_id").notNull().references(() => specialDateSettings.id, { onDelete: "cascade" }),
+  allowedTime: varchar("allowed_time", { length: 20 }).notNull(), // e.g., "7:00 AM", stored as 12-hour format for UI consistency
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Groomers
 export const groomers = pgTable("groomers", {
   id: serial("id").primaryKey(),
@@ -378,6 +395,17 @@ export const insertDailyAppointmentLimitSchema = createInsertSchema(dailyAppoint
   updatedAt: true,
 });
 
+export const insertSpecialDateSettingSchema = createInsertSchema(specialDateSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSpecialDateAllowedTimeSchema = createInsertSchema(specialDateAllowedTimes).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -411,3 +439,7 @@ export type WeeklyAppointmentLimit = typeof weeklyAppointmentLimits.$inferSelect
 export type InsertWeeklyAppointmentLimit = z.infer<typeof insertWeeklyAppointmentLimitSchema>;
 export type DailyAppointmentLimit = typeof dailyAppointmentLimits.$inferSelect;
 export type InsertDailyAppointmentLimit = z.infer<typeof insertDailyAppointmentLimitSchema>;
+export type SpecialDateSetting = typeof specialDateSettings.$inferSelect;
+export type InsertSpecialDateSetting = z.infer<typeof insertSpecialDateSettingSchema>;
+export type SpecialDateAllowedTime = typeof specialDateAllowedTimes.$inferSelect;
+export type InsertSpecialDateAllowedTime = z.infer<typeof insertSpecialDateAllowedTimeSchema>;
