@@ -5484,9 +5484,7 @@ export default function Admin() {
                     petName: editPetName,
                     petType: editPetType,
                     specialNotes: editNotes,
-                    price: editPrice,
-                    appointmentDate: editDate ? editDate.toISOString().split('T')[0] : undefined,
-                    appointmentTime: editTime || undefined
+                    price: editPrice
                   })}
                   disabled={updateAppointmentDetailsMutation.isPending}
                   className="bg-brand-blue hover:bg-blue-700"

@@ -139,7 +139,7 @@ export function initializeScheduledTasks() {
       const createdContacts = [];
       
       // Cache all contacts once to avoid repeated queries
-      const allContacts = await storage.getContacts();
+      const allContacts = await storage.getAllContacts();
 
       for (const contactData of extractedContacts) {
         let existingContact = null;

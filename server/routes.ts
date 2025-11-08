@@ -1788,7 +1788,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // If matching user found, grant them groomer privileges
           if (matchingUser && !matchingUser.isGroomer) {
-            await storage.updateUser(matchingUser.id, { isGroomer: true });
+            await storage.updateUserGroomer(matchingUser.id, true);
             console.log(`Linked groomer ${groomer.id} to user account ${matchingUser.id} (${matchingUser.email})`);
           }
         } catch (linkError) {
@@ -2312,12 +2312,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Find and delete duplicates (keep the oldest one)
       let deletedCount = 0;
-      const duplicateGroups = [];
+      const duplicateGroups: any[] = [];
       
-      for (const [phone, contacts] of phoneGroups.entries()) {
+      for (const [phone, contacts] of Array.from(phoneGroups.entries())) {
         if (contacts.length > 1) {
           // Sort by creation date (oldest first)
-          contacts.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+          contacts.sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
           
           // Keep the first (oldest), delete the rest
           const toKeep = contacts[0];
@@ -2326,7 +2326,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           duplicateGroups.push({
             phone,
             kept: { id: toKeep.id, name: toKeep.name, createdAt: toKeep.createdAt },
-            deleted: toDelete.map(c => ({ id: c.id, name: c.name, createdAt: c.createdAt }))
+            deleted: toDelete.map((c: any) => ({ id: c.id, name: c.name, createdAt: c.createdAt }))
           });
           
           for (const contact of toDelete) {
@@ -2423,7 +2423,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create new appointments
-      let createdAppointments = [];
+      let createdAppointments: any[] = [];
       if (appointmentsToCreate.length > 0) {
         createdAppointments = await storage.bulkCreateAppointments(appointmentsToCreate);
         console.log(`Created ${createdAppointments.length} new appointments from calendar`);
