@@ -351,7 +351,7 @@ export default function Booking() {
             <div>
               <h4 className="font-bold text-yellow-800 mb-2">IMPORTANT NOTICE</h4>
               <p className="text-sm text-yellow-700">
-                <strong>NO Poodles, Doodles, German Shepherds, or Large Mix Breed Dogs after 12:00 PM!</strong>
+                <strong>NO Poodles, Doodles, German Shepherds, or Large Breed Dogs after 12:00 PM!</strong>
               </p>
               <p className="text-xs text-yellow-600 mt-1">
                 If you schedule for after 12:00 PM with a large dog, you will be asked to reschedule when you arrive.
