@@ -1226,6 +1226,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const id = parseInt(req.params.id);
       const { ownerFirstName, ownerLastName, ownerPhoneNumber, petName, petType, specialNotes, price, appointmentDate, appointmentTime } = req.body;
+      console.log(`Updating appointment ${id} - Date: ${appointmentDate}, Time: ${appointmentTime}`);
 
       // Get the current appointment to get the old phone number
       const currentAppointment = await storage.getAppointment(id);
