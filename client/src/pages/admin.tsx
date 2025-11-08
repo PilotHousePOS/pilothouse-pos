@@ -2331,7 +2331,8 @@ export default function Admin() {
       price,
       appointmentDate,
       appointmentTime,
-      groomerId
+      groomerId,
+      serviceType
     }: { 
       id: number; 
       ownerFirstName?: string;
@@ -2344,6 +2345,7 @@ export default function Admin() {
       appointmentDate?: Date;
       appointmentTime?: string;
       groomerId?: number | null;
+      serviceType?: string;
     }) => {
       // Build request body with all provided fields
       const updates: any = {};
@@ -2355,6 +2357,7 @@ export default function Admin() {
       if (specialNotes !== undefined && specialNotes !== '') updates.specialNotes = specialNotes;
       if (price !== undefined && price !== '') updates.price = price;
       if (groomerId !== undefined) updates.groomerId = groomerId;
+      if (serviceType !== undefined && serviceType !== '') updates.serviceType = serviceType;
       
       // Format date to YYYY-MM-DD without timezone conversion
       if (appointmentDate !== undefined) {
@@ -3672,7 +3675,13 @@ export default function Admin() {
                             )}
                             {currentAppointment.groomerId && (
                               <p className="text-xs text-blue-700 font-medium mt-1" data-testid={`appointment-groomer-${currentAppointment.id}`}>
-                                Groomer: {groomers.find((g: any) => g.id === currentAppointment.groomerId)?.name || 'Unknown'}
+                                Groomer: {(() => {
+                                  const groomer = groomers.find((g: any) => 
+                                    g.id === currentAppointment.groomerId || 
+                                    g.id === parseInt(currentAppointment.groomerId as any)
+                                  );
+                                  return groomer?.name || 'Unknown';
+                                })()}
                               </p>
                             )}
                             <p className="text-xs text-purple-600 mt-0.5 font-medium">{hasMultiple ? 'Click purple badge to cycle through dates' : 'Click to view details'}</p>
