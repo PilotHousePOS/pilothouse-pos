@@ -1577,6 +1577,43 @@ function formatServiceType(serviceType: string): string {
   return serviceType;
 }
 
+// Helper function to normalize service type to canonical values
+function normalizeServiceType(serviceType: string | undefined | null): string {
+  if (!serviceType) return 'grooming-full'; // Default to full grooming
+  
+  const normalized = serviceType.toLowerCase().trim().replace(/\s+/g, '-');
+  
+  // First, return if already canonical
+  if (normalized === 'grooming-bath') return 'grooming-bath';
+  if (normalized === 'grooming-full') return 'grooming-full';
+  
+  // Explicit mapping table for known legacy values
+  const legacyMapping: Record<string, string> = {
+    'bath': 'grooming-bath',
+    'bath-only': 'grooming-bath',
+    'grooming-bath': 'grooming-bath',
+    'full-groom': 'grooming-full',
+    'full-grooming': 'grooming-full',
+    'full_groom': 'grooming-full',
+    'grooming-full': 'grooming-full',
+    'grooming': 'grooming-full',
+    'groom': 'grooming-full',
+  };
+  
+  // Check explicit mapping
+  if (legacyMapping[normalized]) {
+    return legacyMapping[normalized];
+  }
+  
+  // Heuristic fallback only if no exact match
+  if (normalized.includes('bath')) {
+    return 'grooming-bath';
+  }
+  
+  // Default to full grooming for any unknown values
+  return 'grooming-full';
+}
+
 export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const typedUser = user as User;
@@ -1604,6 +1641,7 @@ export default function Admin() {
   const [editDate, setEditDate] = useState<Date | undefined>(undefined);
   const [editTime, setEditTime] = useState('');
   const [editGroomerId, setEditGroomerId] = useState<number | null>(null);
+  const [editServiceType, setEditServiceType] = useState('');
   
   // Pagination for approved appointments
   const [approvedAppointmentsPage, setApprovedAppointmentsPage] = useState(0);
@@ -3632,6 +3670,11 @@ export default function Admin() {
                                 Price: ${currentAppointment.price}
                               </p>
                             )}
+                            {currentAppointment.groomerId && (
+                              <p className="text-xs text-blue-700 font-medium mt-1" data-testid={`appointment-groomer-${currentAppointment.id}`}>
+                                Groomer: {groomers.find((g: any) => g.id === currentAppointment.groomerId)?.name || 'Unknown'}
+                              </p>
+                            )}
                             <p className="text-xs text-purple-600 mt-0.5 font-medium">{hasMultiple ? 'Click purple badge to cycle through dates' : 'Click to view details'}</p>
                           </div>
                           <div className="flex flex-col gap-2 items-end">
@@ -3653,6 +3696,7 @@ export default function Admin() {
                                   setEditDate(currentAppointment.appointmentDate ? new Date(currentAppointment.appointmentDate) : undefined);
                                   setEditTime(currentAppointment.appointmentTime || '');
                                   setEditGroomerId(currentAppointment.groomerId || null);
+                                  setEditServiceType(normalizeServiceType(currentAppointment.serviceType || currentAppointment.service));
                                 }}
                                 data-testid={`edit-appointment-${currentAppointment.id}`}
                               >
@@ -5811,6 +5855,23 @@ export default function Admin() {
                 />
               </div>
 
+              {/* Service Type Selection */}
+              <div>
+                <Label htmlFor="edit-service-type">Service Type</Label>
+                <Select
+                  value={editServiceType}
+                  onValueChange={(value) => setEditServiceType(value)}
+                >
+                  <SelectTrigger id="edit-service-type" data-testid="select-edit-service-type">
+                    <SelectValue placeholder="Select service type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="grooming-bath">Bath Only</SelectItem>
+                    <SelectItem value="grooming-full">Full Grooming</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Groomer Selection */}
               <div>
                 <Label htmlFor="edit-groomer">Assign Groomer (Optional)</Label>
@@ -5898,7 +5959,8 @@ export default function Admin() {
                     price: editPrice,
                     appointmentDate: editDate,
                     appointmentTime: editTime,
-                    groomerId: editGroomerId
+                    groomerId: editGroomerId,
+                    serviceType: editServiceType
                   })}
                   disabled={updateAppointmentDetailsMutation.isPending}
                   className="bg-brand-blue hover:bg-blue-700"
