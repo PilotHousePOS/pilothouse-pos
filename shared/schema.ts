@@ -211,6 +211,7 @@ export const contacts = pgTable("contacts", {
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }), // Optional - use phone as placeholder if not provided
   phoneNumber: varchar("phone_number", { length: 20 }),
+  petNames: text("pet_names").array(), // Array of pet names from appointments
   notes: text("notes"),
   animalType: varchar("animal_type", { length: 100 }), // dog, cat, bird, reptile, etc.
   breed: varchar("breed", { length: 255 }), // specific breed (especially for dogs)
