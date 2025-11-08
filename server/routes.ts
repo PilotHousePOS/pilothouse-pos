@@ -1492,7 +1492,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const appointmentData = insertAppointmentSchema.parse({ 
         ...req.body, 
         userId,
-        isApproved: isAdmin ? true : false
+        isApproved: isAdmin ? true : false,
+        status: isAdmin ? 'confirmed' : 'scheduled'
       });
       const appointment = await storage.createAppointment(appointmentData);
       
