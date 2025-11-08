@@ -312,6 +312,8 @@ export const insertAppointmentSchema = createInsertSchema(appointments).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  ownerFirstName: z.string().optional(),
 });
 
 export const insertCustomerPetSchema = createInsertSchema(customerPets).omit({
