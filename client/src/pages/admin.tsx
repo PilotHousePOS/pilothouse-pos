@@ -2295,16 +2295,19 @@ export default function Admin() {
 
   const updateAppointmentIsHereMutation = useMutation({
     mutationFn: async ({ id, isHere }: { id: number; isHere: boolean }) => {
-      await apiRequest("PATCH", `/api/appointments/${id}/is-here`, { isHere });
+      const result = await apiRequest("PATCH", `/api/appointments/${id}/is-here`, { isHere });
+      return result;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: async (_, variables) => {
       toast({
         title: "Arrival Status Updated",
         description: variables.isHere ? "Customer marked as arrived" : "Customer marked as not arrived",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      // Force immediate refetch of appointments data
+      await queryClient.refetchQueries({ queryKey: ["/api/appointments"] });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Error updating isHere status:', error);
       toast({
         title: "Update Failed",
         description: "Failed to update arrival status. Please try again.",
