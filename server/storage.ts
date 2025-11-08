@@ -106,6 +106,8 @@ export interface IStorage {
     petType?: string; 
     specialNotes?: string; 
     price?: string;
+    appointmentDate?: string;
+    appointmentTime?: string;
   }): Promise<Appointment>;
   clearAllAppointments(): Promise<void>;
   bulkCreateAppointments(appointments: InsertAppointment[]): Promise<Appointment[]>;
@@ -663,6 +665,8 @@ export class DatabaseStorage implements IStorage {
     petType?: string; 
     specialNotes?: string; 
     price?: string;
+    appointmentDate?: string;
+    appointmentTime?: string;
   }): Promise<Appointment> {
     const updateData: any = { updatedAt: new Date() };
     
@@ -673,6 +677,8 @@ export class DatabaseStorage implements IStorage {
     if (updates.petType !== undefined) updateData.petType = updates.petType;
     if (updates.specialNotes !== undefined) updateData.specialNotes = updates.specialNotes;
     if (updates.price !== undefined) updateData.price = updates.price;
+    if (updates.appointmentDate !== undefined) updateData.appointmentDate = updates.appointmentDate;
+    if (updates.appointmentTime !== undefined) updateData.appointmentTime = updates.appointmentTime;
     
     const [updated] = await db
       .update(appointments)
