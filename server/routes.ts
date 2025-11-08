@@ -2516,6 +2516,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reset ALL isHere flags across all appointments (for fixing stale data)
+  app.post("/api/admin/appointments/reset-all-here", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      console.log('Running manual reset: Resetting ALL "Here" statuses across all appointments');
+      
+      const allAppointments = await storage.getAppointments();
+      
+      // Find all appointments with isHere = true
+      const appointmentsWithHere = allAppointments.filter((apt: any) => apt.isHere === true);
+      
+      console.log(`Found ${appointmentsWithHere.length} appointments with "Here" status set to true`);
+      
+      // Reset all of them
+      for (const appointment of appointmentsWithHere) {
+        await storage.updateAppointmentIsHere(appointment.id, false);
+        console.log(`Reset "Here" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
+      }
+      
+      res.json({ 
+        message: `Successfully reset ${appointmentsWithHere.length} "Here" statuses`,
+        resetCount: appointmentsWithHere.length
+      });
+    } catch (error) {
+      console.error('Error resetting all "Here" statuses:', error);
+      res.status(500).json({ 
+        message: "Failed to reset all 'Here' statuses", 
+        error: (error as Error).message 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -2380,6 +2380,26 @@ export default function Admin() {
     },
   });
 
+  const resetAllHereMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/admin/appointments/reset-all-here", {});
+    },
+    onSuccess: async (data: any) => {
+      toast({
+        title: "Reset Complete",
+        description: data.message || "All 'Here' statuses have been reset.",
+      });
+      await queryClient.refetchQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Reset Failed",
+        description: "Failed to reset 'Here' statuses.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const deleteCalendarEventMutation = useMutation({
     mutationFn: async (eventId: string) => {
       return await apiRequest("DELETE", `/api/admin/calendar/events/${eventId}`, {});
@@ -3085,10 +3105,26 @@ export default function Admin() {
           </CardContent>
         </Card>
         <Card className="min-h-[120px]">
-          <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
+          <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full relative">
             <Users className="w-8 h-8 mb-3 text-blue-600" />
             <div className="text-2xl font-bold mb-1" data-testid="dashboard-customers-here">{customersHere}</div>
-            <div className="text-sm text-gray-500">Customers Here</div>
+            <div className="text-sm text-gray-500 mb-2">Customers Here</div>
+            {typedUser?.isAdmin && customersHere > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  if (confirm('Reset ALL "Here" statuses across all appointments? This cannot be undone.')) {
+                    resetAllHereMutation.mutate();
+                  }
+                }}
+                disabled={resetAllHereMutation.isPending}
+                className="text-xs h-6 px-2"
+                data-testid="button-reset-all-here"
+              >
+                {resetAllHereMutation.isPending ? 'Resetting...' : 'Reset All'}
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
