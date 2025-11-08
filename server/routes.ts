@@ -2654,6 +2654,140 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Special date settings routes
+  app.get("/api/admin/special-dates", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin && !user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
+      }
+
+      const specialDates = await storage.getAllSpecialDateSettings();
+      
+      // Get allowed times for each special date
+      const specialDatesWithTimes = await Promise.all(
+        specialDates.map(async (setting) => {
+          const times = await storage.getSpecialDateAllowedTimes(setting.id);
+          return { ...setting, allowedTimes: times };
+        })
+      );
+
+      res.json(specialDatesWithTimes);
+    } catch (error) {
+      console.error('Error fetching special dates:', error);
+      res.status(500).json({ message: "Failed to fetch special dates" });
+    }
+  });
+
+  app.post("/api/admin/special-dates", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { date, name, allowedTimes } = req.body;
+
+      if (!date || !name || !allowedTimes || !Array.isArray(allowedTimes)) {
+        return res.status(400).json({ message: "Date, name, and allowedTimes array are required" });
+      }
+
+      // Create the special date setting
+      const setting = await storage.createSpecialDateSetting({ date, name });
+
+      // Add allowed times
+      const times = await Promise.all(
+        allowedTimes.map((time: string) =>
+          storage.addSpecialDateAllowedTime({
+            specialDateId: setting.id,
+            allowedTime: time,
+          })
+        )
+      );
+
+      res.json({ ...setting, allowedTimes: times });
+    } catch (error) {
+      console.error('Error creating special date:', error);
+      res.status(500).json({ message: "Failed to create special date" });
+    }
+  });
+
+  app.put("/api/admin/special-dates/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { id } = req.params;
+      const { date, name, allowedTimes } = req.body;
+
+      // Update the special date setting
+      const setting = await storage.updateSpecialDateSetting(parseInt(id), { date, name });
+
+      // If allowedTimes is provided, update them
+      if (allowedTimes && Array.isArray(allowedTimes)) {
+        // Delete existing times
+        const existingTimes = await storage.getSpecialDateAllowedTimes(setting.id);
+        await Promise.all(
+          existingTimes.map((time) => storage.deleteSpecialDateAllowedTime(time.id))
+        );
+
+        // Add new times
+        const times = await Promise.all(
+          allowedTimes.map((time: string) =>
+            storage.addSpecialDateAllowedTime({
+              specialDateId: setting.id,
+              allowedTime: time,
+            })
+          )
+        );
+
+        return res.json({ ...setting, allowedTimes: times });
+      }
+
+      const times = await storage.getSpecialDateAllowedTimes(setting.id);
+      res.json({ ...setting, allowedTimes: times });
+    } catch (error) {
+      console.error('Error updating special date:', error);
+      res.status(500).json({ message: "Failed to update special date" });
+    }
+  });
+
+  app.delete("/api/admin/special-dates/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { id } = req.params;
+      await storage.deleteSpecialDateSetting(parseInt(id));
+
+      res.json({ message: "Special date deleted successfully" });
+    } catch (error) {
+      console.error('Error deleting special date:', error);
+      res.status(500).json({ message: "Failed to delete special date" });
+    }
+  });
+
+  // Get special date settings for a specific date (used by booking page)
+  app.get("/api/special-dates/:date", async (req, res) => {
+    try {
+      const { date } = req.params;
+      const result = await storage.getSpecialDateWithTimes(date);
+      
+      if (!result) {
+        return res.json(null);
+      }
+
+      res.json({ ...result.setting, allowedTimes: result.times });
+    } catch (error) {
+      console.error('Error fetching special date:', error);
+      res.status(500).json({ message: "Failed to fetch special date" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

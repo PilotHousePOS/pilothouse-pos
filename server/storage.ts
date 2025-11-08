@@ -46,6 +46,12 @@ import {
   type InsertDailyAppointmentLimit,
   type WeeklyAppointmentLimit,
   type InsertWeeklyAppointmentLimit,
+  specialDateSettings,
+  specialDateAllowedTimes,
+  type SpecialDateSetting,
+  type InsertSpecialDateSetting,
+  type SpecialDateAllowedTime,
+  type InsertSpecialDateAllowedTime,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, ilike, lt, isNull } from "drizzle-orm";
@@ -173,6 +179,17 @@ export interface IStorage {
   getAllWeeklyAppointmentLimits(): Promise<WeeklyAppointmentLimit[]>;
   upsertWeeklyAppointmentLimit(limit: InsertWeeklyAppointmentLimit): Promise<WeeklyAppointmentLimit>;
   deleteWeeklyAppointmentLimit(id: number): Promise<void>;
+
+  // Special date settings operations
+  getSpecialDateSetting(date: string): Promise<SpecialDateSetting | undefined>;
+  getAllSpecialDateSettings(): Promise<SpecialDateSetting[]>;
+  createSpecialDateSetting(setting: InsertSpecialDateSetting): Promise<SpecialDateSetting>;
+  updateSpecialDateSetting(id: number, setting: Partial<InsertSpecialDateSetting>): Promise<SpecialDateSetting>;
+  deleteSpecialDateSetting(id: number): Promise<void>;
+  getSpecialDateAllowedTimes(specialDateId: number): Promise<SpecialDateAllowedTime[]>;
+  addSpecialDateAllowedTime(allowedTime: InsertSpecialDateAllowedTime): Promise<SpecialDateAllowedTime>;
+  deleteSpecialDateAllowedTime(id: number): Promise<void>;
+  getSpecialDateWithTimes(date: string): Promise<{ setting: SpecialDateSetting; times: SpecialDateAllowedTime[] } | null>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1053,6 +1070,54 @@ export class DatabaseStorage implements IStorage {
 
   async deleteWeeklyAppointmentLimit(id: number): Promise<void> {
     await db.delete(weeklyAppointmentLimits).where(eq(weeklyAppointmentLimits.id, id));
+  }
+
+  // Special date settings operations
+  async getSpecialDateSetting(date: string): Promise<SpecialDateSetting | undefined> {
+    const [setting] = await db.select().from(specialDateSettings).where(eq(specialDateSettings.date, date));
+    return setting;
+  }
+
+  async getAllSpecialDateSettings(): Promise<SpecialDateSetting[]> {
+    return await db.select().from(specialDateSettings).orderBy(specialDateSettings.date);
+  }
+
+  async createSpecialDateSetting(settingData: InsertSpecialDateSetting): Promise<SpecialDateSetting> {
+    const [result] = await db.insert(specialDateSettings).values(settingData).returning();
+    return result;
+  }
+
+  async updateSpecialDateSetting(id: number, settingData: Partial<InsertSpecialDateSetting>): Promise<SpecialDateSetting> {
+    const [result] = await db
+      .update(specialDateSettings)
+      .set({ ...settingData, updatedAt: new Date() })
+      .where(eq(specialDateSettings.id, id))
+      .returning();
+    return result;
+  }
+
+  async deleteSpecialDateSetting(id: number): Promise<void> {
+    await db.delete(specialDateSettings).where(eq(specialDateSettings.id, id));
+  }
+
+  async getSpecialDateAllowedTimes(specialDateId: number): Promise<SpecialDateAllowedTime[]> {
+    return await db.select().from(specialDateAllowedTimes).where(eq(specialDateAllowedTimes.specialDateId, specialDateId));
+  }
+
+  async addSpecialDateAllowedTime(allowedTimeData: InsertSpecialDateAllowedTime): Promise<SpecialDateAllowedTime> {
+    const [result] = await db.insert(specialDateAllowedTimes).values(allowedTimeData).returning();
+    return result;
+  }
+
+  async deleteSpecialDateAllowedTime(id: number): Promise<void> {
+    await db.delete(specialDateAllowedTimes).where(eq(specialDateAllowedTimes.id, id));
+  }
+
+  async getSpecialDateWithTimes(date: string): Promise<{ setting: SpecialDateSetting; times: SpecialDateAllowedTime[] } | null> {
+    const setting = await this.getSpecialDateSetting(date);
+    if (!setting) return null;
+    const times = await this.getSpecialDateAllowedTimes(setting.id);
+    return { setting, times };
   }
 }
 
