@@ -5815,17 +5815,17 @@ export default function Admin() {
               <div>
                 <Label htmlFor="edit-groomer">Assign Groomer (Optional)</Label>
                 <Select
-                  value={editGroomerId?.toString() || ''}
-                  onValueChange={(value) => setEditGroomerId(value ? parseInt(value) : null)}
+                  value={editGroomerId !== null ? editGroomerId.toString() : 'none'}
+                  onValueChange={(value) => setEditGroomerId(value === 'none' ? null : parseInt(value))}
                 >
                   <SelectTrigger id="edit-groomer" data-testid="select-edit-groomer">
                     <SelectValue placeholder="Select a groomer (optional)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No groomer assigned</SelectItem>
-                    {(groomers as any[])
-                      .filter((g) => g.isActive)
-                      .map((groomer) => (
+                    <SelectItem value="none">No groomer assigned</SelectItem>
+                    {Array.isArray(groomers) && groomers
+                      .filter((g: any) => g.isActive)
+                      .map((groomer: any) => (
                         <SelectItem key={groomer.id} value={groomer.id.toString()}>
                           {groomer.name}
                         </SelectItem>
