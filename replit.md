@@ -25,6 +25,7 @@ The application is a full-stack web application with a clear separation of conce
 - Prominent warning banners for breed restrictions.
 - Toast notifications for user feedback.
 - Universal back button at top-left corner on secondary pages, using `safeGoBack` to prevent navigation to auth pages.
+- **Force Refresh Button**: Manual refresh control in admin dashboard header to clear all cached data and force refetch from server, addressing stale data issues on tablets and mobile devices.
 
 **Technical Implementations & Feature Specifications:**
 - **Pet & Supply Management:** Multi-image support with Amazon-style enlargement and mobile swipe gestures.
@@ -32,7 +33,7 @@ The application is a full-stack web application with a clear separation of conce
     - 15-minute intervals with admin approval workflow and automated email notifications
     - "My Appointments" page for customers
     - Google Calendar appointment sync with incremental imports (no duplicates) and intelligent parsing
-    - **Google Calendar Integration**: ALL calendar events sync to appointments (phone numbers optional, syncs from today onwards). Newly synced events appear in pending appointments requiring admin approval
+    - **Google Calendar Integration**: Calendar events sync to appointments (phone numbers optional, syncs from NOW onwards to exclude past appointments). Newly synced events appear in pending appointments requiring admin approval
     - **Service Type Detection**: Events with "bath" in title marked as "Bath Only", all others as "Full Grooming"
     - **Collapsible UI**: Approved appointments display at the top with inline status controls; Pending Approval section follows; Pending appointments (from Google Calendar sync) come next; Denied appointments behind expandable button. All appointment sections appear before any order sections
     - **Pagination System**: Approved and Denied appointments display 4 items per page with mobile swipe gestures and arrow navigation. Sliding window shows max 5 page indicators to prevent overflow. Automatic page clamping prevents blank sections when lists shrink after status changes
