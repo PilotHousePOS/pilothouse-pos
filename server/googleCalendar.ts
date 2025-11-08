@@ -245,19 +245,18 @@ export async function syncAppointmentsFromCalendarEvents() {
   try {
     const calendar = await getUncachableGoogleCalendarClient();
     
-    // Start from today at midnight to sync all current and future appointments
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to midnight
+    // Start from NOW to only sync future appointments (not past ones from today)
+    const now = new Date();
     
-    // Fetch events from today through next 90 days
+    // Fetch events from now through next 90 days
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 90);
 
-    console.log(`[SYNC] Fetching calendar events from ${today.toISOString()} to ${futureDate.toISOString()}`);
+    console.log(`[SYNC] Fetching calendar events from ${now.toISOString()} to ${futureDate.toISOString()}`);
 
     const response = await calendar.events.list({
       calendarId: 'primary',
-      timeMin: today.toISOString(),
+      timeMin: now.toISOString(),
       timeMax: futureDate.toISOString(),
       maxResults: 500,
       singleEvents: true,

@@ -2991,6 +2991,33 @@ export default function Admin() {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
           <div className="flex items-center space-x-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments/unapproved"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/groomers"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/admin/groomers"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/admin/grooming-settings"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/admin/daily-limits"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/admin/calendar/events"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/admin/calendar/events/date"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
+                toast({
+                  title: "Refreshed",
+                  description: "All data has been refreshed from the server.",
+                });
+              }}
+              data-testid="button-refresh-all"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Refresh
+            </Button>
             <AdminNotifications />
             {typedUser?.isAdmin ? (
               <Badge variant="secondary" className="bg-brand-blue text-white">
