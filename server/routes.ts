@@ -1337,6 +1337,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get appointment details before updating for customer notification
       const oldAppointment = await storage.getAppointment(id);
+      
+      // Groomers can only edit already-approved appointments, not approve pending ones
+      if (user?.isGroomer && !user?.isAdmin && oldAppointment?.status === 'scheduled') {
+        return res.status(403).json({ message: "Only admins can approve pending appointments" });
+      }
+      
       const appointment = await storage.updateAppointmentStatus(id, status);
       
       // Send customer notification for confirmed or rejected appointments

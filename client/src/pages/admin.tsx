@@ -3743,7 +3743,7 @@ export default function Admin() {
                           size="sm"
                           className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
                           onClick={() => approveAppointmentMutation.mutate(currentAppointment.id)}
-                          disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending}
+                          disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending || (typedUser?.isGroomer && !typedUser?.isAdmin)}
                           data-testid={`approve-appointment-${currentAppointment.id}`}
                         >
                           {approveAppointmentMutation.isPending ? 'Approving...' : 'Approve'}
@@ -3753,7 +3753,7 @@ export default function Admin() {
                           variant="destructive"
                           className="w-full sm:w-auto"
                           onClick={() => rejectAppointmentMutation.mutate(currentAppointment.id)}
-                          disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending}
+                          disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending || (typedUser?.isGroomer && !typedUser?.isAdmin)}
                           data-testid={`reject-appointment-${currentAppointment.id}`}
                         >
                           {rejectAppointmentMutation.isPending ? 'Rejecting...' : 'Reject'}
