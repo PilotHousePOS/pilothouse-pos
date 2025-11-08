@@ -2457,7 +2457,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { statuses } = req.body; // Optional array of statuses to filter
       
-      console.log('Running manual cleanup: Clearing past appointments', statuses ? `for statuses: ${statuses.join(', ')}` : 'for all statuses');
+      console.log('Running manual cleanup: Clearing past appointments and resetting "Here" status', statuses ? `for statuses: ${statuses.join(', ')}` : 'for all statuses');
       
       const allAppointments = await storage.getAppointments();
       
@@ -2465,7 +2465,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      // Filter for appointments that have already passed
+      // First, reset isHere flag for ALL past appointments (regardless of status filter)
+      const pastAppointmentsWithHere = allAppointments.filter((apt: any) => {
+        if (!apt.isHere) return false;
+        
+        const appointmentDate = new Date(apt.appointmentDate);
+        appointmentDate.setHours(0, 0, 0, 0);
+        
+        return appointmentDate < today;
+      });
+      
+      console.log(`Resetting "Here" status for ${pastAppointmentsWithHere.length} past appointments`);
+      
+      for (const appointment of pastAppointmentsWithHere) {
+        await storage.updateAppointmentIsHere(appointment.id, false);
+        console.log(`Reset "Here" status for appointment: ${appointment.id} from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
+      }
+      
+      // Then, delete appointments that match the filter criteria
       const pastAppointments = allAppointments.filter((apt: any) => {
         // If statuses filter is provided, check if appointment matches
         if (statuses && Array.isArray(statuses) && statuses.length > 0) {
@@ -2486,8 +2503,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       res.json({ 
-        message: `Successfully deleted ${pastAppointments.length} past appointments`,
-        deletedCount: pastAppointments.length
+        message: `Successfully deleted ${pastAppointments.length} past appointments and reset ${pastAppointmentsWithHere.length} "Here" statuses`,
+        deletedCount: pastAppointments.length,
+        hereResetCount: pastAppointmentsWithHere.length
       });
     } catch (error) {
       console.error('Error cleaning up past appointments:', error);

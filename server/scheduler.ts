@@ -2,10 +2,10 @@ import cron from 'node-cron';
 import { storage } from './storage';
 
 export function initializeScheduledTasks() {
-  // Clear approved appointments every day at 12:00 AM
+  // Clear approved appointments and reset "Here" status every day at 12:00 AM
   cron.schedule('0 0 * * *', async () => {
     try {
-      console.log('Running scheduled task: Clearing past approved appointments at midnight');
+      console.log('Running scheduled task: Clearing past approved appointments and resetting "Here" status at midnight');
       
       const allAppointments = await storage.getAppointments();
       
@@ -13,7 +13,24 @@ export function initializeScheduledTasks() {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      // Filter for approved appointments (confirmed or completed) that have already passed
+      // First, reset isHere flag for ALL past appointments (regardless of status)
+      const pastAppointmentsWithHere = allAppointments.filter((apt: any) => {
+        if (!apt.isHere) return false;
+        
+        const appointmentDate = new Date(apt.appointmentDate);
+        appointmentDate.setHours(0, 0, 0, 0);
+        
+        return appointmentDate < today;
+      });
+      
+      console.log(`Resetting "Here" status for ${pastAppointmentsWithHere.length} past appointments`);
+      
+      for (const appointment of pastAppointmentsWithHere) {
+        await storage.updateAppointmentIsHere(appointment.id, false);
+        console.log(`Reset "Here" status for appointment: ${appointment.id} from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
+      }
+      
+      // Then, delete approved appointments (confirmed or completed) that have already passed
       const pastApprovedAppointments = allAppointments.filter((apt: any) => {
         // Include both confirmed and completed as "approved" statuses
         if (apt.status !== 'confirmed' && apt.status !== 'completed') return false;
@@ -31,7 +48,7 @@ export function initializeScheduledTasks() {
         console.log(`Deleted past appointment: ${appointment.id} from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
       }
       
-      console.log('Successfully cleared past approved appointments');
+      console.log('Successfully cleared past approved appointments and reset "Here" status');
     } catch (error) {
       console.error('Error clearing past approved appointments:', error);
     }
