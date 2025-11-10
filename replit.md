@@ -31,7 +31,7 @@ The application is a full-stack web application with a clear separation of conce
 - Force Refresh Button in admin dashboard header to clear cached data.
 
 **Technical Implementations & Feature Specifications:**
-- **Pet & Supply Management:** Multi-image support, extensive inventory (5,893+ supplies), automated brand extraction (840+ brands), specialized reptile supply filter (723+ products by brand/keyword), and case-insensitive search for all products and pets.
+- **Pet & Supply Management:** Multi-image support, extensive inventory (5,893+ supplies), automated brand extraction (840+ brands), specialized reptile supply filter (723+ products by brand/keyword), case-insensitive search for all products and pets, and paginated supply loading (24 items per page) to optimize performance and reduce customer lag.
 - **Appointment System:** 15-minute intervals, admin approval workflow, email notifications, "My Appointments" page, Google Calendar sync, chronological ordering, service type detection, collapsible UI, pagination, customer arrival and payment tracking, weekly appointment limits, special date configurations, groomer assignment, role-based access, visual indicators, automatic past appointment hiding, booking restrictions (no same-day for customers), scheduled daily maintenance tasks, manual cleanup options, appointment editing, and comprehensive appointment history tracking integrated with contacts.
 - **Order & Notification System:** Admin email/push notifications for new orders/appointments, customer email/SMS/web push for order status, and detailed order history.
 - **Authentication & Authorization:** JWT tokens in secure cookies, password reset, user settings, admin user management, three-tier role system (Customer, Groomer, Admin).
