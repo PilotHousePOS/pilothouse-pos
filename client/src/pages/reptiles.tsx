@@ -5,8 +5,29 @@ import { ShoppingCart, Sparkles, X, ChevronLeft, ChevronRight, ArrowLeft } from 
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { safeGoBack } from "@/lib/navigation";
+
+const ITEMS_PER_PAGE = 24;
+
+// Helper function to calculate which page indicators to display (max 5)
+function getPageIndicators(currentPage: number, totalPages: number): number[] {
+  const MAX_INDICATORS = 5;
+  
+  if (totalPages <= MAX_INDICATORS) {
+    return Array.from({ length: totalPages }, (_, i) => i);
+  }
+  
+  let startPage = Math.max(0, currentPage - Math.floor(MAX_INDICATORS / 2));
+  let endPage = startPage + MAX_INDICATORS;
+  
+  if (endPage > totalPages) {
+    endPage = totalPages;
+    startPage = Math.max(0, endPage - MAX_INDICATORS);
+  }
+  
+  return Array.from({ length: endPage - startPage }, (_, i) => startPage + i);
+}
 
 export default function ReptilesPage() {
   const { toast } = useToast();
@@ -14,6 +35,9 @@ export default function ReptilesPage() {
   const [selectedType, setSelectedType] = useState<"pet" | "supply" | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [modalZoom, setModalZoom] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
 
   const { data: pets = [], isLoading: petsLoading } = useQuery<any[]>({
     queryKey: ["/api/pets", { species: "reptile" }],
@@ -25,15 +49,23 @@ export default function ReptilesPage() {
   });
 
   const { data: suppliesData, isLoading: suppliesLoading } = useQuery<any>({
-    queryKey: ["/api/supplies", { category: "reptile-supplies", limit: 100 }],
+    queryKey: ["/api/supplies", { category: "reptile-supplies", page: currentPage, limit: ITEMS_PER_PAGE }],
     queryFn: async () => {
-      const response = await fetch("/api/supplies?category=reptile-supplies&limit=100");
+      const response = await fetch(`/api/supplies?category=reptile-supplies&page=${currentPage}&limit=${ITEMS_PER_PAGE}`);
       if (!response.ok) throw new Error("Failed to fetch supplies");
       return response.json();
     },
   });
 
   const supplies = suppliesData?.items || [];
+  const totalPages = suppliesData?.totalPages || 0;
+
+  // Reset page when totalPages changes or currentPage is out of bounds
+  useEffect(() => {
+    if (totalPages > 0 && currentPage >= totalPages) {
+      setCurrentPage(0);
+    }
+  }, [totalPages, currentPage]);
 
   const handleAddToCart = async (item: any, type: "pet" | "supply") => {
     try {
@@ -183,53 +215,118 @@ export default function ReptilesPage() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-max">
-              {supplies.map((supply: any) => (
-                <Card 
-                  key={supply.id} 
-                  className="overflow-visible hover:shadow-lg transition-shadow flex flex-col min-w-0 cursor-pointer"
-                  onClick={() => {
-                    setSelectedItem(supply);
-                    setSelectedType("supply");
-                  }}
-                >
-                  <div className="h-48 bg-gray-200 overflow-hidden flex-shrink-0">
-                    {(supply.imageUrls?.[0] || supply.imageUrl) && (
-                      <img
-                        src={supply.imageUrls?.[0] || supply.imageUrl}
-                        alt={supply.name}
-                        className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
-                      />
-                    )}
-                  </div>
-                  <CardContent className="p-4 pb-6 flex flex-col flex-grow">
-                    <h3 className="font-bold text-lg mb-2">{supply.name}</h3>
-                    <p className="text-sm text-gray-600 mb-2">{supply.category}</p>
-                    {supply.description && (
-                      <p className="text-sm text-gray-500 mb-3 line-clamp-2">
-                        {supply.description}
-                      </p>
-                    )}
-                    <div className="mt-auto pt-2 space-y-3">
-                      <div className="text-lg font-bold text-green-600">
-                        ${supply.price}
-                      </div>
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAddToCart(supply, "supply");
-                        }}
-                        className="w-full bg-green-600 hover:bg-green-700"
-                        data-testid={`add-to-cart-supply-${supply.id}`}
-                      >
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Add to Cart
-                      </Button>
+            <>
+              <div 
+                className="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-max"
+                onTouchStart={(e) => {
+                  setTouchStart(e.targetTouches[0].clientX);
+                  setTouchEnd(0);
+                }}
+                onTouchMove={(e) => setTouchEnd(e.targetTouches[0].clientX)}
+                onTouchEnd={() => {
+                  if (touchEnd !== 0) {
+                    if (touchStart - touchEnd > 75 && currentPage < totalPages - 1) {
+                      setCurrentPage(currentPage + 1);
+                    }
+                    if (touchStart - touchEnd < -75 && currentPage > 0) {
+                      setCurrentPage(currentPage - 1);
+                    }
+                  }
+                }}
+              >
+                {supplies.map((supply: any) => (
+                  <Card 
+                    key={supply.id} 
+                    className="overflow-visible hover:shadow-lg transition-shadow flex flex-col min-w-0 cursor-pointer"
+                    onClick={() => {
+                      setSelectedItem(supply);
+                      setSelectedType("supply");
+                    }}
+                  >
+                    <div className="h-48 bg-gray-200 overflow-hidden flex-shrink-0">
+                      {(supply.imageUrls?.[0] || supply.imageUrl) && (
+                        <img
+                          src={supply.imageUrls?.[0] || supply.imageUrl}
+                          alt={supply.name}
+                          className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
+                        />
+                      )}
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    <CardContent className="p-4 pb-6 flex flex-col flex-grow">
+                      <h3 className="font-bold text-lg mb-2">{supply.name}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{supply.category}</p>
+                      {supply.description && (
+                        <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+                          {supply.description}
+                        </p>
+                      )}
+                      <div className="mt-auto pt-2 space-y-3">
+                        <div className="text-lg font-bold text-green-600">
+                          ${supply.price}
+                        </div>
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart(supply, "supply");
+                          }}
+                          className="w-full bg-green-600 hover:bg-green-700"
+                          data-testid={`add-to-cart-supply-${supply.id}`}
+                        >
+                          <ShoppingCart className="w-4 h-4 mr-2" />
+                          Add to Cart
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    disabled={currentPage === 0}
+                    className="text-green-600 hover:text-green-800"
+                    data-testid="button-prev-page"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </Button>
+                  
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-600">
+                      Page {currentPage + 1} of {totalPages}
+                    </span>
+                    <div className="flex gap-2">
+                      {getPageIndicators(currentPage, totalPages).map((i) => (
+                        <button
+                          key={i}
+                          onClick={() => setCurrentPage(i)}
+                          className={`w-2 h-2 rounded-full transition-all ${
+                            i === currentPage ? 'bg-green-600 w-6' : 'bg-gray-300 hover:bg-gray-400'
+                          }`}
+                          aria-label={`Go to page ${i + 1}`}
+                          data-testid={`page-indicator-${i}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    disabled={currentPage === totalPages - 1}
+                    className="text-green-600 hover:text-green-800"
+                    data-testid="button-next-page"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </section>
       </div>
