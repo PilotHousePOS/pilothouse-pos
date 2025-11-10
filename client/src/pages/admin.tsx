@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import type { User } from "@shared/schema";
@@ -50,7 +50,8 @@ import {
   ChevronRight,
   ChevronDown,
   ChevronUp,
-  DollarSign
+  DollarSign,
+  History
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -353,7 +354,7 @@ function ContactAppointmentHistory({ contactId }: { contactId: number }) {
 
   return (
     <div className="space-y-2">
-      <p className="text-sm font-medium text-gray-700">Grooming History ({completedAppointments.length})</p>
+      <p className="text-sm font-medium text-gray-700">Recent Grooming History ({completedAppointments.length})</p>
       <div className="space-y-2 max-h-48 overflow-y-auto">
         {completedAppointments.map((apt: any) => (
           <div key={apt.id} className="bg-gray-50 rounded p-2 text-xs" data-testid={`appointment-history-${apt.id}`}>
@@ -374,6 +375,164 @@ function ContactAppointmentHistory({ contactId }: { contactId: number }) {
         ))}
       </div>
     </div>
+  );
+}
+
+// Full History Dialog Component
+function ContactFullHistoryDialog({ contactId, contactName, isOpen, onClose }: { 
+  contactId: number; 
+  contactName: string;
+  isOpen: boolean; 
+  onClose: () => void;
+}) {
+  // Fetch current appointments
+  const { data: currentAppointments = [], isLoading: isLoadingCurrent, error: currentError } = useQuery<any[]>({
+    queryKey: ["/api/contacts", contactId, "appointments"],
+    queryFn: async () => {
+      const response = await fetch(`/api/contacts/${contactId}/appointments`, {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch current appointments');
+      return response.json();
+    },
+    enabled: isOpen && !!contactId,
+  });
+
+  // Fetch historical appointments
+  const { data: historicalAppointments = [], isLoading: isLoadingHistory, error: historyError } = useQuery<any[]>({
+    queryKey: ["/api/contacts", contactId, "history"],
+    queryFn: async () => {
+      const response = await fetch(`/api/contacts/${contactId}/history`, {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch appointment history');
+      return response.json();
+    },
+    enabled: isOpen && !!contactId,
+  });
+
+  const { toast } = useToast();
+
+  // Show error toast when errors occur (using useEffect to avoid repeated renders)
+  React.useEffect(() => {
+    if (currentError || historyError) {
+      toast({
+        title: "Error Loading Data",
+        description: "Failed to fetch appointment data. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [currentError, historyError, toast]);
+
+  const isLoading = isLoadingCurrent || isLoadingHistory;
+  
+  // Filter current appointments for confirmed/completed
+  const confirmedAppointments = currentAppointments.filter(apt => 
+    apt.status === 'confirmed' || apt.status === 'completed'
+  );
+
+  // Helper function to format service type
+  const formatService = (serviceType: string) => {
+    if (!serviceType) return 'Grooming';
+    if (serviceType.toLowerCase().includes('bath')) return 'Bath';
+    if (serviceType.toLowerCase().includes('full') || serviceType.toLowerCase().includes('grooming')) return 'Full Grooming';
+    return serviceType;
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Full Grooming History - {contactName}</DialogTitle>
+        </DialogHeader>
+
+        {isLoading && (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-sm text-gray-500">Loading history...</div>
+          </div>
+        )}
+
+        {!isLoading && (
+          <div className="space-y-6">
+            {/* Current Appointments Section */}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                Current Appointments
+                <Badge variant="default" className="bg-green-600">Active</Badge>
+              </h3>
+              {currentError ? (
+                <div className="bg-red-50 border border-red-200 rounded p-3 text-sm text-red-700">
+                  Failed to load current appointments. Please try again.
+                </div>
+              ) : confirmedAppointments.length === 0 ? (
+                <p className="text-sm text-gray-500">No current appointments</p>
+              ) : (
+                <div className="space-y-2">
+                  {confirmedAppointments.map((apt: any) => (
+                    <div key={`current-${apt.id}`} className="bg-gray-50 rounded p-3 text-sm" data-testid={`current-appointment-${apt.id}`}>
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-1">
+                          <p className="font-semibold">{formatService(apt.serviceType || apt.service)}</p>
+                          <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
+                          <p className="text-gray-500 text-xs">
+                            {parseLocalDate(apt.appointmentDate).toLocaleDateString()} at {apt.appointmentTime}
+                          </p>
+                          {apt.groomerName && (
+                            <p className="text-gray-600 text-xs">Groomer: {apt.groomerName}</p>
+                          )}
+                        </div>
+                        <Badge variant="outline" className="text-xs">{apt.status}</Badge>
+                      </div>
+                      {apt.specialNotes && (
+                        <p className="text-gray-600 mt-2 italic text-xs">{apt.specialNotes}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Historical Appointments Section */}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                Past Appointments (Archived)
+                <Badge variant="secondary" className="bg-gray-400">Archived</Badge>
+              </h3>
+              {historyError ? (
+                <div className="bg-red-50 border border-red-200 rounded p-3 text-sm text-red-700">
+                  Failed to load appointment history. Please try again.
+                </div>
+              ) : historicalAppointments.length === 0 ? (
+                <p className="text-sm text-gray-500">No archived appointments</p>
+              ) : (
+                <div className="space-y-2">
+                  {historicalAppointments.map((apt: any) => (
+                    <div key={`history-${apt.id}`} className="bg-gray-100 rounded p-3 text-sm opacity-80" data-testid={`history-item-${apt.id}`}>
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-1">
+                          <p className="font-semibold text-gray-700">{formatService(apt.serviceType)}</p>
+                          <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
+                          <p className="text-gray-500 text-xs">
+                            {parseLocalDate(apt.appointmentDate).toLocaleDateString()} at {apt.appointmentTime}
+                          </p>
+                          {apt.groomerName && (
+                            <p className="text-gray-600 text-xs">Groomer: {apt.groomerName}</p>
+                          )}
+                        </div>
+                        <Badge variant="outline" className="text-xs bg-gray-200">{apt.status}</Badge>
+                      </div>
+                      {apt.notes && (
+                        <p className="text-gray-600 mt-2 italic text-xs">{apt.notes}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -403,6 +562,7 @@ function ContactsManager() {
   });
   const [currentPage, setCurrentPage] = useState(0);
   const [expandedContactId, setExpandedContactId] = useState<string | number | null>(null);
+  const [historyDialogContact, setHistoryDialogContact] = useState<{ id: number; name: string } | null>(null);
 
   // Dog breeds list for the breed selector
   const dogBreeds = [
@@ -1310,7 +1470,7 @@ function ContactsManager() {
                       </div>
                     )}
                     
-                    {/* Edit/Delete buttons - only visible when expanded */}
+                    {/* Action buttons - only visible when expanded */}
                     {contact.isDatabaseContact && isExpanded && (
                       <div className="flex gap-2 pt-2 mt-1 border-t border-gray-200">
                         <Button
@@ -1325,6 +1485,19 @@ function ContactsManager() {
                         >
                           <Edit className="w-4 h-4 mr-1" />
                           <span className="text-sm">Edit</span>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-3 flex-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setHistoryDialogContact({ id: contact.id, name: contact.displayName || contact.name });
+                          }}
+                          data-testid={`button-view-history-${index}`}
+                        >
+                          <History className="w-4 h-4 mr-1" />
+                          <span className="text-sm">History</span>
                         </Button>
                         <Button
                           variant="ghost"
@@ -1419,6 +1592,16 @@ function ContactsManager() {
               Create Event with Selected Contacts
             </Button>
           </div>
+        )}
+        
+        {/* Full History Dialog */}
+        {historyDialogContact && (
+          <ContactFullHistoryDialog
+            contactId={historyDialogContact.id}
+            contactName={historyDialogContact.name ?? ''}
+            isOpen={Boolean(historyDialogContact)}
+            onClose={() => setHistoryDialogContact(null)}
+          />
         )}
       </CardContent>
     </Card>
