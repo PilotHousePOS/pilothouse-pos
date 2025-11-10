@@ -52,6 +52,20 @@ The application is a full-stack web application with a clear separation of conce
       - Auto-sync Google Calendar appointments and contacts daily at 7:30 AM (EST)
     - **Manual Cleanup**: Section-specific "Clear Past" buttons available for admins in Approved, Pending, and Denied appointment sections. Each button only deletes past appointments from its respective section (Approved: confirmed/completed, Pending: scheduled, Denied: rejected/cancelled)
     - **Appointment Editing**: Admins and groomers can edit all appointment details including date, time, groomer assignment, and service type via the edit dialog. Date formatting uses local timezone to prevent date shift issues when saving changes
+    - **Appointment History System**: Comprehensive history tracking for deleted appointments integrated with contact management
+      - **Database Schema**: Dedicated `appointmentHistory` table with contactId foreign key, indexed for performance. Stores full appointment details including date, time, service type, pet info, groomer name, status, and source (manual/calendar)
+      - **Automatic Preservation**: All past appointments are automatically saved to history before deletion via:
+        - Midnight scheduler cleanup (saves past approved appointments daily at 12:00 AM EST)
+        - Manual "Clear Past" buttons in each appointment section
+        - Transactional contact lookup/creation ensures data integrity even for calendar-synced appointments
+      - **History Retrieval**: GET `/api/contacts/:id/history` API endpoint (admin/groomer only) returns chronological history ordered by date descending
+      - **Dual-Surface UI**: Contact cards display both inline "Recent Grooming History" (last 3 appointments) and "View Full History" button
+      - **Full History Dialog**: Opens comprehensive dialog with two parallel-loaded sections:
+        - "Current Appointments" section with "Active" badge showing confirmed/completed appointments still in database
+        - "Past Appointments (Archived)" section with "Archived" badge showing deleted appointments from history table with muted styling
+        - Robust error handling with useEffect for toast notifications and explicit error states
+        - Loading states, empty states, and proper close handling
+      - **Contact Integration**: History persists across contact lifecycle, enabling grooming pattern analysis and customer service insights
 - **Order & Notification System:** Admin email/push notifications for new orders/appointments. Customer email/SMS/web push for order status. Order History page with detailed modals.
 - **Authentication & Authorization:** 
     - JWT tokens in secure cookies with comprehensive password reset
