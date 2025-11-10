@@ -25,9 +25,9 @@ export default function AquaticsPage() {
   });
 
   const { data: suppliesData, isLoading: suppliesLoading } = useQuery<any>({
-    queryKey: ["/api/supplies", { category: "aquatic", limit: 100 }],
+    queryKey: ["/api/supplies", { category: "aquatic-supplies", limit: 100 }],
     queryFn: async () => {
-      const response = await fetch("/api/supplies?category=aquatic&limit=100");
+      const response = await fetch("/api/supplies?category=aquatic-supplies&limit=100");
       if (!response.ok) throw new Error("Failed to fetch supplies");
       return response.json();
     },

@@ -15,7 +15,10 @@ A mobile-friendly web application for "Animal House" pet store, focusing on pet 
 - Mobile authentication consistency: Same account should show identical admin access across devices
 - Inventory Management: Full product names and descriptions preserved from Excel imports (no abbreviations)
 - Search Functionality: All searches (supplies, pets) must be case-insensitive
-- Reptile Supplies: Specialized filtering system identifies reptile products by brand and keywords while maintaining original categories
+- Supply Filtering: Centralized filtering system with proper brand/keyword separation:
+  - Reptile supplies (681 items): ZooMed, Exo Terra, Zilla, Fluker's, ReptiCare brands + reptile-related keywords
+  - Aquatic supplies (187 items): Tetra, Aqueon, GloFish, Marina, API, Fluval, SeaChem, Hikari brands + aquatic-related keywords
+  - Mutual exclusions ensure no cross-contamination between categories
 
 ## System Architecture
 The application is a full-stack web application with a clear separation of concerns, built with React, Vite, TypeScript, Tailwind CSS, shadcn/ui for the frontend, and Express.js with TypeScript for the backend, utilizing PostgreSQL with Drizzle ORM.

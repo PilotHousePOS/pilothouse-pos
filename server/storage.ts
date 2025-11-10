@@ -57,8 +57,9 @@ import {
   type InsertSpecialDateAllowedTime,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, and, or, ilike, lt, isNull, count, sql } from "drizzle-orm";
+import { eq, desc, asc, and, or, not, ilike, lt, isNull, count, sql } from "drizzle-orm";
 import { phoneNumbersMatch } from "./phoneUtils";
+import { SUPPLY_FILTERS, type FilterType } from "./filterConfig";
 
 export interface IStorage {
   // User operations
@@ -89,7 +90,7 @@ export interface IStorage {
     offset: number; 
     category?: string; 
     search?: string; 
-    isReptileFilter?: boolean;
+    filterType?: FilterType;
   }): Promise<{ items: Supply[]; total: number }>;
   getSupply(id: number): Promise<Supply | undefined>;
   createSupply(supply: InsertSupply): Promise<Supply>;
@@ -417,12 +418,16 @@ export class DatabaseStorage implements IStorage {
 
   async getReptileSupplies(): Promise<Supply[]> {
     // Get supplies for reptiles based on brand or keywords in name/description
-    const reptileBrands = ['ZooMed', 'Exo Terra', 'Zilla', "Fluker's", 'ReptiCare', 'Tetra'];
+    const reptileBrands = ['ZooMed', 'Exo Terra', 'Zilla', "Fluker's", 'ReptiCare'];
     const reptileKeywords = [
       'gecko', 'lizard', 'snake', 'turtle', 'tortoise', 'chameleon',
       'bearded dragon', 'iguana', 'frog', 'toad', 'salamander', 'newt',
       'reptile', 'amphibian', 'terrarium', 'vivarium', 'repti'
     ];
+    
+    // Aquatic brands and keywords to EXCLUDE from reptile supplies
+    const aquaticBrands = ['Tetra', 'Aqueon', 'GloFish', 'Marina', 'API', 'Fluval', 'SeaChem', 'Hikari'];
+    const aquaticKeywords = ['fish', 'aquarium', 'aquatic', 'glo fish', 'betta'];
     
     // Build OR conditions for brands and keywords
     const brandConditions = reptileBrands.map(brand => eq(supplies.brand, brand));
@@ -431,13 +436,24 @@ export class DatabaseStorage implements IStorage {
       ilike(supplies.description, `%${keyword}%`)
     ]);
     
+    // Build exclusion conditions for aquatic products (handle NULL fields with OR isNull)
+    const aquaticBrandExclusions = aquaticBrands.map(brand => 
+      or(isNull(supplies.brand), not(eq(supplies.brand, brand)))
+    );
+    const aquaticKeywordExclusions = aquaticKeywords.flatMap(keyword => [
+      or(isNull(supplies.name), not(ilike(supplies.name, `%${keyword}%`))),
+      or(isNull(supplies.description), not(ilike(supplies.description, `%${keyword}%`)))
+    ]);
+    
     return await db
       .select()
       .from(supplies)
       .where(
         and(
           eq(supplies.isActive, true),
-          or(...brandConditions, ...keywordConditions)
+          or(...brandConditions, ...keywordConditions),
+          ...aquaticBrandExclusions,
+          ...aquaticKeywordExclusions
         )
       )
       .orderBy(desc(supplies.createdAt));
@@ -465,29 +481,37 @@ export class DatabaseStorage implements IStorage {
     offset: number;
     category?: string;
     search?: string;
-    isReptileFilter?: boolean;
+    filterType?: FilterType;
   }): Promise<{ items: Supply[]; total: number }> {
-    const { limit, offset, category, search, isReptileFilter } = params;
+    const { limit, offset, category, search, filterType } = params;
 
     // Build WHERE conditions based on filters
     let whereConditions: any[] = [eq(supplies.isActive, true)];
 
-    if (isReptileFilter) {
-      // Reptile filter: use brand and keyword matching
-      const reptileBrands = ['ZooMed', 'Exo Terra', 'Zilla', "Fluker's", 'ReptiCare', 'Tetra'];
-      const reptileKeywords = [
-        'gecko', 'lizard', 'snake', 'turtle', 'tortoise', 'chameleon',
-        'bearded dragon', 'iguana', 'frog', 'toad', 'salamander', 'newt',
-        'reptile', 'amphibian', 'terrarium', 'vivarium', 'repti'
-      ];
+    if (filterType) {
+      // Use centralized filter configuration
+      const config = SUPPLY_FILTERS[filterType];
       
-      const brandConditions = reptileBrands.map(brand => eq(supplies.brand, brand));
-      const keywordConditions = reptileKeywords.flatMap(keyword => [
+      // Build inclusion conditions for brands and keywords
+      const brandConditions = config.includeBrands.map(brand => eq(supplies.brand, brand));
+      const keywordConditions = config.includeKeywords.flatMap(keyword => [
         ilike(supplies.name, `%${keyword}%`),
         ilike(supplies.description, `%${keyword}%`)
       ]);
       
+      // Build exclusion conditions (handle NULL fields with OR isNull)
+      const excludeBrandConditions = config.excludeBrands.map(brand => 
+        or(isNull(supplies.brand), not(eq(supplies.brand, brand)))
+      );
+      const excludeKeywordConditions = config.excludeKeywords.flatMap(keyword => [
+        or(isNull(supplies.name), not(ilike(supplies.name, `%${keyword}%`))),
+        or(isNull(supplies.description), not(ilike(supplies.description, `%${keyword}%`)))
+      ]);
+      
+      // Apply filter: include matching items but exclude conflicting ones
       whereConditions.push(or(...brandConditions, ...keywordConditions));
+      whereConditions.push(...excludeBrandConditions);
+      whereConditions.push(...excludeKeywordConditions);
     } else if (search) {
       // Search filter
       whereConditions.push(

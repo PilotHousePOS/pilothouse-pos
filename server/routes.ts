@@ -632,16 +632,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const pageSize = Math.min(100, Math.max(1, parseInt(limit as string) || 24));
       const offset = pageNum * pageSize;
 
-      // Determine if this is the reptile filter
-      const isReptileFilter = category === 'reptile-supplies';
+      // Determine filter type based on category parameter
+      let filterType: 'reptile' | 'aquatic' | undefined;
+      if (category === 'reptile-supplies') {
+        filterType = 'reptile';
+      } else if (category === 'aquatic-supplies') {
+        filterType = 'aquatic';
+      }
       
       // Use paginated query
       const { items, total } = await storage.getPaginatedSupplies({
         limit: pageSize,
         offset,
-        category: isReptileFilter ? undefined : (category as string | undefined),
+        category: filterType ? undefined : (category as string | undefined),
         search: search as string | undefined,
-        isReptileFilter
+        filterType
       });
 
       // Return paginated response with metadata
