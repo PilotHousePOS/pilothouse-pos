@@ -1924,10 +1924,12 @@ export default function Admin() {
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
 
-  const { data: supplies = [] } = useQuery({
-    queryKey: ["/api/supplies"],
+  const { data: suppliesData } = useQuery<any>({
+    queryKey: ["/api/supplies", { limit: 10000 }],
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
+  
+  const supplies = suppliesData?.items || [];
 
   const { data: orders = [] } = useQuery({
     queryKey: ["/api/orders"],

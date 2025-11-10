@@ -24,21 +24,16 @@ export default function ReptilesPage() {
     },
   });
 
-  const { data: supplies = [], isLoading: suppliesLoading } = useQuery<any[]>({
-    queryKey: ["/api/supplies", { category: "reptile" }],
+  const { data: suppliesData, isLoading: suppliesLoading } = useQuery<any>({
+    queryKey: ["/api/supplies", { category: "reptile-supplies", limit: 100 }],
     queryFn: async () => {
-      const response = await fetch("/api/supplies");
+      const response = await fetch("/api/supplies?category=reptile-supplies&limit=100");
       if (!response.ok) throw new Error("Failed to fetch supplies");
-      const allSupplies = await response.json();
-      return allSupplies.filter((supply: any) => 
-        supply.category?.toLowerCase().includes("reptile") || 
-        supply.category?.toLowerCase().includes("lizard") ||
-        supply.category?.toLowerCase().includes("snake") ||
-        supply.category?.toLowerCase().includes("gecko") ||
-        supply.category?.toLowerCase().includes("chameleon")
-      );
+      return response.json();
     },
   });
+
+  const supplies = suppliesData?.items || [];
 
   const handleAddToCart = async (item: any, type: "pet" | "supply") => {
     try {

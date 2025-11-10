@@ -24,18 +24,16 @@ export default function AquaticsPage() {
     },
   });
 
-  const { data: supplies = [], isLoading: suppliesLoading } = useQuery<any[]>({
-    queryKey: ["/api/supplies", { category: "aquatic" }],
+  const { data: suppliesData, isLoading: suppliesLoading } = useQuery<any>({
+    queryKey: ["/api/supplies", { category: "aquatic", limit: 100 }],
     queryFn: async () => {
-      const response = await fetch("/api/supplies");
+      const response = await fetch("/api/supplies?category=aquatic&limit=100");
       if (!response.ok) throw new Error("Failed to fetch supplies");
-      const allSupplies = await response.json();
-      return allSupplies.filter((supply: any) => 
-        supply.category?.toLowerCase().includes("aquatic") || 
-        supply.category?.toLowerCase().includes("fish")
-      );
+      return response.json();
     },
   });
+
+  const supplies = suppliesData?.items || [];
 
   const handleAddToCart = async (item: any, type: "pet" | "supply") => {
     try {

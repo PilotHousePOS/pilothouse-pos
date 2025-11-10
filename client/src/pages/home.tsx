@@ -66,8 +66,8 @@ export default function Home() {
     retry: false,
   });
 
-  const { data: supplies = [] } = useQuery({
-    queryKey: ["/api/supplies"],
+  const { data: suppliesData } = useQuery({
+    queryKey: ["/api/supplies", { limit: 3 }],
     retry: false,
   });
 
@@ -76,13 +76,14 @@ export default function Home() {
     retry: false,
   });
 
+  const supplies = suppliesData?.items || [];
   const featuredPets = (pets as any[]).slice(0, 2);
-  const featuredSupplies = (supplies as any[]).slice(0, 3);
+  const featuredSupplies = supplies.slice(0, 3);
   const cartCount = (cartItems as any[]).length;
 
   // Calculate stats
   const totalPets = (pets as any[]).filter((p: any) => p.isAvailable).length;
-  const totalSupplies = (supplies as any[]).length;
+  const totalSupplies = suppliesData?.total || 0;
 
   return (
     <div className="pb-20 bg-gradient-to-b from-gray-50 to-white">
