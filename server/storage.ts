@@ -315,7 +315,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(pets)
-      .where(and(eq(pets.species, species), eq(pets.isAvailable, true)))
+      .where(and(ilike(pets.species, species), eq(pets.isAvailable, true)))
       .orderBy(desc(pets.createdAt));
   }
 
