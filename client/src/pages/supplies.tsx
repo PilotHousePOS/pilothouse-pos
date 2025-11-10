@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import SupplyCard from "@/components/supply-card";
 import CartSidebar from "@/components/cart-sidebar";
 
@@ -15,18 +15,60 @@ const SUPPLY_CATEGORIES = [
   { id: 'accessories', label: 'Accessories', emoji: '🎀' },
 ];
 
+const ITEMS_PER_PAGE = 24;
+
+// Helper function to calculate which page indicators to display (max 5)
+function getPageIndicators(currentPage: number, totalPages: number): number[] {
+  const MAX_INDICATORS = 5;
+  
+  if (totalPages <= MAX_INDICATORS) {
+    return Array.from({ length: totalPages }, (_, i) => i);
+  }
+  
+  let startPage = Math.max(0, currentPage - Math.floor(MAX_INDICATORS / 2));
+  let endPage = startPage + MAX_INDICATORS;
+  
+  if (endPage > totalPages) {
+    endPage = totalPages;
+    startPage = Math.max(0, endPage - MAX_INDICATORS);
+  }
+  
+  return Array.from({ length: endPage - startPage }, (_, i) => startPage + i);
+}
+
 export default function Supplies() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
 
-  const { data: supplies = [], isLoading } = useQuery({
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [searchQuery, selectedCategory]);
+
+  const { data, isLoading } = useQuery<{
+    items: any[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }>({
     queryKey: [
-      "/api/supplies", 
-      ...(selectedCategory ? [`category=${selectedCategory}`] : []),
-      ...(searchQuery ? [`search=${searchQuery}`] : [])
-    ].filter(Boolean),
+      "/api/supplies",
+      { 
+        page: currentPage, 
+        limit: ITEMS_PER_PAGE,
+        ...(selectedCategory && { category: selectedCategory }),
+        ...(searchQuery && { search: searchQuery })
+      }
+    ],
   });
+
+  const supplies = data?.items || [];
+  const totalPages = data?.totalPages || 0;
 
   const { data: cartItems = [] } = useQuery({
     queryKey: ["/api/cart"],
@@ -103,11 +145,71 @@ export default function Supplies() {
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {supplies.map((supply) => (
-            <SupplyCard key={supply.id} supply={supply} />
-          ))}
-        </div>
+        <>
+          <div 
+            className="space-y-4"
+            onTouchStart={(e) => setTouchStart(e.targetTouches[0].clientX)}
+            onTouchMove={(e) => setTouchEnd(e.targetTouches[0].clientX)}
+            onTouchEnd={() => {
+              if (touchStart - touchEnd > 75 && currentPage < totalPages - 1) {
+                setCurrentPage(currentPage + 1);
+              }
+              if (touchStart - touchEnd < -75 && currentPage > 0) {
+                setCurrentPage(currentPage - 1);
+              }
+            }}
+          >
+            {supplies.map((supply) => (
+              <SupplyCard key={supply.id} supply={supply} />
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 0}
+                className="text-blue-600 hover:text-blue-800"
+                data-testid="button-previous-page"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+              
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-gray-600">
+                  Page {currentPage + 1} of {totalPages}
+                </span>
+                <div className="flex gap-2">
+                  {getPageIndicators(currentPage, totalPages).map((i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentPage(i)}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        i === currentPage ? 'bg-blue-600 w-6' : 'bg-gray-300 hover:bg-gray-400'
+                      }`}
+                      aria-label={`Go to page ${i + 1}`}
+                      data-testid={`page-indicator-${i}`}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage === totalPages - 1}
+                className="text-blue-600 hover:text-blue-800"
+                data-testid="button-next-page"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </Button>
+            </div>
+          )}
+        </>
       )}
 
       <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
