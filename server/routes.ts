@@ -2699,6 +2699,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reset ALL isPaid flags across all appointments (for fixing stale data)
+  app.post("/api/admin/appointments/reset-all-paid", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      console.log('Running manual reset: Resetting ALL "Paid" statuses across all appointments');
+      
+      const allAppointments = await storage.getAppointments();
+      
+      // Find all appointments with isPaid = true
+      const appointmentsWithPaid = allAppointments.filter((apt: any) => apt.isPaid === true);
+      
+      console.log(`Found ${appointmentsWithPaid.length} appointments with "Paid" status set to true`);
+      
+      // Reset all of them
+      for (const appointment of appointmentsWithPaid) {
+        await storage.updateAppointmentIsPaid(appointment.id, false);
+        console.log(`Reset "Paid" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
+      }
+      
+      res.json({ 
+        message: `Successfully reset ${appointmentsWithPaid.length} "Paid" statuses`,
+        resetCount: appointmentsWithPaid.length
+      });
+    } catch (error) {
+      console.error('Error resetting all "Paid" statuses:', error);
+      res.status(500).json({ 
+        message: "Failed to reset all 'Paid' statuses", 
+        error: (error as Error).message 
+      });
+    }
+  });
+
   // Special date settings routes
   app.get("/api/admin/special-dates", authMiddleware, async (req: any, res) => {
     try {

@@ -5,7 +5,7 @@ export function initializeScheduledTasks() {
   // Clear approved appointments and reset "Here" status every day at 12:00 AM
   cron.schedule('0 0 * * *', async () => {
     try {
-      console.log('Running scheduled task: Clearing past approved appointments and resetting ALL "Here" statuses at midnight');
+      console.log('Running scheduled task: Clearing past approved appointments and resetting ALL "Here" and "Paid" statuses at midnight');
       
       const allAppointments = await storage.getAppointments();
       
@@ -21,6 +21,16 @@ export function initializeScheduledTasks() {
       for (const appointment of appointmentsWithHere) {
         await storage.updateAppointmentIsHere(appointment.id, false);
         console.log(`Reset "Here" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
+      }
+      
+      // Second, reset isPaid flag for ALL appointments (regardless of date or status)
+      const appointmentsWithPaid = allAppointments.filter((apt: any) => apt.isPaid === true);
+      
+      console.log(`Resetting "Paid" status for ${appointmentsWithPaid.length} appointments (all appointments, not just past ones)`);
+      
+      for (const appointment of appointmentsWithPaid) {
+        await storage.updateAppointmentIsPaid(appointment.id, false);
+        console.log(`Reset "Paid" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
       }
       
       // Then, delete approved appointments (confirmed or completed) that have already passed
@@ -41,7 +51,7 @@ export function initializeScheduledTasks() {
         console.log(`Deleted past appointment: ${appointment.id} from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
       }
       
-      console.log('Successfully cleared past approved appointments and reset "Here" status');
+      console.log('Successfully cleared past approved appointments and reset "Here" and "Paid" statuses');
     } catch (error) {
       console.error('Error clearing past approved appointments:', error);
     }
@@ -168,6 +178,6 @@ export function initializeScheduledTasks() {
   });
 
   console.log('Scheduled tasks initialized:');
-  console.log('- Clear approved appointments: Daily at 12:00 AM (EST)');
+  console.log('- Clear approved appointments and reset "Here"/"Paid" flags: Daily at 12:00 AM (EST)');
   console.log('- Auto-sync Google Calendar appointments and contacts: Daily at 7:30 AM (EST)');
 }
