@@ -622,74 +622,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Supply routes with fallback data
+  // Supply routes with pagination
   app.get("/api/supplies", async (req, res) => {
     try {
-      const { category, search } = req.query;
-      let supplies;
+      const { category, search, page = '0', limit = '24' } = req.query;
       
-      if (search) {
-        supplies = await storage.searchSupplies(search as string);
-      } else if (category === 'reptile-supplies') {
-        // Special filter for reptile supplies
-        supplies = await storage.getReptileSupplies();
-      } else if (category) {
-        supplies = await storage.getSuppliesByCategory(category as string);
-      } else {
-        supplies = await storage.getAllSupplies();
-      }
+      // Parse pagination parameters with defaults
+      const pageNum = Math.max(0, parseInt(page as string) || 0);
+      const pageSize = Math.min(100, Math.max(1, parseInt(limit as string) || 24));
+      const offset = pageNum * pageSize;
+
+      // Determine if this is the reptile filter
+      const isReptileFilter = category === 'reptile-supplies';
       
-      res.json(supplies);
+      // Use paginated query
+      const { items, total } = await storage.getPaginatedSupplies({
+        limit: pageSize,
+        offset,
+        category: isReptileFilter ? undefined : (category as string | undefined),
+        search: search as string | undefined,
+        isReptileFilter
+      });
+
+      // Return paginated response with metadata
+      res.json({
+        items,
+        total,
+        page: pageNum,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize)
+      });
     } catch (error) {
       console.error("Error fetching supplies:", error);
-      // Return fallback data on error
-      res.json([
-        {
-          id: 1,
-          name: "Premium Dog Food",
-          brand: "Royal Canin",
-          category: "food",
-          price: "49.99",
-          description: "High-quality nutrition for adult dogs",
-          imageUrl: "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
-          stockQuantity: 25,
-          isActive: true,
-          weight: null,
-          size: null,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          id: 2,
-          name: "Cat Litter",
-          brand: "Fresh Step",
-          category: "hygiene",
-          price: "12.99",
-          description: "Odor control cat litter", 
-          imageUrl: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
-          stockQuantity: 15,
-          isActive: true,
-          weight: null,
-          size: null,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          id: 3,
-          name: "Reptile Heat Lamp",
-          brand: "Zoo Med",
-          category: "equipment",
-          price: "29.99",
-          description: "Essential heating for reptile habitats",
-          imageUrl: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
-          stockQuantity: 8,
-          isActive: true,
-          weight: null,
-          size: null,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      ]);
+      res.status(500).json({ 
+        message: "Failed to fetch supplies",
+        items: [],
+        total: 0,
+        page: 0,
+        pageSize: 24,
+        totalPages: 0
+      });
     }
   });
 
