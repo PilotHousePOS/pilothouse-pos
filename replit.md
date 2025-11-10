@@ -15,11 +15,16 @@ A mobile-friendly web application for "Animal House" pet store, focusing on pet 
 - Mobile authentication consistency: Same account should show identical admin access across devices
 - Inventory Management: Full product names and descriptions preserved from Excel imports (no abbreviations)
 - Search Functionality: All searches (supplies, pets) must be case-insensitive
+  - Search works across all supply pages (main Supplies, Aquatics, Exotic Reptiles)
+  - Search combines with category and filterType filters (AND logic)
+  - Whitespace-only searches treated as empty searches
+  - Search bars integrated into specialty pages (Aquatics, Reptiles) with pagination support
 - Supply Filtering: Centralized, research-based filtering system with proper brand/keyword separation (server/filterConfig.ts):
   - Reptile supplies (681 items): ZooMed, Exo Terra, Zilla, Fluker's, ReptiCare brands + reptile keywords
   - Aquatic supplies (189 items): Hikari, Tetra, Aqueon, Marineland, API, Fluval, SeaChem, GloFish brands + aquatic keywords
   - Brand categorizations based on web research of company specializations
-  - Mutual exclusions with NULL-safe logic ensure no cross-contamination between categories
+  - Category constraints always apply to prevent cross-contamination between departments
+  - filterType and category filters work together (not mutually exclusive)
 
 ## System Architecture
 The application is a full-stack web application with a clear separation of concerns, built with React, Vite, TypeScript, Tailwind CSS, shadcn/ui for the frontend, and Express.js with TypeScript for the backend, utilizing PostgreSQL with Drizzle ORM.
@@ -35,7 +40,7 @@ The application is a full-stack web application with a clear separation of conce
 - Force Refresh Button in admin dashboard header to clear cached data.
 
 **Technical Implementations & Feature Specifications:**
-- **Pet & Supply Management:** Multi-image support, extensive inventory (5,893+ supplies), automated brand extraction (840+ brands), specialized reptile supply filter (723+ products by brand/keyword), case-insensitive search for all products and pets, and paginated supply loading (24 items per page) across all supply pages (main Supplies, Aquatics, and Exotic Reptiles) with touch gesture support to optimize performance and reduce customer lag.
+- **Pet & Supply Management:** Multi-image support, extensive inventory (5,893+ supplies), automated brand extraction (840+ brands), specialized reptile supply filter (723+ products by brand/keyword), case-insensitive search for all products and pets (with whitespace normalization), search functionality integrated across all supply pages with pagination, and paginated supply loading (24 items per page) across all supply pages (main Supplies, Aquatics, and Exotic Reptiles) with touch gesture support to optimize performance and reduce customer lag.
 - **Appointment System:** 15-minute intervals, admin approval workflow, email notifications, "My Appointments" page, Google Calendar sync, chronological ordering, service type detection, collapsible UI, pagination, customer arrival and payment tracking, weekly appointment limits, special date configurations, groomer assignment, role-based access, visual indicators, automatic past appointment hiding, booking restrictions (no same-day for customers), scheduled daily maintenance tasks, manual cleanup options, appointment editing, and comprehensive appointment history tracking integrated with contacts.
 - **Order & Notification System:** Admin email/push notifications for new orders/appointments, customer email/SMS/web push for order status, and detailed order history.
 - **Authentication & Authorization:** JWT tokens in secure cookies, password reset, user settings, admin user management, three-tier role system (Customer, Groomer, Admin).
