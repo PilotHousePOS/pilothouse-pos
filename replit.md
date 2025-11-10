@@ -33,6 +33,7 @@ The application is a full-stack web application with a clear separation of conce
     - 15-minute intervals with admin approval workflow and automated email notifications
     - "My Appointments" page for customers
     - Google Calendar appointment sync with incremental imports (no duplicates) and intelligent parsing
+    - **Chronological Ordering**: All appointments are ordered by date in ascending order (oldest/soonest dates first) to prioritize upcoming appointments
     - **Google Calendar Integration**: Calendar events sync to appointments (phone numbers optional, syncs from today at midnight onwards). Newly synced events appear in pending appointments requiring admin approval. Appointments remain visible all day regardless of whether their time has passed - only appointments from past DATES are hidden/deleted.
     - **Service Type Detection**: Events with "bath" in title marked as "Bath Only", all others as "Full Grooming"
     - **Collapsible UI**: Approved appointments display at the top with inline status controls; Pending Approval section follows; Pending appointments (from Google Calendar sync) come next; Denied appointments behind expandable button. All appointment sections appear before any order sections
@@ -40,6 +41,7 @@ The application is a full-stack web application with a clear separation of conce
     - **Customer Arrival Tracking**: "Here" checkbox on approved appointments allows admins and groomers to mark when customers arrive. Updates instantly with toast notifications. "Reset All Here" button on dashboard card allows admins to clear all isHere flags across all appointments for stale data cleanup.
     - **Weekly Appointment Limits**: Admins can set separate limits for bath and grooming appointments by day of the week (Monday through Saturday) via Grooming Settings tab. Limits are remembered and editable. System enforces limits during booking with clear error messages based on the appointment's day of week.
     - **Special Date Settings**: Admins can configure specific dates (e.g., holidays) with custom booking time slots via Grooming Settings tab. Special dates override normal operating hours and weekly limits. Normalized database schema with separate tables for special dates and their allowed times. Backend validation ensures only configured times can be booked on special dates. Booking page automatically displays only allowed times when a special date is selected, with a visual indicator notifying users of limited availability.
+    - **Groomer Assignment**: Admin and groomer users can assign groomers to appointments during booking or via appointment editing. Groomer names display on appointment cards alongside service type and other details.
     - Role-based access: Groomers can edit already-approved appointments (details and status changes) and contacts, but cannot approve/reject pending appointments. Admins have full modification access including deletion and appointment approval.
     - Visual indicators: Google Calendar appointments display "Synced" badge throughout workflow
     - **Automatic Filtering**: Approved and denied appointments from dates before today are automatically hidden from the UI (only today and future appointments display). Past appointments remain in database until manually deleted via "Clear Past" button or scheduled cleanup
@@ -48,7 +50,7 @@ The application is a full-stack web application with a clear separation of conce
       - Clear past approved appointments (confirmed/completed) and reset ALL isHere flags across all appointments daily at 12:00 AM (EST)
       - Auto-sync Google Calendar appointments and contacts daily at 7:30 AM (EST)
     - **Manual Cleanup**: Section-specific "Clear Past" buttons available for admins in Approved, Pending, and Denied appointment sections. Each button only deletes past appointments from its respective section (Approved: confirmed/completed, Pending: scheduled, Denied: rejected/cancelled)
-    - **Appointment Editing**: Admins can edit all appointment details including date and time via the edit dialog. Date formatting uses local timezone to prevent date shift issues when saving changes
+    - **Appointment Editing**: Admins and groomers can edit all appointment details including date, time, groomer assignment, and service type via the edit dialog. Date formatting uses local timezone to prevent date shift issues when saving changes
 - **Order & Notification System:** Admin email/push notifications for new orders/appointments. Customer email/SMS/web push for order status. Order History page with detailed modals.
 - **Authentication & Authorization:** 
     - JWT tokens in secure cookies with comprehensive password reset

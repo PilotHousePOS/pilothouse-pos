@@ -54,7 +54,7 @@ import {
   type InsertSpecialDateAllowedTime,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, or, ilike, lt, isNull } from "drizzle-orm";
+import { eq, desc, asc, and, or, ilike, lt, isNull } from "drizzle-orm";
 import { phoneNumbersMatch } from "./phoneUtils";
 
 export interface IStorage {
@@ -586,7 +586,7 @@ export class DatabaseStorage implements IStorage {
       }
 
       // Get all appointments
-      const allAppointments = await db.select().from(appointments).orderBy(desc(appointments.appointmentDate));
+      const allAppointments = await db.select().from(appointments).orderBy(asc(appointments.appointmentDate));
       
       // Filter by matching phone number
       return allAppointments.filter(apt => {
@@ -596,7 +596,7 @@ export class DatabaseStorage implements IStorage {
         return false;
       });
     } else {
-      return await db.select().from(appointments).orderBy(desc(appointments.appointmentDate));
+      return await db.select().from(appointments).orderBy(asc(appointments.appointmentDate));
     }
   }
 
