@@ -2436,6 +2436,29 @@ export default function Admin() {
     },
   });
 
+  const updateAppointmentIsPaidMutation = useMutation({
+    mutationFn: async ({ id, isPaid }: { id: number; isPaid: boolean }) => {
+      const result = await apiRequest("PATCH", `/api/appointments/${id}/is-paid`, { isPaid });
+      return result;
+    },
+    onSuccess: async (_, variables) => {
+      toast({
+        title: "Payment Status Updated",
+        description: variables.isPaid ? "Customer marked as paid" : "Customer marked as not paid",
+      });
+      // Force immediate refetch of appointments data
+      await queryClient.refetchQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: (error) => {
+      console.error('Error updating isPaid status:', error);
+      toast({
+        title: "Update Failed",
+        description: "Failed to update payment status. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const deleteAppointmentMutation = useMutation({
     mutationFn: async (id: number) => {
       await apiRequest("DELETE", `/api/admin/appointments/${id}`, {});
@@ -3775,6 +3798,25 @@ export default function Admin() {
                                 className="text-xs font-medium cursor-pointer"
                               >
                                 Here
+                              </label>
+                            </div>
+                            <div className="flex items-center gap-1.5 px-2 py-1 border rounded bg-white">
+                              <Checkbox
+                                id={`is-paid-${currentAppointment.id}`}
+                                checked={currentAppointment.isPaid || false}
+                                onCheckedChange={(checked) => {
+                                  updateAppointmentIsPaidMutation.mutate({ 
+                                    id: currentAppointment.id, 
+                                    isPaid: checked as boolean 
+                                  });
+                                }}
+                                data-testid={`checkbox-is-paid-${currentAppointment.id}`}
+                              />
+                              <label 
+                                htmlFor={`is-paid-${currentAppointment.id}`}
+                                className="text-xs font-medium cursor-pointer"
+                              >
+                                Paid
                               </label>
                             </div>
                           </div>
