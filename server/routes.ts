@@ -1415,6 +1415,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/appointments/:id/is-paid", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin && !user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const { isPaid } = req.body;
+      
+      if (typeof isPaid !== 'boolean') {
+        return res.status(400).json({ message: "isPaid must be a boolean" });
+      }
+
+      const appointment = await storage.updateAppointmentIsPaid(id, isPaid);
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+      res.json(appointment);
+    } catch (error) {
+      console.error("Error updating appointment payment status:", error);
+      res.status(500).json({ message: "Failed to update appointment payment status" });
+    }
+  });
+
   app.post("/api/appointments", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;
