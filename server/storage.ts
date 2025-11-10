@@ -107,6 +107,7 @@ export interface IStorage {
   getAppointmentsByPhoneNumber(phoneNumber: string): Promise<Appointment[]>;
   updateAppointmentStatus(id: number, status: string): Promise<Appointment>;
   updateAppointmentIsHere(id: number, isHere: boolean): Promise<Appointment>;
+  updateAppointmentIsPaid(id: number, isPaid: boolean): Promise<Appointment>;
   updateAppointmentDetails(id: number, updates: { 
     ownerFirstName?: string; 
     ownerLastName?: string; 
@@ -630,6 +631,15 @@ export class DatabaseStorage implements IStorage {
     const [updated] = await db
       .update(appointments)
       .set({ isHere, updatedAt: new Date() })
+      .where(eq(appointments.id, id))
+      .returning();
+    return updated;
+  }
+
+  async updateAppointmentIsPaid(id: number, isPaid: boolean): Promise<Appointment> {
+    const [updated] = await db
+      .update(appointments)
+      .set({ isPaid, updatedAt: new Date() })
       .where(eq(appointments.id, id))
       .returning();
     return updated;
