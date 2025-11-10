@@ -133,6 +133,7 @@ export const appointments = pgTable("appointments", {
   status: varchar("status", { length: 50 }).default("scheduled"), // scheduled, confirmed, completed, cancelled
   isApproved: boolean("is_approved").default(false), // pending admin approval
   isHere: boolean("is_here").default(false), // customer has arrived
+  isPaid: boolean("is_paid").default(false), // customer has paid
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   source: varchar("source", { length: 50 }).default("manual"), // manual or google_calendar
   googleEventId: varchar("google_event_id", { length: 255 }), // Google Calendar event ID
