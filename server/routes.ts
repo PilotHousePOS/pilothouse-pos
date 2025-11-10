@@ -2642,16 +2642,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return appointmentDate < today;
       });
       
-      console.log(`Deleting ${pastAppointments.length} past appointments`);
+      console.log(`Saving ${pastAppointments.length} past appointments to history before deletion`);
       
+      let savedCount = 0;
       for (const appointment of pastAppointments) {
+        try {
+          // Save to history before deleting
+          const history = await storage.saveAppointmentToHistory(appointment);
+          console.log(`Saved appointment ${appointment.id} to history (history ID: ${history.id})`);
+          savedCount++;
+        } catch (error) {
+          console.error(`Failed to save appointment ${appointment.id} to history:`, error);
+          // Continue with deletion even if history save fails
+        }
+        
         await storage.deleteAppointment(appointment.id);
         console.log(`Deleted past appointment: ${appointment.id} (${appointment.status}) from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
       }
       
       res.json({ 
-        message: `Successfully deleted ${pastAppointments.length} past appointments and reset ${pastAppointmentsWithHere.length} "Here" statuses`,
+        message: `Successfully saved ${savedCount} and deleted ${pastAppointments.length} past appointments, reset ${pastAppointmentsWithHere.length} "Here" statuses`,
         deletedCount: pastAppointments.length,
+        savedCount: savedCount,
         hereResetCount: pastAppointmentsWithHere.length
       });
     } catch (error) {

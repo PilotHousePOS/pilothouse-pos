@@ -44,9 +44,18 @@ export function initializeScheduledTasks() {
         return appointmentDate < today;
       });
       
-      console.log(`Deleting ${pastApprovedAppointments.length} past approved appointments`);
+      console.log(`Saving ${pastApprovedAppointments.length} past approved appointments to history before deletion`);
       
       for (const appointment of pastApprovedAppointments) {
+        try {
+          // Save to history before deleting
+          const history = await storage.saveAppointmentToHistory(appointment);
+          console.log(`Saved appointment ${appointment.id} to history (history ID: ${history.id})`);
+        } catch (error) {
+          console.error(`Failed to save appointment ${appointment.id} to history:`, error);
+          // Continue with deletion even if history save fails
+        }
+        
         await storage.deleteAppointment(appointment.id);
         console.log(`Deleted past appointment: ${appointment.id} from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
       }
