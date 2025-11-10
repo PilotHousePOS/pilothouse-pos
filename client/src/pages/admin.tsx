@@ -49,7 +49,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  DollarSign
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -2543,6 +2544,26 @@ export default function Admin() {
     },
   });
 
+  const resetAllPaidMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/admin/appointments/reset-all-paid", {});
+    },
+    onSuccess: async (data: any) => {
+      toast({
+        title: "Reset Complete",
+        description: data.message || "All 'Paid' statuses have been reset.",
+      });
+      await queryClient.refetchQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Reset Failed",
+        description: "Failed to reset 'Paid' statuses.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const deleteCalendarEventMutation = useMutation({
     mutationFn: async (eventId: string) => {
       return await apiRequest("DELETE", `/api/admin/calendar/events/${eventId}`, {});
@@ -3046,6 +3067,12 @@ export default function Admin() {
   });
   const customersHere = appointmentsHere.length;
 
+  // Calculate customers paid - filter appointments with isPaid = true
+  const appointmentsPaid = (appointments as any[]).filter((a: any) => 
+    (a.status === 'confirmed' || a.status === 'completed') && a.isPaid === true
+  );
+  const customersPaid = appointmentsPaid.length;
+
   // Appointments pagination handlers
   const handleAppointmentsTouchStart = (e: React.TouchEvent) => {
     setAppointmentsTouchStart(e.targetTouches[0].clientX);
@@ -3313,7 +3340,7 @@ export default function Admin() {
       <div className="px-6">{/* Content continues */}
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
         <Card className="min-h-[120px]">
           <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
             <PawPrint className="w-8 h-8 mb-3 text-brand-blue" />
@@ -3361,6 +3388,29 @@ export default function Admin() {
                 data-testid="button-reset-all-here"
               >
                 {resetAllHereMutation.isPending ? 'Resetting...' : 'Reset All'}
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+        <Card className="min-h-[120px]">
+          <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full relative">
+            <DollarSign className="w-8 h-8 mb-3 text-green-600" />
+            <div className="text-2xl font-bold mb-1" data-testid="dashboard-customers-paid">{customersPaid}</div>
+            <div className="text-sm text-gray-500 mb-2">Customers Paid</div>
+            {typedUser?.isAdmin && customersPaid > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  if (confirm('Reset ALL "Paid" statuses across all appointments? This cannot be undone.')) {
+                    resetAllPaidMutation.mutate();
+                  }
+                }}
+                disabled={resetAllPaidMutation.isPending}
+                className="text-xs h-6 px-2"
+                data-testid="button-reset-all-paid"
+              >
+                {resetAllPaidMutation.isPending ? 'Resetting...' : 'Reset All'}
               </Button>
             )}
           </CardContent>
