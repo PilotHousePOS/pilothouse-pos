@@ -57,7 +57,7 @@ import {
   type InsertSpecialDateAllowedTime,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, and, or, ilike, lt, isNull } from "drizzle-orm";
+import { eq, desc, asc, and, or, ilike, lt, isNull, count, sql } from "drizzle-orm";
 import { phoneNumbersMatch } from "./phoneUtils";
 
 export interface IStorage {
@@ -84,6 +84,13 @@ export interface IStorage {
   getSuppliesByCategory(category: string): Promise<Supply[]>;
   getReptileSupplies(): Promise<Supply[]>;
   searchSupplies(query: string): Promise<Supply[]>;
+  getPaginatedSupplies(params: { 
+    limit: number; 
+    offset: number; 
+    category?: string; 
+    search?: string; 
+    isReptileFilter?: boolean;
+  }): Promise<{ items: Supply[]; total: number }>;
   getSupply(id: number): Promise<Supply | undefined>;
   createSupply(supply: InsertSupply): Promise<Supply>;
   updateSupply(id: number, supply: Partial<InsertSupply>): Promise<Supply>;
@@ -451,6 +458,66 @@ export class DatabaseStorage implements IStorage {
         )
       )
       .orderBy(desc(supplies.createdAt));
+  }
+
+  async getPaginatedSupplies(params: {
+    limit: number;
+    offset: number;
+    category?: string;
+    search?: string;
+    isReptileFilter?: boolean;
+  }): Promise<{ items: Supply[]; total: number }> {
+    const { limit, offset, category, search, isReptileFilter } = params;
+
+    // Build WHERE conditions based on filters
+    let whereConditions: any[] = [eq(supplies.isActive, true)];
+
+    if (isReptileFilter) {
+      // Reptile filter: use brand and keyword matching
+      const reptileBrands = ['ZooMed', 'Exo Terra', 'Zilla', "Fluker's", 'ReptiCare', 'Tetra'];
+      const reptileKeywords = [
+        'gecko', 'lizard', 'snake', 'turtle', 'tortoise', 'chameleon',
+        'bearded dragon', 'iguana', 'frog', 'toad', 'salamander', 'newt',
+        'reptile', 'amphibian', 'terrarium', 'vivarium', 'repti'
+      ];
+      
+      const brandConditions = reptileBrands.map(brand => eq(supplies.brand, brand));
+      const keywordConditions = reptileKeywords.flatMap(keyword => [
+        ilike(supplies.name, `%${keyword}%`),
+        ilike(supplies.description, `%${keyword}%`)
+      ]);
+      
+      whereConditions.push(or(...brandConditions, ...keywordConditions));
+    } else if (search) {
+      // Search filter
+      whereConditions.push(
+        or(
+          ilike(supplies.name, `%${search}%`),
+          ilike(supplies.brand, `%${search}%`),
+          ilike(supplies.description, `%${search}%`)
+        )
+      );
+    } else if (category) {
+      // Category filter
+      whereConditions.push(eq(supplies.category, category));
+    }
+
+    // Get total count with filters
+    const [{ value: total }] = await db
+      .select({ value: count() })
+      .from(supplies)
+      .where(and(...whereConditions));
+
+    // Get paginated items with filters
+    const items = await db
+      .select()
+      .from(supplies)
+      .where(and(...whereConditions))
+      .orderBy(desc(supplies.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return { items, total };
   }
 
   async getSupply(id: number): Promise<Supply | undefined> {
