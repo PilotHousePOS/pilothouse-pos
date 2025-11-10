@@ -641,10 +641,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Use paginated query
+      // Note: Don't pass category when filterType is set, as Aquatics/Reptiles use brand/keyword matching, not DB categories
       const { items, total } = await storage.getPaginatedSupplies({
         limit: pageSize,
         offset,
-        category: category as string | undefined,
+        category: filterType ? undefined : (category as string | undefined),
         search: search as string | undefined,
         filterType
       });
