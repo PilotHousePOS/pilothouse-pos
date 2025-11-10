@@ -249,6 +249,32 @@ export const contacts = pgTable("contacts", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Appointment history - preserves completed appointments for contact records
+export const appointmentHistory = pgTable("appointment_history", {
+  id: serial("id").primaryKey(),
+  contactId: integer("contact_id").notNull().references(() => contacts.id, { onDelete: "cascade" }),
+  // Denormalized contact info for display (preserved even if contact changes)
+  ownerPhoneNumber: varchar("owner_phone_number", { length: 20 }),
+  ownerEmail: varchar("owner_email", { length: 255 }),
+  ownerFirstName: varchar("owner_first_name", { length: 255 }),
+  ownerLastName: varchar("owner_last_name", { length: 255 }),
+  // Appointment details
+  appointmentDate: date("appointment_date").notNull(),
+  appointmentTime: varchar("appointment_time", { length: 20 }),
+  petName: varchar("pet_name", { length: 255 }),
+  petType: varchar("pet_type", { length: 100 }), // dog, cat, bird, reptile, etc.
+  breed: varchar("breed", { length: 255 }),
+  serviceType: varchar("service_type", { length: 50 }), // "Bath Only" or "Full Grooming"
+  groomerName: varchar("groomer_name", { length: 255 }),
+  status: varchar("status", { length: 50 }), // confirmed, completed, cancelled, rejected
+  source: varchar("source", { length: 50 }), // manual, google_calendar
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(), // When the history record was created
+}, (table) => ({
+  contactIdIdx: index("appointment_history_contact_id_idx").on(table.contactId),
+  appointmentDateIdx: index("appointment_history_date_idx").on(table.appointmentDate),
+}));
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   cartItems: many(cartItems),
@@ -407,6 +433,11 @@ export const insertSpecialDateAllowedTimeSchema = createInsertSchema(specialDate
   createdAt: true,
 });
 
+export const insertAppointmentHistorySchema = createInsertSchema(appointmentHistory).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -444,3 +475,5 @@ export type SpecialDateSetting = typeof specialDateSettings.$inferSelect;
 export type InsertSpecialDateSetting = z.infer<typeof insertSpecialDateSettingSchema>;
 export type SpecialDateAllowedTime = typeof specialDateAllowedTimes.$inferSelect;
 export type InsertSpecialDateAllowedTime = z.infer<typeof insertSpecialDateAllowedTimeSchema>;
+export type AppointmentHistory = typeof appointmentHistory.$inferSelect;
+export type InsertAppointmentHistory = z.infer<typeof insertAppointmentHistorySchema>;
