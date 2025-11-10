@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Fish, X, ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ShoppingCart, Fish, X, ChevronLeft, ChevronRight, ArrowLeft, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -38,6 +39,7 @@ export default function AquaticsPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: pets = [], isLoading: petsLoading } = useQuery<any[]>({
     queryKey: ["/api/pets", { species: "fish" }],
@@ -49,9 +51,10 @@ export default function AquaticsPage() {
   });
 
   const { data: suppliesData, isLoading: suppliesLoading } = useQuery<any>({
-    queryKey: ["/api/supplies", { category: "aquatic-supplies", page: currentPage, limit: ITEMS_PER_PAGE }],
+    queryKey: ["/api/supplies", { category: "aquatic-supplies", page: currentPage, limit: ITEMS_PER_PAGE, search: searchQuery }],
     queryFn: async () => {
-      const response = await fetch(`/api/supplies?category=aquatic-supplies&page=${currentPage}&limit=${ITEMS_PER_PAGE}`);
+      const searchParam = searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : '';
+      const response = await fetch(`/api/supplies?category=aquatic-supplies&page=${currentPage}&limit=${ITEMS_PER_PAGE}${searchParam}`);
       if (!response.ok) throw new Error("Failed to fetch supplies");
       return response.json();
     },
@@ -59,6 +62,11 @@ export default function AquaticsPage() {
 
   const supplies = suppliesData?.items || [];
   const totalPages = suppliesData?.totalPages || 0;
+
+  // Reset page when search changes
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [searchQuery]);
 
   // Reset page when totalPages changes or currentPage is out of bounds
   useEffect(() => {
@@ -195,6 +203,20 @@ export default function AquaticsPage() {
         {/* Aquatic Supplies Section */}
         <section>
           <h2 className="text-2xl font-bold mb-6 text-gray-800">Aquatic Supplies</h2>
+          
+          {/* Search Bar */}
+          <div className="relative mb-6">
+            <Input
+              type="text"
+              placeholder="Search aquatic supplies..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-white border-gray-200 rounded-xl"
+              data-testid="input-search-aquatic-supplies"
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          </div>
+
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (

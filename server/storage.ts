@@ -487,6 +487,9 @@ export class DatabaseStorage implements IStorage {
 
     // Build WHERE conditions based on filters
     let whereConditions: any[] = [eq(supplies.isActive, true)];
+    
+    // Trim search to handle whitespace consistently
+    const trimmedSearch = search?.trim() || '';
 
     if (filterType) {
       // Use centralized filter configuration
@@ -512,17 +515,21 @@ export class DatabaseStorage implements IStorage {
       whereConditions.push(or(...brandConditions, ...keywordConditions));
       whereConditions.push(...excludeBrandConditions);
       whereConditions.push(...excludeKeywordConditions);
-    } else if (search) {
-      // Search filter
+    }
+    
+    // Apply search filter (works alongside filterType or standalone)
+    if (trimmedSearch) {
       whereConditions.push(
         or(
-          ilike(supplies.name, `%${search}%`),
-          ilike(supplies.brand, `%${search}%`),
-          ilike(supplies.description, `%${search}%`)
+          ilike(supplies.name, `%${trimmedSearch}%`),
+          ilike(supplies.brand, `%${trimmedSearch}%`),
+          ilike(supplies.description, `%${trimmedSearch}%`)
         )
       );
-    } else if (category) {
-      // Category filter
+    }
+    
+    // Apply category filter whenever category is provided
+    if (category) {
       whereConditions.push(eq(supplies.category, category));
     }
 

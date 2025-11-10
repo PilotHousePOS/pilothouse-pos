@@ -644,7 +644,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { items, total } = await storage.getPaginatedSupplies({
         limit: pageSize,
         offset,
-        category: filterType ? undefined : (category as string | undefined),
+        category: category as string | undefined,
         search: search as string | undefined,
         filterType
       });
