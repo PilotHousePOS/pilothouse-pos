@@ -3129,6 +3129,35 @@ export default function Admin() {
     return grouped;
   };
 
+  // Sort grouped appointments by earliest appointment date (with time as tie-breaker)
+  const sortGroupedAppointmentsByEarliest = (entries: [string, any[]][]) => {
+    return entries.sort(([, a], [, b]) => {
+      // Skip empty groups
+      if (!a.length || !b.length) return 0;
+      
+      // Get earliest appointments from each group
+      const earliestA = a[0];
+      const earliestB = b[0];
+      
+      // Parse dates safely
+      const dateA = new Date(earliestA.appointmentDate).getTime();
+      const dateB = new Date(earliestB.appointmentDate).getTime();
+      
+      // Handle invalid dates
+      if (isNaN(dateA) || isNaN(dateB)) return 0;
+      
+      // Compare by date first
+      if (dateA !== dateB) {
+        return dateA - dateB;
+      }
+      
+      // If same date, use time as tie-breaker
+      const timeA = earliestA.appointmentTime || '';
+      const timeB = earliestB.appointmentTime || '';
+      return timeA.localeCompare(timeB);
+    });
+  };
+
   const cycleAppointmentGroup = (phone: string, groupedAppts: Record<string, any[]>) => {
     setAppointmentGroupIndexes(prev => {
       const currentIndex = prev[phone] || 0;
@@ -3580,7 +3609,7 @@ export default function Admin() {
             </div>
 
             {showApprovedAppointments && (() => {
-              const phoneGroups = Object.entries(groupedApprovedAppointments);
+              const phoneGroups = sortGroupedAppointmentsByEarliest(Object.entries(groupedApprovedAppointments));
               const totalPages = Math.ceil(phoneGroups.length / APPOINTMENTS_PER_PAGE);
               const startIdx = approvedAppointmentsPage * APPOINTMENTS_PER_PAGE;
               const paginatedPhoneGroups = phoneGroups.slice(startIdx, startIdx + APPOINTMENTS_PER_PAGE);
@@ -3821,7 +3850,8 @@ export default function Admin() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {Object.entries(groupedUnapprovedAppointments).map(([phone, phoneAppointments]) => {
+                  {sortGroupedAppointmentsByEarliest(Object.entries(groupedUnapprovedAppointments))
+                    .map(([phone, phoneAppointments]) => {
                     const currentAppointment = getCurrentAppointment(phone, phoneAppointments);
                     const isHighlighted = matchesSearch(currentAppointment, 'appointment');
                     const hasMultiple = phoneAppointments.length > 1;
@@ -3949,7 +3979,8 @@ export default function Admin() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {Object.entries(groupedPendingAppointments).map(([phone, phoneAppointments]) => {
+                {sortGroupedAppointmentsByEarliest(Object.entries(groupedPendingAppointments))
+                  .map(([phone, phoneAppointments]) => {
                   const currentAppointment = getCurrentAppointment(phone, phoneAppointments);
                   const isHighlighted = matchesSearch(currentAppointment, 'appointment');
                   const hasMultiple = phoneAppointments.length > 1;
@@ -4059,7 +4090,7 @@ export default function Admin() {
               </div>
 
               {showDeniedAppointments && (() => {
-                const phoneGroups = Object.entries(groupedDeniedAppointments);
+                const phoneGroups = sortGroupedAppointmentsByEarliest(Object.entries(groupedDeniedAppointments));
                 const totalPages = Math.ceil(phoneGroups.length / APPOINTMENTS_PER_PAGE);
                 const startIdx = deniedAppointmentsPage * APPOINTMENTS_PER_PAGE;
                 const paginatedPhoneGroups = phoneGroups.slice(startIdx, startIdx + APPOINTMENTS_PER_PAGE);
