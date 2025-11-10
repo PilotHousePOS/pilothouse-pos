@@ -13,6 +13,7 @@ import {
   passwordResetTokens,
   wishlistItems,
   contacts,
+  appointmentHistory,
   dailyAppointmentLimits,
   weeklyAppointmentLimits,
   type User,
@@ -42,6 +43,8 @@ import {
   type InsertWishlistItem,
   type Contact,
   type InsertContact,
+  type AppointmentHistory,
+  type InsertAppointmentHistory,
   type DailyAppointmentLimit,
   type InsertDailyAppointmentLimit,
   type WeeklyAppointmentLimit,
@@ -123,6 +126,10 @@ export interface IStorage {
   }): Promise<Appointment>;
   clearAllAppointments(): Promise<void>;
   bulkCreateAppointments(appointments: InsertAppointment[]): Promise<Appointment[]>;
+  
+  // Appointment history operations
+  saveAppointmentToHistory(appointment: Appointment, options?: { groomerName?: string }): Promise<AppointmentHistory>;
+  getAppointmentHistoryByContactId(contactId: number): Promise<AppointmentHistory[]>;
 
   // Customer pet operations
   getCustomerPets(userId: string): Promise<CustomerPet[]>;
@@ -653,6 +660,78 @@ export class DatabaseStorage implements IStorage {
     if (appointmentList.length === 0) return [];
     const newAppointments = await db.insert(appointments).values(appointmentList).returning();
     return newAppointments;
+  }
+
+  // Appointment history operations
+  async saveAppointmentToHistory(appointment: Appointment, options?: { groomerName?: string }): Promise<AppointmentHistory> {
+    // Skip if no phone number (cannot link to contact)
+    if (!appointment.ownerPhoneNumber) {
+      console.log(`Skipping history for appointment ${appointment.id}: no phone number`);
+      throw new Error('Cannot save appointment history: missing phone number');
+    }
+
+    // Find or create contact by phone number
+    let contact = await this.getContactByPhoneNumber(appointment.ownerPhoneNumber);
+    
+    if (!contact) {
+      // Create a new contact for this phone number
+      const contactName = `${appointment.ownerFirstName || ''} ${appointment.ownerLastName || ''}`.trim() || 'Unknown';
+      contact = await this.createContact({
+        name: contactName,
+        phoneNumber: appointment.ownerPhoneNumber,
+        email: appointment.ownerEmail || null,
+        petNames: appointment.petName ? [appointment.petName] : null,
+        animalType: appointment.petType || null,
+        breed: appointment.breed || null,
+        source: appointment.source || 'manual',
+        notes: null,
+        linkedUserId: null,
+      });
+      console.log(`Created new contact ${contact.id} for appointment ${appointment.id}`);
+    }
+
+    // Get groomer name if not provided and groomerId exists
+    let groomerName = options?.groomerName || 'Unknown';
+    if (!options?.groomerName && appointment.groomerId) {
+      const groomer = await this.getGroomer(appointment.groomerId);
+      if (groomer) {
+        groomerName = groomer.name;
+      } else {
+        console.log(`Warning: groomer ${appointment.groomerId} not found for appointment ${appointment.id}`);
+      }
+    }
+
+    // Create appointment history record
+    const historyData: InsertAppointmentHistory = {
+      contactId: contact.id,
+      ownerPhoneNumber: appointment.ownerPhoneNumber,
+      ownerEmail: appointment.ownerEmail || null,
+      ownerFirstName: appointment.ownerFirstName || null,
+      ownerLastName: appointment.ownerLastName || null,
+      appointmentDate: appointment.appointmentDate,
+      appointmentTime: appointment.appointmentTime,
+      petName: appointment.petName || null,
+      petType: appointment.petType || null,
+      breed: appointment.breed || null,
+      serviceType: appointment.serviceType || appointment.service || null,
+      groomerName: groomerName,
+      status: appointment.status,
+      source: appointment.source || null,
+      notes: appointment.specialNotes || null,
+    };
+
+    const [savedHistory] = await db.insert(appointmentHistory).values(historyData).returning();
+    console.log(`Saved appointment ${appointment.id} to history (history ID: ${savedHistory.id})`);
+    return savedHistory;
+  }
+
+  async getAppointmentHistoryByContactId(contactId: number): Promise<AppointmentHistory[]> {
+    const history = await db
+      .select()
+      .from(appointmentHistory)
+      .where(eq(appointmentHistory.contactId, contactId))
+      .orderBy(desc(appointmentHistory.appointmentDate));
+    return history;
   }
 
   async getUnapprovedAppointments(): Promise<Appointment[]> {
