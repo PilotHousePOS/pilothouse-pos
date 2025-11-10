@@ -82,6 +82,7 @@ export interface IStorage {
   // Supply operations
   getAllSupplies(): Promise<Supply[]>;
   getSuppliesByCategory(category: string): Promise<Supply[]>;
+  getReptileSupplies(): Promise<Supply[]>;
   searchSupplies(query: string): Promise<Supply[]>;
   getSupply(id: number): Promise<Supply | undefined>;
   createSupply(supply: InsertSupply): Promise<Supply>;
@@ -404,6 +405,34 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(supplies)
       .where(and(eq(supplies.category, category), eq(supplies.isActive, true)))
+      .orderBy(desc(supplies.createdAt));
+  }
+
+  async getReptileSupplies(): Promise<Supply[]> {
+    // Get supplies for reptiles based on brand or keywords in name/description
+    const reptileBrands = ['ZooMed', 'Exo Terra', 'Zilla', "Fluker's", 'ReptiCare', 'Tetra'];
+    const reptileKeywords = [
+      'gecko', 'lizard', 'snake', 'turtle', 'tortoise', 'chameleon',
+      'bearded dragon', 'iguana', 'frog', 'toad', 'salamander', 'newt',
+      'reptile', 'amphibian', 'terrarium', 'vivarium', 'repti'
+    ];
+    
+    // Build OR conditions for brands and keywords
+    const brandConditions = reptileBrands.map(brand => eq(supplies.brand, brand));
+    const keywordConditions = reptileKeywords.flatMap(keyword => [
+      ilike(supplies.name, `%${keyword}%`),
+      ilike(supplies.description, `%${keyword}%`)
+    ]);
+    
+    return await db
+      .select()
+      .from(supplies)
+      .where(
+        and(
+          eq(supplies.isActive, true),
+          or(...brandConditions, ...keywordConditions)
+        )
+      )
       .orderBy(desc(supplies.createdAt));
   }
 

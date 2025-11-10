@@ -630,6 +630,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (search) {
         supplies = await storage.searchSupplies(search as string);
+      } else if (category === 'reptile-supplies') {
+        // Special filter for reptile supplies
+        supplies = await storage.getReptileSupplies();
       } else if (category) {
         supplies = await storage.getSuppliesByCategory(category as string);
       } else {
