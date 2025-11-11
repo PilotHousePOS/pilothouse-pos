@@ -105,7 +105,8 @@ async function main() {
     const changes: { id: number; oldName: string; newName: string }[] = [];
     let updatedCount = 0;
     
-    // Process each food supply
+    // Process each food supply to build change list
+    console.log('🔍 Analyzing products and building change list...\n');
     for (const supply of foodSupplies) {
       const expandedName = expandAbbreviations(supply.name);
       
@@ -115,19 +116,61 @@ async function main() {
           oldName: supply.name,
           newName: expandedName
         });
-        
-        if (isApplyMode) {
-          // Apply the change
-          await db.update(supplies)
-            .set({ name: expandedName })
-            .where(eq(supplies.id, supply.id));
-          
-          updatedCount++;
-          
-          if (updatedCount % 50 === 0) {
-            console.log(`✓ Updated ${updatedCount} products...`);
+      }
+    }
+    
+    // Save planned changes before applying (for safety)
+    if (isApplyMode && changes.length > 0) {
+      const plannedChangesLog = {
+        timestamp: new Date().toISOString(),
+        status: 'planned',
+        totalPlanned: changes.length,
+        changes: changes,
+        backupFile: backupFilename
+      };
+      fs.writeFileSync(logFilename, JSON.stringify(plannedChangesLog, null, 2));
+      console.log(`📝 Planned changes logged to: ${logFilename}\n`);
+      
+      console.log(`🔄 Applying ${changes.length} changes in a transaction (all-or-nothing)...\n`);
+      
+      try {
+        // Apply all changes in a single transaction for safety
+        await db.transaction(async (tx) => {
+          for (const change of changes) {
+            await tx.update(supplies)
+              .set({ name: change.newName })
+              .where(eq(supplies.id, change.id));
+            
+            updatedCount++;
+            
+            if (updatedCount % 50 === 0) {
+              console.log(`✓ Updated ${updatedCount} products...`);
+            }
           }
-        }
+        });
+        
+        console.log(`\n✅ Transaction committed successfully!`);
+        
+      } catch (txError) {
+        // Transaction rolled back automatically
+        console.error('\n❌ Transaction failed and was rolled back!');
+        console.error('Error:', txError);
+        
+        // Update audit log to reflect failure
+        const failedLog = {
+          timestamp: new Date().toISOString(),
+          status: 'failed',
+          error: txError instanceof Error ? txError.message : String(txError),
+          totalPlanned: changes.length,
+          totalApplied: 0,
+          changes: changes,
+          backupFile: backupFilename
+        };
+        fs.writeFileSync(logFilename, JSON.stringify(failedLog, null, 2));
+        console.log(`\n📝 Failure logged to: ${logFilename}`);
+        console.log(`📦 Data unchanged - backup not needed\n`);
+        
+        throw txError;
       }
     }
     
@@ -150,16 +193,17 @@ async function main() {
         console.log('');
       }
       
-      // Save audit log
-      const logData = {
+      // Update audit log to mark as completed
+      const completedLog = {
         timestamp: new Date().toISOString(),
+        status: 'completed',
         totalProcessed: foodSupplies.length,
         totalUpdated: updatedCount,
         changes: changes,
         backupFile: backupFilename
       };
       
-      fs.writeFileSync(logFilename, JSON.stringify(logData, null, 2));
+      fs.writeFileSync(logFilename, JSON.stringify(completedLog, null, 2));
       
       console.log(`\n📝 Audit log saved to: ${logFilename}`);
       console.log(`📦 Backup file: ${backupFilename}\n`);
