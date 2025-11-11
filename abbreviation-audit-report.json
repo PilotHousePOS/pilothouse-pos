@@ -1,0 +1,976 @@
+{
+  "timestamp": "2025-11-11T22:53:56.730Z",
+  "totalSupplies": 7316,
+  "totalAbbreviationPatterns": 20,
+  "totalProductsWithAbbreviations": 642,
+  "byCategory": {
+    "brand": [
+      {
+        "category": "brand",
+        "abbreviation": "sd",
+        "fullForm": "Science Diet",
+        "count": 202,
+        "examples": [
+          {
+            "id": 6679,
+            "name": "SD 7+ sm min ck 5.8oz"
+          },
+          {
+            "id": 6615,
+            "name": "SD ck stew 12.5oz"
+          },
+          {
+            "id": 6851,
+            "name": "SD cat sen kitten salm stew 2.8oz"
+          },
+          {
+            "id": 6850,
+            "name": "SD cat in do salm stew 2.8oz"
+          },
+          {
+            "id": 6849,
+            "name": "SD kitten ck stew 2.8oz"
+          }
+        ]
+      }
+    ],
+    "protein": [
+      {
+        "category": "protein",
+        "abbreviation": "ck",
+        "fullForm": "Chicken",
+        "count": 168,
+        "examples": [
+          {
+            "id": 6688,
+            "name": "DIAM cat ck 5.5oz"
+          },
+          {
+            "id": 6680,
+            "name": "VIT ESSEN cat ck pat 8oz"
+          },
+          {
+            "id": 6679,
+            "name": "SD 7+ sm min ck 5.8oz"
+          },
+          {
+            "id": 6676,
+            "name": "VIT ESSEN cat ck min nib 12oz"
+          },
+          {
+            "id": 6668,
+            "name": "PRO PLAN cat ck & ri 16#"
+          }
+        ]
+      },
+      {
+        "category": "protein",
+        "abbreviation": "salm",
+        "fullForm": "Salmon",
+        "count": 42,
+        "examples": [
+          {
+            "id": 6657,
+            "name": "ZIGN salm 12.5#"
+          },
+          {
+            "id": 6656,
+            "name": "ZIGN salm 4#"
+          },
+          {
+            "id": 2175,
+            "name": "Blue Wilderness Chnk&Salm Treats"
+          },
+          {
+            "id": 6648,
+            "name": "ZIGN sele trout & salm 12.5#"
+          },
+          {
+            "id": 6647,
+            "name": "ZIGN trout & salm 25#"
+          }
+        ]
+      },
+      {
+        "category": "protein",
+        "abbreviation": "lam",
+        "fullForm": "Lamb",
+        "count": 30,
+        "examples": [
+          {
+            "id": 6641,
+            "name": "PRO PLAN lam & veg 13oz"
+          },
+          {
+            "id": 6891,
+            "name": "FRESHPET vit gr fr beef,lam 5.5#"
+          },
+          {
+            "id": 6880,
+            "name": "FRESHPET sm br ck,turk,lam 1#"
+          },
+          {
+            "id": 6691,
+            "name": "NUTRI SOUR cat ck,tu&lam 5.5oz"
+          },
+          {
+            "id": 6549,
+            "name": "WELLN lam stew 12.5oz"
+          }
+        ]
+      },
+      {
+        "category": "protein",
+        "abbreviation": "chk",
+        "fullForm": "Chicken",
+        "count": 4,
+        "examples": [
+          {
+            "id": 2144,
+            "name": "Catit Creamy Chk&Shmp 12 pk"
+          },
+          {
+            "id": 4632,
+            "name": "SMARTBONES KABOBZ CHK, PK,DCK"
+          },
+          {
+            "id": 4647,
+            "name": "SMARTBONES 24 MINI CHK"
+          },
+          {
+            "id": 4788,
+            "name": "NUTRISRC BIG BITES CHK"
+          }
+        ]
+      },
+      {
+        "category": "protein",
+        "abbreviation": "bf",
+        "fullForm": "Beef",
+        "count": 3,
+        "examples": [
+          {
+            "id": 4854,
+            "name": "TUESDAYS 10-12\" BF BASTED CHKRLL"
+          },
+          {
+            "id": 4855,
+            "name": "TUESDAYS 10\" BF CHEEK RLL DUSTED"
+          },
+          {
+            "id": 4486,
+            "name": "REDBARN SMMD BF CHEEK RL CHKN"
+          }
+        ]
+      },
+      {
+        "category": "protein",
+        "abbreviation": "duc",
+        "fullForm": "Duck",
+        "count": 2,
+        "examples": [
+          {
+            "id": 6478,
+            "name": "FROMM duc a la veg 12.2oz"
+          },
+          {
+            "id": 6474,
+            "name": "FROMM tur duc & sw pot 12.2oz"
+          }
+        ]
+      },
+      {
+        "category": "protein",
+        "abbreviation": "dk",
+        "fullForm": "Duck",
+        "count": 1,
+        "examples": [
+          {
+            "id": 1923,
+            "name": "PennPlex Felt Steps Dk Grey 13\"H"
+          }
+        ]
+      }
+    ],
+    "size": [
+      {
+        "category": "size",
+        "abbreviation": "sm br",
+        "fullForm": "Small Breed",
+        "count": 50,
+        "examples": [
+          {
+            "id": 4685,
+            "name": "RWRDS CRUNCH BIS SM BR SAL 8OZ"
+          },
+          {
+            "id": 6880,
+            "name": "FRESHPET sm br ck,turk,lam 1#"
+          },
+          {
+            "id": 6879,
+            "name": "FRESHPET sm br ck1#"
+          },
+          {
+            "id": 6878,
+            "name": "FRESHPET sm br ck,tur 1#"
+          },
+          {
+            "id": 6877,
+            "name": "FRESHPET sm br multi prot 1#"
+          }
+        ]
+      },
+      {
+        "category": "size",
+        "abbreviation": "lg br",
+        "fullForm": "Large Breed",
+        "count": 50,
+        "examples": [
+          {
+            "id": 6633,
+            "name": "PRO PLAN lg br 13oz"
+          },
+          {
+            "id": 6632,
+            "name": "PRO PLAN lg br beef 13oz"
+          },
+          {
+            "id": 6527,
+            "name": "PRO PLAN lg br salm 34#"
+          },
+          {
+            "id": 6526,
+            "name": "PRO PLAN sen lg br pup sal 24#"
+          },
+          {
+            "id": 6378,
+            "name": "PRO PLAN lg br puppy 34#"
+          }
+        ]
+      }
+    ],
+    "life_stage": [
+      {
+        "category": "life_stage",
+        "abbreviation": "pup",
+        "fullForm": "Puppy",
+        "count": 30,
+        "examples": [
+          {
+            "id": 2922,
+            "name": "NYLA PUP TEETHING RINGS"
+          },
+          {
+            "id": 2937,
+            "name": "KONG WUBBA PUP ASSORT. SM"
+          },
+          {
+            "id": 2968,
+            "name": "KONG CMFT HEDGEHUG PUP XS"
+          },
+          {
+            "id": 2969,
+            "name": "KONG CMFT HEDGEHUG PUP MD"
+          },
+          {
+            "id": 3121,
+            "name": "KNG ZIGGIES ENHANCE PUP M/L 8OZ"
+          }
+        ]
+      },
+      {
+        "category": "life_stage",
+        "abbreviation": "jr",
+        "fullForm": "Junior",
+        "count": 9,
+        "examples": [
+          {
+            "id": 2840,
+            "name": "TUFFY T-JR-3WT-CB"
+          },
+          {
+            "id": 2839,
+            "name": "TUFFY T-JR-BR-RP"
+          },
+          {
+            "id": 2847,
+            "name": "TUFFY-OC-JR-FISH-OR"
+          },
+          {
+            "id": 2852,
+            "name": "TUFFY T-JR-B-RP"
+          },
+          {
+            "id": 2855,
+            "name": "TUFFY T-JR-Z-ELEPHANT"
+          }
+        ]
+      }
+    ],
+    "common": [
+      {
+        "category": "common",
+        "abbreviation": "org",
+        "fullForm": "Organic",
+        "count": 16,
+        "examples": [
+          {
+            "id": 4934,
+            "name": "GREENIES ORG LG 6OZ"
+          },
+          {
+            "id": 4936,
+            "name": "GREENIES ORG TEENIE 6OZ"
+          },
+          {
+            "id": 4937,
+            "name": "GREENIES ORG REG 12OZ"
+          },
+          {
+            "id": 4938,
+            "name": "GREENIES ORG PETITE 12OZ"
+          },
+          {
+            "id": 4939,
+            "name": "GREENIES ORG TEENIE 12OZ"
+          }
+        ]
+      },
+      {
+        "category": "common",
+        "abbreviation": "asst",
+        "fullForm": "Assorted",
+        "count": 10,
+        "examples": [
+          {
+            "id": 1184,
+            "name": "AE Asst Bird Cage"
+          },
+          {
+            "id": 2692,
+            "name": "MULTIPET NOSEY BUDDY ASST"
+          },
+          {
+            "id": 2936,
+            "name": "KONG WUBBA FRIENDS ASST. SM"
+          },
+          {
+            "id": 5203,
+            "name": "AQUAPLNT 2.5/3.5\" RCKPLNT ASST"
+          },
+          {
+            "id": 5349,
+            "name": "SKULL GAZER SM ASST"
+          }
+        ]
+      },
+      {
+        "category": "common",
+        "abbreviation": "nat",
+        "fullForm": "Natural",
+        "count": 9,
+        "examples": [
+          {
+            "id": 4047,
+            "name": "OXBOW PURCMFRT 72L NAT."
+          },
+          {
+            "id": 5409,
+            "name": "2PK NAT 10 GAL TANK DECOR"
+          },
+          {
+            "id": 5844,
+            "name": "BASIC HOODIE NAT BLU MED"
+          },
+          {
+            "id": 5850,
+            "name": "BASIC HOODIE NAT BLU SM"
+          },
+          {
+            "id": 4050,
+            "name": "OXBW PURCMFRT 28L NAT"
+          }
+        ]
+      },
+      {
+        "category": "common",
+        "abbreviation": "out",
+        "fullForm": "Outdoor",
+        "count": 7,
+        "examples": [
+          {
+            "id": 1734,
+            "name": "PetCrest Tie Out Stake"
+          },
+          {
+            "id": 1742,
+            "name": "Titan Tie Out Chain 15Ft"
+          },
+          {
+            "id": 1773,
+            "name": "PH Tie Out Trolley Set Hvy Dty"
+          },
+          {
+            "id": 1775,
+            "name": "FourPaws 50' Hvy weight tie out cable"
+          },
+          {
+            "id": 2199,
+            "name": "SPOT American Take-Out"
+          }
+        ]
+      },
+      {
+        "category": "common",
+        "abbreviation": "ind",
+        "fullForm": "Indoor",
+        "count": 3,
+        "examples": [
+          {
+            "id": 6674,
+            "name": "CAT CHOW ind 15#"
+          },
+          {
+            "id": 6663,
+            "name": "CAT CHOW ind 3.15#"
+          },
+          {
+            "id": 6762,
+            "name": "ACANA cat ind herring 4#"
+          }
+        ]
+      },
+      {
+        "category": "common",
+        "abbreviation": "w/",
+        "fullForm": "with",
+        "count": 1,
+        "examples": [
+          {
+            "id": 3098,
+            "name": "KNG BALL W/ HOLE MD/LG"
+          }
+        ]
+      }
+    ],
+    "diet": [
+      {
+        "category": "diet",
+        "abbreviation": "hp",
+        "fullForm": "High Protein",
+        "count": 3,
+        "examples": [
+          {
+            "id": 3482,
+            "name": "VALHOMA 22 HP COLLAR"
+          },
+          {
+            "id": 3495,
+            "name": "VALHOMA SPIKE 16 HP CLLR"
+          },
+          {
+            "id": 3485,
+            "name": "VALHOMA 24 HP COLLAR"
+          }
+        ]
+      }
+    ],
+    "formula": [
+      {
+        "category": "formula",
+        "abbreviation": "ent",
+        "fullForm": "Entree",
+        "count": 2,
+        "examples": [
+          {
+            "id": 6543,
+            "name": "WELLNESS pt ent roast ck 3oz"
+          },
+          {
+            "id": 6542,
+            "name": "WELLNESS pt ent ck,gr be 3oz"
+          }
+        ]
+      }
+    ]
+  },
+  "allResults": [
+    {
+      "category": "brand",
+      "abbreviation": "sd",
+      "fullForm": "Science Diet",
+      "count": 202,
+      "examples": [
+        {
+          "id": 6679,
+          "name": "SD 7+ sm min ck 5.8oz"
+        },
+        {
+          "id": 6615,
+          "name": "SD ck stew 12.5oz"
+        },
+        {
+          "id": 6851,
+          "name": "SD cat sen kitten salm stew 2.8oz"
+        },
+        {
+          "id": 6850,
+          "name": "SD cat in do salm stew 2.8oz"
+        },
+        {
+          "id": 6849,
+          "name": "SD kitten ck stew 2.8oz"
+        }
+      ]
+    },
+    {
+      "category": "protein",
+      "abbreviation": "ck",
+      "fullForm": "Chicken",
+      "count": 168,
+      "examples": [
+        {
+          "id": 6688,
+          "name": "DIAM cat ck 5.5oz"
+        },
+        {
+          "id": 6680,
+          "name": "VIT ESSEN cat ck pat 8oz"
+        },
+        {
+          "id": 6679,
+          "name": "SD 7+ sm min ck 5.8oz"
+        },
+        {
+          "id": 6676,
+          "name": "VIT ESSEN cat ck min nib 12oz"
+        },
+        {
+          "id": 6668,
+          "name": "PRO PLAN cat ck & ri 16#"
+        }
+      ]
+    },
+    {
+      "category": "size",
+      "abbreviation": "sm br",
+      "fullForm": "Small Breed",
+      "count": 50,
+      "examples": [
+        {
+          "id": 4685,
+          "name": "RWRDS CRUNCH BIS SM BR SAL 8OZ"
+        },
+        {
+          "id": 6880,
+          "name": "FRESHPET sm br ck,turk,lam 1#"
+        },
+        {
+          "id": 6879,
+          "name": "FRESHPET sm br ck1#"
+        },
+        {
+          "id": 6878,
+          "name": "FRESHPET sm br ck,tur 1#"
+        },
+        {
+          "id": 6877,
+          "name": "FRESHPET sm br multi prot 1#"
+        }
+      ]
+    },
+    {
+      "category": "size",
+      "abbreviation": "lg br",
+      "fullForm": "Large Breed",
+      "count": 50,
+      "examples": [
+        {
+          "id": 6633,
+          "name": "PRO PLAN lg br 13oz"
+        },
+        {
+          "id": 6632,
+          "name": "PRO PLAN lg br beef 13oz"
+        },
+        {
+          "id": 6527,
+          "name": "PRO PLAN lg br salm 34#"
+        },
+        {
+          "id": 6526,
+          "name": "PRO PLAN sen lg br pup sal 24#"
+        },
+        {
+          "id": 6378,
+          "name": "PRO PLAN lg br puppy 34#"
+        }
+      ]
+    },
+    {
+      "category": "protein",
+      "abbreviation": "salm",
+      "fullForm": "Salmon",
+      "count": 42,
+      "examples": [
+        {
+          "id": 6657,
+          "name": "ZIGN salm 12.5#"
+        },
+        {
+          "id": 6656,
+          "name": "ZIGN salm 4#"
+        },
+        {
+          "id": 2175,
+          "name": "Blue Wilderness Chnk&Salm Treats"
+        },
+        {
+          "id": 6648,
+          "name": "ZIGN sele trout & salm 12.5#"
+        },
+        {
+          "id": 6647,
+          "name": "ZIGN trout & salm 25#"
+        }
+      ]
+    },
+    {
+      "category": "life_stage",
+      "abbreviation": "pup",
+      "fullForm": "Puppy",
+      "count": 30,
+      "examples": [
+        {
+          "id": 2922,
+          "name": "NYLA PUP TEETHING RINGS"
+        },
+        {
+          "id": 2937,
+          "name": "KONG WUBBA PUP ASSORT. SM"
+        },
+        {
+          "id": 2968,
+          "name": "KONG CMFT HEDGEHUG PUP XS"
+        },
+        {
+          "id": 2969,
+          "name": "KONG CMFT HEDGEHUG PUP MD"
+        },
+        {
+          "id": 3121,
+          "name": "KNG ZIGGIES ENHANCE PUP M/L 8OZ"
+        }
+      ]
+    },
+    {
+      "category": "protein",
+      "abbreviation": "lam",
+      "fullForm": "Lamb",
+      "count": 30,
+      "examples": [
+        {
+          "id": 6641,
+          "name": "PRO PLAN lam & veg 13oz"
+        },
+        {
+          "id": 6891,
+          "name": "FRESHPET vit gr fr beef,lam 5.5#"
+        },
+        {
+          "id": 6880,
+          "name": "FRESHPET sm br ck,turk,lam 1#"
+        },
+        {
+          "id": 6691,
+          "name": "NUTRI SOUR cat ck,tu&lam 5.5oz"
+        },
+        {
+          "id": 6549,
+          "name": "WELLN lam stew 12.5oz"
+        }
+      ]
+    },
+    {
+      "category": "common",
+      "abbreviation": "org",
+      "fullForm": "Organic",
+      "count": 16,
+      "examples": [
+        {
+          "id": 4934,
+          "name": "GREENIES ORG LG 6OZ"
+        },
+        {
+          "id": 4936,
+          "name": "GREENIES ORG TEENIE 6OZ"
+        },
+        {
+          "id": 4937,
+          "name": "GREENIES ORG REG 12OZ"
+        },
+        {
+          "id": 4938,
+          "name": "GREENIES ORG PETITE 12OZ"
+        },
+        {
+          "id": 4939,
+          "name": "GREENIES ORG TEENIE 12OZ"
+        }
+      ]
+    },
+    {
+      "category": "common",
+      "abbreviation": "asst",
+      "fullForm": "Assorted",
+      "count": 10,
+      "examples": [
+        {
+          "id": 1184,
+          "name": "AE Asst Bird Cage"
+        },
+        {
+          "id": 2692,
+          "name": "MULTIPET NOSEY BUDDY ASST"
+        },
+        {
+          "id": 2936,
+          "name": "KONG WUBBA FRIENDS ASST. SM"
+        },
+        {
+          "id": 5203,
+          "name": "AQUAPLNT 2.5/3.5\" RCKPLNT ASST"
+        },
+        {
+          "id": 5349,
+          "name": "SKULL GAZER SM ASST"
+        }
+      ]
+    },
+    {
+      "category": "life_stage",
+      "abbreviation": "jr",
+      "fullForm": "Junior",
+      "count": 9,
+      "examples": [
+        {
+          "id": 2840,
+          "name": "TUFFY T-JR-3WT-CB"
+        },
+        {
+          "id": 2839,
+          "name": "TUFFY T-JR-BR-RP"
+        },
+        {
+          "id": 2847,
+          "name": "TUFFY-OC-JR-FISH-OR"
+        },
+        {
+          "id": 2852,
+          "name": "TUFFY T-JR-B-RP"
+        },
+        {
+          "id": 2855,
+          "name": "TUFFY T-JR-Z-ELEPHANT"
+        }
+      ]
+    },
+    {
+      "category": "common",
+      "abbreviation": "nat",
+      "fullForm": "Natural",
+      "count": 9,
+      "examples": [
+        {
+          "id": 4047,
+          "name": "OXBOW PURCMFRT 72L NAT."
+        },
+        {
+          "id": 5409,
+          "name": "2PK NAT 10 GAL TANK DECOR"
+        },
+        {
+          "id": 5844,
+          "name": "BASIC HOODIE NAT BLU MED"
+        },
+        {
+          "id": 5850,
+          "name": "BASIC HOODIE NAT BLU SM"
+        },
+        {
+          "id": 4050,
+          "name": "OXBW PURCMFRT 28L NAT"
+        }
+      ]
+    },
+    {
+      "category": "common",
+      "abbreviation": "out",
+      "fullForm": "Outdoor",
+      "count": 7,
+      "examples": [
+        {
+          "id": 1734,
+          "name": "PetCrest Tie Out Stake"
+        },
+        {
+          "id": 1742,
+          "name": "Titan Tie Out Chain 15Ft"
+        },
+        {
+          "id": 1773,
+          "name": "PH Tie Out Trolley Set Hvy Dty"
+        },
+        {
+          "id": 1775,
+          "name": "FourPaws 50' Hvy weight tie out cable"
+        },
+        {
+          "id": 2199,
+          "name": "SPOT American Take-Out"
+        }
+      ]
+    },
+    {
+      "category": "protein",
+      "abbreviation": "chk",
+      "fullForm": "Chicken",
+      "count": 4,
+      "examples": [
+        {
+          "id": 2144,
+          "name": "Catit Creamy Chk&Shmp 12 pk"
+        },
+        {
+          "id": 4632,
+          "name": "SMARTBONES KABOBZ CHK, PK,DCK"
+        },
+        {
+          "id": 4647,
+          "name": "SMARTBONES 24 MINI CHK"
+        },
+        {
+          "id": 4788,
+          "name": "NUTRISRC BIG BITES CHK"
+        }
+      ]
+    },
+    {
+      "category": "protein",
+      "abbreviation": "bf",
+      "fullForm": "Beef",
+      "count": 3,
+      "examples": [
+        {
+          "id": 4854,
+          "name": "TUESDAYS 10-12\" BF BASTED CHKRLL"
+        },
+        {
+          "id": 4855,
+          "name": "TUESDAYS 10\" BF CHEEK RLL DUSTED"
+        },
+        {
+          "id": 4486,
+          "name": "REDBARN SMMD BF CHEEK RL CHKN"
+        }
+      ]
+    },
+    {
+      "category": "diet",
+      "abbreviation": "hp",
+      "fullForm": "High Protein",
+      "count": 3,
+      "examples": [
+        {
+          "id": 3482,
+          "name": "VALHOMA 22 HP COLLAR"
+        },
+        {
+          "id": 3495,
+          "name": "VALHOMA SPIKE 16 HP CLLR"
+        },
+        {
+          "id": 3485,
+          "name": "VALHOMA 24 HP COLLAR"
+        }
+      ]
+    },
+    {
+      "category": "common",
+      "abbreviation": "ind",
+      "fullForm": "Indoor",
+      "count": 3,
+      "examples": [
+        {
+          "id": 6674,
+          "name": "CAT CHOW ind 15#"
+        },
+        {
+          "id": 6663,
+          "name": "CAT CHOW ind 3.15#"
+        },
+        {
+          "id": 6762,
+          "name": "ACANA cat ind herring 4#"
+        }
+      ]
+    },
+    {
+      "category": "protein",
+      "abbreviation": "duc",
+      "fullForm": "Duck",
+      "count": 2,
+      "examples": [
+        {
+          "id": 6478,
+          "name": "FROMM duc a la veg 12.2oz"
+        },
+        {
+          "id": 6474,
+          "name": "FROMM tur duc & sw pot 12.2oz"
+        }
+      ]
+    },
+    {
+      "category": "formula",
+      "abbreviation": "ent",
+      "fullForm": "Entree",
+      "count": 2,
+      "examples": [
+        {
+          "id": 6543,
+          "name": "WELLNESS pt ent roast ck 3oz"
+        },
+        {
+          "id": 6542,
+          "name": "WELLNESS pt ent ck,gr be 3oz"
+        }
+      ]
+    },
+    {
+      "category": "protein",
+      "abbreviation": "dk",
+      "fullForm": "Duck",
+      "count": 1,
+      "examples": [
+        {
+          "id": 1923,
+          "name": "PennPlex Felt Steps Dk Grey 13\"H"
+        }
+      ]
+    },
+    {
+      "category": "common",
+      "abbreviation": "w/",
+      "fullForm": "with",
+      "count": 1,
+      "examples": [
+        {
+          "id": 3098,
+          "name": "KNG BALL W/ HOLE MD/LG"
+        }
+      ]
+    }
+  ]
+}
