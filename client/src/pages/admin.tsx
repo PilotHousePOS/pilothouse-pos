@@ -1861,6 +1861,7 @@ function normalizeServiceType(serviceType: string | undefined | null): string {
 }
 
 export default function Admin() {
+  console.log('🔴 Admin component loaded - CODE VERSION: 2024-11-11-UPDATE');
   const { user, isAuthenticated, isLoading } = useAuth();
   const typedUser = user as User;
   const { toast } = useToast();
