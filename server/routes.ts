@@ -2885,6 +2885,146 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Export entire database to JSON (Admin only)
+  app.get("/api/admin/database/export", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      console.log("Starting database export...");
+
+      // Export all data
+      const exportData = {
+        version: "1.0",
+        exportDate: new Date().toISOString(),
+        environment: process.env.NODE_ENV || "development",
+        data: {
+          users: await storage.getAllUsers(),
+          pets: await storage.getPets(),
+          supplies: await storage.getSupplies({}, 0, 100000), // Get all supplies
+          appointments: await storage.getAppointments(),
+          orders: await storage.getOrders(),
+          groomers: await storage.getAllGroomers(),
+          contacts: await storage.getAllContacts(),
+          specialDates: await storage.getAllSpecialDates(),
+        }
+      };
+
+      console.log(`Exported ${exportData.data.users.length} users, ${exportData.data.supplies.items.length} supplies, ${exportData.data.appointments.length} appointments`);
+
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', `attachment; filename="database-export-${Date.now()}.json"`);
+      res.json(exportData);
+    } catch (error) {
+      console.error('Error exporting database:', error);
+      res.status(500).json({ message: "Failed to export database" });
+    }
+  });
+
+  // Import database from JSON (Admin only - DEVELOPMENT ONLY)
+  app.post("/api/admin/database/import", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      // Safety check: only allow in development
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(403).json({ message: "Database import is disabled in production for safety" });
+      }
+
+      const importData = req.body;
+      
+      if (!importData || !importData.version || !importData.data) {
+        return res.status(400).json({ message: "Invalid import data format" });
+      }
+
+      console.log("Starting database import...");
+      let stats = {
+        users: 0,
+        supplies: 0,
+        pets: 0,
+        appointments: 0,
+        orders: 0,
+        groomers: 0,
+        contacts: 0,
+      };
+
+      // Import supplies (they don't have dependencies)
+      if (importData.data.supplies?.items) {
+        for (const supply of importData.data.supplies.items) {
+          try {
+            await storage.upsertSupply(supply);
+            stats.supplies++;
+          } catch (err) {
+            console.error(`Failed to import supply ${supply.id}:`, err);
+          }
+        }
+      }
+
+      // Import pets
+      if (importData.data.pets) {
+        for (const pet of importData.data.pets) {
+          try {
+            await storage.upsertPet(pet);
+            stats.pets++;
+          } catch (err) {
+            console.error(`Failed to import pet ${pet.id}:`, err);
+          }
+        }
+      }
+
+      // Import groomers
+      if (importData.data.groomers) {
+        for (const groomer of importData.data.groomers) {
+          try {
+            await storage.upsertGroomer(groomer);
+            stats.groomers++;
+          } catch (err) {
+            console.error(`Failed to import groomer ${groomer.id}:`, err);
+          }
+        }
+      }
+
+      // Import contacts
+      if (importData.data.contacts) {
+        for (const contact of importData.data.contacts) {
+          try {
+            await storage.upsertContact(contact);
+            stats.contacts++;
+          } catch (err) {
+            console.error(`Failed to import contact ${contact.id}:`, err);
+          }
+        }
+      }
+
+      // Import appointments
+      if (importData.data.appointments) {
+        for (const appointment of importData.data.appointments) {
+          try {
+            await storage.upsertAppointment(appointment);
+            stats.appointments++;
+          } catch (err) {
+            console.error(`Failed to import appointment ${appointment.id}:`, err);
+          }
+        }
+      }
+
+      console.log("Import complete:", stats);
+
+      res.json({ 
+        message: "Database imported successfully",
+        stats 
+      });
+    } catch (error) {
+      console.error('Error importing database:', error);
+      res.status(500).json({ message: "Failed to import database" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

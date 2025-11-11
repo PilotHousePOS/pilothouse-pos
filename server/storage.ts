@@ -1341,6 +1341,52 @@ export class DatabaseStorage implements IStorage {
     const times = await this.getSpecialDateAllowedTimes(setting.id);
     return { setting, times };
   }
+
+  // Upsert methods for database import
+  async upsertSupply(supply: any): Promise<void> {
+    const existing = await db.select().from(supplies).where(eq(supplies.id, supply.id)).limit(1);
+    if (existing.length > 0) {
+      await db.update(supplies).set(supply).where(eq(supplies.id, supply.id));
+    } else {
+      await db.insert(supplies).values(supply);
+    }
+  }
+
+  async upsertPet(pet: any): Promise<void> {
+    const existing = await db.select().from(pets).where(eq(pets.id, pet.id)).limit(1);
+    if (existing.length > 0) {
+      await db.update(pets).set(pet).where(eq(pets.id, pet.id));
+    } else {
+      await db.insert(pets).values(pet);
+    }
+  }
+
+  async upsertGroomer(groomer: any): Promise<void> {
+    const existing = await db.select().from(groomers).where(eq(groomers.id, groomer.id)).limit(1);
+    if (existing.length > 0) {
+      await db.update(groomers).set(groomer).where(eq(groomers.id, groomer.id));
+    } else {
+      await db.insert(groomers).values(groomer);
+    }
+  }
+
+  async upsertContact(contact: any): Promise<void> {
+    const existing = await db.select().from(contacts).where(eq(contacts.id, contact.id)).limit(1);
+    if (existing.length > 0) {
+      await db.update(contacts).set(contact).where(eq(contacts.id, contact.id));
+    } else {
+      await db.insert(contacts).values(contact);
+    }
+  }
+
+  async upsertAppointment(appointment: any): Promise<void> {
+    const existing = await db.select().from(appointments).where(eq(appointments.id, appointment.id)).limit(1);
+    if (existing.length > 0) {
+      await db.update(appointments).set(appointment).where(eq(appointments.id, appointment.id));
+    } else {
+      await db.insert(appointments).values(appointment);
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();
