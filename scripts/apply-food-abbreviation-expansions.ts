@@ -5,6 +5,9 @@ import * as fs from 'fs';
 
 // Focused abbreviation mapping for food products only
 const foodAbbreviations: Record<string, string> = {
+  // Special patterns (must be first - order matters)
+  'tri bl': 'Tri Blend',
+  
   // Brand
   'sd': 'Science Diet',
   'RC': 'Royal Canin',
@@ -12,6 +15,12 @@ const foodAbbreviations: Record<string, string> = {
   'EB': 'Eukanuba',
   'IAM': 'IAMS',
   'buf': 'Blue Buffalo',
+  
+  // Colors
+  'wh': 'White',
+  'gre': 'Grey',
+  'bl': 'Black',
+  'burgund': 'Burgundy',
   
   // Size
   'sm br': 'Small Breed',
@@ -43,6 +52,26 @@ const foodAbbreviations: Record<string, string> = {
   '#': 'lb',
 };
 
+// Function to capitalize first letter of each word except articles
+function toTitleCase(text: string): string {
+  const lowercaseWords = ['and', 'is', 'or', 'but', 'a', 'an', 'the', 'of', 'in', 'on', 'at', 'to', 'for', 'with'];
+  
+  return text.split(' ').map((word, index) => {
+    // Always capitalize first word
+    if (index === 0) {
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    }
+    
+    // Don't capitalize articles/conjunctions
+    if (lowercaseWords.includes(word.toLowerCase())) {
+      return word.toLowerCase();
+    }
+    
+    // Capitalize everything else
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  }).join(' ');
+}
+
 // Function to expand abbreviations
 function expandAbbreviations(text: string): string {
   let expanded = text;
@@ -60,6 +89,9 @@ function expandAbbreviations(text: string): string {
       expanded = expanded.replace(regex, full);
     }
   }
+  
+  // Apply title case
+  expanded = toTitleCase(expanded);
   
   return expanded;
 }
