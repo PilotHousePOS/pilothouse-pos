@@ -67,29 +67,34 @@ async function main() {
       }
     }
     
-    console.log('🔄 Starting restore operation...\n');
+    console.log(`🔄 Restoring ${backupData.products.length} products in a transaction (all-or-nothing)...\n`);
     
     let restoredCount = 0;
-    const errors: Array<{ id: number; error: string }> = [];
     
-    // Restore each product
-    for (const product of backupData.products) {
-      try {
-        await db.update(supplies)
-          .set({ name: product.name })
-          .where(eq(supplies.id, product.id));
-        
-        restoredCount++;
-        
-        if (restoredCount % 50 === 0) {
-          console.log(`✓ Restored ${restoredCount} products...`);
+    try {
+      // Restore all products in a single transaction for safety
+      await db.transaction(async (tx) => {
+        for (const product of backupData.products) {
+          await tx.update(supplies)
+            .set({ name: product.name })
+            .where(eq(supplies.id, product.id));
+          
+          restoredCount++;
+          
+          if (restoredCount % 50 === 0) {
+            console.log(`✓ Restored ${restoredCount} products...`);
+          }
         }
-      } catch (error) {
-        errors.push({
-          id: product.id,
-          error: error instanceof Error ? error.message : String(error)
-        });
-      }
+      });
+      
+      console.log(`\n✅ Transaction committed successfully!`);
+      
+    } catch (txError) {
+      // Transaction rolled back automatically
+      console.error('\n❌ Transaction failed and was rolled back!');
+      console.error('Error:', txError);
+      console.log('\n📦 Data unchanged - restore operation failed safely\n');
+      throw txError;
     }
     
     console.log('\n==============================================');
@@ -97,24 +102,8 @@ async function main() {
     console.log('==============================================\n');
     
     console.log(`✅ Successfully restored ${restoredCount} products`);
-    
-    if (errors.length > 0) {
-      console.log(`⚠️  Failed to restore ${errors.length} products\n`);
-      console.log('Failed products:');
-      errors.slice(0, 10).forEach(err => {
-        console.log(`  - ID ${err.id}: ${err.error}`);
-      });
-      if (errors.length > 10) {
-        console.log(`  ... and ${errors.length - 10} more errors\n`);
-      }
-      
-      // Save error log
-      const errorLogFile = `restore-errors-${Date.now()}.json`;
-      fs.writeFileSync(errorLogFile, JSON.stringify(errors, null, 2));
-      console.log(`📝 Error log saved to: ${errorLogFile}\n`);
-    }
-    
-    console.log('🎉 Restore operation completed!\n');
+    console.log(`📦 All product names returned to backup state\n`);
+    console.log('🎉 Restore operation completed!\n`);
     
   } catch (error) {
     console.error('❌ Fatal error during restore:', error);
