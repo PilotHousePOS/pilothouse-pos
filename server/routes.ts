@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
 import crypto from "crypto";
+import XLSX from "xlsx";
 import { storage } from "./storage";
 import { generateToken, verifyToken, authMiddleware, setAuthCookie } from "./auth";
 import {
@@ -43,6 +44,26 @@ const upload = multer({
       cb(null, true);
     } else {
       cb(new Error('Only image files are allowed'));
+    }
+  }
+});
+
+// Configure multer for Excel file uploads
+const excelUpload = multer({ 
+  storage: multer.memoryStorage(), // Store in memory for immediate processing
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit for Excel files
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedMimeTypes = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+      'application/vnd.ms-excel', // .xls
+      'application/octet-stream' // Sometimes Excel files are detected as this
+    ];
+    if (allowedMimeTypes.includes(file.mimetype) || file.originalname.match(/\.(xlsx|xls)$/i)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only Excel files (.xlsx, .xls) are allowed'));
     }
   }
 });
@@ -2991,6 +3012,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error exporting database:', error);
       res.status(500).json({ message: "Failed to export database" });
+    }
+  });
+
+  // Import inventory from Excel file (Admin only)
+  app.post("/api/admin/inventory/import", authMiddleware, excelUpload.single('file'), async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const updateExisting = req.body.updateExisting === 'true';
+      
+      // Parse Excel file from buffer
+      const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const data = XLSX.utils.sheet_to_json(worksheet);
+
+      console.log(`Processing ${data.length} rows from Excel file...`);
+      console.log(`Mode: ${updateExisting ? 'Update Existing' : 'Add New Only'}`);
+
+      // Get existing supplies if updating
+      let existingSuppliesMap = new Map();
+      if (updateExisting) {
+        const existingSupplies = await storage.getAllSupplies();
+        existingSupplies.forEach((supply: any) => {
+          existingSuppliesMap.set(supply.name.toLowerCase().trim(), supply);
+        });
+      } else {
+        const existingSupplies = await storage.getAllSupplies();
+        existingSupplies.forEach((supply: any) => {
+          existingSuppliesMap.set(supply.name.toLowerCase().trim(), supply);
+        });
+      }
+
+      let stats = {
+        added: 0,
+        updated: 0,
+        skipped: 0,
+        errors: [] as string[]
+      };
+
+      for (let i = 0; i < data.length; i++) {
+        const row: any = data[i];
+
+        try {
+          // Skip header row
+          if (row.Description === 'Description') {
+            continue;
+          }
+
+          // Skip inactive items - default to active if TRUE column is missing
+          // Only skip if explicitly set to false or FALSE string
+          const isActive = row.TRUE === undefined || row.TRUE === true || String(row.TRUE).toLowerCase() === 'true';
+          if (!isActive) {
+            stats.skipped++;
+            continue;
+          }
+
+          // Extract data from Excel columns
+          const name = (row.Description || '').toString().trim();
+          const category = (row['Category '] || row.Category || 'accessories').toString().trim().toLowerCase();
+          const brand = (row.Mfg || row.Vendor || '').toString().trim();
+          const price = parseFloat(row.Price || '0');
+          const stockQuantity = parseInt(row.QtyOnHand || '0', 10) || 0;
+          const size = (row.Size || '').toString().trim();
+          const description = (row.DescLong || row.Description || '').toString().trim();
+
+          // Skip if no name or price
+          if (!name || name === '' || price <= 0) {
+            stats.skipped++;
+            continue;
+          }
+
+          // Normalize category
+          let normalizedCategory = category;
+          if (category.includes('food')) normalizedCategory = 'food';
+          else if (category.includes('toy')) normalizedCategory = 'toys';
+          else if (category.includes('bed')) normalizedCategory = 'beds';
+          else if (category.includes('treat')) normalizedCategory = 'treats';
+          else if (category.includes('health') || category.includes('medicine')) normalizedCategory = 'health';
+          else if (category.includes('collar') || category.includes('leash')) normalizedCategory = 'accessories';
+          else if (category.includes('crate') || category.includes('carrier')) normalizedCategory = 'accessories';
+          else normalizedCategory = 'accessories';
+
+          // Generate image URL (placeholder)
+          const imageUrl = '/placeholder-supply.jpg';
+
+          const existingSupply = existingSuppliesMap.get(name.toLowerCase().trim());
+
+          if (existingSupply && updateExisting) {
+            // Update existing supply
+            await storage.updateSupply(existingSupply.id, {
+              name,
+              description,
+              price,
+              category: normalizedCategory,
+              imageUrl: existingSupply.imageUrl || imageUrl,
+              stockQuantity,
+              brand,
+              size
+            });
+            stats.updated++;
+          } else if (!existingSupply) {
+            // Add new supply
+            await storage.createSupply({
+              name,
+              description,
+              price,
+              category: normalizedCategory,
+              imageUrl,
+              stockQuantity,
+              brand,
+              size
+            });
+            stats.added++;
+          } else {
+            // Skip if exists and not updating
+            stats.skipped++;
+          }
+        } catch (error: any) {
+          console.error(`Error processing row ${i}:`, error);
+          stats.errors.push(`Row ${i}: ${error.message}`);
+          if (stats.errors.length > 10) break; // Stop if too many errors
+        }
+      }
+
+      console.log(`Import complete: ${stats.added} added, ${stats.updated} updated, ${stats.skipped} skipped, ${stats.errors.length} errors`);
+
+      res.json({
+        success: true,
+        stats,
+        message: `Import complete: ${stats.added} added, ${stats.updated} updated, ${stats.skipped} skipped`
+      });
+    } catch (error: any) {
+      console.error('Excel import error:', error);
+      res.status(500).json({ 
+        success: false,
+        message: "Failed to import Excel file",
+        error: error.message 
+      });
     }
   });
 
