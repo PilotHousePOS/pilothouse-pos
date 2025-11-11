@@ -135,8 +135,25 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
     '1:00 PM', '1:15 PM', '1:30 PM'
   ];
 
+  const normalizeTime = (timeStr: string): string => {
+    // If already in 12-hour format, return as-is
+    if (timeStr.includes('AM') || timeStr.includes('PM')) {
+      return timeStr;
+    }
+    
+    // Convert 24-hour format to 12-hour format
+    const [hours, minutes] = timeStr.split(':').map(num => parseInt(num, 10));
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    const formattedMinutes = minutes ? `:${minutes.toString().padStart(2, '0')}` : ':00';
+    return `${hour12}${formattedMinutes} ${period}`;
+  };
+
   const getAppointmentsForTime = (time: string) => {
-    return confirmedAppointments.filter((apt: any) => apt.appointmentTime === time);
+    return confirmedAppointments.filter((apt: any) => {
+      const normalizedAptTime = normalizeTime(apt.appointmentTime);
+      return normalizedAptTime === time;
+    });
   };
 
   const getGoogleEventsForTime = (time: string) => {
