@@ -5799,7 +5799,15 @@ export default function Admin() {
                   />
                   <Button
                     onClick={() => {
-                      document.getElementById('supplies-import-file')?.click();
+                      console.log('Import button clicked - opening file picker...');
+                      const input = document.getElementById('supplies-import-file');
+                      console.log('File input element:', input);
+                      if (input) {
+                        input.click();
+                        console.log('File picker should open now');
+                      } else {
+                        console.error('File input element not found!');
+                      }
                     }}
                     variant="outline"
                     className="border-green-600 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
