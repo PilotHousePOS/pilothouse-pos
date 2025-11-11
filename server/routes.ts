@@ -3387,6 +3387,104 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Export ONLY supplies to JSON (Admin only - Safe for production)
+  app.get("/api/admin/supplies/export", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      console.log("Starting supplies-only export...");
+
+      const allSupplies = await storage.getAllSupplies();
+
+      const exportData = {
+        version: "1.0",
+        type: "supplies-only",
+        exportDate: new Date().toISOString(),
+        environment: process.env.NODE_ENV || "development",
+        data: {
+          supplies: allSupplies
+        }
+      };
+
+      console.log(`Exported: ${exportData.data.supplies.length} supplies`);
+
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', `attachment; filename="supplies-export-${Date.now()}.json"`);
+      res.json(exportData);
+    } catch (error) {
+      console.error('Error exporting supplies:', error);
+      res.status(500).json({ message: "Failed to export supplies" });
+    }
+  });
+
+  // Import ONLY supplies from JSON (Admin only - SAFE FOR PRODUCTION)
+  app.post("/api/admin/supplies/import", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const importData = req.body;
+      
+      // Validate import data format
+      if (!importData || !importData.version || !importData.data) {
+        return res.status(400).json({ message: "Invalid import data format - missing version or data" });
+      }
+
+      // Ensure this is a supplies-only export
+      if (importData.type !== "supplies-only") {
+        return res.status(400).json({ message: "This endpoint only accepts supplies-only export files. Use the full database import for complete exports." });
+      }
+
+      // Validate supplies array exists and is an array
+      if (!importData.data.supplies || !Array.isArray(importData.data.supplies)) {
+        return res.status(400).json({ message: "Invalid import data format - supplies must be an array" });
+      }
+
+      console.log("Starting supplies-only import...");
+      console.log("Import data version:", importData.version);
+      console.log("Source environment:", importData.environment);
+      console.log(`Processing ${importData.data.supplies.length} supplies...`);
+
+      let stats = {
+        supplies: 0,
+        errors: [] as string[]
+      };
+
+      // Import supplies
+      for (const supply of importData.data.supplies) {
+        try {
+          await storage.upsertSupply(supply);
+          stats.supplies++;
+        } catch (err) {
+          const errorMsg = `Failed to import supply ID ${supply?.id || 'unknown'}: ${err instanceof Error ? err.message : 'Unknown error'}`;
+          console.error(errorMsg);
+          stats.errors.push(errorMsg);
+        }
+      }
+
+      console.log(`Supplies import complete: ${stats.supplies} supplies imported, ${stats.errors.length} errors`);
+
+      res.json({ 
+        message: stats.errors.length === 0 
+          ? "Supplies import completed successfully" 
+          : `Supplies import completed with ${stats.errors.length} error(s)`,
+        stats: {
+          supplies: stats.supplies,
+          errorCount: stats.errors.length,
+          errors: stats.errors.slice(0, 20) // Return first 20 errors for debugging
+        }
+      });
+    } catch (error) {
+      console.error('Error importing supplies:', error);
+      res.status(500).json({ message: "Failed to import supplies" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -5634,11 +5634,181 @@ export default function Admin() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Database className="w-5 h-5" />
-                Database Sync
+                <Package className="w-5 h-5" />
+                Supplies Sync (Safe for Production)
               </CardTitle>
               <CardDescription>
-                Export production data and import to development environment
+                Export and import ONLY supplies inventory - safe to use in production
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Info Banner */}
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-green-600 dark:text-green-500 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-semibold text-green-800 dark:text-green-300 mb-1">Safe for Production</p>
+                    <ul className="list-disc list-inside space-y-1 text-green-700 dark:text-green-400">
+                      <li>Only updates supplies inventory - won't affect users, orders, or appointments</li>
+                      <li>Works in both development and production environments</li>
+                      <li>Perfect for syncing product name updates to production</li>
+                      <li>Uses upsert - updates existing items by ID, adds new items</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Export Section */}
+              <div className="space-y-3">
+                <div>
+                  <h3 className="font-semibold text-lg mb-1">Export Supplies</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Download only the supplies inventory as a JSON file (e.g., from development with updated names)
+                  </p>
+                </div>
+                <Button
+                  onClick={async () => {
+                    try {
+                      const response = await fetch('/api/admin/supplies/export', {
+                        credentials: 'include'
+                      });
+                      
+                      if (!response.ok) {
+                        throw new Error('Export failed');
+                      }
+                      
+                      const blob = await response.blob();
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `supplies-export-${Date.now()}.json`;
+                      document.body.appendChild(a);
+                      a.click();
+                      window.URL.revokeObjectURL(url);
+                      document.body.removeChild(a);
+                      
+                      toast({
+                        title: "Export successful",
+                        description: "Supplies inventory exported successfully"
+                      });
+                    } catch (error) {
+                      console.error('Export error:', error);
+                      toast({
+                        title: "Export failed",
+                        description: "Failed to export supplies",
+                        variant: "destructive"
+                      });
+                    }
+                  }}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  data-testid="button-export-supplies"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export Supplies Only
+                </Button>
+              </div>
+
+              {/* Import Section */}
+              <div className="space-y-3 pt-4 border-t">
+                <div>
+                  <h3 className="font-semibold text-lg mb-1">Import Supplies</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Upload a supplies-only export file to update inventory (e.g., import to production with updated names)
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <input
+                    type="file"
+                    accept="application/json"
+                    id="supplies-import-file"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+
+                      try {
+                        const text = await file.text();
+                        const data = JSON.parse(text);
+                        
+                        // Verify it's a supplies-only export
+                        if (data.type !== 'supplies-only') {
+                          throw new Error('This file is not a supplies-only export. Please use the correct export file.');
+                        }
+                        
+                        const response = await fetch('/api/admin/supplies/import', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          credentials: 'include',
+                          body: JSON.stringify(data)
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (!response.ok) {
+                          throw new Error(result.message || 'Import failed');
+                        }
+                        
+                        // Show success with error details if any
+                        const errorCount = result.stats?.errorCount || 0;
+                        if (errorCount > 0) {
+                          toast({
+                            title: "Import completed with errors",
+                            description: `Imported ${result.stats?.supplies || 0} supplies, ${errorCount} failed. Check console for details.`,
+                            variant: "destructive"
+                          });
+                          console.error('Import errors:', result.stats?.errors);
+                        } else {
+                          toast({
+                            title: "Import successful",
+                            description: `Imported ${result.stats?.supplies || 0} supplies`
+                          });
+                        }
+                        
+                        // Reload the page to show fresh data
+                        setTimeout(() => window.location.reload(), 1500);
+                      } catch (error) {
+                        console.error('Import error:', error);
+                        toast({
+                          title: "Import failed",
+                          description: error instanceof Error ? error.message : "Failed to import supplies",
+                          variant: "destructive"
+                        });
+                      }
+                      
+                      // Reset file input
+                      e.target.value = '';
+                    }}
+                    data-testid="input-import-supplies"
+                  />
+                  <Button
+                    onClick={() => {
+                      document.getElementById('supplies-import-file')?.click();
+                    }}
+                    variant="outline"
+                    className="border-green-600 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
+                    data-testid="button-import-supplies"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Import Supplies Only
+                  </Button>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Select a supplies-only JSON file (safe for production)
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Database className="w-5 h-5" />
+                Full Database Sync (Development Only)
+              </CardTitle>
+              <CardDescription>
+                Export all data and import to development environment only
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">

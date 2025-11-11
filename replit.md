@@ -50,7 +50,9 @@ The application is a full-stack web application with a clear separation of conce
 - **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtering content by species.
 - **Admin Order Management:** Displays actual product/pet names and customer names in order details.
 - **Orders & Appointments Search:** Unified search bar in admin panel to filter appointments and orders by customer name, phone number, or pet name, with visual highlighting for matches.
-- **Database Sync Tool:** Admin-only export/import functionality to sync production data to development environment. Exports all 14 database tables (users, pets, supplies, appointments, orders, orderItems, groomers, contacts, customerPets, wishlistItems, groomerAvailability, weeklyAppointmentLimits, dailyAppointmentLimits, specialDateSettings, specialDateAllowedTimes) to JSON with dependency ordering. Import is development-only for safety, processes tables in correct order to preserve foreign key relationships.
+- **Database Sync Tools:** 
+  - **Supplies-Only Sync (Production-Safe):** Admin-only export/import of supplies inventory only. Safe for production use since it only touches the supplies table without affecting users, orders, or appointments. Validates file type and array structure before import. Returns detailed error reporting for failed imports. Perfect for syncing product name updates from development to production.
+  - **Full Database Sync (Development-Only):** Admin-only export/import functionality to sync production data to development environment. Exports all 14 database tables (users, pets, supplies, appointments, orders, orderItems, groomers, contacts, customerPets, wishlistItems, groomerAvailability, weeklyAppointmentLimits, dailyAppointmentLimits, specialDateSettings, specialDateAllowedTimes) to JSON with dependency ordering. Import is development-only for safety, processes tables in correct order to preserve foreign key relationships.
 
 **System Design Choices:**
 - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
