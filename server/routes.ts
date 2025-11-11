@@ -2896,11 +2896,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Starting database export...");
 
       // Export all data in dependency order (parents before children)
-      const allSupplies = await storage.getSupplies({}, 0, 100000);
+      const allSupplies = await storage.getAllSupplies();
       const allOrders = await storage.getOrders();
       const allAppointments = await storage.getAppointments();
       const allGroomers = await storage.getAllGroomers();
-      const allSpecialDates = await storage.getAllSpecialDates();
+      const allSpecialDateSettings = await storage.getAllSpecialDateSettings();
       
       // Get dependent data
       const orderItemsData = await storage.getAllOrderItems();
@@ -2919,8 +2919,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Independent tables first
           users: await storage.getAllUsers(),
           groomers: allGroomers,
-          pets: await storage.getPets(),
-          supplies: allSupplies.items,
+          pets: await storage.getAllPets(),
+          supplies: allSupplies,
           contacts: await storage.getAllContacts(),
           
           // Dependent tables
@@ -2932,7 +2932,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           groomerAvailability: groomerAvailabilityData,
           weeklyAppointmentLimits: weeklyLimitsData,
           dailyAppointmentLimits: dailyLimitsData,
-          specialDateSettings: allSpecialDates,
+          specialDateSettings: allSpecialDateSettings,
           specialDateAllowedTimes: specialDateTimesData,
         }
       };
