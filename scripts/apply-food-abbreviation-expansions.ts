@@ -29,6 +29,7 @@ const foodAbbreviations: Record<string, string> = {
   'trk': 'Turkey',
   'salm': 'Salmon',
   'duc': 'Duck',
+  'ri': 'rice',
   
   // Life stages
   'pup': 'Puppy',

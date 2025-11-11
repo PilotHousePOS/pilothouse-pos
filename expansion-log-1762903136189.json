@@ -1,0 +1,54 @@
+{
+  "timestamp": "2025-11-11T23:18:57.081Z",
+  "status": "completed",
+  "totalProcessed": 951,
+  "totalUpdated": 9,
+  "changes": [
+    {
+      "id": 6668,
+      "oldName": "PRO PLAN cat Chicken & ri 16lb",
+      "newName": "PRO PLAN cat Chicken & rice 16lb"
+    },
+    {
+      "id": 6638,
+      "oldName": "PRO PLAN 7+ beef & ri 13oz",
+      "newName": "PRO PLAN 7+ beef & rice 13oz"
+    },
+    {
+      "id": 6636,
+      "oldName": "PRO PLAN beef & ri 13oz",
+      "newName": "PRO PLAN beef & rice 13oz"
+    },
+    {
+      "id": 6634,
+      "oldName": "PRO PLAN Chicken & ri 13oz",
+      "newName": "PRO PLAN Chicken & rice 13oz"
+    },
+    {
+      "id": 6885,
+      "oldName": "FRESHPET Chicken,ri 6lb",
+      "newName": "FRESHPET Chicken,rice 6lb"
+    },
+    {
+      "id": 6509,
+      "oldName": "NUTRI SOUR beef & ri 1203oz",
+      "newName": "NUTRI SOUR beef & rice 1203oz"
+    },
+    {
+      "id": 6887,
+      "oldName": "FRESHPET Chicken,ri 2lb",
+      "newName": "FRESHPET Chicken,rice 2lb"
+    },
+    {
+      "id": 6667,
+      "oldName": "PRO PLAN cat Chicken & ri 3.5lb",
+      "newName": "PRO PLAN cat Chicken & rice 3.5lb"
+    },
+    {
+      "id": 6483,
+      "oldName": "FROMM Chicken & ri 12.2oz",
+      "newName": "FROMM Chicken & rice 12.2oz"
+    }
+  ],
+  "backupFile": "backup-before-expansion-1762903136189.json"
+}
