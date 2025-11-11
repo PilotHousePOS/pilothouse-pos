@@ -1817,6 +1817,7 @@ export default function Admin() {
   const [isSyncAppointmentsConfirmOpen, setIsSyncAppointmentsConfirmOpen] = useState(false);
   const [showApprovedAppointments, setShowApprovedAppointments] = useState(false);
   const [showDeniedAppointments, setShowDeniedAppointments] = useState(false);
+  const [filterByHere, setFilterByHere] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<any>(null);
   const [editNotes, setEditNotes] = useState('');
   const [editPrice, setEditPrice] = useState('');
@@ -3431,17 +3432,20 @@ export default function Admin() {
       .filter((a: any) => {
         if (a.status !== 'confirmed' && a.status !== 'completed') return false;
         
+        // When filtering by "Here", only show appointments marked as here
+        if (filterByHere && !a.isHere) return false;
+        
         // When searching, show all matching appointments regardless of date
         if (search.trim()) return true;
         
         // Otherwise, only show appointments from today onwards
-        const appointmentDate = new Date(a.appointmentDate);
+        const appointmentDate = parseLocalDate(a.appointmentDate);
         appointmentDate.setHours(0, 0, 0, 0);
         
         return appointmentDate >= today;
       });
     return groupAppointmentsByPhone(approvedAppts);
-  }, [appointments, filteredAppointments, search]);
+  }, [appointments, filteredAppointments, search, filterByHere]);
 
   // Group denied appointments by phone number (only show today and future dates, unless searching)
   const groupedDeniedAppointments = useMemo(() => {
@@ -3456,7 +3460,7 @@ export default function Admin() {
         if (search.trim()) return true;
         
         // Otherwise, only show appointments from today onwards
-        const appointmentDate = new Date(a.appointmentDate);
+        const appointmentDate = parseLocalDate(a.appointmentDate);
         appointmentDate.setHours(0, 0, 0, 0);
         
         return appointmentDate >= today;
@@ -3557,16 +3561,28 @@ export default function Admin() {
             <div className="text-sm text-gray-500">Pending Appts</div>
           </CardContent>
         </Card>
-        <Card className="min-h-[120px]">
+        <Card className={`min-h-[120px] ${filterByHere ? 'ring-2 ring-blue-600' : ''}`}>
           <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full relative">
-            <Users className="w-8 h-8 mb-3 text-blue-600" />
-            <div className="text-2xl font-bold mb-1" data-testid="dashboard-customers-here">{customersHere}</div>
-            <div className="text-sm text-gray-500 mb-2">Customers Here</div>
+            <div 
+              className="cursor-pointer flex flex-col items-center justify-center w-full"
+              onClick={() => {
+                setFilterByHere(!filterByHere);
+                if (!filterByHere) {
+                  setShowApprovedAppointments(true);
+                }
+              }}
+              data-testid="card-customers-here"
+            >
+              <Users className="w-8 h-8 mb-3 text-blue-600" />
+              <div className="text-2xl font-bold mb-1" data-testid="dashboard-customers-here">{customersHere}</div>
+              <div className="text-sm text-gray-500 mb-2">Customers Here</div>
+            </div>
             {typedUser?.isAdmin && customersHere > 0 && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   if (confirm('Reset ALL "Here" statuses across all appointments? This cannot be undone.')) {
                     resetAllHereMutation.mutate();
                   }
