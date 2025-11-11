@@ -37,12 +37,19 @@ function getPageIndicators(currentPage: number, totalPages: number): number[] {
 }
 
 export default function Supplies() {
+  const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+
+  // Handle search submit
+  const handleSearch = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    setSearchQuery(searchInput.trim());
+  };
 
   // Reset page when filters change
   useEffect(() => {
@@ -95,16 +102,39 @@ export default function Supplies() {
       </div>
       
       {/* Search Bar */}
-      <div className="relative mb-6">
-        <Input
-          type="text"
-          placeholder="Search supplies..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 bg-gray-100 border-none rounded-xl"
-        />
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-      </div>
+      <form onSubmit={handleSearch} className="relative mb-6 flex gap-2">
+        <div className="relative flex-1">
+          <Input
+            type="text"
+            placeholder="Search supplies..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="pl-10 bg-gray-100 border-none rounded-xl"
+            data-testid="input-search-supplies"
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        </div>
+        <Button 
+          type="submit" 
+          className="bg-brand-blue hover:bg-brand-blue/90"
+          data-testid="button-search-supplies"
+        >
+          Search
+        </Button>
+        {searchQuery && (
+          <Button 
+            type="button" 
+            variant="outline"
+            onClick={() => {
+              setSearchInput('');
+              setSearchQuery('');
+            }}
+            data-testid="button-clear-search"
+          >
+            Clear
+          </Button>
+        )}
+      </form>
 
       {/* Category Grid */}
       <div className="grid grid-cols-3 gap-4 mb-6">
