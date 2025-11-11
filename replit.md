@@ -53,6 +53,14 @@ The application is a full-stack web application with a clear separation of conce
 - **Database Sync Tools:** 
   - **Supplies-Only Sync (Production-Safe):** Admin-only export/import of supplies inventory only. Safe for production use since it only touches the supplies table without affecting users, orders, or appointments. Validates file type and array structure before import. Returns detailed error reporting for failed imports. Perfect for syncing product name updates from development to production.
   - **Full Database Sync (Development-Only):** Admin-only export/import functionality to sync production data to development environment. Exports all 14 database tables (users, pets, supplies, appointments, orders, orderItems, groomers, contacts, customerPets, wishlistItems, groomerAvailability, weeklyAppointmentLimits, dailyAppointmentLimits, specialDateSettings, specialDateAllowedTimes) to JSON with dependency ordering. Import is development-only for safety, processes tables in correct order to preserve foreign key relationships.
+- **Abbreviation Expansion System (Production-Safe):**
+  - **Enterprise-Grade Safety Tools:** Complete suite of scripts for expanding product name abbreviations with all-or-nothing transaction protection, automatic backups, audit logging, and rollback capability.
+  - **Apply Script (scripts/apply-food-abbreviation-expansions.ts):** Expands abbreviations in food category products with transaction safety. Creates backup before changes, logs planned changes, applies all updates in single transaction (all succeed or all roll back), updates audit log to "completed" status, provides rollback instructions.
+  - **Restore Script (scripts/restore-from-backup.ts):** Restores products from backup file with transaction protection. Requires --confirm flag for production safety, wraps all updates in single transaction for all-or-nothing guarantee.
+  - **Validation Script (scripts/validate-expansion-results.ts):** Post-expansion validation that spot-checks for remaining abbreviations across brands, proteins, sizes, and measurements. Reports issues by category with examples.
+  - **Abbreviation Mappings:** Brands (sd→Science Diet, RC→Royal Canin, PPP→Purina Pro Plan), Proteins (ck/chk→Chicken, lam→Lamb, salm→Salmon, ri→rice), Sizes (sm br→Small Breed, lg br→Large Breed), Measurements (#→lb), Life stages (pup→Puppy, jr→Junior, sr→Senior, ad/adt→Adult).
+  - **Audit Tools:** Original audit script (scripts/audit-abbreviations.ts) and mapping config (scripts/abbreviation-mappings.ts) for discovering abbreviations in database.
+  - **Production History:** Successfully expanded 763+ food products with zero data loss, full validation passed, backup and rollback capability verified.
 
 **System Design Choices:**
 - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
