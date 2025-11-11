@@ -102,6 +102,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test-only endpoint to create users (only in development)
+  app.post('/api/test/create-user', async (req, res) => {
+    if (process.env.NODE_ENV !== 'development') {
+      return res.status(403).json({ message: "Test endpoints only available in development" });
+    }
+
+    try {
+      const { email, password, firstName, lastName, phoneNumber, isAdmin, isGroomer } = req.body;
+      
+      if (!email || !password || !firstName || !lastName) {
+        return res.status(400).json({ message: "Email, password, firstName, and lastName are required" });
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        // Return existing user instead of error
+        console.log('Test user already exists, returning existing:', email);
+        const { password: _, ...userWithoutPassword } = existingUser;
+        return res.json(userWithoutPassword);
+      }
+
+      // Create new user
+      const newUser = await storage.createUser({
+        email,
+        password,
+        firstName,
+        lastName,
+        isAdmin: isAdmin || false,
+        isGroomer: isGroomer || false,
+      });
+
+      // Update phone number if provided
+      if (phoneNumber) {
+        await db.update(users).set({ phoneNumber }).where(eq(users.id, newUser.id));
+      }
+
+      console.log('Test user created:', email, 'isAdmin:', isAdmin, 'isGroomer:', isGroomer);
+      const { password: _, ...userWithoutPassword } = newUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Test user creation error:", error);
+      res.status(500).json({ message: "Failed to create test user" });
+    }
+  });
+
   // Customer login
   app.post('/api/auth/login', async (req, res) => {
     try {
