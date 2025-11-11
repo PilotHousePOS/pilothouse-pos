@@ -34,6 +34,7 @@ import {
   PawPrint,
   Package,
   Upload,
+  Download,
   X,
   Shield,
   ArrowLeft,
@@ -46,12 +47,14 @@ import {
   Eye,
   EyeOff,
   AlertTriangle,
+  AlertCircle,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
   ChevronUp,
   DollarSign,
-  History
+  History,
+  Database
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -3632,6 +3635,11 @@ export default function Admin() {
             <TabsTrigger value="contacts" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
               Contacts
             </TabsTrigger>
+            {typedUser?.isAdmin && (
+              <TabsTrigger value="database" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                Database
+              </TabsTrigger>
+            )}
           </TabsList>
         </div>
 
@@ -5427,6 +5435,162 @@ export default function Admin() {
 
         <TabsContent value="contacts" className="space-y-6">
           <ContactsManager />
+        </TabsContent>
+
+        <TabsContent value="database" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Database className="w-5 h-5" />
+                Database Sync
+              </CardTitle>
+              <CardDescription>
+                Export production data and import to development environment
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Warning Banner */}
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-500 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-semibold text-yellow-800 dark:text-yellow-300 mb-1">Important Notes</p>
+                    <ul className="list-disc list-inside space-y-1 text-yellow-700 dark:text-yellow-400">
+                      <li>Export downloads a JSON file with all database tables</li>
+                      <li>Import is only available in development environment</li>
+                      <li>Import will overwrite existing data (upsert by ID)</li>
+                      <li>Always backup before importing</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Export Section */}
+              <div className="space-y-3">
+                <div>
+                  <h3 className="font-semibold text-lg mb-1">Export Database</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Download all database tables as a JSON file. Use this to backup production data or sync to development.
+                  </p>
+                </div>
+                <Button
+                  onClick={async () => {
+                    try {
+                      const response = await fetch('/api/admin/database/export', {
+                        credentials: 'include'
+                      });
+                      
+                      if (!response.ok) {
+                        throw new Error('Export failed');
+                      }
+                      
+                      const blob = await response.blob();
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `database-export-${Date.now()}.json`;
+                      document.body.appendChild(a);
+                      a.click();
+                      window.URL.revokeObjectURL(url);
+                      document.body.removeChild(a);
+                      
+                      toast({
+                        title: "Export successful",
+                        description: "Database export downloaded successfully"
+                      });
+                    } catch (error) {
+                      console.error('Export error:', error);
+                      toast({
+                        title: "Export failed",
+                        description: "Failed to export database",
+                        variant: "destructive"
+                      });
+                    }
+                  }}
+                  className="bg-brand-blue hover:bg-blue-600"
+                  data-testid="button-export-database"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export Database
+                </Button>
+              </div>
+
+              {/* Import Section */}
+              <div className="space-y-3 pt-4 border-t">
+                <div>
+                  <h3 className="font-semibold text-lg mb-1">Import Database</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Upload a previously exported JSON file to sync production data to development.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <input
+                    type="file"
+                    accept="application/json"
+                    id="database-import-file"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+
+                      try {
+                        const text = await file.text();
+                        const data = JSON.parse(text);
+                        
+                        const response = await fetch('/api/admin/database/import', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          credentials: 'include',
+                          body: JSON.stringify(data)
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (!response.ok) {
+                          throw new Error(result.message || 'Import failed');
+                        }
+                        
+                        toast({
+                          title: "Import successful",
+                          description: `Imported ${Object.values(result.stats || {}).reduce((a: number, b: any) => a + (Number(b) || 0), 0)} records`
+                        });
+                        
+                        // Reload the page to show fresh data
+                        setTimeout(() => window.location.reload(), 1500);
+                      } catch (error) {
+                        console.error('Import error:', error);
+                        toast({
+                          title: "Import failed",
+                          description: error instanceof Error ? error.message : "Failed to import database",
+                          variant: "destructive"
+                        });
+                      }
+                      
+                      // Reset file input
+                      e.target.value = '';
+                    }}
+                    data-testid="input-import-file"
+                  />
+                  <Button
+                    onClick={() => {
+                      document.getElementById('database-import-file')?.click();
+                    }}
+                    variant="outline"
+                    className="border-brand-blue text-brand-blue hover:bg-brand-blue/10"
+                    data-testid="button-import-database"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Import Database
+                  </Button>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Select a JSON file exported from production database
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="grooming">

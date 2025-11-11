@@ -2895,24 +2895,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("Starting database export...");
 
-      // Export all data
+      // Export all data in dependency order (parents before children)
+      const allSupplies = await storage.getSupplies({}, 0, 100000);
+      const allOrders = await storage.getOrders();
+      const allAppointments = await storage.getAppointments();
+      const allGroomers = await storage.getAllGroomers();
+      const allSpecialDates = await storage.getAllSpecialDates();
+      
+      // Get dependent data
+      const orderItemsData = await storage.getAllOrderItems();
+      const wishlistData = await storage.getAllWishlistItems();
+      const customerPetsData = await storage.getAllCustomerPets();
+      const groomerAvailabilityData = await storage.getAllGroomerAvailability();
+      const weeklyLimitsData = await storage.getAllWeeklyLimits();
+      const dailyLimitsData = await storage.getAllDailyLimits();
+      const specialDateTimesData = await storage.getAllSpecialDateTimes();
+
       const exportData = {
         version: "1.0",
         exportDate: new Date().toISOString(),
         environment: process.env.NODE_ENV || "development",
         data: {
+          // Independent tables first
           users: await storage.getAllUsers(),
+          groomers: allGroomers,
           pets: await storage.getPets(),
-          supplies: await storage.getSupplies({}, 0, 100000), // Get all supplies
-          appointments: await storage.getAppointments(),
-          orders: await storage.getOrders(),
-          groomers: await storage.getAllGroomers(),
+          supplies: allSupplies.items,
           contacts: await storage.getAllContacts(),
-          specialDates: await storage.getAllSpecialDates(),
+          
+          // Dependent tables
+          customerPets: customerPetsData,
+          appointments: allAppointments,
+          orders: allOrders,
+          orderItems: orderItemsData,
+          wishlistItems: wishlistData,
+          groomerAvailability: groomerAvailabilityData,
+          weeklyAppointmentLimits: weeklyLimitsData,
+          dailyAppointmentLimits: dailyLimitsData,
+          specialDateSettings: allSpecialDates,
+          specialDateAllowedTimes: specialDateTimesData,
         }
       };
 
-      console.log(`Exported ${exportData.data.users.length} users, ${exportData.data.supplies.items.length} supplies, ${exportData.data.appointments.length} appointments`);
+      console.log(`Exported: ${exportData.data.users.length} users, ${exportData.data.supplies.length} supplies, ${exportData.data.appointments.length} appointments, ${exportData.data.orders.length} orders`);
 
       res.setHeader('Content-Type', 'application/json');
       res.setHeader('Content-Disposition', `attachment; filename="database-export-${Date.now()}.json"`);
@@ -2938,24 +2963,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const importData = req.body;
       
+      // Validate import data format
       if (!importData || !importData.version || !importData.data) {
-        return res.status(400).json({ message: "Invalid import data format" });
+        return res.status(400).json({ message: "Invalid import data format - missing version or data" });
       }
 
       console.log("Starting database import...");
+      console.log("Import data version:", importData.version);
+      console.log("Source environment:", importData.environment);
+
       let stats = {
         users: 0,
         supplies: 0,
         pets: 0,
-        appointments: 0,
-        orders: 0,
         groomers: 0,
         contacts: 0,
+        customerPets: 0,
+        appointments: 0,
+        orders: 0,
+        orderItems: 0,
+        wishlistItems: 0,
+        groomerAvailability: 0,
+        weeklyLimits: 0,
+        dailyLimits: 0,
+        specialDateSettings: 0,
+        specialDateAllowedTimes: 0,
       };
 
-      // Import supplies (they don't have dependencies)
-      if (importData.data.supplies?.items) {
-        for (const supply of importData.data.supplies.items) {
+      // Import in dependency order: parents before children
+      
+      // 0. Users first (many tables reference userId)
+      if (importData.data.users) {
+        for (const user of importData.data.users) {
+          try {
+            await storage.upsertUser(user);
+            stats.users++;
+          } catch (err) {
+            console.error(`Failed to import user ${user.id}:`, err);
+          }
+        }
+      }
+      
+      // 1. Independent tables (no foreign keys to users)
+      if (importData.data.supplies) {
+        for (const supply of importData.data.supplies) {
           try {
             await storage.upsertSupply(supply);
             stats.supplies++;
@@ -2965,7 +3016,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Import pets
       if (importData.data.pets) {
         for (const pet of importData.data.pets) {
           try {
@@ -2977,7 +3027,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Import groomers
       if (importData.data.groomers) {
         for (const groomer of importData.data.groomers) {
           try {
@@ -2989,7 +3038,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Import contacts
       if (importData.data.contacts) {
         for (const contact of importData.data.contacts) {
           try {
@@ -3001,7 +3049,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Import appointments
+      // 2. Tables with foreign keys to above tables
+      if (importData.data.customerPets) {
+        for (const customerPet of importData.data.customerPets) {
+          try {
+            await storage.upsertCustomerPet(customerPet);
+            stats.customerPets++;
+          } catch (err) {
+            console.error(`Failed to import customer pet ${customerPet.id}:`, err);
+          }
+        }
+      }
+
+      if (importData.data.groomerAvailability) {
+        for (const availability of importData.data.groomerAvailability) {
+          try {
+            await storage.upsertGroomerAvailability(availability);
+            stats.groomerAvailability++;
+          } catch (err) {
+            console.error(`Failed to import groomer availability ${availability.id}:`, err);
+          }
+        }
+      }
+
       if (importData.data.appointments) {
         for (const appointment of importData.data.appointments) {
           try {
@@ -3009,6 +3079,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
             stats.appointments++;
           } catch (err) {
             console.error(`Failed to import appointment ${appointment.id}:`, err);
+          }
+        }
+      }
+
+      if (importData.data.orders) {
+        for (const order of importData.data.orders) {
+          try {
+            await storage.upsertOrder(order);
+            stats.orders++;
+          } catch (err) {
+            console.error(`Failed to import order ${order.id}:`, err);
+          }
+        }
+      }
+
+      // 3. Child tables (depend on orders)
+      if (importData.data.orderItems) {
+        for (const orderItem of importData.data.orderItems) {
+          try {
+            await storage.upsertOrderItem(orderItem);
+            stats.orderItems++;
+          } catch (err) {
+            console.error(`Failed to import order item ${orderItem.id}:`, err);
+          }
+        }
+      }
+
+      if (importData.data.wishlistItems) {
+        for (const wishlistItem of importData.data.wishlistItems) {
+          try {
+            await storage.upsertWishlistItem(wishlistItem);
+            stats.wishlistItems++;
+          } catch (err) {
+            console.error(`Failed to import wishlist item ${wishlistItem.id}:`, err);
+          }
+        }
+      }
+
+      // 4. Settings tables
+      if (importData.data.weeklyAppointmentLimits) {
+        for (const limit of importData.data.weeklyAppointmentLimits) {
+          try {
+            await storage.upsertWeeklyLimit(limit);
+            stats.weeklyLimits++;
+          } catch (err) {
+            console.error(`Failed to import weekly limit ${limit.id}:`, err);
+          }
+        }
+      }
+
+      if (importData.data.dailyAppointmentLimits) {
+        for (const limit of importData.data.dailyAppointmentLimits) {
+          try {
+            await storage.upsertDailyLimit(limit);
+            stats.dailyLimits++;
+          } catch (err) {
+            console.error(`Failed to import daily limit ${limit.id}:`, err);
+          }
+        }
+      }
+
+      if (importData.data.specialDateSettings) {
+        for (const setting of importData.data.specialDateSettings) {
+          try {
+            await storage.upsertSpecialDateSetting(setting);
+            stats.specialDateSettings++;
+          } catch (err) {
+            console.error(`Failed to import special date setting ${setting.id}:`, err);
+          }
+        }
+      }
+
+      if (importData.data.specialDateAllowedTimes) {
+        for (const allowedTime of importData.data.specialDateAllowedTimes) {
+          try {
+            await storage.upsertSpecialDateAllowedTime(allowedTime);
+            stats.specialDateAllowedTimes++;
+          } catch (err) {
+            console.error(`Failed to import special date allowed time ${allowedTime.id}:`, err);
           }
         }
       }
@@ -3021,7 +3170,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error('Error importing database:', error);
-      res.status(500).json({ message: "Failed to import database" });
+      res.status(500).json({ message: "Failed to import database", error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 

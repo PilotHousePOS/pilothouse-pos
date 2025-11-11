@@ -1342,7 +1342,45 @@ export class DatabaseStorage implements IStorage {
     return { setting, times };
   }
 
+  // Get all methods for database export
+  async getAllOrderItems(): Promise<any[]> {
+    return await db.select().from(orderItems);
+  }
+
+  async getAllWishlistItems(): Promise<any[]> {
+    return await db.select().from(wishlistItems);
+  }
+
+  async getAllCustomerPets(): Promise<any[]> {
+    return await db.select().from(customerPets);
+  }
+
+  async getAllGroomerAvailability(): Promise<any[]> {
+    return await db.select().from(groomerAvailability);
+  }
+
+  async getAllWeeklyLimits(): Promise<any[]> {
+    return await db.select().from(weeklyAppointmentLimits);
+  }
+
+  async getAllDailyLimits(): Promise<any[]> {
+    return await db.select().from(dailyAppointmentLimits);
+  }
+
+  async getAllSpecialDateTimes(): Promise<any[]> {
+    return await db.select().from(specialDateAllowedTimes);
+  }
+
   // Upsert methods for database import
+  async upsertUser(user: any): Promise<void> {
+    const existing = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
+    if (existing.length > 0) {
+      await db.update(users).set(user).where(eq(users.id, user.id));
+    } else {
+      await db.insert(users).values(user);
+    }
+  }
+
   async upsertSupply(supply: any): Promise<void> {
     const existing = await db.select().from(supplies).where(eq(supplies.id, supply.id)).limit(1);
     if (existing.length > 0) {
@@ -1385,6 +1423,87 @@ export class DatabaseStorage implements IStorage {
       await db.update(appointments).set(appointment).where(eq(appointments.id, appointment.id));
     } else {
       await db.insert(appointments).values(appointment);
+    }
+  }
+
+  async upsertCustomerPet(customerPet: any): Promise<void> {
+    const existing = await db.select().from(customerPets).where(eq(customerPets.id, customerPet.id)).limit(1);
+    if (existing.length > 0) {
+      await db.update(customerPets).set(customerPet).where(eq(customerPets.id, customerPet.id));
+    } else {
+      await db.insert(customerPets).values(customerPet);
+    }
+  }
+
+  async upsertOrder(order: any): Promise<void> {
+    const existing = await db.select().from(orders).where(eq(orders.id, order.id)).limit(1);
+    if (existing.length > 0) {
+      await db.update(orders).set(order).where(eq(orders.id, order.id));
+    } else {
+      await db.insert(orders).values(order);
+    }
+  }
+
+  async upsertOrderItem(orderItem: any): Promise<void> {
+    const existing = await db.select().from(orderItems).where(eq(orderItems.id, orderItem.id)).limit(1);
+    if (existing.length > 0) {
+      await db.update(orderItems).set(orderItem).where(eq(orderItems.id, orderItem.id));
+    } else {
+      await db.insert(orderItems).values(orderItem);
+    }
+  }
+
+  async upsertWishlistItem(wishlistItem: any): Promise<void> {
+    const existing = await db.select().from(wishlistItems).where(eq(wishlistItems.id, wishlistItem.id)).limit(1);
+    if (existing.length > 0) {
+      await db.update(wishlistItems).set(wishlistItem).where(eq(wishlistItems.id, wishlistItem.id));
+    } else {
+      await db.insert(wishlistItems).values(wishlistItem);
+    }
+  }
+
+  async upsertGroomerAvailability(availability: any): Promise<void> {
+    const existing = await db.select().from(groomerAvailability).where(eq(groomerAvailability.id, availability.id)).limit(1);
+    if (existing.length > 0) {
+      await db.update(groomerAvailability).set(availability).where(eq(groomerAvailability.id, availability.id));
+    } else {
+      await db.insert(groomerAvailability).values(availability);
+    }
+  }
+
+  async upsertWeeklyLimit(limit: any): Promise<void> {
+    const existing = await db.select().from(weeklyAppointmentLimits).where(eq(weeklyAppointmentLimits.id, limit.id)).limit(1);
+    if (existing.length > 0) {
+      await db.update(weeklyAppointmentLimits).set(limit).where(eq(weeklyAppointmentLimits.id, limit.id));
+    } else {
+      await db.insert(weeklyAppointmentLimits).values(limit);
+    }
+  }
+
+  async upsertDailyLimit(limit: any): Promise<void> {
+    const existing = await db.select().from(dailyAppointmentLimits).where(eq(dailyAppointmentLimits.id, limit.id)).limit(1);
+    if (existing.length > 0) {
+      await db.update(dailyAppointmentLimits).set(limit).where(eq(dailyAppointmentLimits.id, limit.id));
+    } else {
+      await db.insert(dailyAppointmentLimits).values(limit);
+    }
+  }
+
+  async upsertSpecialDateSetting(setting: any): Promise<void> {
+    const existing = await db.select().from(specialDateSettings).where(eq(specialDateSettings.id, setting.id)).limit(1);
+    if (existing.length > 0) {
+      await db.update(specialDateSettings).set(setting).where(eq(specialDateSettings.id, setting.id));
+    } else {
+      await db.insert(specialDateSettings).values(setting);
+    }
+  }
+
+  async upsertSpecialDateAllowedTime(allowedTime: any): Promise<void> {
+    const existing = await db.select().from(specialDateAllowedTimes).where(eq(specialDateAllowedTimes.id, allowedTime.id)).limit(1);
+    if (existing.length > 0) {
+      await db.update(specialDateAllowedTimes).set(allowedTime).where(eq(specialDateAllowedTimes.id, allowedTime.id));
+    } else {
+      await db.insert(specialDateAllowedTimes).values(allowedTime);
     }
   }
 }
