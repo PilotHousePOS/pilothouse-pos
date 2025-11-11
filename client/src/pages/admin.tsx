@@ -190,11 +190,41 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
     setSelectedDate(newDate);
   };
 
-  // Find time slots that have appointments
-  const occupiedSlots = timeSlots.filter((time) => {
-    const appointmentsList = getAppointmentsForTime(time);
-    const googleEventsList = getGoogleEventsForTime(time);
-    return appointmentsList.length > 0 || googleEventsList.length > 0;
+  // Dynamically create time slots from actual appointments and events
+  const allActualTimes = new Set<string>();
+  
+  // Add all appointment times
+  confirmedAppointments.forEach((apt: any) => {
+    const normalizedTime = normalizeTime(apt.appointmentTime);
+    allActualTimes.add(normalizedTime);
+  });
+  
+  // Add all Google Calendar event times
+  googleEvents.forEach((event: any) => {
+    if (event.start?.dateTime) {
+      const eventStart = new Date(event.start.dateTime);
+      const eventTimeStr = eventStart.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      });
+      allActualTimes.add(eventTimeStr);
+    }
+  });
+  
+  // Convert to array and sort chronologically
+  const occupiedSlots = Array.from(allActualTimes).sort((a, b) => {
+    const parseTime = (timeStr: string) => {
+      const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+      if (!match) return 0;
+      let hours = parseInt(match[1]);
+      const minutes = parseInt(match[2]);
+      const period = match[3].toUpperCase();
+      if (period === 'PM' && hours !== 12) hours += 12;
+      if (period === 'AM' && hours === 12) hours = 0;
+      return hours * 60 + minutes;
+    };
+    return parseTime(a) - parseTime(b);
   });
 
   const totalAppointments = confirmedAppointments.length + googleEvents.length;
