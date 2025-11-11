@@ -3458,7 +3458,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Import supplies
       for (const supply of importData.data.supplies) {
         try {
-          await storage.upsertSupply(supply);
+          // Convert timestamp strings back to Date objects
+          const sanitizedSupply = {
+            ...supply,
+            createdAt: supply.createdAt ? new Date(supply.createdAt) : undefined
+          };
+          
+          await storage.upsertSupply(sanitizedSupply);
           stats.supplies++;
         } catch (err) {
           const errorMsg = `Failed to import supply ID ${supply?.id || 'unknown'}: ${err instanceof Error ? err.message : 'Unknown error'}`;
