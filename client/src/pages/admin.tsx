@@ -1861,7 +1861,6 @@ function normalizeServiceType(serviceType: string | undefined | null): string {
 }
 
 export default function Admin() {
-  console.log('🔴 Admin component loaded - CODE VERSION: 2024-11-11-UPDATE');
   const { user, isAuthenticated, isLoading } = useAuth();
   const typedUser = user as User;
   const { toast } = useToast();
@@ -5727,28 +5726,19 @@ export default function Admin() {
                       const file = e.target.files?.[0];
                       if (!file) return;
 
-                      console.log('Import started - file selected:', file.name, 'size:', file.size);
-
                       try {
-                        // Show loading toast
                         toast({
                           title: "Importing supplies...",
                           description: "Please wait while we process your file."
                         });
 
                         const text = await file.text();
-                        console.log('File read successfully, size:', text.length, 'characters');
-                        
                         const data = JSON.parse(text);
-                        console.log('JSON parsed successfully, type:', data.type, 'supplies count:', data.data?.supplies?.length);
                         
-                        // Verify it's a supplies-only export
                         if (data.type !== 'supplies-only') {
-                          console.error('Invalid file type:', data.type);
                           throw new Error('This file is not a supplies-only export. Please use the correct export file.');
                         }
                         
-                        console.log('Sending import request to server...');
                         const response = await fetch('/api/admin/supplies/import', {
                           method: 'POST',
                           headers: {
@@ -5758,23 +5748,19 @@ export default function Admin() {
                           body: JSON.stringify(data)
                         });
                         
-                        console.log('Server response status:', response.status);
                         const result = await response.json();
-                        console.log('Server response:', result);
                         
                         if (!response.ok) {
                           throw new Error(result.message || 'Import failed');
                         }
                         
-                        // Show success with error details if any
                         const errorCount = result.stats?.errorCount || 0;
                         if (errorCount > 0) {
                           toast({
                             title: "Import completed with errors",
-                            description: `Imported ${result.stats?.supplies || 0} supplies, ${errorCount} failed. Check console for details.`,
+                            description: `Imported ${result.stats?.supplies || 0} supplies, ${errorCount} failed.`,
                             variant: "destructive"
                           });
-                          console.error('Import errors:', result.stats?.errors);
                         } else {
                           toast({
                             title: "Import successful",
@@ -5782,10 +5768,8 @@ export default function Admin() {
                           });
                         }
                         
-                        // Reload the page to show fresh data
                         setTimeout(() => window.location.reload(), 1500);
                       } catch (error) {
-                        console.error('Import error:', error);
                         toast({
                           title: "Import failed",
                           description: error instanceof Error ? error.message : "Failed to import supplies",
@@ -5793,22 +5777,13 @@ export default function Admin() {
                         });
                       }
                       
-                      // Reset file input
                       e.target.value = '';
                     }}
                     data-testid="input-import-supplies"
                   />
                   <Button
                     onClick={() => {
-                      console.log('Import button clicked - opening file picker...');
-                      const input = document.getElementById('supplies-import-file');
-                      console.log('File input element:', input);
-                      if (input) {
-                        input.click();
-                        console.log('File picker should open now');
-                      } else {
-                        console.error('File input element not found!');
-                      }
+                      document.getElementById('supplies-import-file')?.click();
                     }}
                     variant="outline"
                     className="border-green-600 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
