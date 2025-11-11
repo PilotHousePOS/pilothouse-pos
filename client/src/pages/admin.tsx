@@ -135,8 +135,8 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
     '1:00 PM', '1:15 PM', '1:30 PM'
   ];
 
-  const getAppointmentForTime = (time: string) => {
-    return confirmedAppointments.find((apt: any) => apt.appointmentTime === time);
+  const getAppointmentsForTime = (time: string) => {
+    return confirmedAppointments.filter((apt: any) => apt.appointmentTime === time);
   };
 
   const getGoogleEventsForTime = (time: string) => {
@@ -169,9 +169,9 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
 
   // Find time slots that have appointments
   const occupiedSlots = timeSlots.filter((time) => {
-    const appointment = getAppointmentForTime(time);
+    const appointmentsList = getAppointmentsForTime(time);
     const googleEventsList = getGoogleEventsForTime(time);
-    return appointment || googleEventsList.length > 0;
+    return appointmentsList.length > 0 || googleEventsList.length > 0;
   });
 
   const totalAppointments = confirmedAppointments.length + googleEvents.length;
@@ -217,7 +217,7 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
             </div>
             
             {occupiedSlots.map((time) => {
-              const appointment = getAppointmentForTime(time);
+              const appointmentsList = getAppointmentsForTime(time);
               const googleEventsList = getGoogleEventsForTime(time);
               
               return (
@@ -226,8 +226,8 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                     {time}
                   </div>
                   <div className="flex-1 space-y-2">
-                    {appointment && (
-                      <div className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
+                    {appointmentsList.map((appointment: any, idx: number) => (
+                      <div key={appointment.id || idx} className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
                         <div className="flex items-center justify-between">
                           <div>
                             <h4 className="font-semibold text-gray-900">
@@ -242,6 +242,11 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                             <p className="text-xs text-blue-600">
                               Service: {formatServiceType(appointment.serviceType)}
                             </p>
+                            {appointment.groomerName && (
+                              <p className="text-xs text-gray-600 mt-1">
+                                Notes: Groomer-{appointment.groomerName}
+                              </p>
+                            )}
                           </div>
                           <Badge variant="default" className="bg-green-600">
                             Grooming
@@ -253,7 +258,7 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                           </p>
                         )}
                       </div>
-                    )}
+                    ))}
                     
                     {googleEventsList.map((event: any, idx: number) => (
                       <div key={event.id || idx} className="bg-purple-50 p-3 rounded border-l-4 border-purple-500">
