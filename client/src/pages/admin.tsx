@@ -120,9 +120,9 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
     retry: false,
   });
 
-  // Filter confirmed appointments for the selected date
+  // Filter confirmed and completed appointments for the selected date
   const confirmedAppointments = appointments.filter((apt: any) => 
-    apt.status === 'confirmed' && 
+    (apt.status === 'confirmed' || apt.status === 'completed') && 
     parseLocalDate(apt.appointmentDate).toDateString() === selectedDate.toDateString()
   );
 
