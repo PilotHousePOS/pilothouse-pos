@@ -1,0 +1,244 @@
+{
+  "timestamp": "2025-11-11T23:22:42.122Z",
+  "status": "completed",
+  "totalProcessed": 951,
+  "totalUpdated": 47,
+  "changes": [
+    {
+      "id": 6604,
+      "oldName": "BL BUF wild duck 12.5oz",
+      "newName": "BL Blue Buffalo wild duck 12.5oz"
+    },
+    {
+      "id": 6597,
+      "oldName": "BL BUF beef stew",
+      "newName": "BL Blue Buffalo beef stew"
+    },
+    {
+      "id": 6662,
+      "oldName": "HEALTH EXTEN buf 10lb",
+      "newName": "HEALTH EXTEN Blue Buffalo 10lb"
+    },
+    {
+      "id": 6660,
+      "oldName": "HEALTH EXTEN buf 4lb",
+      "newName": "HEALTH EXTEN Blue Buffalo 4lb"
+    },
+    {
+      "id": 6621,
+      "oldName": "BL BUF delight ro Chicken 3.5oz",
+      "newName": "BL Blue Buffalo delight ro Chicken 3.5oz"
+    },
+    {
+      "id": 6620,
+      "oldName": "BL BUF delight fil mig 3.5oz",
+      "newName": "BL Blue Buffalo delight fil mig 3.5oz"
+    },
+    {
+      "id": 6619,
+      "oldName": "BL BUF delight gr Chicken 3.5oz",
+      "newName": "BL Blue Buffalo delight gr Chicken 3.5oz"
+    },
+    {
+      "id": 6618,
+      "oldName": "BL BUF Puppy 12.5oz",
+      "newName": "BL Blue Buffalo Puppy 12.5oz"
+    },
+    {
+      "id": 6617,
+      "oldName": "BL BUF Chicken 12.5 oz",
+      "newName": "BL Blue Buffalo Chicken 12.5 oz"
+    },
+    {
+      "id": 6616,
+      "oldName": "BL BUF 12.5oz",
+      "newName": "BL Blue Buffalo 12.5oz"
+    },
+    {
+      "id": 6614,
+      "oldName": "BL BUF lamb 12.5oz",
+      "newName": "BL Blue Buffalo lamb 12.5oz"
+    },
+    {
+      "id": 6613,
+      "oldName": "BL BUF fish 12.5oz",
+      "newName": "BL Blue Buffalo fish 12.5oz"
+    },
+    {
+      "id": 6612,
+      "oldName": "BL BUF beef 12.5oz",
+      "newName": "BL Blue Buffalo beef 12.5oz"
+    },
+    {
+      "id": 6611,
+      "oldName": "BL BUF sen 12.5oz",
+      "newName": "BL Blue Buffalo sen 12.5oz"
+    },
+    {
+      "id": 6610,
+      "oldName": "BL BUF heal weigh 12.5oz",
+      "newName": "BL Blue Buffalo heal weigh 12.5oz"
+    },
+    {
+      "id": 6609,
+      "oldName": "BL BUF free lamb 12.5oz",
+      "newName": "BL Blue Buffalo free lamb 12.5oz"
+    },
+    {
+      "id": 6608,
+      "oldName": "BL BUF free Puppy 12.5oz",
+      "newName": "BL Blue Buffalo free Puppy 12.5oz"
+    },
+    {
+      "id": 6607,
+      "oldName": "BL BUF basic lamb 12.5oz",
+      "newName": "BL Blue Buffalo basic lamb 12.5oz"
+    },
+    {
+      "id": 6606,
+      "oldName": "BL BUF basic turk 12.5oz",
+      "newName": "BL Blue Buffalo basic turk 12.5oz"
+    },
+    {
+      "id": 6605,
+      "oldName": "BL BUF wild he wei 12.5oz",
+      "newName": "BL Blue Buffalo wild he wei 12.5oz"
+    },
+    {
+      "id": 6603,
+      "oldName": "BL BUF wild b&Chicken 12.5oz",
+      "newName": "BL Blue Buffalo wild b&Chicken 12.5oz"
+    },
+    {
+      "id": 6602,
+      "oldName": "BL BUF wild sen 12.5oz",
+      "newName": "BL Blue Buffalo wild sen 12.5oz"
+    },
+    {
+      "id": 6601,
+      "oldName": "BL BUF wild turk 12.5oz",
+      "newName": "BL Blue Buffalo wild turk 12.5oz"
+    },
+    {
+      "id": 6600,
+      "oldName": "BL BUF wild Puppy 12.5oz",
+      "newName": "BL Blue Buffalo wild Puppy 12.5oz"
+    },
+    {
+      "id": 6599,
+      "oldName": "BL BUF sun din 12.5oz",
+      "newName": "BL Blue Buffalo sun din 12.5oz"
+    },
+    {
+      "id": 6598,
+      "oldName": "BL BUF bac yard bbq 12.5oz",
+      "newName": "BL Blue Buffalo bac yard bbq 12.5oz"
+    },
+    {
+      "id": 6596,
+      "oldName": "BL BUF hunters stew 12.5oz",
+      "newName": "BL Blue Buffalo hunters stew 12.5oz"
+    },
+    {
+      "id": 6595,
+      "oldName": "BL BUF Chicken stew 12.5oz",
+      "newName": "BL Blue Buffalo Chicken stew 12.5oz"
+    },
+    {
+      "id": 6872,
+      "oldName": "BLUE BUF cat wild turkey 5.5oz",
+      "newName": "BLUE Blue Buffalo cat wild turkey 5.5oz"
+    },
+    {
+      "id": 6870,
+      "oldName": "BLUE BUF cat wild duck 3oz",
+      "newName": "BLUE Blue Buffalo cat wild duck 3oz"
+    },
+    {
+      "id": 6873,
+      "oldName": "BLUE BUF cat wild Salmon 5.5ozx",
+      "newName": "BLUE Blue Buffalo cat wild Salmon 5.5ozx"
+    },
+    {
+      "id": 6868,
+      "oldName": "BLUE BUF tuna grav 5.5oz",
+      "newName": "BLUE Blue Buffalo tuna grav 5.5oz"
+    },
+    {
+      "id": 6867,
+      "oldName": "BLUE BUF fish,shrim 5.5oz",
+      "newName": "BLUE Blue Buffalo fish,shrim 5.5oz"
+    },
+    {
+      "id": 6864,
+      "oldName": "BLUE BUF cat ocean,tuna 5.5oz",
+      "newName": "BLUE Blue Buffalo cat ocean,tuna 5.5oz"
+    },
+    {
+      "id": 6862,
+      "oldName": "BLUE BUF kitten 3oz",
+      "newName": "BLUE Blue Buffalo kitten 3oz"
+    },
+    {
+      "id": 6861,
+      "oldName": "BLUE BUF 3oz fish,shrimp 3oz",
+      "newName": "BLUE Blue Buffalo 3oz fish,shrimp 3oz"
+    },
+    {
+      "id": 6866,
+      "oldName": "BLUE BUF cat Salmon pate 5.5oz",
+      "newName": "BLUE Blue Buffalo cat Salmon pate 5.5oz"
+    },
+    {
+      "id": 6865,
+      "oldName": "Blue buf cat turk,Chicken 5.5oz",
+      "newName": "Blue Blue Buffalo cat turk,Chicken 5.5oz"
+    },
+    {
+      "id": 6863,
+      "oldName": "BLUE BUF cat Chicken morsels",
+      "newName": "BLUE Blue Buffalo cat Chicken morsels"
+    },
+    {
+      "id": 6860,
+      "oldName": "BLUE BUF Chicken grav 3oz",
+      "newName": "BLUE Blue Buffalo Chicken grav 3oz"
+    },
+    {
+      "id": 6871,
+      "oldName": "BLUE BUF cat wild Chicken 3oz",
+      "newName": "BLUE Blue Buffalo cat wild Chicken 3oz"
+    },
+    {
+      "id": 6869,
+      "oldName": "BLUE BUF cat Chicken grav 5.5oz",
+      "newName": "BLUE Blue Buffalo cat Chicken grav 5.5oz"
+    },
+    {
+      "id": 6826,
+      "oldName": "BLUE BUF cat indo 7lb",
+      "newName": "BLUE Blue Buffalo cat indo 7lb"
+    },
+    {
+      "id": 6825,
+      "oldName": "BLUE BUF cat sen 7lb",
+      "newName": "BLUE Blue Buffalo cat sen 7lb"
+    },
+    {
+      "id": 6824,
+      "oldName": "BLUE BUF cat mature 7lb",
+      "newName": "BLUE Blue Buffalo cat mature 7lb"
+    },
+    {
+      "id": 6823,
+      "oldName": "BLUE BUF kitten 7lb",
+      "newName": "BLUE Blue Buffalo kitten 7lb"
+    },
+    {
+      "id": 6822,
+      "oldName": "BLUE BUF cat wild Chicken 6lb",
+      "newName": "BLUE Blue Buffalo cat wild Chicken 6lb"
+    }
+  ],
+  "backupFile": "backup-before-expansion-1762903360540.json"
+}

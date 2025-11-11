@@ -2,20 +2,38 @@ import { db } from '../server/db';
 import { supplies } from '../shared/schema';
 
 // Key brands and terms to spot-check
+// IMPORTANT: Keep this in sync with scripts/apply-food-abbreviation-expansions.ts
 const spotChecks = {
   brands: {
-    'Science Diet': ['sd', 'SD'],
-    'Royal Canin': ['RC', 'rc'],
-    'Purina Pro Plan': ['PPP', 'ppp'],
+    'Science Diet': ['\\bsd\\b', '\\bSD\\b'],
+    'Royal Canin': ['\\bRC\\b', '\\brc\\b'],
+    'Purina Pro Plan': ['\\bPPP\\b', '\\bppp\\b'],
+    'Eukanuba': ['\\bEB\\b', '\\beb\\b'],
+    'IAMS': ['\\bIAM\\b', '\\biam\\b'],
+    'Blue Buffalo': ['\\bbuf\\b', '\\bBUF\\b', '\\bBuf\\b'],
   },
   proteins: {
     'Chicken': ['\\bck\\b', '\\bchk\\b'],
     'Lamb': ['\\blam\\b'],
     'Salmon': ['\\bsalm\\b'],
+    'Beef': ['\\bbf\\b'],
+    'Turkey': ['\\btk\\b', '\\btrk\\b'],
+    'Duck': ['\\bduc\\b'],
+    'rice': ['\\bri\\b'],
   },
   sizes: {
     'Small Breed': ['sm br', 'SM BR'],
+    'Medium Breed': ['md br', 'MD BR'],
     'Large Breed': ['lg br', 'LG BR'],
+    'Extra Large Breed': ['xlg br', 'XLG BR'],
+    'Mini Breed': ['mini br', 'MINI BR'],
+    'Toy Breed': ['toy br', 'TOY BR'],
+  },
+  lifestages: {
+    'Puppy': ['\\bpup\\b', '\\bPUP\\b'],
+    'Junior': ['\\bjr\\b', '\\bJR\\b'],
+    'Senior': ['\\bsr\\b', '\\bSR\\b'],
+    'Adult': ['\\bad\\b', '\\badt\\b', '\\bAD\\b', '\\bADT\\b'],
   },
   measurements: {
     'lb': ['#(?=\\s|$)'],
@@ -36,10 +54,10 @@ async function main() {
     console.log(`📊 Food products: ${foodSupplies.length}\n`);
     
     let totalIssues = 0;
-    const issuesByCategory: Record<string, Array<{ id: number; name: string; issue: string }>> = {};
+    const issuesByCategory: Record<string, Array<{ id: number; name: string; field: string; issue: string }>> = {};
     
-    // Check for remaining abbreviations
-    console.log('🔍 Checking for remaining abbreviations...\n');
+    // Check for remaining abbreviations in both names AND descriptions
+    console.log('🔍 Checking for remaining abbreviations in names and descriptions...\n');
     
     for (const [category, terms] of Object.entries(spotChecks)) {
       issuesByCategory[category] = [];
@@ -49,11 +67,24 @@ async function main() {
           const regex = new RegExp(pattern, 'i');
           
           for (const supply of foodSupplies) {
+            // Check name field
             if (regex.test(supply.name)) {
               issuesByCategory[category].push({
                 id: supply.id,
                 name: supply.name,
-                issue: `Contains "${pattern}" instead of "${fullTerm}"`
+                field: 'name',
+                issue: `Name contains "${pattern}" instead of "${fullTerm}"`
+              });
+              totalIssues++;
+            }
+            
+            // Check description field if it exists
+            if (supply.description && regex.test(supply.description)) {
+              issuesByCategory[category].push({
+                id: supply.id,
+                name: supply.name,
+                field: 'description',
+                issue: `Description contains "${pattern}" instead of "${fullTerm}"`
               });
               totalIssues++;
             }
@@ -98,7 +129,7 @@ async function main() {
           const displayCount = Math.min(5, issues.length);
           for (let i = 0; i < displayCount; i++) {
             const issue = issues[i];
-            console.log(`  ${i + 1}. ID ${issue.id}: ${issue.name}`);
+            console.log(`  ${i + 1}. ID ${issue.id} [${issue.field}]: ${issue.name}`);
             console.log(`     → ${issue.issue}`);
           }
           

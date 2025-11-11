@@ -11,6 +11,7 @@ const foodAbbreviations: Record<string, string> = {
   'PPP': 'Purina Pro Plan',
   'EB': 'Eukanuba',
   'IAM': 'IAMS',
+  'buf': 'Blue Buffalo',
   
   // Size
   'sm br': 'Small Breed',
