@@ -696,7 +696,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Parse pagination parameters with defaults
       const pageNum = Math.max(0, parseInt(page as string) || 0);
-      const pageSize = Math.min(100, Math.max(1, parseInt(limit as string) || 24));
+      const pageSize = Math.min(20000, Math.max(1, parseInt(limit as string) || 24));
       const offset = pageNum * pageSize;
 
       // Determine filter type based on category parameter
