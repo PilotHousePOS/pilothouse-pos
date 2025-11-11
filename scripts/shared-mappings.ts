@@ -11,6 +11,8 @@ export const lowercaseWords = ['and', 'is', 'or', 'but', 'a', 'an', 'the', 'of',
 // Multi-word patterns must come first to avoid partial replacements
 export const abbreviationMappings: Record<string, string> = {
   // Special multi-word patterns (MUST BE FIRST)
+  'BL BUF': 'Blue Buffalo',
+  'bl buf': 'Blue Buffalo',
   'tri bl': 'Tri Blend',
   'sm br': 'Small Breed',
   'md br': 'Medium Breed',
@@ -27,7 +29,7 @@ export const abbreviationMappings: Record<string, string> = {
   'IAM': 'IAMS',
   'buf': 'Blue Buffalo',
   
-  // Colors (process after "tri bl" to avoid conflicts)
+  // Colors (process after "tri bl" and "BL BUF" to avoid conflicts)
   'wh': 'White',
   'whi': 'White',
   'gre': 'Grey',
