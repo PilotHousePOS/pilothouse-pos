@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-11-11T23:51:40.294Z",
+  "status": "completed",
+  "totalChanges": 2,
+  "nameChanges": 1,
+  "descriptionChanges": 1,
+  "changes": [
+    {
+      "id": 6620,
+      "field": "name",
+      "oldValue": "Blue Buffalo Delight Fillet Mig 3.5oz",
+      "newValue": "Blue Buffalo Delight Fillet Mignon 3.5oz",
+      "changes": [
+        "name: \"Blue Buffalo Delight Fillet Mig 3.5oz\" → \"Blue Buffalo Delight Fillet Mignon 3.5oz\""
+      ]
+    },
+    {
+      "id": 6620,
+      "field": "description",
+      "oldValue": "Blue Buffalo Delight Fillet Mig 3.5oz",
+      "newValue": "Blue Buffalo Delight Fillet Mignon 3.5oz",
+      "changes": [
+        "desc: \"Blue Buffalo Delight Fillet Mig 3.5oz\" → \"Blue Buffalo Delight Fillet Mignon 3.5oz\""
+      ]
+    }
+  ],
+  "backupFile": "backup-before-expansion-1762905097774.json",
+  "completedAt": "2025-11-11T23:51:40.394Z"
+}

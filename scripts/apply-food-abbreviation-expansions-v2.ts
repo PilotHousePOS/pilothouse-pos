@@ -48,7 +48,10 @@ function correctSpelling(text: string): string {
 
 // Phase 3: Apply title case while respecting allowlists
 function applyTitleCase(text: string): string {
-  return text.split(' ').map((word, index) => {
+  // Helper to capitalize a single word
+  const capitalizeWord = (word: string, isFirstWord: boolean): string => {
+    if (!word) return word;
+    
     const upperWord = word.toUpperCase();
     const lowerWord = word.toLowerCase();
     
@@ -58,7 +61,7 @@ function applyTitleCase(text: string): string {
     }
     
     // Always capitalize first word
-    if (index === 0) {
+    if (isFirstWord) {
       return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
     }
     
@@ -69,6 +72,25 @@ function applyTitleCase(text: string): string {
     
     // Capitalize everything else
     return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  };
+  
+  // Split on spaces and process each segment
+  return text.split(' ').map((segment, spaceIndex) => {
+    // Check if this segment contains slashes or commas
+    if (segment.includes('/')) {
+      // Split on slashes and capitalize each part
+      return segment.split('/').map((part, slashIndex) => 
+        capitalizeWord(part, spaceIndex === 0 && slashIndex === 0)
+      ).join('/');
+    } else if (segment.includes(',')) {
+      // Split on commas and capitalize each part
+      return segment.split(',').map((part, commaIndex) => 
+        capitalizeWord(part, spaceIndex === 0 && commaIndex === 0)
+      ).join(',');
+    } else {
+      // No special characters, just capitalize normally
+      return capitalizeWord(segment, spaceIndex === 0);
+    }
   }).join(' ');
 }
 

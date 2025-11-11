@@ -11,6 +11,7 @@ export const lowercaseWords = ['and', 'is', 'or', 'but', 'a', 'an', 'the', 'of',
 // Multi-word patterns must come first to avoid partial replacements
 export const abbreviationMappings: Record<string, string> = {
   // Special multi-word patterns (MUST BE FIRST)
+  'mig mig': 'mignon',
   'BL BUF': 'Blue Buffalo',
   'bl buf': 'Blue Buffalo',
   'tri bl': 'Tri Blend',
@@ -33,6 +34,7 @@ export const abbreviationMappings: Record<string, string> = {
   'wh': 'White',
   'whi': 'White',
   'gre': 'Grey',
+  'grn': 'Green',
   'bl': 'Black',
   'burgund': 'Burgundy',
   
@@ -43,14 +45,22 @@ export const abbreviationMappings: Record<string, string> = {
   'bf': 'Beef',
   'tk': 'Turkey',
   'trk': 'Turkey',
+  'turk': 'Turkey',
   'salm': 'Salmon',
   'duc': 'Duck',
   'ri': 'rice',
+  'shrim': 'Shrimp',
+  
+  // Other food terms
+  'grav': 'Gravy',
+  'fil': 'Fillet',
+  'mig': 'Mignon',
   
   // Life stages
   'pup': 'Puppy',
   'jr': 'Junior',
   'sr': 'Senior',
+  'sen': 'Senior',
   'ad': 'Adult',
   'adt': 'Adult',
   
@@ -79,6 +89,7 @@ export function getValidationPatterns() {
     colors: {
       'White': ['\\bwh\\b', '\\bwhi\\b'],
       'Grey': ['\\bgre\\b'],
+      'Green': ['\\bgrn\\b'],
       'Black': ['\\bbl\\b', '\\bBL\\b'],
       'Burgundy': ['\\bburgund\\b'],
     },
@@ -87,9 +98,16 @@ export function getValidationPatterns() {
       'Lamb': ['\\blam\\b'],
       'Salmon': ['\\bsalm\\b'],
       'Beef': ['\\bbf\\b'],
-      'Turkey': ['\\btk\\b', '\\btrk\\b'],
+      'Turkey': ['\\btk\\b', '\\btrk\\b', '\\bturk\\b'],
       'Duck': ['\\bduc\\b'],
       'rice': ['\\bri\\b'],
+      'Shrimp': ['\\bshrim\\b'],
+    },
+    other: {
+      'Gravy': ['\\bgrav\\b'],
+      'Fillet': ['\\bfil\\b'],
+      'Mignon': ['\\bmig\\b'],
+      'mignon': ['mig mig'],
     },
     sizes: {
       'Small Breed': ['sm br', 'SM BR'],
@@ -102,7 +120,7 @@ export function getValidationPatterns() {
     lifestages: {
       'Puppy': ['\\bpup\\b', '\\bPUP\\b'],
       'Junior': ['\\bjr\\b', '\\bJR\\b'],
-      'Senior': ['\\bsr\\b', '\\bSR\\b'],
+      'Senior': ['\\bsr\\b', '\\bSR\\b', '\\bsen\\b', '\\bSEN\\b'],
       'Adult': ['\\bad\\b', '\\badt\\b', '\\bAD\\b', '\\bADT\\b'],
     },
     measurements: {
