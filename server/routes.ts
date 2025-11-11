@@ -3461,7 +3461,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Convert timestamp strings back to Date objects
           const sanitizedSupply = {
             ...supply,
-            createdAt: supply.createdAt ? new Date(supply.createdAt) : undefined
+            createdAt: supply.createdAt ? new Date(supply.createdAt) : undefined,
+            updatedAt: supply.updatedAt ? new Date(supply.updatedAt) : undefined
           };
           
           await storage.upsertSupply(sanitizedSupply);
