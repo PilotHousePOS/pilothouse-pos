@@ -5726,15 +5726,28 @@ export default function Admin() {
                       const file = e.target.files?.[0];
                       if (!file) return;
 
+                      console.log('Import started - file selected:', file.name, 'size:', file.size);
+
                       try {
+                        // Show loading toast
+                        toast({
+                          title: "Importing supplies...",
+                          description: "Please wait while we process your file."
+                        });
+
                         const text = await file.text();
+                        console.log('File read successfully, size:', text.length, 'characters');
+                        
                         const data = JSON.parse(text);
+                        console.log('JSON parsed successfully, type:', data.type, 'supplies count:', data.data?.supplies?.length);
                         
                         // Verify it's a supplies-only export
                         if (data.type !== 'supplies-only') {
+                          console.error('Invalid file type:', data.type);
                           throw new Error('This file is not a supplies-only export. Please use the correct export file.');
                         }
                         
+                        console.log('Sending import request to server...');
                         const response = await fetch('/api/admin/supplies/import', {
                           method: 'POST',
                           headers: {
@@ -5744,7 +5757,9 @@ export default function Admin() {
                           body: JSON.stringify(data)
                         });
                         
+                        console.log('Server response status:', response.status);
                         const result = await response.json();
+                        console.log('Server response:', result);
                         
                         if (!response.ok) {
                           throw new Error(result.message || 'Import failed');
