@@ -103,7 +103,7 @@ async function main() {
     
     console.log(`✅ Successfully restored ${restoredCount} products`);
     console.log(`📦 All product names returned to backup state\n`);
-    console.log('🎉 Restore operation completed!\n`);
+    console.log('🎉 Restore operation completed!\n');
     
   } catch (error) {
     console.error('❌ Fatal error during restore:', error);
