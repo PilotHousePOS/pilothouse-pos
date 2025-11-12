@@ -3450,40 +3450,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Source environment:", importData.environment);
       console.log(`Processing ${importData.data.supplies.length} supplies...`);
 
-      let stats = {
-        supplies: 0,
-        errors: [] as string[]
-      };
+      // Sanitize all supplies data first (convert timestamp strings to Date objects)
+      const sanitizedSupplies = importData.data.supplies.map((supply: any) => ({
+        ...supply,
+        createdAt: supply.createdAt ? new Date(supply.createdAt) : undefined,
+        updatedAt: supply.updatedAt ? new Date(supply.updatedAt) : undefined
+      }));
 
-      // Import supplies
-      for (const supply of importData.data.supplies) {
-        try {
-          // Convert timestamp strings back to Date objects
-          const sanitizedSupply = {
-            ...supply,
-            createdAt: supply.createdAt ? new Date(supply.createdAt) : undefined,
-            updatedAt: supply.updatedAt ? new Date(supply.updatedAt) : undefined
-          };
-          
-          await storage.upsertSupply(sanitizedSupply);
-          stats.supplies++;
-        } catch (err) {
-          const errorMsg = `Failed to import supply ID ${supply?.id || 'unknown'}: ${err instanceof Error ? err.message : 'Unknown error'}`;
-          console.error(errorMsg);
-          stats.errors.push(errorMsg);
-        }
-      }
+      // Use bulk upsert for performance
+      const result = await storage.bulkUpsertSupplies(sanitizedSupplies);
 
-      console.log(`Supplies import complete: ${stats.supplies} supplies imported, ${stats.errors.length} errors`);
+      console.log(`Supplies import complete: ${result.imported} supplies imported, ${result.failed} failed, ${result.errors.length} errors`);
 
       res.json({ 
-        message: stats.errors.length === 0 
+        message: result.errors.length === 0 
           ? "Supplies import completed successfully" 
-          : `Supplies import completed with ${stats.errors.length} error(s)`,
+          : `Supplies import completed with ${result.errors.length} error(s)`,
         stats: {
-          supplies: stats.supplies,
-          errorCount: stats.errors.length,
-          errors: stats.errors.slice(0, 20) // Return first 20 errors for debugging
+          supplies: result.imported,
+          failed: result.failed,
+          errorCount: result.errors.length,
+          errors: result.errors.slice(0, 20) // Return first 20 errors for debugging
         }
       });
     } catch (error) {

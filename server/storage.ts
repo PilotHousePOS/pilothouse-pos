@@ -1390,6 +1390,53 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  async bulkUpsertSupplies(suppliesData: any[]): Promise<{ imported: number; failed: number; errors: string[] }> {
+    const CHUNK_SIZE = 500;
+    let imported = 0;
+    const errors: string[] = [];
+
+    // Process in chunks
+    for (let i = 0; i < suppliesData.length; i += CHUNK_SIZE) {
+      const chunk = suppliesData.slice(i, i + CHUNK_SIZE);
+      
+      try {
+        await db.transaction(async (tx) => {
+          await tx.insert(supplies)
+            .values(chunk)
+            .onConflictDoUpdate({
+              target: supplies.id,
+              set: {
+                name: sql`EXCLUDED.name`,
+                category: sql`EXCLUDED.category`,
+                brand: sql`EXCLUDED.brand`,
+                price: sql`EXCLUDED.price`,
+                description: sql`EXCLUDED.description`,
+                imageUrl: sql`EXCLUDED.image_url`,
+                imageUrls: sql`EXCLUDED.image_urls`,
+                stockQuantity: sql`EXCLUDED.stock_quantity`,
+                isActive: sql`EXCLUDED.is_active`,
+                weight: sql`EXCLUDED.weight`,
+                size: sql`EXCLUDED.size`,
+                updatedAt: sql`EXCLUDED.updated_at`,
+              },
+            });
+        });
+        imported += chunk.length;
+      } catch (error) {
+        const chunkIds = chunk.map((s: any) => s.id).join(', ');
+        const errorMsg = `Failed to import chunk (IDs: ${chunkIds}): ${error instanceof Error ? error.message : 'Unknown error'}`;
+        console.error(errorMsg);
+        errors.push(errorMsg);
+      }
+    }
+
+    return {
+      imported,
+      failed: suppliesData.length - imported,
+      errors
+    };
+  }
+
   async upsertPet(pet: any): Promise<void> {
     const existing = await db.select().from(pets).where(eq(pets.id, pet.id)).limit(1);
     if (existing.length > 0) {
