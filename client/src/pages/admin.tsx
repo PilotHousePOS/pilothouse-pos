@@ -2004,6 +2004,10 @@ export default function Admin() {
   const { data: appointments = [] } = useQuery<any[]>({
     queryKey: ["/api/appointments"],
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 
   const { data: unapprovedAppointments = [] } = useQuery<any[]>({
