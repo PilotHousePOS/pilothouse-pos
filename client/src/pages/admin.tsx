@@ -55,7 +55,8 @@ import {
   DollarSign,
   History,
   Database,
-  FileText
+  FileText,
+  Sparkles
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -5931,6 +5932,80 @@ export default function Admin() {
                   </p>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5" />
+                Auto-Categorize Products
+              </CardTitle>
+              <CardDescription>
+                Automatically classify products as Aquatic or Reptile based on names and brands
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-semibold text-blue-800 dark:text-blue-300 mb-1">How It Works</p>
+                    <ul className="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-400">
+                      <li>Analyzes product names, brands, and descriptions</li>
+                      <li>Recognizes fish names (betta, goldfish, etc.) → Aquatics section</li>
+                      <li>Recognizes reptile names (gecko, snake, etc.) → Exotic Reptiles section</li>
+                      <li>Uses brand recognition (ZooMed → Reptile, Tetra → Aquatic)</li>
+                      <li>Products without clear indicators remain in general supplies</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                onClick={async () => {
+                  try {
+                    toast({
+                      title: "Categorizing products...",
+                      description: "This may take a few moments for 7,000+ products"
+                    });
+
+                    const response = await fetch('/api/admin/supplies/auto-categorize', {
+                      method: 'POST',
+                      credentials: 'include'
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (!response.ok) {
+                      throw new Error(result.message || 'Categorization failed');
+                    }
+                    
+                    const { stats } = result;
+                    toast({
+                      title: "Categorization complete!",
+                      description: `Aquatic: ${stats.aquatic} | Reptile: ${stats.reptile} | General: ${stats.general} | Total: ${stats.total} (${stats.duration})`
+                    });
+                    
+                    setTimeout(() => window.location.reload(), 1500);
+                  } catch (error) {
+                    console.error('Categorization error:', error);
+                    toast({
+                      title: "Categorization failed",
+                      description: error instanceof Error ? error.message : "Failed to categorize products",
+                      variant: "destructive"
+                    });
+                  }
+                }}
+                className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white"
+                data-testid="button-auto-categorize"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Auto-Categorize All Products
+              </Button>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Processes all {7316} active products and assigns them to the appropriate section
+              </p>
             </CardContent>
           </Card>
 

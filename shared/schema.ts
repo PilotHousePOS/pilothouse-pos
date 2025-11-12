@@ -81,6 +81,7 @@ export const supplies = pgTable("supplies", {
   isActive: boolean("is_active").default(true),
   weight: varchar("weight", { length: 50 }),
   size: varchar("size", { length: 50 }),
+  filterType: varchar("filter_type", { length: 20 }), // 'aquatic', 'reptile', or null for general
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

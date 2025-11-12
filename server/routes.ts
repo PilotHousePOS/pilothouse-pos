@@ -3680,6 +3680,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Auto-categorize all supplies based on names/brands (Admin only)
+  app.post("/api/admin/supplies/auto-categorize", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      console.log("Starting automatic product categorization...");
+      const startTime = Date.now();
+
+      const stats = await storage.autoCategorizeAllSupplies();
+
+      const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+      console.log(`Auto-categorization complete in ${duration}s:`, stats);
+
+      res.json({
+        message: "Product categorization completed successfully",
+        stats: {
+          ...stats,
+          duration: `${duration}s`
+        }
+      });
+    } catch (error) {
+      console.error('Error auto-categorizing supplies:', error);
+      res.status(500).json({ message: "Failed to auto-categorize supplies" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

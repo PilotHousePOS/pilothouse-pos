@@ -104,6 +104,12 @@ export interface IStorage {
   createSupply(supply: InsertSupply): Promise<Supply>;
   updateSupply(id: number, supply: Partial<InsertSupply>): Promise<Supply>;
   deleteSupply(id: number): Promise<void>;
+  autoCategorizeAllSupplies(): Promise<{
+    aquatic: number;
+    reptile: number;
+    general: number;
+    total: number;
+  }>;
 
   // Cart operations
   getCartItems(userId: string): Promise<CartItem[]>;
@@ -587,6 +593,57 @@ export class DatabaseStorage implements IStorage {
 
   async deleteSupply(id: number): Promise<void> {
     await db.delete(supplies).where(eq(supplies.id, id));
+  }
+
+  async autoCategorizeAllSupplies(): Promise<{
+    aquatic: number;
+    reptile: number;
+    general: number;
+    total: number;
+  }> {
+    const { categorizeProducts } = await import('./productCategorization');
+    
+    // Load all supplies
+    const allSupplies = await db.select({
+      id: supplies.id,
+      name: supplies.name,
+      brand: supplies.brand,
+      description: supplies.description
+    }).from(supplies).where(eq(supplies.isActive, true));
+
+    const BATCH_SIZE = 500;
+    let aquaticCount = 0;
+    let reptileCount = 0;
+    let generalCount = 0;
+
+    // Process in batches to avoid memory issues
+    for (let i = 0; i < allSupplies.length; i += BATCH_SIZE) {
+      const batch = allSupplies.slice(i, i + BATCH_SIZE);
+      
+      // Categorize the batch
+      const categorized = categorizeProducts(batch);
+
+      // Prepare bulk update using transaction
+      await db.transaction(async (tx) => {
+        for (const result of categorized) {
+          await tx.update(supplies)
+            .set({ filterType: result.filterType })
+            .where(eq(supplies.id, result.id));
+
+          // Count categories
+          if (result.filterType === 'aquatic') aquaticCount++;
+          else if (result.filterType === 'reptile') reptileCount++;
+          else generalCount++;
+        }
+      });
+    }
+
+    return {
+      aquatic: aquaticCount,
+      reptile: reptileCount,
+      general: generalCount,
+      total: allSupplies.length
+    };
   }
 
   // Cart operations
