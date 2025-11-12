@@ -122,6 +122,8 @@ export interface IStorage {
     total: number;
   }>;
 
+  getSuppliesWithoutImages(limit: number, offset: number): Promise<Supply[]>;
+
   // Cart operations
   getCartItems(userId: string): Promise<CartItem[]>;
   addToCart(cartItem: InsertCartItem): Promise<CartItem>;
@@ -566,6 +568,16 @@ export class DatabaseStorage implements IStorage {
   async getSupply(id: number): Promise<Supply | undefined> {
     const [supply] = await db.select().from(supplies).where(eq(supplies.id, id));
     return supply;
+  }
+
+  async getSuppliesWithoutImages(limit: number, offset: number): Promise<Supply[]> {
+    return await db
+      .select()
+      .from(supplies)
+      .where(or(isNull(supplies.imageUrl), eq(supplies.imageUrl, '')))
+      .limit(limit)
+      .offset(offset)
+      .orderBy(supplies.id);
   }
 
   async createSupply(supply: InsertSupply): Promise<Supply> {

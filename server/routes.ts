@@ -3718,6 +3718,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Search for product image from major distributors (Admin only)
+  app.post("/api/admin/supplies/search-image/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { id } = req.params;
+      const supply = await storage.getSupply(parseInt(id));
+      
+      if (!supply) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      // Return the search query info for the frontend to use
+      const searchQuery = supply.brand 
+        ? `${supply.brand} ${supply.name} pet supplies product image site:chewy.com OR site:petco.com OR site:petsmart.com`
+        : `${supply.name} pet supplies product image site:chewy.com OR site:petco.com OR site:petsmart.com`;
+
+      res.json({
+        productId: supply.id,
+        productName: supply.name,
+        brand: supply.brand,
+        searchQuery: searchQuery,
+        message: "Use this search query to find product images"
+      });
+    } catch (error) {
+      console.error('Error searching for product image:', error);
+      res.status(500).json({ message: "Failed to search for product image" });
+    }
+  });
+
+  // Update product image URL (Admin only)
+  app.put("/api/admin/supplies/:id/image", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { id } = req.params;
+      const { imageUrl } = req.body;
+
+      if (!imageUrl) {
+        return res.status(400).json({ message: "Image URL is required" });
+      }
+
+      await storage.updateSupply(parseInt(id), { imageUrl });
+
+      res.json({ 
+        message: "Product image updated successfully",
+        imageUrl 
+      });
+    } catch (error) {
+      console.error('Error updating product image:', error);
+      res.status(500).json({ message: "Failed to update product image" });
+    }
+  });
+
+  // Get products without images (Admin only)
+  app.get("/api/admin/supplies/without-images", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { limit = '100', offset = '0' } = req.query;
+      const supplies = await storage.getSuppliesWithoutImages(parseInt(limit as string), parseInt(offset as string));
+
+      res.json(supplies);
+    } catch (error) {
+      console.error('Error getting products without images:', error);
+      res.status(500).json({ message: "Failed to get products without images" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
