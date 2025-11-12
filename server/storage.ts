@@ -16,6 +16,7 @@ import {
   appointmentHistory,
   dailyAppointmentLimits,
   weeklyAppointmentLimits,
+  supplyImportStaging,
   type User,
   type UpsertUser,
   type Pet,
@@ -55,11 +56,18 @@ import {
   type InsertSpecialDateSetting,
   type SpecialDateAllowedTime,
   type InsertSpecialDateAllowedTime,
+  type SupplyImportStaging,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, and, or, not, ilike, lt, isNull, count, sql } from "drizzle-orm";
 import { phoneNumbersMatch } from "./phoneUtils";
 import { SUPPLY_FILTERS, type FilterType } from "./filterConfig";
+import { 
+  createCompositeKey, 
+  calculateDataChecksum, 
+  findDuplicateMatch,
+  normalizeSku 
+} from "./duplicateDetection";
 
 export interface IStorage {
   // User operations
@@ -209,6 +217,13 @@ export interface IStorage {
   addSpecialDateAllowedTime(allowedTime: InsertSpecialDateAllowedTime): Promise<SpecialDateAllowedTime>;
   deleteSpecialDateAllowedTime(id: number): Promise<void>;
   getSpecialDateWithTimes(date: string): Promise<{ setting: SpecialDateSetting; times: SpecialDateAllowedTime[] } | null>;
+
+  // Supply import staging operations
+  stageSupplyImports(sessionId: string, supplies: any[]): Promise<{ sessionId: string; staged: number; duplicates: number; updates: number }>;
+  getStagedImports(sessionId: string): Promise<any[]>;
+  approveStagedImports(sessionId: string): Promise<{ created: number; updated: number }>;
+  rejectStagedImports(sessionId: string): Promise<void>;
+  clearOldStagingData(daysOld: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1552,6 +1567,176 @@ export class DatabaseStorage implements IStorage {
     } else {
       await db.insert(specialDateAllowedTimes).values(allowedTime);
     }
+  }
+
+  // Supply import staging operations
+  async stageSupplyImports(sessionId: string, suppliesData: any[]): Promise<{ sessionId: string; staged: number; duplicates: number; updates: number }> {
+    // Get all existing supplies for duplicate detection
+    const existingSupplies = await db.select().from(supplies);
+    
+    let staged = 0;
+    let duplicates = 0;
+    let updates = 0;
+    
+    // Process each supply in chunks of 100 to avoid overwhelming the database
+    for (let i = 0; i < suppliesData.length; i += 100) {
+      const chunk = suppliesData.slice(i, i + 100);
+      const stagingRecords = [];
+      
+      for (const [index, supplyData] of chunk.entries()) {
+        const rowNumber = i + index + 1;
+        
+        // Calculate composite key and checksum
+        const compositeKey = createCompositeKey(supplyData.name, supplyData.brand, supplyData.size);
+        const dataChecksum = calculateDataChecksum(supplyData);
+        const normalizedSkuValue = normalizeSku(supplyData.sku);
+        
+        // Find duplicate match
+        const match = findDuplicateMatch(
+          {
+            sku: supplyData.sku,
+            name: supplyData.name,
+            brand: supplyData.brand,
+            size: supplyData.size,
+            dataChecksum,
+          },
+          existingSupplies
+        );
+        
+        // Determine status
+        let status = 'pending';
+        let conflictReason = null;
+        let matchedSupplyId = null;
+        
+        if (match.matchType === 'exact') {
+          status = 'duplicate';
+          conflictReason = match.conflictReason;
+          matchedSupplyId = match.matchedSupply?.id || null;
+          duplicates++;
+        } else if (match.matchType === 'update') {
+          status = 'update';
+          conflictReason = match.conflictReason;
+          matchedSupplyId = match.matchedSupply?.id || null;
+          updates++;
+        } else {
+          status = 'new';
+          staged++;
+        }
+        
+        // Create staging record
+        stagingRecords.push({
+          importSessionId: sessionId,
+          name: supplyData.name,
+          category: supplyData.category,
+          brand: supplyData.brand || null,
+          price: supplyData.price.toString(),
+          description: supplyData.description || null,
+          stockQuantity: supplyData.stockQuantity || 0,
+          size: supplyData.size || null,
+          weight: supplyData.weight || null,
+          sku: supplyData.sku || null,
+          compositeKey,
+          normalizedSku: normalizedSkuValue,
+          dataChecksum,
+          status,
+          matchedSupplyId,
+          conflictReason,
+          rowNumber,
+        });
+      }
+      
+      // Bulk insert staging records
+      if (stagingRecords.length > 0) {
+        await db.insert(supplyImportStaging).values(stagingRecords);
+      }
+    }
+    
+    return { sessionId, staged, duplicates, updates };
+  }
+
+  async getStagedImports(sessionId: string): Promise<any[]> {
+    const stagedItems = await db
+      .select()
+      .from(supplyImportStaging)
+      .where(eq(supplyImportStaging.importSessionId, sessionId))
+      .orderBy(supplyImportStaging.rowNumber);
+    
+    return stagedItems;
+  }
+
+  async approveStagedImports(sessionId: string): Promise<{ created: number; updated: number }> {
+    // Get all pending/new/update items for this session
+    const stagedItems = await db
+      .select()
+      .from(supplyImportStaging)
+      .where(
+        and(
+          eq(supplyImportStaging.importSessionId, sessionId),
+          or(
+            eq(supplyImportStaging.status, 'new'),
+            eq(supplyImportStaging.status, 'update')
+          )
+        )
+      );
+    
+    let created = 0;
+    let updated = 0;
+    
+    // Wrap everything in a transaction for atomicity
+    await db.transaction(async (tx) => {
+      // Process in chunks of 100
+      for (let i = 0; i < stagedItems.length; i += 100) {
+        const chunk = stagedItems.slice(i, i + 100);
+        
+        for (const item of chunk) {
+          if (item.status === 'new') {
+            // Insert new supply
+            await tx.insert(supplies).values({
+              name: item.name,
+              category: item.category,
+              brand: item.brand,
+              price: item.price,
+              description: item.description,
+              stockQuantity: item.stockQuantity,
+              size: item.size,
+              weight: item.weight,
+              isActive: true,
+            });
+            created++;
+          } else if (item.status === 'update' && item.matchedSupplyId) {
+            // Update existing supply
+            await tx.update(supplies).set({
+              name: item.name,
+              category: item.category,
+              brand: item.brand,
+              price: item.price,
+              description: item.description,
+              stockQuantity: item.stockQuantity,
+              size: item.size,
+              weight: item.weight,
+              updatedAt: new Date(),
+            }).where(eq(supplies.id, item.matchedSupplyId));
+            updated++;
+          }
+        }
+      }
+      
+      // Delete staged items only after all operations succeed
+      await tx.delete(supplyImportStaging).where(eq(supplyImportStaging.importSessionId, sessionId));
+    });
+    
+    return { created, updated };
+  }
+
+  async rejectStagedImports(sessionId: string): Promise<void> {
+    await db.delete(supplyImportStaging).where(eq(supplyImportStaging.importSessionId, sessionId));
+  }
+
+  async clearOldStagingData(daysOld: number = 7): Promise<void> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - daysOld);
+    
+    await db.delete(supplyImportStaging).where(lt(supplyImportStaging.createdAt, cutoffDate));
   }
 }
 

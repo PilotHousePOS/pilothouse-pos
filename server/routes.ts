@@ -3183,6 +3183,185 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // STAGING WORKFLOW: Stage Excel import with duplicate detection
+  app.post("/api/admin/inventory/stage-import", authMiddleware, excelUpload.single('file'), async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      // Generate unique session ID for this import
+      const sessionId = `import_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+      
+      // Parse Excel file from buffer using exceljs
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(req.file.buffer);
+      const worksheet = workbook.worksheets[0];
+      
+      // Convert worksheet to JSON format
+      const data: any[] = [];
+      const headers: any = {};
+      
+      worksheet.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) {
+          // First row is headers
+          row.eachCell((cell, colNumber) => {
+            headers[colNumber] = cell.value?.toString() || '';
+          });
+        } else {
+          // Data rows
+          const rowData: any = {};
+          row.eachCell((cell, colNumber) => {
+            const header = headers[colNumber];
+            if (header) {
+              rowData[header] = cell.value;
+            }
+          });
+          if (Object.keys(rowData).length > 0) {
+            data.push(rowData);
+          }
+        }
+      });
+
+      console.log(`Staging ${data.length} rows from Excel file...`);
+
+      // Process and stage the supplies
+      const suppliesData = data.map((row: any) => {
+        const name = row['Description']?.toString().trim() || '';
+        const category = row['Category']?.toString().toLowerCase().trim() || '';
+        const price = parseFloat(row['Unit Price']?.toString().replace(/[^0-9.-]+/g, '') || '0');
+        const description = row['Description']?.toString().trim() || '';
+        const stockQuantity = parseInt(row['Quantity']?.toString() || '0');
+        const brand = row['Brand']?.toString().trim() || null;
+        const size = row['Size']?.toString().trim() || null;
+        const sku = row['SKU']?.toString().trim() || null;
+
+        return {
+          name,
+          category,
+          brand,
+          price,
+          description,
+          stockQuantity,
+          size,
+          sku
+        };
+      }).filter((supply: any) => supply.name && supply.price > 0);
+
+      // Stage the imports with duplicate detection
+      const result = await storage.stageSupplyImports(sessionId, suppliesData);
+
+      console.log(`Staging complete: ${result.staged} new, ${result.updates} updates, ${result.duplicates} duplicates`);
+
+      res.json({
+        success: true,
+        sessionId: result.sessionId,
+        stats: {
+          total: suppliesData.length,
+          new: result.staged,
+          updates: result.updates,
+          duplicates: result.duplicates
+        },
+        message: `Import staged: ${result.staged} new items, ${result.updates} updates, ${result.duplicates} exact duplicates`
+      });
+    } catch (error: any) {
+      console.error('Excel staging error:', error);
+      res.status(500).json({ 
+        success: false,
+        message: "Failed to stage Excel file",
+        error: error.message 
+      });
+    }
+  });
+
+  // Get staged imports for preview
+  app.get("/api/admin/inventory/staged/:sessionId", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { sessionId } = req.params;
+      const stagedItems = await storage.getStagedImports(sessionId);
+
+      res.json({
+        success: true,
+        sessionId,
+        items: stagedItems,
+        summary: {
+          total: stagedItems.length,
+          new: stagedItems.filter(i => i.status === 'new').length,
+          updates: stagedItems.filter(i => i.status === 'update').length,
+          duplicates: stagedItems.filter(i => i.status === 'duplicate').length
+        }
+      });
+    } catch (error: any) {
+      console.error('Get staged imports error:', error);
+      res.status(500).json({ 
+        success: false,
+        message: "Failed to get staged imports",
+        error: error.message 
+      });
+    }
+  });
+
+  // Approve staged imports and apply to production
+  app.post("/api/admin/inventory/approve/:sessionId", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { sessionId } = req.params;
+      const result = await storage.approveStagedImports(sessionId);
+
+      res.json({
+        success: true,
+        message: `Import approved: ${result.created} created, ${result.updated} updated`,
+        stats: result
+      });
+    } catch (error: any) {
+      console.error('Approve staged imports error:', error);
+      res.status(500).json({ 
+        success: false,
+        message: "Failed to approve imports",
+        error: error.message 
+      });
+    }
+  });
+
+  // Reject staged imports
+  app.delete("/api/admin/inventory/reject/:sessionId", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { sessionId } = req.params;
+      await storage.rejectStagedImports(sessionId);
+
+      res.json({
+        success: true,
+        message: "Staged imports rejected and deleted"
+      });
+    } catch (error: any) {
+      console.error('Reject staged imports error:', error);
+      res.status(500).json({ 
+        success: false,
+        message: "Failed to reject imports",
+        error: error.message 
+      });
+    }
+  });
+
   // Import database from JSON (Admin only - DEVELOPMENT ONLY)
   app.post("/api/admin/database/import", authMiddleware, async (req: any, res) => {
     try {

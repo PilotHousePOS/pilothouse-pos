@@ -477,3 +477,46 @@ export type SpecialDateAllowedTime = typeof specialDateAllowedTimes.$inferSelect
 export type InsertSpecialDateAllowedTime = z.infer<typeof insertSpecialDateAllowedTimeSchema>;
 export type AppointmentHistory = typeof appointmentHistory.$inferSelect;
 export type InsertAppointmentHistory = z.infer<typeof insertAppointmentHistorySchema>;
+
+// Staging table for supply imports with duplicate detection
+export const supplyImportStaging = pgTable("supply_import_staging", {
+  id: serial("id").primaryKey(),
+  importSessionId: varchar("import_session_id", { length: 255 }).notNull(), // Group imports together
+  
+  // Supply data fields
+  name: varchar("name", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(),
+  brand: varchar("brand", { length: 255 }),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  description: text("description"),
+  stockQuantity: integer("stock_quantity").default(0),
+  size: varchar("size", { length: 50 }),
+  weight: varchar("weight", { length: 50 }),
+  sku: varchar("sku", { length: 100 }), // Optional SKU field for better identification
+  
+  // Duplicate detection fields
+  compositeKey: varchar("composite_key", { length: 500 }).notNull(), // name+brand+size normalized
+  normalizedSku: varchar("normalized_sku", { length: 100 }), // Normalized SKU (uppercase, trimmed)
+  dataChecksum: varchar("data_checksum", { length: 64 }).notNull(), // SHA-256 of all fields
+  
+  // Status and matching
+  status: varchar("status", { length: 50 }).notNull().default("pending"), // pending, approved, rejected, duplicate, update
+  matchedSupplyId: integer("matched_supply_id").references(() => supplies.id), // If duplicate/update, which supply it matches
+  conflictReason: text("conflict_reason"), // Why it's marked as duplicate/conflict
+  
+  // Metadata
+  rowNumber: integer("row_number"), // Original row number in Excel file
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  // Index for fast duplicate detection
+  index("staging_composite_key_idx").on(table.importSessionId, table.compositeKey),
+  index("staging_sku_idx").on(table.normalizedSku),
+]);
+
+export const insertSupplyImportStagingSchema = createInsertSchema(supplyImportStaging).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type SupplyImportStaging = typeof supplyImportStaging.$inferSelect;
+export type InsertSupplyImportStaging = z.infer<typeof insertSupplyImportStagingSchema>;

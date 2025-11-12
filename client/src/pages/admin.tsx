@@ -5634,6 +5634,140 @@ export default function Admin() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
+                <Eye className="w-5 h-5" />
+                Stage Import (Preview & Approve)
+              </CardTitle>
+              <CardDescription>
+                Upload Excel file with duplicate detection - preview changes before applying
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Info Banner */}
+              <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-purple-600 dark:text-purple-500 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-semibold text-purple-800 dark:text-purple-300 mb-1">Smart Duplicate Detection</p>
+                    <ul className="list-disc list-inside space-y-1 text-purple-700 dark:text-purple-400">
+                      <li>Detects duplicates by name + brand + size</li>
+                      <li>Shows which items will be added, updated, or skipped</li>
+                      <li>Preview all changes before applying</li>
+                      <li>Safer than direct import - you can review first</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <input
+                  type="file"
+                  accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                  id="excel-stage-file"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+
+                    try {
+                      const formData = new FormData();
+                      formData.append('file', file);
+
+                      toast({
+                        title: "Analyzing...",
+                        description: "Detecting duplicates, please wait..."
+                      });
+
+                      const response = await fetch('/api/admin/inventory/stage-import', {
+                        method: 'POST',
+                        credentials: 'include',
+                        body: formData
+                      });
+
+                      const result = await response.json();
+
+                      if (!response.ok) {
+                        throw new Error(result.message || 'Staging failed');
+                      }
+
+                      // Show summary and ask for approval
+                      const sessionId = result.sessionId;
+                      const summary = `Analysis complete:\n\n✓ ${result.stats.new} new items will be added\n✓ ${result.stats.updates} items will be updated\n✓ ${result.stats.duplicates} exact duplicates will be skipped\n\nTotal: ${result.stats.total} items processed\n\nDo you want to apply these changes?`;
+                      
+                      const approved = window.confirm(summary);
+                      
+                      if (approved) {
+                        // Approve and apply
+                        toast({
+                          title: "Applying changes...",
+                          description: "Please wait..."
+                        });
+                        
+                        const approveResponse = await fetch(`/api/admin/inventory/approve/${sessionId}`, {
+                          method: 'POST',
+                          credentials: 'include'
+                        });
+                        
+                        const approveResult = await approveResponse.json();
+                        
+                        if (!approveResponse.ok) {
+                          throw new Error(approveResult.message || 'Approval failed');
+                        }
+                        
+                        toast({
+                          title: "Import successful",
+                          description: `${approveResult.stats.created} created, ${approveResult.stats.updated} updated`
+                        });
+                        
+                        // Reload supplies data
+                        queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
+                      } else {
+                        // Reject
+                        await fetch(`/api/admin/inventory/reject/${sessionId}`, {
+                          method: 'DELETE',
+                          credentials: 'include'
+                        });
+                        
+                        toast({
+                          title: "Import cancelled",
+                          description: "No changes were made"
+                        });
+                      }
+                    } catch (error) {
+                      console.error('Staging error:', error);
+                      toast({
+                        title: "Staging failed",
+                        description: error instanceof Error ? error.message : "Failed to stage Excel file",
+                        variant: "destructive"
+                      });
+                    }
+
+                    // Reset file input
+                    e.target.value = '';
+                  }}
+                  data-testid="input-excel-stage"
+                />
+
+                <Button
+                  onClick={() => {
+                    document.getElementById('excel-stage-file')?.click();
+                  }}
+                  className="bg-purple-600 hover:bg-purple-700 w-full sm:w-auto"
+                  data-testid="button-stage-excel"
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  Stage & Preview Import
+                </Button>
+
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Upload to see what will be added, updated, or duplicated
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
                 <Package className="w-5 h-5" />
                 Supplies Sync (Safe for Production)
               </CardTitle>
