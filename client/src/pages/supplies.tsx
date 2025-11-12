@@ -13,6 +13,11 @@ const SUPPLY_CATEGORIES = [
   { id: 'leashes', label: 'Leashes', emoji: '🦮' },
   { id: 'healthcare', label: 'Health', emoji: '💊' },
   { id: 'accessories', label: 'Accessories', emoji: '🎀' },
+  { id: 'aquatics', label: 'Aquatics', emoji: '🐠' },
+  { id: 'reptiles', label: 'Reptiles', emoji: '🦎' },
+  { id: 'birdCages', label: 'Bird Cages', emoji: '🪺' },
+  { id: 'dogCages', label: 'Dog Cages/Houses', emoji: '🏠' },
+  { id: 'smallAnimalCages', label: 'Small Animal Cages', emoji: '🐹' },
 ];
 
 const ITEMS_PER_PAGE = 24;

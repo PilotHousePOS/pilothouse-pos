@@ -140,6 +140,11 @@ export interface CategoryStats {
   leashes: number;
   healthcare: number;
   accessories: number;
+  aquatics: number;
+  reptiles: number;
+  birdCages: number;
+  dogCages: number;
+  smallAnimalCages: number;
   unchanged: number;
 }
 
@@ -151,6 +156,11 @@ export function getEmptyStats(): CategoryStats {
     leashes: 0,
     healthcare: 0,
     accessories: 0,
+    aquatics: 0,
+    reptiles: 0,
+    birdCages: 0,
+    dogCages: 0,
+    smallAnimalCages: 0,
     unchanged: 0,
   };
 }
