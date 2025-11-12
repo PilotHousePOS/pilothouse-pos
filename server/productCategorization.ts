@@ -87,34 +87,17 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
     }
   }
 
-  // Check for excluded brands (CRITICAL: prevents ZooMed betta → reptile)
-  for (const excludedBrand of SUPPLY_FILTERS.aquatic.excludeBrands) {
-    if (brand === normalizeBrand(excludedBrand)) {
-      aquaticScore = Math.max(0, aquaticScore - 60); // Strong penalty for excluded brand
-      matchedReasons.push(`Excluded brand from aquatic: ${excludedBrand}`);
-      break;
-    }
-  }
-
-  for (const excludedBrand of SUPPLY_FILTERS.reptile.excludeBrands) {
-    if (brand === normalizeBrand(excludedBrand)) {
-      reptileScore = Math.max(0, reptileScore - 60); // Strong penalty for excluded brand
-      matchedReasons.push(`Excluded brand from reptile: ${excludedBrand}`);
-      break;
-    }
-  }
-
-  // Check for exclusion keywords (reduces score significantly)
+  // Check for exclusion keywords FIRST (MUST override brand bonus)
   for (const keyword of SUPPLY_FILTERS.aquatic.excludeKeywords) {
     if (name.includes(keyword.toLowerCase()) || description.includes(keyword.toLowerCase())) {
-      aquaticScore = Math.max(0, aquaticScore - 40);
+      aquaticScore = 0; // Complete override - aquatic keywords mean NOT aquatic
       matchedReasons.push(`Excluded from aquatic: "${keyword}"`);
     }
   }
 
   for (const keyword of SUPPLY_FILTERS.reptile.excludeKeywords) {
     if (name.includes(keyword.toLowerCase()) || description.includes(keyword.toLowerCase())) {
-      reptileScore = Math.max(0, reptileScore - 40);
+      reptileScore = 0; // Complete override - "betta" means NOT reptile, even for ZooMed
       matchedReasons.push(`Excluded from reptile: "${keyword}"`);
     }
   }
