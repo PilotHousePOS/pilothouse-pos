@@ -380,7 +380,7 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
   },
 };
 
-// Lowered to 25 to allow brand-only matches for well-known food/toy brands
+// Lowered to 15 to allow single-keyword matches for specialized products (e.g., betta=aquatics)
 // Pattern matching (oz, lb) adds +10pts to food products
 // Strong exclusion penalties (-30) prevent false positives
-export const CATEGORY_CONFIDENCE_THRESHOLD = 25;
+export const CATEGORY_CONFIDENCE_THRESHOLD = 15;
