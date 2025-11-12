@@ -524,29 +524,9 @@ export class DatabaseStorage implements IStorage {
     const trimmedSearch = search?.trim() || '';
 
     if (filterType) {
-      // Use centralized filter configuration
-      const config = SUPPLY_FILTERS[filterType];
-      
-      // Build inclusion conditions for brands and keywords
-      const brandConditions = config.includeBrands.map(brand => eq(supplies.brand, brand));
-      const keywordConditions = config.includeKeywords.flatMap(keyword => [
-        ilike(supplies.name, `%${keyword}%`),
-        ilike(supplies.description, `%${keyword}%`)
-      ]);
-      
-      // Build exclusion conditions (handle NULL fields with OR isNull)
-      const excludeBrandConditions = config.excludeBrands.map(brand => 
-        or(isNull(supplies.brand), not(eq(supplies.brand, brand)))
-      );
-      const excludeKeywordConditions = config.excludeKeywords.flatMap(keyword => [
-        or(isNull(supplies.name), not(ilike(supplies.name, `%${keyword}%`))),
-        or(isNull(supplies.description), not(ilike(supplies.description, `%${keyword}%`)))
-      ]);
-      
-      // Apply filter: include matching items but exclude conflicting ones
-      whereConditions.push(or(...brandConditions, ...keywordConditions));
-      whereConditions.push(...excludeBrandConditions);
-      whereConditions.push(...excludeKeywordConditions);
+      // Use the pre-calculated filter_type column (set by auto-categorization)
+      // This is much more reliable than runtime filtering
+      whereConditions.push(eq(supplies.filterType, filterType));
     }
     
     // Apply search filter (works alongside filterType or standalone)
