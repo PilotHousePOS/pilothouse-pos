@@ -47,7 +47,12 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'Authority', 'Simply Nourish', 'Whole Earth Farms', 'Dave\'s', 'Nature\'s Recipe',
       'Nutri Sou', 'Vit Essen', 'Tow Can', 'Nutrient',
       // Small animal food brands
-      'Kaytee', 'Oxbow', 'Vitakraft', 'Higgins', 'Lafeber', 'Mazuri',
+      'Kaytee', 'Oxbow', 'Oxbow Animal Health', 'Vitakraft', 'Higgins', 'Lafeber', 'Lafeber\'s',
+      'Mazuri', 'Supreme Petfoods', 'Small Pet Select', 'Wild Harvest', 'Living World',
+      'Tiny Friends Farm', 'Science Selective',
+      // Bird food brands
+      'ZuPreem', 'Harrison\'s', 'Harrison\'s Bird Foods', 'Brown\'s', 'FM Browns', 'Volkman',
+      'Dr. Harvey\'s', 'Avi-Cakes', 'Nutri-Berries',
     ],
     nameKeywords: [
       // Very specific food terms (avoid generic words like "chew")
@@ -63,7 +68,14 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       // Specific meal types
       'breakfast', 'dinner', 'supper', 'cuts in gravy', 'flaked',
       // Small animal specific food terms
-      'fortidiet', 'pellets', 'hay', 'timothy', 'alfalfa',
+      'fortidiet', 'pellets', 'hay', 'timothy hay', 'alfalfa hay', 'orchard hay',
+      'timothy', 'alfalfa', 'rabbit food', 'guinea pig food', 'hamster food',
+      'chinchilla food', 'ferret food', 'critical care', 'vitamin c',
+      // Bird specific food terms
+      'bird food', 'seed mix', 'seed blend', 'parakeet food', 'cockatiel food',
+      'parrot food', 'finch food', 'canary food', 'macaw food', 'conure food',
+      'fruitblend', 'nutri-berries', 'avi-cakes', 'spray millet', 'millet spray',
+      'bird pellets', 'parakeet pellets', 'parrot pellets',
     ],
     descriptionKeywords: [
       'nutritious', 'balanced', 'complete', 'wholesome', 'digestible', 'protein-rich',
@@ -82,6 +94,11 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'GoDog', 'SPOT', 'Mammoth', 'Benebone', 'Tuffy', 'Bullymake', 'Jolly Pets',
       'Planet Dog', 'Trixie', 'Nina Ottosson', 'iFetch', 'Kng', 'Spot',
       'Jones', 'Smartplay', 'Pacific Perch',
+      // Small animal toy brands
+      'Sofier', 'YIXUND', 'VESPRO', 'mini&moe',
+      // Bird toy brands
+      'Bonka Bird Toys', 'Planet Pleasures', 'Super Bird Creations', 'JW Pet',
+      'Kyouki', 'Bird Safe Store', 'KATUMO', 'Prevue Pet', 'Agape',
     ],
     nameKeywords: [
       // Specific toy types (not generic "chew")
@@ -95,9 +112,14 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'catnip toy', 'teaser wand', 'feather toy', 'cat mouse',
       'scratching post', 'cat tree', 'scratcher', 'track toy',
       // Bird/small animal toys
-      'perch', 'branch', 'swing', 'ladder', 'bridge',
+      'perch', 'bird perch', 'natural perch', 'rope perch', 'platform perch',
+      'swing', 'bird swing', 'ladder', 'bridge', 'bird ladder',
+      'bell toy', 'chewing toy', 'foraging toy', 'activity toy',
+      'rotating perch', 'spinning toy', 'exercise wheel',
+      'woven ball', 'grass ball', 'seagrass', 'vine ball',
+      'apple wood stick', 'timothy stick', 'chew stick',
       // Only "toy" when clearly a toy
-      ' toy ', 'dog toy', 'cat toy', 'pet toy', 'chew toy',
+      ' toy ', 'dog toy', 'cat toy', 'pet toy', 'chew toy', 'bird toy',
     ],
     descriptionKeywords: [
       'interactive', 'engaging', 'entertaining', 'stimulating', 'bouncy', 'floating',
@@ -192,6 +214,10 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'Fluval', 'Seachem', 'API', 'Marineland', 'Aqueon', 'GloFish', 'Tetra',
       'Zoo Med', 'ZooMed', 'Exo Terra', 'Flukers', 'Zilla',
       'Vari Kennel',
+      // Small animal bedding brands
+      'Carefresh', 'American Wood Fibers', 'AWF', 'Catalyst Pet', 'Burgess',
+      // Small animal accessory brands (overlaps with toys/food)
+      'Ferplast', 'WARE', 'You & Me', 'The Hay Experts',
     ],
     nameKeywords: [
       // Aquarium/fish supplies
@@ -207,16 +233,21 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'paludarium', 'backround', 'rock lair', 'betta log', 'betta diver',
       'bettamatic', 'pure water care', 'repuvb',
       // Bird supplies
-      'bird cage', 'aviary', 'perch', 'nest', 'feeder', 'bird bath',
+      'bird cage', 'aviary', 'nest', 'bird bath', 'cuttlebone', 'mineral block',
+      'nesting material', 'bird mirror',
+      // Small animal bedding
+      'bedding', 'paper bedding', 'wood shavings', 'aspen shavings', 'pine pellets',
+      'clean & cozy', 'confetti', 'nap & nest', 'douglas fir', 'paper fiber',
       // Small animal housing
-      'cage', 'habitat', 'hutch', 'enclosure', 'exercise wheel',
-      'hamtrac', 'hideout', 'tunnel', 'exercise loop',
+      'cage', 'habitat', 'hutch', 'enclosure', 'hamtrac', 'hideout', 'tunnel',
+      'exercise loop', 'exercise pen', 'playpen',
       // Crates & carriers
       'crate', 'kennel', 'carrier', 'vari kennel', 'travel crate',
       // Bowls & feeders
-      'bowl', 'dish', 'feeder', 'waterer', 'fountain', 'automatic feeder',
+      'bowl', 'dish', 'feeder', 'waterer', 'fountain', 'automatic feeder', 'water bottle',
+      'hay feeder', 'hay rack',
       // Litter & waste
-      'litter box', 'litter scoop', 'waste bag', 'poop bag',
+      'litter box', 'litter scoop', 'waste bag', 'poop bag', 'litter',
       // Pet clothing
       'tanktop', 'sweater', 'coat', 'jacket', 'raincoat', 'costume',
       // Misc accessories
