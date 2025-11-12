@@ -212,57 +212,31 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
 
   accessories: {
     brands: [
-      'Petmate', 'MidWest', 'Precision Pet', 'Aspen Pet', 'Frisco', 'Iris',
-      'Richell', 'Carlson', 'Regalo', 'Carlson Pet', 'YETI', 'RTIC',
-      'Bergan', 'Van Ness', 'Pioneer Pet', 'Catit', 'Drinkwell', 'PetSafe',
-      'Fluval', 'Seachem', 'API', 'Marineland', 'Aqueon', 'GloFish', 'Tetra',
-      'Zoo Med', 'ZooMed', 'Exo Terra', 'Flukers', 'Zilla',
-      'Vari Kennel',
-      // Small animal bedding brands
-      'Carefresh', 'American Wood Fibers', 'AWF', 'Catalyst Pet', 'Burgess',
-      // Small animal accessory brands (overlaps with toys/food)
-      'Ferplast', 'WARE', 'You & Me', 'The Hay Experts',
+      // Pet clothing & fashion brands
+      'Aria', 'Zack & Zoey', 'Casual Canine', 'East Side Collection', 'Hip Doggie',
+      'Pup Crew', 'Pet Life', 'Fashion Pet', 'Rubie\'s', 'Bootique',
     ],
     nameKeywords: [
-      // Aquarium/fish supplies
-      'aquarium', 'fish tank', 'filter', 'pump', 'heater', 'thermometer',
-      'air stone', 'bubbler', 'substrate', 'gravel', 'sand', 'decor',
-      'ornament', 'plant', 'betta plant', 'water treatment', 'conditioner',
-      'clarity', 'zeo-carb', 'cartridge', 'media', 'betta', 'marine',
-      'anemone', 'corkscrew', 'grass plant', 'leaf',
-      // Reptile/terrarium supplies
-      'terrarium', 'vivarium', 'heat lamp', 'UVB', 'basking', 'hide',
-      'cave', 'reptile', 'gecko', 'bearded dragon', 'snake', 'lizard',
-      'calcium', 'supplement cube', 'orange cube', 'tortoise', 'turtle',
-      'paludarium', 'backround', 'rock lair', 'betta log', 'betta diver',
-      'bettamatic', 'pure water care', 'repuvb',
-      // Bird supplies
-      'bird cage', 'aviary', 'nest', 'bird bath', 'cuttlebone', 'mineral block',
-      'nesting material', 'bird mirror',
-      // Small animal bedding
-      'bedding', 'paper bedding', 'wood shavings', 'aspen shavings', 'pine pellets',
-      'clean & cozy', 'confetti', 'nap & nest', 'douglas fir', 'paper fiber',
-      // Small animal housing
-      'cage', 'habitat', 'hutch', 'enclosure', 'hamtrac', 'hideout', 'tunnel',
-      'exercise loop', 'exercise pen', 'playpen',
-      // Crates & carriers
-      'crate', 'kennel', 'carrier', 'vari kennel', 'travel crate',
-      // Bowls & feeders
-      'bowl', 'dish', 'feeder', 'waterer', 'fountain', 'automatic feeder', 'water bottle',
-      'hay feeder', 'hay rack',
-      // Litter & waste
-      'litter box', 'litter scoop', 'waste bag', 'poop bag', 'litter',
-      // Pet clothing
-      'tanktop', 'sweater', 'coat', 'jacket', 'raincoat', 'costume',
-      // Misc accessories
-      'replacement parts', 'stacker', 'castle', 'bridge', 'troll',
-      'sponge filter', 'ecorenew', 'forza', 'spectrastone',
+      // Pet clothing & apparel
+      'bow', 'bow tie', 'bowtie', 'hair bow', 'ribbon', 'bandana', 'bandanna',
+      'tanktop', 'tank top', 'sweater', 'coat', 'jacket', 'raincoat', 'hoodie',
+      'costume', 'dress', 'tutu', 'shirt', 't-shirt', 'tee', 'vest',
+      'pajamas', 'pjs', 'bathrobe', 'robe',
+      // Decorative items
+      'bell', 'bells', 'charm', 'tag charm', 'id tag', 'decorative tag',
+      'sticker', 'stickers', 'decal', 'decals', 'patch', 'patches',
+      'decoration', 'ornament', 'seasonal decor', 'holiday decor',
+      // Accessories
+      'scarf', 'neckerchief', 'hat', 'cap', 'sunglasses', 'goggles',
+      'socks', 'booties', 'shoes', 'sneakers',
     ],
     descriptionKeywords: [
-      'convenient', 'practical', 'essential', 'functional', 'storage', 'organization',
+      'fashionable', 'stylish', 'decorative', 'adorable', 'cute', 'festive',
     ],
     exclusionKeywords: [
-      'food', 'kibble', 'treat', 'meal', 'gravy', 'stew',
+      'food', 'kibble', 'treat', 'meal', 'toy', 'ball', 'chew',
+      'bowl', 'feeder', 'aquarium', 'cage', 'crate', 'carrier',
+      'shampoo', 'brush', 'clipper', 'bed',
     ],
   },
 };
