@@ -153,12 +153,12 @@ export default function Home() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
             <Sparkles className="w-6 h-6 text-brand-orange mr-2" />
-            <h2 className="text-3xl font-bold text-gray-900">Find Your Perfect</h2>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Find Your Perfect</h2>
           </div>
-          <h3 className="text-4xl font-bold bg-gradient-to-r from-brand-blue via-brand-red to-brand-orange bg-clip-text text-transparent mb-4">
+          <h3 className="text-4xl font-bold bg-gradient-to-r from-blue-500 via-red-500 to-orange-500 bg-clip-text text-transparent mb-4">
             Furry Friend
           </h3>
-          <p className="text-gray-600 text-lg">Discover loving companions waiting for their forever home</p>
+          <p className="text-gray-600 dark:text-gray-300 text-lg">Discover loving companions waiting for their forever home</p>
         </div>
 
 
@@ -168,11 +168,11 @@ export default function Home() {
       <section className="px-6 pb-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 flex items-center">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
               <Star className="w-6 h-6 text-brand-orange mr-2" />
               Featured Pets
             </h3>
-            <p className="text-gray-500 text-sm">Ready to find their forever home</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">Ready to find their forever home</p>
           </div>
           <Button 
             variant="ghost" 
