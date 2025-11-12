@@ -56,7 +56,8 @@ import {
   History,
   Database,
   FileText,
-  Sparkles
+  Sparkles,
+  Grid3X3
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -2831,6 +2832,28 @@ export default function Admin() {
         variant: "destructive",
       });
     },
+  });
+
+  const autoCategorizeTypesMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/admin/supplies/auto-categorize-categories");
+      return response.json();
+    },
+    onSuccess: (data: any) => {
+      const { stats } = data;
+      toast({
+        title: "Category mapping complete!",
+        description: `Food: ${stats.food} • Toys: ${stats.toys} • Beds: ${stats.beds} • Leashes: ${stats.leashes} • Healthcare: ${stats.healthcare} • Accessories: ${stats.accessories} • Unchanged: ${stats.unchanged} • Total: ${stats.total} (${stats.duration})`
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Category mapping failed",
+        description: error instanceof Error ? error.message : "Unable to update categories",
+        variant: "destructive"
+      });
+    }
   });
 
   // Clamp approved appointments pagination when list shrinks
@@ -6005,6 +6028,49 @@ export default function Admin() {
               </Button>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Processes all {7316} active products and assigns them to the appropriate section
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Grid3X3 className="w-5 h-5" />
+                Auto-Categorize Product Types
+              </CardTitle>
+              <CardDescription>
+                Assigns products into Food, Toys, Beds, Leashes, Healthcare, and Accessories using brand/keyword scoring
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-semibold text-purple-800 dark:text-purple-300 mb-1">How It Works</p>
+                    <ul className="list-disc list-inside space-y-1 text-purple-700 dark:text-purple-400">
+                      <li>Brand defaults: KONG → Toys, Blue Buffalo → Food, Coastal → Leashes (25 points)</li>
+                      <li>Name keywords: "chicken", "beef" → Food; "ball", "squeaker" → Toys (15 points each, max 3)</li>
+                      <li>Description keywords: "nutritious" → Food; "durable" → Toys (10 points each, max 2)</li>
+                      <li>Pattern matching: "5.5oz", "12lb" → Food (10 points)</li>
+                      <li>Exclusion penalties: Food keywords exclude Toys/Leashes (-30 points)</li>
+                      <li>Minimum 25 points required; ambiguous items remain unchanged</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                onClick={() => autoCategorizeTypesMutation.mutate()}
+                disabled={autoCategorizeTypesMutation.isPending}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                data-testid="button-auto-categorize-types"
+              >
+                <Grid3X3 className="w-4 h-4 mr-2" />
+                {autoCategorizeTypesMutation.isPending ? "Categorizing..." : "Auto-Categorize Product Types"}
+              </Button>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Uses expanded brand/keyword mappings to set precise product types while leaving ambiguous items unchanged. Processes all {7316} active products in batches.
               </p>
             </CardContent>
           </Card>

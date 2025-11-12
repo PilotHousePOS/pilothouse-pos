@@ -111,6 +111,17 @@ export interface IStorage {
     total: number;
   }>;
 
+  autoCategorizeProductCategories(): Promise<{
+    food: number;
+    toys: number;
+    beds: number;
+    leashes: number;
+    healthcare: number;
+    accessories: number;
+    unchanged: number;
+    total: number;
+  }>;
+
   // Cart operations
   getCartItems(userId: string): Promise<CartItem[]>;
   addToCart(cartItem: InsertCartItem): Promise<CartItem>;
@@ -653,6 +664,65 @@ export class DatabaseStorage implements IStorage {
       general: generalCount,
       total: allSupplies.length
     };
+  }
+
+  async autoCategorizeProductCategories(): Promise<{
+    food: number;
+    toys: number;
+    beds: number;
+    leashes: number;
+    healthcare: number;
+    accessories: number;
+    unchanged: number;
+    total: number;
+  }> {
+    const { determineCategory } = await import('./productCategory');
+    
+    // Load all supplies
+    const allSupplies = await db.select().from(supplies).where(eq(supplies.isActive, true));
+
+    const BATCH_SIZE = 500;
+    const stats = {
+      food: 0,
+      toys: 0,
+      beds: 0,
+      leashes: 0,
+      healthcare: 0,
+      accessories: 0,
+      unchanged: 0,
+      total: 0
+    };
+
+    // Process in batches to avoid memory issues
+    for (let i = 0; i < allSupplies.length; i += BATCH_SIZE) {
+      const batch = allSupplies.slice(i, i + BATCH_SIZE);
+      const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+      const totalBatches = Math.ceil(allSupplies.length / BATCH_SIZE);
+      
+      // Prepare bulk update using transaction
+      await db.transaction(async (tx) => {
+        for (const supply of batch) {
+          const suggestedCategory = determineCategory(supply);
+          
+          if (suggestedCategory) {
+            await tx.update(supplies)
+              .set({ category: suggestedCategory })
+              .where(eq(supplies.id, supply.id));
+
+            // Count categories
+            stats[suggestedCategory as keyof typeof stats]++;
+          } else {
+            stats.unchanged++;
+          }
+          stats.total++;
+        }
+      });
+
+      console.log(`Batch ${batchNum}/${totalBatches}: Processed ${batch.length} products`);
+    }
+
+    console.log(`Category Auto-Categorization Complete:`, stats);
+    return stats;
   }
 
   // Cart operations

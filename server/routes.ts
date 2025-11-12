@@ -3709,6 +3709,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Auto-categorize product categories (food, toys, beds, etc.) - Admin only
+  app.post("/api/admin/supplies/auto-categorize-categories", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      console.log("Starting automatic category assignment...");
+      const startTime = Date.now();
+
+      const stats = await storage.autoCategorizeProductCategories();
+
+      const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+      console.log(`Category assignment complete in ${duration}s:`, stats);
+
+      res.json({
+        message: "Category assignment completed successfully",
+        stats: {
+          ...stats,
+          duration: `${duration}s`
+        }
+      });
+    } catch (error) {
+      console.error('Error auto-categorizing product categories:', error);
+      res.status(500).json({ message: "Failed to auto-categorize product categories" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
