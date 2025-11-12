@@ -184,7 +184,7 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'Heartgard', 'Interceptor', 'Trifexis', 'Revolution', 'Capstar',
       'FURminator', 'Safari', 'Oster', 'Wahl', 'Andis', 'TropiClean', 'Earthbath',
       'Burt\'s Bees', 'Veterinary Formula', 'Douxo', 'Malaseb', 'Zymox',
-      'Topiclean', 'Adams', 'Petodor',
+      'Topiclean', 'Adams', 'PetOdor',
     ],
     nameKeywords: [
       // Supplements & medications
