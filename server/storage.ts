@@ -584,20 +584,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSuppliesWithoutImages(limit: number, offset: number): Promise<Supply[]> {
-    return await db
-      .select()
-      .from(supplies)
-      .where(or(isNull(supplies.imageUrl), eq(supplies.imageUrl, '')))
-      .limit(limit)
-      .offset(offset)
-      .orderBy(supplies.id);
+    const allSupplies = await db.select().from(supplies);
+    
+    // Filter out products with no images OR broken /uploads/ images
+    const withoutImages = allSupplies.filter(s => {
+      if (!s.imageUrl || s.imageUrl === '') return true;
+      if (s.imageUrl.startsWith('/uploads/')) return true; // Broken local uploads
+      return false;
+    });
+    
+    return withoutImages.slice(offset, offset + limit);
   }
 
   async getSupplyImageStats() {
     const allSupplies = await db.select().from(supplies);
     
     const totalProducts = allSupplies.length;
-    const withImages = allSupplies.filter(s => s.imageUrl && s.imageUrl !== '').length;
+    // Count valid images (not empty, not broken /uploads/ links)
+    const withImages = allSupplies.filter(s => {
+      if (!s.imageUrl || s.imageUrl === '') return false;
+      if (s.imageUrl.startsWith('/uploads/')) return false; // Broken local uploads
+      return true;
+    }).length;
     const withoutImages = totalProducts - withImages;
 
     const brandStats = new Map<string, { total: number; withImages: number }>();
@@ -620,7 +628,12 @@ export class DatabaseStorage implements IStorage {
       brandData.total++;
       categoryData.total++;
 
-      if (supply.imageUrl && supply.imageUrl !== '') {
+      // Only count as "with images" if URL exists and is NOT a broken /uploads/ link
+      const hasValidImage = supply.imageUrl && 
+                           supply.imageUrl !== '' && 
+                           !supply.imageUrl.startsWith('/uploads/');
+      
+      if (hasValidImage) {
         brandData.withImages++;
         categoryData.withImages++;
       }

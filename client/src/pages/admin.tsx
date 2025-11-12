@@ -1871,10 +1871,29 @@ function ProductImageManager() {
   const [searchQuery, setSearchQuery] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [showProducts, setShowProducts] = useState(false);
 
   // Fetch image stats
   const { data: imageStats, isLoading: statsLoading } = useQuery({
     queryKey: ['/api/admin/supplies/image-stats'],
+  });
+
+  // Fetch products without images
+  const { data: productsData, isLoading: productsLoading, refetch: refetchProducts } = useQuery({
+    queryKey: ['/api/admin/supplies/without-images', selectedBrand, selectedCategory, searchQuery],
+    queryFn: async () => {
+      const params = new URLSearchParams({ limit: '50', offset: '0' });
+      if (selectedBrand) params.append('brand', selectedBrand);
+      if (selectedCategory) params.append('category', selectedCategory);
+      if (searchQuery.trim()) params.append('search', searchQuery.trim());
+      
+      const response = await fetch(`/api/admin/supplies/without-images?${params}`, {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch products');
+      return response.json();
+    },
+    enabled: showProducts,
   });
 
   // Update product image mutation
@@ -1885,6 +1904,7 @@ function ProductImageManager() {
     onSuccess: () => {
       // Invalidate queries to refresh statistics
       queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/image-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/without-images'] });
       queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
       
       toast({
@@ -1893,6 +1913,7 @@ function ProductImageManager() {
       });
       setSelectedProduct(null);
       setImageUrl('');
+      refetchProducts();
     },
     onError: () => {
       toast({
@@ -1902,6 +1923,28 @@ function ProductImageManager() {
       });
     },
   });
+
+  const handleBrandSearch = (brand: string) => {
+    setSelectedBrand(brand);
+    setSelectedCategory('');
+    setSearchQuery('');
+    setShowProducts(true);
+  };
+
+  const handleCategorySearch = (category: string) => {
+    setSelectedCategory(category);
+    setSelectedBrand('');
+    setSearchQuery('');
+    setShowProducts(true);
+  };
+
+  const handleManualSearch = () => {
+    setSelectedBrand('');
+    setSelectedCategory('');
+    setShowProducts(true);
+  };
+
+  const products = productsData || [];
 
   return (
     <div className="space-y-6">
@@ -1947,7 +1990,7 @@ function ProductImageManager() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => setSelectedBrand(brand.brand)}
+                          onClick={() => handleBrandSearch(brand.brand)}
                           data-testid={`button-select-brand-${brand.brand}`}
                         >
                           Search
@@ -1971,7 +2014,7 @@ function ProductImageManager() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => setSelectedCategory(cat.category)}
+                          onClick={() => handleCategorySearch(cat.category)}
                           data-testid={`button-select-category-${cat.category}`}
                         >
                           Search
@@ -2002,15 +2045,89 @@ function ProductImageManager() {
               onChange={(e) => setSearchQuery(e.target.value)}
               data-testid="input-product-search"
             />
-            <Button variant="outline" data-testid="button-search-product">
+            <Button 
+              variant="outline" 
+              onClick={handleManualSearch}
+              data-testid="button-search-product"
+            >
               <Search className="w-4 h-4" />
             </Button>
           </div>
 
+          {/* Products List */}
+          {showProducts && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold">
+                  {selectedBrand ? `Brand: ${selectedBrand}` : 
+                   selectedCategory ? `Category: ${selectedCategory}` : 
+                   'Search Results'}
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowProducts(false);
+                    setSelectedBrand('');
+                    setSelectedCategory('');
+                    setSearchQuery('');
+                  }}
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Clear
+                </Button>
+              </div>
+
+              {productsLoading ? (
+                <div className="text-center py-4">Loading products...</div>
+              ) : products.length === 0 ? (
+                <div className="text-center py-4 text-gray-500">No products found</div>
+              ) : (
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {products.map((product: any) => (
+                    <div
+                      key={product.id}
+                      className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={() => {
+                        setSelectedProduct(product);
+                        setImageUrl(product.imageUrl || '');
+                      }}
+                      data-testid={`product-row-${product.id}`}
+                    >
+                      <div>
+                        <div className="font-medium">{product.name}</div>
+                        <div className="text-xs text-gray-600">
+                          {product.brand && <span>Brand: {product.brand} | </span>}
+                          <span>Category: {product.category}</span>
+                        </div>
+                      </div>
+                      <Button size="sm" variant="outline">
+                        Add Image
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {selectedProduct && (
-            <div className="border rounded-lg p-4 space-y-4">
+            <div className="border rounded-lg p-4 space-y-4 bg-blue-50 dark:bg-blue-900/20">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold">Edit Image for: {selectedProduct.name}</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedProduct(null);
+                    setImageUrl('');
+                  }}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+
               <div>
-                <h3 className="font-semibold">{selectedProduct.name}</h3>
                 <p className="text-sm text-gray-600">Brand: {selectedProduct.brand || 'Unknown'}</p>
                 <p className="text-sm text-gray-600">Category: {selectedProduct.category}</p>
               </div>
@@ -2024,11 +2141,11 @@ function ProductImageManager() {
                   data-testid="input-image-url"
                 />
                 {imageUrl && (
-                  <div className="border rounded p-2">
+                  <div className="border rounded p-2 bg-white">
                     <img 
                       src={imageUrl} 
                       alt="Preview" 
-                      className="max-w-xs max-h-48 object-contain"
+                      className="max-w-xs max-h-48 object-contain mx-auto"
                       onError={() => toast({ title: 'Invalid image URL', variant: 'destructive' })}
                     />
                   </div>
@@ -2045,6 +2162,7 @@ function ProductImageManager() {
                   }}
                   disabled={!imageUrl || updateImageMutation.isPending}
                   data-testid="button-save-image"
+                  className="bg-green-600 hover:bg-green-700"
                 >
                   {updateImageMutation.isPending ? 'Saving...' : 'Save Image'}
                 </Button>
