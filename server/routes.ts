@@ -3796,6 +3796,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get counts by brand and category (Admin only)
+  app.get("/api/admin/supplies/image-stats", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const stats = await storage.getSupplyImageStats();
+      res.json(stats);
+    } catch (error) {
+      console.error('Error getting supply image stats:', error);
+      res.status(500).json({ message: "Failed to get supply image stats" });
+    }
+  });
+
+  // Get products by brand or category for batch processing (Admin only)
+  app.get("/api/admin/supplies/batch-filter", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { brand, category, limit = '50', offset = '0' } = req.query;
+      
+      if (!brand && !category) {
+        return res.status(400).json({ message: "Brand or category is required" });
+      }
+
+      const supplies = await storage.getSuppliesByBrandOrCategory({
+        brand: brand as string,
+        category: category as string,
+        limit: parseInt(limit as string),
+        offset: parseInt(offset as string)
+      });
+
+      res.json(supplies);
+    } catch (error) {
+      console.error('Error getting products by brand/category:', error);
+      res.status(500).json({ message: "Failed to get products by brand/category" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

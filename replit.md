@@ -58,6 +58,14 @@ The application is a full-stack web application built with React, Vite, TypeScri
 - **Abbreviation Expansion System:**
     - **Enterprise-Grade Three-Phase Pipeline:** Expands abbreviations, corrects spelling, and applies professional title case to product names and descriptions with transactional protection, backups, and rollback.
     - **Shared Mappings Module:** Centralized abbreviation mappings, spelling corrections, and title case rules.
+- **Product Image Management System:**
+    - **Statistics Dashboard:** Real-time tracking of total products, products with/without images, breakdown by brand and category.
+    - **Manual Image Search:** Individual product image URL input with preview and validation.
+    - **Batch Search Tools:** Filter by brand or category for targeted image updates.
+    - **Cost Management:** Warning system for web search credit usage, selective search capabilities to manage costs.
+    - **Admin-Only Access:** Secure endpoints with admin authentication for all image management operations.
+    - **Brand Standardization:** Automatic "Zoo Medium" → "ZooMed" standardization for consistency.
+    - **API Endpoints:** /api/admin/supplies/image-stats, /api/admin/supplies/without-images, /api/admin/supplies/batch-filter, /api/admin/supplies/:id/image
 
 **System Design Choices:**
 - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.

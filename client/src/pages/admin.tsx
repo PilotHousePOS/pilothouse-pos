@@ -1862,6 +1862,270 @@ function normalizeServiceType(serviceType: string | undefined | null): string {
   return 'grooming-full';
 }
 
+// Product Image Manager Component
+function ProductImageManager() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [selectedBrand, setSelectedBrand] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+
+  // Fetch image stats
+  const { data: imageStats, isLoading: statsLoading } = useQuery({
+    queryKey: ['/api/admin/supplies/image-stats'],
+  });
+
+  // Update product image mutation
+  const updateImageMutation = useMutation({
+    mutationFn: async ({ productId, imageUrl }: { productId: number; imageUrl: string }) => {
+      await apiRequest('PUT', `/api/admin/supplies/${productId}/image`, { imageUrl });
+    },
+    onSuccess: () => {
+      // Invalidate queries to refresh statistics
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/image-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
+      
+      toast({
+        title: 'Success',
+        description: 'Product image updated successfully',
+      });
+      setSelectedProduct(null);
+      setImageUrl('');
+    },
+    onError: () => {
+      toast({
+        title: 'Error',
+        description: 'Failed to update product image',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  return (
+    <div className="space-y-6">
+      {/* Statistics Dashboard */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Grid3X3 className="w-5 h-5" />
+            Product Image Statistics
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {statsLoading ? (
+            <div className="text-center py-4">Loading statistics...</div>
+          ) : imageStats ? (
+            <div className="space-y-6">
+              {/* Overall Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">{imageStats.totalProducts}</div>
+                  <div className="text-sm text-gray-600">Total Products</div>
+                </div>
+                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">{imageStats.withImages}</div>
+                  <div className="text-sm text-gray-600">With Images</div>
+                </div>
+                <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-red-600">{imageStats.withoutImages}</div>
+                  <div className="text-sm text-gray-600">Missing Images</div>
+                </div>
+              </div>
+
+              {/* Brand Breakdown */}
+              <div>
+                <h3 className="font-semibold mb-3">Top Brands Needing Images</h3>
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {imageStats.byBrand.slice(0, 10).map((brand: any) => (
+                    <div key={brand.brand} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                      <span className="font-medium">{brand.brand}</span>
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className="text-gray-600">Total: {brand.total}</span>
+                        <span className="text-red-600">Missing: {brand.withoutImages}</span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedBrand(brand.brand)}
+                          data-testid={`button-select-brand-${brand.brand}`}
+                        >
+                          Search
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Category Breakdown */}
+              <div>
+                <h3 className="font-semibold mb-3">Categories Needing Images</h3>
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {imageStats.byCategory.slice(0, 10).map((cat: any) => (
+                    <div key={cat.category} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                      <span className="font-medium capitalize">{cat.category}</span>
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className="text-gray-600">Total: {cat.total}</span>
+                        <span className="text-red-600">Missing: {cat.withoutImages}</span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedCategory(cat.category)}
+                          data-testid={`button-select-category-${cat.category}`}
+                        >
+                          Search
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
+
+      {/* Manual Product Search */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Manual Product Image Search</CardTitle>
+          <CardDescription>
+            Search for individual products and add image URLs from major distributors (Chewy, Petco, PetSmart)
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Search by product name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              data-testid="input-product-search"
+            />
+            <Button variant="outline" data-testid="button-search-product">
+              <Search className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {selectedProduct && (
+            <div className="border rounded-lg p-4 space-y-4">
+              <div>
+                <h3 className="font-semibold">{selectedProduct.name}</h3>
+                <p className="text-sm text-gray-600">Brand: {selectedProduct.brand || 'Unknown'}</p>
+                <p className="text-sm text-gray-600">Category: {selectedProduct.category}</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Image URL</Label>
+                <Input
+                  placeholder="Paste image URL from distributor website..."
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  data-testid="input-image-url"
+                />
+                {imageUrl && (
+                  <div className="border rounded p-2">
+                    <img 
+                      src={imageUrl} 
+                      alt="Preview" 
+                      className="max-w-xs max-h-48 object-contain"
+                      onError={() => toast({ title: 'Invalid image URL', variant: 'destructive' })}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => {
+                    updateImageMutation.mutate({
+                      productId: selectedProduct.id,
+                      imageUrl,
+                    });
+                  }}
+                  disabled={!imageUrl || updateImageMutation.isPending}
+                  data-testid="button-save-image"
+                >
+                  {updateImageMutation.isPending ? 'Saving...' : 'Save Image'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedProduct(null);
+                    setImageUrl('');
+                  }}
+                  data-testid="button-cancel-image"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Batch Search Tools */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Batch Image Search</CardTitle>
+          <CardDescription>
+            Search for images for all products in a specific brand or category
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-yellow-800 dark:text-yellow-200">
+                <p className="font-semibold mb-1">Cost Management</p>
+                <p>Web searches consume your monthly Replit credits. Batch searching {imageStats?.totalProducts || 7316} products may use significant credits. Search selectively by brand or category to manage costs.</p>
+              </div>
+            </div>
+          </div>
+
+          {selectedBrand && (
+            <div className="border rounded-lg p-4 bg-blue-50 dark:bg-blue-900/20">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold">Selected Brand: {selectedBrand}</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedBrand('')}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
+                This feature will be enhanced with automated web search in a future update.
+                For now, manually search for products from this brand above.
+              </p>
+            </div>
+          )}
+
+          {selectedCategory && (
+            <div className="border rounded-lg p-4 bg-green-50 dark:bg-green-900/20">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold capitalize">Selected Category: {selectedCategory}</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedCategory('')}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
+                This feature will be enhanced with automated web search in a future update.
+                For now, manually search for products from this category above.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const typedUser = user as User;
@@ -3709,6 +3973,12 @@ export default function Admin() {
               Inventory
             </TabsTrigger>
             {typedUser?.isAdmin && (
+              <TabsTrigger value="product-images" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                <span className="hidden lg:inline">Product Images</span>
+                <span className="lg:hidden">Images</span>
+              </TabsTrigger>
+            )}
+            {typedUser?.isAdmin && (
               <TabsTrigger value="grooming" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 <span className="hidden lg:inline">Grooming Settings</span>
                 <span className="lg:hidden">Grooming</span>
@@ -5528,6 +5798,10 @@ export default function Admin() {
 
         <TabsContent value="contacts" className="space-y-6">
           <ContactsManager />
+        </TabsContent>
+
+        <TabsContent value="product-images" className="space-y-6">
+          <ProductImageManager />
         </TabsContent>
 
         <TabsContent value="database" className="space-y-6">

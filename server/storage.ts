@@ -123,6 +123,19 @@ export interface IStorage {
   }>;
 
   getSuppliesWithoutImages(limit: number, offset: number): Promise<Supply[]>;
+  getSupplyImageStats(): Promise<{
+    totalProducts: number;
+    withImages: number;
+    withoutImages: number;
+    byBrand: { brand: string; total: number; withImages: number; withoutImages: number }[];
+    byCategory: { category: string; total: number; withImages: number; withoutImages: number }[];
+  }>;
+  getSuppliesByBrandOrCategory(params: {
+    brand?: string;
+    category?: string;
+    limit: number;
+    offset: number;
+  }): Promise<Supply[]>;
 
   // Cart operations
   getCartItems(userId: string): Promise<CartItem[]>;
@@ -577,6 +590,95 @@ export class DatabaseStorage implements IStorage {
       .where(or(isNull(supplies.imageUrl), eq(supplies.imageUrl, '')))
       .limit(limit)
       .offset(offset)
+      .orderBy(supplies.id);
+  }
+
+  async getSupplyImageStats() {
+    const allSupplies = await db.select().from(supplies);
+    
+    const totalProducts = allSupplies.length;
+    const withImages = allSupplies.filter(s => s.imageUrl && s.imageUrl !== '').length;
+    const withoutImages = totalProducts - withImages;
+
+    const brandStats = new Map<string, { total: number; withImages: number }>();
+    const categoryStats = new Map<string, { total: number; withImages: number }>();
+
+    allSupplies.forEach(supply => {
+      const brand = supply.brand || 'Unknown';
+      const category = supply.category || 'Unknown';
+      
+      if (!brandStats.has(brand)) {
+        brandStats.set(brand, { total: 0, withImages: 0 });
+      }
+      if (!categoryStats.has(category)) {
+        categoryStats.set(category, { total: 0, withImages: 0 });
+      }
+
+      const brandData = brandStats.get(brand)!;
+      const categoryData = categoryStats.get(category)!;
+
+      brandData.total++;
+      categoryData.total++;
+
+      if (supply.imageUrl && supply.imageUrl !== '') {
+        brandData.withImages++;
+        categoryData.withImages++;
+      }
+    });
+
+    const byBrand = Array.from(brandStats.entries())
+      .map(([brand, stats]) => ({
+        brand,
+        total: stats.total,
+        withImages: stats.withImages,
+        withoutImages: stats.total - stats.withImages
+      }))
+      .sort((a, b) => b.withoutImages - a.withoutImages);
+
+    const byCategory = Array.from(categoryStats.entries())
+      .map(([category, stats]) => ({
+        category,
+        total: stats.total,
+        withImages: stats.withImages,
+        withoutImages: stats.total - stats.withImages
+      }))
+      .sort((a, b) => b.withoutImages - a.withoutImages);
+
+    return {
+      totalProducts,
+      withImages,
+      withoutImages,
+      byBrand,
+      byCategory
+    };
+  }
+
+  async getSuppliesByBrandOrCategory(params: {
+    brand?: string;
+    category?: string;
+    limit: number;
+    offset: number;
+  }): Promise<Supply[]> {
+    const conditions = [];
+    
+    if (params.brand) {
+      conditions.push(eq(supplies.brand, params.brand));
+    }
+    
+    if (params.category) {
+      conditions.push(eq(supplies.category, params.category));
+    }
+
+    if (conditions.length === 0) {
+      return [];
+    }
+
+    return await db
+      .select()
+      .from(supplies)
+      .where(and(...conditions))
+      .limit(params.limit)
+      .offset(params.offset)
       .orderBy(supplies.id);
   }
 
