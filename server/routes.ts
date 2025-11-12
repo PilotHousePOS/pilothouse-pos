@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
 import crypto from "crypto";
-import XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import { storage } from "./storage";
 import { generateToken, verifyToken, authMiddleware, setAuthCookie } from "./auth";
 import {
@@ -3029,11 +3029,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const updateExisting = req.body.updateExisting === 'true';
       
-      // Parse Excel file from buffer
-      const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      const data = XLSX.utils.sheet_to_json(worksheet);
+      // Parse Excel file from buffer using exceljs
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(req.file.buffer);
+      const worksheet = workbook.worksheets[0];
+      
+      // Convert worksheet to JSON format
+      const data: any[] = [];
+      const headers: any = {};
+      
+      worksheet.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) {
+          // First row is headers
+          row.eachCell((cell, colNumber) => {
+            headers[colNumber] = cell.value?.toString() || '';
+          });
+        } else {
+          // Data rows
+          const rowData: any = {};
+          row.eachCell((cell, colNumber) => {
+            const header = headers[colNumber];
+            if (header) {
+              rowData[header] = cell.value;
+            }
+          });
+          data.push(rowData);
+        }
+      });
 
       console.log(`Processing ${data.length} rows from Excel file...`);
       console.log(`Mode: ${updateExisting ? 'Update Existing' : 'Add New Only'}`);
