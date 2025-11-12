@@ -619,9 +619,16 @@ export class DatabaseStorage implements IStorage {
     // Process in batches to avoid memory issues
     for (let i = 0; i < allSupplies.length; i += BATCH_SIZE) {
       const batch = allSupplies.slice(i, i + BATCH_SIZE);
+      const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+      const totalBatches = Math.ceil(allSupplies.length / BATCH_SIZE);
       
       // Categorize the batch
       const categorized = categorizeProducts(batch);
+      
+      // Count batch results for logging
+      const batchAquatic = categorized.filter(r => r.filterType === 'aquatic').length;
+      const batchReptile = categorized.filter(r => r.filterType === 'reptile').length;
+      const batchGeneral = categorized.filter(r => r.filterType === null).length;
 
       // Prepare bulk update using transaction
       await db.transaction(async (tx) => {
@@ -636,6 +643,8 @@ export class DatabaseStorage implements IStorage {
           else generalCount++;
         }
       });
+
+      console.log(`Batch ${batchNum}/${totalBatches}: Aquatic=${batchAquatic}, Reptile=${batchReptile}, General=${batchGeneral}`);
     }
 
     return {

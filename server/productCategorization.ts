@@ -17,9 +17,16 @@ export interface CategorizationResult {
  * @param product - Product to categorize
  * @returns Categorization result with filterType, confidence, and reason
  */
+/**
+ * Normalize brand name for comparison (handles "Zoo Med" vs "ZooMed")
+ */
+function normalizeBrand(brand: string): string {
+  return brand.toLowerCase().replace(/['\s\-\.]/g, '');
+}
+
 export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'description'>): CategorizationResult {
   const name = (product.name || '').toLowerCase();
-  const brand = (product.brand || '').toLowerCase();
+  const brand = normalizeBrand(product.brand || '');
   const description = (product.description || '').toLowerCase();
   
   let aquaticScore = 0;
@@ -28,7 +35,7 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
 
   // Check aquatic brands (highest priority - 50 points)
   for (const aquaticBrand of SUPPLY_FILTERS.aquatic.includeBrands) {
-    if (brand === aquaticBrand.toLowerCase()) {
+    if (brand === normalizeBrand(aquaticBrand)) {
       aquaticScore += 50;
       matchedReasons.push(`Aquatic brand: ${aquaticBrand}`);
       break;
@@ -37,7 +44,7 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
 
   // Check reptile brands (highest priority - 50 points)
   for (const reptileBrand of SUPPLY_FILTERS.reptile.includeBrands) {
-    if (brand === reptileBrand.toLowerCase()) {
+    if (brand === normalizeBrand(reptileBrand)) {
       reptileScore += 50;
       matchedReasons.push(`Reptile brand: ${reptileBrand}`);
       break;
