@@ -296,6 +296,9 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
     ],
     exclusionKeywords: [
       'food', 'crickets', 'mealworms', 'frozen food', 'reptile food',
+      // CRITICAL: Exclude all aquatic keywords to prevent ZooMed betta → reptiles
+      'betta', 'fish', 'aquarium', 'fish tank', 'aquatic', 'freshwater',
+      'saltwater', 'marine', 'goldfish', 'tropical fish', 'glo fish',
     ],
   },
 
