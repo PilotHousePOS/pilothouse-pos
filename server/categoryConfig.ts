@@ -198,15 +198,19 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'aquarium', 'fish tank', 'filter', 'pump', 'heater', 'thermometer',
       'air stone', 'bubbler', 'substrate', 'gravel', 'sand', 'decor',
       'ornament', 'plant', 'betta plant', 'water treatment', 'conditioner',
-      'clarity', 'zeo-carb', 'cartridge', 'media',
+      'clarity', 'zeo-carb', 'cartridge', 'media', 'betta', 'marine',
+      'anemone', 'corkscrew', 'grass plant', 'leaf',
       // Reptile/terrarium supplies
       'terrarium', 'vivarium', 'heat lamp', 'UVB', 'basking', 'hide',
       'cave', 'reptile', 'gecko', 'bearded dragon', 'snake', 'lizard',
-      'calcium', 'supplement cube', 'orange cube',
+      'calcium', 'supplement cube', 'orange cube', 'tortoise', 'turtle',
+      'paludarium', 'backround', 'rock lair', 'betta log', 'betta diver',
+      'bettamatic', 'pure water care', 'repuvb',
       // Bird supplies
       'bird cage', 'aviary', 'perch', 'nest', 'feeder', 'bird bath',
       // Small animal housing
       'cage', 'habitat', 'hutch', 'enclosure', 'exercise wheel',
+      'hamtrac', 'hideout', 'tunnel', 'exercise loop',
       // Crates & carriers
       'crate', 'kennel', 'carrier', 'vari kennel', 'travel crate',
       // Bowls & feeders
@@ -217,6 +221,7 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'tanktop', 'sweater', 'coat', 'jacket', 'raincoat', 'costume',
       // Misc accessories
       'replacement parts', 'stacker', 'castle', 'bridge', 'troll',
+      'sponge filter', 'ecorenew', 'forza', 'spectrastone',
     ],
     descriptionKeywords: [
       'convenient', 'practical', 'essential', 'functional', 'storage', 'organization',
@@ -227,6 +232,7 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
   },
 };
 
-// Lowered to 40 to allow brand (25) + 1 keyword (15) or 3 keywords (45)
-// This requires at least 2-3 orthogonal signals to categorize
-export const CATEGORY_CONFIDENCE_THRESHOLD = 40;
+// Lowered to 25 to allow brand-only matches for well-known food/toy brands
+// Pattern matching (oz, lb) adds +10pts to food products
+// Strong exclusion penalties (-30) prevent false positives
+export const CATEGORY_CONFIDENCE_THRESHOLD = 25;

@@ -82,6 +82,15 @@ export function calculateCategoryScore(
     }
   }
 
+  // Special pattern-based scoring for food category
+  if (category === 'food') {
+    // Weight/volume patterns suggest food products (+10 points)
+    const foodSizePattern = /\d+(\.\d+)?\s*(oz|lb|g|kg|gal|ml)\b/i;
+    if (foodSizePattern.test(supplyName)) {
+      score += 10;
+    }
+  }
+
   return score;
 }
 
