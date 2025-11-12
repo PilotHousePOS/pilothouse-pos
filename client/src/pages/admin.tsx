@@ -2834,27 +2834,6 @@ export default function Admin() {
     },
   });
 
-  const autoCategorizeTypesMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest("POST", "/api/admin/supplies/auto-categorize-categories");
-      return response.json();
-    },
-    onSuccess: (data: any) => {
-      const { stats } = data;
-      toast({
-        title: "Category mapping complete!",
-        description: `Food: ${stats.food} • Toys: ${stats.toys} • Beds: ${stats.beds} • Leashes: ${stats.leashes} • Healthcare: ${stats.healthcare} • Accessories: ${stats.accessories} • Unchanged: ${stats.unchanged} • Total: ${stats.total} (${stats.duration})`
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Category mapping failed",
-        description: error instanceof Error ? error.message : "Unable to update categories",
-        variant: "destructive"
-      });
-    }
-  });
 
   // Clamp approved appointments pagination when list shrinks
   useEffect(() => {
@@ -5962,25 +5941,36 @@ export default function Admin() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5" />
-                Auto-Categorize Products
+                Auto-Categorize All Products
               </CardTitle>
               <CardDescription>
-                Automatically classify products as Aquatic or Reptile based on names and brands
+                Automatically organizes all products into 11 categories AND specialty sections (Aquatics/Reptiles)
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-semibold text-blue-800 dark:text-blue-300 mb-1">How It Works</p>
-                    <ul className="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-400">
-                      <li>Analyzes product names, brands, and descriptions</li>
-                      <li>Recognizes fish names (betta, goldfish, etc.) → Aquatics section</li>
-                      <li>Recognizes reptile names (gecko, snake, etc.) → Exotic Reptiles section</li>
-                      <li>Uses brand recognition (ZooMed → Reptile, Tetra → Aquatic)</li>
-                      <li>Products without clear indicators remain in general supplies</li>
-                    </ul>
+                    <p className="font-semibold text-blue-800 dark:text-blue-300 mb-2">Combined Categorization (2 Steps)</p>
+                    <div className="space-y-2">
+                      <div>
+                        <p className="font-medium text-blue-700 dark:text-blue-400">Step 1: Specialty Sections (filterType)</p>
+                        <ul className="list-disc list-inside space-y-1 text-blue-600 dark:text-blue-500 ml-2">
+                          <li>Aquatics: fish tanks, filters, aquatic brands (Tetra, Fluval, API)</li>
+                          <li>Reptiles: terrariums, heat lamps, reptile brands (ZooMed, Exo Terra)</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="font-medium text-purple-700 dark:text-purple-400">Step 2: Product Categories (11 types)</p>
+                        <ul className="list-disc list-inside space-y-1 text-purple-600 dark:text-purple-500 ml-2">
+                          <li>Food, Toys, Beds, Leashes, Healthcare, Accessories</li>
+                          <li>Aquatics, Reptiles, Bird Supplies, Dog Cages, Small Animal Supplies</li>
+                          <li>Brand scoring: KONG → Toys, Fluval → Aquatics (25 pts)</li>
+                          <li>Keyword scoring: "aquarium" → Aquatics, "bird cage" → Bird Supplies (15 pts each)</li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -5989,8 +5979,8 @@ export default function Admin() {
                 onClick={async () => {
                   try {
                     toast({
-                      title: "Categorizing products...",
-                      description: "This may take a few moments for 7,000+ products"
+                      title: "Categorizing all products...",
+                      description: "Setting specialty sections + 11 product categories. This may take a moment for 7,316 products."
                     });
 
                     const response = await fetch('/api/admin/supplies/auto-categorize', {
@@ -6005,9 +5995,12 @@ export default function Admin() {
                     }
                     
                     const { stats } = result;
+                    const filterStats = stats.filterType;
+                    const categoryStats = stats.categories;
+                    
                     toast({
                       title: "Categorization complete!",
-                      description: `Aquatic: ${stats.aquatic} | Reptile: ${stats.reptile} | General: ${stats.general} | Total: ${stats.total} (${stats.duration})`
+                      description: `Specialty: Aquatic ${filterStats.aquatic} • Reptile ${filterStats.reptile} | Categories: Food ${categoryStats.food} • Toys ${categoryStats.toys} • Aquatics ${categoryStats.aquatics} • Reptiles ${categoryStats.reptiles} (${stats.duration})`
                     });
                     
                     setTimeout(() => window.location.reload(), 1500);
@@ -6020,57 +6013,14 @@ export default function Admin() {
                     });
                   }
                 }}
-                className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white"
+                className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white"
                 data-testid="button-auto-categorize"
               >
                 <Sparkles className="w-4 h-4 mr-2" />
                 Auto-Categorize All Products
               </Button>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Processes all {7316} active products and assigns them to the appropriate section
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Grid3X3 className="w-5 h-5" />
-                Auto-Categorize Product Types
-              </CardTitle>
-              <CardDescription>
-                Assigns products into 11 categories: Food, Toys, Beds, Leashes, Healthcare, Accessories, Aquatics, Reptiles, Bird Supplies, Dog Cages/Houses, Small Animal Supplies
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-semibold text-purple-800 dark:text-purple-300 mb-1">How It Works</p>
-                    <ul className="list-disc list-inside space-y-1 text-purple-700 dark:text-purple-400">
-                      <li>Brand defaults: KONG → Toys, Fluval → Aquatics, ZooMed → Reptiles, MidWest → Dog Cages (25 points)</li>
-                      <li>Name keywords: "aquarium", "fish tank" → Aquatics; "bird cage", "aviary" → Bird Supplies (15 points each, max 3)</li>
-                      <li>Description keywords: "freshwater", "marine" → Aquatics; "spacious habitat" → Small Animal Supplies (10 points each, max 2)</li>
-                      <li>Pattern matching: "5.5oz", "12lb" → Food (10 points)</li>
-                      <li>Exclusion penalties: Food keywords exclude Toys/Cages (-30 points)</li>
-                      <li>Minimum 25 points required; ambiguous items remain unchanged</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                onClick={() => autoCategorizeTypesMutation.mutate()}
-                disabled={autoCategorizeTypesMutation.isPending}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-                data-testid="button-auto-categorize-types"
-              >
-                <Grid3X3 className="w-4 h-4 mr-2" />
-                {autoCategorizeTypesMutation.isPending ? "Categorizing..." : "Auto-Categorize Product Types"}
-              </Button>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Uses expanded brand/keyword mappings to set precise product types while leaving ambiguous items unchanged. Processes all {7316} active products in batches.
+                Processes all {7316} active products in 2 steps: specialty sections (Aquatics/Reptiles) + 11 product categories
               </p>
             </CardContent>
           </Card>

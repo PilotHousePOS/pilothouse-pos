@@ -3680,7 +3680,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Auto-categorize all supplies based on names/brands (Admin only)
+  // Combined auto-categorization: Sets both filterType AND category (Admin only)
   app.post("/api/admin/supplies/auto-categorize", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
@@ -3688,53 +3688,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      console.log("Starting automatic product categorization...");
+      console.log("Starting combined auto-categorization (filterType + category)...");
       const startTime = Date.now();
 
-      const stats = await storage.autoCategorizeAllSupplies();
+      // Step 1: Categorize filterType (aquatic/reptile/general)
+      console.log("Step 1: Setting filterType (specialty sections)...");
+      const filterStats = await storage.autoCategorizeAllSupplies();
+      
+      // Step 2: Categorize category (11 main categories)
+      console.log("Step 2: Setting category (11 product types)...");
+      const categoryStats = await storage.autoCategorizeProductCategories();
 
       const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-      console.log(`Auto-categorization complete in ${duration}s:`, stats);
+      console.log(`Combined auto-categorization complete in ${duration}s`);
+      console.log(`FilterType: Aquatic=${filterStats.aquatic}, Reptile=${filterStats.reptile}, General=${filterStats.general}`);
+      console.log(`Categories: ${JSON.stringify(categoryStats)}`);
 
       res.json({
-        message: "Product categorization completed successfully",
+        message: "Auto-categorization completed successfully",
         stats: {
-          ...stats,
+          filterType: filterStats,
+          categories: categoryStats,
           duration: `${duration}s`
         }
       });
     } catch (error) {
       console.error('Error auto-categorizing supplies:', error);
       res.status(500).json({ message: "Failed to auto-categorize supplies" });
-    }
-  });
-
-  // Auto-categorize product categories (food, toys, beds, etc.) - Admin only
-  app.post("/api/admin/supplies/auto-categorize-categories", authMiddleware, async (req: any, res) => {
-    try {
-      const user = await storage.getUser(req.user?.id);
-      if (!user?.isAdmin) {
-        return res.status(403).json({ message: "Admin access required" });
-      }
-
-      console.log("Starting automatic category assignment...");
-      const startTime = Date.now();
-
-      const stats = await storage.autoCategorizeProductCategories();
-
-      const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-      console.log(`Category assignment complete in ${duration}s:`, stats);
-
-      res.json({
-        message: "Category assignment completed successfully",
-        stats: {
-          ...stats,
-          duration: `${duration}s`
-        }
-      });
-    } catch (error) {
-      console.error('Error auto-categorizing product categories:', error);
-      res.status(500).json({ message: "Failed to auto-categorize product categories" });
     }
   });
 
