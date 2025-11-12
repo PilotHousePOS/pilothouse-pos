@@ -54,10 +54,15 @@ export default function ReptilesPage() {
     queryKey: ["/api/supplies", { category: "reptile-supplies", page: currentPage, limit: ITEMS_PER_PAGE, search: searchQuery }],
     queryFn: async () => {
       const searchParam = searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : '';
-      const response = await fetch(`/api/supplies?category=reptile-supplies&page=${currentPage}&limit=${ITEMS_PER_PAGE}${searchParam}`);
+      const response = await fetch(`/api/supplies?category=reptile-supplies&page=${currentPage}&limit=${ITEMS_PER_PAGE}${searchParam}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
       if (!response.ok) throw new Error("Failed to fetch supplies");
       return response.json();
     },
+    staleTime: 0,
+    gcTime: 0,
   });
 
   const supplies = suppliesData?.items || [];
