@@ -118,10 +118,10 @@ async function main() {
   const backupFilename = `backup-before-expansion-${timestamp}.json`;
   
   console.log('==============================================');
-  console.log('   FOOD PRODUCT EXPANSION & FORMATTING');
+  console.log('   PRODUCT EXPANSION & FORMATTING (ALL)');
   console.log('==============================================\n');
   console.log(`📋 Mode: ${isApplyMode ? 'APPLY CHANGES' : 'DRY RUN'}`);
-  console.log(`🎯 Target: Food category products (names + descriptions)\n`);
+  console.log(`🎯 Target: ALL products (names + descriptions)\n`);
   
   if (isApplyMode) {
     console.log(`⚠️  SAFETY MEASURES ACTIVE:`);
@@ -132,31 +132,29 @@ async function main() {
   }
   
   try {
-    // Get all food supplies
+    // Get all supplies (ALL categories)
     const allSupplies = await db.select().from(supplies);
-    const foodSupplies = allSupplies.filter(s => s.category === 'food');
     
     // Create backup before any changes
     if (isApplyMode) {
-      console.log('📦 Creating backup of all food products...');
+      console.log('📦 Creating backup of all products...');
       const backupData = {
         timestamp: new Date().toISOString(),
-        totalProducts: foodSupplies.length,
-        products: foodSupplies
+        totalProducts: allSupplies.length,
+        products: allSupplies
       };
       fs.writeFileSync(backupFilename, JSON.stringify(backupData, null, 2));
       console.log(`✅ Backup saved to: ${backupFilename}\n`);
     }
     
-    console.log(`📊 Total products: ${allSupplies.length}`);
-    console.log(`📊 Food products: ${foodSupplies.length}\n`);
+    console.log(`📊 Total products: ${allSupplies.length}\n`);
     
     const allChanges: FieldChange[] = [];
     
     // Build change list by processing each supply
     console.log('🔍 Analyzing products and building change list...\n');
     
-    for (const supply of foodSupplies) {
+    for (const supply of allSupplies) {
       const changes: string[] = [];
       let nameChanged = false;
       let descChanged = false;

@@ -4,6 +4,12 @@
 // Brands that should stay fully uppercase (don't title case these)
 export const uppercaseBrands = ['IAMS', 'PPP', 'RC', 'EB'];
 
+// Brand/SKU codes that should NEVER be expanded (abbreviations that are brand names or product codes)
+export const nonExpandableCodes = ['CK', 'KNG', 'KONG', 'NYLA', 'SM', 'MD', 'LG', 'XS', 'XL', 'BCN'];
+
+// Protein abbreviations that need food context to expand (only expand if clearly food-related)
+export const proteinAbbreviations = ['ck', 'chk', 'bf', 'lam', 'salm', 'tk', 'trk', 'turk', 'duc', 'shrim'];
+
 // Words to keep lowercase in title case (articles, conjunctions, prepositions, units)
 export const lowercaseWords = ['and', 'is', 'or', 'but', 'a', 'an', 'the', 'of', 'in', 'on', 'at', 'to', 'for', 'with', 'lb', 'oz', 'kg', 'g', 'mg'];
 
