@@ -37,10 +37,14 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'Blue Buffalo', 'IAMS', 'Eukanuba', 'Nutro', 'Taste of the Wild', 'Wellness',
       'Natural Balance', 'Merrick', 'Orijen', 'Acana', 'Fromm', 'Canidae', 'Ziwi',
       'Stella & Chewy\'s', 'Primal', 'Instinct', 'Nature\'s Variety', 'Solid Gold',
+      'Earthborn', 'Earthborn Holistic', 'AvoDerm', 'Open Farm', 'Pinnacle',
+      'VICTOR', 'Victor', 'NutriSource', 'Tuffy\'s', 'Full Moon', 'Dr. Marty',
+      'Freshpet', 'The Farmer\'s Dog', 'Nom Nom', 'Ollie', 'Tucker\'s',
       // Mass market brands
       'Diamond', 'Diam', 'Kirkland', 'Pedigree', 'Friskies', 'Fancy Feast', 'Whiskas',
       'Meow Mix', 'Kit & Kaboodle', '9Lives', 'Sheba', 'Temptations', 'Greenies',
       'Rachael Ray', 'Cesar', 'Beneful', 'Dog Chow', 'Cat Chow', 'Purina ONE',
+      'Kibbles \'n Bits', 'Milk-Bone', 'Pup-Peroni',
       // Premium wet food brands
       'Tiki Cat', 'Weruva', 'BFF', 'Nulo', 'Halo', 'Castor & Pollux', 'Newman\'s Own',
       // Store/house brands
