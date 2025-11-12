@@ -3302,10 +3302,21 @@ export default function Admin() {
   const pendingAppointments = (appointments as any[]).filter((a: any) => a.status === 'scheduled').length;
   const pendingOrders = (orders as any[]).filter((o: any) => o.status === 'pending').length;
   
-  // Calculate customers here - filter appointments with isHere = true
-  const appointmentsHere = (appointments as any[]).filter((a: any) => 
-    (a.status === 'confirmed' || a.status === 'completed') && a.isHere === true
-  );
+  // Calculate customers here - filter appointments with isHere = true from today onwards
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const appointmentsHere = (appointments as any[]).filter((a: any) => {
+    if (a.status !== 'confirmed' && a.status !== 'completed') return false;
+    if (!a.isHere) return false;
+    
+    // Only count appointments from today onwards (same logic as approved appointments display)
+    const appointmentDate = parseLocalDate(a.appointmentDate);
+    appointmentDate.setHours(0, 0, 0, 0);
+    
+    return appointmentDate >= today;
+  });
+  
   console.log('Customers Here calculation:', {
     totalAppointments: appointments.length,
     confirmedOrCompleted: (appointments as any[]).filter((a: any) => 
