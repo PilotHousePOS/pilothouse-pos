@@ -31,6 +31,7 @@ The application is a full-stack web application with a clear separation of conce
 
 **UI/UX Decisions:**
 - Dark, bold design with strong contrast and mobile responsiveness.
+- Homepage hero text with proper dark mode contrast: "Find Your Perfect" uses dark:text-white, gradient "Furry Friend" text uses vibrant blue-500/red-500/orange-500 colors visible on all backgrounds.
 - Full-screen modals for mobile forms.
 - Amazon-style image enlargement with carousels and swipe gestures.
 - Themed headers for Aquatics (blue) and Exotic Reptiles (green) pages.
