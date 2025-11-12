@@ -3209,7 +3209,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (importData.data.users) {
         for (const user of importData.data.users) {
           try {
-            await storage.upsertUser(user);
+            await storage.upsertUserForImport(user);
             stats.users++;
           } catch (err) {
             console.error(`Failed to import user ${user.id}:`, err);

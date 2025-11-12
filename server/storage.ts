@@ -1372,7 +1372,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Upsert methods for database import
-  async upsertUser(user: any): Promise<void> {
+  async upsertUserForImport(user: any): Promise<void> {
     const existing = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
     if (existing.length > 0) {
       await db.update(users).set(user).where(eq(users.id, user.id));
