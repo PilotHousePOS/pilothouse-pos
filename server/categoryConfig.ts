@@ -239,6 +239,142 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'shampoo', 'brush', 'clipper', 'bed',
     ],
   },
+
+  aquatics: {
+    brands: [
+      'Fluval', 'Seachem', 'API', 'Marineland', 'Aqueon', 'GloFish', 'Tetra',
+      'Hikari', 'Aqua Culture', 'Top Fin', 'Penn Plax', 'Omega One',
+      'Aquatop', 'Hydor', 'Eheim', 'Marina', 'Aquascapes', 'Imagitarium',
+    ],
+    nameKeywords: [
+      // Aquarium equipment
+      'aquarium', 'fish tank', 'filter', 'pump', 'heater', 'thermometer',
+      'air stone', 'bubbler', 'airstone', 'air pump', 'powerhead',
+      // Water treatment
+      'water treatment', 'water conditioner', 'clarity', 'zeo-carb',
+      'cartridge', 'media', 'ammonia', 'nitrite', 'ph buffer',
+      // Aquarium decor
+      'substrate', 'gravel', 'sand', 'aquarium decor', 'aquarium ornament',
+      'aquarium plant', 'betta plant', 'artificial plant', 'silk plant',
+      'anemone', 'corkscrew', 'grass plant', 'aquarium background',
+      // Betta specific
+      'betta', 'betta log', 'betta diver', 'betta hammock', 'bettamatic',
+      // Maintenance
+      'algae scraper', 'gravel vacuum', 'fish net', 'siphon',
+    ],
+    descriptionKeywords: [
+      'freshwater', 'saltwater', 'marine', 'aquatic', 'underwater',
+    ],
+    exclusionKeywords: [
+      'food', 'flakes', 'pellets', 'turtle food', 'fish food',
+    ],
+  },
+
+  reptiles: {
+    brands: [
+      'Zoo Med', 'ZooMed', 'Exo Terra', 'Fluker\'s', 'Zilla', 'ReptiCare',
+      'Reptile Supply', 'Thrive', 'Komodo', 'Reptisun', 'Repti',
+    ],
+    nameKeywords: [
+      // Terrarium equipment
+      'terrarium', 'vivarium', 'heat lamp', 'heating lamp', 'basking lamp',
+      'UVB', 'uvb bulb', 'basking bulb', 'ceramic heater', 'heat mat',
+      'under tank heater', 'thermostat', 'thermometer hygrometer',
+      // Reptile habitat decor
+      'hide', 'cave', 'rock lair', 'reptile cave', 'basking platform',
+      'vines', 'reptile vine', 'background', 'terrarium background',
+      'paludarium', 'desert substrate', 'coconut fiber', 'reptile bark',
+      // Species specific
+      'gecko', 'bearded dragon', 'snake', 'lizard', 'iguana',
+      'chameleon', 'tortoise', 'turtle', 'hermit crab',
+      // Supplements (non-food)
+      'calcium dust', 'vitamin dust', 'supplement cube', 'orange cube',
+      'mineral block', 'cuttlebone',
+    ],
+    descriptionKeywords: [
+      'reptile', 'amphibian', 'tropical', 'desert habitat', 'arboreal',
+    ],
+    exclusionKeywords: [
+      'food', 'crickets', 'mealworms', 'frozen food', 'reptile food',
+    ],
+  },
+
+  birdCages: {
+    brands: [
+      'Prevue Pet', 'Prevue Hendryx', 'Vision', 'Yaheetech', 'Mcage',
+      'A&E Cage', 'Midwest Homes', 'Ferplast', 'Kaytee', 'You & Me',
+    ],
+    nameKeywords: [
+      // Bird housing
+      'bird cage', 'aviary', 'flight cage', 'breeding cage', 'travel cage',
+      'parakeet cage', 'cockatiel cage', 'parrot cage', 'finch cage',
+      'canary cage', 'bird habitat', 'bird home',
+      // Cage accessories
+      'cage cover', 'cage liner', 'cage tray', 'grate', 'perch cover',
+      'nest', 'nesting box', 'bird nest', 'nest material', 'nesting material',
+      'bird bath', 'bath house', 'bird mirror',
+      // Cage parts
+      'cage door', 'play top', 'playtop', 'cage stand', 'caster wheels',
+    ],
+    descriptionKeywords: [
+      'spacious', 'durable cage', 'bird home', 'avian housing',
+    ],
+    exclusionKeywords: [
+      'food', 'seed', 'pellets', 'toy', 'perch', 'swing', 'ladder',
+    ],
+  },
+
+  dogCages: {
+    brands: [
+      'MidWest', 'MidWest Homes', 'Petmate', 'Precision Pet', 'AmazonBasics',
+      'IRIS', 'Carlson', 'Regalo', 'Frisco', 'EliteField', 'Vari Kennel',
+      'New World', 'ProSelect', 'Aspen Pet',
+    ],
+    nameKeywords: [
+      // Dog crates & kennels
+      'dog crate', 'dog kennel', 'wire crate', 'plastic crate', 'soft crate',
+      'travel crate', 'airline crate', 'vari kennel', 'pet carrier',
+      'crate divider', 'crate mat', 'crate cover', 'crate tray',
+      // Dog houses
+      'dog house', 'doghouse', 'outdoor house', 'insulated house',
+      'elevated house', 'weatherproof house',
+      // Gates & pens
+      'exercise pen', 'playpen', 'pet gate', 'baby gate', 'pressure gate',
+      'freestanding gate', 'puppy pen', 'x-pen',
+    ],
+    descriptionKeywords: [
+      'secure', 'containment', 'training crate', 'house training',
+    ],
+    exclusionKeywords: [
+      'food', 'toy', 'bed', 'bowl', 'leash', 'collar',
+    ],
+  },
+
+  smallAnimalCages: {
+    brands: [
+      'Kaytee', 'Prevue Pet', 'Living World', 'Ferplast', 'Ware',
+      'MidWest', 'You & Me', 'Oxbow', 'All Living Things', 'Habitrail',
+    ],
+    nameKeywords: [
+      // Small animal housing
+      'hamster cage', 'guinea pig cage', 'rabbit cage', 'rabbit hutch',
+      'chinchilla cage', 'gerbil cage', 'mouse cage', 'rat cage',
+      'ferret cage', 'hedgehog cage', 'small animal habitat',
+      'critter cage', 'critter home', 'modular habitat',
+      // Cage components
+      'cage accessories', 'hideout', 'tunnel', 'hamster tube',
+      'exercise loop', 'ramp', 'platform', 'second level',
+      'cage bedding tray', 'wire top', 'habitat topper',
+      // Outdoor housing
+      'outdoor hutch', 'rabbit run', 'enclosure', 'playpen',
+    ],
+    descriptionKeywords: [
+      'spacious habitat', 'multi-level', 'ventilated', 'easy clean',
+    ],
+    exclusionKeywords: [
+      'food', 'hay', 'pellets', 'treat', 'chew toy', 'bedding',
+    ],
+  },
 };
 
 // Lowered to 25 to allow brand-only matches for well-known food/toy brands
