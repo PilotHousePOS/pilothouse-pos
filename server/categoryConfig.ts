@@ -299,7 +299,7 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
     ],
   },
 
-  birdCages: {
+  birdSupplies: {
     brands: [
       'Prevue Pet', 'Prevue Hendryx', 'Vision', 'Yaheetech', 'Mcage',
       'A&E Cage', 'Midwest Homes', 'Ferplast', 'Kaytee', 'You & Me',
@@ -350,7 +350,7 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
     ],
   },
 
-  smallAnimalCages: {
+  smallAnimalSupplies: {
     brands: [
       'Kaytee', 'Prevue Pet', 'Living World', 'Ferplast', 'Ware',
       'MidWest', 'You & Me', 'Oxbow', 'All Living Things', 'Habitrail',

@@ -6039,7 +6039,7 @@ export default function Admin() {
                 Auto-Categorize Product Types
               </CardTitle>
               <CardDescription>
-                Assigns products into 11 categories: Food, Toys, Beds, Leashes, Healthcare, Accessories, Aquatics, Reptiles, Bird Cages, Dog Cages/Houses, Small Animal Cages
+                Assigns products into 11 categories: Food, Toys, Beds, Leashes, Healthcare, Accessories, Aquatics, Reptiles, Bird Supplies, Dog Cages/Houses, Small Animal Supplies
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -6050,8 +6050,8 @@ export default function Admin() {
                     <p className="font-semibold text-purple-800 dark:text-purple-300 mb-1">How It Works</p>
                     <ul className="list-disc list-inside space-y-1 text-purple-700 dark:text-purple-400">
                       <li>Brand defaults: KONG → Toys, Fluval → Aquatics, ZooMed → Reptiles, MidWest → Dog Cages (25 points)</li>
-                      <li>Name keywords: "aquarium", "fish tank" → Aquatics; "bird cage", "aviary" → Bird Cages (15 points each, max 3)</li>
-                      <li>Description keywords: "freshwater", "marine" → Aquatics; "spacious habitat" → Small Animal Cages (10 points each, max 2)</li>
+                      <li>Name keywords: "aquarium", "fish tank" → Aquatics; "bird cage", "aviary" → Bird Supplies (15 points each, max 3)</li>
+                      <li>Description keywords: "freshwater", "marine" → Aquatics; "spacious habitat" → Small Animal Supplies (10 points each, max 2)</li>
                       <li>Pattern matching: "5.5oz", "12lb" → Food (10 points)</li>
                       <li>Exclusion penalties: Food keywords exclude Toys/Cages (-30 points)</li>
                       <li>Minimum 25 points required; ambiguous items remain unchanged</li>
@@ -8059,11 +8059,11 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
               <SelectItem value="leashes">Leashes</SelectItem>
               <SelectItem value="healthcare">Healthcare</SelectItem>
               <SelectItem value="accessories">Accessories</SelectItem>
-              <SelectItem value="fish_tanks">Aquatics</SelectItem>
-              <SelectItem value="reptile_tanks">Reptiles</SelectItem>
-              <SelectItem value="bird_cages">Bird Cages</SelectItem>
-              <SelectItem value="dog_cages">Dog Cages/Houses</SelectItem>
-              <SelectItem value="small_animal_cages">Small Animal Cages</SelectItem>
+              <SelectItem value="aquatics">Aquatics</SelectItem>
+              <SelectItem value="reptiles">Reptiles</SelectItem>
+              <SelectItem value="birdSupplies">Bird Supplies</SelectItem>
+              <SelectItem value="dogCages">Dog Cages/Houses</SelectItem>
+              <SelectItem value="smallAnimalSupplies">Small Animal Supplies</SelectItem>
             </SelectContent>
           </Select>
         </div>

@@ -71,7 +71,7 @@ export const pets = pgTable("pets", {
 export const supplies = pgTable("supplies", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
-  category: varchar("category", { length: 100 }).notNull(), // food, toys, beds, leashes, healthcare, accessories
+  category: varchar("category", { length: 100 }).notNull(), // food, toys, beds, leashes, healthcare, accessories, aquatics, reptiles, birdSupplies, dogCages, smallAnimalSupplies
   brand: varchar("brand", { length: 255 }),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   description: text("description"),

@@ -53,7 +53,7 @@ The application is a full-stack web application built with React, Vite, TypeScri
     - **Full Database Sync:** Development-only export/import of all database tables for environment syncing.
 - **Auto-Categorization System:**
     - **Specialty Section Categorization (filterType):** Intelligent product classification for Aquatics or Exotic Reptiles based on name, brand, and description analysis with a scoring algorithm.
-    - **Product Type Categorization (category):** Comprehensive brand/keyword-based system assigning products to 11 categories (e.g., Food, Toys, Aquatics, Reptiles, Cages) using multi-signal scoring.
+    - **Product Type Categorization (category):** Comprehensive brand/keyword-based system assigning products to 11 categories (Food, Toys, Beds, Leashes, Healthcare, Accessories, Aquatics, Reptiles, Bird Supplies, Dog Cages/Houses, Small Animal Supplies) using multi-signal scoring.
 - **Abbreviation Expansion System:**
     - **Enterprise-Grade Three-Phase Pipeline:** Expands abbreviations, corrects spelling, and applies professional title case to product names and descriptions with transactional protection, backups, and rollback.
     - **Shared Mappings Module:** Centralized abbreviation mappings, spelling corrections, and title case rules.
