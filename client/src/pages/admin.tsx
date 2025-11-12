@@ -2146,7 +2146,9 @@ function ProductImageManager() {
                       src={imageUrl} 
                       alt="Preview" 
                       className="max-w-xs max-h-48 object-contain mx-auto"
-                      onError={() => toast({ title: 'Invalid image URL', variant: 'destructive' })}
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder-supply.jpg';
+                      }}
                     />
                   </div>
                 )}

@@ -583,15 +583,50 @@ export class DatabaseStorage implements IStorage {
     return supply;
   }
 
-  async getSuppliesWithoutImages(limit: number, offset: number): Promise<Supply[]> {
+  async getSuppliesWithoutImages(
+    limit: number, 
+    offset: number, 
+    brand?: string, 
+    category?: string, 
+    search?: string
+  ): Promise<Supply[]> {
     const allSupplies = await db.select().from(supplies);
     
-    // Filter out products with no images OR broken /uploads/ images
-    const withoutImages = allSupplies.filter(s => {
+    // Filter out products with no images, placeholder images, or broken /uploads/ images
+    let withoutImages = allSupplies.filter(s => {
       if (!s.imageUrl || s.imageUrl === '') return true;
       if (s.imageUrl.startsWith('/uploads/')) return true; // Broken local uploads
+      if (s.imageUrl === '/placeholder-supply.jpg') return true; // Placeholder images
       return false;
     });
+    
+    // Apply brand filter
+    if (brand) {
+      withoutImages = withoutImages.filter(s => {
+        // Handle "Unknown" brand (null or empty in database)
+        if (brand.toLowerCase() === 'unknown') {
+          return !s.brand || s.brand === '';
+        }
+        return s.brand?.toLowerCase() === brand.toLowerCase();
+      });
+    }
+    
+    // Apply category filter
+    if (category) {
+      withoutImages = withoutImages.filter(s => 
+        s.category?.toLowerCase() === category.toLowerCase()
+      );
+    }
+    
+    // Apply search filter (case-insensitive, searches name and description)
+    if (search && search.trim()) {
+      const searchLower = search.toLowerCase().trim();
+      withoutImages = withoutImages.filter(s =>
+        s.name?.toLowerCase().includes(searchLower) ||
+        s.description?.toLowerCase().includes(searchLower) ||
+        s.brand?.toLowerCase().includes(searchLower)
+      );
+    }
     
     return withoutImages.slice(offset, offset + limit);
   }
@@ -600,10 +635,11 @@ export class DatabaseStorage implements IStorage {
     const allSupplies = await db.select().from(supplies);
     
     const totalProducts = allSupplies.length;
-    // Count valid images (not empty, not broken /uploads/ links)
+    // Count valid images (not empty, not broken /uploads/ links, not placeholders)
     const withImages = allSupplies.filter(s => {
       if (!s.imageUrl || s.imageUrl === '') return false;
       if (s.imageUrl.startsWith('/uploads/')) return false; // Broken local uploads
+      if (s.imageUrl === '/placeholder-supply.jpg') return false; // Placeholder images
       return true;
     }).length;
     const withoutImages = totalProducts - withImages;
@@ -628,10 +664,11 @@ export class DatabaseStorage implements IStorage {
       brandData.total++;
       categoryData.total++;
 
-      // Only count as "with images" if URL exists and is NOT a broken /uploads/ link
+      // Only count as "with images" if URL exists and is NOT broken or a placeholder
       const hasValidImage = supply.imageUrl && 
                            supply.imageUrl !== '' && 
-                           !supply.imageUrl.startsWith('/uploads/');
+                           !supply.imageUrl.startsWith('/uploads/') &&
+                           supply.imageUrl !== '/placeholder-supply.jpg';
       
       if (hasValidImage) {
         brandData.withImages++;

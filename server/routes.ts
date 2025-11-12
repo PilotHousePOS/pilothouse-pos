@@ -3786,8 +3786,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      const { limit = '100', offset = '0' } = req.query;
-      const supplies = await storage.getSuppliesWithoutImages(parseInt(limit as string), parseInt(offset as string));
+      const { limit = '100', offset = '0', brand, category, search } = req.query;
+      const supplies = await storage.getSuppliesWithoutImages(
+        parseInt(limit as string), 
+        parseInt(offset as string),
+        brand as string,
+        category as string,
+        search as string
+      );
 
       res.json(supplies);
     } catch (error) {
