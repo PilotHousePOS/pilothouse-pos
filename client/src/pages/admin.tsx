@@ -3894,7 +3894,8 @@ export default function Admin() {
         if (a.status !== 'confirmed' && a.status !== 'completed') return false;
         
         // When filtering by "Here", only show appointments marked as here
-        if (filterByHere && !a.isHere) return false;
+        // EXCEPTION: Always show paid appointments regardless of "Here" filter
+        if (filterByHere && !a.isHere && !a.isPaid) return false;
         
         // When searching, show all matching appointments regardless of date
         if (search.trim()) return true;

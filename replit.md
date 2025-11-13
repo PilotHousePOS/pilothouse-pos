@@ -38,7 +38,7 @@ The application is a full-stack web application built with React, Vite, TypeScri
 
 **Technical Implementations & Feature Specifications:**
 - **Pet & Supply Management:** Multi-image support, extensive inventory, automated brand extraction, specialized reptile supply filtering, case-insensitive search with pagination and touch gesture support.
-- **Appointment System:** 15-minute intervals, admin approval, email notifications, Google Calendar sync, chronological ordering, customer arrival/payment tracking, weekly limits, special date configurations, groomer assignment, role-based access, and comprehensive history.
+- **Appointment System:** 15-minute intervals, admin approval, email notifications, Google Calendar sync, chronological ordering, customer arrival/payment tracking, weekly limits, special date configurations, groomer assignment, role-based access, and comprehensive history. Paid appointments always remain visible in the approved appointments list regardless of "Customers Here" filter status.
 - **Order & Notification System:** Admin email/push notifications for new orders/appointments, customer email/SMS/web push for status, and detailed order history.
 - **Authentication & Authorization:** JWT tokens in secure cookies, password reset, user settings, admin user management, three-tier role system (Customer, Groomer, Admin).
 - **Wishlist System:** Dedicated page with add/remove and quick "Add to Cart."
