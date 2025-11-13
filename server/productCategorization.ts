@@ -51,6 +51,24 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
     }
   }
 
+  // Special rule: "bridge" products go to aquatics UNLESS "lizard" appears near it
+  if (name.includes('bridge')) {
+    // Check if "lizard" appears within 20 characters of "bridge"
+    const bridgeIndex = name.indexOf('bridge');
+    const searchStart = Math.max(0, bridgeIndex - 20);
+    const searchEnd = Math.min(name.length, bridgeIndex + 26); // "bridge".length = 6, +20 = 26
+    const nearbyText = name.substring(searchStart, searchEnd);
+    
+    if (nearbyText.includes('lizard')) {
+      // It's a lizard bridge - let normal reptile rules handle it
+      matchedReasons.push('Bridge with "lizard" - skipping aquatic rule');
+    } else {
+      // It's an aquarium bridge
+      aquaticScore += 30;
+      matchedReasons.push('Bridge (aquarium) name');
+    }
+  }
+
   // Check aquatic keywords in name (high priority - 30 points)
   for (const keyword of SUPPLY_FILTERS.aquatic.includeKeywords) {
     if (name.includes(keyword.toLowerCase())) {

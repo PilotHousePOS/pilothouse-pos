@@ -54,6 +54,7 @@ The application is a full-stack web application built with React, Vite, TypeScri
 - **Auto-Categorization System:**
     - **Combined Auto-Categorization:** Single-button operation that performs both specialty section (filterType) and product type (category) categorization in one process.
     - **Step 1 - Specialty Sections (filterType):** Classifies products as Aquatic or Reptile based on brand and keyword analysis for specialty pages.
+      - **Special Rule - Bridges:** Products with "bridge" in the name automatically categorize as Aquatic UNLESS "lizard" appears within 20 characters of "bridge" (e.g., "lizard bridge" stays in reptile category).
     - **Step 2 - Product Categories (category):** Assigns products to 11 categories (Food, Toys, Beds, Leashes, Healthcare, Accessories, Aquatics, Reptiles, Bird Supplies, Dog Cages/Houses, Small Animal Supplies) using multi-signal scoring with brand defaults, name keywords, description keywords, and exclusion penalties.
 - **Abbreviation Expansion System:**
     - **Enterprise-Grade Three-Phase Pipeline:** Expands abbreviations, corrects spelling, and applies professional title case to product names and descriptions with transactional protection, backups, and rollback.
