@@ -16,7 +16,8 @@ export function normalizeBrand(brand: string): string {
 
 export function calculateCategoryScore(
   supply: Supply,
-  category: string
+  category: string,
+  skipExclusions: boolean = false
 ): number {
   const mapping = CATEGORY_MAPPINGS[category];
   if (!mapping) return 0;
@@ -71,8 +72,8 @@ export function calculateCategoryScore(
     }
   }
 
-  // Exclusion penalty (-30 points per match)
-  if (mapping.exclusionKeywords) {
+  // Exclusion penalty (-30 points per match) - skip if checking brand defaults
+  if (!skipExclusions && mapping.exclusionKeywords) {
     for (const keyword of mapping.exclusionKeywords) {
       const keywordLower = keyword.toLowerCase();
       if (supplyName.includes(keywordLower) || supplyDescription.includes(keywordLower)) {
@@ -103,7 +104,8 @@ export function determineCategory(supply: Supply): string | null {
     const brandLower = brand.toLowerCase();
     if (supplyBrand.includes(brandLower) || supplyName.includes(brandLower)) {
       // Brand found, but verify with scoring to prevent misclassification
-      const categoryScore = calculateCategoryScore(supply, defaultCategory);
+      // Skip exclusions for brand defaults (e.g., ProPlan with "toy" should still be food)
+      const categoryScore = calculateCategoryScore(supply, defaultCategory, true);
       // If brand default category has reasonable score (>15), use it
       if (categoryScore >= 15) {
         return defaultCategory;

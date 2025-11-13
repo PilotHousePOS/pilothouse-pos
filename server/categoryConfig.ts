@@ -27,6 +27,8 @@ export const BRAND_CATEGORY_DEFAULTS: Record<string, string> = {
   'Blue Buffalo': 'food',  // Blue Buffalo is primarily food
   'Chuckit': 'toys',       // Chuckit is toys
   'FURminator': 'healthcare', // FURminator is grooming tools
+  'Pro Plan': 'food',      // ProPlan is dog/cat food (toy = breed size, not accessory)
+  'Purina Pro Plan': 'food', // ProPlan is dog/cat food
 };
 
 export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {

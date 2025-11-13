@@ -56,6 +56,9 @@ The application is a full-stack web application built with React, Vite, TypeScri
     - **Step 1 - Specialty Sections (filterType):** Classifies products as Aquatic or Reptile based on brand and keyword analysis for specialty pages.
       - **Special Rule - Bridges:** Products with "bridge" in the name automatically categorize as Aquatic UNLESS "lizard" appears within 20 characters of "bridge" (e.g., "lizard bridge" stays in reptile category).
     - **Step 2 - Product Categories (category):** Assigns products to 11 categories (Food, Toys, Beds, Leashes, Healthcare, Accessories, Aquatics, Reptiles, Bird Supplies, Dog Cages/Houses, Small Animal Supplies) using multi-signal scoring with brand defaults, name keywords, description keywords, and exclusion penalties.
+      - **Brand Override Rules:** Specific brands always categorize to their primary category regardless of conflicting keywords:
+        - ProPlan/Purina Pro Plan → Food (even if "toy" appears, which refers to toy breed size)
+        - KONG → Toys, Blue Buffalo → Food, Chuckit → Toys, FURminator → Healthcare, Ruffwear → Leashes
 - **Abbreviation Expansion System:**
     - **Enterprise-Grade Three-Phase Pipeline:** Expands abbreviations, corrects spelling, and applies professional title case to product names and descriptions with transactional protection, backups, and rollback.
     - **Shared Mappings Module:** Centralized abbreviation mappings, spelling corrections, and title case rules.
