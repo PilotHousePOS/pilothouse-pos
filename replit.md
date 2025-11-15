@@ -62,12 +62,13 @@ The application is a full-stack web application built with React, Vite, TypeScri
 - **Abbreviation Expansion System:**
     - **Enterprise-Grade Three-Phase Pipeline:** Expands abbreviations, corrects spelling, and applies professional title case to product names and descriptions with transactional protection, backups, and rollback.
     - **Shared Mappings Module:** Centralized abbreviation mappings, spelling corrections, and title case rules in scripts/expand-abbreviations.ts.
-    - **Comprehensive Abbreviation Coverage:** 40+ mappings including:
-      - Brand abbreviations: Wholseso/Wholso/Wholeso→Wholesome, Vict→Victor, Euk→Eukanuba, Nutri Sour/Sou→Nutrisource, Blue B→Blue Buffalo, Red B→RedBarn, Zign→Zignature, Tow→Taste of the Wild, Nb→Natural Balance, Zig→Zignature, Nyla→Nylabone, Diam→Diamond, Orij→Orijen, Cand→Canidae
-      - Multi-word phrases: Fromm Gold Weight→Fromm Gold Weight Management, Perf Weight→Perfect Weight, Mini Chu→Minniechuncks, Gr Fr→Grain Free, Conure&tiel→Conure & Cockatiel, Clmbree→Calm Breeze, Bbypdr→Baby powder, Worldsbestcatlitter→World's Best Cat Litter, Swtpot→Sweet Potato, Beggarbns→Beggin', Frndsfrm→Friends From The Farm
-      - Single words: Sportmix→Sportsmix, Orig→Original, Cast→Cat, Per→Perfect, Ind→Indoor, Shred→Shredded, Seaf→Seafood, Unsc.→Unscented, Kanga→Kangaroo, Zssen→Zssential, Yurkey→Turkey, Blk→Black, Yng→Young, Gpig→Guineapig, Spe/Spec→Special, Sal→Salmon, Proc→Process, Nat→Natural, Fd→Freeze Dried
-      - Spelling corrections: Vegtable→Vegetable
-    - **Latest Run Results:** 404 total products updated across multiple runs (185 initial + 172 brand abbreviations + 47 latest run)
+    - **Comprehensive Abbreviation Coverage:** 80+ mappings including:
+      - Brand abbreviations: Wholseso/Wholso→Wholesome, Vict→Victor, Euk→Eukanuba, Nutri Sour/Sou→Nutrisource, Blue B→Blue Buffalo, Red B→RedBarn, Zign→Zignature, Tow/Toe→Taste of the Wild, Nb→Natural Balance, Zig→Zignature, Nyla→Nylabone, Diam→Diamond, Orij→Orijen, Cand→Canidae
+      - Multi-word phrases: Fromm Gold Weight→Fromm Gold Weight Management, Perf Weight→Perfect Weight, Gr Fr→Grain Free, Conure&tiel/Conure&lovebird→Conure & Cockatiel/Lovebird, Rat&mouse→Rat & Mouse, Chkn&dck→Chicken & Duck, Chkn&lvr→Chicken & Liver, Tuk,Sard→Turkey, Sardine, Roc Moun→Rocky Mountain, Anc Mount/Stream/Prairie/Wetland→Ancient Mountain/Stream/Prairie/Wetland, Pacif Stre→Pacific Stream, Can Riv→Canyon River, Worldsbestcatlitter→World's Best Cat Litter, Swtpot→Sweet Potato, Beggarbns→Beggin', Frndsfrm→Friends From The Farm
+      - Protein abbreviations: Chkn→Chicken, Bef→Beef, Lam→Lamb, Rab→Rabbit, Ven→Venison, Tuk→Turkey, Sard→Sardine, Lvr→Liver, Dck→Duck
+      - Single words: Sportmix→Sportsmix, Orig→Original, Cast→Cat, Per→Perfect, Ind→Indoor, Shred→Shredded, Seaf→Seafood, Unsc.→Unscented, Kanga→Kangaroo, Zssen→Zssential, Yurkey→Turkey, Blk→Black, Yng→Young, Gpig→Guineapig, Spe/Spec→Special, Sal→Salmon, Proc→Process, Nat→Natural, Fd→Freeze Dried, Als→All Life Stages, Anc→Ancient, Roc→Rocky, Moun→Mountain, Riv→River, Stre→Stream, Pacif→Pacific, Fro/Frzn→Frozen, Nug→Nuggets, Pron/Pront→Pronto, Gitd→Glow in the Dark
+      - Spelling corrections: Vegtable→Vegetable, Thermoter→Thermometer, Watm→Watermelon, Sunburts→Sunburst, Cockateil→Cockatiel, Prarie→Prairie
+    - **Latest Run Results:** 572 total products updated across multiple runs (185 initial + 172 brand abbreviations + 47 spelling + 168 comprehensive expansion)
 - **Brand Extraction System:**
     - **Comprehensive Brand Database:** scripts/extract-brands.ts with 80+ brand patterns across all pet categories
     - **Coverage:** 63.7% of inventory (4,659 of 7,316 products) have assigned brands
