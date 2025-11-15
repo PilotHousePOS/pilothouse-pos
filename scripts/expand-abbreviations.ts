@@ -7,6 +7,7 @@ async function expandAbbreviations() {
   
   // Define abbreviation mappings
   const abbreviations = [
+    // Brand abbreviations
     { pattern: /\bWholseso\b/gi, replacement: 'Wholesome' },
     { pattern: /\bWholso\b/gi, replacement: 'Wholesome' },
     { pattern: /\bWholeso\b/gi, replacement: 'Wholesome' },
@@ -16,6 +17,36 @@ async function expandAbbreviations() {
     { pattern: /\bNutri Sour\b/gi, replacement: 'Nutrisource' },
     { pattern: /\bNutri Sou\b/gi, replacement: 'Nutrisource' },
     { pattern: /\bBlue B\b/gi, replacement: 'Blue Buffalo' },
+    { pattern: /\bRed B\b/gi, replacement: 'RedBarn' },
+    { pattern: /\bZign\b/gi, replacement: 'Zignature' },
+    
+    // Multi-word phrases (must come before single words)
+    { pattern: /\bFromm Gold Weight\b(?! Management)/gi, replacement: 'Fromm Gold Weight Management' },
+    { pattern: /\bPerf Weight\b/gi, replacement: 'Perfect Weight' },
+    { pattern: /\bMini Chu\b/gi, replacement: 'Minniechuncks' },
+    { pattern: /\bGr Fr\b/gi, replacement: 'Grain Free' },
+    { pattern: /\bConure&tiel\b/gi, replacement: 'Conure & Cockatiel' },
+    { pattern: /\bClmbree\b/gi, replacement: 'Calm Breeze' },
+    { pattern: /\bBbypdr\b/gi, replacement: 'Baby powder' },
+    { pattern: /\bWorldsbestcatlitter\b/gi, replacement: "World's Best Cat Litter" },
+    
+    // Single word abbreviations
+    { pattern: /\bSportmix\b/gi, replacement: 'Sportsmix' },
+    { pattern: /\bOrig\b/gi, replacement: 'Original' },
+    { pattern: /\bCast\b/gi, replacement: 'Cat' },
+    { pattern: /\bPer\b/gi, replacement: 'Perfect' },
+    { pattern: /\bInd\b/gi, replacement: 'Indoor' },
+    { pattern: /\bShred\b/gi, replacement: 'Shredded' },
+    { pattern: /\bSeaf\b/gi, replacement: 'Seafood' },
+    { pattern: /\bUnsc\./gi, replacement: 'Unscented' },
+    { pattern: /\bKanga\b/gi, replacement: 'Kangaroo' },
+    { pattern: /\bZssen\b/gi, replacement: 'Zssential' },
+    { pattern: /\bYurkey\b/gi, replacement: 'Turkey' },
+    { pattern: /\bBlk\b/gi, replacement: 'Black' },
+    { pattern: /\bYng\b/gi, replacement: 'Young' },
+    { pattern: /\bGpig\b/gi, replacement: 'Guineapig' },
+    { pattern: /\bSpe\b/gi, replacement: 'Special' },
+    { pattern: /\bSpec\b/gi, replacement: 'Special' },
   ];
   
   // Get all supplies

@@ -62,6 +62,11 @@ The application is a full-stack web application built with React, Vite, TypeScri
 - **Abbreviation Expansion System:**
     - **Enterprise-Grade Three-Phase Pipeline:** Expands abbreviations, corrects spelling, and applies professional title case to product names and descriptions with transactional protection, backups, and rollback.
     - **Shared Mappings Module:** Centralized abbreviation mappings, spelling corrections, and title case rules.
+    - **Comprehensive Abbreviation Coverage:** scripts/expand-abbreviations.ts includes 26+ mappings:
+      - Brand abbreviations: Wholseso/Wholso/Wholeso→Wholesome, Vict→Victor, Euk→Eukanuba, Nutri Sour/Sou→Nutrisource, Blue B→Blue Buffalo, Red B→RedBarn, Zign→Zignature
+      - Multi-word phrases: Fromm Gold Weight→Fromm Gold Weight Management, Perf Weight→Perfect Weight, Mini Chu→Minniechuncks, Gr Fr→Grain Free, Conure&tiel→Conure & Cockatiel, Clmbree→Calm Breeze, Bbypdr→Baby powder, Worldsbestcatlitter→World's Best Cat Litter
+      - Single words: Sportmix→Sportsmix, Orig→Original, Cast→Cat, Per→Perfect, Ind→Indoor, Shred→Shredded, Seaf→Seafood, Unsc.→Unscented, Kanga→Kangaroo, Zssen→Zssential, Yurkey→Turkey, Blk→Black, Yng→Young, Gpig→Guineapig, Spe/Spec→Special
+    - **Latest Run Results:** 185 products updated with expanded abbreviations and corrected misspellings
 - **Product Image Management System:**
     - **Statistics Dashboard:** Real-time tracking of total products, products with/without images, breakdown by brand and category.
     - **Manual Image Search:** Individual product image URL input with preview and validation.
