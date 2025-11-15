@@ -28,11 +28,13 @@ export default function Booking() {
     type: string;
     serviceType: string;
     notes: string;
+    groomerId?: string;
   }>>([{
     name: '',
     type: '',
     serviceType: '',
     notes: '',
+    groomerId: '',
   }]);
   
   const [ownerInfo, setOwnerInfo] = useState({
@@ -268,7 +270,7 @@ export default function Booking() {
       setSelectedDate(new Date());
       setSelectedTime('');
       setSelectedGroomer('');
-      setPets([{ name: '', type: '', serviceType: '', notes: '' }]);
+      setPets([{ name: '', type: '', serviceType: '', notes: '', groomerId: '' }]);
       setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
     },
@@ -326,12 +328,13 @@ export default function Booking() {
         petType: pet.type,
         serviceType: pet.serviceType,
         specialNotes: pet.notes,
+        groomerId: pet.groomerId ? parseInt(pet.groomerId) : undefined,
       })),
     });
   };
 
   const addPet = () => {
-    setPets([...pets, { name: '', type: '', serviceType: '', notes: '' }]);
+    setPets([...pets, { name: '', type: '', serviceType: '', notes: '', groomerId: '' }]);
   };
 
   const removePet = (index: number) => {
@@ -624,6 +627,31 @@ export default function Booking() {
                       ))}
                     </div>
                   </RadioGroup>
+                </div>
+                
+                <div>
+                  <Label className="text-xs text-gray-600 mb-2 block">Groomer for this Pet (Optional)</Label>
+                  <Select 
+                    value={pet.groomerId || "default"} 
+                    onValueChange={(value) => updatePet(index, 'groomerId', value === "default" ? "" : value)}
+                  >
+                    <SelectTrigger className="border-gray-300 rounded-xl" data-testid={`select-pet-groomer-${index}`}>
+                      <SelectValue placeholder="Use appointment default" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="default">
+                        {selectedGroomer ? "Use Appointment Default" : "No Preference"}
+                      </SelectItem>
+                      {Array.isArray(availableGroomers) && availableGroomers.map((groomer: any) => (
+                        <SelectItem key={groomer.id} value={groomer.id.toString()}>
+                          {groomer.specialties ? `${groomer.name} (${groomer.specialties})` : groomer.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Override appointment-level groomer for this specific pet
+                  </p>
                 </div>
                 
                 <Textarea

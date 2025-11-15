@@ -1648,12 +1648,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         const petsWithPrice = petsArray.map((pet: any) => {
           const service = SERVICES.find(s => s.id === pet.serviceType);
+          // Use per-pet groomerId if specified, otherwise fall back to appointment-level groomerId
+          const groomerId = pet.groomerId || req.body.groomerId;
           return {
             petName: pet.petName,
             petType: pet.petType,
             serviceType: pet.serviceType,
             specialNotes: pet.specialNotes,
             price: service ? service.price.toString() : '0',
+            groomerId: groomerId || null,
           };
         });
         
