@@ -122,11 +122,11 @@ export const appointments = pgTable("appointments", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").notNull().references(() => users.id),
   groomerId: integer("groomer_id").references(() => groomers.id, { onDelete: "set null" }),
-  serviceType: varchar("service_type", { length: 100 }).notNull(), // grooming
+  serviceType: varchar("service_type", { length: 100 }).notNull(), // grooming (kept for backward compatibility)
   appointmentDate: date("appointment_date").notNull(),
   appointmentTime: varchar("appointment_time", { length: 20 }).notNull(),
-  petName: varchar("pet_name", { length: 255 }).notNull(),
-  petType: varchar("pet_type", { length: 100 }).notNull(),
+  petName: varchar("pet_name", { length: 255 }).notNull(), // Primary pet name (kept for backward compatibility)
+  petType: varchar("pet_type", { length: 100 }).notNull(), // Primary pet type (kept for backward compatibility)
   specialNotes: text("special_notes"),
   ownerFirstName: varchar("owner_first_name", { length: 255 }),
   ownerLastName: varchar("owner_last_name", { length: 255 }).notNull(),
@@ -141,6 +141,17 @@ export const appointments = pgTable("appointments", {
   groomerTag: varchar("groomer_tag", { length: 100 }), // Groomer name/tag from calendar event
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Appointment pets (many-to-many: one appointment can have multiple pets, each with their own service)
+export const appointmentPets = pgTable("appointment_pets", {
+  id: serial("id").primaryKey(),
+  appointmentId: integer("appointment_id").notNull().references(() => appointments.id, { onDelete: "cascade" }),
+  petName: varchar("pet_name", { length: 255 }).notNull(),
+  petType: varchar("pet_type", { length: 100 }).notNull(), // Dog or Cat
+  serviceType: varchar("service_type", { length: 100 }).notNull(), // "Bath Only" or "Full Grooming"
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Customer pets (pets owned by users)
@@ -372,6 +383,11 @@ export const insertAppointmentSchema = createInsertSchema(appointments).omit({
   ownerFirstName: z.string().optional(),
 });
 
+export const insertAppointmentPetSchema = createInsertSchema(appointmentPets).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertCustomerPetSchema = createInsertSchema(customerPets).omit({
   id: true,
   createdAt: true,
@@ -456,6 +472,8 @@ export type OrderItem = typeof orderItems.$inferSelect;
 export type InsertOrderItem = z.infer<typeof insertOrderItemSchema>;
 export type Appointment = typeof appointments.$inferSelect;
 export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
+export type AppointmentPet = typeof appointmentPets.$inferSelect;
+export type InsertAppointmentPet = z.infer<typeof insertAppointmentPetSchema>;
 export type CustomerPet = typeof customerPets.$inferSelect;
 export type InsertCustomerPet = z.infer<typeof insertCustomerPetSchema>;
 export type GroomingSetting = typeof groomingSettings.$inferSelect;
