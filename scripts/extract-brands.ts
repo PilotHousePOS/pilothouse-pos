@@ -37,11 +37,16 @@ async function extractBrands() {
     
     // Dog & Cat food brands
     { pattern: /\bpro plan\b|\bproplan\b|\bpurina pro plan\b/i, brand: 'Purina Pro Plan' },
-    { pattern: /\bblue buffalo\b|\bblue\b(?=.*food)/i, brand: 'Blue Buffalo' },
-    { pattern: /\bhill'?s?\b(?=.*science)/i, brand: "Hill's Science Diet" },
+    { pattern: /\bblue buffalo\b|\bblue b\b/i, brand: 'Blue Buffalo' },
+    { pattern: /\bscience diet\b|\bhill'?s?\b(?=.*science)/i, brand: 'Science Diet' },
     { pattern: /\broyale canin\b|\broyal canin\b/i, brand: 'Royal Canin' },
     { pattern: /\biams\b/i, brand: 'IAMS' },
     { pattern: /\bwellness\b(?=.*food|.*core)/i, brand: 'Wellness' },
+    { pattern: /\bwholseso\b|\bwholesome\b/i, brand: 'Wholesome' },
+    { pattern: /\bsensi\b|\bsensitive\b/i, brand: 'Sensitive' },
+    { pattern: /\bvict\b|\bvictor\b/i, brand: 'Victor' },
+    { pattern: /\beuk\b|\beukanuba\b/i, brand: 'Eukanuba' },
+    { pattern: /\bnutri sour\b|\bnutri sou\b|\bnutrisource\b/i, brand: 'Nutrisource' },
     { pattern: /\bmerrick\b/i, brand: 'Merrick' },
     { pattern: /\btaste of the wild\b/i, brand: 'Taste of the Wild' },
     { pattern: /\borijen\b/i, brand: 'Orijen' },
