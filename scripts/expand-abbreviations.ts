@@ -8,6 +8,8 @@ async function expandAbbreviations() {
   // Define abbreviation mappings
   const abbreviations = [
     { pattern: /\bWholseso\b/gi, replacement: 'Wholesome' },
+    { pattern: /\bWholso\b/gi, replacement: 'Wholesome' },
+    { pattern: /\bWholeso\b/gi, replacement: 'Wholesome' },
     { pattern: /\bSensi\b/gi, replacement: 'Sensitive' },
     { pattern: /\bVict\b/gi, replacement: 'Victor' },
     { pattern: /\bEuk\b/gi, replacement: 'Eukanuba' },
