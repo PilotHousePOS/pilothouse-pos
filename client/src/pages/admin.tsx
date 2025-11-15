@@ -24,6 +24,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Calendar } from "@/components/ui/calendar";
+import { Progress } from "@/components/ui/progress";
 import { 
   Plus,
   Edit,
@@ -57,7 +58,10 @@ import {
   Database,
   FileText,
   Sparkles,
-  Grid3X3
+  Grid3X3,
+  Loader2,
+  Save,
+  CheckCircle2
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -1897,6 +1901,14 @@ function ProductImageManager() {
   const [imageUrl, setImageUrl] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [showProducts, setShowProducts] = useState(false);
+  
+  // Batch search state
+  const [isBatchSearching, setIsBatchSearching] = useState(false);
+  const [batchSearchProgress, setBatchSearchProgress] = useState(0);
+  const [batchSearchTotal, setBatchSearchTotal] = useState(0);
+  const [batchSearchResults, setBatchSearchResults] = useState<any[]>([]);
+  const [maxProducts, setMaxProducts] = useState(20);
+  const [showBatchResults, setShowBatchResults] = useState(false);
 
   // Fetch image stats
   const { data: imageStats, isLoading: statsLoading } = useQuery({
@@ -1948,6 +1960,121 @@ function ProductImageManager() {
       });
     },
   });
+
+  // Batch update images mutation
+  const batchUpdateMutation = useMutation({
+    mutationFn: async (updates: { productId: number; imageUrl: string }[]) => {
+      for (const update of updates) {
+        await apiRequest('PUT', `/api/admin/supplies/${update.productId}/image`, { 
+          imageUrl: update.imageUrl 
+        });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/image-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/without-images'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
+      
+      toast({
+        title: 'Success',
+        description: 'Batch images updated successfully',
+      });
+      setBatchSearchResults([]);
+      setShowBatchResults(false);
+      refetchProducts();
+    },
+    onError: () => {
+      toast({
+        title: 'Error',
+        description: 'Failed to update batch images',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Start batch search for images
+  const handleStartBatchSearch = async () => {
+    if (!products || products.length === 0) {
+      toast({
+        title: 'No products',
+        description: 'No products available to search',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const productIds = products.slice(0, maxProducts).map((p: any) => p.id);
+    
+    setIsBatchSearching(true);
+    setBatchSearchProgress(0);
+    setBatchSearchTotal(productIds.length);
+    setBatchSearchResults([]);
+
+    try {
+      const response = await fetch('/api/admin/supplies/batch-image-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ productIds, maxProducts }),
+      });
+
+      if (!response.ok) throw new Error('Batch search failed');
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setBatchSearchResults(data.results);
+        setShowBatchResults(true);
+        toast({
+          title: 'Search Complete',
+          description: `Processed ${data.processed} products. Review results below.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to perform batch search',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsBatchSearching(false);
+    }
+  };
+
+  // Save approved images
+  const handleSaveBatchResults = () => {
+    const approved = batchSearchResults.filter(r => r.approved && r.imageUrl);
+    
+    if (approved.length === 0) {
+      toast({
+        title: 'No images selected',
+        description: 'Please approve at least one image to save',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const updates = approved.map(r => ({
+      productId: r.productId,
+      imageUrl: r.imageUrl,
+    }));
+
+    batchUpdateMutation.mutate(updates);
+  };
+
+  // Toggle approval for a batch result
+  const toggleApproval = (index: number) => {
+    setBatchSearchResults(prev => 
+      prev.map((r, i) => i === index ? { ...r, approved: !r.approved } : r)
+    );
+  };
+
+  // Update image URL for a batch result
+  const updateBatchResultImage = (index: number, imageUrl: string) => {
+    setBatchSearchResults(prev =>
+      prev.map((r, i) => i === index ? { ...r, imageUrl, approved: true } : r)
+    );
+  };
 
   const handleBrandSearch = (brand: string) => {
     setSelectedBrand(brand);
@@ -2230,40 +2357,266 @@ function ProductImageManager() {
 
           {selectedBrand && (
             <div className="border rounded-lg p-4 bg-blue-50 dark:bg-blue-900/20">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold">Selected Brand: {selectedBrand}</h3>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setSelectedBrand('')}
+                  onClick={() => {
+                    setSelectedBrand('');
+                    setShowBatchResults(false);
+                    setBatchSearchResults([]);
+                  }}
+                  data-testid="button-clear-brand"
                 >
                   <X className="w-4 h-4" />
                 </Button>
               </div>
-              <p className="text-sm text-gray-600 mb-3">
-                This feature will be enhanced with automated web search in a future update.
-                For now, manually search for products from this brand above.
-              </p>
+
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="max-products">Number of products to process (max 50)</Label>
+                  <Input
+                    id="max-products"
+                    type="number"
+                    min="1"
+                    max="50"
+                    value={maxProducts}
+                    onChange={(e) => setMaxProducts(Math.min(50, Math.max(1, parseInt(e.target.value) || 20)))}
+                    className="mt-2"
+                    data-testid="input-max-products"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {products?.length || 0} products available without images
+                  </p>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleStartBatchSearch}
+                    disabled={isBatchSearching || !products || products.length === 0}
+                    className="bg-blue-600 hover:bg-blue-700"
+                    data-testid="button-start-batch-search"
+                  >
+                    {isBatchSearching ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Searching...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="w-4 h-4 mr-2" />
+                        Start Batch Search
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {isBatchSearching && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span>Processing products...</span>
+                      <span>{batchSearchProgress} / {batchSearchTotal}</span>
+                    </div>
+                    <Progress value={(batchSearchProgress / batchSearchTotal) * 100} />
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
           {selectedCategory && (
             <div className="border rounded-lg p-4 bg-green-50 dark:bg-green-900/20">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold capitalize">Selected Category: {selectedCategory}</h3>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setSelectedCategory('')}
+                  onClick={() => {
+                    setSelectedCategory('');
+                    setShowBatchResults(false);
+                    setBatchSearchResults([]);
+                  }}
+                  data-testid="button-clear-category"
                 >
                   <X className="w-4 h-4" />
                 </Button>
               </div>
-              <p className="text-sm text-gray-600 mb-3">
-                This feature will be enhanced with automated web search in a future update.
-                For now, manually search for products from this category above.
-              </p>
+
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="max-products-cat">Number of products to process (max 50)</Label>
+                  <Input
+                    id="max-products-cat"
+                    type="number"
+                    min="1"
+                    max="50"
+                    value={maxProducts}
+                    onChange={(e) => setMaxProducts(Math.min(50, Math.max(1, parseInt(e.target.value) || 20)))}
+                    className="mt-2"
+                    data-testid="input-max-products-category"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {products?.length || 0} products available without images
+                  </p>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleStartBatchSearch}
+                    disabled={isBatchSearching || !products || products.length === 0}
+                    className="bg-green-600 hover:bg-green-700"
+                    data-testid="button-start-batch-search-category"
+                  >
+                    {isBatchSearching ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Searching...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="w-4 h-4 mr-2" />
+                        Start Batch Search
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {isBatchSearching && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span>Processing products...</span>
+                      <span>{batchSearchProgress} / {batchSearchTotal}</span>
+                    </div>
+                    <Progress value={(batchSearchProgress / batchSearchTotal) * 100} />
+                  </div>
+                )}
+              </div>
             </div>
+          )}
+
+          {/* Batch Search Results */}
+          {showBatchResults && batchSearchResults.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Batch Search Results</CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setShowBatchResults(false);
+                      setBatchSearchResults([]);
+                    }}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+                <CardDescription>
+                  Review and approve images before saving. You can manually edit image URLs.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    <strong>Note:</strong> Automated web search is preparing search queries for you. 
+                    For each product, use the provided search query to find images on distributor websites 
+                    (Chewy, Petco, PetSmart, Amazon), then paste the image URL below.
+                  </p>
+                </div>
+
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {batchSearchResults.map((result, index) => (
+                    <div 
+                      key={result.productId} 
+                      className="border rounded-lg p-4 space-y-3 bg-white dark:bg-gray-800"
+                      data-testid={`batch-result-${index}`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{result.productName}</h4>
+                          {result.brand && (
+                            <p className="text-sm text-gray-600">Brand: {result.brand}</p>
+                          )}
+                          {result.searchQuery && (
+                            <p className="text-xs text-gray-500 mt-1 break-all">
+                              <strong>Search:</strong> {result.searchQuery}
+                            </p>
+                          )}
+                        </div>
+                        <Badge variant={result.approved ? "default" : "outline"} className={result.approved ? "bg-green-600" : ""}>
+                          {result.approved ? "Approved" : "Pending"}
+                        </Badge>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Image URL</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Paste image URL here..."
+                            value={result.imageUrl || ''}
+                            onChange={(e) => updateBatchResultImage(index, e.target.value)}
+                            data-testid={`input-batch-image-${index}`}
+                          />
+                          <Button
+                            size="sm"
+                            variant={result.approved ? "default" : "outline"}
+                            onClick={() => toggleApproval(index)}
+                            disabled={!result.imageUrl}
+                            data-testid={`button-approve-${index}`}
+                          >
+                            {result.approved ? <CheckCircle2 className="w-4 h-4" /> : "Approve"}
+                          </Button>
+                        </div>
+                        
+                        {result.imageUrl && (
+                          <div className="border rounded p-2 bg-gray-50 dark:bg-gray-900">
+                            <img 
+                              src={result.imageUrl} 
+                              alt="Preview" 
+                              className="max-w-xs max-h-32 object-contain mx-auto"
+                              onError={(e) => {
+                                e.currentTarget.src = '/placeholder-supply.jpg';
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex gap-2 pt-4 border-t">
+                  <Button
+                    onClick={handleSaveBatchResults}
+                    disabled={batchUpdateMutation.isPending || !batchSearchResults.some(r => r.approved)}
+                    className="bg-green-600 hover:bg-green-700"
+                    data-testid="button-save-batch"
+                  >
+                    {batchUpdateMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4 mr-2" />
+                        Save {batchSearchResults.filter(r => r.approved).length} Approved Images
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowBatchResults(false);
+                      setBatchSearchResults([]);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           )}
         </CardContent>
       </Card>
