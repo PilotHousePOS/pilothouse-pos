@@ -61,7 +61,8 @@ import {
   Grid3X3,
   Loader2,
   Save,
-  CheckCircle2
+  CheckCircle2,
+  Home
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -2661,6 +2662,449 @@ function ProductImageManager() {
   );
 }
 
+function BoardingManagement({ isAddOpen, setIsAddOpen }: { isAddOpen: boolean; setIsAddOpen: (open: boolean) => void }) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [editingRecord, setEditingRecord] = useState<any>(null);
+  
+  const boardingQuery = useQuery({
+    queryKey: ['/api/admin/boarding'],
+  });
+  
+  const createMutation = useMutation({
+    mutationFn: async (data: any) => {
+      console.log('Creating boarding record with data:', data);
+      return await apiRequest('/api/admin/boarding', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/boarding'] });
+      setIsAddOpen(false);
+      toast({ title: 'Boarding record created successfully' });
+    },
+    onError: (error: any) => {
+      console.error('Failed to create boarding record:', error);
+      toast({ title: 'Failed to create boarding record', variant: 'destructive' });
+    },
+  });
+  
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      return await apiRequest(`/api/admin/boarding/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/boarding'] });
+      setEditingRecord(null);
+      toast({ title: 'Boarding record updated successfully' });
+    },
+    onError: () => {
+      toast({ title: 'Failed to update boarding record', variant: 'destructive' });
+    },
+  });
+  
+  const checkInMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest(`/api/admin/boarding/${id}/check-in`, {
+        method: 'PATCH',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/boarding'] });
+      toast({ title: 'Checked in successfully' });
+    },
+    onError: () => {
+      toast({ title: 'Failed to check in', variant: 'destructive' });
+    },
+  });
+  
+  const checkOutMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest(`/api/admin/boarding/${id}/check-out`, {
+        method: 'PATCH',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/boarding'] });
+      toast({ title: 'Checked out successfully' });
+    },
+    onError: () => {
+      toast({ title: 'Failed to check out', variant: 'destructive' });
+    },
+  });
+  
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest(`/api/admin/boarding/${id}`, {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/boarding'] });
+      toast({ title: 'Boarding record deleted successfully' });
+    },
+    onError: () => {
+      toast({ title: 'Failed to delete boarding record', variant: 'destructive' });
+    },
+  });
+  
+  const calculateDays = (startDate: string, endDate: string) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.max(1, days);
+  };
+  
+  const calculateTotal = (record: any) => {
+    let startDate, endDate, isActual;
+    
+    if (record.actualDropOffDate && record.actualPickUpDate) {
+      startDate = record.actualDropOffDate;
+      endDate = record.actualPickUpDate;
+      isActual = true;
+    } else {
+      startDate = record.estimatedDropOffDate;
+      endDate = record.estimatedPickUpDate;
+      isActual = false;
+    }
+    
+    if (startDate && endDate) {
+      const days = calculateDays(startDate, endDate);
+      return days * parseFloat(record.dailyRate || 0);
+    }
+    return 0;
+  };
+  
+  return (
+    <div className="space-y-4">
+      {boardingQuery.isLoading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
+          <p className="text-sm text-gray-500 mt-2">Loading boarding records...</p>
+        </div>
+      ) : !boardingQuery.data || boardingQuery.data.length === 0 ? (
+        <div className="text-center py-8 text-gray-500">
+          <Home className="w-12 h-12 mx-auto mb-3 opacity-30" />
+          <p>No boarding records found</p>
+          <p className="text-sm mt-1">Click "New Boarding" to add a record</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {boardingQuery.data.map((record: any) => (
+            <Card key={record.id} className="border shadow-sm">
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg">{record.animalName}</h3>
+                      <p className="text-sm text-gray-600">{record.animalType}</p>
+                    </div>
+                    <Badge variant={record.status === 'completed' ? 'secondary' : record.actualDropOffDate ? 'default' : 'outline'}>
+                      {record.status === 'completed' ? 'Completed' : record.actualDropOffDate ? 'In Boarding' : 'Scheduled'}
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-600">Customer: {record.customerName}</p>
+                      <p className="text-gray-600">Phone: {record.customerPhone}</p>
+                      {record.customerEmail && (
+                        <p className="text-gray-600">Email: {record.customerEmail}</p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-gray-600">Estimated Drop-off: {record.estimatedDropOffDate}</p>
+                      <p className="text-gray-600">Estimated Pick-up: {record.estimatedPickUpDate}</p>
+                      {record.actualDropOffDate && (
+                        <p className="text-green-600 font-medium">Actual Drop-off: {record.actualDropOffDate}</p>
+                      )}
+                      {record.actualPickUpDate && (
+                        <p className="text-green-600 font-medium">Actual Pick-up: {record.actualPickUpDate}</p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <div>
+                      <p className="text-sm text-gray-600">Daily Rate: ${parseFloat(record.dailyRate || 0).toFixed(2)}</p>
+                      {record.status === 'completed' && record.actualDropOffDate && record.actualPickUpDate ? (
+                        <p className="text-lg font-semibold text-green-600">
+                          Final Total: ${calculateTotal(record).toFixed(2)}
+                        </p>
+                      ) : (
+                        <p className="text-lg font-semibold text-blue-600">
+                          Estimated Total: ${calculateTotal(record).toFixed(2)}
+                          {!record.estimatedDropOffDate || !record.estimatedPickUpDate ? ' (incomplete dates)' : ''}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      {!record.actualDropOffDate && record.status !== 'completed' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => checkInMutation.mutate(record.id)}
+                          disabled={checkInMutation.isPending}
+                          data-testid={`button-check-in-${record.id}`}
+                        >
+                          Check In
+                        </Button>
+                      )}
+                      {record.actualDropOffDate && !record.actualPickUpDate && (
+                        <Button
+                          size="sm"
+                          onClick={() => checkOutMutation.mutate(record.id)}
+                          disabled={checkOutMutation.isPending}
+                          data-testid={`button-check-out-${record.id}`}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          Check Out
+                        </Button>
+                      )}
+                      {record.status !== 'completed' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setEditingRecord(record)}
+                          data-testid={`button-edit-${record.id}`}
+                        >
+                          <Pencil className="w-3 h-3 mr-1" />
+                          Edit
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => {
+                          if (confirm('Are you sure you want to delete this boarding record?')) {
+                            deleteMutation.mutate(record.id);
+                          }
+                        }}
+                        data-testid={`button-delete-${record.id}`}
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {record.notes && (
+                    <div className="pt-2 border-t">
+                      <p className="text-xs text-gray-500">Special Instructions:</p>
+                      <p className="text-sm">{record.notes}</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+      
+      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+        <DialogContent className="max-w-md mx-auto">
+          <DialogHeader>
+            <DialogTitle>New Boarding Record</DialogTitle>
+          </DialogHeader>
+          <BoardingForm
+            onSubmit={(data) => createMutation.mutate(data)}
+            onCancel={() => setIsAddOpen(false)}
+            isPending={createMutation.isPending}
+          />
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={!!editingRecord} onOpenChange={() => setEditingRecord(null)}>
+        <DialogContent className="max-w-md mx-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Boarding Record</DialogTitle>
+          </DialogHeader>
+          <BoardingForm
+            initialData={editingRecord}
+            onSubmit={(data) => updateMutation.mutate({ id: editingRecord.id, data })}
+            onCancel={() => setEditingRecord(null)}
+            isPending={updateMutation.isPending}
+          />
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function BoardingForm({ initialData, onSubmit, onCancel, isPending }: any) {
+  const [formData, setFormData] = useState({
+    customerName: initialData?.customerName || '',
+    customerPhone: initialData?.customerPhone || '',
+    customerEmail: initialData?.customerEmail || '',
+    animalName: initialData?.animalName || '',
+    animalType: initialData?.animalType || '',
+    estimatedDropOffDate: initialData?.estimatedDropOffDate || new Date().toISOString().split('T')[0],
+    estimatedPickUpDate: initialData?.estimatedPickUpDate || new Date(Date.now() + 86400000).toISOString().split('T')[0],
+    dailyRate: initialData?.dailyRate || '25.00',
+    notes: initialData?.notes || '',
+  });
+  
+  const estimatedDays = useMemo(() => {
+    if (formData.estimatedDropOffDate && formData.estimatedPickUpDate) {
+      const start = new Date(formData.estimatedDropOffDate);
+      const end = new Date(formData.estimatedPickUpDate);
+      const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+      return Math.max(1, days);
+    }
+    return 1;
+  }, [formData.estimatedDropOffDate, formData.estimatedPickUpDate]);
+  
+  const estimatedTotal = useMemo(() => {
+    return estimatedDays * parseFloat(formData.dailyRate || 0);
+  }, [estimatedDays, formData.dailyRate]);
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('BoardingForm submit with data:', formData);
+    onSubmit(formData);
+  };
+  
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label>Customer Name</Label>
+        <Input
+          required
+          value={formData.customerName}
+          onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
+          placeholder="John Doe"
+          data-testid="input-customer-name"
+        />
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Customer Phone</Label>
+          <Input
+            required
+            value={formData.customerPhone}
+            onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
+            placeholder="(555) 123-4567"
+            data-testid="input-customer-phone"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Customer Email</Label>
+          <Input
+            type="email"
+            value={formData.customerEmail}
+            onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
+            placeholder="john@example.com"
+            data-testid="input-customer-email"
+          />
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Animal Name</Label>
+          <Input
+            required
+            value={formData.animalName}
+            onChange={(e) => setFormData({ ...formData, animalName: e.target.value })}
+            placeholder="Max"
+            data-testid="input-animal-name"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Animal Type</Label>
+          <Input
+            required
+            value={formData.animalType}
+            onChange={(e) => setFormData({ ...formData, animalType: e.target.value })}
+            placeholder="Dog, Cat, etc."
+            data-testid="input-animal-type"
+          />
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Estimated Drop-off</Label>
+          <Input
+            type="date"
+            required
+            value={formData.estimatedDropOffDate}
+            onChange={(e) => setFormData({ ...formData, estimatedDropOffDate: e.target.value })}
+            data-testid="input-estimated-drop-off"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Estimated Pick-up</Label>
+          <Input
+            type="date"
+            required
+            value={formData.estimatedPickUpDate}
+            onChange={(e) => setFormData({ ...formData, estimatedPickUpDate: e.target.value })}
+            data-testid="input-estimated-pick-up"
+          />
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <Label>Daily Rate ($)</Label>
+        <Input
+          type="number"
+          step="0.01"
+          required
+          value={formData.dailyRate}
+          onChange={(e) => setFormData({ ...formData, dailyRate: e.target.value })}
+          placeholder="25.00"
+          data-testid="input-daily-rate"
+        />
+      </div>
+      
+      <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+        <p className="text-sm">
+          <span className="font-medium">Estimated Days:</span> {estimatedDays} day{estimatedDays !== 1 ? 's' : ''}
+        </p>
+        <p className="text-sm font-semibold mt-1">
+          <span>Estimated Total:</span> ${estimatedTotal.toFixed(2)}
+        </p>
+      </div>
+      
+      <div className="space-y-2">
+        <Label>Special Instructions (Optional)</Label>
+        <Textarea
+          value={formData.notes}
+          onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+          placeholder="Feeding schedule, medications, behavioral notes..."
+          rows={3}
+          data-testid="input-special-instructions"
+        />
+      </div>
+      
+      <div className="flex gap-2 pt-2">
+        <Button
+          type="submit"
+          disabled={isPending}
+          className="flex-1 bg-brand-blue hover:bg-blue-600"
+          data-testid="button-submit-boarding"
+        >
+          {isPending ? 'Saving...' : (initialData ? 'Update' : 'Create')}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          className="flex-1"
+          data-testid="button-cancel-boarding"
+        >
+          Cancel
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const typedUser = user as User;
@@ -2674,6 +3118,7 @@ export default function Admin() {
   const [isAddGroomerOpen, setIsAddGroomerOpen] = useState(false);
   const [editingGroomer, setEditingGroomer] = useState<any>(null);
   const [groomerToDelete, setGroomerToDelete] = useState<any>(null);
+  const [isAddBoardingOpen, setIsAddBoardingOpen] = useState(false);
   const [isSyncAppointmentsConfirmOpen, setIsSyncAppointmentsConfirmOpen] = useState(false);
   const [showApprovedAppointments, setShowApprovedAppointments] = useState(false);
   const [showDeniedAppointments, setShowDeniedAppointments] = useState(false);
@@ -4530,6 +4975,11 @@ export default function Admin() {
             <TabsTrigger value="groomers" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
               Groomers
             </TabsTrigger>
+            {typedUser?.isAdmin && (
+              <TabsTrigger value="boarding" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                Boarding
+              </TabsTrigger>
+            )}
             {typedUser?.isAdmin && (
               <TabsTrigger value="users" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 Users
@@ -7551,6 +8001,32 @@ export default function Admin() {
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="boarding">
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <CardTitle className="flex items-center gap-2">
+                  <Home className="w-5 h-5" />
+                  Boarding Records
+                </CardTitle>
+                {typedUser?.isAdmin && (
+                  <Button 
+                    onClick={() => setIsAddBoardingOpen(true)}
+                    className="w-full sm:w-auto bg-brand-blue hover:bg-blue-600"
+                    data-testid="button-add-boarding"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    New Boarding
+                  </Button>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              <BoardingManagement isAddOpen={isAddBoardingOpen} setIsAddOpen={setIsAddBoardingOpen} />
             </CardContent>
           </Card>
         </TabsContent>
