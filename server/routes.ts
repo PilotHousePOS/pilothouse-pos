@@ -1583,21 +1583,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
                    apt.status !== 'rejected';
           });
           
-          // Count existing service types including multi-pet appointments
-          let bathAppointments = 0;
-          let groomAppointments = 0;
+          // Count total dogs/pets by service type (not appointments)
+          let bathDogs = 0;
+          let groomDogs = 0;
           
           for (const apt of appointmentsOnDate) {
             // Get appointment pets to count service types accurately
             const aptPets = await storage.getAppointmentPets(apt.id);
             if (aptPets && aptPets.length > 0) {
               // Multi-pet appointment - count each pet's service type
-              bathAppointments += aptPets.filter((p: any) => p.serviceType === 'grooming-bath').length;
-              groomAppointments += aptPets.filter((p: any) => p.serviceType === 'grooming-full').length;
+              bathDogs += aptPets.filter((p: any) => p.serviceType === 'grooming-bath').length;
+              groomDogs += aptPets.filter((p: any) => p.serviceType === 'grooming-full').length;
             } else {
               // Legacy single-pet appointment - use appointment's serviceType
-              if (apt.serviceType === 'grooming-bath') bathAppointments++;
-              if (apt.serviceType === 'grooming-full') groomAppointments++;
+              if (apt.serviceType === 'grooming-bath') bathDogs++;
+              if (apt.serviceType === 'grooming-full') groomDogs++;
             }
           }
           
@@ -1605,16 +1605,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const requestedBaths = petsArray.filter((p: any) => p.serviceType === 'grooming-bath').length;
           const requestedGrooms = petsArray.filter((p: any) => p.serviceType === 'grooming-full').length;
           
-          // Check if limits would be exceeded
-          if (bathAppointments + requestedBaths > weeklyLimit.maxBathAppointments) {
+          // HARD LIMIT: Cannot be bypassed by anyone, including admins
+          // This ensures grooming capacity is never exceeded
+          if (bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
             return res.status(400).json({
-              message: `Bath appointments are fully booked for this date (limit: ${weeklyLimit.maxBathAppointments}, ${bathAppointments} already booked). Please select a different date.`
+              message: `Bath grooming capacity is fully booked for this date (limit: ${weeklyLimit.maxBathAppointments} dogs, ${bathDogs} already booked). Please select a different date.`
             });
           }
           
-          if (groomAppointments + requestedGrooms > weeklyLimit.maxGroomAppointments) {
+          if (groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
             return res.status(400).json({
-              message: `Full grooming appointments are fully booked for this date (limit: ${weeklyLimit.maxGroomAppointments}, ${groomAppointments} already booked). Please select a different date.`
+              message: `Full grooming capacity is fully booked for this date (limit: ${weeklyLimit.maxGroomAppointments} dogs, ${groomDogs} already booked). Please select a different date.`
             });
           }
         }
