@@ -3910,6 +3910,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Batch search for product images using web search (Admin only)
+  app.post("/api/admin/supplies/batch-image-search", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { productIds, maxProducts = 20 } = req.body;
+      
+      if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
+        return res.status(400).json({ message: "Product IDs array is required" });
+      }
+
+      // Limit to prevent excessive credit usage
+      const idsToProcess = productIds.slice(0, Math.min(productIds.length, maxProducts));
+      const results = [];
+
+      for (const productId of idsToProcess) {
+        const supply = await storage.getSupply(productId);
+        if (!supply) {
+          results.push({
+            productId,
+            success: false,
+            error: 'Product not found'
+          });
+          continue;
+        }
+
+        try {
+          // Build search query for pet supply distributors
+          const searchQuery = `${supply.brand || ''} ${supply.name} pet supply product image site:chewy.com OR site:petco.com OR site:petsmart.com OR site:amazon.com`.trim();
+          
+          // Use Replit's web_search (note: this is a placeholder - actual implementation would use the web_search tool)
+          // For now, we'll return a structured result that frontend can use
+          results.push({
+            productId: supply.id,
+            productName: supply.name,
+            brand: supply.brand,
+            success: true,
+            searchQuery,
+            // In production, this would contain actual image URLs found via web search
+            // For now, we'll mark it as needing manual review
+            imageUrl: null,
+            needsManualSearch: true
+          });
+        } catch (error: any) {
+          results.push({
+            productId: supply.id,
+            success: false,
+            error: error.message || 'Search failed'
+          });
+        }
+      }
+
+      res.json({
+        success: true,
+        processed: results.length,
+        total: productIds.length,
+        results
+      });
+    } catch (error: any) {
+      console.error('Batch image search error:', error);
+      res.status(500).json({ 
+        success: false,
+        message: "Failed to perform batch image search",
+        error: error.message 
+      });
+    }
+  });
+
   // Get products by brand or category for batch processing (Admin only)
   app.get("/api/admin/supplies/batch-filter", authMiddleware, async (req: any, res) => {
     try {
