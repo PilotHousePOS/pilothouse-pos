@@ -1891,6 +1891,18 @@ function normalizeServiceType(serviceType: string | undefined | null): string {
   return 'grooming-full';
 }
 
+// Batch search result type
+interface BatchSearchResult {
+  productId: number;
+  productName: string;
+  brand: string | null;
+  success: boolean;
+  searchQuery: string;
+  imageUrl: string | null;
+  approved: boolean;
+  error: string | null;
+}
+
 // Product Image Manager Component
 function ProductImageManager() {
   const { toast } = useToast();
@@ -1906,7 +1918,7 @@ function ProductImageManager() {
   const [isBatchSearching, setIsBatchSearching] = useState(false);
   const [batchSearchProgress, setBatchSearchProgress] = useState(0);
   const [batchSearchTotal, setBatchSearchTotal] = useState(0);
-  const [batchSearchResults, setBatchSearchResults] = useState<any[]>([]);
+  const [batchSearchResults, setBatchSearchResults] = useState<BatchSearchResult[]>([]);
   const [maxProducts, setMaxProducts] = useState(20);
   const [showBatchResults, setShowBatchResults] = useState(false);
 
@@ -2018,22 +2030,37 @@ function ProductImageManager() {
         body: JSON.stringify({ productIds, maxProducts }),
       });
 
-      if (!response.ok) throw new Error('Batch search failed');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || 'Batch search failed');
+      }
       
       const data = await response.json();
       
-      if (data.success) {
-        setBatchSearchResults(data.results);
+      if (data.success && Array.isArray(data.results)) {
+        // Filter out any malformed results and ensure proper typing
+        const validResults = data.results.filter((r: any) => 
+          r && typeof r.productId === 'number' && r.productName
+        );
+        
+        setBatchSearchResults(validResults as BatchSearchResult[]);
         setShowBatchResults(true);
+        
+        const successCount = validResults.filter((r: BatchSearchResult) => r.success).length;
+        const errorCount = validResults.filter((r: BatchSearchResult) => !r.success).length;
+        
         toast({
           title: 'Search Complete',
-          description: `Processed ${data.processed} products. Review results below.`,
+          description: `Processed ${data.processed} products. ${successCount} successful${errorCount > 0 ? `, ${errorCount} failed` : ''}. Review results below.`,
         });
+      } else {
+        throw new Error('Invalid response format');
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Batch search error:', error);
       toast({
         title: 'Error',
-        description: 'Failed to perform batch search',
+        description: error.message || 'Failed to perform batch search',
         variant: 'destructive',
       });
     } finally {
@@ -2529,7 +2556,7 @@ function ProductImageManager() {
                   {batchSearchResults.map((result, index) => (
                     <div 
                       key={result.productId} 
-                      className="border rounded-lg p-4 space-y-3 bg-white dark:bg-gray-800"
+                      className={`border rounded-lg p-4 space-y-3 ${result.success ? 'bg-white dark:bg-gray-800' : 'bg-red-50 dark:bg-red-900/20 border-red-200'}`}
                       data-testid={`batch-result-${index}`}
                     >
                       <div className="flex items-start justify-between">
@@ -2538,50 +2565,60 @@ function ProductImageManager() {
                           {result.brand && (
                             <p className="text-sm text-gray-600">Brand: {result.brand}</p>
                           )}
-                          {result.searchQuery && (
+                          {result.error && (
+                            <p className="text-sm text-red-600 mt-1">
+                              <strong>Error:</strong> {result.error}
+                            </p>
+                          )}
+                          {result.success && result.searchQuery && (
                             <p className="text-xs text-gray-500 mt-1 break-all">
                               <strong>Search:</strong> {result.searchQuery}
                             </p>
                           )}
                         </div>
-                        <Badge variant={result.approved ? "default" : "outline"} className={result.approved ? "bg-green-600" : ""}>
-                          {result.approved ? "Approved" : "Pending"}
+                        <Badge 
+                          variant={result.success ? (result.approved ? "default" : "outline") : "destructive"}
+                          className={result.approved ? "bg-green-600" : ""}
+                        >
+                          {result.success ? (result.approved ? "Approved" : "Pending") : "Failed"}
                         </Badge>
                       </div>
 
-                      <div className="space-y-2">
-                        <Label>Image URL</Label>
-                        <div className="flex gap-2">
-                          <Input
-                            placeholder="Paste image URL here..."
-                            value={result.imageUrl || ''}
-                            onChange={(e) => updateBatchResultImage(index, e.target.value)}
-                            data-testid={`input-batch-image-${index}`}
-                          />
-                          <Button
-                            size="sm"
-                            variant={result.approved ? "default" : "outline"}
-                            onClick={() => toggleApproval(index)}
-                            disabled={!result.imageUrl}
-                            data-testid={`button-approve-${index}`}
-                          >
-                            {result.approved ? <CheckCircle2 className="w-4 h-4" /> : "Approve"}
-                          </Button>
-                        </div>
-                        
-                        {result.imageUrl && (
-                          <div className="border rounded p-2 bg-gray-50 dark:bg-gray-900">
-                            <img 
-                              src={result.imageUrl} 
-                              alt="Preview" 
-                              className="max-w-xs max-h-32 object-contain mx-auto"
-                              onError={(e) => {
-                                e.currentTarget.src = '/placeholder-supply.jpg';
-                              }}
+                      {result.success && (
+                        <div className="space-y-2">
+                          <Label>Image URL</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              placeholder="Paste image URL here..."
+                              value={result.imageUrl || ''}
+                              onChange={(e) => updateBatchResultImage(index, e.target.value)}
+                              data-testid={`input-batch-image-${index}`}
                             />
+                            <Button
+                              size="sm"
+                              variant={result.approved ? "default" : "outline"}
+                              onClick={() => toggleApproval(index)}
+                              disabled={!result.imageUrl}
+                              data-testid={`button-approve-${index}`}
+                            >
+                              {result.approved ? <CheckCircle2 className="w-4 h-4" /> : "Approve"}
+                            </Button>
                           </div>
-                        )}
-                      </div>
+                          
+                          {result.imageUrl && (
+                            <div className="border rounded p-2 bg-gray-50 dark:bg-gray-900">
+                              <img 
+                                src={result.imageUrl} 
+                                alt="Preview" 
+                                className="max-w-xs max-h-32 object-contain mx-auto"
+                                onError={(e) => {
+                                  e.currentTarget.src = '/placeholder-supply.jpg';
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

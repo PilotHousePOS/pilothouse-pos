@@ -3910,7 +3910,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Batch search for product images using web search (Admin only)
+  // Batch search for product images - generates search queries for manual image URL entry (Admin only)
   app.post("/api/admin/supplies/batch-image-search", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
@@ -3924,43 +3924,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Product IDs array is required" });
       }
 
-      // Limit to prevent excessive credit usage
-      const idsToProcess = productIds.slice(0, Math.min(productIds.length, maxProducts));
+      // Enforce strict limit to prevent excessive processing (max 50)
+      const requestedMax = Math.min(Math.max(1, parseInt(maxProducts) || 20), 50);
+      const idsToProcess = productIds.slice(0, Math.min(productIds.length, requestedMax));
       const results = [];
 
       for (const productId of idsToProcess) {
-        const supply = await storage.getSupply(productId);
-        if (!supply) {
-          results.push({
-            productId,
-            success: false,
-            error: 'Product not found'
-          });
-          continue;
-        }
-
         try {
-          // Build search query for pet supply distributors
-          const searchQuery = `${supply.brand || ''} ${supply.name} pet supply product image site:chewy.com OR site:petco.com OR site:petsmart.com OR site:amazon.com`.trim();
+          const supply = await storage.getSupply(productId);
           
-          // Use Replit's web_search (note: this is a placeholder - actual implementation would use the web_search tool)
-          // For now, we'll return a structured result that frontend can use
+          if (!supply) {
+            results.push({
+              productId: parseInt(productId),
+              productName: 'Unknown Product',
+              brand: null,
+              success: false,
+              error: 'Product not found',
+              searchQuery: '',
+              imageUrl: null,
+              approved: false
+            });
+            continue;
+          }
+
+          // Build structured search query for pet supply distributors
+          const brandPart = supply.brand ? `${supply.brand} ` : '';
+          const searchQuery = `${brandPart}${supply.name} pet supply product image site:chewy.com OR site:petco.com OR site:petsmart.com OR site:amazon.com`.trim();
+          
+          // Return structured result for manual image URL entry
           results.push({
             productId: supply.id,
             productName: supply.name,
-            brand: supply.brand,
+            brand: supply.brand || null,
             success: true,
             searchQuery,
-            // In production, this would contain actual image URLs found via web search
-            // For now, we'll mark it as needing manual review
             imageUrl: null,
-            needsManualSearch: true
+            approved: false,
+            error: null
           });
         } catch (error: any) {
           results.push({
-            productId: supply.id,
+            productId: parseInt(productId),
+            productName: 'Error loading product',
+            brand: null,
             success: false,
-            error: error.message || 'Search failed'
+            error: error.message || 'Failed to process product',
+            searchQuery: '',
+            imageUrl: null,
+            approved: false
           });
         }
       }
@@ -3969,6 +3980,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         processed: results.length,
         total: productIds.length,
+        maxProducts: requestedMax,
         results
       });
     } catch (error: any) {

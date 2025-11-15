@@ -65,11 +65,14 @@ The application is a full-stack web application built with React, Vite, TypeScri
 - **Product Image Management System:**
     - **Statistics Dashboard:** Real-time tracking of total products, products with/without images, breakdown by brand and category.
     - **Manual Image Search:** Individual product image URL input with preview and validation.
-    - **Batch Search Tools:** Filter by brand or category for targeted image updates.
-    - **Cost Management:** Warning system for web search credit usage, selective search capabilities to manage costs.
+    - **Automated Batch Search:** Select brand or category, configure batch size (max 50), generate search queries for each product, preview & approve images before saving.
+      - **Progress Tracking:** Real-time progress bar showing products processed.
+      - **Preview & Approval Interface:** Review all found images, manually paste image URLs, approve/reject each result.
+      - **Batch Update:** Save all approved images in one operation.
+    - **Cost Management:** Warning system for web search credit usage, selective search capabilities to manage costs, configurable batch size.
     - **Admin-Only Access:** Secure endpoints with admin authentication for all image management operations.
     - **Brand Standardization:** Automatic "Zoo Medium" → "ZooMed" standardization for consistency.
-    - **API Endpoints:** /api/admin/supplies/image-stats, /api/admin/supplies/without-images, /api/admin/supplies/batch-filter, /api/admin/supplies/:id/image
+    - **API Endpoints:** /api/admin/supplies/image-stats, /api/admin/supplies/without-images, /api/admin/supplies/batch-filter, /api/admin/supplies/batch-image-search, /api/admin/supplies/:id/image
 
 **System Design Choices:**
 - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
