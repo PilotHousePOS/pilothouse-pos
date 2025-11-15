@@ -7,7 +7,10 @@ async function expandAbbreviations() {
   
   // Define abbreviation mappings
   const abbreviations = [
-    // Brand abbreviations
+    // Brand abbreviations (multi-word first)
+    { pattern: /\bTaste of the Wild\b/gi, replacement: 'Taste of the Wild' },
+    { pattern: /\bNatural Balance\b/gi, replacement: 'Natural Balance' },
+    { pattern: /\bFerret Nation\b/gi, replacement: 'Ferret Nation' },
     { pattern: /\bWholseso\b/gi, replacement: 'Wholesome' },
     { pattern: /\bWholso\b/gi, replacement: 'Wholesome' },
     { pattern: /\bWholeso\b/gi, replacement: 'Wholesome' },
@@ -20,6 +23,15 @@ async function expandAbbreviations() {
     { pattern: /\bRed B\b/gi, replacement: 'RedBarn' },
     { pattern: /\bZign\b/gi, replacement: 'Zignature' },
     
+    // Short brand abbreviations at start of product name
+    { pattern: /^Tow\b/gi, replacement: 'Taste of the Wild' },
+    { pattern: /^Nb\b/gi, replacement: 'Natural Balance' },
+    { pattern: /^Zig\b/gi, replacement: 'Zignature' },
+    { pattern: /^Nyla\b/gi, replacement: 'Nylabone' },
+    { pattern: /^Diam\b/gi, replacement: 'Diamond' },
+    { pattern: /^Orij\b/gi, replacement: 'Orijen' },
+    { pattern: /^Cand\b/gi, replacement: 'Canidae' },
+    
     // Multi-word phrases (must come before single words)
     { pattern: /\bFromm Gold Weight\b(?! Management)/gi, replacement: 'Fromm Gold Weight Management' },
     { pattern: /\bPerf Weight\b/gi, replacement: 'Perfect Weight' },
@@ -29,6 +41,9 @@ async function expandAbbreviations() {
     { pattern: /\bClmbree\b/gi, replacement: 'Calm Breeze' },
     { pattern: /\bBbypdr\b/gi, replacement: 'Baby powder' },
     { pattern: /\bWorldsbestcatlitter\b/gi, replacement: "World's Best Cat Litter" },
+    { pattern: /\bSwtpot\b/gi, replacement: 'Sweet Potato' },
+    { pattern: /\bBeggarbns\b/gi, replacement: "Beggin'" },
+    { pattern: /\bFrndsfrm\b/gi, replacement: 'Friends From The Farm' },
     
     // Single word abbreviations
     { pattern: /\bSportmix\b/gi, replacement: 'Sportsmix' },
@@ -47,6 +62,10 @@ async function expandAbbreviations() {
     { pattern: /\bGpig\b/gi, replacement: 'Guineapig' },
     { pattern: /\bSpe\b/gi, replacement: 'Special' },
     { pattern: /\bSpec\b/gi, replacement: 'Special' },
+    { pattern: /\bSal\b/gi, replacement: 'Salmon' },
+    { pattern: /\bProc\b/gi, replacement: 'Process' },
+    { pattern: /\bNat\b/gi, replacement: 'Natural' },
+    { pattern: /\bFd\b/gi, replacement: 'Freeze Dried' },
   ];
   
   // Get all supplies

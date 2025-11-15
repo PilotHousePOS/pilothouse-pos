@@ -61,12 +61,21 @@ The application is a full-stack web application built with React, Vite, TypeScri
         - KONG → Toys, Blue Buffalo → Food, Chuckit → Toys, FURminator → Healthcare, Ruffwear → Leashes
 - **Abbreviation Expansion System:**
     - **Enterprise-Grade Three-Phase Pipeline:** Expands abbreviations, corrects spelling, and applies professional title case to product names and descriptions with transactional protection, backups, and rollback.
-    - **Shared Mappings Module:** Centralized abbreviation mappings, spelling corrections, and title case rules.
-    - **Comprehensive Abbreviation Coverage:** scripts/expand-abbreviations.ts includes 26+ mappings:
-      - Brand abbreviations: Wholseso/Wholso/Wholeso→Wholesome, Vict→Victor, Euk→Eukanuba, Nutri Sour/Sou→Nutrisource, Blue B→Blue Buffalo, Red B→RedBarn, Zign→Zignature
-      - Multi-word phrases: Fromm Gold Weight→Fromm Gold Weight Management, Perf Weight→Perfect Weight, Mini Chu→Minniechuncks, Gr Fr→Grain Free, Conure&tiel→Conure & Cockatiel, Clmbree→Calm Breeze, Bbypdr→Baby powder, Worldsbestcatlitter→World's Best Cat Litter
-      - Single words: Sportmix→Sportsmix, Orig→Original, Cast→Cat, Per→Perfect, Ind→Indoor, Shred→Shredded, Seaf→Seafood, Unsc.→Unscented, Kanga→Kangaroo, Zssen→Zssential, Yurkey→Turkey, Blk→Black, Yng→Young, Gpig→Guineapig, Spe/Spec→Special
-    - **Latest Run Results:** 185 products updated with expanded abbreviations and corrected misspellings
+    - **Shared Mappings Module:** Centralized abbreviation mappings, spelling corrections, and title case rules in scripts/expand-abbreviations.ts.
+    - **Comprehensive Abbreviation Coverage:** 40+ mappings including:
+      - Brand abbreviations: Wholseso/Wholso/Wholeso→Wholesome, Vict→Victor, Euk→Eukanuba, Nutri Sour/Sou→Nutrisource, Blue B→Blue Buffalo, Red B→RedBarn, Zign→Zignature, Tow→Taste of the Wild, Nb→Natural Balance, Zig→Zignature, Nyla→Nylabone, Diam→Diamond, Orij→Orijen, Cand→Canidae
+      - Multi-word phrases: Fromm Gold Weight→Fromm Gold Weight Management, Perf Weight→Perfect Weight, Mini Chu→Minniechuncks, Gr Fr→Grain Free, Conure&tiel→Conure & Cockatiel, Clmbree→Calm Breeze, Bbypdr→Baby powder, Worldsbestcatlitter→World's Best Cat Litter, Swtpot→Sweet Potato, Beggarbns→Beggin', Frndsfrm→Friends From The Farm
+      - Single words: Sportmix→Sportsmix, Orig→Original, Cast→Cat, Per→Perfect, Ind→Indoor, Shred→Shredded, Seaf→Seafood, Unsc.→Unscented, Kanga→Kangaroo, Zssen→Zssential, Yurkey→Turkey, Blk→Black, Yng→Young, Gpig→Guineapig, Spe/Spec→Special, Sal→Salmon, Proc→Process, Nat→Natural, Fd→Freeze Dried
+    - **Latest Run Results:** 357 total products updated across multiple runs (185 initial + 172 brand abbreviations)
+- **Brand Extraction System:**
+    - **Comprehensive Brand Database:** scripts/extract-brands.ts with 80+ brand patterns across all pet categories
+    - **Coverage:** 63.7% of inventory (4,659 of 7,316 products) have assigned brands
+    - **Top Brands:** Coastal Pet Products (896), KONG (318), ZooMed (272), Exo Terra (213), Science Diet (200), Lil Pals (164), Fluval (155), Kaytee (136), Fromm (135), Zilla (118), Tetra (103), Blue Buffalo (101), Aqueon (95), Nutrisource (92), RedBarn (89), Oxbow (89)
+    - **Small Animal Brands:** Oxbow (89), Kaytee (136), Marshall (11), Higgins (13), Ferret Nation (4), A&E Cage Company (13), Birdlife (74), Quiko (2)
+    - **Food Brands:** Fromm, Diamond, Natural Balance, Pure Vita, Canidae, Sportsmix, Freshpet, Taste of the Wild, and all major dog/cat food brands
+    - **Aquatic Brands:** Marina (66), Aquatop (59), Cascade (24), Activ (4), Acurel (2), plus all major aquatic brands
+    - **Treats & Accessories:** Greenies (49), SmartBones (20), Nylabone (56), SodaPup (15), Jolly Pets (7), Meowijuana (9), Fresh Kisses (14)
+    - **Latest Run Results:** 1,842 brands extracted in latest run, increasing coverage from 38.5% to 63.7%
 - **Product Image Management System:**
     - **Statistics Dashboard:** Real-time tracking of total products, products with/without images, breakdown by brand and category.
     - **Manual Image Search:** Individual product image URL input with preview and validation.

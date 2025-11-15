@@ -33,11 +33,16 @@ async function extractBrands() {
     { pattern: /\bfluval\b/i, brand: 'Fluval' },
     { pattern: /\bseachem\b/i, brand: 'SeaChem' },
     { pattern: /\bglofish\b/i, brand: 'GloFish' },
-    { pattern: /\bpenn plax\b|\bpenn-plax\b/i, brand: 'Penn Plax' },
+    { pattern: /\bpenn plax\b|\bpenn-plax\b|\bpennplac\b/i, brand: 'Penn Plax' },
+    { pattern: /\bmarina\b/i, brand: 'Marina' },
+    { pattern: /\bcascade\b/i, brand: 'Cascade' },
+    { pattern: /\baquatop\b/i, brand: 'Aquatop' },
+    { pattern: /\bactiv\b(?=.*water|.*betta)/i, brand: 'Activ' },
+    { pattern: /\bacurel\b/i, brand: 'Acurel' },
     
     // Dog & Cat food brands
     { pattern: /\bpro plan\b|\bproplan\b|\bpurina pro plan\b/i, brand: 'Purina Pro Plan' },
-    { pattern: /\bblue buffalo\b|\bblue b\b/i, brand: 'Blue Buffalo' },
+    { pattern: /\bblue buffalo\b|\bblue b\b|\bbluebuff\b/i, brand: 'Blue Buffalo' },
     { pattern: /\bscience diet\b|\bhill'?s?\b(?=.*science)/i, brand: 'Science Diet' },
     { pattern: /\broyale canin\b|\broyal canin\b/i, brand: 'Royal Canin' },
     { pattern: /\biams\b/i, brand: 'IAMS' },
@@ -45,13 +50,20 @@ async function extractBrands() {
     { pattern: /\bwholseso\b|\bwholso\b|\bwholeso\b|\bwholesome\b/i, brand: 'Wholesome' },
     { pattern: /\bvict\b|\bvictor\b/i, brand: 'Victor' },
     { pattern: /\beuk\b|\beukanuba\b/i, brand: 'Eukanuba' },
-    { pattern: /\bnutri sour\b|\bnutri sou\b|\bnutrisource\b/i, brand: 'Nutrisource' },
+    { pattern: /\bnutri sour\b|\bnutri sou\b|\bnutrisource\b|\bnutrisrc\b/i, brand: 'Nutrisource' },
     { pattern: /\bmerrick\b/i, brand: 'Merrick' },
     { pattern: /\btaste of the wild\b/i, brand: 'Taste of the Wild' },
     { pattern: /\borijen\b/i, brand: 'Orijen' },
     { pattern: /\bacana\b/i, brand: 'Acana' },
     { pattern: /\bnutro\b/i, brand: 'Nutro' },
     { pattern: /\bzign\b|\bzignature\b/i, brand: 'Zignature' },
+    { pattern: /\bfromm\b/i, brand: 'Fromm' },
+    { pattern: /\bdiamond\b/i, brand: 'Diamond' },
+    { pattern: /\bnatural balance\b/i, brand: 'Natural Balance' },
+    { pattern: /\bpure vita\b/i, brand: 'Pure Vita' },
+    { pattern: /\bcanidae\b/i, brand: 'Canidae' },
+    { pattern: /\bsportsmix\b/i, brand: 'Sportsmix' },
+    { pattern: /\bfreshpet\b/i, brand: 'Freshpet' },
     { pattern: /\bfancy feast\b/i, brand: 'Fancy Feast' },
     { pattern: /\bfriskies\b/i, brand: 'Friskies' },
     { pattern: /\bmeow mix\b/i, brand: 'Meow Mix' },
@@ -65,6 +77,11 @@ async function extractBrands() {
     { pattern: /\bwest paw\b|\bwestpaw\b/i, brand: 'West Paw' },
     { pattern: /\boutward hound\b/i, brand: 'Outward Hound' },
     { pattern: /\bpetmate\b/i, brand: 'Petmate' },
+    { pattern: /\bsodapup\b/i, brand: 'SodaPup' },
+    { pattern: /\bjolly\s*pet/i, brand: 'Jolly Pets' },
+    { pattern: /\bmeowijuana\b/i, brand: 'Meowijuana' },
+    { pattern: /\bspot\b(?=.*toy|.*ball|.*latex)/i, brand: 'Spot' },
+    { pattern: /\bcoastal\b/i, brand: 'Coastal Pet Products' },
     
     // Grooming & Healthcare
     { pattern: /\bfurminator\b/i, brand: 'FURminator' },
@@ -76,6 +93,9 @@ async function extractBrands() {
     { pattern: /\bearthbath\b/i, brand: 'Earthbath' },
     { pattern: /\btropiclean\b/i, brand: 'TropiClean' },
     { pattern: /\bburt'?s bees\b/i, brand: "Burt's Bees" },
+    { pattern: /\bpetcrest\b/i, brand: 'Petcrest' },
+    { pattern: /\bhappy jack\b/i, brand: 'Happy Jack' },
+    { pattern: /\badams\b(?=.*spray|.*flea)/i, brand: 'Adams' },
     
     // Leashes & Collars
     { pattern: /\bruffwear\b/i, brand: 'Ruffwear' },
@@ -89,6 +109,24 @@ async function extractBrands() {
     { pattern: /\bvitakraft\b/i, brand: 'Vitakraft' },
     { pattern: /\bsunseed\b/i, brand: 'Sunseed' },
     { pattern: /\bliving world\b/i, brand: 'Living World' },
+    { pattern: /\bmarshall\b/i, brand: 'Marshall' },
+    { pattern: /\bhiggins\b/i, brand: 'Higgins' },
+    { pattern: /\bferret nation\b|\bnation\b(?=.*hammock|.*cage|.*shelf)/i, brand: 'Ferret Nation' },
+    { pattern: /\bbirdlife\b/i, brand: 'Birdlife' },
+    { pattern: /\ba&e\b/i, brand: 'A&E Cage Company' },
+    { pattern: /\bquiko\b/i, brand: 'Quiko' },
+    
+    // Treats & Chews
+    { pattern: /\bgreenies\b/i, brand: 'Greenies' },
+    { pattern: /\bsmartbones\b/i, brand: 'SmartBones' },
+    { pattern: /\bbeggin'?\b/i, brand: "Beggin'" },
+    { pattern: /\bjones\b(?=.*chew|.*bone)/i, brand: 'Jones Natural Chews' },
+    { pattern: /\bfresh kisses\b/i, brand: 'Fresh Kisses' },
+    
+    // Cat Litter & Supplies
+    { pattern: /\bintersand\b/i, brand: 'Intersand' },
+    { pattern: /\bsupernatural\b/i, brand: 'Supernatural' },
+    { pattern: /\bcatit\b/i, brand: 'Catit' },
     
     // Additional common brands
     { pattern: /\blil pals\b|\blil'?pals\b/i, brand: 'Lil Pals' },
@@ -101,6 +139,12 @@ async function extractBrands() {
     { pattern: /\bsimple solution\b/i, brand: 'Simple Solution' },
     { pattern: /\bpet botanics\b/i, brand: 'Pet Botanics' },
     { pattern: /\bstellar\b/i, brand: 'Stellar' },
+    { pattern: /\bpethouse\b/i, brand: 'Pethouse' },
+    { pattern: /\bquiettime\b/i, brand: 'QuietTime' },
+    { pattern: /\breptology\b/i, brand: 'Reptology' },
+    { pattern: /\bruffntuff\b/i, brand: 'RuffNTuff' },
+    { pattern: /\bhappydog\b/i, brand: 'HappyDog' },
+    { pattern: /\bbasic\b(?=.*hoodie|.*leash)/i, brand: 'Basic' },
   ];
   
   let updated = 0;
