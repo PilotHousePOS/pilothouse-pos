@@ -2116,15 +2116,15 @@ function ProductImageManager() {
               {/* Overall Stats */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">{imageStats.totalProducts}</div>
+                  <div className="text-2xl font-bold text-blue-600">{(imageStats as any).totalProducts || 0}</div>
                   <div className="text-sm text-gray-600">Total Products</div>
                 </div>
                 <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">{imageStats.withImages}</div>
+                  <div className="text-2xl font-bold text-green-600">{(imageStats as any).withImages || 0}</div>
                   <div className="text-sm text-gray-600">With Images</div>
                 </div>
                 <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-red-600">{imageStats.withoutImages}</div>
+                  <div className="text-2xl font-bold text-red-600">{(imageStats as any).withoutImages || 0}</div>
                   <div className="text-sm text-gray-600">Missing Images</div>
                 </div>
               </div>
@@ -2133,7 +2133,7 @@ function ProductImageManager() {
               <div>
                 <h3 className="font-semibold mb-3">Top Brands Needing Images</h3>
                 <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {imageStats.byBrand.slice(0, 10).map((brand: any) => (
+                  {((imageStats as any).byBrand || []).slice(0, 10).map((brand: any) => (
                     <div key={brand.brand} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded">
                       <span className="font-medium">{brand.brand}</span>
                       <div className="flex items-center gap-4 text-sm">
@@ -2157,7 +2157,7 @@ function ProductImageManager() {
               <div>
                 <h3 className="font-semibold mb-3">Categories Needing Images</h3>
                 <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {imageStats.byCategory.slice(0, 10).map((cat: any) => (
+                  {((imageStats as any).byCategory || []).slice(0, 10).map((cat: any) => (
                     <div key={cat.category} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded">
                       <span className="font-medium capitalize">{cat.category}</span>
                       <div className="flex items-center gap-4 text-sm">
@@ -2350,7 +2350,7 @@ function ProductImageManager() {
               <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
               <div className="text-sm text-yellow-800 dark:text-yellow-200">
                 <p className="font-semibold mb-1">Cost Management</p>
-                <p>Web searches consume your monthly Replit credits. Batch searching {imageStats?.totalProducts || 7316} products may use significant credits. Search selectively by brand or category to manage costs.</p>
+                <p>Web searches consume your monthly Replit credits. Batch searching {((imageStats as any)?.totalProducts) || 7316} products may use significant credits. Search selectively by brand or category to manage costs.</p>
               </div>
             </div>
           </div>
