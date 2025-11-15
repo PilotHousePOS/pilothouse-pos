@@ -66,6 +66,7 @@ async function expandAbbreviations() {
     { pattern: /\bProc\b/gi, replacement: 'Process' },
     { pattern: /\bNat\b/gi, replacement: 'Natural' },
     { pattern: /\bFd\b/gi, replacement: 'Freeze Dried' },
+    { pattern: /\bVegtable\b/gi, replacement: 'Vegetable' },
   ];
   
   // Get all supplies

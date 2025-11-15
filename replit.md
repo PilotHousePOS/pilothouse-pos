@@ -66,7 +66,8 @@ The application is a full-stack web application built with React, Vite, TypeScri
       - Brand abbreviations: Wholseso/Wholso/Wholeso→Wholesome, Vict→Victor, Euk→Eukanuba, Nutri Sour/Sou→Nutrisource, Blue B→Blue Buffalo, Red B→RedBarn, Zign→Zignature, Tow→Taste of the Wild, Nb→Natural Balance, Zig→Zignature, Nyla→Nylabone, Diam→Diamond, Orij→Orijen, Cand→Canidae
       - Multi-word phrases: Fromm Gold Weight→Fromm Gold Weight Management, Perf Weight→Perfect Weight, Mini Chu→Minniechuncks, Gr Fr→Grain Free, Conure&tiel→Conure & Cockatiel, Clmbree→Calm Breeze, Bbypdr→Baby powder, Worldsbestcatlitter→World's Best Cat Litter, Swtpot→Sweet Potato, Beggarbns→Beggin', Frndsfrm→Friends From The Farm
       - Single words: Sportmix→Sportsmix, Orig→Original, Cast→Cat, Per→Perfect, Ind→Indoor, Shred→Shredded, Seaf→Seafood, Unsc.→Unscented, Kanga→Kangaroo, Zssen→Zssential, Yurkey→Turkey, Blk→Black, Yng→Young, Gpig→Guineapig, Spe/Spec→Special, Sal→Salmon, Proc→Process, Nat→Natural, Fd→Freeze Dried
-    - **Latest Run Results:** 357 total products updated across multiple runs (185 initial + 172 brand abbreviations)
+      - Spelling corrections: Vegtable→Vegetable
+    - **Latest Run Results:** 404 total products updated across multiple runs (185 initial + 172 brand abbreviations + 47 latest run)
 - **Brand Extraction System:**
     - **Comprehensive Brand Database:** scripts/extract-brands.ts with 80+ brand patterns across all pet categories
     - **Coverage:** 63.7% of inventory (4,659 of 7,316 products) have assigned brands
