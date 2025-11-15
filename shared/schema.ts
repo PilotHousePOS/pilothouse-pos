@@ -498,6 +498,39 @@ export type InsertSpecialDateAllowedTime = z.infer<typeof insertSpecialDateAllow
 export type AppointmentHistory = typeof appointmentHistory.$inferSelect;
 export type InsertAppointmentHistory = z.infer<typeof insertAppointmentHistorySchema>;
 
+// Pet Boarding/Babysitting records
+export const boardingRecords = pgTable("boarding_records", {
+  id: serial("id").primaryKey(),
+  
+  // Customer information
+  customerName: varchar("customer_name", { length: 255 }).notNull(),
+  customerEmail: varchar("customer_email", { length: 255 }),
+  customerPhone: varchar("customer_phone", { length: 20 }).notNull(),
+  
+  // Animal information
+  animalType: varchar("animal_type", { length: 100 }).notNull(), // dog, cat, bird, rabbit, etc.
+  animalName: varchar("animal_name", { length: 255 }).notNull(),
+  
+  // Dates
+  estimatedDropOffDate: date("estimated_drop_off_date").notNull(),
+  actualDropOffDate: date("actual_drop_off_date"),
+  estimatedPickUpDate: date("estimated_pick_up_date").notNull(),
+  actualPickUpDate: date("actual_pick_up_date"),
+  
+  // Pricing
+  dailyRate: decimal("daily_rate", { precision: 10, scale: 2 }).notNull(), // Price per day
+  
+  // Status
+  status: varchar("status", { length: 50 }).default("active").notNull(), // active, completed, cancelled
+  
+  // Additional notes
+  notes: text("notes"),
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Staging table for supply imports with duplicate detection
 export const supplyImportStaging = pgTable("supply_import_staging", {
   id: serial("id").primaryKey(),
