@@ -1115,10 +1115,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const appointmentIds = filteredAppointments.map((apt: any) => apt.id);
       const petsByAppointmentId = await storage.getAppointmentPetsByAppointmentIds(appointmentIds);
       
-      const appointmentsWithPets = filteredAppointments.map((apt: any) => ({
-        ...apt,
-        pets: petsByAppointmentId.get(apt.id) || []
-      }));
+      const appointmentsWithPets = filteredAppointments.map((apt: any) => {
+        let pets = petsByAppointmentId.get(apt.id);
+        
+        // Backfill pets array from main appointment record for legacy single-pet appointments
+        if (!pets || pets.length === 0) {
+          if (apt.petName && apt.petType) {
+            pets = [{
+              appointmentId: apt.id,
+              petName: apt.petName,
+              petType: apt.petType,
+              serviceType: apt.serviceType,
+              price: apt.price,
+              specialNotes: apt.specialNotes
+            }];
+          } else {
+            pets = [];
+          }
+        }
+        
+        return {
+          ...apt,
+          pets
+        };
+      });
       
       res.json(appointmentsWithPets);
     } catch (error) {

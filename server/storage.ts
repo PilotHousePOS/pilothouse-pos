@@ -60,7 +60,7 @@ import {
   type SupplyImportStaging,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, and, or, not, ilike, lt, isNull, count, sql } from "drizzle-orm";
+import { eq, desc, asc, and, or, not, ilike, lt, isNull, count, sql, inArray } from "drizzle-orm";
 import { phoneNumbersMatch } from "./phoneUtils";
 import { SUPPLY_FILTERS, type FilterType } from "./filterConfig";
 import { 
@@ -1037,7 +1037,7 @@ export class DatabaseStorage implements IStorage {
     const allPets = await db
       .select()
       .from(appointmentPets)
-      .where(sql`${appointmentPets.appointmentId} = ANY(${appointmentIds})`);
+      .where(inArray(appointmentPets.appointmentId, appointmentIds));
     
     // Group pets by appointment ID
     const petsByAppointmentId = new Map<number, any[]>();
