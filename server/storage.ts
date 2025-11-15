@@ -1034,10 +1034,21 @@ export class DatabaseStorage implements IStorage {
       return new Map();
     }
     
-    // Fetch all pets for the given appointment IDs in a single query
+    // Fetch all pets for the given appointment IDs in a single query with groomer info
     const allPets = await db
-      .select()
+      .select({
+        id: appointmentPets.id,
+        appointmentId: appointmentPets.appointmentId,
+        petName: appointmentPets.petName,
+        petType: appointmentPets.petType,
+        serviceType: appointmentPets.serviceType,
+        price: appointmentPets.price,
+        groomerId: appointmentPets.groomerId,
+        groomerName: groomers.name,
+        createdAt: appointmentPets.createdAt,
+      })
       .from(appointmentPets)
+      .leftJoin(groomers, eq(appointmentPets.groomerId, groomers.id))
       .where(inArray(appointmentPets.appointmentId, appointmentIds));
     
     // Group pets by appointment ID

@@ -319,6 +319,11 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                                     <p className="text-xs text-blue-600">
                                       Service: {formatServiceType(pet.serviceType)}
                                     </p>
+                                    {(pet.groomerName || appointment.groomerName) && (
+                                      <p className="text-xs text-purple-600 mt-1">
+                                        Groomer: {pet.groomerName || appointment.groomerName}
+                                      </p>
+                                    )}
                                     {pet.specialNotes && (
                                       <p className="text-xs text-gray-500 mt-1">
                                         Notes: {pet.specialNotes}
