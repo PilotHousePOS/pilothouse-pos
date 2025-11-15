@@ -282,39 +282,59 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                     {time}
                   </div>
                   <div className="flex-1 space-y-2">
-                    {appointmentsList.map((appointment: any, idx: number) => (
-                      <div key={appointment.id || idx} className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-semibold text-gray-900">
-                              {capitalizeWords(appointment.petName)} ({appointment.petType})
-                            </h4>
-                            <p className="text-sm text-gray-600">
-                              Owner: {capitalizeWords(appointment.ownerFirstName)} {capitalizeWords(appointment.ownerLastName)}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              Phone: {appointment.ownerPhoneNumber}
-                            </p>
-                            <p className="text-xs text-blue-600">
-                              Service: {formatServiceType(appointment.serviceType)}
-                            </p>
-                            {appointment.groomerName && (
-                              <p className="text-xs text-gray-600 mt-1">
-                                Notes: Groomer-{appointment.groomerName}
+                    {appointmentsList.map((appointment: any, idx: number) => {
+                      // Use pets array if available, otherwise fall back to legacy single-pet fields
+                      const pets = appointment.pets && appointment.pets.length > 0 
+                        ? appointment.pets 
+                        : [{
+                            petName: appointment.petName,
+                            petType: appointment.petType,
+                            serviceType: appointment.serviceType,
+                            specialNotes: appointment.specialNotes
+                          }];
+                      
+                      return (
+                        <div key={appointment.id || idx} className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <p className="text-sm text-gray-600 mb-2">
+                                Owner: {capitalizeWords(appointment.ownerFirstName)} {capitalizeWords(appointment.ownerLastName)}
                               </p>
-                            )}
+                              <p className="text-sm text-gray-600 mb-2">
+                                Phone: {appointment.ownerPhoneNumber}
+                              </p>
+                              {appointment.groomerName && (
+                                <p className="text-xs text-gray-600 mb-2">
+                                  Groomer: {appointment.groomerName}
+                                </p>
+                              )}
+                              
+                              {/* Display all pets */}
+                              <div className="space-y-2 mt-2">
+                                {pets.map((pet: any, petIdx: number) => (
+                                  <div key={petIdx} className="bg-white p-2 rounded border border-blue-200">
+                                    <h4 className="font-semibold text-gray-900">
+                                      {capitalizeWords(pet.petName)} ({pet.petType})
+                                    </h4>
+                                    <p className="text-xs text-blue-600">
+                                      Service: {formatServiceType(pet.serviceType)}
+                                    </p>
+                                    {pet.specialNotes && (
+                                      <p className="text-xs text-gray-500 mt-1">
+                                        Notes: {pet.specialNotes}
+                                      </p>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            <Badge variant="default" className="bg-green-600">
+                              Grooming
+                            </Badge>
                           </div>
-                          <Badge variant="default" className="bg-green-600">
-                            Grooming
-                          </Badge>
                         </div>
-                        {appointment.specialNotes && (
-                          <p className="text-xs text-gray-500 mt-2">
-                            Notes: {appointment.specialNotes}
-                          </p>
-                        )}
-                      </div>
-                    ))}
+                      );
+                    })}
                     
                     {googleEventsList.map((event: any, idx: number) => (
                       <div key={event.id || idx} className="bg-purple-50 p-3 rounded border-l-4 border-purple-500">
@@ -2523,11 +2543,18 @@ export default function Admin() {
     return (appointments as any[]).filter(appointment => {
       const fullName = `${appointment.ownerFirstName || ''} ${appointment.ownerLastName || ''}`.toLowerCase();
       const phone = (appointment.ownerPhoneNumber || '').replace(/\D/g, '');
-      const petName = (appointment.petName || '').toLowerCase();
       
       const nameMatch = fullName.includes(query);
       const phoneMatch = searchDigits.length > 0 && phone.includes(searchDigits);
-      const petMatch = petName.includes(query);
+      
+      // Search across all pets in the appointment
+      const pets = appointment.pets && appointment.pets.length > 0 
+        ? appointment.pets 
+        : [{ petName: appointment.petName }];
+      
+      const petMatch = pets.some((pet: any) => 
+        (pet.petName || '').toLowerCase().includes(query)
+      );
       
       return nameMatch || phoneMatch || petMatch;
     });

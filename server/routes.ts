@@ -1111,7 +1111,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return true;
       });
       
-      res.json(filteredAppointments);
+      // Enrich appointments with pets data using bulk query to avoid N+1
+      const appointmentIds = filteredAppointments.map((apt: any) => apt.id);
+      const petsByAppointmentId = await storage.getAppointmentPetsByAppointmentIds(appointmentIds);
+      
+      const appointmentsWithPets = filteredAppointments.map((apt: any) => ({
+        ...apt,
+        pets: petsByAppointmentId.get(apt.id) || []
+      }));
+      
+      res.json(appointmentsWithPets);
     } catch (error) {
       console.error("Error fetching appointments:", error);
       res.status(500).json({ message: "Failed to fetch appointments" });

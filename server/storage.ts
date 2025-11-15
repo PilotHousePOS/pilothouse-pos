@@ -157,6 +157,7 @@ export interface IStorage {
   createAppointment(appointment: InsertAppointment): Promise<Appointment>;
   createAppointmentPets(appointmentId: number, pets: Array<{petName: string; petType: string; serviceType: string; price: string; specialNotes?: string}>): Promise<void>;
   getAppointmentPets(appointmentId: number): Promise<any[]>;
+  getAppointmentPetsByAppointmentIds(appointmentIds: number[]): Promise<Map<number, any[]>>;
   getAppointments(userId?: string): Promise<Appointment[]>;
   getAppointment(id: number): Promise<Appointment | undefined>;
   getAppointmentsByPhoneNumber(phoneNumber: string): Promise<Appointment[]>;
@@ -1025,6 +1026,28 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(appointmentPets)
       .where(eq(appointmentPets.appointmentId, appointmentId));
+  }
+
+  async getAppointmentPetsByAppointmentIds(appointmentIds: number[]): Promise<Map<number, any[]>> {
+    if (appointmentIds.length === 0) {
+      return new Map();
+    }
+    
+    // Fetch all pets for the given appointment IDs in a single query
+    const allPets = await db
+      .select()
+      .from(appointmentPets)
+      .where(sql`${appointmentPets.appointmentId} = ANY(${appointmentIds})`);
+    
+    // Group pets by appointment ID
+    const petsByAppointmentId = new Map<number, any[]>();
+    for (const pet of allPets) {
+      const existing = petsByAppointmentId.get(pet.appointmentId) || [];
+      existing.push(pet);
+      petsByAppointmentId.set(pet.appointmentId, existing);
+    }
+    
+    return petsByAppointmentId;
   }
 
   async getAppointments(userId?: string): Promise<Appointment[]> {
