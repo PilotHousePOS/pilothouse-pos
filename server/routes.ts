@@ -1727,6 +1727,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Boarding/Babysitting routes
+  app.get("/api/admin/boarding", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const records = await storage.getAllBoardingRecords();
+      res.json(records);
+    } catch (error) {
+      console.error("Error fetching boarding records:", error);
+      res.status(500).json({ message: "Failed to fetch boarding records" });
+    }
+  });
+
+  app.get("/api/admin/boarding/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const record = await storage.getBoardingRecord(parseInt(req.params.id));
+      if (!record) {
+        return res.status(404).json({ message: "Boarding record not found" });
+      }
+      res.json(record);
+    } catch (error) {
+      console.error("Error fetching boarding record:", error);
+      res.status(500).json({ message: "Failed to fetch boarding record" });
+    }
+  });
+
+  app.post("/api/admin/boarding", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const record = await storage.createBoardingRecord(req.body);
+      res.json(record);
+    } catch (error) {
+      console.error("Error creating boarding record:", error);
+      res.status(500).json({ message: "Failed to create boarding record" });
+    }
+  });
+
+  app.put("/api/admin/boarding/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const record = await storage.updateBoardingRecord(parseInt(req.params.id), req.body);
+      res.json(record);
+    } catch (error) {
+      console.error("Error updating boarding record:", error);
+      res.status(500).json({ message: "Failed to update boarding record" });
+    }
+  });
+
+  app.patch("/api/admin/boarding/:id/check-in", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const record = await storage.checkInBoardingRecord(parseInt(req.params.id));
+      res.json(record);
+    } catch (error) {
+      console.error("Error checking in boarding record:", error);
+      res.status(500).json({ message: "Failed to check in boarding record" });
+    }
+  });
+
+  app.patch("/api/admin/boarding/:id/check-out", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const record = await storage.checkOutBoardingRecord(parseInt(req.params.id));
+      res.json(record);
+    } catch (error) {
+      console.error("Error checking out boarding record:", error);
+      res.status(500).json({ message: "Failed to check out boarding record" });
+    }
+  });
+
+  app.delete("/api/admin/boarding/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      await storage.deleteBoardingRecord(parseInt(req.params.id));
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting boarding record:", error);
+      res.status(500).json({ message: "Failed to delete boarding record" });
+    }
+  });
+
   // Admin user management routes
   app.get("/api/admin/users", authMiddleware, async (req: any, res) => {
     try {

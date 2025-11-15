@@ -566,6 +566,16 @@ export const supplyImportStaging = pgTable("supply_import_staging", {
   index("staging_sku_idx").on(table.normalizedSku),
 ]);
 
+// Boarding schemas
+export const insertBoardingRecordSchema = createInsertSchema(boardingRecords).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type BoardingRecord = typeof boardingRecords.$inferSelect;
+export type InsertBoardingRecord = z.infer<typeof insertBoardingRecordSchema>;
+
 export const insertSupplyImportStagingSchema = createInsertSchema(supplyImportStaging).omit({
   id: true,
   createdAt: true,

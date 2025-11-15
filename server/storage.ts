@@ -18,6 +18,7 @@ import {
   dailyAppointmentLimits,
   weeklyAppointmentLimits,
   supplyImportStaging,
+  boardingRecords,
   type User,
   type UpsertUser,
   type Pet,
@@ -58,6 +59,8 @@ import {
   type SpecialDateAllowedTime,
   type InsertSpecialDateAllowedTime,
   type SupplyImportStaging,
+  type BoardingRecord,
+  type InsertBoardingRecord,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, and, or, not, ilike, lt, isNull, count, sql, inArray } from "drizzle-orm";
@@ -260,6 +263,15 @@ export interface IStorage {
   approveStagedImports(sessionId: string): Promise<{ created: number; updated: number }>;
   rejectStagedImports(sessionId: string): Promise<void>;
   clearOldStagingData(daysOld: number): Promise<void>;
+
+  // Boarding operations
+  getAllBoardingRecords(): Promise<BoardingRecord[]>;
+  getBoardingRecord(id: number): Promise<BoardingRecord | undefined>;
+  createBoardingRecord(record: InsertBoardingRecord): Promise<BoardingRecord>;
+  updateBoardingRecord(id: number, record: Partial<InsertBoardingRecord>): Promise<BoardingRecord>;
+  checkInBoardingRecord(id: number): Promise<BoardingRecord>;
+  checkOutBoardingRecord(id: number): Promise<BoardingRecord>;
+  deleteBoardingRecord(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2077,6 +2089,58 @@ export class DatabaseStorage implements IStorage {
     cutoffDate.setDate(cutoffDate.getDate() - daysOld);
     
     await db.delete(supplyImportStaging).where(lt(supplyImportStaging.createdAt, cutoffDate));
+  }
+
+  // Boarding operations
+  async getAllBoardingRecords(): Promise<BoardingRecord[]> {
+    return await db.select().from(boardingRecords).orderBy(desc(boardingRecords.createdAt));
+  }
+
+  async getBoardingRecord(id: number): Promise<BoardingRecord | undefined> {
+    const [record] = await db.select().from(boardingRecords).where(eq(boardingRecords.id, id));
+    return record;
+  }
+
+  async createBoardingRecord(record: InsertBoardingRecord): Promise<BoardingRecord> {
+    const [created] = await db.insert(boardingRecords).values(record).returning();
+    return created;
+  }
+
+  async updateBoardingRecord(id: number, record: Partial<InsertBoardingRecord>): Promise<BoardingRecord> {
+    const [updated] = await db
+      .update(boardingRecords)
+      .set({ ...record, updatedAt: new Date() })
+      .where(eq(boardingRecords.id, id))
+      .returning();
+    return updated;
+  }
+
+  async checkInBoardingRecord(id: number): Promise<BoardingRecord> {
+    const today = new Date().toISOString().split('T')[0];
+    const [updated] = await db
+      .update(boardingRecords)
+      .set({ actualDropOffDate: today, updatedAt: new Date() })
+      .where(eq(boardingRecords.id, id))
+      .returning();
+    return updated;
+  }
+
+  async checkOutBoardingRecord(id: number): Promise<BoardingRecord> {
+    const today = new Date().toISOString().split('T')[0];
+    const [updated] = await db
+      .update(boardingRecords)
+      .set({ 
+        actualPickUpDate: today, 
+        status: 'completed',
+        updatedAt: new Date() 
+      })
+      .where(eq(boardingRecords.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteBoardingRecord(id: number): Promise<void> {
+    await db.delete(boardingRecords).where(eq(boardingRecords.id, id));
   }
 }
 
