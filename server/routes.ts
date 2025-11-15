@@ -1528,6 +1528,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // Support both old single-pet format and new multi-pet format
+      const petsArray = req.body.pets || [{ 
+        petName: req.body.petName, 
+        petType: req.body.petType, 
+        serviceType: req.body.serviceType,
+        specialNotes: req.body.specialNotes 
+      }];
+
       // Check weekly appointment limits for the selected day of week
       const dayOfWeek = appointmentDate.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
       
@@ -1546,37 +1554,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
                    apt.status !== 'rejected';
           });
           
-          const bathAppointments = appointmentsOnDate.filter((apt: any) => apt.serviceType === 'grooming-bath').length;
-          const groomAppointments = appointmentsOnDate.filter((apt: any) => apt.serviceType === 'grooming-full').length;
+          // Count existing service types including multi-pet appointments
+          let bathAppointments = 0;
+          let groomAppointments = 0;
           
-          // Check if limit is exceeded
-          const serviceType = req.body.serviceType;
-          if (serviceType === 'grooming-bath' && bathAppointments >= weeklyLimit.maxBathAppointments) {
+          for (const apt of appointmentsOnDate) {
+            // Get appointment pets to count service types accurately
+            const aptPets = await storage.getAppointmentPets(apt.id);
+            if (aptPets && aptPets.length > 0) {
+              // Multi-pet appointment - count each pet's service type
+              bathAppointments += aptPets.filter((p: any) => p.serviceType === 'grooming-bath').length;
+              groomAppointments += aptPets.filter((p: any) => p.serviceType === 'grooming-full').length;
+            } else {
+              // Legacy single-pet appointment - use appointment's serviceType
+              if (apt.serviceType === 'grooming-bath') bathAppointments++;
+              if (apt.serviceType === 'grooming-full') groomAppointments++;
+            }
+          }
+          
+          // Count requested pets by service type
+          const requestedBaths = petsArray.filter((p: any) => p.serviceType === 'grooming-bath').length;
+          const requestedGrooms = petsArray.filter((p: any) => p.serviceType === 'grooming-full').length;
+          
+          // Check if limits would be exceeded
+          if (bathAppointments + requestedBaths > weeklyLimit.maxBathAppointments) {
             return res.status(400).json({
-              message: `Bath appointments are fully booked for this date (limit: ${weeklyLimit.maxBathAppointments}). Please select a different date.`
+              message: `Bath appointments are fully booked for this date (limit: ${weeklyLimit.maxBathAppointments}, ${bathAppointments} already booked). Please select a different date.`
             });
           }
           
-          if (serviceType === 'grooming-full' && groomAppointments >= weeklyLimit.maxGroomAppointments) {
+          if (groomAppointments + requestedGrooms > weeklyLimit.maxGroomAppointments) {
             return res.status(400).json({
-              message: `Full grooming appointments are fully booked for this date (limit: ${weeklyLimit.maxGroomAppointments}). Please select a different date.`
+              message: `Full grooming appointments are fully booked for this date (limit: ${weeklyLimit.maxGroomAppointments}, ${groomAppointments} already booked). Please select a different date.`
             });
           }
         }
       }
       
+      // For multi-pet appointments, use first pet's info in main record for backward compatibility
+      const firstPet = petsArray[0];
+      const petNamesStr = petsArray.map((p: any) => p.petName).join(', ');
+      
       // Admin-created appointments bypass approval, others require approval
       const appointmentData = insertAppointmentSchema.parse({ 
-        ...req.body, 
+        ...req.body,
+        // Use first pet's data for backward compatibility
+        petName: firstPet.petName,
+        petType: firstPet.petType,
+        serviceType: firstPet.serviceType,
+        specialNotes: firstPet.specialNotes,
         userId,
         isApproved: isAdmin ? true : false,
         status: isAdmin ? 'confirmed' : 'scheduled'
       });
       const appointment = await storage.createAppointment(appointmentData);
       
+      // Create appointment_pets records for all pets
+      if (req.body.pets && req.body.pets.length > 0) {
+        const SERVICES = [
+          { id: 'grooming-full', price: 75 },
+          { id: 'grooming-bath', price: 45 },
+        ];
+        
+        const petsWithPrice = petsArray.map((pet: any) => {
+          const service = SERVICES.find(s => s.id === pet.serviceType);
+          return {
+            petName: pet.petName,
+            petType: pet.petType,
+            serviceType: pet.serviceType,
+            specialNotes: pet.specialNotes,
+            price: service ? service.price.toString() : '0',
+          };
+        });
+        
+        await storage.createAppointmentPets(appointment.id, petsWithPrice);
+      }
+      
       // Send admin notifications for new appointment
       try {
         const customerName = `${appointmentData.ownerFirstName} ${appointmentData.ownerLastName}`;
+        const serviceInfo = petsArray.length > 1 
+          ? `${petsArray.length} pets: ${petNamesStr}`
+          : appointmentData.serviceType;
         
         // Get all admin users
         const allUsers = await storage.getAllUsers();
@@ -1589,7 +1648,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           adminEmails,
           appointment.id,
           customerName,
-          appointmentData.serviceType,
+          serviceInfo,
           appointmentData.appointmentDate,
           appointmentData.appointmentTime
         );

@@ -6,6 +6,7 @@ import {
   orders,
   orderItems,
   appointments,
+  appointmentPets,
   customerPets,
   groomingSettings,
   groomers,
@@ -154,6 +155,8 @@ export interface IStorage {
 
   // Appointment operations
   createAppointment(appointment: InsertAppointment): Promise<Appointment>;
+  createAppointmentPets(appointmentId: number, pets: Array<{petName: string; petType: string; serviceType: string; price: string; specialNotes?: string}>): Promise<void>;
+  getAppointmentPets(appointmentId: number): Promise<any[]>;
   getAppointments(userId?: string): Promise<Appointment[]>;
   getAppointment(id: number): Promise<Appointment | undefined>;
   getAppointmentsByPhoneNumber(phoneNumber: string): Promise<Appointment[]>;
@@ -1000,6 +1003,28 @@ export class DatabaseStorage implements IStorage {
   async createAppointment(appointment: InsertAppointment): Promise<Appointment> {
     const [newAppointment] = await db.insert(appointments).values(appointment).returning();
     return newAppointment;
+  }
+
+  async createAppointmentPets(
+    appointmentId: number, 
+    pets: Array<{petName: string; petType: string; serviceType: string; price: string; specialNotes?: string}>
+  ): Promise<void> {
+    const petRecords = pets.map(pet => ({
+      appointmentId,
+      petName: pet.petName,
+      petType: pet.petType,
+      serviceType: pet.serviceType,
+      price: pet.price,
+      specialNotes: pet.specialNotes,
+    }));
+    await db.insert(appointmentPets).values(petRecords);
+  }
+
+  async getAppointmentPets(appointmentId: number): Promise<any[]> {
+    return await db
+      .select()
+      .from(appointmentPets)
+      .where(eq(appointmentPets.appointmentId, appointmentId));
   }
 
   async getAppointments(userId?: string): Promise<Appointment[]> {

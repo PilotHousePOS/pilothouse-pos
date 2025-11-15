@@ -20,15 +20,20 @@ const SERVICES = [
 ];
 
 export default function Booking() {
-  const [selectedService, setSelectedService] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedGroomer, setSelectedGroomer] = useState('');
-  const [petInfo, setPetInfo] = useState({
+  const [pets, setPets] = useState<Array<{
+    name: string;
+    type: string;
+    serviceType: string;
+    notes: string;
+  }>>([{
     name: '',
     type: '',
+    serviceType: '',
     notes: '',
-  });
+  }]);
   
   const [ownerInfo, setOwnerInfo] = useState({
     firstName: '',
@@ -138,10 +143,11 @@ export default function Booking() {
     
     // Auto-fill pet name if extracted
     if (petName) {
-      setPetInfo(prev => ({
-        ...prev,
-        name: petName,
-      }));
+      setPets(prev => {
+        const updated = [...prev];
+        updated[0] = { ...updated[0], name: petName };
+        return updated;
+      });
     }
     
     setContactSearch(contact.name || '');
@@ -259,11 +265,10 @@ export default function Booking() {
         description: "Your appointment has been successfully scheduled.",
       });
       // Reset form
-      setSelectedService('');
       setSelectedDate(new Date());
       setSelectedTime('');
       setSelectedGroomer('');
-      setPetInfo({ name: '', type: '', notes: '' });
+      setPets([{ name: '', type: '', serviceType: '', notes: '' }]);
       setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
     },
@@ -287,37 +292,64 @@ export default function Booking() {
     },
   });
 
-  const selectedServiceData = SERVICES.find(s => s.id === selectedService);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedService || !selectedDate || !selectedTime || !petInfo.name || !petInfo.type || 
-        !ownerInfo.lastName || !ownerInfo.phoneNumber) {
+    // Validate all pets have required fields
+    const invalidPet = pets.find(pet => !pet.name || !pet.type || !pet.serviceType);
+    
+    if (!selectedDate || !selectedTime || invalidPet || !ownerInfo.lastName || !ownerInfo.phoneNumber) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields including owner information.",
+        description: "Please fill in all required fields for all pets and owner information.",
         variant: "destructive",
       });
       return;
     }
 
-    const serviceData = SERVICES.find(s => s.id === selectedService);
-    if (!serviceData) return;
+    // Calculate total price from all pets
+    const totalPrice = pets.reduce((sum, pet) => {
+      const serviceData = SERVICES.find(s => s.id === pet.serviceType);
+      return sum + (serviceData?.price || 0);
+    }, 0);
 
     createAppointmentMutation.mutate({
-      serviceType: selectedService,
       appointmentDate: selectedDate.toISOString().split('T')[0],
       appointmentTime: selectedTime,
       ...(selectedGroomer && { groomerId: parseInt(selectedGroomer) }),
-      petName: petInfo.name,
-      petType: petInfo.type,
-      specialNotes: petInfo.notes,
       ownerFirstName: ownerInfo.firstName,
       ownerLastName: ownerInfo.lastName,
       ownerPhoneNumber: ownerInfo.phoneNumber,
-      price: serviceData.price.toString(),
+      price: totalPrice.toString(),
+      pets: pets.map(pet => ({
+        petName: pet.name,
+        petType: pet.type,
+        serviceType: pet.serviceType,
+        specialNotes: pet.notes,
+      })),
     });
+  };
+
+  const addPet = () => {
+    setPets([...pets, { name: '', type: '', serviceType: '', notes: '' }]);
+  };
+
+  const removePet = (index: number) => {
+    if (pets.length === 1) {
+      toast({
+        title: "Cannot Remove",
+        description: "You must have at least one pet for the appointment.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setPets(pets.filter((_, i) => i !== index));
+  };
+
+  const updatePet = (index: number, field: string, value: string) => {
+    const updated = [...pets];
+    updated[index] = { ...updated[index], [field]: value };
+    setPets(updated);
   };
 
   return (
@@ -348,27 +380,6 @@ export default function Booking() {
         </div>
       ) : (
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Service Selection */}
-        <div>
-          <Label className="text-sm font-semibold text-gray-900 mb-3 block">Select Service</Label>
-          <RadioGroup value={selectedService} onValueChange={setSelectedService}>
-            <div className="space-y-3">
-              {SERVICES.map((service) => (
-                <Card key={service.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardContent className="p-3">
-                    <Label htmlFor={service.id} className="flex items-center space-x-3 cursor-pointer">
-                      <RadioGroupItem value={service.id} id={service.id} />
-                      <div className="flex-1">
-                        <div className="font-semibold text-gray-900">{service.name}</div>
-                        <div className="text-sm text-gray-500">{service.description}</div>
-                      </div>
-                    </Label>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </RadioGroup>
-        </div>
 
         {/* Date Selection */}
         <div>
@@ -539,38 +550,92 @@ export default function Booking() {
           </div>
         </div>
 
-        {/* Pet Information */}
+        {/* Pet Information - Multiple Pets */}
         <div>
-          <Label className="text-sm font-semibold text-gray-900 mb-3 block">Pet Information</Label>
-          <div className="space-y-3">
-            <Input
-              type="text"
-              placeholder="Pet Name *"
-              value={petInfo.name}
-              onChange={(e) => setPetInfo({ ...petInfo, name: e.target.value })}
-              className="border-gray-300 rounded-xl"
-              required
-            />
-            <Select value={petInfo.type} onValueChange={(value) => setPetInfo({ ...petInfo, type: value })}>
-              <SelectTrigger className="border-gray-300 rounded-xl">
-                <SelectValue placeholder="Select Pet Type *" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="dog">Dog</SelectItem>
-                <SelectItem value="cat">Cat</SelectItem>
-                <SelectItem value="bird">Bird</SelectItem>
-                <SelectItem value="fish">Fish</SelectItem>
-                <SelectItem value="reptile">Reptile</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-            <Textarea
-              placeholder="Special notes or instructions..."
-              value={petInfo.notes}
-              onChange={(e) => setPetInfo({ ...petInfo, notes: e.target.value })}
-              className="border-gray-300 rounded-xl h-20 resize-none"
-            />
+          <div className="flex items-center justify-between mb-3">
+            <Label className="text-sm font-semibold text-gray-900">Pet Information</Label>
+            <Button
+              type="button"
+              onClick={addPet}
+              variant="outline"
+              size="sm"
+              className="text-brand-blue border-brand-blue hover:bg-brand-blue hover:text-white"
+              data-testid="button-add-pet"
+            >
+              + Add Another Pet
+            </Button>
           </div>
+          
+          {pets.map((pet, index) => (
+            <Card key={index} className="mb-4">
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold text-gray-900">Pet {index + 1}</h4>
+                  {pets.length > 1 && (
+                    <Button
+                      type="button"
+                      onClick={() => removePet(index)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      data-testid={`button-remove-pet-${index}`}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </div>
+                
+                <Input
+                  type="text"
+                  placeholder="Pet Name *"
+                  value={pet.name}
+                  onChange={(e) => updatePet(index, 'name', e.target.value)}
+                  className="border-gray-300 rounded-xl"
+                  required
+                  data-testid={`input-pet-name-${index}`}
+                />
+                
+                <Select value={pet.type} onValueChange={(value) => updatePet(index, 'type', value)}>
+                  <SelectTrigger className="border-gray-300 rounded-xl" data-testid={`select-pet-type-${index}`}>
+                    <SelectValue placeholder="Select Pet Type *" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dog">Dog</SelectItem>
+                    <SelectItem value="cat">Cat</SelectItem>
+                    <SelectItem value="bird">Bird</SelectItem>
+                    <SelectItem value="fish">Fish</SelectItem>
+                    <SelectItem value="reptile">Reptile</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <div>
+                  <Label className="text-xs text-gray-600 mb-2 block">Service Type *</Label>
+                  <RadioGroup value={pet.serviceType} onValueChange={(value) => updatePet(index, 'serviceType', value)}>
+                    <div className="space-y-2">
+                      {SERVICES.map((service) => (
+                        <div key={service.id} className="flex items-center space-x-3 p-2 border rounded-lg hover:bg-gray-50">
+                          <RadioGroupItem value={service.id} id={`${service.id}-${index}`} data-testid={`radio-service-${service.id}-${index}`} />
+                          <Label htmlFor={`${service.id}-${index}`} className="flex-1 cursor-pointer">
+                            <div className="font-medium text-gray-900">{service.name}</div>
+                            <div className="text-xs text-gray-500">{service.description}</div>
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </RadioGroup>
+                </div>
+                
+                <Textarea
+                  placeholder="Special notes or instructions..."
+                  value={pet.notes}
+                  onChange={(e) => updatePet(index, 'notes', e.target.value)}
+                  className="border-gray-300 rounded-xl h-20 resize-none"
+                  data-testid={`textarea-pet-notes-${index}`}
+                />
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* Book Button */}
