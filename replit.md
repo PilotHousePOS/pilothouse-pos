@@ -47,6 +47,17 @@ The application is a full-stack web application built with React, Vite, TypeScri
 - **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtered by species.
 - **Admin Order Management:** Displays actual product/pet and customer names in order details.
 - **Orders & Appointments Search:** Unified search in admin panel by customer name, phone, or pet name.
+- **Pet Boarding/Babysitting System:** Complete boarding management with intelligent cost calculation:
+    - **CRUD Operations:** Create, read, update, and delete boarding records with full form validation
+    - **Customer & Pet Information:** Track customer name, phone, email (optional), animal name, and type
+    - **Flexible Date Management:** Estimated dates for planning, actual dates for tracking real check-in/out times
+    - **Smart Total Calculation:** Automatically uses both actual dates when available, otherwise uses both estimated dates (never mixes dates to avoid incorrect calculations)
+    - **Status Tracking:** Three states - Scheduled (outline badge), In Boarding (default badge), Completed (secondary badge)
+    - **Quick Actions:** One-click check-in/out buttons, edit for non-completed records, delete with confirmation
+    - **Visual Indicators:** "Estimated Total" (blue) for scheduled/in-boarding records, "Final Total" (green) for completed records with actual dates
+    - **Daily Rate Customization:** Configurable per-boarding rate with automatic multi-day calculations (minimum 1 day)
+    - **Special Instructions:** Optional notes field for dietary needs, medications, behavioral information
+    - **Admin-Only Access:** All boarding endpoints require admin authentication for security
 - **Database Sync Tools:**
     - **Staging Import with Duplicate Prevention:** Excel import system with smart duplicate detection, SHA-256 checksums, and transactional safety for production.
     - **Supplies-Only Sync:** Admin-only export/import of supplies inventory for production.

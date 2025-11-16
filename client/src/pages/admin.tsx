@@ -2674,10 +2674,7 @@ function BoardingManagement({ isAddOpen, setIsAddOpen }: { isAddOpen: boolean; s
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
       console.log('Creating boarding record with data:', data);
-      return await apiRequest('/api/admin/boarding', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+      return await apiRequest('POST', '/api/admin/boarding', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/boarding'] });
@@ -2692,10 +2689,7 @@ function BoardingManagement({ isAddOpen, setIsAddOpen }: { isAddOpen: boolean; s
   
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: any }) => {
-      return await apiRequest(`/api/admin/boarding/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-      });
+      return await apiRequest('PUT', `/api/admin/boarding/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/boarding'] });
@@ -2709,9 +2703,7 @@ function BoardingManagement({ isAddOpen, setIsAddOpen }: { isAddOpen: boolean; s
   
   const checkInMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/admin/boarding/${id}/check-in`, {
-        method: 'PATCH',
-      });
+      return await apiRequest('PATCH', `/api/admin/boarding/${id}/check-in`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/boarding'] });
@@ -2724,9 +2716,7 @@ function BoardingManagement({ isAddOpen, setIsAddOpen }: { isAddOpen: boolean; s
   
   const checkOutMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/admin/boarding/${id}/check-out`, {
-        method: 'PATCH',
-      });
+      return await apiRequest('PATCH', `/api/admin/boarding/${id}/check-out`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/boarding'] });
@@ -2739,9 +2729,7 @@ function BoardingManagement({ isAddOpen, setIsAddOpen }: { isAddOpen: boolean; s
   
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/admin/boarding/${id}`, {
-        method: 'DELETE',
-      });
+      return await apiRequest('DELETE', `/api/admin/boarding/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/boarding'] });
