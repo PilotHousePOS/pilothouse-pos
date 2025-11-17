@@ -19,6 +19,7 @@ import {
   weeklyAppointmentLimits,
   supplyImportStaging,
   boardingRecords,
+  scheduleEntries,
   type User,
   type UpsertUser,
   type Pet,
@@ -61,6 +62,8 @@ import {
   type SupplyImportStaging,
   type BoardingRecord,
   type InsertBoardingRecord,
+  type ScheduleEntry,
+  type InsertScheduleEntry,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, and, or, not, ilike, lt, isNull, count, sql, inArray } from "drizzle-orm";
@@ -272,6 +275,12 @@ export interface IStorage {
   checkInBoardingRecord(id: number): Promise<BoardingRecord>;
   checkOutBoardingRecord(id: number): Promise<BoardingRecord>;
   deleteBoardingRecord(id: number): Promise<void>;
+  
+  // Schedule operations
+  getAllScheduleEntries(): Promise<ScheduleEntry[]>;
+  batchUpdateScheduleEntries(entries: InsertScheduleEntry[]): Promise<ScheduleEntry[]>;
+  updateScheduleEntry(id: number, entry: Partial<InsertScheduleEntry>): Promise<ScheduleEntry>;
+  deleteScheduleEntry(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2141,6 +2150,37 @@ export class DatabaseStorage implements IStorage {
 
   async deleteBoardingRecord(id: number): Promise<void> {
     await db.delete(boardingRecords).where(eq(boardingRecords.id, id));
+  }
+
+  // Schedule operations
+  async getAllScheduleEntries(): Promise<ScheduleEntry[]> {
+    return await db.select().from(scheduleEntries)
+      .orderBy(asc(scheduleEntries.section), asc(scheduleEntries.displayOrder), asc(scheduleEntries.employeeName));
+  }
+
+  async batchUpdateScheduleEntries(entries: InsertScheduleEntry[]): Promise<ScheduleEntry[]> {
+    // Delete all existing entries first, then insert the new ones
+    await db.delete(scheduleEntries);
+    
+    if (entries.length === 0) {
+      return [];
+    }
+    
+    const inserted = await db.insert(scheduleEntries).values(entries).returning();
+    return inserted;
+  }
+
+  async updateScheduleEntry(id: number, entry: Partial<InsertScheduleEntry>): Promise<ScheduleEntry> {
+    const [updated] = await db
+      .update(scheduleEntries)
+      .set({ ...entry, updatedAt: new Date() })
+      .where(eq(scheduleEntries.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteScheduleEntry(id: number): Promise<void> {
+    await db.delete(scheduleEntries).where(eq(scheduleEntries.id, id));
   }
 }
 

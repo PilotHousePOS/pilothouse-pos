@@ -1880,6 +1880,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Schedule routes
+  app.get("/api/admin/schedule", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const scheduleEntries = await storage.getAllScheduleEntries();
+      res.json(scheduleEntries);
+    } catch (error) {
+      console.error("Error fetching schedule entries:", error);
+      res.status(500).json({ message: "Failed to fetch schedule entries" });
+    }
+  });
+
+  app.post("/api/admin/schedule/batch", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const { entries } = req.body;
+      const result = await storage.batchUpdateScheduleEntries(entries);
+      res.json(result);
+    } catch (error) {
+      console.error("Error batch updating schedule entries:", error);
+      res.status(500).json({ message: "Failed to batch update schedule entries" });
+    }
+  });
+
+  app.patch("/api/admin/schedule/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const updated = await storage.updateScheduleEntry(parseInt(req.params.id), req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating schedule entry:", error);
+      res.status(500).json({ message: "Failed to update schedule entry" });
+    }
+  });
+
+  app.delete("/api/admin/schedule/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      await storage.deleteScheduleEntry(parseInt(req.params.id));
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting schedule entry:", error);
+      res.status(500).json({ message: "Failed to delete schedule entry" });
+    }
+  });
+
   // Admin user management routes
   app.get("/api/admin/users", authMiddleware, async (req: any, res) => {
     try {
