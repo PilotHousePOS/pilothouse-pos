@@ -3215,7 +3215,6 @@ function EditAppointmentDialog({
         ownerPhoneNumber: ownerPhone,
         pricingMode,
         pets: pets.map(pet => ({
-          id: pet.id,
           petName: pet.name,
           petType: pet.type,
           serviceType: pet.serviceType,
