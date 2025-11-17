@@ -567,6 +567,18 @@ export const supplyImportStaging = pgTable("supply_import_staging", {
   index("staging_sku_idx").on(table.normalizedSku),
 ]);
 
+// Employee Schedule
+export const scheduleEntries = pgTable("schedule_entries", {
+  id: serial("id").primaryKey(),
+  section: varchar("section", { length: 10 }).notNull(), // A, B, C, etc.
+  employeeName: varchar("employee_name", { length: 255 }).notNull(),
+  dayOfWeek: varchar("day_of_week", { length: 20 }).notNull(), // Monday, Tuesday, etc.
+  timeSlot: varchar("time_slot", { length: 100 }).notNull(), // e.g., "1-6", "12-6", "OFF", "9:30am-5"
+  displayOrder: integer("display_order").default(0), // For ordering employees within a section
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Boarding schemas
 export const insertBoardingRecordSchema = createInsertSchema(boardingRecords).omit({
   id: true,
@@ -584,3 +596,13 @@ export const insertSupplyImportStagingSchema = createInsertSchema(supplyImportSt
 
 export type SupplyImportStaging = typeof supplyImportStaging.$inferSelect;
 export type InsertSupplyImportStaging = z.infer<typeof insertSupplyImportStagingSchema>;
+
+// Schedule schemas
+export const insertScheduleEntrySchema = createInsertSchema(scheduleEntries).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type ScheduleEntry = typeof scheduleEntries.$inferSelect;
+export type InsertScheduleEntry = z.infer<typeof insertScheduleEntrySchema>;
