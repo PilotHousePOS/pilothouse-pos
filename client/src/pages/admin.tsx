@@ -1855,6 +1855,44 @@ function formatServiceType(serviceType: string): string {
   return serviceType;
 }
 
+// Helper function to get combined service type label for multi-pet appointments
+function getCombinedServiceLabel(appointment: any): string {
+  // If no pets array or only one pet, use standard formatting
+  if (!appointment.pets || appointment.pets.length <= 1) {
+    return formatServiceType(appointment.serviceType || appointment.service);
+  }
+  
+  // Get unique service types from all pets
+  const serviceTypes = new Set(
+    appointment.pets.map((pet: any) => {
+      const normalized = (pet.serviceType || '').toLowerCase();
+      if (normalized.includes('bath') && !normalized.includes('full')) {
+        return 'bath';
+      } else if (normalized.includes('full') || normalized.includes('grooming')) {
+        return 'full';
+      }
+      return normalized;
+    })
+  );
+  
+  // If all pets have the same service type, return it
+  if (serviceTypes.size === 1) {
+    const serviceType = Array.from(serviceTypes)[0];
+    return serviceType === 'bath' ? 'Bath' : 'Full Grooming';
+  }
+  
+  // Multiple different service types - combine them
+  const hasBath = serviceTypes.has('bath');
+  const hasFull = serviceTypes.has('full');
+  
+  if (hasFull && hasBath) {
+    return 'Full Grooming/Bath';
+  }
+  
+  // Fallback to standard formatting if we can't determine
+  return formatServiceType(appointment.serviceType || appointment.service);
+}
+
 // Helper function to normalize service type to canonical values
 function normalizeServiceType(serviceType: string | undefined | null): string {
   if (!serviceType) return 'grooming-full'; // Default to full grooming
@@ -5765,7 +5803,7 @@ export default function Admin() {
                             onClick={() => setSelectedAppointment(currentAppointment)}
                           >
                             <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-                              <h3 className="font-semibold text-sm">{formatServiceType(currentAppointment.serviceType || currentAppointment.service)}</h3>
+                              <h3 className="font-semibold text-sm">{getCombinedServiceLabel(currentAppointment)}</h3>
                               {currentAppointment.source === 'google_calendar' && (
                                 <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300 text-xs px-1.5 py-0">
                                   <CalendarIcon className="w-3 h-3 mr-0.5" />
@@ -6018,7 +6056,7 @@ export default function Admin() {
                             </Badge>
                           )}
                         </div>
-                        <h3 className="font-semibold">{formatServiceType(currentAppointment.serviceType || currentAppointment.service)}</h3>
+                        <h3 className="font-semibold">{getCombinedServiceLabel(currentAppointment)}</h3>
                         <p className="text-sm text-gray-600 break-words">
                           Pet: {currentAppointment.pets && currentAppointment.pets.length > 0 
                             ? currentAppointment.pets.map((p: any) => capitalizeWords(p.petName)).join(', ')
