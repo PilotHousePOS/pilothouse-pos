@@ -2709,6 +2709,30 @@ function ScheduleManagement() {
   const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const SECTIONS = ['A', 'B', 'C'];
   
+  // Calculate dates for each section
+  const getDatesForSection = (section: string) => {
+    const now = new Date();
+    const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    
+    // Calculate days to subtract to get to Monday of current week
+    const daysToMonday = currentDay === 0 ? 6 : currentDay - 1;
+    const currentWeekMonday = new Date(now);
+    currentWeekMonday.setDate(now.getDate() - daysToMonday);
+    currentWeekMonday.setHours(0, 0, 0, 0);
+    
+    // Section A = previous week, B = current week, C = next week
+    const weekOffset = section === 'A' ? -7 : section === 'B' ? 0 : 7;
+    const sectionMonday = new Date(currentWeekMonday);
+    sectionMonday.setDate(currentWeekMonday.getDate() + weekOffset);
+    
+    // Generate dates for all days of the week
+    return DAYS.map((_, index) => {
+      const date = new Date(sectionMonday);
+      date.setDate(sectionMonday.getDate() + index);
+      return date;
+    });
+  };
+  
   // Fetch schedule entries
   const scheduleQuery = useQuery({
     queryKey: ['/api/admin/schedule'],
@@ -2872,11 +2896,17 @@ function ScheduleManagement() {
                 <thead>
                   <tr className="bg-green-100">
                     <th className="border border-gray-300 px-2 py-2 text-left text-sm font-semibold min-w-[120px]">Employee</th>
-                    {DAYS.map(day => (
-                      <th key={day} className="border border-gray-300 px-2 py-2 text-center text-sm font-semibold min-w-[100px]">
-                        {day.substring(0, 3)}
-                      </th>
-                    ))}
+                    {DAYS.map((day, index) => {
+                      const dates = getDatesForSection(section);
+                      const date = dates[index];
+                      const month = date.getMonth() + 1;
+                      const dayNum = date.getDate();
+                      return (
+                        <th key={day} className="border border-gray-300 px-2 py-2 text-center text-sm font-semibold min-w-[100px]">
+                          {day.substring(0, 3)} {month}/{dayNum}
+                        </th>
+                      );
+                    })}
                     <th className="border border-gray-300 px-2 py-2 text-center text-sm font-semibold w-[80px]">Actions</th>
                   </tr>
                 </thead>
