@@ -2700,6 +2700,239 @@ function ProductImageManager() {
   );
 }
 
+function ScheduleManagement() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [scheduleData, setScheduleData] = useState<Record<string, any[]>>({ A: [], B: [], C: [] });
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const SECTIONS = ['A', 'B', 'C'];
+  
+  // Fetch schedule entries
+  const scheduleQuery = useQuery({
+    queryKey: ['/api/admin/schedule'],
+  });
+  
+  // Organize schedule data by section and employee
+  useEffect(() => {
+    if (scheduleQuery.data) {
+      const organized: Record<string, any[]> = { A: [], B: [], C: [] };
+      const entries = scheduleQuery.data as any[];
+      
+      // Group by section and employee
+      SECTIONS.forEach(section => {
+        const sectionEntries = entries.filter((e: any) => e.section === section);
+        const employees = [...new Set(sectionEntries.map((e: any) => e.employeeName))];
+        
+        organized[section] = employees.map((empName, idx) => {
+          const empEntries = sectionEntries.filter((e: any) => e.employeeName === empName);
+          const schedule: Record<string, string> = {};
+          
+          DAYS.forEach(day => {
+            const dayEntry = empEntries.find((e: any) => e.dayOfWeek === day);
+            schedule[day] = dayEntry?.timeSlot || 'OFF';
+          });
+          
+          return {
+            employeeName: empName,
+            displayOrder: idx,
+            ...schedule
+          };
+        });
+      });
+      
+      setScheduleData(organized);
+    }
+  }, [scheduleQuery.data]);
+  
+  const handleCellChange = (section: string, employeeIndex: number, day: string, value: string) => {
+    setScheduleData(prev => ({
+      ...prev,
+      [section]: prev[section].map((emp, idx) => 
+        idx === employeeIndex ? { ...emp, [day]: value } : emp
+      )
+    }));
+  };
+  
+  const handleEmployeeNameChange = (section: string, employeeIndex: number, newName: string) => {
+    setScheduleData(prev => ({
+      ...prev,
+      [section]: prev[section].map((emp, idx) => 
+        idx === employeeIndex ? { ...emp, employeeName: newName } : emp
+      )
+    }));
+  };
+  
+  const addEmployee = (section: string) => {
+    const newEmployee: any = {
+      employeeName: 'New Employee',
+      displayOrder: scheduleData[section].length,
+    };
+    
+    DAYS.forEach(day => {
+      newEmployee[day] = 'OFF';
+    });
+    
+    setScheduleData(prev => ({
+      ...prev,
+      [section]: [...prev[section], newEmployee]
+    }));
+  };
+  
+  const removeEmployee = (section: string, employeeIndex: number) => {
+    setScheduleData(prev => ({
+      ...prev,
+      [section]: prev[section].filter((_, idx) => idx !== employeeIndex)
+    }));
+  };
+  
+  const saveSchedule = async () => {
+    setIsSaving(true);
+    try {
+      const entries: any[] = [];
+      
+      SECTIONS.forEach(section => {
+        scheduleData[section].forEach((employee, idx) => {
+          DAYS.forEach(day => {
+            entries.push({
+              section,
+              employeeName: employee.employeeName,
+              dayOfWeek: day,
+              timeSlot: employee[day] || 'OFF',
+              displayOrder: idx
+            });
+          });
+        });
+      });
+      
+      await apiRequest('POST', '/api/admin/schedule/batch', { entries });
+      await queryClient.invalidateQueries({ queryKey: ['/api/admin/schedule'] });
+      toast({ title: 'Schedule saved successfully' });
+    } catch (error) {
+      console.error('Failed to save schedule:', error);
+      toast({ title: 'Failed to save schedule', variant: 'destructive' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+  
+  if (scheduleQuery.isLoading) {
+    return <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+  }
+  
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <CardTitle className="flex items-center gap-2">
+            <CalendarIcon className="w-5 h-5" />
+            Employee Schedule
+          </CardTitle>
+          <Button 
+            onClick={saveSchedule}
+            disabled={isSaving}
+            className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
+            data-testid="button-save-schedule"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                Save Schedule
+              </>
+            )}
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-8">
+        {SECTIONS.map(section => (
+          <div key={section} className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-gray-900 bg-green-200 px-3 py-1 rounded">
+                Section {section}
+              </h3>
+              <Button 
+                size="sm"
+                variant="outline"
+                onClick={() => addEmployee(section)}
+                data-testid={`button-add-employee-${section}`}
+              >
+                <Plus className="w-3 h-3 mr-1" />
+                Add Employee
+              </Button>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse border border-gray-300">
+                <thead>
+                  <tr className="bg-green-100">
+                    <th className="border border-gray-300 px-2 py-2 text-left text-sm font-semibold min-w-[120px]">Employee</th>
+                    {DAYS.map(day => (
+                      <th key={day} className="border border-gray-300 px-2 py-2 text-center text-sm font-semibold min-w-[100px]">
+                        {day.substring(0, 3)}
+                      </th>
+                    ))}
+                    <th className="border border-gray-300 px-2 py-2 text-center text-sm font-semibold w-[80px]">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {scheduleData[section].map((employee, empIdx) => (
+                    <tr key={empIdx} className="hover:bg-gray-50">
+                      <td className="border border-gray-300 px-2 py-1">
+                        <input
+                          type="text"
+                          value={employee.employeeName}
+                          onChange={(e) => handleEmployeeNameChange(section, empIdx, e.target.value)}
+                          className="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                          data-testid={`input-employee-name-${section}-${empIdx}`}
+                        />
+                      </td>
+                      {DAYS.map(day => (
+                        <td key={day} className="border border-gray-300 px-1 py-1">
+                          <input
+                            type="text"
+                            value={employee[day] || 'OFF'}
+                            onChange={(e) => handleCellChange(section, empIdx, day, e.target.value)}
+                            className="w-full px-2 py-1 text-sm text-center border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="OFF"
+                            data-testid={`input-schedule-${section}-${empIdx}-${day}`}
+                          />
+                        </td>
+                      ))}
+                      <td className="border border-gray-300 px-2 py-1 text-center">
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => removeEmployee(section, empIdx)}
+                          data-testid={`button-remove-employee-${section}-${empIdx}`}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                  {scheduleData[section].length === 0 && (
+                    <tr>
+                      <td colSpan={DAYS.length + 2} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                        No employees in this section. Click "Add Employee" to get started.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
 function BoardingManagement({ isAddOpen, setIsAddOpen }: { isAddOpen: boolean; setIsAddOpen: (open: boolean) => void }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -5493,6 +5726,11 @@ export default function Admin() {
             {typedUser?.isAdmin && (
               <TabsTrigger value="boarding" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 Boarding
+              </TabsTrigger>
+            )}
+            {typedUser?.isAdmin && (
+              <TabsTrigger value="schedule" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                Schedule
               </TabsTrigger>
             )}
             {typedUser?.isAdmin && (
@@ -8564,6 +8802,10 @@ export default function Admin() {
               <BoardingManagement isAddOpen={isAddBoardingOpen} setIsAddOpen={setIsAddBoardingOpen} />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="schedule">
+          <ScheduleManagement />
         </TabsContent>
       </Tabs>
 
