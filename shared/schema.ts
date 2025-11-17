@@ -136,6 +136,7 @@ export const appointments = pgTable("appointments", {
   isHere: boolean("is_here").default(false), // customer has arrived
   isPaid: boolean("is_paid").default(false), // customer has paid
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  pricingMode: varchar("pricing_mode", { length: 20 }).default("individual"), // individual (sum of pet prices) or override (total price overrides individual)
   source: varchar("source", { length: 50 }).default("manual"), // manual or google_calendar
   googleEventId: varchar("google_event_id", { length: 255 }), // Google Calendar event ID
   groomerTag: varchar("groomer_tag", { length: 100 }), // Groomer name/tag from calendar event

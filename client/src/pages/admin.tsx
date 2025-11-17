@@ -3093,6 +3093,463 @@ function BoardingForm({ initialData, onSubmit, onCancel, isPending }: any) {
   );
 }
 
+// Edit Appointment Dialog Component - Multi-Pet Support
+function EditAppointmentDialog({
+  appointmentId,
+  initialOwnerFirstName,
+  initialOwnerLastName,
+  initialOwnerPhone,
+  initialDate,
+  initialTime,
+  onClose,
+  groomers,
+  isBookingDateAvailable,
+  bookingAvailableTimeSlots
+}: {
+  appointmentId: number;
+  initialOwnerFirstName: string;
+  initialOwnerLastName: string;
+  initialOwnerPhone: string;
+  initialDate: Date | undefined;
+  initialTime: string;
+  onClose: () => void;
+  groomers: any[];
+  isBookingDateAvailable: (date: Date) => boolean;
+  bookingAvailableTimeSlots: string[];
+}) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // State for appointment-level fields
+  const [ownerFirstName, setOwnerFirstName] = useState(initialOwnerFirstName);
+  const [ownerLastName, setOwnerLastName] = useState(initialOwnerLastName);
+  const [ownerPhone, setOwnerPhone] = useState(initialOwnerPhone);
+  const [date, setDate] = useState(initialDate);
+  const [time, setTime] = useState(initialTime);
+  
+  // State for pets array
+  const [pets, setPets] = useState<any[]>([]);
+  const [pricingMode, setPricingMode] = useState<'individual' | 'override'>('individual');
+  const [totalPriceOverride, setTotalPriceOverride] = useState('');
+  
+  // Service prices constant
+  const SERVICES = [
+    { id: 'grooming-full', name: 'Full Grooming', price: 35 },
+    { id: 'grooming-bath', name: 'Bath Only', price: 20 },
+  ];
+  
+  // Fetch appointment and appointment_pets data
+  const { data: appointmentData, isLoading: isLoadingAppointment } = useQuery({
+    queryKey: ['/api/appointments', appointmentId],
+    queryFn: async () => {
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (!response.ok) throw new Error('Failed to fetch appointment');
+      return response.json();
+    },
+    enabled: !!appointmentId,
+  });
+  
+  // Initialize state when appointment data loads
+  useEffect(() => {
+    if (appointmentData) {
+      // If appointment has pets array, use it; otherwise create from single pet
+      if (appointmentData.pets && appointmentData.pets.length > 0) {
+        setPets(appointmentData.pets.map((pet: any) => ({
+          id: pet.id,
+          name: pet.petName,
+          type: pet.petType,
+          serviceType: pet.serviceType,
+          notes: pet.specialNotes || '',
+          groomerId: pet.groomerId || null,
+          price: pet.price ? parseFloat(pet.price).toString() : '0',
+        })));
+      } else {
+        // Fallback to single pet from appointment table
+        setPets([{
+          id: null,
+          name: appointmentData.petName || '',
+          type: appointmentData.petType || 'Dog',
+          serviceType: appointmentData.serviceType || 'grooming-full',
+          notes: appointmentData.specialNotes || '',
+          groomerId: appointmentData.groomerId || null,
+          price: appointmentData.price ? parseFloat(appointmentData.price).toString() : '35',
+        }]);
+      }
+      
+      // Set pricing mode based on appointment data
+      setPricingMode(appointmentData.pricingMode || 'individual');
+      if (appointmentData.pricingMode === 'override' && appointmentData.price) {
+        setTotalPriceOverride(parseFloat(appointmentData.price).toString());
+      }
+    }
+  }, [appointmentData]);
+  
+  // Calculate total price in individual mode
+  const calculatedTotal = pets.reduce((sum, pet) => sum + (parseFloat(pet.price) || 0), 0);
+  
+  // Update pet field
+  const updatePet = (index: number, field: string, value: any) => {
+    const updated = [...pets];
+    updated[index] = { ...updated[index], [field]: value };
+    
+    // Auto-update price when service changes in individual mode
+    if (field === 'serviceType' && pricingMode === 'individual') {
+      const service = SERVICES.find(s => s.id === value);
+      if (service) {
+        updated[index].price = service.price.toString();
+      }
+    }
+    
+    setPets(updated);
+  };
+  
+  // Save mutation
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      const updates: any = {
+        ownerFirstName,
+        ownerLastName,
+        ownerPhoneNumber: ownerPhone,
+        pricingMode,
+        pets: pets.map(pet => ({
+          id: pet.id,
+          petName: pet.name,
+          petType: pet.type,
+          serviceType: pet.serviceType,
+          specialNotes: pet.notes,
+          groomerId: pet.groomerId || null,
+          price: pet.price,
+        })),
+      };
+      
+      // Set total price based on mode
+      if (pricingMode === 'override') {
+        updates.price = totalPriceOverride;
+      } else {
+        updates.price = calculatedTotal.toString();
+      }
+      
+      // Format date if changed
+      if (date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        updates.appointmentDate = `${year}-${month}-${day}`;
+      }
+      
+      if (time) {
+        updates.appointmentTime = time;
+      }
+      
+      await apiRequest("PATCH", `/api/admin/appointments/${appointmentId}/details`, updates);
+    },
+    onSuccess: async () => {
+      toast({
+        title: "Appointment Updated",
+        description: "Appointment details have been updated successfully.",
+      });
+      await queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      onClose();
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update appointment. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  if (isLoadingAppointment) {
+    return (
+      <Dialog open={true} onOpenChange={onClose}>
+        <DialogContent className="max-w-2xl">
+          <div className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-blue mx-auto mb-2"></div>
+              <p className="text-sm text-gray-600">Loading appointment details...</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+  
+  return (
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Edit Appointment</DialogTitle>
+          <DialogDescription>Update appointment information for all pets</DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-6">
+          {/* Owner Information Section */}
+          <div className="space-y-4 pb-4 border-b">
+            <h3 className="font-semibold text-sm">Owner Information</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="owner-first-name">First Name</Label>
+                <Input
+                  id="owner-first-name"
+                  value={ownerFirstName}
+                  onChange={(e) => setOwnerFirstName(e.target.value)}
+                  placeholder="John"
+                  data-testid="input-edit-owner-first-name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="owner-last-name">Last Name</Label>
+                <Input
+                  id="owner-last-name"
+                  value={ownerLastName}
+                  onChange={(e) => setOwnerLastName(e.target.value)}
+                  placeholder="Doe"
+                  data-testid="input-edit-owner-last-name"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="owner-phone">Phone Number</Label>
+              <Input
+                id="owner-phone"
+                value={ownerPhone}
+                onChange={(e) => setOwnerPhone(e.target.value)}
+                placeholder="(555) 123-4567"
+                data-testid="input-edit-owner-phone"
+              />
+            </div>
+          </div>
+          
+          {/* Date & Time Section */}
+          <div className="space-y-4 pb-4 border-b">
+            <h3 className="font-semibold text-sm">Appointment Date & Time</h3>
+            <div>
+              <Label>Date</Label>
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                disabled={(d) => !isBookingDateAvailable(d)}
+                className="rounded-md border"
+                data-testid="calendar-edit-date"
+              />
+            </div>
+            <div>
+              <Label>Time</Label>
+              <div className="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto p-2 border rounded">
+                {bookingAvailableTimeSlots.map((t) => (
+                  <Button
+                    key={t}
+                    type="button"
+                    variant={time === t ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setTime(t)}
+                    data-testid={`edit-time-slot-${t.replace(/[:\s]/g, '-')}`}
+                  >
+                    {t}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          {/* Pets Section */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-sm">Pets ({pets.length})</h3>
+            
+            {/* Pet Cards - Stacked */}
+            {pets.map((pet, index) => (
+              <div key={index} className="p-4 border rounded-lg space-y-3 bg-gray-50">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-semibold text-sm">Pet {index + 1}</span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor={`pet-name-${index}`}>Name</Label>
+                    <Input
+                      id={`pet-name-${index}`}
+                      value={pet.name}
+                      onChange={(e) => updatePet(index, 'name', e.target.value)}
+                      placeholder="Buddy"
+                      data-testid={`input-edit-pet-name-${index}`}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor={`pet-type-${index}`}>Type</Label>
+                    <Input
+                      id={`pet-type-${index}`}
+                      value={pet.type}
+                      onChange={(e) => updatePet(index, 'type', e.target.value)}
+                      placeholder="Dog"
+                      data-testid={`input-edit-pet-type-${index}`}
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor={`pet-service-${index}`}>Service</Label>
+                    <Select
+                      value={pet.serviceType}
+                      onValueChange={(value) => updatePet(index, 'serviceType', value)}
+                    >
+                      <SelectTrigger id={`pet-service-${index}`} data-testid={`select-edit-service-${index}`}>
+                        <SelectValue placeholder="Select service" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="grooming-full">Full Grooming</SelectItem>
+                        <SelectItem value="grooming-bath">Bath Only</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor={`pet-groomer-${index}`}>Groomer</Label>
+                    <Select
+                      value={pet.groomerId !== null ? pet.groomerId.toString() : 'none'}
+                      onValueChange={(value) => updatePet(index, 'groomerId', value === 'none' ? null : parseInt(value))}
+                    >
+                      <SelectTrigger id={`pet-groomer-${index}`} data-testid={`select-edit-groomer-${index}`}>
+                        <SelectValue placeholder="Optional" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No groomer assigned</SelectItem>
+                        {Array.isArray(groomers) && groomers
+                          .filter((g: any) => g.isActive)
+                          .map((groomer: any) => (
+                            <SelectItem key={groomer.id} value={groomer.id.toString()}>
+                              {groomer.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor={`pet-notes-${index}`}>Special Notes</Label>
+                  <Textarea
+                    id={`pet-notes-${index}`}
+                    value={pet.notes}
+                    onChange={(e) => updatePet(index, 'notes', e.target.value)}
+                    placeholder="Special instructions..."
+                    rows={2}
+                    data-testid={`input-edit-notes-${index}`}
+                  />
+                </div>
+                
+                {pricingMode === 'individual' && (
+                  <div>
+                    <Label htmlFor={`pet-price-${index}`}>Price ($)</Label>
+                    <Input
+                      id={`pet-price-${index}`}
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={pet.price}
+                      onChange={(e) => updatePet(index, 'price', e.target.value)}
+                      placeholder="35.00"
+                      data-testid={`input-edit-price-${index}`}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          
+          {/* Pricing Section */}
+          <div className="space-y-4 pt-4 border-t">
+            <h3 className="font-semibold text-sm">Pricing</h3>
+            
+            {/* Pricing Mode Toggle */}
+            <div>
+              <Label>Pricing Mode</Label>
+              <div className="flex gap-4 mt-2">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id="pricing-individual"
+                    checked={pricingMode === 'individual'}
+                    onChange={() => setPricingMode('individual')}
+                    data-testid="radio-pricing-individual"
+                  />
+                  <Label htmlFor="pricing-individual" className="cursor-pointer font-normal">
+                    Individual Pet Prices
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id="pricing-override"
+                    checked={pricingMode === 'override'}
+                    onChange={() => setPricingMode('override')}
+                    data-testid="radio-pricing-override"
+                  />
+                  <Label htmlFor="pricing-override" className="cursor-pointer font-normal">
+                    Single Total Override
+                  </Label>
+                </div>
+              </div>
+            </div>
+            
+            {/* Total Price Display/Input */}
+            {pricingMode === 'individual' ? (
+              <div className="bg-blue-50 p-3 rounded">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">Calculated Total:</span>
+                  <span className="text-lg font-bold text-blue-700" data-testid="text-calculated-total">
+                    ${calculatedTotal.toFixed(2)}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-600 mt-1">Sum of individual pet prices</p>
+              </div>
+            ) : (
+              <div>
+                <Label htmlFor="total-override">Total Price Override ($)</Label>
+                <Input
+                  id="total-override"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={totalPriceOverride}
+                  onChange={(e) => setTotalPriceOverride(e.target.value)}
+                  placeholder="0.00"
+                  data-testid="input-total-override"
+                  className="max-w-xs"
+                />
+                <p className="text-xs text-gray-600 mt-1">This overrides individual pet prices</p>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Action Buttons */}
+        <DialogFooter className="mt-6">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            data-testid="button-cancel-edit"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => saveMutation.mutate()}
+            disabled={saveMutation.isPending}
+            className="bg-brand-blue hover:bg-blue-700"
+            data-testid="button-save-edit"
+          >
+            {saveMutation.isPending ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const typedUser = user as User;
@@ -3112,6 +3569,13 @@ export default function Admin() {
   const [showDeniedAppointments, setShowDeniedAppointments] = useState(false);
   const [filterByHere, setFilterByHere] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<any>(null);
+  
+  // Multi-pet editing state
+  const [editPets, setEditPets] = useState<any[]>([]);
+  const [editPricingMode, setEditPricingMode] = useState<'individual' | 'override'>('individual');
+  const [editTotalPriceOverride, setEditTotalPriceOverride] = useState('');
+  
+  // Legacy single-pet editing state (kept for backward compatibility)
   const [editNotes, setEditNotes] = useState('');
   const [editPrice, setEditPrice] = useState('');
   const [editOwnerFirstName, setEditOwnerFirstName] = useState('');
@@ -8197,223 +8661,30 @@ export default function Admin() {
         </Dialog>
       )}
 
-      {/* Edit Appointment Dialog */}
+      {/* Edit Appointment Dialog - Multi-Pet */}
       {editingAppointment && (
-        <Dialog open={!!editingAppointment} onOpenChange={() => {
-          setEditingAppointment(null);
-          setEditNotes('');
-          setEditPrice('');
-          setEditOwnerFirstName('');
-          setEditOwnerLastName('');
-          setEditOwnerPhone('');
-          setEditPetName('');
-          setEditPetType('');
-          setEditDate(undefined);
-          setEditTime('');
-          setEditGroomerId(null);
-        }}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Edit Appointment Details</DialogTitle>
-              <DialogDescription>Update appointment information and status.</DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="edit-owner-first-name">Owner First Name</Label>
-                  <Input
-                    id="edit-owner-first-name"
-                    value={editOwnerFirstName}
-                    onChange={(e) => setEditOwnerFirstName(e.target.value)}
-                    placeholder="John"
-                    data-testid="input-edit-owner-first-name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="edit-owner-last-name">Owner Last Name</Label>
-                  <Input
-                    id="edit-owner-last-name"
-                    value={editOwnerLastName}
-                    onChange={(e) => setEditOwnerLastName(e.target.value)}
-                    placeholder="Doe"
-                    data-testid="input-edit-owner-last-name"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="edit-owner-phone">Owner Phone Number</Label>
-                <Input
-                  id="edit-owner-phone"
-                  value={editOwnerPhone}
-                  onChange={(e) => setEditOwnerPhone(e.target.value)}
-                  placeholder="(555) 123-4567"
-                  data-testid="input-edit-owner-phone"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="edit-pet-name">Pet Name</Label>
-                  <Input
-                    id="edit-pet-name"
-                    value={editPetName}
-                    onChange={(e) => setEditPetName(e.target.value)}
-                    placeholder="Buddy"
-                    data-testid="input-edit-pet-name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="edit-pet-type">Pet Type</Label>
-                  <Input
-                    id="edit-pet-type"
-                    value={editPetType}
-                    onChange={(e) => setEditPetType(e.target.value)}
-                    placeholder="Dog"
-                    data-testid="input-edit-pet-type"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="edit-notes">Special Notes</Label>
-                <Textarea
-                  id="edit-notes"
-                  value={editNotes}
-                  onChange={(e) => setEditNotes(e.target.value)}
-                  placeholder="Add special notes or instructions for the grooming appointment..."
-                  rows={3}
-                  data-testid="input-edit-notes"
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-price">Price ($)</Label>
-                <Input
-                  id="edit-price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={editPrice}
-                  onChange={(e) => setEditPrice(e.target.value)}
-                  placeholder="45.00"
-                  data-testid="input-edit-price"
-                />
-              </div>
-
-              {/* Service Type Selection */}
-              <div>
-                <Label htmlFor="edit-service-type">Service Type</Label>
-                <Select
-                  value={editServiceType}
-                  onValueChange={(value) => setEditServiceType(value)}
-                >
-                  <SelectTrigger id="edit-service-type" data-testid="select-edit-service-type">
-                    <SelectValue placeholder="Select service type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="grooming-bath">Bath Only</SelectItem>
-                    <SelectItem value="grooming-full">Full Grooming</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Groomer Selection */}
-              <div>
-                <Label htmlFor="edit-groomer">Assign Groomer (Optional)</Label>
-                <Select
-                  value={editGroomerId !== null ? editGroomerId.toString() : 'none'}
-                  onValueChange={(value) => setEditGroomerId(value === 'none' ? null : parseInt(value))}
-                >
-                  <SelectTrigger id="edit-groomer" data-testid="select-edit-groomer">
-                    <SelectValue placeholder="Select a groomer (optional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">No groomer assigned</SelectItem>
-                    {Array.isArray(groomers) && groomers
-                      .filter((g: any) => g.isActive)
-                      .map((groomer: any) => (
-                        <SelectItem key={groomer.id} value={groomer.id.toString()}>
-                          {groomer.name}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              {/* Date Selection */}
-              <div>
-                <Label>Appointment Date</Label>
-                <Calendar
-                  mode="single"
-                  selected={editDate}
-                  onSelect={setEditDate}
-                  disabled={(date) => !isBookingDateAvailable(date)}
-                  className="rounded-md border"
-                  data-testid="calendar-edit-date"
-                />
-              </div>
-
-              {/* Time Selection */}
-              <div>
-                <Label>Appointment Time</Label>
-                <div className="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto p-2 border rounded">
-                  {bookingAvailableTimeSlots.map((time) => (
-                    <Button
-                      key={time}
-                      type="button"
-                      variant={editTime === time ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setEditTime(time)}
-                      data-testid={`edit-time-slot-${time.replace(/[:\s]/g, '-')}`}
-                    >
-                      {time}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setEditingAppointment(null);
-                    setEditNotes('');
-                    setEditPrice('');
-                    setEditOwnerFirstName('');
-                    setEditOwnerLastName('');
-                    setEditOwnerPhone('');
-                    setEditPetName('');
-                    setEditPetType('');
-                    setEditDate(undefined);
-                    setEditTime('');
-                    setEditGroomerId(null);
-                  }}
-                  data-testid="button-cancel-edit"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={() => updateAppointmentDetailsMutation.mutate({
-                    id: editingAppointment.id,
-                    ownerFirstName: editOwnerFirstName,
-                    ownerLastName: editOwnerLastName,
-                    ownerPhoneNumber: editOwnerPhone,
-                    petName: editPetName,
-                    petType: editPetType,
-                    specialNotes: editNotes,
-                    price: editPrice,
-                    appointmentDate: editDate,
-                    appointmentTime: editTime,
-                    groomerId: editGroomerId,
-                    serviceType: editServiceType
-                  })}
-                  disabled={updateAppointmentDetailsMutation.isPending}
-                  className="bg-brand-blue hover:bg-blue-700"
-                  data-testid="button-save-edit"
-                >
-                  {updateAppointmentDetailsMutation.isPending ? 'Saving...' : 'Save Changes'}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <EditAppointmentDialog 
+          appointmentId={editingAppointment.id}
+          initialOwnerFirstName={editOwnerFirstName}
+          initialOwnerLastName={editOwnerLastName}
+          initialOwnerPhone={editOwnerPhone}
+          initialDate={editDate}
+          initialTime={editTime}
+          onClose={() => {
+            setEditingAppointment(null);
+            setEditPets([]);
+            setEditPricingMode('individual');
+            setEditTotalPriceOverride('');
+            setEditOwnerFirstName('');
+            setEditOwnerLastName('');
+            setEditOwnerPhone('');
+            setEditDate(undefined);
+            setEditTime('');
+          }}
+          groomers={groomers}
+          isBookingDateAvailable={isBookingDateAvailable}
+          bookingAvailableTimeSlots={bookingAvailableTimeSlots}
+        />
       )}
 
       {/* Edit Pet Dialog */}

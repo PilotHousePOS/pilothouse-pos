@@ -1147,6 +1147,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get single appointment with pets (for editing)
+  app.get("/api/appointments/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const appointmentId = parseInt(req.params.id);
+      const user = await storage.getUser(userId);
+      
+      const appointment = await storage.getAppointment(appointmentId);
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+      
+      // Check access: admin/groomer can see all, customer can only see their own
+      if (!user?.isAdmin && !user?.isGroomer && appointment.userId !== userId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Fetch appointment_pets
+      const pets = await storage.getAppointmentPets(appointmentId);
+      
+      // Return appointment with pets array
+      res.json({
+        ...appointment,
+        pets: pets.length > 0 ? pets : undefined
+      });
+    } catch (error) {
+      console.error("Error fetching appointment:", error);
+      res.status(500).json({ message: "Failed to fetch appointment" });
+    }
+  });
+
   // Get unapproved appointments (admin and groomer access)
   app.get("/api/admin/appointments/unapproved", authMiddleware, async (req: any, res) => {
     try {
@@ -1293,7 +1324,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update appointment notes and price (admin and groomer)
+  // Update appointment details with multi-pet support (admin and groomer)
   app.patch("/api/admin/appointments/:id/details", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
@@ -1302,10 +1333,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const id = parseInt(req.params.id);
-      const { ownerFirstName, ownerLastName, ownerPhoneNumber, petName, petType, specialNotes, price, appointmentDate, appointmentTime, groomerId, serviceType } = req.body;
-      console.log(`Updating appointment ${id} - Date: ${appointmentDate}, Time: ${appointmentTime}`);
+      const { ownerFirstName, ownerLastName, ownerPhoneNumber, pets, pricingMode, price, appointmentDate, appointmentTime } = req.body;
 
-      // Get the current appointment to get the old phone number
+      // VALIDATION: Ensure pets array has at least one pet if provided
+      if (pets !== undefined) {
+        if (!Array.isArray(pets) || pets.length === 0) {
+          return res.status(400).json({ message: "At least one pet is required" });
+        }
+        
+        // Validate each pet has required fields
+        for (const pet of pets) {
+          if (!pet.petName || !pet.petType || !pet.serviceType) {
+            return res.status(400).json({ message: "Each pet must have name, type, and service" });
+          }
+        }
+      }
+
+      console.log(`Updating appointment ${id} - Pets: ${pets?.length || 0}, Pricing Mode: ${pricingMode}`);
+
+      // Get the current appointment
       const currentAppointment = await storage.getAppointment(id);
       if (!currentAppointment) {
         return res.status(404).json({ message: "Appointment not found" });
@@ -1319,49 +1365,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Build update object with only provided fields
-      const updates: { 
-        ownerFirstName?: string; 
-        ownerLastName?: string; 
-        ownerPhoneNumber?: string; 
-        petName?: string; 
-        petType?: string;
-        specialNotes?: string; 
-        price?: string;
-        appointmentDate?: string;
-        appointmentTime?: string;
-        groomerId?: number | null;
-        serviceType?: string;
-      } = {};
-      
+      // Build appointment-level update object
+      const updates: any = {};
       if (ownerFirstName !== undefined) updates.ownerFirstName = ownerFirstName;
       if (ownerLastName !== undefined) updates.ownerLastName = ownerLastName;
       if (ownerPhoneNumber !== undefined) updates.ownerPhoneNumber = ownerPhoneNumber;
-      if (petName !== undefined) updates.petName = petName;
-      if (petType !== undefined) updates.petType = petType;
-      if (specialNotes !== undefined) updates.specialNotes = specialNotes;
       if (price !== undefined) updates.price = price;
+      if (pricingMode !== undefined) updates.pricingMode = pricingMode;
       if (appointmentDate !== undefined) updates.appointmentDate = appointmentDate;
       if (appointmentTime !== undefined) updates.appointmentTime = appointmentTime;
-      if (groomerId !== undefined) updates.groomerId = groomerId;
-      if (serviceType !== undefined) updates.serviceType = serviceType;
-
-      const appointment = await storage.updateAppointmentDetails(id, updates);
       
-      // Update corresponding contact if phone number fields were changed
-      if (ownerFirstName !== undefined || ownerLastName !== undefined || ownerPhoneNumber !== undefined || petName !== undefined || petType !== undefined) {
+      // If pets array is provided, update first pet in appointment table for backward compatibility
+      if (pets && pets.length > 0) {
+        const firstPet = pets[0];
+        updates.petName = firstPet.petName;
+        updates.petType = firstPet.petType;
+        updates.serviceType = firstPet.serviceType;
+        updates.specialNotes = firstPet.specialNotes;
+        updates.groomerId = firstPet.groomerId || null;
+      }
+
+      // TRANSACTION: Update appointment and pets atomically
+      const appointment = await db.transaction(async (tx) => {
+        // Update appointment
+        const updatedAppointment = await storage.updateAppointmentDetails(id, updates);
+        
+        // Update appointment_pets if pets array provided
+        if (pets && Array.isArray(pets)) {
+          // Delete existing appointment_pets
+          await storage.deleteAppointmentPets(id);
+          
+          // Create new appointment_pets records
+          const petsWithPrice = pets.map((pet: any) => ({
+            petName: pet.petName,
+            petType: pet.petType,
+            serviceType: pet.serviceType,
+            specialNotes: pet.specialNotes || '',
+            price: pet.price ? pet.price.toString() : '0',
+            groomerId: pet.groomerId || null,
+          }));
+          
+          await storage.createAppointmentPets(id, petsWithPrice);
+        }
+        
+        return updatedAppointment;
+      });
+      
+      // Update corresponding contact (outside transaction to avoid blocking)
+      if (ownerFirstName !== undefined || ownerLastName !== undefined || ownerPhoneNumber !== undefined || pets) {
         try {
-          // Determine which phone number to use for finding the contact
           const oldPhone = currentAppointment.ownerPhoneNumber;
           const newPhone = ownerPhoneNumber || currentAppointment.ownerPhoneNumber;
           
-          // Try to find contact by old phone number first
           const normalizedOldPhone = normalizePhoneNumber(oldPhone);
           const allContacts = await storage.getAllContacts();
           let contact = allContacts.find((c: any) => normalizePhoneNumber(c.phoneNumber || '') === normalizedOldPhone);
           
           if (contact) {
-            // Update the contact with new information
             const contactUpdates: any = {};
             
             if (ownerFirstName !== undefined || ownerLastName !== undefined) {
@@ -1374,17 +1434,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
               contactUpdates.phoneNumber = ownerPhoneNumber;
             }
             
-            if (petType !== undefined) {
-              contactUpdates.animalType = petType;
-            }
-            
-            // Collect all unique pet names from appointments with this phone number
-            if (petName !== undefined || ownerPhoneNumber !== undefined) {
-              const phoneToCheck = newPhone;
-              const appointmentsForPhone = await storage.getAppointmentsByPhoneNumber(phoneToCheck);
-              const uniquePetNames = [...new Set(appointmentsForPhone.map((apt: any) => apt.petName).filter(Boolean))];
-              if (uniquePetNames.length > 0) {
-                contactUpdates.petNames = uniquePetNames;
+            // Update pet names from pets array
+            if (pets && pets.length > 0) {
+              const petNames = pets.map((p: any) => p.petName).filter(Boolean);
+              if (petNames.length > 0) {
+                contactUpdates.petNames = petNames;
+              }
+              // Use first pet's type
+              if (pets[0].petType) {
+                contactUpdates.animalType = pets[0].petType;
               }
             }
             
