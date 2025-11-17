@@ -4253,8 +4253,8 @@ export default function Admin() {
       pets: bookingPets.map(pet => ({
         petName: pet.name,
         petType: pet.type,
-        serviceType: SERVICES.find(s => s.id === pet.serviceType)?.name || '',
-        notes: pet.notes,
+        serviceType: pet.serviceType,
+        specialNotes: pet.notes,
         groomerId: pet.groomerId ? parseInt(pet.groomerId) : null,
       })),
     };
