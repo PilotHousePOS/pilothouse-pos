@@ -1642,8 +1642,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create appointment_pets records for all pets
       if (req.body.pets && req.body.pets.length > 0) {
         const SERVICES = [
-          { id: 'grooming-full', price: 75 },
-          { id: 'grooming-bath', price: 45 },
+          { id: 'grooming-full', price: 35 },
+          { id: 'grooming-bath', price: 20 },
         ];
         
         const petsWithPrice = petsArray.map((pet: any) => {

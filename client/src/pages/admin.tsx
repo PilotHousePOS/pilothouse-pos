@@ -5323,7 +5323,12 @@ export default function Admin() {
                               )}
                             </div>
                             <div className="text-xs text-gray-600 space-y-0.5">
-                              <p>Pet: {currentAppointment.petName} ({currentAppointment.petType})</p>
+                              <p className="break-words">
+                                Pet: {currentAppointment.pets && currentAppointment.pets.length > 0 
+                                  ? currentAppointment.pets.map((p: any) => capitalizeWords(p.petName)).join(', ')
+                                  : currentAppointment.petName
+                                } ({currentAppointment.petType || (currentAppointment.pets && currentAppointment.pets[0]?.petType) || 'dog'})
+                              </p>
                               <p>Owner: {currentAppointment.ownerFirstName} {currentAppointment.ownerLastName}</p>
                               <p>Phone: {currentAppointment.ownerPhoneNumber}</p>
                               <p className="text-gray-500">{parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
@@ -5551,7 +5556,12 @@ export default function Admin() {
                           )}
                         </div>
                         <h3 className="font-semibold">{formatServiceType(currentAppointment.serviceType || currentAppointment.service)}</h3>
-                        <p className="text-sm text-gray-600">Pet: {capitalizeWords(currentAppointment.petName)} ({currentAppointment.petType})</p>
+                        <p className="text-sm text-gray-600 break-words">
+                          Pet: {currentAppointment.pets && currentAppointment.pets.length > 0 
+                            ? currentAppointment.pets.map((p: any) => capitalizeWords(p.petName)).join(', ')
+                            : capitalizeWords(currentAppointment.petName)
+                          } ({currentAppointment.petType || (currentAppointment.pets && currentAppointment.pets[0]?.petType) || 'dog'})
+                        </p>
                         <p className="text-sm text-gray-600">Owner: {capitalizeWords(currentAppointment.ownerFirstName)} {capitalizeWords(currentAppointment.ownerLastName)}</p>
                         <p className="text-sm text-gray-600">Phone: {currentAppointment.ownerPhoneNumber}</p>
                         <p className="text-xs text-gray-500">Date: {parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
@@ -5674,7 +5684,12 @@ export default function Admin() {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-gray-600">Pet: {capitalizeWords(currentAppointment.petName)} ({currentAppointment.petType})</p>
+                        <p className="text-sm text-gray-600 break-words">
+                          Pet: {currentAppointment.pets && currentAppointment.pets.length > 0 
+                            ? currentAppointment.pets.map((p: any) => capitalizeWords(p.petName)).join(', ')
+                            : capitalizeWords(currentAppointment.petName)
+                          } ({currentAppointment.petType || (currentAppointment.pets && currentAppointment.pets[0]?.petType) || 'dog'})
+                        </p>
                         <p className="text-sm text-gray-600">Owner: {capitalizeWords(currentAppointment.ownerFirstName)} {capitalizeWords(currentAppointment.ownerLastName)}</p>
                         <p className="text-sm text-gray-600">Phone: {currentAppointment.ownerPhoneNumber}</p>
                         <p className="text-xs text-gray-500">{parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
@@ -5823,7 +5838,12 @@ export default function Admin() {
                                 )}
                               </div>
                               <div className="text-xs text-gray-600 space-y-0.5">
-                                <p>Pet: {currentAppointment.petName} ({currentAppointment.petType})</p>
+                                <p className="break-words">
+                                  Pet: {currentAppointment.pets && currentAppointment.pets.length > 0 
+                                    ? currentAppointment.pets.map((p: any) => capitalizeWords(p.petName)).join(', ')
+                                    : currentAppointment.petName
+                                  } ({currentAppointment.petType || (currentAppointment.pets && currentAppointment.pets[0]?.petType) || 'dog'})
+                                </p>
                                 <p>Owner: {currentAppointment.ownerFirstName} {currentAppointment.ownerLastName}</p>
                                 <p>Phone: {currentAppointment.ownerPhoneNumber}</p>
                                 <p className="text-gray-500">{parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
