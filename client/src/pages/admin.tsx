@@ -8075,21 +8075,53 @@ export default function Admin() {
                 </div>
                 <div className="border-t pt-3">
                   <h4 className="font-semibold text-gray-900 mb-2">Pet Information</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm font-semibold text-gray-700">Pet Name</Label>
-                      <p className="text-gray-900">{capitalizeWords(selectedAppointment.petName)}</p>
+                  {selectedAppointment.pets && selectedAppointment.pets.length > 0 ? (
+                    <div className="space-y-3">
+                      {selectedAppointment.pets.map((pet: any, index: number) => (
+                        <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                          <div className="font-medium text-sm text-gray-600 mb-2">Pet {index + 1}</div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label className="text-xs font-semibold text-gray-600">Name</Label>
+                              <p className="text-gray-900">{capitalizeWords(pet.petName)}</p>
+                            </div>
+                            <div>
+                              <Label className="text-xs font-semibold text-gray-600">Type</Label>
+                              <p className="text-gray-900">{pet.petType}</p>
+                            </div>
+                            <div className="col-span-2">
+                              <Label className="text-xs font-semibold text-gray-600">Service</Label>
+                              <p className="text-gray-900">{formatServiceType(pet.serviceType)}</p>
+                            </div>
+                            {pet.specialNotes && (
+                              <div className="col-span-2">
+                                <Label className="text-xs font-semibold text-gray-600">Notes</Label>
+                                <p className="text-gray-900 text-sm">{pet.specialNotes}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <div>
-                      <Label className="text-sm font-semibold text-gray-700">Pet Type</Label>
-                      <p className="text-gray-900">{selectedAppointment.petType}</p>
-                    </div>
-                  </div>
-                  {selectedAppointment.specialNotes && (
-                    <div className="mt-3">
-                      <Label className="text-sm font-semibold text-gray-700">Special Notes</Label>
-                      <p className="text-gray-900">{selectedAppointment.specialNotes}</p>
-                    </div>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-sm font-semibold text-gray-700">Pet Name</Label>
+                          <p className="text-gray-900">{capitalizeWords(selectedAppointment.petName)}</p>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-semibold text-gray-700">Pet Type</Label>
+                          <p className="text-gray-900">{selectedAppointment.petType}</p>
+                        </div>
+                      </div>
+                      {selectedAppointment.specialNotes && (
+                        <div className="mt-3">
+                          <Label className="text-sm font-semibold text-gray-700">Special Notes</Label>
+                          <p className="text-gray-900">{selectedAppointment.specialNotes}</p>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
                 <div className="border-t pt-3">
