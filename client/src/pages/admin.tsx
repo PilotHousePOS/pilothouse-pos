@@ -3184,15 +3184,15 @@ export default function Admin() {
     allowedTimes: [],
   });
   const [newAllowedTime, setNewAllowedTime] = useState('');
-  const [bookingSelectedService, setBookingSelectedService] = useState('');
-  const [bookingSelectedGroomer, setBookingSelectedGroomer] = useState('');
   const [bookingSelectedDate, setBookingSelectedDate] = useState<Date | undefined>(new Date());
   const [bookingSelectedTime, setBookingSelectedTime] = useState('');
-  const [bookingPetInfo, setBookingPetInfo] = useState({
+  const [bookingPets, setBookingPets] = useState([{
     name: '',
-    type: '',
+    type: 'Dog',
+    serviceType: '',
     notes: '',
-  });
+    groomerId: '',
+  }]);
   const [bookingOwnerInfo, setBookingOwnerInfo] = useState({
     firstName: '',
     lastName: '',
@@ -3392,7 +3392,7 @@ export default function Admin() {
   const handleBookingSelectContact = (contact: any) => {
     let firstName = '';
     let lastName = '';
-    let petName = '';
+    let fallbackPetName = '';
     
     // Check if this is a Google Calendar contact
     if (contact.source === 'google_calendar') {
@@ -3419,7 +3419,7 @@ export default function Admin() {
         if (phoneIndex > 1) {
           // Pet name is between last name and phone number
           const petNameWords = nameWords.slice(1, phoneIndex);
-          petName = petNameWords.join(' ');
+          fallbackPetName = petNameWords.join(' ');
         }
       } else {
         // New format: name is just the last name
@@ -3440,7 +3440,7 @@ export default function Admin() {
           
           if (summaryPhoneIndex > 1) {
             const petNameWords = summaryWords.slice(1, summaryPhoneIndex);
-            petName = petNameWords.join(' ');
+            fallbackPetName = petNameWords.join(' ');
           }
         }
       }
@@ -3457,23 +3457,45 @@ export default function Admin() {
       phoneNumber: contact.phoneNumber || '',
     });
     
-    // Auto-populate pet name if extracted from calendar event
-    if (petName) {
-      setBookingPetInfo(prev => ({
-        ...prev,
+    // Check if contact has petNames array (new format)
+    if (contact.petNames && Array.isArray(contact.petNames) && contact.petNames.length > 0) {
+      // Populate multiple pets from petNames array
+      const newPets = contact.petNames.map((petName: string) => ({
         name: petName,
+        type: 'Dog',
+        serviceType: '',
+        notes: '',
+        groomerId: '',
       }));
+      setBookingPets(newPets);
+      
+      toast({
+        title: "Contact Selected",
+        description: `Information populated for ${lastName} - ${contact.petNames.join(', ')}`,
+      });
+    } else if (fallbackPetName) {
+      // Fallback to old format (extract from name)
+      setBookingPets([{
+        name: fallbackPetName,
+        type: 'Dog',
+        serviceType: '',
+        notes: '',
+        groomerId: '',
+      }]);
+      
+      toast({
+        title: "Contact Selected",
+        description: `Information populated for ${lastName} - Pet: ${fallbackPetName}`,
+      });
+    } else {
+      toast({
+        title: "Contact Selected",
+        description: `Information populated for ${lastName || contact.name}`,
+      });
     }
     
     setBookingContactSearch(contact.name || '');
     setShowBookingContactDropdown(false);
-    
-    toast({
-      title: "Contact Selected",
-      description: petName 
-        ? `Information populated for ${lastName} - Pet: ${petName}`
-        : `Information populated for ${contact.name}`,
-    });
   };
 
   // Generate available time slots for booking
@@ -4179,13 +4201,10 @@ export default function Admin() {
       setIsBookAppointmentOpen(false);
       // Reset form
       setBookingContactSearch('');
-      setBookingSelectedService('');
-      setBookingSelectedGroomer('');
       setBookingSelectedDate(new Date());
       setBookingSelectedTime('');
-      setBookingPetInfo({ name: '', type: '', notes: '' });
+      setBookingPets([{ name: '', type: 'Dog', serviceType: '', notes: '', groomerId: '' }]);
       setBookingOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
-      setBookingPrice('');
       // Refresh appointments
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
     },
@@ -4201,36 +4220,43 @@ export default function Admin() {
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!bookingSelectedService || !bookingSelectedDate || !bookingSelectedTime || !bookingPrice) {
+    // Validate all pets have required fields
+    const invalidPet = bookingPets.find(pet => !pet.name || !pet.type || !pet.serviceType);
+    
+    if (!bookingSelectedDate || !bookingSelectedTime || invalidPet || !bookingOwnerInfo.lastName || !bookingOwnerInfo.phoneNumber) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields including price.",
+        description: "Please fill in all required fields for all pets and owner information.",
         variant: "destructive",
       });
       return;
     }
 
     const SERVICES = [
-      { id: 'grooming-full', name: 'Full Grooming' },
-      { id: 'grooming-bath', name: 'Bath Only' },
+      { id: 'grooming-full', name: 'Full Grooming', price: 35 },
+      { id: 'grooming-bath', name: 'Bath Only', price: 20 },
     ];
 
-    const serviceData = SERVICES.find(s => s.id === bookingSelectedService);
-    if (!serviceData) return;
+    // Calculate total price from all pets
+    const totalPrice = bookingPets.reduce((sum, pet) => {
+      const serviceData = SERVICES.find(s => s.id === pet.serviceType);
+      return sum + (serviceData?.price || 0);
+    }, 0);
 
     const appointmentData = {
-      serviceType: serviceData.name,
-      service: serviceData.name,
       appointmentDate: bookingSelectedDate.toISOString().split('T')[0],
       appointmentTime: bookingSelectedTime,
-      petName: bookingPetInfo.name,
-      petType: bookingPetInfo.type,
-      specialNotes: bookingPetInfo.notes,
       ownerFirstName: bookingOwnerInfo.firstName,
       ownerLastName: bookingOwnerInfo.lastName,
       ownerPhoneNumber: bookingOwnerInfo.phoneNumber,
-      price: bookingPrice,
-      groomerId: bookingSelectedGroomer ? parseInt(bookingSelectedGroomer) : null,
+      price: totalPrice.toString(),
+      pets: bookingPets.map(pet => ({
+        petName: pet.name,
+        petType: pet.type,
+        serviceType: SERVICES.find(s => s.id === pet.serviceType)?.name || '',
+        notes: pet.notes,
+        groomerId: pet.groomerId ? parseInt(pet.groomerId) : null,
+      })),
     };
 
     createAppointmentMutation.mutate(appointmentData);
@@ -8568,116 +8594,147 @@ export default function Admin() {
             </div>
 
             {/* Pet Information */}
-            <div>
-              <Label>Pet Name *</Label>
-              <Input
-                type="text"
-                value={bookingPetInfo.name}
-                onChange={(e) => setBookingPetInfo({ ...bookingPetInfo, name: e.target.value })}
-                required
-                data-testid="input-booking-pet-name"
-              />
-            </div>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <Label className="text-lg font-semibold">Pets Information</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setBookingPets([...bookingPets, { name: '', type: 'Dog', serviceType: '', notes: '', groomerId: '' }])}
+                  data-testid="button-add-pet"
+                >
+                  Add Another Pet
+                </Button>
+              </div>
 
-            <div>
-              <Label>Pet Type *</Label>
-              <Select 
-                value={bookingPetInfo.type} 
-                onValueChange={(value) => setBookingPetInfo({ ...bookingPetInfo, type: value })}
-              >
-                <SelectTrigger data-testid="select-booking-pet-type">
-                  <SelectValue placeholder="Select pet type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Dog">Dog</SelectItem>
-                  <SelectItem value="Cat">Cat</SelectItem>
-                  <SelectItem value="Bird">Bird</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              {bookingPets.map((pet, index) => (
+                <div key={index} className="border p-4 rounded-lg space-y-3 relative">
+                  {bookingPets.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute top-2 right-2"
+                      onClick={() => setBookingPets(bookingPets.filter((_, i) => i !== index))}
+                      data-testid={`button-remove-pet-${index}`}
+                    >
+                      Remove
+                    </Button>
+                  )}
 
-            <div>
-              <Label>Special Notes</Label>
-              <Textarea
-                value={bookingPetInfo.notes}
-                onChange={(e) => setBookingPetInfo({ ...bookingPetInfo, notes: e.target.value })}
-                placeholder="Any special instructions or requirements..."
-                data-testid="input-booking-notes"
-              />
-            </div>
+                  <div className="font-medium text-sm text-gray-700">Pet {index + 1}</div>
 
-            {/* Service Selection */}
-            <div>
-              <Label>Select Service *</Label>
-              <RadioGroup 
-                value={bookingSelectedService} 
-                onValueChange={(value) => {
-                  setBookingSelectedService(value);
-                  // Set default price based on service
-                  if (value === 'grooming-full') {
-                    setBookingPrice('35');
-                  } else if (value === 'grooming-bath') {
-                    setBookingPrice('20');
-                  }
-                }}
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="grooming-full" id="booking-full" />
-                    <Label htmlFor="booking-full" className="cursor-pointer">Full Grooming</Label>
+                  <div>
+                    <Label>Pet Name *</Label>
+                    <Input
+                      type="text"
+                      value={pet.name}
+                      onChange={(e) => {
+                        const newPets = [...bookingPets];
+                        newPets[index].name = e.target.value;
+                        setBookingPets(newPets);
+                      }}
+                      required
+                      data-testid={`input-pet-name-${index}`}
+                    />
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="grooming-bath" id="booking-bath" />
-                    <Label htmlFor="booking-bath" className="cursor-pointer">Bath Only</Label>
+
+                  <div>
+                    <Label>Pet Type *</Label>
+                    <Select
+                      value={pet.type}
+                      onValueChange={(value) => {
+                        const newPets = [...bookingPets];
+                        newPets[index].type = value;
+                        setBookingPets(newPets);
+                      }}
+                    >
+                      <SelectTrigger data-testid={`select-pet-type-${index}`}>
+                        <SelectValue placeholder="Select pet type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Dog">Dog</SelectItem>
+                        <SelectItem value="Cat">Cat</SelectItem>
+                        <SelectItem value="Bird">Bird</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label>Service Type *</Label>
+                    <Select
+                      value={pet.serviceType}
+                      onValueChange={(value) => {
+                        const newPets = [...bookingPets];
+                        newPets[index].serviceType = value;
+                        setBookingPets(newPets);
+                      }}
+                    >
+                      <SelectTrigger data-testid={`select-service-type-${index}`}>
+                        <SelectValue placeholder="Select service" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="grooming-full">Full Grooming ($35)</SelectItem>
+                        <SelectItem value="grooming-bath">Bath Only ($20)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label>Groomer (Optional)</Label>
+                    <Select
+                      value={pet.groomerId || "none"}
+                      onValueChange={(value) => {
+                        const newPets = [...bookingPets];
+                        newPets[index].groomerId = value === "none" ? "" : value;
+                        setBookingPets(newPets);
+                      }}
+                    >
+                      <SelectTrigger data-testid={`select-groomer-${index}`}>
+                        <SelectValue placeholder="Select groomer (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No Preference</SelectItem>
+                        {Array.isArray(groomers) && groomers.map((groomer: any) => (
+                          <SelectItem key={groomer.id} value={groomer.id.toString()}>
+                            {groomer.specialties ? `${groomer.name} (${groomer.specialties})` : groomer.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label>Special Notes</Label>
+                    <Textarea
+                      value={pet.notes}
+                      onChange={(e) => {
+                        const newPets = [...bookingPets];
+                        newPets[index].notes = e.target.value;
+                        setBookingPets(newPets);
+                      }}
+                      placeholder="Any special instructions..."
+                      data-testid={`input-pet-notes-${index}`}
+                    />
                   </div>
                 </div>
-              </RadioGroup>
-            </div>
+              ))}
 
-            {/* Groomer Selection */}
-            <div>
-              <Label>Select Groomer (Optional)</Label>
-              <Select 
-                value={bookingSelectedGroomer || "none"} 
-                onValueChange={(value) => setBookingSelectedGroomer(value === "none" ? "" : value)}
-              >
-                <SelectTrigger data-testid="select-booking-groomer">
-                  <SelectValue placeholder="Select a groomer (optional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">No Preference</SelectItem>
-                  {Array.isArray(groomers) && groomers.map((groomer: any) => (
-                    <SelectItem key={groomer.id} value={groomer.id.toString()}>
-                      {groomer.specialties ? `${groomer.name} (${groomer.specialties})` : groomer.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground mt-1">
-                Choose a preferred groomer or leave as "No Preference"
-              </p>
-            </div>
-
-            {/* Price Selection */}
-            {bookingSelectedService && (
-              <div>
-                <Label>Price (USD) *</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={bookingPrice}
-                  onChange={(e) => setBookingPrice(e.target.value)}
-                  placeholder="Enter price"
-                  required
-                  data-testid="input-booking-price"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  {bookingSelectedService === 'grooming-full' ? 'Suggested: $35' : 'Suggested: $20'}
-                </p>
+              {/* Total Price Display */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold">Total Price:</span>
+                  <span className="text-xl font-bold">
+                    ${bookingPets.reduce((sum, pet) => {
+                      const prices: any = { 'grooming-full': 35, 'grooming-bath': 20 };
+                      return sum + (prices[pet.serviceType] || 0);
+                    }, 0)}
+                  </span>
+                </div>
               </div>
-            )}
+            </div>
 
             {/* Date Selection */}
             <div>

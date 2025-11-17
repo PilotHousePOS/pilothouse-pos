@@ -148,7 +148,7 @@ export default function Booking() {
       // Populate multiple pets from petNames array
       const newPets = contact.petNames.map((petName: string) => ({
         name: petName,
-        type: '',
+        type: 'Dog',
         serviceType: '',
         notes: '',
         groomerId: '',
@@ -163,7 +163,7 @@ export default function Booking() {
       // Fallback to old format (extract from name)
       setPets([{
         name: fallbackPetName,
-        type: '',
+        type: 'Dog',
         serviceType: '',
         notes: '',
         groomerId: '',
