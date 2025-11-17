@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-A mobile-friendly web application for "Animal House" pet store, designed to streamline pet browsing, grooming appointment booking, and pet supply purchasing. The application includes robust inventory management, customer accounts, and administrative functionalities. It features a dark, bold design and specializes in grooming services (bath and full service), pet adoption, and exotic reptile specialties, explicitly excluding vet care or training services. The business vision is to provide a comprehensive, branded online presence, enhancing service accessibility and product sales.
+A mobile-friendly web application for "Animal House" pet store, focusing on pet browsing, grooming appointment booking, and pet supply purchasing. The application includes inventory management, customer accounts, and administrative functionalities. It features a dark, bold design and specializes in grooming services (bath and full service), pet adoption, and exotic reptile specialties, explicitly excluding vet care or training services. The business vision is to provide a comprehensive, branded online presence, enhancing service accessibility and product sales.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -38,68 +38,22 @@ The application is a full-stack web application built with React, Vite, TypeScri
 
 **Technical Implementations & Feature Specifications:**
 - **Pet & Supply Management:** Multi-image support, extensive inventory, automated brand extraction, specialized reptile supply filtering, case-insensitive search with pagination and touch gesture support.
-- **Appointment System:** 15-minute intervals, admin approval, email notifications, Google Calendar sync, chronological ordering, customer arrival/payment tracking, weekly limits (HARD LIMITS: counts total dogs/pets, not appointments - applies to everyone including admins), special date configurations, groomer assignment, role-based access, multi-pet booking support, and comprehensive history. Paid appointments always remain visible in the approved appointments list regardless of "Customers Here" filter status.
+- **Appointment System:** 15-minute intervals, admin approval, email notifications, Google Calendar sync, chronological ordering, customer arrival/payment tracking, weekly limits, special date configurations, groomer assignment, role-based access, multi-pet booking, and comprehensive history.
 - **Order & Notification System:** Admin email/push notifications for new orders/appointments, customer email/SMS/web push for status, and detailed order history.
 - **Authentication & Authorization:** JWT tokens in secure cookies, password reset, user settings, admin user management, three-tier role system (Customer, Groomer, Admin).
 - **Wishlist System:** Dedicated page with add/remove and quick "Add to Cart."
-- **Google Calendar & Contact Management:** Connected Google Calendar, unified calendar view, hybrid contact system with multi-pet support, automatic phone number extraction, event creation from contacts, and seamless multi-pet booking integration (contact selection auto-populates all pet names into booking form).
+- **Google Calendar & Contact Management:** Connected Google Calendar, unified calendar view, hybrid contact system with multi-pet support, automatic phone number extraction, event creation from contacts, and seamless multi-pet booking integration.
 - **Groomer Management System:** Admin CRUD operations for groomers.
 - **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtered by species.
 - **Admin Order Management:** Displays actual product/pet and customer names in order details.
 - **Orders & Appointments Search:** Unified search in admin panel by customer name, phone, or pet name.
-- **Pet Boarding/Babysitting System:** Complete boarding management with intelligent cost calculation:
-    - **CRUD Operations:** Create, read, update, and delete boarding records with full form validation
-    - **Customer & Pet Information:** Track customer name, phone, email (optional), animal name, and type
-    - **Flexible Date Management:** Estimated dates for planning, actual dates for tracking real check-in/out times
-    - **Smart Total Calculation:** Automatically uses both actual dates when available, otherwise uses both estimated dates (never mixes dates to avoid incorrect calculations)
-    - **Status Tracking:** Three states - Scheduled (outline badge), In Boarding (default badge), Completed (secondary badge)
-    - **Quick Actions:** One-click check-in/out buttons, edit for non-completed records, delete with confirmation
-    - **Visual Indicators:** "Estimated Total" (blue) for scheduled/in-boarding records, "Final Total" (green) for completed records with actual dates
-    - **Daily Rate Customization:** Configurable per-boarding rate with automatic multi-day calculations (minimum 1 day)
-    - **Special Instructions:** Optional notes field for dietary needs, medications, behavioral information
-    - **Admin-Only Access:** All boarding endpoints require admin authentication for security
-- **Database Sync Tools:**
-    - **Staging Import with Duplicate Prevention:** Excel import system with smart duplicate detection, SHA-256 checksums, and transactional safety for production.
-    - **Supplies-Only Sync:** Admin-only export/import of supplies inventory for production.
-    - **Full Database Sync:** Development-only export/import of all database tables for environment syncing.
-- **Auto-Categorization System:**
-    - **Combined Auto-Categorization:** Single-button operation that performs both specialty section (filterType) and product type (category) categorization in one process.
-    - **Step 1 - Specialty Sections (filterType):** Classifies products as Aquatic or Reptile based on brand and keyword analysis for specialty pages.
-      - **Special Rule - Bridges:** Products with "bridge" in the name automatically categorize as Aquatic UNLESS "lizard" appears within 20 characters of "bridge" (e.g., "lizard bridge" stays in reptile category).
-    - **Step 2 - Product Categories (category):** Assigns products to 11 categories (Food, Toys, Beds, Leashes, Healthcare, Accessories, Aquatics, Reptiles, Bird Supplies, Dog Cages/Houses, Small Animal Supplies) using multi-signal scoring with brand defaults, name keywords, description keywords, and exclusion penalties.
-      - **Brand Override Rules:** Specific brands always categorize to their primary category regardless of conflicting keywords:
-        - ProPlan/Purina Pro Plan → Food (even if "toy" appears, which refers to toy breed size)
-        - KONG → Toys, Blue Buffalo → Food, Chuckit → Toys, FURminator → Healthcare, Ruffwear → Leashes
-- **Abbreviation Expansion System:**
-    - **Enterprise-Grade Three-Phase Pipeline:** Expands abbreviations, corrects spelling, and applies professional title case to product names and descriptions with transactional protection, backups, and rollback.
-    - **Shared Mappings Module:** Centralized abbreviation mappings, spelling corrections, and title case rules in scripts/expand-abbreviations.ts.
-    - **Comprehensive Abbreviation Coverage:** 80+ mappings including:
-      - Brand abbreviations: Wholseso/Wholso→Wholesome, Vict→Victor, Euk→Eukanuba, Nutri Sour/Sou→Nutrisource, Blue B→Blue Buffalo, Red B→RedBarn, Zign→Zignature, Tow/Toe→Taste of the Wild, Nb→Natural Balance, Zig→Zignature, Nyla→Nylabone, Diam→Diamond, Orij→Orijen, Cand→Canidae
-      - Multi-word phrases: Fromm Gold Weight→Fromm Gold Weight Management, Perf Weight→Perfect Weight, Gr Fr→Grain Free, Conure&tiel/Conure&lovebird→Conure & Cockatiel/Lovebird, Rat&mouse→Rat & Mouse, Chkn&dck→Chicken & Duck, Chkn&lvr→Chicken & Liver, Tuk,Sard→Turkey, Sardine, Roc Moun→Rocky Mountain, Anc Mount/Stream/Prairie/Wetland→Ancient Mountain/Stream/Prairie/Wetland, Pacif Stre→Pacific Stream, Can Riv→Canyon River, Worldsbestcatlitter→World's Best Cat Litter, Swtpot→Sweet Potato, Beggarbns→Beggin', Frndsfrm→Friends From The Farm
-      - Protein abbreviations: Chkn→Chicken, Bef→Beef, Lam→Lamb, Rab→Rabbit, Ven→Venison, Tuk→Turkey, Sard→Sardine, Lvr→Liver, Dck→Duck
-      - Single words: Sportmix→Sportsmix, Orig→Original, Cast→Cat, Per→Perfect, Ind→Indoor, Shred→Shredded, Seaf→Seafood, Unsc.→Unscented, Kanga→Kangaroo, Zssen→Zssential, Yurkey→Turkey, Blk→Black, Yng→Young, Gpig→Guineapig, Spe/Spec→Special, Sal→Salmon, Proc→Process, Nat→Natural, Fd→Freeze Dried, Als→All Life Stages, Anc→Ancient, Roc→Rocky, Moun→Mountain, Riv→River, Stre→Stream, Pacif→Pacific, Fro/Frzn→Frozen, Nug→Nuggets, Pron/Pront→Pronto, Gitd→Glow in the Dark
-      - Spelling corrections: Vegtable→Vegetable, Thermoter→Thermometer, Watm→Watermelon, Sunburts→Sunburst, Cockateil→Cockatiel, Prarie→Prairie
-    - **Latest Run Results:** 572 total products updated across multiple runs (185 initial + 172 brand abbreviations + 47 spelling + 168 comprehensive expansion)
-- **Brand Extraction System:**
-    - **Comprehensive Brand Database:** scripts/extract-brands.ts with 80+ brand patterns across all pet categories
-    - **Coverage:** 63.7% of inventory (4,659 of 7,316 products) have assigned brands
-    - **Top Brands:** Coastal Pet Products (896), KONG (318), ZooMed (272), Exo Terra (213), Science Diet (200), Lil Pals (164), Fluval (155), Kaytee (136), Fromm (135), Zilla (118), Tetra (103), Blue Buffalo (101), Aqueon (95), Nutrisource (92), RedBarn (89), Oxbow (89)
-    - **Small Animal Brands:** Oxbow (89), Kaytee (136), Marshall (11), Higgins (13), Ferret Nation (4), A&E Cage Company (13), Birdlife (74), Quiko (2)
-    - **Food Brands:** Fromm, Diamond, Natural Balance, Pure Vita, Canidae, Sportsmix, Freshpet, Taste of the Wild, and all major dog/cat food brands
-    - **Aquatic Brands:** Marina (66), Aquatop (59), Cascade (24), Activ (4), Acurel (2), plus all major aquatic brands
-    - **Treats & Accessories:** Greenies (49), SmartBones (20), Nylabone (56), SodaPup (15), Jolly Pets (7), Meowijuana (9), Fresh Kisses (14)
-    - **Latest Run Results:** 1,842 brands extracted in latest run, increasing coverage from 38.5% to 63.7%
-- **Product Image Management System:**
-    - **Statistics Dashboard:** Real-time tracking of total products, products with/without images, breakdown by brand and category.
-    - **Manual Image Search:** Individual product image URL input with preview and validation.
-    - **Automated Batch Search:** Select brand or category, configure batch size (max 50), generate search queries for each product, preview & approve images before saving.
-      - **Progress Tracking:** Real-time progress bar showing products processed.
-      - **Preview & Approval Interface:** Review all found images, manually paste image URLs, approve/reject each result.
-      - **Batch Update:** Save all approved images in one operation.
-    - **Cost Management:** Warning system for web search credit usage, selective search capabilities to manage costs, configurable batch size.
-    - **Admin-Only Access:** Secure endpoints with admin authentication for all image management operations.
-    - **Brand Standardization:** Automatic "Zoo Medium" → "ZooMed" standardization for consistency.
-    - **API Endpoints:** /api/admin/supplies/image-stats, /api/admin/supplies/without-images, /api/admin/supplies/batch-filter, /api/admin/supplies/batch-image-search, /api/admin/supplies/:id/image
+- **Pet Boarding/Babysitting System:** Complete boarding management with intelligent cost calculation, flexible date management, status tracking (Scheduled, In Boarding, Completed), quick actions, and admin-only access.
+- **Database Sync Tools:** Staging import with duplicate prevention (Excel), supplies-only sync (admin-only), and full database sync (development-only).
+- **Auto-Categorization System:** Single-button operation for both specialty section (filterType) and product type (category) classification based on brand and keyword analysis.
+- **Abbreviation Expansion System:** Three-phase pipeline for expanding abbreviations, correcting spelling, and applying professional title case to product names/descriptions using centralized mappings.
+- **Brand Extraction System:** Comprehensive brand database for automated brand assignment to products.
+- **Product Image Management System:** Statistics dashboard, manual image search, automated batch search with preview and approval, cost management, and admin-only access.
+- **Employee Schedule Management System:** Sectioned schedule view, weekly editable grid, employee management, flexible time slots, batch save, data persistence, empty state handling, and admin-only access.
 
 **System Design Choices:**
 - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
