@@ -134,7 +134,7 @@ export default function Booking() {
     const lastName = nameParts[0] || '';
     
     // Remaining words (before phone/groomer tag) are Pet Name(s)
-    const petName = nameParts.slice(1).join(' ') || '';
+    const fallbackPetName = nameParts.slice(1).join(' ') || '';
     
     // Update owner info with last name only (no first name in this pattern)
     setOwnerInfo({
@@ -143,22 +143,45 @@ export default function Booking() {
       phoneNumber: contact.phoneNumber || '',
     });
     
-    // Auto-fill pet name if extracted
-    if (petName) {
-      setPets(prev => {
-        const updated = [...prev];
-        updated[0] = { ...updated[0], name: petName };
-        return updated;
+    // Check if contact has petNames array (new format)
+    if (contact.petNames && Array.isArray(contact.petNames) && contact.petNames.length > 0) {
+      // Populate multiple pets from petNames array
+      const newPets = contact.petNames.map((petName: string) => ({
+        name: petName,
+        type: '',
+        serviceType: '',
+        notes: '',
+        groomerId: '',
+      }));
+      setPets(newPets);
+      
+      toast({
+        title: "Contact Selected",
+        description: `Information populated for ${lastName} - ${contact.petNames.join(', ')}`,
+      });
+    } else if (fallbackPetName) {
+      // Fallback to old format (extract from name)
+      setPets([{
+        name: fallbackPetName,
+        type: '',
+        serviceType: '',
+        notes: '',
+        groomerId: '',
+      }]);
+      
+      toast({
+        title: "Contact Selected",
+        description: `Information populated for ${lastName} - ${fallbackPetName}`,
+      });
+    } else {
+      toast({
+        title: "Contact Selected",
+        description: `Information populated for ${lastName}`,
       });
     }
     
     setContactSearch(contact.name || '');
     setShowContactDropdown(false);
-    
-    toast({
-      title: "Contact Selected",
-      description: `Information populated for ${lastName}${petName ? ` - ${petName}` : ''}`,
-    });
   };
 
   // Check if a date is available for booking
