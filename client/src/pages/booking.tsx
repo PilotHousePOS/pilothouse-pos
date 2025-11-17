@@ -31,7 +31,7 @@ export default function Booking() {
     groomerId?: string;
   }>>([{
     name: '',
-    type: 'Dog',
+    type: 'dog',
     serviceType: '',
     notes: '',
     groomerId: '',
@@ -293,7 +293,7 @@ export default function Booking() {
       setSelectedDate(new Date());
       setSelectedTime('');
       setSelectedGroomer('');
-      setPets([{ name: '', type: 'Dog', serviceType: '', notes: '', groomerId: '' }]);
+      setPets([{ name: '', type: 'dog', serviceType: '', notes: '', groomerId: '' }]);
       setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
     },
@@ -357,7 +357,7 @@ export default function Booking() {
   };
 
   const addPet = () => {
-    setPets([...pets, { name: '', type: 'Dog', serviceType: '', notes: '', groomerId: '' }]);
+    setPets([...pets, { name: '', type: 'dog', serviceType: '', notes: '', groomerId: '' }]);
   };
 
   const removePet = (index: number) => {
