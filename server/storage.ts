@@ -164,6 +164,7 @@ export interface IStorage {
   createAppointmentPets(appointmentId: number, pets: Array<{petName: string; petType: string; serviceType: string; price: string; specialNotes?: string; groomerId?: number | null}>): Promise<void>;
   getAppointmentPets(appointmentId: number): Promise<any[]>;
   getAppointmentPetsByAppointmentIds(appointmentIds: number[]): Promise<Map<number, any[]>>;
+  deleteAppointmentPets(appointmentId: number): Promise<void>;
   getAppointments(userId?: string): Promise<Appointment[]>;
   getAppointment(id: number): Promise<Appointment | undefined>;
   getAppointmentsByPhoneNumber(phoneNumber: string): Promise<Appointment[]>;
@@ -1081,6 +1082,10 @@ export class DatabaseStorage implements IStorage {
     }
     
     return petsByAppointmentId;
+  }
+
+  async deleteAppointmentPets(appointmentId: number): Promise<void> {
+    await db.delete(appointmentPets).where(eq(appointmentPets.appointmentId, appointmentId));
   }
 
   async getAppointments(userId?: string): Promise<Appointment[]> {
