@@ -815,6 +815,17 @@ export class DatabaseStorage implements IStorage {
       // CRITICAL: Explicitly set filterType even when NULL to clear old values
       await db.transaction(async (tx) => {
         for (const result of categorized) {
+          // Get the original product data for logging
+          const originalProduct = batch.find(p => p.id === result.id);
+          
+          // DEBUG: Log Kong products specifically
+          if (originalProduct?.brand && originalProduct.brand.toLowerCase().includes('kong')) {
+            console.log(`[KONG DEBUG] Product: "${originalProduct.name}" (ID: ${result.id})`);
+            console.log(`[KONG DEBUG]   Brand: "${originalProduct.brand}"`);
+            console.log(`[KONG DEBUG]   Categorized as: ${result.filterType === null ? 'NULL (general)' : result.filterType}`);
+            console.log(`[KONG DEBUG]   Reason: ${result.reason}`);
+          }
+          
           // Always update filterType to ensure old 'reptile'/'aquatic' values are cleared
           await tx.update(supplies)
             .set({ 
