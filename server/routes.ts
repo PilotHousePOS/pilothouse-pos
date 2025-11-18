@@ -3979,6 +3979,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Fix Kong toys in Reptiles section (One-time fix - Admin only)
+  app.post("/api/admin/supplies/fix-kong-reptiles", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      console.log("[FIX-KONG] Clearing Kong toys from reptile category...");
+      
+      // Direct SQL update to fix Kong products
+      const result = await storage.fixKongReptiles();
+      
+      console.log(`[FIX-KONG] Fixed ${result.count} Kong products`);
+
+      res.json({
+        message: `Successfully cleared ${result.count} Kong products from reptile category`,
+        count: result.count
+      });
+    } catch (error) {
+      console.error('[FIX-KONG] Error fixing Kong reptiles:', error);
+      res.status(500).json({ message: "Failed to fix Kong reptiles" });
+    }
+  });
+
   // Combined auto-categorization: Sets both filterType AND category (Admin only)
   app.post("/api/admin/supplies/auto-categorize", authMiddleware, async (req: any, res) => {
     try {
@@ -3988,6 +4013,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       console.log("Starting combined auto-categorization (filterType + category)...");
+      console.log("[VERSION CHECK] Kong debug logging enabled - should see Kong products below");
       const startTime = Date.now();
 
       // Step 1: Categorize filterType (aquatic/reptile/general)

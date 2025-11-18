@@ -118,6 +118,8 @@ export interface IStorage {
     total: number;
   }>;
 
+  fixKongReptiles(): Promise<{ count: number }>;
+
   autoCategorizeProductCategories(): Promise<{
     food: number;
     toys: number;
@@ -776,6 +778,22 @@ export class DatabaseStorage implements IStorage {
     await db.delete(supplies).where(eq(supplies.id, id));
   }
 
+  async fixKongReptiles(): Promise<{ count: number }> {
+    // Direct SQL fix to clear Kong toys from reptile category
+    const result = await db
+      .update(supplies)
+      .set({ filterType: null })
+      .where(
+        and(
+          ilike(supplies.brand, '%kong%'),
+          eq(supplies.filterType, 'reptile')
+        )
+      )
+      .returning({ id: supplies.id });
+    
+    return { count: result.length };
+  }
+
   async autoCategorizeAllSupplies(): Promise<{
     aquatic: number;
     reptile: number;
@@ -815,17 +833,6 @@ export class DatabaseStorage implements IStorage {
       // CRITICAL: Explicitly set filterType even when NULL to clear old values
       await db.transaction(async (tx) => {
         for (const result of categorized) {
-          // Get the original product data for logging
-          const originalProduct = batch.find(p => p.id === result.id);
-          
-          // DEBUG: Log Kong products specifically
-          if (originalProduct?.brand && originalProduct.brand.toLowerCase().includes('kong')) {
-            console.log(`[KONG DEBUG] Product: "${originalProduct.name}" (ID: ${result.id})`);
-            console.log(`[KONG DEBUG]   Brand: "${originalProduct.brand}"`);
-            console.log(`[KONG DEBUG]   Categorized as: ${result.filterType === null ? 'NULL (general)' : result.filterType}`);
-            console.log(`[KONG DEBUG]   Reason: ${result.reason}`);
-          }
-          
           // Always update filterType to ensure old 'reptile'/'aquatic' values are cleared
           await tx.update(supplies)
             .set({ 
