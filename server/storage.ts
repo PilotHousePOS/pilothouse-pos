@@ -812,10 +812,14 @@ export class DatabaseStorage implements IStorage {
       const batchGeneral = categorized.filter(r => r.filterType === null).length;
 
       // Prepare bulk update using transaction
+      // CRITICAL: Explicitly set filterType even when NULL to clear old values
       await db.transaction(async (tx) => {
         for (const result of categorized) {
+          // Always update filterType to ensure old 'reptile'/'aquatic' values are cleared
           await tx.update(supplies)
-            .set({ filterType: result.filterType })
+            .set({ 
+              filterType: result.filterType // Explicitly set to null when filterType is null
+            })
             .where(eq(supplies.id, result.id));
 
           // Count categories
