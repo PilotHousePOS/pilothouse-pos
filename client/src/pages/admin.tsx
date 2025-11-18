@@ -3433,13 +3433,15 @@ function EditAppointmentDialog({
   const [pricingMode, setPricingMode] = useState<'individual' | 'override'>('individual');
   const [totalPriceOverride, setTotalPriceOverride] = useState('');
   
-  // Track if we've initialized from fetched data to prevent overwriting user edits
-  const initializedRef = useRef(false);
+  // Track which appointment we've initialized for (prevents overwriting edits on refetch)
+  const initializedAppointmentId = useRef<number | null>(null);
   
-  // Reset initialization flag when appointmentId changes (new appointment being edited)
+  // Reset initialization ref when component unmounts
   useEffect(() => {
-    initializedRef.current = false;
-  }, [appointmentId]);
+    return () => {
+      initializedAppointmentId.current = null;
+    };
+  }, []);
   
   // Service prices constant
   const SERVICES = [
@@ -3459,11 +3461,16 @@ function EditAppointmentDialog({
       return response.json();
     },
     enabled: !!appointmentId,
+    // Disable background refetching to prevent overwriting user edits
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: true, // Always fetch when dialog opens
   });
   
-  // Initialize state when appointment data loads (only once)
+  // Initialize state when appointment data loads (only once per appointmentId)
   useEffect(() => {
-    if (!appointmentData || initializedRef.current) return;
+    // Skip if no data or already initialized for this appointment
+    if (!appointmentData || initializedAppointmentId.current === appointmentId) return;
     
     // Update date and time from fetched appointment data (using local date parser to avoid timezone issues)
     if (appointmentData.appointmentDate) {
@@ -3504,13 +3511,14 @@ function EditAppointmentDialog({
     
     // Set pricing mode based on appointment data
     setPricingMode(appointmentData.pricingMode || 'individual');
+    // Only update override price if explicitly set (preserve any previous value if switching modes)
     if (appointmentData.pricingMode === 'override' && appointmentData.price) {
       setTotalPriceOverride(parseFloat(appointmentData.price).toString());
     }
     
-    // Mark as initialized
-    initializedRef.current = true;
-  }, [appointmentData]);
+    // Mark this appointment as initialized
+    initializedAppointmentId.current = appointmentId;
+  }, [appointmentData, appointmentId]);
   
   // Calculate total price in individual mode
   const calculatedTotal = pets.reduce((sum, pet) => sum + (parseFloat(pet.price) || 0), 0);
