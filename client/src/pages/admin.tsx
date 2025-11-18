@@ -3433,6 +3433,14 @@ function EditAppointmentDialog({
   const [pricingMode, setPricingMode] = useState<'individual' | 'override'>('individual');
   const [totalPriceOverride, setTotalPriceOverride] = useState('');
   
+  // Track if we've initialized from fetched data to prevent overwriting user edits
+  const initializedRef = useRef(false);
+  
+  // Reset initialization flag when appointmentId changes (new appointment being edited)
+  useEffect(() => {
+    initializedRef.current = false;
+  }, [appointmentId]);
+  
   // Service prices constant
   const SERVICES = [
     { id: 'grooming-full', name: 'Full Grooming', price: 35 },
@@ -3453,39 +3461,55 @@ function EditAppointmentDialog({
     enabled: !!appointmentId,
   });
   
-  // Initialize state when appointment data loads
+  // Initialize state when appointment data loads (only once)
   useEffect(() => {
-    if (appointmentData) {
-      // If appointment has pets array, use it; otherwise create from single pet
-      if (appointmentData.pets && appointmentData.pets.length > 0) {
-        setPets(appointmentData.pets.map((pet: any) => ({
-          id: pet.id,
-          name: pet.petName,
-          type: pet.petType,
-          serviceType: pet.serviceType,
-          notes: pet.specialNotes || '',
-          groomerId: pet.groomerId || null,
-          price: pet.price ? parseFloat(pet.price).toString() : '0',
-        })));
-      } else {
-        // Fallback to single pet from appointment table
-        setPets([{
-          id: null,
-          name: appointmentData.petName || '',
-          type: appointmentData.petType || 'Dog',
-          serviceType: appointmentData.serviceType || 'grooming-full',
-          notes: appointmentData.specialNotes || '',
-          groomerId: appointmentData.groomerId || null,
-          price: appointmentData.price ? parseFloat(appointmentData.price).toString() : '35',
-        }]);
-      }
-      
-      // Set pricing mode based on appointment data
-      setPricingMode(appointmentData.pricingMode || 'individual');
-      if (appointmentData.pricingMode === 'override' && appointmentData.price) {
-        setTotalPriceOverride(parseFloat(appointmentData.price).toString());
-      }
+    if (!appointmentData || initializedRef.current) return;
+    
+    // Update date and time from fetched appointment data (using local date parser to avoid timezone issues)
+    if (appointmentData.appointmentDate) {
+      setDate(parseLocalDate(appointmentData.appointmentDate));
     }
+    if (appointmentData.appointmentTime) {
+      setTime(appointmentData.appointmentTime);
+    }
+    
+    // Update owner information from fetched data
+    setOwnerFirstName(appointmentData.ownerFirstName || '');
+    setOwnerLastName(appointmentData.ownerLastName || '');
+    setOwnerPhone(appointmentData.ownerPhoneNumber || '');
+    
+    // If appointment has pets array, use it; otherwise create from single pet
+    if (appointmentData.pets && appointmentData.pets.length > 0) {
+      setPets(appointmentData.pets.map((pet: any) => ({
+        id: pet.id,
+        name: pet.petName,
+        type: pet.petType,
+        serviceType: pet.serviceType,
+        notes: pet.specialNotes || '',
+        groomerId: pet.groomerId || null,
+        price: pet.price ? parseFloat(pet.price).toString() : '0',
+      })));
+    } else {
+      // Fallback to single pet from appointment table
+      setPets([{
+        id: null,
+        name: appointmentData.petName || '',
+        type: appointmentData.petType || 'Dog',
+        serviceType: appointmentData.serviceType || 'grooming-full',
+        notes: appointmentData.specialNotes || '',
+        groomerId: appointmentData.groomerId || null,
+        price: appointmentData.price ? parseFloat(appointmentData.price).toString() : '35',
+      }]);
+    }
+    
+    // Set pricing mode based on appointment data
+    setPricingMode(appointmentData.pricingMode || 'individual');
+    if (appointmentData.pricingMode === 'override' && appointmentData.price) {
+      setTotalPriceOverride(parseFloat(appointmentData.price).toString());
+    }
+    
+    // Mark as initialized
+    initializedRef.current = true;
   }, [appointmentData]);
   
   // Calculate total price in individual mode
