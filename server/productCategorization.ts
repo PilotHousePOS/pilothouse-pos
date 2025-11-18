@@ -35,11 +35,13 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
 
   // **CRITICAL: Check brand exclusions FIRST before any scoring**
   // This prevents toy/aquatic brands from ever being categorized as reptile (and vice versa)
+  // Use "includes" to handle brand variants like "Kong Company", "KONG®", etc.
   let excludedFromAquatic = false;
   let excludedFromReptile = false;
 
   for (const excludeBrand of SUPPLY_FILTERS.aquatic.excludeBrands) {
-    if (brand === normalizeBrand(excludeBrand)) {
+    const normalizedExclude = normalizeBrand(excludeBrand);
+    if (brand.includes(normalizedExclude)) {
       excludedFromAquatic = true;
       matchedReasons.push(`Excluded from aquatic (brand): ${excludeBrand}`);
       break;
@@ -47,7 +49,8 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   }
 
   for (const excludeBrand of SUPPLY_FILTERS.reptile.excludeBrands) {
-    if (brand === normalizeBrand(excludeBrand)) {
+    const normalizedExclude = normalizeBrand(excludeBrand);
+    if (brand.includes(normalizedExclude)) {
       excludedFromReptile = true;
       matchedReasons.push(`Excluded from reptile (brand): ${excludeBrand}`);
       break;
