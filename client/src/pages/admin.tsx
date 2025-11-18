@@ -4001,6 +4001,9 @@ export default function Admin() {
   // Track current index for each phone number group (for cycling through appointments)
   const [appointmentGroupIndexes, setAppointmentGroupIndexes] = useState<Record<string, number>>({});
   
+  // Supply search state
+  const [supplySearchQuery, setSupplySearchQuery] = useState('');
+  
   const ITEMS_PER_PAGE = 4;
 
   // Always call all hooks at the top level
@@ -5915,7 +5918,19 @@ export default function Admin() {
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <Package className="w-5 h-5" />
-                  Supplies ({(supplies as any[]).length})
+                  Supplies ({
+                    supplySearchQuery.trim() 
+                      ? `${(supplies as any[]).filter((supply: any) => {
+                          const query = supplySearchQuery.toLowerCase();
+                          return (
+                            supply.name?.toLowerCase().includes(query) ||
+                            supply.brand?.toLowerCase().includes(query) ||
+                            supply.category?.toLowerCase().includes(query) ||
+                            supply.description?.toLowerCase().includes(query)
+                          );
+                        }).length} / ${(supplies as any[]).length}`
+                      : (supplies as any[]).length
+                  })
                 </CardTitle>
                 {typedUser?.isAdmin && (
                   <Dialog open={isAddSupplyOpen} onOpenChange={setIsAddSupplyOpen}>
@@ -5937,8 +5952,42 @@ export default function Admin() {
               </div>
             </CardHeader>
             <CardContent>
+              {/* Search bar */}
+              <div className="mb-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search supplies by name, brand, or category..."
+                    value={supplySearchQuery}
+                    onChange={(e) => setSupplySearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand-orange focus:border-brand-orange"
+                    data-testid="input-supply-search"
+                  />
+                  {supplySearchQuery && (
+                    <button
+                      onClick={() => setSupplySearchQuery('')}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                      data-testid="button-clear-supply-search"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              </div>
               <div className="space-y-4">
-                {(supplies as any[]).map((supply: any) => (
+                {(supplies as any[])
+                  .filter((supply: any) => {
+                    if (!supplySearchQuery.trim()) return true;
+                    const query = supplySearchQuery.toLowerCase();
+                    return (
+                      supply.name?.toLowerCase().includes(query) ||
+                      supply.brand?.toLowerCase().includes(query) ||
+                      supply.category?.toLowerCase().includes(query) ||
+                      supply.description?.toLowerCase().includes(query)
+                    );
+                  })
+                  .map((supply: any) => (
                   <div key={supply.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex-1">
                       <h3 className="font-semibold">{supply.name}</h3>

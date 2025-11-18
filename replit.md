@@ -20,13 +20,13 @@ A mobile-friendly web application for "Animal House" pet store, focusing on pet 
   - Whitespace-only searches treated as empty searches
   - Search bars integrated into specialty pages (Aquatics, Reptiles) with pagination support
 - Supply Filtering: Centralized, research-based filtering system with proper brand/keyword separation (server/filterConfig.ts):
-  - Reptile supplies (681 items): ZooMed, Exo Terra, Zilla, Fluker's, ReptiCare brands + reptile keywords
-  - Aquatic supplies (189 items): Hikari, Tetra, Aqueon, Marineland, API, Fluval, SeaChem, GloFish brands + aquatic keywords
-  - Brand categorizations based on web research of company specializations
-  - Category constraints always apply to prevent cross-contamination between departments
-  - filterType and category filters work together (not mutually exclusive)
-  - Toy brands (Kong, Nylabone, Chuckit!, etc.) excluded from specialty sections to prevent miscategorization
-  - Brand-based exclusion takes priority over keyword matching (e.g., Kong "Frog" toy won't appear in reptile section)
+  - Reptile supplies: ZooMed, Exo Terra, Zilla, Fluker's, ReptiCare brands + reptile keywords
+  - Aquatic supplies: Hikari, Tetra, Aqueon, Marineland, API, Fluval, SeaChem, GloFish brands + aquatic keywords
+  - **Cross-category brands (ZooMed)**: Make both aquatic AND reptile products - not excluded from either category, keywords determine final categorization
+  - **Keyword priority system**: Species-specific keywords (60pts) override brand scoring (40pts) for accurate categorization
+  - **Exclusion logic**: Brand exclusions prevent brand scoring only; keyword exclusions prevent keyword scoring only
+  - Toy brands (Kong, Nylabone, Chuckit!, etc.) hard-excluded from both categories via brand AND keyword exclusions
+  - Example: "ZooMed Pleco" → pleco keyword (60pts aquatic) beats ZooMed brand (40pts reptile) → categorized as Aquatic
 
 ## System Architecture
 The application is a full-stack web application built with React, Vite, TypeScript, Tailwind CSS, shadcn/ui for the frontend, and Express.js with TypeScript for the backend, utilizing PostgreSQL with Drizzle ORM.

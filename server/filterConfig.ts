@@ -15,18 +15,19 @@ export type FilterType = 'reptile' | 'aquatic';
 export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
   reptile: {
     // Reptile-specialized brands based on company research
+    // ZooMed included - they make both reptile AND aquatic products (keywords will decide)
     includeBrands: ['ZooMed', 'Exo Terra', 'Zilla', "Fluker's", 'ReptiCare'],
     includeKeywords: [
       'gecko', 'lizard', 'snake', 'turtle', 'tortoise', 'chameleon',
       'bearded dragon', 'iguana', 'frog', 'toad', 'salamander', 'newt',
       'reptile', 'amphibian', 'terrarium', 'vivarium', 'repti'
     ],
-    // Exclude aquatic brands and toy brands - these are not reptile supplies
+    // Exclude ONLY pure aquatic brands and toy brands (NOT cross-category brands like ZooMed)
     excludeBrands: [
       'Tetra', 'Aqueon', 'GloFish', 'Marineland', 'API', 'Fluval', 'SeaChem', 'Hikari',
       'Kong', 'Nylabone', 'Chuckit!', 'Outward Hound', 'ZippyPaws', 'KONG'
     ],
-    excludeKeywords: ['fish', 'aquarium', 'aquatic', 'glo fish', 'betta', 'dog toy', 'cat toy', 'pet toy']
+    excludeKeywords: ['fish', 'aquarium', 'aquatic', 'glo fish', 'betta', 'pleco', 'plecostomus', 'dog toy', 'cat toy', 'pet toy']
   },
   aquatic: {
     // Aquatic-specialized brands based on company research:
@@ -42,11 +43,12 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
     includeKeywords: [
       'fish', 'aquarium', 'aquatic', 'betta', 'glo fish', 'goldfish',
       'tropical fish', 'freshwater', 'saltwater', 'reef', 'marine', 'koi',
-      'cichlid', 'tetra', 'guppy', 'molly', 'platy'
+      'cichlid', 'tetra', 'guppy', 'molly', 'platy', 'pleco', 'plecostomus'
     ],
-    // Exclude reptile brands and toy brands
+    // Exclude ONLY pure reptile brands and toy brands (NOT cross-category brands like ZooMed)
+    // ZooMed removed - they make both aquatic AND reptile products
     excludeBrands: [
-      'ZooMed', 'Exo Terra', 'Zilla', "Fluker's", 'ReptiCare',
+      'Exo Terra', 'Zilla', "Fluker's", 'ReptiCare',
       'Kong', 'Nylabone', 'Chuckit!', 'Outward Hound', 'ZippyPaws', 'KONG'
     ],
     excludeKeywords: [
