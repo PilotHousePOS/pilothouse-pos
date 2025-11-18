@@ -25,6 +25,8 @@ A mobile-friendly web application for "Animal House" pet store, focusing on pet 
   - Brand categorizations based on web research of company specializations
   - Category constraints always apply to prevent cross-contamination between departments
   - filterType and category filters work together (not mutually exclusive)
+  - Toy brands (Kong, Nylabone, Chuckit!, etc.) excluded from specialty sections to prevent miscategorization
+  - Brand-based exclusion takes priority over keyword matching (e.g., Kong "Frog" toy won't appear in reptile section)
 
 ## System Architecture
 The application is a full-stack web application built with React, Vite, TypeScript, Tailwind CSS, shadcn/ui for the frontend, and Express.js with TypeScript for the backend, utilizing PostgreSQL with Drizzle ORM.
@@ -49,7 +51,7 @@ The application is a full-stack web application built with React, Vite, TypeScri
 - **Orders & Appointments Search:** Unified search in admin panel by customer name, phone, or pet name.
 - **Pet Boarding/Babysitting System:** Complete boarding management with intelligent cost calculation, flexible date management, status tracking (Scheduled, In Boarding, Completed), quick actions, and admin-only access.
 - **Database Sync Tools:** Staging import with duplicate prevention (Excel), supplies-only sync (admin-only), and full database sync (development-only).
-- **Auto-Categorization System:** Single-button operation for both specialty section (filterType) and product type (category) classification based on brand and keyword analysis.
+- **Auto-Categorization System:** Single-button operation for both specialty section (filterType) and product type (category) classification based on brand and keyword analysis. Includes brand-based exclusion logic to prevent toy brands from being miscategorized as reptile/aquatic supplies (e.g., Kong toys with animal names stay in toys category).
 - **Abbreviation Expansion System:** Three-phase pipeline for expanding abbreviations, correcting spelling, and applying professional title case to product names/descriptions using centralized mappings.
 - **Brand Extraction System:** Comprehensive brand database for automated brand assignment to products.
 - **Product Image Management System:** Statistics dashboard, manual image search, automated batch search with preview and approval, cost management, and admin-only access.

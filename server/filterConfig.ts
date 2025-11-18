@@ -21,9 +21,12 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
       'bearded dragon', 'iguana', 'frog', 'toad', 'salamander', 'newt',
       'reptile', 'amphibian', 'terrarium', 'vivarium', 'repti'
     ],
-    // Exclude all aquatic brands - these are exclusively for fish/aquariums
-    excludeBrands: ['Tetra', 'Aqueon', 'GloFish', 'Marineland', 'API', 'Fluval', 'SeaChem', 'Hikari'],
-    excludeKeywords: ['fish', 'aquarium', 'aquatic', 'glo fish', 'betta']
+    // Exclude aquatic brands and toy brands - these are not reptile supplies
+    excludeBrands: [
+      'Tetra', 'Aqueon', 'GloFish', 'Marineland', 'API', 'Fluval', 'SeaChem', 'Hikari',
+      'Kong', 'Nylabone', 'Chuckit!', 'Outward Hound', 'ZippyPaws', 'KONG'
+    ],
+    excludeKeywords: ['fish', 'aquarium', 'aquatic', 'glo fish', 'betta', 'dog toy', 'cat toy', 'pet toy']
   },
   aquatic: {
     // Aquatic-specialized brands based on company research:
@@ -41,11 +44,14 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
       'tropical fish', 'freshwater', 'saltwater', 'reef', 'marine', 'koi',
       'cichlid', 'tetra', 'guppy', 'molly', 'platy'
     ],
-    // Exclude all reptile brands
-    excludeBrands: ['ZooMed', 'Exo Terra', 'Zilla', "Fluker's", 'ReptiCare'],
+    // Exclude reptile brands and toy brands
+    excludeBrands: [
+      'ZooMed', 'Exo Terra', 'Zilla', "Fluker's", 'ReptiCare',
+      'Kong', 'Nylabone', 'Chuckit!', 'Outward Hound', 'ZippyPaws', 'KONG'
+    ],
     excludeKeywords: [
       'gecko', 'lizard', 'snake', 'bearded dragon', 'iguana',
-      'reptile', 'terrarium', 'vivarium', 'repti'
+      'reptile', 'terrarium', 'vivarium', 'repti', 'dog toy', 'cat toy', 'pet toy'
     ]
   }
 };

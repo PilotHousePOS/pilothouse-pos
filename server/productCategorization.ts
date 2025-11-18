@@ -105,7 +105,24 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
     }
   }
 
-  // Check for exclusion keywords FIRST (MUST override brand bonus)
+  // Check for exclusion brands FIRST (highest priority - overrides everything)
+  for (const excludeBrand of SUPPLY_FILTERS.aquatic.excludeBrands) {
+    if (brand === normalizeBrand(excludeBrand)) {
+      aquaticScore = 0; // Complete override - toy/reptile brands are NOT aquatic
+      matchedReasons.push(`Excluded from aquatic (brand): ${excludeBrand}`);
+      break;
+    }
+  }
+
+  for (const excludeBrand of SUPPLY_FILTERS.reptile.excludeBrands) {
+    if (brand === normalizeBrand(excludeBrand)) {
+      reptileScore = 0; // Complete override - toy/aquatic brands are NOT reptile
+      matchedReasons.push(`Excluded from reptile (brand): ${excludeBrand}`);
+      break;
+    }
+  }
+
+  // Check for exclusion keywords (MUST override brand bonus)
   for (const keyword of SUPPLY_FILTERS.aquatic.excludeKeywords) {
     if (name.includes(keyword.toLowerCase()) || description.includes(keyword.toLowerCase())) {
       aquaticScore = 0; // Complete override - aquatic keywords mean NOT aquatic
