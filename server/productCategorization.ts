@@ -33,21 +33,63 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   let reptileScore = 0;
   const matchedReasons: string[] = [];
 
-  // Check aquatic brands (highest priority - 50 points)
-  for (const aquaticBrand of SUPPLY_FILTERS.aquatic.includeBrands) {
-    if (brand === normalizeBrand(aquaticBrand)) {
-      aquaticScore += 50;
-      matchedReasons.push(`Aquatic brand: ${aquaticBrand}`);
+  // **CRITICAL: Check brand exclusions FIRST before any scoring**
+  // This prevents toy/aquatic brands from ever being categorized as reptile (and vice versa)
+  let excludedFromAquatic = false;
+  let excludedFromReptile = false;
+
+  for (const excludeBrand of SUPPLY_FILTERS.aquatic.excludeBrands) {
+    if (brand === normalizeBrand(excludeBrand)) {
+      excludedFromAquatic = true;
+      matchedReasons.push(`Excluded from aquatic (brand): ${excludeBrand}`);
       break;
     }
   }
 
-  // Check reptile brands (highest priority - 50 points)
-  for (const reptileBrand of SUPPLY_FILTERS.reptile.includeBrands) {
-    if (brand === normalizeBrand(reptileBrand)) {
-      reptileScore += 50;
-      matchedReasons.push(`Reptile brand: ${reptileBrand}`);
+  for (const excludeBrand of SUPPLY_FILTERS.reptile.excludeBrands) {
+    if (brand === normalizeBrand(excludeBrand)) {
+      excludedFromReptile = true;
+      matchedReasons.push(`Excluded from reptile (brand): ${excludeBrand}`);
       break;
+    }
+  }
+
+  // Check exclusion keywords (also highest priority)
+  for (const keyword of SUPPLY_FILTERS.aquatic.excludeKeywords) {
+    if (name.includes(keyword.toLowerCase()) || description.includes(keyword.toLowerCase())) {
+      excludedFromAquatic = true;
+      matchedReasons.push(`Excluded from aquatic (keyword): "${keyword}"`);
+      break;
+    }
+  }
+
+  for (const keyword of SUPPLY_FILTERS.reptile.excludeKeywords) {
+    if (name.includes(keyword.toLowerCase()) || description.includes(keyword.toLowerCase())) {
+      excludedFromReptile = true;
+      matchedReasons.push(`Excluded from reptile (keyword): "${keyword}"`);
+      break;
+    }
+  }
+
+  // Check aquatic brands (highest priority - 50 points) - ONLY if not excluded
+  if (!excludedFromAquatic) {
+    for (const aquaticBrand of SUPPLY_FILTERS.aquatic.includeBrands) {
+      if (brand === normalizeBrand(aquaticBrand)) {
+        aquaticScore += 50;
+        matchedReasons.push(`Aquatic brand: ${aquaticBrand}`);
+        break;
+      }
+    }
+  }
+
+  // Check reptile brands (highest priority - 50 points) - ONLY if not excluded
+  if (!excludedFromReptile) {
+    for (const reptileBrand of SUPPLY_FILTERS.reptile.includeBrands) {
+      if (brand === normalizeBrand(reptileBrand)) {
+        reptileScore += 50;
+        matchedReasons.push(`Reptile brand: ${reptileBrand}`);
+        break;
+      }
     }
   }
 
@@ -69,71 +111,47 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
     }
   }
 
-  // Check aquatic keywords in name (high priority - 30 points)
-  for (const keyword of SUPPLY_FILTERS.aquatic.includeKeywords) {
-    if (name.includes(keyword.toLowerCase())) {
-      aquaticScore += 30;
-      matchedReasons.push(`Fish/aquatic name: "${keyword}"`);
-      break; // Only count once
+  // Check aquatic keywords in name (high priority - 30 points) - ONLY if not excluded
+  if (!excludedFromAquatic) {
+    for (const keyword of SUPPLY_FILTERS.aquatic.includeKeywords) {
+      if (name.includes(keyword.toLowerCase())) {
+        aquaticScore += 30;
+        matchedReasons.push(`Fish/aquatic name: "${keyword}"`);
+        break; // Only count once
+      }
     }
   }
 
-  // Check reptile keywords in name (high priority - 30 points)
-  for (const keyword of SUPPLY_FILTERS.reptile.includeKeywords) {
-    if (name.includes(keyword.toLowerCase())) {
-      reptileScore += 30;
-      matchedReasons.push(`Reptile name: "${keyword}"`);
-      break; // Only count once
+  // Check reptile keywords in name (high priority - 30 points) - ONLY if not excluded
+  if (!excludedFromReptile) {
+    for (const keyword of SUPPLY_FILTERS.reptile.includeKeywords) {
+      if (name.includes(keyword.toLowerCase())) {
+        reptileScore += 30;
+        matchedReasons.push(`Reptile name: "${keyword}"`);
+        break; // Only count once
+      }
     }
   }
 
-  // Check aquatic keywords in description (medium priority - 15 points)
-  for (const keyword of SUPPLY_FILTERS.aquatic.includeKeywords) {
-    if (description.includes(keyword.toLowerCase())) {
-      aquaticScore += 15;
-      matchedReasons.push(`Fish/aquatic description: "${keyword}"`);
-      break; // Only count once
+  // Check aquatic keywords in description (medium priority - 15 points) - ONLY if not excluded
+  if (!excludedFromAquatic) {
+    for (const keyword of SUPPLY_FILTERS.aquatic.includeKeywords) {
+      if (description.includes(keyword.toLowerCase())) {
+        aquaticScore += 15;
+        matchedReasons.push(`Fish/aquatic description: "${keyword}"`);
+        break; // Only count once
+      }
     }
   }
 
-  // Check reptile keywords in description (medium priority - 15 points)
-  for (const keyword of SUPPLY_FILTERS.reptile.includeKeywords) {
-    if (description.includes(keyword.toLowerCase())) {
-      reptileScore += 15;
-      matchedReasons.push(`Reptile description: "${keyword}"`);
-      break; // Only count once
-    }
-  }
-
-  // Check for exclusion brands FIRST (highest priority - overrides everything)
-  for (const excludeBrand of SUPPLY_FILTERS.aquatic.excludeBrands) {
-    if (brand === normalizeBrand(excludeBrand)) {
-      aquaticScore = 0; // Complete override - toy/reptile brands are NOT aquatic
-      matchedReasons.push(`Excluded from aquatic (brand): ${excludeBrand}`);
-      break;
-    }
-  }
-
-  for (const excludeBrand of SUPPLY_FILTERS.reptile.excludeBrands) {
-    if (brand === normalizeBrand(excludeBrand)) {
-      reptileScore = 0; // Complete override - toy/aquatic brands are NOT reptile
-      matchedReasons.push(`Excluded from reptile (brand): ${excludeBrand}`);
-      break;
-    }
-  }
-
-  // Check for exclusion keywords (MUST override brand bonus)
-  for (const keyword of SUPPLY_FILTERS.aquatic.excludeKeywords) {
-    if (name.includes(keyword.toLowerCase()) || description.includes(keyword.toLowerCase())) {
-      aquaticScore = 0; // Complete override - aquatic keywords mean NOT aquatic
-      matchedReasons.push(`Excluded from aquatic: "${keyword}"`);
-    }
-  }
-
-  for (const keyword of SUPPLY_FILTERS.reptile.excludeKeywords) {
-    if (name.includes(keyword.toLowerCase()) || description.includes(keyword.toLowerCase())) {
-      reptileScore = 0; // Complete override - "betta" means NOT reptile, even for ZooMed
-      matchedReasons.push(`Excluded from reptile: "${keyword}"`);
+  // Check reptile keywords in description (medium priority - 15 points) - ONLY if not excluded
+  if (!excludedFromReptile) {
+    for (const keyword of SUPPLY_FILTERS.reptile.includeKeywords) {
+      if (description.includes(keyword.toLowerCase())) {
+        reptileScore += 15;
+        matchedReasons.push(`Reptile description: "${keyword}"`);
+        break; // Only count once
+      }
     }
   }
 
@@ -157,7 +175,7 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
       filterType: null,
       confidence: 0,
       reason: matchedReasons.length > 0 
-        ? `Ambiguous or general product (aquatic: ${aquaticScore}, reptile: ${reptileScore})`
+        ? `${matchedReasons.join(', ')} (scores: aquatic=${aquaticScore}, reptile=${reptileScore})`
         : 'No specific fish/reptile indicators found'
     };
   }
