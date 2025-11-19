@@ -79,6 +79,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Blubrede': 'Blueberry',
   'White Gr': 'With Grain',
   'Red B': 'RedBarn',
+  'Waf': 'Waffer',
   
   // Fix awkward spacing issues
   'Div Ider': 'Divider',
