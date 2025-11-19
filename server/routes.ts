@@ -22,6 +22,7 @@ import { getUpcomingEvents, getAllCalendarContacts, createCalendarEvent, getEven
 import { normalizePhoneNumber } from './phoneUtils';
 import { db } from './db';
 import { eq } from 'drizzle-orm';
+import { expandProductAbbreviations } from './abbreviationExpansion';
 
 // Configure multer for file uploads
 const uploadStorage = multer.diskStorage({
