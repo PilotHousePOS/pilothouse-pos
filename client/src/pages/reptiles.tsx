@@ -8,6 +8,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { safeGoBack } from "@/lib/navigation";
+import { useDebounce } from "@/hooks/use-debounce";
 
 const ITEMS_PER_PAGE = 24;
 
@@ -39,7 +40,10 @@ export default function ReptilesPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  
+  // Debounce search to avoid flickering on every keystroke
+  const searchQuery = useDebounce(searchInput, 500);
 
   const { data: pets = [], isLoading: petsLoading } = useQuery<any[]>({
     queryKey: ["/api/pets", { species: "reptile" }],
@@ -214,8 +218,8 @@ export default function ReptilesPage() {
             <Input
               type="text"
               placeholder="Search reptile supplies..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="pl-10 bg-white border-gray-200 rounded-xl"
               data-testid="input-search-reptile-supplies"
             />
