@@ -60,6 +60,9 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   // Chemistry (non-context dependent)
   'Phos': 'Phosphate',
   
+  // Common misspellings
+  'Thermoneter': 'Thermometer',
+  
   // Food/Flavors
   'Blubrede': 'Blueberry',
   'White Gr': 'With Grain',

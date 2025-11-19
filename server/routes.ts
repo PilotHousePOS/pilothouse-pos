@@ -782,7 +782,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const id = parseInt(req.params.id);
-      const supplyData = insertSupplySchema.partial().parse(req.body);
+      let supplyData = insertSupplySchema.partial().parse(req.body);
+      
+      // Apply abbreviation expansion to name and description if provided
+      if (supplyData.name || supplyData.description) {
+        const expanded = expandProductAbbreviations(
+          supplyData.name || undefined,
+          supplyData.description || undefined
+        );
+        if (supplyData.name) supplyData.name = expanded.name;
+        if (supplyData.description) supplyData.description = expanded.description;
+      }
+      
       const supply = await storage.updateSupply(id, supplyData);
       res.json(supply);
     } catch (error) {
