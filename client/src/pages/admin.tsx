@@ -3436,12 +3436,11 @@ function EditAppointmentDialog({
   // Track which appointment we've initialized for (prevents overwriting edits on refetch)
   const initializedAppointmentId = useRef<number | null>(null);
   
-  // Reset initialization ref when component unmounts
-  useEffect(() => {
-    return () => {
-      initializedAppointmentId.current = null;
-    };
-  }, []);
+  // Wrap onClose to reset the initialization guard
+  const handleClose = () => {
+    initializedAppointmentId.current = null;
+    onClose();
+  };
   
   // Service prices constant
   const SERVICES = [
@@ -3584,7 +3583,7 @@ function EditAppointmentDialog({
         description: "Appointment details have been updated successfully.",
       });
       await queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
-      onClose();
+      handleClose();
     },
     onError: () => {
       toast({
@@ -3597,7 +3596,7 @@ function EditAppointmentDialog({
   
   if (isLoadingAppointment) {
     return (
-      <Dialog open={true} onOpenChange={onClose}>
+      <Dialog open={true} onOpenChange={handleClose}>
         <DialogContent className="max-w-2xl">
           <div className="flex items-center justify-center py-8">
             <div className="text-center">
@@ -3611,7 +3610,7 @@ function EditAppointmentDialog({
   }
   
   return (
-    <Dialog open={true} onOpenChange={onClose}>
+    <Dialog open={true} onOpenChange={handleClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Appointment</DialogTitle>
@@ -3863,7 +3862,7 @@ function EditAppointmentDialog({
         <DialogFooter className="mt-6">
           <Button
             variant="outline"
-            onClick={onClose}
+            onClick={handleClose}
             data-testid="button-cancel-edit"
           >
             Cancel
