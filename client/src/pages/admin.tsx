@@ -3901,6 +3901,7 @@ export default function Admin() {
   const [showDeniedAppointments, setShowDeniedAppointments] = useState(false);
   const [filterByHere, setFilterByHere] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<any>(null);
+  const [isCategorizing, setIsCategorizing] = useState(false);
   
   // Multi-pet editing state
   const [editPets, setEditPets] = useState<any[]>([]);
