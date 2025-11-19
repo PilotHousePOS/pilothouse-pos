@@ -218,16 +218,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const token = headerToken || cookieToken;
       
-      console.log('Auth check - cookies:', req.cookies);
-      console.log('Auth check - authorization header:', authHeader);
-      console.log('Auth check - token found:', !!token);
-      
       if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
       const user = verifyToken(token);
-      console.log('Auth check - user verified:', !!user);
       
       if (!user) {
         return res.status(401).json({ message: "Invalid token" });

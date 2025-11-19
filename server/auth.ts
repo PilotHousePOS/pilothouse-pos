@@ -41,19 +41,13 @@ export function verifyToken(token: string): JWTUser | null {
 }
 
 export function authMiddleware(req: any, res: Response, next: NextFunction) {
-  console.log('Auth check - cookies:', req.cookies);
-  console.log('Auth check - authorization header:', req.headers.authorization);
-  
   const token = req.cookies?.auth_token || req.headers.authorization?.replace('Bearer ', '');
-  
-  console.log('Auth check - token found:', !!token);
   
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
   const user = verifyToken(token);
-  console.log('Auth check - user verified:', !!user);
   
   if (!user) {
     return res.status(401).json({ message: 'Invalid token' });
@@ -64,8 +58,6 @@ export function authMiddleware(req: any, res: Response, next: NextFunction) {
 }
 
 export function setAuthCookie(res: Response, token: string) {
-  console.log('Setting auth cookie with token length:', token.length);
-  
   const isProduction = process.env.NODE_ENV === 'production';
   
   res.cookie('auth_token', token, {
