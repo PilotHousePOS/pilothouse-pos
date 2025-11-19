@@ -8051,6 +8051,7 @@ export default function Admin() {
                         <p className="font-medium text-green-700 dark:text-green-400">Size & Other:</p>
                         <ul className="list-disc list-inside space-y-1 text-green-600 dark:text-green-500 ml-2">
                           <li>Sizes: Lg/Med/Sm/Xs → Large/Medium/Small/Extra Small</li>
+                          <li>Colors: Bk → Black, Dk → Dark, Lt → Light</li>
                           <li>Quality: Hvy Dty → Heavy Duty</li>
                           <li>Animals: Eleph → Elephant</li>
                           <li>Misc: Cmfrt → Comfort, Asst → Assorted, Kng → Kong</li>

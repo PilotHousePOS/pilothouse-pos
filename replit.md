@@ -58,7 +58,8 @@ The application is a full-stack web application built with React, Vite, TypeScri
   - **Phosphate:** "Aqueon Phos Remove" → "Aqueon Phosphate Remove"
   - **Food/Flavors:** Red B → RedBarn, White Gr → With Grain, Blubrede → Blueberry
   - **Sizes:** Lg/Med/Sm/Xs/Xl/Xxl → Large/Medium/Small/Extra Small/Extra Large/Extra Extra Large
-  - **Quality:** Hvy Dty → Heavy Duty, Lt → Light, Dk → Dark
+  - **Colors:** Bk → Black, Dk → Dark, Lt → Light
+  - **Quality:** Hvy Dty → Heavy Duty
   - **Animals:** Eleph → Elephant
   - **Misc:** Cmfrt → Comfort, Asst → Assorted, Jr/Sr → Junior/Senior, Kng → Kong, Nat/Natu → Natural, Pk/Dbl/Sngl → Pack/Double/Single
   - Single-button admin operation with smart context detection

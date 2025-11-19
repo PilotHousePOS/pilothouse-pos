@@ -36,6 +36,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Dty': 'Duty',
   'Lt': 'Light',
   'Dk': 'Dark',
+  'Bk': 'Black',
   
   // Comfort/General
   'Cmfrt': 'Comfort',
