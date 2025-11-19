@@ -56,8 +56,10 @@ The application is a full-stack web application built with React, Vite, TypeScri
   - **Water Chemistry pH:** "Api Ph Test Kit" → "Api pH Test Kit" (detects test/kit/down/up keywords + aquatic brands)
   - **Brand Name:** "Ph Cozy Corner Lg" → "Prevue Hendrix Cozy Corner Large"
   - **Phosphate:** "Aqueon Phos Remove" → "Aqueon Phosphate Remove"
-  - **Size/Quality:** Lg/Med/Sm → Large/Medium/Small, Hvy Dty → Heavy Duty, Cmfrt → Comfort
-  - **Other Brands:** Kng → Kong, Nat/Natu → Natural
+  - **Sizes:** Lg/Med/Sm/Xs/Xl/Xxl → Large/Medium/Small/Extra Small/Extra Large/Extra Extra Large
+  - **Quality:** Hvy Dty → Heavy Duty, Lt → Light, Dk → Dark
+  - **Animals:** Eleph → Elephant
+  - **Misc:** Cmfrt → Comfort, Asst → Assorted, Jr/Sr → Junior/Senior, Kng → Kong, Nat/Natu → Natural, Pk/Dbl/Sngl → Pack/Double/Single
   - Single-button admin operation with smart context detection
 - **Brand Extraction System:** Comprehensive brand database for automated brand assignment to products.
 - **Product Image Management System:** Statistics dashboard, manual image search, automated batch search with preview and approval, cost management, and admin-only access.

@@ -28,6 +28,8 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Xlg': 'Extra Large',
   'Xl': 'Extra Large',
   'Xxl': 'Extra Extra Large',
+  'Xs': 'Extra Small',
+  'Xsm': 'Extra Small',
   
   // Material/Quality
   'Hvy': 'Heavy',
@@ -45,6 +47,14 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Pk': 'Pack',
   'Dbl': 'Double',
   'Sngl': 'Single',
+  'Asst': 'Assorted',
+  
+  // Age/Demographics
+  'Jr': 'Junior',
+  'Sr': 'Senior',
+  
+  // Animals
+  'Eleph': 'Elephant',
   
   // Chemistry (non-context dependent)
   'Phos': 'Phosphate',
