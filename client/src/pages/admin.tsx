@@ -3940,6 +3940,11 @@ export default function Admin() {
   // Search state for orders and appointments
   const [search, setSearch] = useState('');
   
+  // Pagination and search for supplies
+  const [supplySearchQuery, setSupplySearchQuery] = useState('');
+  const [suppliesPage, setSuppliesPage] = useState(0);
+  const SUPPLIES_PER_PAGE = 20;
+  
   // Pagination for in progress orders (confirmed)
   const [inProgressOrdersPage, setInProgressOrdersPage] = useState(0);
   const [inProgressOrdersTouchStart, setInProgressOrdersTouchStart] = useState(0);
@@ -4010,9 +4015,6 @@ export default function Admin() {
   // Track current index for each phone number group (for cycling through appointments)
   const [appointmentGroupIndexes, setAppointmentGroupIndexes] = useState<Record<string, number>>({});
   
-  // Supply search state
-  const [supplySearchQuery, setSupplySearchQuery] = useState('');
-  
   const ITEMS_PER_PAGE = 4;
 
   // Always call all hooks at the top level
@@ -4022,11 +4024,17 @@ export default function Admin() {
   });
 
   const { data: suppliesData } = useQuery<any>({
-    queryKey: ["/api/supplies", { limit: 10000 }],
+    queryKey: ["/api/supplies", { 
+      page: suppliesPage, 
+      limit: SUPPLIES_PER_PAGE,
+      search: supplySearchQuery 
+    }],
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
   
   const supplies = suppliesData?.items || [];
+  const suppliesTotalPages = suppliesData?.totalPages || 0;
+  const suppliesTotal = suppliesData?.total || 0;
 
   const { data: orders = [] } = useQuery({
     queryKey: ["/api/orders"],
@@ -5927,19 +5935,7 @@ export default function Admin() {
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <Package className="w-5 h-5" />
-                  Supplies ({
-                    supplySearchQuery.trim() 
-                      ? `${(supplies as any[]).filter((supply: any) => {
-                          const query = supplySearchQuery.toLowerCase();
-                          return (
-                            supply.name?.toLowerCase().includes(query) ||
-                            supply.brand?.toLowerCase().includes(query) ||
-                            supply.category?.toLowerCase().includes(query) ||
-                            supply.description?.toLowerCase().includes(query)
-                          );
-                        }).length} / ${(supplies as any[]).length}`
-                      : (supplies as any[]).length
-                  })
+                  Supplies ({suppliesTotal}{supplySearchQuery.trim() ? ` found` : ` total`})
                 </CardTitle>
                 {typedUser?.isAdmin && (
                   <Dialog open={isAddSupplyOpen} onOpenChange={setIsAddSupplyOpen}>
@@ -5969,13 +5965,19 @@ export default function Admin() {
                     type="text"
                     placeholder="Search supplies by name, brand, or category..."
                     value={supplySearchQuery}
-                    onChange={(e) => setSupplySearchQuery(e.target.value)}
+                    onChange={(e) => {
+                      setSupplySearchQuery(e.target.value);
+                      setSuppliesPage(0); // Reset to first page on search
+                    }}
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand-orange focus:border-brand-orange"
                     data-testid="input-supply-search"
                   />
                   {supplySearchQuery && (
                     <button
-                      onClick={() => setSupplySearchQuery('')}
+                      onClick={() => {
+                        setSupplySearchQuery('');
+                        setSuppliesPage(0);
+                      }}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                       data-testid="button-clear-supply-search"
                     >
@@ -5985,18 +5987,7 @@ export default function Admin() {
                 </div>
               </div>
               <div className="space-y-4">
-                {(supplies as any[])
-                  .filter((supply: any) => {
-                    if (!supplySearchQuery.trim()) return true;
-                    const query = supplySearchQuery.toLowerCase();
-                    return (
-                      supply.name?.toLowerCase().includes(query) ||
-                      supply.brand?.toLowerCase().includes(query) ||
-                      supply.category?.toLowerCase().includes(query) ||
-                      supply.description?.toLowerCase().includes(query)
-                    );
-                  })
-                  .map((supply: any) => (
+                {(supplies as any[]).map((supply: any) => (
                   <div key={supply.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex-1">
                       <h3 className="font-semibold">{supply.name}</h3>
@@ -6030,6 +6021,37 @@ export default function Admin() {
                   </div>
                 ))}
               </div>
+              
+              {/* Pagination Controls */}
+              {suppliesTotalPages > 1 && (
+                <div className="flex items-center justify-between mt-6 pt-4 border-t">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    Page {suppliesPage + 1} of {suppliesTotalPages} • Showing {supplies.length} of {suppliesTotal} items
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSuppliesPage(prev => Math.max(0, prev - 1))}
+                      disabled={suppliesPage === 0}
+                      data-testid="button-supplies-prev-page"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSuppliesPage(prev => Math.min(suppliesTotalPages - 1, prev + 1))}
+                      disabled={suppliesPage >= suppliesTotalPages - 1}
+                      data-testid="button-supplies-next-page"
+                    >
+                      Next
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
