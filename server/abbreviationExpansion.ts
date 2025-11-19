@@ -89,6 +89,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   
   // Brands (only expand when at start or after space)
   'Kng': 'Kong',
+  'Simplesolutions': 'Simple Solutions',
 };
 
 /**

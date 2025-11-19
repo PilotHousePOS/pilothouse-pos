@@ -67,7 +67,8 @@ The application is a full-stack web application built with React, Vite, TypeScri
   - **Colors:** Bk → Black, Dk → Dark, Lt → Light
   - **Quality:** Hvy Dty → Heavy Duty
   - **Animals:** Eleph → Elephant
-  - **Misc:** Cmfrt → Comfort, Asst → Assorted, Jr/Sr → Junior/Senior, Kng → Kong, Nat/Natu → Natural, Pk/Dbl/Sngl → Pack/Double/Single, Thermoneter → Thermometer
+  - **Misc:** Cmfrt → Comfort, Asst → Assorted, Jr/Sr → Junior/Senior, Nat/Natu → Natural, Pk/Dbl/Sngl → Pack/Double/Single, Thermoneter → Thermometer
+  - **Brands:** Kng → Kong, Simplesolutions → Simple Solutions
   - Single-button admin operation with smart context detection
   - Auto-applied when editing supplies in admin panel
 - **Brand Extraction System:** Comprehensive brand database for automated brand assignment to products.
