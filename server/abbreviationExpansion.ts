@@ -82,6 +82,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Waf': 'Waffer',
   'Froz': 'Frozen',
   'Blo': 'Blood',
+  'Cmbs': 'Crumbs',
   
   // Fix awkward spacing issues
   'Div Ider': 'Divider',

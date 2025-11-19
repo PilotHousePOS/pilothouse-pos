@@ -62,7 +62,7 @@ The application is a full-stack web application built with React, Vite, TypeScri
   - **Brand Name:** "Ph Cozy Corner Lg" → "Prevue Hendrix Cozy Corner Large"
   - **Aquarium Gallon:** "10 Ga Tank" → "10 Gallon Tank" (detects tank/aquarium/filter keywords + numbers + aquatic brands)
   - **Phosphate:** "Aqueon Phos Remove" → "Aqueon Phosphate Remove"
-  - **Food/Flavors:** Red B → RedBarn, White Gr → With Grain, Blubrede → Blueberry, Waf → Waffer, Froz → Frozen, Blo → Blood
+  - **Food/Flavors:** Red B → RedBarn, White Gr → With Grain, Blubrede → Blueberry, Waf → Waffer, Froz → Frozen, Blo → Blood, Cmbs → Crumbs
   - **Sizes:** Lg/Med/Sm/Xs/Xl/Xxl → Large/Medium/Small/Extra Small/Extra Large/Extra Extra Large
   - **Colors:** Bk → Black, Dk → Dark, Lt → Light
   - **Quality:** Hvy Dty → Heavy Duty
