@@ -14,7 +14,12 @@ A mobile-friendly web application for "Animal House" pet store, focusing on pet 
 - Grooming services: Only "Bath Only" and "Full Grooming" options
 - Mobile authentication consistency: Same account should show identical admin access across devices
 - Inventory Management: Full product names and descriptions preserved from Excel imports (no abbreviations)
-- Search Functionality: All searches (supplies, pets) must be case-insensitive
+- Search Functionality: All searches (supplies, pets) with intelligent typo tolerance
+  - **Fuzzy Search (NEW):** Auto-corrects typos and finds closest matches (70% similarity threshold)
+    - Example: "thermoneter" finds "thermometer" products
+    - Example: "chamelion" finds "chameleon" products
+    - Searches across name, brand, and description fields
+    - Results sorted by relevance (exact matches first, then close matches)
   - Search works across all supply pages (main Supplies, Aquatics, Exotic Reptiles)
   - Search combines with category and filterType filters (AND logic)
   - Whitespace-only searches treated as empty searches

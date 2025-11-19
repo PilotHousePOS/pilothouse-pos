@@ -572,29 +572,46 @@ export class DatabaseStorage implements IStorage {
       whereConditions.push(eq(supplies.filterType, filterType));
     }
     
-    // Apply search filter (works alongside filterType or standalone)
-    if (trimmedSearch) {
-      whereConditions.push(
-        or(
-          ilike(supplies.name, `%${trimmedSearch}%`),
-          ilike(supplies.brand, `%${trimmedSearch}%`),
-          ilike(supplies.description, `%${trimmedSearch}%`)
-        )
-      );
-    }
-    
     // Apply category filter whenever category is provided
     if (category) {
       whereConditions.push(eq(supplies.category, category));
     }
 
-    // Get total count with filters
+    // If we have a search query, use fuzzy search for typo tolerance
+    if (trimmedSearch) {
+      // Import fuzzy search at runtime to avoid circular dependencies
+      const { fuzzySearchFilter } = await import('./fuzzySearch');
+      
+      // Fetch all matching items from database (without search filter to get broader set)
+      const allItems = await db
+        .select()
+        .from(supplies)
+        .where(and(...whereConditions))
+        .orderBy(desc(supplies.createdAt));
+      
+      // Apply fuzzy search filtering with typo tolerance
+      const filteredItems = fuzzySearchFilter(
+        allItems,
+        trimmedSearch,
+        (item) => [item.name || '', item.brand || '', item.description || ''],
+        70 // 70% similarity threshold for typo tolerance
+      );
+      
+      // Get total count
+      const total = filteredItems.length;
+      
+      // Apply pagination manually after fuzzy filtering
+      const items = filteredItems.slice(offset, offset + limit);
+      
+      return { items, total };
+    }
+
+    // No search query - use standard SQL pagination
     const [{ value: total }] = await db
       .select({ value: count() })
       .from(supplies)
       .where(and(...whereConditions));
 
-    // Get paginated items with filters
     const items = await db
       .select()
       .from(supplies)
