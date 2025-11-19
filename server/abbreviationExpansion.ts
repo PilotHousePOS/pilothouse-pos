@@ -80,6 +80,9 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'White Gr': 'With Grain',
   'Red B': 'RedBarn',
   
+  // Fix awkward spacing issues
+  'Div Ider': 'Divider',
+  
   // Brands (only expand when at start or after space)
   'Kng': 'Kong',
 };

@@ -121,8 +121,8 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
           <div className="p-4 flex-1">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <h4 className="font-semibold text-gray-900 text-sm">{supply.name}</h4>
-                <p className="text-xs text-gray-500">{supply.brand}</p>
+                <h4 className="font-semibold text-gray-900 text-sm break-words">{supply.name}</h4>
+                <p className="text-xs text-gray-500 break-words">{supply.brand}</p>
                 <p className="text-xs text-gray-400">
                   {supply.weight && `${supply.weight} • `}
                   {supply.size && supply.size}
