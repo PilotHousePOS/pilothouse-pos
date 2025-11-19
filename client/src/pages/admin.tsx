@@ -300,12 +300,26 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                           }];
                       
                       return (
-                        <div key={appointment.id || idx} className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
+                        <div 
+                          key={appointment.id || idx} 
+                          className={`p-3 rounded border-l-4 ${
+                            appointment.isHere 
+                              ? 'bg-green-100 border-green-600 ring-2 ring-green-400' 
+                              : 'bg-blue-50 border-blue-500'
+                          }`}
+                        >
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
-                              <p className="text-sm text-gray-600 mb-2">
-                                Owner: {capitalizeWords(appointment.ownerFirstName)} {capitalizeWords(appointment.ownerLastName)}
-                              </p>
+                              <div className="flex items-center gap-2 mb-2">
+                                <p className="text-sm text-gray-600">
+                                  Owner: {capitalizeWords(appointment.ownerFirstName)} {capitalizeWords(appointment.ownerLastName)}
+                                </p>
+                                {appointment.isHere && (
+                                  <Badge variant="default" className="bg-green-600 text-white text-xs">
+                                    ✓ HERE
+                                  </Badge>
+                                )}
+                              </div>
                               <p className="text-sm text-gray-600 mb-2">
                                 Phone: {appointment.ownerPhoneNumber}
                               </p>
@@ -318,7 +332,14 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                               {/* Display all pets */}
                               <div className="space-y-2 mt-2">
                                 {pets.map((pet: any, petIdx: number) => (
-                                  <div key={petIdx} className="bg-white p-2 rounded border border-blue-200">
+                                  <div 
+                                    key={petIdx} 
+                                    className={`p-2 rounded border ${
+                                      appointment.isHere 
+                                        ? 'bg-white border-green-300' 
+                                        : 'bg-white border-blue-200'
+                                    }`}
+                                  >
                                     <h4 className="font-semibold text-gray-900">
                                       {capitalizeWords(pet.petName)} ({pet.petType})
                                     </h4>
