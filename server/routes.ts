@@ -3999,6 +3999,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Expand abbreviations in all product names and descriptions (Admin only)
+  app.post("/api/admin/supplies/expand-abbreviations", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      console.log("Starting abbreviation expansion for all products...");
+      const { expandAbbreviations } = await import('./abbreviationExpansion');
+      const startTime = Date.now();
+
+      // Get all supplies
+      const supplies = await storage.getAllSupplies();
+      let updatedCount = 0;
+      let skippedCount = 0;
+
+      for (const supply of supplies) {
+        const expandedName = expandAbbreviations(supply.name);
+        const expandedDescription = expandAbbreviations(supply.description);
+
+        // Only update if something changed
+        if (expandedName !== supply.name || expandedDescription !== supply.description) {
+          await storage.updateSupply(supply.id, {
+            name: expandedName,
+            description: expandedDescription
+          });
+          updatedCount++;
+          
+          if (updatedCount <= 10) {
+            console.log(`Updated: "${supply.name}" → "${expandedName}"`);
+          }
+        } else {
+          skippedCount++;
+        }
+      }
+
+      const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+      console.log(`Abbreviation expansion complete in ${duration}s`);
+      console.log(`Updated: ${updatedCount}, Skipped: ${skippedCount}`);
+
+      res.json({
+        message: "Abbreviation expansion completed successfully",
+        stats: {
+          total: supplies.length,
+          updated: updatedCount,
+          skipped: skippedCount,
+          duration: `${duration}s`
+        }
+      });
+    } catch (error) {
+      console.error('Error expanding abbreviations:', error);
+      res.status(500).json({ message: "Failed to expand abbreviations" });
+    }
+  });
+
   // Combined auto-categorization: Sets both filterType AND category (Admin only)
   app.post("/api/admin/supplies/auto-categorize", authMiddleware, async (req: any, res) => {
     try {

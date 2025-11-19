@@ -62,7 +62,8 @@ import {
   Loader2,
   Save,
   CheckCircle2,
-  Home
+  Home,
+  Type
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -8165,6 +8166,90 @@ export default function Admin() {
               </Button>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Run this once to clear existing incorrect categorizations, then use Auto-Categorize to prevent future issues
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Type className="w-5 h-5" />
+                Expand Abbreviations
+              </CardTitle>
+              <CardDescription>
+                Smart expansion of abbreviations in product names (Ph → Prevue Hendrix or pH, Phos → Phosphate, Lg → Large, etc.)
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-semibold text-green-800 dark:text-green-300 mb-2">Context-Aware Expansion</p>
+                    <div className="space-y-2">
+                      <div>
+                        <p className="font-medium text-green-700 dark:text-green-400">Water Chemistry (keeps pH):</p>
+                        <ul className="list-disc list-inside space-y-1 text-green-600 dark:text-green-500 ml-2">
+                          <li>"Api Ph Test Kit" → "Api pH Test Kit"</li>
+                          <li>"Api Ph Down" → "Api pH Down"</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="font-medium text-green-700 dark:text-green-400">Brand Name (expands):</p>
+                        <ul className="list-disc list-inside space-y-1 text-green-600 dark:text-green-500 ml-2">
+                          <li>"Ph Cozy Corner Lg" → "Prevue Hendrix Cozy Corner Large"</li>
+                          <li>"Aqueon Phos Remove" → "Aqueon Phosphate Remove"</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="font-medium text-green-700 dark:text-green-400">Size & Other:</p>
+                        <ul className="list-disc list-inside space-y-1 text-green-600 dark:text-green-500 ml-2">
+                          <li>Lg/Med/Sm → Large/Medium/Small</li>
+                          <li>Hvy Dty → Heavy Duty</li>
+                          <li>Cmfrt → Comfort, Kng → Kong</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <Button
+                onClick={async () => {
+                  if (!confirm('Expand abbreviations in all product names and descriptions? This will update products with smart context detection (Ph → Prevue Hendrix or pH based on context).')) {
+                    return;
+                  }
+                  setIsCategorizing(true);
+                  try {
+                    const response = await apiRequest('POST', '/api/admin/supplies/expand-abbreviations');
+                    toast({
+                      title: "Abbreviation Expansion Complete",
+                      description: `Updated ${response.stats.updated} products in ${response.stats.duration}`,
+                    });
+                  } catch (error: any) {
+                    toast({
+                      title: "Error",
+                      description: error.message || "Failed to expand abbreviations",
+                      variant: "destructive",
+                    });
+                  } finally {
+                    setIsCategorizing(false);
+                  }
+                }}
+                disabled={isCategorizing}
+                className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white"
+                data-testid="button-expand-abbreviations"
+              >
+                {isCategorizing ? (
+                  <>Processing...</>
+                ) : (
+                  <>
+                    <Type className="w-4 h-4 mr-2" />
+                    Expand All Abbreviations
+                  </>
+                )}
+              </Button>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Smart expansion with context detection - water chemistry vs brand names
               </p>
             </CardContent>
           </Card>

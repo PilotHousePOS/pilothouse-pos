@@ -52,7 +52,13 @@ The application is a full-stack web application built with React, Vite, TypeScri
 - **Pet Boarding/Babysitting System:** Complete boarding management with intelligent cost calculation, flexible date management, status tracking (Scheduled, In Boarding, Completed), quick actions, and admin-only access.
 - **Database Sync Tools:** Staging import with duplicate prevention (Excel), supplies-only sync (admin-only), and full database sync (development-only).
 - **Auto-Categorization System:** Single-button operation for both specialty section (filterType) and product type (category) classification based on brand and keyword analysis. Includes brand-based exclusion logic to prevent toy brands from being miscategorized as reptile/aquatic supplies (e.g., Kong toys with animal names stay in toys category).
-- **Abbreviation Expansion System:** Three-phase pipeline for expanding abbreviations, correcting spelling, and applying professional title case to product names/descriptions using centralized mappings.
+- **Smart Abbreviation Expansion System:** Context-aware expansion of abbreviations in product names/descriptions with intelligent detection:
+  - **Water Chemistry pH:** "Api Ph Test Kit" → "Api pH Test Kit" (detects test/kit/down/up keywords + aquatic brands)
+  - **Brand Name:** "Ph Cozy Corner Lg" → "Prevue Hendrix Cozy Corner Large"
+  - **Phosphate:** "Aqueon Phos Remove" → "Aqueon Phosphate Remove"
+  - **Size/Quality:** Lg/Med/Sm → Large/Medium/Small, Hvy Dty → Heavy Duty, Cmfrt → Comfort
+  - **Other Brands:** Kng → Kong, Nat/Natu → Natural
+  - Single-button admin operation with smart context detection
 - **Brand Extraction System:** Comprehensive brand database for automated brand assignment to products.
 - **Product Image Management System:** Statistics dashboard, manual image search, automated batch search with preview and approval, cost management, and admin-only access.
 - **Employee Schedule Management System:** Sectioned schedule view with sequential weekly dates (Section A = previous week, B = current week, C = next week), weekly editable grid with date display (e.g., "Mon 11/17"), employee management, flexible time slots, batch save, data persistence, empty state handling, and admin-only access.
