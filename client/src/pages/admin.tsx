@@ -8068,16 +8068,17 @@ export default function Admin() {
                   }
                   setIsCategorizing(true);
                   try {
-                    const response = await apiRequest('POST', '/api/admin/supplies/expand-abbreviations');
+                    const res = await apiRequest('POST', '/api/admin/supplies/expand-abbreviations');
+                    const data = await res.json();
                     
                     // Validate response structure
-                    if (!response || !response.stats) {
+                    if (!data || !data.stats) {
                       throw new Error('Invalid response from server');
                     }
                     
                     toast({
                       title: "Abbreviation Expansion Complete",
-                      description: `Updated ${response.stats.updated || 0} products in ${response.stats.duration || 'N/A'}`,
+                      description: `Updated ${data.stats.updated || 0} products in ${data.stats.duration || 'N/A'}`,
                     });
                     
                     // Refresh supplies data
