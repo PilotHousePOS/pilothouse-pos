@@ -8069,11 +8069,21 @@ export default function Admin() {
                   setIsCategorizing(true);
                   try {
                     const response = await apiRequest('POST', '/api/admin/supplies/expand-abbreviations');
+                    
+                    // Validate response structure
+                    if (!response || !response.stats) {
+                      throw new Error('Invalid response from server');
+                    }
+                    
                     toast({
                       title: "Abbreviation Expansion Complete",
-                      description: `Updated ${response.stats.updated} products in ${response.stats.duration}`,
+                      description: `Updated ${response.stats.updated || 0} products in ${response.stats.duration || 'N/A'}`,
                     });
+                    
+                    // Refresh supplies data
+                    queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
                   } catch (error: any) {
+                    console.error('Abbreviation expansion error:', error);
                     toast({
                       title: "Error",
                       description: error.message || "Failed to expand abbreviations",
