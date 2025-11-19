@@ -56,6 +56,7 @@ The application is a full-stack web application built with React, Vite, TypeScri
   - **Water Chemistry pH:** "Api Ph Test Kit" → "Api pH Test Kit" (detects test/kit/down/up keywords + aquatic brands)
   - **Brand Name:** "Ph Cozy Corner Lg" → "Prevue Hendrix Cozy Corner Large"
   - **Phosphate:** "Aqueon Phos Remove" → "Aqueon Phosphate Remove"
+  - **Food/Flavors:** Red B → RedBarn, White Gr → With Grain, Blubrede → Blueberry
   - **Sizes:** Lg/Med/Sm/Xs/Xl/Xxl → Large/Medium/Small/Extra Small/Extra Large/Extra Extra Large
   - **Quality:** Hvy Dty → Heavy Duty, Lt → Light, Dk → Dark
   - **Animals:** Eleph → Elephant

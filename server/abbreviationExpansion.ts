@@ -59,6 +59,11 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   // Chemistry (non-context dependent)
   'Phos': 'Phosphate',
   
+  // Food/Flavors
+  'Blubrede': 'Blueberry',
+  'White Gr': 'With Grain',
+  'Red B': 'RedBarn',
+  
   // Brands (only expand when at start or after space)
   'Kng': 'Kong',
 };
