@@ -14,6 +14,18 @@ const PH_CHEMISTRY_BRANDS = [
   'api', 'aqueon', 'fluval', 'seachem', 'marineland', 'tetra'
 ];
 
+// Aquarium keywords that indicate "Ga" means Gallon (volume measurement)
+const GALLON_AQUARIUM_KEYWORDS = [
+  'tank', 'aquarium', 'filter', 'heater', 'pump', 'canister', 'terrarium',
+  'sump', 'refugium', 'overflow', 'water', 'kit', 'setup', 'system'
+];
+
+// Aquarium brands that commonly use "Ga" for Gallon measurements
+const GALLON_AQUARIUM_BRANDS = [
+  'aqueon', 'marineland', 'fluval', 'tetra', 'api', 'penn plax', 'pennplax',
+  'zoo med', 'zilla', 'exo terra', 'glofish'
+];
+
 /**
  * Main abbreviation mappings
  * Key: abbreviation (case-insensitive match)
@@ -102,6 +114,48 @@ function isWaterChemistryPh(text: string, phPosition: number): boolean {
 }
 
 /**
+ * Determines if "Ga" should be treated as Gallon (volume measurement) in aquarium context
+ * @param text - The full text being analyzed
+ * @param gaPosition - Position of "Ga" in the text
+ * @returns true if it's Gallon measurement, false otherwise
+ */
+function isAquariumGallon(text: string, gaPosition: number): boolean {
+  const lowerText = text.toLowerCase();
+  const afterGa = lowerText.substring(gaPosition + 2).trim();
+  const beforeGa = lowerText.substring(0, gaPosition).trim();
+  
+  // Check if followed by aquarium keywords (e.g., "10 Ga Tank")
+  for (const keyword of GALLON_AQUARIUM_KEYWORDS) {
+    if (afterGa.startsWith(keyword)) {
+      return true;
+    }
+  }
+  
+  // Check if preceded by a number (e.g., "10 Ga" or "20Ga")
+  // Look for digits immediately before or with a space
+  if (/\d\s*$/.test(beforeGa)) {
+    return true;
+  }
+  
+  // Check if preceded by aquarium brand
+  for (const brand of GALLON_AQUARIUM_BRANDS) {
+    if (beforeGa.includes(brand)) {
+      return true;
+    }
+  }
+  
+  // Check if the text contains aquarium keywords anywhere
+  for (const keyword of GALLON_AQUARIUM_KEYWORDS) {
+    if (lowerText.includes(keyword)) {
+      return true;
+    }
+  }
+  
+  // Default: not a gallon measurement
+  return false;
+}
+
+/**
  * Expands abbreviations in a text string with context awareness
  * @param text - Text to expand abbreviations in
  * @returns Text with expanded abbreviations
@@ -134,6 +188,28 @@ export function expandAbbreviations(text: string | null | undefined): string {
       // Brand name: Ph → Prevue Hendrix
       result = result.substring(0, index) + 'Prevue Hendrix' + result.substring(index + 2);
     }
+  }
+  
+  // Handle "Ga" with context detection (aquarium gallon measurements)
+  // Match "Ga" as a whole word
+  const gaRegex = /\bGa\b/gi;
+  const gaMatches: Array<{index: number, isGallon: boolean}> = [];
+  
+  while ((match = gaRegex.exec(result)) !== null) {
+    gaMatches.push({
+      index: match.index,
+      isGallon: isAquariumGallon(result, match.index)
+    });
+  }
+  
+  // Replace from end to start to preserve positions
+  for (let i = gaMatches.length - 1; i >= 0; i--) {
+    const { index, isGallon } = gaMatches[i];
+    if (isGallon) {
+      // Aquarium measurement: Ga → Gallon
+      result = result.substring(0, index) + 'Gallon' + result.substring(index + 2);
+    }
+    // Otherwise leave "Ga" as-is (could be abbreviation for Georgia, etc.)
   }
   
   // Expand other abbreviations (whole word matches)
