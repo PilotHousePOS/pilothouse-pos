@@ -1954,6 +1954,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Grooming schedule routes
+  app.get("/api/admin/grooming-schedule", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const groomingScheduleEntries = await storage.getAllGroomingScheduleEntries();
+      res.json(groomingScheduleEntries);
+    } catch (error) {
+      console.error("Error fetching grooming schedule entries:", error);
+      res.status(500).json({ message: "Failed to fetch grooming schedule entries" });
+    }
+  });
+
+  app.post("/api/admin/grooming-schedule/batch", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const { entries } = req.body;
+      const result = await storage.batchUpdateGroomingScheduleEntries(entries);
+      res.json(result);
+    } catch (error) {
+      console.error("Error batch updating grooming schedule entries:", error);
+      res.status(500).json({ message: "Failed to batch update grooming schedule entries" });
+    }
+  });
+
+  app.patch("/api/admin/grooming-schedule/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const updated = await storage.updateGroomingScheduleEntry(parseInt(req.params.id), req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating grooming schedule entry:", error);
+      res.status(500).json({ message: "Failed to update grooming schedule entry" });
+    }
+  });
+
+  app.delete("/api/admin/grooming-schedule/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      await storage.deleteGroomingScheduleEntry(parseInt(req.params.id));
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting grooming schedule entry:", error);
+      res.status(500).json({ message: "Failed to delete grooming schedule entry" });
+    }
+  });
+
   // Admin user management routes
   app.get("/api/admin/users", authMiddleware, async (req: any, res) => {
     try {

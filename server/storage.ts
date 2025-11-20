@@ -20,6 +20,7 @@ import {
   supplyImportStaging,
   boardingRecords,
   scheduleEntries,
+  groomingScheduleEntries,
   orderPhotos,
   extractedOrderItems,
   type User,
@@ -66,6 +67,8 @@ import {
   type InsertBoardingRecord,
   type ScheduleEntry,
   type InsertScheduleEntry,
+  type GroomingScheduleEntry,
+  type InsertGroomingScheduleEntry,
   type OrderPhoto,
   type InsertOrderPhoto,
   type ExtractedOrderItem,
@@ -2246,6 +2249,37 @@ export class DatabaseStorage implements IStorage {
 
   async deleteScheduleEntry(id: number): Promise<void> {
     await db.delete(scheduleEntries).where(eq(scheduleEntries.id, id));
+  }
+
+  // Grooming Schedule operations
+  async getAllGroomingScheduleEntries(): Promise<GroomingScheduleEntry[]> {
+    return await db.select().from(groomingScheduleEntries)
+      .orderBy(asc(groomingScheduleEntries.section), asc(groomingScheduleEntries.displayOrder), asc(groomingScheduleEntries.groomerName));
+  }
+
+  async batchUpdateGroomingScheduleEntries(entries: InsertGroomingScheduleEntry[]): Promise<GroomingScheduleEntry[]> {
+    // Delete all existing entries first, then insert the new ones
+    await db.delete(groomingScheduleEntries);
+    
+    if (entries.length === 0) {
+      return [];
+    }
+    
+    const inserted = await db.insert(groomingScheduleEntries).values(entries).returning();
+    return inserted;
+  }
+
+  async updateGroomingScheduleEntry(id: number, entry: Partial<InsertGroomingScheduleEntry>): Promise<GroomingScheduleEntry> {
+    const [updated] = await db
+      .update(groomingScheduleEntries)
+      .set({ ...entry, updatedAt: new Date() })
+      .where(eq(groomingScheduleEntries.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteGroomingScheduleEntry(id: number): Promise<void> {
+    await db.delete(groomingScheduleEntries).where(eq(groomingScheduleEntries.id, id));
   }
 
   // Order Photo operations

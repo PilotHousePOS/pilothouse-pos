@@ -579,6 +579,18 @@ export const scheduleEntries = pgTable("schedule_entries", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Grooming Schedule
+export const groomingScheduleEntries = pgTable("grooming_schedule_entries", {
+  id: serial("id").primaryKey(),
+  section: varchar("section", { length: 10 }).notNull(), // A, B, C, etc.
+  groomerName: varchar("groomer_name", { length: 255 }).notNull(),
+  dayOfWeek: varchar("day_of_week", { length: 20 }).notNull(), // Monday, Tuesday, etc.
+  timeSlot: varchar("time_slot", { length: 100 }).notNull(), // e.g., "8-5", "9:30am-1pm", "OFF"
+  displayOrder: integer("display_order").default(0), // For ordering groomers within a section
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Boarding schemas
 export const insertBoardingRecordSchema = createInsertSchema(boardingRecords).omit({
   id: true,
@@ -606,6 +618,16 @@ export const insertScheduleEntrySchema = createInsertSchema(scheduleEntries).omi
 
 export type ScheduleEntry = typeof scheduleEntries.$inferSelect;
 export type InsertScheduleEntry = z.infer<typeof insertScheduleEntrySchema>;
+
+// Grooming Schedule schemas
+export const insertGroomingScheduleEntrySchema = createInsertSchema(groomingScheduleEntries).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type GroomingScheduleEntry = typeof groomingScheduleEntries.$inferSelect;
+export type InsertGroomingScheduleEntry = z.infer<typeof insertGroomingScheduleEntrySchema>;
 
 // Order Photo Uploads - AI-powered order extraction from photos
 export const orderPhotos = pgTable("order_photos", {

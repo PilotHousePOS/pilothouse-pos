@@ -3522,70 +3522,150 @@ function ScheduleManagement() {
   );
 }
 
-function GroomingSchedule({ appointments, groomers, onSelectAppointment }: { appointments: any[], groomers: any[], onSelectAppointment?: (apt: any) => void }) {
-  const [selectedWeek, setSelectedWeek] = useState(0); // 0 = current week, -1 = previous, 1 = next
+function GroomingSchedule() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [scheduleData, setScheduleData] = useState<Record<string, any[]>>({ A: [], B: [], C: [] });
+  const [isSaving, setIsSaving] = useState(false);
   
   const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const SECTIONS = ['A', 'B', 'C'];
   
-  // Calculate dates for the selected week
-  const getWeekDates = () => {
+  // Calculate dates for each section
+  const getDatesForSection = (section: string) => {
     const now = new Date();
     const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    
+    // Calculate days to subtract to get to Monday of current week
     const daysToMonday = currentDay === 0 ? 6 : currentDay - 1;
     const currentWeekMonday = new Date(now);
     currentWeekMonday.setDate(now.getDate() - daysToMonday);
     currentWeekMonday.setHours(0, 0, 0, 0);
     
-    const weekOffset = selectedWeek * 7;
-    const weekMonday = new Date(currentWeekMonday);
-    weekMonday.setDate(currentWeekMonday.getDate() + weekOffset);
+    // Section A = previous week, B = current week, C = next week
+    const weekOffset = section === 'A' ? -7 : section === 'B' ? 0 : 7;
+    const sectionMonday = new Date(currentWeekMonday);
+    sectionMonday.setDate(currentWeekMonday.getDate() + weekOffset);
     
+    // Generate dates for all days of the week
     return DAYS.map((_, index) => {
-      const date = new Date(weekMonday);
-      date.setDate(weekMonday.getDate() + index);
+      const date = new Date(sectionMonday);
+      date.setDate(sectionMonday.getDate() + index);
       return date;
     });
   };
   
-  const weekDates = getWeekDates();
+  // Fetch grooming schedule entries
+  const scheduleQuery = useQuery({
+    queryKey: ['/api/admin/grooming-schedule'],
+  });
   
-  // Parse date string to Date object
-  const parseLocalDate = (dateString: string): Date => {
-    const [year, month, day] = dateString.split('-').map(Number);
-    return new Date(year, month - 1, day);
-  };
-  
-  // Get appointments for a specific groomer and date
-  const getAppointmentsForGroomerAndDate = (groomerId: number, date: Date) => {
-    return appointments.filter((apt: any) => {
-      const aptDate = parseLocalDate(apt.appointmentDate);
-      const matchesDate = aptDate.toDateString() === date.toDateString();
-      const matchesGroomer = apt.groomerId === groomerId;
-      const isConfirmedOrCompleted = apt.status === 'confirmed' || apt.status === 'completed';
-      return matchesDate && matchesGroomer && isConfirmedOrCompleted;
-    });
-  };
-  
-  // Format service type
-  const formatServiceType = (serviceType: string): string => {
-    if (!serviceType) return '';
-    const normalized = serviceType.toLowerCase();
-    if (normalized.includes('bath') && !normalized.includes('full')) {
-      return 'Bath';
-    } else if (normalized.includes('full') || normalized.includes('grooming')) {
-      return 'Full';
+  // Organize schedule data by section and groomer
+  useEffect(() => {
+    if (scheduleQuery.data) {
+      const organized: Record<string, any[]> = { A: [], B: [], C: [] };
+      const entries = scheduleQuery.data as any[];
+      
+      // Group by section and groomer
+      SECTIONS.forEach(section => {
+        const sectionEntries = entries.filter((e: any) => e.section === section);
+        const groomers = [...new Set(sectionEntries.map((e: any) => e.groomerName))];
+        
+        organized[section] = groomers.map((groomerName, idx) => {
+          const groomerEntries = sectionEntries.filter((e: any) => e.groomerName === groomerName);
+          const schedule: Record<string, string> = {};
+          
+          DAYS.forEach(day => {
+            const dayEntry = groomerEntries.find((e: any) => e.dayOfWeek === day);
+            schedule[day] = dayEntry?.timeSlot || 'OFF';
+          });
+          
+          return {
+            groomerName: groomerName,
+            displayOrder: idx,
+            ...schedule
+          };
+        });
+      });
+      
+      setScheduleData(organized);
     }
-    return serviceType;
+  }, [scheduleQuery.data]);
+  
+  const handleCellChange = (section: string, groomerIndex: number, day: string, value: string) => {
+    setScheduleData(prev => ({
+      ...prev,
+      [section]: prev[section].map((groomer, idx) => 
+        idx === groomerIndex ? { ...groomer, [day]: value } : groomer
+      )
+    }));
   };
   
-  const activeGroomers = groomers?.filter((g: any) => g.isActive) || [];
-  
-  const getWeekLabel = () => {
-    if (selectedWeek === 0) return 'Current Week';
-    if (selectedWeek === -1) return 'Previous Week';
-    if (selectedWeek === 1) return 'Next Week';
-    return selectedWeek > 0 ? `${selectedWeek} Weeks Ahead` : `${Math.abs(selectedWeek)} Weeks Ago`;
+  const handleGroomerNameChange = (section: string, groomerIndex: number, newName: string) => {
+    setScheduleData(prev => ({
+      ...prev,
+      [section]: prev[section].map((groomer, idx) => 
+        idx === groomerIndex ? { ...groomer, groomerName: newName } : groomer
+      )
+    }));
   };
+  
+  const addGroomer = (section: string) => {
+    const newGroomer: any = {
+      groomerName: 'New Groomer',
+      displayOrder: scheduleData[section].length,
+    };
+    
+    DAYS.forEach(day => {
+      newGroomer[day] = 'OFF';
+    });
+    
+    setScheduleData(prev => ({
+      ...prev,
+      [section]: [...prev[section], newGroomer]
+    }));
+  };
+  
+  const removeGroomer = (section: string, groomerIndex: number) => {
+    setScheduleData(prev => ({
+      ...prev,
+      [section]: prev[section].filter((_, idx) => idx !== groomerIndex)
+    }));
+  };
+  
+  const saveSchedule = async () => {
+    setIsSaving(true);
+    try {
+      const entries: any[] = [];
+      
+      SECTIONS.forEach(section => {
+        scheduleData[section].forEach((groomer, idx) => {
+          DAYS.forEach(day => {
+            entries.push({
+              section,
+              groomerName: groomer.groomerName,
+              dayOfWeek: day,
+              timeSlot: groomer[day] || 'OFF',
+              displayOrder: idx
+            });
+          });
+        });
+      });
+      
+      await apiRequest('POST', '/api/admin/grooming-schedule/batch', { entries });
+      await queryClient.invalidateQueries({ queryKey: ['/api/admin/grooming-schedule'] });
+      toast({ title: 'Grooming schedule saved successfully' });
+    } catch (error) {
+      console.error('Failed to save grooming schedule:', error);
+      toast({ title: 'Failed to save grooming schedule', variant: 'destructive' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+  
+  if (scheduleQuery.isLoading) {
+    return <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+  }
   
   return (
     <Card className="mt-6">
@@ -3595,110 +3675,111 @@ function GroomingSchedule({ appointments, groomers, onSelectAppointment }: { app
             <CalendarIcon className="w-5 h-5" />
             Grooming Schedule
           </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setSelectedWeek(selectedWeek - 1)}
-              data-testid="button-prev-week"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Previous Week
-            </Button>
-            <span className="text-sm font-medium px-3">{getWeekLabel()}</span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setSelectedWeek(selectedWeek + 1)}
-              data-testid="button-next-week"
-            >
-              Next Week
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-            {selectedWeek !== 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedWeek(0)}
-                data-testid="button-current-week"
-              >
-                Today
-              </Button>
+          <Button 
+            onClick={saveSchedule}
+            disabled={isSaving}
+            className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
+            data-testid="button-save-grooming-schedule"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                Save Grooming Schedule
+              </>
             )}
-          </div>
+          </Button>
         </div>
       </CardHeader>
-      <CardContent>
-        {activeGroomers.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">
-            No active groomers. Add groomers in the Groomers section.
-          </div>
-        ) : (
-          <div className="overflow-auto -mx-6 px-6">
-            <div className="inline-block min-w-full align-middle">
-              <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-700">
-                <thead>
-                  <tr className="bg-gray-100 dark:bg-gray-800">
-                    <th className="sticky left-0 z-10 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 px-4 py-2 text-left font-semibold min-w-[120px]">
-                      Groomer
-                    </th>
-                    {weekDates.map((date, idx) => (
-                      <th key={idx} className="border border-gray-300 dark:border-gray-700 px-2 py-2 text-center font-semibold min-w-[140px]">
-                        <div>{DAYS[idx].slice(0, 3)}</div>
-                        <div className="text-xs font-normal text-gray-600 dark:text-gray-400">
-                          {date.getMonth() + 1}/{date.getDate()}
-                        </div>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {activeGroomers.map((groomer: any) => (
-                    <tr key={groomer.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                      <td className="sticky left-0 z-10 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-4 py-2 font-medium">
-                        {groomer.name}
-                      </td>
-                      {weekDates.map((date, dayIdx) => {
-                        const dayAppointments = getAppointmentsForGroomerAndDate(groomer.id, date);
-                        return (
-                          <td 
-                            key={dayIdx} 
-                            className="border border-gray-300 dark:border-gray-700 px-2 py-2 align-top bg-white dark:bg-gray-900"
-                          >
-                            {dayAppointments.length > 0 ? (
-                              <div className="space-y-1">
-                                {dayAppointments.map((apt: any) => (
-                                  <button
-                                    key={apt.id}
-                                    onClick={() => onSelectAppointment?.(apt)}
-                                    className="w-full text-left text-xs bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded p-1.5 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors cursor-pointer"
-                                    title="Click to view/edit appointment details"
-                                  >
-                                    <div className="font-semibold text-blue-900 dark:text-blue-100">
-                                      {apt.appointmentTime}
-                                    </div>
-                                    <div className="text-gray-700 dark:text-gray-300 truncate">
-                                      {apt.customerPets?.map((p: any) => p.petName).join(', ')}
-                                    </div>
-                                    <div className="text-gray-600 dark:text-gray-400">
-                                      {formatServiceType(apt.serviceType)}
-                                    </div>
-                                  </button>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="text-center text-gray-400 text-xs">-</div>
-                            )}
-                          </td>
-                        );
-                      })}
+      <CardContent className="space-y-6">
+        {SECTIONS.map(section => {
+          const dates = getDatesForSection(section);
+          return (
+            <div key={section} className="border rounded-lg p-4 bg-green-50 dark:bg-green-900/10">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-semibold text-green-800 dark:text-green-300">
+                  Section {section}
+                </h3>
+                <Button
+                  size="sm"
+                  onClick={() => addGroomer(section)}
+                  className="bg-green-600 hover:bg-green-700"
+                  data-testid={`button-add-groomer-${section}`}
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Groomer
+                </Button>
+              </div>
+              
+              <div className="overflow-x-auto -mx-4 px-4">
+                <table className="w-full border-collapse border border-gray-300 dark:border-gray-700 min-w-[800px]">
+                  <thead>
+                    <tr className="bg-gray-100 dark:bg-gray-800">
+                      <th className="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left font-semibold">Groomer</th>
+                      {DAYS.map((day, idx) => (
+                        <th key={day} className="border border-gray-300 dark:border-gray-700 px-2 py-2 text-center font-semibold">
+                          <div>{day.slice(0, 3)}</div>
+                          <div className="text-xs font-normal text-gray-600 dark:text-gray-400">
+                            {dates[idx].getMonth() + 1}/{dates[idx].getDate()}
+                          </div>
+                        </th>
+                      ))}
+                      <th className="border border-gray-300 dark:border-gray-700 px-2 py-2 text-center font-semibold">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {scheduleData[section].map((groomer, groomerIdx) => (
+                      <tr key={groomerIdx}>
+                        <td className="border border-gray-300 dark:border-gray-700 px-2 py-1">
+                          <input
+                            type="text"
+                            value={groomer.groomerName}
+                            onChange={(e) => handleGroomerNameChange(section, groomerIdx, e.target.value)}
+                            className="w-full px-2 py-1 border-none bg-transparent focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                            data-testid={`input-groomer-name-${section}-${groomerIdx}`}
+                          />
+                        </td>
+                        {DAYS.map(day => (
+                          <td key={day} className="border border-gray-300 dark:border-gray-700 px-2 py-1">
+                            <input
+                              type="text"
+                              value={groomer[day]}
+                              onChange={(e) => handleCellChange(section, groomerIdx, day, e.target.value)}
+                              className="w-full px-2 py-1 border-none bg-transparent text-center focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                              placeholder="OFF"
+                              data-testid={`input-time-${section}-${groomerIdx}-${day}`}
+                            />
+                          </td>
+                        ))}
+                        <td className="border border-gray-300 dark:border-gray-700 px-2 py-1 text-center">
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => removeGroomer(section, groomerIdx)}
+                            data-testid={`button-remove-groomer-${section}-${groomerIdx}`}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                    {scheduleData[section].length === 0 && (
+                      <tr>
+                        <td colSpan={DAYS.length + 2} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                          No groomers in this section. Click "Add Groomer" to get started.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })}
       </CardContent>
     </Card>
   );
@@ -9677,11 +9758,7 @@ export default function Admin() {
 
         <TabsContent value="schedule">
           <ScheduleManagement />
-          <GroomingSchedule 
-            appointments={appointments || []} 
-            groomers={groomers || []} 
-            onSelectAppointment={setSelectedAppointment}
-          />
+          <GroomingSchedule />
         </TabsContent>
       </Tabs>
 
