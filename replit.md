@@ -74,6 +74,7 @@ The application is a full-stack web application built with React, Vite, TypeScri
 - **Brand Extraction System:** Comprehensive brand database for automated brand assignment to products.
 - **Product Image Management System:** Statistics dashboard, manual image search, automated batch search with preview and approval, cost management, and admin-only access.
 - **Employee Schedule Management System:** Sectioned schedule view with sequential weekly dates (Section A = previous week, B = current week, C = next week), weekly editable grid with date display (e.g., "Mon 11/17"), employee management, flexible time slots, batch save, data persistence, empty state handling, and admin-only access.
+- **Grooming Schedule Management System:** Simplified weekly schedule for groomers showing current week (Monday-Sunday) with automatic date display, editable groomer names and time slots, add/remove groomers, batch save functionality, data persistence, and admin-only access.
 - **AI-Powered Order Photo Upload System:** Upload supplier order photos to extract items automatically with GPT-5 vision, adjustable price multiplier for markup calculation, editable extracted items (name, quantity, price), bulk add to inventory, photo management with history, and admin-only access.
 
 **System Design Choices:**

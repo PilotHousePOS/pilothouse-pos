@@ -3525,14 +3525,13 @@ function ScheduleManagement() {
 function GroomingSchedule() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [scheduleData, setScheduleData] = useState<Record<string, any[]>>({ A: [], B: [], C: [] });
+  const [scheduleData, setScheduleData] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   
   const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  const SECTIONS = ['A', 'B', 'C'];
   
-  // Calculate dates for each section
-  const getDatesForSection = (section: string) => {
+  // Calculate dates for current week
+  const getWeekDates = () => {
     const now = new Date();
     const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
     
@@ -3542,95 +3541,78 @@ function GroomingSchedule() {
     currentWeekMonday.setDate(now.getDate() - daysToMonday);
     currentWeekMonday.setHours(0, 0, 0, 0);
     
-    // Section A = previous week, B = current week, C = next week
-    const weekOffset = section === 'A' ? -7 : section === 'B' ? 0 : 7;
-    const sectionMonday = new Date(currentWeekMonday);
-    sectionMonday.setDate(currentWeekMonday.getDate() + weekOffset);
-    
     // Generate dates for all days of the week
     return DAYS.map((_, index) => {
-      const date = new Date(sectionMonday);
-      date.setDate(sectionMonday.getDate() + index);
+      const date = new Date(currentWeekMonday);
+      date.setDate(currentWeekMonday.getDate() + index);
       return date;
     });
   };
+  
+  const dates = getWeekDates();
   
   // Fetch grooming schedule entries
   const scheduleQuery = useQuery({
     queryKey: ['/api/admin/grooming-schedule'],
   });
   
-  // Organize schedule data by section and groomer
+  // Organize schedule data by groomer
   useEffect(() => {
     if (scheduleQuery.data) {
-      const organized: Record<string, any[]> = { A: [], B: [], C: [] };
       const entries = scheduleQuery.data as any[];
+      const groomers = [...new Set(entries.map((e: any) => e.groomerName))];
       
-      // Group by section and groomer
-      SECTIONS.forEach(section => {
-        const sectionEntries = entries.filter((e: any) => e.section === section);
-        const groomers = [...new Set(sectionEntries.map((e: any) => e.groomerName))];
+      const organized = groomers.map((groomerName, idx) => {
+        const groomerEntries = entries.filter((e: any) => e.groomerName === groomerName);
+        const schedule: Record<string, string> = {};
         
-        organized[section] = groomers.map((groomerName, idx) => {
-          const groomerEntries = sectionEntries.filter((e: any) => e.groomerName === groomerName);
-          const schedule: Record<string, string> = {};
-          
-          DAYS.forEach(day => {
-            const dayEntry = groomerEntries.find((e: any) => e.dayOfWeek === day);
-            schedule[day] = dayEntry?.timeSlot || 'OFF';
-          });
-          
-          return {
-            groomerName: groomerName,
-            displayOrder: idx,
-            ...schedule
-          };
+        DAYS.forEach(day => {
+          const dayEntry = groomerEntries.find((e: any) => e.dayOfWeek === day);
+          schedule[day] = dayEntry?.timeSlot || 'OFF';
         });
+        
+        return {
+          groomerName: groomerName,
+          displayOrder: idx,
+          ...schedule
+        };
       });
       
       setScheduleData(organized);
     }
   }, [scheduleQuery.data]);
   
-  const handleCellChange = (section: string, groomerIndex: number, day: string, value: string) => {
-    setScheduleData(prev => ({
-      ...prev,
-      [section]: prev[section].map((groomer, idx) => 
+  const handleCellChange = (groomerIndex: number, day: string, value: string) => {
+    setScheduleData(prev => 
+      prev.map((groomer, idx) => 
         idx === groomerIndex ? { ...groomer, [day]: value } : groomer
       )
-    }));
+    );
   };
   
-  const handleGroomerNameChange = (section: string, groomerIndex: number, newName: string) => {
-    setScheduleData(prev => ({
-      ...prev,
-      [section]: prev[section].map((groomer, idx) => 
+  const handleGroomerNameChange = (groomerIndex: number, newName: string) => {
+    setScheduleData(prev =>
+      prev.map((groomer, idx) => 
         idx === groomerIndex ? { ...groomer, groomerName: newName } : groomer
       )
-    }));
+    );
   };
   
-  const addGroomer = (section: string) => {
+  const addGroomer = () => {
     const newGroomer: any = {
       groomerName: 'New Groomer',
-      displayOrder: scheduleData[section].length,
+      displayOrder: scheduleData.length,
     };
     
     DAYS.forEach(day => {
       newGroomer[day] = 'OFF';
     });
     
-    setScheduleData(prev => ({
-      ...prev,
-      [section]: [...prev[section], newGroomer]
-    }));
+    setScheduleData(prev => [...prev, newGroomer]);
   };
   
-  const removeGroomer = (section: string, groomerIndex: number) => {
-    setScheduleData(prev => ({
-      ...prev,
-      [section]: prev[section].filter((_, idx) => idx !== groomerIndex)
-    }));
+  const removeGroomer = (groomerIndex: number) => {
+    setScheduleData(prev => prev.filter((_, idx) => idx !== groomerIndex));
   };
   
   const saveSchedule = async () => {
@@ -3638,16 +3620,14 @@ function GroomingSchedule() {
     try {
       const entries: any[] = [];
       
-      SECTIONS.forEach(section => {
-        scheduleData[section].forEach((groomer, idx) => {
-          DAYS.forEach(day => {
-            entries.push({
-              section,
-              groomerName: groomer.groomerName,
-              dayOfWeek: day,
-              timeSlot: groomer[day] || 'OFF',
-              displayOrder: idx
-            });
+      scheduleData.forEach((groomer, idx) => {
+        DAYS.forEach(day => {
+          entries.push({
+            section: 'A',
+            groomerName: groomer.groomerName,
+            dayOfWeek: day,
+            timeSlot: groomer[day] || 'OFF',
+            displayOrder: idx
           });
         });
       });
@@ -3695,91 +3675,81 @@ function GroomingSchedule() {
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {SECTIONS.map(section => {
-          const dates = getDatesForSection(section);
-          return (
-            <div key={section} className="border rounded-lg p-4 bg-green-50 dark:bg-green-900/10">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold text-green-800 dark:text-green-300">
-                  Section {section}
-                </h3>
-                <Button
-                  size="sm"
-                  onClick={() => addGroomer(section)}
-                  className="bg-green-600 hover:bg-green-700"
-                  data-testid={`button-add-groomer-${section}`}
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Add Groomer
-                </Button>
-              </div>
-              
-              <div className="overflow-x-auto -mx-4 px-4">
-                <table className="w-full border-collapse border border-gray-300 dark:border-gray-700 min-w-[800px]">
-                  <thead>
-                    <tr className="bg-gray-100 dark:bg-gray-800">
-                      <th className="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left font-semibold">Groomer</th>
-                      {DAYS.map((day, idx) => (
-                        <th key={day} className="border border-gray-300 dark:border-gray-700 px-2 py-2 text-center font-semibold">
-                          <div>{day.slice(0, 3)}</div>
-                          <div className="text-xs font-normal text-gray-600 dark:text-gray-400">
-                            {dates[idx].getMonth() + 1}/{dates[idx].getDate()}
-                          </div>
-                        </th>
-                      ))}
-                      <th className="border border-gray-300 dark:border-gray-700 px-2 py-2 text-center font-semibold">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {scheduleData[section].map((groomer, groomerIdx) => (
-                      <tr key={groomerIdx}>
-                        <td className="border border-gray-300 dark:border-gray-700 px-2 py-1">
-                          <input
-                            type="text"
-                            value={groomer.groomerName}
-                            onChange={(e) => handleGroomerNameChange(section, groomerIdx, e.target.value)}
-                            className="w-full px-2 py-1 border-none bg-transparent focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
-                            data-testid={`input-groomer-name-${section}-${groomerIdx}`}
-                          />
-                        </td>
-                        {DAYS.map(day => (
-                          <td key={day} className="border border-gray-300 dark:border-gray-700 px-2 py-1">
-                            <input
-                              type="text"
-                              value={groomer[day]}
-                              onChange={(e) => handleCellChange(section, groomerIdx, day, e.target.value)}
-                              className="w-full px-2 py-1 border-none bg-transparent text-center focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
-                              placeholder="OFF"
-                              data-testid={`input-time-${section}-${groomerIdx}-${day}`}
-                            />
-                          </td>
-                        ))}
-                        <td className="border border-gray-300 dark:border-gray-700 px-2 py-1 text-center">
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => removeGroomer(section, groomerIdx)}
-                            data-testid={`button-remove-groomer-${section}-${groomerIdx}`}
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                    {scheduleData[section].length === 0 && (
-                      <tr>
-                        <td colSpan={DAYS.length + 2} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
-                          No groomers in this section. Click "Add Groomer" to get started.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          );
-        })}
+      <CardContent>
+        <div className="flex items-center justify-between mb-3">
+          <Button
+            size="sm"
+            onClick={addGroomer}
+            className="bg-green-600 hover:bg-green-700"
+            data-testid="button-add-groomer"
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            Add Groomer
+          </Button>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse border border-gray-300 dark:border-gray-700 min-w-[800px]">
+            <thead>
+              <tr className="bg-gray-100 dark:bg-gray-800">
+                <th className="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left font-semibold">Groomer</th>
+                {DAYS.map((day, idx) => (
+                  <th key={day} className="border border-gray-300 dark:border-gray-700 px-2 py-2 text-center font-semibold">
+                    <div>{day.slice(0, 3)}</div>
+                    <div className="text-xs font-normal text-gray-600 dark:text-gray-400">
+                      {dates[idx].getMonth() + 1}/{dates[idx].getDate()}
+                    </div>
+                  </th>
+                ))}
+                <th className="border border-gray-300 dark:border-gray-700 px-2 py-2 text-center font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {scheduleData.map((groomer, groomerIdx) => (
+                <tr key={groomerIdx}>
+                  <td className="border border-gray-300 dark:border-gray-700 px-2 py-1">
+                    <input
+                      type="text"
+                      value={groomer.groomerName}
+                      onChange={(e) => handleGroomerNameChange(groomerIdx, e.target.value)}
+                      className="w-full px-2 py-1 border-none bg-transparent focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                      data-testid={`input-groomer-name-${groomerIdx}`}
+                    />
+                  </td>
+                  {DAYS.map(day => (
+                    <td key={day} className="border border-gray-300 dark:border-gray-700 px-2 py-1">
+                      <input
+                        type="text"
+                        value={groomer[day]}
+                        onChange={(e) => handleCellChange(groomerIdx, day, e.target.value)}
+                        className="w-full px-2 py-1 border-none bg-transparent text-center focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                        placeholder="OFF"
+                        data-testid={`input-time-${groomerIdx}-${day}`}
+                      />
+                    </td>
+                  ))}
+                  <td className="border border-gray-300 dark:border-gray-700 px-2 py-1 text-center">
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => removeGroomer(groomerIdx)}
+                      data-testid={`button-remove-groomer-${groomerIdx}`}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+              {scheduleData.length === 0 && (
+                <tr>
+                  <td colSpan={DAYS.length + 2} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                    No groomers added. Click "Add Groomer" to get started.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </CardContent>
     </Card>
   );
