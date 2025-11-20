@@ -20,6 +20,8 @@ import {
   supplyImportStaging,
   boardingRecords,
   scheduleEntries,
+  orderPhotos,
+  extractedOrderItems,
   type User,
   type UpsertUser,
   type Pet,
@@ -64,6 +66,10 @@ import {
   type InsertBoardingRecord,
   type ScheduleEntry,
   type InsertScheduleEntry,
+  type OrderPhoto,
+  type InsertOrderPhoto,
+  type ExtractedOrderItem,
+  type InsertExtractedOrderItem,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, and, or, not, ilike, lt, isNull, count, sql, inArray } from "drizzle-orm";
@@ -284,6 +290,21 @@ export interface IStorage {
   batchUpdateScheduleEntries(entries: InsertScheduleEntry[]): Promise<ScheduleEntry[]>;
   updateScheduleEntry(id: number, entry: Partial<InsertScheduleEntry>): Promise<ScheduleEntry>;
   deleteScheduleEntry(id: number): Promise<void>;
+
+  // Order Photo operations
+  getAllOrderPhotos(userId?: string): Promise<OrderPhoto[]>;
+  getOrderPhoto(id: number): Promise<OrderPhoto | undefined>;
+  createOrderPhoto(photo: InsertOrderPhoto): Promise<OrderPhoto>;
+  updateOrderPhoto(id: number, photo: Partial<InsertOrderPhoto>): Promise<OrderPhoto>;
+  deleteOrderPhoto(id: number): Promise<void>;
+
+  // Extracted Order Item operations
+  getExtractedOrderItems(orderPhotoId: number): Promise<ExtractedOrderItem[]>;
+  getExtractedOrderItem(id: number): Promise<ExtractedOrderItem | undefined>;
+  createExtractedOrderItem(item: InsertExtractedOrderItem): Promise<ExtractedOrderItem>;
+  updateExtractedOrderItem(id: number, item: Partial<InsertExtractedOrderItem>): Promise<ExtractedOrderItem>;
+  deleteExtractedOrderItem(id: number): Promise<void>;
+  bulkCreateExtractedOrderItems(items: InsertExtractedOrderItem[]): Promise<ExtractedOrderItem[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2225,6 +2246,75 @@ export class DatabaseStorage implements IStorage {
 
   async deleteScheduleEntry(id: number): Promise<void> {
     await db.delete(scheduleEntries).where(eq(scheduleEntries.id, id));
+  }
+
+  // Order Photo operations
+  async getAllOrderPhotos(userId?: string): Promise<OrderPhoto[]> {
+    if (userId) {
+      return await db.select().from(orderPhotos)
+        .where(eq(orderPhotos.userId, userId))
+        .orderBy(desc(orderPhotos.createdAt));
+    }
+    return await db.select().from(orderPhotos).orderBy(desc(orderPhotos.createdAt));
+  }
+
+  async getOrderPhoto(id: number): Promise<OrderPhoto | undefined> {
+    const [photo] = await db.select().from(orderPhotos).where(eq(orderPhotos.id, id));
+    return photo;
+  }
+
+  async createOrderPhoto(photo: InsertOrderPhoto): Promise<OrderPhoto> {
+    const [created] = await db.insert(orderPhotos).values(photo).returning();
+    return created;
+  }
+
+  async updateOrderPhoto(id: number, photo: Partial<InsertOrderPhoto>): Promise<OrderPhoto> {
+    const [updated] = await db
+      .update(orderPhotos)
+      .set({ ...photo, updatedAt: new Date() })
+      .where(eq(orderPhotos.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteOrderPhoto(id: number): Promise<void> {
+    await db.delete(orderPhotos).where(eq(orderPhotos.id, id));
+  }
+
+  // Extracted Order Item operations
+  async getExtractedOrderItems(orderPhotoId: number): Promise<ExtractedOrderItem[]> {
+    return await db.select().from(extractedOrderItems)
+      .where(eq(extractedOrderItems.orderPhotoId, orderPhotoId))
+      .orderBy(asc(extractedOrderItems.id));
+  }
+
+  async getExtractedOrderItem(id: number): Promise<ExtractedOrderItem | undefined> {
+    const [item] = await db.select().from(extractedOrderItems).where(eq(extractedOrderItems.id, id));
+    return item;
+  }
+
+  async createExtractedOrderItem(item: InsertExtractedOrderItem): Promise<ExtractedOrderItem> {
+    const [created] = await db.insert(extractedOrderItems).values(item).returning();
+    return created;
+  }
+
+  async updateExtractedOrderItem(id: number, item: Partial<InsertExtractedOrderItem>): Promise<ExtractedOrderItem> {
+    const [updated] = await db
+      .update(extractedOrderItems)
+      .set({ ...item, updatedAt: new Date() })
+      .where(eq(extractedOrderItems.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteExtractedOrderItem(id: number): Promise<void> {
+    await db.delete(extractedOrderItems).where(eq(extractedOrderItems.id, id));
+  }
+
+  async bulkCreateExtractedOrderItems(items: InsertExtractedOrderItem[]): Promise<ExtractedOrderItem[]> {
+    if (items.length === 0) return [];
+    const created = await db.insert(extractedOrderItems).values(items).returning();
+    return created;
   }
 }
 

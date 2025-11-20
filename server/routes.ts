@@ -23,6 +23,7 @@ import { normalizePhoneNumber } from './phoneUtils';
 import { db } from './db';
 import { eq } from 'drizzle-orm';
 import { expandProductAbbreviations } from './abbreviationExpansion';
+import { extractOrderFromPhoto } from './orderPhotoProcessor';
 
 // Helper function to capitalize first letter of each word
 function capitalizeWords(text: string | undefined | null): string | undefined | null {
@@ -4334,6 +4335,283 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error getting products by brand/category:', error);
       res.status(500).json({ message: "Failed to get products by brand/category" });
+    }
+  });
+
+  // ============================================
+  // ORDER PHOTO UPLOAD & EXTRACTION ROUTES
+  // ============================================
+
+  // Upload order photo and extract items using AI Vision (Admin only)
+  app.post("/api/admin/order-photos", upload.single('orderPhoto'), authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const priceMultiplier = parseFloat(req.body.priceMultiplier || "1.0");
+      
+      if (isNaN(priceMultiplier) || priceMultiplier <= 0) {
+        return res.status(400).json({ message: "Invalid price multiplier" });
+      }
+
+      // Create the order photo record
+      const orderPhoto = await storage.createOrderPhoto({
+        userId: user.id,
+        imageUrl: `/uploads/${req.file.filename}`,
+        priceMultiplier: priceMultiplier.toString(),
+        status: "processing"
+      });
+
+      // Process the image with AI Vision in background
+      const imagePath = req.file.path;
+      
+      try {
+        const extractionResult = await extractOrderFromPhoto(imagePath);
+        
+        if (!extractionResult.success) {
+          // Update status to error
+          await storage.updateOrderPhoto(orderPhoto.id, {
+            status: "error",
+            errorMessage: extractionResult.error || "Failed to extract items"
+          });
+          return res.status(500).json({ 
+            message: "Failed to extract items from photo",
+            error: extractionResult.error 
+          });
+        }
+
+        // Save extracted items to database
+        const itemsToCreate = extractionResult.items.map(item => ({
+          orderPhotoId: orderPhoto.id,
+          itemName: item.itemName,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice.toString(),
+          markedUpPrice: (item.unitPrice * priceMultiplier).toFixed(2),
+          category: item.category || "accessories",
+          brand: item.brand || null,
+          notes: item.notes || null,
+          addedToInventory: false
+        }));
+
+        const extractedItems = await storage.bulkCreateExtractedOrderItems(itemsToCreate);
+
+        // Update status to completed
+        await storage.updateOrderPhoto(orderPhoto.id, {
+          status: "completed",
+          aiResponse: extractionResult.rawResponse || null
+        });
+
+        res.json({
+          success: true,
+          orderPhoto: {
+            ...orderPhoto,
+            status: "completed"
+          },
+          extractedItems,
+          itemCount: extractedItems.length
+        });
+
+      } catch (processingError: any) {
+        console.error("Error processing order photo:", processingError);
+        await storage.updateOrderPhoto(orderPhoto.id, {
+          status: "error",
+          errorMessage: processingError.message
+        });
+        res.status(500).json({ 
+          message: "Failed to process order photo",
+          error: processingError.message 
+        });
+      }
+    } catch (error: any) {
+      console.error("Error uploading order photo:", error);
+      res.status(500).json({ message: "Failed to upload order photo" });
+    }
+  });
+
+  // Get all order photos (Admin only)
+  app.get("/api/admin/order-photos", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const orderPhotos = await storage.getAllOrderPhotos();
+      res.json(orderPhotos);
+    } catch (error) {
+      console.error("Error fetching order photos:", error);
+      res.status(500).json({ message: "Failed to fetch order photos" });
+    }
+  });
+
+  // Get a single order photo with its extracted items (Admin only)
+  app.get("/api/admin/order-photos/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const orderPhoto = await storage.getOrderPhoto(id);
+      
+      if (!orderPhoto) {
+        return res.status(404).json({ message: "Order photo not found" });
+      }
+
+      const extractedItems = await storage.getExtractedOrderItems(id);
+      
+      res.json({
+        orderPhoto,
+        extractedItems
+      });
+    } catch (error) {
+      console.error("Error fetching order photo:", error);
+      res.status(500).json({ message: "Failed to fetch order photo" });
+    }
+  });
+
+  // Update an extracted order item (Admin only)
+  app.put("/api/admin/extracted-items/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const { itemName, quantity, unitPrice, markedUpPrice, category, brand, notes } = req.body;
+      
+      const updatedItem = await storage.updateExtractedOrderItem(id, {
+        itemName,
+        quantity,
+        unitPrice,
+        markedUpPrice,
+        category,
+        brand,
+        notes
+      });
+
+      res.json(updatedItem);
+    } catch (error) {
+      console.error("Error updating extracted item:", error);
+      res.status(500).json({ message: "Failed to update extracted item" });
+    }
+  });
+
+  // Delete an extracted order item (Admin only)
+  app.delete("/api/admin/extracted-items/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      await storage.deleteExtractedOrderItem(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting extracted item:", error);
+      res.status(500).json({ message: "Failed to delete extracted item" });
+    }
+  });
+
+  // Add extracted items to supplies inventory (Admin only)
+  app.post("/api/admin/extracted-items/add-to-inventory", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { itemIds } = req.body;
+      
+      if (!itemIds || !Array.isArray(itemIds) || itemIds.length === 0) {
+        return res.status(400).json({ message: "Item IDs array is required" });
+      }
+
+      const results = [];
+      
+      for (const itemId of itemIds) {
+        try {
+          const extractedItem = await storage.getExtractedOrderItem(parseInt(itemId));
+          
+          if (!extractedItem) {
+            results.push({ itemId, success: false, error: "Item not found" });
+            continue;
+          }
+
+          if (extractedItem.addedToInventory) {
+            results.push({ itemId, success: false, error: "Already added to inventory" });
+            continue;
+          }
+
+          // Create supply from extracted item
+          const supply = await storage.createSupply({
+            name: extractedItem.itemName,
+            category: extractedItem.category || "accessories",
+            brand: extractedItem.brand || null,
+            price: extractedItem.markedUpPrice,
+            description: extractedItem.notes || null,
+            stockQuantity: extractedItem.quantity,
+            isActive: true
+          });
+
+          // Mark item as added to inventory
+          await storage.updateExtractedOrderItem(extractedItem.id, {
+            addedToInventory: true,
+            supplyId: supply.id
+          });
+
+          results.push({ 
+            itemId: extractedItem.id, 
+            success: true, 
+            supplyId: supply.id,
+            supplyName: supply.name
+          });
+        } catch (itemError: any) {
+          results.push({ 
+            itemId, 
+            success: false, 
+            error: itemError.message 
+          });
+        }
+      }
+
+      const successCount = results.filter(r => r.success).length;
+      
+      res.json({
+        success: true,
+        processed: results.length,
+        successCount,
+        results
+      });
+    } catch (error: any) {
+      console.error("Error adding items to inventory:", error);
+      res.status(500).json({ message: "Failed to add items to inventory" });
+    }
+  });
+
+  // Delete an order photo and all its extracted items (Admin only)
+  app.delete("/api/admin/order-photos/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      await storage.deleteOrderPhoto(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting order photo:", error);
+      res.status(500).json({ message: "Failed to delete order photo" });
     }
   });
 

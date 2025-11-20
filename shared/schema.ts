@@ -620,6 +620,12 @@ export const orderPhotos = pgTable("order_photos", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const insertOrderPhotoSchema = createInsertSchema(orderPhotos)
+  .omit({ id: true, createdAt: true, updatedAt: true })
+  .extend({
+    priceMultiplier: z.string().regex(/^\d+(\.\d{1,2})?$/).transform(val => val)
+  });
+
 // Extracted items from order photos
 export const extractedOrderItems = pgTable("extracted_order_items", {
   id: serial("id").primaryKey(),
@@ -637,21 +643,15 @@ export const extractedOrderItems = pgTable("extracted_order_items", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Order photo schemas
-export const insertOrderPhotoSchema = createInsertSchema(orderPhotos).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
 export type OrderPhoto = typeof orderPhotos.$inferSelect;
 export type InsertOrderPhoto = z.infer<typeof insertOrderPhotoSchema>;
 
-export const insertExtractedOrderItemSchema = createInsertSchema(extractedOrderItems).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
+export const insertExtractedOrderItemSchema = createInsertSchema(extractedOrderItems)
+  .omit({ id: true, createdAt: true, updatedAt: true })
+  .extend({
+    unitPrice: z.string().regex(/^\d+(\.\d{1,2})?$/).transform(val => val),
+    markedUpPrice: z.string().regex(/^\d+(\.\d{1,2})?$/).transform(val => val)
+  });
 
 export type ExtractedOrderItem = typeof extractedOrderItems.$inferSelect;
 export type InsertExtractedOrderItem = z.infer<typeof insertExtractedOrderItemSchema>;
