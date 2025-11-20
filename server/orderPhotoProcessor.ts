@@ -116,7 +116,7 @@ Return ONLY valid JSON in this EXACT format (no markdown, no explanations):
         }
       ],
       response_format: { type: "json_object" },
-      max_completion_tokens: 4096,
+      max_completion_tokens: 16000,
     });
 
     console.log("=== OpenAI Vision Response ===");
