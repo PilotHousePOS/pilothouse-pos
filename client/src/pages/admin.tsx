@@ -2098,6 +2098,27 @@ function OrderPhotoUploadManager() {
     },
   });
 
+  // Delete extracted item mutation
+  const deleteItemMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest('DELETE', `/api/admin/extracted-items/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/admin/order-photos/${selectedPhotoId}`] });
+      toast({
+        title: "Success",
+        description: "Item deleted successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -2489,24 +2510,39 @@ function OrderPhotoUploadManager() {
                             </div>
                           </div>
                           {!item.addedToInventory && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                const newMap = new Map(editingItems);
-                                newMap.set(item.id, {
-                                  itemName: item.itemName,
-                                  quantity: item.quantity,
-                                  unitPrice: parseFloat(item.unitPrice || 0),
-                                  markedUpPrice: parseFloat(item.markedUpPrice || 0),
-                                });
-                                setEditingItems(newMap);
-                              }}
-                              data-testid={`button-edit-${item.id}`}
-                            >
-                              <Edit className="w-4 h-4 mr-1" />
-                              Edit
-                            </Button>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  const newMap = new Map(editingItems);
+                                  newMap.set(item.id, {
+                                    itemName: item.itemName,
+                                    quantity: item.quantity,
+                                    unitPrice: parseFloat(item.unitPrice || 0),
+                                    markedUpPrice: parseFloat(item.markedUpPrice || 0),
+                                  });
+                                  setEditingItems(newMap);
+                                }}
+                                data-testid={`button-edit-${item.id}`}
+                              >
+                                <Edit className="w-4 h-4 mr-1" />
+                                Edit
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => {
+                                  if (confirm(`Delete "${item.itemName}"?`)) {
+                                    deleteItemMutation.mutate(item.id);
+                                  }
+                                }}
+                                disabled={deleteItemMutation.isPending}
+                                data-testid={`button-delete-item-${item.id}`}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                           )}
                         </div>
                       )}

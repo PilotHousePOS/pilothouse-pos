@@ -4638,6 +4638,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             continue;
           }
 
+          // Skip non-inventory items like truck fuel charge
+          if (extractedItem.itemName.toLowerCase().includes('truck fuel charge')) {
+            results.push({ itemId, success: false, error: "Skipped - non-inventory expense item" });
+            continue;
+          }
+
           // Apply auto-categorization to determine filterType and category
           const categorizationResult = categorizeProduct({
             name: extractedItem.itemName,
