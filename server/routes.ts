@@ -24,6 +24,18 @@ import { db } from './db';
 import { eq } from 'drizzle-orm';
 import { expandProductAbbreviations } from './abbreviationExpansion';
 
+// Helper function to capitalize first letter of each word
+function capitalizeWords(text: string | undefined | null): string | undefined | null {
+  if (!text) return text;
+  return text
+    .split(' ')
+    .map(word => {
+      if (!word) return word;
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join(' ');
+}
+
 // Configure multer for file uploads
 const uploadStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -2520,11 +2532,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Use phone as placeholder for email if email is not provided
       const contactEmail = trimmedEmail && trimmedEmail.includes('@') ? trimmedEmail : trimmedPhone;
 
+      // Capitalize first letter of each word in name and pet names
+      const capitalizedName = capitalizeWords(trimmedName);
+      const capitalizedPetNames = petNames ? capitalizeWords(petNames) : null;
+
       const contact = await storage.createContact({ 
-        name: trimmedName, 
+        name: capitalizedName as string, 
         email: contactEmail, 
         phoneNumber: trimmedPhone,
-        petNames: petNames || null,
+        petNames: capitalizedPetNames,
         notes,
         animalType,
         breed 
@@ -2562,11 +2578,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         contactEmail = trimmedEmail && trimmedEmail.includes('@') ? trimmedEmail : trimmedPhone;
       }
       
+      // Capitalize first letter of each word in name and pet names
+      const capitalizedName = trimmedName ? capitalizeWords(trimmedName) : undefined;
+      const capitalizedPetNames = petNames !== undefined ? capitalizeWords(petNames) : undefined;
+      
       const contact = await storage.updateContact(id, { 
-        name: trimmedName, 
+        name: capitalizedName as string | undefined, 
         email: contactEmail, 
         phoneNumber: trimmedPhone,
-        petNames: petNames !== undefined ? petNames : undefined,
+        petNames: capitalizedPetNames,
         notes,
         animalType,
         breed 

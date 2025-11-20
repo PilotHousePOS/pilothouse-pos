@@ -49,7 +49,7 @@ The application is a full-stack web application built with React, Vite, TypeScri
 - **Order & Notification System:** Admin email/push notifications for new orders/appointments, customer email/SMS/web push for status, and detailed order history.
 - **Authentication & Authorization:** JWT tokens in secure cookies, password reset, user settings, admin user management, three-tier role system (Customer, Groomer, Admin).
 - **Wishlist System:** Dedicated page with add/remove and quick "Add to Cart."
-- **Google Calendar & Contact Management:** Connected Google Calendar, unified calendar view, hybrid contact system with multi-pet support, automatic phone number extraction, event creation from contacts, and seamless multi-pet booking integration.
+- **Google Calendar & Contact Management:** Connected Google Calendar, unified calendar view, hybrid contact system with multi-pet support, automatic phone number extraction, event creation from contacts, seamless multi-pet booking integration, and auto-capitalization of contact names and pet names (first letter of each word).
 - **Groomer Management System:** Admin CRUD operations for groomers.
 - **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtered by species.
 - **Admin Order Management:** Displays actual product/pet and customer names in order details.
