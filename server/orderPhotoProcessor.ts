@@ -49,37 +49,38 @@ export async function extractOrderFromPhoto(
     const mimeType = getMimeType(imagePath);
 
     // Prepare the prompt for OpenAI Vision
-    const prompt = `You are analyzing a photo of a SUPPLIER ORDER INVOICE or PRODUCT LIST for a pet store. This is a table/list of products with prices.
+    const prompt = `You are analyzing a photo of a SUPPLIER ORDER INVOICE for a pet store. This document shows a table with the following columns from LEFT TO RIGHT:
 
-CRITICAL: You MUST extract EVERY SINGLE LINE ITEM visible in the document. Look for tables, lists, or rows of products.
+Column 1: "Item" - The product name
+Column 2: "Unit Cost" - The price for ONE unit (e.g., $2.13, $1.82, $4.20)
+Column 3: "Qty" - Quantity ordered (usually 12, 25, 30, 50, etc.)
+Column 4: "Qty Shipped" - Quantity shipped
+Column 5: "Item Total" - The total price (DO NOT USE THIS - we need Unit Cost only)
 
-For each product line, extract:
-1. Item name (the product name, e.g., "Marble Swordtail Reg", "Black Highfin Lyretail Reg")
-2. Quantity (how many units ordered - look for "Qty" column)
-3. Unit Cost/Price (the price PER UNIT - look for "Unit Cost" column, NOT the total)
-4. Brand name (if visible, otherwise empty string)
-5. Category - choose from: food, toys, beds, leashes, healthcare, accessories, aquatics, reptiles, birdSupplies, dogCages, smallAnimalSupplies
+YOUR TASK:
+1. Extract EVERY row from this table
+2. For each row, read: Item Name (column 1), Unit Cost (column 2), and Qty (column 3)
+3. The Unit Cost column contains dollar amounts like $2.13, $1.82, $4.20 - READ THESE CAREFULLY
+4. Extract the numeric value from Unit Cost (e.g., "$2.13" becomes 2.13)
 
-CRITICAL INSTRUCTIONS:
-- This is typically a TABULAR format with columns: Item Name, Unit Cost, Quantity, Total
-- Extract the UNIT COST/UNIT PRICE column (not the total)
-- If you see 50+ products, extract ALL of them - don't skip any
-- For aquatic/fish products, use category "aquatics"
-- For reptile products, use category "reptiles"
-- If unclear, use "accessories"
-- DO NOT return an empty items array - if you see a product list, extract it!
+CRITICAL EXTRACTION RULES:
+- Read the "Unit Cost" column (second column) very carefully - it shows prices like $2.13, $1.82, $4.20, etc.
+- DO NOT use the "Item Total" column (last column) - that's the total price, not unit price
+- If you cannot read a specific Unit Cost value, look more carefully - they are visible in the image
+- For aquatic/fish products (Swordtails, Tetras, Cichlids, Guppies, Mollies, Plecos, etc.), use category "aquatics"
+- Extract ALL rows - this invoice likely has 50-80+ items
 
-Example of what you might see:
-"Marble Swordtail Reg    $2.13    12    $25.56"
-Should become: {"itemName": "Marble Swordtail Reg", "quantity": 12, "unitPrice": 2.13, "category": "aquatics"}
+EXAMPLE ROW from the invoice:
+Visual: "Marble Swordtail Reg    $2.13    12    12    $25.56"
+Extract as: {"itemName": "Marble Swordtail Reg", "quantity": 12, "unitPrice": 2.13, "category": "aquatics", "brand": "", "notes": ""}
 
-Return ONLY valid JSON in this EXACT format (no markdown, no explanations):
+Return ONLY valid JSON in this EXACT format:
 {
   "items": [
     {
-      "itemName": "Product Name Here",
-      "quantity": 2,
-      "unitPrice": 15.99,
+      "itemName": "Marble Swordtail Reg",
+      "quantity": 12,
+      "unitPrice": 2.13,
       "brand": "",
       "category": "aquatics",
       "notes": ""
