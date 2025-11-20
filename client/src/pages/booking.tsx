@@ -116,8 +116,8 @@ export default function Booking() {
 
   // Handle contact selection
   const handleSelectContact = (contact: any) => {
-    // Pattern: "LastName PetName PhoneNumber GroomerTag"
-    // Example: "Diaz Oreo 3183344619"
+    // Pattern: "FirstName LastName"
+    // Example: "Angie Arnendariz"
     
     let contactName = contact.name || '';
     
@@ -130,15 +130,22 @@ export default function Booking() {
     // Split remaining parts
     const nameParts = contactName.split(/\s+/).filter(Boolean);
     
-    // First word is Last Name
-    const lastName = nameParts[0] || '';
+    // Parse as "FirstName LastName" format
+    let firstName = '';
+    let lastName = '';
     
-    // Remaining words (before phone/groomer tag) are Pet Name(s)
-    const fallbackPetName = nameParts.slice(1).join(' ') || '';
+    if (nameParts.length >= 2) {
+      // First word is firstName, second word is lastName
+      firstName = nameParts[0];
+      lastName = nameParts[1];
+    } else if (nameParts.length === 1) {
+      // Only one name provided - use as lastName
+      lastName = nameParts[0];
+    }
     
-    // Update owner info with last name only (no first name in this pattern)
+    // Update owner info with parsed names
     setOwnerInfo({
-      firstName: '',
+      firstName,
       lastName,
       phoneNumber: contact.phoneNumber || '',
     });
@@ -155,28 +162,16 @@ export default function Booking() {
       }));
       setPets(newPets);
       
+      const fullName = [firstName, lastName].filter(Boolean).join(' ');
       toast({
         title: "Contact Selected",
-        description: `Information populated for ${lastName} - ${contact.petNames.join(', ')}`,
-      });
-    } else if (fallbackPetName) {
-      // Fallback to old format (extract from name)
-      setPets([{
-        name: fallbackPetName,
-        type: 'Dog',
-        serviceType: '',
-        notes: '',
-        groomerId: '',
-      }]);
-      
-      toast({
-        title: "Contact Selected",
-        description: `Information populated for ${lastName} - ${fallbackPetName}`,
+        description: `Information populated for ${fullName} - ${contact.petNames.join(', ')}`,
       });
     } else {
+      const fullName = [firstName, lastName].filter(Boolean).join(' ');
       toast({
         title: "Contact Selected",
-        description: `Information populated for ${lastName}`,
+        description: `Information populated for ${fullName}`,
       });
     }
     
