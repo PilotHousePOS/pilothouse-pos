@@ -103,7 +103,7 @@ Return your response in this exact JSON format:
         }
       ],
       response_format: { type: "json_object" },
-      max_tokens: 4096,
+      max_completion_tokens: 4096,
     });
 
     const content = response.choices[0]?.message?.content;
