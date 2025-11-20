@@ -3,6 +3,24 @@ import fs from "fs";
 import path from "path";
 import { pdf } from "pdf-to-img";
 
+/**
+ * Apply .99 pricing rule to a price
+ * - If cents are 26-99: round to same dollar + .99 (e.g., $5.80 → $5.99)
+ * - If cents are 00-25: round to previous dollar + .99 (e.g., $5.25 → $4.99)
+ */
+export function apply99Pricing(price: number): number {
+  const dollars = Math.floor(price);
+  const cents = Math.round((price - dollars) * 100);
+  
+  if (cents >= 26) {
+    // Round to same dollar + .99
+    return dollars + 0.99;
+  } else {
+    // Round to previous dollar + .99
+    return Math.max(0, dollars - 1) + 0.99;
+  }
+}
+
 // Lazy initialization of OpenAI client to prevent startup crashes if credentials aren't configured
 let openaiClient: OpenAI | null = null;
 

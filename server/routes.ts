@@ -23,7 +23,7 @@ import { normalizePhoneNumber } from './phoneUtils';
 import { db } from './db';
 import { eq } from 'drizzle-orm';
 import { expandProductAbbreviations } from './abbreviationExpansion';
-import { extractOrderFromPhoto } from './orderPhotoProcessor';
+import { extractOrderFromPhoto, apply99Pricing } from './orderPhotoProcessor';
 
 // Helper function to capitalize first letter of each word
 function capitalizeWords(text: string | undefined | null): string | undefined | null {
@@ -4422,7 +4422,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           itemName: item.itemName,
           quantity: item.quantity,
           unitPrice: item.unitPrice.toString(),
-          markedUpPrice: (item.unitPrice * priceMultiplier).toFixed(2),
+          markedUpPrice: apply99Pricing(item.unitPrice * priceMultiplier).toFixed(2),
           category: item.category || "accessories",
           brand: item.brand || null,
           notes: item.notes || null,
@@ -4518,11 +4518,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const { itemName, quantity, unitPrice, markedUpPrice, category, brand, notes } = req.body;
       
+      // Apply .99 pricing rule to the marked-up price
+      const finalMarkedUpPrice = apply99Pricing(parseFloat(markedUpPrice)).toFixed(2);
+      
       const updatedItem = await storage.updateExtractedOrderItem(id, {
         itemName,
         quantity,
         unitPrice,
-        markedUpPrice,
+        markedUpPrice: finalMarkedUpPrice,
         category,
         brand,
         notes
