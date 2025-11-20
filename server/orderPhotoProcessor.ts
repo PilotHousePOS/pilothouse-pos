@@ -107,7 +107,11 @@ Return your response in this exact JSON format:
     });
 
     const content = response.choices[0]?.message?.content;
+    console.log("=== OpenAI Vision Response ===");
+    console.log("Raw content:", content);
+    
     if (!content) {
+      console.log("ERROR: No content in response");
       return {
         success: false,
         items: [],
@@ -116,8 +120,21 @@ Return your response in this exact JSON format:
     }
 
     // Parse the JSON response
-    const parsedData = JSON.parse(content);
+    let parsedData;
+    try {
+      parsedData = JSON.parse(content);
+      console.log("Parsed data:", JSON.stringify(parsedData, null, 2));
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
+      return {
+        success: false,
+        items: [],
+        error: "Failed to parse AI response"
+      };
+    }
+    
     const items: ExtractedItem[] = parsedData.items || [];
+    console.log(`Extracted ${items.length} items from AI response`);
 
     // Apply price multiplier to create marked-up prices
     const processedItems = items.map(item => ({
