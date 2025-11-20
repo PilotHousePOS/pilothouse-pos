@@ -1971,7 +1971,7 @@ function OrderPhotoUploadManager() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [priceMultiplier, setPriceMultiplier] = useState(1.5);
+  const [priceMultiplier, setPriceMultiplier] = useState<string | number>("1.5");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedPhotoId, setSelectedPhotoId] = useState<number | null>(null);
@@ -2114,7 +2114,8 @@ function OrderPhotoUploadManager() {
     if (!selectedFile) return;
     setIsProcessing(true);
     try {
-      await uploadPhotoMutation.mutateAsync({ file: selectedFile, multiplier: priceMultiplier });
+      const multiplier = typeof priceMultiplier === 'string' ? parseFloat(priceMultiplier) || 1.5 : priceMultiplier;
+      await uploadPhotoMutation.mutateAsync({ file: selectedFile, multiplier });
     } finally {
       setIsProcessing(false);
     }
@@ -2185,12 +2186,15 @@ function OrderPhotoUploadManager() {
                   max="10"
                   step="0.1"
                   value={priceMultiplier}
-                  onChange={(e) => setPriceMultiplier(parseFloat(e.target.value) || 1.5)}
+                  onChange={(e) => setPriceMultiplier(e.target.value)}
                   className="w-32 px-3 py-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
                   data-testid="input-price-multiplier"
                 />
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {((priceMultiplier - 1) * 100).toFixed(0)}% markup
+                  {(() => {
+                    const multiplier = typeof priceMultiplier === 'string' ? parseFloat(priceMultiplier) : priceMultiplier;
+                    return isNaN(multiplier) ? '0' : ((multiplier - 1) * 100).toFixed(0);
+                  })()}% markup
                 </span>
               </div>
             </div>
