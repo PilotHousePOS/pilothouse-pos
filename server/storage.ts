@@ -2249,13 +2249,29 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Order Photo operations
-  async getAllOrderPhotos(userId?: string): Promise<OrderPhoto[]> {
+  async getAllOrderPhotos(userId?: string): Promise<any[]> {
+    let photos: OrderPhoto[];
     if (userId) {
-      return await db.select().from(orderPhotos)
+      photos = await db.select().from(orderPhotos)
         .where(eq(orderPhotos.userId, userId))
         .orderBy(desc(orderPhotos.createdAt));
+    } else {
+      photos = await db.select().from(orderPhotos).orderBy(desc(orderPhotos.createdAt));
     }
-    return await db.select().from(orderPhotos).orderBy(desc(orderPhotos.createdAt));
+    
+    // Add item count for each photo
+    const photosWithCount = await Promise.all(
+      photos.map(async (photo) => {
+        const items = await db.select().from(extractedOrderItems)
+          .where(eq(extractedOrderItems.orderPhotoId, photo.id));
+        return {
+          ...photo,
+          itemCount: items.length
+        };
+      })
+    );
+    
+    return photosWithCount;
   }
 
   async getOrderPhoto(id: number): Promise<OrderPhoto | undefined> {

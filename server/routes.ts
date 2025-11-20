@@ -4343,7 +4343,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============================================
 
   // Upload order photo and extract items using AI Vision (Admin only)
-  app.post("/api/admin/order-photos", upload.single('orderPhoto'), authMiddleware, async (req: any, res) => {
+  app.post("/api/admin/order-photos", upload.single('photo'), authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin) {

@@ -63,7 +63,9 @@ import {
   Save,
   CheckCircle2,
   Home,
-  Type
+  Type,
+  Image,
+  Camera
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -1962,6 +1964,531 @@ interface BatchSearchResult {
   imageUrl: string | null;
   approved: boolean;
   error: string | null;
+}
+
+// Order Photo Upload Manager Component
+function OrderPhotoUploadManager() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [priceMultiplier, setPriceMultiplier] = useState(1.5);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedPhotoId, setSelectedPhotoId] = useState<number | null>(null);
+  const [editingItems, setEditingItems] = useState<Map<number, { name: string; quantity: number; unitPrice: number }>>(new Map());
+
+  // Fetch uploaded order photos
+  const { data: orderPhotos, isLoading: photosLoading, refetch: refetchPhotos } = useQuery({
+    queryKey: ['/api/admin/order-photos'],
+  });
+
+  // Fetch extracted items for selected photo
+  const { data: extractedItems, isLoading: itemsLoading, refetch: refetchItems } = useQuery({
+    queryKey: [`/api/admin/order-photos/${selectedPhotoId}`],
+    enabled: selectedPhotoId !== null,
+  });
+
+  // Upload and process photo mutation
+  const uploadPhotoMutation = useMutation({
+    mutationFn: async ({ file, multiplier }: { file: File; multiplier: number }) => {
+      const formData = new FormData();
+      formData.append('photo', file);
+      formData.append('priceMultiplier', multiplier.toString());
+
+      const response = await fetch('/api/admin/order-photos', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to upload photo');
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/order-photos'] });
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      toast({
+        title: "Success",
+        description: "Order photo processed successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update extracted item mutation
+  const updateItemMutation = useMutation({
+    mutationFn: async ({ id, data, multiplier }: { id: number; data: { name: string; quantity: number; unitPrice: number }; multiplier: number }) => {
+      await apiRequest('PUT', `/api/admin/extracted-items/${id}`, {
+        itemName: data.name,
+        quantity: data.quantity,
+        unitPrice: data.unitPrice.toString(),
+        markedUpPrice: (data.unitPrice * multiplier).toFixed(2)
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/admin/order-photos/${selectedPhotoId}`] });
+      toast({
+        title: "Success",
+        description: "Item updated successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Add items to inventory mutation
+  const addToInventoryMutation = useMutation({
+    mutationFn: async (itemIds: number[]) => {
+      await apiRequest('POST', '/api/admin/extracted-items/add-to-inventory', { itemIds });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/admin/order-photos/${selectedPhotoId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
+      toast({
+        title: "Success",
+        description: "Items added to inventory successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete photo mutation
+  const deletePhotoMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest('DELETE', `/api/admin/order-photos/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/order-photos'] });
+      if (selectedPhotoId) {
+        setSelectedPhotoId(null);
+      }
+      toast({
+        title: "Success",
+        description: "Photo deleted successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+    setIsProcessing(true);
+    try {
+      await uploadPhotoMutation.mutateAsync({ file: selectedFile, multiplier: priceMultiplier });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleUpdateItem = (id: number) => {
+    const editedData = editingItems.get(id);
+    const multiplier = parseFloat(extractedItems?.orderPhoto?.priceMultiplier || "1.0");
+    if (editedData) {
+      updateItemMutation.mutate({ id, data: editedData, multiplier });
+      const newMap = new Map(editingItems);
+      newMap.delete(id);
+      setEditingItems(newMap);
+    }
+  };
+
+  const handleAddToInventory = () => {
+    const items = extractedItems?.extractedItems || [];
+    const notAddedItems = items.filter((item: any) => !item.addedToInventory);
+    if (notAddedItems.length === 0) {
+      toast({
+        title: "Info",
+        description: "All items are already in inventory",
+      });
+      return;
+    }
+    const itemIds = notAddedItems.map((item: any) => item.id);
+    addToInventoryMutation.mutate(itemIds);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Upload Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Camera className="w-5 h-5" />
+            AI Order Photo Upload
+          </CardTitle>
+          <CardDescription>
+            Upload supplier order photos and extract items with AI vision (GPT-5)
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Info Banner */}
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-500 flex-shrink-0 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-semibold text-blue-800 dark:text-blue-300 mb-1">How It Works</p>
+                <ul className="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-400">
+                  <li>Upload photo of supplier order with item names, quantities, and prices</li>
+                  <li>AI extracts all items automatically using GPT-5 vision</li>
+                  <li>Review and edit extracted items before adding to inventory</li>
+                  <li>Price multiplier applies markup (e.g., 1.5 = 50% markup on wholesale)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Price Multiplier (Markup)</label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  step="0.1"
+                  value={priceMultiplier}
+                  onChange={(e) => setPriceMultiplier(parseFloat(e.target.value) || 1.5)}
+                  className="w-32 px-3 py-2 border rounded-md dark:bg-gray-800 dark:border-gray-700"
+                  data-testid="input-price-multiplier"
+                />
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {((priceMultiplier - 1) * 100).toFixed(0)}% markup
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <input
+                type="file"
+                accept="image/*"
+                id="order-photo-file"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+              <label
+                htmlFor="order-photo-file"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
+                data-testid="button-select-photo"
+              >
+                <Image className="w-4 h-4" />
+                Select Photo
+              </label>
+            </div>
+
+            {previewUrl && (
+              <div className="space-y-3">
+                <img
+                  src={previewUrl}
+                  alt="Order preview"
+                  className="max-w-full h-auto max-h-96 rounded-lg border dark:border-gray-700"
+                  data-testid="img-order-preview"
+                />
+                <Button
+                  onClick={handleUpload}
+                  disabled={isProcessing || !selectedFile}
+                  className="w-full"
+                  data-testid="button-upload-process"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Processing with AI...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Upload & Process with AI
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Uploaded Photos List */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <History className="w-5 h-5" />
+            Uploaded Order Photos
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {photosLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin" />
+            </div>
+          ) : !orderPhotos?.length ? (
+            <p className="text-center text-gray-500 dark:text-gray-400 py-8">
+              No order photos uploaded yet
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {orderPhotos.map((photo: any) => (
+                <div
+                  key={photo.id}
+                  className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                    selectedPhotoId === photo.id
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                  }`}
+                  onClick={() => setSelectedPhotoId(photo.id)}
+                  data-testid={`card-photo-${photo.id}`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium">
+                          {new Date(photo.uploadedAt).toLocaleDateString()}
+                        </span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                          {new Date(photo.uploadedAt).toLocaleTimeString()}
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        Multiplier: {photo.priceMultiplier}x • Items: {photo.itemCount || 0}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={photo.photoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                        onClick={(e) => e.stopPropagation()}
+                        data-testid={`link-view-photo-${photo.id}`}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </a>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm('Delete this photo and all extracted items?')) {
+                            deletePhotoMutation.mutate(photo.id);
+                          }
+                        }}
+                        data-testid={`button-delete-photo-${photo.id}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Extracted Items */}
+      {selectedPhotoId && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Extracted Items
+              </span>
+              {extractedItems?.extractedItems?.some((item: any) => !item.addedToInventory) && (
+                <Button
+                  onClick={handleAddToInventory}
+                  disabled={addToInventoryMutation.isPending}
+                  data-testid="button-add-all-to-inventory"
+                >
+                  <Package className="w-4 h-4 mr-2" />
+                  Add All to Inventory
+                </Button>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {itemsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin" />
+              </div>
+            ) : !extractedItems?.extractedItems?.length ? (
+              <p className="text-center text-gray-500 dark:text-gray-400 py-8">
+                No items extracted from this photo
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {extractedItems.extractedItems.map((item: any) => {
+                  const isEditing = editingItems.has(item.id);
+                  const editData = editingItems.get(item.id) || {
+                    name: item.name,
+                    quantity: item.quantity,
+                    unitPrice: item.unitPrice,
+                  };
+
+                  return (
+                    <div
+                      key={item.id}
+                      className={`p-4 border rounded-lg ${
+                        item.addedToInventory
+                          ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                          : 'border-gray-200 dark:border-gray-700'
+                      }`}
+                      data-testid={`item-${item.id}`}
+                    >
+                      {isEditing ? (
+                        <div className="space-y-3">
+                          <div>
+                            <label className="text-sm font-medium">Item Name</label>
+                            <input
+                              type="text"
+                              value={editData.name}
+                              onChange={(e) => {
+                                const newMap = new Map(editingItems);
+                                newMap.set(item.id, { ...editData, name: e.target.value });
+                                setEditingItems(newMap);
+                              }}
+                              className="w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:border-gray-700 mt-1"
+                              data-testid={`input-edit-name-${item.id}`}
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="text-sm font-medium">Quantity</label>
+                              <input
+                                type="number"
+                                min="1"
+                                value={editData.quantity}
+                                onChange={(e) => {
+                                  const newMap = new Map(editingItems);
+                                  newMap.set(item.id, { ...editData, quantity: parseInt(e.target.value) || 1 });
+                                  setEditingItems(newMap);
+                                }}
+                                className="w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:border-gray-700 mt-1"
+                                data-testid={`input-edit-quantity-${item.id}`}
+                              />
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium">Unit Price ($)</label>
+                              <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={editData.unitPrice}
+                                onChange={(e) => {
+                                  const newMap = new Map(editingItems);
+                                  newMap.set(item.id, { ...editData, unitPrice: parseFloat(e.target.value) || 0 });
+                                  setEditingItems(newMap);
+                                }}
+                                className="w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:border-gray-700 mt-1"
+                                data-testid={`input-edit-price-${item.id}`}
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handleUpdateItem(item.id)}
+                              disabled={updateItemMutation.isPending}
+                              data-testid={`button-save-${item.id}`}
+                            >
+                              <Save className="w-4 h-4 mr-1" />
+                              Save
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                const newMap = new Map(editingItems);
+                                newMap.delete(item.id);
+                                setEditingItems(newMap);
+                              }}
+                              data-testid={`button-cancel-${item.id}`}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="font-medium mb-1">{item.name}</div>
+                            <div className="text-sm text-gray-600 dark:text-gray-400">
+                              Quantity: {item.quantity} • Price: ${item.unitPrice.toFixed(2)}
+                              {item.addedToInventory && (
+                                <span className="ml-2 text-green-600 dark:text-green-400 font-medium">
+                                  ✓ Added to Inventory
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {!item.addedToInventory && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                const newMap = new Map(editingItems);
+                                newMap.set(item.id, {
+                                  name: item.name,
+                                  quantity: item.quantity,
+                                  unitPrice: item.unitPrice,
+                                });
+                                setEditingItems(newMap);
+                              }}
+                              data-testid={`button-edit-${item.id}`}
+                            >
+                              <Edit className="w-4 h-4 mr-1" />
+                              Edit
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
 }
 
 // Product Image Manager Component
@@ -5840,6 +6367,12 @@ export default function Admin() {
               Contacts
             </TabsTrigger>
             {typedUser?.isAdmin && (
+              <TabsTrigger value="order-photos" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                <span className="hidden lg:inline">Order Photos</span>
+                <span className="lg:hidden">Photos</span>
+              </TabsTrigger>
+            )}
+            {typedUser?.isAdmin && (
               <TabsTrigger value="database" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 Database
               </TabsTrigger>
@@ -7723,6 +8256,10 @@ export default function Admin() {
 
         <TabsContent value="product-images" className="space-y-6">
           <ProductImageManager />
+        </TabsContent>
+
+        <TabsContent value="order-photos" className="space-y-6">
+          <OrderPhotoUploadManager />
         </TabsContent>
 
         <TabsContent value="database" className="space-y-6">
