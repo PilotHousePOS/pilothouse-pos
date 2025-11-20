@@ -633,6 +633,7 @@ export type InsertGroomingScheduleEntry = z.infer<typeof insertGroomingScheduleE
 export const orderPhotos = pgTable("order_photos", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").notNull().references(() => users.id),
+  name: varchar("name", { length: 255 }), // Optional user-defined name/label for the order
   imageUrl: varchar("image_url", { length: 500 }).notNull(),
   priceMultiplier: decimal("price_multiplier", { precision: 5, scale: 2 }).notNull().default("1.00"), // Markup multiplier (e.g., 1.5 = 50% markup)
   status: varchar("status", { length: 50 }).default("processing"), // processing, completed, error

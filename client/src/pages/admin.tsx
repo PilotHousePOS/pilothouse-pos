@@ -1975,7 +1975,9 @@ function OrderPhotoUploadManager() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedPhotoId, setSelectedPhotoId] = useState<number | null>(null);
-  const [editingItems, setEditingItems] = useState<Map<number, { name: string; quantity: number; unitPrice: number; markedUpPrice: number }>>(new Map());
+  const [editingItems, setEditingItems] = useState<Map<number, { itemName: string; quantity: number; unitPrice: number; markedUpPrice: number }>>(new Map());
+  const [editingPhotoName, setEditingPhotoName] = useState<number | null>(null);
+  const [photoNameInput, setPhotoNameInput] = useState<string>('');
 
   // Fetch uploaded order photos
   const { data: orderPhotos, isLoading: photosLoading, refetch: refetchPhotos } = useQuery({
@@ -2108,6 +2110,29 @@ function OrderPhotoUploadManager() {
       toast({
         title: "Success",
         description: "Item deleted successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update photo name mutation
+  const updatePhotoNameMutation = useMutation({
+    mutationFn: async ({ id, name }: { id: number; name: string }) => {
+      await apiRequest('PUT', `/api/admin/order-photos/${id}`, { name });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/order-photos'] });
+      setEditingPhotoName(null);
+      setPhotoNameInput('');
+      toast({
+        title: "Success",
+        description: "Order name updated successfully",
       });
     },
     onError: (error: Error) => {
@@ -2311,14 +2336,71 @@ function OrderPhotoUploadManager() {
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium">
-                          {new Date(photo.uploadedAt).toLocaleDateString()}
-                        </span>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                          {new Date(photo.uploadedAt).toLocaleTimeString()}
-                        </span>
-                      </div>
+                      {editingPhotoName === photo.id ? (
+                        <div className="flex items-center gap-2 mb-1">
+                          <input
+                            type="text"
+                            value={photoNameInput}
+                            onChange={(e) => setPhotoNameInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                updatePhotoNameMutation.mutate({ id: photo.id, name: photoNameInput });
+                              } else if (e.key === 'Escape') {
+                                setEditingPhotoName(null);
+                                setPhotoNameInput('');
+                              }
+                            }}
+                            className="flex-1 px-2 py-1 text-sm border rounded dark:bg-gray-800 dark:border-gray-700"
+                            placeholder="Enter order name..."
+                            autoFocus
+                            onClick={(e) => e.stopPropagation()}
+                            data-testid={`input-photo-name-${photo.id}`}
+                          />
+                          <Button
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updatePhotoNameMutation.mutate({ id: photo.id, name: photoNameInput });
+                            }}
+                            disabled={updatePhotoNameMutation.isPending}
+                            data-testid={`button-save-photo-name-${photo.id}`}
+                          >
+                            <Save className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingPhotoName(null);
+                              setPhotoNameInput('');
+                            }}
+                            data-testid={`button-cancel-photo-name-${photo.id}`}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium">
+                            {photo.name || `Order ${new Date(photo.createdAt).toLocaleDateString()}`}
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingPhotoName(photo.id);
+                              setPhotoNameInput(photo.name || `Order ${new Date(photo.createdAt).toLocaleDateString()}`);
+                            }}
+                            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                            data-testid={`button-edit-photo-name-${photo.id}`}
+                          >
+                            <Edit className="w-3 h-3" />
+                          </button>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            {new Date(photo.createdAt).toLocaleTimeString()}
+                          </span>
+                        </div>
+                      )}
                       <div className="text-sm text-gray-600 dark:text-gray-400">
                         Multiplier: {photo.priceMultiplier}x • Items: {photo.itemCount || 0}
                       </div>

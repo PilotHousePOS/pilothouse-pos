@@ -4562,6 +4562,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update an order photo (Admin only)
+  app.put("/api/admin/order-photos/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const { name } = req.body;
+      
+      const updatedPhoto = await storage.updateOrderPhoto(id, { name });
+      res.json(updatedPhoto);
+    } catch (error) {
+      console.error("Error updating order photo:", error);
+      res.status(500).json({ message: "Failed to update order photo" });
+    }
+  });
+
   // Update an extracted order item (Admin only)
   app.put("/api/admin/extracted-items/:id", authMiddleware, async (req: any, res) => {
     try {
