@@ -7,7 +7,7 @@ import { SUPPLY_FILTERS, FilterType } from './filterConfig';
 import type { Supply } from '@shared/schema';
 
 export interface CategorizationResult {
-  filterType: 'aquatic' | 'reptile' | null;
+  filterType: 'aquatic' | 'reptile' | 'smallanimal' | null;
   confidence: number; // 0-100
   reason: string;
 }
@@ -31,17 +31,20 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   
   let aquaticScore = 0;
   let reptileScore = 0;
+  let smallAnimalScore = 0;
   const matchedReasons: string[] = [];
 
   // **THREE-TIER EXCLUSION SYSTEM:**
-  // 1. Hard exclusions (toy brands): Excluded from BOTH categories → immediately return null
+  // 1. Hard exclusions (toy brands): Excluded from ALL categories → immediately return null
   // 2. Soft exclusions (pure category brands): Brand doesn't score, but keywords can
   // 3. Cross-category brands (ZooMed): Not excluded, both brand and keywords score
   
   let brandExcludedFromAquatic = false;
   let brandExcludedFromReptile = false;
+  let brandExcludedFromSmallAnimal = false;
   let keywordExcludedFromAquatic = false;
   let keywordExcludedFromReptile = false;
+  let keywordExcludedFromSmallAnimal = false;
 
   // Check brand exclusions (for brand scoring only)
   for (const excludeBrand of SUPPLY_FILTERS.aquatic.excludeBrands) {
@@ -62,13 +65,22 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
     }
   }
 
-  // **HARD STOP: If brand excluded from BOTH categories (toy brands), immediately return null**
+  for (const excludeBrand of SUPPLY_FILTERS.smallanimal.excludeBrands) {
+    const normalizedExclude = normalizeBrand(excludeBrand);
+    if (brand.includes(normalizedExclude)) {
+      brandExcludedFromSmallAnimal = true;
+      matchedReasons.push(`Brand excluded from small animal: ${excludeBrand}`);
+      break;
+    }
+  }
+
+  // **HARD STOP: If brand excluded from ALL categories (toy brands), immediately return null**
   // This prevents Kong "Frog Toy" from scoring reptile points via "frog" keyword
-  if (brandExcludedFromAquatic && brandExcludedFromReptile) {
+  if (brandExcludedFromAquatic && brandExcludedFromReptile && brandExcludedFromSmallAnimal) {
     return {
       filterType: null,
       confidence: 0,
-      reason: `Hard exclusion: ${matchedReasons.join(', ')} - toy brand never categorized as aquatic/reptile`
+      reason: `Hard exclusion: ${matchedReasons.join(', ')} - toy brand never categorized`
     };
   }
 
@@ -85,6 +97,14 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
     if (name.includes(keyword.toLowerCase()) || description.includes(keyword.toLowerCase())) {
       keywordExcludedFromReptile = true;
       matchedReasons.push(`Keyword excluded from reptile: "${keyword}"`);
+      break;
+    }
+  }
+
+  for (const keyword of SUPPLY_FILTERS.smallanimal.excludeKeywords) {
+    if (name.includes(keyword.toLowerCase()) || description.includes(keyword.toLowerCase())) {
+      keywordExcludedFromSmallAnimal = true;
+      matchedReasons.push(`Keyword excluded from small animal: "${keyword}"`);
       break;
     }
   }
@@ -113,6 +133,18 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
     }
   }
 
+  // Check small animal keywords in name (highest priority - 60 points)
+  // ONLY blocked by keyword exclusions, NOT brand exclusions
+  if (!keywordExcludedFromSmallAnimal) {
+    for (const keyword of SUPPLY_FILTERS.smallanimal.includeKeywords) {
+      if (name.includes(keyword.toLowerCase())) {
+        smallAnimalScore += 60;
+        matchedReasons.push(`Small animal keyword: "${keyword}"`);
+        break; // Only count once
+      }
+    }
+  }
+
   // Check aquatic brands (40 points) - blocked by BRAND exclusions
   if (!brandExcludedFromAquatic) {
     for (const aquaticBrand of SUPPLY_FILTERS.aquatic.includeBrands) {
@@ -130,6 +162,17 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
       if (brand === normalizeBrand(reptileBrand)) {
         reptileScore += 40;
         matchedReasons.push(`Reptile brand: ${reptileBrand}`);
+        break;
+      }
+    }
+  }
+
+  // Check small animal brands (40 points) - blocked by BRAND exclusions
+  if (!brandExcludedFromSmallAnimal) {
+    for (const smallAnimalBrand of SUPPLY_FILTERS.smallanimal.includeBrands) {
+      if (brand === normalizeBrand(smallAnimalBrand)) {
+        smallAnimalScore += 40;
+        matchedReasons.push(`Small animal brand: ${smallAnimalBrand}`);
         break;
       }
     }
@@ -177,19 +220,35 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
     }
   }
 
+  // Check small animal keywords in description (medium priority - 15 points)
+  // ONLY blocked by keyword exclusions, NOT brand exclusions
+  if (!keywordExcludedFromSmallAnimal) {
+    for (const keyword of SUPPLY_FILTERS.smallanimal.includeKeywords) {
+      if (description.includes(keyword.toLowerCase())) {
+        smallAnimalScore += 15;
+        matchedReasons.push(`Small animal description: "${keyword}"`);
+        break; // Only count once
+      }
+    }
+  }
+
   // Determine result based on scores
   const minConfidence = 25; // Minimum score to assign a category
   
-  if (aquaticScore >= minConfidence && aquaticScore > reptileScore) {
+  // Find the highest score among all categories
+  const scores = [
+    { type: 'aquatic' as const, score: aquaticScore },
+    { type: 'reptile' as const, score: reptileScore },
+    { type: 'smallanimal' as const, score: smallAnimalScore }
+  ];
+  
+  scores.sort((a, b) => b.score - a.score);
+  const winner = scores[0];
+  
+  if (winner.score >= minConfidence) {
     return {
-      filterType: 'aquatic',
-      confidence: Math.min(100, aquaticScore),
-      reason: matchedReasons.join(', ')
-    };
-  } else if (reptileScore >= minConfidence && reptileScore > aquaticScore) {
-    return {
-      filterType: 'reptile',
-      confidence: Math.min(100, reptileScore),
+      filterType: winner.type,
+      confidence: Math.min(100, winner.score),
       reason: matchedReasons.join(', ')
     };
   } else {
@@ -197,8 +256,8 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
       filterType: null,
       confidence: 0,
       reason: matchedReasons.length > 0 
-        ? `${matchedReasons.join(', ')} (scores: aquatic=${aquaticScore}, reptile=${reptileScore})`
-        : 'No specific fish/reptile indicators found'
+        ? `${matchedReasons.join(', ')} (scores: aquatic=${aquaticScore}, reptile=${reptileScore}, small animal=${smallAnimalScore})`
+        : 'No specific category indicators found'
     };
   }
 }

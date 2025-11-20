@@ -10,7 +10,7 @@ export interface FilterConfig {
   excludeKeywords: string[];
 }
 
-export type FilterType = 'reptile' | 'aquatic';
+export type FilterType = 'reptile' | 'aquatic' | 'smallanimal';
 
 export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
   reptile: {
@@ -56,6 +56,32 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
     excludeKeywords: [
       'gecko', 'lizard', 'snake', 'bearded dragon', 'iguana',
       'reptile', 'terrarium', 'vivarium', 'repti', 'dog toy', 'cat toy', 'pet toy'
+    ]
+  },
+  smallanimal: {
+    // Small animal specialized brands
+    // Oxbow: Premium small animal nutrition and hay specialist
+    // Kaytee: Leading small animal bedding, food, and habitat brand
+    // Living World: Small pet supplies and accessories
+    // Vitakraft: German small animal treats and food
+    // Supreme: Science Selective small animal nutrition
+    // Small Pet Select: Premium hay and bedding
+    includeBrands: ['Oxbow', 'Kaytee', 'Living World', 'Vitakraft', 'Supreme', 'Small Pet Select', "Brown's"],
+    includeKeywords: [
+      'mouse', 'mice', 'ferret', 'chinchilla', 'hamster', 'rabbit', 'bunny',
+      'guinea pig', 'gerbil', 'rat', 'hedgehog', 'sugar glider',
+      'small animal', 'small pet', 'rodent', 'pocket pet',
+      'cage', 'hutch', 'bedding', 'timothy hay', 'alfalfa hay'
+    ],
+    // Exclude brands specific to other categories
+    excludeBrands: [
+      'Tetra', 'Aqueon', 'GloFish', 'Marineland', 'API', 'Fluval', 'SeaChem', 'Hikari',
+      'Exo Terra', 'Zilla', "Fluker's", 'ReptiCare',
+      'Kong', 'Nylabone', 'Chuckit!', 'Outward Hound', 'ZippyPaws', 'KONG'
+    ],
+    excludeKeywords: [
+      'fish', 'aquarium', 'aquatic', 'gecko', 'lizard', 'snake', 'reptile',
+      'dog toy', 'cat toy', 'pet toy', 'dog', 'cat', 'puppy', 'kitten'
     ]
   }
 };

@@ -4676,6 +4676,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             category = 'fish'; // Aquatic items are fish supplies
           } else if (categorizationResult.filterType === 'reptile') {
             category = 'reptile'; // Reptile items
+          } else if (categorizationResult.filterType === 'smallanimal') {
+            category = 'smallanimal'; // Small animal items (mice, ferrets, rabbits, etc.)
           }
 
           // Create supply from extracted item with auto-categorization applied
