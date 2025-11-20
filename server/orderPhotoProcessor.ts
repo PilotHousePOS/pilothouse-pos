@@ -184,7 +184,8 @@ function getMimeType(filePath: string): string {
     '.jpeg': 'image/jpeg',
     '.png': 'image/png',
     '.gif': 'image/gif',
-    '.webp': 'image/webp'
+    '.webp': 'image/webp',
+    '.pdf': 'application/pdf'
   };
   return mimeTypes[ext] || 'image/jpeg';
 }

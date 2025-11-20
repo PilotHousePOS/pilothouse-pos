@@ -2198,7 +2198,7 @@ function OrderPhotoUploadManager() {
             <div>
               <input
                 type="file"
-                accept="image/*"
+                accept="image/*,application/pdf"
                 id="order-photo-file"
                 className="hidden"
                 onChange={handleFileChange}
@@ -2209,18 +2209,28 @@ function OrderPhotoUploadManager() {
                 data-testid="button-select-photo"
               >
                 <Image className="w-4 h-4" />
-                Select Photo
+                Select Photo or PDF
               </label>
             </div>
 
             {previewUrl && (
               <div className="space-y-3">
-                <img
-                  src={previewUrl}
-                  alt="Order preview"
-                  className="max-w-full h-auto max-h-96 rounded-lg border dark:border-gray-700"
-                  data-testid="img-order-preview"
-                />
+                {selectedFile?.type === 'application/pdf' ? (
+                  <div className="p-6 border rounded-lg dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-center">
+                    <FileText className="w-16 h-16 mx-auto mb-3 text-gray-400" />
+                    <p className="font-medium">{selectedFile.name}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      PDF selected - Ready to process
+                    </p>
+                  </div>
+                ) : (
+                  <img
+                    src={previewUrl}
+                    alt="Order preview"
+                    className="max-w-full h-auto max-h-96 rounded-lg border dark:border-gray-700"
+                    data-testid="img-order-preview"
+                  />
+                )}
                 <Button
                   onClick={handleUpload}
                   disabled={isProcessing || !selectedFile}
