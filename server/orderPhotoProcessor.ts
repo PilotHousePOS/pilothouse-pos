@@ -2,12 +2,27 @@ import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
 
-// This is using Replit's AI Integrations service, which provides OpenAI-compatible API access without requiring your own OpenAI API key.
-// the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
-const openai = new OpenAI({
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY
-});
+// Lazy initialization of OpenAI client to prevent startup crashes if credentials aren't configured
+let openaiClient: OpenAI | null = null;
+
+function getOpenAIClient(): OpenAI {
+  if (!openaiClient) {
+    // Check if credentials are available
+    if (!process.env.AI_INTEGRATIONS_OPENAI_API_KEY) {
+      throw new Error(
+        "OpenAI API credentials not configured. Please set up the OpenAI integration in your Replit project."
+      );
+    }
+    
+    // This is using Replit's AI Integrations service, which provides OpenAI-compatible API access without requiring your own OpenAI API key.
+    // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
+    openaiClient = new OpenAI({
+      baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+      apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY
+    });
+  }
+  return openaiClient;
+}
 
 export interface ExtractedItem {
   itemName: string;
@@ -73,6 +88,7 @@ Return your response in this exact JSON format:
 
     // Call OpenAI Vision API
     // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
+    const openai = getOpenAIClient();
     const response = await openai.chat.completions.create({
       model: "gpt-5",
       messages: [
