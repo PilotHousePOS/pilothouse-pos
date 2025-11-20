@@ -7,15 +7,9 @@ let openaiClient: OpenAI | null = null;
 
 function getOpenAIClient(): OpenAI {
   if (!openaiClient) {
-    // Check if credentials are available
-    if (!process.env.AI_INTEGRATIONS_OPENAI_API_KEY) {
-      throw new Error(
-        "OpenAI API credentials not configured. Please set up the OpenAI integration in your Replit project."
-      );
-    }
-    
     // This is using Replit's AI Integrations service, which provides OpenAI-compatible API access without requiring your own OpenAI API key.
     // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
+    // Note: AI_INTEGRATIONS_OPENAI_API_KEY is a dummy value for SDK compatibility - don't check if it exists
     openaiClient = new OpenAI({
       baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
       apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY
