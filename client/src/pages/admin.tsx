@@ -2369,7 +2369,7 @@ function OrderPhotoUploadManager() {
                   const editData = editingItems.get(item.id) || {
                     itemName: item.itemName,
                     quantity: item.quantity,
-                    unitPrice: item.unitPrice,
+                    unitPrice: parseFloat(item.unitPrice || 0),
                   };
 
                   return (
@@ -2460,7 +2460,7 @@ function OrderPhotoUploadManager() {
                           <div className="flex-1">
                             <div className="font-medium mb-1">{item.itemName}</div>
                             <div className="text-sm text-gray-600 dark:text-gray-400">
-                              Quantity: {item.quantity} • Price: ${typeof item.unitPrice === 'number' ? item.unitPrice.toFixed(2) : '0.00'}
+                              Quantity: {item.quantity} • Price: ${parseFloat(item.unitPrice || 0).toFixed(2)}
                               {item.addedToInventory && (
                                 <span className="ml-2 text-green-600 dark:text-green-400 font-medium">
                                   ✓ Added to Inventory
@@ -2477,7 +2477,7 @@ function OrderPhotoUploadManager() {
                                 newMap.set(item.id, {
                                   itemName: item.itemName,
                                   quantity: item.quantity,
-                                  unitPrice: item.unitPrice,
+                                  unitPrice: parseFloat(item.unitPrice || 0),
                                 });
                                 setEditingItems(newMap);
                               }}
