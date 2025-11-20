@@ -24,6 +24,7 @@ import { db } from './db';
 import { eq } from 'drizzle-orm';
 import { expandProductAbbreviations } from './abbreviationExpansion';
 import { extractOrderFromPhoto, apply99Pricing } from './orderPhotoProcessor';
+import { categorizeProduct } from './productCategorization';
 
 // Helper function to capitalize first letter of each word
 function capitalizeWords(text: string | undefined | null): string | undefined | null {
@@ -4639,15 +4640,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
             continue;
           }
 
-          // Create supply from extracted item
+          // Apply auto-categorization to determine filterType and category
+          const categorizationResult = categorizeProduct({
+            name: extractedItem.itemName,
+            brand: extractedItem.brand || '',
+            description: extractedItem.notes || ''
+          });
+
+          // Determine category based on filterType or fall back to extracted category
+          let category = extractedItem.category || "accessories";
+          if (categorizationResult.filterType === 'aquatic') {
+            category = 'fish'; // Aquatic items are fish supplies
+          } else if (categorizationResult.filterType === 'reptile') {
+            category = 'reptile'; // Reptile items
+          }
+
+          // Create supply from extracted item with auto-categorization applied
           const supply = await storage.createSupply({
             name: extractedItem.itemName,
-            category: extractedItem.category || "accessories",
+            category: category,
             brand: extractedItem.brand || null,
             price: extractedItem.markedUpPrice,
             description: extractedItem.notes || null,
             stockQuantity: extractedItem.quantity,
-            isActive: true
+            isActive: true,
+            filterType: categorizationResult.filterType // Set filterType for aquatic/reptile specialty sections
           });
 
           // Mark item as added to inventory

@@ -43,7 +43,9 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
     includeKeywords: [
       'fish', 'aquarium', 'aquatic', 'betta', 'glo fish', 'goldfish',
       'tropical fish', 'freshwater', 'saltwater', 'reef', 'marine', 'koi',
-      'cichlid', 'tetra', 'guppy', 'molly', 'platy', 'pleco', 'plecostomus'
+      'cichlid', 'tetra', 'guppy', 'molly', 'platy', 'pleco', 'plecostomus',
+      'swordtail', 'angelfish', 'barb', 'danio', 'rasbora', 'loach', 'catfish',
+      'corydoras', 'cory', 'shrimp', 'snail', 'crab'
     ],
     // Exclude ONLY pure reptile brands and toy brands (NOT cross-category brands like ZooMed)
     // ZooMed removed - they make both aquatic AND reptile products
