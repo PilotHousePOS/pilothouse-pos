@@ -606,3 +606,52 @@ export const insertScheduleEntrySchema = createInsertSchema(scheduleEntries).omi
 
 export type ScheduleEntry = typeof scheduleEntries.$inferSelect;
 export type InsertScheduleEntry = z.infer<typeof insertScheduleEntrySchema>;
+
+// Order Photo Uploads - AI-powered order extraction from photos
+export const orderPhotos = pgTable("order_photos", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  imageUrl: varchar("image_url", { length: 500 }).notNull(),
+  priceMultiplier: decimal("price_multiplier", { precision: 5, scale: 2 }).notNull().default("1.00"), // Markup multiplier (e.g., 1.5 = 50% markup)
+  status: varchar("status", { length: 50 }).default("processing"), // processing, completed, error
+  aiResponse: text("ai_response"), // Raw AI response for debugging
+  errorMessage: text("error_message"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Extracted items from order photos
+export const extractedOrderItems = pgTable("extracted_order_items", {
+  id: serial("id").primaryKey(),
+  orderPhotoId: integer("order_photo_id").notNull().references(() => orderPhotos.id, { onDelete: "cascade" }),
+  itemName: varchar("item_name", { length: 255 }).notNull(),
+  quantity: integer("quantity").notNull().default(1),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(), // Original price from photo
+  markedUpPrice: decimal("marked_up_price", { precision: 10, scale: 2 }).notNull(), // Price after markup
+  category: varchar("category", { length: 100 }), // Auto-suggested category
+  brand: varchar("brand", { length: 255 }), // Auto-extracted brand
+  notes: text("notes"), // Any special notes about the item
+  addedToInventory: boolean("added_to_inventory").default(false), // Whether it's been added to supplies
+  supplyId: integer("supply_id").references(() => supplies.id), // If added to inventory, reference to the supply
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Order photo schemas
+export const insertOrderPhotoSchema = createInsertSchema(orderPhotos).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type OrderPhoto = typeof orderPhotos.$inferSelect;
+export type InsertOrderPhoto = z.infer<typeof insertOrderPhotoSchema>;
+
+export const insertExtractedOrderItemSchema = createInsertSchema(extractedOrderItems).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type ExtractedOrderItem = typeof extractedOrderItems.$inferSelect;
+export type InsertExtractedOrderItem = z.infer<typeof insertExtractedOrderItemSchema>;
