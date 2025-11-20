@@ -1975,7 +1975,7 @@ function OrderPhotoUploadManager() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedPhotoId, setSelectedPhotoId] = useState<number | null>(null);
-  const [editingItems, setEditingItems] = useState<Map<number, { name: string; quantity: number; unitPrice: number }>>(new Map());
+  const [editingItems, setEditingItems] = useState<Map<number, { name: string; quantity: number; unitPrice: number; markedUpPrice: number }>>(new Map());
 
   // Fetch uploaded order photos
   const { data: orderPhotos, isLoading: photosLoading, refetch: refetchPhotos } = useQuery({
@@ -2028,12 +2028,12 @@ function OrderPhotoUploadManager() {
 
   // Update extracted item mutation
   const updateItemMutation = useMutation({
-    mutationFn: async ({ id, data, multiplier }: { id: number; data: { itemName: string; quantity: number; unitPrice: number }; multiplier: number }) => {
+    mutationFn: async ({ id, data }: { id: number; data: { itemName: string; quantity: number; unitPrice: number; markedUpPrice: number } }) => {
       await apiRequest('PUT', `/api/admin/extracted-items/${id}`, {
         itemName: data.itemName,
         quantity: data.quantity,
         unitPrice: data.unitPrice.toString(),
-        markedUpPrice: (data.unitPrice * multiplier).toFixed(2)
+        markedUpPrice: data.markedUpPrice.toString()
       });
     },
     onSuccess: () => {
@@ -2123,9 +2123,8 @@ function OrderPhotoUploadManager() {
 
   const handleUpdateItem = (id: number) => {
     const editedData = editingItems.get(id);
-    const multiplier = parseFloat(extractedItems?.orderPhoto?.priceMultiplier || "1.0");
     if (editedData) {
-      updateItemMutation.mutate({ id, data: editedData, multiplier });
+      updateItemMutation.mutate({ id, data: editedData });
       const newMap = new Map(editingItems);
       newMap.delete(id);
       setEditingItems(newMap);
@@ -2374,6 +2373,7 @@ function OrderPhotoUploadManager() {
                     itemName: item.itemName,
                     quantity: item.quantity,
                     unitPrice: parseFloat(item.unitPrice || 0),
+                    markedUpPrice: parseFloat(item.markedUpPrice || 0),
                   };
 
                   return (
@@ -2402,7 +2402,7 @@ function OrderPhotoUploadManager() {
                               data-testid={`input-edit-name-${item.id}`}
                             />
                           </div>
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="grid grid-cols-3 gap-3">
                             <div>
                               <label className="text-sm font-medium">Quantity</label>
                               <input
@@ -2419,7 +2419,7 @@ function OrderPhotoUploadManager() {
                               />
                             </div>
                             <div>
-                              <label className="text-sm font-medium">Unit Price ($)</label>
+                              <label className="text-sm font-medium">Unit Cost ($)</label>
                               <input
                                 type="number"
                                 min="0"
@@ -2432,6 +2432,22 @@ function OrderPhotoUploadManager() {
                                 }}
                                 className="w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:border-gray-700 mt-1"
                                 data-testid={`input-edit-price-${item.id}`}
+                              />
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium">Final Retail ($)</label>
+                              <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={editData.markedUpPrice}
+                                onChange={(e) => {
+                                  const newMap = new Map(editingItems);
+                                  newMap.set(item.id, { ...editData, markedUpPrice: parseFloat(e.target.value) || 0 });
+                                  setEditingItems(newMap);
+                                }}
+                                className="w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:border-gray-700 mt-1"
+                                data-testid={`input-edit-retail-price-${item.id}`}
                               />
                             </div>
                           </div>
@@ -2482,6 +2498,7 @@ function OrderPhotoUploadManager() {
                                   itemName: item.itemName,
                                   quantity: item.quantity,
                                   unitPrice: parseFloat(item.unitPrice || 0),
+                                  markedUpPrice: parseFloat(item.markedUpPrice || 0),
                                 });
                                 setEditingItems(newMap);
                               }}
