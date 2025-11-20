@@ -5044,10 +5044,16 @@ export default function Admin() {
         }
       }
     } else {
-      // Regular contact - split name normally
-      const nameParts = (contact.name || '').split(' ');
-      firstName = nameParts[0] || '';
-      lastName = nameParts.slice(1).join(' ') || '';
+      // Regular contact - name is stored as "FirstName LastName" format
+      const nameParts = (contact.name || '').trim().split(/\s+/);
+      if (nameParts.length >= 2) {
+        // Has both first and last name
+        firstName = nameParts[0];
+        lastName = nameParts.slice(1).join(' ');
+      } else if (nameParts.length === 1) {
+        // Only one name - put it in last name to match expected behavior
+        lastName = nameParts[0];
+      }
     }
     
     setBookingOwnerInfo({
