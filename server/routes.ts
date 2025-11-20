@@ -2536,7 +2536,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Capitalize first letter of each word in name and pet names
       const capitalizedName = capitalizeWords(trimmedName);
       // petNames should be an array in the database
-      const capitalizedPetNames = petNames ? [capitalizeWords(petNames) as string] : null;
+      const trimmedPetNames = petNames?.trim();
+      const capitalizedPetNames = trimmedPetNames ? [capitalizeWords(trimmedPetNames) as string] : null;
 
       const contact = await storage.createContact({ 
         name: capitalizedName as string, 
@@ -2583,7 +2584,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Capitalize first letter of each word in name and pet names
       const capitalizedName = trimmedName ? capitalizeWords(trimmedName) : undefined;
       // petNames should be an array in the database
-      const capitalizedPetNames = petNames !== undefined ? (petNames ? [capitalizeWords(petNames) as string] : null) : undefined;
+      const trimmedPetNamesUpdate = petNames?.trim();
+      const capitalizedPetNames = petNames !== undefined ? (trimmedPetNamesUpdate ? [capitalizeWords(trimmedPetNamesUpdate) as string] : null) : undefined;
       
       const contact = await storage.updateContact(id, { 
         name: capitalizedName as string | undefined, 
