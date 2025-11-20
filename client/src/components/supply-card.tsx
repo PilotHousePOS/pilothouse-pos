@@ -253,13 +253,21 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
 
           {/* Product Details */}
           <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="font-semibold">Brand:</span>
-              <span>{supply.brand}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-semibold">Category:</span>
-              <span className="capitalize">{supply.category}</span>
+            {supply.brand && (
+              <div className="flex justify-between">
+                <span className="font-semibold">Brand:</span>
+                <span>{supply.brand}</span>
+              </div>
+            )}
+            <div className="flex gap-6">
+              <div>
+                <span className="font-semibold">Category: </span>
+                <span className="capitalize">{supply.category}</span>
+              </div>
+              <div>
+                <span className="font-semibold">Price: </span>
+                <span className="text-brand-red font-bold text-lg">${supply.price}</span>
+              </div>
             </div>
             {supply.weight && (
               <div className="flex justify-between">
@@ -273,17 +281,13 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
                 <span>{supply.size}</span>
               </div>
             )}
-            <div className="flex justify-between">
-              <span className="font-semibold">Price:</span>
-              <span className="text-brand-red font-bold text-lg">${supply.price}</span>
-            </div>
             {supply.description && (
               <div>
                 <span className="font-semibold">Description:</span>
                 <p className="text-gray-600 mt-1">{supply.description}</p>
               </div>
             )}
-            <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
               <span className="font-semibold">Stock:</span>
               <Badge variant={supply.stockQuantity && supply.stockQuantity > 0 ? "default" : "destructive"}>
                 {supply.stockQuantity && supply.stockQuantity > 0 ? `${supply.stockQuantity} in stock` : "Out of Stock"}
