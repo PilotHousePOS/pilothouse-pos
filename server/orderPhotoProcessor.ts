@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
+import { pdf } from "pdf-to-img";
 
 // Lazy initialization of OpenAI client to prevent startup crashes if credentials aren't configured
 let openaiClient: OpenAI | null = null;
@@ -43,10 +44,33 @@ export async function extractOrderFromPhoto(
   imagePath: string
 ): Promise<OrderExtractionResult> {
   try {
-    // Read the image file and convert to base64
-    const imageBuffer = fs.readFileSync(imagePath);
+    let imageBuffer: Buffer;
+    let mimeType = getMimeType(imagePath);
+    
+    // If it's a PDF, convert first page to PNG image
+    if (mimeType === 'application/pdf') {
+      console.log("Converting PDF to image...");
+      const document = await pdf(imagePath, { scale: 3 }); // Higher scale for better quality
+      let firstPage: Buffer | null = null;
+      
+      for await (const page of document) {
+        firstPage = page;
+        break; // Only get first page
+      }
+      
+      if (!firstPage) {
+        throw new Error("Failed to extract page from PDF");
+      }
+      
+      imageBuffer = firstPage;
+      mimeType = 'image/png';
+      console.log("PDF converted to PNG successfully");
+    } else {
+      // Read the image file directly
+      imageBuffer = fs.readFileSync(imagePath);
+    }
+    
     const base64Image = imageBuffer.toString('base64');
-    const mimeType = getMimeType(imagePath);
 
     // Prepare the prompt for OpenAI Vision
     const prompt = `You are analyzing a photo of a SUPPLIER ORDER INVOICE for a pet store. This document shows a table with the following columns from LEFT TO RIGHT:
