@@ -2028,9 +2028,9 @@ function OrderPhotoUploadManager() {
 
   // Update extracted item mutation
   const updateItemMutation = useMutation({
-    mutationFn: async ({ id, data, multiplier }: { id: number; data: { name: string; quantity: number; unitPrice: number }; multiplier: number }) => {
+    mutationFn: async ({ id, data, multiplier }: { id: number; data: { itemName: string; quantity: number; unitPrice: number }; multiplier: number }) => {
       await apiRequest('PUT', `/api/admin/extracted-items/${id}`, {
-        itemName: data.name,
+        itemName: data.itemName,
         quantity: data.quantity,
         unitPrice: data.unitPrice.toString(),
         markedUpPrice: (data.unitPrice * multiplier).toFixed(2)
@@ -2367,7 +2367,7 @@ function OrderPhotoUploadManager() {
                 {extractedItems.extractedItems.map((item: any) => {
                   const isEditing = editingItems.has(item.id);
                   const editData = editingItems.get(item.id) || {
-                    name: item.name,
+                    itemName: item.itemName,
                     quantity: item.quantity,
                     unitPrice: item.unitPrice,
                   };
@@ -2388,10 +2388,10 @@ function OrderPhotoUploadManager() {
                             <label className="text-sm font-medium">Item Name</label>
                             <input
                               type="text"
-                              value={editData.name}
+                              value={editData.itemName}
                               onChange={(e) => {
                                 const newMap = new Map(editingItems);
-                                newMap.set(item.id, { ...editData, name: e.target.value });
+                                newMap.set(item.id, { ...editData, itemName: e.target.value });
                                 setEditingItems(newMap);
                               }}
                               className="w-full px-3 py-2 border rounded-md dark:bg-gray-800 dark:border-gray-700 mt-1"
@@ -2458,7 +2458,7 @@ function OrderPhotoUploadManager() {
                       ) : (
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1">
-                            <div className="font-medium mb-1">{item.name}</div>
+                            <div className="font-medium mb-1">{item.itemName}</div>
                             <div className="text-sm text-gray-600 dark:text-gray-400">
                               Quantity: {item.quantity} • Price: ${typeof item.unitPrice === 'number' ? item.unitPrice.toFixed(2) : '0.00'}
                               {item.addedToInventory && (
@@ -2475,7 +2475,7 @@ function OrderPhotoUploadManager() {
                               onClick={() => {
                                 const newMap = new Map(editingItems);
                                 newMap.set(item.id, {
-                                  name: item.name,
+                                  itemName: item.itemName,
                                   quantity: item.quantity,
                                   unitPrice: item.unitPrice,
                                 });
