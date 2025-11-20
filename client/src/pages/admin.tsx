@@ -2460,7 +2460,7 @@ function OrderPhotoUploadManager() {
                           <div className="flex-1">
                             <div className="font-medium mb-1">{item.itemName}</div>
                             <div className="text-sm text-gray-600 dark:text-gray-400">
-                              Quantity: {item.quantity} • Price: ${parseFloat(item.unitPrice || 0).toFixed(2)}
+                              Quantity: {item.quantity} • Unit Cost: ${parseFloat(item.unitPrice || 0).toFixed(2)} → Retail: ${parseFloat(item.markedUpPrice || 0).toFixed(2)}
                               {item.addedToInventory && (
                                 <span className="ml-2 text-green-600 dark:text-green-400 font-medium">
                                   ✓ Added to Inventory
