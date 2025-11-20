@@ -49,33 +49,40 @@ export async function extractOrderFromPhoto(
     const mimeType = getMimeType(imagePath);
 
     // Prepare the prompt for OpenAI Vision
-    const prompt = `You are analyzing a photo of an order invoice, receipt, or product list. Extract ALL items with their quantities and prices.
+    const prompt = `You are analyzing a photo of a SUPPLIER ORDER INVOICE or PRODUCT LIST for a pet store. This is a table/list of products with prices.
 
-For each item, provide:
-1. Item name (full product name)
-2. Quantity ordered
-3. Unit price (price per single item, not total)
-4. Brand name (if visible)
-5. Suggested category (food, toys, beds, leashes, healthcare, accessories, aquatics, reptiles, birdSupplies, dogCages, smallAnimalSupplies)
+CRITICAL: You MUST extract EVERY SINGLE LINE ITEM visible in the document. Look for tables, lists, or rows of products.
 
-IMPORTANT RULES:
-- Extract the UNIT PRICE, not the total price. If you see "2 x $5.00 = $10.00", the unit price is $5.00
-- If only total price is shown, divide by quantity to get unit price
-- Be thorough - extract every single item visible in the image
-- If brand is unclear, leave it empty
-- If category is unclear, use "accessories" as default
-- Return ONLY valid JSON, no explanations
+For each product line, extract:
+1. Item name (the product name, e.g., "Marble Swordtail Reg", "Black Highfin Lyretail Reg")
+2. Quantity (how many units ordered - look for "Qty" column)
+3. Unit Cost/Price (the price PER UNIT - look for "Unit Cost" column, NOT the total)
+4. Brand name (if visible, otherwise empty string)
+5. Category - choose from: food, toys, beds, leashes, healthcare, accessories, aquatics, reptiles, birdSupplies, dogCages, smallAnimalSupplies
 
-Return your response in this exact JSON format:
+CRITICAL INSTRUCTIONS:
+- This is typically a TABULAR format with columns: Item Name, Unit Cost, Quantity, Total
+- Extract the UNIT COST/UNIT PRICE column (not the total)
+- If you see 50+ products, extract ALL of them - don't skip any
+- For aquatic/fish products, use category "aquatics"
+- For reptile products, use category "reptiles"
+- If unclear, use "accessories"
+- DO NOT return an empty items array - if you see a product list, extract it!
+
+Example of what you might see:
+"Marble Swordtail Reg    $2.13    12    $25.56"
+Should become: {"itemName": "Marble Swordtail Reg", "quantity": 12, "unitPrice": 2.13, "category": "aquatics"}
+
+Return ONLY valid JSON in this EXACT format (no markdown, no explanations):
 {
   "items": [
     {
       "itemName": "Product Name Here",
       "quantity": 2,
       "unitPrice": 15.99,
-      "brand": "BrandName",
-      "category": "food",
-      "notes": "any special notes"
+      "brand": "",
+      "category": "aquatics",
+      "notes": ""
     }
   ]
 }`;
