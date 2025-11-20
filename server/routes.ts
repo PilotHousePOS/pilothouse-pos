@@ -2535,9 +2535,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Capitalize first letter of each word in name and pet names
       const capitalizedName = capitalizeWords(trimmedName);
-      // petNames should be an array in the database
-      const trimmedPetNames = petNames?.trim();
-      const capitalizedPetNames = trimmedPetNames ? [capitalizeWords(trimmedPetNames) as string] : null;
+      // petNames can come as array or string from frontend, convert to array for database
+      let capitalizedPetNames: string[] | null = null;
+      if (petNames) {
+        if (Array.isArray(petNames)) {
+          // Frontend sends as array - capitalize each name
+          const filteredNames = petNames.filter(name => name && typeof name === 'string' && name.trim());
+          capitalizedPetNames = filteredNames.length > 0 
+            ? filteredNames.map(name => capitalizeWords(name.trim()) as string)
+            : null;
+        } else if (typeof petNames === 'string') {
+          // Fallback for string format - trim and capitalize
+          const trimmed = petNames.trim();
+          capitalizedPetNames = trimmed ? [capitalizeWords(trimmed) as string] : null;
+        }
+      }
 
       const contact = await storage.createContact({ 
         name: capitalizedName as string, 
@@ -2583,9 +2595,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Capitalize first letter of each word in name and pet names
       const capitalizedName = trimmedName ? capitalizeWords(trimmedName) : undefined;
-      // petNames should be an array in the database
-      const trimmedPetNamesUpdate = petNames?.trim();
-      const capitalizedPetNames = petNames !== undefined ? (trimmedPetNamesUpdate ? [capitalizeWords(trimmedPetNamesUpdate) as string] : null) : undefined;
+      // petNames can come as array or string from frontend, convert to array for database
+      let capitalizedPetNames: string[] | null | undefined = undefined;
+      if (petNames !== undefined) {
+        if (petNames === null || (Array.isArray(petNames) && petNames.length === 0)) {
+          capitalizedPetNames = null;
+        } else if (Array.isArray(petNames)) {
+          // Frontend sends as array - capitalize each name
+          const filteredNames = petNames.filter(name => name && typeof name === 'string' && name.trim());
+          capitalizedPetNames = filteredNames.length > 0 
+            ? filteredNames.map(name => capitalizeWords(name.trim()) as string)
+            : null;
+        } else if (typeof petNames === 'string') {
+          // Fallback for string format - trim and capitalize
+          const trimmed = petNames.trim();
+          capitalizedPetNames = trimmed ? [capitalizeWords(trimmed) as string] : null;
+        }
+      }
       
       const contact = await storage.updateContact(id, { 
         name: capitalizedName as string | undefined, 
