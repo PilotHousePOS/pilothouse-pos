@@ -3522,7 +3522,7 @@ function ScheduleManagement() {
   );
 }
 
-function GroomingSchedule({ appointments, groomers }: { appointments: any[], groomers: any[] }) {
+function GroomingSchedule({ appointments, groomers, onSelectAppointment }: { appointments: any[], groomers: any[], onSelectAppointment?: (apt: any) => void }) {
   const [selectedWeek, setSelectedWeek] = useState(0); // 0 = current week, -1 = previous, 1 = next
   
   const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -3634,66 +3634,69 @@ function GroomingSchedule({ appointments, groomers }: { appointments: any[], gro
             No active groomers. Add groomers in the Groomers section.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-gray-300 dark:border-gray-700 min-w-[800px]">
-              <thead>
-                <tr className="bg-gray-100 dark:bg-gray-800">
-                  <th className="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left font-semibold">
-                    Groomer
-                  </th>
-                  {weekDates.map((date, idx) => (
-                    <th key={idx} className="border border-gray-300 dark:border-gray-700 px-2 py-2 text-center font-semibold">
-                      <div>{DAYS[idx].slice(0, 3)}</div>
-                      <div className="text-xs font-normal text-gray-600 dark:text-gray-400">
-                        {date.getMonth() + 1}/{date.getDate()}
-                      </div>
+          <div className="overflow-auto -mx-6 px-6">
+            <div className="inline-block min-w-full align-middle">
+              <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-700">
+                <thead>
+                  <tr className="bg-gray-100 dark:bg-gray-800">
+                    <th className="sticky left-0 z-10 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 px-4 py-2 text-left font-semibold min-w-[120px]">
+                      Groomer
                     </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {activeGroomers.map((groomer: any) => (
-                  <tr key={groomer.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <td className="border border-gray-300 dark:border-gray-700 px-4 py-2 font-medium">
-                      {groomer.name}
-                    </td>
-                    {weekDates.map((date, dayIdx) => {
-                      const dayAppointments = getAppointmentsForGroomerAndDate(groomer.id, date);
-                      return (
-                        <td 
-                          key={dayIdx} 
-                          className="border border-gray-300 dark:border-gray-700 px-2 py-2 align-top"
-                        >
-                          {dayAppointments.length > 0 ? (
-                            <div className="space-y-1">
-                              {dayAppointments.map((apt: any) => (
-                                <div
-                                  key={apt.id}
-                                  className="text-xs bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded p-1.5"
-                                  title={`${apt.ownerName} - ${apt.customerPets?.map((p: any) => p.petName).join(', ')} - ${apt.appointmentTime}`}
-                                >
-                                  <div className="font-semibold text-blue-900 dark:text-blue-100">
-                                    {apt.appointmentTime}
-                                  </div>
-                                  <div className="text-gray-700 dark:text-gray-300 truncate">
-                                    {apt.customerPets?.map((p: any) => p.petName).join(', ')}
-                                  </div>
-                                  <div className="text-gray-600 dark:text-gray-400">
-                                    {formatServiceType(apt.serviceType)}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="text-center text-gray-400 text-xs">-</div>
-                          )}
-                        </td>
-                      );
-                    })}
+                    {weekDates.map((date, idx) => (
+                      <th key={idx} className="border border-gray-300 dark:border-gray-700 px-2 py-2 text-center font-semibold min-w-[140px]">
+                        <div>{DAYS[idx].slice(0, 3)}</div>
+                        <div className="text-xs font-normal text-gray-600 dark:text-gray-400">
+                          {date.getMonth() + 1}/{date.getDate()}
+                        </div>
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {activeGroomers.map((groomer: any) => (
+                    <tr key={groomer.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                      <td className="sticky left-0 z-10 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-4 py-2 font-medium">
+                        {groomer.name}
+                      </td>
+                      {weekDates.map((date, dayIdx) => {
+                        const dayAppointments = getAppointmentsForGroomerAndDate(groomer.id, date);
+                        return (
+                          <td 
+                            key={dayIdx} 
+                            className="border border-gray-300 dark:border-gray-700 px-2 py-2 align-top bg-white dark:bg-gray-900"
+                          >
+                            {dayAppointments.length > 0 ? (
+                              <div className="space-y-1">
+                                {dayAppointments.map((apt: any) => (
+                                  <button
+                                    key={apt.id}
+                                    onClick={() => onSelectAppointment?.(apt)}
+                                    className="w-full text-left text-xs bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded p-1.5 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors cursor-pointer"
+                                    title="Click to view/edit appointment details"
+                                  >
+                                    <div className="font-semibold text-blue-900 dark:text-blue-100">
+                                      {apt.appointmentTime}
+                                    </div>
+                                    <div className="text-gray-700 dark:text-gray-300 truncate">
+                                      {apt.customerPets?.map((p: any) => p.petName).join(', ')}
+                                    </div>
+                                    <div className="text-gray-600 dark:text-gray-400">
+                                      {formatServiceType(apt.serviceType)}
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-center text-gray-400 text-xs">-</div>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </CardContent>
@@ -9674,7 +9677,11 @@ export default function Admin() {
 
         <TabsContent value="schedule">
           <ScheduleManagement />
-          <GroomingSchedule appointments={appointments || []} groomers={groomers || []} />
+          <GroomingSchedule 
+            appointments={appointments || []} 
+            groomers={groomers || []} 
+            onSelectAppointment={setSelectedAppointment}
+          />
         </TabsContent>
       </Tabs>
 
