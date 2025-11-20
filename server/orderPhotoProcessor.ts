@@ -90,6 +90,12 @@ Return ONLY valid JSON in this EXACT format (no markdown, no explanations):
     // Call OpenAI Vision API
     // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
     const openai = getOpenAIClient();
+    
+    console.log(`Processing image: ${imagePath}`);
+    console.log(`Image size: ${imageBuffer.length} bytes`);
+    console.log(`MIME type: ${mimeType}`);
+    console.log(`Base64 length: ${base64Image.length} characters`);
+    
     const response = await openai.chat.completions.create({
       model: "gpt-5",
       messages: [
@@ -113,8 +119,9 @@ Return ONLY valid JSON in this EXACT format (no markdown, no explanations):
       max_completion_tokens: 4096,
     });
 
-    const content = response.choices[0]?.message?.content;
     console.log("=== OpenAI Vision Response ===");
+    console.log("Full response:", JSON.stringify(response, null, 2));
+    const content = response.choices[0]?.message?.content;
     console.log("Raw content:", content);
     
     if (!content) {
