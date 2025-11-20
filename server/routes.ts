@@ -4680,6 +4680,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             supplyName: supply.name
           });
         } catch (itemError: any) {
+          console.error(`Error adding item ${itemId} to inventory:`, itemError);
           results.push({ 
             itemId, 
             success: false, 
