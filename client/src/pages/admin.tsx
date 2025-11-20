@@ -3522,6 +3522,185 @@ function ScheduleManagement() {
   );
 }
 
+function GroomingSchedule({ appointments, groomers }: { appointments: any[], groomers: any[] }) {
+  const [selectedWeek, setSelectedWeek] = useState(0); // 0 = current week, -1 = previous, 1 = next
+  
+  const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  
+  // Calculate dates for the selected week
+  const getWeekDates = () => {
+    const now = new Date();
+    const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const daysToMonday = currentDay === 0 ? 6 : currentDay - 1;
+    const currentWeekMonday = new Date(now);
+    currentWeekMonday.setDate(now.getDate() - daysToMonday);
+    currentWeekMonday.setHours(0, 0, 0, 0);
+    
+    const weekOffset = selectedWeek * 7;
+    const weekMonday = new Date(currentWeekMonday);
+    weekMonday.setDate(currentWeekMonday.getDate() + weekOffset);
+    
+    return DAYS.map((_, index) => {
+      const date = new Date(weekMonday);
+      date.setDate(weekMonday.getDate() + index);
+      return date;
+    });
+  };
+  
+  const weekDates = getWeekDates();
+  
+  // Parse date string to Date object
+  const parseLocalDate = (dateString: string): Date => {
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+  
+  // Get appointments for a specific groomer and date
+  const getAppointmentsForGroomerAndDate = (groomerId: number, date: Date) => {
+    return appointments.filter((apt: any) => {
+      const aptDate = parseLocalDate(apt.appointmentDate);
+      const matchesDate = aptDate.toDateString() === date.toDateString();
+      const matchesGroomer = apt.groomerId === groomerId;
+      const isConfirmedOrCompleted = apt.status === 'confirmed' || apt.status === 'completed';
+      return matchesDate && matchesGroomer && isConfirmedOrCompleted;
+    });
+  };
+  
+  // Format service type
+  const formatServiceType = (serviceType: string): string => {
+    if (!serviceType) return '';
+    const normalized = serviceType.toLowerCase();
+    if (normalized.includes('bath') && !normalized.includes('full')) {
+      return 'Bath';
+    } else if (normalized.includes('full') || normalized.includes('grooming')) {
+      return 'Full';
+    }
+    return serviceType;
+  };
+  
+  const activeGroomers = groomers?.filter((g: any) => g.isActive) || [];
+  
+  const getWeekLabel = () => {
+    if (selectedWeek === 0) return 'Current Week';
+    if (selectedWeek === -1) return 'Previous Week';
+    if (selectedWeek === 1) return 'Next Week';
+    return selectedWeek > 0 ? `${selectedWeek} Weeks Ahead` : `${Math.abs(selectedWeek)} Weeks Ago`;
+  };
+  
+  return (
+    <Card className="mt-6">
+      <CardHeader>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <CardTitle className="flex items-center gap-2">
+            <CalendarIcon className="w-5 h-5" />
+            Grooming Schedule
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSelectedWeek(selectedWeek - 1)}
+              data-testid="button-prev-week"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Previous Week
+            </Button>
+            <span className="text-sm font-medium px-3">{getWeekLabel()}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSelectedWeek(selectedWeek + 1)}
+              data-testid="button-next-week"
+            >
+              Next Week
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+            {selectedWeek !== 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedWeek(0)}
+                data-testid="button-current-week"
+              >
+                Today
+              </Button>
+            )}
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {activeGroomers.length === 0 ? (
+          <div className="text-center text-gray-500 py-8">
+            No active groomers. Add groomers in the Groomers section.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse border border-gray-300 dark:border-gray-700 min-w-[800px]">
+              <thead>
+                <tr className="bg-gray-100 dark:bg-gray-800">
+                  <th className="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left font-semibold">
+                    Groomer
+                  </th>
+                  {weekDates.map((date, idx) => (
+                    <th key={idx} className="border border-gray-300 dark:border-gray-700 px-2 py-2 text-center font-semibold">
+                      <div>{DAYS[idx].slice(0, 3)}</div>
+                      <div className="text-xs font-normal text-gray-600 dark:text-gray-400">
+                        {date.getMonth() + 1}/{date.getDate()}
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {activeGroomers.map((groomer: any) => (
+                  <tr key={groomer.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                    <td className="border border-gray-300 dark:border-gray-700 px-4 py-2 font-medium">
+                      {groomer.name}
+                    </td>
+                    {weekDates.map((date, dayIdx) => {
+                      const dayAppointments = getAppointmentsForGroomerAndDate(groomer.id, date);
+                      return (
+                        <td 
+                          key={dayIdx} 
+                          className="border border-gray-300 dark:border-gray-700 px-2 py-2 align-top"
+                        >
+                          {dayAppointments.length > 0 ? (
+                            <div className="space-y-1">
+                              {dayAppointments.map((apt: any) => (
+                                <div
+                                  key={apt.id}
+                                  className="text-xs bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded p-1.5"
+                                  title={`${apt.ownerName} - ${apt.customerPets?.map((p: any) => p.petName).join(', ')} - ${apt.appointmentTime}`}
+                                >
+                                  <div className="font-semibold text-blue-900 dark:text-blue-100">
+                                    {apt.appointmentTime}
+                                  </div>
+                                  <div className="text-gray-700 dark:text-gray-300 truncate">
+                                    {apt.customerPets?.map((p: any) => p.petName).join(', ')}
+                                  </div>
+                                  <div className="text-gray-600 dark:text-gray-400">
+                                    {formatServiceType(apt.serviceType)}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-center text-gray-400 text-xs">-</div>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function BoardingManagement({ isAddOpen, setIsAddOpen }: { isAddOpen: boolean; setIsAddOpen: (open: boolean) => void }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -9495,6 +9674,7 @@ export default function Admin() {
 
         <TabsContent value="schedule">
           <ScheduleManagement />
+          <GroomingSchedule appointments={appointments || []} groomers={groomers || []} />
         </TabsContent>
       </Tabs>
 
