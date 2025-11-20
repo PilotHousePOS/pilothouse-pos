@@ -4573,14 +4573,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const { itemName, quantity, unitPrice, markedUpPrice, category, brand, notes } = req.body;
       
-      // Apply .99 pricing rule to the marked-up price
-      const finalMarkedUpPrice = apply99Pricing(parseFloat(markedUpPrice)).toFixed(2);
-      
+      // When manually updating, preserve the exact price without .99 pricing adjustment
       const updatedItem = await storage.updateExtractedOrderItem(id, {
         itemName,
         quantity,
         unitPrice,
-        markedUpPrice: finalMarkedUpPrice,
+        markedUpPrice: parseFloat(markedUpPrice).toFixed(2),
         category,
         brand,
         notes
