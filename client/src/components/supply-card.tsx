@@ -141,17 +141,19 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
               </div>
               <div className="text-right">
                 <p className="text-sm font-bold text-brand-red">${supply.price}</p>
-                <Button 
-                  className="bg-brand-blue hover:bg-blue-600 text-white px-3 py-1 rounded-full text-xs mt-1"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    addToCartMutation.mutate();
-                  }}
-                  disabled={supply.stockQuantity === 0 || addToCartMutation.isPending}
-                  data-testid="button-add-to-cart"
-                >
-                  {addToCartMutation.isPending ? "Adding..." : "Add to Cart"}
-                </Button>
+                {supply.stockQuantity !== 0 && (
+                  <Button 
+                    className="bg-brand-blue hover:bg-blue-600 text-white px-3 py-1 rounded-full text-xs mt-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addToCartMutation.mutate();
+                    }}
+                    disabled={addToCartMutation.isPending}
+                    data-testid="button-add-to-cart"
+                  >
+                    {addToCartMutation.isPending ? "Adding..." : "Add to Cart"}
+                  </Button>
+                )}
               </div>
             </div>
           </div>
