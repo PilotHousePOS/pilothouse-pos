@@ -89,6 +89,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Chckwcheese': 'Chicken With Cheese',
   'Whslm': 'Wholesome',
   'Whlsm': 'Wholesome',
+  'Forti': 'Fortified',
   
   // Accessories
   'Hrness': 'Harness',
