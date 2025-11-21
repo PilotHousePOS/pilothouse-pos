@@ -72,6 +72,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   
   // Animals
   'Eleph': 'Elephant',
+  'Shri': 'Shrimp',
   
   // Chemistry (non-context dependent)
   'Phos': 'Phosphate',
@@ -99,6 +100,8 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Prot': 'Protein',
   'He Wei': 'Healthy Weight',
   'Sensi': 'Sensitive',
+  'Spiru': 'Spirulina',
+  'Brin': 'Brine',
   
   // Accessories
   'Hrness': 'Harness',
