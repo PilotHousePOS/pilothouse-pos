@@ -55,6 +55,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Nat': 'Natural',
   'Natu': 'Natural',
   'Natl': 'Natural',
+  'Rwrds': 'Rewards',
   
   // Quantity
   'Pk': 'Pack',
