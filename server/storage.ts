@@ -73,6 +73,15 @@ import {
   type InsertOrderPhoto,
   type ExtractedOrderItem,
   type InsertExtractedOrderItem,
+  astroCustomers,
+  astroFrequentBuyerProgress,
+  astroPurchaseSyncLog,
+  type AstroCustomer,
+  type InsertAstroCustomer,
+  type AstroFrequentBuyerProgress,
+  type InsertAstroFrequentBuyerProgress,
+  type AstroPurchaseSyncLog,
+  type InsertAstroPurchaseSyncLog,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, and, or, not, ilike, lt, isNull, count, sql, inArray } from "drizzle-orm";
@@ -313,6 +322,19 @@ export interface IStorage {
   updateExtractedOrderItem(id: number, item: Partial<InsertExtractedOrderItem>): Promise<ExtractedOrderItem>;
   deleteExtractedOrderItem(id: number): Promise<void>;
   bulkCreateExtractedOrderItems(items: InsertExtractedOrderItem[]): Promise<ExtractedOrderItem[]>;
+
+  // Astro Loyalty operations
+  getAstroCustomerByUserId(userId: string): Promise<AstroCustomer | undefined>;
+  getAstroCustomerByAstroId(astroCustomerId: string): Promise<AstroCustomer | undefined>;
+  createAstroCustomer(customer: InsertAstroCustomer): Promise<AstroCustomer>;
+  updateAstroCustomer(id: number, customer: Partial<InsertAstroCustomer>): Promise<AstroCustomer>;
+  getAllAstroCustomers(): Promise<AstroCustomer[]>;
+  
+  getFrequentBuyerProgressByCustomer(astroCustomerId: number): Promise<AstroFrequentBuyerProgress[]>;
+  upsertFrequentBuyerProgress(progress: InsertAstroFrequentBuyerProgress): Promise<AstroFrequentBuyerProgress>;
+  
+  getPurchaseSyncLogByOrder(orderId: number): Promise<AstroPurchaseSyncLog[]>;
+  createPurchaseSyncLog(log: InsertAstroPurchaseSyncLog): Promise<AstroPurchaseSyncLog>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2607,6 +2629,77 @@ export class DatabaseStorage implements IStorage {
   async bulkCreateExtractedOrderItems(items: InsertExtractedOrderItem[]): Promise<ExtractedOrderItem[]> {
     if (items.length === 0) return [];
     const created = await db.insert(extractedOrderItems).values(items).returning();
+    return created;
+  }
+
+  // Astro Loyalty operations
+  async getAstroCustomerByUserId(userId: string): Promise<AstroCustomer | undefined> {
+    const [customer] = await db.select().from(astroCustomers).where(eq(astroCustomers.userId, userId));
+    return customer;
+  }
+
+  async getAstroCustomerByAstroId(astroCustomerId: string): Promise<AstroCustomer | undefined> {
+    const [customer] = await db.select().from(astroCustomers).where(eq(astroCustomers.astroCustomerId, astroCustomerId));
+    return customer;
+  }
+
+  async createAstroCustomer(customer: InsertAstroCustomer): Promise<AstroCustomer> {
+    const [created] = await db.insert(astroCustomers).values(customer).returning();
+    return created;
+  }
+
+  async updateAstroCustomer(id: number, customer: Partial<InsertAstroCustomer>): Promise<AstroCustomer> {
+    const [updated] = await db
+      .update(astroCustomers)
+      .set({ ...customer, updatedAt: new Date() })
+      .where(eq(astroCustomers.id, id))
+      .returning();
+    return updated;
+  }
+
+  async getAllAstroCustomers(): Promise<AstroCustomer[]> {
+    return await db.select().from(astroCustomers).orderBy(asc(astroCustomers.createdAt));
+  }
+
+  async getFrequentBuyerProgressByCustomer(astroCustomerId: number): Promise<AstroFrequentBuyerProgress[]> {
+    return await db.select().from(astroFrequentBuyerProgress)
+      .where(eq(astroFrequentBuyerProgress.astroCustomerId, astroCustomerId))
+      .orderBy(desc(astroFrequentBuyerProgress.lastPurchaseDate));
+  }
+
+  async upsertFrequentBuyerProgress(progress: InsertAstroFrequentBuyerProgress): Promise<AstroFrequentBuyerProgress> {
+    // Check if progress exists for this customer and program
+    const existing = await db.select().from(astroFrequentBuyerProgress)
+      .where(
+        and(
+          eq(astroFrequentBuyerProgress.astroCustomerId, progress.astroCustomerId),
+          eq(astroFrequentBuyerProgress.programId, progress.programId)
+        )
+      );
+
+    if (existing.length > 0) {
+      // Update existing progress
+      const [updated] = await db
+        .update(astroFrequentBuyerProgress)
+        .set({ ...progress, updatedAt: new Date() })
+        .where(eq(astroFrequentBuyerProgress.id, existing[0].id))
+        .returning();
+      return updated;
+    } else {
+      // Create new progress
+      const [created] = await db.insert(astroFrequentBuyerProgress).values(progress).returning();
+      return created;
+    }
+  }
+
+  async getPurchaseSyncLogByOrder(orderId: number): Promise<AstroPurchaseSyncLog[]> {
+    return await db.select().from(astroPurchaseSyncLog)
+      .where(eq(astroPurchaseSyncLog.orderId, orderId))
+      .orderBy(desc(astroPurchaseSyncLog.syncedAt));
+  }
+
+  async createPurchaseSyncLog(log: InsertAstroPurchaseSyncLog): Promise<AstroPurchaseSyncLog> {
+    const [created] = await db.insert(astroPurchaseSyncLog).values(log).returning();
     return created;
   }
 }
