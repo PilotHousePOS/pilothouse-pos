@@ -206,14 +206,14 @@ export default function Supplies() {
           <Button
             key={category.id}
             variant="ghost"
-            className={`bg-white rounded-xl p-4 text-center shadow-sm hover:shadow-md transition-shadow ${
+            className={`bg-white rounded-xl p-4 text-center shadow-sm hover:shadow-md transition-shadow h-auto min-h-[80px] flex items-center justify-center ${
               selectedCategory === category.id ? 'ring-2 ring-brand-blue' : ''
             }`}
             onClick={() => setSelectedCategory(selectedCategory === category.id ? '' : category.id)}
           >
-            <div className="text-center">
+            <div className="text-center w-full">
               <div className="text-2xl mb-2">{category.emoji}</div>
-              <div className="text-xs font-semibold text-gray-900">{category.label}</div>
+              <div className="text-xs font-semibold text-gray-900 leading-tight">{category.label}</div>
             </div>
           </Button>
         ))}
@@ -229,15 +229,15 @@ export default function Supplies() {
                 key={animal.id}
                 variant="outline"
                 size="sm"
-                className={`text-center py-2 ${
+                className={`text-center py-3 h-auto min-h-[70px] flex items-center justify-center ${
                   selectedAnimalType === animal.id ? 'bg-brand-blue text-white border-brand-blue' : 'bg-white'
                 }`}
                 onClick={() => setSelectedAnimalType(selectedAnimalType === animal.id ? '' : animal.id)}
                 data-testid={`button-filter-${animal.id}`}
               >
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center w-full">
                   <div className="text-lg mb-1">{animal.emoji}</div>
-                  <div className="text-xs">{animal.label}</div>
+                  <div className="text-xs leading-tight">{animal.label}</div>
                 </div>
               </Button>
             ))}
@@ -255,15 +255,15 @@ export default function Supplies() {
                 key={food.id}
                 variant="outline"
                 size="sm"
-                className={`text-center py-2 ${
+                className={`text-center py-3 h-auto min-h-[70px] flex items-center justify-center ${
                   selectedFoodType === food.id ? 'bg-brand-blue text-white border-brand-blue' : 'bg-white'
                 }`}
                 onClick={() => setSelectedFoodType(selectedFoodType === food.id ? '' : food.id)}
                 data-testid={`button-filter-${food.id}`}
               >
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center w-full">
                   <div className="text-lg mb-1">{food.emoji}</div>
-                  <div className="text-xs">{food.label}</div>
+                  <div className="text-xs leading-tight">{food.label}</div>
                 </div>
               </Button>
             ))}
@@ -281,15 +281,15 @@ export default function Supplies() {
                 key={toy.id}
                 variant="outline"
                 size="sm"
-                className={`text-center py-2 ${
+                className={`text-center py-3 h-auto min-h-[70px] flex items-center justify-center ${
                   selectedToyType === toy.id ? 'bg-brand-blue text-white border-brand-blue' : 'bg-white'
                 }`}
                 onClick={() => setSelectedToyType(selectedToyType === toy.id ? '' : toy.id)}
                 data-testid={`button-filter-${toy.id}`}
               >
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center w-full">
                   <div className="text-lg mb-1">{toy.emoji}</div>
-                  <div className="text-xs">{toy.label}</div>
+                  <div className="text-xs leading-tight">{toy.label}</div>
                 </div>
               </Button>
             ))}
@@ -307,15 +307,15 @@ export default function Supplies() {
                 key={healthcare.id}
                 variant="outline"
                 size="sm"
-                className={`text-center py-2 ${
+                className={`text-center py-3 h-auto min-h-[70px] flex items-center justify-center ${
                   selectedHealthcareType === healthcare.id ? 'bg-brand-blue text-white border-brand-blue' : 'bg-white'
                 }`}
                 onClick={() => setSelectedHealthcareType(selectedHealthcareType === healthcare.id ? '' : healthcare.id)}
                 data-testid={`button-filter-${healthcare.id}`}
               >
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center w-full">
                   <div className="text-lg mb-1">{healthcare.emoji}</div>
-                  <div className="text-xs">{healthcare.label}</div>
+                  <div className="text-xs leading-tight">{healthcare.label}</div>
                 </div>
               </Button>
             ))}
