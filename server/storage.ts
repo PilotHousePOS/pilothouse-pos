@@ -642,77 +642,91 @@ export class DatabaseStorage implements IStorage {
       }
     };
 
-    // Define food type keywords for filtering with exclusions
-    const foodKeywords: Record<string, { include: string[], exclude: string[] }> = {
+    // Define food type keywords and brands for filtering with exclusions
+    const foodKeywords: Record<string, { include: string[], exclude: string[], brands: string[] }> = {
       'dog-food': {
         include: ['dog', 'puppy', 'canine', 'k9', 'large breed', 'small breed', 'adult dog', 'senior dog'],
-        exclude: ['cat', 'kitten', 'bird', 'fish food', 'betta', 'goldfish', 'guinea pig', 'hamster', 'rabbit']
+        exclude: ['cat', 'kitten', 'bird', 'fish food', 'betta', 'goldfish', 'guinea pig', 'hamster', 'rabbit'],
+        brands: ['victor', 'purina', 'blue buffalo', 'pedigree', 'iams', 'eukanuba', 'royal canin', 'hills', 'wellness', 'nutro', 'taste of the wild', 'orijen', 'acana', 'fromm', 'merrick', 'canidae', 'diamond naturals', 'rachael ray nutrish', 'solid gold', 'earthborn holistic']
       },
       'cat-food': {
         include: ['cat', 'kitten', 'feline'],
-        exclude: ['dog', 'puppy', 'bird', 'fish food', 'betta', 'goldfish', 'guinea pig', 'hamster', 'rabbit']
+        exclude: ['dog', 'puppy', 'bird', 'fish food', 'betta', 'goldfish', 'guinea pig', 'hamster', 'rabbit'],
+        brands: ['fancy feast', 'friskies', 'meow mix', 'sheba', 'whiskas', 'iams', 'royal canin', 'hills', 'wellness', 'blue buffalo', 'purina', 'nutro']
       },
       'bird-food': {
         include: ['bird', 'parakeet', 'parrot', 'finch', 'canary', 'cockatiel', 'avian', 'millet'],
-        exclude: ['dog', 'cat', 'puppy', 'kitten', 'fish food', 'betta', 'goldfish']
+        exclude: ['dog', 'cat', 'puppy', 'kitten', 'fish food', 'betta', 'goldfish'],
+        brands: ['kaytee', 'zupreem', 'higgins', 'lafeber', 'vitakraft', 'brown\'s', 'volkman']
       },
       'fish-food': {
         include: ['fish food', 'betta', 'goldfish', 'tropical fish', 'aquatic', 'koi', 'flake', 'pellet', 'tetra', 'guppy', 'cichlid', 'catfish'],
-        exclude: ['dog food', 'puppy food', 'cat food', 'kitten food', 'chicken', 'beef', 'lamb', 'turkey']
+        exclude: ['dog food', 'puppy food', 'cat food', 'kitten food', 'chicken', 'beef', 'lamb', 'turkey'],
+        brands: ['tetra', 'hikari', 'omega one', 'api', 'aqueon', 'northfin', 'new life spectrum', 'sera', 'wardley']
       },
       'small-animal-food': {
         include: ['guinea pig', 'hamster', 'rabbit', 'bunny', 'ferret', 'gerbil', 'chinchilla', 'cavy', 'mouse', 'rat', 'timothy hay', 'alfalfa'],
-        exclude: ['dog', 'puppy', 'cat', 'kitten', 'bird']
+        exclude: ['dog', 'puppy', 'cat', 'kitten', 'bird'],
+        brands: ['oxbow', 'kaytee', 'vitakraft', 'supreme', 'burgess', 'living world']
       }
     };
 
     // Define toy type keywords for filtering with exclusions
-    const toyKeywords: Record<string, { include: string[], exclude: string[] }> = {
+    const toyKeywords: Record<string, { include: string[], exclude: string[], brands?: string[] }> = {
       'dog-toys': {
-        include: ['dog toy', 'puppy toy', 'canine toy', 'k9 toy', 'chew', 'fetch', 'tug', 'rope toy', 'kong', 'nylabone', 'benebone'],
-        exclude: ['cat', 'kitten', 'bird', 'hamster', 'guinea pig', 'rabbit']
+        include: ['dog toy', 'puppy toy', 'canine toy', 'k9 toy', 'chew', 'fetch', 'tug', 'rope toy'],
+        exclude: ['cat', 'kitten', 'bird', 'hamster', 'guinea pig', 'rabbit'],
+        brands: ['kong', 'nylabone', 'benebone', 'chuckit', 'west paw', 'mammoth']
       },
       'cat-toys': {
         include: ['cat toy', 'kitten toy', 'feline', 'catnip', 'mouse toy', 'feather', 'wand toy'],
-        exclude: ['dog', 'puppy', 'bird', 'hamster', 'guinea pig', 'rabbit']
+        exclude: ['dog', 'puppy', 'bird', 'hamster', 'guinea pig', 'rabbit'],
+        brands: ['petstages', 'jackson galaxy', 'yeowww']
       },
       'bird-toys': {
         include: ['bird toy', 'parakeet', 'parrot', 'perch', 'avian', 'bird swing', 'bird ladder'],
-        exclude: ['dog', 'puppy', 'cat', 'kitten']
+        exclude: ['dog', 'puppy', 'cat', 'kitten'],
+        brands: []
       },
       'small-animal-toys': {
         include: ['guinea pig', 'hamster', 'rabbit', 'bunny', 'ferret', 'gerbil', 'chinchilla', 'small animal'],
-        exclude: ['dog', 'puppy', 'cat', 'kitten', 'bird']
+        exclude: ['dog', 'puppy', 'cat', 'kitten', 'bird'],
+        brands: []
       }
     };
 
     // Define healthcare type keywords for filtering with exclusions
-    const healthcareKeywords: Record<string, { include: string[], exclude: string[] }> = {
+    const healthcareKeywords: Record<string, { include: string[], exclude: string[], brands?: string[] }> = {
       'flea-tick': {
-        include: ['flea', 'tick', 'pest', 'insect', 'parasite', 'frontline', 'advantage', 'seresto', 'flea collar'],
-        exclude: []
+        include: ['flea', 'tick', 'pest', 'insect', 'parasite', 'flea collar'],
+        exclude: [],
+        brands: ['frontline', 'advantage', 'seresto', 'bayer', 'capstar']
       },
       'dental': {
         include: ['dental', 'teeth', 'tooth', 'breath', 'tartar', 'plaque', 'oral', 'toothbrush', 'toothpaste'],
-        exclude: []
+        exclude: [],
+        brands: ['tropiclean', 'virbac', 'petsmile']
       },
       'supplements': {
         include: ['supplement', 'vitamin', 'probiotic', 'joint', 'hip', 'glucosamine', 'omega', 'nutrient', 'multivitamin'],
-        exclude: ['shampoo', 'conditioner', 'brush']
+        exclude: ['shampoo', 'conditioner', 'brush'],
+        brands: ['cosequin', 'dasuquin', 'nutramax', 'grizzly']
       },
       'grooming': {
         include: ['shampoo', 'conditioner', 'brush', 'comb', 'nail', 'clipper', 'trimmer', 'grooming', 'bath', 'deshedding'],
-        exclude: ['food', 'treat', 'toy']
+        exclude: ['food', 'treat', 'toy'],
+        brands: ['furminator', 'chris christensen', 'isle of dogs']
       },
       'first-aid': {
         include: ['first aid', 'bandage', 'ointment', 'cream', 'wound', 'antiseptic', 'antibiotic', 'healing', 'gauze'],
-        exclude: ['shampoo', 'conditioner']
+        exclude: ['shampoo', 'conditioner'],
+        brands: []
       }
     };
 
     // Helper function to filter items by keywords with inclusion and exclusion logic
     // Uses word boundary matching to avoid false matches (e.g., "cat" won't match "catfish")
-    const filterByKeywords = (items: Supply[], filterType: string, keywords: Record<string, { include: string[], exclude: string[] }>): Supply[] => {
+    const filterByKeywords = (items: Supply[], filterType: string, keywords: Record<string, { include: string[], exclude: string[], brands?: string[] }>): Supply[] => {
       const filterConfig = keywords[filterType];
       if (!filterConfig) return items;
       
@@ -733,6 +747,7 @@ export class DatabaseStorage implements IStorage {
       
       return items.filter(item => {
         const textToSearch = `${item.name || ''} ${item.description || ''}`.trim();
+        const brandText = (item.brand || '').toLowerCase().trim();
         
         // Check if any exclusion keyword is present - if yes, exclude this item
         if (filterConfig.exclude.length > 0) {
@@ -740,6 +755,14 @@ export class DatabaseStorage implements IStorage {
             matchesKeyword(textToSearch, keyword)
           );
           if (hasExclusion) return false;
+        }
+        
+        // Check if brand matches (if brands are defined for this filter)
+        if (filterConfig.brands && filterConfig.brands.length > 0 && brandText) {
+          const brandMatches = filterConfig.brands.some(brand => 
+            brandText.includes(brand.toLowerCase())
+          );
+          if (brandMatches) return true;
         }
         
         // Check if any inclusion keyword is present
