@@ -76,6 +76,7 @@ The application is a full-stack web application built with React, Vite, TypeScri
 - **Employee Schedule Management System:** Sectioned schedule view with sequential weekly dates (Section A = previous week, B = current week, C = next week), weekly editable grid with date display (e.g., "Mon 11/17"), employee management, flexible time slots, batch save, data persistence, empty state handling, and admin-only access.
 - **Grooming Schedule Management System:** Simplified weekly schedule for groomers showing current week (Monday-Sunday) with automatic date display, editable groomer names and time slots, add/remove groomers, batch save functionality, data persistence, and admin-only access.
 - **AI-Powered Order Photo Upload System:** Upload supplier order photos to extract items automatically with GPT-5 vision, adjustable price multiplier for markup calculation, editable extracted items (name, quantity, price), bulk add to inventory with automatic categorization (items are auto-categorized as aquatic/reptile based on keywords when added to inventory), photo management with history, and admin-only access. Aquatic keywords include common fish names (swordtail, angelfish, barb, danio, rasbora, loach, catfish, corydoras, cory, shrimp, snail, crab, etc.).
+- **Astro Loyalty Integration (NEW):** Customer loyalty program integration with Astro platform including automatic customer account linking, purchase sync for loyalty points tracking, frequent buyer program progress monitoring, admin dashboard for viewing linked customers and sync status, and comprehensive API integration framework. Requires Astro API credentials ($50/month subscription via developer1.astroloyalty.com).
 
 **System Design Choices:**
 - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
@@ -92,6 +93,7 @@ The application is a full-stack web application built with React, Vite, TypeScri
 - **Email Service**: SendGrid
 - **SMS Service**: Twilio
 - **Calendar Integration**: Google Calendar
+- **Loyalty Program**: Astro Loyalty (optional, $50/month)
 - **Frontend Framework**: React
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS
@@ -99,3 +101,23 @@ The application is a full-stack web application built with React, Vite, TypeScri
 - **Server-Side Framework**: Express.js
 - **Query Library**: TanStack Query
 - **Client-Side Router**: Wouter
+
+## Environment Variables
+
+### Required Secrets (via Replit Secrets panel)
+- `DATABASE_URL` - PostgreSQL connection string (auto-configured by Replit)
+- `SENDGRID_API_KEY` - SendGrid API key for email notifications
+- `TWILIO_ACCOUNT_SID` - Twilio account SID for SMS notifications
+- `TWILIO_AUTH_TOKEN` - Twilio authentication token
+- `TWILIO_PHONE_NUMBER` - Twilio phone number for sending SMS
+- `GOOGLE_CLIENT_ID` - Google OAuth client ID for calendar integration
+- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
+- `OPENAI_API_KEY` - OpenAI API key for AI-powered order photo extraction
+
+### Optional Secrets (for Astro Loyalty)
+- `ASTRO_API_KEY` - Astro Loyalty API key (contact developer1.astroloyalty.com)
+- `ASTRO_STORE_ID` - Astro Loyalty store identifier
+- `ASTRO_API_URL` - Astro API endpoint URL (defaults to production if not set)
+
+### Session Secret
+- `SESSION_SECRET` - Secret key for session management (auto-generated or manually set)
