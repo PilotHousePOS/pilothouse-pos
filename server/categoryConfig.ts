@@ -117,9 +117,9 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       // Cat-specific toys
       'catnip toy', 'teaser wand', 'feather toy', 'cat mouse',
       'scratching post', 'cat tree', 'scratcher', 'track toy',
-      // Bird/small animal toys
-      'perch', 'bird perch', 'natural perch', 'rope perch', 'platform perch',
-      'swing', 'bird swing', 'ladder', 'bridge', 'bird ladder',
+      // Bird/small animal toys (NOT aquarium perch/bridge)
+      'bird perch', 'natural perch', 'rope perch', 'platform perch',
+      'bird swing', 'bird ladder', 'hamster bridge', 'gerbil bridge',
       'bell toy', 'chewing toy', 'foraging toy', 'activity toy',
       'rotating perch', 'spinning toy', 'exercise wheel',
       'woven ball', 'grass ball', 'seagrass', 'vine ball',
@@ -133,6 +133,127 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
     exclusionKeywords: [
       'food', 'treat', 'kibble', 'meal', 'dinner', 'nutrition', 'gravy', 'stew',
       'shampoo', 'wipes', 'collar', 'leash', 'harness', 'bed', 'crate',
+      // CRITICAL: Exclude ALL aquarium-related terms to prevent fish products from appearing in toys
+      'aquarium', 'fish tank', 'betta', 'glo fish', 'goldfish', 'tropical fish',
+      'molly', 'platy', 'swordtail', 'cichlid', 'guppy', 'angelfish', 'tetra',
+      'fish', 'aquatic', 'freshwater', 'saltwater', 'marine',
+    ],
+  },
+
+  dogTreats: {
+    brands: [
+      // Premium treat brands
+      'Zuke\'s', 'Old Mother Hubbard', 'Cloud Star', 'Bocce\'s Bakery', 'Blue Buffalo',
+      'Wellness', 'Merrick', 'RedBarn', 'Barkworthies', 'Best Bully Sticks',
+      'Jack & Pup', 'Nature\'s Variety', 'Instinct', 'Primal', 'Stella & Chewy\'s',
+      'Full Moon', 'Plato', 'Riley\'s Organics', 'Dogswell', 'Whimzees',
+      // Mass market treat brands
+      'Milk-Bone', 'Pup-Peroni', 'Greenies', 'Beggin\'', 'Nudges', 'Purina Busy',
+      'Dentastix', 'Pedigree', 'Rachael Ray', 'Cesar', 'Beneful',
+      'Blue Dog Bakery', 'Three Dog Bakery', 'Wet Noses', 'Loving Pets',
+      // Dental/chew treat brands
+      'Whimzees', 'OraVet', 'Dentastix', 'Greenies', 'Fresh Breath', 'TropiClean',
+      // Natural/jerky brands
+      'Happy Howie\'s', 'Newman\'s Own', 'Wellness', 'Natural Balance', 'Canine Naturals',
+      'Smartbones', 'DreamBone', 'Good\'n\'Fun', 'Himalayan', 'Himalayan Dog Chew',
+      // Training treat brands
+      'Stewart', 'Bil-Jac', 'Crazy Dog', 'Blue Buffalo Wilderness Trail Treats',
+    ],
+    nameKeywords: [
+      // Explicit treat terms
+      'dog treat', 'dog snack', 'training treat', 'puppy treat', 'doggy treat',
+      'treats for dogs', 'dog biscuit', 'dog cookie', 'dog jerky',
+      // Dental treats
+      'dental treat', 'dental chew', 'dentastix', 'greenies', 'breath treat',
+      'teeth cleaning', 'tartar control', 'dental stick', 'toothbrush treat',
+      // Chew treats (not toys)
+      'bully stick', 'rawhide', 'collagen stick', 'pizzle stick', 'beef stick',
+      'pig ear', 'cow ear', 'lamb ear', 'jerky stick', 'trachea',
+      'tendon', 'gullet', 'tripe', 'esophagus', 'beef cheek',
+      // Soft treats
+      'soft chew', 'soft treat', 'training bite', 'mini treat', 'tiny treat',
+      'chewy treat', 'moist treat', 'semi-moist', 'tender bite',
+      // Freeze-dried/dehydrated treats
+      'freeze dried', 'freeze-dried', 'dehydrated', 'air dried', 'air-dried',
+      'single ingredient', 'pure meat', 'meat only',
+      // Specific treat types
+      'peanut butter treat', 'bacon treat', 'chicken treat', 'beef treat',
+      'salmon treat', 'sweet potato treat', 'apple treat',
+      // Functional treats
+      'calming treat', 'hip joint treat', 'probiotic treat', 'vitamin treat',
+      'supplement treat', 'wellness treat',
+      // Size/portion descriptors
+      'bite size', 'mini bite', 'tiny bite', 'small bite', 'treat pouch',
+    ],
+    descriptionKeywords: [
+      'reward', 'training', 'delicious', 'tasty', 'wholesome', 'nutritious',
+      'limited ingredient', 'grain free treat', 'natural treat', 'healthy snack',
+    ],
+    exclusionKeywords: [
+      // Exclude food (meals)
+      'dog food', 'kibble', 'dry food', 'wet food', 'canned food', 'meal', 'dinner',
+      'breakfast', 'nutrition', 'formula', 'diet', 'lb bag',
+      // Exclude non-treats
+      'toy', 'ball', 'collar', 'leash', 'bed', 'crate', 'bowl',
+      'shampoo', 'supplement pill', 'medication',
+    ],
+  },
+
+  catTreats: {
+    brands: [
+      // Premium cat treat brands
+      'Temptations', 'Greenies', 'Friskies Party Mix', 'Fancy Feast', 'Sheba',
+      'Tiki Cat', 'Weruva', 'Inaba', 'Churu', 'Purebites', 'Halo',
+      'Wellness Kittles', 'Blue Buffalo Bursts', 'Feline Greenies',
+      // Natural/freeze-dried brands
+      'Vital Essentials', 'Stella & Chewy\'s', 'Primal', 'Instinct', 'Nature\'s Variety',
+      'Northwest Naturals', 'Orijen', 'Acana', 'Whole Life',
+      // Mass market brands
+      'Meow Mix', 'Cat Chow', 'Purina Fancy Feast', 'Whiskas', '9Lives',
+      'Kit & Kaboodle', 'Friskies', 'Delectables', 'Sheba Meaty Tender Sticks',
+      // Specialty treat brands
+      'Ciao', 'CatSure', 'Hartz Delectables', 'SmartBites', 'Feline Natural',
+      'Applaws', 'Catit Creamy', 'Lil\' Soups', 'Broths', 'Cat-Man-Doo',
+    ],
+    nameKeywords: [
+      // Explicit treat terms
+      'cat treat', 'cat snack', 'kitty treat', 'kitten treat', 'treats for cats',
+      'cat biscuit', 'cat cookie', 'crunchy treat', 'soft treat',
+      // Dental treats
+      'dental treat', 'feline greenies', 'teeth cleaning', 'tartar control',
+      'breath treat', 'dental stick',
+      // Lickable/creamy treats
+      'lickable treat', 'creamy treat', 'squeeze up', 'liquid treat',
+      'puree', 'broth', 'bisque', 'soup', 'churu', 'delectables',
+      'creamy lickable', 'lick treat', 'wet treat', 'gravy treat',
+      // Crunchy treats
+      'temptations', 'party mix', 'crunchy treat', 'crispy treat',
+      'crunch', 'snack mix', 'variety pack',
+      // Freeze-dried/dehydrated treats
+      'freeze dried', 'freeze-dried', 'dehydrated', 'air dried', 'air-dried',
+      'single ingredient', 'pure meat', 'meat only', 'protein treat',
+      // Specific treat flavors/types
+      'tuna treat', 'salmon treat', 'chicken treat', 'seafood treat',
+      'turkey treat', 'catnip treat', 'bonito flake', 'shrimp treat',
+      // Functional treats
+      'calming treat', 'hairball treat', 'vitamin treat', 'probiotic treat',
+      'wellness treat', 'urinary treat', 'joint treat',
+      // Size/portion descriptors
+      'bite size', 'mini bite', 'tiny bite', 'small bite', 'treat stick',
+      'meaty stick', 'tender stick',
+    ],
+    descriptionKeywords: [
+      'reward', 'delicious', 'tasty', 'irresistible', 'wholesome', 'nutritious',
+      'limited ingredient', 'grain free treat', 'natural treat', 'healthy snack',
+      'cats love', 'feline favorite', 'purrfect',
+    ],
+    exclusionKeywords: [
+      // Exclude food (meals)
+      'cat food', 'kibble', 'dry food', 'wet food', 'canned food', 'meal', 'dinner',
+      'breakfast', 'nutrition', 'formula', 'diet', 'lb bag', 'pate',
+      // Exclude non-treats
+      'toy', 'ball', 'collar', 'leash', 'bed', 'crate', 'litter', 'bowl',
+      'shampoo', 'supplement pill', 'medication', 'scratching post',
     ],
   },
 
