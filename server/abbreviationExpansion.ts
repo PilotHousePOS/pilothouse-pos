@@ -56,6 +56,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Natu': 'Natural',
   'Natl': 'Natural',
   'Rwrds': 'Rewards',
+  'Essen': 'Essentials',
   
   // Quantity
   'Pk': 'Pack',
@@ -90,6 +91,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Whslm': 'Wholesome',
   'Whlsm': 'Wholesome',
   'Forti': 'Fortified',
+  'Bis': 'Bison',
   
   // Accessories
   'Hrness': 'Harness',
