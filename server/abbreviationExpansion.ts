@@ -42,6 +42,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Xxl': 'Extra Extra Large',
   'Xs': 'Extra Small',
   'Xsm': 'Extra Small',
+  'Jum': 'Jumbo',
   
   // Material/Quality
   'Hvy': 'Heavy',
