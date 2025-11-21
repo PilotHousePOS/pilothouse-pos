@@ -678,3 +678,75 @@ export const insertExtractedOrderItemSchema = createInsertSchema(extractedOrderI
 
 export type ExtractedOrderItem = typeof extractedOrderItems.$inferSelect;
 export type InsertExtractedOrderItem = z.infer<typeof insertExtractedOrderItemSchema>;
+
+// Astro Loyalty Integration - Links local customers to Astro loyalty accounts
+export const astroCustomers = pgTable("astro_customers", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  astroCustomerId: varchar("astro_customer_id", { length: 255 }).notNull().unique(), // Astro's customer ID
+  email: varchar("email", { length: 255 }).notNull(), // Email used in Astro (required by Astro)
+  phoneNumber: varchar("phone_number", { length: 20 }), // Phone number in Astro
+  loyaltyPoints: integer("loyalty_points").default(0), // Current loyalty points balance
+  lastSyncedAt: timestamp("last_synced_at"), // Last time we synced with Astro API
+  syncStatus: varchar("sync_status", { length: 50 }).default("pending"), // pending, synced, error
+  syncError: text("sync_error"), // Error message if sync failed
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAstroCustomerSchema = createInsertSchema(astroCustomers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type AstroCustomer = typeof astroCustomers.$inferSelect;
+export type InsertAstroCustomer = z.infer<typeof insertAstroCustomerSchema>;
+
+// Astro Frequent Buyer Programs - Tracks progress on "buy X get 1 free" programs
+export const astroFrequentBuyerProgress = pgTable("astro_frequent_buyer_progress", {
+  id: serial("id").primaryKey(),
+  astroCustomerId: integer("astro_customer_id").notNull().references(() => astroCustomers.id, { onDelete: "cascade" }),
+  programId: varchar("program_id", { length: 255 }).notNull(), // Astro's program ID (e.g., brand-specific)
+  programName: varchar("program_name", { length: 255 }).notNull(), // "Blue Buffalo 12+1", "Hill's 12+1", etc.
+  productName: varchar("product_name", { length: 255 }), // Specific product in the program
+  currentPunches: integer("current_punches").default(0), // How many purchases toward next free item
+  requiredPunches: integer("required_punches").notNull(), // Total needed for free item (usually 12)
+  freeItemsEarned: integer("free_items_earned").default(0), // Total free items earned in this program
+  lastPurchaseDate: timestamp("last_purchase_date"), // Most recent purchase in this program
+  expiresAt: timestamp("expires_at"), // When the current progress expires (if applicable)
+  lastSyncedAt: timestamp("last_synced_at"), // Last sync with Astro
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAstroFrequentBuyerProgressSchema = createInsertSchema(astroFrequentBuyerProgress).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type AstroFrequentBuyerProgress = typeof astroFrequentBuyerProgress.$inferSelect;
+export type InsertAstroFrequentBuyerProgress = z.infer<typeof insertAstroFrequentBuyerProgressSchema>;
+
+// Astro Purchase Sync Log - Tracks which purchases have been synced to Astro
+export const astroPurchaseSyncLog = pgTable("astro_purchase_sync_log", {
+  id: serial("id").primaryKey(),
+  orderId: integer("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
+  astroCustomerId: integer("astro_customer_id").notNull().references(() => astroCustomers.id, { onDelete: "cascade" }),
+  supplyId: integer("supply_id").references(() => supplies.id), // Which product was synced
+  quantity: integer("quantity").notNull(),
+  syncedAt: timestamp("synced_at").defaultNow(),
+  syncStatus: varchar("sync_status", { length: 50 }).default("success"), // success, failed, pending
+  astroTransactionId: varchar("astro_transaction_id", { length: 255 }), // Astro's transaction ID
+  syncError: text("sync_error"), // Error message if sync failed
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAstroPurchaseSyncLogSchema = createInsertSchema(astroPurchaseSyncLog).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type AstroPurchaseSyncLog = typeof astroPurchaseSyncLog.$inferSelect;
+export type InsertAstroPurchaseSyncLog = z.infer<typeof insertAstroPurchaseSyncLogSchema>;
