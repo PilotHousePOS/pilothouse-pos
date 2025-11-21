@@ -66,7 +66,10 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
     // Vitakraft: German small animal treats and food
     // Supreme: Science Selective small animal nutrition
     // Small Pet Select: Premium hay and bedding
-    includeBrands: ['Oxbow', 'Kaytee', 'Living World', 'Vitakraft', 'Supreme', 'Small Pet Select', "Brown's"],
+    // Ferret Nation: Premium ferret cages and habitats
+    // Marshall: Ferret food, treats, and accessories specialist
+    // Ware: Small animal habitats, hideaways, and accessories
+    includeBrands: ['Oxbow', 'Kaytee', 'Living World', 'Vitakraft', 'Supreme', 'Small Pet Select', "Brown's", 'Ferret Nation', 'Marshall', 'Ware', 'Nation'],
     includeKeywords: [
       'mouse', 'mice', 'ferret', 'chinchilla', 'hamster', 'rabbit', 'bunny',
       'guinea pig', 'gerbil', 'rat', 'hedgehog', 'sugar glider',
