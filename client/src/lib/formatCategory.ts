@@ -25,6 +25,8 @@ export function formatCategory(category: string | null | undefined): string {
     smallanimal: 'Small Animal',
     fish: 'Fish',
     reptile: 'Reptile',
+    dogTreats: 'Dog Treats',
+    catTreats: 'Cat Treats',
   };
 
   return categoryMap[category] || capitalizeWords(category);

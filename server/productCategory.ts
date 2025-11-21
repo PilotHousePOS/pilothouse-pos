@@ -147,6 +147,8 @@ export interface CategoryStats {
   birdCages: number;
   dogCages: number;
   smallAnimalCages: number;
+  dogTreats: number;
+  catTreats: number;
   unchanged: number;
 }
 
@@ -163,6 +165,8 @@ export function getEmptyStats(): CategoryStats {
     birdCages: 0,
     dogCages: 0,
     smallAnimalCages: 0,
+    dogTreats: 0,
+    catTreats: 0,
     unchanged: 0,
   };
 }

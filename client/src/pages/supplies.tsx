@@ -19,6 +19,8 @@ const SUPPLY_CATEGORIES = [
   { id: 'dogCages', label: 'Dog Cages', emoji: '🏠' },
   { id: 'smallAnimalSupplies', label: 'Small Animal Supplies', emoji: '🐹' },
   { id: 'smallanimal', label: 'Small Animal', emoji: '🐹' },
+  { id: 'dogTreats', label: 'Dog Treats', emoji: '🦴' },
+  { id: 'catTreats', label: 'Cat Treats', emoji: '🐱' },
 ];
 
 const ITEMS_PER_PAGE = 24;
