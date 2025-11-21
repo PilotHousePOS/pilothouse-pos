@@ -11,13 +11,14 @@ const SUPPLY_CATEGORIES = [
   { id: 'toys', label: 'Toys', emoji: '🧸' },
   { id: 'beds', label: 'Beds', emoji: '🛏️' },
   { id: 'leashes', label: 'Leashes', emoji: '🦮' },
-  { id: 'healthcare', label: 'Health', emoji: '💊' },
+  { id: 'healthcare', label: 'Healthcare', emoji: '💊' },
   { id: 'accessories', label: 'Accessories', emoji: '🎀' },
   { id: 'aquatics', label: 'Aquatics', emoji: '🐠' },
   { id: 'reptiles', label: 'Reptiles', emoji: '🦎' },
   { id: 'birdSupplies', label: 'Bird Supplies', emoji: '🪺' },
-  { id: 'dogCages', label: 'Dog Cages/Houses', emoji: '🏠' },
+  { id: 'dogCages', label: 'Dog Cages', emoji: '🏠' },
   { id: 'smallAnimalSupplies', label: 'Small Animal Supplies', emoji: '🐹' },
+  { id: 'smallanimal', label: 'Small Animal', emoji: '🐹' },
 ];
 
 const ITEMS_PER_PAGE = 24;

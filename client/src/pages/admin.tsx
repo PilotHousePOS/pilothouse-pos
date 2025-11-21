@@ -72,6 +72,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import AdminNotifications from "@/components/admin-notifications";
 import { safeGoBack } from "@/lib/navigation";
 import { capitalizeWords } from "@/lib/stringUtils";
+import { formatCategory } from "@/lib/formatCategory";
 
 // Helper function to parse date string as local date (not UTC)
 function parseLocalDate(dateString: string): Date {
@@ -3014,7 +3015,7 @@ function ProductImageManager() {
                         <div className="font-medium">{product.name}</div>
                         <div className="text-xs text-gray-600">
                           {product.brand && <span>Brand: {product.brand} | </span>}
-                          <span>Category: {product.category}</span>
+                          <span>Category: {formatCategory(product.category)}</span>
                         </div>
                       </div>
                       <Button size="sm" variant="outline">
@@ -3045,7 +3046,7 @@ function ProductImageManager() {
 
               <div>
                 <p className="text-sm text-gray-600">Brand: {selectedProduct.brand || 'Unknown'}</p>
-                <p className="text-sm text-gray-600">Category: {selectedProduct.category}</p>
+                <p className="text-sm text-gray-600">Category: {formatCategory(selectedProduct.category)}</p>
               </div>
 
               <div className="space-y-2">
@@ -6933,7 +6934,7 @@ export default function Admin() {
                   <div key={supply.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex-1">
                       <h3 className="font-semibold">{supply.name}</h3>
-                      <p className="text-sm text-gray-600">{supply.brand} • {supply.category} • ${supply.price}</p>
+                      <p className="text-sm text-gray-600">{supply.brand} • {formatCategory(supply.category)} • ${supply.price}</p>
                       <p className="text-xs text-gray-500">Stock: {supply.stockQuantity}</p>
                     </div>
                     <div className="flex items-center gap-2">

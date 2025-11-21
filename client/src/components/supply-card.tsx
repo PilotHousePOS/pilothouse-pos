@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { formatCategory } from "@/lib/formatCategory";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Supply } from "@shared/schema";
 
