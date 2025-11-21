@@ -4832,6 +4832,247 @@ function EditAppointmentDialog({
   );
 }
 
+// Astro Loyalty Manager Component
+function AstroLoyaltyManager() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
+  const [connectionResult, setConnectionResult] = useState<any>(null);
+
+  // Fetch Astro customers
+  const { data: astroCustomers = [], isLoading } = useQuery({
+    queryKey: ['/api/admin/astro/customers'],
+    enabled: true
+  });
+
+  // Test connection mutation
+  const testConnection = async () => {
+    setIsTestingConnection(true);
+    try {
+      const response = await fetch('/api/admin/astro/test-connection', {
+        credentials: 'include'
+      });
+      const result = await response.json();
+      setConnectionResult(result);
+      
+      if (result.success) {
+        toast({
+          title: "Connection successful!",
+          description: "Astro Loyalty API is configured and working"
+        });
+      } else {
+        toast({
+          title: "Connection failed",
+          description: result.message || "Please check your API credentials",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Test connection error:', error);
+      toast({
+        title: "Connection test failed",
+        description: "Failed to test Astro connection",
+        variant: "destructive"
+      });
+      setConnectionResult({ success: false, message: "Network error" });
+    } finally {
+      setIsTestingConnection(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Integration Status Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5" />
+            Astro Loyalty Integration
+          </CardTitle>
+          <CardDescription>
+            Manage customer loyalty program integration with Astro
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Setup Instructions Banner */}
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-500 flex-shrink-0 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-semibold text-blue-800 dark:text-blue-300 mb-2">Setup Required</p>
+                <div className="space-y-2 text-blue-700 dark:text-blue-400">
+                  <p>To enable Astro Loyalty integration:</p>
+                  <ol className="list-decimal list-inside space-y-1 ml-2">
+                    <li>Contact <a href="mailto:developer1.astroloyalty.com" className="underline font-medium">developer1.astroloyalty.com</a> to get API credentials</li>
+                    <li>Subscription cost: $50/month</li>
+                    <li>Add the following environment variables to your Replit Secrets:
+                      <ul className="list-disc list-inside ml-4 mt-1 space-y-0.5">
+                        <li><code className="bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded text-xs">ASTRO_API_KEY</code></li>
+                        <li><code className="bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded text-xs">ASTRO_STORE_ID</code></li>
+                        <li><code className="bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded text-xs">ASTRO_API_URL</code> (optional, defaults to production)</li>
+                      </ul>
+                    </li>
+                    <li>Test the connection using the button below</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Connection Test */}
+          <div className="space-y-3">
+            <Button
+              onClick={testConnection}
+              disabled={isTestingConnection}
+              className="bg-brand-blue hover:bg-blue-600"
+              data-testid="button-test-astro-connection"
+            >
+              {isTestingConnection ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Testing...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Test Connection
+                </>
+              )}
+            </Button>
+
+            {/* Connection Status */}
+            {connectionResult && (
+              <div className={`rounded-lg p-3 ${
+                connectionResult.success 
+                  ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
+                  : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
+              }`}>
+                <div className="flex items-start gap-2">
+                  {connectionResult.success ? (
+                    <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-500 mt-0.5" />
+                  ) : (
+                    <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-500 mt-0.5" />
+                  )}
+                  <div className="text-sm">
+                    <p className={`font-semibold ${
+                      connectionResult.success 
+                        ? 'text-green-800 dark:text-green-300'
+                        : 'text-red-800 dark:text-red-300'
+                    }`}>
+                      {connectionResult.success ? 'Connected' : 'Connection Failed'}
+                    </p>
+                    <p className={
+                      connectionResult.success 
+                        ? 'text-green-700 dark:text-green-400'
+                        : 'text-red-700 dark:text-red-400'
+                    }>
+                      {connectionResult.message}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Features List */}
+          <div className="pt-4 border-t">
+            <h3 className="font-semibold mb-3">Features</h3>
+            <ul className="space-y-2 text-sm">
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <span>Automatic customer account creation and linking</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <span>Purchase sync to Astro for loyalty points tracking</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <span>Frequent buyer program progress tracking</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <span>Customer loyalty dashboard and status display</span>
+              </li>
+            </ul>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Linked Customers Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="w-5 h-5" />
+            Linked Customers ({astroCustomers.length})
+          </CardTitle>
+          <CardDescription>
+            Customers who have linked their accounts to Astro Loyalty
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+            </div>
+          ) : astroCustomers.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <Users className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+              <p>No customers have linked their accounts yet</p>
+              <p className="text-sm mt-1">Customers can link their accounts from their profile page</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {astroCustomers.map((customer: any) => (
+                <div 
+                  key={customer.id}
+                  className="border rounded-lg p-4 space-y-2"
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="font-semibold">{customer.userName}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{customer.email}</p>
+                    </div>
+                    <Badge 
+                      variant={customer.syncStatus === 'synced' ? 'default' : 'secondary'}
+                      className={customer.syncStatus === 'synced' ? 'bg-green-600' : ''}
+                    >
+                      {customer.syncStatus}
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-600 dark:text-gray-400">Loyalty Points</p>
+                      <p className="font-semibold">{customer.loyaltyPoints || 0}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 dark:text-gray-400">Last Synced</p>
+                      <p className="font-semibold">
+                        {customer.lastSyncedAt 
+                          ? new Date(customer.lastSyncedAt).toLocaleDateString()
+                          : 'Never'
+                        }
+                      </p>
+                    </div>
+                  </div>
+
+                  {customer.phoneNumber && (
+                    <div className="text-sm">
+                      <p className="text-gray-600 dark:text-gray-400">Phone</p>
+                      <p className="font-semibold">{customer.phoneNumber}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const typedUser = user as User;
@@ -6786,6 +7027,12 @@ export default function Admin() {
             {typedUser?.isAdmin && (
               <TabsTrigger value="database" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 Database
+              </TabsTrigger>
+            )}
+            {typedUser?.isAdmin && (
+              <TabsTrigger value="astro" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                <span className="hidden lg:inline">Astro Loyalty</span>
+                <span className="lg:hidden">Astro</span>
               </TabsTrigger>
             )}
           </TabsList>
@@ -9897,6 +10144,10 @@ export default function Admin() {
         <TabsContent value="schedule">
           <ScheduleManagement />
           <GroomingSchedule />
+        </TabsContent>
+
+        <TabsContent value="astro" className="space-y-6">
+          <AstroLoyaltyManager />
         </TabsContent>
       </Tabs>
 
