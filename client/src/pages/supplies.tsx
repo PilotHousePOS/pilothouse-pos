@@ -17,8 +17,7 @@ const SUPPLY_CATEGORIES = [
   { id: 'reptiles', label: 'Reptiles', emoji: '🦎' },
   { id: 'birdSupplies', label: 'Bird Supplies', emoji: '🪺' },
   { id: 'dogCages', label: 'Dog Cages', emoji: '🏠' },
-  { id: 'smallAnimalSupplies', label: 'Small Animal Supplies', emoji: '🐹' },
-  { id: 'smallanimal', label: 'Small Animal', emoji: '🐰' },
+  { id: 'smallanimal', label: 'Small Animals', emoji: '🐹' },
   { id: 'dogTreats', label: 'Dog Treats', emoji: '🦴' },
   { id: 'catTreats', label: 'Cat Treats', emoji: '🐱' },
 ];
@@ -100,7 +99,7 @@ export default function Supplies() {
   useEffect(() => {
     setCurrentPage(0);
     // Clear animal type when not in small animal category
-    if (selectedCategory !== 'smallAnimalSupplies' && selectedCategory !== 'smallanimal') {
+    if (selectedCategory !== 'smallanimal') {
       setSelectedAnimalType('');
     }
     // Clear food type when not in food category
@@ -221,7 +220,7 @@ export default function Supplies() {
       </div>
 
       {/* Animal Type Filter (shows only for small animal categories) */}
-      {(selectedCategory === 'smallAnimalSupplies' || selectedCategory === 'smallanimal') && (
+      {selectedCategory === 'smallanimal' && (
         <div className="mb-6">
           <h3 className="text-sm font-semibold text-gray-700 mb-3">Filter by Animal Type:</h3>
           <div className="grid grid-cols-3 gap-3">
