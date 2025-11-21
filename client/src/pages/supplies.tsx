@@ -17,8 +17,8 @@ const SUPPLY_CATEGORIES = [
   { id: 'reptiles', label: 'Reptiles', emoji: '🦎' },
   { id: 'birdSupplies', label: 'Bird Supplies', emoji: '🪺' },
   { id: 'dogCages', label: 'Dog Cages', emoji: '🏠' },
-  { id: 'smallAnimalSupplies', label: 'Small Animal Supplies', emoji: '🐹' },
-  { id: 'smallanimal', label: 'Small Animal', emoji: '🐹' },
+  { id: 'smallAnimalSupplies', label: 'Small Animal Supplies', emoji: '🐇' },
+  { id: 'smallanimal', label: 'Small Animal', emoji: '🐇' },
   { id: 'dogTreats', label: 'Dog Treats', emoji: '🦴' },
   { id: 'catTreats', label: 'Cat Treats', emoji: '🐱' },
 ];
