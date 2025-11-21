@@ -116,6 +116,9 @@ export interface IStorage {
     search?: string; 
     filterType?: FilterType;
     animalType?: string;
+    foodType?: string;
+    toyType?: string;
+    healthcareType?: string;
   }): Promise<{ items: Supply[]; total: number }>;
   getSupply(id: number): Promise<Supply | undefined>;
   createSupply(supply: InsertSupply): Promise<Supply>;
@@ -584,8 +587,11 @@ export class DatabaseStorage implements IStorage {
     search?: string;
     filterType?: FilterType;
     animalType?: string;
+    foodType?: string;
+    toyType?: string;
+    healthcareType?: string;
   }): Promise<{ items: Supply[]; total: number }> {
-    const { limit, offset, category, search, filterType, animalType } = params;
+    const { limit, offset, category, search, filterType, animalType, foodType, toyType, healthcareType } = params;
 
     // Build WHERE conditions based on filters
     let whereConditions: any[] = [eq(supplies.isActive, true)];
@@ -605,25 +611,147 @@ export class DatabaseStorage implements IStorage {
     }
 
     // Define animal type keywords for filtering
-    const animalKeywords: Record<string, string[]> = {
-      'hamster': ['hamster'],
-      'guinea-pig': ['guinea pig', 'cavy'],
-      'rabbit': ['rabbit', 'bunny'],
-      'ferret': ['ferret'],
-      'mouse-rat': ['mouse', 'rat', 'mice'],
-      'gerbil': ['gerbil'],
-      'chinchilla': ['chinchilla']
+    const animalKeywords: Record<string, { include: string[], exclude: string[] }> = {
+      'hamster': {
+        include: ['hamster'],
+        exclude: []
+      },
+      'guinea-pig': {
+        include: ['guinea pig', 'cavy'],
+        exclude: []
+      },
+      'rabbit': {
+        include: ['rabbit', 'bunny'],
+        exclude: []
+      },
+      'ferret': {
+        include: ['ferret'],
+        exclude: []
+      },
+      'mouse-rat': {
+        include: ['mouse', 'rat', 'mice'],
+        exclude: []
+      },
+      'gerbil': {
+        include: ['gerbil'],
+        exclude: []
+      },
+      'chinchilla': {
+        include: ['chinchilla'],
+        exclude: []
+      }
+    };
+
+    // Define food type keywords for filtering with exclusions
+    const foodKeywords: Record<string, { include: string[], exclude: string[] }> = {
+      'dog-food': {
+        include: ['dog', 'puppy', 'canine', 'k9', 'large breed', 'small breed', 'adult dog', 'senior dog'],
+        exclude: ['cat', 'kitten', 'bird', 'fish food', 'betta', 'goldfish', 'guinea pig', 'hamster', 'rabbit']
+      },
+      'cat-food': {
+        include: ['cat', 'kitten', 'feline'],
+        exclude: ['dog', 'puppy', 'bird', 'fish food', 'betta', 'goldfish', 'guinea pig', 'hamster', 'rabbit']
+      },
+      'bird-food': {
+        include: ['bird', 'parakeet', 'parrot', 'finch', 'canary', 'cockatiel', 'avian', 'millet'],
+        exclude: ['dog', 'cat', 'puppy', 'kitten', 'fish food', 'betta', 'goldfish']
+      },
+      'fish-food': {
+        include: ['fish food', 'betta', 'goldfish', 'tropical fish', 'aquatic', 'koi', 'flake', 'pellet', 'tetra', 'guppy', 'cichlid', 'catfish'],
+        exclude: ['dog food', 'puppy food', 'cat food', 'kitten food', 'chicken', 'beef', 'lamb', 'turkey']
+      },
+      'small-animal-food': {
+        include: ['guinea pig', 'hamster', 'rabbit', 'bunny', 'ferret', 'gerbil', 'chinchilla', 'cavy', 'mouse', 'rat', 'timothy hay', 'alfalfa'],
+        exclude: ['dog', 'puppy', 'cat', 'kitten', 'bird']
+      }
+    };
+
+    // Define toy type keywords for filtering with exclusions
+    const toyKeywords: Record<string, { include: string[], exclude: string[] }> = {
+      'dog-toys': {
+        include: ['dog toy', 'puppy toy', 'canine toy', 'k9 toy', 'chew', 'fetch', 'tug', 'rope toy', 'kong', 'nylabone', 'benebone'],
+        exclude: ['cat', 'kitten', 'bird', 'hamster', 'guinea pig', 'rabbit']
+      },
+      'cat-toys': {
+        include: ['cat toy', 'kitten toy', 'feline', 'catnip', 'mouse toy', 'feather', 'wand toy'],
+        exclude: ['dog', 'puppy', 'bird', 'hamster', 'guinea pig', 'rabbit']
+      },
+      'bird-toys': {
+        include: ['bird toy', 'parakeet', 'parrot', 'perch', 'avian', 'bird swing', 'bird ladder'],
+        exclude: ['dog', 'puppy', 'cat', 'kitten']
+      },
+      'small-animal-toys': {
+        include: ['guinea pig', 'hamster', 'rabbit', 'bunny', 'ferret', 'gerbil', 'chinchilla', 'small animal'],
+        exclude: ['dog', 'puppy', 'cat', 'kitten', 'bird']
+      }
+    };
+
+    // Define healthcare type keywords for filtering with exclusions
+    const healthcareKeywords: Record<string, { include: string[], exclude: string[] }> = {
+      'flea-tick': {
+        include: ['flea', 'tick', 'pest', 'insect', 'parasite', 'frontline', 'advantage', 'seresto', 'flea collar'],
+        exclude: []
+      },
+      'dental': {
+        include: ['dental', 'teeth', 'tooth', 'breath', 'tartar', 'plaque', 'oral', 'toothbrush', 'toothpaste'],
+        exclude: []
+      },
+      'supplements': {
+        include: ['supplement', 'vitamin', 'probiotic', 'joint', 'hip', 'glucosamine', 'omega', 'nutrient', 'multivitamin'],
+        exclude: ['shampoo', 'conditioner', 'brush']
+      },
+      'grooming': {
+        include: ['shampoo', 'conditioner', 'brush', 'comb', 'nail', 'clipper', 'trimmer', 'grooming', 'bath', 'deshedding'],
+        exclude: ['food', 'treat', 'toy']
+      },
+      'first-aid': {
+        include: ['first aid', 'bandage', 'ointment', 'cream', 'wound', 'antiseptic', 'antibiotic', 'healing', 'gauze'],
+        exclude: ['shampoo', 'conditioner']
+      }
+    };
+
+    // Helper function to filter items by keywords with inclusion and exclusion logic
+    // Uses word boundary matching to avoid false matches (e.g., "cat" won't match "catfish")
+    const filterByKeywords = (items: Supply[], filterType: string, keywords: Record<string, { include: string[], exclude: string[] }>): Supply[] => {
+      const filterConfig = keywords[filterType];
+      if (!filterConfig) return items;
+      
+      // Helper to check if keyword matches with word boundaries
+      const matchesKeyword = (text: string, keyword: string): boolean => {
+        const lowerText = text.toLowerCase();
+        const lowerKeyword = keyword.toLowerCase();
+        
+        // For multi-word phrases, use simple includes
+        if (keyword.includes(' ')) {
+          return lowerText.includes(lowerKeyword);
+        }
+        
+        // For single words, check word boundaries to avoid substring matches
+        const regex = new RegExp(`\\b${lowerKeyword}\\b`, 'i');
+        return regex.test(lowerText);
+      };
+      
+      return items.filter(item => {
+        const textToSearch = `${item.name || ''} ${item.description || ''}`.trim();
+        
+        // Check if any exclusion keyword is present - if yes, exclude this item
+        if (filterConfig.exclude.length > 0) {
+          const hasExclusion = filterConfig.exclude.some(keyword => 
+            matchesKeyword(textToSearch, keyword)
+          );
+          if (hasExclusion) return false;
+        }
+        
+        // Check if any inclusion keyword is present
+        return filterConfig.include.some(keyword => 
+          matchesKeyword(textToSearch, keyword)
+        );
+      });
     };
 
     // Helper function to filter items by animal type keywords
     const filterByAnimalType = (items: Supply[], animalType: string): Supply[] => {
-      const keywords = animalKeywords[animalType];
-      if (!keywords) return items;
-      
-      return items.filter(item => {
-        const textToSearch = `${item.name || ''} ${item.description || ''}`.toLowerCase().trim();
-        return keywords.some(keyword => textToSearch.includes(keyword.toLowerCase()));
-      });
+      return filterByKeywords(items, animalType, animalKeywords);
     };
 
     // If we have a search query, use fuzzy search for typo tolerance
@@ -638,9 +766,18 @@ export class DatabaseStorage implements IStorage {
         .where(and(...whereConditions))
         .orderBy(desc(supplies.createdAt));
       
-      // Apply animal type filter FIRST, before fuzzy search
+      // Apply specialty filters FIRST, before fuzzy search
       if (animalType) {
         allItems = filterByAnimalType(allItems, animalType);
+      }
+      if (foodType) {
+        allItems = filterByKeywords(allItems, foodType, foodKeywords);
+      }
+      if (toyType) {
+        allItems = filterByKeywords(allItems, toyType, toyKeywords);
+      }
+      if (healthcareType) {
+        allItems = filterByKeywords(allItems, healthcareType, healthcareKeywords);
       }
       
       // Then apply fuzzy search filtering with typo tolerance
@@ -660,20 +797,31 @@ export class DatabaseStorage implements IStorage {
       return { items, total };
     }
 
-    // If we have animal filter but no search, fetch and filter
-    if (animalType) {
+    // If we have any specialty filter but no search, fetch and filter
+    if (animalType || foodType || toyType || healthcareType) {
       // Fetch all items matching category/filterType first
-      const allItems = await db
+      let allItems = await db
         .select()
         .from(supplies)
         .where(and(...whereConditions))
         .orderBy(desc(supplies.createdAt));
       
-      // Filter by animal type keywords in name or description
-      const animalFilteredItems = filterByAnimalType(allItems, animalType);
+      // Apply filters in sequence
+      if (animalType) {
+        allItems = filterByAnimalType(allItems, animalType);
+      }
+      if (foodType) {
+        allItems = filterByKeywords(allItems, foodType, foodKeywords);
+      }
+      if (toyType) {
+        allItems = filterByKeywords(allItems, toyType, toyKeywords);
+      }
+      if (healthcareType) {
+        allItems = filterByKeywords(allItems, healthcareType, healthcareKeywords);
+      }
       
-      const total = animalFilteredItems.length;
-      const items = animalFilteredItems.slice(offset, offset + limit);
+      const total = allItems.length;
+      const items = allItems.slice(offset, offset + limit);
       return { items, total };
     }
 

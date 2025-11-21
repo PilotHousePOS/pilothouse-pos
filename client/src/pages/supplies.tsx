@@ -54,11 +54,37 @@ const ANIMAL_TYPES = [
   { id: 'chinchilla', label: 'Chinchilla', emoji: '🐭' },
 ];
 
+const FOOD_TYPES = [
+  { id: 'dog-food', label: 'Dog Food', emoji: '🐕' },
+  { id: 'cat-food', label: 'Cat Food', emoji: '🐱' },
+  { id: 'bird-food', label: 'Bird Food', emoji: '🦜' },
+  { id: 'fish-food', label: 'Fish Food', emoji: '🐠' },
+  { id: 'small-animal-food', label: 'Small Animal', emoji: '🐹' },
+];
+
+const TOY_TYPES = [
+  { id: 'dog-toys', label: 'Dog Toys', emoji: '🐕' },
+  { id: 'cat-toys', label: 'Cat Toys', emoji: '🐱' },
+  { id: 'bird-toys', label: 'Bird Toys', emoji: '🦜' },
+  { id: 'small-animal-toys', label: 'Small Animal', emoji: '🐹' },
+];
+
+const HEALTHCARE_TYPES = [
+  { id: 'flea-tick', label: 'Flea & Tick', emoji: '🪲' },
+  { id: 'dental', label: 'Dental Care', emoji: '🦷' },
+  { id: 'supplements', label: 'Supplements', emoji: '💊' },
+  { id: 'grooming', label: 'Grooming', emoji: '🛁' },
+  { id: 'first-aid', label: 'First Aid', emoji: '🩹' },
+];
+
 export default function Supplies() {
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedAnimalType, setSelectedAnimalType] = useState('');
+  const [selectedFoodType, setSelectedFoodType] = useState('');
+  const [selectedToyType, setSelectedToyType] = useState('');
+  const [selectedHealthcareType, setSelectedHealthcareType] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
@@ -70,12 +96,24 @@ export default function Supplies() {
     setSearchQuery(searchInput.trim());
   };
 
-  // Reset page and animal filter when category changes
+  // Reset page and filters when category changes
   useEffect(() => {
     setCurrentPage(0);
     // Clear animal type when not in small animal category
     if (selectedCategory !== 'smallAnimalSupplies' && selectedCategory !== 'smallanimal') {
       setSelectedAnimalType('');
+    }
+    // Clear food type when not in food category
+    if (selectedCategory !== 'food') {
+      setSelectedFoodType('');
+    }
+    // Clear toy type when not in toys category
+    if (selectedCategory !== 'toys') {
+      setSelectedToyType('');
+    }
+    // Clear healthcare type when not in healthcare category
+    if (selectedCategory !== 'healthcare') {
+      setSelectedHealthcareType('');
     }
   }, [searchQuery, selectedCategory]);
 
@@ -93,7 +131,10 @@ export default function Supplies() {
         limit: ITEMS_PER_PAGE,
         ...(selectedCategory && { category: selectedCategory }),
         ...(searchQuery && { search: searchQuery }),
-        ...(selectedAnimalType && { animalType: selectedAnimalType })
+        ...(selectedAnimalType && { animalType: selectedAnimalType }),
+        ...(selectedFoodType && { foodType: selectedFoodType }),
+        ...(selectedToyType && { toyType: selectedToyType }),
+        ...(selectedHealthcareType && { healthcareType: selectedHealthcareType })
       }
     ],
   });
@@ -198,6 +239,84 @@ export default function Supplies() {
                 <div className="flex flex-col items-center">
                   <div className="text-lg mb-1">{animal.emoji}</div>
                   <div className="text-xs">{animal.label}</div>
+                </div>
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Food Type Filter (shows only for food category) */}
+      {selectedCategory === 'food' && (
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Filter by Food Type:</h3>
+          <div className="grid grid-cols-3 gap-3">
+            {FOOD_TYPES.map((food) => (
+              <Button
+                key={food.id}
+                variant="outline"
+                size="sm"
+                className={`text-center py-2 ${
+                  selectedFoodType === food.id ? 'bg-brand-blue text-white border-brand-blue' : 'bg-white'
+                }`}
+                onClick={() => setSelectedFoodType(selectedFoodType === food.id ? '' : food.id)}
+                data-testid={`button-filter-${food.id}`}
+              >
+                <div className="flex flex-col items-center">
+                  <div className="text-lg mb-1">{food.emoji}</div>
+                  <div className="text-xs">{food.label}</div>
+                </div>
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Toy Type Filter (shows only for toys category) */}
+      {selectedCategory === 'toys' && (
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Filter by Toy Type:</h3>
+          <div className="grid grid-cols-2 gap-3">
+            {TOY_TYPES.map((toy) => (
+              <Button
+                key={toy.id}
+                variant="outline"
+                size="sm"
+                className={`text-center py-2 ${
+                  selectedToyType === toy.id ? 'bg-brand-blue text-white border-brand-blue' : 'bg-white'
+                }`}
+                onClick={() => setSelectedToyType(selectedToyType === toy.id ? '' : toy.id)}
+                data-testid={`button-filter-${toy.id}`}
+              >
+                <div className="flex flex-col items-center">
+                  <div className="text-lg mb-1">{toy.emoji}</div>
+                  <div className="text-xs">{toy.label}</div>
+                </div>
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Healthcare Type Filter (shows only for healthcare category) */}
+      {selectedCategory === 'healthcare' && (
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Filter by Product Type:</h3>
+          <div className="grid grid-cols-3 gap-3">
+            {HEALTHCARE_TYPES.map((healthcare) => (
+              <Button
+                key={healthcare.id}
+                variant="outline"
+                size="sm"
+                className={`text-center py-2 ${
+                  selectedHealthcareType === healthcare.id ? 'bg-brand-blue text-white border-brand-blue' : 'bg-white'
+                }`}
+                onClick={() => setSelectedHealthcareType(selectedHealthcareType === healthcare.id ? '' : healthcare.id)}
+                data-testid={`button-filter-${healthcare.id}`}
+              >
+                <div className="flex flex-col items-center">
+                  <div className="text-lg mb-1">{healthcare.emoji}</div>
+                  <div className="text-xs">{healthcare.label}</div>
                 </div>
               </Button>
             ))}
