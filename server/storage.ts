@@ -136,6 +136,7 @@ export interface IStorage {
     leashes: number;
     healthcare: number;
     accessories: number;
+    smallanimal: number;
     unchanged: number;
     total: number;
   }>;
@@ -906,6 +907,7 @@ export class DatabaseStorage implements IStorage {
     leashes: number;
     healthcare: number;
     accessories: number;
+    smallanimal: number;
     unchanged: number;
     total: number;
   }> {
@@ -922,6 +924,7 @@ export class DatabaseStorage implements IStorage {
       leashes: 0,
       healthcare: 0,
       accessories: 0,
+      smallanimal: 0,
       unchanged: 0,
       total: 0
     };
@@ -935,7 +938,15 @@ export class DatabaseStorage implements IStorage {
       // Prepare bulk update using transaction
       await db.transaction(async (tx) => {
         for (const supply of batch) {
-          const suggestedCategory = determineCategory(supply);
+          let suggestedCategory = null;
+          
+          // PRIORITY 1: If filterType is set to smallanimal, set category to smallanimal
+          if (supply.filterType === 'smallanimal') {
+            suggestedCategory = 'smallanimal';
+          } else {
+            // PRIORITY 2: Use standard category determination for other products
+            suggestedCategory = determineCategory(supply);
+          }
           
           if (suggestedCategory) {
             await tx.update(supplies)
