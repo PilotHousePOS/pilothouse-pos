@@ -134,9 +134,11 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'food', 'treat', 'kibble', 'meal', 'dinner', 'nutrition', 'gravy', 'stew',
       'shampoo', 'wipes', 'collar', 'leash', 'harness', 'bed', 'crate',
       // CRITICAL: Exclude ALL aquarium-related terms to prevent fish products from appearing in toys
+      // Note: Don't exclude "fish" alone (catches "fishbone" toys) - use specific fish names instead
       'aquarium', 'fish tank', 'betta', 'glo fish', 'goldfish', 'tropical fish',
-      'molly', 'platy', 'swordtail', 'cichlid', 'guppy', 'angelfish', 'tetra',
-      'fish', 'aquatic', 'freshwater', 'saltwater', 'marine',
+      'molly reg', 'molly ', 'platy', 'swordtail', 'cichlid', 'guppy', 'angelfish',
+      'tetra reg', 'tetra ', 'balloon lyretail', 'balloon green', 'brooklyn bridge',
+      'aquatic', 'freshwater', 'saltwater', 'marine', ' fish ', 'reg fish',
     ],
   },
 
