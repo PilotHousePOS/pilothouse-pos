@@ -137,6 +137,15 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
     (apt.status === 'confirmed' || apt.status === 'completed') && 
     parseLocalDate(apt.appointmentDate).toDateString() === selectedDate.toDateString()
   );
+  
+  // Calculate total number of dogs/pets across all confirmed appointments
+  const totalDogs = confirmedAppointments.reduce((sum: number, apt: any) => {
+    if (apt.pets && apt.pets.length > 0) {
+      return sum + apt.pets.length;
+    }
+    // Legacy single-pet appointments count as 1
+    return sum + 1;
+  }, 0);
 
   // Group appointments by time slot
   const timeSlots = [
@@ -278,7 +287,7 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
         ) : (
           <div className="space-y-2">
             <div className="text-sm text-gray-600 mb-4">
-              {confirmedAppointments.length} confirmed appointments + {googleEvents.length} calendar events for this day
+              {totalDogs} {totalDogs === 1 ? 'dog' : 'dogs'} ({confirmedAppointments.length} {confirmedAppointments.length === 1 ? 'appointment' : 'appointments'}) + {googleEvents.length} calendar {googleEvents.length === 1 ? 'event' : 'events'} for this day
             </div>
             
             {occupiedSlots.map((time) => {
