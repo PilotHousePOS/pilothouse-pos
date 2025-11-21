@@ -86,6 +86,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Cmbs': 'Crumbs',
   'Chckwcheese': 'Chicken With Cheese',
   'Whslm': 'Wholesome',
+  'Whlsm': 'Wholesome',
   
   // Fix awkward spacing issues
   'Div Ider': 'Divider',
