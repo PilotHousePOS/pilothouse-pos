@@ -66,6 +66,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   // Age/Demographics
   'Jr': 'Junior',
   'Sr': 'Senior',
+  'Juvi': 'Juvenile',
   
   // Animals
   'Eleph': 'Elephant',
@@ -82,11 +83,15 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Red B': 'RedBarn',
   'Waf': 'Waffer',
   'Froz': 'Frozen',
+  'Fr': 'Frozen',
   'Blo': 'Blood',
   'Cmbs': 'Crumbs',
   'Chckwcheese': 'Chicken With Cheese',
   'Whslm': 'Wholesome',
   'Whlsm': 'Wholesome',
+  
+  // Accessories
+  'Hrness': 'Harness',
   
   // Fix awkward spacing issues
   'Div Ider': 'Divider',
@@ -94,6 +99,9 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   // Brands (only expand when at start or after space)
   'Kng': 'Kong',
   'Simplesolutions': 'Simple Solutions',
+  'Ntrisrc': 'Nutrisource',
+  'Rndlk': 'Round Lake Farm',
+  'Friendfrm': 'Tiny Friends Farm',
 };
 
 /**
