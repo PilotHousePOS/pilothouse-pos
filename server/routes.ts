@@ -4825,6 +4825,254 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============================================
+  // ASTRO LOYALTY INTEGRATION ROUTES
+  // ============================================
+
+  // Test Astro API connection (Admin only)
+  app.get("/api/admin/astro/test-connection", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { testAstroConnection } = await import('./astroLoyalty');
+      const result = await testAstroConnection();
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error testing Astro connection:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to test Astro connection",
+        error: (error as Error).message
+      });
+    }
+  });
+
+  // Get Astro customer status for current user
+  app.get("/api/astro/my-status", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const astroCustomer = await storage.getAstroCustomerByUserId(userId);
+      
+      if (!astroCustomer) {
+        return res.json({
+          linked: false,
+          message: "Your account is not linked to Astro Loyalty yet"
+        });
+      }
+
+      // Get frequent buyer progress
+      const progress = await storage.getFrequentBuyerProgressByCustomer(astroCustomer.id);
+
+      res.json({
+        linked: true,
+        loyaltyPoints: astroCustomer.loyaltyPoints,
+        email: astroCustomer.email,
+        lastSyncedAt: astroCustomer.lastSyncedAt,
+        syncStatus: astroCustomer.syncStatus,
+        frequentBuyerPrograms: progress
+      });
+    } catch (error) {
+      console.error("Error getting Astro status:", error);
+      res.status(500).json({ message: "Failed to get loyalty status" });
+    }
+  });
+
+  // Link customer to Astro Loyalty (creates account if needed)
+  app.post("/api/astro/link-account", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Check if already linked
+      const existing = await storage.getAstroCustomerByUserId(userId);
+      if (existing) {
+        return res.status(400).json({ 
+          message: "Account is already linked to Astro Loyalty",
+          astroCustomer: existing
+        });
+      }
+
+      // Lookup or create customer in Astro
+      const { lookupOrCreateAstroCustomer } = await import('./astroLoyalty');
+      const astroData = await lookupOrCreateAstroCustomer({
+        email: user.email || '',
+        firstName: user.firstName || undefined,
+        lastName: user.lastName || undefined,
+        phoneNumber: user.phoneNumber || undefined,
+      });
+
+      if (!astroData) {
+        return res.status(503).json({ 
+          message: "Astro Loyalty integration is not currently enabled. Please contact store admin."
+        });
+      }
+
+      // Create local Astro customer record
+      const astroCustomer = await storage.createAstroCustomer({
+        userId,
+        astroCustomerId: astroData.customerId,
+        email: user.email || '',
+        phoneNumber: user.phoneNumber || null,
+        loyaltyPoints: astroData.loyaltyPoints,
+        lastSyncedAt: new Date(),
+        syncStatus: 'synced',
+      });
+
+      res.json({
+        success: true,
+        message: "Successfully linked to Astro Loyalty!",
+        astroCustomer
+      });
+    } catch (error) {
+      console.error("Error linking Astro account:", error);
+      res.status(500).json({ message: "Failed to link Astro account" });
+    }
+  });
+
+  // Sync a purchase to Astro (called automatically on order completion)
+  app.post("/api/astro/sync-purchase/:orderId", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const orderId = parseInt(req.params.orderId);
+
+      // Get the order
+      const order = await storage.getOrder(orderId);
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
+      // Verify ownership (unless admin)
+      const user = await storage.getUser(userId);
+      if (order.userId !== userId && !user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Check if customer is linked to Astro
+      const astroCustomer = await storage.getAstroCustomerByUserId(order.userId);
+      if (!astroCustomer) {
+        return res.status(400).json({ 
+          message: "Customer account is not linked to Astro Loyalty"
+        });
+      }
+
+      // Check if already synced
+      const existingSync = await storage.getPurchaseSyncLogByOrder(orderId);
+      if (existingSync.length > 0 && existingSync[0].syncStatus === 'success') {
+        return res.status(400).json({ 
+          message: "This purchase has already been synced to Astro"
+        });
+      }
+
+      // Get order items
+      const orderItemsList = await storage.getOrderItemsByOrder(orderId);
+      if (orderItemsList.length === 0) {
+        return res.status(400).json({ message: "Order has no items" });
+      }
+
+      // Prepare purchase data
+      const { syncPurchaseToAstro } = await import('./astroLoyalty');
+      const items = [];
+      
+      for (const item of orderItemsList) {
+        if (item.supplyId) {
+          const supply = await storage.getSupply(item.supplyId);
+          if (supply) {
+            items.push({
+              productId: supply.id.toString(),
+              productName: supply.name,
+              brand: supply.brand || undefined,
+              quantity: item.quantity,
+              unitPrice: parseFloat(item.price),
+              totalPrice: parseFloat(item.price) * item.quantity,
+            });
+          }
+        }
+      }
+
+      const syncResult = await syncPurchaseToAstro({
+        customerId: astroCustomer.astroCustomerId,
+        transactionId: orderId.toString(),
+        items,
+        purchaseDate: order.orderDate,
+        totalAmount: parseFloat(order.totalAmount),
+      });
+
+      if (!syncResult) {
+        // Log failed sync
+        await storage.createPurchaseSyncLog({
+          orderId,
+          astroCustomerId: astroCustomer.id,
+          supplyId: null,
+          quantity: items.reduce((sum, item) => sum + item.quantity, 0),
+          syncStatus: 'failed',
+          syncError: 'Astro integration not enabled',
+        });
+
+        return res.status(503).json({ 
+          message: "Astro Loyalty integration is not currently enabled"
+        });
+      }
+
+      // Log successful sync for each item
+      for (const item of items) {
+        await storage.createPurchaseSyncLog({
+          orderId,
+          astroCustomerId: astroCustomer.id,
+          supplyId: parseInt(item.productId),
+          quantity: item.quantity,
+          syncStatus: 'success',
+          astroTransactionId: syncResult.transactionId,
+        });
+      }
+
+      res.json({
+        success: true,
+        message: "Purchase synced to Astro Loyalty successfully!",
+        astroTransactionId: syncResult.transactionId
+      });
+    } catch (error) {
+      console.error("Error syncing purchase to Astro:", error);
+      res.status(500).json({ message: "Failed to sync purchase" });
+    }
+  });
+
+  // Get all Astro customers (Admin only)
+  app.get("/api/admin/astro/customers", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const customers = await storage.getAllAstroCustomers();
+      
+      // Enrich with user data
+      const enrichedCustomers = await Promise.all(
+        customers.map(async (astroCustomer) => {
+          const user = await storage.getUser(astroCustomer.userId);
+          return {
+            ...astroCustomer,
+            userName: user ? `${user.firstName} ${user.lastName}` : 'Unknown',
+            userEmail: user?.email
+          };
+        })
+      );
+
+      res.json(enrichedCustomers);
+    } catch (error) {
+      console.error("Error getting Astro customers:", error);
+      res.status(500).json({ message: "Failed to get Astro customers" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
