@@ -44,10 +44,21 @@ function getPageIndicators(currentPage: number, totalPages: number): number[] {
   return Array.from({ length: endPage - startPage }, (_, i) => startPage + i);
 }
 
+const ANIMAL_TYPES = [
+  { id: 'hamster', label: 'Hamster', emoji: '🐹' },
+  { id: 'guinea-pig', label: 'Guinea Pig', emoji: '🐹' },
+  { id: 'rabbit', label: 'Rabbit', emoji: '🐰' },
+  { id: 'ferret', label: 'Ferret', emoji: '🦦' },
+  { id: 'mouse-rat', label: 'Mouse/Rat', emoji: '🐭' },
+  { id: 'gerbil', label: 'Gerbil', emoji: '🐭' },
+  { id: 'chinchilla', label: 'Chinchilla', emoji: '🐭' },
+];
+
 export default function Supplies() {
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedAnimalType, setSelectedAnimalType] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
@@ -59,9 +70,13 @@ export default function Supplies() {
     setSearchQuery(searchInput.trim());
   };
 
-  // Reset page when filters change
+  // Reset page and animal filter when category changes
   useEffect(() => {
     setCurrentPage(0);
+    // Clear animal type when not in small animal category
+    if (selectedCategory !== 'smallAnimalSupplies' && selectedCategory !== 'smallanimal') {
+      setSelectedAnimalType('');
+    }
   }, [searchQuery, selectedCategory]);
 
   const { data, isLoading } = useQuery<{
@@ -77,7 +92,8 @@ export default function Supplies() {
         page: currentPage, 
         limit: ITEMS_PER_PAGE,
         ...(selectedCategory && { category: selectedCategory }),
-        ...(searchQuery && { search: searchQuery })
+        ...(searchQuery && { search: searchQuery }),
+        ...(selectedAnimalType && { animalType: selectedAnimalType })
       }
     ],
   });
@@ -162,6 +178,32 @@ export default function Supplies() {
           </Button>
         ))}
       </div>
+
+      {/* Animal Type Filter (shows only for small animal categories) */}
+      {(selectedCategory === 'smallAnimalSupplies' || selectedCategory === 'smallanimal') && (
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Filter by Animal Type:</h3>
+          <div className="grid grid-cols-3 gap-3">
+            {ANIMAL_TYPES.map((animal) => (
+              <Button
+                key={animal.id}
+                variant="outline"
+                size="sm"
+                className={`text-center py-2 ${
+                  selectedAnimalType === animal.id ? 'bg-brand-blue text-white border-brand-blue' : 'bg-white'
+                }`}
+                onClick={() => setSelectedAnimalType(selectedAnimalType === animal.id ? '' : animal.id)}
+                data-testid={`button-filter-${animal.id}`}
+              >
+                <div className="flex flex-col items-center">
+                  <div className="text-lg mb-1">{animal.emoji}</div>
+                  <div className="text-xs">{animal.label}</div>
+                </div>
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Products Grid */}
       {isLoading ? (

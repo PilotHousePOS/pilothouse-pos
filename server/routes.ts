@@ -702,7 +702,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Supply routes with pagination
   app.get("/api/supplies", async (req, res) => {
     try {
-      const { category, search, page = '0', limit = '24' } = req.query;
+      const { category, search, page = '0', limit = '24', animalType } = req.query;
       
       // Parse pagination parameters with defaults
       const pageNum = Math.max(0, parseInt(page as string) || 0);
@@ -724,7 +724,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         offset,
         category: filterType ? undefined : (category as string | undefined),
         search: search as string | undefined,
-        filterType
+        filterType,
+        animalType: animalType as string | undefined
       });
 
       // Return paginated response with metadata

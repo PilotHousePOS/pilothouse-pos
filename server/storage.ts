@@ -115,6 +115,7 @@ export interface IStorage {
     category?: string; 
     search?: string; 
     filterType?: FilterType;
+    animalType?: string;
   }): Promise<{ items: Supply[]; total: number }>;
   getSupply(id: number): Promise<Supply | undefined>;
   createSupply(supply: InsertSupply): Promise<Supply>;
@@ -582,8 +583,9 @@ export class DatabaseStorage implements IStorage {
     category?: string;
     search?: string;
     filterType?: FilterType;
+    animalType?: string;
   }): Promise<{ items: Supply[]; total: number }> {
-    const { limit, offset, category, search, filterType } = params;
+    const { limit, offset, category, search, filterType, animalType } = params;
 
     // Build WHERE conditions based on filters
     let whereConditions: any[] = [eq(supplies.isActive, true)];
@@ -602,13 +604,44 @@ export class DatabaseStorage implements IStorage {
       whereConditions.push(eq(supplies.category, category));
     }
 
+    // Apply animal type filter for small animal products
+    // Uses keyword matching in name/description for animal-specific products
+    let animalFilteredItems: Supply[] | null = null;
+    if (animalType) {
+      const animalKeywords: Record<string, string[]> = {
+        'hamster': ['hamster'],
+        'guinea-pig': ['guinea pig', 'cavy'],
+        'rabbit': ['rabbit', 'bunny'],
+        'ferret': ['ferret'],
+        'mouse-rat': ['mouse', 'rat', 'mice'],
+        'gerbil': ['gerbil'],
+        'chinchilla': ['chinchilla']
+      };
+      
+      const keywords = animalKeywords[animalType];
+      if (keywords) {
+        // Fetch all items matching category/filterType first
+        const allItems = await db
+          .select()
+          .from(supplies)
+          .where(and(...whereConditions))
+          .orderBy(desc(supplies.createdAt));
+        
+        // Filter by animal type keywords in name or description
+        animalFilteredItems = allItems.filter(item => {
+          const textToSearch = `${item.name || ''} ${item.description || ''}`.toLowerCase();
+          return keywords.some(keyword => textToSearch.includes(keyword.toLowerCase()));
+        });
+      }
+    }
+
     // If we have a search query, use fuzzy search for typo tolerance
     if (trimmedSearch) {
       // Import fuzzy search at runtime to avoid circular dependencies
       const { fuzzySearchFilter } = await import('./fuzzySearch');
       
-      // Fetch all matching items from database (without search filter to get broader set)
-      const allItems = await db
+      // Use animalFilteredItems if available, otherwise fetch all matching items
+      const allItems = animalFilteredItems || await db
         .select()
         .from(supplies)
         .where(and(...whereConditions))
@@ -628,6 +661,13 @@ export class DatabaseStorage implements IStorage {
       // Apply pagination manually after fuzzy filtering
       const items = filteredItems.slice(offset, offset + limit);
       
+      return { items, total };
+    }
+
+    // If we have animal filter but no search, use the filtered items
+    if (animalFilteredItems) {
+      const total = animalFilteredItems.length;
+      const items = animalFilteredItems.slice(offset, offset + limit);
       return { items, total };
     }
 
