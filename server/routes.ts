@@ -1390,6 +1390,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // CHECK CAPACITY LIMITS if date or pets are being changed
+      if (appointmentDate !== undefined || pets !== undefined) {
+        // Use new date if provided, otherwise use current
+        const dateToCheck = appointmentDate ? new Date(appointmentDate) : new Date(currentAppointment.appointmentDate);
+        const appointmentDateStr = dateToCheck.toISOString().split('T')[0];
+        const dayOfWeek = dateToCheck.getDay();
+        
+        // Get the pets that will be in this appointment after the update
+        let finalPets;
+        if (pets !== undefined) {
+          // Using new pets array
+          finalPets = pets;
+        } else {
+          // Using existing pets
+          const existingPets = await storage.getAppointmentPets(id);
+          if (existingPets && existingPets.length > 0) {
+            finalPets = existingPets;
+          } else {
+            // Legacy single-pet appointment
+            finalPets = [{
+              serviceType: currentAppointment.serviceType
+            }];
+          }
+        }
+        
+        // Check weekly limits for Monday-Saturday (1-6)
+        if (dayOfWeek >= 1 && dayOfWeek <= 6) {
+          const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
+          
+          if (weeklyLimit) {
+            // Count existing appointments on the target date (excluding this one and cancelled/rejected)
+            const allAppointments = await storage.getAppointments();
+            const appointmentsOnDate = allAppointments.filter((apt: any) => {
+              const aptDateStr = new Date(apt.appointmentDate).toISOString().split('T')[0];
+              return aptDateStr === appointmentDateStr && 
+                     apt.id !== id && // Exclude current appointment being updated
+                     apt.status !== 'cancelled' && 
+                     apt.status !== 'rejected';
+            });
+            
+            // Count existing dogs by service type
+            let bathDogs = 0;
+            let groomDogs = 0;
+            
+            for (const apt of appointmentsOnDate) {
+              const aptPets = await storage.getAppointmentPets(apt.id);
+              if (aptPets && aptPets.length > 0) {
+                bathDogs += aptPets.filter((p: any) => p.serviceType === 'grooming-bath').length;
+                groomDogs += aptPets.filter((p: any) => p.serviceType === 'grooming-full').length;
+              } else {
+                // Legacy single-pet
+                if (apt.serviceType === 'grooming-bath') bathDogs++;
+                if (apt.serviceType === 'grooming-full') groomDogs++;
+              }
+            }
+            
+            // Count dogs in the updated appointment
+            const requestedBaths = finalPets.filter((p: any) => p.serviceType === 'grooming-bath').length;
+            const requestedGrooms = finalPets.filter((p: any) => p.serviceType === 'grooming-full').length;
+            
+            // Check if update would exceed capacity
+            if (bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
+              return res.status(400).json({
+                message: `Cannot update: Bath grooming capacity would be exceeded for this date (limit: ${weeklyLimit.maxBathAppointments} dogs, ${bathDogs} already booked by other appointments). Please select a different date or reduce the number of bath services.`
+              });
+            }
+            
+            if (groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
+              return res.status(400).json({
+                message: `Cannot update: Full grooming capacity would be exceeded for this date (limit: ${weeklyLimit.maxGroomAppointments} dogs, ${groomDogs} already booked by other appointments). Please select a different date or reduce the number of full groom services.`
+              });
+            }
+          }
+        }
+      }
+
       // Build appointment-level update object
       const updates: any = {};
       if (ownerFirstName !== undefined) updates.ownerFirstName = ownerFirstName;
