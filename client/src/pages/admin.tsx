@@ -5474,7 +5474,7 @@ export default function Admin() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
@@ -5486,9 +5486,12 @@ export default function Admin() {
         }, 500);
         return;
       }
+      
+      // Show specific error message if available
+      const errorMessage = error?.message || "Failed to delete supply.";
       toast({
         title: "Error",
-        description: "Failed to delete supply.",
+        description: errorMessage,
         variant: "destructive",
       });
     },

@@ -1011,6 +1011,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteSupply(id: number): Promise<void> {
+    // Check if supply is referenced in any order items
+    const orderItemsWithSupply = await db
+      .select()
+      .from(orderItems)
+      .where(eq(orderItems.supplyId, id))
+      .limit(1);
+
+    if (orderItemsWithSupply.length > 0) {
+      throw new Error("Cannot delete supply that has been ordered. Consider marking it as inactive instead.");
+    }
+
+    // Delete any cart items referencing this supply first
+    await db.delete(cartItems).where(eq(cartItems.supplyId, id));
+    
+    // Now delete the supply
     await db.delete(supplies).where(eq(supplies.id, id));
   }
 
