@@ -81,24 +81,49 @@ export function fuzzyMatch(
   const lowerText = text.toLowerCase();
   const lowerQuery = query.toLowerCase().trim();
   
+  // FIRST: Check for exact substring match in full text (highest priority)
+  if (lowerText.includes(lowerQuery)) {
+    return { matches: true, score: 100 };
+  }
+  
   // Check each word in the query
   const queryWords = lowerQuery.split(/\s+/);
   let totalScore = 0;
   let matchedWords = 0;
   
   for (const queryWord of queryWords) {
+    // Skip very short query words for fuzzy matching (require exact match)
+    if (queryWord.length <= 2) {
+      if (lowerText.includes(queryWord)) {
+        matchedWords++;
+        totalScore += 100;
+      } else {
+        totalScore += 0;
+      }
+      continue;
+    }
+    
     let bestScore = 0;
     
     // Check against each word in the text
     const textWords = lowerText.split(/\s+/);
     for (const textWord of textWords) {
-      const score = similarityScore(textWord, queryWord);
-      bestScore = Math.max(bestScore, score);
+      // For short text words, require exact match
+      if (textWord.length <= 3) {
+        if (textWord === queryWord) {
+          bestScore = Math.max(bestScore, 100);
+        }
+      } else {
+        // For longer words, use similarity scoring
+        const score = similarityScore(textWord, queryWord);
+        bestScore = Math.max(bestScore, score);
+      }
     }
     
-    // Also check against the full text for substring matches
-    const fullTextScore = similarityScore(lowerText, queryWord);
-    bestScore = Math.max(bestScore, fullTextScore);
+    // Also check if query word appears as substring in full text
+    if (lowerText.includes(queryWord)) {
+      bestScore = Math.max(bestScore, 95);
+    }
     
     if (bestScore >= threshold) {
       matchedWords++;
