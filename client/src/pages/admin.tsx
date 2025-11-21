@@ -679,6 +679,7 @@ function ContactsManager() {
     animalType: '',
     breed: '',
   });
+  const [petNamesInput, setPetNamesInput] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const [expandedContactId, setExpandedContactId] = useState<string | number | null>(null);
   const [historyDialogContact, setHistoryDialogContact] = useState<{ id: number; name: string } | null>(null);
@@ -724,6 +725,7 @@ function ContactsManager() {
       });
       setIsAddContactOpen(false);
       setContactFormData({ name: '', email: '', phoneNumber: '', petNames: [], notes: '', animalType: '', breed: '' });
+      setPetNamesInput('');
       queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
     },
     onError: () => {
@@ -746,6 +748,7 @@ function ContactsManager() {
       });
       setEditingContact(null);
       setContactFormData({ name: '', email: '', phoneNumber: '', petNames: [], notes: '', animalType: '', breed: '' });
+      setPetNamesInput('');
       await queryClient.refetchQueries({ queryKey: ["/api/contacts"] });
     },
     onError: () => {
@@ -973,6 +976,7 @@ function ContactsManager() {
       animalType: contact.animalType || '',
       breed: contact.breed || '',
     });
+    setPetNamesInput((contact.petNames || []).join(', '));
   };
 
   const handleUpdateContact = () => {
@@ -1123,8 +1127,11 @@ function ContactsManager() {
                       data-testid="input-contact-pet-names"
                       type="text"
                       placeholder="Buddy, Max, Luna (comma separated)"
-                      value={contactFormData.petNames.join(', ')}
+                      value={petNamesInput}
                       onChange={(e) => {
+                        setPetNamesInput(e.target.value);
+                      }}
+                      onBlur={(e) => {
                         const names = e.target.value.split(',').map(n => n.trim()).filter(Boolean);
                         setContactFormData({ ...contactFormData, petNames: names });
                       }}
@@ -1238,8 +1245,11 @@ function ContactsManager() {
                       data-testid="input-edit-contact-pet-names"
                       type="text"
                       placeholder="Buddy, Max, Luna (comma separated)"
-                      value={(contactFormData.petNames || []).join(', ')}
+                      value={petNamesInput}
                       onChange={(e) => {
+                        setPetNamesInput(e.target.value);
+                      }}
+                      onBlur={(e) => {
                         const names = e.target.value.split(',').map(n => n.trim()).filter(Boolean);
                         setContactFormData({ ...contactFormData, petNames: names });
                       }}
