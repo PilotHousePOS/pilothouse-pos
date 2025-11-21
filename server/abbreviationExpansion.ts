@@ -111,6 +111,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Ntrisrc': 'Nutrisource',
   'Rndlk': 'Round Lake Farm',
   'Friendfrm': 'Tiny Friends Farm',
+  'Bluebuff': 'Bluebuffalo',
 };
 
 /**
