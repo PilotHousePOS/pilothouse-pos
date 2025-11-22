@@ -1430,25 +1430,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
                      apt.status !== 'rejected';
             });
             
-            // Count existing dogs by service type
+            // Count existing dogs by service type with substring matching
             let bathDogs = 0;
             let groomDogs = 0;
             
             for (const apt of appointmentsOnDate) {
               const aptPets = await storage.getAppointmentPets(apt.id);
               if (aptPets && aptPets.length > 0) {
-                bathDogs += aptPets.filter((p: any) => p.serviceType === 'grooming-bath').length;
-                groomDogs += aptPets.filter((p: any) => p.serviceType === 'grooming-full').length;
+                for (const p of aptPets) {
+                  const serviceType = (p.serviceType || '').toLowerCase();
+                  if (serviceType.includes('bath')) {
+                    bathDogs++;
+                  } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+                    groomDogs++;
+                  }
+                }
               } else {
-                // Legacy single-pet
-                if (apt.serviceType === 'grooming-bath') bathDogs++;
-                if (apt.serviceType === 'grooming-full') groomDogs++;
+                // Legacy single-pet with substring matching
+                const serviceType = (apt.serviceType || '').toLowerCase();
+                if (serviceType.includes('bath')) {
+                  bathDogs++;
+                } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+                  groomDogs++;
+                }
               }
             }
             
-            // Count dogs in the updated appointment
-            const requestedBaths = finalPets.filter((p: any) => p.serviceType === 'grooming-bath').length;
-            const requestedGrooms = finalPets.filter((p: any) => p.serviceType === 'grooming-full').length;
+            // Count dogs in the updated appointment with substring matching
+            let requestedBaths = 0;
+            let requestedGrooms = 0;
+            for (const p of finalPets) {
+              const serviceType = (p.serviceType || '').toLowerCase();
+              if (serviceType.includes('bath')) {
+                requestedBaths++;
+              } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+                requestedGrooms++;
+              }
+            }
             
             // Check if update would exceed capacity
             if (bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
@@ -1750,19 +1768,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Get appointment pets to count service types accurately
             const aptPets = await storage.getAppointmentPets(apt.id);
             if (aptPets && aptPets.length > 0) {
-              // Multi-pet appointment - count each pet's service type
-              bathDogs += aptPets.filter((p: any) => p.serviceType === 'grooming-bath').length;
-              groomDogs += aptPets.filter((p: any) => p.serviceType === 'grooming-full').length;
+              // Multi-pet appointment - count each pet's service type with substring matching
+              for (const p of aptPets) {
+                const serviceType = (p.serviceType || '').toLowerCase();
+                if (serviceType.includes('bath')) {
+                  bathDogs++;
+                } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+                  groomDogs++;
+                }
+              }
             } else {
-              // Legacy single-pet appointment - use appointment's serviceType
-              if (apt.serviceType === 'grooming-bath') bathDogs++;
-              if (apt.serviceType === 'grooming-full') groomDogs++;
+              // Legacy single-pet appointment - use appointment's serviceType with substring matching
+              const serviceType = (apt.serviceType || '').toLowerCase();
+              if (serviceType.includes('bath')) {
+                bathDogs++;
+              } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+                groomDogs++;
+              }
             }
           }
           
-          // Count requested pets by service type
-          const requestedBaths = petsArray.filter((p: any) => p.serviceType === 'grooming-bath').length;
-          const requestedGrooms = petsArray.filter((p: any) => p.serviceType === 'grooming-full').length;
+          // Count requested pets by service type with substring matching
+          let requestedBaths = 0;
+          let requestedGrooms = 0;
+          for (const p of petsArray) {
+            const serviceType = (p.serviceType || '').toLowerCase();
+            if (serviceType.includes('bath')) {
+              requestedBaths++;
+            } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+              requestedGrooms++;
+            }
+          }
           
           // HARD LIMIT: Cannot be bypassed by anyone, including admins
           // This ensures grooming capacity is never exceeded
