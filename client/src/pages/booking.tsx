@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -45,6 +46,7 @@ export default function Booking() {
 
   const [contactSearch, setContactSearch] = useState('');
   const [showContactDropdown, setShowContactDropdown] = useState(false);
+  const [showCapacityDialog, setShowCapacityDialog] = useState(false);
 
   // Fetch current user data to check if admin/groomer
   const { data: currentUser, isLoading: isUserLoading } = useQuery({
@@ -292,7 +294,7 @@ export default function Booking() {
       setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
@@ -304,6 +306,32 @@ export default function Booking() {
         }, 500);
         return;
       }
+      
+      // Extract error message from apiRequest error format: "400: {json}"
+      let errorText = '';
+      if (error?.message) {
+        // Parse the error message which is in format "statusCode: jsonText"
+        const parts = error.message.split(': ', 2);
+        if (parts.length === 2) {
+          try {
+            const jsonData = JSON.parse(parts[1]);
+            errorText = jsonData.message || '';
+          } catch {
+            errorText = parts[1];
+          }
+        } else {
+          errorText = error.message;
+        }
+      }
+      
+      // Check if this is a capacity error
+      if (errorText.includes('capacity is fully booked') || errorText.includes('capacity would be exceeded')) {
+        // Show centered modal for capacity errors
+        setShowCapacityDialog(true);
+        return;
+      }
+      
+      // For other errors, show toast
       toast({
         title: "Booking Failed",
         description: "Failed to book appointment. Please try again.",
@@ -697,6 +725,27 @@ export default function Booking() {
         </Button>
       </form>
       )}
+      
+      {/* Capacity Error Dialog */}
+      <Dialog open={showCapacityDialog} onOpenChange={setShowCapacityDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-center">Fully Booked</DialogTitle>
+            <DialogDescription className="text-center text-base pt-4">
+              We are fully booked for that day. Please select a different date.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center">
+            <Button
+              onClick={() => setShowCapacityDialog(false)}
+              className="bg-brand-red hover:bg-red-600 text-white px-8"
+              data-testid="button-capacity-dialog-close"
+            >
+              OK
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       </div>
     </div>
   );
