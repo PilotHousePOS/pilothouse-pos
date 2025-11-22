@@ -281,6 +281,7 @@ export function categorizeProducts(products: Pick<Supply, 'id' | 'name' | 'brand
 
 /**
  * Detects if a product name represents a live animal (should go to pets, not supplies)
+ * Uses word-boundary matching and contextual scoring for robust detection
  * @param itemName - Product name to check
  * @returns Object with isLiveAnimal boolean, species, and detected keywords
  */
@@ -289,134 +290,298 @@ export function detectLiveAnimal(itemName: string): {
   species: string | null;
   detectedKeywords: string[];
 } {
-  const nameLower = itemName.toLowerCase();
-  const detectedKeywords: string[] = [];
-  let species: string | null = null;
-
-  // **STEP 1: Check supply exclusions FIRST** - If it's clearly a supply, return immediately
-  const supplyExclusions = [
-    // Food & Nutrition
-    'food', 'pellet', 'treat', 'bedding', 'flakes', 'wafer',
-    'chip', 'pellets', 'block', 'stick', 'drops', 'powder',
-    'vitamin', 'supplement', 'medicine', 'nutrition',
-    
-    // Housing & Accessories
-    'cage', 'tank', 'aquarium', 'terrarium', 'habitat',
-    'filter', 'heater', 'decoration', 'decor', 'toy', 'bowl', 'bottle',
-    'substrate', 'collar', 'leash', 'harness', 'carrier', 'crate', 'brush',
-    'shavings', 'litter', 'hay', 'straw',
-    'pump', 'air pump', 'whisper', 'cave', 'shelter', 'hide',
-    'light', 'lighting', 'bulb', 'lamp', 'uvb', 'basking',
-    
-    // Products & Kits
-    'kit', 'starter', 'system', 'setup', 'complete', 'care',
-    'conditioner', 'treatment', 'cleaner', 'remover', 'control',
-    
-    // Shampoos & Grooming
-    'shampoo', 'spray', 'wipes', 'solution',
-    
-    // Brand/Product Names (when species names are used as brands)
-    'safestart', 'safe start', 'aquasafe', 'bettasafe', 'aquacare',
-    'complete care', 'ultimate', 'premium', 'professional', 'advanced',
-    'shield', 'guard', 'protect', 'defense', 'max', 'plus', 'pro'
-  ];
-
-  const isSupply = supplyExclusions.some(exclusion => nameLower.includes(exclusion));
+  const nameLower = itemName.toLowerCase().trim();
   
-  if (isSupply) {
-    // It's a supply - don't even check for animal keywords
-    return {
-      isLiveAnimal: false,
-      species: null,
-      detectedKeywords: []
-    };
-  }
-
-  // **STEP 2: Check for explicit "live animal" indicators**
-  const explicitLiveIndicators = [
-    'live', 'feeder', 'baby', 'juvenile', 'adult',
-    'male', 'female', 'pair', 'breeding', 'starter'
-  ];
-
-  const hasExplicitLiveIndicator = explicitLiveIndicators.some(indicator => 
-    nameLower.includes(indicator)
-  );
-
-  // **STEP 3: Check animal keywords** - Only match if standalone or with live indicator
-  const liveAnimalPatterns = {
-    // Small Animals / Rodents - Use standalone word boundaries where possible
-    mice: ['live mice', 'feeder mice', 'pinkie mice', 'fuzzy mice', 'hopper mice', 'mice'],
-    hamster: ['hamster'],
-    guineapig: ['guinea pig', 'guinea-pig', 'guineapig'],
-    gerbil: ['gerbil'],
-    chinchilla: ['chinchilla'],
-    ferret: ['ferret'], // Will be validated as standalone by word count check
-    rabbit: ['rabbit', 'bunny'], // Will be validated as standalone by word count check
-    rat: ['live rat', 'feeder rat', 'rat'],
+  // Tokenize into words (handles hyphens, slashes, etc.)
+  const words = nameLower.split(/[\s\-\/]+/).filter(w => w.length > 0);
+  const wordSet = new Set(words);
+  
+  // **NEGATIVE SIGNALS**: Strong indicators this is a supply, not a live animal
+  const supplyKeywords = new Set([
+    // Food & Nutrition
+    'food', 'foods', 'pellet', 'pellets', 'treat', 'treats', 'bedding', 'flakes', 'wafer', 'wafers',
+    'chip', 'chips', 'block', 'stick', 'drops', 'powder', 'vitamin', 'vitamins', 'supplement', 'supplements', 'medicine', 'medicines',
+    'hay', 'straw', 'litter', 'shavings',
     
-    // Fish (common species) - More specific patterns
-    goldfish: ['goldfish', 'gold fish'],
-    betta: ['betta fish', 'betta'],
+    // Housing & Equipment
+    'cage', 'cages', 'tank', 'tanks', 'aquarium', 'terrarium', 'habitat', 'filter', 'filters', 'heater', 'heaters', 'pump', 'pumps',
+    'decoration', 'decorations', 'decor', 'toy', 'toys', 'bowl', 'bowls', 'bottle', 'bottles', 'substrate',
+    'kit', 'kits', 'starter', 'starters', 'collar', 'collars', 'leash', 'harness', 'carrier', 'crate', 'brush', 'net',
+    'ornament', 'ornaments', 'moss', 'hook', 'hooks', 'statue', 'statues', 'set', 'sets',
+    
+    // Products & Treatments
+    'conditioner', 'treatment', 'treatments', 'cleaner', 'shampoo', 'spray', 'sprays', 'solution', 'solutions',
+    'light', 'lights', 'lighting', 'bulb', 'bulbs', 'lamp', 'lamps', 'cave', 'caves', 'shelter', 'shelters', 'hide',
+    'remover', 'control', 'system', 'systems', 'setup', 'setups', 'complete', 'care', 'decorative',
+    'shed', 'shedding', 'aid', 'humidifier', 'training', 'trainer', 'perch', 'stand',
+    
+    // Merchandise & Product Types (comprehensive product noun taxonomy)
+    'plush', 'stuffed', 'hoodie', 'shirt', 't-shirt', 'tshirt', 'tee', 'apparel', 'clothing',
+    'keychain', 'poster', 'print', 'sticker', 'decal', 'magnet', 'mug', 'cup',
+    'calendar', 'book', 'guide', 'magazine', 'journal', 'notebook',
+    'hammock', 'blanket', 'towel', 'mat', 'pad', 'cushion',
+    'charm', 'pendant', 'jewelry', 'necklace', 'bracelet',
+    'figurine', 'model', 'replica', 'sculpture'
+  ]);
+  
+  // Brand/product name words that indicate this is a supply product, not a live animal
+  const brandProductWords = new Set([
+    'buddy', 'guard', 'shield', 'safe', 'safestart', 'aquasafe', 'bettasafe',
+    'bioscrub', 'bio', 'scrub', 'max', 'plus', 'pro', 'premium', 'ultimate'
+  ]);
+  
+  // Check for supply keywords with word-boundary matching
+  const hasSupplyKeyword = words.some(word => supplyKeywords.has(word));
+  const hasBrandProductWord = words.some(word => brandProductWords.has(word));
+  
+  if (hasSupplyKeyword || hasBrandProductWord) {
+    return { isLiveAnimal: false, species: null, detectedKeywords: [] };
+  }
+  
+  // **POSITIVE SIGNALS**: Three-set taxonomy for robust detection
+  
+  // 1. Live indicators - explicit life stage, sex, and acquisition context
+  const liveIndicators = new Set([
+    'live', 'feeder', 'baby', 'babies', 'juvenile', 'juveniles', 'adult', 'adults',
+    'hatchling', 'hatchlings', 'subadult', 'subadults', 'yearling', 'yearlings',
+    'male', 'males', 'female', 'females', 'pair', 'pairs', 'breeding',
+    'young', 'newborn', 'infant', 'fry', 'fingerling', 'tadpole', 'tadpoles'
+  ]);
+  
+  // 2. Base species nouns - taxonomic/common names that can appear as trailing words
+  const baseSpeciesNouns = new Set([
+    // Fish
+    'cichlid', 'cichlids', 'tetra', 'tetras', 'danio', 'danios', 'loach', 'loaches',
+    'barb', 'barbs', 'gourami', 'gouramis', 'catfish', 'angelfish',
+    // Reptiles
+    'python', 'pythons', 'snake', 'snakes', 'gecko', 'geckos', 'dragon', 'dragons',
+    'chameleon', 'chameleons', 'turtle', 'turtles', 'tortoise', 'tortoises',
+    'lizard', 'lizards', 'frog', 'frogs', 'toad', 'toads',
+    // Small animals
+    'hamster', 'hamsters', 'gerbil', 'gerbils', 'mouse', 'mice', 'rat', 'rats',
+    'rabbit', 'rabbits', 'guinea', 'pig', 'pigs', 'ferret', 'ferrets'
+  ]);
+  
+  const hasLiveIndicator = words.some(word => liveIndicators.has(word));
+  
+  // **SPECIES DETECTION**: Check for animal species keywords with word-boundary matching
+  const speciesPatterns: Record<string, string[]> = {
+    // Small Animals
+    mice: ['mice', 'mouse', 'pinkie', 'fuzzy', 'hopper'],
+    hamster: ['hamster', 'hamsters'],
+    guineapig: ['guinea', 'guineapig'],
+    gerbil: ['gerbil', 'gerbils'],
+    chinchilla: ['chinchilla', 'chinchillas'],
+    ferret: ['ferret', 'ferrets'],
+    rabbit: ['rabbit', 'rabbits', 'bunny', 'bunnies'],
+    rat: ['rat', 'rats'],
+    
+    // Fish
+    goldfish: ['goldfish'],
+    betta: ['betta', 'bettas'],
     guppy: ['guppy', 'guppies'],
     molly: ['molly', 'mollies'],
     platy: ['platy', 'platies'],
-    swordtail: ['swordtail', 'sword tail'],
-    tetra: ['neon tetra', 'cardinal tetra', 'tetra'],
-    angelfish: ['angelfish', 'angel fish'],
-    gourami: ['gourami'],
-    barb: ['tiger barb', 'cherry barb', 'barb'],
-    danio: ['zebra danio', 'danio'],
-    rasbora: ['rasbora'],
-    loach: ['clown loach', 'kuhli loach', 'loach'],
-    catfish: ['corydoras', 'cory', 'plecostomus', 'pleco', 'catfish'],
-    cichlid: ['african cichlid', 'german blue ram', 'electric blue', 'cichlid'],
+    swordtail: ['swordtail', 'swordtails'],
+    tetra: ['tetra', 'tetras'],
+    angelfish: ['angelfish'],
+    gourami: ['gourami', 'gouramis'],
+    barb: ['barb', 'barbs'],
+    danio: ['danio', 'danios'],
+    rasbora: ['rasbora', 'rasboras'],
+    loach: ['loach', 'loaches'],
+    catfish: ['catfish', 'corydoras', 'cory', 'pleco', 'plecostomus'],
+    cichlid: ['cichlid', 'cichlids'],
     discus: ['discus'],
     koi: ['koi'],
     
     // Reptiles
-    gecko: ['leopard gecko', 'crested gecko', 'gecko'],
-    beardeddragon: ['bearded dragon', 'beardie'],
-    chameleon: ['veiled chameleon', 'panther chameleon', 'jackson chameleon', "jackson's chameleon", 'chameleon'],
-    iguana: ['iguana'],
-    snake: ['ball python', 'corn snake', 'king snake', 'snake'],
-    turtle: ['turtle', 'tortoise'],
-    frog: ['tree frog', 'frog'],
-    salamander: ['salamander', 'newt'],
+    gecko: ['gecko', 'geckos'],
+    beardeddragon: ['beardie', 'bearded'],
+    chameleon: ['chameleon', 'chameleons'],
+    iguana: ['iguana', 'iguanas'],
+    snake: ['snake', 'snakes'],
+    turtle: ['turtle', 'turtles', 'tortoise', 'tortoises'],
+    frog: ['frog', 'frogs'],
+    salamander: ['salamander', 'salamanders', 'newt', 'newts'],
     
     // Birds
-    parakeet: ['parakeet', 'budgie', 'budgerigar'],
-    cockatiel: ['cockatiel'],
-    canary: ['canary'],
-    finch: ['finch'],
-    parrot: ['parrot', 'macaw', 'conure']
+    parakeet: ['parakeet', 'parakeets', 'budgie', 'budgerigar'],
+    cockatiel: ['cockatiel', 'cockatiels'],
+    canary: ['canary', 'canaries'],
+    finch: ['finch', 'finches'],
+    parrot: ['parrot', 'parrots', 'macaw', 'conure']
   };
-
-  // Check each pattern
-  for (const [speciesKey, patterns] of Object.entries(liveAnimalPatterns)) {
-    for (const pattern of patterns) {
-      // Check if pattern exists in the name
-      if (nameLower.includes(pattern)) {
-        detectedKeywords.push(pattern);
-        species = speciesKey;
+  
+  // **EARLY CHECK FOR MULTI-WORD SPECIES PATTERNS** (for short names without single-word species keywords)
+  // This handles cases like "Ball Python" where neither "ball" nor "python" are in species patterns
+  if (words.length >= 2 && words.length <= 5) {
+    const multiWordPatterns = [
+      // Cichlids (various orderings)
+      ['german', 'blue', 'ram'],
+      ['blue', 'ram', 'cichlid'],
+      ['ram', 'cichlid'],
+      ['electric', 'blue'],
+      
+      // Other Fish
+      ['neon', 'tetra'],
+      ['cardinal', 'tetra'],
+      ['zebra', 'danio'],
+      ['clown', 'loach'],
+      ['kuhli', 'loach'],
+      
+      // Reptiles
+      ['leopard', 'gecko'],
+      ['crested', 'gecko'],
+      ['bearded', 'dragon'],
+      ['jackson', 'chameleon'],
+      ['veiled', 'chameleon'],
+      ['panther', 'chameleon'],
+      ['ball', 'python'],
+      ['corn', 'snake'],
+      ['king', 'snake'],
+      
+      // Small Animals & Amphibians
+      ['guinea', 'pig'],
+      ['tree', 'frog']
+    ];
+    
+    // Map pattern to species for proper routing (COMPLETE MAPPING)
+    const patternSpeciesMap: Record<string, string> = {
+      // Reptiles
+      'bearded-dragon': 'beardeddragon',
+      'ball-python': 'snake',
+      'corn-snake': 'snake',
+      'king-snake': 'snake',
+      'tree-frog': 'frog',
+      'leopard-gecko': 'gecko',
+      'crested-gecko': 'gecko',
+      'jackson-chameleon': 'chameleon',
+      'veiled-chameleon': 'chameleon',
+      'panther-chameleon': 'chameleon',
+      
+      // Fish
+      'neon-tetra': 'tetra',
+      'cardinal-tetra': 'tetra',
+      'zebra-danio': 'danio',
+      'clown-loach': 'loach',
+      'kuhli-loach': 'loach',
+      'german-blue-ram': 'cichlid',
+      'blue-ram-cichlid': 'cichlid',
+      'ram-cichlid': 'cichlid',
+      'electric-blue': 'cichlid',
+      
+      // Small Animals
+      'guinea-pig': 'guineapig'
+    };
+    
+    const matchedPattern = multiWordPatterns.find(pattern =>
+      pattern.every(word => wordSet.has(word))
+    );
+    
+    if (matchedPattern) {
+      // **CRITICAL CHECK**: Verify remaining words are positive signals
+      // Allowed: live indicators OR base species nouns (e.g., "Electric Blue Ram Cichlid")
+      // Rejected: product nouns (e.g., "Corn Snake Deluxe")
+      const patternSet = new Set(matchedPattern);
+      const remainingWords = words.filter(word => 
+        !patternSet.has(word) && 
+        !liveIndicators.has(word) && 
+        !baseSpeciesNouns.has(word)
+      );
+      
+      // If there are remaining words that are NOT positive signals, this is likely a product
+      if (remainingWords.length > 0) {
+        // Fall through to single-word species check
+      } else {
+        // All words are either in the pattern, live indicators, or base species nouns → Live animal
+        const patternKey = matchedPattern.join('-');
+        const species = patternSpeciesMap[patternKey] || 'multiword';
+        return { isLiveAnimal: true, species, detectedKeywords: matchedPattern };
+      }
+    }
+  }
+  
+  // **SINGLE-WORD SPECIES KEYWORD CHECK**
+  // Split species into SPECIFIC (safe to auto-approve) vs GENERIC (require live indicator or multi-word pattern)
+  const specificSpeciesPatterns: Record<string, string[]> = {
+    // These are VERY specific animal names - safe to auto-approve on simple names
+    mice: ['mice', 'mouse', 'pinkie', 'fuzzy', 'hopper'],
+    hamster: ['hamster', 'hamsters'],
+    guineapig: ['guinea', 'guineapig'],
+    gerbil: ['gerbil', 'gerbils'],
+    chinchilla: ['chinchilla', 'chinchillas'],
+    ferret: ['ferret', 'ferrets'],
+    rabbit: ['rabbit', 'rabbits', 'bunny', 'bunnies'],
+    goldfish: ['goldfish'],
+    betta: ['betta', 'bettas']
+  };
+  
+  const genericSpeciesPatterns: Record<string, string[]> = {
+    // These are GENERIC - could appear in product names - require live indicator or multi-word pattern
+    tetra: ['tetra', 'tetras'],
+    gecko: ['gecko', 'geckos'],
+    bearded: ['beardie', 'bearded'],
+    chameleon: ['chameleon', 'chameleons'],
+    iguana: ['iguana', 'iguanas'],
+    snake: ['snake', 'snakes'],
+    turtle: ['turtle', 'turtles', 'tortoise', 'tortoises'],
+    frog: ['frog', 'frogs'],
+    parrot: ['parrot', 'parrots'],
+    cockatiel: ['cockatiel', 'cockatiels'],
+    parakeet: ['parakeet', 'parakeets']
+  };
+  
+  let detectedSpecies: string | null = null;
+  const detectedKeywords: string[] = [];
+  let isSpecificSpecies = false;
+  
+  // Check specific species first
+  for (const [species, keywords] of Object.entries(specificSpeciesPatterns)) {
+    for (const keyword of keywords) {
+      if (wordSet.has(keyword)) {
+        detectedKeywords.push(keyword);
+        detectedSpecies = species;
+        isSpecificSpecies = true;
         break;
       }
     }
-    if (species) break; // Found a match, stop searching
+    if (detectedSpecies) break;
   }
-
-  // **STEP 4: Determine if it's a live animal**
-  // Require EITHER:
-  // - Explicit live indicator (e.g., "live goldfish", "feeder mice")
-  // - OR animal keyword that matched AND name is reasonably short (≤5 words to allow for multi-word species names like "German Blue Ram Cichlid")
-  const isReasonablyShortName = nameLower.split(' ').length <= 5;
   
-  const isLiveAnimal = detectedKeywords.length > 0 && (
-    hasExplicitLiveIndicator || isReasonablyShortName
-  );
-
-  return {
-    isLiveAnimal,
-    species: isLiveAnimal ? species : null,
-    detectedKeywords
-  };
+  // If no specific species, check generic species
+  if (!detectedSpecies) {
+    for (const [species, keywords] of Object.entries(genericSpeciesPatterns)) {
+      for (const keyword of keywords) {
+        if (wordSet.has(keyword)) {
+          detectedKeywords.push(keyword);
+          detectedSpecies = species;
+          isSpecificSpecies = false;
+          break;
+        }
+      }
+      if (detectedSpecies) break;
+    }
+  }
+  
+  // No species keyword found
+  if (!detectedSpecies) {
+    return { isLiveAnimal: false, species: null, detectedKeywords: [] };
+  }
+  
+  // **DECISION LOGIC**:
+  // Case 1: Has explicit live indicator → Definitely a live animal
+  if (hasLiveIndicator) {
+    return { isLiveAnimal: true, species: detectedSpecies, detectedKeywords };
+  }
+  
+  // Case 2: SPECIFIC species with simple name (≤3 words) → Live animal
+  // Only SPECIFIC species can be auto-approved on word count alone
+  if (isSpecificSpecies && words.length <= 3) {
+    return { isLiveAnimal: true, species: detectedSpecies, detectedKeywords };
+  }
+  
+  // Case 3: GENERIC species without live indicator → Reject (likely a product)
+  // Generic species like "snake", "frog", "parrot" MUST have live indicator or multi-word pattern
+  return { isLiveAnimal: false, species: null, detectedKeywords: [] };
 }
