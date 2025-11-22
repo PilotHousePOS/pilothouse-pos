@@ -892,7 +892,13 @@ function ContactsManager() {
           const emailMatch = email.startsWith(query);
           const phoneMatch = searchDigits.length > 0 && phone.startsWith(searchDigits);
           
-          return nameMatch || emailMatch || phoneMatch;
+          // Search through pet names
+          const petNames = contact.petNames || [];
+          const petNameMatch = petNames.some((petName: string) => 
+            petName.toLowerCase().includes(query)
+          );
+          
+          return nameMatch || emailMatch || phoneMatch || petNameMatch;
         })
         .sort((a, b) => {
           const nameA = (a.displayName || a.name || '').toLowerCase();
