@@ -4743,6 +4743,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
             continue;
           }
 
+          // Detect if this is a live animal (should go to pets, not supplies)
+          const { detectLiveAnimal } = await import('./productCategorization');
+          const liveAnimalDetection = detectLiveAnimal(extractedItem.itemName);
+
+          if (liveAnimalDetection.isLiveAnimal) {
+            // This is a live animal - add to pets instead of supplies
+            const speciesMap: Record<string, string> = {
+              mice: 'Small Animals',
+              hamster: 'Small Animals',
+              guineapig: 'Small Animals',
+              gerbil: 'Small Animals',
+              chinchilla: 'Small Animals',
+              ferret: 'Small Animals',
+              rabbit: 'Small Animals',
+              rat: 'Small Animals',
+              goldfish: 'Fish',
+              betta: 'Fish',
+              guppy: 'Fish',
+              molly: 'Fish',
+              platy: 'Fish',
+              swordtail: 'Fish',
+              tetra: 'Fish',
+              angelfish: 'Fish',
+              gourami: 'Fish',
+              barb: 'Fish',
+              danio: 'Fish',
+              rasbora: 'Fish',
+              loach: 'Fish',
+              catfish: 'Fish',
+              cichlid: 'Fish',
+              discus: 'Fish',
+              koi: 'Fish',
+              gecko: 'Reptiles',
+              beardeddragon: 'Reptiles',
+              chameleon: 'Reptiles',
+              iguana: 'Reptiles',
+              snake: 'Reptiles',
+              turtle: 'Reptiles',
+              frog: 'Reptiles',
+              salamander: 'Reptiles',
+              parakeet: 'Birds',
+              cockatiel: 'Birds',
+              canary: 'Birds',
+              finch: 'Birds',
+              parrot: 'Birds'
+            };
+
+            const species = speciesMap[liveAnimalDetection.species || ''] || 'Other';
+
+            // Create pet from extracted item
+            const pet = await storage.createPet({
+              name: extractedItem.itemName,
+              species: species,
+              breed: liveAnimalDetection.detectedKeywords.join(', ') || null,
+              price: extractedItem.markedUpPrice,
+              age: null,
+              description: extractedItem.notes || null,
+              isActive: true
+            });
+
+            // Mark item as added to inventory (linked to pet instead of supply)
+            await storage.updateExtractedOrderItem(extractedItem.id, {
+              addedToInventory: true,
+              supplyId: null // No supply ID since it's a pet
+            });
+
+            results.push({ 
+              itemId: extractedItem.id, 
+              success: true, 
+              petId: pet.id,
+              petName: pet.name,
+              isLiveAnimal: true,
+              detectedAs: liveAnimalDetection.species
+            });
+            continue;
+          }
+
           // Apply auto-categorization to determine filterType and category
           const categorizationResult = categorizeProduct({
             name: extractedItem.itemName,
@@ -4782,7 +4859,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             itemId: extractedItem.id, 
             success: true, 
             supplyId: supply.id,
-            supplyName: supply.name
+            supplyName: supply.name,
+            isLiveAnimal: false
           });
         } catch (itemError: any) {
           console.error(`Error adding item ${itemId} to inventory:`, itemError);

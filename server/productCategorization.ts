@@ -278,3 +278,107 @@ export function categorizeProducts(products: Pick<Supply, 'id' | 'name' | 'brand
     ...categorizeProduct(product)
   }));
 }
+
+/**
+ * Detects if a product name represents a live animal (should go to pets, not supplies)
+ * @param itemName - Product name to check
+ * @returns Object with isLiveAnimal boolean, species, and detected keywords
+ */
+export function detectLiveAnimal(itemName: string): {
+  isLiveAnimal: boolean;
+  species: string | null;
+  detectedKeywords: string[];
+} {
+  const nameLower = itemName.toLowerCase();
+  const detectedKeywords: string[] = [];
+  let species: string | null = null;
+
+  // Live animal keywords by category
+  const liveAnimalPatterns = {
+    // Small Animals / Rodents
+    mice: ['mouse', 'mice', 'feeder mice', 'live mice', 'pinkie mice', 'fuzzy mice', 'hopper mice'],
+    hamster: ['hamster', 'syrian hamster', 'dwarf hamster'],
+    guineapig: ['guinea pig', 'guinea-pig', 'guineapig'],
+    gerbil: ['gerbil'],
+    chinchilla: ['chinchilla'],
+    ferret: ['ferret'],
+    rabbit: ['rabbit', 'bunny'],
+    rat: ['rat', 'rats', 'feeder rat', 'live rat'],
+    
+    // Fish (common species)
+    goldfish: ['goldfish', 'gold fish'],
+    betta: ['betta', 'betta fish', 'siamese fighting fish'],
+    guppy: ['guppy', 'guppies'],
+    molly: ['molly', 'mollies'],
+    platy: ['platy', 'platies'],
+    swordtail: ['swordtail', 'sword tail'],
+    tetra: ['tetra', 'neon tetra', 'cardinal tetra'],
+    angelfish: ['angelfish', 'angel fish'],
+    gourami: ['gourami'],
+    barb: ['barb', 'tiger barb', 'cherry barb'],
+    danio: ['danio', 'zebra danio'],
+    rasbora: ['rasbora'],
+    loach: ['loach', 'clown loach', 'kuhli loach'],
+    catfish: ['catfish', 'cory', 'corydoras', 'pleco', 'plecostomus'],
+    cichlid: ['cichlid', 'african cichlid'],
+    discus: ['discus'],
+    koi: ['koi'],
+    
+    // Reptiles
+    gecko: ['gecko', 'leopard gecko', 'crested gecko'],
+    beardeddragon: ['bearded dragon', 'beardie'],
+    chameleon: ['chameleon', 'veiled chameleon', 'panther chameleon', 'jackson chameleon', "jackson's chameleon"],
+    iguana: ['iguana'],
+    snake: ['snake', 'ball python', 'corn snake', 'king snake'],
+    turtle: ['turtle', 'tortoise'],
+    frog: ['frog', 'tree frog'],
+    salamander: ['salamander', 'newt'],
+    
+    // Birds
+    parakeet: ['parakeet', 'budgie', 'budgerigar'],
+    cockatiel: ['cockatiel'],
+    canary: ['canary'],
+    finch: ['finch'],
+    parrot: ['parrot', 'macaw', 'conure']
+  };
+
+  // Check each pattern
+  for (const [speciesKey, patterns] of Object.entries(liveAnimalPatterns)) {
+    for (const pattern of patterns) {
+      if (nameLower.includes(pattern)) {
+        detectedKeywords.push(pattern);
+        species = speciesKey;
+        break;
+      }
+    }
+    if (species) break; // Found a match, stop searching
+  }
+
+  // Additional context clues that indicate live animal
+  const liveAnimalContexts = [
+    'live', 'feeder', 'baby', 'juvenile', 'adult',
+    'male', 'female', 'pair', 'breeding'
+  ];
+
+  const hasLiveContext = liveAnimalContexts.some(context => 
+    nameLower.includes(context) && detectedKeywords.length > 0
+  );
+
+  // Exclude if it's clearly a supply/product, not a live animal
+  const supplyExclusions = [
+    'food', 'pellet', 'treat', 'bedding', 'cage', 'tank',
+    'filter', 'heater', 'decoration', 'toy', 'bowl', 'bottle',
+    'substrate', 'vitamin', 'supplement', 'medicine', 'shampoo',
+    'collar', 'leash', 'harness', 'carrier', 'crate'
+  ];
+
+  const isSupply = supplyExclusions.some(exclusion => nameLower.includes(exclusion));
+
+  const isLiveAnimal = detectedKeywords.length > 0 && !isSupply;
+
+  return {
+    isLiveAnimal,
+    species: isLiveAnimal ? species : null,
+    detectedKeywords
+  };
+}
