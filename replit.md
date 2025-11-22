@@ -76,7 +76,20 @@ The application is a full-stack web application built with React, Vite, TypeScri
 - **Employee Schedule Management System:** Sectioned schedule view with sequential weekly dates (Section A = previous week, B = current week, C = next week), weekly editable grid with date display (e.g., "Mon 11/17"), employee management, flexible time slots, batch save, data persistence, empty state handling, and admin-only access.
 - **Grooming Schedule Management System:** Simplified weekly schedule for groomers showing current week (Monday-Sunday) with automatic date display, editable groomer names and time slots, add/remove groomers, batch save functionality, data persistence, and admin-only access.
 - **AI-Powered Order Photo Upload System:** Upload supplier order photos to extract items automatically with GPT-5 vision, adjustable price multiplier for markup calculation, editable extracted items (name, quantity, price), bulk add to inventory with automatic categorization (items are auto-categorized as aquatic/reptile based on keywords when added to inventory), photo management with history, and admin-only access. Aquatic keywords include common fish names (swordtail, angelfish, barb, danio, rasbora, loach, catfish, corydoras, cory, shrimp, snail, crab, etc.).
-- **Astro Loyalty Integration (NEW):** Customer loyalty program integration with Astro platform including automatic customer account linking, purchase sync for loyalty points tracking, frequent buyer program progress monitoring, admin dashboard for viewing linked customers and sync status, and comprehensive API integration framework. Requires Astro API credentials ($50/month subscription via developer1.astroloyalty.com).
+  - **Live Animal Detection System:** Production-ready word-boundary matching algorithm with three-set taxonomy prevents live animals from being added to supplies inventory:
+    - **Three-Set Taxonomy:**
+      1. **Live Indicators:** Explicit life stage/sex/context words (live, feeder, baby, juvenile, hatchling, subadult, yearling, male, female, pair, breeding, fry, fingerling, tadpole, etc.)
+      2. **Base Species Nouns:** Taxonomic/common names (cichlid, tetra, python, gecko, hamster, ferret, mouse, mice, etc.) - can appear as trailing words
+      3. **Multi-Word Patterns:** Species-specific compound names (Ball Python, Bearded Dragon, Electric Blue Ram Cichlid, Jackson's Chameleon, etc.)
+    - **Species Categorization:**
+      - **Specific Species (auto-approve for simple names):** goldfish, betta, guppy, molly, platy, swordtail, angelfish, oscar, discus, arowana, ferret, hamster, gerbil, hedgehog, chinchilla, beardeddragon (Bearded Dragon)
+      - **Generic Species (require live indicators or multi-word patterns):** snake, frog, parrot, gecko, turtle, lizard, etc.
+    - **Supply Exclusion:** 145+ supply keywords (food, pellet, treat, tank, cage, toy, plush, hoodie, etc.) with comprehensive product noun taxonomy prevent false positives
+    - **Word-Boundary Matching:** Prevents brand name collisions (e.g., "Tetra SafeStart" vs "Neon Tetra")
+    - **Remaining-Word Validation:** Multi-word patterns validate that remaining words are either live indicators or base species nouns (prevents "Corn Snake Plush" or "Ball Python Experience" false positives)
+    - **Pattern-to-Species Mapping:** Complete mapping for all multi-word patterns (ball-python → snake, bearded-dragon → beardeddragon, electric-blue-ram → cichlid, etc.)
+    - **Custom .99 Pricing:** Live animals auto-flagged with .99 pricing rules for supplier orders
+- **Astro Loyalty Integration:** Customer loyalty program integration with Astro platform including automatic customer account linking, purchase sync for loyalty points tracking, frequent buyer program progress monitoring, admin dashboard for viewing linked customers and sync status, and comprehensive API integration framework. Requires Astro API credentials ($50/month subscription via developer1.astroloyalty.com).
 
 **System Design Choices:**
 - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
