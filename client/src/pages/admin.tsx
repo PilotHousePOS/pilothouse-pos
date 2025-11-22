@@ -5187,6 +5187,7 @@ export default function Admin() {
   
   // Book Appointment Modal State
   const [isBookAppointmentOpen, setIsBookAppointmentOpen] = useState(false);
+  const [showAdminCapacityDialog, setShowAdminCapacityDialog] = useState(false);
   const [bookingContactSearch, setBookingContactSearch] = useState('');
   const [showBookingContactDropdown, setShowBookingContactDropdown] = useState(false);
 
@@ -6242,7 +6243,32 @@ export default function Admin() {
       // Refresh appointments
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      // Extract error message from apiRequest error format: "400: {json}"
+      let errorText = '';
+      if (error?.message) {
+        // Parse the error message which is in format "statusCode: jsonText"
+        const parts = error.message.split(': ', 2);
+        if (parts.length === 2) {
+          try {
+            const jsonData = JSON.parse(parts[1]);
+            errorText = jsonData.message || '';
+          } catch {
+            errorText = parts[1];
+          }
+        } else {
+          errorText = error.message;
+        }
+      }
+      
+      // Check if this is a capacity error
+      if (errorText.includes('capacity is fully booked') || errorText.includes('capacity would be exceeded')) {
+        // Show centered modal for capacity errors
+        setShowAdminCapacityDialog(true);
+        return;
+      }
+      
+      // For other errors, show toast
       toast({
         title: "Error",
         description: "Failed to create appointment.",
@@ -10756,6 +10782,27 @@ export default function Admin() {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Capacity Error Dialog */}
+      <Dialog open={showAdminCapacityDialog} onOpenChange={setShowAdminCapacityDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-center">Fully Booked</DialogTitle>
+            <DialogDescription className="text-center text-base pt-4">
+              We are fully booked for that day. Please select a different date.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center">
+            <Button
+              onClick={() => setShowAdminCapacityDialog(false)}
+              className="bg-brand-red hover:bg-red-600 text-white px-8"
+              data-testid="button-admin-capacity-dialog-close"
+            >
+              OK
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
       </div>
