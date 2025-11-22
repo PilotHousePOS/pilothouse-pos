@@ -56,8 +56,8 @@ export const pets = pgTable("pets", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   species: varchar("species", { length: 100 }).notNull(), // mammals, bird, fish, reptile
-  breed: varchar("breed", { length: 255 }).notNull(),
-  age: varchar("age", { length: 50 }).notNull(),
+  breed: varchar("breed", { length: 255 }), // Optional - may not have breed info from AI detection
+  age: varchar("age", { length: 50 }), // Optional - may not have age info from AI detection
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   description: text("description"),
   imageUrl: varchar("image_url", { length: 500 }),
