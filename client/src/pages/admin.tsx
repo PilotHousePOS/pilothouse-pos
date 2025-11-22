@@ -142,22 +142,30 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
   const dogCounts = confirmedAppointments.reduce((counts: { bathDogs: number; fullGroomDogs: number }, apt: any) => {
     if (apt.pets && apt.pets.length > 0) {
       apt.pets.forEach((pet: any) => {
+        // Determine petType - fallback to appointment level if pet level is missing
+        const petType = (pet.petType || apt.petType || '').toLowerCase();
+        
         // Only count dogs, exclude cats
-        if (pet.petType?.toLowerCase() === 'dog') {
-          if (pet.serviceType === 'grooming-bath') {
+        if (petType === 'dog') {
+          const serviceType = (pet.serviceType || apt.serviceType || '').toLowerCase();
+          
+          // Use substring matching to handle variants (grooming-bath, bath, grooming-full, full groom, etc.)
+          if (serviceType.includes('bath')) {
             counts.bathDogs++;
-          } else if (pet.serviceType === 'grooming-full') {
+          } else if (serviceType.includes('full') || serviceType.includes('groom')) {
             counts.fullGroomDogs++;
           }
         }
       });
     } else {
       // Legacy single-pet appointments - check if it's a dog
-      const serviceType = apt.serviceType || 'grooming-bath';
-      if (apt.petType?.toLowerCase() === 'dog') {
-        if (serviceType === 'grooming-bath') {
+      const petType = (apt.petType || '').toLowerCase();
+      if (petType === 'dog') {
+        const serviceType = (apt.serviceType || 'grooming-bath').toLowerCase();
+        
+        if (serviceType.includes('bath')) {
           counts.bathDogs++;
-        } else if (serviceType === 'grooming-full') {
+        } else if (serviceType.includes('full') || serviceType.includes('groom')) {
           counts.fullGroomDogs++;
         }
       }
