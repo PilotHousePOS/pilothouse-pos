@@ -269,7 +269,7 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
  */
 export function categorizeProducts(products: Pick<Supply, 'id' | 'name' | 'brand' | 'description'>[]): Array<{
   id: number;
-  filterType: 'aquatic' | 'reptile' | null;
+  filterType: 'aquatic' | 'reptile' | 'smallanimal' | null;
   confidence: number;
   reason: string;
 }> {
@@ -293,45 +293,94 @@ export function detectLiveAnimal(itemName: string): {
   const detectedKeywords: string[] = [];
   let species: string | null = null;
 
-  // Live animal keywords by category
+  // **STEP 1: Check supply exclusions FIRST** - If it's clearly a supply, return immediately
+  const supplyExclusions = [
+    // Food & Nutrition
+    'food', 'pellet', 'treat', 'bedding', 'flakes', 'wafer',
+    'chip', 'pellets', 'block', 'stick', 'drops', 'powder',
+    'vitamin', 'supplement', 'medicine', 'nutrition',
+    
+    // Housing & Accessories
+    'cage', 'tank', 'aquarium', 'terrarium', 'habitat',
+    'filter', 'heater', 'decoration', 'decor', 'toy', 'bowl', 'bottle',
+    'substrate', 'collar', 'leash', 'harness', 'carrier', 'crate', 'brush',
+    'shavings', 'litter', 'hay', 'straw',
+    'pump', 'air pump', 'whisper', 'cave', 'shelter', 'hide',
+    'light', 'lighting', 'bulb', 'lamp', 'uvb', 'basking',
+    
+    // Products & Kits
+    'kit', 'starter', 'system', 'setup', 'complete', 'care',
+    'conditioner', 'treatment', 'cleaner', 'remover', 'control',
+    
+    // Shampoos & Grooming
+    'shampoo', 'spray', 'wipes', 'solution',
+    
+    // Brand/Product Names (when species names are used as brands)
+    'safestart', 'safe start', 'aquasafe', 'bettasafe', 'aquacare',
+    'complete care', 'ultimate', 'premium', 'professional', 'advanced',
+    'shield', 'guard', 'protect', 'defense', 'max', 'plus', 'pro'
+  ];
+
+  const isSupply = supplyExclusions.some(exclusion => nameLower.includes(exclusion));
+  
+  if (isSupply) {
+    // It's a supply - don't even check for animal keywords
+    return {
+      isLiveAnimal: false,
+      species: null,
+      detectedKeywords: []
+    };
+  }
+
+  // **STEP 2: Check for explicit "live animal" indicators**
+  const explicitLiveIndicators = [
+    'live', 'feeder', 'baby', 'juvenile', 'adult',
+    'male', 'female', 'pair', 'breeding', 'starter'
+  ];
+
+  const hasExplicitLiveIndicator = explicitLiveIndicators.some(indicator => 
+    nameLower.includes(indicator)
+  );
+
+  // **STEP 3: Check animal keywords** - Only match if standalone or with live indicator
   const liveAnimalPatterns = {
-    // Small Animals / Rodents
-    mice: ['mouse', 'mice', 'feeder mice', 'live mice', 'pinkie mice', 'fuzzy mice', 'hopper mice'],
-    hamster: ['hamster', 'syrian hamster', 'dwarf hamster'],
+    // Small Animals / Rodents - Use standalone word boundaries where possible
+    mice: ['live mice', 'feeder mice', 'pinkie mice', 'fuzzy mice', 'hopper mice', 'mice'],
+    hamster: ['hamster'],
     guineapig: ['guinea pig', 'guinea-pig', 'guineapig'],
     gerbil: ['gerbil'],
     chinchilla: ['chinchilla'],
-    ferret: ['ferret'],
-    rabbit: ['rabbit', 'bunny'],
-    rat: ['rat', 'rats', 'feeder rat', 'live rat'],
+    ferret: ['ferret'], // Will be validated as standalone by word count check
+    rabbit: ['rabbit', 'bunny'], // Will be validated as standalone by word count check
+    rat: ['live rat', 'feeder rat', 'rat'],
     
-    // Fish (common species)
+    // Fish (common species) - More specific patterns
     goldfish: ['goldfish', 'gold fish'],
-    betta: ['betta', 'betta fish', 'siamese fighting fish'],
+    betta: ['betta fish', 'betta'],
     guppy: ['guppy', 'guppies'],
     molly: ['molly', 'mollies'],
     platy: ['platy', 'platies'],
     swordtail: ['swordtail', 'sword tail'],
-    tetra: ['tetra', 'neon tetra', 'cardinal tetra'],
+    tetra: ['neon tetra', 'cardinal tetra', 'tetra'],
     angelfish: ['angelfish', 'angel fish'],
     gourami: ['gourami'],
-    barb: ['barb', 'tiger barb', 'cherry barb'],
-    danio: ['danio', 'zebra danio'],
+    barb: ['tiger barb', 'cherry barb', 'barb'],
+    danio: ['zebra danio', 'danio'],
     rasbora: ['rasbora'],
-    loach: ['loach', 'clown loach', 'kuhli loach'],
-    catfish: ['catfish', 'cory', 'corydoras', 'pleco', 'plecostomus'],
-    cichlid: ['cichlid', 'african cichlid'],
+    loach: ['clown loach', 'kuhli loach', 'loach'],
+    catfish: ['corydoras', 'cory', 'plecostomus', 'pleco', 'catfish'],
+    cichlid: ['african cichlid', 'german blue ram', 'electric blue', 'cichlid'],
     discus: ['discus'],
     koi: ['koi'],
     
     // Reptiles
-    gecko: ['gecko', 'leopard gecko', 'crested gecko'],
+    gecko: ['leopard gecko', 'crested gecko', 'gecko'],
     beardeddragon: ['bearded dragon', 'beardie'],
-    chameleon: ['chameleon', 'veiled chameleon', 'panther chameleon', 'jackson chameleon', "jackson's chameleon"],
+    chameleon: ['veiled chameleon', 'panther chameleon', 'jackson chameleon', "jackson's chameleon", 'chameleon'],
     iguana: ['iguana'],
-    snake: ['snake', 'ball python', 'corn snake', 'king snake'],
+    snake: ['ball python', 'corn snake', 'king snake', 'snake'],
     turtle: ['turtle', 'tortoise'],
-    frog: ['frog', 'tree frog'],
+    frog: ['tree frog', 'frog'],
     salamander: ['salamander', 'newt'],
     
     // Birds
@@ -345,6 +394,7 @@ export function detectLiveAnimal(itemName: string): {
   // Check each pattern
   for (const [speciesKey, patterns] of Object.entries(liveAnimalPatterns)) {
     for (const pattern of patterns) {
+      // Check if pattern exists in the name
       if (nameLower.includes(pattern)) {
         detectedKeywords.push(pattern);
         species = speciesKey;
@@ -354,27 +404,15 @@ export function detectLiveAnimal(itemName: string): {
     if (species) break; // Found a match, stop searching
   }
 
-  // Additional context clues that indicate live animal
-  const liveAnimalContexts = [
-    'live', 'feeder', 'baby', 'juvenile', 'adult',
-    'male', 'female', 'pair', 'breeding'
-  ];
-
-  const hasLiveContext = liveAnimalContexts.some(context => 
-    nameLower.includes(context) && detectedKeywords.length > 0
+  // **STEP 4: Determine if it's a live animal**
+  // Require EITHER:
+  // - Explicit live indicator (e.g., "live goldfish", "feeder mice")
+  // - OR animal keyword that matched AND name is reasonably short (≤5 words to allow for multi-word species names like "German Blue Ram Cichlid")
+  const isReasonablyShortName = nameLower.split(' ').length <= 5;
+  
+  const isLiveAnimal = detectedKeywords.length > 0 && (
+    hasExplicitLiveIndicator || isReasonablyShortName
   );
-
-  // Exclude if it's clearly a supply/product, not a live animal
-  const supplyExclusions = [
-    'food', 'pellet', 'treat', 'bedding', 'cage', 'tank',
-    'filter', 'heater', 'decoration', 'toy', 'bowl', 'bottle',
-    'substrate', 'vitamin', 'supplement', 'medicine', 'shampoo',
-    'collar', 'leash', 'harness', 'carrier', 'crate'
-  ];
-
-  const isSupply = supplyExclusions.some(exclusion => nameLower.includes(exclusion));
-
-  const isLiveAnimal = detectedKeywords.length > 0 && !isSupply;
 
   return {
     isLiveAnimal,
