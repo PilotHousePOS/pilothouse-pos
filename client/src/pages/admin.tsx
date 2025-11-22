@@ -138,14 +138,32 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
     parseLocalDate(apt.appointmentDate).toDateString() === selectedDate.toDateString()
   );
   
-  // Calculate total number of dogs/pets across all confirmed appointments
-  const totalDogs = confirmedAppointments.reduce((sum: number, apt: any) => {
+  // Calculate separate counts for bath vs full groom dogs (exclude cats)
+  const dogCounts = confirmedAppointments.reduce((counts: { bathDogs: number; fullGroomDogs: number }, apt: any) => {
     if (apt.pets && apt.pets.length > 0) {
-      return sum + apt.pets.length;
+      apt.pets.forEach((pet: any) => {
+        // Only count dogs, exclude cats
+        if (pet.petType?.toLowerCase() === 'dog') {
+          if (pet.serviceType === 'grooming-bath') {
+            counts.bathDogs++;
+          } else if (pet.serviceType === 'grooming-full') {
+            counts.fullGroomDogs++;
+          }
+        }
+      });
+    } else {
+      // Legacy single-pet appointments - check if it's a dog
+      const serviceType = apt.serviceType || 'grooming-bath';
+      if (apt.petType?.toLowerCase() === 'dog') {
+        if (serviceType === 'grooming-bath') {
+          counts.bathDogs++;
+        } else if (serviceType === 'grooming-full') {
+          counts.fullGroomDogs++;
+        }
+      }
     }
-    // Legacy single-pet appointments count as 1
-    return sum + 1;
-  }, 0);
+    return counts;
+  }, { bathDogs: 0, fullGroomDogs: 0 });
 
   // Group appointments by time slot
   const timeSlots = [
@@ -287,7 +305,7 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
         ) : (
           <div className="space-y-2">
             <div className="text-sm text-gray-600 mb-4">
-              {totalDogs} {totalDogs === 1 ? 'dog' : 'dogs'} ({confirmedAppointments.length} {confirmedAppointments.length === 1 ? 'appointment' : 'appointments'}) + {googleEvents.length} calendar {googleEvents.length === 1 ? 'event' : 'events'} for this day
+              {dogCounts.fullGroomDogs} full groom, {dogCounts.bathDogs} bath ({confirmedAppointments.length} {confirmedAppointments.length === 1 ? 'appointment' : 'appointments'}) + {googleEvents.length} calendar {googleEvents.length === 1 ? 'event' : 'events'} for this day
             </div>
             
             {occupiedSlots.map((time) => {
