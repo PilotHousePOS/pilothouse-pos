@@ -1,18 +1,18 @@
 import cron from 'node-cron';
 import { storage } from './storage';
 
-// Helper to normalize dates to local timezone (America/New_York) for accurate comparison
-// Prevents late evening EST appointments from shifting to next day in UTC
+// Helper to normalize dates to local timezone (America/Chicago) for accurate comparison
+// Prevents late evening CST appointments from shifting to next day in UTC
 function getLocalDateString(date: Date): string {
-  return date.toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); // YYYY-MM-DD format
+  return date.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' }); // YYYY-MM-DD format
 }
 
-// Helper to get day of week in America/New_York timezone
-// Prevents late evening EST appointments from being misidentified as next day in UTC
+// Helper to get day of week in America/Chicago timezone
+// Prevents late evening CST appointments from being misidentified as next day in UTC
 function getLocalDayOfWeek(date: Date): number {
-  // Format the date in America/New_York timezone and parse to get local day
+  // Format the date in America/Chicago timezone and parse to get local day
   const formatter = new Intl.DateTimeFormat('en-US', { 
-    timeZone: 'America/New_York', 
+    timeZone: 'America/Chicago', 
     weekday: 'short' 
   });
   const dayName = formatter.format(date); // 'Mon', 'Tue', etc.
@@ -160,7 +160,7 @@ export function initializeScheduledTasks() {
       console.error('Error clearing past approved appointments:', error);
     }
   }, {
-    timezone: "America/New_York"
+    timezone: "America/Chicago"
   });
 
   // Auto-sync Google Calendar appointments and contacts every day at 7:30 AM
@@ -301,10 +301,10 @@ export function initializeScheduledTasks() {
       console.error('Error auto-syncing Google Calendar:', error);
     }
   }, {
-    timezone: "America/New_York"
+    timezone: "America/Chicago"
   });
 
   console.log('Scheduled tasks initialized:');
-  console.log('- Clear approved appointments and reset "Here"/"Paid" flags: Daily at 12:00 AM (EST)');
-  console.log('- Auto-sync Google Calendar appointments and contacts: Daily at 7:30 AM (EST)');
+  console.log('- Clear approved appointments and reset "Here"/"Paid" flags: Daily at 12:00 AM (CST)');
+  console.log('- Auto-sync Google Calendar appointments and contacts: Daily at 7:30 AM (CST)');
 }
