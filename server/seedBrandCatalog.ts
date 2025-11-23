@@ -47,6 +47,24 @@ export async function seedBrandCatalog(storage: IStorage): Promise<void> {
     // ====================
     {
       brand: 'Science Diet',
+      productLine: null,
+      abbreviation: 'SD',
+      expansion: 'Science Diet',
+      category: 'dog food',
+      evidence: 'Industry-standard abbreviation for Science Diet brand',
+      contextKeywords: ['dog', 'cat', 'veterinary'],
+    },
+    {
+      brand: 'Science Diet',
+      productLine: null,
+      abbreviation: 'Sci Diet',
+      expansion: 'Science Diet',
+      category: 'dog food',
+      evidence: 'Science Diet brand abbreviation variant',
+      contextKeywords: ['dog', 'cat'],
+    },
+    {
+      brand: 'Science Diet',
       productLine: 'Indoor',
       abbreviation: 'Indo',
       expansion: 'Indoor',
@@ -109,6 +127,24 @@ export async function seedBrandCatalog(storage: IStorage): Promise<void> {
     // ====================
     {
       brand: 'Blue Buffalo',
+      productLine: null,
+      abbreviation: 'BB',
+      expansion: 'Blue Buffalo',
+      category: 'dog food',
+      evidence: 'Industry-standard abbreviation for Blue Buffalo brand',
+      contextKeywords: ['dog', 'cat', 'natural'],
+    },
+    {
+      brand: 'Blue Buffalo',
+      productLine: null,
+      abbreviation: 'Bl Buf',
+      expansion: 'Blue Buffalo',
+      category: 'dog food',
+      evidence: 'Blue Buffalo brand abbreviation variant',
+      contextKeywords: ['dog', 'cat'],
+    },
+    {
+      brand: 'Blue Buffalo',
       productLine: 'Life Protection',
       abbreviation: 'LP',
       expansion: 'Life Protection',
@@ -138,6 +174,24 @@ export async function seedBrandCatalog(storage: IStorage): Promise<void> {
     // ====================
     // ROYAL CANIN
     // ====================
+    {
+      brand: 'Royal Canin',
+      productLine: null,
+      abbreviation: 'RC',
+      expansion: 'Royal Canin',
+      category: 'dog food',
+      evidence: 'Industry-standard abbreviation for Royal Canin brand',
+      contextKeywords: ['dog', 'cat', 'veterinary'],
+    },
+    {
+      brand: 'Royal Canin',
+      productLine: null,
+      abbreviation: 'Ry Can',
+      expansion: 'Royal Canin',
+      category: 'dog food',
+      evidence: 'Royal Canin brand abbreviation variant',
+      contextKeywords: ['dog', 'cat'],
+    },
     {
       brand: 'Royal Canin',
       productLine: null,
@@ -178,6 +232,24 @@ export async function seedBrandCatalog(storage: IStorage): Promise<void> {
     // ====================
     // PRO PLAN (Purina)
     // ====================
+    {
+      brand: 'Pro Plan',
+      productLine: null,
+      abbreviation: 'PP',
+      expansion: 'Pro Plan',
+      category: 'dog food',
+      evidence: 'Industry-standard abbreviation for Pro Plan brand',
+      contextKeywords: ['dog', 'cat', 'purina'],
+    },
+    {
+      brand: 'Pro Plan',
+      productLine: null,
+      abbreviation: 'Pr Pln',
+      expansion: 'Pro Plan',
+      category: 'dog food',
+      evidence: 'Pro Plan brand abbreviation variant',
+      contextKeywords: ['dog', 'cat'],
+    },
     {
       brand: 'Pro Plan',
       productLine: 'Savor',
@@ -249,6 +321,24 @@ export async function seedBrandCatalog(storage: IStorage): Promise<void> {
     // ====================
     // TASTE OF THE WILD
     // ====================
+    {
+      brand: 'Taste of the Wild',
+      productLine: null,
+      abbreviation: 'TOW',
+      expansion: 'Taste of the Wild',
+      category: 'dog food',
+      evidence: 'Industry-standard abbreviation for Taste of the Wild brand',
+      contextKeywords: ['dog', 'cat', 'grain free'],
+    },
+    {
+      brand: 'Taste of the Wild',
+      productLine: null,
+      abbreviation: 'Tow',
+      expansion: 'Taste of the Wild',
+      category: 'dog food',
+      evidence: 'Taste of the Wild brand abbreviation variant',
+      contextKeywords: ['dog', 'cat', 'grain free'],
+    },
     {
       brand: 'Taste of the Wild',
       productLine: 'High Prairie',
@@ -342,6 +432,24 @@ export async function seedBrandCatalog(storage: IStorage): Promise<void> {
     // ====================
     // NATURAL BALANCE
     // ====================
+    {
+      brand: 'Natural Balance',
+      productLine: null,
+      abbreviation: 'NB',
+      expansion: 'Natural Balance',
+      category: 'dog food',
+      evidence: 'Industry-standard abbreviation for Natural Balance brand',
+      contextKeywords: ['dog', 'cat', 'natural'],
+    },
+    {
+      brand: 'Natural Balance',
+      productLine: null,
+      abbreviation: 'Nat Bal',
+      expansion: 'Natural Balance',
+      category: 'dog food',
+      evidence: 'Natural Balance brand abbreviation variant',
+      contextKeywords: ['dog', 'cat'],
+    },
     {
       brand: 'Natural Balance',
       productLine: 'Limited Ingredient',

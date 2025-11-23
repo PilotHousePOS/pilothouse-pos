@@ -22,14 +22,14 @@ function extractBrand(productName: string): string | null {
   // Include alternate spellings and common variations
   // IMPORTANT: Brand name MUST match the catalog entries exactly
   const knownBrands = [
-    { name: 'Science Diet', patterns: ['hill\'s science diet', 'science diet'] },
+    { name: 'Science Diet', patterns: ['hill\'s science diet', 'science diet', 'sd'] },
     { name: 'Nutrisource', patterns: ['nutrisource', 'nutri source', 'nutr source'] },
-    { name: 'Blue Buffalo', patterns: ['blue buffalo', 'bluebuffalo', 'blue buff'] },
-    { name: 'Taste of the Wild', patterns: ['taste of the wild', 'taste wild'] },
+    { name: 'Blue Buffalo', patterns: ['blue buffalo', 'bluebuffalo', 'blue buff', 'bb'] },
+    { name: 'Taste of the Wild', patterns: ['taste of the wild', 'taste wild', 'tow'] },
     { name: 'Castor & Pollux', patterns: ['castor & pollux', 'castor and pollux'] },
-    { name: 'Royal Canin', patterns: ['royal canin'] },
-    { name: 'Pro Plan', patterns: ['pro plan', 'proplan'] },
-    { name: 'Natural Balance', patterns: ['natural balance', 'nat balance'] },
+    { name: 'Royal Canin', patterns: ['royal canin', 'rc'] },
+    { name: 'Pro Plan', patterns: ['pro plan', 'proplan', 'pp'] },
+    { name: 'Natural Balance', patterns: ['natural balance', 'nat balance', 'nb'] },
     { name: 'Rachael Ray', patterns: ['rachael ray'] },
     { name: 'Solid Gold', patterns: ['solid gold'] },
     { name: 'Fancy Feast', patterns: ['fancy feast'] },
