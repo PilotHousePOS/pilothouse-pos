@@ -5236,6 +5236,11 @@ export default function Admin() {
   const [calendarEventsTouchStart, setCalendarEventsTouchStart] = useState(0);
   const [calendarEventsTouchEnd, setCalendarEventsTouchEnd] = useState(0);
 
+  // Search and pagination state for pets
+  const [petSearchQuery, setPetSearchQuery] = useState('');
+  const [petsPage, setPetsPage] = useState(1);
+  const PETS_PER_PAGE = 20;
+
   // Track current index for each phone number group (for cycling through appointments)
   const [appointmentGroupIndexes, setAppointmentGroupIndexes] = useState<Record<string, number>>({});
   
@@ -5243,11 +5248,17 @@ export default function Admin() {
 
   // Always call all hooks at the top level
   const { data: petsData } = useQuery({
-    queryKey: ["/api/pets"],
+    queryKey: ["/api/pets", { 
+      page: petsPage, 
+      limit: PETS_PER_PAGE,
+      search: petSearchQuery 
+    }],
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
 
   const pets = (petsData as any)?.pets || [];
+  const petsTotalPages = (petsData as any)?.pagination?.totalPages || 0;
+  const petsTotal = (petsData as any)?.pagination?.total || 0;
 
   const { data: suppliesData } = useQuery<any>({
     queryKey: ["/api/supplies", { 
@@ -7105,7 +7116,7 @@ export default function Admin() {
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <PawPrint className="w-5 h-5" />
-                  Pets ({(pets as any[]).length})
+                  Pets ({petsTotal}{petSearchQuery.trim() ? ` found` : ` total`})
                 </CardTitle>
                 {/* Mobile: Custom Modal, Desktop: Dialog */}
                 {typedUser?.isAdmin && (
@@ -7163,6 +7174,24 @@ export default function Admin() {
               </div>
             </CardHeader>
             <CardContent>
+              {/* Search Bar */}
+              <div className="mb-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search pets by name, species, or breed..."
+                    value={petSearchQuery}
+                    onChange={(e) => {
+                      setPetSearchQuery(e.target.value);
+                      setPetsPage(1);
+                    }}
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue"
+                    data-testid="input-search-pets-admin"
+                  />
+                </div>
+              </div>
+
               <div className="space-y-4">
                 {(pets as any[]).map((pet: any) => (
                   <div key={pet.id} className="flex items-center justify-between p-4 border rounded-lg">
@@ -7198,6 +7227,35 @@ export default function Admin() {
                   </div>
                 ))}
               </div>
+
+              {/* Pagination Controls */}
+              {petsTotalPages > 1 && (
+                <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setPetsPage(prev => Math.max(1, prev - 1))}
+                    disabled={petsPage === 1}
+                    data-testid="button-pets-prev-page"
+                  >
+                    <ChevronLeft className="w-4 h-4 mr-1" />
+                    Previous
+                  </Button>
+                  <div className="text-sm text-gray-600">
+                    Page {petsPage} of {petsTotalPages}
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setPetsPage(prev => Math.min(petsTotalPages, prev + 1))}
+                    disabled={petsPage === petsTotalPages}
+                    data-testid="button-pets-next-page"
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
