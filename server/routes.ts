@@ -4323,19 +4323,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Only remove if there's an exact name match with a supply (duplicate)
         if (matchingSupply) {
+          console.log(`[DEBUG] Checking duplicate pet "${pet.name}" (ID: ${pet.id}) against supply "${matchingSupply.name}" (ID: ${matchingSupply.id})`);
+          
           // Check for references BEFORE attempting to delete
           const hasReferences = await storage.hasPetReferences(pet.id);
+          console.log(`[DEBUG] Pet "${pet.name}" (ID: ${pet.id}) has references: ${hasReferences}`);
           
           if (hasReferences) {
             // Pet has existing references (orders, appointments) - skip it
             skippedDuplicates++;
-            console.log(`⊘ Skipped duplicate pet: "${pet.name}" (has existing references - orders/wishlist/cart)`);
+            console.log(`⊘ Skipped duplicate pet: "${pet.name}" (ID: ${pet.id}) - has existing references`);
           } else {
             // No references - safe to delete
             try {
               await storage.deletePet(pet.id);
               removedDuplicates++;
-              console.log(`✓ Removed duplicate pet: "${pet.name}" (matching supply exists: ID ${matchingSupply.id})`);
+              console.log(`✓ Removed duplicate pet: "${pet.name}" (ID: ${pet.id}, matching supply: ${matchingSupply.id})`);
             } catch (error: any) {
               console.error(`Error removing duplicate pet "${pet.name}":`, error);
             }
