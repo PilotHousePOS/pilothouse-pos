@@ -4684,8 +4684,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("Starting 'Process All' - Step 1/3: Expanding abbreviations...");
       const startTime = Date.now();
-      const { expandAllAbbreviations } = await import('./abbreviationExpansion');
-      const expandResults = await expandAllAbbreviations();
+      
+      // Expand abbreviations using brand catalog
+      const { expandAbbreviationsAsync } = await import('./abbreviationExpansion');
+      const supplies = await storage.getAllSupplies();
+      let expandChanged = 0;
+      let expandUnchanged = 0;
+      let catalogHits = 0;
+
+      for (const supply of supplies) {
+        const nameResult = await expandAbbreviationsAsync(supply.name, storage);
+        const descResult = await expandAbbreviationsAsync(supply.description, storage);
+
+        if (nameResult.catalogUsed || descResult.catalogUsed) {
+          catalogHits++;
+        }
+
+        if (nameResult.expanded !== supply.name || descResult.expanded !== supply.description) {
+          await storage.updateSupply(supply.id, {
+            name: nameResult.expanded,
+            description: descResult.expanded
+          });
+          expandChanged++;
+        } else {
+          expandUnchanged++;
+        }
+      }
       
       console.log("Step 2/3: Auto-categorizing supplies...");
       
@@ -4762,9 +4786,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "All processing completed successfully",
         stats: {
           expand: {
-            changed: expandResults.changed,
-            unchanged: expandResults.unchanged,
-            catalogHits: expandResults.catalogHits,
+            changed: expandChanged,
+            unchanged: expandUnchanged,
+            catalogHits: catalogHits,
           },
           duplicatesRemoved: duplicateResults.duplicatesRemoved,
           duplicatesSkipped: duplicateResults.duplicatesSkipped,
