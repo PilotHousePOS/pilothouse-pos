@@ -167,6 +167,13 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Bluebuff': 'Bluebuffalo',
   'Arm&ham': 'Arm & Hammer',
   'Arm&hamm': 'Arm & Hammer',
+  
+  // Fromm Product Lines
+  'Pure Sniffers': 'PurrSnickety',
+  'Pu Sniffers': 'PurrSnickety',
+  'Pur Sni': 'PurrSnickety',
+  'Pu Sni': 'PurrSnickety',
+  'Sniffers': 'PurrSnickety',
 };
 
 /**
