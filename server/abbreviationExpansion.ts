@@ -341,7 +341,7 @@ export function expandAbbreviations(text: string | null | undefined, storage?: I
   // Expand other abbreviations (whole word matches)
   for (const [abbrev, expansion] of Object.entries(ABBREVIATION_MAPPINGS)) {
     // Create regex that matches whole word (case-insensitive)
-    const regex = new RegExp(`\\b${abbrev}\\b`, 'g');
+    const regex = new RegExp(`\\b${abbrev}\\b`, 'gi');
     result = result.replace(regex, expansion);
   }
   
@@ -413,7 +413,7 @@ export async function expandAbbreviationsAsync(
   
   // Expand other abbreviations (whole word matches)
   for (const [abbrev, expansion] of Object.entries(ABBREVIATION_MAPPINGS)) {
-    const regex = new RegExp(`\\b${abbrev}\\b`, 'g');
+    const regex = new RegExp(`\\b${abbrev}\\b`, 'gi');
     result = result.replace(regex, expansion);
   }
   
