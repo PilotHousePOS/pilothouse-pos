@@ -63,6 +63,11 @@ export const pets = pgTable("pets", {
   imageUrl: varchar("image_url", { length: 500 }),
   imageUrls: text("image_urls").array(), // Multiple images support
   isAvailable: boolean("is_available").default(true),
+  // POS Integration & Priority Tracking
+  priceSource: varchar("price_source", { length: 20 }).default("default"), // manual, pos, ai_extraction, import, default
+  manualPriceOverride: boolean("manual_price_override").default(false), // If true, POS won't override price
+  posProductId: varchar("pos_product_id", { length: 255 }), // External POS system product ID
+  posLastSyncedAt: timestamp("pos_last_synced_at"), // Last time POS data was synced
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -82,6 +87,13 @@ export const supplies = pgTable("supplies", {
   weight: varchar("weight", { length: 50 }),
   size: varchar("size", { length: 50 }),
   filterType: varchar("filter_type", { length: 20 }), // 'aquatic', 'reptile', or null for general
+  // POS Integration & Priority Tracking
+  priceSource: varchar("price_source", { length: 20 }).default("default"), // manual, pos, ai_extraction, import, default
+  quantitySource: varchar("quantity_source", { length: 20 }).default("default"), // manual, pos, ai_extraction, import, default
+  manualPriceOverride: boolean("manual_price_override").default(false), // If true, POS won't override price
+  manualQuantityOverride: boolean("manual_quantity_override").default(false), // If true, POS won't override quantity
+  posProductId: varchar("pos_product_id", { length: 255 }), // External POS system product ID
+  posLastSyncedAt: timestamp("pos_last_synced_at"), // Last time POS data was synced
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -5312,6 +5312,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================================
+  // POS INTEGRATION ENDPOINTS
+  // ========================================
+
+  // POS Webhook - Receive real-time product updates from POS system
+  app.post("/api/pos/webhook", async (req, res) => {
+    try {
+      const { products, type } = req.body; // type: 'supply' or 'pet'
+      
+      if (!products || !Array.isArray(products)) {
+        return res.status(400).json({ message: "Invalid products data" });
+      }
+
+      // Import POS sync functions
+      const { bulkSyncFromPOS } = await import('./posSync');
+      
+      const result = await bulkSyncFromPOS(products, type || 'supply');
+      
+      console.log(`POS Webhook: Updated=${result.updated}, Created=${result.created}, Skipped=${result.skipped}, Errors=${result.errors.length}`);
+      
+      res.json({
+        success: true,
+        ...result
+      });
+    } catch (error) {
+      console.error("Error processing POS webhook:", error);
+      res.status(500).json({ message: "Failed to process POS webhook" });
+    }
+  });
+
+  // Manual POS Sync - Admin can trigger manual sync
+  app.post("/api/admin/pos/sync", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { products, type } = req.body;
+      
+      if (!products || !Array.isArray(products)) {
+        return res.status(400).json({ message: "Invalid products data" });
+      }
+
+      const { bulkSyncFromPOS } = await import('./posSync');
+      const result = await bulkSyncFromPOS(products, type || 'supply');
+      
+      res.json({
+        success: true,
+        message: `Synced ${result.updated + result.created} items from POS`,
+        ...result
+      });
+    } catch (error) {
+      console.error("Error manual POS sync:", error);
+      res.status(500).json({ message: "Failed to sync from POS" });
+    }
+  });
+
+  // Set manual override flags for a supply
+  app.post("/api/admin/supplies/:id/manual-override", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { id } = req.params;
+      const { overridePrice, overrideQuantity } = req.body;
+
+      const { setSupplyManualOverride } = await import('./posSync');
+      await setSupplyManualOverride(
+        parseInt(id),
+        overridePrice ?? false,
+        overrideQuantity ?? false
+      );
+
+      res.json({ 
+        success: true,
+        message: "Manual override flags updated"
+      });
+    } catch (error) {
+      console.error("Error setting manual override:", error);
+      res.status(500).json({ message: "Failed to set manual override" });
+    }
+  });
+
+  // Set manual override flag for a pet
+  app.post("/api/admin/pets/:id/manual-override", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { id } = req.params;
+      const { overridePrice } = req.body;
+
+      const { setPetManualOverride } = await import('./posSync');
+      await setPetManualOverride(parseInt(id), overridePrice ?? false);
+
+      res.json({ 
+        success: true,
+        message: "Manual override flag updated"
+      });
+    } catch (error) {
+      console.error("Error setting manual override:", error);
+      res.status(500).json({ message: "Failed to set manual override" });
+    }
+  });
+
+  // Get POS sync status
+  app.get("/api/admin/pos/status", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { getSuppliesPOSSyncStatus } = await import('./posSync');
+      const status = await getSuppliesPOSSyncStatus();
+      
+      res.json(status);
+    } catch (error) {
+      console.error("Error getting POS status:", error);
+      res.status(500).json({ message: "Failed to get POS status" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
