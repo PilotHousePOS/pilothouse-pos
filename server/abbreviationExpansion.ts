@@ -110,6 +110,12 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   // Fix awkward spacing issues
   'Div Ider': 'Divider',
   
+  // Aquarium Equipment
+  'Whisp': 'Whisper',
+  'Filt': 'Filter',
+  'Crt': 'Cartridge',
+  'Crb': 'Carbon',
+  
   // Brands (only expand when at start or after space)
   'Kng': 'Kong',
   'Simplesolutions': 'Simple Solutions',
