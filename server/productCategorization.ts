@@ -315,6 +315,11 @@ export function detectLiveAnimal(itemName: string): {
     'remover', 'control', 'system', 'systems', 'setup', 'setups', 'complete', 'care', 'decorative',
     'shed', 'shedding', 'aid', 'humidifier', 'training', 'trainer', 'perch', 'stand',
     
+    // Aquarium/Pet Supply Products (expanded from false positives)
+    'tools', 'tool', 'mirror', 'mirrors', 'thermometer', 'thermometers', 'renewal', 'renew',
+    'basic', 'basics', 'shaker', 'shakers', 'diver', 'divers', 'water', 'conditioner',
+    'test', 'tester', 'strip', 'strips', 'meter', 'gauge', 'reader',
+    
     // Merchandise & Product Types (comprehensive product noun taxonomy)
     'plush', 'stuffed', 'hoodie', 'shirt', 't-shirt', 'tshirt', 'tee', 'apparel', 'clothing',
     'keychain', 'poster', 'print', 'sticker', 'decal', 'magnet', 'mug', 'cup',
@@ -324,17 +329,30 @@ export function detectLiveAnimal(itemName: string): {
     'figurine', 'model', 'replica', 'sculpture'
   ]);
   
-  // Brand/product name words that indicate this is a supply product, not a live animal
-  const brandProductWords = new Set([
+  // Supply manufacturer brand names - strong indicator this is a product, not a live animal
+  const supplyBrands = new Set([
+    // Aquarium supply manufacturers
+    'tetra', 'api', 'aqueon', 'marineland', 'fluval', 'seachem', 'hikari',
+    'omega', 'aquaclear', 'glofish', 'penn', 'plax', 'imagitarium',
+    
+    // Reptile supply manufacturers  
+    'zoomed', 'exoterra', 'exo', 'terra', 'zilla', 'flukers', 'repticare',
+    
+    // General pet supply manufacturers
+    'kaytee', 'oxbow', 'vitakraft', 'sunseed', 'higgins',
+    
+    // Product line descriptors
     'buddy', 'guard', 'shield', 'safe', 'safestart', 'aquasafe', 'bettasafe',
-    'bioscrub', 'bio', 'scrub', 'max', 'plus', 'pro', 'premium', 'ultimate'
+    'bioscrub', 'bio', 'scrub', 'max', 'plus', 'pro', 'premium', 'ultimate',
+    'activ'
   ]);
   
-  // Check for supply keywords with word-boundary matching
+  // Check for supply keywords and brands with word-boundary matching
   const hasSupplyKeyword = words.some(word => supplyKeywords.has(word));
-  const hasBrandProductWord = words.some(word => brandProductWords.has(word));
+  const hasSupplyBrand = words.some(word => supplyBrands.has(word));
   
-  if (hasSupplyKeyword || hasBrandProductWord) {
+  // If product contains supply keywords OR supply brand names, it's NOT a live animal
+  if (hasSupplyKeyword || hasSupplyBrand) {
     return { isLiveAnimal: false, species: null, detectedKeywords: [] };
   }
   
