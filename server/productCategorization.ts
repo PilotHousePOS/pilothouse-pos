@@ -313,6 +313,7 @@ export function detectLiveAnimal(itemName: string): {
     'hay', 'straw', 'litter', 'shavings', 'diet', 'diets', 'meal', 'meals', 'nutrition',
     'bite', 'bites', 'crunch', 'crunchies', 'nibbles', 'nugget', 'nuggets', 'formula', 'blend',
     'feeder', 'feeders', 'buffet', 'floating', 'sinking', 'freeze-dried', 'freeze', 'dried',
+    'vitamized', 'lax', 'rx',
     // Weight indicators (strong signal for food products)
     'lb', 'lbs', 'oz', 'ounce', 'ounces', 'pound', 'pounds', 'kg', 'gram', 'grams', 'g',
     
@@ -326,6 +327,7 @@ export function detectLiveAnimal(itemName: string): {
     // Toy materials and descriptors
     'felt', 'fleece', 'yarn', 'sponge', 'shaggy', 'squeakeeez', 'skinneez', 'squeaky', 'plush', 'fuzzy',
     'pointer', 'rattle', 'clatter', 'crinkle', 'house', 'led', 'catnip', 'rope', 'tug',
+    'heartbeat', 'donutz', 'buddies', 'sooth',
     
     // Products & Treatments
     'conditioner', 'treatment', 'treatments', 'cleaner', 'shampoo', 'spray', 'sprays', 'solution', 'solutions',
@@ -333,6 +335,7 @@ export function detectLiveAnimal(itemName: string): {
     'den', 'dens', 'hide', 'hideaway', 'hideaways', 'habitat', 'log', 'logs', 'rock', 'rocks', 'stone', 'stones',
     'remover', 'control', 'system', 'systems', 'setup', 'setups', 'complete', 'care', 'decorative',
     'shed', 'shedding', 'aid', 'humidifier', 'training', 'trainer', 'perch', 'stand',
+    'odor', 'spritz', 'gdibye', 'daily',
     
     // Aquarium/Pet Supply Products (expanded from false positives)
     // NOTE: Removed "water" - too generic, appears in "Chinese Water Dragon", "African Water Frog"
@@ -364,8 +367,11 @@ export function detectLiveAnimal(itemName: string): {
     // General pet supply manufacturers
     'kaytee', 'oxbow', 'vitakraft', 'sunseed', 'higgins',
     
+    // Small animal/ferret supply manufacturers
+    'marshall', 'marshalls', 'oasis',
+    
     // Pet toy manufacturers
-    'kong', 'nylabone', 'chuckit', 'spot', 'turbo', 'ethical',
+    'kong', 'nylabone', 'chuckit', 'spot', 'turbo', 'ethical', 'zippypaws', 'tuffy',
     
     // Product line descriptors
     'buddy', 'guard', 'shield', 'safe', 'safestart', 'aquasafe', 'bettasafe',
