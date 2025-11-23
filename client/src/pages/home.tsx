@@ -61,7 +61,7 @@ export default function Home() {
   };
   const [, setLocation] = useLocation();
 
-  const { data: pets = [] } = useQuery({
+  const { data: petsData } = useQuery({
     queryKey: ["/api/pets"],
     retry: false,
   });
@@ -76,13 +76,14 @@ export default function Home() {
     retry: false,
   });
 
+  const pets = (petsData as any)?.pets || [];
   const supplies = (suppliesData as any)?.items || [];
-  const featuredPets = (pets as any[]).slice(0, 2);
+  const featuredPets = pets.slice(0, 2);
   const featuredSupplies = supplies.slice(0, 3);
   const cartCount = (cartItems as any[]).length;
 
   // Calculate stats
-  const totalPets = (pets as any[]).filter((p: any) => p.isAvailable).length;
+  const totalPets = pets.filter((p: any) => p.isAvailable).length;
   const totalSupplies = (suppliesData as any)?.total || 0;
 
   return (
