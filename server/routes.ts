@@ -4664,6 +4664,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { auditUnknownAbbreviations } = await import('./abbreviationAudit');
       const results = await auditUnknownAbbreviations();
       
+      // Log the results to console for debugging
+      console.log(`\n=== ABBREVIATION AUDIT RESULTS ===`);
+      console.log(`Total supplies scanned: ${results.total}`);
+      console.log(`Catalog hits: ${results.catalogHits}`);
+      console.log(`Unknown abbreviations found: ${results.unknownAbbreviations.length}`);
+      console.log(`\nTop 10 Unknown Abbreviations:`);
+      results.unknownAbbreviations.slice(0, 10).forEach((item, index) => {
+        console.log(`${index + 1}. [ID ${item.id}] "${item.name}" → "${item.expandedName}"`);
+        console.log(`   Reason: ${item.reason}`);
+      });
+      console.log(`===================================\n`);
+      
       res.json({
         message: "Abbreviation audit completed",
         stats: results
