@@ -4713,12 +4713,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("Step 2/3: Auto-categorizing supplies...");
       
-      // Step 0: Remove duplicate pets
-      const duplicateResults = await storage.removeDuplicatePets();
-      
-      // Step 1: Clean invalid pets and move live animals
-      const allPets = await storage.getAllPets();
+      // Step 0: Remove invalid pets (toys/supplies that shouldn't be in pets table)
       const { detectLiveAnimal } = await import('./productCategorization');
+      const allPets = await storage.getAllPets();
       let invalidPetsRemoved = 0;
       let invalidPetsSkipped = 0;
       
@@ -4790,8 +4787,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             unchanged: expandUnchanged,
             catalogHits: catalogHits,
           },
-          duplicatesRemoved: duplicateResults.duplicatesRemoved,
-          duplicatesSkipped: duplicateResults.duplicatesSkipped,
           invalidPetsRemoved,
           invalidPetsSkipped,
           liveAnimals: { movedToPets, skippedDueToReferences },
