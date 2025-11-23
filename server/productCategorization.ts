@@ -295,6 +295,20 @@ export function detectLiveAnimal(itemName: string): {
   // Normalize Unicode apostrophes to ASCII
   const normalized = nameLower.replace(/[''`´]/g, "'");
   
+  // **EARLY REJECTION: Check for weight patterns** (e.g., "7.9", ".71oz", "2oz", "12.2oz")
+  // These patterns indicate food/supply products with weight measurements
+  const weightPatterns = [
+    /\d+\.?\d*oz\b/,      // Matches: 2oz, 12.2oz, .71oz
+    /\d+\.?\d*lb\b/,      // Matches: 5lb, 2.5lb
+    /\d+\.?\d*g\b/,       // Matches: 100g, 2.5g
+    /\d+\.?\d*kg\b/,      // Matches: 1kg, 1.5kg
+    /\b\d+\.\d+\b/        // Matches standalone decimals: 7.9, 2.5, 0.71
+  ];
+  
+  if (weightPatterns.some(pattern => pattern.test(normalized))) {
+    return { isLiveAnimal: false, species: null, detectedKeywords: [] };
+  }
+  
   // Tokenize into words, strip possessives
   const words = normalized
     .split(/[\s\-\/]+/)
@@ -323,7 +337,7 @@ export function detectLiveAnimal(itemName: string): {
     'felt', 'fleece', 'yarn', 'sponge', 'shaggy', 'squeaky', 'plush', 'fuzzy',
     'rattle', 'clatter', 'crinkle', 'led', 'catnip', 'rope', 'tug', 'heartbeat', 'donutz', 'buddies', 'sooth',
     'conditioner', 'treatment', 'cleaner', 'shampoo', 'spray', 'solution',
-    'light', 'bulb', 'lamp', 'cave', 'shelter', 'den', 'hideaway', 'log', 'rock', 'stone',
+    'light', 'bulb', 'lamp', 'cave', 'shelter', 'den', 'hideaway', 'log', 'rock', 'stone', 'gravel',
     'remover', 'control', 'system', 'setup', 'complete', 'care', 'decorative',
     'shed', 'shedding', 'aid', 'humidifier', 'training', 'trainer', 'perch', 'stand',
     'odor', 'spritz', 'gdibye', 'daily', 'multi',
@@ -331,7 +345,8 @@ export function detectLiveAnimal(itemName: string): {
     'shaker', 'diver', 'test', 'tester', 'strip', 'meter', 'gauge', 'reader',
     'hoodie', 'shirt', 'apparel', 'clothing', 'keychain', 'poster', 'sticker', 'magnet', 'mug',
     'calendar', 'book', 'guide', 'magazine', 'notebook', 'hammock', 'blanket', 'towel', 'mat', 'pad', 'cushion',
-    'charm', 'pendant', 'jewelry', 'necklace', 'figurine', 'model', 'replica'
+    'charm', 'pendant', 'jewelry', 'necklace', 'figurine', 'model', 'replica',
+    'plant', 'plants', 'volcano', 'castle', 'bridge', 'arch', 'bubbler', 'aerator'
   ]);
   
   // **2. SUPPLY BRANDS** (-100 points each - very strong negative signal)
@@ -361,41 +376,69 @@ export function detectLiveAnimal(itemName: string): {
   
   // **3. SPECIFIC SPECIES** (+80 points - very specific animal names, safe to auto-approve)
   const specificSpecies: Record<string, string[]> = {
+    // Fish - Livebearers
     molly: ['molly', 'mollies'],
     platy: ['platy', 'platies'],
     swordtail: ['swordtail', 'swordtails'],
-    goldfish: ['goldfish'],
-    betta: ['betta', 'bettas'],
     guppy: ['guppy', 'guppies'],
+    
+    // Fish - Bettas & Gouramis  
+    betta: ['betta', 'bettas'],
+    gourami: ['gourami', 'gouramis'],
+    
+    // Fish - Goldfish & Koi
+    goldfish: ['goldfish'],
+    koi: ['koi'],
+    
+    // Fish - Angelfish & Discus
+    angelfish: ['angelfish'],
+    discus: ['discus'],
+    
+    // Fish - Specialty
+    arowana: ['arowana', 'arowanas'],
+    
+    // Small Animals
     chinchilla: ['chinchilla', 'chinchillas'],
     hamster: ['hamster', 'hamsters'],
     gerbil: ['gerbil', 'gerbils'],
     guineapig: ['guinea'],
-    hedgehog: ['hedgehog', 'hedgehogs'],
-    angelfish: ['angelfish'],
-    discus: ['discus'],
-    arowana: ['arowana', 'arowanas']
+    hedgehog: ['hedgehog', 'hedgehogs']
   };
   
   // **4. GENERIC SPECIES** (+40 points - could appear in product names)
   const genericSpecies: Record<string, string[]> = {
+    // Small Animals
     rabbit: ['rabbit', 'rabbits', 'bunny', 'bunnies'],
     rat: ['rat', 'rats'],
     mouse: ['mouse', 'mice'],
     ferret: ['ferret', 'ferrets'],
+    
+    // Fish - Tetras & Small Schooling
     tetra: ['tetra', 'tetras'],
+    rasbora: ['rasbora', 'rasboras'],
+    danio: ['danio', 'danios'],
+    barb: ['barb', 'barbs'],
+    
+    // Fish - Catfish & Bottom Dwellers
+    catfish: ['catfish', 'pleco', 'plecostomus', 'cory', 'corydoras'],
+    loach: ['loach', 'loaches'],
+    
+    // Fish - Cichlids
+    cichlid: ['cichlid', 'cichlids', 'ram'],
+    
+    // Fish - Sharks (aquarium sharks)
+    shark: ['shark', 'sharks'],
+    
+    // Reptiles
     gecko: ['gecko', 'geckos'],
     chameleon: ['chameleon', 'chameleons'],
     snake: ['snake', 'snakes'],
+    dragon: ['dragon', 'dragons'],
+    
+    // Amphibians
     frog: ['frog', 'frogs'],
     turtle: ['turtle', 'turtles'],
-    catfish: ['catfish', 'pleco', 'plecostomus', 'cory', 'corydoras'],
-    cichlid: ['cichlid', 'cichlids'],
-    barb: ['barb', 'barbs'],
-    danio: ['danio', 'danios'],
-    loach: ['loach', 'loaches'],
-    gourami: ['gourami', 'gouramis'],
-    rasbora: ['rasbora', 'rasboras']
+    newt: ['newt', 'newts']
   };
   
   // **5. LIVE INDICATORS** (+20 points - explicit live animal signals)
@@ -406,16 +449,48 @@ export function detectLiveAnimal(itemName: string): {
   
   // **6. MULTI-WORD PATTERNS** (+60 points - specific multi-word animal names)
   const multiWordPatterns: Record<string, string[]> = {
+    // Tetras
     'neon-tetra': ['neon', 'tetra'],
     'cardinal-tetra': ['cardinal', 'tetra'],
     'black-tetra': ['black', 'tetra'],
+    'serpae-tetra': ['serpae', 'tetra'],
+    'glowlight-tetra': ['glowlight', 'tetra'],
+    'ember-tetra': ['ember', 'tetra'],
+    
+    // Danios & Rasboras
     'zebra-danio': ['zebra', 'danio'],
+    'leopard-danio': ['leopard', 'danio'],
+    'harlequin-rasbora': ['harlequin', 'rasbora'],
+    
+    // Barbs
+    'cherry-barb': ['cherry', 'barb'],
+    'tiger-barb': ['tiger', 'barb'],
+    
+    // Loaches
     'clown-loach': ['clown', 'loach'],
+    'kuhli-loach': ['kuhli', 'loach'],
+    'yoyo-loach': ['yoyo', 'loach'],
+    
+    // Cichlids
+    'german-ram': ['german', 'ram'],
+    'electric-blue': ['electric', 'blue'],
+    
+    // Catfish
+    'cory-cat': ['cory', 'cat'],
+    
+    // Reptiles
     'leopard-gecko': ['leopard', 'gecko'],
     'crested-gecko': ['crested', 'gecko'],
     'bearded-dragon': ['bearded', 'dragon'],
     'ball-python': ['ball', 'python'],
+    'corn-snake': ['corn', 'snake'],
     'jackson-chameleon': ['jackson', 'chameleon'],
+    
+    // Amphibians
+    'african-frog': ['african', 'frog'],
+    'tree-frog': ['tree', 'frog'],
+    
+    // Small Animals
     'guinea-pig': ['guinea', 'pig']
   };
   
