@@ -66,7 +66,8 @@ import {
   Type,
   Image,
   Camera,
-  BookOpen
+  BookOpen,
+  Zap
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
