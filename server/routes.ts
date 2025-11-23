@@ -4472,8 +4472,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         message: "Auto-categorization completed successfully",
         stats: {
-          duplicatesRemoved: removedDuplicates,
-          duplicatesSkipped: skippedDuplicates,
+          invalidPetsRemoved: removedInvalidPets,
+          invalidPetsSkipped: skippedInvalidPets,
           liveAnimals: {
             movedToPets: movedToPets,
             skippedDueToReferences: skippedDueToReferences,
