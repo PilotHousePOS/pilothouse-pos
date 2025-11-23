@@ -4389,7 +4389,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }
             } catch (deleteError: any) {
               // If deletion fails due to foreign key constraint, skip but keep the pet
-              if (deleteError.message && deleteError.message.includes('foreign key constraint')) {
+              // PostgreSQL FK constraint error code is '23503'
+              const isFKError = 
+                deleteError.code === '23503' || 
+                (deleteError.message && deleteError.message.includes('foreign key constraint')) ||
+                (deleteError.message && deleteError.message.includes('violates foreign key'));
+              
+              if (isFKError) {
                 skippedDueToReferences++;
                 if (skippedDueToReferences <= 5) {
                   console.log(`Skipped deleting supply "${supply.name}" (ID: ${supply.id}) - has references in extracted_order_items. Pet created but supply kept.`);
