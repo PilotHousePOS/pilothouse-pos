@@ -80,6 +80,8 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   
   // Common misspellings
   'Thermoneter': 'Thermometer',
+  'Greeniues': 'Greenies',
+  'Wishbne': 'Wishbone',
   
   // Food/Flavors
   'Blubrede': 'Blueberry',
@@ -98,6 +100,20 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Forti': 'Fortified',
   'Bis': 'Bison',
   'Ck': 'Chicken',
+  'Chkn': 'Chicken',
+  'Bcn': 'Bacon',
+  'Pb': 'Peanut Butter',
+  'Bne': 'Bone',
+  'Tur': 'Turkey',
+  'Ven': 'Venison',
+  'Be': 'Beef',
+  'Bef': 'Beef',
+  'Veg': 'Vegetable',
+  'Bar': 'Barley',
+  'Pumpk': 'Pumpkin',
+  'Sw Pot': 'Sweet Potato',
+  'Gr Bean': 'Green Bean',
+  'Br Rice': 'Brown Rice',
   'Prot': 'Protein',
   'He Wei': 'Healthy Weight',
   'Sensi': 'Sensitive',
@@ -114,7 +130,28 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Whisp': 'Whisper',
   'Filt': 'Filter',
   'Crt': 'Cartridge',
+  'Cart': 'Cartridge',
   'Crb': 'Carbon',
+  'Therm': 'Thermometer',
+  'Therma': 'Thermal',
+  'Spng': 'Sponge',
+  'Plnt': 'Plant',
+  'Rck': 'Rock',
+  'Blm': 'Bloom',
+  'Flwr': 'Flower',
+  'Ptch': 'Patch',
+  'Mush': 'Mushroom',
+  'Pnk': 'Pink',
+  'Sprflx': 'Superflex',
+  'Wld': 'Wild',
+  'Mxred': 'Mixed',
+  'Vib': 'Vibrant',
+  'Repl': 'Replacement',
+  'Pd': 'Pad',
+  'Contr': 'Controller',
+  'Wtr': 'Water',
+  'Mod': 'Model',
+  'Aquar': 'Aquarium',
   
   // Toys/Misc
   '&Fam': '& Family',
@@ -124,9 +161,12 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Kng': 'Kong',
   'Simplesolutions': 'Simple Solutions',
   'Ntrisrc': 'Nutrisource',
+  'Nutrisrc': 'Nutrisource',
   'Rndlk': 'Round Lake Farm',
   'Friendfrm': 'Tiny Friends Farm',
   'Bluebuff': 'Bluebuffalo',
+  'Arm&ham': 'Arm & Hammer',
+  'Arm&hamm': 'Arm & Hammer',
 };
 
 /**
@@ -209,6 +249,16 @@ export function expandAbbreviations(text: string | null | undefined): string {
   if (!text || typeof text !== 'string') return '';
   
   let result = text;
+  
+  // Fix spacing issues first
+  // 1. Replace double (or more) spaces with single space
+  result = result.replace(/\s{2,}/g, ' ');
+  
+  // 2. Fix ampersand spacing: add space before & if missing
+  result = result.replace(/([a-zA-Z])&/g, '$1 &');
+  
+  // 3. Fix ampersand spacing: add space after & if missing (except &fam which we handle separately)
+  result = result.replace(/&([a-zA-Z])/g, '& $1');
   
   // Handle "Ph" with context detection (must be done first before other replacements)
   // Match "Ph" as a whole word at the start or after a space
