@@ -14,6 +14,7 @@ import {
   insertAppointmentSchema,
   insertCustomerPetSchema,
   users,
+  extractedOrderItems,
 } from "@shared/schema";
 import { z } from "zod";
 import { notificationService } from './notifications';
@@ -4372,7 +4373,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
               isAvailable: supply.isActive
             });
 
-            // Try to delete the supply (may fail if there are foreign key references)
+            // Update extracted_order_items to link to the new pet instead of the supply
+            // This preserves traceability: order items that became live animals can be tracked
+            await db.update(extractedOrderItems)
+              .set({ 
+                supplyId: null,  // Clear supply reference
+                petId: pet.id    // Link to the new pet
+              })
+              .where(eq(extractedOrderItems.supplyId, supply.id));
+
+            // Now delete the supply (should succeed since FK references are cleared)
             try {
               await storage.deleteSupply(supply.id);
               
@@ -4385,23 +4395,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
               });
 
               if (movedToPets <= 10) {
-                console.log(`Moved to pets: "${supply.name}" → ${species} (detected as ${liveAnimalDetection.species})`);
+                console.log(`✓ Moved to pets: "${supply.name}" → ${species} (Pet ID: ${pet.id}, detected as ${liveAnimalDetection.species})`);
               }
             } catch (deleteError: any) {
-              // If deletion fails due to foreign key constraint, skip but keep the pet
-              // PostgreSQL FK constraint error code is '23503'
+              // Only catch FK constraint errors - rethrow all other errors
               const isFKError = 
                 deleteError.code === '23503' || 
                 (deleteError.message && deleteError.message.includes('foreign key constraint')) ||
                 (deleteError.message && deleteError.message.includes('violates foreign key'));
               
               if (isFKError) {
+                // FK error despite clearing references - log and continue
                 skippedDueToReferences++;
-                if (skippedDueToReferences <= 5) {
-                  console.log(`Skipped deleting supply "${supply.name}" (ID: ${supply.id}) - has references in extracted_order_items. Pet created but supply kept.`);
-                }
+                console.error(`FK constraint error deleting supply "${supply.name}" (ID: ${supply.id}):`, deleteError.message);
               } else {
-                // Re-throw other errors
+                // Critical error (DB outage, permissions, etc.) - rethrow
                 throw deleteError;
               }
             }

@@ -661,7 +661,8 @@ export const extractedOrderItems = pgTable("extracted_order_items", {
   brand: varchar("brand", { length: 255 }), // Auto-extracted brand
   notes: text("notes"), // Any special notes about the item
   addedToInventory: boolean("added_to_inventory").default(false), // Whether it's been added to supplies
-  supplyId: integer("supply_id").references(() => supplies.id), // If added to inventory, reference to the supply
+  supplyId: integer("supply_id").references(() => supplies.id), // If added to inventory as supply, reference to the supply
+  petId: integer("pet_id").references(() => pets.id), // If item was detected as live animal, reference to the pet
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
