@@ -25,7 +25,7 @@ import { db } from './db';
 import { eq } from 'drizzle-orm';
 import { expandProductAbbreviations } from './abbreviationExpansion';
 import { extractOrderFromPhoto, apply99Pricing } from './orderPhotoProcessor';
-import { categorizeProduct } from './productCategorization';
+import { categorizeProduct, detectLiveAnimal } from './productCategorization';
 
 // Helper function to capitalize first letter of each word
 function capitalizeWords(text: string | undefined | null): string | undefined | null {
@@ -4305,33 +4305,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Step 0a: Safe cleanup - Remove invalid pets (toys, supplies that shouldn't be in pets table)
       // Uses detectLiveAnimal to identify items that are NOT live animals and removes them
       console.log("Step 0a: Removing invalid pets (toys/supplies in pets table)...");
-      const { detectLiveAnimal: detectLiveAnimalFunction } = await import('./productCategorization');
       const allPets = await storage.getAllPets();
       
       let removedInvalidPets = 0;
       let skippedInvalidPets = 0;
       
       for (const pet of allPets) {
-        const detection = detectLiveAnimalFunction(pet.name);
+        const detection = detectLiveAnimal(pet.name);
         
         // If NOT detected as a live animal, it's invalid (toy, supply, etc.)
         if (!detection.isLiveAnimal) {
-          console.log(`[DEBUG] Invalid pet detected: "${pet.name}" (ID: ${pet.id}) - not a live animal`);
-          
           // Check for references BEFORE attempting to delete
           const hasReferences = await storage.hasPetReferences(pet.id);
-          console.log(`[DEBUG] Pet "${pet.name}" (ID: ${pet.id}) has references: ${hasReferences}`);
           
           if (hasReferences) {
             // Pet has existing references (orders, appointments) - skip it
             skippedInvalidPets++;
-            console.log(`⊘ Skipped invalid pet: "${pet.name}" (ID: ${pet.id}) - has existing references`);
+            console.log(`⊘ Skipped invalid pet: "${pet.name}" (has existing references)`);
           } else {
             // No references - safe to delete
             try {
               await storage.deletePet(pet.id);
               removedInvalidPets++;
-              console.log(`✓ Removed invalid pet: "${pet.name}" (ID: ${pet.id}) - toy/supply in pets table`);
+              console.log(`✓ Removed invalid pet: "${pet.name}" - toy/supply in pets table`);
             } catch (error: any) {
               console.error(`Error removing invalid pet "${pet.name}":`, error);
             }

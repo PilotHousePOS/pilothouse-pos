@@ -485,46 +485,29 @@ export class DatabaseStorage implements IStorage {
       .from(cartItems)
       .where(eq(cartItems.petId, id));
     
-    console.log(`[hasPetReferences] Pet ${id} - cart: ${cartCount.count}`);
-    if (cartCount.count > 0) {
-      console.log(`[hasPetReferences] Pet ${id} HAS CART REFERENCES`);
-      return true;
-    }
+    if (cartCount.count > 0) return true;
     
     const [orderCount] = await db
       .select({ count: count() })
       .from(orderItems)
       .where(eq(orderItems.petId, id));
     
-    console.log(`[hasPetReferences] Pet ${id} - orders: ${orderCount.count}`);
-    if (orderCount.count > 0) {
-      console.log(`[hasPetReferences] Pet ${id} HAS ORDER REFERENCES`);
-      return true;
-    }
+    if (orderCount.count > 0) return true;
     
     const [wishlistCount] = await db
       .select({ count: count() })
       .from(wishlistItems)
       .where(eq(wishlistItems.petId, id));
     
-    console.log(`[hasPetReferences] Pet ${id} - wishlist: ${wishlistCount.count}`);
-    if (wishlistCount.count > 0) {
-      console.log(`[hasPetReferences] Pet ${id} HAS WISHLIST REFERENCES`);
-      return true;
-    }
+    if (wishlistCount.count > 0) return true;
     
     const [extractedCount] = await db
       .select({ count: count() })
       .from(extractedOrderItems)
       .where(eq(extractedOrderItems.petId, id));
     
-    console.log(`[hasPetReferences] Pet ${id} - extracted: ${extractedCount.count}`);
-    if (extractedCount.count > 0) {
-      console.log(`[hasPetReferences] Pet ${id} HAS EXTRACTED ORDER REFERENCES`);
-      return true;
-    }
+    if (extractedCount.count > 0) return true;
     
-    console.log(`[hasPetReferences] Pet ${id} - NO REFERENCES FOUND`);
     return false;
   }
 

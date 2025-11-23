@@ -292,8 +292,17 @@ export function detectLiveAnimal(itemName: string): {
 } {
   const nameLower = itemName.toLowerCase().trim();
   
-  // Tokenize into words (handles hyphens, slashes, etc.)
-  const words = nameLower.split(/[\s\-\/]+/).filter(w => w.length > 0);
+  // Normalize Unicode apostrophes to ASCII before processing
+  // Handles curly quotes (', '), backticks (`), and acute accents (´)
+  const normalized = nameLower.replace(/[''`´]/g, "'");
+  
+  // Tokenize into words (handles hyphens, slashes, apostrophes, etc.)
+  // Strip possessive apostrophes: "Jackson's" → "jackson", "Marshall's" → "marshall"
+  const words = normalized
+    .split(/[\s\-\/]+/)
+    .map(w => w.replace(/'s$/g, '')) // Remove possessive 's from word endings (ASCII apostrophe)
+    .map(w => w.replace(/[']/g, '')) // Remove any remaining apostrophes
+    .filter(w => w.length > 0);
   const wordSet = new Set(words);
   
   // **NEGATIVE SIGNALS**: Strong indicators this is a supply, not a live animal
