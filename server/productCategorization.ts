@@ -524,19 +524,21 @@ export function detectLiveAnimal(itemName: string): {
   // Split species into SPECIFIC (safe to auto-approve) vs GENERIC (require live indicator or multi-word pattern)
   const specificSpeciesPatterns: Record<string, string[]> = {
     // These are VERY specific animal names - safe to auto-approve on simple names
+    // NOTE: Removed betta, goldfish, tetra - these appear too often in supply product names
     mice: ['mice', 'mouse', 'pinkie', 'fuzzy', 'hopper'],
     hamster: ['hamster', 'hamsters'],
     guineapig: ['guinea', 'guineapig'],
     gerbil: ['gerbil', 'gerbils'],
     chinchilla: ['chinchilla', 'chinchillas'],
     ferret: ['ferret', 'ferrets'],
-    rabbit: ['rabbit', 'rabbits', 'bunny', 'bunnies'],
-    goldfish: ['goldfish'],
-    betta: ['betta', 'bettas']
+    rabbit: ['rabbit', 'rabbits', 'bunny', 'bunnies']
   };
   
   const genericSpeciesPatterns: Record<string, string[]> = {
     // These are GENERIC - could appear in product names - require live indicator or multi-word pattern
+    // HIGH-RISK: betta, goldfish, tetra appear frequently in supply names (tools, water conditioner, food, etc.)
+    betta: ['betta', 'bettas'],
+    goldfish: ['goldfish'],
     tetra: ['tetra', 'tetras'],
     gecko: ['gecko', 'geckos'],
     bearded: ['beardie', 'bearded'],
