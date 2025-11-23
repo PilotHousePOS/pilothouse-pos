@@ -5117,6 +5117,8 @@ function BrandCatalogManager() {
   const queryClient = useQueryClient();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editEntry, setEditEntry] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
   
   // Form schema that handles contextKeywords as comma-separated string for UI
   const formSchema = z.object({
@@ -5486,8 +5488,9 @@ function BrandCatalogManager() {
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {entries.map((entry: any) => (
+          <>
+            <div className="space-y-3">
+              {entries.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((entry: any) => (
               <div key={entry.id} className="border rounded-lg p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -5557,8 +5560,45 @@ function BrandCatalogManager() {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            
+            {/* Pagination Controls */}
+            {entries.length > itemsPerPage && (
+              <div className="flex items-center justify-between pt-4 mt-4 border-t">
+                <div className="text-sm text-gray-600">
+                  Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, entries.length)} of {entries.length} entries
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    data-testid="button-prev-page"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </Button>
+                  <div className="flex items-center gap-2 px-3">
+                    <span className="text-sm font-medium">
+                      Page {currentPage} of {Math.ceil(entries.length / itemsPerPage)}
+                    </span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.min(Math.ceil(entries.length / itemsPerPage), p + 1))}
+                    disabled={currentPage >= Math.ceil(entries.length / itemsPerPage)}
+                    data-testid="button-next-page"
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </CardContent>
       </Card>
