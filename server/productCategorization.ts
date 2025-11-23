@@ -302,6 +302,9 @@ export function detectLiveAnimal(itemName: string): {
     'food', 'foods', 'pellet', 'pellets', 'treat', 'treats', 'bedding', 'flakes', 'wafer', 'wafers',
     'chip', 'chips', 'block', 'stick', 'drops', 'powder', 'vitamin', 'vitamins', 'supplement', 'supplements', 'medicine', 'medicines',
     'hay', 'straw', 'litter', 'shavings', 'diet', 'diets', 'meal', 'meals', 'nutrition',
+    'bite', 'bites', 'crunch', 'crunchies', 'nibbles', 'nugget', 'nuggets', 'formula', 'blend',
+    // Weight indicators (strong signal for food products)
+    'lb', 'lbs', 'oz', 'ounce', 'ounces', 'pound', 'pounds', 'kg', 'gram', 'grams', 'g',
     
     // Housing & Equipment
     'cage', 'cages', 'tank', 'tanks', 'aquarium', 'terrarium', 'habitat', 'filter', 'filters', 'heater', 'heaters', 'pump', 'pumps',
@@ -309,6 +312,8 @@ export function detectLiveAnimal(itemName: string): {
     'kit', 'kits', 'starter', 'starters', 'collar', 'collars', 'leash', 'harness', 'carrier', 'crate', 'brush', 'net',
     'ornament', 'ornaments', 'moss', 'hook', 'hooks', 'statue', 'statues', 'set', 'sets',
     'bag', 'bags', 'glove', 'gloves', 'wrap', 'wraps', 'climbing', 'climb', 'hide', 'hides', 'tunnel', 'tunnels',
+    // Toy materials and descriptors
+    'felt', 'fleece', 'yarn', 'sponge', 'shaggy', 'squeakeeez', 'skinneez', 'squeaky', 'plush', 'fuzzy',
     
     // Products & Treatments
     'conditioner', 'treatment', 'treatments', 'cleaner', 'shampoo', 'spray', 'sprays', 'solution', 'solutions',
@@ -346,6 +351,9 @@ export function detectLiveAnimal(itemName: string): {
     
     // General pet supply manufacturers
     'kaytee', 'oxbow', 'vitakraft', 'sunseed', 'higgins',
+    
+    // Pet toy manufacturers
+    'kong', 'nylabone', 'chuckit', 'spot', 'turbo', 'ethical',
     
     // Product line descriptors
     'buddy', 'guard', 'shield', 'safe', 'safestart', 'aquasafe', 'bettasafe',
