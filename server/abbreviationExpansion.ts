@@ -122,10 +122,16 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Brin': 'Brine',
   'Sal': 'Salmon',
   'Dck': 'Duck',
-  'Tndr': 'Tender',
+  'Tndr Bts': 'Tender Bites',
+  'Lil Bts': 'Little Bites',
+  'Little Bts': 'Little Bites',
+  'Nutty Butt Bts': 'Nutty Butter Bites',
   'Bts': 'Bites',
-  'Chom': 'Chomp',
-  'Chomp': 'Chomp',
+  'Bore': 'Wild Boar',
+  
+  // Nutrisource Product Lines
+  'Chom': 'Chompy Chompers',
+  'Chomp': 'Chompy Chompers',
   
   // Accessories
   'Hrness': 'Harness',
