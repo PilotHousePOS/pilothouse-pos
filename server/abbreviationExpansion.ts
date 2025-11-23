@@ -41,6 +41,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Med': 'Medium',
   'Md': 'Medium',
   'Sm': 'Small',
+  'Min': 'Mini',
   'Xlg': 'Extra Large',
   'Xl': 'Extra Large',
   'Xxl': 'Extra Extra Large',
@@ -125,6 +126,13 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Sal': 'Salmon',
   'Dck': 'Duck',
   'Chu': 'Chunks',
+  'Riv': 'River',
+  'Cich': 'Cichlid',
+  'Pel': 'Pellets',
+  'Sup': 'Super',
+  'Col': 'Color',
+  'Nib': 'Nibbles',
+  'Pat': 'Pate',
   // 'Tndr Bts': 'Tender Bites',  // MOVED TO BRAND CATALOG
   // 'Lil Bts': 'Little Bites',  // MOVED TO BRAND CATALOG
   // 'Little Bts': 'Little Bites',  // MOVED TO BRAND CATALOG
@@ -164,7 +172,9 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Repl': 'Replacement',
   'Pd': 'Pad',
   'Contr': 'Controller',
+  'Con': 'Conditioner',
   'Wtr': 'Water',
+  'Wat': 'Water',
   'Mod': 'Model',
   'Aquar': 'Aquarium',
   
@@ -174,6 +184,8 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   
   // Brands (only expand when at start or after space)
   'Kng': 'Kong',
+  'Vit': 'Vital',
+  'Ess': 'Essentials',
   'Simplesolutions': 'Simple Solutions',
   'Ntrisrc': 'Nutrisource',
   'Nutrisrc': 'Nutrisource',
