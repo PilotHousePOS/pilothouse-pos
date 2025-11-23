@@ -20,8 +20,9 @@ function extractBrand(productName: string): string | null {
   
   // Common pet food brands to detect (ordered by priority/specificity)
   // Include alternate spellings and common variations
+  // IMPORTANT: Brand name MUST match the catalog entries exactly
   const knownBrands = [
-    { name: 'Hill\'s Science Diet', patterns: ['hill\'s science diet', 'science diet'] },
+    { name: 'Science Diet', patterns: ['hill\'s science diet', 'science diet'] },
     { name: 'Nutrisource', patterns: ['nutrisource', 'nutri source', 'nutr source'] },
     { name: 'Blue Buffalo', patterns: ['blue buffalo', 'bluebuffalo', 'blue buff'] },
     { name: 'Taste of the Wild', patterns: ['taste of the wild', 'taste wild'] },
