@@ -124,6 +124,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Brin': 'Brine',
   'Sal': 'Salmon',
   'Dck': 'Duck',
+  'Chu': 'Chunks',
   // 'Tndr Bts': 'Tender Bites',  // MOVED TO BRAND CATALOG
   // 'Lil Bts': 'Little Bites',  // MOVED TO BRAND CATALOG
   // 'Little Bts': 'Little Bites',  // MOVED TO BRAND CATALOG

@@ -121,6 +121,15 @@ export async function seedBrandCatalog(storage: IStorage): Promise<void> {
       evidence: 'Nutrisource Little Bites variant abbreviation',
       contextKeywords: ['dog', 'small'],
     },
+    {
+      brand: 'Nutrisource',
+      productLine: 'Grillin\' Grillers',
+      abbreviation: 'Grl',
+      expansion: 'Grillin\' Grillers',
+      category: 'dog treats',
+      evidence: 'Product packaging shows GRILLIN\' GRILLERS - https://www.chewy.com/nutrisource-choice-grillin-grillers/dp/447157',
+      contextKeywords: ['dog', 'treats', 'beef', 'chicken'],
+    },
     
     // ====================
     // BLUE BUFFALO
