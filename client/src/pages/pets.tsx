@@ -7,7 +7,7 @@ import PetCard from "@/components/pet-card";
 
 const PET_SPECIES = [
   { id: 'all', label: 'All Pets', emoji: '🐾' },
-  { id: 'mammals', label: 'Mammals', emoji: '🐕' },
+  { id: 'Small Animals', label: 'Small Animals', emoji: '🐕' },
   { id: 'bird', label: 'Birds', emoji: '🦜' },
   { id: 'fish', label: 'Fish', emoji: '🐟' },
   { id: 'reptile', label: 'Reptiles', emoji: '🦎' },

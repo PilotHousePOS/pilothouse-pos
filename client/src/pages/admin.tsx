@@ -10869,7 +10869,7 @@ function EditPetForm({ pet, onSubmit }: { pet: any; onSubmit: (data: any) => voi
             <SelectValue placeholder="Select species" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="mammals">Mammals</SelectItem>
+            <SelectItem value="Small Animals">Small Animals</SelectItem>
             <SelectItem value="bird">Bird</SelectItem>
             <SelectItem value="fish">Fish</SelectItem>
             <SelectItem value="reptile">Reptile</SelectItem>
@@ -11292,7 +11292,7 @@ function AddPetForm({ onSubmit }: { onSubmit: (data: any) => void }) {
             <SelectValue placeholder="Select species" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="mammals">Mammals</SelectItem>
+            <SelectItem value="Small Animals">Small Animals</SelectItem>
             <SelectItem value="bird">Bird</SelectItem>
             <SelectItem value="fish">Fish</SelectItem>
             <SelectItem value="reptile">Reptile</SelectItem>
