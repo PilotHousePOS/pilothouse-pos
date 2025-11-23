@@ -88,8 +88,6 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'White Gr': 'With Grain',
   'Red B': 'RedBarn',
   'Waf': 'Waffer',
-  'Froz': 'Frozen',
-  'Fr': 'Frozen',
   'Blo': 'Blood',
   'Cmbs': 'Crumbs',
   'Chckwcheese': 'Chicken With Cheese',
@@ -104,7 +102,6 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Bcn': 'Bacon',
   'Pb': 'Peanut Butter',
   'Bne': 'Bone',
-  'Bore': 'Bone',
   'Tur': 'Turkey',
   'Ven': 'Venison',
   'Be': 'Beef',
@@ -127,7 +124,6 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Little Bts': 'Little Bites',
   'Nutty Butt Bts': 'Nutty Butter Bites',
   'Bts': 'Bites',
-  'Bore': 'Wild Boar',
   
   // Nutrisource Product Lines
   'Chom': 'Chompy Chompers',
@@ -188,10 +184,11 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Pu Sni': 'PurrSnickity',
   'Sniffers': 'PurrSnickity',
   
-  // Fromm PurrSnickity Flavors
-  'Co': 'Chicken Au Frommage',
-  'Game': 'Game Bird Grandeur',
-  'Salmon': 'Salmon Splendor',
+  // Location/Environment
+  'In Do': 'Indoor',
+  
+  // Brand-specific context (removed generic expansions - need brand catalog)
+  // Fromm, Freshpet, Science Diet require context-aware expansion
 };
 
 /**
