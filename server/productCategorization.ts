@@ -346,7 +346,8 @@ export function detectLiveAnimal(itemName: string): {
     'hoodie', 'shirt', 'apparel', 'clothing', 'keychain', 'poster', 'sticker', 'magnet', 'mug',
     'calendar', 'book', 'guide', 'magazine', 'notebook', 'hammock', 'blanket', 'towel', 'mat', 'pad', 'cushion',
     'charm', 'pendant', 'jewelry', 'necklace', 'figurine', 'model', 'replica',
-    'plant', 'plants', 'volcano', 'castle', 'bridge', 'arch', 'bubbler', 'aerator'
+    'plant', 'plants', 'volcano', 'castle', 'bridge', 'arch', 'bubbler', 'aerator',
+    'vibrance', 'crisp', 'crisps', 'lovelies'
   ]);
   
   // **2. SUPPLY BRANDS** (-100 points each - very strong negative signal)
@@ -357,7 +358,8 @@ export function detectLiveAnimal(itemName: string): {
     'marshall', 'marshalls', 'oasis', 'vitaless',
     'kong', 'nylabone', 'chuckit', 'spot', 'spt', 'turbo', 'ethical', 'zippypaws', 'tuffy',
     'buddy', 'guard', 'shield', 'safe', 'safestart', 'aquasafe', 'bettasafe',
-    'bioscrub', 'bio', 'scrub', 'max', 'plus', 'pro', 'premium', 'ultimate', 'activ'
+    'bioscrub', 'bio', 'scrub', 'max', 'plus', 'pro', 'premium', 'ultimate', 'activ',
+    'friends', 'farm', 'barbie', 'barbies', 'spongebob', 'frozen', 'dory'
   ]);
   
   // Calculate supply score
@@ -420,14 +422,21 @@ export function detectLiveAnimal(itemName: string): {
     barb: ['barb', 'barbs'],
     
     // Fish - Catfish & Bottom Dwellers
-    catfish: ['catfish', 'pleco', 'plecostomus', 'cory', 'corydoras'],
+    catfish: ['catfish', 'pleco', 'plecostomus', 'cory', 'corydoras', 'paleatus', 'aeneus'],
     loach: ['loach', 'loaches'],
     
     // Fish - Cichlids
-    cichlid: ['cichlid', 'cichlids', 'ram'],
+    cichlid: ['cichlid', 'cichlids', 'ram', 'peacock', 'aulonocara', 'maylandia', 'apistogramma', 'severum', 'nyererei'],
     
-    // Fish - Sharks (aquarium sharks)
+    // Fish - Sharks & Polypterus (aquarium sharks)
     shark: ['shark', 'sharks'],
+    polypterus: ['polypterus', 'bichir', 'senegalus', 'dinosaur'],
+    
+    // Fish - Shrimp & Invertebrates
+    shrimp: ['shrimp', 'shrimps', 'neocaridina', 'amano'],
+    
+    // Fish - Algae Eaters
+    algaeeater: ['siamese', 'chinese', 'farlowella'],
     
     // Reptiles
     gecko: ['gecko', 'geckos'],
