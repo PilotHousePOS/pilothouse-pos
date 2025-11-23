@@ -316,8 +316,9 @@ export function detectLiveAnimal(itemName: string): {
     'shed', 'shedding', 'aid', 'humidifier', 'training', 'trainer', 'perch', 'stand',
     
     // Aquarium/Pet Supply Products (expanded from false positives)
+    // NOTE: Removed "water" - too generic, appears in "Chinese Water Dragon", "African Water Frog"
     'tools', 'tool', 'mirror', 'mirrors', 'thermometer', 'thermometers', 'renewal', 'renew',
-    'basic', 'basics', 'shaker', 'shakers', 'diver', 'divers', 'water', 'conditioner',
+    'basic', 'basics', 'shaker', 'shakers', 'diver', 'divers',
     'test', 'tester', 'strip', 'strips', 'meter', 'gauge', 'reader',
     
     // Merchandise & Product Types (comprehensive product noun taxonomy)
@@ -330,13 +331,16 @@ export function detectLiveAnimal(itemName: string): {
   ]);
   
   // Supply manufacturer brand names - strong indicator this is a product, not a live animal
+  // NOTE: Excluded "tetra" - it's both a brand AND a fish species (Neon Tetra, Cardinal Tetra)
+  // NOTE: Excluded "glofish" - it's a live fish brand (GloFish Electric Green Tetra, etc.)
+  // Supply keywords will still catch Tetra brand products (e.g., "Tetra BettaSafe" has "safe")
   const supplyBrands = new Set([
-    // Aquarium supply manufacturers
-    'tetra', 'api', 'aqueon', 'marineland', 'fluval', 'seachem', 'hikari',
-    'omega', 'aquaclear', 'glofish', 'penn', 'plax', 'imagitarium',
+    // Aquarium supply manufacturers (excluding species-name and live-brand collisions)
+    'api', 'aqueon', 'marineland', 'fluval', 'seachem', 'hikari',
+    'omega', 'aquaclear', 'penn', 'plax', 'imagitarium',
     
     // Reptile supply manufacturers  
-    'zoomed', 'exoterra', 'exo', 'terra', 'zilla', 'flukers', 'repticare',
+    'zoomed', 'exoterra', 'zilla', 'flukers', 'repticare',
     
     // General pet supply manufacturers
     'kaytee', 'oxbow', 'vitakraft', 'sunseed', 'higgins',
@@ -524,21 +528,28 @@ export function detectLiveAnimal(itemName: string): {
   // Split species into SPECIFIC (safe to auto-approve) vs GENERIC (require live indicator or multi-word pattern)
   const specificSpeciesPatterns: Record<string, string[]> = {
     // These are VERY specific animal names - safe to auto-approve on simple names
-    // NOTE: Removed betta, goldfish, tetra - these appear too often in supply product names
+    // Supply brand/keyword filtering (above) already blocks "Betta Tools", "Goldfish Food", etc.
     mice: ['mice', 'mouse', 'pinkie', 'fuzzy', 'hopper'],
     hamster: ['hamster', 'hamsters'],
     guineapig: ['guinea', 'guineapig'],
     gerbil: ['gerbil', 'gerbils'],
     chinchilla: ['chinchilla', 'chinchillas'],
     ferret: ['ferret', 'ferrets'],
-    rabbit: ['rabbit', 'rabbits', 'bunny', 'bunnies']
+    rabbit: ['rabbit', 'rabbits', 'bunny', 'bunnies'],
+    goldfish: ['goldfish'],
+    betta: ['betta', 'bettas'],
+    guppy: ['guppy', 'guppies'],
+    molly: ['molly', 'mollies'],
+    platy: ['platy', 'platies'],
+    swordtail: ['swordtail', 'swordtails'],
+    angelfish: ['angelfish'],
+    discus: ['discus'],
+    arowana: ['arowana', 'arowanas'],
+    hedgehog: ['hedgehog', 'hedgehogs']
   };
   
   const genericSpeciesPatterns: Record<string, string[]> = {
     // These are GENERIC - could appear in product names - require live indicator or multi-word pattern
-    // HIGH-RISK: betta, goldfish, tetra appear frequently in supply names (tools, water conditioner, food, etc.)
-    betta: ['betta', 'bettas'],
-    goldfish: ['goldfish'],
     tetra: ['tetra', 'tetras'],
     gecko: ['gecko', 'geckos'],
     bearded: ['beardie', 'bearded'],
