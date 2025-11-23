@@ -4340,7 +4340,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // NOTE: detectLiveAnimal() excludes toy brands (spot, turbo, kong, etc.) and toy materials
       // (felt, fleece, yarn, sponge, etc.) so toys will NOT be moved to pets
       console.log("Step 0b: Detecting live animals and moving to pets...");
-      const { detectLiveAnimal } = await import('./productCategorization');
       const allSupplies = await storage.getAllSupplies();
       
       let movedToPets = 0;
@@ -4943,7 +4942,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
 
           // Detect if this is a live animal (should go to pets, not supplies)
-          const { detectLiveAnimal } = await import('./productCategorization');
           const liveAnimalDetection = detectLiveAnimal(extractedItem.itemName);
 
           if (liveAnimalDetection.isLiveAnimal) {
