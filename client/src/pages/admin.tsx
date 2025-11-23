@@ -7414,7 +7414,7 @@ export default function Admin() {
         <Card className="min-h-[120px]">
           <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
             <PawPrint className="w-8 h-8 mb-3 text-brand-blue" />
-            <div className="text-2xl font-bold mb-1">{(pets as any[]).length}</div>
+            <div className="text-2xl font-bold mb-1">{petsTotal}</div>
             <div className="text-sm text-gray-500">Total Pets</div>
           </CardContent>
         </Card>
