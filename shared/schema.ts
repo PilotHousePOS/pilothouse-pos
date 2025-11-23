@@ -72,6 +72,24 @@ export const pets = pgTable("pets", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Brand catalog for validated abbreviation expansions
+export const brandCatalog = pgTable("brand_catalog", {
+  id: serial("id").primaryKey(),
+  brand: varchar("brand", { length: 255 }).notNull(), // e.g., "Freshpet", "Fromm", "Science Diet"
+  productLine: varchar("product_line", { length: 255 }), // e.g., "Vital", "PurrSnickity", "Indoor" (optional)
+  abbreviation: varchar("abbreviation", { length: 80 }).notNull(), // e.g., "Vit Gr", "Pur Sni", "Indo"
+  expansion: varchar("expansion", { length: 255 }).notNull(), // e.g., "Vital Grain Free", "PurrSnickity", "Indoor"
+  category: varchar("category", { length: 100 }), // e.g., "dog food", "cat food", "treats"
+  evidence: text("evidence").notNull(), // REQUIRED: URL, packaging photo reference, or source documentation
+  contextKeywords: text("context_keywords").array(), // Additional keywords to help match context
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  // Composite unique constraint: prevent duplicate brand + abbreviation combinations
+  index("brand_catalog_brand_idx").on(table.brand),
+  index("brand_catalog_abbreviation_idx").on(table.abbreviation),
+]);
+
 // Pet supplies inventory
 export const supplies = pgTable("supplies", {
   id: serial("id").primaryKey(),
@@ -368,6 +386,12 @@ export const insertPetSchema = createInsertSchema(pets).omit({
   updatedAt: true,
 });
 
+export const insertBrandCatalogSchema = createInsertSchema(brandCatalog).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertSupplySchema = createInsertSchema(supplies).omit({
   id: true,
   createdAt: true,
@@ -476,6 +500,8 @@ export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 export type InsertPasswordResetToken = z.infer<typeof insertPasswordResetTokenSchema>;
 export type Pet = typeof pets.$inferSelect;
 export type InsertPet = z.infer<typeof insertPetSchema>;
+export type BrandCatalogEntry = typeof brandCatalog.$inferSelect;
+export type InsertBrandCatalogEntry = z.infer<typeof insertBrandCatalogSchema>;
 export type Supply = typeof supplies.$inferSelect;
 export type InsertSupply = z.infer<typeof insertSupplySchema>;
 export type CartItem = typeof cartItems.$inferSelect;
