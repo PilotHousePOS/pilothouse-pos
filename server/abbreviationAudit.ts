@@ -1,5 +1,5 @@
 import { storage } from './storage';
-import { expandAbbreviationsInText } from './abbreviationExpansion';
+import { expandAbbreviationsAsync } from './abbreviationExpansion';
 
 /**
  * Audit all supplies to identify unknown abbreviations that need brand catalog research
@@ -21,16 +21,16 @@ export async function auditUnknownAbbreviations() {
   
   for (const supply of allSupplies) {
     total++;
-    const result = expandAbbreviationsInText(supply.name);
+    const result = await expandAbbreviationsAsync(supply.name, storage);
     
     // Track catalog hits (items that used brand catalog)
-    if (result.usedCatalog) {
+    if (result.catalogUsed) {
       catalogHits++;
       continue; // Skip items that successfully used catalog
     }
     
     // Check if it changed without catalog (generic fallback)
-    const changedWithoutCatalog = result.changed && !result.usedCatalog;
+    const changedWithoutCatalog = (result.expanded !== supply.name) && !result.catalogUsed;
     
     // Pattern detection for suspected abbreviations
     const suspectedPatterns: string[] = [];
@@ -66,7 +66,7 @@ export async function auditUnknownAbbreviations() {
       unknownAbbreviations.push({
         id: supply.id,
         name: supply.name,
-        expandedName: result.text,
+        expandedName: result.expanded,
         reason: reasons.join(' | '),
       });
     }
