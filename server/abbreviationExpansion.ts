@@ -116,6 +116,10 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Crt': 'Cartridge',
   'Crb': 'Carbon',
   
+  // Toys/Misc
+  '&Fam': '& Family',
+  '&fam': '& Family',
+  
   // Brands (only expand when at start or after space)
   'Kng': 'Kong',
   'Simplesolutions': 'Simple Solutions',
