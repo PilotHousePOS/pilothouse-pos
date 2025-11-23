@@ -577,7 +577,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         pagination: {
           currentPage: pageNum,
           totalPages,
-          totalCount,
+          total: totalCount,
           pageSize
         }
       });
