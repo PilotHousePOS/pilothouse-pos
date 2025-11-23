@@ -661,9 +661,10 @@ export function detectLiveAnimal(itemName: string): {
     return { isLiveAnimal: true, species: detectedSpecies, detectedKeywords };
   }
   
-  // Case 2: SPECIFIC species with simple name (≤3 words) → Live animal
-  // These species are specific enough that short names are safe to auto-approve
-  if (isSpecificSpecies && words.length <= 3) {
+  // Case 2: SPECIFIC species with descriptive name (≤5 words) → Live animal
+  // These species are specific enough that names with adjectives are safe to auto-approve
+  // Examples: "Assorted Crescent Platy Medium", "Black Highfin Swordtail Reg"
+  if (isSpecificSpecies && words.length <= 5) {
     return { isLiveAnimal: true, species: detectedSpecies, detectedKeywords };
   }
   
