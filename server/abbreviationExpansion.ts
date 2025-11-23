@@ -104,6 +104,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Bcn': 'Bacon',
   'Pb': 'Peanut Butter',
   'Bne': 'Bone',
+  'Bore': 'Bone',
   'Tur': 'Turkey',
   'Ven': 'Venison',
   'Be': 'Beef',
@@ -119,6 +120,12 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Sensi': 'Sensitive',
   'Spiru': 'Spirulina',
   'Brin': 'Brine',
+  'Sal': 'Salmon',
+  'Dck': 'Duck',
+  'Tndr': 'Tender',
+  'Bts': 'Bites',
+  'Chom': 'Chomp',
+  'Chomp': 'Chomp',
   
   // Accessories
   'Hrness': 'Harness',
