@@ -347,7 +347,10 @@ export function detectLiveAnimal(itemName: string): {
     'calendar', 'book', 'guide', 'magazine', 'notebook', 'hammock', 'blanket', 'towel', 'mat', 'pad', 'cushion',
     'charm', 'pendant', 'jewelry', 'necklace', 'figurine', 'model', 'replica',
     'plant', 'plants', 'volcano', 'castle', 'bridge', 'arch', 'bubbler', 'aerator',
-    'vibrance', 'crisp', 'crisps', 'lovelies'
+    'vibrance', 'crisp', 'crisps', 'lovelies',
+    'skull', 'gazer', 'squeak', 'dura', 'fused', 'mammoth', 'squeaker',
+    'whisp', 'whisper', 'filt', 'cartridge', 'crt', 'crb', 'carbon', 'biobag', 'ex20', 'ex30', 'ex45', 'ex70',
+    'pump550', 'pump1000', 'pond', 'whsip'
   ]);
   
   // **2. SUPPLY BRANDS** (-100 points each - very strong negative signal)
