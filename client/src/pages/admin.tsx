@@ -5242,10 +5242,12 @@ export default function Admin() {
   const ITEMS_PER_PAGE = 4;
 
   // Always call all hooks at the top level
-  const { data: pets = [] } = useQuery({
+  const { data: petsData } = useQuery({
     queryKey: ["/api/pets"],
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
+
+  const pets = (petsData as any)?.pets || [];
 
   const { data: suppliesData } = useQuery<any>({
     queryKey: ["/api/supplies", { 
