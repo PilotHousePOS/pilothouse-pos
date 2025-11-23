@@ -1,7 +1,11 @@
 /**
  * Smart abbreviation expansion system for product names and descriptions
+ * Priority: Brand catalog (research-backed) > Generic abbreviations (fallback)
  * Handles context-aware expansion (e.g., "Ph" can be pH or Prevue Hendrix)
  */
+
+import type { IStorage } from './storage';
+import { expandProductName } from './brandCatalog';
 
 // Water chemistry keywords that indicate "Ph" means pH (water acidity), not Prevue Hendrix
 const PH_CHEMISTRY_KEYWORDS = [
@@ -119,15 +123,15 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Brin': 'Brine',
   'Sal': 'Salmon',
   'Dck': 'Duck',
-  'Tndr Bts': 'Tender Bites',
-  'Lil Bts': 'Little Bites',
-  'Little Bts': 'Little Bites',
+  // 'Tndr Bts': 'Tender Bites',  // MOVED TO BRAND CATALOG
+  // 'Lil Bts': 'Little Bites',  // MOVED TO BRAND CATALOG
+  // 'Little Bts': 'Little Bites',  // MOVED TO BRAND CATALOG
   'Nutty Butt Bts': 'Nutty Butter Bites',
   'Bts': 'Bites',
   
-  // Nutrisource Product Lines
-  'Chom': 'Chompy Chompers',
-  'Chomp': 'Chompy Chompers',
+  // Nutrisource Product Lines (fallback - prefer brand catalog)
+  // 'Chom': 'Chompy Chompers',  // MOVED TO BRAND CATALOG
+  // 'Chomp': 'Chompy Chompers',  // MOVED TO BRAND CATALOG
   
   // Accessories
   'Hrness': 'Harness',
@@ -177,18 +181,18 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Arm&ham': 'Arm & Hammer',
   'Arm&hamm': 'Arm & Hammer',
   
-  // Fromm Product Lines
-  'Pure Sniffers': 'PurrSnickity',
-  'Pu Sniffers': 'PurrSnickity',
-  'Pur Sni': 'PurrSnickity',
-  'Pu Sni': 'PurrSnickity',
-  'Sniffers': 'PurrSnickity',
+  // Fromm Product Lines (fallback - prefer brand catalog)
+  // 'Pure Sniffers': 'PurrSnickity',  // MOVED TO BRAND CATALOG
+  // 'Pu Sniffers': 'PurrSnickity',  // MOVED TO BRAND CATALOG
+  // 'Pur Sni': 'PurrSnickity',  // MOVED TO BRAND CATALOG
+  // 'Pu Sni': 'PurrSnickity',  // MOVED TO BRAND CATALOG
+  // 'Sniffers': 'PurrSnickity',  // MOVED TO BRAND CATALOG
   
-  // Location/Environment
-  'In Do': 'Indoor',
+  // Location/Environment (fallback - prefer brand catalog for Science Diet)
+  // 'In Do': 'Indoor',  // MOVED TO BRAND CATALOG (Science Diet specific)
   
-  // Brand-specific context (removed generic expansions - need brand catalog)
-  // Fromm, Freshpet, Science Diet require context-aware expansion
+  // Brand-specific context (removed generic expansions - now use brand catalog)
+  // Fromm, Freshpet, Science Diet, Nutrisource require brand catalog
 };
 
 /**
@@ -264,11 +268,16 @@ function isAquariumGallon(text: string, gaPosition: number): boolean {
 
 /**
  * Expands abbreviations in a text string with context awareness
+ * Uses brand catalog first (research-backed), then falls back to generic mappings
  * @param text - Text to expand abbreviations in
+ * @param storage - Optional storage for brand catalog lookup (async version recommended)
  * @returns Text with expanded abbreviations
  */
-export function expandAbbreviations(text: string | null | undefined): string {
+export function expandAbbreviations(text: string | null | undefined, storage?: IStorage): string {
   if (!text || typeof text !== 'string') return '';
+  
+  // NOTE: This is the synchronous version for backwards compatibility
+  // For brand catalog expansion, use expandAbbreviationsAsync instead
   
   let result = text;
   
@@ -340,6 +349,78 @@ export function expandAbbreviations(text: string | null | undefined): string {
 }
 
 /**
+ * Async version: Expands abbreviations using brand catalog FIRST, then generic fallback
+ * This is the preferred method for new code
+ * @param text - Text to expand abbreviations in
+ * @param storage - Storage interface for brand catalog
+ * @returns Promise with object containing expanded text and catalog usage flag
+ */
+export async function expandAbbreviationsAsync(
+  text: string | null | undefined,
+  storage: IStorage
+): Promise<{ expanded: string; catalogUsed: boolean }> {
+  if (!text || typeof text !== 'string') return { expanded: '', catalogUsed: false };
+  
+  // Step 1: Try brand catalog expansion (research-backed, context-aware)
+  const catalogResult = await expandProductName(storage, text);
+  const catalogUsed = catalogResult !== text; // Track if catalog made changes
+  
+  // Step 2: Fall back to generic abbreviation expansion
+  // Fix spacing issues first
+  let result = catalogResult;
+  result = result.replace(/\s{2,}/g, ' ');
+  result = result.replace(/([a-zA-Z])&/g, '$1 &');
+  result = result.replace(/&([a-zA-Z])/g, '& $1');
+  
+  // Handle "Ph" with context detection
+  const phRegex = /\bPh\b/g;
+  let match;
+  const phMatches: Array<{index: number, isChemistry: boolean}> = [];
+  
+  while ((match = phRegex.exec(result)) !== null) {
+    phMatches.push({
+      index: match.index,
+      isChemistry: isWaterChemistryPh(result, match.index)
+    });
+  }
+  
+  for (let i = phMatches.length - 1; i >= 0; i--) {
+    const { index, isChemistry } = phMatches[i];
+    if (isChemistry) {
+      result = result.substring(0, index) + 'pH' + result.substring(index + 2);
+    } else {
+      result = result.substring(0, index) + 'Prevue Hendrix' + result.substring(index + 2);
+    }
+  }
+  
+  // Handle "Ga" with context detection
+  const gaRegex = /\bGa\b/gi;
+  const gaMatches: Array<{index: number, isGallon: boolean}> = [];
+  
+  while ((match = gaRegex.exec(result)) !== null) {
+    gaMatches.push({
+      index: match.index,
+      isGallon: isAquariumGallon(result, match.index)
+    });
+  }
+  
+  for (let i = gaMatches.length - 1; i >= 0; i--) {
+    const { index, isGallon } = gaMatches[i];
+    if (isGallon) {
+      result = result.substring(0, index) + 'Gallon' + result.substring(index + 2);
+    }
+  }
+  
+  // Expand other abbreviations (whole word matches)
+  for (const [abbrev, expansion] of Object.entries(ABBREVIATION_MAPPINGS)) {
+    const regex = new RegExp(`\\b${abbrev}\\b`, 'g');
+    result = result.replace(regex, expansion);
+  }
+  
+  return { expanded: result, catalogUsed };
+}
+
+/**
  * Expands abbreviations in both name and description of a product
  * @param name - Product name
  * @param description - Product description
@@ -352,5 +433,28 @@ export function expandProductAbbreviations(
   return {
     name: expandAbbreviations(name),
     description: expandAbbreviations(description)
+  };
+}
+
+/**
+ * Async version: Expands abbreviations in both name and description using brand catalog
+ * This is the preferred method for new code
+ * @param name - Product name
+ * @param description - Product description
+ * @param storage - Storage interface for brand catalog
+ * @returns Promise with object containing expanded name, description, and catalog usage flag
+ */
+export async function expandProductAbbreviationsAsync(
+  name: string | null | undefined,
+  description: string | null | undefined,
+  storage: IStorage
+): Promise<{ name: string; description: string; catalogUsed: boolean }> {
+  const nameResult = await expandAbbreviationsAsync(name, storage);
+  const descResult = await expandAbbreviationsAsync(description, storage);
+  
+  return {
+    name: nameResult.expanded,
+    description: descResult.expanded,
+    catalogUsed: nameResult.catalogUsed || descResult.catalogUsed
   };
 }

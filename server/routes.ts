@@ -4302,6 +4302,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Expand abbreviations in all product names and descriptions (Admin only)
+  // Now uses brand catalog for research-backed expansions!
   app.post("/api/admin/supplies/expand-abbreviations", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
@@ -4309,29 +4310,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      console.log("Starting abbreviation expansion for all products...");
-      const { expandAbbreviations } = await import('./abbreviationExpansion');
+      console.log("Starting abbreviation expansion (brand catalog + generic fallback)...");
+      const { expandAbbreviationsAsync } = await import('./abbreviationExpansion');
       const startTime = Date.now();
 
       // Get all supplies
       const supplies = await storage.getAllSupplies();
       let updatedCount = 0;
       let skippedCount = 0;
+      let catalogHits = 0;
 
       for (const supply of supplies) {
-        const expandedName = expandAbbreviations(supply.name);
-        const expandedDescription = expandAbbreviations(supply.description);
+        // Use async version with brand catalog support
+        const nameResult = await expandAbbreviationsAsync(supply.name, storage);
+        const descResult = await expandAbbreviationsAsync(supply.description, storage);
+
+        // Track if brand catalog made changes (NOT generic fallback)
+        if (nameResult.catalogUsed || descResult.catalogUsed) {
+          catalogHits++;
+        }
 
         // Only update if something changed
-        if (expandedName !== supply.name || expandedDescription !== supply.description) {
+        if (nameResult.expanded !== supply.name || descResult.expanded !== supply.description) {
           await storage.updateSupply(supply.id, {
-            name: expandedName,
-            description: expandedDescription
+            name: nameResult.expanded,
+            description: descResult.expanded
           });
           updatedCount++;
           
           if (updatedCount <= 10) {
-            console.log(`Updated: "${supply.name}" → "${expandedName}"`);
+            console.log(`Updated: "${supply.name}" → "${nameResult.expanded}"`);
           }
         } else {
           skippedCount++;
@@ -4340,14 +4348,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const duration = ((Date.now() - startTime) / 1000).toFixed(2);
       console.log(`Abbreviation expansion complete in ${duration}s`);
-      console.log(`Updated: ${updatedCount}, Skipped: ${skippedCount}`);
+      console.log(`Updated: ${updatedCount}, Skipped: ${skippedCount}, Brand catalog hits: ${catalogHits}`);
 
       res.json({
-        message: "Abbreviation expansion completed successfully",
+        message: "Abbreviation expansion completed successfully (using brand catalog)",
         stats: {
           total: supplies.length,
           updated: updatedCount,
           skipped: skippedCount,
+          catalogHits,
           duration: `${duration}s`
         }
       });
