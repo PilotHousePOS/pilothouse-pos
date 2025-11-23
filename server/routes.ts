@@ -4302,10 +4302,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("[VERSION CHECK] Kong debug logging enabled - should see Kong products below");
       const startTime = Date.now();
 
-      // Step 0: Detect live animals and move them to pets
+      // Step 0a: Safe cleanup - Remove pet duplicates that have matching supplies
+      // This only removes pets where an identical supply exists (safe duplicate removal)
+      console.log("Step 0a: Removing pet duplicates with matching supplies...");
+      const allPets = await storage.getAllPets();
+      const allSuppliesMap = new Map<string, any>();
+      const allSuppliesTemp = await storage.getAllSupplies();
+      
+      // Build a map of supply names for fast lookup
+      for (const supply of allSuppliesTemp) {
+        const key = supply.name.toLowerCase().trim();
+        allSuppliesMap.set(key, supply);
+      }
+      
+      let removedDuplicates = 0;
+      let skippedDuplicates = 0;
+      for (const pet of allPets) {
+        const petNameKey = pet.name.toLowerCase().trim();
+        const matchingSupply = allSuppliesMap.get(petNameKey);
+        
+        // Only remove if there's an exact name match with a supply (duplicate)
+        if (matchingSupply) {
+          // Check for references BEFORE attempting to delete
+          const hasReferences = await storage.hasPetReferences(pet.id);
+          
+          if (hasReferences) {
+            // Pet has existing references (orders, appointments) - skip it
+            skippedDuplicates++;
+            console.log(`⊘ Skipped duplicate pet: "${pet.name}" (has existing references - orders/wishlist/cart)`);
+          } else {
+            // No references - safe to delete
+            try {
+              await storage.deletePet(pet.id);
+              removedDuplicates++;
+              console.log(`✓ Removed duplicate pet: "${pet.name}" (matching supply exists: ID ${matchingSupply.id})`);
+            } catch (error: any) {
+              console.error(`Error removing duplicate pet "${pet.name}":`, error);
+            }
+          }
+        }
+      }
+      console.log(`Removed ${removedDuplicates} duplicate pets, skipped ${skippedDuplicates} with references`);
+
+      // Step 0b: Detect live animals and move them to pets
       // NOTE: detectLiveAnimal() excludes toy brands (spot, turbo, kong, etc.) and toy materials
       // (felt, fleece, yarn, sponge, etc.) so toys will NOT be moved to pets
-      console.log("Step 0: Detecting live animals and moving to pets...");
+      console.log("Step 0b: Detecting live animals and moving to pets...");
       const { detectLiveAnimal } = await import('./productCategorization');
       const allSupplies = await storage.getAllSupplies();
       
@@ -4439,6 +4481,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         message: "Auto-categorization completed successfully",
         stats: {
+          duplicatesRemoved: removedDuplicates,
+          duplicatesSkipped: skippedDuplicates,
           liveAnimals: {
             movedToPets: movedToPets,
             skippedDueToReferences: skippedDueToReferences,

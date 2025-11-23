@@ -9402,10 +9402,17 @@ export default function Admin() {
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-semibold text-blue-800 dark:text-blue-300 mb-2">Combined Categorization (3 Steps)</p>
+                    <p className="font-semibold text-blue-800 dark:text-blue-300 mb-2">Combined Categorization (4 Steps)</p>
                     <div className="space-y-2">
                       <div>
-                        <p className="font-medium text-green-700 dark:text-green-400">Step 0: Live Animal Detection</p>
+                        <p className="font-medium text-purple-700 dark:text-purple-400">Step 0a: Duplicate Cleanup</p>
+                        <ul className="list-disc list-inside space-y-1 text-purple-600 dark:text-purple-500 ml-2">
+                          <li>Removes pets that have exact name matches with supplies (proven duplicates)</li>
+                          <li>Skips pets with existing orders/appointments (preserves data integrity)</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="font-medium text-green-700 dark:text-green-400">Step 0b: Live Animal Detection</p>
                         <ul className="list-disc list-inside space-y-1 text-green-600 dark:text-green-500 ml-2">
                           <li>Scans all supplies for live animals (fish, reptiles, small animals, birds)</li>
                           <li>Automatically moves detected live animals to Pets inventory</li>
@@ -9456,19 +9463,28 @@ export default function Admin() {
                     const liveAnimals = stats.liveAnimals || { movedToPets: 0, skippedDueToReferences: 0 };
                     const filterStats = stats.filterType;
                     const categoryStats = stats.categories;
+                    const duplicatesRemoved = stats.duplicatesRemoved || 0;
+                    const duplicatesSkipped = stats.duplicatesSkipped || 0;
                     
-                    let liveAnimalMsg = '';
-                    if (liveAnimals.movedToPets > 0) {
-                      liveAnimalMsg = `🐾 Moved ${liveAnimals.movedToPets} live animals to Pets`;
-                      if (liveAnimals.skippedDueToReferences > 0) {
-                        liveAnimalMsg += ` (${liveAnimals.skippedDueToReferences} skipped due to existing references)`;
+                    let statusMsg = '';
+                    if (duplicatesRemoved > 0 || duplicatesSkipped > 0) {
+                      statusMsg = `🧹 Duplicates: ${duplicatesRemoved} removed`;
+                      if (duplicatesSkipped > 0) {
+                        statusMsg += `, ${duplicatesSkipped} skipped`;
                       }
-                      liveAnimalMsg += ' | ';
+                      statusMsg += ' | ';
+                    }
+                    if (liveAnimals.movedToPets > 0) {
+                      statusMsg += `🐾 Moved ${liveAnimals.movedToPets} live animals to Pets`;
+                      if (liveAnimals.skippedDueToReferences > 0) {
+                        statusMsg += ` (${liveAnimals.skippedDueToReferences} skipped)`;
+                      }
+                      statusMsg += ' | ';
                     }
                     
                     toast({
                       title: "Categorization complete!",
-                      description: `${liveAnimalMsg}Specialty: Aquatic ${filterStats.aquatic} • Reptile ${filterStats.reptile} | Categories: Food ${categoryStats.food} • Toys ${categoryStats.toys} • Aquatics ${categoryStats.aquatics} • Reptiles ${categoryStats.reptiles} (${stats.duration})`
+                      description: `${statusMsg}Specialty: Aquatic ${filterStats.aquatic} • Reptile ${filterStats.reptile} | Categories: Food ${categoryStats.food} • Toys ${categoryStats.toys} • Aquatics ${categoryStats.aquatics} • Reptiles ${categoryStats.reptiles} (${stats.duration})`
                     });
                     
                     setTimeout(() => window.location.reload(), 1500);
@@ -9488,7 +9504,7 @@ export default function Admin() {
                 Auto-Categorize All Products
               </Button>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Processes all {7316} active products in 3 steps: detect live animals (excludes toys) → specialty sections (Aquatics/Reptiles) → 11 product categories
+                Processes all {7316} active products in 4 steps: remove duplicates → detect live animals (excludes toys) → specialty sections (Aquatics/Reptiles) → 11 product categories
               </p>
             </CardContent>
           </Card>

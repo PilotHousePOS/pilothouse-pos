@@ -112,6 +112,7 @@ export interface IStorage {
   createPet(pet: InsertPet): Promise<Pet>;
   updatePet(id: number, pet: Partial<InsertPet>): Promise<Pet>;
   deletePet(id: number): Promise<void>;
+  hasPetReferences(id: number): Promise<boolean>;
 
   // Supply operations
   getAllSupplies(): Promise<Supply[]>;
@@ -475,6 +476,39 @@ export class DatabaseStorage implements IStorage {
 
   async deletePet(id: number): Promise<void> {
     await db.delete(pets).where(eq(pets.id, id));
+  }
+
+  async hasPetReferences(id: number): Promise<boolean> {
+    // Check if pet is referenced in: cartItems, orderItems, wishlistItems, extractedOrderItems
+    const [cartCount] = await db
+      .select({ count: count() })
+      .from(cartItems)
+      .where(eq(cartItems.petId, id));
+    
+    if (cartCount.count > 0) return true;
+    
+    const [orderCount] = await db
+      .select({ count: count() })
+      .from(orderItems)
+      .where(eq(orderItems.petId, id));
+    
+    if (orderCount.count > 0) return true;
+    
+    const [wishlistCount] = await db
+      .select({ count: count() })
+      .from(wishlistItems)
+      .where(eq(wishlistItems.petId, id));
+    
+    if (wishlistCount.count > 0) return true;
+    
+    const [extractedCount] = await db
+      .select({ count: count() })
+      .from(extractedOrderItems)
+      .where(eq(extractedOrderItems.petId, id));
+    
+    if (extractedCount.count > 0) return true;
+    
+    return false;
   }
 
   // Supply operations
