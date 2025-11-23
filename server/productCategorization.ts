@@ -301,17 +301,19 @@ export function detectLiveAnimal(itemName: string): {
     // Food & Nutrition
     'food', 'foods', 'pellet', 'pellets', 'treat', 'treats', 'bedding', 'flakes', 'wafer', 'wafers',
     'chip', 'chips', 'block', 'stick', 'drops', 'powder', 'vitamin', 'vitamins', 'supplement', 'supplements', 'medicine', 'medicines',
-    'hay', 'straw', 'litter', 'shavings',
+    'hay', 'straw', 'litter', 'shavings', 'diet', 'diets', 'meal', 'meals', 'nutrition',
     
     // Housing & Equipment
     'cage', 'cages', 'tank', 'tanks', 'aquarium', 'terrarium', 'habitat', 'filter', 'filters', 'heater', 'heaters', 'pump', 'pumps',
     'decoration', 'decorations', 'decor', 'toy', 'toys', 'bowl', 'bowls', 'bottle', 'bottles', 'substrate',
     'kit', 'kits', 'starter', 'starters', 'collar', 'collars', 'leash', 'harness', 'carrier', 'crate', 'brush', 'net',
     'ornament', 'ornaments', 'moss', 'hook', 'hooks', 'statue', 'statues', 'set', 'sets',
+    'bag', 'bags', 'glove', 'gloves', 'wrap', 'wraps', 'climbing', 'climb', 'hide', 'hides', 'tunnel', 'tunnels',
     
     // Products & Treatments
     'conditioner', 'treatment', 'treatments', 'cleaner', 'shampoo', 'spray', 'sprays', 'solution', 'solutions',
-    'light', 'lights', 'lighting', 'bulb', 'bulbs', 'lamp', 'lamps', 'cave', 'caves', 'shelter', 'shelters', 'hide',
+    'light', 'lights', 'lighting', 'bulb', 'bulbs', 'lamp', 'lamps', 'cave', 'caves', 'shelter', 'shelters',
+    'den', 'dens', 'hide', 'hideaway', 'hideaways', 'habitat', 'log', 'logs', 'rock', 'rocks', 'stone', 'stones',
     'remover', 'control', 'system', 'systems', 'setup', 'setups', 'complete', 'care', 'decorative',
     'shed', 'shedding', 'aid', 'humidifier', 'training', 'trainer', 'perch', 'stand',
     
@@ -445,17 +447,20 @@ export function detectLiveAnimal(itemName: string): {
       ['ram', 'cichlid'],
       ['electric', 'blue'],
       
-      // Other Fish
+      // Other Fish (common variants)
       ['neon', 'tetra'],
       ['cardinal', 'tetra'],
+      ['black', 'tetra'],
+      ['glofish', 'tetra'], // GloFish tetras
       ['zebra', 'danio'],
       ['clown', 'loach'],
       ['kuhli', 'loach'],
       
-      // Reptiles
+      // Reptiles (common variants)
       ['leopard', 'gecko'],
       ['crested', 'gecko'],
       ['bearded', 'dragon'],
+      ['chinese', 'dragon'], // Chinese Water Dragon
       ['jackson', 'chameleon'],
       ['veiled', 'chameleon'],
       ['panther', 'chameleon'],
@@ -463,28 +468,39 @@ export function detectLiveAnimal(itemName: string): {
       ['corn', 'snake'],
       ['king', 'snake'],
       
-      // Small Animals & Amphibians
-      ['guinea', 'pig'],
-      ['tree', 'frog']
+      // Amphibians (common variants)
+      ['tree', 'frog'],
+      ['african', 'frog'], // African dwarf frog, African water frog
+      ['pacman', 'frog'],
+      
+      // Small Animals
+      ['guinea', 'pig']
     ];
     
     // Map pattern to species for proper routing (COMPLETE MAPPING)
     const patternSpeciesMap: Record<string, string> = {
       // Reptiles
       'bearded-dragon': 'beardeddragon',
+      'chinese-dragon': 'beardeddragon', // Chinese Water Dragon
       'ball-python': 'snake',
       'corn-snake': 'snake',
       'king-snake': 'snake',
-      'tree-frog': 'frog',
       'leopard-gecko': 'gecko',
       'crested-gecko': 'gecko',
       'jackson-chameleon': 'chameleon',
       'veiled-chameleon': 'chameleon',
       'panther-chameleon': 'chameleon',
       
+      // Amphibians
+      'tree-frog': 'frog',
+      'african-frog': 'frog',
+      'pacman-frog': 'frog',
+      
       // Fish
       'neon-tetra': 'tetra',
       'cardinal-tetra': 'tetra',
+      'black-tetra': 'tetra',
+      'glofish-tetra': 'tetra',
       'zebra-danio': 'danio',
       'clown-loach': 'loach',
       'kuhli-loach': 'loach',
@@ -502,21 +518,40 @@ export function detectLiveAnimal(itemName: string): {
     );
     
     if (matchedPattern) {
-      // **CRITICAL CHECK**: Verify remaining words are positive signals
-      // Allowed: live indicators OR base species nouns (e.g., "Electric Blue Ram Cichlid")
+      // **CRITICAL CHECK**: Verify remaining words are positive signals or neutral adjectives
+      // Allowed: live indicators, base species nouns, OR neutral adjectives (colors, regions, descriptors)
       // Rejected: product nouns (e.g., "Corn Snake Deluxe")
+      
+      // Neutral adjectives commonly used in live animal names (colors, regions, descriptors, trailing nouns)
+      const neutralAdjectives = new Set([
+        // Colors
+        'red', 'blue', 'green', 'yellow', 'orange', 'black', 'white', 'pink', 'purple',
+        'gold', 'silver', 'bronze', 'brown', 'gray', 'grey', 'electric', 'neon', 'bright',
+        'dark', 'light', 'spotted', 'striped', 'albino',
+        // Regions
+        'african', 'asian', 'chinese', 'japanese', 'indian', 'australian', 'american',
+        'dwarf', 'giant', 'mini', 'small', 'large', 'medium',
+        // Descriptors (common in live animal names)
+        'water', 'tree', 'wild', 'fancy', 'regular', 'assorted', 'mixed', 'common',
+        'long', 'short', 'high', 'low', 'fin', 'finned', 'tail', 'tailed',
+        // Trailing category nouns (common in live animal product names)
+        'fish', 'fishes', 'reptile', 'reptiles', 'amphibian', 'amphibians', 'bird', 'birds',
+        'animal', 'animals', 'pet', 'pets'
+      ]);
+      
       const patternSet = new Set(matchedPattern);
       const remainingWords = words.filter(word => 
         !patternSet.has(word) && 
         !liveIndicators.has(word) && 
-        !baseSpeciesNouns.has(word)
+        !baseSpeciesNouns.has(word) &&
+        !neutralAdjectives.has(word) // Allow neutral adjectives
       );
       
-      // If there are remaining words that are NOT positive signals, this is likely a product
+      // If there are remaining words that are NOT positive signals or neutral adjectives, this is likely a product
       if (remainingWords.length > 0) {
         // Fall through to single-word species check
       } else {
-        // All words are either in the pattern, live indicators, or base species nouns → Live animal
+        // All words are either in the pattern, live indicators, base species nouns, or neutral adjectives → Live animal
         const patternKey = matchedPattern.join('-');
         const species = patternSpeciesMap[patternKey] || 'multiword';
         return { isLiveAnimal: true, species, detectedKeywords: matchedPattern };
@@ -607,12 +642,14 @@ export function detectLiveAnimal(itemName: string): {
   }
   
   // Case 2: SPECIFIC species with simple name (≤3 words) → Live animal
-  // Only SPECIFIC species can be auto-approved on word count alone
+  // These species are specific enough that short names are safe to auto-approve
   if (isSpecificSpecies && words.length <= 3) {
     return { isLiveAnimal: true, species: detectedSpecies, detectedKeywords };
   }
   
   // Case 3: GENERIC species without live indicator → Reject (likely a product)
-  // Generic species like "snake", "frog", "parrot" MUST have live indicator or multi-word pattern
+  // Generic species like "snake", "frog", "gecko", "tetra" appear in many product names
+  // Multi-word patterns (checked earlier) already handled legitimate live animals
+  // If we reach here, it's likely a supply product that passed the keyword filter
   return { isLiveAnimal: false, species: null, detectedKeywords: [] };
 }
