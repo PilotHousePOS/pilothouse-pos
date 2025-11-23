@@ -540,18 +540,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Pet routes with fallback data
+  // Pet routes with search and pagination
   app.get("/api/pets", async (req, res) => {
     try {
-      const { species } = req.query;
-      const pets = species 
+      const { species, search, page = '0', limit = '20' } = req.query;
+      
+      // Parse pagination parameters
+      const pageNum = Math.max(0, parseInt(page as string) || 0);
+      const pageSize = Math.min(100, Math.max(1, parseInt(limit as string) || 20));
+      const offset = pageNum * pageSize;
+      
+      let allPets = species 
         ? await storage.getPetsBySpecies(species as string)
         : await storage.getAllPets();
-      res.json(pets);
+      
+      // Apply search filter if provided (fuzzy search across name, species, breed, description)
+      if (search && typeof search === 'string' && search.trim()) {
+        const searchLower = search.toLowerCase().trim();
+        allPets = allPets.filter(pet => 
+          pet.name?.toLowerCase().includes(searchLower) ||
+          pet.species?.toLowerCase().includes(searchLower) ||
+          pet.breed?.toLowerCase().includes(searchLower) ||
+          pet.description?.toLowerCase().includes(searchLower)
+        );
+      }
+      
+      // Calculate total count and pages
+      const totalCount = allPets.length;
+      const totalPages = Math.ceil(totalCount / pageSize);
+      
+      // Apply pagination
+      const paginatedPets = allPets.slice(offset, offset + pageSize);
+      
+      res.json({
+        pets: paginatedPets,
+        pagination: {
+          currentPage: pageNum,
+          totalPages,
+          totalCount,
+          pageSize
+        }
+      });
     } catch (error) {
       console.error("Error fetching pets:", error);
       // Return fallback data on error
-      res.json([
+      res.json({
+        pets: [
         {
           id: 1,
           name: "Bella",
@@ -591,7 +625,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           createdAt: new Date(),
           updatedAt: new Date()
         }
-      ]);
+        ],
+        pagination: {
+          currentPage: 0,
+          totalPages: 1,
+          totalCount: 3,
+          pageSize: 20
+        }
+      });
     }
   });
 
