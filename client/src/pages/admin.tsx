@@ -74,6 +74,10 @@ import AdminNotifications from "@/components/admin-notifications";
 import { safeGoBack } from "@/lib/navigation";
 import { capitalizeWords } from "@/lib/stringUtils";
 import { formatCategory } from "@/lib/formatCategory";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 // Helper function to parse date string as local date (not UTC)
 function parseLocalDate(dateString: string): Date {
@@ -10031,6 +10035,156 @@ export default function Admin() {
               </Button>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Processes all {7316} active products in 4 steps: remove duplicates → detect live animals (excludes toys) → specialty sections (Aquatics/Reptiles) → 11 product categories
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Search className="w-5 h-5" />
+                Audit Unknown Abbreviations
+              </CardTitle>
+              <CardDescription>
+                Scan inventory to identify abbreviations that need brand catalog research
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-semibold text-yellow-800 dark:text-yellow-300 mb-2">Identifies Research Opportunities</p>
+                    <ul className="list-disc list-inside space-y-1 text-yellow-700 dark:text-yellow-500">
+                      <li>Scans all supplies for potential unknown abbreviations</li>
+                      <li>Shows which products used brand catalog vs generic fallbacks</li>
+                      <li>Highlights uppercase sequences and short words needing research</li>
+                      <li>Helps you prioritize what to add to Brand Catalog</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/admin/supplies/audit-abbreviations', {
+                      method: 'POST',
+                      credentials: 'include',
+                    });
+                    
+                    if (!res.ok) {
+                      if (res.status === 401 || res.status === 403) {
+                        throw new Error('Unauthorized');
+                      }
+                      throw new Error('Failed to audit abbreviations');
+                    }
+                    
+                    const result = await res.json();
+                    const { stats } = result;
+                    
+                    toast({
+                      title: "Abbreviation Audit Complete",
+                      description: `Found ${stats.unknownAbbreviations.length} supplies with suspected abbreviations. Catalog hits: ${stats.catalogHits}/${stats.total}`,
+                    });
+                  } catch (error) {
+                    toast({
+                      title: "Error",
+                      description: error instanceof Error && error.message === 'Unauthorized' 
+                        ? "Authentication required" 
+                        : "Failed to audit abbreviations",
+                      variant: "destructive"
+                    });
+                  }
+                }}
+                className="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white"
+                data-testid="button-audit-abbreviations"
+              >
+                <Search className="w-4 h-4 mr-2" />
+                Audit Unknown Abbreviations
+              </Button>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Quick scan to identify abbreviations that need brand research for the catalog
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="w-5 h-5" />
+                Process All (3-in-1)
+              </CardTitle>
+              <CardDescription>
+                Run all 3 operations in sequence: Expand → Categorize → Audit
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-semibold text-purple-800 dark:text-purple-300 mb-2">Automated Processing Pipeline</p>
+                    <ul className="list-disc list-inside space-y-1 text-purple-700 dark:text-purple-500">
+                      <li><strong>Step 1:</strong> Expand abbreviations using brand catalog</li>
+                      <li><strong>Step 2:</strong> Auto-categorize all products (live animals, specialty sections, categories)</li>
+                      <li><strong>Step 3:</strong> Audit for unknown abbreviations needing research</li>
+                    </ul>
+                    <p className="mt-2 text-purple-600 dark:text-purple-400 font-medium">⏱️ Estimated time: 10-20 seconds for 7,000+ products</p>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                onClick={async () => {
+                  try {
+                    toast({
+                      title: "Processing Started",
+                      description: "Running all 3 operations... This may take 10-20 seconds",
+                    });
+
+                    const res = await fetch('/api/admin/supplies/process-all', {
+                      method: 'POST',
+                      credentials: 'include',
+                    });
+                    
+                    if (!res.ok) {
+                      if (res.status === 401 || res.status === 403) {
+                        throw new Error('Unauthorized');
+                      }
+                      throw new Error('Failed to process all operations');
+                    }
+                    
+                    const result = await res.json();
+                    const { stats, totalDuration } = result;
+                    
+                    const specialtyCount = (stats.filterType?.aquatic || 0) + (stats.filterType?.reptile || 0);
+                    
+                    toast({
+                      title: "All Processing Complete",
+                      description: `✓ Expanded ${stats.expand.changed} names (${stats.expand.catalogHits} catalog hits) | ✓ Categorized ${specialtyCount} specialty items | ✓ Found ${stats.audit.unknownCount} unknown abbreviations | Duration: ${totalDuration}`,
+                    });
+
+                    queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
+                    queryClient.invalidateQueries({ queryKey: ['/api/pets'] });
+                  } catch (error) {
+                    toast({
+                      title: "Error",
+                      description: error instanceof Error && error.message === 'Unauthorized' 
+                        ? "Authentication required" 
+                        : "Failed to complete processing",
+                      variant: "destructive"
+                    });
+                  }
+                }}
+                className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 hover:from-purple-700 hover:via-pink-700 hover:to-red-700 text-white font-bold"
+                data-testid="button-process-all"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Process All (Expand → Categorize → Audit)
+              </Button>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Convenience wrapper - runs all automation in one click. Individual buttons still available if you need to re-run specific steps.
               </p>
             </CardContent>
           </Card>

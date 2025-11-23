@@ -4653,6 +4653,140 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Audit unknown abbreviations (Admin only)
+  app.post("/api/admin/supplies/audit-abbreviations", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { auditUnknownAbbreviations } = await import('./abbreviationAudit');
+      const results = await auditUnknownAbbreviations();
+      
+      res.json({
+        message: "Abbreviation audit completed",
+        stats: results
+      });
+    } catch (error) {
+      console.error('Error auditing abbreviations:', error);
+      res.status(500).json({ message: "Failed to audit abbreviations" });
+    }
+  });
+
+  // Process All: Expand abbreviations → Auto-categorize → Audit (Admin only)
+  app.post("/api/admin/supplies/process-all", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      console.log("Starting 'Process All' - Step 1/3: Expanding abbreviations...");
+      const startTime = Date.now();
+      const { expandAllAbbreviations } = await import('./abbreviationExpansion');
+      const expandResults = await expandAllAbbreviations();
+      
+      console.log("Step 2/3: Auto-categorizing supplies...");
+      
+      // Step 0: Remove duplicate pets
+      const duplicateResults = await storage.removeDuplicatePets();
+      
+      // Step 1: Clean invalid pets and move live animals
+      const allPets = await storage.getAllPets();
+      const { detectLiveAnimal } = await import('./productCategorization');
+      let invalidPetsRemoved = 0;
+      let invalidPetsSkipped = 0;
+      
+      for (const pet of allPets) {
+        const detection = detectLiveAnimal(pet.name);
+        if (!detection.isLiveAnimal) {
+          const hasReferences = await storage.hasPetReferences(pet.id);
+          if (hasReferences) {
+            invalidPetsSkipped++;
+          } else {
+            try {
+              await storage.deletePet(pet.id);
+              invalidPetsRemoved++;
+            } catch (error) {
+              invalidPetsSkipped++;
+            }
+          }
+        }
+      }
+
+      const allSupplies = await storage.getAllSupplies();
+      let movedToPets = 0;
+      let skippedDueToReferences = 0;
+      
+      for (const supply of allSupplies) {
+        const detection = detectLiveAnimal(supply.name);
+        if (detection.isLiveAnimal && detection.species) {
+          try {
+            await storage.createPet({
+              name: supply.name,
+              species: detection.species,
+              breed: detection.detectedKeywords.join(' ') || null,
+              price: supply.price,
+              description: supply.description || null,
+              imageUrl: supply.imageUrl || null,
+              imageUrls: supply.imageUrls || [],
+              priceSource: supply.priceSource || 'default',
+            });
+            
+            try {
+              await storage.deleteSupply(supply.id);
+              movedToPets++;
+            } catch (deleteError: any) {
+              skippedDueToReferences++;
+            }
+          } catch (error) {
+            console.error(`Error moving "${supply.name}" to pets:`, error);
+          }
+        }
+      }
+
+      // Step 2: Auto-categorize specialty sections
+      const filterStats = await storage.autoCategorizeAllSupplies();
+      
+      // Step 3: Auto-categorize product types
+      const categoryStats = await storage.autoCategorizeProductCategories();
+      
+      console.log("Step 3/3: Auditing unknown abbreviations...");
+      const { auditUnknownAbbreviations } = await import('./abbreviationAudit');
+      const auditResults = await auditUnknownAbbreviations();
+
+      const totalDuration = ((Date.now() - startTime) / 1000).toFixed(2);
+      
+      res.json({
+        message: "All processing completed successfully",
+        stats: {
+          expand: {
+            changed: expandResults.changed,
+            unchanged: expandResults.unchanged,
+            catalogHits: expandResults.catalogHits,
+          },
+          duplicatesRemoved: duplicateResults.duplicatesRemoved,
+          duplicatesSkipped: duplicateResults.duplicatesSkipped,
+          invalidPetsRemoved,
+          invalidPetsSkipped,
+          liveAnimals: { movedToPets, skippedDueToReferences },
+          filterType: filterStats,
+          categories: categoryStats,
+          audit: {
+            total: auditResults.total,
+            catalogHits: auditResults.catalogHits,
+            unknownCount: auditResults.unknownAbbreviations.length,
+          },
+        },
+        totalDuration: `${totalDuration}s`
+      });
+    } catch (error) {
+      console.error('Error in process-all:', error);
+      res.status(500).json({ message: "Failed to complete processing" });
+    }
+  });
+
   // Search for product image from major distributors (Admin only)
   app.post("/api/admin/supplies/search-image/:id", authMiddleware, async (req: any, res) => {
     try {
