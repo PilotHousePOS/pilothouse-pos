@@ -303,6 +303,7 @@ export function detectLiveAnimal(itemName: string): {
     'chip', 'chips', 'block', 'stick', 'drops', 'powder', 'vitamin', 'vitamins', 'supplement', 'supplements', 'medicine', 'medicines',
     'hay', 'straw', 'litter', 'shavings', 'diet', 'diets', 'meal', 'meals', 'nutrition',
     'bite', 'bites', 'crunch', 'crunchies', 'nibbles', 'nugget', 'nuggets', 'formula', 'blend',
+    'feeder', 'feeders', 'buffet', 'floating', 'sinking', 'freeze-dried', 'freeze', 'dried',
     // Weight indicators (strong signal for food products)
     'lb', 'lbs', 'oz', 'ounce', 'ounces', 'pound', 'pounds', 'kg', 'gram', 'grams', 'g',
     
@@ -312,8 +313,10 @@ export function detectLiveAnimal(itemName: string): {
     'kit', 'kits', 'starter', 'starters', 'collar', 'collars', 'leash', 'harness', 'carrier', 'crate', 'brush', 'net',
     'ornament', 'ornaments', 'moss', 'hook', 'hooks', 'statue', 'statues', 'set', 'sets',
     'bag', 'bags', 'glove', 'gloves', 'wrap', 'wraps', 'climbing', 'climb', 'hide', 'hides', 'tunnel', 'tunnels',
+    'plant', 'plants', 'volcano', 'castle', 'bridge', 'arch', 'gravel', 'bubbler', 'aerator',
     // Toy materials and descriptors
     'felt', 'fleece', 'yarn', 'sponge', 'shaggy', 'squeakeeez', 'skinneez', 'squeaky', 'plush', 'fuzzy',
+    'pointer', 'rattle', 'clatter', 'crinkle', 'house', 'led', 'catnip', 'rope', 'tug',
     
     // Products & Treatments
     'conditioner', 'treatment', 'treatments', 'cleaner', 'shampoo', 'spray', 'sprays', 'solution', 'solutions',
