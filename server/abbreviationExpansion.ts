@@ -169,11 +169,16 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Arm&hamm': 'Arm & Hammer',
   
   // Fromm Product Lines
-  'Pure Sniffers': 'PurrSnickety',
-  'Pu Sniffers': 'PurrSnickety',
-  'Pur Sni': 'PurrSnickety',
-  'Pu Sni': 'PurrSnickety',
-  'Sniffers': 'PurrSnickety',
+  'Pure Sniffers': 'PurrSnickity',
+  'Pu Sniffers': 'PurrSnickity',
+  'Pur Sni': 'PurrSnickity',
+  'Pu Sni': 'PurrSnickity',
+  'Sniffers': 'PurrSnickity',
+  
+  // Fromm PurrSnickity Flavors
+  'Co': 'Chicken Au Frommage',
+  'Game': 'Game Bird Grandeur',
+  'Salmon': 'Salmon Splendor',
 };
 
 /**
