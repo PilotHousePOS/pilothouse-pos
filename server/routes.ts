@@ -4302,28 +4302,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("[VERSION CHECK] Kong debug logging enabled - should see Kong products below");
       const startTime = Date.now();
 
-      // Step 0a: Safe cleanup - Remove pet duplicates that have matching supplies
-      // This only removes pets where an identical supply exists (safe duplicate removal)
-      console.log("Step 0a: Removing pet duplicates with matching supplies...");
+      // Step 0a: Safe cleanup - Remove invalid pets (toys, supplies that shouldn't be in pets table)
+      // Uses detectLiveAnimal to identify items that are NOT live animals and removes them
+      console.log("Step 0a: Removing invalid pets (toys/supplies in pets table)...");
+      const { detectLiveAnimal: detectLiveAnimalFunction } = await import('./productCategorization');
       const allPets = await storage.getAllPets();
-      const allSuppliesMap = new Map<string, any>();
-      const allSuppliesTemp = await storage.getAllSupplies();
       
-      // Build a map of supply names for fast lookup
-      for (const supply of allSuppliesTemp) {
-        const key = supply.name.toLowerCase().trim();
-        allSuppliesMap.set(key, supply);
-      }
+      let removedInvalidPets = 0;
+      let skippedInvalidPets = 0;
       
-      let removedDuplicates = 0;
-      let skippedDuplicates = 0;
       for (const pet of allPets) {
-        const petNameKey = pet.name.toLowerCase().trim();
-        const matchingSupply = allSuppliesMap.get(petNameKey);
+        const detection = detectLiveAnimalFunction(pet.name);
         
-        // Only remove if there's an exact name match with a supply (duplicate)
-        if (matchingSupply) {
-          console.log(`[DEBUG] Checking duplicate pet "${pet.name}" (ID: ${pet.id}) against supply "${matchingSupply.name}" (ID: ${matchingSupply.id})`);
+        // If NOT detected as a live animal, it's invalid (toy, supply, etc.)
+        if (!detection.isLiveAnimal) {
+          console.log(`[DEBUG] Invalid pet detected: "${pet.name}" (ID: ${pet.id}) - not a live animal`);
           
           // Check for references BEFORE attempting to delete
           const hasReferences = await storage.hasPetReferences(pet.id);
@@ -4331,21 +4324,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           if (hasReferences) {
             // Pet has existing references (orders, appointments) - skip it
-            skippedDuplicates++;
-            console.log(`⊘ Skipped duplicate pet: "${pet.name}" (ID: ${pet.id}) - has existing references`);
+            skippedInvalidPets++;
+            console.log(`⊘ Skipped invalid pet: "${pet.name}" (ID: ${pet.id}) - has existing references`);
           } else {
             // No references - safe to delete
             try {
               await storage.deletePet(pet.id);
-              removedDuplicates++;
-              console.log(`✓ Removed duplicate pet: "${pet.name}" (ID: ${pet.id}, matching supply: ${matchingSupply.id})`);
+              removedInvalidPets++;
+              console.log(`✓ Removed invalid pet: "${pet.name}" (ID: ${pet.id}) - toy/supply in pets table`);
             } catch (error: any) {
-              console.error(`Error removing duplicate pet "${pet.name}":`, error);
+              console.error(`Error removing invalid pet "${pet.name}":`, error);
             }
           }
         }
       }
-      console.log(`Removed ${removedDuplicates} duplicate pets, skipped ${skippedDuplicates} with references`);
+      console.log(`Removed ${removedInvalidPets} invalid pets (toys/supplies), skipped ${skippedInvalidPets} with references`);
 
       // Step 0b: Detect live animals and move them to pets
       // NOTE: detectLiveAnimal() excludes toy brands (spot, turbo, kong, etc.) and toy materials
