@@ -165,9 +165,9 @@ export interface IStorage {
     smallanimal: number;
     aquatics: number;
     reptiles: number;
-    birdCages: number;
+    birdSupplies: number;
     dogCages: number;
-    smallAnimalCages: number;
+    smallAnimalSupplies: number;
     dogTreats: number;
     catTreats: number;
     unchanged: number;
@@ -1268,9 +1268,9 @@ export class DatabaseStorage implements IStorage {
     smallanimal: number;
     aquatics: number;
     reptiles: number;
-    birdCages: number;
+    birdSupplies: number;
     dogCages: number;
-    smallAnimalCages: number;
+    smallAnimalSupplies: number;
     dogTreats: number;
     catTreats: number;
     unchanged: number;
@@ -1292,9 +1292,9 @@ export class DatabaseStorage implements IStorage {
       smallanimal: 0,
       aquatics: 0,
       reptiles: 0,
-      birdCages: 0,
+      birdSupplies: 0,
       dogCages: 0,
-      smallAnimalCages: 0,
+      smallAnimalSupplies: 0,
       dogTreats: 0,
       catTreats: 0,
       unchanged: 0,

@@ -101,6 +101,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Wholeso': 'Wholesome',
   'Forti': 'Fortified',
   'Bis': 'Bison',
+  'Bore': 'Boar',
   'Ck': 'Chicken',
   'Chkn': 'Chicken',
   'Bcn': 'Bacon',
