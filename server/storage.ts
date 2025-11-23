@@ -163,6 +163,13 @@ export interface IStorage {
     healthcare: number;
     accessories: number;
     smallanimal: number;
+    aquatics: number;
+    reptiles: number;
+    birdCages: number;
+    dogCages: number;
+    smallAnimalCages: number;
+    dogTreats: number;
+    catTreats: number;
     unchanged: number;
     total: number;
   }>;
@@ -1259,6 +1266,13 @@ export class DatabaseStorage implements IStorage {
     healthcare: number;
     accessories: number;
     smallanimal: number;
+    aquatics: number;
+    reptiles: number;
+    birdCages: number;
+    dogCages: number;
+    smallAnimalCages: number;
+    dogTreats: number;
+    catTreats: number;
     unchanged: number;
     total: number;
   }> {
@@ -1276,6 +1290,13 @@ export class DatabaseStorage implements IStorage {
       healthcare: 0,
       accessories: 0,
       smallanimal: 0,
+      aquatics: 0,
+      reptiles: 0,
+      birdCages: 0,
+      dogCages: 0,
+      smallAnimalCages: 0,
+      dogTreats: 0,
+      catTreats: 0,
       unchanged: 0,
       total: 0
     };
