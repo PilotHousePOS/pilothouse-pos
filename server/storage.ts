@@ -1,6 +1,7 @@
 import {
   users,
   pets,
+  brandCatalog,
   supplies,
   cartItems,
   orders,
@@ -27,6 +28,8 @@ import {
   type UpsertUser,
   type Pet,
   type InsertPet,
+  type BrandCatalogEntry,
+  type InsertBrandCatalogEntry,
   type Supply,
   type InsertSupply,
   type CartItem,
@@ -113,6 +116,15 @@ export interface IStorage {
   updatePet(id: number, pet: Partial<InsertPet>): Promise<Pet>;
   deletePet(id: number): Promise<void>;
   hasPetReferences(id: number): Promise<boolean>;
+
+  // Brand Catalog operations
+  getAllBrandCatalogEntries(): Promise<BrandCatalogEntry[]>;
+  getBrandCatalogEntry(id: number): Promise<BrandCatalogEntry | undefined>;
+  getBrandCatalogByBrand(brand: string): Promise<BrandCatalogEntry[]>;
+  lookupAbbreviation(brand: string, abbreviation: string): Promise<BrandCatalogEntry | undefined>;
+  createBrandCatalogEntry(entry: InsertBrandCatalogEntry): Promise<BrandCatalogEntry>;
+  updateBrandCatalogEntry(id: number, entry: Partial<InsertBrandCatalogEntry>): Promise<BrandCatalogEntry>;
+  deleteBrandCatalogEntry(id: number): Promise<void>;
 
   // Supply operations
   getAllSupplies(): Promise<Supply[]>;
@@ -509,6 +521,57 @@ export class DatabaseStorage implements IStorage {
     if (extractedCount.count > 0) return true;
     
     return false;
+  }
+
+  // Brand Catalog operations
+  async getAllBrandCatalogEntries(): Promise<BrandCatalogEntry[]> {
+    return await db.select().from(brandCatalog).orderBy(brandCatalog.brand, brandCatalog.productLine);
+  }
+
+  async getBrandCatalogEntry(id: number): Promise<BrandCatalogEntry | undefined> {
+    const [entry] = await db.select().from(brandCatalog).where(eq(brandCatalog.id, id));
+    return entry;
+  }
+
+  async getBrandCatalogByBrand(brand: string): Promise<BrandCatalogEntry[]> {
+    return await db
+      .select()
+      .from(brandCatalog)
+      .where(ilike(brandCatalog.brand, brand))
+      .orderBy(brandCatalog.productLine);
+  }
+
+  async lookupAbbreviation(brand: string, abbreviation: string): Promise<BrandCatalogEntry | undefined> {
+    // Case-insensitive lookup for brand + abbreviation match
+    const [entry] = await db
+      .select()
+      .from(brandCatalog)
+      .where(
+        and(
+          ilike(brandCatalog.brand, brand),
+          ilike(brandCatalog.abbreviation, abbreviation)
+        )
+      )
+      .limit(1);
+    return entry;
+  }
+
+  async createBrandCatalogEntry(entry: InsertBrandCatalogEntry): Promise<BrandCatalogEntry> {
+    const [newEntry] = await db.insert(brandCatalog).values(entry).returning();
+    return newEntry;
+  }
+
+  async updateBrandCatalogEntry(id: number, entry: Partial<InsertBrandCatalogEntry>): Promise<BrandCatalogEntry> {
+    const [updatedEntry] = await db
+      .update(brandCatalog)
+      .set({ ...entry, updatedAt: new Date() })
+      .where(eq(brandCatalog.id, id))
+      .returning();
+    return updatedEntry;
+  }
+
+  async deleteBrandCatalogEntry(id: number): Promise<void> {
+    await db.delete(brandCatalog).where(eq(brandCatalog.id, id));
   }
 
   // Supply operations

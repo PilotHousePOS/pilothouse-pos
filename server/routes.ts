@@ -4275,6 +4275,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Seed brand catalog with validated research (Admin only)
+  app.post("/api/admin/brand-catalog/seed", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      console.log("Seeding brand catalog with validated research...");
+      const { seedBrandCatalog } = await import('./seedBrandCatalog');
+      
+      await seedBrandCatalog(storage);
+      
+      return res.json({ 
+        message: "Brand catalog seeded successfully",
+        success: true 
+      });
+    } catch (error) {
+      console.error("Error seeding brand catalog:", error);
+      return res.status(500).json({ 
+        message: "Failed to seed brand catalog",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   // Expand abbreviations in all product names and descriptions (Admin only)
   app.post("/api/admin/supplies/expand-abbreviations", authMiddleware, async (req: any, res) => {
     try {
