@@ -4301,6 +4301,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("[VERSION CHECK] Kong debug logging enabled - should see Kong products below");
       const startTime = Date.now();
 
+      // Step 0: Detect live animals and move them to pets
+      console.log("Step 0: Detecting live animals and moving to pets...");
+      const { detectLiveAnimal } = await import('./productCategorization');
+      const allSupplies = await storage.getAllSupplies();
+      
+      let movedToPets = 0;
+      const liveAnimalResults = [];
+
+      const speciesMap: Record<string, string> = {
+        mice: 'Small Animals',
+        hamster: 'Small Animals',
+        guineapig: 'Small Animals',
+        gerbil: 'Small Animals',
+        chinchilla: 'Small Animals',
+        ferret: 'Small Animals',
+        rabbit: 'Small Animals',
+        rat: 'Small Animals',
+        goldfish: 'Fish',
+        betta: 'Fish',
+        guppy: 'Fish',
+        molly: 'Fish',
+        platy: 'Fish',
+        swordtail: 'Fish',
+        tetra: 'Fish',
+        angelfish: 'Fish',
+        gourami: 'Fish',
+        barb: 'Fish',
+        danio: 'Fish',
+        rasbora: 'Fish',
+        loach: 'Fish',
+        catfish: 'Fish',
+        cichlid: 'Fish',
+        discus: 'Fish',
+        koi: 'Fish',
+        gecko: 'Reptiles',
+        beardeddragon: 'Reptiles',
+        chameleon: 'Reptiles',
+        iguana: 'Reptiles',
+        snake: 'Reptiles',
+        turtle: 'Reptiles',
+        frog: 'Reptiles',
+        salamander: 'Reptiles',
+        parakeet: 'Birds',
+        cockatiel: 'Birds',
+        canary: 'Birds',
+        finch: 'Birds',
+        parrot: 'Birds'
+      };
+
+      let skippedDueToReferences = 0;
+
+      for (const supply of allSupplies) {
+        const liveAnimalDetection = detectLiveAnimal(supply.name);
+        
+        if (liveAnimalDetection.isLiveAnimal) {
+          try {
+            const species = speciesMap[liveAnimalDetection.species || ''] || 'Other';
+            
+            // Create pet from supply
+            const pet = await storage.createPet({
+              name: supply.name,
+              species: species,
+              breed: liveAnimalDetection.detectedKeywords.join(', ') || null,
+              price: supply.price,
+              age: null,
+              description: supply.description,
+              imageUrl: supply.imageUrl || null,
+              imageUrls: supply.imageUrls || null,
+              isAvailable: supply.isActive
+            });
+
+            // Try to delete the supply (may fail if there are foreign key references)
+            try {
+              await storage.deleteSupply(supply.id);
+              
+              movedToPets++;
+              liveAnimalResults.push({
+                name: supply.name,
+                petId: pet.id,
+                species: species,
+                detectedAs: liveAnimalDetection.species
+              });
+
+              if (movedToPets <= 10) {
+                console.log(`Moved to pets: "${supply.name}" → ${species} (detected as ${liveAnimalDetection.species})`);
+              }
+            } catch (deleteError: any) {
+              // If deletion fails due to foreign key constraint, skip but keep the pet
+              if (deleteError.message && deleteError.message.includes('foreign key constraint')) {
+                skippedDueToReferences++;
+                if (skippedDueToReferences <= 5) {
+                  console.log(`Skipped deleting supply "${supply.name}" (ID: ${supply.id}) - has references in extracted_order_items. Pet created but supply kept.`);
+                }
+              } else {
+                // Re-throw other errors
+                throw deleteError;
+              }
+            }
+          } catch (error: any) {
+            console.error(`Error moving "${supply.name}" to pets:`, error);
+          }
+        }
+      }
+
+      console.log(`Live animal detection complete: ${movedToPets} items moved to pets, ${skippedDueToReferences} skipped due to existing references`);
+
       // Step 1: Categorize filterType (aquatic/reptile/general)
       console.log("Step 1: Setting filterType (specialty sections)...");
       const filterStats = await storage.autoCategorizeAllSupplies();
@@ -4317,6 +4423,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         message: "Auto-categorization completed successfully",
         stats: {
+          liveAnimals: {
+            movedToPets: movedToPets,
+            skippedDueToReferences: skippedDueToReferences,
+            details: liveAnimalResults.slice(0, 10)
+          },
           filterType: filterStats,
           categories: categoryStats,
           duration: `${duration}s`

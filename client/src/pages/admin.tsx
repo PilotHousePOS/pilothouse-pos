@@ -9394,7 +9394,7 @@ export default function Admin() {
                 Auto-Categorize All Products
               </CardTitle>
               <CardDescription>
-                Automatically organizes all products into 11 categories AND specialty sections (Aquatics/Reptiles)
+                Detects live animals, organizes all products into 11 categories AND specialty sections (Aquatics/Reptiles)
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -9402,8 +9402,15 @@ export default function Admin() {
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-semibold text-blue-800 dark:text-blue-300 mb-2">Combined Categorization (2 Steps)</p>
+                    <p className="font-semibold text-blue-800 dark:text-blue-300 mb-2">Combined Categorization (3 Steps)</p>
                     <div className="space-y-2">
+                      <div>
+                        <p className="font-medium text-green-700 dark:text-green-400">Step 0: Live Animal Detection</p>
+                        <ul className="list-disc list-inside space-y-1 text-green-600 dark:text-green-500 ml-2">
+                          <li>Scans all supplies for live animals (fish, reptiles, small animals, birds)</li>
+                          <li>Automatically moves detected live animals to Pets inventory</li>
+                        </ul>
+                      </div>
                       <div>
                         <p className="font-medium text-blue-700 dark:text-blue-400">Step 1: Specialty Sections (filterType)</p>
                         <ul className="list-disc list-inside space-y-1 text-blue-600 dark:text-blue-500 ml-2">
@@ -9430,7 +9437,7 @@ export default function Admin() {
                   try {
                     toast({
                       title: "Categorizing all products...",
-                      description: "Setting specialty sections + 11 product categories. This may take a moment for 7,316 products."
+                      description: "Detecting live animals and setting specialty sections + 11 product categories. This may take a moment for 7,316 products."
                     });
 
                     const response = await fetch('/api/admin/supplies/auto-categorize', {
@@ -9445,12 +9452,22 @@ export default function Admin() {
                     }
                     
                     const { stats } = result;
+                    const liveAnimals = stats.liveAnimals || { movedToPets: 0, skippedDueToReferences: 0 };
                     const filterStats = stats.filterType;
                     const categoryStats = stats.categories;
                     
+                    let liveAnimalMsg = '';
+                    if (liveAnimals.movedToPets > 0) {
+                      liveAnimalMsg = `🐾 Moved ${liveAnimals.movedToPets} live animals to Pets`;
+                      if (liveAnimals.skippedDueToReferences > 0) {
+                        liveAnimalMsg += ` (${liveAnimals.skippedDueToReferences} skipped due to existing references)`;
+                      }
+                      liveAnimalMsg += ' | ';
+                    }
+                    
                     toast({
                       title: "Categorization complete!",
-                      description: `Specialty: Aquatic ${filterStats.aquatic} • Reptile ${filterStats.reptile} | Categories: Food ${categoryStats.food} • Toys ${categoryStats.toys} • Aquatics ${categoryStats.aquatics} • Reptiles ${categoryStats.reptiles} (${stats.duration})`
+                      description: `${liveAnimalMsg}Specialty: Aquatic ${filterStats.aquatic} • Reptile ${filterStats.reptile} | Categories: Food ${categoryStats.food} • Toys ${categoryStats.toys} • Aquatics ${categoryStats.aquatics} • Reptiles ${categoryStats.reptiles} (${stats.duration})`
                     });
                     
                     setTimeout(() => window.location.reload(), 1500);
@@ -9470,7 +9487,7 @@ export default function Admin() {
                 Auto-Categorize All Products
               </Button>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Processes all {7316} active products in 2 steps: specialty sections (Aquatics/Reptiles) + 11 product categories
+                Processes all {7316} active products in 3 steps: detect live animals → specialty sections (Aquatics/Reptiles) → 11 product categories
               </p>
             </CardContent>
           </Card>
