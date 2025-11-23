@@ -453,7 +453,8 @@ export function detectLiveAnimal(itemName: string): {
   // **5. LIVE INDICATORS** (+20 points - explicit live animal signals)
   const liveIndicators = new Set([
     'live', 'baby', 'babies', 'juvenile', 'adult', 'male', 'female', 'pair',
-    'hatchling', 'subadult', 'yearling', 'breeding', 'young', 'newborn', 'infant', 'fry'
+    'hatchling', 'subadult', 'yearling', 'breeding', 'young', 'newborn', 'infant', 'fry',
+    'reg', 'regular', 'small', 'medium', 'large', 'xlarge', 'assorted'
   ]);
   
   // **6. MULTI-WORD PATTERNS** (+60 points - specific multi-word animal names)
