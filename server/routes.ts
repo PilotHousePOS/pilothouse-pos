@@ -4275,6 +4275,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all brand catalog entries (Admin only)
+  app.get("/api/admin/brand-catalog", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const entries = await storage.getAllBrandCatalogEntries();
+      return res.json(entries);
+    } catch (error) {
+      console.error("Error fetching brand catalog:", error);
+      return res.status(500).json({ message: "Failed to fetch brand catalog" });
+    }
+  });
+
+  // Create brand catalog entry (Admin only)
+  app.post("/api/admin/brand-catalog", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      // Validate request body with zod schema
+      const { insertBrandCatalogSchema } = await import('@shared/schema');
+      const validated = insertBrandCatalogSchema.parse(req.body);
+
+      const entry = await storage.createBrandCatalogEntry(validated);
+      return res.json(entry);
+    } catch (error) {
+      console.error("Error creating brand catalog entry:", error);
+      if (error instanceof Error && error.name === 'ZodError') {
+        return res.status(400).json({ 
+          message: "Validation failed",
+          error: error.message
+        });
+      }
+      return res.status(500).json({ 
+        message: "Failed to create brand catalog entry",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Update brand catalog entry (Admin only)
+  app.patch("/api/admin/brand-catalog/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      // Validate request body with partial zod schema
+      const { insertBrandCatalogSchema } = await import('@shared/schema');
+      const validated = insertBrandCatalogSchema.partial().parse(req.body);
+
+      const entry = await storage.updateBrandCatalogEntry(parseInt(req.params.id), validated);
+      return res.json(entry);
+    } catch (error) {
+      console.error("Error updating brand catalog entry:", error);
+      if (error instanceof Error && error.name === 'ZodError') {
+        return res.status(400).json({ 
+          message: "Validation failed",
+          error: error.message
+        });
+      }
+      return res.status(500).json({ message: "Failed to update brand catalog entry" });
+    }
+  });
+
+  // Delete brand catalog entry (Admin only)
+  app.delete("/api/admin/brand-catalog/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      await storage.deleteBrandCatalogEntry(parseInt(req.params.id));
+      return res.json({ message: "Brand catalog entry deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting brand catalog entry:", error);
+      return res.status(500).json({ message: "Failed to delete brand catalog entry" });
+    }
+  });
+
   // Seed brand catalog with validated research (Admin only)
   app.post("/api/admin/brand-catalog/seed", authMiddleware, async (req: any, res) => {
     try {

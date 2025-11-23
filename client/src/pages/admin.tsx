@@ -65,7 +65,8 @@ import {
   Home,
   Type,
   Image,
-  Camera
+  Camera,
+  BookOpen
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -5105,6 +5106,461 @@ function AstroLoyaltyManager() {
   );
 }
 
+// Brand Catalog Manager Component
+function BrandCatalogManager() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [editEntry, setEditEntry] = useState<any>(null);
+  
+  // Form schema that handles contextKeywords as comma-separated string for UI
+  const formSchema = z.object({
+    brand: z.string().min(1, "Brand is required"),
+    productLine: z.string().optional(),
+    abbreviation: z.string().min(1, "Abbreviation is required"),
+    expansion: z.string().min(1, "Expansion is required"),
+    evidence: z.string().min(1, "Evidence is required"),
+    category: z.string().optional(),
+    contextKeywordsString: z.string().optional(),
+  });
+
+  // Form with react-hook-form
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      brand: "",
+      productLine: "",
+      abbreviation: "",
+      expansion: "",
+      evidence: "",
+      category: "",
+      contextKeywordsString: "",
+    },
+  });
+
+  // Reset form when editing or adding
+  useEffect(() => {
+    if (editEntry) {
+      form.reset({
+        brand: editEntry.brand || "",
+        productLine: editEntry.productLine || "",
+        abbreviation: editEntry.abbreviation || "",
+        expansion: editEntry.expansion || "",
+        evidence: editEntry.evidence || "",
+        category: editEntry.category || "",
+        contextKeywordsString: editEntry.contextKeywords?.join(', ') || "",
+      });
+    } else if (isAddOpen) {
+      form.reset({
+        brand: "",
+        productLine: "",
+        abbreviation: "",
+        expansion: "",
+        evidence: "",
+        category: "",
+        contextKeywordsString: "",
+      });
+    }
+  }, [editEntry, isAddOpen, form]);
+
+  // Fetch catalog entries
+  const { data: entries = [], isLoading } = useQuery({
+    queryKey: ['/api/admin/brand-catalog'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/brand-catalog', { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch catalog');
+      return res.json();
+    }
+  });
+
+  // Seed catalog mutation
+  const seedMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch('/api/admin/brand-catalog/seed', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to seed catalog');
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Success", description: "Catalog seeded with validated brand data" });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/brand-catalog'] });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to seed catalog", variant: "destructive" });
+    }
+  });
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`/api/admin/brand-catalog/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to delete entry');
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Success", description: "Entry deleted successfully" });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/brand-catalog'] });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to delete entry", variant: "destructive" });
+    }
+  });
+
+  // Create mutation
+  const createMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await fetch('/api/admin/brand-catalog', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Failed to create entry');
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Success", description: "Entry created successfully" });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/brand-catalog'] });
+      setIsAddOpen(false);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    }
+  });
+
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      const res = await fetch(`/api/admin/brand-catalog/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Failed to update entry');
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Success", description: "Entry updated successfully" });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/brand-catalog'] });
+      setEditEntry(null);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    }
+  });
+
+  // Form submission handler - transforms UI data to API schema
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    // Transform and normalize data for backend schema
+    const data = {
+      brand: values.brand.trim(),
+      productLine: values.productLine?.trim() || null,
+      abbreviation: values.abbreviation.trim(),
+      expansion: values.expansion.trim(),
+      evidence: values.evidence.trim(),
+      category: values.category?.trim() || null,
+      contextKeywords: values.contextKeywordsString
+        ? values.contextKeywordsString.split(',').map(k => k.trim()).filter(Boolean)
+        : [],
+    };
+
+    if (editEntry) {
+      updateMutation.mutate({ id: editEntry.id, data });
+    } else {
+      createMutation.mutate(data);
+    }
+  };
+
+  return (
+    <>
+      {/* Add/Edit Dialog */}
+      <Dialog open={isAddOpen || !!editEntry} onOpenChange={(open) => {
+        if (!open) {
+          setIsAddOpen(false);
+          setEditEntry(null);
+        }
+      }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editEntry ? 'Edit Catalog Entry' : 'Add Catalog Entry'}</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="brand"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Brand *</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="e.g., Freshpet" data-testid="input-brand" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="productLine"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Product Line</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="e.g., Vital" data-testid="input-product-line" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="abbreviation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Abbreviation *</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="e.g., Vit" data-testid="input-abbreviation" />
+                      </FormControl>
+                      <FormDescription>How it appears in product names</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="expansion"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Expansion *</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="e.g., Vital" data-testid="input-expansion" />
+                      </FormControl>
+                      <FormDescription>Full form to expand to</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="evidence"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Evidence *</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="URL or source confirming this expansion" data-testid="input-evidence" />
+                    </FormControl>
+                    <FormDescription>URL or source proving this abbreviation is correct</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="e.g., Dog Food" data-testid="input-category" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="contextKeywordsString"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Context Keywords</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="e.g., dog, food, fresh (comma-separated)" data-testid="input-context-keywords" />
+                      </FormControl>
+                      <FormDescription>Comma-separated keywords to match context</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setIsAddOpen(false);
+                    setEditEntry(null);
+                  }}
+                  data-testid="button-cancel-form"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                  data-testid="button-submit-form"
+                >
+                  {createMutation.isPending || updateMutation.isPending ? 'Saving...' : editEntry ? 'Update Entry' : 'Create Entry'}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5" />
+              Brand Catalog ({entries.length} entries)
+            </CardTitle>
+            <p className="text-sm text-gray-600 mt-1">
+              Research-backed abbreviation expansions to prevent guesswork
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => setIsAddOpen(true)}
+              size="sm"
+              className="bg-brand-blue hover:bg-blue-600"
+              data-testid="button-add-catalog-entry"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Entry
+            </Button>
+            <Button 
+              onClick={() => seedMutation.mutate()}
+              size="sm"
+              variant="outline"
+              className="bg-green-50 hover:bg-green-100"
+              disabled={seedMutation.isPending}
+              data-testid="button-seed-catalog"
+            >
+              <Database className="w-4 h-4 mr-2" />
+              {seedMutation.isPending ? 'Seeding...' : 'Seed Catalog'}
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="text-center py-8">
+            <Loader2 className="w-8 h-8 mx-auto animate-spin text-gray-400" />
+            <p className="text-sm text-gray-500 mt-2">Loading catalog...</p>
+          </div>
+        ) : entries.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-50" />
+            <p className="font-medium">No catalog entries yet</p>
+            <p className="text-sm mt-1">Click "Seed Catalog" to populate with validated brand data</p>
+            <p className="text-xs mt-2 max-w-md mx-auto">
+              The brand catalog provides research-backed abbreviation expansions for brands like Freshpet, Fromm, Science Diet, and Nutrisource - no more guessing!
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {entries.map((entry: any) => (
+              <div key={entry.id} className="border rounded-lg p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant="outline" className="font-medium">
+                        {entry.brand}
+                      </Badge>
+                      {entry.productLine && (
+                        <Badge variant="secondary" className="text-xs">
+                          {entry.productLine}
+                        </Badge>
+                      )}
+                      {entry.category && (
+                        <Badge variant="default" className="text-xs bg-blue-100 text-blue-800">
+                          {entry.category}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <span className="font-semibold text-gray-700">Abbreviation:</span>{' '}
+                        <span className="font-mono bg-yellow-100 px-1.5 py-0.5 rounded">{entry.abbreviation}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-gray-700">Expansion:</span>{' '}
+                        <span className="font-mono bg-green-100 px-1.5 py-0.5 rounded">{entry.expansion}</span>
+                      </div>
+                    </div>
+                    {entry.evidence && (
+                      <div className="mt-2 text-xs text-gray-600 bg-gray-50 p-2 rounded border-l-2 border-blue-400">
+                        <span className="font-semibold">Evidence:</span> {entry.evidence}
+                      </div>
+                    )}
+                    {entry.contextKeywords && entry.contextKeywords.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {entry.contextKeywords.map((keyword: string, idx: number) => (
+                          <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                            {keyword}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditEntry(entry)}
+                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                      data-testid={`button-edit-entry-${entry.id}`}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        if (confirm(`Delete entry "${entry.abbreviation}" → "${entry.expansion}"?`)) {
+                          deleteMutation.mutate(entry.id);
+                        }
+                      }}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      data-testid={`button-delete-entry-${entry.id}`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+      </Card>
+    </>
+  );
+}
+
 export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const typedUser = user as User;
@@ -7085,6 +7541,12 @@ export default function Admin() {
               </TabsTrigger>
             )}
             {typedUser?.isAdmin && (
+              <TabsTrigger value="brand-catalog" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                <span className="hidden lg:inline">Brand Catalog</span>
+                <span className="lg:hidden">Brands</span>
+              </TabsTrigger>
+            )}
+            {typedUser?.isAdmin && (
               <TabsTrigger value="users" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 Users
               </TabsTrigger>
@@ -9032,6 +9494,10 @@ export default function Admin() {
 
         <TabsContent value="product-images" className="space-y-6">
           <ProductImageManager />
+        </TabsContent>
+
+        <TabsContent value="brand-catalog" className="space-y-6">
+          <BrandCatalogManager />
         </TabsContent>
 
         <TabsContent value="order-photos" className="space-y-6">
