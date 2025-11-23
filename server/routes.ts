@@ -4303,6 +4303,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const startTime = Date.now();
 
       // Step 0: Detect live animals and move them to pets
+      // NOTE: detectLiveAnimal() excludes toy brands (spot, turbo, kong, etc.) and toy materials
+      // (felt, fleece, yarn, sponge, etc.) so toys will NOT be moved to pets
       console.log("Step 0: Detecting live animals and moving to pets...");
       const { detectLiveAnimal } = await import('./productCategorization');
       const allSupplies = await storage.getAllSupplies();

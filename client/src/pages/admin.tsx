@@ -9409,6 +9409,7 @@ export default function Admin() {
                         <ul className="list-disc list-inside space-y-1 text-green-600 dark:text-green-500 ml-2">
                           <li>Scans all supplies for live animals (fish, reptiles, small animals, birds)</li>
                           <li>Automatically moves detected live animals to Pets inventory</li>
+                          <li>Excludes toy brands (Turbo, Spot, Kong) and materials (felt, fleece, yarn)</li>
                         </ul>
                       </div>
                       <div>
@@ -9487,7 +9488,7 @@ export default function Admin() {
                 Auto-Categorize All Products
               </Button>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Processes all {7316} active products in 3 steps: detect live animals → specialty sections (Aquatics/Reptiles) → 11 product categories
+                Processes all {7316} active products in 3 steps: detect live animals (excludes toys) → specialty sections (Aquatics/Reptiles) → 11 product categories
               </p>
             </CardContent>
           </Card>
