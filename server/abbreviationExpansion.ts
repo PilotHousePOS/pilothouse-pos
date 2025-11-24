@@ -812,206 +812,28 @@ export async function expandAbbreviationsAsync(
   const instinctUltProteinPattern = /\b(Instinct)\s+Ult\s+Protein\b/gi;
   preProcessed = preProcessed.replace(instinctUltProteinPattern, "$1 Ultimate Protein");
   
-  // === COMPREHENSIVE BRAND-SPECIFIC PATTERN EXPANSIONS === 
-  // Based on extensive product catalog research (Nov 2024)
-  
-  // === FROMM COMPREHENSIVE EXPANSIONS ===
-  // Reference: https://frommfamily.com/
-  
-  // Fromm Gold Ancient Grains
-  const frommAncientPattern = /\b(Fromm)\s+Ancient\b(?!\s+Gr)/gi;
-  preProcessed = preProcessed.replace(frommAncientPattern, "$1 Adult Gold with Ancient Grains");
-  
-  // Fromm Classic Line - Wet Food (12.5oz cans)
-  const frommClasicChickenPattern = /\b(Fromm)\s+Clasic\s+Chicken\b/gi;
-  preProcessed = preProcessed.replace(frommClasicChickenPattern, "$1 Classic Adult Chicken & Rice Pâté");
-  const frommClasicPuppyPattern = /\b(Fromm)\s+Clasic\s+Puppy\b/gi;
-  preProcessed = preProcessed.replace(frommClasicPuppyPattern, "$1 Classic Puppy Chicken & Salmon Pâté");
-  const frommClasicRurkPattern = /\b(Fromm)\s+Clasic\s+Rurk\b/gi;
-  preProcessed = preProcessed.replace(frommClasicRurkPattern, "$1 Classic Adult Turkey & Rice Pâté");
-  
-  // Fromm Four-Star Wet Food (12.2oz cans) - Add "Pâté" if missing
-  const frommFourStarBeefPattern = /\b(Fromm)\s+Beef(?:\s+&\s+Barley)?(?!\s+Pâté)\b(?=\s+12\.2oz|\s*$)/gi;
-  preProcessed = preProcessed.replace(frommFourStarBeefPattern, "$1 Beef Pâté");
-  const frommFourStarChickenPattern = /\b(Fromm)\s+Chicken(?!\s+&)(?!\s+Pâté)\b(?=\s+12\.2oz|\s*$)/gi;
-  preProcessed = preProcessed.replace(frommFourStarChickenPattern, "$1 Chicken Pâté");
-  const frommFourStarLambPattern = /\b(Fromm)\s+Lamb(?!\s+Pâté)\b(?=\s+12\.2oz|\s*$)/gi;
-  preProcessed = preProcessed.replace(frommFourStarLambPattern, "$1 Lamb Pâté");
-  const frommFourStarTurkeyPumpkinPattern = /\b(Fromm)\s+Turkey\s+&\s+Pumpkin(?!\s+Pâté)\b/gi;
-  preProcessed = preProcessed.replace(frommFourStarTurkeyPumpkinPattern, "$1 Turkey & Pumpkin Pâté");
-  const frommFourStarSeafoodPattern = /\b(Fromm)\s+Seafood(?!\s+Pâté)\b(?=\s+12\.2oz|\s*$)/gi;
-  preProcessed = preProcessed.replace(frommFourStarSeafoodPattern, "$1 Seafood Pâté");
-  
-  // Fromm Crunchy O's - Fix typos and add full official names
-  const frommCrunchyosBannaPattern = /\b(Fromm)\s+Crunchyos\s+Banna\b/gi;
-  preProcessed = preProcessed.replace(frommCrunchyosBannaPattern, "$1 Crunchy Os Banana Kablammas");
-  const frommCrunchyosBlueberryPattern = /\b(Fromm)\s+Crunchyos\s+Blueberry\b/gi;
-  preProcessed = preProcessed.replace(frommCrunchyosBlueberryPattern, "$1 Crunchy Os Blueberry Blasts");
-  const frommCrunchyosCheesePattern = /\b(Fromm)\s+Crunchyos\s+Cheese\b/gi;
-  preProcessed = preProcessed.replace(frommCrunchyosCheesePattern, "$1 Crunchy Os Cheese");
-  const frommCrunchyosPeanutPattern = /\b(Fromm)\s+Crunchyos\s+Peanut\b/gi;
-  preProcessed = preProcessed.replace(frommCrunchyosPeanutPattern, "$1 Crunchy Os Peanut Butter");
-  const frommCrunchyosPotroastPattern = /\b(Fromm)\s+Crunchyos\s+Potroast\b/gi;
-  preProcessed = preProcessed.replace(frommCrunchyosPotroastPattern, "$1 Crunchy Os Pot Roast");
-  
-  // Fromm Cat Line
-  const frommCatAdultPattern = /\b(Fromm)\s+Cat\s+Adult\b/gi;
-  preProcessed = preProcessed.replace(frommCatAdultPattern, "$1 Gold Adult Cat Food");
-  const frommCatWeightPattern = /\b(Fromm)\s+Cat\s+Weight\b/gi;
-  preProcessed = preProcessed.replace(frommCatWeightPattern, "$1 Healthy Weight Gold Cat Food");
-  
-  // Fromm Weight Management
-  const frommCoastWeightPattern = /\b(Fromm)\s+Coast\s+Weight\b/gi;
-  preProcessed = preProcessed.replace(frommCoastWeightPattern, "$1 Gold Coast Weight Management");
-  
-  // === SCIENCE DIET COMPREHENSIVE EXPANSIONS ===
-  // Reference: https://www.hillspet.com/
-  
-  // Science Diet 7+ (Senior) - Add complete product names
-  const scienceDiet7PlusPattern = /\b(Science Diet)\s+7\+\b(?!\s+(?:Small|Beef|Chicken|Turkey))/gi;
-  preProcessed = preProcessed.replace(scienceDiet7PlusPattern, "$1 Adult 7+ Chicken Meal, Barley & Rice Recipe");
-  const scienceDiet7PlusSmallBitePattern = /\b(Science Diet)\s+7\+\s+Small\s+Bite\b/gi;
-  preProcessed = preProcessed.replace(scienceDiet7PlusSmallBitePattern, "$1 Adult 7+ Small Bites Chicken Meal, Barley & Rice Recipe");
-  
-  // Science Diet Cat 11+ (Senior)
-  const scienceDietCat11PlusPattern = /\b(Science Diet)\s+Cat\s+11\+\b/gi;
-  preProcessed = preProcessed.replace(scienceDietCat11PlusPattern, "$1 Adult 11+ Chicken Recipe Cat Food");
-  
-  // Science Diet Cat 7+ (Mature)
-  const scienceDietCat7PlusPattern = /\b(Science Diet)\s+Cat\s+7\+\b/gi;
-  preProcessed = preProcessed.replace(scienceDietCat7PlusPattern, "$1 Adult 7+ Chicken Recipe Cat Food");
-  
-  // Science Diet Hairball Control
-  const scienceDietCatHairPattern = /\b(Science Diet)\s+Cat\s+Hair\b/gi;
-  preProcessed = preProcessed.replace(scienceDietCatHairPattern, "$1 Cat Hairball Control");
-  const scienceDietHairballPattern = /\b(Science Diet)\s+Cat\s+Hairball\s+Control\b(?!\s+(?:Light|7\+))/gi;
-  preProcessed = preProcessed.replace(scienceDietHairballPattern, "$1 Adult Hairball Control Chicken Recipe");
-  const scienceDietHairballLightPattern = /\b(Science Diet)\s+Cat\s+Hairball\s+Control\s+Light\b/gi;
-  preProcessed = preProcessed.replace(scienceDietHairballLightPattern, "$1 Adult Hairball Control Light Chicken Recipe");
-  const scienceDietHairball7PlusPattern = /\b(Science Diet)\s+Cat\s+Hairball\s+Control\s+7\+\b/gi;
-  preProcessed = preProcessed.replace(scienceDietHairball7PlusPattern, "$1 Adult 7+ Hairball Control Chicken Recipe");
-  
-  // Science Diet Cat Indoor
-  const scienceDietCatIndoorPattern = /\b(Science Diet)\s+Cat\s+Indoor\b(?!\s+7\+)/gi;
-  preProcessed = preProcessed.replace(scienceDietCatIndoorPattern, "$1 Adult Indoor Chicken Recipe");
-  const scienceDietCatIndoor7PlusPattern = /\b(Science Diet)\s+Cat\s+Indoor\s+7\+\b/gi;
-  preProcessed = preProcessed.replace(scienceDietCatIndoor7PlusPattern, "$1 Adult 7+ Indoor Chicken Recipe");
-  
-  // Science Diet Cat Light (Weight Management)
-  const scienceDietCatLightPattern = /\b(Science Diet)\s+Cat\s+Light\b/gi;
-  preProcessed = preProcessed.replace(scienceDietCatLightPattern, "$1 Adult Light Chicken Recipe");
-  
-  // Science Diet Adult (basic formula)
-  const scienceDietChickenPattern = /\b(Science Diet)\s+Chicken\b(?!\s+(?:&|Stew|Meal))/gi;
-  preProcessed = preProcessed.replace(scienceDietChickenPattern, "$1 Adult Chicken & Barley Recipe");
-  
-  // Science Diet abbreviations in wet food
-  const scienceDietCatTendPattern = /\b(Science Diet)\s+Cat\s+Tend\b/gi;
-  preProcessed = preProcessed.replace(scienceDietCatTendPattern, "$1 Cat Tender");
-  const scienceDietCatPerDigPattern = /\b(Science Diet)\s+Cat\s+Per\s+Dig\b/gi;
-  preProcessed = preProcessed.replace(scienceDietCatPerDigPattern, "$1 Cat Perfect Digestion");
-  const scienceDietCatInDoPattern = /\b(Science Diet)\s+Cat\s+in\s+Do\b/gi;
-  preProcessed = preProcessed.replace(scienceDietCatInDoPattern, "$1 Cat Indoor");
-  
-  // === BLUE BUFFALO COMPREHENSIVE EXPANSIONS ===
-  // Reference: https://www.bluebuffalo.com/
-  
-  // Blue Buffalo Backyard BBQ
-  const blueBacYardBbqPattern = /\b(Blue Buffalo)\s+Bac\s+Yard\s+Bb?b?q?\b/gi;
-  preProcessed = preProcessed.replace(blueBacYardBbqPattern, "$1 Family Favorite Recipes Backyard BBQ");
-  
-  // Blue Buffalo Freedom (grain-free line)
-  const blueFreePattern = /\b(Blue Buffalo)\s+Free\b(?!\s+(?:Lamb|Puppy|Turkey))/gi;
-  preProcessed = preProcessed.replace(blueFreePattern, "$1 Freedom");
-  const blueFreeLambPattern = /\b(Blue Buffalo)\s+Free\s+Lamb\b/gi;
-  preProcessed = preProcessed.replace(blueFreeLambPattern, "$1 Freedom Lamb Recipe");
-  const blueFreePuppyPattern = /\b(Blue Buffalo)\s+Free\s+Puppy\b/gi;
-  preProcessed = preProcessed.replace(blueFreePuppyPattern, "$1 Freedom Puppy Recipe");
-  
-  // Blue Buffalo Basics (limited ingredient)
-  const blueBasicLambPattern = /\b(Blue Buffalo)\s+Basic\s+Lamb\b/gi;
-  preProcessed = preProcessed.replace(blueBasicLambPattern, "$1 Basics Limited Ingredient Lamb & Potato Recipe");
-  const blueBasicTurkeyPattern = /\b(Blue Buffalo)\s+Basic\s+Turkey\b/gi;
-  preProcessed = preProcessed.replace(blueBasicTurkeyPattern, "$1 Basics Limited Ingredient Turkey & Potato Recipe");
-  
-  // Blue Buffalo Healthy Weight
-  const blueHealWeighPattern = /\b(Blue Buffalo)\s+Heal\s+Weigh\b/gi;
-  preProcessed = preProcessed.replace(blueHealWeighPattern, "$1 Homestyle Recipe Healthy Weight");
-  
-  // Blue Buffalo Sunday Dinner
-  const blueSunDinPattern = /\b(Blue Buffalo)\s+Sun\s+Din\b/gi;
-  preProcessed = preProcessed.replace(blueSunDinPattern, "$1 Family Favorite Recipes Sunday Dinner");
-  
-  // Blue Buffalo Delights
-  const blueDelightGrPattern = /\b(Blue Buffalo)\s+Delight\s+Gr\s+Chicken\b/gi;
-  preProcessed = preProcessed.replace(blueDelightGrPattern, "$1 Divine Delights Grilled Chicken");
-  const blueDelightRoPattern = /\b(Blue Buffalo)\s+Delight\s+Ro\s+Chicken\b/gi;
-  preProcessed = preProcessed.replace(blueDelightRoPattern, "$1 Divine Delights Roasted Chicken");
-  
-  // === TASTE OF THE WILD COMPREHENSIVE EXPANSIONS ===
-  // Reference: https://www.tasteofthewildpetfood.com/
-  
-  // Taste of the Wild Additional Patterns - match actual database abbreviations
-  
-  // Ancient Grains Line - Complete product names
-  const totwAncMountPattern = /\b(Taste of the Wild)\s+Ancient\s+Mount(?:ain)?\b/gi;
-  preProcessed = preProcessed.replace(totwAncMountPattern, "$1 Ancient Mountain Canine Recipe with Roasted Lamb");
-  const totwAncPrairiePattern = /\b(Taste of the Wild)\s+Ancient\s+Pra(?:irie|rie)\b/gi;
-  preProcessed = preProcessed.replace(totwAncPrairiePattern, "$1 Ancient Prairie Canine Recipe with Roasted Bison & Roasted Venison");
-  const totwAncStreamPattern = /\b(Taste of the Wild)\s+Ancient\s+Stream\b/gi;
-  preProcessed = preProcessed.replace(totwAncStreamPattern, "$1 Ancient Stream Canine Recipe with Smoke-Flavored Salmon");
-  const totwAncWetlandsPattern = /\b(Taste of the Wild)\s+Ancient\s+Wetlands\b/gi;
-  preProcessed = preProcessed.replace(totwAncWetlandsPattern, "$1 Ancient Wetlands Canine Recipe with Roasted Fowl");
-  
-  // Cat formulas
-  const totwCatCanyonRiverPattern = /\b(Taste of the Wild)\s+Cat\s+Canyon\s+River\b/gi;
-  preProcessed = preProcessed.replace(totwCatCanyonRiverPattern, "$1 Canyon River Feline Recipe with Trout & Smoked Salmon");
-  const totwCanRiverPattern = /\b(Taste of the Wild)\s+Can\s+River\b/gi;
-  preProcessed = preProcessed.replace(totwCanRiverPattern, "$1 Canyon River Feline Recipe");
-  const totwCatLowlandCreekPattern = /\b(Taste of the Wild)\s+Cat\s+Lowland\s+Creek\b/gi;
-  preProcessed = preProcessed.replace(totwCatLowlandCreekPattern, "$1 Lowland Creek Feline Recipe with Quail");
-  const totwRockyMountainPattern = /\b(Taste of the Wild)\s+Rocky\s+Mountain\b/gi;
-  preProcessed = preProcessed.replace(totwRockyMountainPattern, "$1 Rocky Mountain Feline Recipe");
-  
-  // === MERRICK COMPREHENSIVE EXPANSIONS ===
-  // Reference: https://www.merrickpetcare.com/
-  
-  // Merrick Power Bites
-  const merrickPowrBitesPattern = /\b(Merrick)\s+Powr\s+Bites\b/gi;
-  preProcessed = preProcessed.replace(merrickPowrBitesPattern, "$1 Power Bites");
-  const merrickPwrBitesPattern = /\b(Merrick)\s+Pwr\s+Bites\b/gi;
-  preProcessed = preProcessed.replace(merrickPwrBitesPattern, "$1 Power Bites Natural Soft And Chewy Real Meat Dog Treats");
-  
-  // Regular Line abbreviations
-  const totwAppalPattern = /\b(Taste of the Wild)\s+Appal\b/gi;
-  preProcessed = preProcessed.replace(totwAppalPattern, "$1 Appalachian");
-  const totwSierMountPattern = /\b(Taste of the Wild)\s+Sier(?:ra)?\s+Mount\b/gi;
-  preProcessed = preProcessed.replace(totwSierMountPattern, "$1 Sierra Mountain");
-  const totwSierraMtnPattern = /\b(Taste of the Wild|TOW|Tow)\s+Sie?rra?\s+Mtn\b/gi;
-  preProcessed = preProcessed.replace(totwSierraMtnPattern, "$1 Sierra Mountain");
-  const totwSouthCanPattern = /\b(Taste of the Wild)\s+South\s+Can\b/gi;
-  preProcessed = preProcessed.replace(totwSouthCanPattern, "$1 Southwest Canyon");
-  const totwSouthwestCanyonPattern = /\b(Taste of the Wild|TOW|Tow)\s+(SW|SoW?est)\s+Can(?:yon)?\b/gi;
-  preProcessed = preProcessed.replace(totwSouthwestCanyonPattern, "$1 Southwest Canyon");
-  const totwRocMounPattern = /\b(Taste of the Wild)\s+Roc\s+Moun(?:t)?\b/gi;
-  preProcessed = preProcessed.replace(totwRocMounPattern, "$1 Rocky Mountain");
-  const totwPacifStrePattern = /\b(Taste of the Wild)\s+Pacif\s+Stre\b/gi;
-  preProcessed = preProcessed.replace(totwPacifStrePattern, "$1 Pacific Stream");
-  
-  const totwWetlandsPattern = /\b(Taste of the Wild|TOW|Tow)\s+Wetl(?:ands)?\b/gi;
-  preProcessed = preProcessed.replace(totwWetlandsPattern, "$1 Wetlands");
-  const totwPineForestPattern = /\b(Taste of the Wild|TOW|Tow)\s+Pine\s+For(?:est)?\b/gi;
-  preProcessed = preProcessed.replace(totwPineForestPattern, "$1 Pine Forest");
-  
-  // Merrick Additional Patterns
-  const merrickGameBirdPattern = /\b(Merrick)\s+(Bckctry\s+)?Game\s+Bird\b/gi;
-  preProcessed = preProcessed.replace(merrickGameBirdPattern, "$1 Backcountry Game Bird");
-  const merrickPacificCatchPattern = /\b(Merrick)\s+(Bckctry\s+)?Pac(?:ific)?\s+Catch\b/gi;
-  preProcessed = preProcessed.replace(merrickPacificCatchPattern, "$1 Backcountry Pacific Catch");
-  const merrickGreatPlainsPattern = /\b(Merrick)\s+(Bckctry\s+)?(?:Gr|Great)\s+Plains\b/gi;
-  preProcessed = preProcessed.replace(merrickGreatPlainsPattern, "$1 Backcountry Great Plains");
-  const merrickBigGamePattern = /\b(Merrick)\s+(Bckctry\s+)?Big\s+Game\b/gi;
-  preProcessed = preProcessed.replace(merrickBigGamePattern, "$1 Backcountry Big Game");
+  // === BRAND-SPECIFIC PATTERN EXPANSIONS === 
+  // IMPORTANT: Only patterns with VERIFIED evidence from actual database records are included
+  // Speculative patterns removed per architect guidance - require SKU-level proof before adding
+  //
+  // REMOVED (Nov 24, 2024) - Pending evidence-first verification:
+  //   - Fromm Gold Ancient Grains patterns (need specific SKU list from production)
+  //   - Fromm Classic/Four-Star wet food patterns (need can size + variant proof)
+  //   - Fromm Crunchy O's patterns (need flavor confirmation from inventory)
+  //   - Science Diet 7+/11+/Hairball/Indoor patterns (need formula-specific evidence)
+  //   - Blue Buffalo Backyard BBQ/Freedom/Basics patterns (need product line verification)
+  //   - Taste of the Wild Ancient Grains patterns (need dry vs wet vs cat distinction)
+  //   - Merrick Power Bites/Backcountry patterns (need specific SKU abbreviations)
+  //
+  // TO RESTORE: Follow evidence-first workflow:
+  //   1. Obtain actual abbreviated SKU from production database
+  //   2. Verify official name via product packaging photo or brand website
+  //   3. Add to brandCatalog.ts (preferred) OR create SKU-specific regex here
+  //   4. Add fixture test to validate exact expansion
+  //   5. Run automated regression tests before enabling in Process All
+  //
+  // NOTE: Nutrisource patterns below were verified with 93 database records (previous session)
+  // and remain as trusted examples of proper evidence-based expansion methodology
   
   // Royal Canin Additional Breed Patterns
   const royalCaninLabRetPattern = /\b(Royal Canin|RC)\s+Lab(?:rador)?\s+Retr\b/gi;

@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-A mobile-friendly web application for the "Animal House" pet store, designed to enhance online presence, service accessibility, and product sales. It facilitates pet browsing, grooming appointment booking, and pet supply purchasing, including exotic reptiles. The application integrates inventory management, customer accounts, and administrative functionalities, specifically excluding vet care and training services.
+A mobile-friendly web application for the "Animal House" pet store, aimed at enhancing its online presence, service accessibility, and product sales. The application facilitates pet browsing, grooming appointment booking, and pet supply purchasing (including exotic reptiles). It integrates inventory management, customer accounts, and administrative functionalities, specifically excluding vet care and training services. The business vision is to provide a comprehensive online platform that boosts sales and streamlines operations for a modern pet store.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -32,7 +32,7 @@ A mobile-friendly web application for the "Animal House" pet store, designed to 
   - Example: "ZooMed Pleco" → pleco keyword (60pts aquatic) beats ZooMed brand (40pts reptile) → categorized as Aquatic
 
 ## System Architecture
-The application is a full-stack web application. The frontend uses React, Vite, TypeScript, Tailwind CSS, and shadcn/ui. The backend uses Express.js with TypeScript, connected to a PostgreSQL database via Drizzle ORM.
+The application is a full-stack web application with a React frontend (Vite, TypeScript, Tailwind CSS, shadcn/ui) and an Express.js backend (TypeScript) connected to a PostgreSQL database via Drizzle ORM.
 
 **UI/UX Decisions:**
 - Dark, bold design with strong contrast and mobile responsiveness.
@@ -42,48 +42,26 @@ The application is a full-stack web application. The frontend uses React, Vite, 
 - Universal back button and force refresh button in admin dashboard.
 
 **Technical Implementations & Feature Specifications:**
-- **Pet & Supply Management:** Multi-image support, extensive inventory, automated brand extraction, specialized reptile supply filtering, case-insensitive search with pagination and touch gesture support.
-- **Appointment System:** 15-minute intervals, admin approval, email notifications, Google Calendar sync, chronological ordering, customer arrival/payment tracking, weekly limits, special date configurations, groomer assignment, role-based access, multi-pet booking, and comprehensive history.
-- **Order & Notification System:** Admin email/push notifications for new orders/appointments, customer email/SMS/web push for status, and detailed order history.
-- **Authentication & Authorization:** JWT tokens in secure cookies, password reset, user settings, admin user management, three-tier role system (Customer, Groomer, Admin).
+- **Pet & Supply Management:** Multi-image support, extensive inventory, automated brand extraction, specialized reptile supply filtering, case-insensitive search with pagination and touch gestures.
+- **Appointment System:** 15-minute intervals, admin approval, email notifications, Google Calendar sync, customer tracking, weekly limits, special date configurations, groomer assignment, role-based access, multi-pet booking, and comprehensive history.
+- **Order & Notification System:** Admin notifications for new orders/appointments, customer notifications for status updates, and detailed order history.
+- **Authentication & Authorization:** JWT tokens in secure cookies, password reset, user settings, admin user management, and a three-tier role system (Customer, Groomer, Admin).
 - **Wishlist System:** Dedicated page with add/remove and quick "Add to Cart."
-- **Google Calendar & Contact Management:** Connected Google Calendar, unified calendar view, hybrid contact system with multi-pet support, automatic phone number extraction, event creation from contacts, seamless multi-pet booking integration, auto-capitalization, and automatic capacity validation.
+- **Google Calendar & Contact Management:** Integrated Google Calendar, unified calendar view, hybrid contact system with multi-pet support, and event creation from contacts.
 - **Groomer Management System:** Admin CRUD operations for groomers.
 - **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtered by species.
 - **Admin Order Management:** Displays actual product/pet and customer names in order details.
 - **Orders & Appointments Search:** Unified search in admin panel by customer name, phone, or pet name.
-- **Pet Boarding/Babysitting System:** Complete boarding management with intelligent cost calculation, flexible date management, status tracking, quick actions, and admin-only access.
+- **Pet Boarding/Babysitting System:** Complete boarding management with intelligent cost calculation, flexible date management, status tracking, and admin-only access.
 - **Database Sync Tools:** Staging import with duplicate prevention, supplies-only sync (admin-only), and full database sync (development-only).
-- **Auto-Categorization System:** Single-button operation for specialty section and product type classification based on brand and keyword analysis, including brand-based exclusion logic. Includes a Live Animal Detection (Step 0) system that scans supplies for live animals, creates pet records, and handles foreign key constraints.
-- **Smart Abbreviation Expansion System:** Comprehensive, research-based abbreviation expansion covering 13+ major pet food brands with evidence-backed patterns. Features:
-  - **Brand-Scoped Pattern Matching:** 100+ product line abbreviations with brand-specific context (e.g., "Nutrisource Grill" → "Nutrisource Grillin' Grillers", "Fromm Pure Sniffers" → "Fromm PurrSnickety")
-  - **Covered Brands:** Nutrisource, Fromm, Blue Buffalo, Taste of the Wild, Merrick, Pro Plan, Royal Canin, Science Diet, Wellness, Natural Balance, Orijen, Canidae, Instinct
-  - **Advanced Features:**
-    - **Unicode Support:** Handles accent marks correctly (e.g., "Fromm Duck A La Veg" → "Fromm Duck À La Veg")
-    - **Optional Prefix Preservation:** Preserves or omits species qualifiers (e.g., "Fromm Cat Duck À La Veg" keeps "Cat", "Fromm Duck À La Veg" stays dog formula)
-    - **Context-Aware Replacements:** Uses replacement functions to preserve captured groups and prevent false positives
-  - **Generic Expansion:** Context-aware expansion for common abbreviations (Water Chemistry pH, Aquarium Gallons, Food/Flavors, Sizes, Colors, Quality, Animals)
-  - **Three-Layer System:** (1) Brand-specific patterns with negative lookaheads and replacement functions, (2) Brand catalog lookup with 96+ verified entries, (3) Generic fallback mappings
-  - **Evidence-Based:** All brand patterns include official website references and research documentation
-  - **Word Boundaries:** Regex patterns use \b anchors to prevent false matches
-  - **Auto-Applied:** Runs on admin "Process All" and when editing individual supplies
-  - **Recent Pattern Additions (Nov 2024):**
-    - **Nutrisource Comprehensive Expansion (Nov 24):** Brand normalization ("Nutri Sour", "Nutr Sour", "Nutri Sou" → "Nutrisource"), product lines (PureVita "Pv", Classic Catch "Clas", Select series "Prairie/Heartland/Woodlands/Seafood"), term expansion ("Entre" → "Entree", "Gr" → "Grain Free"), data cleanup ("Gr Frozen" → "Grain Free", "Crisp/Crispy Crisp" → "Crispers"), duplicate word removal. All patterns verified with Google search of official Nutrisource website (nutrisourcepetfoods.com, discovernutrisource.com)
-    - **Fromm:** PurrSnickety flavors (Game Bird Grandeur, Chicken Delight, Salmon Splendor), À La Veg recipes (Duck/Chicken/Salmon/Beef), Chicken Au Frommage, Pork & Applesauce
-    - **Taste of the Wild:** Sierra Mountain, Southwest Canyon, Wetlands, Pine Forest expansions
-    - **Merrick:** Backcountry Game Bird/Pacific Catch/Great Plains/Big Game
-    - **Royal Canin:** 10+ breed abbreviations (Lab Retriever, French Bulldog, Miniature Schnauzer, etc.), size formulas (XS, Sm, Med, Lg)
-    - **Science Diet:** Perfect Weight, Sensitive Stomach, Youthful Vitality, Oral Care
-    - **Wellness:** CORE+, Grain Free expansions
-    - **Orijen:** Amazing Grains, Tundra, Fit & Trim
-  - **Examples:** "BB LP" → "Blue Buffalo Life Protection Formula", "TOTW Hi Prair" → "Taste of the Wild High Prairie", "RC Germ Shep" → "Royal Canin German Shepherd", "Fromm Duck A La Veg" → "Fromm Duck À La Veg", "Nutri Sour Pv Beef Entre" → "Nutrisource PureVita Beef Entree", "Nutri Sour Cat Clas Cat" → "Nutrisource Classic Catch Cat"
+- **Auto-Categorization System:** Single-button operation for specialty section and product type classification based on brand and keyword analysis, including Live Animal Detection and record creation.
+- **Smart Abbreviation Expansion System:** Comprehensive, research-based abbreviation expansion for major pet food brands, ensuring full product name clarity across various inputs.
 - **Brand Extraction System:** Comprehensive brand database for automated brand assignment.
-- **Product Image Management System:** Statistics dashboard, manual image search, automated batch search with preview and approval, cost management, and admin-only access.
-- **Employee Schedule Management System:** Sectioned schedule view (previous, current, next week), editable grid, employee management, flexible time slots, batch save, data persistence, empty state handling, and admin-only access.
-- **Grooming Schedule Management System:** Simplified weekly schedule for groomers showing current week, editable groomer names and time slots, add/remove groomers, batch save, data persistence, and admin-only access.
-- **AI-Powered Order Photo Upload System:** Upload supplier order photos to extract items automatically with GPT-5 vision, adjustable price multiplier, editable extracted items, bulk add to inventory with automatic categorization, and photo management with history. Features a production-ready Live Animal Detection System with a three-set taxonomy (Live Indicators, Base Species Nouns, Multi-Word Patterns), species categorization rules, supply exclusion keywords, word-boundary matching, remaining-word validation, and custom .99 pricing for live animals.
-- **Astro Loyalty Integration:** Customer loyalty program integration including automatic account linking, purchase sync, frequent buyer program monitoring, and admin dashboard.
-- **POS Integration System:** Real-time price and inventory synchronization with external Point of Sale systems with a priority-based override logic (Manual Admin Edits > POS Data > AI Order Photo Extraction > Excel Imports/Default Data). Includes tracking fields, real-time sync via webhook, manual override capabilities, bulk operations, POS-agnostic design, and an admin dashboard for sync status.
+- **Product Image Management System:** Statistics dashboard, manual and automated batch image search with preview and approval, and admin-only access.
+- **Employee & Grooming Schedule Management Systems:** Sectioned schedule views, editable grids, employee/groomer management, flexible time slots, batch save, and admin-only access.
+- **AI-Powered Order Photo Upload System:** Upload supplier order photos to extract items automatically using GPT-5 vision, with adjustable price multipliers, editable extracted items, bulk add to inventory with automatic categorization, and photo management. Includes a production-ready Live Animal Detection System with species categorization rules and custom pricing.
+- **Astro Loyalty Integration:** Customer loyalty program integration including automatic account linking, purchase sync, and frequent buyer program monitoring.
+- **POS Integration System:** Real-time price and inventory synchronization with external Point of Sale systems, priority-based override logic, tracking fields, webhook-based sync, and an admin dashboard.
 
 **System Design Choices:**
 - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
