@@ -432,6 +432,16 @@ export async function expandAbbreviationsAsync(
   const nutrisourceCrispyCripPattern = /\b(Nutrisource)\s+Crispy\s+Crip\b/gi;
   let preProcessed = text.replace(nutrisourceCrispyCripPattern, "$1 Crispy Crispers");
   
+  // Nutrisource: "Crispy Crisp" → "Crispy Crispers"
+  // Handle "Nutrisource Crispy Crisp Lamb" → "Nutrisource Crispy Crispers Lamb"
+  const nutrisourceCrispyCrispPattern = /\b(Nutrisource)\s+Crispy\s+Crisp\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceCrispyCrispPattern, "$1 Crispy Crispers");
+  
+  // Nutrisource: "Crisp" (without "Crispy") → "Crispers"
+  // Handle "Nutrisource Crisp Chicken" → "Nutrisource Crispers Chicken"
+  const nutrisourceCrispPattern = /\b(Nutrisource)\s+Crisp\b(?!\s*Crispers)/gi;
+  preProcessed = preProcessed.replace(nutrisourceCrispPattern, "$1 Crispers");
+  
   // Nutrisource: "Grill" → "Grillin' Grillers"
   // Handle "Nutrisource Grill [anything]" → "Nutrisource Grillin' Grillers [anything]"
   // Uses negative lookahead to prevent matching "Grilled" or "Grills" or "Grillin'"
@@ -490,6 +500,12 @@ export async function expandAbbreviationsAsync(
   // Reference: Grain-free formulas use "Grain Free" in official names
   const nutrisourceGrPattern = /\b(Nutrisource)\s+Gr\s+/gi;
   preProcessed = preProcessed.replace(nutrisourceGrPattern, "$1 Grain Free ");
+  
+  // "Gr Frozen" → "Grain Free" (data entry error - "Frozen" should be removed)
+  // Nutrisource does not make frozen raw food, only freeze-dried
+  // Reference: https://nutrisourcepetfoods.com/category/our-food/freeze-dried/
+  const nutrisourceGrFrozenPattern = /\b(Nutrisource)\s+Grain\s+Free\s+Frozen\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceGrFrozenPattern, "$1 Grain Free");
   
   // STEP 4: Cleanup duplicate words (e.g., "Cat Clas Cat" → "Classic Catch Cat")
   // Remove duplicate "Cat" when it appears before and after product line
