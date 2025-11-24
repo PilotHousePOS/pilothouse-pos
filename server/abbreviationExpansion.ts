@@ -496,6 +496,35 @@ export async function expandAbbreviationsAsync(
   const nutrisourceSeafoodPattern = /\b(Nutrisource)\s+Seafood(?!\s+Select)\b/gi;
   preProcessed = preProcessed.replace(nutrisourceSeafoodPattern, "$1 Seafood Select");
   
+  // Country Select: "Count Sele" → "Country Select"
+  // Reference: https://nutrisourcepetfoods.com/our-food/country-select-entree/
+  const nutrisourceCountrySelePattern = /\b(Nutrisource\s+(?:Cat\s+)?)Count\s+Sele\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceCountrySelePattern, "$1Country Select");
+  
+  // Turkey Select: "Turkey Sele" → "Turkey & Turkey Liver Select"
+  // Reference: https://nutrisourcepetfoods.com/our-food/turkey-select/
+  const nutrisourceTurkeySelePattern = /\b(Nutrisource\s+(?:Cat\s+)?)Turkey\s+Sele\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceTurkeySelePattern, "$1Turkey & Turkey Liver Select");
+  
+  // General "Sele" → "Select" (for any remaining cases)
+  const nutrisourceSelePattern = /\b(Nutrisource\s+(?:Cat\s+)?(?:\w+\s+)?)Sele\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceSelePattern, "$1Select");
+  
+  // Chicken & Salmon Select: "Chicken,Salmon" → "Chicken & Salmon Select"
+  // Reference: https://nutrisourcepetfoods.com/our-food/cat-kitten-chicken-salmon-recipe/
+  const nutrisourceChickenSalmonPattern = /\b(Nutrisource\s+(?:Cat\s+)?)Chicken,\s*Salmon\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceChickenSalmonPattern, "$1Chicken & Salmon Select");
+  
+  // Chicken, Turkey & Lamb: "Chicken,Tu & lamb" → "Chicken, Turkey & Lamb"
+  // Reference: https://nutrisourcepetfoods.com/our-food/chicken-turkey-lamb-fish/
+  const nutrisourceChickenTuLambPattern = /\b(Nutrisource\s+(?:Cat\s+)?)Chicken,\s*Tu\s+&\s+lamb\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceChickenTuLambPattern, "$1Chicken, Turkey & Lamb");
+  
+  // General pattern: "Tu" → "Turkey" (very short abbreviation, must come before "Tur")
+  // This is more aggressive than "Tur" but needed for products like "Chicken,Tu"
+  const nutrisourceTuPattern = /\b(Nutrisource\s+(?:Cat\s+)?(?:\w+\s+)?)Tu\b(?!\s*&)/gi;
+  preProcessed = preProcessed.replace(nutrisourceTuPattern, "$1Turkey");
+  
   // STEP 3: Term Expansion (after brand and product line are normalized)
   // "Entre" → "Entree" (PureVita wet food uses "Entree")
   // Reference: https://nutrisourcepetfoods.com/our-food/beef-entree-2/
