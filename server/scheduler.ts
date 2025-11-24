@@ -3,13 +3,13 @@ import { storage } from './storage';
 
 // Helper to normalize dates to local timezone (America/Chicago) for accurate comparison
 // Prevents late evening CST appointments from shifting to next day in UTC
-function getLocalDateString(date: Date): string {
+export function getLocalDateString(date: Date): string {
   return date.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' }); // YYYY-MM-DD format
 }
 
 // Helper to get day of week in America/Chicago timezone
 // Prevents late evening CST appointments from being misidentified as next day in UTC
-function getLocalDayOfWeek(date: Date): number {
+export function getLocalDayOfWeek(date: Date): number {
   // Format the date in America/Chicago timezone and parse to get local day
   const formatter = new Intl.DateTimeFormat('en-US', { 
     timeZone: 'America/Chicago', 

@@ -1436,8 +1436,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (appointmentDate !== undefined || pets !== undefined) {
         // Use new date if provided, otherwise use current
         const dateToCheck = appointmentDate ? new Date(appointmentDate) : new Date(currentAppointment.appointmentDate);
-        const appointmentDateStr = dateToCheck.toISOString().split('T')[0];
-        const dayOfWeek = dateToCheck.getDay();
+        // Use timezone-aware functions to prevent UTC/CST mismatch bugs
+        const { getLocalDateString, getLocalDayOfWeek } = await import('./scheduler');
+        const appointmentDateStr = getLocalDateString(dateToCheck);
+        const dayOfWeek = getLocalDayOfWeek(dateToCheck);
         
         // Get the pets that will be in this appointment after the update
         let finalPets;
@@ -1465,7 +1467,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Count existing appointments on the target date (excluding this one and cancelled/rejected)
             const allAppointments = await storage.getAppointments();
             const appointmentsOnDate = allAppointments.filter((apt: any) => {
-              const aptDateStr = new Date(apt.appointmentDate).toISOString().split('T')[0];
+              // Use timezone-aware date comparison to prevent UTC/CST mismatch
+              const aptDateStr = getLocalDateString(new Date(apt.appointmentDate));
               return aptDateStr === appointmentDateStr && 
                      apt.id !== id && // Exclude current appointment being updated
                      apt.status !== 'cancelled' && 
