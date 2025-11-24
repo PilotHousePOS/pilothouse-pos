@@ -397,25 +397,50 @@ export async function expandAbbreviationsAsync(
   preProcessed = preProcessed.replace(nutrisourceGrillPattern, "$1 Grillin' Grillers");
   
   // Fromm Product Line Expansions
-  // Reference: https://frommfamily.com/products/cat/four-star/
+  // Reference: https://frommfamily.com/products/cat/four-star/ & https://frommfamily.com/products/cat/purrsnickitty/
   
-  // "Pure Sniffers" or "Pu Sniffers" → "PurrSnickitty"
+  // PurrSnickety (correct spelling from product packaging)
+  // "Pure Sniffers" or "Pu Sniffers" → "PurrSnickety"
   const frommPureSniffersPattern = /\b(Fromm)\s+Pure\s+Sniffers\b/gi;
-  preProcessed = preProcessed.replace(frommPureSniffersPattern, "$1 PurrSnickitty");
+  preProcessed = preProcessed.replace(frommPureSniffersPattern, "$1 PurrSnickety");
   const frommPuSniffersPattern = /\b(Fromm)\s+Pu\s+Sniffers\b/gi;
-  preProcessed = preProcessed.replace(frommPuSniffersPattern, "$1 PurrSnickitty");
+  preProcessed = preProcessed.replace(frommPuSniffersPattern, "$1 PurrSnickety");
   
-  // "Cat Game" or "Game Bird" → "Game Bird Grandeur" (PurrSnickitty)
+  // "Cat Game" or "Game Bird" → "Game Bird Grandeur" (PurrSnickety)
   const frommGameBirdPattern = /\b(Fromm)\s+(Cat\s+)?Game\s+Bird(?!\s+Grandeur)\b/gi;
   preProcessed = preProcessed.replace(frommGameBirdPattern, "$1 Game Bird Grandeur");
   
-  // "Chk Del" or "Chicken Del" → "Chicken Delight" (PurrSnickitty)
+  // "Chk Del" or "Chicken Del" → "Chicken Delight" (PurrSnickety)
   const frommChickenDelightPattern = /\b(Fromm)\s+(Chk|Chicken)\s+Del\b/gi;
   preProcessed = preProcessed.replace(frommChickenDelightPattern, "$1 Chicken Delight");
   
-  // "Sal Splen" or "Salmon Splen" → "Salmon Splendor" (PurrSnickitty)
+  // "Sal Splen" or "Salmon Splen" → "Salmon Splendor" (PurrSnickety)
   const frommSalmonSplendorPattern = /\b(Fromm)\s+(Sal|Salmon)\s+Splen\b/gi;
   preProcessed = preProcessed.replace(frommSalmonSplendorPattern, "$1 Salmon Splendor");
+  
+  // À La Veg Recipes (Four-Star) - handles both with and without accent marks
+  // Preserves optional "Cat" prefix - matches both dog and cat formulas
+  // "Duck A La Veg" → "Duck À La Veg" OR "Cat Duck A La Veg" → "Cat Duck À La Veg"
+  const frommDuckALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Duck\s+[AÀ]\s+La\s+Veg\b/gi;
+  preProcessed = preProcessed.replace(frommDuckALaVegPattern, (match, p1, p2) => `${p1} ${p2 || ''}Duck À La Veg`);
+  
+  // "Chicken A La Veg" → "Chicken À La Veg" OR "Cat Chicken A La Veg" → "Cat Chicken À La Veg"
+  const frommChickenALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Chicken\s+[AÀ]\s+La\s+Veg\b/gi;
+  preProcessed = preProcessed.replace(frommChickenALaVegPattern, (match, p1, p2) => `${p1} ${p2 || ''}Chicken À La Veg`);
+  
+  // "Salmon A La Veg" → "Salmon À La Veg" OR "Cat Salmon A La Veg" → "Cat Salmon À La Veg"
+  const frommSalmonALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Salmon\s+[AÀ]\s+La\s+Veg\b/gi;
+  preProcessed = preProcessed.replace(frommSalmonALaVegPattern, (match, p1, p2) => `${p1} ${p2 || ''}Salmon À La Veg`);
+  
+  // "Beef Frit" or "Beef Frittata" → "Beef Frittata Veg"
+  // Preserves optional "Cat" prefix
+  const frommBeefFritPattern = /\b(Fromm)\s+(Cat\s+)?Beef\s+Frit(?:tata)?(?!\s+Veg)\b/gi;
+  preProcessed = preProcessed.replace(frommBeefFritPattern, (match, p1, p2) => `${p1} ${p2 || ''}Beef Frittata Veg`);
+  
+  // "Chicken Au From" → "Chicken Au Frommage" (PurrSnickety)
+  // Preserves optional "Cat" prefix
+  const frommChickenAuFromPattern = /\b(Fromm)\s+(Cat\s+)?Chicken\s+Au\s+From(?!mage)\b/gi;
+  preProcessed = preProcessed.replace(frommChickenAuFromPattern, (match, p1, p2) => `${p1} ${p2 || ''}Chicken Au Frommage`);
   
   // "Cat Surf" or "Surf" → "Surf & Turf" (Four-Star)
   const frommSurfPattern = /\b(Fromm)\s+Cat\s+Surf\b/gi;
@@ -428,12 +453,6 @@ export async function expandAbbreviationsAsync(
   // "Cat Has Duck" or "Has Duck" → "Hasen Duckenpfeffer" (Four-Star)
   const frommHasPattern = /\b(Fromm)\s+Cat\s+Has\s+Duck\b/gi;
   preProcessed = preProcessed.replace(frommHasPattern, "$1 Cat Hasen Duckenpfeffer");
-  
-  // "Beef Living" → "Beef Frittata Veg" (Four-Star)
-  const frommBeefLivingPattern = /\b(Fromm)\s+Beef\s+Living\b/gi;
-  preProcessed = preProcessed.replace(frommBeefLivingPattern, "$1 Beef Frittata Veg");
-  const frommCatBeefLivingPattern = /\b(Fromm)\s+Cat\s+Beef\s+Living\b/gi;
-  preProcessed = preProcessed.replace(frommCatBeefLivingPattern, "$1 Cat Beef Frittata Veg");
   
   // Blue Buffalo Product Line Expansions
   // Reference: https://www.bluebuffalo.com/
@@ -573,6 +592,92 @@ export async function expandAbbreviationsAsync(
   // "Ult Protein" → "Ultimate Protein"
   const instinctUltProteinPattern = /\b(Instinct)\s+Ult\s+Protein\b/gi;
   preProcessed = preProcessed.replace(instinctUltProteinPattern, "$1 Ultimate Protein");
+  
+  // === COMPREHENSIVE BRAND-SPECIFIC PATTERN EXPANSIONS === 
+  // Based on extensive product catalog research (Nov 2024)
+  
+  // Taste of the Wild Additional Patterns
+  const totwSierraMountainPattern = /\b(Taste of the Wild|TOW|Tow)\s+Sie?rra?\s+Mtn\b/gi;
+  preProcessed = preProcessed.replace(totwSierraMountainPattern, "$1 Sierra Mountain");
+  const totwSouthwestCanyonPattern = /\b(Taste of the Wild|TOW|Tow)\s+(SW|SoW?est)\s+Can(?:yon)?\b/gi;
+  preProcessed = preProcessed.replace(totwSouthwestCanyonPattern, "$1 Southwest Canyon");
+  const totwWetlandsPattern = /\b(Taste of the Wild|TOW|Tow)\s+Wetl(?:ands)?\b/gi;
+  preProcessed = preProcessed.replace(totwWetlandsPattern, "$1 Wetlands");
+  const totwPineForestPattern = /\b(Taste of the Wild|TOW|Tow)\s+Pine\s+For(?:est)?\b/gi;
+  preProcessed = preProcessed.replace(totwPineForestPattern, "$1 Pine Forest");
+  
+  // Merrick Additional Patterns
+  const merrickGameBirdPattern = /\b(Merrick)\s+(Bckctry\s+)?Game\s+Bird\b/gi;
+  preProcessed = preProcessed.replace(merrickGameBirdPattern, "$1 Backcountry Game Bird");
+  const merrickPacificCatchPattern = /\b(Merrick)\s+(Bckctry\s+)?Pac(?:ific)?\s+Catch\b/gi;
+  preProcessed = preProcessed.replace(merrickPacificCatchPattern, "$1 Backcountry Pacific Catch");
+  const merrickGreatPlainsPattern = /\b(Merrick)\s+(Bckctry\s+)?(?:Gr|Great)\s+Plains\b/gi;
+  preProcessed = preProcessed.replace(merrickGreatPlainsPattern, "$1 Backcountry Great Plains");
+  const merrickBigGamePattern = /\b(Merrick)\s+(Bckctry\s+)?Big\s+Game\b/gi;
+  preProcessed = preProcessed.replace(merrickBigGamePattern, "$1 Backcountry Big Game");
+  
+  // Royal Canin Additional Breed Patterns
+  const royalCaninLabRetPattern = /\b(Royal Canin|RC)\s+Lab(?:rador)?\s+Retr\b/gi;
+  preProcessed = preProcessed.replace(royalCaninLabRetPattern, "$1 Labrador Retriever");
+  const royalCaninYorkiePattern = /\b(Royal Canin|RC)\s+Yorkie\b/gi;
+  preProcessed = preProcessed.replace(royalCaninYorkiePattern, "$1 Yorkshire Terrier");
+  const royalCaninBulldogPattern = /\b(Royal Canin|RC)\s+Bulldog\b/gi;
+  preProcessed = preProcessed.replace(royalCaninBulldogPattern, "$1 Bulldog");
+  const royalCaninFrBulldogPattern = /\b(Royal Canin|RC)\s+Fr(?:ench)?\s+Bulldog\b/gi;
+  preProcessed = preProcessed.replace(royalCaninFrBulldogPattern, "$1 French Bulldog");
+  const royalCaninDachsPattern = /\b(Royal Canin|RC)\s+Dachs(?:hund)?\b/gi;
+  preProcessed = preProcessed.replace(royalCaninDachsPattern, "$1 Dachshund");
+  const royalCaninMinSchnauPattern = /\b(Royal Canin|RC)\s+Min(?:iature)?\s+Schnau(?:zer)?\b/gi;
+  preProcessed = preProcessed.replace(royalCaninMinSchnauPattern, "$1 Miniature Schnauzer");
+  // Size abbreviations
+  const royalCaninLgPattern = /\b(Royal Canin|RC)\s+Lg\b/gi;
+  preProcessed = preProcessed.replace(royalCaninLgPattern, "$1 Large");
+  const royalCaninSmPattern = /\b(Royal Canin|RC)\s+Sm(?!\s+Breed)\b/gi;
+  preProcessed = preProcessed.replace(royalCaninSmPattern, "$1 Small");
+  const royalCaninXSPattern = /\b(Royal Canin|RC)\s+XS\b/gi;
+  preProcessed = preProcessed.replace(royalCaninXSPattern, "$1 X-Small");
+  
+  // Science Diet Additional Patterns
+  const scienceDietPerfWtPattern = /\b(Science Diet|SD)\s+Perf(?:ect)?\s+W(?:ei)?ght\b/gi;
+  preProcessed = preProcessed.replace(scienceDietPerfWtPattern, "$1 Perfect Weight");
+  const scienceDietSensStomPattern = /\b(Science Diet|SD)\s+Sens(?:itive)?\s+Stom(?:ach)?\b/gi;
+  preProcessed = preProcessed.replace(scienceDietSensStomPattern, "$1 Sensitive Stomach");
+  const scienceDietYouthVitPattern = /\b(Science Diet|SD)\s+Youth(?:ful)?\s+Vit(?:ality)?\b/gi;
+  preProcessed = preProcessed.replace(scienceDietYouthVitPattern, "$1 Youthful Vitality");
+  const scienceDietOralCarePattern = /\b(Science Diet|SD)\s+Oral\s+Care\b/gi;
+  preProcessed = preProcessed.replace(scienceDietOralCarePattern, "$1 Oral Care");
+  
+  // Wellness Additional Patterns
+  const wellnessCOREPlusPattern = /\b(Wellness)\s+CORE\s*\+\b/gi;
+  preProcessed = preProcessed.replace(wellnessCOREPlusPattern, "$1 CORE+");
+  const wellnessGrainFreePattern = /\b(Wellness)\s+Gr(?:ain)?\s+Free\b/gi;
+  preProcessed = preProcessed.replace(wellnessGrainFreePattern, "$1 Grain Free");
+  
+  // Nutrisource Additional Patterns
+  const nutrisourcePureVitaPattern = /\b(Nutrisource)\s+Pure\s+Vita?\b/gi;
+  preProcessed = preProcessed.replace(nutrisourcePureVitaPattern, "$1 PureVita");
+  const nutrisourceElementPattern = /\b(Nutrisource)\s+Elem(?:ent)?\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceElementPattern, "$1 Element Series");
+  
+  // Fromm Additional Patterns
+  const frommGoldPattern = /\b(Fromm)\s+Gold\b/gi;
+  preProcessed = preProcessed.replace(frommGoldPattern, "$1 Gold");
+  const frommPorkApplesaucePattern = /\b(Fromm)\s+Pork\s+Apple(?:sauce)?\b/gi;
+  preProcessed = preProcessed.replace(frommPorkApplesaucePattern, "$1 Pork & Applesauce");
+  
+  // Blue Buffalo Additional Patterns
+  const blueBuffaloBasicsPattern = /\b(Blue Buffalo|BB)\s+Basics\b/gi;
+  preProcessed = preProcessed.replace(blueBuffaloBasicsPattern, "$1 Basics");
+  const blueBuffaloTrueSolPattern = /\b(Blue Buffalo|BB)\s+True\s+Sol(?:utions)?\b/gi;
+  preProcessed = preProcessed.replace(blueBuffaloTrueSolPattern, "$1 True Solutions");
+  
+  // Orijen Additional Patterns
+  const orijenAmazingGrainsPattern = /\b(Orijen)\s+Amaz(?:ing)?\s+Grains\b/gi;
+  preProcessed = preProcessed.replace(orijenAmazingGrainsPattern, "$1 Amazing Grains");
+  const orijenTundraPattern = /\b(Orijen)\s+Tundra\b/gi;
+  preProcessed = preProcessed.replace(orijenTundraPattern, "$1 Tundra");
+  const orijenFitTrimPattern = /\b(Orijen)\s+Fit\s+&?\s*Trim\b/gi;
+  preProcessed = preProcessed.replace(orijenFitTrimPattern, "$1 Fit & Trim");
   
   // Step 1: Try brand catalog expansion (research-backed, context-aware)
   const catalogResult = await expandProductName(storage, preProcessed);
