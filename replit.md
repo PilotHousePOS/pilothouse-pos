@@ -56,14 +56,26 @@ The application is a full-stack web application. The frontend uses React, Vite, 
 - **Database Sync Tools:** Staging import with duplicate prevention, supplies-only sync (admin-only), and full database sync (development-only).
 - **Auto-Categorization System:** Single-button operation for specialty section and product type classification based on brand and keyword analysis, including brand-based exclusion logic. Includes a Live Animal Detection (Step 0) system that scans supplies for live animals, creates pet records, and handles foreign key constraints.
 - **Smart Abbreviation Expansion System:** Comprehensive, research-based abbreviation expansion covering 13+ major pet food brands with evidence-backed patterns. Features:
-  - **Brand-Scoped Pattern Matching:** 60+ product line abbreviations with brand-specific context (e.g., "Nutrisource Grill" → "Nutrisource Grillin' Grillers", "Fromm Pure Sniffers" → "Fromm PurrSnickitty")
+  - **Brand-Scoped Pattern Matching:** 100+ product line abbreviations with brand-specific context (e.g., "Nutrisource Grill" → "Nutrisource Grillin' Grillers", "Fromm Pure Sniffers" → "Fromm PurrSnickety")
   - **Covered Brands:** Nutrisource, Fromm, Blue Buffalo, Taste of the Wild, Merrick, Pro Plan, Royal Canin, Science Diet, Wellness, Natural Balance, Orijen, Canidae, Instinct
+  - **Advanced Features:**
+    - **Unicode Support:** Handles accent marks correctly (e.g., "Fromm Duck A La Veg" → "Fromm Duck À La Veg")
+    - **Optional Prefix Preservation:** Preserves or omits species qualifiers (e.g., "Fromm Cat Duck À La Veg" keeps "Cat", "Fromm Duck À La Veg" stays dog formula)
+    - **Context-Aware Replacements:** Uses replacement functions to preserve captured groups and prevent false positives
   - **Generic Expansion:** Context-aware expansion for common abbreviations (Water Chemistry pH, Aquarium Gallons, Food/Flavors, Sizes, Colors, Quality, Animals)
-  - **Three-Layer System:** (1) Brand-specific patterns with negative lookaheads, (2) Brand catalog lookup with 96+ verified entries, (3) Generic fallback mappings
+  - **Three-Layer System:** (1) Brand-specific patterns with negative lookaheads and replacement functions, (2) Brand catalog lookup with 96+ verified entries, (3) Generic fallback mappings
   - **Evidence-Based:** All brand patterns include official website references and research documentation
   - **Word Boundaries:** Regex patterns use \b anchors to prevent false matches
   - **Auto-Applied:** Runs on admin "Process All" and when editing individual supplies
-  - **Examples:** "BB LP" → "Blue Buffalo Life Protection Formula", "TOTW Hi Prair" → "Taste of the Wild High Prairie", "RC Germ Shep" → "Royal Canin German Shepherd"
+  - **Recent Pattern Additions (Nov 2024):**
+    - **Fromm:** PurrSnickety flavors (Game Bird Grandeur, Chicken Delight, Salmon Splendor), À La Veg recipes (Duck/Chicken/Salmon/Beef), Chicken Au Frommage, Pork & Applesauce
+    - **Taste of the Wild:** Sierra Mountain, Southwest Canyon, Wetlands, Pine Forest expansions
+    - **Merrick:** Backcountry Game Bird/Pacific Catch/Great Plains/Big Game
+    - **Royal Canin:** 10+ breed abbreviations (Lab Retriever, French Bulldog, Miniature Schnauzer, etc.), size formulas (XS, Sm, Med, Lg)
+    - **Science Diet:** Perfect Weight, Sensitive Stomach, Youthful Vitality, Oral Care
+    - **Wellness:** CORE+, Grain Free expansions
+    - **Orijen:** Amazing Grains, Tundra, Fit & Trim
+  - **Examples:** "BB LP" → "Blue Buffalo Life Protection Formula", "TOTW Hi Prair" → "Taste of the Wild High Prairie", "RC Germ Shep" → "Royal Canin German Shepherd", "Fromm Duck A La Veg" → "Fromm Duck À La Veg"
 - **Brand Extraction System:** Comprehensive brand database for automated brand assignment.
 - **Product Image Management System:** Statistics dashboard, manual image search, automated batch search with preview and approval, cost management, and admin-only access.
 - **Employee Schedule Management System:** Sectioned schedule view (previous, current, next week), editable grid, employee management, flexible time slots, batch save, data persistence, empty state handling, and admin-only access.
