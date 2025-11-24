@@ -405,9 +405,17 @@ export async function expandAbbreviationsAsync(
   const frommPuSniffersPattern = /\b(Fromm)\s+Pu\s+Sniffers\b/gi;
   preProcessed = preProcessed.replace(frommPuSniffersPattern, "$1 PurrSnickitty");
   
-  // "Cat Game" or "Game" → "Game Bird Recipe" (Four-Star)
-  const frommGamePattern = /\b(Fromm)\s+Cat\s+Game\b/gi;
-  preProcessed = preProcessed.replace(frommGamePattern, "$1 Cat Game Bird Recipe");
+  // "Cat Game" or "Game Bird" → "Game Bird Grandeur" (PurrSnickitty)
+  const frommGameBirdPattern = /\b(Fromm)\s+(Cat\s+)?Game\s+Bird(?!\s+Grandeur)\b/gi;
+  preProcessed = preProcessed.replace(frommGameBirdPattern, "$1 Game Bird Grandeur");
+  
+  // "Chk Del" or "Chicken Del" → "Chicken Delight" (PurrSnickitty)
+  const frommChickenDelightPattern = /\b(Fromm)\s+(Chk|Chicken)\s+Del\b/gi;
+  preProcessed = preProcessed.replace(frommChickenDelightPattern, "$1 Chicken Delight");
+  
+  // "Sal Splen" or "Salmon Splen" → "Salmon Splendor" (PurrSnickitty)
+  const frommSalmonSplendorPattern = /\b(Fromm)\s+(Sal|Salmon)\s+Splen\b/gi;
+  preProcessed = preProcessed.replace(frommSalmonSplendorPattern, "$1 Salmon Splendor");
   
   // "Cat Surf" or "Surf" → "Surf & Turf" (Four-Star)
   const frommSurfPattern = /\b(Fromm)\s+Cat\s+Surf\b/gi;
