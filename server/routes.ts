@@ -555,14 +555,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         : await storage.getAllPets();
       
       // Apply search filter if provided (fuzzy search across name, species, breed, description)
+      // Includes brand name expansion for abbreviated brand names
       if (search && typeof search === 'string' && search.trim()) {
-        const searchLower = search.toLowerCase().trim();
-        allPets = allPets.filter(pet => 
-          pet.name?.toLowerCase().includes(searchLower) ||
-          pet.species?.toLowerCase().includes(searchLower) ||
-          pet.breed?.toLowerCase().includes(searchLower) ||
-          pet.description?.toLowerCase().includes(searchLower)
-        );
+        const { expandBrandNames } = await import('./brandNameExpansion');
+        const brandVariations = expandBrandNames(search);
+        
+        allPets = allPets.filter(pet => {
+          const searchableText = [
+            pet.name || '',
+            pet.species || '',
+            pet.breed || '',
+            pet.description || ''
+          ].join(' ').toLowerCase();
+          
+          // Check if any brand variation matches
+          return brandVariations.some(variation => 
+            searchableText.includes(variation.toLowerCase())
+          );
+        });
       }
       
       // Calculate total count and pages

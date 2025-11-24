@@ -1,7 +1,10 @@
 /**
  * Fuzzy search utility for typo-tolerant searching
  * Finds closest matches even with spelling mistakes
+ * Includes brand name expansion for abbreviated brand names
  */
+
+import { expandBrandNames } from './brandNameExpansion';
 
 /**
  * Calculate Levenshtein distance between two strings
@@ -142,6 +145,10 @@ export function fuzzyMatch(
 
 /**
  * Filter and sort items by fuzzy search relevance
+ * Includes brand name expansion to match abbreviated brand names
+ * Example: searching "Diamond" will also match products with "Diam" in the name
+ * Example: searching "Blue Buffalo" will also match products with "Blue B"
+ * 
  * @param items - Array of items to search
  * @param query - Search query
  * @param getSearchableText - Function to extract searchable text from each item
@@ -158,24 +165,35 @@ export function fuzzySearchFilter<T>(
     return items;
   }
   
-  const results: Array<T & { _relevance: number }> = [];
+  // Expand brand names to include variations (e.g., "Diamond" → ["Diamond", "Diam"])
+  const brandVariations = expandBrandNames(query);
   
-  for (const item of items) {
-    const searchableTexts = getSearchableText(item);
-    let bestScore = 0;
-    
-    // Check all searchable fields and take the best match
-    for (const text of searchableTexts) {
-      const { matches, score } = fuzzyMatch(text, query, threshold);
-      if (matches) {
-        bestScore = Math.max(bestScore, score);
+  const resultsMap = new Map<any, number>(); // Track best score for each item
+  
+  // Search with each brand variation
+  for (const searchQuery of brandVariations) {
+    for (const item of items) {
+      const searchableTexts = getSearchableText(item);
+      let bestScore = resultsMap.get(item) || 0;
+      
+      // Check all searchable fields and take the best match
+      for (const text of searchableTexts) {
+        const { matches, score } = fuzzyMatch(text, searchQuery, threshold);
+        if (matches) {
+          bestScore = Math.max(bestScore, score);
+        }
+      }
+      
+      if (bestScore > 0) {
+        resultsMap.set(item, bestScore);
       }
     }
-    
-    if (bestScore > 0) {
-      results.push({ ...item, _relevance: bestScore });
-    }
   }
+  
+  // Convert map to array with relevance scores
+  const results: Array<T & { _relevance: number }> = Array.from(resultsMap.entries()).map(
+    ([item, score]) => ({ ...item, _relevance: score })
+  );
   
   // Sort by relevance (highest first)
   results.sort((a, b) => (b._relevance || 0) - (a._relevance || 0));
