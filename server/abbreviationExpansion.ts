@@ -125,6 +125,12 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Brin': 'Brine',
   'Sal': 'Salmon',
   'Dck': 'Duck',
+  'duck': 'Duck',
+  'Lmb': 'Lamb',
+  'beef': 'Beef',
+  'Truk': 'Turkey',
+  'Veni': 'Venison',
+  'App': 'Apple',
   'Chu': 'Chunks',
   'Riv': 'River',
   'Cich': 'Cichlid',
@@ -133,6 +139,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Col': 'Color',
   'Nib': 'Nibbles',
   'Pat': 'Pate',
+  'Crip': 'Crisp',
   // 'Tndr Bts': 'Tender Bites',  // MOVED TO BRAND CATALOG
   // 'Lil Bts': 'Little Bites',  // MOVED TO BRAND CATALOG
   // 'Little Bts': 'Little Bites',  // MOVED TO BRAND CATALOG
