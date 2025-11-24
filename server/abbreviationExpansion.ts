@@ -390,10 +390,16 @@ function detectBrand(text: string): string | null {
     'Natural Balance', 'Canidae', 'Instinct'
   ];
   
+  // Check for full brand names first
   for (const brand of brandPatterns) {
     if (new RegExp(`\\b${brand}\\b`, 'i').test(text)) {
       return brand;
     }
+  }
+  
+  // Check for Nutrisource abbreviated variations
+  if (/\bNutri\s+Sour\b/i.test(text) || /\bNutr\s+Sour\b/i.test(text) || /\bNutri\s+Sou\b/i.test(text) || /\bNutrisrc\b/i.test(text) || /\bNtrisrc\b/i.test(text)) {
+    return 'Nutrisource';
   }
   
   return null;
@@ -431,6 +437,64 @@ export async function expandAbbreviationsAsync(
   // Uses negative lookahead to prevent matching "Grilled" or "Grills" or "Grillin'"
   const nutrisourceGrillPattern = /\b(Nutrisource)\s+Grill(?!ed|s|in')\b/gi;
   preProcessed = preProcessed.replace(nutrisourceGrillPattern, "$1 Grillin' Grillers");
+  
+  // === NUTRISOURCE COMPREHENSIVE BRAND & PRODUCT LINE EXPANSION ===
+  // Reference: https://nutrisourcepetfoods.com/, https://discovernutrisource.com/
+  // Verified via Google search November 2024
+  
+  // STEP 1: Brand Name Normalization (MUST come first before product line expansion)
+  // Fix all variations of abbreviated "Nutrisource" brand name
+  const nutrisourceBrandPattern1 = /\bNutri\s+Sour\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceBrandPattern1, "Nutrisource");
+  const nutrisourceBrandPattern2 = /\bNutr\s+Sour\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceBrandPattern2, "Nutrisource");
+  const nutrisourceBrandPattern3 = /\bNutri\s+Sou\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceBrandPattern3, "Nutrisource");
+  
+  // STEP 2: Product Line Expansion (after brand is normalized to "Nutrisource")
+  // PureVita line: "Pv" → "PureVita"
+  // Reference: https://nutrisourcepetfoods.com/category/our-food/purevita/
+  const nutrisourcePvPattern = /\b(Nutrisource)\s+Pv\b/gi;
+  preProcessed = preProcessed.replace(nutrisourcePvPattern, "$1 PureVita");
+  
+  // Element Series - Classic Catch: "Clas" → "Classic Catch"
+  // Reference: https://nutrisourcepetfoods.com/our-food/element-series/classic-catch-wet/
+  const nutrisourceClassicPattern = /\b(Nutrisource)\s+Clas\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceClassicPattern, "$1 Classic Catch");
+  
+  // Select Series: Add "Select" to product line names
+  // Reference: https://nutrisourcepetfoods.com/our-food/prairie-select-recipe/
+  const nutrisourcePrairiePattern = /\b(Nutrisource)\s+Prairie(?!\s+Select)\b/gi;
+  preProcessed = preProcessed.replace(nutrisourcePrairiePattern, "$1 Prairie Select");
+  
+  // Reference: https://nutrisourcepetfoods.com/our-food/heartland-select/
+  const nutrisourceHeartlandPattern = /\b(Nutrisource)\s+Heartland(?!\s+Select)\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceHeartlandPattern, "$1 Heartland Select");
+  
+  // Reference: https://nutrisourcepetfoods.com/our-food/woodlands-select-recipe/
+  const nutrisourceWoodlandPattern = /\b(Nutrisource)\s+Woodlands?(?!\s+Select)\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceWoodlandPattern, "$1 Woodlands Select");
+  
+  // Seafood Select
+  // Reference: https://nutrisourcepetfoods.com/our-food/seafood-select/
+  const nutrisourceSeafoodPattern = /\b(Nutrisource)\s+Seafood(?!\s+Select)\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceSeafoodPattern, "$1 Seafood Select");
+  
+  // STEP 3: Term Expansion (after brand and product line are normalized)
+  // "Entre" → "Entree" (PureVita wet food uses "Entree")
+  // Reference: https://nutrisourcepetfoods.com/our-food/beef-entree-2/
+  const nutrisourceEntrePattern = /\b(Nutrisource\s+(?:PureVita\s+)?(?:\w+\s+)?)Entre\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceEntrePattern, "$1Entree");
+  
+  // "Gr " → "Grain Free " (when followed by a space, indicates Grain Free formula)
+  // Reference: Grain-free formulas use "Grain Free" in official names
+  const nutrisourceGrPattern = /\b(Nutrisource)\s+Gr\s+/gi;
+  preProcessed = preProcessed.replace(nutrisourceGrPattern, "$1 Grain Free ");
+  
+  // STEP 4: Cleanup duplicate words (e.g., "Cat Clas Cat" → "Classic Catch Cat")
+  // Remove duplicate "Cat" when it appears before and after product line
+  const nutrisourceDuplicateCatPattern = /\b(Nutrisource)\s+Cat\s+(\w+(?:\s+\w+)?)\s+Cat\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceDuplicateCatPattern, "$1 $2 Cat");
   
   // Fromm Product Line Expansions
   // Reference: https://frommfamily.com/products/cat/four-star/ & https://frommfamily.com/products/cat/purrsnickitty/
