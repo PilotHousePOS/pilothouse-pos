@@ -68,6 +68,7 @@ The application is a full-stack web application. The frontend uses React, Vite, 
   - **Word Boundaries:** Regex patterns use \b anchors to prevent false matches
   - **Auto-Applied:** Runs on admin "Process All" and when editing individual supplies
   - **Recent Pattern Additions (Nov 2024):**
+    - **Nutrisource Comprehensive Expansion (Nov 24):** Brand normalization ("Nutri Sour", "Nutr Sour", "Nutri Sou" → "Nutrisource"), product lines (PureVita "Pv", Classic Catch "Clas", Select series "Prairie/Heartland/Woodlands/Seafood"), term expansion ("Entre" → "Entree", "Gr" → "Grain Free"), data cleanup ("Gr Frozen" → "Grain Free", "Crisp/Crispy Crisp" → "Crispers"), duplicate word removal. All patterns verified with Google search of official Nutrisource website (nutrisourcepetfoods.com, discovernutrisource.com)
     - **Fromm:** PurrSnickety flavors (Game Bird Grandeur, Chicken Delight, Salmon Splendor), À La Veg recipes (Duck/Chicken/Salmon/Beef), Chicken Au Frommage, Pork & Applesauce
     - **Taste of the Wild:** Sierra Mountain, Southwest Canyon, Wetlands, Pine Forest expansions
     - **Merrick:** Backcountry Game Bird/Pacific Catch/Great Plains/Big Game
@@ -75,7 +76,7 @@ The application is a full-stack web application. The frontend uses React, Vite, 
     - **Science Diet:** Perfect Weight, Sensitive Stomach, Youthful Vitality, Oral Care
     - **Wellness:** CORE+, Grain Free expansions
     - **Orijen:** Amazing Grains, Tundra, Fit & Trim
-  - **Examples:** "BB LP" → "Blue Buffalo Life Protection Formula", "TOTW Hi Prair" → "Taste of the Wild High Prairie", "RC Germ Shep" → "Royal Canin German Shepherd", "Fromm Duck A La Veg" → "Fromm Duck À La Veg"
+  - **Examples:** "BB LP" → "Blue Buffalo Life Protection Formula", "TOTW Hi Prair" → "Taste of the Wild High Prairie", "RC Germ Shep" → "Royal Canin German Shepherd", "Fromm Duck A La Veg" → "Fromm Duck À La Veg", "Nutri Sour Pv Beef Entre" → "Nutrisource PureVita Beef Entree", "Nutri Sour Cat Clas Cat" → "Nutrisource Classic Catch Cat"
 - **Brand Extraction System:** Comprehensive brand database for automated brand assignment.
 - **Product Image Management System:** Statistics dashboard, manual image search, automated batch search with preview and approval, cost management, and admin-only access.
 - **Employee Schedule Management System:** Sectioned schedule view (previous, current, next week), editable grid, employee management, flexible time slots, batch save, data persistence, empty state handling, and admin-only access.

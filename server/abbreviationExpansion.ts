@@ -461,6 +461,12 @@ export async function expandAbbreviationsAsync(
   const nutrisourceBrandPattern3 = /\bNutri\s+Sou\b/gi;
   preProcessed = preProcessed.replace(nutrisourceBrandPattern3, "Nutrisource");
   
+  // STEP 1.5: Pre-cleanup - Remove duplicate "Cat" BEFORE product line expansion
+  // Handle "Nutrisource Cat Clas Cat" → "Nutrisource Clas Cat" first
+  // This allows "Clas" to be properly expanded to "Classic Catch" in the next step
+  const nutrisourcePreCleanupCatPattern = /\b(Nutrisource)\s+Cat\s+(\w+)\s+Cat\b/gi;
+  preProcessed = preProcessed.replace(nutrisourcePreCleanupCatPattern, "$1 $2 Cat");
+  
   // STEP 2: Product Line Expansion (after brand is normalized to "Nutrisource")
   // PureVita line: "Pv" → "PureVita"
   // Reference: https://nutrisourcepetfoods.com/category/our-food/purevita/
@@ -506,11 +512,6 @@ export async function expandAbbreviationsAsync(
   // Reference: https://nutrisourcepetfoods.com/category/our-food/freeze-dried/
   const nutrisourceGrFrozenPattern = /\b(Nutrisource)\s+Grain\s+Free\s+Frozen\b/gi;
   preProcessed = preProcessed.replace(nutrisourceGrFrozenPattern, "$1 Grain Free");
-  
-  // STEP 4: Cleanup duplicate words (e.g., "Cat Clas Cat" → "Classic Catch Cat")
-  // Remove duplicate "Cat" when it appears before and after product line
-  const nutrisourceDuplicateCatPattern = /\b(Nutrisource)\s+Cat\s+(\w+(?:\s+\w+)?)\s+Cat\b/gi;
-  preProcessed = preProcessed.replace(nutrisourceDuplicateCatPattern, "$1 $2 Cat");
   
   // Fromm Product Line Expansions
   // Reference: https://frommfamily.com/products/cat/four-star/ & https://frommfamily.com/products/cat/purrsnickitty/
