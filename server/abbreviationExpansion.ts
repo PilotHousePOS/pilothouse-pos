@@ -390,14 +390,36 @@ export async function expandAbbreviationsAsync(
   const nutrisourceGrillPattern = /\b(Nutrisource)\s+Grill(?!ed|s|in')\b/gi;
   let preProcessed = text.replace(nutrisourceGrillPattern, "$1 Grillin' Grillers");
   
-  // Fromm: "Pure Sniffers" or "Pu Sniffers" → "PurrSnickitty"
-  // Official Fromm product line for picky cats
-  // Reference: https://frommfamily.com/products/cat/purrsnickitty/
+  // Fromm Product Line Expansions
+  // Reference: https://frommfamily.com/products/cat/four-star/
+  
+  // "Pure Sniffers" or "Pu Sniffers" → "PurrSnickitty"
   const frommPureSniffersPattern = /\b(Fromm)\s+Pure\s+Sniffers\b/gi;
   preProcessed = preProcessed.replace(frommPureSniffersPattern, "$1 PurrSnickitty");
-  
   const frommPuSniffersPattern = /\b(Fromm)\s+Pu\s+Sniffers\b/gi;
   preProcessed = preProcessed.replace(frommPuSniffersPattern, "$1 PurrSnickitty");
+  
+  // "Cat Game" or "Game" → "Game Bird Recipe" (Four-Star)
+  const frommGamePattern = /\b(Fromm)\s+Cat\s+Game\b/gi;
+  preProcessed = preProcessed.replace(frommGamePattern, "$1 Cat Game Bird Recipe");
+  
+  // "Cat Surf" or "Surf" → "Surf & Turf" (Four-Star)
+  const frommSurfPattern = /\b(Fromm)\s+Cat\s+Surf\b/gi;
+  preProcessed = preProcessed.replace(frommSurfPattern, "$1 Cat Surf & Turf");
+  
+  // "Cat Saslm" → "Cat Salmon" (typo fix)
+  const frommSaslmPattern = /\b(Fromm)\s+Cat\s+Saslm\b/gi;
+  preProcessed = preProcessed.replace(frommSaslmPattern, "$1 Cat Salmon");
+  
+  // "Cat Has Duck" or "Has Duck" → "Hasen Duckenpfeffer" (Four-Star)
+  const frommHasPattern = /\b(Fromm)\s+Cat\s+Has\s+Duck\b/gi;
+  preProcessed = preProcessed.replace(frommHasPattern, "$1 Cat Hasen Duckenpfeffer");
+  
+  // "Beef Living" → "Beef Frittata Veg" (Four-Star)
+  const frommBeefLivingPattern = /\b(Fromm)\s+Beef\s+Living\b/gi;
+  preProcessed = preProcessed.replace(frommBeefLivingPattern, "$1 Beef Frittata Veg");
+  const frommCatBeefLivingPattern = /\b(Fromm)\s+Cat\s+Beef\s+Living\b/gi;
+  preProcessed = preProcessed.replace(frommCatBeefLivingPattern, "$1 Cat Beef Frittata Veg");
   
   // Step 1: Try brand catalog expansion (research-backed, context-aware)
   const catalogResult = await expandProductName(storage, preProcessed);
