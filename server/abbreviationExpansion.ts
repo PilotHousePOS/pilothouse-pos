@@ -491,8 +491,13 @@ export async function expandAbbreviationsAsync(
   const nutrisourceWoodlandPattern = /\b(Nutrisource)\s+Woodlands?(?!\s+Select)\b/gi;
   preProcessed = preProcessed.replace(nutrisourceWoodlandPattern, "$1 Woodlands Select");
   
-  // Seafood Select
+  // "Seaf" → "Seafood Select" (handle abbreviation BEFORE full word)
   // Reference: https://nutrisourcepetfoods.com/our-food/seafood-select/
+  // Matches "Nutrisource Seaf" or "Nutrisource Small Bite Seaf"
+  const nutrisourceSeafPattern = /\b(Nutrisource(?:\s+(?:Small|Large)\s+Bite)?)\s+Seaf\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceSeafPattern, "$1 Seafood Select");
+  
+  // Seafood Select (add "Select" if missing from full "Seafood")
   const nutrisourceSeafoodPattern = /\b(Nutrisource)\s+Seafood(?!\s+Select)\b/gi;
   preProcessed = preProcessed.replace(nutrisourceSeafoodPattern, "$1 Seafood Select");
   
@@ -531,16 +536,22 @@ export async function expandAbbreviationsAsync(
   const nutrisourceEntrePattern = /\b(Nutrisource\s+(?:PureVita\s+)?(?:\w+\s+)?)Entre\b/gi;
   preProcessed = preProcessed.replace(nutrisourceEntrePattern, "$1Entree");
   
+  // "Perfor" → "Performance" 
+  // Reference: https://nutrisourcepetfoods.com/our-food/nutrisource/performance-recipe/
+  const nutrisourcePerforPattern = /\bNutrisource\s+Perfor\b/gi;
+  preProcessed = preProcessed.replace(nutrisourcePerforPattern, "Nutrisource Performance");
+  
+  // "Gr Frozen" → "Grain Free" (handle BEFORE the general Gr pattern)
+  // Nutrisource does not make frozen raw food, only freeze-dried
+  // Reference: https://nutrisourcepetfoods.com/category/our-food/freeze-dried/
+  // Matches "Nutrisource Large Breed Gr Frozen Lamb" etc.
+  const nutrisourceGrFrozenPattern = /\b(Nutrisource(?:\s+\w+)*?)\s+Gr\s+Frozen\b/gi;
+  preProcessed = preProcessed.replace(nutrisourceGrFrozenPattern, "$1 Grain Free");
+  
   // "Gr " → "Grain Free " (when followed by a space, indicates Grain Free formula)
   // Reference: Grain-free formulas use "Grain Free" in official names
   const nutrisourceGrPattern = /\b(Nutrisource)\s+Gr\s+/gi;
   preProcessed = preProcessed.replace(nutrisourceGrPattern, "$1 Grain Free ");
-  
-  // "Gr Frozen" → "Grain Free" (data entry error - "Frozen" should be removed)
-  // Nutrisource does not make frozen raw food, only freeze-dried
-  // Reference: https://nutrisourcepetfoods.com/category/our-food/freeze-dried/
-  const nutrisourceGrFrozenPattern = /\b(Nutrisource)\s+Grain\s+Free\s+Frozen\b/gi;
-  preProcessed = preProcessed.replace(nutrisourceGrFrozenPattern, "$1 Grain Free");
   
   // Fromm Product Line Expansions
   // Reference: https://frommfamily.com/products/cat/four-star/ & https://frommfamily.com/products/cat/purrsnickitty/
