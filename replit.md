@@ -71,6 +71,8 @@ The application is a full-stack web application with a React frontend (Vite, Typ
   - SmartBones: "Smartbone/Smartbones" → "SmartBones" (20+ products) - capitalization fix
   - Benebone: "BeneBone" → "Benebone" (20+ products) - capitalization fix to match official trademark
   - Merrick Fresh Kisses: "Dbbl" → "Double-Brush" (14 products) - proprietary design feature expansion
+  - Dogswell: "Guthealth" → "Gut Health", "Hip & joint" → "Hip & Joint", "Skin & coat" → "Skin & Coat" (6 products)
+  - Durvet: "Liquid Wrm" → "Liquid Wormer 2X", "Tripwrm" → "Triple Wormer", "Wrmeze" → "Worm Ease" (6 products)
   - All patterns verified with official website documentation, packaging photos, and database evidence
   - Start-of-string anchoring prevents corruption of non-brand text
   - Context-aware "Diam" expansion: Distinguishes "Diameter" (measurements like "12 inch Diam tube") from "Diamond" (brand names)

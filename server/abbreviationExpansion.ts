@@ -892,6 +892,49 @@ export async function expandAbbreviationsAsync(
   const freshKissesDbblPattern = /\b(Fresh Kisses)\s+((?:\w+\s+)*)Dbbl\b/gi;
   preProcessed = preProcessed.replace(freshKissesDbblPattern, "$1 $2Double-Brush");
   
+  // Dogswell Functional Product Line Expansions
+  // Evidence: 6 products in database with abbreviated functional names
+  // Database examples: "Dogswell Guthealth Jerky", "Dogswell Hip & joint Jerky", "Dogswell Skin & coat Jerky"
+  // Screenshots: attached_assets/Screenshot 2025-11-24 172251_1764026923283.png
+  // Official site: https://dogswell.com/
+  // Official product lines: Gut Health, Hip & Joint, Skin & Coat
+  
+  // "Guthealth" → "Gut Health" (two words)
+  const dogswellGuthealthPattern = /\b(Dogswell)\s+Guthealth\b/gi;
+  preProcessed = preProcessed.replace(dogswellGuthealthPattern, "$1 Gut Health");
+  
+  // "Hip & joint" → "Hip & Joint" (capital J)
+  const hipJointCapPattern = /\b(Hip\s+&\s+)joint\b/g;
+  preProcessed = preProcessed.replace(hipJointCapPattern, "$1Joint");
+  
+  // "Skin & coat" → "Skin & Coat" (capital C)
+  const skinCoatCapPattern = /\b(Skin\s+&\s+)coat\b/g;
+  preProcessed = preProcessed.replace(skinCoatCapPattern, "$1Coat");
+  
+  // Durvet Wormer Product Line Expansions
+  // Evidence: 6 products in database with "Wrm" abbreviations
+  // Database examples: "Durvet Liquid Wrm Dogs 2oz", "Durvet Tripwrm 12pk Chw", "Durvet Wrmeze Liquid 8oz"
+  // Screenshots: attached_assets/Screenshot 2025-11-24 172303_1764026965724.png
+  // Official site: https://www.durvet.com/
+  
+  // "Liquid Wrm" → "Liquid Wormer 2X"
+  // Official product: Liquid Wormer™ 2X (double strength)
+  const durvetLiquidWrmPattern = /\b(Durvet)\s+Liquid\s+Wrm\b/gi;
+  preProcessed = preProcessed.replace(durvetLiquidWrmPattern, "$1 Liquid Wormer 2X");
+  
+  // "Tripwrm" → "Triple Wormer"
+  // Official product: Triple Wormer® Chewable Tablets
+  const durvetTripwrmPattern = /\b(Durvet)\s+Tripwrm\b/gi;
+  preProcessed = preProcessed.replace(durvetTripwrmPattern, "$1 Triple Wormer");
+  
+  // "Wrmeze" → "Worm Ease"
+  // Official product: WormEze™ Liquid
+  const durvetWrmezePattern = /\b(Durvet)\s+(?:Feline\s+)?Wrmeze\b/gi;
+  preProcessed = preProcessed.replace(durvetWrmezePattern, (match, p1) => {
+    if (match.includes('Feline')) return `${p1} Feline Worm Ease`;
+    return `${p1} Worm Ease`;
+  });
+  
   // === BRAND-SPECIFIC PATTERN EXPANSIONS === 
   // IMPORTANT: Only patterns with VERIFIED evidence from actual database records are included
   // Speculative patterns removed per architect guidance - require SKU-level proof before adding
