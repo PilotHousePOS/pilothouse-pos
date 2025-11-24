@@ -14,7 +14,7 @@ A mobile-friendly web application for the "Animal House" pet store, aimed at enh
 - Grooming services: Only "Bath Only" and "Full Grooming" options
 - Mobile authentication consistency: Same account should show identical admin access across devices
 - Inventory Management: Full product names and descriptions preserved from Excel imports (no abbreviations)
-- Search Functionality: All searches (supplies, pets) with intelligent typo tolerance
+- Search Functionality: All searches (supplies, pets) with intelligent typo tolerance and brand expansion
   - Fuzzy Search: Auto-corrects typos and finds closest matches (70% similarity threshold)
   - Searches across name, brand, and description fields
   - Results sorted by relevance (exact matches first, then close matches)
@@ -22,6 +22,13 @@ A mobile-friendly web application for the "Animal House" pet store, aimed at enh
   - Search combines with category and filterType filters (AND logic)
   - Whitespace-only searches treated as empty searches
   - Search bars integrated into specialty pages (Aquatics, Reptiles) with pagination support
+  - Brand Name Expansion: Automatically maps abbreviated brand names to full names for better search results (server/brandNameExpansion.ts)
+    - Example: "Diamond" → finds products with "Diam" in name
+    - Example: "Blue Buffalo" → finds products with "Blue B"
+    - Example: "Primal" → finds products with "Prim", "Prim Fd", "Prim Kitr"
+    - Bidirectional mapping: Search works both ways (abbreviation → full name, full name → abbreviation)
+    - Always returns trimmed values to prevent whitespace regression bugs
+    - Integrated into both supply fuzzy search and pet search endpoints
 - Supply Filtering: Centralized, research-based filtering system with proper brand/keyword separation (server/filterConfig.ts):
   - Reptile supplies: ZooMed, Exo Terra, Zilla, Fluker's, ReptiCare brands + reptile keywords
   - Aquatic supplies: Hikari, Tetra, Aqueon, Marineland, API, Fluval, SeaChem, GloFish brands + aquatic keywords
