@@ -421,6 +421,145 @@ export async function expandAbbreviationsAsync(
   const frommCatBeefLivingPattern = /\b(Fromm)\s+Cat\s+Beef\s+Living\b/gi;
   preProcessed = preProcessed.replace(frommCatBeefLivingPattern, "$1 Cat Beef Frittata Veg");
   
+  // Blue Buffalo Product Line Expansions
+  // Reference: https://www.bluebuffalo.com/
+  
+  // "LP" → "Life Protection Formula"
+  const blueBuffaloLPPattern = /\b(Blue Buffalo|BB|Bl Buf)\s+LP\b/gi;
+  preProcessed = preProcessed.replace(blueBuffaloLPPattern, (match, brand) => `${brand} Life Protection Formula`);
+  
+  // "Wild" or "Wilderness" standalone after brand
+  const blueBuffaloWildPattern = /\b(Blue Buffalo|BB)\s+Wild(?!erness)\b/gi;
+  preProcessed = preProcessed.replace(blueBuffaloWildPattern, "$1 Wilderness");
+  
+  // "Gr Free" or "Freedom" → "Freedom"
+  const blueBuffaloFreedomPattern = /\b(Blue Buffalo|BB|Bl Buf)\s+Gr\s+Free\b/gi;
+  preProcessed = preProcessed.replace(blueBuffaloFreedomPattern, "$1 Freedom");
+  
+  // Taste of the Wild Product Line Expansions
+  // Reference: https://www.tasteofthewildpetfood.com/
+  
+  // "Hi Prair" → "High Prairie"
+  const totwHiPrairPattern = /\b(Taste of the Wild|TOW|Tow)\s+Hi\s+Prair\b/gi;
+  preProcessed = preProcessed.replace(totwHiPrairPattern, "$1 High Prairie");
+  
+  // "Pac Strm" → "Pacific Stream"
+  const totwPacStrmPattern = /\b(Taste of the Wild|TOW|Tow)\s+Pac\s+Strm\b/gi;
+  preProcessed = preProcessed.replace(totwPacStrmPattern, "$1 Pacific Stream");
+  
+  // "Gr Free" → "Grain Free" (context: after TOTW)
+  const totwGrFreePattern = /\b(Taste of the Wild|TOW|Tow)\s+Gr\s+Free\b/gi;
+  preProcessed = preProcessed.replace(totwGrFreePattern, "$1 Grain Free");
+  
+  // Merrick Product Line Expansions
+  // Reference: https://www.merrickpetcare.com/
+  
+  // "Clas" → "Classic"
+  const merrickClasPattern = /\b(Merrick)\s+Clas\b/gi;
+  preProcessed = preProcessed.replace(merrickClasPattern, "$1 Classic");
+  
+  // "Bckctry" → "Backcountry"
+  const merrickBckctryPattern = /\b(Merrick)\s+Bckctry\b/gi;
+  preProcessed = preProcessed.replace(merrickBckctryPattern, "$1 Backcountry");
+  
+  // "Gr Free" → "Grain Free" (context: after Merrick)
+  const merrickGrFreePattern = /\b(Merrick)\s+Gr\s+Free\b/gi;
+  preProcessed = preProcessed.replace(merrickGrFreePattern, "$1 Grain Free");
+  
+  // Pro Plan Product Line Expansions  
+  // Reference: https://www.purina.com/pro-plan
+  
+  // "Svr" → "Savor" (older branding, now "Complete Essentials")
+  const proPlanSvrPattern = /\b(Pro Plan|PP|Pr Pln)\s+Svr\b/gi;
+  preProcessed = preProcessed.replace(proPlanSvrPattern, "$1 Savor");
+  
+  // "Fcs" → "Focus" (older branding, now "Specialized")
+  const proPlanFcsPattern = /\b(Pro Plan|PP|Pr Pln)\s+Fcs\b/gi;
+  preProcessed = preProcessed.replace(proPlanFcsPattern, "$1 Focus");
+  
+  // "Sprt" → "Sport"
+  const proPlanSprtPattern = /\b(Pro Plan|PP|Pr Pln)\s+Sprt\b/gi;
+  preProcessed = preProcessed.replace(proPlanSprtPattern, "$1 Sport");
+  
+  // "Sen" → "Sensitive Skin & Stomach"
+  const proPlanSenPattern = /\b(Pro Plan|PP|Pr Pln)\s+Sen\b/gi;
+  preProcessed = preProcessed.replace(proPlanSenPattern, "$1 Sensitive Skin & Stomach");
+  
+  // Royal Canin Breed-Specific Expansions
+  // Reference: https://www.royalcanin.com/us/dogs/products/breed-health-nutrition
+  
+  // "Germ Shep" → "German Shepherd"
+  const royalCaninGermShepPattern = /\b(Royal Canin|RC|Ry Can)\s+Germ\s+Shep\b/gi;
+  preProcessed = preProcessed.replace(royalCaninGermShepPattern, "$1 German Shepherd");
+  
+  // "Gldn Retr" → "Golden Retriever"
+  const royalCaninGldnRetrPattern = /\b(Royal Canin|RC|Ry Can)\s+Gldn\s+Retr\b/gi;
+  preProcessed = preProcessed.replace(royalCaninGldnRetrPattern, "$1 Golden Retriever");
+  
+  // "Med" → "Medium" (when after Royal Canin)
+  const royalCaninMedPattern = /\b(Royal Canin|RC)\s+Med\b/gi;
+  preProcessed = preProcessed.replace(royalCaninMedPattern, "$1 Medium");
+  
+  // Science Diet / Hill's Prescription Diet Expansions
+  // Reference: https://www.hillspet.com/
+  
+  // "Indo" → "Indoor"
+  const scienceDietIndoPattern = /\b(Science Diet|SD|Sci Diet)\s+Indo\b/gi;
+  preProcessed = preProcessed.replace(scienceDietIndoPattern, "$1 Indoor");
+  
+  // Prescription Diet letter codes (a/d, b/d, c/d, etc.)
+  // Note: These are already handled well by the brand catalog, but adding context-aware expansion
+  // "/d" means "diet" in all Hill's Prescription Diet formulas
+  
+  // Wellness Product Line Expansions
+  // Reference: https://www.wellnesspetfood.com/
+  
+  // "CORE+" → "CORE+" (ensure proper capitalization)
+  const wellnessCorePattern = /\b(Wellness)\s+Core\b/gi;
+  preProcessed = preProcessed.replace(wellnessCorePattern, "$1 CORE");
+  
+  // "Comp Health" → "Complete Health"
+  const wellnessCompHealthPattern = /\b(Wellness)\s+Comp\s+Health\b/gi;
+  preProcessed = preProcessed.replace(wellnessCompHealthPattern, "$1 Complete Health");
+  
+  // Natural Balance Product Line Expansions
+  // Reference: https://www.naturalbalanceinc.com/
+  
+  // "LID" or "L.I.D." → "Limited Ingredient Diets"
+  const naturalBalanceLIDPattern = /\b(Natural Balance|Nat Balance)\s+L\.?I\.?D\.?\b/gi;
+  preProcessed = preProcessed.replace(naturalBalanceLIDPattern, "$1 Limited Ingredient Diets");
+  
+  // Orijen Product Line Expansions
+  // Reference: https://www.orijenpetfoods.com/
+  
+  // "Reg Red" → "Regional Red"
+  const orijenRegRedPattern = /\b(Orijen)\s+Reg\s+Red\b/gi;
+  preProcessed = preProcessed.replace(orijenRegRedPattern, "$1 Regional Red");
+  
+  // "Six Fish" remains "Six Fish" (already correct, but ensure proper capitalization)
+  
+  // Canidae Product Line Expansions
+  // Reference: https://canidae.com/
+  
+  // "ALS" → "All Life Stages"
+  const canidaeALSPattern = /\b(Canidae)\s+ALS\b/gi;
+  preProcessed = preProcessed.replace(canidaeALSPattern, "$1 All Life Stages");
+  
+  // "PURE" already correct - ensure capitalization
+  const canidaePurePattern = /\b(Canidae)\s+Pure\b/gi;
+  preProcessed = preProcessed.replace(canidaePurePattern, "$1 PURE");
+  
+  // Instinct Product Line Expansions
+  // Reference: https://instinctpetfood.com/
+  
+  // "Raw Bst" → "Raw Boost"
+  const instinctRawBoostPattern = /\b(Instinct)\s+Raw\s+Bst\b/gi;
+  preProcessed = preProcessed.replace(instinctRawBoostPattern, "$1 Raw Boost");
+  
+  // "Ult Protein" → "Ultimate Protein"
+  const instinctUltProteinPattern = /\b(Instinct)\s+Ult\s+Protein\b/gi;
+  preProcessed = preProcessed.replace(instinctUltProteinPattern, "$1 Ultimate Protein");
+  
   // Step 1: Try brand catalog expansion (research-backed, context-aware)
   const catalogResult = await expandProductName(storage, preProcessed);
   const catalogUsed = catalogResult !== preProcessed; // Track if catalog made changes
