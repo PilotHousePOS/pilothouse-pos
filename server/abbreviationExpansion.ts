@@ -382,9 +382,26 @@ export async function expandAbbreviationsAsync(
 ): Promise<{ expanded: string; catalogUsed: boolean }> {
   if (!text || typeof text !== 'string') return { expanded: '', catalogUsed: false };
   
+  // Step 0: Smart context-aware pattern expansion (Brand-specific fixes)
+  
+  // Nutrisource: "Grill" → "Grillin' Grillers"
+  // Handle "Nutrisource Grill [anything]" → "Nutrisource Grillin' Grillers [anything]"
+  // Uses negative lookahead to prevent matching "Grilled" or "Grills" or "Grillin'"
+  const nutrisourceGrillPattern = /\b(Nutrisource)\s+Grill(?!ed|s|in')\b/gi;
+  let preProcessed = text.replace(nutrisourceGrillPattern, "$1 Grillin' Grillers");
+  
+  // Fromm: "Pure Sniffers" or "Pu Sniffers" → "PurrSnickitty"
+  // Official Fromm product line for picky cats
+  // Reference: https://frommfamily.com/products/cat/purrsnickitty/
+  const frommPureSniffersPattern = /\b(Fromm)\s+Pure\s+Sniffers\b/gi;
+  preProcessed = preProcessed.replace(frommPureSniffersPattern, "$1 PurrSnickitty");
+  
+  const frommPuSniffersPattern = /\b(Fromm)\s+Pu\s+Sniffers\b/gi;
+  preProcessed = preProcessed.replace(frommPuSniffersPattern, "$1 PurrSnickitty");
+  
   // Step 1: Try brand catalog expansion (research-backed, context-aware)
-  const catalogResult = await expandProductName(storage, text);
-  const catalogUsed = catalogResult !== text; // Track if catalog made changes
+  const catalogResult = await expandProductName(storage, preProcessed);
+  const catalogUsed = catalogResult !== preProcessed; // Track if catalog made changes
   
   // Step 2: Fall back to generic abbreviation expansion
   // Fix spacing issues first
