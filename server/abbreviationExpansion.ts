@@ -816,6 +816,12 @@ export async function expandAbbreviationsAsync(
   // IMPORTANT: Only patterns with VERIFIED evidence from actual database records are included
   // Speculative patterns removed per architect guidance - require SKU-level proof before adding
   //
+  // REVERTED (Nov 24, 2025) - Pending evidence-first verification with packaging photos:
+  //   - Blue B → Blue Buffalo (conflicted with evidence-first workflow - need packaging verification)
+  //   - Diam → Diamond (risk of corrupting diameter measurements - need official product names)
+  //   - Prim Fd → Primal Freeze Dried (need official website confirmation)
+  //   - Prim Kitr → Primal Kitten (FAILED: creates "Primal Kitten Puppy" - need disambiguation logic)
+  //
   // REMOVED (Nov 24, 2024) - Pending evidence-first verification:
   //   - Fromm Gold Ancient Grains patterns (need specific SKU list from production)
   //   - Fromm Classic/Four-Star wet food patterns (need can size + variant proof)
