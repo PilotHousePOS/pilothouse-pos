@@ -453,12 +453,12 @@ export async function expandAbbreviationsAsync(
   // Beef recipes - CAT vs DOG distinction is critical!
   // For CATS: "Beef Liváttini Veg" (official Four-Star cat food)
   // For DOGS: "Beef Frittata Veg" (official Four-Star dog food)
-  // Match CAT versions and convert to correct name - must match full string including Vegetable
-  const frommCatBeefPattern = /\b(Fromm)\s+Cat\s+Beef\s+(?:Liváttini|Frittata|Frit)(?:\s+Vegetable|\s+Veg)?\b/gi;
+  // Match CAT versions and convert to correct name - REQUIRE Vegetable/Veg in pattern
+  const frommCatBeefPattern = /\b(Fromm)\s+Cat\s+Beef\s+(?:Liváttini|Frittata|Frit)\s+Veg(?:etable)?\b/gi;
   preProcessed = preProcessed.replace(frommCatBeefPattern, "$1 Cat Beef Liváttini Veg");
   
-  // Match DOG versions (without "Cat") and standardize
-  const frommDogBeefPattern = /\b(Fromm)\s+Beef\s+Frit(?:tata)?(?:\s+Vegetable|\s+Veg)?\b/gi;
+  // Match DOG versions (without "Cat") and standardize - REQUIRE Vegetable/Veg in pattern
+  const frommDogBeefPattern = /\b(Fromm)\s+Beef\s+Frit(?:tata)?\s+Veg(?:etable)?\b/gi;
   preProcessed = preProcessed.replace(frommDogBeefPattern, "$1 Beef Frittata Veg");
   
   // "Chicken Au From" → "Chicken Au Frommage" (PurrSnickety)
@@ -497,12 +497,12 @@ export async function expandAbbreviationsAsync(
   // Taste of the Wild Product Line Expansions
   // Reference: https://www.tasteofthewildpetfood.com/
   
-  // "Hi Prair" → "High Prairie"
-  const totwHiPrairPattern = /\b(Taste of the Wild|TOW|Tow)\s+Hi\s+Prair\b/gi;
+  // "Hi Prair" or "High Prai" → "High Prairie"
+  const totwHiPrairPattern = /\b(Taste of the Wild|TOW|Tow)\s+Hi(?:gh)?\s+Prai(?:r(?:ie)?)?\b/gi;
   preProcessed = preProcessed.replace(totwHiPrairPattern, "$1 High Prairie");
   
-  // "Pac Strm" → "Pacific Stream"
-  const totwPacStrmPattern = /\b(Taste of the Wild|TOW|Tow)\s+Pac\s+Strm\b/gi;
+  // "Pac Strm" or "Pacif Stream" → "Pacific Stream"
+  const totwPacStrmPattern = /\b(Taste of the Wild|TOW|Tow)\s+Pac(?:if)?\s+Str(?:m|eam)\b/gi;
   preProcessed = preProcessed.replace(totwPacStrmPattern, "$1 Pacific Stream");
   
   // "Gr Free" → "Grain Free" (context: after TOTW)
@@ -701,6 +701,26 @@ export async function expandAbbreviationsAsync(
   const scienceDietOralCarePattern = /\b(Science Diet|SD)\s+Oral\s+Care\b/gi;
   preProcessed = preProcessed.replace(scienceDietOralCarePattern, "$1 Oral Care");
   
+  // "Hairba" → "Hairball Control"
+  const scienceDietHairbaPattern = /\b(Science Diet|SD)\s+Cat\s+Hairba\b/gi;
+  preProcessed = preProcessed.replace(scienceDietHairbaPattern, "$1 Cat Hairball Control");
+  
+  // "Heal Cuis" → "Healthy Cuisine"
+  const scienceDietHealCuisPattern = /\b(Science Diet|SD)\s+(?:Cat\s+|Kitten\s+)?Heal\s+Cuis\b/gi;
+  preProcessed = preProcessed.replace(scienceDietHealCuisPattern, (match, p1) => {
+    if (match.includes('Cat')) return `${p1} Cat Healthy Cuisine`;
+    if (match.includes('Kitten')) return `${p1} Kitten Healthy Cuisine`;
+    return `${p1} Healthy Cuisine`;
+  });
+  
+  // "Urin" or "Urina" → "Urinary & Hairball Control"
+  const scienceDietUrinPattern = /\b(Science Diet|SD)\s+Cat\s+Urin(?:a)?\b/gi;
+  preProcessed = preProcessed.replace(scienceDietUrinPattern, "$1 Cat Urinary & Hairball Control");
+  
+  // "Cast" → context unclear, possibly "Castrated" or typo for "Cat" - need to verify in database
+  const scienceDietCastPattern = /\b(Science Diet|SD)\s+Cast\s+/gi;
+  preProcessed = preProcessed.replace(scienceDietCastPattern, "$1 Cat ");
+  
   // Wellness Additional Patterns
   const wellnessCOREPlusPattern = /\b(Wellness)\s+CORE\s*\+\b/gi;
   preProcessed = preProcessed.replace(wellnessCOREPlusPattern, "$1 CORE+");
@@ -732,6 +752,14 @@ export async function expandAbbreviationsAsync(
   preProcessed = preProcessed.replace(orijenTundraPattern, "$1 Tundra");
   const orijenFitTrimPattern = /\b(Orijen)\s+Fit\s+&?\s*Trim\b/gi;
   preProcessed = preProcessed.replace(orijenFitTrimPattern, "$1 Fit & Trim");
+  
+  // "Region" → "Regional Red" (confirmed from official Orijen website)
+  const orijenRegionPattern = /\b(Orijen)\s+Region(?!\s+Red|\s+al)\b/gi;
+  preProcessed = preProcessed.replace(orijenRegionPattern, "$1 Regional Red");
+  
+  // "Wi Re" → "Wild Reserve" (confirmed from official Orijen website - Wild Reserve, Kitten Recipe)
+  const orijenWiRePattern = /\b(Orijen)\s+Wi\s+Re\b/gi;
+  preProcessed = preProcessed.replace(orijenWiRePattern, "$1 Wild Reserve");
   
   // Step 1: Try brand catalog expansion (research-backed, context-aware)
   const catalogResult = await expandProductName(storage, preProcessed);
