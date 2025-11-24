@@ -406,9 +406,10 @@ export async function expandAbbreviationsAsync(
   const frommPuSniffersPattern = /\b(Fromm)\s+Pu\s+Sniffers\b/gi;
   preProcessed = preProcessed.replace(frommPuSniffersPattern, "$1 PurrSnickety");
   
-  // "Cat Game" or "Game Bird" → "Game Bird Grandeur" (PurrSnickety)
-  const frommGameBirdPattern = /\b(Fromm)\s+(Cat\s+)?Game\s+Bird(?!\s+Grandeur)\b/gi;
-  preProcessed = preProcessed.replace(frommGameBirdPattern, "$1 Game Bird Grandeur");
+  // "Cat Game" or "Game Bird" → "Game Bird Recipe" (Four-Star)
+  // Official name is "Game Bird Recipe" NOT "Game Bird Grandeur"
+  const frommGameBirdPattern = /\b(Fromm)\s+(Cat\s+)?Game\s+Bird(?!\s+Recipe)\b/gi;
+  preProcessed = preProcessed.replace(frommGameBirdPattern, (match, p1, p2) => `${p1} ${p2 || ''}Game Bird Recipe`);
   
   // "Chk Del" or "Chicken Del" → "Chicken Delight" (PurrSnickety)
   const frommChickenDelightPattern = /\b(Fromm)\s+(Chk|Chicken)\s+Del\b/gi;
@@ -445,18 +446,25 @@ export async function expandAbbreviationsAsync(
   const frommSalmonVegetablePattern = /\b(Fromm)\s+(Cat\s+)?Salmon\s+Vegetable\b/gi;
   preProcessed = preProcessed.replace(frommSalmonVegetablePattern, (match, p1, p2) => `${p1} ${p2 || ''}Salmon À La Veg`);
   
-  // Matches: "Beef Frittata Vegetable", "Beef Frit", "Beef Frittata" → "Beef Frittata Veg"
-  // Preserves optional "Cat" prefix
-  const frommBeefFritPattern = /\b(Fromm)\s+(Cat\s+)?Beef\s+Frit(?:tata)?(?:\s+Veg(?:etable)?)?(?!\s+Veg\b)/gi;
-  preProcessed = preProcessed.replace(frommBeefFritPattern, (match, p1, p2) => `${p1} ${p2 || ''}Beef Frittata Veg`);
+  // Beef recipes - CAT vs DOG distinction is critical!
+  // For CATS: "Beef Liváttini Veg" (official Four-Star cat food)
+  // For DOGS: "Beef Frittata Veg" (official Four-Star dog food)
+  // Match CAT versions and convert to correct name
+  const frommCatBeefPattern = /\b(Fromm)\s+Cat\s+Beef\s+(?:Frittata|Frit)(?:\s+Veg(?:etable)?)?\b/gi;
+  preProcessed = preProcessed.replace(frommCatBeefPattern, "$1 Cat Beef Liváttini Veg");
+  
+  // Match DOG versions (without "Cat") and standardize
+  const frommDogBeefPattern = /\b(Fromm)\s+Beef\s+Frit(?:tata)?(?:\s+Veg(?:etable)?)?\b/gi;
+  preProcessed = preProcessed.replace(frommDogBeefPattern, "$1 Beef Frittata Veg");
   
   // "Chicken Au From" → "Chicken Au Frommage" (PurrSnickety)
   // Preserves optional "Cat" prefix
   const frommChickenAuFromPattern = /\b(Fromm)\s+(Cat\s+)?Chicken\s+Au\s+From(?!mage)\b/gi;
   preProcessed = preProcessed.replace(frommChickenAuFromPattern, (match, p1, p2) => `${p1} ${p2 || ''}Chicken Au Frommage`);
   
-  // "Cat Surf" or "Surf" → "Surf & Turf" (Four-Star)
-  const frommSurfPattern = /\b(Fromm)\s+Cat\s+Surf\b/gi;
+  // "Cat Surf" → "Cat Surf & Turf" (Four-Star)
+  // Use negative lookahead to prevent matching if "& Turf" already exists
+  const frommSurfPattern = /\b(Fromm)\s+Cat\s+Surf(?!\s+&\s+Turf)\b/gi;
   preProcessed = preProcessed.replace(frommSurfPattern, "$1 Cat Surf & Turf");
   
   // "Cat Saslm" → "Cat Salmon" (typo fix)
