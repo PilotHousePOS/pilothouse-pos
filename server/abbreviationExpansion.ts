@@ -442,6 +442,10 @@ export async function expandAbbreviationsAsync(
   const frommPuSniffersPattern = /\b(Fromm)\s+Pu\s+Sniffers\b/gi;
   preProcessed = preProcessed.replace(frommPuSniffersPattern, "$1 PurrSnickety");
   
+  // Fix common misspelling: "PurrSnickitty" → "PurrSnickety"
+  const frommPurrSnickittyPattern = /\b(Fromm)\s+PurrSnickitty\b/gi;
+  preProcessed = preProcessed.replace(frommPurrSnickittyPattern, "$1 PurrSnickety");
+  
   // "Cat Game" or "Game Bird" → "Game Bird Recipe" (Four-Star)
   // Official name is "Game Bird Recipe" NOT "Game Bird Grandeur"
   // First remove "Grandeur" if it exists, then add "Recipe" if missing
