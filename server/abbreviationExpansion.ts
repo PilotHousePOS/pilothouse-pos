@@ -427,7 +427,7 @@ export async function expandAbbreviationsAsync(
   // Preserves optional "Cat" prefix - matches both dog and cat formulas
   
   // VARIATION 1: With "a La" - Matches: "Duck a La Vegetable", "Duck A La Veg", "Duck À La Veg" → "Duck À La Veg"
-  const frommDuckALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Duck\s+[AÀa]\s+La\s+Veg(?:etable)?\b/gi;
+  const frommDuckALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Duck\s+[AÀa]\s+La\s+(?:Veg|Vegetable)\b/gi;
   preProcessed = preProcessed.replace(frommDuckALaVegPattern, (match, p1, p2) => `${p1} ${p2 || ''}Duck À La Veg`);
   
   // VARIATION 2: Without "a La" - Matches: "Duck Vegetable" (missing "a La") → "Duck À La Veg"
@@ -435,7 +435,7 @@ export async function expandAbbreviationsAsync(
   preProcessed = preProcessed.replace(frommDuckVegetablePattern, (match, p1, p2) => `${p1} ${p2 || ''}Duck À La Veg`);
   
   // VARIATION 1: With "a La" - Matches: "Chicken a La Vegetable", "Chicken A La Veg", "Chicken À La Veg" → "Chicken À La Veg"
-  const frommChickenALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Chicken\s+[AÀa]\s+La\s+Veg(?:etable)?\b/gi;
+  const frommChickenALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Chicken\s+[AÀa]\s+La\s+(?:Veg|Vegetable)\b/gi;
   preProcessed = preProcessed.replace(frommChickenALaVegPattern, (match, p1, p2) => `${p1} ${p2 || ''}Chicken À La Veg`);
   
   // VARIATION 2: Without "a La" - Matches: "Chicken Vegetable" (missing "a La") → "Chicken À La Veg"
@@ -443,7 +443,7 @@ export async function expandAbbreviationsAsync(
   preProcessed = preProcessed.replace(frommChickenVegetablePattern, (match, p1, p2) => `${p1} ${p2 || ''}Chicken À La Veg`);
   
   // VARIATION 1: With "a La" - Matches: "Salmon a La Vegetable", "Salmon A La Veg", "Salmon À La Veg" → "Salmon À La Veg"
-  const frommSalmonALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Salmon\s+[AÀa]\s+La\s+Veg(?:etable)?\b/gi;
+  const frommSalmonALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Salmon\s+[AÀa]\s+La\s+(?:Veg|Vegetable)\b/gi;
   preProcessed = preProcessed.replace(frommSalmonALaVegPattern, (match, p1, p2) => `${p1} ${p2 || ''}Salmon À La Veg`);
   
   // VARIATION 2: Without "a La" - Matches: "Salmon Vegetable" (missing "a La") → "Salmon À La Veg"
@@ -453,12 +453,12 @@ export async function expandAbbreviationsAsync(
   // Beef recipes - CAT vs DOG distinction is critical!
   // For CATS: "Beef Liváttini Veg" (official Four-Star cat food)
   // For DOGS: "Beef Frittata Veg" (official Four-Star dog food)
-  // Match CAT versions and convert to correct name - REQUIRE Vegetable/Veg in pattern
-  const frommCatBeefPattern = /\b(Fromm)\s+Cat\s+Beef\s+(?:Liváttini|Frittata|Frit)\s+Veg(?:etable)?\b/gi;
+  // Match CAT versions and convert to correct name - match either Veg OR Vegetable
+  const frommCatBeefPattern = /\b(Fromm)\s+Cat\s+Beef\s+(?:Liváttini|Frittata|Frit)\s+(?:Veg|Vegetable)\b/gi;
   preProcessed = preProcessed.replace(frommCatBeefPattern, "$1 Cat Beef Liváttini Veg");
   
-  // Match DOG versions (without "Cat") and standardize - REQUIRE Vegetable/Veg in pattern
-  const frommDogBeefPattern = /\b(Fromm)\s+Beef\s+Frit(?:tata)?\s+Veg(?:etable)?\b/gi;
+  // Match DOG versions (without "Cat") and standardize - match either Veg OR Vegetable
+  const frommDogBeefPattern = /\b(Fromm)\s+Beef\s+Frit(?:tata)?\s+(?:Veg|Vegetable)\b/gi;
   preProcessed = preProcessed.replace(frommDogBeefPattern, "$1 Beef Frittata Veg");
   
   // "Chicken Au From" → "Chicken Au Frommage" (PurrSnickety)
@@ -636,7 +636,7 @@ export async function expandAbbreviationsAsync(
   // Regular Line abbreviations
   const totwAppalPattern = /\b(Taste of the Wild)\s+Appal\b/gi;
   preProcessed = preProcessed.replace(totwAppalPattern, "$1 Appalachian");
-  const totwSierMountPattern = /\b(Taste of the Wild)\s+Sier\s+Mount\b/gi;
+  const totwSierMountPattern = /\b(Taste of the Wild)\s+Sier(?:ra)?\s+Mount\b/gi;
   preProcessed = preProcessed.replace(totwSierMountPattern, "$1 Sierra Mountain");
   const totwSierraMtnPattern = /\b(Taste of the Wild|TOW|Tow)\s+Sie?rra?\s+Mtn\b/gi;
   preProcessed = preProcessed.replace(totwSierraMtnPattern, "$1 Sierra Mountain");
