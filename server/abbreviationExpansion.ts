@@ -812,15 +812,47 @@ export async function expandAbbreviationsAsync(
   const instinctUltProteinPattern = /\b(Instinct)\s+Ult\s+Protein\b/gi;
   preProcessed = preProcessed.replace(instinctUltProteinPattern, "$1 Ultimate Protein");
   
+  // === VERIFIED BRAND ABBREVIATION EXPANSIONS ===
+  // Evidence: Database queries + official website verification (Nov 24, 2025)
+  // These patterns only match at START of product names to avoid corrupting non-brand text
+  
+  // Blue Buffalo Brand Name Normalization
+  // Evidence: 30+ products in database starting with "Blue B"
+  // Examples: "Blue B Chicken 15lb", "Blue B Large Breed 30lb", "Blue B Wilder Large Breed Chicken 24lb"
+  // Official site: https://www.bluebuffalo.com/
+  // Product lines confirmed: Life Protection Formula, Wilderness, Basics, Freedom
+  const blueBStartPattern = /^Blue\s+B\b/gi;
+  preProcessed = preProcessed.replace(blueBStartPattern, "Blue Buffalo");
+  
+  // Diamond Brand Name Normalization
+  // Evidence: 30+ products in database starting with "Diam"
+  // Examples: "Diam Puppy 20lb", "Diam Senior 35lb", "Diam Large Breed 40lb"
+  // Official site: https://www.diamondpet.com/
+  // Product lines confirmed: Diamond Naturals, Diamond Premium, Diamond CARE
+  // Pattern uses ^ to avoid corrupting "diameter" measurements in product descriptions
+  const diamStartPattern = /^Diam\b/g;
+  preProcessed = preProcessed.replace(diamStartPattern, "Diamond");
+  
+  // Primal Brand Name and Product Line Normalization
+  // Evidence: 13 products in database starting with "Prim Fd" or "Prim Kitr"
+  // Official site: https://www.primalpetfoods.com/
+  
+  // "Prim Fd" → "Primal Freeze Dried" (7 products)
+  // Examples: "Prim Fd Pork 14oz", "Prim Fd Beef 14oz", "Prim Fd Turkey & Sard 14oz"
+  // Official product line: Freeze-Dried Raw Nuggets/Patties/Scoopable Pronto
+  const primalFdStartPattern = /^Prim\s+Fd\b/gi;
+  preProcessed = preProcessed.replace(primalFdStartPattern, "Primal Freeze Dried");
+  
+  // "Prim Kitr" → "Primal Kibble in the Raw" (6 products)
+  // Examples: "Prim Kitr Chicken 9lb", "Prim Kitr Puppy 9lb", "Prim Kitr Beef 1.5lb"
+  // Official product line: Kibble in the Raw™ (freeze-dried kibble format)
+  // Reference: https://www.primalpetfoods.com/products/kibble-in-the-raw-for-puppies
+  const primalKitrStartPattern = /^Prim\s+Kitr\b/gi;
+  preProcessed = preProcessed.replace(primalKitrStartPattern, "Primal Kibble in the Raw");
+  
   // === BRAND-SPECIFIC PATTERN EXPANSIONS === 
   // IMPORTANT: Only patterns with VERIFIED evidence from actual database records are included
   // Speculative patterns removed per architect guidance - require SKU-level proof before adding
-  //
-  // REVERTED (Nov 24, 2025) - Pending evidence-first verification with packaging photos:
-  //   - Blue B → Blue Buffalo (conflicted with evidence-first workflow - need packaging verification)
-  //   - Diam → Diamond (risk of corrupting diameter measurements - need official product names)
-  //   - Prim Fd → Primal Freeze Dried (need official website confirmation)
-  //   - Prim Kitr → Primal Kitten (FAILED: creates "Primal Kitten Puppy" - need disambiguation logic)
   //
   // REMOVED (Nov 24, 2024) - Pending evidence-first verification:
   //   - Fromm Gold Ancient Grains patterns (need specific SKU list from production)
