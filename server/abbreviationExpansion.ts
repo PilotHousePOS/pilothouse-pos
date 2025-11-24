@@ -384,10 +384,11 @@ export async function expandAbbreviationsAsync(
   
   // Step 0: Smart context-aware pattern expansion (Brand-specific fixes)
   
-  // Fix "Crispy Crip" → "Crispy" (prevent duplication when expanding "Crip" to "Crisp")
-  // Handle cases like "Nutrisource Crispy Crip Lamb" → "Nutrisource Crispy Lamb"
-  const crispyCripPattern = /\b(Crispy)\s+Crip\b/gi;
-  let preProcessed = text.replace(crispyCripPattern, "$1");
+  // Nutrisource: "Crispy Crip" → "Crispy Crispers"
+  // Handle "Nutrisource Crispy Crip Lamb" → "Nutrisource Crispy Crispers Lamb"
+  // Reference: https://nutrisourcepetfoods.com/our-food/chicken-duck-crispy-crispers/
+  const nutrisourceCrispyCripPattern = /\b(Nutrisource)\s+Crispy\s+Crip\b/gi;
+  let preProcessed = text.replace(nutrisourceCrispyCripPattern, "$1 Crispy Crispers");
   
   // Nutrisource: "Grill" → "Grillin' Grillers"
   // Handle "Nutrisource Grill [anything]" → "Nutrisource Grillin' Grillers [anything]"
