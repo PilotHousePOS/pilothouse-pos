@@ -112,7 +112,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Ven': 'Venison',
   'Be': 'Beef',
   'Bef': 'Beef',
-  // 'Veg': 'Vegetable',  // REMOVED - Conflicts with Fromm "À La Veg" patterns (Veg is the CORRECT short form, not an abbreviation)
+  'Veg': 'Vegetable',  // Restored - will be conditionally skipped for Fromm products
   'Bar': 'Barley',
   'Pumpk': 'Pumpkin',
   'Sw Pot': 'Sweet Potato',
@@ -370,6 +370,36 @@ export function expandAbbreviations(text: string | null | undefined, storage?: I
 }
 
 /**
+ * Expansion context for brand-aware abbreviation handling
+ * Protects brand-validated tokens from generic expansion
+ */
+interface ExpansionContext {
+  resolvedBrand: string | null;
+  protectedTokens: Set<string>;
+}
+
+/**
+ * Detect brand from product name
+ * @param text - Product name/description
+ * @returns Brand name or null
+ */
+function detectBrand(text: string): string | null {
+  const brandPatterns = [
+    'Fromm', 'Nutrisource', 'Blue Buffalo', 'Taste of the Wild',
+    'Science Diet', 'Orijen', 'Merrick', 'Royal Canin', 'Wellness',
+    'Natural Balance', 'Canidae', 'Instinct'
+  ];
+  
+  for (const brand of brandPatterns) {
+    if (new RegExp(`\\b${brand}\\b`, 'i').test(text)) {
+      return brand;
+    }
+  }
+  
+  return null;
+}
+
+/**
  * Async version: Expands abbreviations using brand catalog FIRST, then generic fallback
  * This is the preferred method for new code
  * @param text - Text to expand abbreviations in
@@ -381,6 +411,12 @@ export async function expandAbbreviationsAsync(
   storage: IStorage
 ): Promise<{ expanded: string; catalogUsed: boolean }> {
   if (!text || typeof text !== 'string') return { expanded: '', catalogUsed: false };
+  
+  // Initialize expansion context
+  const context: ExpansionContext = {
+    resolvedBrand: detectBrand(text),
+    protectedTokens: new Set<string>()
+  };
   
   // Step 0: Smart context-aware pattern expansion (Brand-specific fixes)
   
@@ -425,29 +461,54 @@ export async function expandAbbreviationsAsync(
   
   // À La Veg Recipes (Four-Star) - handles both with and without accent marks
   // Preserves optional "Cat" prefix - matches both dog and cat formulas
+  // IMPORTANT: After these patterns, "Veg" is the official short form (NOT an abbreviation to expand)
   
   // VARIATION 1: With "a La" - Matches: "Duck a La Vegetable", "Duck A La Veg", "Duck À La Veg" → "Duck À La Veg"
   const frommDuckALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Duck\s+[AÀa]\s+La\s+(?:Veg|Vegetable)\b/gi;
+  if (frommDuckALaVegPattern.test(preProcessed)) {
+    context.protectedTokens.add('Veg'); // Protect "Veg" from generic expansion
+    frommDuckALaVegPattern.lastIndex = 0; // Reset regex after test
+  }
   preProcessed = preProcessed.replace(frommDuckALaVegPattern, (match, p1, p2) => `${p1} ${p2 || ''}Duck À La Veg`);
   
   // VARIATION 2: Without "a La" - Matches: "Duck Vegetable" (missing "a La") → "Duck À La Veg"
   const frommDuckVegetablePattern = /\b(Fromm)\s+(Cat\s+)?Duck\s+Vegetable\b/gi;
+  if (frommDuckVegetablePattern.test(preProcessed)) {
+    context.protectedTokens.add('Veg'); // Protect "Veg" from generic expansion
+    frommDuckVegetablePattern.lastIndex = 0;
+  }
   preProcessed = preProcessed.replace(frommDuckVegetablePattern, (match, p1, p2) => `${p1} ${p2 || ''}Duck À La Veg`);
   
   // VARIATION 1: With "a La" - Matches: "Chicken a La Vegetable", "Chicken A La Veg", "Chicken À La Veg" → "Chicken À La Veg"
   const frommChickenALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Chicken\s+[AÀa]\s+La\s+(?:Veg|Vegetable)\b/gi;
+  if (frommChickenALaVegPattern.test(preProcessed)) {
+    context.protectedTokens.add('Veg');
+    frommChickenALaVegPattern.lastIndex = 0;
+  }
   preProcessed = preProcessed.replace(frommChickenALaVegPattern, (match, p1, p2) => `${p1} ${p2 || ''}Chicken À La Veg`);
   
   // VARIATION 2: Without "a La" - Matches: "Chicken Vegetable" (missing "a La") → "Chicken À La Veg"
   const frommChickenVegetablePattern = /\b(Fromm)\s+(Cat\s+)?Chicken\s+Vegetable\b/gi;
+  if (frommChickenVegetablePattern.test(preProcessed)) {
+    context.protectedTokens.add('Veg');
+    frommChickenVegetablePattern.lastIndex = 0;
+  }
   preProcessed = preProcessed.replace(frommChickenVegetablePattern, (match, p1, p2) => `${p1} ${p2 || ''}Chicken À La Veg`);
   
   // VARIATION 1: With "a La" - Matches: "Salmon a La Vegetable", "Salmon A La Veg", "Salmon À La Veg" → "Salmon À La Veg"
   const frommSalmonALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Salmon\s+[AÀa]\s+La\s+(?:Veg|Vegetable)\b/gi;
+  if (frommSalmonALaVegPattern.test(preProcessed)) {
+    context.protectedTokens.add('Veg');
+    frommSalmonALaVegPattern.lastIndex = 0;
+  }
   preProcessed = preProcessed.replace(frommSalmonALaVegPattern, (match, p1, p2) => `${p1} ${p2 || ''}Salmon À La Veg`);
   
   // VARIATION 2: Without "a La" - Matches: "Salmon Vegetable" (missing "a La") → "Salmon À La Veg"
   const frommSalmonVegetablePattern = /\b(Fromm)\s+(Cat\s+)?Salmon\s+Vegetable\b/gi;
+  if (frommSalmonVegetablePattern.test(preProcessed)) {
+    context.protectedTokens.add('Veg');
+    frommSalmonVegetablePattern.lastIndex = 0;
+  }
   preProcessed = preProcessed.replace(frommSalmonVegetablePattern, (match, p1, p2) => `${p1} ${p2 || ''}Salmon À La Veg`);
   
   // Beef recipes - CAT vs DOG distinction is critical!
@@ -455,10 +516,18 @@ export async function expandAbbreviationsAsync(
   // For DOGS: "Beef Frittata Veg" (official Four-Star dog food)
   // Match CAT versions and convert to correct name - match either Veg OR Vegetable
   const frommCatBeefPattern = /\b(Fromm)\s+Cat\s+Beef\s+(?:Liváttini|Frittata|Frit)\s+(?:Veg|Vegetable)\b/gi;
+  if (frommCatBeefPattern.test(preProcessed)) {
+    context.protectedTokens.add('Veg');
+    frommCatBeefPattern.lastIndex = 0;
+  }
   preProcessed = preProcessed.replace(frommCatBeefPattern, "$1 Cat Beef Liváttini Veg");
   
   // Match DOG versions (without "Cat") and standardize - match either Veg OR Vegetable
   const frommDogBeefPattern = /\b(Fromm)\s+Beef\s+Frit(?:tata)?\s+(?:Veg|Vegetable)\b/gi;
+  if (frommDogBeefPattern.test(preProcessed)) {
+    context.protectedTokens.add('Veg');
+    frommDogBeefPattern.lastIndex = 0;
+  }
   preProcessed = preProcessed.replace(frommDogBeefPattern, "$1 Beef Frittata Veg");
   
   // "Chicken Au From" → "Chicken Au Frommage" (PurrSnickety)
@@ -812,7 +881,13 @@ export async function expandAbbreviationsAsync(
   }
   
   // Expand other abbreviations (whole word matches)
+  // Skip protected tokens to prevent overriding brand-specific terms
   for (const [abbrev, expansion] of Object.entries(ABBREVIATION_MAPPINGS)) {
+    // Skip if this token is protected by brand-specific patterns
+    if (context.protectedTokens.has(abbrev)) {
+      continue;
+    }
+    
     const regex = new RegExp(`\\b${abbrev}\\b`, 'gi');
     result = result.replace(regex, expansion);
   }
