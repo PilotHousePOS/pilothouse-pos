@@ -112,7 +112,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Ven': 'Venison',
   'Be': 'Beef',
   'Bef': 'Beef',
-  'Veg': 'Vegetable',
+  // 'Veg': 'Vegetable',  // REMOVED - Conflicts with Fromm "À La Veg" patterns (Veg is the CORRECT short form, not an abbreviation)
   'Bar': 'Barley',
   'Pumpk': 'Pumpkin',
   'Sw Pot': 'Sweet Potato',
