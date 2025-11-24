@@ -420,21 +420,34 @@ export async function expandAbbreviationsAsync(
   
   // À La Veg Recipes (Four-Star) - handles both with and without accent marks
   // Preserves optional "Cat" prefix - matches both dog and cat formulas
-  // "Duck A La Veg" → "Duck À La Veg" OR "Cat Duck A La Veg" → "Cat Duck À La Veg"
-  const frommDuckALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Duck\s+[AÀ]\s+La\s+Veg\b/gi;
+  
+  // VARIATION 1: With "a La" - Matches: "Duck a La Vegetable", "Duck A La Veg", "Duck À La Veg" → "Duck À La Veg"
+  const frommDuckALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Duck\s+[AÀa]\s+La\s+Veg(?:etable)?\b/gi;
   preProcessed = preProcessed.replace(frommDuckALaVegPattern, (match, p1, p2) => `${p1} ${p2 || ''}Duck À La Veg`);
   
-  // "Chicken A La Veg" → "Chicken À La Veg" OR "Cat Chicken A La Veg" → "Cat Chicken À La Veg"
-  const frommChickenALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Chicken\s+[AÀ]\s+La\s+Veg\b/gi;
+  // VARIATION 2: Without "a La" - Matches: "Duck Vegetable" (missing "a La") → "Duck À La Veg"
+  const frommDuckVegetablePattern = /\b(Fromm)\s+(Cat\s+)?Duck\s+Vegetable\b/gi;
+  preProcessed = preProcessed.replace(frommDuckVegetablePattern, (match, p1, p2) => `${p1} ${p2 || ''}Duck À La Veg`);
+  
+  // VARIATION 1: With "a La" - Matches: "Chicken a La Vegetable", "Chicken A La Veg", "Chicken À La Veg" → "Chicken À La Veg"
+  const frommChickenALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Chicken\s+[AÀa]\s+La\s+Veg(?:etable)?\b/gi;
   preProcessed = preProcessed.replace(frommChickenALaVegPattern, (match, p1, p2) => `${p1} ${p2 || ''}Chicken À La Veg`);
   
-  // "Salmon A La Veg" → "Salmon À La Veg" OR "Cat Salmon A La Veg" → "Cat Salmon À La Veg"
-  const frommSalmonALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Salmon\s+[AÀ]\s+La\s+Veg\b/gi;
+  // VARIATION 2: Without "a La" - Matches: "Chicken Vegetable" (missing "a La") → "Chicken À La Veg"
+  const frommChickenVegetablePattern = /\b(Fromm)\s+(Cat\s+)?Chicken\s+Vegetable\b/gi;
+  preProcessed = preProcessed.replace(frommChickenVegetablePattern, (match, p1, p2) => `${p1} ${p2 || ''}Chicken À La Veg`);
+  
+  // VARIATION 1: With "a La" - Matches: "Salmon a La Vegetable", "Salmon A La Veg", "Salmon À La Veg" → "Salmon À La Veg"
+  const frommSalmonALaVegPattern = /\b(Fromm)\s+(Cat\s+)?Salmon\s+[AÀa]\s+La\s+Veg(?:etable)?\b/gi;
   preProcessed = preProcessed.replace(frommSalmonALaVegPattern, (match, p1, p2) => `${p1} ${p2 || ''}Salmon À La Veg`);
   
-  // "Beef Frit" or "Beef Frittata" → "Beef Frittata Veg"
+  // VARIATION 2: Without "a La" - Matches: "Salmon Vegetable" (missing "a La") → "Salmon À La Veg"
+  const frommSalmonVegetablePattern = /\b(Fromm)\s+(Cat\s+)?Salmon\s+Vegetable\b/gi;
+  preProcessed = preProcessed.replace(frommSalmonVegetablePattern, (match, p1, p2) => `${p1} ${p2 || ''}Salmon À La Veg`);
+  
+  // Matches: "Beef Frittata Vegetable", "Beef Frit", "Beef Frittata" → "Beef Frittata Veg"
   // Preserves optional "Cat" prefix
-  const frommBeefFritPattern = /\b(Fromm)\s+(Cat\s+)?Beef\s+Frit(?:tata)?(?!\s+Veg)\b/gi;
+  const frommBeefFritPattern = /\b(Fromm)\s+(Cat\s+)?Beef\s+Frit(?:tata)?(?:\s+Veg(?:etable)?)?(?!\s+Veg\b)/gi;
   preProcessed = preProcessed.replace(frommBeefFritPattern, (match, p1, p2) => `${p1} ${p2 || ''}Beef Frittata Veg`);
   
   // "Chicken Au From" → "Chicken Au Frommage" (PurrSnickety)
