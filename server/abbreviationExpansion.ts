@@ -408,7 +408,11 @@ export async function expandAbbreviationsAsync(
   
   // "Cat Game" or "Game Bird" → "Game Bird Recipe" (Four-Star)
   // Official name is "Game Bird Recipe" NOT "Game Bird Grandeur"
-  const frommGameBirdPattern = /\b(Fromm)\s+(Cat\s+)?Game\s+Bird(?!\s+Recipe)\b/gi;
+  // First remove "Grandeur" if it exists, then add "Recipe" if missing
+  const frommGameBirdGrandeurPattern = /\b(Fromm)\s+(Cat\s+|PurrSnickety\s+)?Game\s+Bird(?:\s+Recipe)?\s+Grandeur\b/gi;
+  preProcessed = preProcessed.replace(frommGameBirdGrandeurPattern, (match, p1, p2) => `${p1} ${p2 || ''}Game Bird Recipe`);
+  
+  const frommGameBirdPattern = /\b(Fromm)\s+(Cat\s+|PurrSnickety\s+)?Game\s+Bird(?!\s+Recipe)\b/gi;
   preProcessed = preProcessed.replace(frommGameBirdPattern, (match, p1, p2) => `${p1} ${p2 || ''}Game Bird Recipe`);
   
   // "Chk Del" or "Chicken Del" → "Chicken Delight" (PurrSnickety)
@@ -449,12 +453,12 @@ export async function expandAbbreviationsAsync(
   // Beef recipes - CAT vs DOG distinction is critical!
   // For CATS: "Beef Liváttini Veg" (official Four-Star cat food)
   // For DOGS: "Beef Frittata Veg" (official Four-Star dog food)
-  // Match CAT versions and convert to correct name
-  const frommCatBeefPattern = /\b(Fromm)\s+Cat\s+Beef\s+(?:Frittata|Frit)(?:\s+Veg(?:etable)?)?\b/gi;
+  // Match CAT versions and convert to correct name - must match full string including Vegetable
+  const frommCatBeefPattern = /\b(Fromm)\s+Cat\s+Beef\s+(?:Liváttini|Frittata|Frit)(?:\s+Vegetable|\s+Veg)?\b/gi;
   preProcessed = preProcessed.replace(frommCatBeefPattern, "$1 Cat Beef Liváttini Veg");
   
   // Match DOG versions (without "Cat") and standardize
-  const frommDogBeefPattern = /\b(Fromm)\s+Beef\s+Frit(?:tata)?(?:\s+Veg(?:etable)?)?\b/gi;
+  const frommDogBeefPattern = /\b(Fromm)\s+Beef\s+Frit(?:tata)?(?:\s+Vegetable|\s+Veg)?\b/gi;
   preProcessed = preProcessed.replace(frommDogBeefPattern, "$1 Beef Frittata Veg");
   
   // "Chicken Au From" → "Chicken Au Frommage" (PurrSnickety)
@@ -617,11 +621,40 @@ export async function expandAbbreviationsAsync(
   // === COMPREHENSIVE BRAND-SPECIFIC PATTERN EXPANSIONS === 
   // Based on extensive product catalog research (Nov 2024)
   
-  // Taste of the Wild Additional Patterns
-  const totwSierraMountainPattern = /\b(Taste of the Wild|TOW|Tow)\s+Sie?rra?\s+Mtn\b/gi;
-  preProcessed = preProcessed.replace(totwSierraMountainPattern, "$1 Sierra Mountain");
+  // Taste of the Wild Additional Patterns - match actual database abbreviations
+  
+  // Ancient Grains Line
+  const totwAncMountPattern = /\b(Taste of the Wild)\s+Anc\s+Mount\b/gi;
+  preProcessed = preProcessed.replace(totwAncMountPattern, "$1 Ancient Mountain");
+  const totwAncPrairiePattern = /\b(Taste of the Wild)\s+Anc\s+Pra(?:irie|rie)\b/gi;
+  preProcessed = preProcessed.replace(totwAncPrairiePattern, "$1 Ancient Prairie");
+  const totwAncStreamPattern = /\b(Taste of the Wild)\s+Anc\s+Stream\b/gi;
+  preProcessed = preProcessed.replace(totwAncStreamPattern, "$1 Ancient Stream");
+  const totwAncWetlandPattern = /\b(Taste of the Wild)\s+Anc\s+Wetland\b/gi;
+  preProcessed = preProcessed.replace(totwAncWetlandPattern, "$1 Ancient Wetlands");
+  
+  // Regular Line abbreviations
+  const totwAppalPattern = /\b(Taste of the Wild)\s+Appal\b/gi;
+  preProcessed = preProcessed.replace(totwAppalPattern, "$1 Appalachian");
+  const totwSierMountPattern = /\b(Taste of the Wild)\s+Sier\s+Mount\b/gi;
+  preProcessed = preProcessed.replace(totwSierMountPattern, "$1 Sierra Mountain");
+  const totwSierraMtnPattern = /\b(Taste of the Wild|TOW|Tow)\s+Sie?rra?\s+Mtn\b/gi;
+  preProcessed = preProcessed.replace(totwSierraMtnPattern, "$1 Sierra Mountain");
+  const totwSouthCanPattern = /\b(Taste of the Wild)\s+South\s+Can\b/gi;
+  preProcessed = preProcessed.replace(totwSouthCanPattern, "$1 Southwest Canyon");
   const totwSouthwestCanyonPattern = /\b(Taste of the Wild|TOW|Tow)\s+(SW|SoW?est)\s+Can(?:yon)?\b/gi;
   preProcessed = preProcessed.replace(totwSouthwestCanyonPattern, "$1 Southwest Canyon");
+  const totwRocMounPattern = /\b(Taste of the Wild)\s+Roc\s+Moun(?:t)?\b/gi;
+  preProcessed = preProcessed.replace(totwRocMounPattern, "$1 Rocky Mountain");
+  const totwPacifStrePattern = /\b(Taste of the Wild)\s+Pacif\s+Stre\b/gi;
+  preProcessed = preProcessed.replace(totwPacifStrePattern, "$1 Pacific Stream");
+  
+  // Cat food
+  const totwCanRiverPattern = /\b(Taste of the Wild)\s+Cat\s+Can\s+River\b/gi;
+  preProcessed = preProcessed.replace(totwCanRiverPattern, "$1 Cat Canyon River");
+  const totwLowlaPattern = /\b(Taste of the Wild)\s+Cat\s+Lowla\b/gi;
+  preProcessed = preProcessed.replace(totwLowlaPattern, "$1 Cat Lowland Creek");
+  
   const totwWetlandsPattern = /\b(Taste of the Wild|TOW|Tow)\s+Wetl(?:ands)?\b/gi;
   preProcessed = preProcessed.replace(totwWetlandsPattern, "$1 Wetlands");
   const totwPineForestPattern = /\b(Taste of the Wild|TOW|Tow)\s+Pine\s+For(?:est)?\b/gi;
