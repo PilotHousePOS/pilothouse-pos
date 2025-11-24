@@ -824,12 +824,21 @@ export async function expandAbbreviationsAsync(
   const blueBStartPattern = /^Blue\s+B\b/gi;
   preProcessed = preProcessed.replace(blueBStartPattern, "Blue Buffalo");
   
-  // Diamond Brand Name Normalization
+  // === CONTEXT-AWARE "DIAM" EXPANSION ===
+  // Similar to pH vs Prevue Hendrix logic, distinguish measurement contexts from brand names
+  
+  // Step 1: Expand "Diam" → "Diameter" in measurement contexts
+  // Pattern: number + unit (inch/cm/mm/ft/meter/metre) + "Diam"
+  // Examples: "12 inch Diam tube", "5cm Diam", "10 mm Diam pipe"
+  // This runs BEFORE brand pattern to give measurement context priority
+  const diameterMeasurementPattern = /\b(\d+(?:\.\d+)?)\s*(inch|in|cm|mm|ft|meter|metre|meters|metres)\.?\s+Diam\b/gi;
+  preProcessed = preProcessed.replace(diameterMeasurementPattern, "$1 $2 Diameter");
+  
+  // Step 2: Expand remaining "Diam" → "Diamond" at start (brand name)
   // Evidence: 30+ products in database starting with "Diam"
   // Examples: "Diam Puppy 20lb", "Diam Senior 35lb", "Diam Large Breed 40lb"
   // Official site: https://www.diamondpet.com/
   // Product lines confirmed: Diamond Naturals, Diamond Premium, Diamond CARE
-  // Pattern uses ^ to avoid corrupting "diameter" measurements in product descriptions
   const diamStartPattern = /^Diam\b/g;
   preProcessed = preProcessed.replace(diamStartPattern, "Diamond");
   

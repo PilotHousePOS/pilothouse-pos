@@ -64,12 +64,13 @@ The application is a full-stack web application with a React frontend (Vite, Typ
 - **Auto-Categorization System:** Single-button operation for specialty section and product type classification based on brand and keyword analysis, including Live Animal Detection and record creation.
 - **Smart Abbreviation Expansion System:** Comprehensive, research-based abbreviation expansion for major pet food brands (server/abbreviationExpansion.ts):
   - Blue Buffalo: "Blue B" → "Blue Buffalo" (30+ products)
-  - Diamond: "Diam" → "Diamond" (30+ products)
+  - Diamond: "Diam" → "Diamond" (30+ products) with context-aware measurement detection
   - Primal: "Prim Fd" → "Primal Freeze Dried", "Prim Kitr" → "Primal Kibble in the Raw" (13 products)
   - Nutrisource: Complete product line expansions (Crispy Crispers, Grillin' Grillers, PureVita, Select Series, etc.)
   - Fromm: Complete product line expansions (PurrSnickety, Four-Star, À La Veg recipes, etc.)
   - All patterns verified with official website documentation and database evidence
-  - Start-of-string anchoring prevents corruption of non-brand text (e.g., diameter measurements)
+  - Start-of-string anchoring prevents corruption of non-brand text
+  - Context-aware "Diam" expansion: Distinguishes "Diameter" (measurements like "12 inch Diam tube") from "Diamond" (brand names)
   - Ensures full product name clarity across all display and processing contexts
 - **Brand Extraction System:** Comprehensive brand database for automated brand assignment.
 - **Product Image Management System:** Statistics dashboard, manual and automated batch image search with preview and approval, and admin-only access.
