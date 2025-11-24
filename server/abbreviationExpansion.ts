@@ -384,11 +384,16 @@ export async function expandAbbreviationsAsync(
   
   // Step 0: Smart context-aware pattern expansion (Brand-specific fixes)
   
+  // Fix "Crispy Crip" → "Crispy" (prevent duplication when expanding "Crip" to "Crisp")
+  // Handle cases like "Nutrisource Crispy Crip Lamb" → "Nutrisource Crispy Lamb"
+  const crispyCripPattern = /\b(Crispy)\s+Crip\b/gi;
+  let preProcessed = text.replace(crispyCripPattern, "$1");
+  
   // Nutrisource: "Grill" → "Grillin' Grillers"
   // Handle "Nutrisource Grill [anything]" → "Nutrisource Grillin' Grillers [anything]"
   // Uses negative lookahead to prevent matching "Grilled" or "Grills" or "Grillin'"
   const nutrisourceGrillPattern = /\b(Nutrisource)\s+Grill(?!ed|s|in')\b/gi;
-  let preProcessed = text.replace(nutrisourceGrillPattern, "$1 Grillin' Grillers");
+  preProcessed = preProcessed.replace(nutrisourceGrillPattern, "$1 Grillin' Grillers");
   
   // Fromm Product Line Expansions
   // Reference: https://frommfamily.com/products/cat/four-star/
