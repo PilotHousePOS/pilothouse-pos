@@ -859,6 +859,39 @@ export async function expandAbbreviationsAsync(
   const primalKitrStartPattern = /^Prim\s+Kitr\b/gi;
   preProcessed = preProcessed.replace(primalKitrStartPattern, "Primal Kibble in the Raw");
   
+  // === TREAT BRAND ABBREVIATION EXPANSIONS ===
+  // Evidence: Database queries + packaging photos + official website verification (Nov 24, 2025)
+  
+  // SmartBones Brand Name Normalization
+  // Evidence: 20+ products in database with inconsistent capitalization
+  // Database variations: "Smartbone", "Smartbones" (missing capital 'B')
+  // Packaging photos: attached_assets/6774_1764025678530.jpg, attached_assets/6775_1764025687997.jpg
+  // Official site: https://www.smartbones.com/
+  // Correct brand name: SmartBones® (capital B)
+  // Product lines: Classic Bone Chews, SmartSticks, Stuffed Twistz, Kabobz
+  const smartbonePattern = /\bSmartbone(?:s)?\b/gi;
+  preProcessed = preProcessed.replace(smartbonePattern, "SmartBones");
+  
+  // Benebone Brand Name Normalization
+  // Evidence: 20+ products in database with inconsistent capitalization
+  // Database variations: "BeneBone" (incorrect capital B)
+  // Packaging photos: attached_assets/6775_1764025687997.jpg
+  // Official site: https://www.benebone.com/
+  // Correct brand name: Benebone (lowercase 'b' - official trademark)
+  // Product lines: Wishbone, Zaggler, Maplestick, Puppy Line
+  const benebonePattern = /\bBeneBone\b/g;
+  preProcessed = preProcessed.replace(benebonePattern, "Benebone");
+  
+  // Merrick Fresh Kisses Product Line Expansion
+  // Evidence: 14 products in database with "Dbbl" abbreviation
+  // Database examples: "Fresh Kisses Extra Small Dbbl Box", "Fresh Kisses Large Dbbl Brush"
+  // Packaging photos: attached_assets/6772_1764025694890.jpg
+  // Official site: https://www.merrickpetcare.com/dog-food/fresh-kisses/
+  // Official product name: Merrick Fresh Kisses Double-Brush Dental Dog Treats
+  // "Dbbl" → "Double-Brush" (proprietary design feature)
+  const freshKissesDbblPattern = /\b(Fresh Kisses)\s+((?:\w+\s+)*)Dbbl\b/gi;
+  preProcessed = preProcessed.replace(freshKissesDbblPattern, "$1 $2Double-Brush");
+  
   // === BRAND-SPECIFIC PATTERN EXPANSIONS === 
   // IMPORTANT: Only patterns with VERIFIED evidence from actual database records are included
   // Speculative patterns removed per architect guidance - require SKU-level proof before adding
