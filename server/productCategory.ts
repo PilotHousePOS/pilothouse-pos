@@ -95,12 +95,15 @@ export function calculateCategoryScore(
   return score;
 }
 
-export function determineCategory(supply: Supply): string | null {
+export function determineCategory(supply: Supply, excludeCategories: string[] = []): string | null {
   // First check brand-specific defaults for overlapping brands
   const supplyName = supply.name.toLowerCase();
   const supplyBrand = supply.brand?.toLowerCase() || '';
   
   for (const [brand, defaultCategory] of Object.entries(BRAND_CATEGORY_DEFAULTS)) {
+    // Skip if this category is excluded
+    if (excludeCategories.includes(defaultCategory)) continue;
+    
     const brandLower = brand.toLowerCase();
     if (supplyBrand.includes(brandLower) || supplyName.includes(brandLower)) {
       // Brand found, but verify with scoring to prevent misclassification
@@ -114,7 +117,7 @@ export function determineCategory(supply: Supply): string | null {
   }
 
   // Standard scoring approach
-  const categories = Object.keys(CATEGORY_MAPPINGS);
+  const categories = Object.keys(CATEGORY_MAPPINGS).filter(cat => !excludeCategories.includes(cat));
   const scores: { category: string; score: number }[] = [];
 
   for (const category of categories) {

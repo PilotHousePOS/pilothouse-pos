@@ -57,7 +57,6 @@ const FOOD_TYPES = [
   { id: 'dog-food', label: 'Dog Food', emoji: '🐕' },
   { id: 'cat-food', label: 'Cat Food', emoji: '🐱' },
   { id: 'bird-food', label: 'Bird Food', emoji: '🦜' },
-  { id: 'fish-food', label: 'Fish Food', emoji: '🐠' },
   { id: 'small-animal-food', label: 'Small Animal', emoji: '🐹' },
 ];
 

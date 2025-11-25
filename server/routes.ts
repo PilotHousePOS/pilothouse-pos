@@ -754,27 +754,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Supply routes with pagination
   app.get("/api/supplies", async (req, res) => {
     try {
-      const { category, search, page = '0', limit = '24', animalType, foodType, toyType, healthcareType } = req.query;
+      const { category, search, page = '0', limit = '24', animalType, foodType, toyType, healthcareType, filterType: filterTypeParam } = req.query;
       
       // Parse pagination parameters with defaults
       const pageNum = Math.max(0, parseInt(page as string) || 0);
       const pageSize = Math.min(20000, Math.max(1, parseInt(limit as string) || 24));
       const offset = pageNum * pageSize;
 
-      // Determine filter type based on category parameter
-      let filterType: 'reptile' | 'aquatic' | undefined;
+      // Determine filter type based on query param or category parameter
+      let filterType: 'reptile' | 'aquatic' | undefined = filterTypeParam as 'reptile' | 'aquatic' | undefined;
+      let actualCategory: string | undefined = category as string | undefined;
+      
       if (category === 'reptile-supplies') {
         filterType = 'reptile';
+        actualCategory = undefined; // Don't filter by category for specialty landing pages
       } else if (category === 'aquatic-supplies') {
         filterType = 'aquatic';
+        actualCategory = undefined; // Don't filter by category for specialty landing pages
       }
       
       // Use paginated query
-      // Note: Don't pass category when filterType is set, as Aquatics/Reptiles use brand/keyword matching, not DB categories
+      // Note: When filterType is set via query param (not via category mapping), we DO want to preserve the category filter
       const { items, total } = await storage.getPaginatedSupplies({
         limit: pageSize,
         offset,
-        category: filterType ? undefined : (category as string | undefined),
+        category: actualCategory,
         search: search as string | undefined,
         filterType,
         animalType: animalType as string | undefined,

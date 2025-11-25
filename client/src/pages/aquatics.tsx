@@ -31,6 +31,12 @@ function getPageIndicators(currentPage: number, totalPages: number): number[] {
   return Array.from({ length: endPage - startPage }, (_, i) => startPage + i);
 }
 
+const AQUATIC_CATEGORIES = [
+  { id: 'food', label: 'Food', emoji: '🐟' },
+  { id: 'healthcare', label: 'Medicine', emoji: '💊' },
+  { id: 'accessories', label: 'Accessories', emoji: '🏺' },
+];
+
 export default function AquaticsPage() {
   const { toast } = useToast();
   const [selectedItem, setSelectedItem] = useState<any>(null);
@@ -41,6 +47,7 @@ export default function AquaticsPage() {
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [searchInput, setSearchInput] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
   
   // Debounce search to avoid flickering on every keystroke
   const searchQuery = useDebounce(searchInput, 500);
@@ -55,10 +62,11 @@ export default function AquaticsPage() {
   });
 
   const { data: suppliesData, isLoading: suppliesLoading } = useQuery<any>({
-    queryKey: ["/api/supplies", { category: "aquatic-supplies", page: currentPage, limit: ITEMS_PER_PAGE, search: searchQuery }],
+    queryKey: ["/api/supplies", { category: selectedCategory || "aquatic-supplies", page: currentPage, limit: ITEMS_PER_PAGE, search: searchQuery }],
     queryFn: async () => {
       const searchParam = searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : '';
-      const response = await fetch(`/api/supplies?category=aquatic-supplies&page=${currentPage}&limit=${ITEMS_PER_PAGE}${searchParam}`);
+      const categoryParam = selectedCategory ? `&category=${selectedCategory}` : '&category=aquatic-supplies';
+      const response = await fetch(`/api/supplies?filterType=aquatic${categoryParam}&page=${currentPage}&limit=${ITEMS_PER_PAGE}${searchParam}`);
       if (!response.ok) throw new Error("Failed to fetch supplies");
       return response.json();
     },
@@ -67,10 +75,10 @@ export default function AquaticsPage() {
   const supplies = suppliesData?.items || [];
   const totalPages = suppliesData?.totalPages || 0;
 
-  // Reset page when search changes
+  // Reset page when search or category changes
   useEffect(() => {
     setCurrentPage(0);
-  }, [searchQuery]);
+  }, [searchQuery, selectedCategory]);
 
   // Reset page when totalPages changes or currentPage is out of bounds
   useEffect(() => {
@@ -207,6 +215,32 @@ export default function AquaticsPage() {
         {/* Aquatic Supplies Section */}
         <section>
           <h2 className="text-2xl font-bold mb-6 text-gray-800">Aquatic Supplies</h2>
+          
+          {/* Category Filter */}
+          <div className="mb-6">
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={selectedCategory === '' ? 'default' : 'outline'}
+                onClick={() => setSelectedCategory('')}
+                className={`${selectedCategory === '' ? 'bg-blue-600 hover:bg-blue-700' : 'hover:bg-gray-100'}`}
+                data-testid="filter-category-all"
+              >
+                All Supplies
+              </Button>
+              {AQUATIC_CATEGORIES.map((cat) => (
+                <Button
+                  key={cat.id}
+                  variant={selectedCategory === cat.id ? 'default' : 'outline'}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`${selectedCategory === cat.id ? 'bg-blue-600 hover:bg-blue-700' : 'hover:bg-gray-100'}`}
+                  data-testid={`filter-category-${cat.id}`}
+                >
+                  <span className="mr-2">{cat.emoji}</span>
+                  {cat.label}
+                </Button>
+              ))}
+            </div>
+          </div>
           
           {/* Search Bar */}
           <div className="relative mb-6">

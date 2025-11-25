@@ -1312,13 +1312,16 @@ export class DatabaseStorage implements IStorage {
         for (const supply of batch) {
           let suggestedCategory = null;
           
-          // PRIORITY 1: If filterType is set to specialty section, set category accordingly
+          // PRIORITY 1: If filterType is set to specialty section, determine subcategory
           if (supply.filterType === 'smallanimal') {
             suggestedCategory = 'smallanimal';
           } else if (supply.filterType === 'aquatic') {
-            suggestedCategory = 'aquatics';
+            // For aquatic items, use standard categorization but EXCLUDE 'aquatics' and 'reptiles' categories
+            // This allows items to be categorized as food, healthcare, accessories, etc.
+            suggestedCategory = determineCategory(supply, ['aquatics', 'reptiles']);
           } else if (supply.filterType === 'reptile') {
-            suggestedCategory = 'reptiles';
+            // For reptile items, use standard categorization but EXCLUDE 'reptiles' and 'aquatics' categories
+            suggestedCategory = determineCategory(supply, ['reptiles', 'aquatics']);
           } else {
             // PRIORITY 2: Use standard category determination for other products
             suggestedCategory = determineCategory(supply);
