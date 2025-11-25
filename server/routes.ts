@@ -1776,9 +1776,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // Use timezone-aware date functions to prevent UTC/CST mismatch bugs
+      const { getLocalDateString, getLocalDayOfWeek } = await import('./scheduler');
+      
       // Check special date settings first (overrides weekly limits)
       const appointmentDate = new Date(req.body.appointmentDate);
-      const appointmentDateStr = appointmentDate.toISOString().split('T')[0];
+      const appointmentDateStr = getLocalDateString(appointmentDate);
       const specialDate = await storage.getSpecialDateWithTimes(appointmentDateStr);
       
       if (specialDate) {
@@ -1802,7 +1805,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }];
 
       // Check weekly appointment limits for the selected day of week
-      const dayOfWeek = appointmentDate.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
+      const dayOfWeek = getLocalDayOfWeek(appointmentDate); // 0=Sunday, 1=Monday, ..., 6=Saturday
       
       // Get weekly limit for this day of week (1-6 for Monday-Saturday)
       if (dayOfWeek >= 1 && dayOfWeek <= 6) {
@@ -1813,7 +1816,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Include all appointments except cancelled/rejected ones
           const allAppointments = await storage.getAppointments();
           const appointmentsOnDate = allAppointments.filter((apt: any) => {
-            const aptDateStr = new Date(apt.appointmentDate).toISOString().split('T')[0];
+            const aptDateStr = getLocalDateString(new Date(apt.appointmentDate));
             return aptDateStr === appointmentDateStr && 
                    apt.status !== 'cancelled' && 
                    apt.status !== 'rejected';
