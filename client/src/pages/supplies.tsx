@@ -126,6 +126,11 @@ export default function Supplies() {
     }
   }, [searchQuery, selectedCategory]);
 
+  // Reset page when any sub-filter changes
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [selectedAnimalType, selectedFoodType, selectedToyType, selectedHealthcareType, selectedAquaticType]);
+
   const { data, isLoading } = useQuery<{
     items: any[];
     total: number;
