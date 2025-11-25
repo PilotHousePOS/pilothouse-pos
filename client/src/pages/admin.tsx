@@ -6462,10 +6462,10 @@ export default function Admin() {
       setEditTime('');
       setEditGroomerId(null);
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to update appointment. Please try again.",
+        description: error?.message || "Failed to update appointment. Please try again.",
         variant: "destructive",
       });
     },

@@ -1446,116 +1446,126 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // CHECK CAPACITY LIMITS if date or pets are being changed
-      if (appointmentDate !== undefined || pets !== undefined) {
-        // Use new date if provided, otherwise use current
-        const dateToCheck = appointmentDate ? new Date(appointmentDate) : new Date(currentAppointment.appointmentDate);
-        // Use timezone-aware functions to prevent UTC/CST mismatch bugs
-        const { getLocalDateString, getLocalDayOfWeek } = await import('./scheduler');
-        const appointmentDateStr = getLocalDateString(dateToCheck);
-        const dayOfWeek = getLocalDayOfWeek(dateToCheck);
-        
-        // Get the pets that will be in this appointment after the update
-        let finalPets;
-        if (pets !== undefined) {
-          // Using new pets array
-          finalPets = pets;
+      // ALWAYS CHECK CAPACITY LIMITS for any edit that might affect capacity
+      // This includes: date changes, pets array changes, OR direct serviceType changes
+      // The inline edit UI sends serviceType directly without pets array, so we must check for that too
+      const { serviceType } = req.body; // Get serviceType from request body for inline edits
+      
+      // Use new date if provided, otherwise use current
+      const dateToCheck = appointmentDate ? new Date(appointmentDate) : new Date(currentAppointment.appointmentDate);
+      // Use timezone-aware functions to prevent UTC/CST mismatch bugs
+      const { getLocalDateString, getLocalDayOfWeek } = await import('./scheduler');
+      const appointmentDateStr = getLocalDateString(dateToCheck);
+      const dayOfWeek = getLocalDayOfWeek(dateToCheck);
+      
+      // Get the pets/services that will be in this appointment after the update
+      let finalPets;
+      if (pets !== undefined) {
+        // Using new pets array from full edit dialog
+        finalPets = pets;
+      } else if (serviceType !== undefined) {
+        // Inline edit: serviceType changed directly without pets array
+        // Use the new serviceType for capacity check
+        finalPets = [{
+          serviceType: serviceType,
+          petName: currentAppointment.petName,
+          petType: currentAppointment.petType
+        }];
+      } else {
+        // No service change - use existing pets/service
+        const existingPets = await storage.getAppointmentPets(id);
+        if (existingPets && existingPets.length > 0) {
+          finalPets = existingPets;
         } else {
-          // Using existing pets
-          const existingPets = await storage.getAppointmentPets(id);
-          if (existingPets && existingPets.length > 0) {
-            finalPets = existingPets;
-          } else {
-            // Legacy single-pet appointment
-            finalPets = [{
-              serviceType: currentAppointment.serviceType
-            }];
-          }
+          // Legacy single-pet appointment
+          finalPets = [{
+            serviceType: currentAppointment.serviceType
+          }];
         }
+      }
+      
+      // Check weekly limits for Monday-Saturday (1-6)
+      if (dayOfWeek >= 1 && dayOfWeek <= 6) {
+        const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
         
-        // Check weekly limits for Monday-Saturday (1-6)
-        if (dayOfWeek >= 1 && dayOfWeek <= 6) {
-          const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
+        if (weeklyLimit) {
+          // Count existing appointments on the target date (excluding this one and cancelled/rejected)
+          const allAppointments = await storage.getAppointments();
+          const appointmentsOnDate = allAppointments.filter((apt: any) => {
+            // Use timezone-aware date comparison to prevent UTC/CST mismatch
+            const aptDateStr = getLocalDateString(new Date(apt.appointmentDate));
+            return aptDateStr === appointmentDateStr && 
+                   apt.id !== id && // Exclude current appointment being updated
+                   apt.status !== 'cancelled' && 
+                   apt.status !== 'rejected';
+          });
           
-          if (weeklyLimit) {
-            // Count existing appointments on the target date (excluding this one and cancelled/rejected)
-            const allAppointments = await storage.getAppointments();
-            const appointmentsOnDate = allAppointments.filter((apt: any) => {
-              // Use timezone-aware date comparison to prevent UTC/CST mismatch
-              const aptDateStr = getLocalDateString(new Date(apt.appointmentDate));
-              return aptDateStr === appointmentDateStr && 
-                     apt.id !== id && // Exclude current appointment being updated
-                     apt.status !== 'cancelled' && 
-                     apt.status !== 'rejected';
-            });
-            
-            console.log(`[CAPACITY CHECK - EDIT] Checking date ${appointmentDateStr}, excluding appointment ${id}`);
-            console.log(`[CAPACITY CHECK - EDIT] Found ${appointmentsOnDate.length} other appointments on this date`);
-            
-            // Count existing dogs by service type with substring matching
-            let bathDogs = 0;
-            let groomDogs = 0;
-            
-            for (const apt of appointmentsOnDate) {
-              const aptPets = await storage.getAppointmentPets(apt.id);
-              if (aptPets && aptPets.length > 0) {
-                for (const p of aptPets) {
-                  const serviceType = (p.serviceType || '').toLowerCase();
-                  if (serviceType.includes('bath')) {
-                    bathDogs++;
-                    console.log(`[CAPACITY CHECK - EDIT] Apt ${apt.id} pet "${p.petName}": BATH`);
-                  } else if (serviceType.includes('full') || serviceType.includes('groom')) {
-                    groomDogs++;
-                    console.log(`[CAPACITY CHECK - EDIT] Apt ${apt.id} pet "${p.petName}": GROOM`);
-                  }
-                }
-              } else {
-                // Legacy single-pet with substring matching
-                const serviceType = (apt.serviceType || '').toLowerCase();
-                if (serviceType.includes('bath')) {
+          console.log(`[CAPACITY CHECK - EDIT] Checking date ${appointmentDateStr}, excluding appointment ${id}`);
+          console.log(`[CAPACITY CHECK - EDIT] Found ${appointmentsOnDate.length} other appointments on this date`);
+          
+          // Count existing dogs by service type with substring matching
+          let bathDogs = 0;
+          let groomDogs = 0;
+          
+          for (const apt of appointmentsOnDate) {
+            const aptPets = await storage.getAppointmentPets(apt.id);
+            if (aptPets && aptPets.length > 0) {
+              for (const p of aptPets) {
+                const svcType = (p.serviceType || '').toLowerCase();
+                if (svcType.includes('bath')) {
                   bathDogs++;
-                  console.log(`[CAPACITY CHECK - EDIT] Apt ${apt.id} (legacy): BATH`);
-                } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+                  console.log(`[CAPACITY CHECK - EDIT] Apt ${apt.id} pet "${p.petName}": BATH`);
+                } else if (svcType.includes('full') || svcType.includes('groom')) {
                   groomDogs++;
-                  console.log(`[CAPACITY CHECK - EDIT] Apt ${apt.id} (legacy): GROOM`);
+                  console.log(`[CAPACITY CHECK - EDIT] Apt ${apt.id} pet "${p.petName}": GROOM`);
                 }
               }
-            }
-            
-            // Count dogs in the updated appointment with substring matching
-            let requestedBaths = 0;
-            let requestedGrooms = 0;
-            for (const p of finalPets) {
-              const serviceType = (p.serviceType || '').toLowerCase();
-              if (serviceType.includes('bath')) {
-                requestedBaths++;
-              } else if (serviceType.includes('full') || serviceType.includes('groom')) {
-                requestedGrooms++;
+            } else {
+              // Legacy single-pet with substring matching
+              const svcType = (apt.serviceType || '').toLowerCase();
+              if (svcType.includes('bath')) {
+                bathDogs++;
+                console.log(`[CAPACITY CHECK - EDIT] Apt ${apt.id} (legacy): BATH`);
+              } else if (svcType.includes('full') || svcType.includes('groom')) {
+                groomDogs++;
+                console.log(`[CAPACITY CHECK - EDIT] Apt ${apt.id} (legacy): GROOM`);
               }
             }
-            
-            console.log(`[CAPACITY CHECK - EDIT] Other appointments: ${groomDogs} grooms, ${bathDogs} baths`);
-            console.log(`[CAPACITY CHECK - EDIT] This update requests: ${requestedGrooms} grooms, ${requestedBaths} baths`);
-            console.log(`[CAPACITY CHECK - EDIT] Limit: ${weeklyLimit.maxGroomAppointments} grooms, ${weeklyLimit.maxBathAppointments} baths`);
-            console.log(`[CAPACITY CHECK - EDIT] After update: ${groomDogs + requestedGrooms} grooms, ${bathDogs + requestedBaths} baths`);
-            
-            // Check if update would exceed capacity
-            if (bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
-              console.log(`[CAPACITY CHECK - EDIT] BLOCKED: Bath capacity exceeded`);
-              return res.status(400).json({
-                message: `Cannot update: Bath grooming capacity would be exceeded for this date (limit: ${weeklyLimit.maxBathAppointments} dogs, ${bathDogs} already booked by other appointments). Please select a different date or reduce the number of bath services.`
-              });
-            }
-            
-            if (groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
-              console.log(`[CAPACITY CHECK - EDIT] BLOCKED: Groom capacity exceeded`);
-              return res.status(400).json({
-                message: `Cannot update: Full grooming capacity would be exceeded for this date (limit: ${weeklyLimit.maxGroomAppointments} dogs, ${groomDogs} already booked by other appointments). Please select a different date or reduce the number of full groom services.`
-              });
-            }
-            
-            console.log(`[CAPACITY CHECK - EDIT] ALLOWED: Within capacity limits`);
           }
+          
+          // Count dogs in the updated appointment with substring matching
+          let requestedBaths = 0;
+          let requestedGrooms = 0;
+          for (const p of finalPets) {
+            const svcType = (p.serviceType || '').toLowerCase();
+            if (svcType.includes('bath')) {
+              requestedBaths++;
+            } else if (svcType.includes('full') || svcType.includes('groom')) {
+              requestedGrooms++;
+            }
+          }
+          
+          console.log(`[CAPACITY CHECK - EDIT] Other appointments: ${groomDogs} grooms, ${bathDogs} baths`);
+          console.log(`[CAPACITY CHECK - EDIT] This update requests: ${requestedGrooms} grooms, ${requestedBaths} baths`);
+          console.log(`[CAPACITY CHECK - EDIT] Limit: ${weeklyLimit.maxGroomAppointments} grooms, ${weeklyLimit.maxBathAppointments} baths`);
+          console.log(`[CAPACITY CHECK - EDIT] After update: ${groomDogs + requestedGrooms} grooms, ${bathDogs + requestedBaths} baths`);
+          
+          // Check if update would exceed capacity
+          if (bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
+            console.log(`[CAPACITY CHECK - EDIT] BLOCKED: Bath capacity exceeded`);
+            return res.status(400).json({
+              message: `Cannot update: Bath grooming capacity would be exceeded for this date (limit: ${weeklyLimit.maxBathAppointments} dogs, ${bathDogs} already booked by other appointments). Please select a different date or reduce the number of bath services.`
+            });
+          }
+          
+          if (groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
+            console.log(`[CAPACITY CHECK - EDIT] BLOCKED: Groom capacity exceeded`);
+            return res.status(400).json({
+              message: `Cannot update: Full grooming capacity would be exceeded for this date (limit: ${weeklyLimit.maxGroomAppointments} dogs, ${groomDogs} already booked by other appointments). Please select a different date or reduce the number of full groom services.`
+            });
+          }
+          
+          console.log(`[CAPACITY CHECK - EDIT] ALLOWED: Within capacity limits`);
         }
       }
 
