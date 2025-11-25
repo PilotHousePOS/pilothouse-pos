@@ -4574,10 +4574,10 @@ function EditAppointmentDialog({
       await queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       handleClose();
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to update appointment. Please try again.",
+        description: error?.message || "Failed to update appointment. Please try again.",
         variant: "destructive",
       });
     },
