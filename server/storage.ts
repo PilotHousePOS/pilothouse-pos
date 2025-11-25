@@ -716,8 +716,9 @@ export class DatabaseStorage implements IStorage {
     foodType?: string;
     toyType?: string;
     healthcareType?: string;
+    aquaticType?: string;
   }): Promise<{ items: Supply[]; total: number }> {
-    const { limit, offset, category, search, filterType, animalType, foodType, toyType, healthcareType } = params;
+    const { limit, offset, category, search, filterType, animalType, foodType, toyType, healthcareType, aquaticType } = params;
 
     // Build WHERE conditions based on filters
     let whereConditions: any[] = [eq(supplies.isActive, true)];
@@ -850,6 +851,25 @@ export class DatabaseStorage implements IStorage {
       }
     };
 
+    // Define aquatic type keywords for filtering with exclusions
+    const aquaticKeywords: Record<string, { include: string[], exclude: string[], brands?: string[] }> = {
+      'fish-food': {
+        include: ['food', 'flake', 'pellet', 'wafer', 'algae', 'brine shrimp', 'bloodworm', 'freeze dried', 'frozen', 'feeder'],
+        exclude: ['filter', 'pump', 'heater', 'thermometer', 'decoration', 'plant', 'gravel', 'substrate', 'net', 'tank'],
+        brands: ['hikari', 'omega one', 'ocean nutrition', 'tetra', 'api', 'fluval', 'aqueon', 'sera', 'new life spectrum']
+      },
+      'medicine': {
+        include: ['medicine', 'treatment', 'remedy', 'medication', 'cure', 'ich', 'fungus', 'bacteria', 'parasite', 'stress coat', 'conditioner', 'dechlorinator', 'prime', 'safe', 'stability'],
+        exclude: ['food', 'flake', 'pellet', 'filter', 'pump', 'decoration'],
+        brands: ['seachem', 'api', 'hikari', 'tetra', 'kordon', 'microbe-lift']
+      },
+      'supplies': {
+        include: ['filter', 'pump', 'heater', 'thermometer', 'air stone', 'airline', 'tubing', 'net', 'gravel', 'substrate', 'decoration', 'plant', 'light', 'hood', 'stand', 'tank', 'aquarium', 'siphon', 'vacuum', 'scraper', 'magnet cleaner'],
+        exclude: ['food', 'flake', 'pellet', 'medicine', 'treatment'],
+        brands: ['marineland', 'fluval', 'aqueon', 'tetra', 'penn plax', 'hydor', 'eheim']
+      }
+    };
+
     // Helper function to filter items by keywords with inclusion and exclusion logic
     // Uses word boundary matching to avoid false matches (e.g., "cat" won't match "catfish")
     const filterByKeywords = (items: Supply[], filterType: string, keywords: Record<string, { include: string[], exclude: string[], brands?: string[] }>): Supply[] => {
@@ -928,6 +948,9 @@ export class DatabaseStorage implements IStorage {
       if (healthcareType) {
         allItems = filterByKeywords(allItems, healthcareType, healthcareKeywords);
       }
+      if (aquaticType) {
+        allItems = filterByKeywords(allItems, aquaticType, aquaticKeywords);
+      }
       
       // Then apply fuzzy search filtering with typo tolerance
       const filteredItems = fuzzySearchFilter(
@@ -947,7 +970,7 @@ export class DatabaseStorage implements IStorage {
     }
 
     // If we have any specialty filter but no search, fetch and filter
-    if (animalType || foodType || toyType || healthcareType) {
+    if (animalType || foodType || toyType || healthcareType || aquaticType) {
       // Fetch all items matching category/filterType first
       let allItems = await db
         .select()
@@ -967,6 +990,9 @@ export class DatabaseStorage implements IStorage {
       }
       if (healthcareType) {
         allItems = filterByKeywords(allItems, healthcareType, healthcareKeywords);
+      }
+      if (aquaticType) {
+        allItems = filterByKeywords(allItems, aquaticType, aquaticKeywords);
       }
       
       const total = allItems.length;

@@ -75,6 +75,12 @@ const HEALTHCARE_TYPES = [
   { id: 'first-aid', label: 'First Aid', emoji: '🩹' },
 ];
 
+const AQUATIC_TYPES = [
+  { id: 'fish-food', label: 'Fish Food', emoji: '🐟' },
+  { id: 'medicine', label: 'Medicine', emoji: '💊' },
+  { id: 'supplies', label: 'Supplies', emoji: '🏺' },
+];
+
 export default function Supplies() {
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -83,6 +89,7 @@ export default function Supplies() {
   const [selectedFoodType, setSelectedFoodType] = useState('');
   const [selectedToyType, setSelectedToyType] = useState('');
   const [selectedHealthcareType, setSelectedHealthcareType] = useState('');
+  const [selectedAquaticType, setSelectedAquaticType] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
@@ -113,6 +120,10 @@ export default function Supplies() {
     if (selectedCategory !== 'healthcare') {
       setSelectedHealthcareType('');
     }
+    // Clear aquatic type when not in aquatics category
+    if (selectedCategory !== 'aquatics') {
+      setSelectedAquaticType('');
+    }
   }, [searchQuery, selectedCategory]);
 
   const { data, isLoading } = useQuery<{
@@ -132,7 +143,8 @@ export default function Supplies() {
         ...(selectedAnimalType && { animalType: selectedAnimalType }),
         ...(selectedFoodType && { foodType: selectedFoodType }),
         ...(selectedToyType && { toyType: selectedToyType }),
-        ...(selectedHealthcareType && { healthcareType: selectedHealthcareType })
+        ...(selectedHealthcareType && { healthcareType: selectedHealthcareType }),
+        ...(selectedAquaticType && { aquaticType: selectedAquaticType })
       }
     ],
   });
@@ -315,6 +327,32 @@ export default function Supplies() {
                 <div className="flex flex-col items-center w-full">
                   <div className="text-lg mb-1">{healthcare.emoji}</div>
                   <div className="text-xs leading-tight">{healthcare.label}</div>
+                </div>
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Aquatic Type Filter (shows only for aquatics category) */}
+      {selectedCategory === 'aquatics' && (
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Filter by Product Type:</h3>
+          <div className="grid grid-cols-3 gap-3">
+            {AQUATIC_TYPES.map((aquatic) => (
+              <Button
+                key={aquatic.id}
+                variant="outline"
+                size="sm"
+                className={`text-center py-3 h-auto min-h-[70px] flex items-center justify-center ${
+                  selectedAquaticType === aquatic.id ? 'bg-blue-500 text-white border-blue-500' : 'bg-white'
+                }`}
+                onClick={() => setSelectedAquaticType(selectedAquaticType === aquatic.id ? '' : aquatic.id)}
+                data-testid={`button-filter-${aquatic.id}`}
+              >
+                <div className="flex flex-col items-center w-full">
+                  <div className="text-lg mb-1">{aquatic.emoji}</div>
+                  <div className="text-xs leading-tight">{aquatic.label}</div>
                 </div>
               </Button>
             ))}
