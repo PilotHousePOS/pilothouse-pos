@@ -820,8 +820,8 @@ export class DatabaseStorage implements IStorage {
         brands: []
       },
       'small-animal-toys': {
-        include: ['guinea pig', 'hamster', 'rabbit', 'bunny', 'ferret', 'gerbil', 'chinchilla', 'small animal', 'kaytee', 'oxbow', 'living world'],
-        exclude: ['dog', 'puppy', 'cat', 'kitten', 'bird', 'airdog'],
+        include: ['guinea pig', 'hamster', 'rabbit', 'bunny', 'ferret', 'gerbil', 'chinchilla', 'small animal', 'kaytee', 'oxbow', 'living world', 'vitakraft', 'runabout', 'run-about', 'chewbular', 'comfort wheel', 'hamsteroids', 'crinkle tunnel', 'flex tunnel', 'combo toy', 'hay ball'],
+        exclude: ['dog', 'puppy', 'cat', 'kitten', 'bird seed', 'bird food', 'airdog'],
         brands: []
       }
     };
