@@ -57,7 +57,14 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
     ],
     excludeKeywords: [
       'gecko', 'lizard', 'snake', 'bearded dragon', 'iguana',
-      'reptile', 'terrarium', 'vivarium', 'repti', 'dog toy', 'cat toy', 'pet toy'
+      'reptile', 'terrarium', 'vivarium', 'repti',
+      'dog toy', 'cat toy', 'pet toy',
+      // Exclude cat/dog food with fish ingredients (multi-word to avoid matching "catfish")
+      'cat food', 'cat treat', 'kitten food', 'kitten treat',
+      'dog food', 'dog treat', 'puppy food', 'puppy treat',
+      'for cats', 'for dogs', 'for kittens', 'for puppies',
+      'catit', 'fussiecat', 'i love cats',  // Cat food brands
+      ' cat ', ' dog ', ' puppy ', ' kitten '  // Space-bounded to avoid matching catfish/dogfish
     ]
   },
   smallanimal: {

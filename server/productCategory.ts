@@ -11,7 +11,8 @@ import {
   AQUATIC_SUPPLIES_BRANDS,
   AQUATIC_FOOD_KEYWORDS,
   AQUATIC_MEDICINE_KEYWORDS,
-  AQUATIC_SUPPLIES_KEYWORDS
+  AQUATIC_SUPPLIES_KEYWORDS,
+  AQUATIC_DECORATION_PHRASES
 } from './aquaticCategoryEvidence';
 
 export function normalizeBrand(brand: string): string {
@@ -111,6 +112,17 @@ export function determineCategory(supply: Supply, excludeCategories: string[] = 
   // EVIDENCE-BASED AQUATIC SUBCATEGORIZATION
   // Only apply aquatic evidence logic when actually processing aquatic items (filterType='aquatic')
   if (supply.filterType === 'aquatic' && excludeCategories.includes('aquatics')) {
+    
+    // PRIORITY 0: Exclude specific decoration product lines (highest priority)
+    // Check if item contains decoration-specific phrases (multi-word matching)
+    for (const phrase of AQUATIC_DECORATION_PHRASES) {
+      const phraseLower = phrase.toLowerCase();
+      if (supplyName.includes(phraseLower) || 
+          supplyDescription.includes(phraseLower)) {
+        // This is a decoration product - skip food/medicine, categorize as accessories
+        return 'accessories';
+      }
+    }
     
     // PRIORITY 1: Brand-based categorization (highest confidence)
     // Check if brand is a food-only specialist

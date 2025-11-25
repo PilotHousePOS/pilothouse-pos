@@ -169,3 +169,28 @@ export const AQUATIC_SUPPLIES_KEYWORDS = [
   'spec', 'flex', 'evo', // Fluval tank series
   'glofish kit', 'glofish aquarium'
 ];
+
+// DECORATION EXCLUSION PHRASES
+// Specific product lines/phrases that indicate decorations, not consumables
+// These are matched as multi-word phrases to avoid false positives
+
+export const AQUATIC_DECORATION_PHRASES = [
+  // Specific decoration product lines
+  'tetra glo',           // Tetra Glo decoration line (plants, trees, etc.)
+  'glofish glo',         // GloFish Glo decorations
+  
+  // Explicit decoration keywords
+  'artificial plant',
+  'plastic plant',
+  'silk plant',
+  'aquarium decoration',
+  'aquarium ornament',
+  'tank decoration',
+  
+  // Decoration types (when combined with context)
+  'twisted tree',
+  'sea grass',
+  'mangrove tree',
+  'castle decoration',
+  'skull decoration'
+];
