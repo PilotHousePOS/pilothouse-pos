@@ -27,7 +27,7 @@ function extractBrand(productName: string): string | null {
     { name: 'Blue Buffalo', patterns: ['blue buffalo', 'bluebuffalo', 'blue buff', 'bb'] },
     { name: 'Taste of the Wild', patterns: ['taste of the wild', 'taste wild', 'tow'] },
     { name: 'Castor & Pollux', patterns: ['castor & pollux', 'castor and pollux'] },
-    { name: 'Royal Canin', patterns: ['royal canin', 'rc'] },
+    { name: 'Royal Canin', patterns: ['royal canin', 'royal can', 'rc'] },
     { name: 'Pro Plan', patterns: ['pro plan', 'proplan', 'pp'] },
     { name: 'Natural Balance', patterns: ['natural balance', 'nat balance', 'nb'] },
     { name: 'Rachael Ray', patterns: ['rachael ray'] },
@@ -45,7 +45,7 @@ function extractBrand(productName: string): string | null {
     { name: 'Zignature', patterns: ['zignature', 'zign'] },
     { name: 'Canidae', patterns: ['canidae'] },
     { name: 'Instinct', patterns: ['instinct'] },
-    { name: 'Earthborn', patterns: ['earthborn'] },
+    { name: 'Earthborn', patterns: ['earthborn', 'earth cat'] },
     { name: 'Nutro', patterns: ['nutro'] },
     { name: 'Eukanuba', patterns: ['eukanuba'] },
     { name: 'Diamond', patterns: ['diamond'] },
@@ -66,6 +66,9 @@ function extractBrand(productName: string): string | null {
     { name: 'Omega One', patterns: ['omega one'] },
     { name: 'Ocean Nutrition', patterns: ['ocean nutrition'] },
     { name: 'Primal', patterns: ['primal'] },
+    { name: 'Inaba', patterns: ['inaba', 'dashi cat', 'dasi cat', 'dashi delights'] },
+    { name: 'Weruva', patterns: ['weruva', 'bff', 'b.f.f.', 'best feline friend'] },
+    { name: 'Fussie Cat', patterns: ['fussie cat', 'fussie'] },
   ];
   
   const lowerName = productName.toLowerCase();
