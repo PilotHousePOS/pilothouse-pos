@@ -1312,9 +1312,13 @@ export class DatabaseStorage implements IStorage {
         for (const supply of batch) {
           let suggestedCategory = null;
           
-          // PRIORITY 1: If filterType is set to smallanimal, set category to smallanimal
+          // PRIORITY 1: If filterType is set to specialty section, set category accordingly
           if (supply.filterType === 'smallanimal') {
             suggestedCategory = 'smallanimal';
+          } else if (supply.filterType === 'aquatic') {
+            suggestedCategory = 'aquatics';
+          } else if (supply.filterType === 'reptile') {
+            suggestedCategory = 'reptiles';
           } else {
             // PRIORITY 2: Use standard category determination for other products
             suggestedCategory = determineCategory(supply);

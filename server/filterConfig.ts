@@ -39,7 +39,9 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
     // - GloFish: Fluorescent fish brand (owned by Spectrum/Tetra)
     // - Fluval: Premium aquarium filters and equipment
     // - SeaChem: Advanced aquarium water care products
-    includeBrands: ['Tetra', 'Aqueon', 'GloFish', 'Marineland', 'API', 'Fluval', 'SeaChem', 'Hikari'],
+    // - Omega One: Premium aquarium fish food with natural ingredients
+    // - Ocean Nutrition: Premium frozen and freeze-dried aquarium foods
+    includeBrands: ['Tetra', 'Aqueon', 'GloFish', 'Marineland', 'API', 'Fluval', 'SeaChem', 'Hikari', 'Omega One', 'Ocean Nutrition'],
     includeKeywords: [
       'fish', 'aquarium', 'aquatic', 'betta', 'glo fish', 'goldfish',
       'tropical fish', 'freshwater', 'saltwater', 'reef', 'marine', 'koi',

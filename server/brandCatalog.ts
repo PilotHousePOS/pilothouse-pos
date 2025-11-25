@@ -63,6 +63,8 @@ function extractBrand(productName: string): string | null {
     { name: 'Nylabone', patterns: ['nylabone'] },
     { name: 'Dogswell', patterns: ['dogswell'] },
     { name: 'Durvet', patterns: ['durvet'] },
+    { name: 'Omega One', patterns: ['omega one'] },
+    { name: 'Ocean Nutrition', patterns: ['ocean nutrition'] },
   ];
   
   const lowerName = productName.toLowerCase();
@@ -276,7 +278,7 @@ export async function suggestResearch(
     }
   }
   
-  return [...new Set(potentialAbbrevs)];
+  return Array.from(new Set(potentialAbbrevs));
 }
 
 /**
