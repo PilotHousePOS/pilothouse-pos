@@ -31,12 +31,19 @@ A mobile-friendly web application for the "Animal House" pet store, aimed at enh
     - Integrated into both supply fuzzy search and pet search endpoints
 - Supply Filtering: Centralized, research-based filtering system with proper brand/keyword separation (server/filterConfig.ts):
   - Reptile supplies: ZooMed, Exo Terra, Zilla, Fluker's, ReptiCare brands + reptile keywords
-  - Aquatic supplies: Hikari, Tetra, Aqueon, Marineland, API, Fluval, SeaChem, GloFish brands + aquatic keywords
+  - Aquatic supplies: Hikari, Tetra, Aqueon, Marineland, API, Fluval, SeaChem, GloFish, Omega One, Ocean Nutrition brands + aquatic keywords
   - Cross-category brands (ZooMed): Make both aquatic AND reptile products - not excluded from either category, keywords determine final categorization
   - Keyword priority system: Species-specific keywords (60pts) override brand scoring (40pts) for accurate categorization
   - Exclusion logic: Brand exclusions prevent brand scoring only; keyword exclusions prevent keyword scoring only
   - Toy brands (Kong, Nylabone, Chuckit!, etc.) hard-excluded from both categories via brand AND keyword exclusions
   - Example: "ZooMed Pleco" → pleco keyword (60pts aquatic) beats ZooMed brand (40pts reptile) → categorized as Aquatic
+  - **Aquatic Subcategorization** (server/aquaticCategoryEvidence.ts): Evidence-based system verified from official brand websites for accurate product classification:
+    - Fish Food: Omega One, Ocean Nutrition (food-only brands) + Hikari, API, Tetra, Aqueon, GloFish, Fluval (food + other products)
+    - Medicine/Healthcare: SeaChem (specialist), API (Melafix, Pimafix, General Cure), Hikari (Ich-X, PraziPro), Tetra (AquaSafe), Aqueon (water conditioners)
+    - Supplies/Equipment: Marineland (equipment-only), Fluval, Aqueon, Tetra, GloFish (equipment + other products)
+    - All brand categorizations verified from official websites (November 25, 2025): hikariusa.com, apifishcare.com, aqueon.com, omegasea.net, oceannutrition.com, tetra-fish.com, marineland.com, fluvalaquatics.com, seachem.com, glofish.com
+    - Keyword-based scoring system with verified product terminology from official product lines
+    - Priority system: Brand-based categorization → Keyword scoring → Default to accessories
 
 ## System Architecture
 The application is a full-stack web application with a React frontend (Vite, TypeScript, Tailwind CSS, shadcn/ui) and an Express.js backend (TypeScript) connected to a PostgreSQL database via Drizzle ORM.
@@ -56,7 +63,7 @@ The application is a full-stack web application with a React frontend (Vite, Typ
 - **Wishlist System:** Dedicated page with add/remove and quick "Add to Cart."
 - **Google Calendar & Contact Management:** Integrated Google Calendar, unified calendar view, hybrid contact system with multi-pet support, and event creation from contacts.
 - **Groomer Management System:** Admin CRUD operations for groomers.
-- **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtered by species.
+- **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtered by species. Aquatics page includes subcategory filters (Fish Food, Medicine, Supplies) with evidence-based categorization.
 - **Admin Order Management:** Displays actual product/pet and customer names in order details.
 - **Orders & Appointments Search:** Unified search in admin panel by customer name, phone, or pet name.
 - **Pet Boarding/Babysitting System:** Complete boarding management with intelligent cost calculation, flexible date management, status tracking, and admin-only access.

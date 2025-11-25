@@ -1,10 +1,18 @@
-import { Supply } from './storage';
+import { Supply } from '@shared/schema';
 import {
   CATEGORY_MAPPINGS,
   CATEGORY_SCORING_WEIGHTS,
   CATEGORY_CONFIDENCE_THRESHOLD,
   BRAND_CATEGORY_DEFAULTS,
 } from './categoryConfig';
+import {
+  AQUATIC_FOOD_BRANDS,
+  AQUATIC_MEDICINE_BRANDS,
+  AQUATIC_SUPPLIES_BRANDS,
+  AQUATIC_FOOD_KEYWORDS,
+  AQUATIC_MEDICINE_KEYWORDS,
+  AQUATIC_SUPPLIES_KEYWORDS
+} from './aquaticCategoryEvidence';
 
 export function normalizeBrand(brand: string): string {
   return brand
@@ -100,41 +108,85 @@ export function determineCategory(supply: Supply, excludeCategories: string[] = 
   const supplyBrand = supply.brand?.toLowerCase() || '';
   const supplyDescription = supply.description?.toLowerCase() || '';
   
-  // SPECIAL HANDLING: Aquatic and Reptile items need subcategorization
-  // When 'aquatics' or 'reptiles' are excluded, use keyword patterns to assign food/healthcare/accessories
-  if (excludeCategories.includes('aquatics') || excludeCategories.includes('reptiles')) {
+  // EVIDENCE-BASED AQUATIC SUBCATEGORIZATION
+  // Only apply aquatic evidence logic when actually processing aquatic items (filterType='aquatic')
+  if (supply.filterType === 'aquatic' && excludeCategories.includes('aquatics')) {
     
-    // Fish Food keywords (prioritize food detection)
-    const foodKeywords = [
-      'food', 'pellet', 'flake', 'wafer', 'cuisine', 'granule', 'treat', 
-      'shrimp', 'brine', 'bloodworm', 'tubifex', 'daphnia', 'krill',
-      'spirulina', 'algae wafer', 'cichlid', 'betta', 'goldfish', 'tropical',
-      'freeze dried', 'frozen', 'diet', 'nutrition'
-    ];
-    
-    // Medicine/Healthcare keywords
-    const healthcareKeywords = [
-      'treatment', 'conditioner', 'stress', 'medication', 'remedy', 'cure',
-      'disease', 'parasite', 'fungus', 'bacteria', 'infection', 'supplement',
-      'water conditioner', 'stress coat', 'aquarium salt', 'medicine',
-      'antibiotic', 'anti-', 'health', 'aid', 'care'
-    ];
-    
-    // Check for food keywords
-    for (const keyword of foodKeywords) {
-      if (supplyName.includes(keyword) || supplyDescription.includes(keyword)) {
-        return 'food';
+    // PRIORITY 1: Brand-based categorization (highest confidence)
+    // Check if brand is a food-only specialist
+    for (const brand of AQUATIC_FOOD_BRANDS) {
+      const brandLower = brand.toLowerCase();
+      if (supplyBrand.includes(brandLower) || supplyName.includes(brandLower)) {
+        // Verify it's actually a food product with keyword check
+        for (const keyword of AQUATIC_FOOD_KEYWORDS) {
+          if (supplyName.includes(keyword) || supplyDescription.includes(keyword)) {
+            return 'food';
+          }
+        }
+        // If no food keywords found but it's a food brand, still likely food
+        // but score it to be safe
+        break;
       }
     }
     
-    // Check for healthcare keywords
-    for (const keyword of healthcareKeywords) {
-      if (supplyName.includes(keyword) || supplyDescription.includes(keyword)) {
-        return 'healthcare';
+    // Check if brand is a medicine specialist
+    for (const brand of AQUATIC_MEDICINE_BRANDS) {
+      const brandLower = brand.toLowerCase();
+      if (supplyBrand.includes(brandLower) || supplyName.includes(brandLower)) {
+        // Verify it's actually a medicine product with keyword check
+        for (const keyword of AQUATIC_MEDICINE_KEYWORDS) {
+          if (supplyName.includes(keyword) || supplyDescription.includes(keyword)) {
+            return 'healthcare';
+          }
+        }
+        // If SeaChem brand but no medicine keywords, might be a filter media or accessory
+        if (brandLower.includes('seachem')) {
+          // Check if it's Purigen, filter media, or other accessories
+          const accessoryKeywords = ['purigen', 'filter', 'media', 'pad', 'carbon'];
+          for (const keyword of accessoryKeywords) {
+            if (supplyName.includes(keyword) || supplyDescription.includes(keyword)) {
+              return 'accessories';
+            }
+          }
+        }
+        break;
       }
     }
     
-    // Default to accessories for specialty items (equipment, decorations, etc.)
+    // PRIORITY 2: Keyword-based categorization (verified keywords from official sources)
+    // Count keyword matches for each category
+    let foodScore = 0;
+    let healthcareScore = 0;
+    let suppliesScore = 0;
+    
+    // Food keyword scoring
+    for (const keyword of AQUATIC_FOOD_KEYWORDS) {
+      if (supplyName.includes(keyword)) foodScore += 10;
+      if (supplyDescription.includes(keyword)) foodScore += 5;
+    }
+    
+    // Healthcare keyword scoring
+    for (const keyword of AQUATIC_MEDICINE_KEYWORDS) {
+      if (supplyName.includes(keyword)) healthcareScore += 10;
+      if (supplyDescription.includes(keyword)) healthcareScore += 5;
+    }
+    
+    // Supplies keyword scoring
+    for (const keyword of AQUATIC_SUPPLIES_KEYWORDS) {
+      if (supplyName.includes(keyword)) suppliesScore += 10;
+      if (supplyDescription.includes(keyword)) suppliesScore += 5;
+    }
+    
+    // Return highest scoring category if it meets threshold
+    const maxScore = Math.max(foodScore, healthcareScore, suppliesScore);
+    if (maxScore >= 10) { // At least one keyword match in name
+      if (foodScore === maxScore) return 'food';
+      if (healthcareScore === maxScore) return 'healthcare';
+      if (suppliesScore === maxScore) return 'accessories';
+    }
+    
+    // PRIORITY 3: Default to accessories if no clear match
+    // Equipment, decorations, and other supplies
     return 'accessories';
   }
   
