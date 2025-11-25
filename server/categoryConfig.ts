@@ -106,8 +106,9 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'GoDog', 'SPOT', 'Mammoth', 'Benebone', 'Tuffy', 'Bullymake', 'Jolly Pets',
       'Planet Dog', 'Trixie', 'Nina Ottosson', 'iFetch', 'Kng', 'Spot',
       'Jones', 'Smartplay', 'Pacific Perch',
-      // Small animal toy brands
-      'Sofier', 'YIXUND', 'VESPRO', 'mini&moe',
+      // Small animal toy brands (verified from research: Kaytee, Oxbow, Ware make toys AND food)
+      // These brands need keyword matching to distinguish toys from food
+      'Sofier', 'YIXUND', 'VESPRO', 'mini&moe', 'Rosewood',
       // Bird toy brands
       'Bonka Bird Toys', 'Planet Pleasures', 'Super Bird Creations', 'JW Pet',
       'Kyouki', 'Bird Safe Store', 'KATUMO', 'Prevue Pet', 'Agape',
@@ -130,6 +131,13 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'rotating perch', 'spinning toy', 'exercise wheel',
       'woven ball', 'grass ball', 'seagrass', 'vine ball',
       'apple wood stick', 'timothy stick', 'chew stick',
+      // Small animal toy specific keywords (verified: Kaytee, Oxbow product lines)
+      'runabout ball', 'run-about ball', 'run about ball', 'hamster ball',
+      'comfort wheel', 'giant wheel', 'silent wheel', 'flying saucer',
+      'chewbular', 'tunnel toy', 'crinkle tunnel', 'flex tunnel',
+      'hay ball', 'crazy hay ball', 'enriched life', 'hamsteroids',
+      'combo toy', 'willow ball', 'willow branch', 'chew cube',
+      'gnaw stick', 'play tunnel', 'hideout', 'play bridge',
       // Only "toy" when clearly a toy
       ' toy ', 'dog toy', 'cat toy', 'pet toy', 'chew toy', 'bird toy',
     ],
