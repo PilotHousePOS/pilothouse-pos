@@ -55,7 +55,13 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Lt': 'Light',
   'Dk': 'Dark',
   'Bk': 'Black',
+  'Blk': 'Black',
   'Rd': 'Red',
+  'Wht': 'White',
+  'Blu': 'Blue',
+  'Purp': 'Purple',
+  'Brwn': 'Brown',
+  'Grn': 'Green',
   
   // Comfort/General
   'Cmfrt': 'Comfort',
@@ -95,6 +101,31 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Runabutball': 'Run-About Ball',
   'Clr': 'Clear',
   'Pebb': 'Pebbles',
+  
+  // Collar/Leash abbreviations
+  'Cllr': 'Collar',
+  'Seccllr': 'Security Collar',
+  'Lsh': 'Leash',
+  'Harn': 'Harness',
+  'Adj': 'Adjustable',
+  'Nyl': 'Nylon',
+  'Lth': 'Leather',
+  
+  // Product type abbreviations
+  'Orig': 'Original',
+  'Ori': 'Original',
+  'Trop': 'Tropical',
+  'Flvr': 'Flavor',
+  'Flv': 'Flavor',
+  'Rll': 'Roll',
+  'Rlls': 'Rolls',
+  'Twst': 'Twist',
+  'Wtrlily': 'Water Lily',
+  
+  // Brand abbreviation fixes
+  'Nthntohide': "Nothin' to Hide",
+  'Nthtohide': "Nothin' to Hide",
+  'Nutr Sou': 'Nutrisource',
   
   // Food/Flavors
   'Blubrede': 'Blueberry',
