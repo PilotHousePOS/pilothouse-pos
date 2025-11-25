@@ -61,6 +61,8 @@ function extractBrand(productName: string): string | null {
     { name: 'Temptations', patterns: ['temptations'] },
     { name: 'Kong', patterns: ['kong'] },
     { name: 'Nylabone', patterns: ['nylabone'] },
+    { name: 'Dogswell', patterns: ['dogswell'] },
+    { name: 'Durvet', patterns: ['durvet'] },
   ];
   
   const lowerName = productName.toLowerCase();
