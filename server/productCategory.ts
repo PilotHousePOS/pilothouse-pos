@@ -96,10 +96,51 @@ export function calculateCategoryScore(
 }
 
 export function determineCategory(supply: Supply, excludeCategories: string[] = []): string | null {
-  // First check brand-specific defaults for overlapping brands
   const supplyName = supply.name.toLowerCase();
   const supplyBrand = supply.brand?.toLowerCase() || '';
+  const supplyDescription = supply.description?.toLowerCase() || '';
   
+  // SPECIAL HANDLING: Aquatic and Reptile items need subcategorization
+  // When 'aquatics' or 'reptiles' are excluded, use keyword patterns to assign food/healthcare/accessories
+  if (excludeCategories.includes('aquatics') || excludeCategories.includes('reptiles')) {
+    
+    // Fish Food keywords (prioritize food detection)
+    const foodKeywords = [
+      'food', 'pellet', 'flake', 'wafer', 'cuisine', 'granule', 'treat', 
+      'shrimp', 'brine', 'bloodworm', 'tubifex', 'daphnia', 'krill',
+      'spirulina', 'algae wafer', 'cichlid', 'betta', 'goldfish', 'tropical',
+      'freeze dried', 'frozen', 'diet', 'nutrition'
+    ];
+    
+    // Medicine/Healthcare keywords
+    const healthcareKeywords = [
+      'treatment', 'conditioner', 'stress', 'medication', 'remedy', 'cure',
+      'disease', 'parasite', 'fungus', 'bacteria', 'infection', 'supplement',
+      'water conditioner', 'stress coat', 'aquarium salt', 'medicine',
+      'antibiotic', 'anti-', 'health', 'aid', 'care'
+    ];
+    
+    // Check for food keywords
+    for (const keyword of foodKeywords) {
+      if (supplyName.includes(keyword) || supplyDescription.includes(keyword)) {
+        return 'food';
+      }
+    }
+    
+    // Check for healthcare keywords
+    for (const keyword of healthcareKeywords) {
+      if (supplyName.includes(keyword) || supplyDescription.includes(keyword)) {
+        return 'healthcare';
+      }
+    }
+    
+    // Default to accessories for specialty items (equipment, decorations, etc.)
+    return 'accessories';
+  }
+  
+  // STANDARD CATEGORIZATION for non-specialty items
+  
+  // First check brand-specific defaults for overlapping brands
   for (const [brand, defaultCategory] of Object.entries(BRAND_CATEGORY_DEFAULTS)) {
     // Skip if this category is excluded
     if (excludeCategories.includes(defaultCategory)) continue;

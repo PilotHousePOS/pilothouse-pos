@@ -32,9 +32,9 @@ function getPageIndicators(currentPage: number, totalPages: number): number[] {
 }
 
 const AQUATIC_CATEGORIES = [
-  { id: 'food', label: 'Food', emoji: '🐟' },
+  { id: 'food', label: 'Fish Food', emoji: '🐟' },
   { id: 'healthcare', label: 'Medicine', emoji: '💊' },
-  { id: 'accessories', label: 'Accessories', emoji: '🏺' },
+  { id: 'accessories', label: 'Supplies', emoji: '🏺' },
 ];
 
 export default function AquaticsPage() {
