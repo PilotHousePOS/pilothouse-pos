@@ -799,25 +799,29 @@ export class DatabaseStorage implements IStorage {
     };
 
     // Define toy type keywords for filtering with exclusions
+    // IMPORTANT: Include brand names in keyword list since brand field is often empty
+    // Products have brand in name like "Kong Airdog" not "Kong Dog Toy"
     const toyKeywords: Record<string, { include: string[], exclude: string[], brands?: string[] }> = {
       'dog-toys': {
-        include: ['dog toy', 'puppy toy', 'canine toy', 'k9 toy', 'chew', 'fetch', 'tug', 'rope toy'],
-        exclude: ['cat', 'kitten', 'bird', 'hamster', 'guinea pig', 'rabbit'],
-        brands: ['kong', 'nylabone', 'benebone', 'chuckit', 'west paw', 'mammoth']
+        // Include common dog toy brands and keywords - brand names check product NAME not brand field
+        include: ['kong', 'nylabone', 'benebone', 'chuckit', 'west paw', 'mammoth', 'outward hound', 'tuffy', 'multipet', 'spot', 'rascals', 'bionic', 'jw', 'starmark', 'zanies', 'dog', 'puppy', 'canine', 'chew', 'fetch', 'tug', 'rope', 'ball', 'squeaker', 'plush'],
+        exclude: ['cat toy', 'kitten', 'catnip', 'bird toy', 'hamster', 'guinea pig', 'rabbit', 'parakeet', 'parrot', 'feather wand'],
+        brands: []
       },
       'cat-toys': {
-        include: ['cat toy', 'kitten toy', 'feline', 'catnip', 'mouse toy', 'feather', 'wand toy'],
-        exclude: ['dog', 'puppy', 'bird', 'hamster', 'guinea pig', 'rabbit'],
-        brands: ['petstages', 'jackson galaxy', 'yeowww']
+        // Include cat-specific brands and keywords
+        include: ['cat', 'kitten', 'feline', 'catnip', 'mouse toy', 'feather', 'wand', 'laser', 'teaser', 'scratcher', 'petstages', 'jackson galaxy', 'yeowww', 'bergan', 'catit'],
+        exclude: ['dog toy', 'puppy toy', 'airdog', 'bird toy', 'hamster', 'guinea pig', 'rabbit'],
+        brands: []
       },
       'bird-toys': {
-        include: ['bird toy', 'parakeet', 'parrot', 'perch', 'avian', 'bird swing', 'bird ladder'],
-        exclude: ['dog', 'puppy', 'cat', 'kitten'],
+        include: ['bird', 'parakeet', 'parrot', 'perch', 'avian', 'swing', 'ladder', 'cockatiel', 'budgie', 'finch', 'birdlife', 'prevue', 'jw bird'],
+        exclude: ['dog', 'puppy', 'cat', 'kitten', 'airdog'],
         brands: []
       },
       'small-animal-toys': {
-        include: ['guinea pig', 'hamster', 'rabbit', 'bunny', 'ferret', 'gerbil', 'chinchilla', 'small animal'],
-        exclude: ['dog', 'puppy', 'cat', 'kitten', 'bird'],
+        include: ['guinea pig', 'hamster', 'rabbit', 'bunny', 'ferret', 'gerbil', 'chinchilla', 'small animal', 'kaytee', 'oxbow', 'living world'],
+        exclude: ['dog', 'puppy', 'cat', 'kitten', 'bird', 'airdog'],
         brands: []
       }
     };
