@@ -840,13 +840,13 @@ export class DatabaseStorage implements IStorage {
       },
       'supplements': {
         include: ['supplement', 'vitamin', 'probiotic', 'joint', 'hip', 'glucosamine', 'omega', 'nutrient', 'multivitamin'],
-        exclude: ['shampoo', 'conditioner', 'brush'],
+        exclude: ['shampoo', 'conditioner', 'brush', 'ear cleaner', 'ear wash', 'ear wipe', 'ear care', 'ear therapy', 'earmite'],
         brands: ['cosequin', 'dasuquin', 'nutramax', 'grizzly']
       },
       'grooming': {
-        include: ['shampoo', 'conditioner', 'brush', 'comb', 'nail', 'clipper', 'trimmer', 'grooming', 'bath', 'deshedding'],
+        include: ['shampoo', 'conditioner', 'brush', 'comb', 'nail', 'clipper', 'trimmer', 'grooming', 'bath', 'deshedding', 'ear cleaner', 'ear wash', 'ear wipe', 'ear care', 'ear therapy', 'earcare', 'earmite', 'cologne', 'deodorizer', 'spritz', 'slicker', 'rake', 'dematter', 'shedding', 'scissors'],
         exclude: ['food', 'treat', 'toy'],
-        brands: ['furminator', 'chris christensen', 'isle of dogs']
+        brands: ['furminator', 'chris christensen', 'isle of dogs', 'safari', 'biogroom', 'tropiclean']
       },
       'first-aid': {
         include: ['first aid', 'bandage', 'ointment', 'cream', 'wound', 'antiseptic', 'antibiotic', 'healing', 'gauze'],
