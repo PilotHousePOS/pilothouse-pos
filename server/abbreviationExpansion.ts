@@ -88,6 +88,14 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Greeniues': 'Greenies',
   'Wishbne': 'Wishbone',
   
+  // Kaytee/Oxbow small animal products (verified from official websites)
+  'Rainbw': 'Rainbow',
+  'Runrnd': 'Run Around',
+  'Tclub': 'Timothy Club',
+  'Runabutball': 'Run-About Ball',
+  'Clr': 'Clear',
+  'Pebb': 'Pebbles',
+  
   // Food/Flavors
   'Blubrede': 'Blueberry',
   'White Gr': 'With Grain',
