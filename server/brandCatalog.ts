@@ -65,6 +65,7 @@ function extractBrand(productName: string): string | null {
     { name: 'Durvet', patterns: ['durvet'] },
     { name: 'Omega One', patterns: ['omega one'] },
     { name: 'Ocean Nutrition', patterns: ['ocean nutrition'] },
+    { name: 'Primal', patterns: ['primal'] },
   ];
   
   const lowerName = productName.toLowerCase();
