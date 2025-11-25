@@ -4422,6 +4422,9 @@ function EditAppointmentDialog({
   const [pricingMode, setPricingMode] = useState<'individual' | 'override'>('individual');
   const [totalPriceOverride, setTotalPriceOverride] = useState('');
   
+  // State for capacity error dialog
+  const [showCapacityDialog, setShowCapacityDialog] = useState(false);
+  
   // Track which appointment we've initialized for (prevents overwriting edits on refetch)
   const initializedAppointmentId = useRef<number | null>(null);
   
@@ -4575,9 +4578,31 @@ function EditAppointmentDialog({
       handleClose();
     },
     onError: (error: any) => {
+      // Extract error message from apiRequest error format: "400: {json}"
+      let errorText = '';
+      if (error?.message) {
+        const parts = error.message.split(': ', 2);
+        if (parts.length === 2) {
+          try {
+            const jsonData = JSON.parse(parts[1]);
+            errorText = jsonData.message || '';
+          } catch {
+            errorText = parts[1];
+          }
+        } else {
+          errorText = error.message;
+        }
+      }
+      
+      // Check if this is a capacity error
+      if (errorText.includes('capacity is fully booked') || errorText.includes('capacity would be exceeded')) {
+        setShowCapacityDialog(true);
+        return;
+      }
+      
       toast({
         title: "Error",
-        description: error?.message || "Failed to update appointment. Please try again.",
+        description: errorText || "Failed to update appointment. Please try again.",
         variant: "destructive",
       });
     },
@@ -4866,6 +4891,23 @@ function EditAppointmentDialog({
           </Button>
         </DialogFooter>
       </DialogContent>
+      
+      {/* Capacity Error Dialog - Centered Popup */}
+      <Dialog open={showCapacityDialog} onOpenChange={setShowCapacityDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-center">Fully Booked</DialogTitle>
+            <DialogDescription className="text-center pt-2">
+              We are fully booked for that day. Please select a different date.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="justify-center">
+            <Button onClick={() => setShowCapacityDialog(false)} data-testid="button-capacity-ok">
+              OK
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
@@ -6463,9 +6505,31 @@ export default function Admin() {
       setEditGroomerId(null);
     },
     onError: (error: any) => {
+      // Extract error message from apiRequest error format: "400: {json}"
+      let errorText = '';
+      if (error?.message) {
+        const parts = error.message.split(': ', 2);
+        if (parts.length === 2) {
+          try {
+            const jsonData = JSON.parse(parts[1]);
+            errorText = jsonData.message || '';
+          } catch {
+            errorText = parts[1];
+          }
+        } else {
+          errorText = error.message;
+        }
+      }
+      
+      // Check if this is a capacity error - show centered dialog
+      if (errorText.includes('capacity is fully booked') || errorText.includes('capacity would be exceeded')) {
+        setShowAdminCapacityDialog(true);
+        return;
+      }
+      
       toast({
         title: "Error",
-        description: error?.message || "Failed to update appointment. Please try again.",
+        description: errorText || "Failed to update appointment. Please try again.",
         variant: "destructive",
       });
     },
