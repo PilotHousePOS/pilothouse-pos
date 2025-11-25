@@ -11,6 +11,7 @@ import { safeGoBack } from "@/lib/navigation";
 import { useDebounce } from "@/hooks/use-debounce";
 
 const ITEMS_PER_PAGE = 24;
+const PETS_PER_PAGE = 6;
 
 // Helper function to calculate which page indicators to display (max 5)
 function getPageIndicators(currentPage: number, totalPages: number): number[] {
@@ -44,6 +45,7 @@ export default function AquaticsPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [modalZoom, setModalZoom] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  const [petsPage, setPetsPage] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [searchInput, setSearchInput] = useState('');
@@ -61,7 +63,9 @@ export default function AquaticsPage() {
     },
   });
   
-  const pets = petsData?.pets || [];
+  const allPets = petsData?.pets || [];
+  const petsTotalPages = Math.ceil(allPets.length / PETS_PER_PAGE);
+  const pets = allPets.slice(petsPage * PETS_PER_PAGE, (petsPage + 1) * PETS_PER_PAGE);
 
   const { data: suppliesData, isLoading: suppliesLoading } = useQuery<any>({
     queryKey: ["/api/supplies", { category: selectedCategory || "aquatic-supplies", page: currentPage, limit: ITEMS_PER_PAGE, search: searchQuery }],
@@ -156,7 +160,7 @@ export default function AquaticsPage() {
                 </Card>
               ))}
             </div>
-          ) : pets.length === 0 ? (
+          ) : allPets.length === 0 ? (
             <Card>
               <CardContent className="p-8 text-center text-gray-500">
                 <Fish className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -164,53 +168,99 @@ export default function AquaticsPage() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-max">
-              {pets.map((pet: any) => (
-                <Card 
-                  key={pet.id} 
-                  className="overflow-visible hover:shadow-lg transition-shadow flex flex-col min-w-0 cursor-pointer"
-                  onClick={() => {
-                    setSelectedItem(pet);
-                    setSelectedType("pet");
-                  }}
-                >
-                  <div className="h-48 bg-gray-200 overflow-hidden flex-shrink-0">
-                    {(pet.imageUrls?.[0] || pet.imageUrl) && (
-                      <img
-                        src={pet.imageUrls?.[0] || pet.imageUrl}
-                        alt={pet.name}
-                        className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
-                      />
-                    )}
-                  </div>
-                  <CardContent className="p-4 pb-6 flex flex-col flex-grow">
-                    <h3 className="font-bold text-lg mb-2">{pet.name}</h3>
-                    <p className="text-sm text-gray-600 mb-2">{pet.breed}</p>
-                    {pet.description && (
-                      <p className="text-sm text-gray-500 mb-3 line-clamp-2">
-                        {pet.description}
-                      </p>
-                    )}
-                    <div className="mt-auto pt-2 space-y-3">
-                      <div className="text-lg font-bold text-blue-600">
-                        ${pet.price}
-                      </div>
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAddToCart(pet, "pet");
-                        }}
-                        className="w-full bg-blue-600 hover:bg-blue-700"
-                        data-testid={`add-to-cart-pet-${pet.id}`}
-                      >
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Add to Cart
-                      </Button>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-max">
+                {pets.map((pet: any) => (
+                  <Card 
+                    key={pet.id} 
+                    className="overflow-visible hover:shadow-lg transition-shadow flex flex-col min-w-0 cursor-pointer"
+                    onClick={() => {
+                      setSelectedItem(pet);
+                      setSelectedType("pet");
+                    }}
+                  >
+                    <div className="h-48 bg-gray-200 overflow-hidden flex-shrink-0">
+                      {(pet.imageUrls?.[0] || pet.imageUrl) && (
+                        <img
+                          src={pet.imageUrls?.[0] || pet.imageUrl}
+                          alt={pet.name}
+                          className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
+                        />
+                      )}
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    <CardContent className="p-4 pb-6 flex flex-col flex-grow">
+                      <h3 className="font-bold text-lg mb-2">{pet.name}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{pet.breed}</p>
+                      {pet.description && (
+                        <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+                          {pet.description}
+                        </p>
+                      )}
+                      <div className="mt-auto pt-2 space-y-3">
+                        <div className="text-lg font-bold text-blue-600">
+                          ${pet.price}
+                        </div>
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart(pet, "pet");
+                          }}
+                          className="w-full bg-blue-600 hover:bg-blue-700"
+                          data-testid={`add-to-cart-pet-${pet.id}`}
+                        >
+                          <ShoppingCart className="w-4 h-4 mr-2" />
+                          Add to Cart
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              
+              {/* Pets Pagination */}
+              {petsTotalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-6">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setPetsPage(Math.max(0, petsPage - 1))}
+                    disabled={petsPage === 0}
+                    className="h-8 w-8"
+                    data-testid="pets-prev-page"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  
+                  {getPageIndicators(petsPage, petsTotalPages).map((pageNum) => (
+                    <Button
+                      key={pageNum}
+                      variant={petsPage === pageNum ? "default" : "outline"}
+                      size="icon"
+                      onClick={() => setPetsPage(pageNum)}
+                      className={`h-8 w-8 ${petsPage === pageNum ? 'bg-blue-600 hover:bg-blue-700' : ''}`}
+                      data-testid={`pets-page-${pageNum}`}
+                    >
+                      {pageNum + 1}
+                    </Button>
+                  ))}
+                  
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setPetsPage(Math.min(petsTotalPages - 1, petsPage + 1))}
+                    disabled={petsPage >= petsTotalPages - 1}
+                    className="h-8 w-8"
+                    data-testid="pets-next-page"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                  
+                  <span className="text-sm text-gray-500 ml-2">
+                    {allPets.length} animals
+                  </span>
+                </div>
+              )}
+            </>
           )}
         </section>
 
