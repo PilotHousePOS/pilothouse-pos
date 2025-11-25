@@ -52,7 +52,7 @@ export default function AquaticsPage() {
   // Debounce search to avoid flickering on every keystroke
   const searchQuery = useDebounce(searchInput, 500);
 
-  const { data: pets = [], isLoading: petsLoading } = useQuery<any[]>({
+  const { data: petsData, isLoading: petsLoading } = useQuery<any>({
     queryKey: ["/api/pets", { species: "fish" }],
     queryFn: async () => {
       const response = await fetch("/api/pets?species=fish");
@@ -60,6 +60,8 @@ export default function AquaticsPage() {
       return response.json();
     },
   });
+  
+  const pets = petsData?.pets || [];
 
   const { data: suppliesData, isLoading: suppliesLoading } = useQuery<any>({
     queryKey: ["/api/supplies", { category: selectedCategory || "aquatic-supplies", page: currentPage, limit: ITEMS_PER_PAGE, search: searchQuery }],
