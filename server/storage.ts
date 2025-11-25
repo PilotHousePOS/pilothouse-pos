@@ -1312,16 +1312,18 @@ export class DatabaseStorage implements IStorage {
         for (const supply of batch) {
           let suggestedCategory = null;
           
-          // PRIORITY 1: If filterType is set to specialty section, determine subcategory
+          // PRIORITY 1: If filterType is set to specialty section, ALWAYS use specialty category
+          // User requirement: Fish food must be in 'aquatics' category, NOT 'food'
           if (supply.filterType === 'smallanimal') {
             suggestedCategory = 'smallanimal';
           } else if (supply.filterType === 'aquatic') {
-            // For aquatic items, use standard categorization but EXCLUDE 'aquatics' and 'reptiles' categories
-            // This allows items to be categorized as food, healthcare, accessories, etc.
-            suggestedCategory = determineCategory(supply, ['aquatics', 'reptiles']);
+            // CRITICAL: Aquatic items MUST have category='aquatics' per user requirement
+            // The Aquatics page filters by filterType='aquatic', and subcategory filtering
+            // is handled by the API with additional keyword-based filtering
+            suggestedCategory = 'aquatics';
           } else if (supply.filterType === 'reptile') {
-            // For reptile items, use standard categorization but EXCLUDE 'reptiles' and 'aquatics' categories
-            suggestedCategory = determineCategory(supply, ['reptiles', 'aquatics']);
+            // Reptile items MUST have category='reptiles' to appear on Reptiles page
+            suggestedCategory = 'reptiles';
           } else {
             // PRIORITY 2: Use standard category determination for other products
             suggestedCategory = determineCategory(supply);
