@@ -45,7 +45,7 @@ function extractBrand(productName: string): string | null {
     { name: 'Zignature', patterns: ['zignature', 'zign'] },
     { name: 'Canidae', patterns: ['canidae'] },
     { name: 'Instinct', patterns: ['instinct'] },
-    { name: 'Earthborn', patterns: ['earthborn', 'earth cat'] },
+    { name: 'Earthborn', patterns: ['earthborn', 'earthborn holistic'] },
     { name: 'Nutro', patterns: ['nutro'] },
     { name: 'Eukanuba', patterns: ['eukanuba'] },
     { name: 'Diamond', patterns: ['diamond'] },
