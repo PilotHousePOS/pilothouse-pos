@@ -57,7 +57,9 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
     ],
     excludeKeywords: [
       'gecko', 'lizard', 'snake', 'bearded dragon', 'iguana',
-      'reptile', 'terrarium', 'vivarium', 'repti',
+      'turtle', 'tortoise',  // Turtles are reptiles, not fish - even aquatic turtles
+      'reptile', 'terrarium', 'vivarium', 'repti', 'amphibian',
+      'frog', 'toad', 'salamander', 'newt', 'chameleon',  // Amphibians are reptile section
       'dog toy', 'cat toy', 'pet toy',
       // Exclude cat/dog food with fish ingredients (multi-word to avoid matching "catfish")
       'cat food', 'cat treat', 'kitten food', 'kitten treat',
