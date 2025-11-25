@@ -43,7 +43,9 @@ A mobile-friendly web application for the "Animal House" pet store, aimed at enh
     - Supplies/Equipment: Marineland (equipment-only), Fluval, Aqueon, Tetra, GloFish (equipment + other products)
     - All brand categorizations verified from official websites (November 25, 2025): hikariusa.com, apifishcare.com, aqueon.com, omegasea.net, oceannutrition.com, tetra-fish.com, marineland.com, fluvalaquatics.com, seachem.com, glofish.com
     - Keyword-based scoring system with verified product terminology from official product lines
-    - Priority system: Brand-based categorization → Keyword scoring → Default to accessories
+    - Priority system: Decoration exclusion (AQUATIC_DECORATION_PHRASES) → Brand-based categorization → Keyword scoring → Default to accessories
+    - Decoration exclusion: Tetra Glo, GloFish Glo, and other decorative product lines automatically categorized as accessories
+    - Cat/dog food exclusion: Products containing cat/dog keywords excluded from aquatic filterType to prevent misclassification of pet food with fish ingredients
 
 ## System Architecture
 The application is a full-stack web application with a React frontend (Vite, TypeScript, Tailwind CSS, shadcn/ui) and an Express.js backend (TypeScript) connected to a PostgreSQL database via Drizzle ORM.
