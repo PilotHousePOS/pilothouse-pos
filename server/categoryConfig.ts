@@ -90,6 +90,12 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'toy', 'ball', 'bowl', 'feeder', 'dispenser', 'collar', 'leash', 'bed',
       'crate', 'carrier', 'shampoo', 'brush', 'clipper', 'cage', 'aquarium',
       'plush', 'squeaky', 'rope', 'frisbee', 'fetch', 'tug',
+      // Aquatic/fish accessories - NOT food
+      'heater', 'filter', 'gravel', 'plant', 'log', 'ceramic', 'moss ball',
+      'bamboo', 'maple', 'papaya', 'betta kit', 'betta clean', 'betta bowl',
+      'betta beads', 'betta ultimate', 'fish tank', 'tank decor', 'ornament',
+      'decoration', 'cave', 'hide', 'hideout', 'thermometer', 'air pump',
+      'air stone', 'siphon', 'net', 'water conditioner', 'dechlorinator',
     ],
   },
 
