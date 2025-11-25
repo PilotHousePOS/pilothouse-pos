@@ -1500,9 +1500,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
                    apt.status !== 'rejected';
           });
           
-          console.log(`[CAPACITY CHECK - EDIT] Checking date ${appointmentDateStr}, excluding appointment ${id}`);
-          console.log(`[CAPACITY CHECK - EDIT] Found ${appointmentsOnDate.length} other appointments on this date`);
-          
           // Count existing dogs by service type with substring matching
           let bathDogs = 0;
           let groomDogs = 0;
@@ -1514,10 +1511,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 const svcType = (p.serviceType || '').toLowerCase();
                 if (svcType.includes('bath')) {
                   bathDogs++;
-                  console.log(`[CAPACITY CHECK - EDIT] Apt ${apt.id} pet "${p.petName}": BATH`);
                 } else if (svcType.includes('full') || svcType.includes('groom')) {
                   groomDogs++;
-                  console.log(`[CAPACITY CHECK - EDIT] Apt ${apt.id} pet "${p.petName}": GROOM`);
                 }
               }
             } else {
@@ -1525,10 +1520,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const svcType = (apt.serviceType || '').toLowerCase();
               if (svcType.includes('bath')) {
                 bathDogs++;
-                console.log(`[CAPACITY CHECK - EDIT] Apt ${apt.id} (legacy): BATH`);
               } else if (svcType.includes('full') || svcType.includes('groom')) {
                 groomDogs++;
-                console.log(`[CAPACITY CHECK - EDIT] Apt ${apt.id} (legacy): GROOM`);
               }
             }
           }
@@ -1545,27 +1538,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           }
           
-          console.log(`[CAPACITY CHECK - EDIT] Other appointments: ${groomDogs} grooms, ${bathDogs} baths`);
-          console.log(`[CAPACITY CHECK - EDIT] This update requests: ${requestedGrooms} grooms, ${requestedBaths} baths`);
-          console.log(`[CAPACITY CHECK - EDIT] Limit: ${weeklyLimit.maxGroomAppointments} grooms, ${weeklyLimit.maxBathAppointments} baths`);
-          console.log(`[CAPACITY CHECK - EDIT] After update: ${groomDogs + requestedGrooms} grooms, ${bathDogs + requestedBaths} baths`);
-          
           // Check if update would exceed capacity
           if (bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
-            console.log(`[CAPACITY CHECK - EDIT] BLOCKED: Bath capacity exceeded`);
             return res.status(400).json({
               message: `Cannot update: Bath grooming capacity would be exceeded for this date (limit: ${weeklyLimit.maxBathAppointments} dogs, ${bathDogs} already booked by other appointments). Please select a different date or reduce the number of bath services.`
             });
           }
           
           if (groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
-            console.log(`[CAPACITY CHECK - EDIT] BLOCKED: Groom capacity exceeded`);
             return res.status(400).json({
               message: `Cannot update: Full grooming capacity would be exceeded for this date (limit: ${weeklyLimit.maxGroomAppointments} dogs, ${groomDogs} already booked by other appointments). Please select a different date or reduce the number of full groom services.`
             });
           }
-          
-          console.log(`[CAPACITY CHECK - EDIT] ALLOWED: Within capacity limits`);
         }
       }
 
