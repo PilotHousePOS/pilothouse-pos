@@ -106,6 +106,8 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'GoDog', 'SPOT', 'Mammoth', 'Benebone', 'Tuffy', 'Bullymake', 'Jolly Pets',
       'Planet Dog', 'Trixie', 'Nina Ottosson', 'iFetch', 'Kng', 'Spot',
       'Jones', 'Smartplay', 'Pacific Perch',
+      // Sea-themed toy brands (these make fish/ocean toys, NOT aquarium products)
+      'Rascals', 'Playfuls',
       // Small animal toy brands (verified from research: Kaytee, Oxbow, Ware make toys AND food)
       // These brands need keyword matching to distinguish toys from food
       'Sofier', 'YIXUND', 'VESPRO', 'mini&moe', 'Rosewood',
@@ -121,6 +123,9 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       // Specific descriptors
       'honk duck', 'wild knots', 'whirlz', 'funfood', 'glow ball',
       'max glow', 'ultra ball', 'wubba', 'goodie bone',
+      // Sea-themed toys (NOT aquarium products - these are dog/cat toys)
+      'angler fish', 'jellyfish', 'crab toy', 'octopus toy', 'shark toy',
+      'sea creature', 'ocean toy', 'fishbone', 'fish toy', 'clownfish toy',
       // Cat-specific toys
       'catnip toy', 'teaser wand', 'feather toy', 'cat mouse',
       'scratching post', 'cat tree', 'scratcher', 'track toy',
@@ -354,6 +359,11 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       // Pet clothing & fashion brands
       'Aria', 'Zack & Zoey', 'Casual Canine', 'East Side Collection', 'Hip Doggie',
       'Pup Crew', 'Pet Life', 'Fashion Pet', 'Rubie\'s', 'Bootique',
+      // Cat litter brands (these go in accessories, NOT aquatics)
+      'Intersand', 'Dr. Elsey', 'Dr Elsey', 'Arm & Hammer', 'Tidy Cats', 'World\'s Best',
+      'Fresh Step', 'Scoop Away', 'Precious Cat', 'Cat\'s Pride', "Cat's Pride",
+      // Pet bowl/feeding brands
+      'Bella', 'Bellabowl', 'Neater Feeder', 'PetRageous',
     ],
     nameKeywords: [
       // Pet clothing & apparel
@@ -368,13 +378,20 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       // Accessories
       'scarf', 'neckerchief', 'hat', 'cap', 'sunglasses', 'goggles',
       'socks', 'booties', 'shoes', 'sneakers',
+      // Cat litter products
+      'cat litter', 'clumping litter', 'scoopable litter', 'odorlock', 'odor lock',
+      'litter box', 'litter pan', 'litter scoop', 'litter mat',
+      // Pet bowls/feeders
+      'pet bowl', 'food bowl', 'water bowl', 'feeding bowl', 'bellabowl',
+      'elevated bowl', 'slow feeder', 'automatic feeder',
     ],
     descriptionKeywords: [
       'fashionable', 'stylish', 'decorative', 'adorable', 'cute', 'festive',
+      'odor control', 'clumping', 'absorbent', // For cat litter
     ],
     exclusionKeywords: [
       'food', 'kibble', 'treat', 'meal', 'toy', 'ball', 'chew',
-      'bowl', 'feeder', 'aquarium', 'cage', 'crate', 'carrier',
+      'aquarium', 'cage', 'crate', 'carrier',
       'shampoo', 'brush', 'clipper', 'bed',
     ],
   },
@@ -406,29 +423,54 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
     ],
     exclusionKeywords: [
       'food', 'flakes', 'pellets', 'turtle food', 'fish food',
+      // CRITICAL: Exclude reptile brands/products - they should be in reptiles category
+      'tetrafauna', 'reptohabitat', 'reptofilter', 'reptomin', 'reptosafe',
+      'exo terra', 'exoterra', 'zilla', "fluker's", 'flukers', 'repticare',
+      'gecko', 'lizard', 'snake', 'bearded dragon', 'iguana', 'chameleon',
+      'turtle', 'tortoise', 'terrarium', 'vivarium', 'reptile', 'amphibian',
+      // CRITICAL: Exclude toy products (sea-themed toys should stay in toys)
+      'dog toy', 'cat toy', 'pet toy', 'squeaky', 'plush toy', 'chew toy',
+      'kong', 'nylabone', 'fishbone', 'fetch', 'teaser wand', 'wrangler',
+      // CRITICAL: Exclude dog/cat food with fish ingredients (should stay in food)
+      'cat food', 'dog food', 'puppy food', 'kitten food',
+      'cat treat', 'dog treat', 'puppy treat', 'kitten treat',
+      'for cats', 'for dogs', 'for kittens', 'for puppies',
+      // CRITICAL: Exclude cat litter products (Intersand Odorlock, etc.)
+      'cat litter', 'litter box', 'odorlock', 'odor lock', 'clumping litter',
+      // CRITICAL: Exclude pet bowls (Bellabowl Fish Blue/Purple are bowls, not fish products)
+      'pet bowl', 'bellabowl', 'food bowl', 'water bowl', 'feeding bowl',
     ],
   },
 
   reptiles: {
     brands: [
-      'Zoo Med', 'ZooMed', 'Exo Terra', 'Fluker\'s', 'Zilla', 'ReptiCare',
+      // Primary reptile brands
+      'Zoo Med', 'ZooMed', 'Exo Terra', 'Exoterra', 'Fluker\'s', 'Flukers', 'Zilla', 'ReptiCare',
       'Reptile Supply', 'Thrive', 'Komodo', 'Reptisun', 'Repti',
+      // Tetra's reptile line (separate from aquatics Tetra)
+      'Tetrafauna', 'Tetra Fauna',
+      // Reptile accessories brands
+      'Reptology', 'Carolina Custom Cages', 'Lugarti',
     ],
     nameKeywords: [
       // Terrarium equipment
       'terrarium', 'vivarium', 'heat lamp', 'heating lamp', 'basking lamp',
       'UVB', 'uvb bulb', 'basking bulb', 'ceramic heater', 'heat mat',
       'under tank heater', 'thermostat', 'thermometer hygrometer',
+      // Tetrafauna specific products
+      'reptohabitat', 'reptofilter', 'reptomin', 'reptosafe', 'reptoguard',
+      'sand mat', 'decorative filter',
       // Reptile habitat decor
       'hide', 'cave', 'rock lair', 'reptile cave', 'basking platform',
       'vines', 'reptile vine', 'background', 'terrarium background',
       'paludarium', 'desert substrate', 'coconut fiber', 'reptile bark',
+      'forest floor', 'eco earth', 'plantation soil', 'excavator clay',
       // Species specific
       'gecko', 'bearded dragon', 'snake', 'lizard', 'iguana',
       'chameleon', 'tortoise', 'turtle', 'hermit crab',
       // Supplements (non-food)
       'calcium dust', 'vitamin dust', 'supplement cube', 'orange cube',
-      'mineral block', 'cuttlebone',
+      'mineral block', 'cuttlebone', 'repti calcium', 'reptivite',
     ],
     descriptionKeywords: [
       'reptile', 'amphibian', 'tropical', 'desert habitat', 'arboreal',
