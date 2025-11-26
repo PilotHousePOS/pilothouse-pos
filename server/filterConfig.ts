@@ -18,7 +18,7 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
     // ZooMed included - they make both reptile AND aquatic products (keywords will decide)
     // Tetrafauna added - Tetra's reptile product line (reptohabitat, reptofilter, etc.)
     // Reptology added - reptile accessories brand
-    includeBrands: ['ZooMed', 'Exo Terra', 'Exoterra', 'Zilla', "Fluker's", 'Flukers', 'ReptiCare', 'Tetrafauna', 'Tetra Fauna', 'Reptology'],
+    includeBrands: ['ZooMed', 'Exo Terra', 'Exoterra', 'Zilla', "Fluker's", 'Flukers', 'ReptiCare', 'Tetrafauna', 'Tetra Fauna', 'Tetrafaune', 'Reptology'],
     includeKeywords: [
       'gecko', 'lizard', 'snake', 'turtle', 'tortoise', 'chameleon',
       'bearded dragon', 'iguana', 'frog', 'toad', 'salamander', 'newt',
@@ -39,6 +39,8 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
     excludeKeywords: [
       'fish', 'aquarium', 'aquatic', 'glo fish', 'betta', 'pleco', 'plecostomus',
       'dog toy', 'cat toy', 'pet toy',
+      // Aquarium plant names that contain reptile-sounding words
+      'lizard tail',  // Lizard Tail is an aquarium plant species (Saururus cernuus)
       // Bird supply keywords - should go to birdSupplies, not reptiles
       'bird', 'parrot', 'parakeet', 'cockatiel', 'finch', 'canary', 'budgie',
       'perch', 'cuttlebone', 'mineral block', 'gravel paper',
@@ -75,7 +77,7 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
     // Exclude pet food brands with fish ingredients
     excludeBrands: [
       // Reptile/terrarium brands (Galapagos makes terrarium bridges, NOT aquarium)
-      'Exo Terra', 'Exoterra', 'Zilla', "Fluker's", 'Flukers', 'ReptiCare', 'Tetrafauna', 'Tetra Fauna', 'Reptology',
+      'Exo Terra', 'Exoterra', 'Zilla', "Fluker's", 'Flukers', 'ReptiCare', 'Tetrafauna', 'Tetra Fauna', 'Tetrafaune', 'Reptology',
       'Galapagos', 'Galap',
       // Bird brands (Happy Beaks makes bird bridges/toys, NOT aquarium)
       'Happy Beaks', 'A&E', 'A & E', 'Prevue',
@@ -102,8 +104,8 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
       'Pethouse'
     ],
     excludeKeywords: [
-      // Reptile keywords
-      'gecko', 'lizard', 'snake', 'bearded dragon', 'iguana',
+      // Reptile keywords (excluding "lizard" - too broad, catches aquarium plants like "Lizard Tail")
+      'gecko', 'snake', 'bearded dragon', 'iguana',
       'turtle', 'tortoise',  // Turtles are reptiles, not fish - even aquatic turtles
       'reptile', 'terrarium', 'vivarium', 'repti', 'amphibian',
       'frog', 'toad', 'salamander', 'newt', 'chameleon',  // Amphibians are reptile section
@@ -151,13 +153,21 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
     ],
     // Exclude brands specific to other categories
     excludeBrands: [
+      // Aquatic brands
       'Tetra', 'Aqueon', 'GloFish', 'Marineland', 'API', 'Fluval', 'SeaChem', 'Hikari',
+      // Reptile brands
       'Exo Terra', 'Zilla', "Fluker's", 'ReptiCare',
-      'Kong', 'Nylabone', 'Chuckit!', 'Outward Hound', 'ZippyPaws', 'KONG'
+      // Toy brands (Spot makes cat toys with mouse-themed names like "Spot House Mouse Helen")
+      'Kong', 'Nylabone', 'Chuckit!', 'Outward Hound', 'ZippyPaws', 'KONG',
+      'Spot', 'SPOT', 'Rascals', 'Multipet', 'Benebone', 'Tuffy', 'Ethical Pet',
+      // Dog/cat food brands (NutriSource makes dog treats with rabbit flavor, NOT small animal food)
+      'Nutrisource', 'Blue Buffalo', 'Fromm', 'Wellness', 'Merrick', 'Orijen', 'Acana'
     ],
     excludeKeywords: [
       'fish', 'aquarium', 'aquatic', 'gecko', 'lizard', 'snake', 'reptile',
-      'dog toy', 'cat toy', 'pet toy', 'dog', 'cat', 'puppy', 'kitten'
+      'dog toy', 'cat toy', 'pet toy', 'dog', 'cat', 'puppy', 'kitten',
+      // Dog treat terms that might contain small animal names as flavors
+      'chompy', 'chompers', 'venison', 'jerky', 'biscuit', 'treat'
     ]
   }
 };

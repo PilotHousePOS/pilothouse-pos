@@ -169,12 +169,32 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
     }
   }
 
+  // Helper function for word-boundary keyword matching (prevents "uva" matching in "fluval")
+  const matchesKeyword = (text: string, keyword: string): boolean => {
+    const lowerKeyword = keyword.toLowerCase();
+    // For short keywords (3 chars or less), require word boundaries
+    if (lowerKeyword.length <= 3) {
+      const regex = new RegExp(`\\b${lowerKeyword}\\b`, 'i');
+      return regex.test(text);
+    }
+    // For longer keywords, simple includes is fine
+    return text.includes(lowerKeyword);
+  };
+
+  // Check if brand is a cross-category brand (in ANY category's includeBrands)
+  // Cross-category brands like API make products for multiple categories (aquatic AND reptile)
+  // For these brands, keywords should decide the category, not brand exclusions
+  // Pure dog food brands like Zignature are NOT in any includeBrands, so brand exclusions block keywords
+  const isCrossCategoryBrand = 
+    SUPPLY_FILTERS.aquatic.includeBrands.some(b => matchesBrand(rawBrand, rawName, b)) ||
+    SUPPLY_FILTERS.reptile.includeBrands.some(b => matchesBrand(rawBrand, rawName, b)) ||
+    SUPPLY_FILTERS.smallanimal.includeBrands.some(b => matchesBrand(rawBrand, rawName, b));
+
   // Check aquatic keywords in name (highest priority - 60 points)
-  // Blocked by BOTH keyword exclusions AND brand exclusions
-  // If brand is excluded from aquatic (e.g., Exo Terra is a reptile brand), don't let aquatic keywords score
-  if (!keywordExcludedFromAquatic && !brandExcludedFromAquatic) {
+  // Blocked by keyword exclusions AND brand exclusions (unless it's a cross-category brand)
+  if (!keywordExcludedFromAquatic && (!brandExcludedFromAquatic || isCrossCategoryBrand)) {
     for (const keyword of SUPPLY_FILTERS.aquatic.includeKeywords) {
-      if (name.includes(keyword.toLowerCase())) {
+      if (matchesKeyword(name, keyword)) {
         aquaticScore += 60;
         matchedReasons.push(`Aquatic keyword: "${keyword}"`);
         break; // Only count once
@@ -183,11 +203,10 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   }
 
   // Check reptile keywords in name (highest priority - 60 points)
-  // Blocked by BOTH keyword exclusions AND brand exclusions
-  // If brand is excluded from reptile (e.g., Fluval is an aquarium brand), don't let reptile keywords score
-  if (!keywordExcludedFromReptile && !brandExcludedFromReptile) {
+  // Cross-category brands like API (in aquatic includeBrands) can score reptile via "turtle" keyword
+  if (!keywordExcludedFromReptile && (!brandExcludedFromReptile || isCrossCategoryBrand)) {
     for (const keyword of SUPPLY_FILTERS.reptile.includeKeywords) {
-      if (name.includes(keyword.toLowerCase())) {
+      if (matchesKeyword(name, keyword)) {
         reptileScore += 60;
         matchedReasons.push(`Reptile keyword: "${keyword}"`);
         break; // Only count once
@@ -196,11 +215,9 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   }
 
   // Check small animal keywords in name (highest priority - 60 points)
-  // Blocked by BOTH keyword exclusions AND brand exclusions
-  // If brand is excluded from small animal (e.g., Fluval is an aquarium brand), don't let small animal keywords score
-  if (!keywordExcludedFromSmallAnimal && !brandExcludedFromSmallAnimal) {
+  if (!keywordExcludedFromSmallAnimal && (!brandExcludedFromSmallAnimal || isCrossCategoryBrand)) {
     for (const keyword of SUPPLY_FILTERS.smallanimal.includeKeywords) {
-      if (name.includes(keyword.toLowerCase())) {
+      if (matchesKeyword(name, keyword)) {
         smallAnimalScore += 60;
         matchedReasons.push(`Small animal keyword: "${keyword}"`);
         break; // Only count once
@@ -208,9 +225,10 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
     }
   }
 
-  // Check aquatic brands (40 points) - blocked by BRAND exclusions
-  // Now checks BOTH brand field AND product name for brand matching
-  if (!brandExcludedFromAquatic) {
+  // Check aquatic brands (40 points) - blocked by BRAND exclusions AND KEYWORD exclusions
+  // If a product contains an excluded keyword (e.g., "turtle"), it shouldn't get aquatic brand points
+  // Example: "Api Turtle Water Conditioner" - API is aquatic brand, but "turtle" keyword blocks it
+  if (!brandExcludedFromAquatic && !keywordExcludedFromAquatic) {
     for (const aquaticBrand of SUPPLY_FILTERS.aquatic.includeBrands) {
       if (matchesBrand(rawBrand, rawName, aquaticBrand)) {
         aquaticScore += 40;
@@ -220,9 +238,9 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
     }
   }
 
-  // Check reptile brands (40 points) - blocked by BRAND exclusions
-  // Now checks BOTH brand field AND product name for brand matching
-  if (!brandExcludedFromReptile) {
+  // Check reptile brands (40 points) - blocked by BRAND exclusions AND KEYWORD exclusions
+  // If a product contains an excluded keyword (e.g., "fish"), it shouldn't get reptile brand points
+  if (!brandExcludedFromReptile && !keywordExcludedFromReptile) {
     for (const reptileBrand of SUPPLY_FILTERS.reptile.includeBrands) {
       if (matchesBrand(rawBrand, rawName, reptileBrand)) {
         reptileScore += 40;
@@ -232,9 +250,9 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
     }
   }
 
-  // Check small animal brands (40 points) - blocked by BRAND exclusions
-  // Now checks BOTH brand field AND product name for brand matching
-  if (!brandExcludedFromSmallAnimal) {
+  // Check small animal brands (40 points) - blocked by BRAND exclusions AND KEYWORD exclusions
+  // If a product contains an excluded keyword (e.g., "fish"), it shouldn't get small animal brand points
+  if (!brandExcludedFromSmallAnimal && !keywordExcludedFromSmallAnimal) {
     for (const smallAnimalBrand of SUPPLY_FILTERS.smallanimal.includeBrands) {
       if (matchesBrand(rawBrand, rawName, smallAnimalBrand)) {
         smallAnimalScore += 40;
