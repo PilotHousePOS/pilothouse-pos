@@ -167,7 +167,11 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
       'fish', 'aquarium', 'aquatic', 'gecko', 'lizard', 'snake', 'reptile',
       'dog toy', 'cat toy', 'pet toy', 'dog', 'cat', 'puppy', 'kitten',
       // Dog treat terms that might contain small animal names as flavors
-      'chompy', 'chompers', 'venison', 'jerky', 'biscuit', 'treat'
+      'chompy', 'chompers', 'venison', 'jerky', 'biscuit', 'treat',
+      // Bird products - should go to birdSupplies, not smallanimal
+      // Kaytee, Living World, Vitakraft, Ware make BOTH small animal AND bird products
+      'bird', 'parrot', 'parakeet', 'cockatiel', 'finch', 'canary', 'budgie',
+      'conure', 'macaw', 'lovebird', 'cockatoo'
     ]
   }
 };
