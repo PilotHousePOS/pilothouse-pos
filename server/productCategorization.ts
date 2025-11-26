@@ -75,7 +75,35 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   let keywordExcludedFromReptile = false;
   let keywordExcludedFromSmallAnimal = false;
 
-  // Check brand exclusions - now checks BOTH brand field AND product name
+  // Check if product matches any includeBrands for each category
+  // We'll use these to give brand points later, but only if not excluded
+  let matchesAquaticIncludeBrand = false;
+  let matchesReptileIncludeBrand = false;
+  let matchesSmallAnimalIncludeBrand = false;
+  
+  for (const includeBrand of SUPPLY_FILTERS.aquatic.includeBrands) {
+    if (matchesBrand(rawBrand, rawName, includeBrand)) {
+      matchesAquaticIncludeBrand = true;
+      break;
+    }
+  }
+  for (const includeBrand of SUPPLY_FILTERS.reptile.includeBrands) {
+    if (matchesBrand(rawBrand, rawName, includeBrand)) {
+      matchesReptileIncludeBrand = true;
+      break;
+    }
+  }
+  for (const includeBrand of SUPPLY_FILTERS.smallanimal.includeBrands) {
+    if (matchesBrand(rawBrand, rawName, includeBrand)) {
+      matchesSmallAnimalIncludeBrand = true;
+      break;
+    }
+  }
+
+  // Check brand exclusions first - MORE SPECIFIC excludeBrands should take priority over LESS SPECIFIC includeBrands
+  // Example: "Tetra Fauna" in excludeBrands should block "Tetra" includeBrand scoring
+  // However, if a product matches an includeBrand for its OWN category, don't exclude from that category
+  // Example: "Tetra Fauna" matches reptile includeBrand, so don't exclude from reptile even if "Tetra" is in reptile excludeBrands
   for (const excludeBrand of SUPPLY_FILTERS.aquatic.excludeBrands) {
     if (matchesBrand(rawBrand, rawName, excludeBrand)) {
       brandExcludedFromAquatic = true;
@@ -84,19 +112,25 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
     }
   }
 
-  for (const excludeBrand of SUPPLY_FILTERS.reptile.excludeBrands) {
-    if (matchesBrand(rawBrand, rawName, excludeBrand)) {
-      brandExcludedFromReptile = true;
-      matchedReasons.push(`Brand excluded from reptile: ${excludeBrand}`);
-      break;
+  // For reptile exclusions, skip if product matches a reptile includeBrand (allows Tetra Fauna to score reptile)
+  if (!matchesReptileIncludeBrand) {
+    for (const excludeBrand of SUPPLY_FILTERS.reptile.excludeBrands) {
+      if (matchesBrand(rawBrand, rawName, excludeBrand)) {
+        brandExcludedFromReptile = true;
+        matchedReasons.push(`Brand excluded from reptile: ${excludeBrand}`);
+        break;
+      }
     }
   }
 
-  for (const excludeBrand of SUPPLY_FILTERS.smallanimal.excludeBrands) {
-    if (matchesBrand(rawBrand, rawName, excludeBrand)) {
-      brandExcludedFromSmallAnimal = true;
-      matchedReasons.push(`Brand excluded from small animal: ${excludeBrand}`);
-      break;
+  // For small animal exclusions, skip if product matches a small animal includeBrand
+  if (!matchesSmallAnimalIncludeBrand) {
+    for (const excludeBrand of SUPPLY_FILTERS.smallanimal.excludeBrands) {
+      if (matchesBrand(rawBrand, rawName, excludeBrand)) {
+        brandExcludedFromSmallAnimal = true;
+        matchedReasons.push(`Brand excluded from small animal: ${excludeBrand}`);
+        break;
+      }
     }
   }
 

@@ -41,11 +41,13 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
       'dog toy', 'cat toy', 'pet toy',
       // Bird supply keywords - should go to birdSupplies, not reptiles
       'bird', 'parrot', 'parakeet', 'cockatiel', 'finch', 'canary', 'budgie',
-      'perch', 'cuttlebone', 'mineral block',
+      'perch', 'cuttlebone', 'mineral block', 'gravel paper',
       // Dog treat keywords - should go to dogTreats, not reptiles
       'beefhide', 'bully stick', 'rawhide', 'dog chew', 'cadet',
       // Cat products - should go to accessories/toys, not reptiles
-      'catit', 'cat fountain', 'cat filter'
+      'catit', 'cat fountain', 'cat filter', 'fountain filter',
+      // Small animal products - should go to smallanimal, not reptiles
+      'bathing sand', 'chinchilla', 'hamster', 'guinea pig'
     ]
   },
   aquatic: {
@@ -89,7 +91,15 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
       // Cat litter brands (Intersand products have "cat" in name but are litter, not aquatic)
       'Intersand',
       // Cat accessory brands (Catit makes cat water fountain filters, not aquarium filters)
-      'Catit', 'Cat/Doglife'
+      'Catit', 'Cat/Doglife', 'Dogit', 'Zeus',
+      // Dog treat brands with fish flavors (Fruitables, Suzies CBD)
+      'Fruitables', 'Suzies', 'Suziescbd',
+      // Bird supply brands
+      'Birdlife', 'JW Insight', 'Livingworld', 'Living World',
+      // Small animal brands
+      'Friendsfarm', 'Friends Farm', 'Tiny Friends', 'Sunburst', 'Higgins',
+      // Fragrance brands (Pethouse makes car fresheners/wax melts)
+      'Pethouse'
     ],
     excludeKeywords: [
       // Reptile keywords
@@ -97,10 +107,11 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
       'turtle', 'tortoise',  // Turtles are reptiles, not fish - even aquatic turtles
       'reptile', 'terrarium', 'vivarium', 'repti', 'amphibian',
       'frog', 'toad', 'salamander', 'newt', 'chameleon',  // Amphibians are reptile section
-      'reptohabitat', 'reptofilter', 'sand mat',
+      'reptohabitat', 'reptofilter', 'reptohab', 'sand mat',
+      'tetra fauna', 'tetrafauna',  // Tetra's reptile line (not to be confused with "tetra" fish species)
       // Toy keywords
       'dog toy', 'cat toy', 'pet toy', 'teaser wand', 'wrangler', 'squeaky',
-      'plush toy', 'chew toy', 'fishbone', 'fetch',
+      'plush toy', 'chew toy', 'fishbone', 'fetch', 'fanatic fish', 'fantastic fish',
       // Exclude cat/dog food with fish ingredients (multi-word to avoid matching "catfish")
       'cat food', 'cat treat', 'kitten food', 'kitten treat',
       'dog food', 'dog treat', 'puppy food', 'puppy treat',
@@ -109,7 +120,15 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
       ' cat ', ' dog ', ' puppy ', ' kitten ',  // Space-bounded to avoid matching catfish/dogfish
       // Pet accessories that shouldn't be in aquatics
       'cat litter', 'litter box', 'odorlock', 'odor lock',
-      'pet bowl', 'bellabowl', 'bellabown', 'food bowl', 'water bowl'
+      'pet bowl', 'bellabowl', 'bellabown', 'food bowl', 'water bowl',
+      // Bird products (perches, gravel paper are for birds, not aquarium)
+      'perch', 'perches', 'gravel paper', 'bird cage', 'cuttlebone', 'mineral block',
+      // Cat/dog water fountain filters (NOT aquarium filters)
+      'fountain filter', 'flowfoun', 'pixi', 'zeus fountain', 'h2eau',
+      // Small animal bathing sand (NOT aquarium sand)
+      'bathing sand', 'nutty pumpkin',
+      // Fragrance products (wax melts, car fresheners)
+      'wax melt', 'car freshener', 'reed diffuser', 'sandlewd', 'sandle wd'
     ]
   },
   smallanimal: {
