@@ -24,9 +24,38 @@ function normalizeBrand(brand: string): string {
   return brand.toLowerCase().replace(/['\s\-\.]/g, '');
 }
 
+/**
+ * Robust brand matching utility that checks BOTH the brand field AND product name
+ * Many products have empty brand fields but the brand appears in the product name
+ * @param productBrand - The brand field from the product (may be empty)
+ * @param productName - The product name (often contains brand)
+ * @param targetBrand - The brand we're looking for
+ * @returns true if the brand is found in either field
+ */
+function matchesBrand(productBrand: string, productName: string, targetBrand: string): boolean {
+  const normalizedTarget = normalizeBrand(targetBrand);
+  const normalizedBrand = normalizeBrand(productBrand);
+  const normalizedName = productName.toLowerCase();
+  
+  // Check brand field (normalized comparison)
+  if (normalizedBrand.includes(normalizedTarget)) {
+    return true;
+  }
+  
+  // Check product name (case-insensitive, handle multi-word brands)
+  const targetLower = targetBrand.toLowerCase();
+  if (normalizedName.includes(targetLower)) {
+    return true;
+  }
+  
+  return false;
+}
+
 export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'description'>): CategorizationResult {
   const name = (product.name || '').toLowerCase();
   const brand = normalizeBrand(product.brand || '');
+  const rawBrand = product.brand || '';
+  const rawName = product.name || '';
   const description = (product.description || '').toLowerCase();
   
   let aquaticScore = 0;
@@ -46,10 +75,9 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   let keywordExcludedFromReptile = false;
   let keywordExcludedFromSmallAnimal = false;
 
-  // Check brand exclusions (for brand scoring only)
+  // Check brand exclusions - now checks BOTH brand field AND product name
   for (const excludeBrand of SUPPLY_FILTERS.aquatic.excludeBrands) {
-    const normalizedExclude = normalizeBrand(excludeBrand);
-    if (brand.includes(normalizedExclude)) {
+    if (matchesBrand(rawBrand, rawName, excludeBrand)) {
       brandExcludedFromAquatic = true;
       matchedReasons.push(`Brand excluded from aquatic: ${excludeBrand}`);
       break;
@@ -57,8 +85,7 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   }
 
   for (const excludeBrand of SUPPLY_FILTERS.reptile.excludeBrands) {
-    const normalizedExclude = normalizeBrand(excludeBrand);
-    if (brand.includes(normalizedExclude)) {
+    if (matchesBrand(rawBrand, rawName, excludeBrand)) {
       brandExcludedFromReptile = true;
       matchedReasons.push(`Brand excluded from reptile: ${excludeBrand}`);
       break;
@@ -66,8 +93,7 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   }
 
   for (const excludeBrand of SUPPLY_FILTERS.smallanimal.excludeBrands) {
-    const normalizedExclude = normalizeBrand(excludeBrand);
-    if (brand.includes(normalizedExclude)) {
+    if (matchesBrand(rawBrand, rawName, excludeBrand)) {
       brandExcludedFromSmallAnimal = true;
       matchedReasons.push(`Brand excluded from small animal: ${excludeBrand}`);
       break;
@@ -149,9 +175,10 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   }
 
   // Check aquatic brands (40 points) - blocked by BRAND exclusions
+  // Now checks BOTH brand field AND product name for brand matching
   if (!brandExcludedFromAquatic) {
     for (const aquaticBrand of SUPPLY_FILTERS.aquatic.includeBrands) {
-      if (brand === normalizeBrand(aquaticBrand)) {
+      if (matchesBrand(rawBrand, rawName, aquaticBrand)) {
         aquaticScore += 40;
         matchedReasons.push(`Aquatic brand: ${aquaticBrand}`);
         break;
@@ -160,9 +187,10 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   }
 
   // Check reptile brands (40 points) - blocked by BRAND exclusions
+  // Now checks BOTH brand field AND product name for brand matching
   if (!brandExcludedFromReptile) {
     for (const reptileBrand of SUPPLY_FILTERS.reptile.includeBrands) {
-      if (brand === normalizeBrand(reptileBrand)) {
+      if (matchesBrand(rawBrand, rawName, reptileBrand)) {
         reptileScore += 40;
         matchedReasons.push(`Reptile brand: ${reptileBrand}`);
         break;
@@ -171,9 +199,10 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   }
 
   // Check small animal brands (40 points) - blocked by BRAND exclusions
+  // Now checks BOTH brand field AND product name for brand matching
   if (!brandExcludedFromSmallAnimal) {
     for (const smallAnimalBrand of SUPPLY_FILTERS.smallanimal.includeBrands) {
-      if (brand === normalizeBrand(smallAnimalBrand)) {
+      if (matchesBrand(rawBrand, rawName, smallAnimalBrand)) {
         smallAnimalScore += 40;
         matchedReasons.push(`Small animal brand: ${smallAnimalBrand}`);
         break;
