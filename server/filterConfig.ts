@@ -31,6 +31,8 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
     excludeBrands: [
       'Tetra', 'Aqueon', 'GloFish', 'Marineland', 'API', 'Fluval', 'SeaChem', 'Hikari',
       'Kong', 'Nylabone', 'Chuckit!', 'Outward Hound', 'ZippyPaws', 'KONG',
+      // Dog toy brands - Rascals makes latex dog toys (frog, fish, etc.) NOT reptile products
+      'Rascals', 'Multipet', 'Benebone', 'Spot', 'SPOT', 'Tuffy', 'Ethical Pet',
       // Bird supply brands - should go to birdSupplies, not reptiles
       'Birdlife', 'Birdlif', 'A & E', 'A&E'
     ],
@@ -70,8 +72,11 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
     // Exclude toy brands that make sea-themed toys (Kong, Spot, Rascals, etc.)
     // Exclude pet food brands with fish ingredients
     excludeBrands: [
-      // Reptile brands
+      // Reptile/terrarium brands (Galapagos makes terrarium bridges, NOT aquarium)
       'Exo Terra', 'Exoterra', 'Zilla', "Fluker's", 'Flukers', 'ReptiCare', 'Tetrafauna', 'Tetra Fauna', 'Reptology',
+      'Galapagos', 'Galap',
+      // Bird brands (Happy Beaks makes bird bridges/toys, NOT aquarium)
+      'Happy Beaks', 'A&E', 'A & E', 'Prevue',
       // Toy brands (make sea-themed toys like Kong Jellyfish, Spot Fish, etc.)
       'Kong', 'KONG', 'Nylabone', 'Chuckit!', 'Outward Hound', 'ZippyPaws', 'Spot', 'SPOT',
       'Tuffy', 'Rascals', 'Playfuls', 'Benebone', 'Multipet', 'Ethical Pet',

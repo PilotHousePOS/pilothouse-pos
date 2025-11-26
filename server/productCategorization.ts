@@ -210,19 +210,32 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
     }
   }
 
-  // Special rule: "bridge" products go to aquatics UNLESS "lizard" appears near it
+  // Special rule: "bridge" products go to aquatics UNLESS excluded
+  // Exclude: bird brands, terrarium brands, lizard products
   if (name.includes('bridge')) {
+    // Bird brands that make bridge toys for birds
+    const birdBrands = ['happy beaks', 'a&e', 'a & e', 'birdie', 'prevue'];
+    const isBirdProduct = birdBrands.some(b => name.includes(b) || rawName.toLowerCase().includes(b));
+    
+    // Terrarium brands that make flexible bridges for reptiles
+    const terrariumBrands = ['galap', 'galapagos', 'exo terra', 'exoterra', 'zilla'];
+    const isTerrarium = terrariumBrands.some(b => name.includes(b) || rawName.toLowerCase().includes(b));
+    
     // Check if "lizard" appears within 20 characters of "bridge"
     const bridgeIndex = name.indexOf('bridge');
     const searchStart = Math.max(0, bridgeIndex - 20);
-    const searchEnd = Math.min(name.length, bridgeIndex + 26); // "bridge".length = 6, +20 = 26
+    const searchEnd = Math.min(name.length, bridgeIndex + 26);
     const nearbyText = name.substring(searchStart, searchEnd);
+    const hasLizard = nearbyText.includes('lizard');
     
-    if (nearbyText.includes('lizard')) {
-      // It's a lizard bridge - let normal reptile rules handle it
+    if (isBirdProduct) {
+      matchedReasons.push('Bridge excluded: bird brand product');
+    } else if (isTerrarium) {
+      matchedReasons.push('Bridge excluded: terrarium brand product');
+    } else if (hasLizard) {
       matchedReasons.push('Bridge with "lizard" - skipping aquatic rule');
     } else {
-      // It's an aquarium bridge
+      // It's an aquarium bridge decoration
       aquaticScore += 30;
       matchedReasons.push('Bridge (aquarium) name');
     }
