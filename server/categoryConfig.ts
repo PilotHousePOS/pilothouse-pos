@@ -430,7 +430,19 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'turtle', 'tortoise', 'terrarium', 'vivarium', 'reptile', 'amphibian',
       // CRITICAL: Exclude toy products (sea-themed toys should stay in toys)
       'dog toy', 'cat toy', 'pet toy', 'squeaky', 'plush toy', 'chew toy',
-      'kong', 'nylabone', 'fishbone', 'fetch', 'teaser wand', 'wrangler',
+      'kong', 'nylabone', 'benebone', 'fishbone', 'fetch', 'teaser wand', 'wrangler',
+      // CRITICAL: Exclude bird products (sand perches are for birds, not aquariums)
+      'perch', 'perches', 'bird cage', 'a & e', 'a&e', 'birdlife', 'jw insight',
+      // CRITICAL: Exclude cat/dog products (cat/dog water fountain filters are NOT aquarium filters)
+      'catit', 'cat fountain', 'cat water fountain', 'flowfoun', 'pixi', 'zeus fountain', 'dogit',
+      // CRITICAL: Exclude small animal products (not aquarium)
+      'bathing sand', 'friendsfarm', 'friends farm', 'tiny friends', 'sunburst nutty',
+      // CRITICAL: Exclude dog food/treat brands with fish ingredients
+      'zignature', 'fruitables', 'bluebuffalo', 'blue buffalo',
+      // CRITICAL: Exclude fragrance/air freshener products
+      'pethouse', 'wax melt', 'car freshener', 'reed diffuser',
+      // CRITICAL: Exclude bird gravel paper (for bird cage bottoms)
+      'gravel paper',
       // CRITICAL: Exclude dog/cat food with fish ingredients (should stay in food)
       'cat food', 'dog food', 'puppy food', 'kitten food',
       'cat treat', 'dog treat', 'puppy treat', 'kitten treat',
