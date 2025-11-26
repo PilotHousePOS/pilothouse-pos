@@ -30,9 +30,21 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
     // Exclude ONLY pure aquatic brands and toy brands (NOT cross-category brands like ZooMed)
     excludeBrands: [
       'Tetra', 'Aqueon', 'GloFish', 'Marineland', 'API', 'Fluval', 'SeaChem', 'Hikari',
-      'Kong', 'Nylabone', 'Chuckit!', 'Outward Hound', 'ZippyPaws', 'KONG'
+      'Kong', 'Nylabone', 'Chuckit!', 'Outward Hound', 'ZippyPaws', 'KONG',
+      // Bird supply brands - should go to birdSupplies, not reptiles
+      'Birdlife', 'Birdlif', 'A & E', 'A&E'
     ],
-    excludeKeywords: ['fish', 'aquarium', 'aquatic', 'glo fish', 'betta', 'pleco', 'plecostomus', 'dog toy', 'cat toy', 'pet toy']
+    excludeKeywords: [
+      'fish', 'aquarium', 'aquatic', 'glo fish', 'betta', 'pleco', 'plecostomus',
+      'dog toy', 'cat toy', 'pet toy',
+      // Bird supply keywords - should go to birdSupplies, not reptiles
+      'bird', 'parrot', 'parakeet', 'cockatiel', 'finch', 'canary', 'budgie',
+      'perch', 'cuttlebone', 'mineral block',
+      // Dog treat keywords - should go to dogTreats, not reptiles
+      'beefhide', 'bully stick', 'rawhide', 'dog chew', 'cadet',
+      // Cat products - should go to accessories/toys, not reptiles
+      'catit', 'cat fountain', 'cat filter'
+    ]
   },
   aquatic: {
     // Aquatic-specialized brands based on company research:
@@ -67,8 +79,12 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
       'Blue Buffalo', 'Fromm', 'Nutrisource', 'Orijen', 'Acana', 'Wellness', 'Welln',
       'Zignature', 'Primal', 'Red Barn', 'RedBarn', 'Victor', 'Vict',
       'Merrick', 'Canidae', 'Natural Balance', 'Taste of the Wild',
+      // B.F.F. and Weruva cat food brands (have fish ingredients but are cat food)
+      'B.F.F.', 'BFF', 'Weruva', 'Beef Cat',
       // Cat litter brands (Intersand products have "cat" in name but are litter, not aquatic)
-      'Intersand'
+      'Intersand',
+      // Cat accessory brands (Catit makes cat water fountain filters, not aquarium filters)
+      'Catit', 'Cat/Doglife'
     ],
     excludeKeywords: [
       // Reptile keywords

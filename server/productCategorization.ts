@@ -110,8 +110,9 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   }
 
   // Check aquatic keywords in name (highest priority - 60 points)
-  // ONLY blocked by keyword exclusions, NOT brand exclusions
-  if (!keywordExcludedFromAquatic) {
+  // Blocked by BOTH keyword exclusions AND brand exclusions
+  // If brand is excluded from aquatic (e.g., Exo Terra is a reptile brand), don't let aquatic keywords score
+  if (!keywordExcludedFromAquatic && !brandExcludedFromAquatic) {
     for (const keyword of SUPPLY_FILTERS.aquatic.includeKeywords) {
       if (name.includes(keyword.toLowerCase())) {
         aquaticScore += 60;
@@ -122,8 +123,9 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   }
 
   // Check reptile keywords in name (highest priority - 60 points)
-  // ONLY blocked by keyword exclusions, NOT brand exclusions
-  if (!keywordExcludedFromReptile) {
+  // Blocked by BOTH keyword exclusions AND brand exclusions
+  // If brand is excluded from reptile (e.g., Fluval is an aquarium brand), don't let reptile keywords score
+  if (!keywordExcludedFromReptile && !brandExcludedFromReptile) {
     for (const keyword of SUPPLY_FILTERS.reptile.includeKeywords) {
       if (name.includes(keyword.toLowerCase())) {
         reptileScore += 60;
@@ -134,8 +136,9 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   }
 
   // Check small animal keywords in name (highest priority - 60 points)
-  // ONLY blocked by keyword exclusions, NOT brand exclusions
-  if (!keywordExcludedFromSmallAnimal) {
+  // Blocked by BOTH keyword exclusions AND brand exclusions
+  // If brand is excluded from small animal (e.g., Fluval is an aquarium brand), don't let small animal keywords score
+  if (!keywordExcludedFromSmallAnimal && !brandExcludedFromSmallAnimal) {
     for (const keyword of SUPPLY_FILTERS.smallanimal.includeKeywords) {
       if (name.includes(keyword.toLowerCase())) {
         smallAnimalScore += 60;
@@ -197,8 +200,8 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   }
 
   // Check aquatic keywords in description (medium priority - 15 points)
-  // ONLY blocked by keyword exclusions, NOT brand exclusions
-  if (!keywordExcludedFromAquatic) {
+  // Blocked by BOTH keyword exclusions AND brand exclusions
+  if (!keywordExcludedFromAquatic && !brandExcludedFromAquatic) {
     for (const keyword of SUPPLY_FILTERS.aquatic.includeKeywords) {
       if (description.includes(keyword.toLowerCase())) {
         aquaticScore += 15;
@@ -209,8 +212,8 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   }
 
   // Check reptile keywords in description (medium priority - 15 points)
-  // ONLY blocked by keyword exclusions, NOT brand exclusions
-  if (!keywordExcludedFromReptile) {
+  // Blocked by BOTH keyword exclusions AND brand exclusions
+  if (!keywordExcludedFromReptile && !brandExcludedFromReptile) {
     for (const keyword of SUPPLY_FILTERS.reptile.includeKeywords) {
       if (description.includes(keyword.toLowerCase())) {
         reptileScore += 15;
@@ -221,8 +224,8 @@ export function categorizeProduct(product: Pick<Supply, 'name' | 'brand' | 'desc
   }
 
   // Check small animal keywords in description (medium priority - 15 points)
-  // ONLY blocked by keyword exclusions, NOT brand exclusions
-  if (!keywordExcludedFromSmallAnimal) {
+  // Blocked by BOTH keyword exclusions AND brand exclusions
+  if (!keywordExcludedFromSmallAnimal && !brandExcludedFromSmallAnimal) {
     for (const keyword of SUPPLY_FILTERS.smallanimal.includeKeywords) {
       if (description.includes(keyword.toLowerCase())) {
         smallAnimalScore += 15;
