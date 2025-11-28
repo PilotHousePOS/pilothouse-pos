@@ -62,6 +62,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Purp': 'Purple',
   'Brwn': 'Brown',
   'Grn': 'Green',
+  'Pkf': 'Pink',
   
   // Comfort/General
   'Cmfrt': 'Comfort',
@@ -111,6 +112,16 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Nyl': 'Nylon',
   'Lth': 'Leather',
   
+  // Coastal Pet Products Pattern Names (Styles leash line)
+  // Reference: https://www.coastalpet.com/products/detail/?id=ADL01
+  'Aln': 'Alien',
+  'Dns': 'Denim',
+  'Fdn': 'Foundation',
+  'Llm': 'Llama',
+  'Pia': 'Pineapple',
+  'Ucn': 'Unicorn',
+  'Bigdogtieout': 'Big Dog Tie Out',
+  
   // Product type abbreviations
   'Orig': 'Original',
   'Ori': 'Original',
@@ -126,6 +137,9 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Nthntohide': "Nothin' to Hide",
   'Nthtohide': "Nothin' to Hide",
   'Nutr Sou': 'Nutrisource',
+  'Nyla': 'Nylabone',
+  'Flexichew': 'FlexiChew',
+  'Reg': 'Regular',
   
   // Food/Flavors
   'Blubrede': 'Blueberry',
