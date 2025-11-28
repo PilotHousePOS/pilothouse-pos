@@ -39,7 +39,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Kit & Kaboodle', patterns: ['kit & kaboodle', 'kit and kaboodle'] },
     { name: 'Special Kitty', patterns: ['special kitty'] },
     { name: 'Freshpet', patterns: ['freshpet', 'fresh pet'] },
-    { name: 'Fromm', patterns: ['fromm'] },
+    { name: 'Fromm', patterns: ['fromm', 'from'] },
     { name: 'Wellness', patterns: ['wellness'] },
     { name: 'Merrick', patterns: ['merrick'] },
     { name: 'Orijen', patterns: ['orijen'] },
@@ -74,10 +74,13 @@ export function extractBrand(productName: string): string | null {
     { name: 'SmartBones', patterns: ['smartbones', 'smartbone'] },
     { name: 'Coastal', patterns: ['coastal'] },
     { name: 'Wolfgang', patterns: ['wolfgang', 'wlfgng'] },
+    { name: 'Pets First', patterns: ['pets first', 'lsu', 'saints', 'nola saints'] },
+    { name: 'Preston', patterns: ['preston'] },
     
     // Health & Supplements
     { name: 'Dogswell', patterns: ['dogswell'] },
     { name: 'Durvet', patterns: ['durvet'] },
+    { name: 'Farnam', patterns: ['farnam', 'canine red cell'] },
     
     // Aquatic Brands (verified from filterConfig.ts + web search Nov 28, 2025)
     { name: 'Omega One', patterns: ['omega one'] },
