@@ -153,7 +153,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Nation', patterns: ['nation'] },
     { name: 'Nibbles', patterns: ['nibbles'] },
     
-    // Additional Verified Brands (Nov 28, 2025)
+    // Additional Verified Brands (Nov 28, 2025 - verified via web search)
     { name: 'Wee-Wee', patterns: ['wee-wee', 'weewee', 'wee wee'] },
     { name: 'Smokehouse', patterns: ['smokehouse', 'smkhouse'] },
     { name: 'Reptology', patterns: ['reptology', 'rept', 'repto'] },
@@ -180,6 +180,22 @@ export function extractBrand(productName: string): string | null {
     { name: 'Forza', patterns: ['forza'] },
     { name: 'Higgins', patterns: ['higgins'] },
     { name: 'ZuPreem', patterns: ['zupreem'] },
+    { name: 'VICTOR', patterns: ['victor', 'vict'] },
+    { name: 'Petcrest', patterns: ['petcrest'] },
+    { name: 'Tuesday\'s Natural Dog Company', patterns: ['tuesday\'s', 'tuesdays'] },
+    { name: 'PetAg', patterns: ['petag', 'pet ag', 'fresh n clean', 'fresh \'n clean', 'freshnclean'] },
+    { name: 'Beautifur', patterns: ['beautifur'] },
+    { name: 'Kaylor', patterns: ['kaylor', 'sweet harvest', 'sweetharvest'] },
+    { name: 'Outward Hound', patterns: ['outward hound', 'outwardhound'] },
+    { name: 'PureBites', patterns: ['purebites', 'pure bites'] },
+    { name: 'Himalayan', patterns: ['himalayan'] },
+    { name: 'Health Extension', patterns: ['health extension', 'health exten'] },
+    { name: 'Jones Natural Chews', patterns: ['jones', 'jones natural'] },
+    { name: 'Banixx', patterns: ['banixx'] },
+    { name: 'Cadet', patterns: ['cadet'] },
+    { name: 'Pet Honesty', patterns: ['pet honesty', 'pethonesty'] },
+    { name: 'Elanco', patterns: ['elanco', 'advantage'] },
+    { name: 'Purina', patterns: ['purina', 'cat chow'] },
     
     // Misc Brands
     { name: 'Spot', patterns: ['spot'] },
