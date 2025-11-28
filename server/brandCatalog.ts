@@ -79,7 +79,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Dogswell', patterns: ['dogswell'] },
     { name: 'Durvet', patterns: ['durvet'] },
     
-    // Aquatic Brands (verified from filterConfig.ts)
+    // Aquatic Brands (verified from filterConfig.ts + web search Nov 28, 2025)
     { name: 'Omega One', patterns: ['omega one'] },
     { name: 'Ocean Nutrition', patterns: ['ocean nutrition'] },
     { name: 'Hikari', patterns: ['hikari'] },
@@ -90,6 +90,10 @@ export function extractBrand(productName: string): string | null {
     { name: 'Fluval', patterns: ['fluval'] },
     { name: 'SeaChem', patterns: ['seachem'] },
     { name: 'GloFish', patterns: ['glofish'] },
+    { name: 'Penn Plax', patterns: ['penn plax', 'penn-plax', 'pennplax', 'penn'] },
+    { name: 'Cascade', patterns: ['cascade'] },
+    { name: 'Aquatop', patterns: ['aquatop'] },
+    { name: 'Aqualife', patterns: ['aqualife'] },
     
     // Reptile Brands (verified from filterConfig.ts)
     { name: 'Zoo Med', patterns: ['zoo med', 'zoomed'] },
@@ -106,9 +110,88 @@ export function extractBrand(productName: string): string | null {
     { name: 'Vitakraft', patterns: ['vitakraft'] },
     { name: 'Ware', patterns: ['ware'] },
     
-    // Bird Brands
+    // Bird Brands (verified from web search Nov 28, 2025)
     { name: 'Birdlife', patterns: ['birdlife', 'bird life'] },
     { name: 'A&E Cage Co', patterns: ['a&e', 'a & e cage'] },
+    { name: 'Prevue', patterns: ['prevue'] },
+    { name: 'Vitapol', patterns: ['vitapol'] },
+    
+    // Health & Wellness (verified from web search Nov 28, 2025)
+    { name: 'Skout\'s Honor', patterns: ['skout\'s honor', 'skouts honor', 'skoutshonor'] },
+    { name: 'NaturVet', patterns: ['naturvet', 'natur vet'] },
+    { name: 'Nature\'s Miracle', patterns: ['nature\'s miracle', 'natures miracle', 'naturesmiracle'] },
+    { name: 'TropiClean', patterns: ['tropiclean', 'tropi clean'] },
+    
+    // Toys & Accessories (verified from web search Nov 28, 2025)
+    { name: 'Tuffy', patterns: ['tuffy', 'tuffys'] },
+    { name: 'JW Pet', patterns: ['jw pet', 'jw'] },
+    { name: 'Rascals', patterns: ['rascals'] },
+    { name: 'Playfuls', patterns: ['playfuls'] },
+    
+    // Collars & Leashes (verified from web search Nov 28, 2025)
+    { name: 'Valhoma', patterns: ['valhoma'] },
+    { name: 'Circle T', patterns: ['circle t', 'circle'] },
+    { name: 'Lupine', patterns: ['lupine'] },
+    
+    // Cat Supplies (verified from web search Nov 28, 2025)
+    { name: 'Catit', patterns: ['catit'] },
+    { name: 'Intersand', patterns: ['intersand'] },
+    { name: 'Petmate', patterns: ['petmate'] },
+    { name: 'Van Ness', patterns: ['van ness', 'vanness'] },
+    
+    // Food & Treats (verified from web search Nov 28, 2025)
+    { name: 'Vital Essentials', patterns: ['vital essentials', 'vital'] },
+    { name: 'Euk', patterns: ['euk'] },
+    
+    // Grooming (verified from web search Nov 28, 2025)
+    { name: 'Safari', patterns: ['safari'] },
+    { name: 'FURminator', patterns: ['furminator'] },
+    
+    // Small Pet (additional brands)
+    { name: 'Midwest', patterns: ['midwest'] },
+    { name: 'Marshall', patterns: ['marshall', 'marshals'] },
+    { name: 'Nation', patterns: ['nation'] },
+    { name: 'Nibbles', patterns: ['nibbles'] },
+    
+    // Additional Verified Brands (Nov 28, 2025)
+    { name: 'Wee-Wee', patterns: ['wee-wee', 'weewee', 'wee wee'] },
+    { name: 'Smokehouse', patterns: ['smokehouse', 'smkhouse'] },
+    { name: 'Reptology', patterns: ['reptology', 'rept', 'repto'] },
+    { name: 'Chuckit!', patterns: ['chuckit!', 'chuckit'] },
+    { name: 'Four Paws', patterns: ['four paws', 'fourpaws'] },
+    { name: 'Multipet', patterns: ['multipet', 'multi pet'] },
+    { name: 'Bio Groom', patterns: ['bio groom', 'biogroom'] },
+    { name: 'Turbo', patterns: ['turbo'] },
+    { name: 'Quiet Time', patterns: ['quiet time', 'quiettime'] },
+    { name: 'Spectrastone', patterns: ['spectrastone', 'spectra stone'] },
+    { name: 'Komodo', patterns: ['komodo'] },
+    { name: 'Pangea', patterns: ['pangea', 'galap'] },
+    { name: 'Mammoth', patterns: ['mammoth'] },
+    { name: 'Earthbath', patterns: ['earthbath'] },
+    { name: 'ZippyPaws', patterns: ['zippy paws', 'zippypaws'] },
+    { name: 'Weco', patterns: ['weco'] },
+    { name: 'Zodiac', patterns: ['zodiac'] },
+    { name: 'Thunder Shirt', patterns: ['thunder shirt', 'thundershirt'] },
+    { name: 'JollyPet', patterns: ['jolly pet', 'jollypet'] },
+    { name: 'Ranch Remedy', patterns: ['ranch remedy'] },
+    { name: 'Bionic', patterns: ['bionic'] },
+    { name: 'Replendish', patterns: ['replendish'] },
+    { name: 'Pondmaster', patterns: ['pondmaster'] },
+    { name: 'Forza', patterns: ['forza'] },
+    { name: 'Higgins', patterns: ['higgins'] },
+    { name: 'ZuPreem', patterns: ['zupreem'] },
+    
+    // Misc Brands
+    { name: 'Spot', patterns: ['spot'] },
+    { name: 'Titan', patterns: ['titan'] },
+    { name: 'Retro', patterns: ['retro'] },
+    { name: 'SodaPup', patterns: ['sodapup', 'soda pup'] },
+    { name: 'Bellabowl', patterns: ['bellabowl', 'bella bowl'] },
+    { name: 'Pethouse', patterns: ['pethouse', 'pet house'] },
+    { name: 'Sunburst', patterns: ['sunburst'] },
+    { name: 'Wholesome', patterns: ['wholesome'] },
+    { name: 'Adams', patterns: ['adams'] },
+    { name: 'Happy', patterns: ['happy'] },
   ];
   
   const lowerName = productName.toLowerCase();
