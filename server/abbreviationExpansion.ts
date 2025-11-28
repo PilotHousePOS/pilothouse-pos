@@ -112,14 +112,15 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Nyl': 'Nylon',
   'Lth': 'Leather',
   
-  // Coastal Pet Products Pattern Names (Styles leash line)
-  // Reference: https://www.coastalpet.com/products/detail/?id=ADL01
-  'Aln': 'Alien',
-  'Dns': 'Denim',
-  'Fdn': 'Foundation',
-  'Llm': 'Llama',
-  'Pia': 'Pineapple',
-  'Ucn': 'Unicorn',
+  // Coastal Pet Products Pattern Names (Authorized Dealer Styles)
+  // Reference: https://coastalpet.com/media/nd3izx2w/2024productcatalog.pdf (Page 11)
+  // Verified from official 2024 Product Catalog, November 28, 2025
+  'Aln': 'Aliens',
+  'Dns': 'Dinosaurs',
+  'Fdn': 'Frosted Donuts',
+  'Llm': 'Llamas',
+  'Pia': 'Pineapples',
+  'Ucn': 'Unicorns',
   'Bigdogtieout': 'Big Dog Tie Out',
   
   // Product type abbreviations

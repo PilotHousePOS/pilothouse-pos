@@ -78,6 +78,7 @@ The application is a full-stack web application with a React frontend (Vite, Typ
 - **Database Sync Tools:** Staging import with duplicate prevention, supplies-only sync (admin-only), and full database sync (development-only).
 - **Auto-Categorization System:** Single-button operation for specialty section and product type classification based on brand and keyword analysis, including Live Animal Detection and record creation.
 - **Smart Abbreviation Expansion System:** Comprehensive, research-based abbreviation expansion for major pet food and treat brands (server/abbreviationExpansion.ts):
+  - **CRITICAL VERIFICATION STANDARD**: ALL abbreviation expansions MUST be verified using official sources (company websites, product catalogs, packaging photos). Absolutely NO guesswork allowed.
   - Blue Buffalo: "Blue B" → "Blue Buffalo" (30+ products)
   - Diamond: "Diam" → "Diamond" (30+ products) with context-aware measurement detection
   - Primal: "Prim Fd" → "Primal Freeze Dried", "Prim Kitr" → "Primal Kibble in the Raw" (13 products)
@@ -88,6 +89,16 @@ The application is a full-stack web application with a React frontend (Vite, Typ
   - Merrick Fresh Kisses: "Dbbl" → "Double-Brush" (14 products) - proprietary design feature expansion
   - Dogswell: "Guthealth" → "Gut Health", "Hip & joint" → "Hip & Joint", "Skin & coat" → "Skin & Coat" (6 products)
   - Durvet: "Liquid Wrm" → "Liquid Wormer 2X", "Tripwrm" → "Triple Wormer", "Wrmeze" → "Worm Ease" (6 products)
+  - **Nylabone Products** (53 products - verified November 28, 2025):
+    - Brand: "Nyla" → "Nylabone", "Nylahealth" → "Nylabone Healthy Edibles"
+    - Product line: "Flexichew" → "FlexiChew" (official capitalization from nylabone.com)
+    - Sizes: "Reg" → "Regular", "Wlf" → "Wolf" (verified official size names: Petite/Regular/Wolf/Giant)
+    - Other: "Durachew" → "DuraChew", "Dentalchew" → "Dental Chew", "Ddbl" → "Double", "Pwr Chw" → "Power Chew"
+  - **Coastal Pet Products** (127+ products - verified November 28, 2025):
+    - Pattern names from official 2024 Product Catalog (coastalpet.com/media/nd3izx2w/2024productcatalog.pdf, Page 11)
+    - "Aln" → "Aliens", "Dns" → "Dinosaurs", "Fdn" → "Frosted Donuts", "Llm" → "Llamas", "Pia" → "Pineapples", "Ucn" → "Unicorns"
+    - Color abbreviations: "Grn" → "Green", "Blu" → "Blue", "Pkf" → "Pink"
+    - Other: "Bigdogtieout" → "Big Dog Tie Out"
   - All patterns verified with official website documentation, packaging photos, and database evidence
   - Start-of-string anchoring prevents corruption of non-brand text
   - Context-aware "Diam" expansion: Distinguishes "Diameter" (measurements like "12 inch Diam tube") from "Diamond" (brand names)
