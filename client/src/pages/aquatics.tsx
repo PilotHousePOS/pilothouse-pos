@@ -49,15 +49,21 @@ export default function AquaticsPage() {
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [searchInput, setSearchInput] = useState('');
+  const [petSearchInput, setPetSearchInput] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   
   // Debounce search to avoid flickering on every keystroke
   const searchQuery = useDebounce(searchInput, 500);
+  const petSearchQuery = useDebounce(petSearchInput, 500);
 
   const { data: petsData, isLoading: petsLoading } = useQuery<any>({
-    queryKey: ["/api/pets", { species: "fish" }],
+    queryKey: ["/api/pets", { species: "fish", search: petSearchQuery }],
     queryFn: async () => {
-      const response = await fetch("/api/pets?species=fish");
+      const params = new URLSearchParams({ species: "fish" });
+      if (petSearchQuery) {
+        params.append('search', petSearchQuery);
+      }
+      const response = await fetch(`/api/pets?${params.toString()}`);
       if (!response.ok) throw new Error("Failed to fetch fish");
       return response.json();
     },
@@ -85,6 +91,11 @@ export default function AquaticsPage() {
   useEffect(() => {
     setCurrentPage(0);
   }, [searchQuery, selectedCategory]);
+
+  // Reset pets page when pet search changes
+  useEffect(() => {
+    setPetsPage(0);
+  }, [petSearchQuery]);
 
   // Reset page when totalPages changes or currentPage is out of bounds
   useEffect(() => {
@@ -148,6 +159,20 @@ export default function AquaticsPage() {
         {/* Fish Section */}
         <section>
           <h2 className="text-2xl font-bold mb-6 text-gray-800">Aquatic Animals</h2>
+          
+          {/* Pet Search Bar */}
+          <div className="relative mb-6">
+            <Input
+              type="text"
+              placeholder="Search aquatic animals..."
+              value={petSearchInput}
+              onChange={(e) => setPetSearchInput(e.target.value)}
+              className="pl-10 bg-white border-gray-200 rounded-xl"
+              data-testid="input-search-aquatic-animals"
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          </div>
+          
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (

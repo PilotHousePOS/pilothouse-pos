@@ -41,18 +41,26 @@ export default function ReptilesPage() {
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [searchInput, setSearchInput] = useState('');
+  const [petSearchInput, setPetSearchInput] = useState('');
   
   // Debounce search to avoid flickering on every keystroke
   const searchQuery = useDebounce(searchInput, 500);
+  const petSearchQuery = useDebounce(petSearchInput, 500);
 
-  const { data: pets = [], isLoading: petsLoading } = useQuery<any[]>({
-    queryKey: ["/api/pets", { species: "reptile" }],
+  const { data: petsData, isLoading: petsLoading } = useQuery<any>({
+    queryKey: ["/api/pets", { species: "reptile", search: petSearchQuery }],
     queryFn: async () => {
-      const response = await fetch("/api/pets?species=reptile");
+      const params = new URLSearchParams({ species: "reptile" });
+      if (petSearchQuery) {
+        params.append('search', petSearchQuery);
+      }
+      const response = await fetch(`/api/pets?${params.toString()}`);
       if (!response.ok) throw new Error("Failed to fetch reptiles");
       return response.json();
     },
   });
+
+  const pets = petsData?.pets || [];
 
   const { data: suppliesData, isLoading: suppliesLoading } = useQuery<any>({
     queryKey: ["/api/supplies", { category: "reptile-supplies", page: currentPage, limit: ITEMS_PER_PAGE, search: searchQuery }],
@@ -76,6 +84,8 @@ export default function ReptilesPage() {
   useEffect(() => {
     setCurrentPage(0);
   }, [searchQuery]);
+
+  // Pets are not paginated server-side, so no need to reset page
 
   // Reset page when totalPages changes or currentPage is out of bounds
   useEffect(() => {
@@ -139,6 +149,20 @@ export default function ReptilesPage() {
         {/* Reptiles Section */}
         <section>
           <h2 className="text-2xl font-bold mb-6 text-gray-800">Exotic Reptiles</h2>
+          
+          {/* Pet Search Bar */}
+          <div className="relative mb-6">
+            <Input
+              type="text"
+              placeholder="Search exotic reptiles..."
+              value={petSearchInput}
+              onChange={(e) => setPetSearchInput(e.target.value)}
+              className="pl-10 bg-white border-gray-200 rounded-xl"
+              data-testid="input-search-reptile-animals"
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          </div>
+          
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (
