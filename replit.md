@@ -22,6 +22,12 @@ A mobile-friendly web application for the "Animal House" pet store, aimed at enh
   - Search combines with category and filterType filters (AND logic)
   - Whitespace-only searches treated as empty searches
   - Search bars integrated into specialty pages (Aquatics, Reptiles) with pagination support
+  - **Animal Search on Specialty Pages**: Independent search bars for animals on Aquatics and Exotic Reptiles pages
+    - Debounced search input (500ms delay) to prevent excessive API calls
+    - Searches fish by name, breed, or description on Aquatics page
+    - Searches reptiles by name, breed, or description on Exotic Reptiles page
+    - Search queries passed to `/api/pets?species={species}&search={query}` endpoint
+    - Separate search functionality for animals and supplies on each specialty page
   - Brand Name Expansion: Automatically maps abbreviated brand names to full names for better search results (server/brandNameExpansion.ts)
     - Example: "Diamond" → finds products with "Diam" in name
     - Example: "Blue Buffalo" → finds products with "Blue B"
