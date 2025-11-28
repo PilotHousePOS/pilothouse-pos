@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-A mobile-friendly web application for the "Animal House" pet store, aimed at enhancing its online presence, service accessibility, and product sales. The application facilitates pet browsing, grooming appointment booking, and pet supply purchasing (including exotic reptiles). It integrates inventory management, customer accounts, and administrative functionalities, specifically excluding vet care and training services. The business vision is to provide a comprehensive online platform that boosts sales and streamlines operations for a modern pet store.
+The Animal House Pet Store project is a mobile-friendly web application designed to enhance the store's online presence, service accessibility, and product sales. It supports pet browsing, grooming appointment booking, and pet supply purchasing, including exotic reptiles. The application aims to provide a comprehensive online platform that boosts sales and streamlines operations, integrating inventory management, customer accounts, and administrative functionalities.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -15,46 +15,21 @@ A mobile-friendly web application for the "Animal House" pet store, aimed at enh
 - Mobile authentication consistency: Same account should show identical admin access across devices
 - Inventory Management: Full product names and descriptions preserved from Excel imports (no abbreviations)
 - Search Functionality: All searches (supplies, pets) with intelligent typo tolerance and brand expansion
-  - Fuzzy Search: Auto-corrects typos and finds closest matches (70% similarity threshold)
-  - Searches across name, brand, and description fields
-  - Results sorted by relevance (exact matches first, then close matches)
-  - Search works across all supply pages (main Supplies, Aquatics, Exotic Reptiles)
-  - Search combines with category and filterType filters (AND logic)
-  - Whitespace-only searches treated as empty searches
-  - Search bars integrated into specialty pages (Aquatics, Reptiles) with pagination support
-  - **Animal Search on Specialty Pages**: Independent search bars for animals on Aquatics and Exotic Reptiles pages
-    - Debounced search input (500ms delay) to prevent excessive API calls
-    - Searches fish by name, breed, or description on Aquatics page
-    - Searches reptiles by name, breed, or description on Exotic Reptiles page
-    - Search queries passed to `/api/pets?species={species}&search={query}` endpoint
-    - Separate search functionality for animals and supplies on each specialty page
-  - Brand Name Expansion: Automatically maps abbreviated brand names to full names for better search results (server/brandNameExpansion.ts)
-    - Example: "Diamond" → finds products with "Diam" in name
-    - Example: "Blue Buffalo" → finds products with "Blue B"
-    - Example: "Primal" → finds products with "Prim", "Prim Fd", "Prim Kitr"
-    - Bidirectional mapping: Search works both ways (abbreviation → full name, full name → abbreviation)
-    - Always returns trimmed values to prevent whitespace regression bugs
-    - Integrated into both supply fuzzy search and pet search endpoints
-- Supply Filtering: Centralized, research-based filtering system with proper brand/keyword separation (server/filterConfig.ts):
-  - Reptile supplies: ZooMed, Exo Terra, Zilla, Fluker's, ReptiCare brands + reptile keywords
-  - Aquatic supplies: Hikari, Tetra, Aqueon, Marineland, API, Fluval, SeaChem, GloFish, Omega One, Ocean Nutrition brands + aquatic keywords
-  - Cross-category brands (ZooMed): Make both aquatic AND reptile products - not excluded from either category, keywords determine final categorization
-  - Keyword priority system: Species-specific keywords (60pts) override brand scoring (40pts) for accurate categorization
-  - Exclusion logic: Brand exclusions prevent brand scoring only; keyword exclusions prevent keyword scoring only
-  - Toy brands (Kong, Nylabone, Chuckit!, etc.) hard-excluded from both categories via brand AND keyword exclusions
-  - Example: "ZooMed Pleco" → pleco keyword (60pts aquatic) beats ZooMed brand (40pts reptile) → categorized as Aquatic
-  - **Aquatic Subcategorization** (server/aquaticCategoryEvidence.ts): Evidence-based system verified from official brand websites for accurate product classification:
-    - Fish Food: Omega One, Ocean Nutrition (food-only brands) + Hikari, API, Tetra, Aqueon, GloFish, Fluval (food + other products)
-    - Medicine/Healthcare: SeaChem (specialist), API (Melafix, Pimafix, General Cure), Hikari (Ich-X, PraziPro), Tetra (AquaSafe), Aqueon (water conditioners)
-    - Supplies/Equipment: Marineland (equipment-only), Fluval, Aqueon, Tetra, GloFish (equipment + other products)
-    - All brand categorizations verified from official websites (November 25, 2025): hikariusa.com, apifishcare.com, aqueon.com, omegasea.net, oceannutrition.com, tetra-fish.com, marineland.com, fluvalaquatics.com, seachem.com, glofish.com
-    - Keyword-based scoring system with verified product terminology from official product lines
-    - Priority system: Decoration exclusion (AQUATIC_DECORATION_PHRASES) → Brand-based categorization → Keyword scoring → Default to accessories
-    - Decoration exclusion: Tetra Glo, GloFish Glo, and other decorative product lines automatically categorized as accessories
-    - Cat/dog food exclusion: Products containing cat/dog keywords excluded from aquatic filterType to prevent misclassification of pet food with fish ingredients
+  - Fuzzy Search: Auto-corrects typos and finds closest matches (70% similarity threshold), searches across name, brand, and description fields, results sorted by relevance. Works across all supply pages, combines with category and filterType filters (AND logic), whitespace-only searches treated as empty searches, and search bars integrated into specialty pages with pagination support.
+  - Animal Search on Specialty Pages: Independent search bars for animals on Aquatics and Exotic Reptiles pages with debounced input (500ms delay). Searches fish/reptiles by name, breed, or description.
+  - Brand Name Expansion: Automatically maps abbreviated brand names to full names for better search results (server/brandNameExpansion.ts).
+- Supply Filtering: Centralized, research-based filtering system with proper brand/keyword separation (server/filterConfig.ts).
+  - Reptile supplies: ZooMed, Exo Terra, Zilla, Fluker's, ReptiCare brands + reptile keywords.
+  - Aquatic supplies: Hikari, Tetra, Aqueon, Marineland, API, Fluval, SeaChem, GloFish, Omega One, Ocean Nutrition brands + aquatic keywords.
+  - Cross-category brands (ZooMed): Make both aquatic AND reptile products - not excluded from either category, keywords determine final categorization.
+  - Keyword priority system: Species-specific keywords (60pts) override brand scoring (40pts) for accurate categorization.
+  - Exclusion logic: Brand exclusions prevent brand scoring only; keyword exclusions prevent keyword scoring only.
+  - Toy brands hard-excluded from both categories via brand AND keyword exclusions.
+  - Aquatic Subcategorization (server/aquaticCategoryEvidence.ts): Evidence-based system with verified product terminology from official product lines. Priority system: Decoration exclusion → Brand-based categorization → Keyword scoring → Default to accessories.
+  - Cat/dog food exclusion: Products containing cat/dog keywords excluded from aquatic filterType.
 
 ## System Architecture
-The application is a full-stack web application with a React frontend (Vite, TypeScript, Tailwind CSS, shadcn/ui) and an Express.js backend (TypeScript) connected to a PostgreSQL database via Drizzle ORM.
+The application is a full-stack web application featuring a React frontend (Vite, TypeScript, Tailwind CSS, shadcn/ui) and an Express.js backend (TypeScript) connected to a PostgreSQL database via Drizzle ORM.
 
 **UI/UX Decisions:**
 - Dark, bold design with strong contrast and mobile responsiveness.
@@ -65,7 +40,7 @@ The application is a full-stack web application with a React frontend (Vite, Typ
 
 **Technical Implementations & Feature Specifications:**
 - **Pet & Supply Management:** Multi-image support, extensive inventory, automated brand extraction, specialized reptile supply filtering, case-insensitive search with pagination and touch gestures.
-- **Appointment System:** 15-minute intervals, admin approval, email notifications, Google Calendar sync, customer tracking, weekly limits (enforced for both new appointments AND edits including inline service type changes), special date configurations, groomer assignment, role-based access, multi-pet booking, and comprehensive history. Timezone-aware date comparison prevents UTC/CST mismatch bugs.
+- **Appointment System:** 15-minute intervals, admin approval, email notifications, Google Calendar sync, customer tracking, weekly limits, special date configurations, groomer assignment, role-based access, multi-pet booking, and comprehensive history with timezone-aware date comparison.
 - **Order & Notification System:** Admin notifications for new orders/appointments, customer notifications for status updates, and detailed order history.
 - **Authentication & Authorization:** JWT tokens in secure cookies, password reset, user settings, admin user management, and a three-tier role system (Customer, Groomer, Admin).
 - **Wishlist System:** Dedicated page with add/remove and quick "Add to Cart."
@@ -75,35 +50,10 @@ The application is a full-stack web application with a React frontend (Vite, Typ
 - **Admin Order Management:** Displays actual product/pet and customer names in order details.
 - **Orders & Appointments Search:** Unified search in admin panel by customer name, phone, or pet name.
 - **Pet Boarding/Babysitting System:** Complete boarding management with intelligent cost calculation, flexible date management, status tracking, and admin-only access.
-- **Database Sync Tools:** Staging import with duplicate prevention, supplies-only sync (admin-only), and full database sync (development-only).
+- **Database Sync Tools:** Staging import with duplicate prevention, supplies-only sync, and full database sync.
 - **Auto-Categorization System:** Single-button operation for specialty section and product type classification based on brand and keyword analysis, including Live Animal Detection and record creation.
-- **Smart Abbreviation Expansion System:** Comprehensive, research-based abbreviation expansion for major pet food and treat brands (server/abbreviationExpansion.ts):
-  - **CRITICAL VERIFICATION STANDARD**: ALL abbreviation expansions MUST be verified using official sources (company websites, product catalogs, packaging photos). Absolutely NO guesswork allowed.
-  - Blue Buffalo: "Blue B" → "Blue Buffalo" (30+ products)
-  - Diamond: "Diam" → "Diamond" (30+ products) with context-aware measurement detection
-  - Primal: "Prim Fd" → "Primal Freeze Dried", "Prim Kitr" → "Primal Kibble in the Raw" (13 products)
-  - Nutrisource: Complete product line expansions (Crispy Crispers, Grillin' Grillers, PureVita, Select Series, etc.)
-  - Fromm: Complete product line expansions (PurrSnickety, Four-Star, À La Veg recipes, etc.)
-  - SmartBones: "Smartbone/Smartbones" → "SmartBones" (20+ products) - capitalization fix
-  - Benebone: "BeneBone" → "Benebone" (20+ products) - capitalization fix to match official trademark
-  - Merrick Fresh Kisses: "Dbbl" → "Double-Brush" (14 products) - proprietary design feature expansion
-  - Dogswell: "Guthealth" → "Gut Health", "Hip & joint" → "Hip & Joint", "Skin & coat" → "Skin & Coat" (6 products)
-  - Durvet: "Liquid Wrm" → "Liquid Wormer 2X", "Tripwrm" → "Triple Wormer", "Wrmeze" → "Worm Ease" (6 products)
-  - **Nylabone Products** (53 products - verified November 28, 2025):
-    - Brand: "Nyla" → "Nylabone", "Nylahealth" → "Nylabone Healthy Edibles"
-    - Product line: "Flexichew" → "FlexiChew" (official capitalization from nylabone.com)
-    - Sizes: "Reg" → "Regular", "Wlf" → "Wolf" (verified official size names: Petite/Regular/Wolf/Giant)
-    - Other: "Durachew" → "DuraChew", "Dentalchew" → "Dental Chew", "Ddbl" → "Double", "Pwr Chw" → "Power Chew"
-  - **Coastal Pet Products** (127+ products - verified November 28, 2025):
-    - Pattern names from official 2024 Product Catalog (coastalpet.com/media/nd3izx2w/2024productcatalog.pdf, Page 11)
-    - "Aln" → "Aliens", "Dns" → "Dinosaurs", "Fdn" → "Frosted Donuts", "Llm" → "Llamas", "Pia" → "Pineapples", "Ucn" → "Unicorns"
-    - Color abbreviations: "Grn" → "Green", "Blu" → "Blue", "Pkf" → "Pink"
-    - Other: "Bigdogtieout" → "Big Dog Tie Out"
-  - All patterns verified with official website documentation, packaging photos, and database evidence
-  - Start-of-string anchoring prevents corruption of non-brand text
-  - Context-aware "Diam" expansion: Distinguishes "Diameter" (measurements like "12 inch Diam tube") from "Diamond" (brand names)
-  - Ensures full product name clarity across all display and processing contexts
-- **Brand Extraction System:** Comprehensive brand database for automated brand assignment.
+- **Smart Abbreviation Expansion System:** Comprehensive, research-based abbreviation expansion for major pet food and treat brands (server/abbreviationExpansion.ts) with critical verification against official sources. Includes context-aware expansions.
+- **Brand Extraction & Assignment System:** Comprehensive brand database (80+ brands) with automated brand detection via `extractBrand()` function and category-specific brand handling. Includes abbreviation normalization and a brand backfill migration script for automated assignment.
 - **Product Image Management System:** Statistics dashboard, manual and automated batch image search with preview and approval, and admin-only access.
 - **Employee & Grooming Schedule Management Systems:** Sectioned schedule views, editable grids, employee/groomer management, flexible time slots, batch save, and admin-only access.
 - **AI-Powered Order Photo Upload System:** Upload supplier order photos to extract items automatically using GPT-5 vision, with adjustable price multipliers, editable extracted items, bulk add to inventory with automatic categorization, and photo management. Includes a production-ready Live Animal Detection System with species categorization rules and custom pricing.
