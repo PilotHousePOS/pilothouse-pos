@@ -10064,7 +10064,7 @@ export default function Admin() {
                       <div>
                         <p className="font-medium text-purple-700 dark:text-purple-400">Step 2: Product Categories (11 types)</p>
                         <ul className="list-disc list-inside space-y-1 text-purple-600 dark:text-purple-500 ml-2">
-                          <li>Food, Toys, Beds, Leashes, Healthcare, Accessories</li>
+                          <li>Food, Toys, Beds, Collars & Leashes, Healthcare, Accessories</li>
                           <li>Aquatics, Reptiles, Bird Supplies, Dog Cages, Small Animal Supplies</li>
                           <li>Brand scoring: KONG → Toys, Fluval → Aquatics (25 pts)</li>
                           <li>Keyword scoring: "aquarium" → Aquatics, "bird cage" → Bird Supplies (15 pts each)</li>
@@ -12201,7 +12201,7 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
               <SelectItem value="food">Food</SelectItem>
               <SelectItem value="toys">Toys</SelectItem>
               <SelectItem value="beds">Beds</SelectItem>
-              <SelectItem value="leashes">Leashes</SelectItem>
+              <SelectItem value="leashes">Collars & Leashes</SelectItem>
               <SelectItem value="healthcare">Healthcare</SelectItem>
               <SelectItem value="accessories">Accessories</SelectItem>
               <SelectItem value="aquatics">Aquatics</SelectItem>
