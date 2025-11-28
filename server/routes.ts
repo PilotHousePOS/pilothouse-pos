@@ -5835,6 +5835,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Download CSV endpoint for unbranded products
+  app.get("/api/download-csv", (req, res) => {
+    const filePath = path.join(process.cwd(), 'FINAL-UNBRANDED-PRODUCTS-UPDATED.csv');
+    res.download(filePath, 'FINAL-UNBRANDED-PRODUCTS-UPDATED.csv', (err) => {
+      if (err) {
+        console.error('Download error:', err);
+        res.status(500).json({ error: 'Failed to download file' });
+      }
+    });
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
