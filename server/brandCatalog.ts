@@ -15,13 +15,15 @@ import type { BrandCatalogEntry } from '@shared/schema';
  * @param productName - Full product name (e.g., "3.5lb Science Diet Indoor" or "Freshpet Vit Gr")
  * @returns Brand name if found, null otherwise
  */
-function extractBrand(productName: string): string | null {
+export function extractBrand(productName: string): string | null {
   if (!productName) return null;
   
-  // Common pet food brands to detect (ordered by priority/specificity)
+  // Common pet brands to detect (ordered by priority/specificity)
   // Include alternate spellings and common variations
   // IMPORTANT: Brand name MUST match the catalog entries exactly
+  // VERIFIED: All high-frequency brands from audit 2024-11-28
   const knownBrands = [
+    // Food Brands
     { name: 'Science Diet', patterns: ['hill\'s science diet', 'science diet', 'sd'] },
     { name: 'Nutrisource', patterns: ['nutrisource', 'nutri source', 'nutr source'] },
     { name: 'Blue Buffalo', patterns: ['blue buffalo', 'bluebuffalo', 'blue buff', 'bb'] },
@@ -59,16 +61,54 @@ function extractBrand(productName: string): string | null {
     { name: 'Whiskas', patterns: ['whiskas'] },
     { name: 'Greenies', patterns: ['greenies'] },
     { name: 'Temptations', patterns: ['temptations'] },
-    { name: 'Kong', patterns: ['kong'] },
-    { name: 'Nylabone', patterns: ['nylabone'] },
-    { name: 'Dogswell', patterns: ['dogswell'] },
-    { name: 'Durvet', patterns: ['durvet'] },
-    { name: 'Omega One', patterns: ['omega one'] },
-    { name: 'Ocean Nutrition', patterns: ['ocean nutrition'] },
     { name: 'Primal', patterns: ['primal'] },
     { name: 'Inaba', patterns: ['inaba', 'dashi cat', 'dasi cat', 'dashi delights'] },
     { name: 'Weruva', patterns: ['weruva', 'bff', 'b.f.f.', 'best feline friend'] },
     { name: 'Fussie Cat', patterns: ['fussie cat', 'fussie'] },
+    { name: 'RedBarn', patterns: ['redbarn', 'red barn'] },
+    
+    // Toy & Accessory Brands
+    { name: 'Kong', patterns: ['kong'] },
+    { name: 'Nylabone', patterns: ['nylabone', 'nyla'] },
+    { name: 'Benebone', patterns: ['benebone'] },
+    { name: 'SmartBones', patterns: ['smartbones', 'smartbone'] },
+    { name: 'Coastal', patterns: ['coastal'] },
+    { name: 'Wolfgang', patterns: ['wolfgang', 'wlfgng'] },
+    
+    // Health & Supplements
+    { name: 'Dogswell', patterns: ['dogswell'] },
+    { name: 'Durvet', patterns: ['durvet'] },
+    
+    // Aquatic Brands (verified from filterConfig.ts)
+    { name: 'Omega One', patterns: ['omega one'] },
+    { name: 'Ocean Nutrition', patterns: ['ocean nutrition'] },
+    { name: 'Hikari', patterns: ['hikari'] },
+    { name: 'Tetra', patterns: ['tetra'] },
+    { name: 'Aqueon', patterns: ['aqueon'] },
+    { name: 'Marineland', patterns: ['marineland', 'marina'] },
+    { name: 'API', patterns: ['api'] },
+    { name: 'Fluval', patterns: ['fluval'] },
+    { name: 'SeaChem', patterns: ['seachem'] },
+    { name: 'GloFish', patterns: ['glofish'] },
+    
+    // Reptile Brands (verified from filterConfig.ts)
+    { name: 'Zoo Med', patterns: ['zoo med', 'zoomed'] },
+    { name: 'Exo Terra', patterns: ['exo terra', 'exoterra'] },
+    { name: 'Zilla', patterns: ['zilla'] },
+    { name: 'Fluker\'s', patterns: ['fluker\'s', 'flukers', 'fluker'] },
+    { name: 'ReptiCare', patterns: ['repticare', 'repti care'] },
+    
+    // Small Animal Brands
+    { name: 'Kaytee', patterns: ['kaytee'] },
+    { name: 'Oxbow', patterns: ['oxbow'] },
+    { name: 'Li\'l Pals', patterns: ['li\'l pals', 'lilpals', 'lil pals'] },
+    { name: 'Living World', patterns: ['living world'] },
+    { name: 'Vitakraft', patterns: ['vitakraft'] },
+    { name: 'Ware', patterns: ['ware'] },
+    
+    // Bird Brands
+    { name: 'Birdlife', patterns: ['birdlife', 'bird life'] },
+    { name: 'A&E Cage Co', patterns: ['a&e', 'a & e cage'] },
   ];
   
   const lowerName = productName.toLowerCase();
