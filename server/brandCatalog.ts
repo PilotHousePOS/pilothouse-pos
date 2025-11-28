@@ -39,7 +39,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Kit & Kaboodle', patterns: ['kit & kaboodle', 'kit and kaboodle'] },
     { name: 'Special Kitty', patterns: ['special kitty'] },
     { name: 'Freshpet', patterns: ['freshpet', 'fresh pet'] },
-    { name: 'Fromm', patterns: ['fromm', 'from'] },
+    { name: 'Fromm', patterns: ['fromm', 'from cat', 'from dog', 'from kitten', 'from puppy', 'from adult'] },
     { name: 'Wellness', patterns: ['wellness'] },
     { name: 'Merrick', patterns: ['merrick'] },
     { name: 'Orijen', patterns: ['orijen'] },
