@@ -4650,6 +4650,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`Live animal detection complete: ${movedToPets} items moved to pets, ${skippedDueToReferences} skipped due to existing references`);
 
+      // Step 0c: Assign brands to products without brands
+      console.log("Step 0c: Assigning brands to products without brands...");
+      const { extractBrand } = await import('./brandCatalog');
+      const freshSupplies = await storage.getAllSupplies();
+      let brandsAssigned = 0;
+      
+      for (const supply of freshSupplies) {
+        if (!supply.brand || supply.brand.trim() === '') {
+          const detectedBrand = extractBrand(supply.name);
+          if (detectedBrand) {
+            await storage.updateSupply(supply.id, { brand: detectedBrand });
+            brandsAssigned++;
+          }
+        }
+      }
+      console.log(`Brand assignment complete: ${brandsAssigned} products updated with detected brands`);
+
       // Step 1: Categorize filterType (aquatic/reptile/general)
       console.log("Step 1: Setting filterType (specialty sections)...");
       const filterStats = await storage.autoCategorizeAllSupplies();
@@ -4673,6 +4690,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             skippedDueToReferences: skippedDueToReferences,
             details: liveAnimalResults.slice(0, 10)
           },
+          brandsAssigned: brandsAssigned,
           filterType: filterStats,
           categories: categoryStats,
           duration: `${duration}s`
@@ -4810,10 +4828,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Step 2: Auto-categorize specialty sections
+      // Step 2a: Assign brands to products without brands
+      console.log("Step 2a: Assigning brands to products without brands...");
+      const { extractBrand } = await import('./brandCatalog');
+      const freshSupplies = await storage.getAllSupplies();
+      let brandsAssigned = 0;
+      
+      for (const supply of freshSupplies) {
+        if (!supply.brand || supply.brand.trim() === '') {
+          const detectedBrand = extractBrand(supply.name);
+          if (detectedBrand) {
+            await storage.updateSupply(supply.id, { brand: detectedBrand });
+            brandsAssigned++;
+          }
+        }
+      }
+      console.log(`Brand assignment complete: ${brandsAssigned} products updated`);
+
+      // Step 2b: Auto-categorize specialty sections
       const filterStats = await storage.autoCategorizeAllSupplies();
       
-      // Step 3: Auto-categorize product types
+      // Step 2c: Auto-categorize product types
       const categoryStats = await storage.autoCategorizeProductCategories();
       
       console.log("Step 3/3: Auditing unknown abbreviations...");
@@ -4833,6 +4868,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           invalidPetsRemoved,
           invalidPetsSkipped,
           liveAnimals: { movedToPets, skippedDueToReferences },
+          brandsAssigned: brandsAssigned,
           filterType: filterStats,
           categories: categoryStats,
           audit: {

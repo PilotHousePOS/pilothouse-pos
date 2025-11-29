@@ -40,11 +40,11 @@ export function extractBrand(productName: string): string | null {
     { name: 'Special Kitty', patterns: ['special kitty'] },
     { name: 'Freshpet', patterns: ['freshpet', 'fresh pet'] },
     { name: 'Fromm', patterns: ['fromm', 'from cat', 'from dog', 'from kitten', 'from puppy', 'from adult'] },
-    { name: 'Wellness', patterns: ['wellness'] },
+    { name: 'Wellness', patterns: ['wellness', 'welln'] },
     { name: 'Merrick', patterns: ['merrick'] },
     { name: 'Orijen', patterns: ['orijen'] },
     { name: 'Acana', patterns: ['acana'] },
-    { name: 'Zignature', patterns: ['zignature', 'zign'] },
+    { name: 'Zignature', patterns: ['zignature', 'zign', 'zig treats', 'zig sft'] },
     { name: 'Canidae', patterns: ['canidae', 'canid', 'cand'] },
     { name: 'Instinct', patterns: ['instinct'] },
     { name: 'Earthborn', patterns: ['earthborn', 'earthborn holistic'] },
@@ -64,7 +64,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Primal', patterns: ['primal'] },
     { name: 'Inaba', patterns: ['inaba', 'dashi cat', 'dasi cat', 'dashi delights'] },
     { name: 'Weruva', patterns: ['weruva', 'bff', 'b.f.f.', 'best feline friend'] },
-    { name: 'Fussie Cat', patterns: ['fussie cat', 'fussie'] },
+    { name: 'Fussie Cat', patterns: ['fussie cat', 'fussie', 'fussiecat'] },
     { name: 'RedBarn', patterns: ['redbarn', 'red barn'] },
     
     // Toy & Accessory Brands
@@ -81,6 +81,16 @@ export function extractBrand(productName: string): string | null {
     { name: 'Dogswell', patterns: ['dogswell'] },
     { name: 'Durvet', patterns: ['durvet'] },
     { name: 'Farnam', patterns: ['farnam', 'canine red cell'] },
+    { name: 'Zymox', patterns: ['zymox'] },
+    { name: 'Arm & Hammer', patterns: ['arm & hammer', 'arm & ham', 'arm & hamm'] },
+    { name: 'Vetericyn', patterns: ['vetericyn'] },
+    { name: 'Carefresh', patterns: ['carefresh'] },
+    { name: 'Four Paws', patterns: ['four paws', 'magiccoat', 'magic coat'] },
+    { name: 'Pure Vita', patterns: ['pure vita', 'purevita'] },
+    { name: 'TropiClean', patterns: ['tropiclean', 'freshbreath', 'freshbreathe', 'fresh breath'] },
+    { name: 'Specialty Pet Products', patterns: ['petodor', 'pet odor exterminator'] },
+    { name: 'Vital Essentials', patterns: ['vital essentials', 'vitaless'] },
+    { name: 'SmarterPaw', patterns: ['meowijuana', 'meowij'] },
     
     // Aquatic Brands (verified from filterConfig.ts + web search Nov 28, 2025)
     { name: 'Omega One', patterns: ['omega one'] },
@@ -90,18 +100,20 @@ export function extractBrand(productName: string): string | null {
     { name: 'Aqueon', patterns: ['aqueon'] },
     { name: 'Marineland', patterns: ['marineland', 'marina'] },
     { name: 'API', patterns: ['api'] },
-    { name: 'Fluval', patterns: ['fluval'] },
+    { name: 'Fluval', patterns: ['fluval', 'aquaclear', 'aqua clear'] },
     { name: 'SeaChem', patterns: ['seachem'] },
     { name: 'GloFish', patterns: ['glofish'] },
     { name: 'Penn Plax', patterns: ['penn plax', 'penn-plax', 'pennplax', 'penn', 'act-air', 'action air', 'action-air', 'dory betta', 'spongebob'] },
-    { name: 'Cascade', patterns: ['cascade'] },
+    { name: 'Fritz Aquatics', patterns: ['fritz'] },
+    { name: 'Acurel', patterns: ['acurel'] },
+    { name: 'Cascade', patterns: ['cascade', 'cascade100', 'cascade20', 'cascade150', 'cascade200', 'cascade80', 'cascade300'] },
     { name: 'Aquatop', patterns: ['aquatop'] },
     { name: 'Aqualife', patterns: ['aqualife'] },
     
     // Reptile Brands (verified from filterConfig.ts)
     { name: 'Zoo Med', patterns: ['zoo med', 'zoomed'] },
     { name: 'Exo Terra', patterns: ['exo terra', 'exoterra'] },
-    { name: 'Zilla', patterns: ['zilla'] },
+    { name: 'Zilla', patterns: ['zilla', 'zila'] },
     { name: 'Fluker\'s', patterns: ['fluker\'s', 'flukers', 'fluker'] },
     { name: 'ReptiCare', patterns: ['repticare', 'repti care'] },
     
@@ -115,7 +127,7 @@ export function extractBrand(productName: string): string | null {
     
     // Bird Brands (verified from web search Nov 28, 2025)
     { name: 'Birdlife', patterns: ['birdlife', 'bird life'] },
-    { name: 'A&E Cage Co', patterns: ['a&e', 'a & e cage'] },
+    { name: 'A&E Cage Co', patterns: ['a&e', 'a & e cage', 'a & e ', 'happybeaks', 'happy beaks'] },
     { name: 'Prevue', patterns: ['prevue'] },
     { name: 'Vitapol', patterns: ['vitapol'] },
     
@@ -210,7 +222,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Tomlyn', patterns: ['tomlyn'] },
     { name: 'BPV Environmental', patterns: ['bpv', 'fresh news', 'freshnews'] },
     { name: 'Multipet', patterns: ['multipet', 'lamb chop', 'lambchop'] },
-    { name: 'Jazwares', patterns: ['jazwares', 'squishmallow', 'squishmallows'] },
+    { name: 'Jazwares', patterns: ['jazwares', 'squishmallow', 'squishmallows', 'squishmellow'] },
     { name: 'Galapagos', patterns: ['galapagos', 'galopagoos'] },
     { name: 'Finley\'s', patterns: ['finley\'s', 'finleys'] },
     { name: 'Vitapol', patterns: ['vitapol', 'smackers'] },
