@@ -27,11 +27,11 @@ export function extractBrand(productName: string): string | null {
     { name: 'Science Diet', patterns: ['hill\'s science diet', 'science diet', 'sd'] },
     { name: 'Nutrisource', patterns: ['nutrisource', 'nutri source', 'nutr source'] },
     { name: 'Blue Buffalo', patterns: ['blue buffalo', 'bluebuffalo', 'blue buff', 'bb'] },
-    { name: 'Taste of the Wild', patterns: ['taste of the wild', 'taste wild', 'tow'] },
+    { name: 'Taste of the Wild', patterns: ['taste of the wild', 'taste wild', 'tow', 'pacific stream'] },
     { name: 'Castor & Pollux', patterns: ['castor & pollux', 'castor and pollux'] },
     { name: 'Royal Canin', patterns: ['royal canin', 'royal can', 'rc'] },
     { name: 'Pro Plan', patterns: ['pro plan', 'proplan', 'pp'] },
-    { name: 'Natural Balance', patterns: ['natural balance', 'nat balance', 'nb'] },
+    { name: 'Natural Balance', patterns: ['natural balance', 'nat balance', 'nb', 'rewards crunch', 'rewards jumpin', 'rewards mini'] },
     { name: 'Rachael Ray', patterns: ['rachael ray'] },
     { name: 'Solid Gold', patterns: ['solid gold'] },
     { name: 'Fancy Feast', patterns: ['fancy feast'] },
@@ -74,7 +74,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'SmartBones', patterns: ['smartbones', 'smartbone'] },
     { name: 'Coastal', patterns: ['coastal'] },
     { name: 'Wolfgang', patterns: ['wolfgang', 'wlfgng'] },
-    { name: 'Pets First', patterns: ['pets first', 'lsu', 'saints', 'nola saints'] },
+    { name: 'Pets First', patterns: ['pets first', 'lsu', 'saints', 'nola saints', 'nola hoodie', 'nola mesh', 'nola onesie'] },
     { name: 'Preston', patterns: ['preston'] },
     
     // Health & Supplements
@@ -103,7 +103,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Fluval', patterns: ['fluval', 'aquaclear', 'aqua clear'] },
     { name: 'SeaChem', patterns: ['seachem'] },
     { name: 'GloFish', patterns: ['glofish'] },
-    { name: 'Penn Plax', patterns: ['penn plax', 'penn-plax', 'pennplax', 'penn', 'act-air', 'action air', 'action-air', 'dory betta', 'spongebob'] },
+    { name: 'Penn Plax', patterns: ['penn plax', 'penn-plax', 'pennplax', 'penn', 'act-air', 'action air', 'action-air', 'dory betta', 'spongebob', 'frzn'] },
     { name: 'Fritz Aquatics', patterns: ['fritz'] },
     { name: 'Acurel', patterns: ['acurel'] },
     { name: 'Cascade', patterns: ['cascade', 'cascade100', 'cascade20', 'cascade150', 'cascade200', 'cascade80', 'cascade300'] },
@@ -125,11 +125,13 @@ export function extractBrand(productName: string): string | null {
     { name: 'Vitakraft', patterns: ['vitakraft'] },
     { name: 'Ware', patterns: ['ware'] },
     
-    // Bird Brands (verified from web search Nov 28, 2025)
+    // Bird Brands (verified from web search Nov 28-29, 2025)
     { name: 'Birdlife', patterns: ['birdlife', 'bird life'] },
     { name: 'A&E Cage Co', patterns: ['a&e', 'a & e cage', 'a & e ', 'happybeaks', 'happy beaks'] },
-    { name: 'Prevue', patterns: ['prevue'] },
+    { name: 'Prevue', patterns: ['prevue', 'carpenter creations', 'carpenter'] },
     { name: 'Vitapol', patterns: ['vitapol'] },
+    { name: 'Lafeber', patterns: ['lafeber', 'lafebers'] },
+    { name: 'Kordon', patterns: ['kordon', 'oasis'] },
     
     // Health & Wellness (verified from web search Nov 28, 2025)
     { name: 'Skout\'s Honor', patterns: ['skout\'s honor', 'skouts honor', 'skoutshonor'] },
@@ -137,21 +139,22 @@ export function extractBrand(productName: string): string | null {
     { name: 'Nature\'s Miracle', patterns: ['nature\'s miracle', 'natures miracle', 'naturesmiracle'] },
     { name: 'TropiClean', patterns: ['tropiclean', 'tropi clean'] },
     
-    // Toys & Accessories (verified from web search Nov 28, 2025)
+    // Toys & Accessories (verified from web search Nov 28-29, 2025)
     { name: 'Tuffy', patterns: ['tuffy', 'tuffys'] },
-    { name: 'JW Pet', patterns: ['jw pet', 'jw'] },
+    { name: 'JW Pet', patterns: ['jw pet', 'jw', 'skidstop', 'skid stop', 'skid-stop'] },
     { name: 'Rascals', patterns: ['rascals'] },
     { name: 'Playfuls', patterns: ['playfuls'] },
+    { name: 'Ethical Pet', patterns: ['ethical pet', 'bam-bones', 'bambones', 'bambone', 'spt ', 'spt axolotl', 'spt slithery', 'spt sooth'] },
     
     // Collars & Leashes (verified from web search Nov 28, 2025)
     { name: 'Valhoma', patterns: ['valhoma'] },
     { name: 'Circle T', patterns: ['circle t', 'circle'] },
     { name: 'Lupine', patterns: ['lupine'] },
     
-    // Cat Supplies (verified from web search Nov 28, 2025)
+    // Cat Supplies (verified from web search Nov 28-29, 2025)
     { name: 'Catit', patterns: ['catit'] },
     { name: 'Intersand', patterns: ['intersand'] },
-    { name: 'Petmate', patterns: ['petmate'] },
+    { name: 'Petmate', patterns: ['petmate', 'vari kennel', 'vari-kennel', 'varikennel'] },
     { name: 'Van Ness', patterns: ['van ness', 'vanness'] },
     
     // Food & Treats (verified from web search Nov 28, 2025)
@@ -163,10 +166,28 @@ export function extractBrand(productName: string): string | null {
     { name: 'FURminator', patterns: ['furminator'] },
     
     // Small Pet (additional brands)
-    { name: 'Midwest', patterns: ['midwest'] },
+    { name: 'MidWest Homes For Pets', patterns: ['midwest', 'mid west', 'mw'] },
     { name: 'Marshall', patterns: ['marshall', 'marshals'] },
     { name: 'Nation', patterns: ['nation'] },
     { name: 'Nibbles', patterns: ['nibbles'] },
+    
+    // Hagen Family Brands (verified from web search Nov 29, 2025)
+    { name: 'Hagen', patterns: ['hagen', 'dogit', 'laguna'] },
+    
+    // Artisan/Specialty Treats (verified from web search Nov 29, 2025)
+    { name: 'Saint Rocco\'s', patterns: ['st.roccos', 'st roccos', 'saint rocco', 'stroccos'] },
+    
+    // Penn Plax Product Lines (verified from web search Nov 29, 2025)
+    { name: 'Penn Plax', patterns: ['aquascapes', 'aquafloras', 'aqua-floras', 'sinkers'] },
+    
+    // Mammoth Pet Products (verified from web search Nov 29, 2025)
+    { name: 'Mammoth Pet Products', patterns: ['mammoth', 'mamm'] },
+    
+    // PetEdge Brands (verified from web search Nov 29, 2025)
+    { name: 'Aria', patterns: ['aria'] },
+    
+    // Nature's Ocean/World Wide Imports (verified from web search Nov 29, 2025)
+    { name: 'Nature\'s Ocean', patterns: ['purewater', 'pure water pebbles'] },
     
     // Additional Verified Brands (Nov 28, 2025 - verified via web search)
     { name: 'Wee-Wee', patterns: ['wee-wee', 'weewee', 'wee wee'] },
