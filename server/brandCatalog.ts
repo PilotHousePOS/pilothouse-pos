@@ -316,6 +316,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Penn Plax', patterns: ['small world'] },
     { name: 'Lee\'s', patterns: ['undergravel filter'] },
     { name: 'Coastal Pet', patterns: ['circle t', 'cirlce'] },
+    { name: 'Fashion Pet', patterns: ['fashion pet'] },
   ];
   
   const lowerName = productName.toLowerCase();
