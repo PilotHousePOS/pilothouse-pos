@@ -26,7 +26,7 @@ export function extractBrand(productName: string): string | null {
     // Food Brands
     { name: 'Science Diet', patterns: ['hill\'s science diet', 'science diet', 'sd'] },
     { name: 'Nutrisource', patterns: ['nutrisource', 'nutri source', 'nutr source'] },
-    { name: 'Blue Buffalo', patterns: ['blue buffalo', 'bluebuffalo', 'blue buff', 'bb'] },
+    { name: 'Blue Buffalo', patterns: ['blue buffalo', 'bluebuffalo', 'blue buff', 'bb', 'blue wilderness'] },
     { name: 'Taste of the Wild', patterns: ['taste of the wild', 'taste wild', 'tow', 'pacific stream'] },
     { name: 'Castor & Pollux', patterns: ['castor & pollux', 'castor and pollux'] },
     { name: 'Royal Canin', patterns: ['royal canin', 'royal can', 'rc'] },
@@ -54,6 +54,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Bil-Jac', patterns: ['bil-jac', 'biljac'] },
     { name: 'Victor', patterns: ['victor'] },
     { name: 'Purina', patterns: ['purina', 'beggin', 'beggin strips'] },
+    { name: 'Tetra', patterns: ['tetra', 'reptomin'] },
     { name: 'Iams', patterns: ['iams'] },
     { name: 'Pedigree', patterns: ['pedigree'] },
     { name: 'Friskies', patterns: ['friskies'] },
@@ -173,7 +174,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Nibbles', patterns: ['nibbles'] },
     
     // Hagen Family Brands (verified from web search Nov 29, 2025)
-    { name: 'Hagen', patterns: ['hagen', 'dogit', 'laguna'] },
+    { name: 'Hagen', patterns: ['hagen', 'dogit', 'laguna', 'smartplay', 'smart.play'] },
     
     // Artisan/Specialty Treats (verified from web search Nov 29, 2025)
     { name: 'Saint Rocco\'s', patterns: ['st.roccos', 'st roccos', 'saint rocco', 'stroccos'] },
@@ -258,7 +259,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'MidWest Homes for Pets', patterns: ['midwest', 'mid-west', 'skudo'] },
     { name: 'Natural Dog Company', patterns: ['natural dog company', 'natural dog'] },
     { name: 'Bully Bunches', patterns: ['bully bunches'] },
-    { name: 'Loving Pets', patterns: ['loving pets', 'nature\'s choice'] },
+    { name: 'Loving Pets', patterns: ['loving pets', 'nature\'s choice', 'dolce', 'dolce moderno'] },
     { name: 'IRIS USA', patterns: ['iris usa', 'iris'] },
     { name: 'Gamma2', patterns: ['gamma2', 'vittles vault'] },
     { name: 'OXO', patterns: ['oxo'] },
@@ -294,6 +295,20 @@ export function extractBrand(productName: string): string | null {
     { name: 'Wholesome', patterns: ['wholesome'] },
     { name: 'Adams', patterns: ['adams'] },
     { name: 'Happy', patterns: ['happy'] },
+    
+    // Systematically Verified Brands (Nov 29, 2025 - thorough web research)
+    { name: 'World\'s Best Cat Litter', patterns: ['worldsbestcatlitter', 'worlds best'] },
+    { name: 'Penn Plax', patterns: ['catlife', 'cat life', 'drytech', 'dry-tech'] },
+    { name: 'Reptile Systems', patterns: ['reptile sys'] },
+    { name: 'Harris', patterns: ['harris'] },
+    { name: 'Simple Solution', patterns: ['simplesolution'] },
+    { name: 'Hagen', patterns: ['hari'] },
+    { name: 'SmarterPaw', patterns: ['doggiejuana', 'juananip'] },
+    { name: 'Dog-O\'s', patterns: ['dogo\'s ice cream', 'dogos'] },
+    { name: 'Estes', patterns: ['stoney river', 'stoneyriver'] },
+    { name: 'Prevue', patterns: ['wacky wood', 'wackywo'] },
+    { name: 'Health Extension', patterns: ['healthext', 'health ext'] },
+    { name: 'TropiClean', patterns: ['spa lavish', 'spa by tropiclean'] },
   ];
   
   const lowerName = productName.toLowerCase();
