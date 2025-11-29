@@ -53,7 +53,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Diamond', patterns: ['diamond'] },
     { name: 'Bil-Jac', patterns: ['bil-jac', 'biljac'] },
     { name: 'Victor', patterns: ['victor'] },
-    { name: 'Purina', patterns: ['purina'] },
+    { name: 'Purina', patterns: ['purina', 'beggin', 'beggin strips'] },
     { name: 'Iams', patterns: ['iams'] },
     { name: 'Pedigree', patterns: ['pedigree'] },
     { name: 'Friskies', patterns: ['friskies'] },
@@ -66,6 +66,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Weruva', patterns: ['weruva', 'bff', 'b.f.f.', 'best feline friend'] },
     { name: 'Fussie Cat', patterns: ['fussie cat', 'fussie', 'fussiecat'] },
     { name: 'RedBarn', patterns: ['redbarn', 'red barn'] },
+    { name: 'Savory Prime', patterns: ['savory prime', 'beggarbns', 'beggar bones'] },
     
     // Toy & Accessory Brands
     { name: 'Kong', patterns: ['kong'] },
