@@ -548,11 +548,52 @@ export async function expandAbbreviationsAsync(
   
   // Step 0: Smart context-aware pattern expansion (Brand-specific fixes)
   
+  // === ZOO MED BRAND NAME FIXES ===
+  // Fix "Zoomed" → "Zoo Med" (commonly written as one word or misspelled)
+  let preProcessed = text.replace(/\bZoomed\b/gi, 'Zoo Med');
+  preProcessed = preProcessed.replace(/\bZooMed\b/g, 'Zoo Med');
+  preProcessed = preProcessed.replace(/\bZoomd\b/gi, 'Zoo Med');
+  
+  // === COASTAL PET PRODUCTS PATTERN+SIZE SPLITTING ===
+  // Coastal uses concatenated pattern+size codes like "Rgbxsm", "Gypmed", etc.
+  // These need to be split before word-boundary matching can work
+  // Pattern codes: Rgb, Rbg, Gyp, Gyb, Gyr, Gyu, Sls, Sso, Lim, Bws, Pkt, Snp, Suf, Ord, Pnk
+  // Size codes: xsm, xxs, sml, med, lrg, xlg, xxxs
+  
+  // Split pattern+size combinations (insert space before size code)
+  preProcessed = preProcessed.replace(/(Rgb|Rbg|Gyp|Gyb|Gyr|Gyu|Sls|Sso|Lim|Bws|Pkt|Snp|Suf|Ord|Pnk|Black|Blue|Red|Pink|Green|Purple|Lime|Gray|Orange|Bright)(xsm|xxs|xxxs|sml|med|lrg|xlg)/gi, '$1 $2');
+  
+  // Expand Coastal pattern codes
+  preProcessed = preProcessed.replace(/\bRgb\b/gi, 'Rainbow');
+  preProcessed = preProcessed.replace(/\bRbg\b/gi, 'Rainbow');
+  preProcessed = preProcessed.replace(/\bGyp\b/gi, 'Gray Pink');
+  preProcessed = preProcessed.replace(/\bGyb\b/gi, 'Gray Blue');
+  preProcessed = preProcessed.replace(/\bGyr\b/gi, 'Gray Red');
+  preProcessed = preProcessed.replace(/\bGyu\b/gi, 'Gray Purple');
+  preProcessed = preProcessed.replace(/\bSls\b/gi, 'Solid');
+  preProcessed = preProcessed.replace(/\bSso\b/gi, 'Solid');
+  preProcessed = preProcessed.replace(/\bLim\b/gi, 'Lime');
+  preProcessed = preProcessed.replace(/\bBws\b/gi, 'Black White Stripe');
+  preProcessed = preProcessed.replace(/\bPkt\b/gi, 'Pink Teal');
+  preProcessed = preProcessed.replace(/\bSnp\b/gi, 'Snake Print');
+  preProcessed = preProcessed.replace(/\bSuf\b/gi, 'Sunflower');
+  preProcessed = preProcessed.replace(/\bOrd\b/gi, 'Orange');
+  preProcessed = preProcessed.replace(/\bPnk\b/gi, 'Pink');
+  
+  // Expand Coastal size codes
+  preProcessed = preProcessed.replace(/\bxxxs\b/gi, 'Extra Extra Extra Small');
+  preProcessed = preProcessed.replace(/\bxxs\b/gi, 'Extra Extra Small');
+  preProcessed = preProcessed.replace(/\bxsm\b/gi, 'Extra Small');
+  preProcessed = preProcessed.replace(/\bsml\b/gi, 'Small');
+  preProcessed = preProcessed.replace(/\bmed\b/gi, 'Medium');
+  preProcessed = preProcessed.replace(/\blrg\b/gi, 'Large');
+  preProcessed = preProcessed.replace(/\bxlg\b/gi, 'Extra Large');
+  
   // Nutrisource: "Crispy Crip" → "Crispy Crispers"
   // Handle "Nutrisource Crispy Crip Lamb" → "Nutrisource Crispy Crispers Lamb"
   // Reference: https://nutrisourcepetfoods.com/our-food/chicken-duck-crispy-crispers/
   const nutrisourceCrispyCripPattern = /\b(Nutrisource)\s+Crispy\s+Crip\b/gi;
-  let preProcessed = text.replace(nutrisourceCrispyCripPattern, "$1 Crispy Crispers");
+  preProcessed = preProcessed.replace(nutrisourceCrispyCripPattern, "$1 Crispy Crispers");
   
   // Nutrisource: "Crispy Crisp" → "Crispy Crispers"
   // Handle "Nutrisource Crispy Crisp Lamb" → "Nutrisource Crispy Crispers Lamb"
