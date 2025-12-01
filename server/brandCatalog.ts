@@ -328,6 +328,139 @@ export function extractBrand(productName: string): string | null {
     { name: 'Banixx', patterns: ['bannixx', 'banixx'] },
     { name: 'Comfort Zone', patterns: ['comfortzone', 'comfort zone'] },
     { name: 'Purina', patterns: ['tidycat', 'tidycats', 'tidy cat', 'tidy cats'] },
+    
+    // Session Dec 1, 2025 - Newly Verified Brands (from 94.94% to 99.20%)
+    { name: 'Avian Breeder', patterns: ['avian breeder', 'avain breeder'] },
+    { name: 'Dog Life', patterns: ['dog life', 'dogslife', 'doglife'] },
+    { name: 'Ethical Pet', patterns: ['best friends', 'mediterranean stainless', 'mediterranin'] },
+    { name: 'Living World', patterns: ['livingworld', 'livingwrld'] },
+    { name: 'Kent Marine', patterns: ['kent marine', 'kent steel'] },
+    { name: 'Petlinks', patterns: ['petlinks'] },
+    { name: 'PetPals', patterns: ['petpals'] },
+    { name: 'PetAg', patterns: ['pm easy reach'] },
+    { name: 'Pretty Pets', patterns: ['prettypets', 'pretty pets'] },
+    { name: 'Praziguard', patterns: ['praziguard'] },
+    { name: 'Pure Water Pebbles', patterns: ['purewatr', 'purewater pebbles'] },
+    { name: 'Python', patterns: ['python clean', 'python squeeze', 'python 13'] },
+    { name: 'Quiko', patterns: ['quiko'] },
+    { name: 'Rep-Cal', patterns: ['rep-cal', 'repcal'] },
+    { name: 'ReptiFauna', patterns: ['reptifauna'] },
+    { name: 'RemedyRecovery', patterns: ['remedyrecv', 'remedyrecovery'] },
+    { name: 'Round Lake Farm', patterns: ['round lake farm', 'rndlake'] },
+    { name: 'Safari', patterns: ['safarin'] },
+    { name: 'Safflower Gold', patterns: ['safflower gold', 'safflowergold'] },
+    { name: 'Salon Scents', patterns: ['salon scents'] },
+    { name: 'San Francisco Bay Brand', patterns: ['san franci', 'san francisco bay'] },
+    { name: 'Sentry', patterns: ['sentry'] },
+    { name: 'Seresto', patterns: ['seresto'] },
+    { name: 'Shepherd Boy', patterns: ['shepherd boy', 'shep boy', 'shepboy', 'shephard'] },
+    { name: 'Simple Solution', patterns: ['simple solution'] },
+    { name: 'SmartBones', patterns: ['smartsticks'] },
+    { name: 'Suzie\'s CBD', patterns: ['suziescbd', 'suzies cbd'] },
+    { name: 'Sweet Harvest', patterns: ['sweethrvst', 'sweet harvest'] },
+    { name: 'Bayer', patterns: ['tapeworm dewormer'] },
+    { name: 'Tetra', patterns: ['tetrafauna', 'tetrafaune', 'reptisticks', 'reptoguard'] },
+    { name: 'Toe Anchor', patterns: ['toe anc', 'toe anchor'] },
+    { name: 'TropiClean', patterns: ['topiclean', 'tropicalen', 'tropicleanoxymed', 'troiclean', 'washaway'] },
+    { name: 'Tuesday Pet', patterns: ['tuesday'] },
+    { name: '5Strands', patterns: ['ucari', '5strands'] },
+    { name: 'Vetriscience', patterns: ['ultrajoint', 'vetriscience'] },
+    { name: 'Veterinary Formula', patterns: ['veterinary formula'] },
+    { name: 'Vitakraft', patterns: ['vitacraft', 'vitadrops', 'vitagarden', 'vitaherbal', 'vitaseed', 'smakers'] },
+    { name: 'Ammonia-X', patterns: ['ammonia-x'] },
+    { name: 'Ginger', patterns: ['ginger float', 'ginger prem'] },
+    { name: 'Max', patterns: ['max bully'] },
+    { name: 'Catit', patterns: ['smart play'] },
+    { name: 'Higgins', patterns: ['sunburts'] },
+    { name: 'Sulfodene', patterns: ['sulfodene'] },
+    { name: 'ZenPet', patterns: ['zenpet'] },
+    { name: 'Zeus', patterns: ['zeus fountain', 'zeus h2eau'] },
+    { name: 'Wellness', patterns: ['wln puppy'] },
+    { name: 'We Pet', patterns: ['we ear', 'we munch'] },
+    { name: 'YummyCombs', patterns: ['yummy crumbs', 'yummycmbs', 'yummycombs'] },
+    { name: 'Ideal', patterns: ['ideal syrflex'] },
+    { name: 'Nacho', patterns: ['nacho duck'] },
+    { name: 'Pet Elite', patterns: ['chicken roller'] },
+    { name: 'Happy Pet', patterns: ['doggie nip'] },
+    { name: 'Icelandic+', patterns: ['sprats'] },
+    { name: 'Cardinal', patterns: ['fast acting super'] },
+    { name: 'Tiki Cat', patterns: ['beef cat tuna', 'beef tuna'] },
+    { name: 'Meijer', patterns: ['meijer ecuttlebone'] },
+    
+    // Penn-Plax extended product patterns (verified Dec 1, 2025)
+    { name: 'Penn Plax', patterns: [
+      'betta tank kit', 'natural tank decor', 'bellabown', 'dry ears bowl', 'dinner mat', 'donut chew',
+      'emergency air', 'faucet waterer', 'heavy weight bowl', 'green red leaf', 'magical castle',
+      'magnolia leaves', 'lizard ladder', 'lock croc', 'lock crok', 'lok-tite', 'madison bridge',
+      'mag-flt', 'mag-scrape', 'medium oval basket', 'mystery mineral', 'kapok pod', 'large food scoop',
+      'nemo', 'night shifter', 'nitrate remover', 'oval basket', 'naturflex', 'ovation filter',
+      'pennplac', 'pennplex', 'penplax', 'perfecto', 'patrick', 'peace love kit', 'parrot starter',
+      'petcrest', 'petodot', 'petrainy', 'petwtrbttl', 'petwtrbttle', 'pet rainydays', 'pine swing',
+      'pipe hideaway', 'pirate wave', 'pixi flowfoun', 'plant decor kit', 'playful forage', 'pleco cave',
+      'podmaster', 'poised mermaid', 'polyfiber', 'pong mag', 'pop up playpen', 'pro-carb', 'pro-z',
+      'rainbow rock', 'rainy days', 'ramp covers', 'red rock', 'redline', 'rhino skull', 'rialto bridge',
+      'rock cave', 'rock stack', 'rodger dodger', 'roundstone', 'sea anemone', 'seasme', 'shark jaw',
+      'shipwreck', 'silent air', 'sitting unicorn', 'skeleton escape', 'skull gazer', 'small blue double',
+      'small dinner mat', 'small food scoop', 'small kennel cup', 'small oval basket', 'small plane',
+      'small rdck', 'small rock cave', 'small split', 'small tan bone', 'spngeb', 'squidwards',
+      'star wars', 'stone hideaway', 'striped pirate', 'stump ornatment', 'suculate', 'sunken',
+      'supergrow', 'supernatural', 'tan plane', 'the bubbler', 'tikiw', 'timmy holedigger',
+      'tortoise salad', 'travel trainer', 'treasure chest', 'trex', 'troll bridge', 'tufa stone',
+      'twin mill', 'uc combo', 'undergravel', 'undergrvel', 'underwater river', 'velociraptors',
+      'weird watrs', 'wizard algae', 'wonder shell', 'wood decor', 'zombie fish', 'zzzz hammock',
+      'aqua marine'
+    ]},
+    
+    // Lixit products (verified Dec 1, 2025)
+    { name: 'Lixit', patterns: ['large breed dog bottle', 'large blue bowl', 'medium blue bowl', 'oral syringe', 'pill crusher', 'pill popper'] },
+    
+    // Van Ness products (verified Dec 1, 2025)
+    { name: 'Van Ness', patterns: ['pureness', 'ruffmtuff', 'ruffntuff', 'vaness'] },
+    
+    // Puppy-peroni products (verified Dec 1, 2025)
+    { name: 'Puppy-peroni', patterns: ['puppy-peroni', 'puppy cup'] },
+    
+    // Rascals products (verified Dec 1, 2025)
+    { name: 'Rascals', patterns: ['rascal'] },
+    
+    // Meowee products (verified Dec 1, 2025)
+    { name: 'Meowee', patterns: ['meowee'] },
+    
+    // Nutri-Vet products (verified Dec 1, 2025)
+    { name: 'Nutri-Vet', patterns: ['nutri-vet', 'nutri-stat', 'nutrivet', 'nutrichomp', 'nt canine'] },
+    
+    // Outward Hound products (verified Dec 1, 2025)
+    { name: 'Outward Hound', patterns: ['otwrd hound', 'red cross life jacket'] },
+    
+    // Paw Patrol licensed products (verified Dec 1, 2025)
+    { name: 'Paw Patrol', patterns: ['paw patrol'] },
+    
+    // Perfect Coat products (verified Dec 1, 2025)
+    { name: 'Perfect Coat', patterns: ['perfect coat'] },
+    
+    // Pet Mate products (verified Dec 1, 2025)
+    { name: 'Pet Mate', patterns: ['pet mate'] },
+    
+    // Pierce's products (verified Dec 1, 2025)
+    { name: 'Pierce\'s', patterns: ['pierce'] },
+    
+    // Loving Pets extended patterns (verified Dec 1, 2025)
+    { name: 'Loving Pets', patterns: ['portofino'] },
+    
+    // Fluval products (verified Dec 1, 2025)
+    { name: 'Fluval', patterns: ['ritesize'] },
+    
+    // Midwest products (verified Dec 1, 2025)
+    { name: 'Midwest', patterns: ['snappy fit', 'snappyfit'] },
+    
+    // Prevue extended patterns (verified Dec 1, 2025)
+    { name: 'Prevue', patterns: ['spree carrier', 'tall flight cage', 'sleep sack', 'ass. keet', 'ass.medium'] },
+    
+    // Four Paws extended patterns (verified Dec 1, 2025)
+    { name: 'Four Paws', patterns: ['weeweed', 'weeweespringact', 'wettail'] },
+    
+    // Multipet extended patterns (verified Dec 1, 2025)
+    { name: 'Multipet', patterns: ['woody woodpecker', 'muktipet', 'mulitpet'] },
   ];
   
   const lowerName = productName.toLowerCase();
