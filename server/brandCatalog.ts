@@ -174,7 +174,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Nibbles', patterns: ['nibbles'] },
     
     // Hagen Family Brands (verified from web search Nov 29, 2025)
-    { name: 'Hagen', patterns: ['hagen', 'dogit', 'laguna', 'smartplay', 'smart.play'] },
+    { name: 'Hagen', patterns: ['hagen', 'dogit', 'laguna', 'smartplay', 'smart.play', 'tropican', 'hagan', 'exact hand feeding', 'exact handfeeding'] },
     
     // Artisan/Specialty Treats (verified from web search Nov 29, 2025)
     { name: 'Saint Rocco\'s', patterns: ['st.roccos', 'st roccos', 'saint rocco', 'stroccos'] },
