@@ -131,7 +131,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Birdlife', patterns: ['birdlife', 'bird life'] },
     { name: 'A&E Cage Co', patterns: ['a&e', 'a & e cage', 'a & e ', 'happybeaks', 'happy beaks', 'nibbles'] },
     { name: 'Prevue', patterns: ['prevue', 'carpenter creations', 'carpenter', 'pacific perch', 'naturals', 'grassy nibbler'] },
-    { name: 'Vitapol', patterns: ['vitapol'] },
+    { name: 'Vitapol', patterns: ['vitapol', 'vita herbal', 'smakers', 'herb smack'] },
     { name: 'Lafeber', patterns: ['lafeber', 'lafebers'] },
     { name: 'Kordon', patterns: ['kordon', 'oasis'] },
     
@@ -226,7 +226,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Kaylor', patterns: ['kaylor', 'sweet harvest', 'sweetharvest'] },
     { name: 'Outward Hound', patterns: ['outward hound', 'outwardhound', 'funfeeder', 'fun feeder', 'slo bowl'] },
     { name: 'PureBites', patterns: ['purebites', 'pure bites'] },
-    { name: "Grandma Lucy's", patterns: ['grandma lucy', 'gmaw lucy', 'grandmalucys', 'herb smack', 'gpaw'] },
+    { name: "Grandma Lucy's", patterns: ['grandma lucy', 'gmaw lucy', 'grandmalucys'] },
     { name: 'Treat Planet', patterns: ['treat planet', 'surf kitty', 'kitty kitty', 'etta says'] },
     { name: 'Himalayan', patterns: ['himalayan'] },
     { name: 'Health Extension', patterns: ['health extension', 'health exten'] },
@@ -252,7 +252,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Jazwares', patterns: ['jazwares', 'squishmallow', 'squishmallows', 'squishmellow'] },
     { name: 'Galapagos', patterns: ['galapagos', 'galopagoos', 'galopagos'] },
     { name: 'Finley\'s', patterns: ['finley\'s', 'finleys'] },
-    { name: 'Vitapol', patterns: ['vitapol', 'smackers'] },
+    // Vitapol patterns consolidated at line 137
     { name: 'The J.M. Smucker Company', patterns: ['milk bone', 'milkbone', 'milk-bone'] },
     { name: 'Scott Pet', patterns: ['scott pet', 'nutri chomps', 'nutrichomps'] },
     { name: 'Starmark', patterns: ['starmark'] },
