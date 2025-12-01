@@ -244,7 +244,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Prevue Pet Products', patterns: ['prevue', 'birdie basics'] },
     { name: 'North States', patterns: ['north states', 'mypet'] },
     { name: 'Merrick', patterns: ['merrick', 'fresh kisses'] },
-    { name: 'Hippie Hounds', patterns: ['hippie hounds', 'hippiehounds'] },
+    { name: 'Hippie Hounds', patterns: ['hippie hounds', 'hippiehounds', 'hippiehnds'] },
     { name: 'Goodwinol', patterns: ['goodwinol', 'vetrx'] },
     { name: 'Tomlyn', patterns: ['tomlyn'] },
     { name: 'BPV Environmental', patterns: ['bpv', 'fresh news', 'freshnews'] },
