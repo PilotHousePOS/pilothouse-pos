@@ -4749,9 +4749,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Expand abbreviations using brand catalog
       const { expandAbbreviationsAsync } = await import('./abbreviationExpansion');
       const supplies = await storage.getAllSupplies();
+      const totalSupplies = supplies.length;
       let expandChanged = 0;
       let expandUnchanged = 0;
       let catalogHits = 0;
+      let processed = 0;
+
+      console.log(`Processing ${totalSupplies} supplies...`);
 
       for (const supply of supplies) {
         const nameResult = await expandAbbreviationsAsync(supply.name, storage);
@@ -4770,7 +4774,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } else {
           expandUnchanged++;
         }
+        
+        processed++;
+        // Log progress every 500 products
+        if (processed % 500 === 0) {
+          console.log(`Step 1/3 Progress: ${processed}/${totalSupplies} (${Math.round(processed/totalSupplies*100)}%)`);
+        }
       }
+      console.log(`Step 1/3 Complete: ${expandChanged} changed, ${expandUnchanged} unchanged, ${catalogHits} catalog hits`);
       
       console.log("Step 2/3: Auto-categorizing supplies...");
       
