@@ -221,7 +221,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'VICTOR', patterns: ['victor', 'vict'] },
     { name: 'Petcrest', patterns: ['petcrest'] },
     { name: 'Tuesday\'s Natural Dog Company', patterns: ['tuesday\'s', 'tuesdays'] },
-    { name: 'PetAg', patterns: ['petag', 'pet ag', 'fresh n clean', 'fresh \'n clean', 'freshnclean'] },
+    { name: 'PetAg', patterns: ['petag', 'pet ag', 'fresh n clean', 'fresh \'n clean', 'freshnclean', 'kmr'] },
     { name: 'Beautifur', patterns: ['beautifur'] },
     { name: 'Kaylor', patterns: ['kaylor', 'sweet harvest', 'sweetharvest'] },
     { name: 'Outward Hound', patterns: ['outward hound', 'outwardhound', 'funfeeder', 'fun feeder', 'slo bowl'] },
