@@ -158,6 +158,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Intersand', patterns: ['intersand'] },
     { name: 'Petmate', patterns: ['petmate', 'vari kennel', 'vari-kennel', 'varikennel'] },
     { name: 'Van Ness', patterns: ['van ness', 'vanness'] },
+    { name: 'Litter Genie', patterns: ['litter genie', 'littergenie'] },
     
     // Food & Treats (verified from web search Nov 28, 2025)
     { name: 'Vital Essentials', patterns: ['vital essentials', 'vital'] },
@@ -175,7 +176,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Nibbles', patterns: ['nibbles'] },
     
     // Hagen Family Brands (verified from web search Nov 29, 2025)
-    { name: 'Hagen', patterns: ['hagen', 'dogit', 'laguna', 'smartplay', 'smart.play', 'tropican', 'hagan', 'exact hand feeding', 'exact handfeeding'] },
+    { name: 'Hagen', patterns: ['hagen', 'dogit', 'laguna', 'smartplay', 'smart.play', 'tropican', 'hagan', 'exact hand feeding', 'exact handfeeding', 'le salon', 'lesalon'] },
     
     // Artisan/Specialty Treats (verified from web search Nov 29, 2025)
     { name: 'Saint Rocco\'s', patterns: ['st.roccos', 'st roccos', 'saint rocco', 'stroccos'] },
@@ -303,7 +304,7 @@ export function extractBrand(productName: string): string | null {
     // Systematically Verified Brands (Nov 29, 2025 - thorough web research)
     { name: 'World\'s Best Cat Litter', patterns: ['worldsbestcatlitter', 'worlds best'] },
     { name: "Dr. Elsey's", patterns: ['dr.elsey', 'dr elsey', 'dr.elseys', 'dr elseys', 'precious cat'] },
-    { name: 'Penn Plax', patterns: ['catlife', 'cat life', 'drytech', 'dry-tech'] },
+    { name: 'Penn Plax', patterns: ['catlife', 'cat life', 'drytech', 'dry-tech', 'life clear', 'clear springs'] },
     { name: 'Reptile Systems', patterns: ['reptile sys'] },
     { name: 'Harris', patterns: ['harris'] },
     { name: 'Simple Solution', patterns: ['simplesolution'] },
