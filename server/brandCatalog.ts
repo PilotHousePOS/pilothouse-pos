@@ -82,12 +82,12 @@ export function extractBrand(productName: string): string | null {
     // Health & Supplements
     { name: 'Dogswell', patterns: ['dogswell'] },
     { name: 'Durvet', patterns: ['durvet'] },
-    { name: 'Farnam', patterns: ['farnam', 'canine red cell'] },
+    { name: 'Farnam', patterns: ['farnam', 'canine red cell', 'flys off', 'flys-off'] },
     { name: 'Zymox', patterns: ['zymox'] },
     { name: 'Arm & Hammer', patterns: ['arm & hammer', 'arm & ham', 'arm & hamm'] },
     { name: 'Vetericyn', patterns: ['vetericyn'] },
     { name: 'Carefresh', patterns: ['carefresh'] },
-    { name: 'Four Paws', patterns: ['four paws', 'magiccoat', 'magic coat'] },
+    { name: 'Four Paws', patterns: ['four paws', 'fourpaws', 'fourpawstieout', 'magiccoat', 'magic coat'] },
     { name: 'Pure Vita', patterns: ['pure vita', 'purevita'] },
     { name: 'TropiClean', patterns: ['tropiclean', 'freshbreath', 'freshbreathe', 'fresh breath'] },
     { name: 'Specialty Pet Products', patterns: ['petodor', 'pet odor exterminator'] },
@@ -170,6 +170,7 @@ export function extractBrand(productName: string): string | null {
     // Small Pet (additional brands)
     { name: 'MidWest Homes For Pets', patterns: ['midwest', 'mid west', 'mw'] },
     { name: 'Marshall', patterns: ['marshall', 'marshals'] },
+    { name: 'Tiny Friends Farm', patterns: ['tiny friends farm', 'tinyfriends', 'tinyfriendfarm', 'friendfarm', 'frndsfrm', 'friend farm'] },
     { name: 'Nation', patterns: ['nation'] },
     { name: 'Nibbles', patterns: ['nibbles'] },
     
@@ -196,7 +197,6 @@ export function extractBrand(productName: string): string | null {
     { name: 'Smokehouse', patterns: ['smokehouse', 'smkhouse'] },
     { name: 'Reptology', patterns: ['reptology', 'rept', 'repto'] },
     { name: 'Chuckit!', patterns: ['chuckit!', 'chuckit'] },
-    { name: 'Four Paws', patterns: ['four paws', 'fourpaws'] },
     { name: 'Multipet', patterns: ['multipet', 'multi pet'] },
     { name: 'Bio Groom', patterns: ['bio groom', 'biogroom'] },
     { name: 'Turbo', patterns: ['turbo'] },
