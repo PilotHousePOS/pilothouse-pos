@@ -114,7 +114,7 @@ export function extractBrand(productName: string): string | null {
     
     // Reptile Brands (verified from filterConfig.ts)
     { name: 'Zoo Med', patterns: ['zoo med', 'zoomed'] },
-    { name: 'Exo Terra', patterns: ['exo terra', 'exoterra'] },
+    { name: 'Exo Terra', patterns: ['exo terra', 'exoterra', 'exoterr', 'exoterrra'] },
     { name: 'Zilla', patterns: ['zilla', 'zila'] },
     { name: 'Fluker\'s', patterns: ['fluker\'s', 'flukers', 'fluker'] },
     { name: 'ReptiCare', patterns: ['repticare', 'repti care'] },
@@ -137,7 +137,7 @@ export function extractBrand(productName: string): string | null {
     
     // Health & Wellness (verified from web search Nov 28, 2025)
     { name: 'Skout\'s Honor', patterns: ['skout\'s honor', 'skouts honor', 'skoutshonor'] },
-    { name: 'NaturVet', patterns: ['naturvet', 'natur vet'] },
+    { name: 'NaturVet', patterns: ['naturvet', 'natur vet', 'natruvet'] },
     { name: 'Nature\'s Miracle', patterns: ['nature\'s miracle', 'natures miracle', 'naturesmiracle'] },
     { name: 'TropiClean', patterns: ['tropiclean', 'tropi clean'] },
     
@@ -259,7 +259,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'MidWest Homes for Pets', patterns: ['midwest', 'mid-west', 'skudo'] },
     { name: 'Natural Dog Company', patterns: ['natural dog company', 'natural dog'] },
     { name: 'Bully Bunches', patterns: ['bully bunches'] },
-    { name: 'Loving Pets', patterns: ['loving pets', 'nature\'s choice', 'dolce', 'dolce moderno'] },
+    { name: 'Loving Pets', patterns: ['loving pets', 'nature\'s choice', 'dolce', 'dolce moderno', 'flavorfullz', 'flvrfullz'] },
     { name: 'IRIS USA', patterns: ['iris usa', 'iris'] },
     { name: 'Gamma2', patterns: ['gamma2', 'vittles vault'] },
     { name: 'OXO', patterns: ['oxo'] },
@@ -298,6 +298,7 @@ export function extractBrand(productName: string): string | null {
     
     // Systematically Verified Brands (Nov 29, 2025 - thorough web research)
     { name: 'World\'s Best Cat Litter', patterns: ['worldsbestcatlitter', 'worlds best'] },
+    { name: "Dr. Elsey's", patterns: ['dr.elsey', 'dr elsey', 'dr.elseys', 'dr elseys', 'precious cat'] },
     { name: 'Penn Plax', patterns: ['catlife', 'cat life', 'drytech', 'dry-tech'] },
     { name: 'Reptile Systems', patterns: ['reptile sys'] },
     { name: 'Harris', patterns: ['harris'] },
