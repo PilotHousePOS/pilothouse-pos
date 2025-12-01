@@ -216,7 +216,7 @@ export function extractBrand(productName: string): string | null {
     { name: 'Replendish', patterns: ['replendish'] },
     { name: 'Pondmaster', patterns: ['pondmaster'] },
     { name: 'Forza', patterns: ['forza'] },
-    { name: 'Higgins', patterns: ['higgins', 'habitat snk', 'habitat snack'] },
+    { name: 'Higgins', patterns: ['higgins', 'habitat snk', 'habitat snack', 'intune', 'in-tune'] },
     { name: 'ZuPreem', patterns: ['zupreem'] },
     { name: 'VICTOR', patterns: ['victor', 'vict'] },
     { name: 'Petcrest', patterns: ['petcrest'] },
