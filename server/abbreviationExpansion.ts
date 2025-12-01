@@ -242,6 +242,8 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   // Toys/Misc
   '&Fam': '& Family',
   '&fam': '& Family',
+  'Strng': 'String',
+  'Tug': 'Tug',
   
   // Brands (only expand when at start or after space)
   'Kng': 'Kong',
@@ -255,6 +257,35 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Bluebuff': 'Bluebuffalo',
   'Arm&ham': 'Arm & Hammer',
   'Arm&hamm': 'Arm & Hammer',
+  
+  // Brand name corrections (misspelled forms in product names)
+  'Zoomed': 'Zoo Med',
+  'ZooMed': 'Zoo Med',  // Sometimes written as one word
+  'Zoomd': 'Zoo Med',
+  
+  // Coastal Pet Products Pattern Names - Color/Pattern Abbreviations
+  // Reference: Coastal 2024 Product Catalog patterns analysis
+  'Rgb': 'Rainbow',
+  'Rbg': 'Rainbow',
+  'Gyp': 'Gray Pink',
+  'Gyb': 'Gray Blue',
+  'Gyr': 'Gray Red',
+  'Gyu': 'Gray Purple',
+  'Sls': 'Solid',
+  'Sso': 'Solid',
+  'Lim': 'Lime',
+  'Bws': 'Black White Stripe',
+  'Pkt': 'Pink Teal',
+  'Snp': 'Snake Print',
+  'Suf': 'Sunflower',
+  'Ord': 'Orange',
+  
+  // Coastal Size abbreviations (combined with patterns)
+  'xsm': 'Extra Small',
+  'xxs': 'Extra Extra Small',
+  'sml': 'Small',
+  'lrg': 'Large',
+  'xlg': 'Extra Large',
   
   // Session Dec 1, 2025 - Common abbreviations and typos (from 94.94% to 99.20% session)
   'Marinelnd': 'Marineland',

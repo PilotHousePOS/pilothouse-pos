@@ -9,6 +9,8 @@ import { expandAbbreviationsAsync } from './abbreviationExpansion';
  */
 export async function auditUnknownAbbreviations() {
   const allSupplies = await storage.getAllSupplies();
+  const totalCount = allSupplies.length;
+  console.log(`Auditing ${totalCount} supplies for unknown abbreviations...`);
   
   let total = 0;
   let catalogHits = 0;
@@ -21,6 +23,12 @@ export async function auditUnknownAbbreviations() {
   
   for (const supply of allSupplies) {
     total++;
+    
+    // Log progress every 1000 products
+    if (total % 1000 === 0) {
+      console.log(`Audit Progress: ${total}/${totalCount} (${Math.round(total/totalCount*100)}%)`);
+    }
+    
     const result = await expandAbbreviationsAsync(supply.name, storage);
     
     // Track catalog hits (items that used brand catalog)
