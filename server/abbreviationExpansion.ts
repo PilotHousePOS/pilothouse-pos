@@ -548,11 +548,22 @@ export async function expandAbbreviationsAsync(
   
   // Step 0: Smart context-aware pattern expansion (Brand-specific fixes)
   
-  // === ZOO MED BRAND NAME FIXES ===
+  // === BRAND NAME FIXES ===
   // Fix "Zoomed" → "Zoo Med" (commonly written as one word or misspelled)
   let preProcessed = text.replace(/\bZoomed\b/gi, 'Zoo Med');
   preProcessed = preProcessed.replace(/\bZooMed\b/g, 'Zoo Med');
   preProcessed = preProcessed.replace(/\bZoomd\b/gi, 'Zoo Med');
+  
+  // Fix "A & e" → "A&E" (brand name formatting for A&E Cage Co)
+  preProcessed = preProcessed.replace(/\bA & e\b/gi, 'A&E');
+  preProcessed = preProcessed.replace(/\bA &e\b/gi, 'A&E');
+  preProcessed = preProcessed.replace(/\bA& e\b/gi, 'A&E');
+  
+  // Fix "Pethonesty" → "Pet Honesty" (brand name spacing)
+  preProcessed = preProcessed.replace(/\bPethonesty\b/gi, 'Pet Honesty');
+  
+  // Fix common typos
+  preProcessed = preProcessed.replace(/\bWoodn\b/gi, 'Wooden');
   
   // === COASTAL PET PRODUCTS PATTERN+SIZE SPLITTING ===
   // Coastal uses concatenated pattern+size codes like "Rgbxsm", "Gypmed", etc.
