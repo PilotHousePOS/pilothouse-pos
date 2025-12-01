@@ -63,6 +63,8 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Brwn': 'Brown',
   'Grn': 'Green',
   'Pkf': 'Pink',
+  'Ylw': 'Yellow',
+  'Gry': 'Gray',
   
   // Comfort/General
   'Cmfrt': 'Comfort',
@@ -143,6 +145,9 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Reg': 'Regular',
   
   // Food/Flavors
+  'Snk': 'Snack',
+  'Ckn': 'Chicken',
+  'Carr': 'Carrot',
   'Blubrede': 'Blueberry',
   'White Gr': 'With Grain',
   'Red B': 'RedBarn',
@@ -553,6 +558,11 @@ export async function expandAbbreviationsAsync(
   let preProcessed = text.replace(/\bZoomed\b/gi, 'Zoo Med');
   preProcessed = preProcessed.replace(/\bZooMed\b/g, 'Zoo Med');
   preProcessed = preProcessed.replace(/\bZoomd\b/gi, 'Zoo Med');
+  // Fix "Zoo Medium" → "Zoo Med" (common typo/expansion error)
+  preProcessed = preProcessed.replace(/\bZoo Medium\b/gi, 'Zoo Med');
+  
+  // Fix "Bluebuffalo" → "Blue Buffalo" (brand name spacing)
+  preProcessed = preProcessed.replace(/\bBluebuffalo\b/gi, 'Blue Buffalo');
   
   // Fix "A & e" → "A&E" (brand name formatting for A&E Cage Co)
   preProcessed = preProcessed.replace(/\bA & e\b/gi, 'A&E');
@@ -1284,6 +1294,13 @@ export async function expandAbbreviationsAsync(
     const regex = new RegExp(`\\b${abbrev}\\b`, 'gi');
     result = result.replace(regex, expansion);
   }
+  
+  // === FINAL CLEANUP: Ampersand Capitalization ===
+  // Capitalize any word that follows "& " and starts with lowercase
+  // e.g., "Apple & banana" → "Apple & Banana"
+  result = result.replace(/&\s+([a-z])/g, (match, firstChar) => {
+    return '& ' + firstChar.toUpperCase();
+  });
   
   return { expanded: result, catalogUsed };
 }
