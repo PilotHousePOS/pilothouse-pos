@@ -317,6 +317,11 @@ export function extractBrand(productName: string): string | null {
     { name: 'Lee\'s', patterns: ['undergravel filter'] },
     { name: 'Coastal Pet', patterns: ['circle t', 'cirlce'] },
     { name: 'Fashion Pet', patterns: ['fashion pet'] },
+    { name: 'Valu-Pak', patterns: ['valu pak', 'valupak', 'valu-pak'] },
+    { name: 'Next Level', patterns: ['next level'] },
+    { name: 'Banixx', patterns: ['bannixx', 'banixx'] },
+    { name: 'Comfort Zone', patterns: ['comfortzone', 'comfort zone'] },
+    { name: 'Purina', patterns: ['tidycat', 'tidycats', 'tidy cat', 'tidy cats'] },
   ];
   
   const lowerName = productName.toLowerCase();
