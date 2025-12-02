@@ -11056,7 +11056,7 @@ export default function Admin() {
       {/* Appointment Details Dialog */}
       {selectedAppointment && (
         <Dialog open={!!selectedAppointment} onOpenChange={() => setSelectedAppointment(null)}>
-          <DialogContent className="max-w-md mx-auto">
+          <DialogContent className="max-w-md mx-auto max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <CalendarIcon className="w-5 h-5" />

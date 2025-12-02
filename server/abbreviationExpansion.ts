@@ -429,6 +429,28 @@ export function expandAbbreviations(text: string | null | undefined, storage?: I
   
   let result = text;
   
+  // === BRAND NAME PRE-PROCESSING (must come before other fixes) ===
+  // Fix "Zoomed" → "Zoo Med" (commonly written as one word or misspelled)
+  result = result.replace(/\bZoomed\b/gi, 'Zoo Med');
+  result = result.replace(/\bZooMed\b/g, 'Zoo Med');
+  result = result.replace(/\bZoomd\b/gi, 'Zoo Med');
+  // Fix "Zoo Medium" → "Zoo Med" (common typo/expansion error)
+  result = result.replace(/\bZoo Medium\b/gi, 'Zoo Med');
+  
+  // Fix "Bluebuffalo" → "Blue Buffalo" (brand name spacing)
+  result = result.replace(/\bBluebuffalo\b/gi, 'Blue Buffalo');
+  
+  // Fix "A & e" → "A&E" (brand name formatting for A&E Cage Co)
+  result = result.replace(/\bA & e\b/gi, 'A&E');
+  result = result.replace(/\bA &e\b/gi, 'A&E');
+  result = result.replace(/\bA& e\b/gi, 'A&E');
+  
+  // Fix "Pethonesty" → "Pet Honesty" (brand name spacing)
+  result = result.replace(/\bPethonesty\b/gi, 'Pet Honesty');
+  
+  // Fix common typos
+  result = result.replace(/\bWoodn\b/gi, 'Wooden');
+  
   // Fix spacing issues first
   // 1. Replace double (or more) spaces with single space
   result = result.replace(/\s{2,}/g, ' ');
@@ -492,6 +514,9 @@ export function expandAbbreviations(text: string | null | undefined, storage?: I
     const regex = new RegExp(`\\b${abbrev}\\b`, 'gi');
     result = result.replace(regex, expansion);
   }
+  
+  // Auto-capitalize word after ampersand (& apple → & Apple)
+  result = result.replace(/& ([a-z])/g, (match, letter) => `& ${letter.toUpperCase()}`);
   
   return result;
 }
@@ -602,11 +627,12 @@ export async function expandAbbreviationsAsync(
   preProcessed = preProcessed.replace(/\bPnk\b/gi, 'Pink');
   
   // Expand Coastal size codes
+  // NOTE: "med" pattern excludes "Zoo Med" brand name to prevent "Zoo Med" → "Zoo Medium"
   preProcessed = preProcessed.replace(/\bxxxs\b/gi, 'Extra Extra Extra Small');
   preProcessed = preProcessed.replace(/\bxxs\b/gi, 'Extra Extra Small');
   preProcessed = preProcessed.replace(/\bxsm\b/gi, 'Extra Small');
   preProcessed = preProcessed.replace(/\bsml\b/gi, 'Small');
-  preProcessed = preProcessed.replace(/\bmed\b/gi, 'Medium');
+  preProcessed = preProcessed.replace(/(?<!Zoo )\bmed\b/gi, 'Medium');
   preProcessed = preProcessed.replace(/\blrg\b/gi, 'Large');
   preProcessed = preProcessed.replace(/\bxlg\b/gi, 'Extra Large');
   
