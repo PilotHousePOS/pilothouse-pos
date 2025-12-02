@@ -790,7 +790,11 @@ function ContactsManager() {
       setEditingContact(null);
       setContactFormData({ name: '', email: '', phoneNumber: '', petNames: [], notes: '', animalType: '', breed: '' });
       setPetNamesInput('');
-      await queryClient.refetchQueries({ queryKey: ["/api/contacts"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
+      await queryClient.invalidateQueries({ predicate: (query) => 
+        Array.isArray(query.queryKey) && 
+        (query.queryKey.some(k => k === "appointments") || query.queryKey.some(k => k === "history"))
+      });
     },
     onError: () => {
       toast({
@@ -6401,6 +6405,9 @@ export default function Admin() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments/unapproved"] });
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      queryClient.invalidateQueries({ predicate: (query) => 
+        Array.isArray(query.queryKey) && query.queryKey.some(k => k === "appointments")
+      });
     },
     onError: () => {
       toast({
@@ -6422,6 +6429,9 @@ export default function Admin() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments/unapproved"] });
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      queryClient.invalidateQueries({ predicate: (query) => 
+        Array.isArray(query.queryKey) && query.queryKey.some(k => k === "appointments")
+      });
     },
     onError: () => {
       toast({
@@ -6489,9 +6499,12 @@ export default function Admin() {
         title: "Appointment Updated",
         description: "Appointment details have been updated successfully.",
       });
-      // Wait for refetch to complete before closing dialog
+      // Invalidate all appointment-related queries including contact-specific ones
       await queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
+      await queryClient.invalidateQueries({ predicate: (query) => 
+        Array.isArray(query.queryKey) && query.queryKey.some(k => k === "appointments")
+      });
       setEditingAppointment(null);
       setEditNotes('');
       setEditPrice('');
@@ -6545,6 +6558,9 @@ export default function Admin() {
         description: "Appointment status has been updated successfully.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      queryClient.invalidateQueries({ predicate: (query) => 
+        Array.isArray(query.queryKey) && query.queryKey.some(k => k === "appointments")
+      });
     },
   });
 
@@ -6605,6 +6621,9 @@ export default function Admin() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments/unapproved"] });
+      queryClient.invalidateQueries({ predicate: (query) => 
+        Array.isArray(query.queryKey) && query.queryKey.some(k => k === "appointments")
+      });
     },
     onError: () => {
       toast({
@@ -6627,6 +6646,9 @@ export default function Admin() {
       // Invalidate both appointments and unapproved appointments to refresh the UI
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments/unapproved"] });
+      queryClient.invalidateQueries({ predicate: (query) => 
+        Array.isArray(query.queryKey) && query.queryKey.some(k => k === "appointments")
+      });
     },
     onError: (error) => {
       toast({
@@ -6648,6 +6670,9 @@ export default function Admin() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments/unapproved"] });
+      queryClient.invalidateQueries({ predicate: (query) => 
+        Array.isArray(query.queryKey) && query.queryKey.some(k => k === "appointments")
+      });
     },
     onError: (error) => {
       toast({
