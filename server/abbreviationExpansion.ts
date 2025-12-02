@@ -38,7 +38,7 @@ const GALLON_AQUARIUM_BRANDS = [
 const ABBREVIATION_MAPPINGS: Record<string, string> = {
   // Size abbreviations
   'Lg': 'Large',
-  'Med': 'Medium',
+  // NOTE: 'Med' removed - handled separately with negative lookbehind to protect "Zoo Med"
   'Md': 'Medium',
   'Sm': 'Small',
   'Min': 'Mini',
@@ -514,6 +514,9 @@ export function expandAbbreviations(text: string | null | undefined, storage?: I
     const regex = new RegExp(`\\b${abbrev}\\b`, 'gi');
     result = result.replace(regex, expansion);
   }
+  
+  // Handle "Med" → "Medium" with negative lookbehind to protect "Zoo Med"
+  result = result.replace(/(?<!Zoo )\bMed\b/gi, 'Medium');
   
   // Auto-capitalize word after ampersand (& apple → & Apple)
   result = result.replace(/& ([a-z])/g, (match, letter) => `& ${letter.toUpperCase()}`);
