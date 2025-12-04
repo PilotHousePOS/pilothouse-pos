@@ -24,6 +24,7 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
   const modalImageRef = useRef<HTMLImageElement>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [imageError, setImageError] = useState(false);
 
   const addToCartMutation = useMutation({
     mutationFn: async () => {
@@ -68,10 +69,15 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
     accessories: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200"
   };
 
-  const images = supply.imageUrls?.filter((url: string) => url) || 
-                (supply.imageUrl ? [supply.imageUrl] : []);
+  const images = supply.imageUrls?.filter((url: string) => url && !url.includes('placeholder')) || 
+                (supply.imageUrl && !supply.imageUrl.includes('placeholder') ? [supply.imageUrl] : []);
   const hasMultipleImages = images.length > 1;
-  const imageUrl = images[currentImageIndex] || defaultImages[supply.category as keyof typeof defaultImages] || defaultImages.food;
+  const fallbackImage = defaultImages[supply.category as keyof typeof defaultImages] || defaultImages.food;
+  const imageUrl = imageError ? fallbackImage : (images[currentImageIndex] || fallbackImage);
+  
+  const handleImageError = () => {
+    setImageError(true);
+  };
 
   // Minimum swipe distance (in px) required to trigger navigation
   const minSwipeDistance = 50;
@@ -116,7 +122,8 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
             <img 
               src={imageUrl}
               alt={supply.name}
-              className="w-full h-full object-cover" 
+              className="w-full h-full object-cover"
+              onError={handleImageError}
             />
           </div>
           <div className="p-4 flex-1">
@@ -194,6 +201,7 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
                 zIndex: modalZoom ? 9999999 : 1,
                 position: modalZoom ? 'relative' : 'relative',
               }}
+              onError={handleImageError}
               data-testid="img-product-modal"
             />
 

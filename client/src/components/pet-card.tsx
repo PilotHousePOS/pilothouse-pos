@@ -17,6 +17,7 @@ export default function PetCard({ pet }: PetCardProps) {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const modalImageRef = useRef<HTMLImageElement>(null);
+  const [imageError, setImageError] = useState(false);
 
   const defaultImages = {
     mammals: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
@@ -29,10 +30,15 @@ export default function PetCard({ pet }: PetCardProps) {
     reptile: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200"
   };
 
-  const images = pet.imageUrls?.filter((url: string) => url) || 
-                (pet.imageUrl ? [pet.imageUrl] : []);
+  const images = pet.imageUrls?.filter((url: string) => url && !url.includes('placeholder')) || 
+                (pet.imageUrl && !pet.imageUrl.includes('placeholder') ? [pet.imageUrl] : []);
   const hasMultipleImages = images.length > 1;
-  const imageUrl = images[currentImageIndex] || defaultImages[pet.species as keyof typeof defaultImages] || defaultImages.mammals;
+  const fallbackImage = defaultImages[pet.species as keyof typeof defaultImages] || defaultImages.mammals;
+  const imageUrl = imageError ? fallbackImage : (images[currentImageIndex] || fallbackImage);
+  
+  const handleImageError = () => {
+    setImageError(true);
+  };
 
   // Minimum swipe distance (in px) required to trigger navigation
   const minSwipeDistance = 50;
@@ -75,7 +81,8 @@ export default function PetCard({ pet }: PetCardProps) {
           <img 
             src={imageUrl}
             alt={pet.name}
-            className="w-full h-32 object-cover" 
+            className="w-full h-32 object-cover"
+            onError={handleImageError}
           />
           <div className="p-3">
             <div className="flex items-start justify-between mb-2">
@@ -137,6 +144,7 @@ export default function PetCard({ pet }: PetCardProps) {
                   zIndex: modalZoom ? 9999999 : 1,
                   position: modalZoom ? 'relative' : 'relative',
                 }}
+                onError={handleImageError}
                 data-testid="img-pet-modal"
               />
 
