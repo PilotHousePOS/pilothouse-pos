@@ -19,22 +19,29 @@ export default function PetCard({ pet }: PetCardProps) {
   const modalImageRef = useRef<HTMLImageElement>(null);
   const [imageError, setImageError] = useState(false);
 
-  const defaultImages = {
+  const defaultImages: Record<string, string> = {
     mammals: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
     "Small Animals": "https://images.unsplash.com/photo-1425082661705-1834bfd09dca?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+    smallanimal: "https://images.unsplash.com/photo-1425082661705-1834bfd09dca?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
     Birds: "https://images.unsplash.com/photo-1452570053594-1b985d6ea890?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
     bird: "https://images.unsplash.com/photo-1452570053594-1b985d6ea890?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
     Fish: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
     fish: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+    Aquatic: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+    aquatic: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
     Reptiles: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
-    reptile: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200"
+    reptile: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+    Reptile: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+    dog: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+    cat: "https://images.unsplash.com/photo-1574158622682-e40e69881006?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
+    default: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200"
   };
 
-  const images = pet.imageUrls?.filter((url: string) => url && !url.includes('placeholder')) || 
-                (pet.imageUrl && !pet.imageUrl.includes('placeholder') ? [pet.imageUrl] : []);
+  const images = pet.imageUrls?.filter((url: string) => url && url.startsWith('http') && !url.includes('placeholder')) || 
+                (pet.imageUrl && pet.imageUrl.startsWith('http') && !pet.imageUrl.includes('placeholder') ? [pet.imageUrl] : []);
   const hasMultipleImages = images.length > 1;
-  const fallbackImage = defaultImages[pet.species as keyof typeof defaultImages] || defaultImages.mammals;
-  const imageUrl = imageError ? fallbackImage : (images[currentImageIndex] || fallbackImage);
+  const fallbackImage = defaultImages[pet.species] || defaultImages.default;
+  const imageUrl = imageError || images.length === 0 ? fallbackImage : (images[currentImageIndex] || fallbackImage);
   
   const handleImageError = () => {
     setImageError(true);
