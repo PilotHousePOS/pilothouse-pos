@@ -862,6 +862,253 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Export inventory to Exatouch POS format
+  app.get("/api/export/exatouch", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      const user = await storage.getUser(userId);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      // Get all supplies and pets
+      const allSupplies = await storage.getAllSupplies();
+      const allPets = await storage.getAllPets();
+
+      // Create workbook with Exatouch format
+      const workbook = new ExcelJS.Workbook();
+      const itemsSheet = workbook.addWorksheet('Items');
+
+      // Set up columns based on Exatouch template (60 columns)
+      itemsSheet.columns = [
+        { header: 'Active', key: 'active', width: 8 },
+        { header: 'Description', key: 'description', width: 50 },
+        { header: 'DescLong', key: 'descLong', width: 60 },
+        { header: 'DescButton', key: 'descButton', width: 20 },
+        { header: 'DescReceipt', key: 'descReceipt', width: 30 },
+        { header: 'DescRemote', key: 'descRemote', width: 30 },
+        { header: 'DescSticky', key: 'descSticky', width: 30 },
+        { header: 'Price', key: 'price', width: 10 },
+        { header: 'PricePrompt', key: 'pricePrompt', width: 10 },
+        { header: 'PriceSuggest', key: 'priceSuggest', width: 12 },
+        { header: 'CostIndex', key: 'costIndex', width: 10 },
+        { header: 'CostAvg', key: 'costAvg', width: 10 },
+        { header: 'CostRecent', key: 'costRecent', width: 10 },
+        { header: 'CostLow', key: 'costLow', width: 10 },
+        { header: 'CostEntered', key: 'costEntered', width: 12 },
+        { header: 'StockType', key: 'stockType', width: 10 },
+        { header: 'QtyOnHand', key: 'qtyOnHand', width: 10 },
+        { header: 'MinQty', key: 'minQty', width: 8 },
+        { header: 'QtyReorder', key: 'qtyReorder', width: 10 },
+        { header: 'LimitQty', key: 'limitQty', width: 10 },
+        { header: 'DynamicEnabled', key: 'dynamicEnabled', width: 15 },
+        { header: 'DynamicQty', key: 'dynamicQty', width: 12 },
+        { header: 'OrderMin', key: 'orderMin', width: 10 },
+        { header: 'SKU', key: 'sku', width: 15 },
+        { header: 'AltSKU', key: 'altSku', width: 15 },
+        { header: 'Category', key: 'category', width: 20 },
+        { header: 'SubCategory', key: 'subCategory', width: 20 },
+        { header: 'Mfg', key: 'mfg', width: 20 },
+        { header: 'MfgPart', key: 'mfgPart', width: 15 },
+        { header: 'Color', key: 'color', width: 12 },
+        { header: 'Size', key: 'size', width: 12 },
+        { header: 'Style', key: 'style', width: 12 },
+        { header: 'PackSize', key: 'packSize', width: 10 },
+        { header: 'PackUnit', key: 'packUnit', width: 10 },
+        { header: 'SBF', key: 'sbf', width: 10 },
+        { header: 'Unit', key: 'unit', width: 10 },
+        { header: 'ChargeUnit', key: 'chargeUnit', width: 12 },
+        { header: 'CustomField1', key: 'customField1', width: 15 },
+        { header: 'CustomField2', key: 'customField2', width: 15 },
+        { header: 'CustomField3', key: 'customField3', width: 15 },
+        { header: 'CustomField4', key: 'customField4', width: 15 },
+        { header: 'EBTFood', key: 'ebtFood', width: 10 },
+        { header: 'EBTCash', key: 'ebtCash', width: 10 },
+        { header: 'CheckAge', key: 'checkAge', width: 10 },
+        { header: 'Refundable', key: 'refundable', width: 12 },
+        { header: 'TaxableA', key: 'taxableA', width: 10 },
+        { header: 'TaxableB', key: 'taxableB', width: 10 },
+        { header: 'TaxableC', key: 'taxableC', width: 10 },
+        { header: 'TaxableD', key: 'taxableD', width: 10 },
+        { header: 'TaxIncluded', key: 'taxIncluded', width: 12 },
+        { header: 'OverridePrice', key: 'overridePrice', width: 14 },
+        { header: 'OverrideQty', key: 'overrideQty', width: 12 },
+        { header: 'ExcludeDisc', key: 'excludeDisc', width: 12 },
+        { header: 'ExcludePromo', key: 'excludePromo', width: 14 },
+        { header: 'Vendor', key: 'vendor', width: 15 },
+        { header: 'VendorBuyQty', key: 'vendorBuyQty', width: 14 },
+        { header: 'VendorSRP', key: 'vendorSrp', width: 12 },
+        { header: 'VendorCost', key: 'vendorCost', width: 12 },
+        { header: 'VendorPart', key: 'vendorPart', width: 12 },
+        { header: 'VendorLeadTime', key: 'vendorLeadTime', width: 15 },
+      ];
+
+      // Style header
+      itemsSheet.getRow(1).font = { bold: true };
+      itemsSheet.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF4472C4' }
+      };
+      itemsSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+
+      // Add supplies
+      allSupplies.forEach(supply => {
+        const priceNum = supply.price ? parseFloat(supply.price.replace(/[^\d.]/g, '')) : '';
+        
+        itemsSheet.addRow({
+          active: 'True',
+          description: supply.name || '',
+          descLong: supply.description || supply.name || '',
+          descButton: (supply.name || '').substring(0, 20),
+          descReceipt: supply.name || '',
+          descRemote: supply.name || '',
+          descSticky: supply.name || '',
+          price: priceNum,
+          pricePrompt: '',
+          priceSuggest: '',
+          costIndex: 0,
+          costAvg: '',
+          costRecent: '',
+          costLow: '',
+          costEntered: '',
+          stockType: 2,
+          qtyOnHand: supply.stock || 0,
+          minQty: 1,
+          qtyReorder: 5,
+          limitQty: '',
+          dynamicEnabled: 'False',
+          dynamicQty: '',
+          orderMin: '',
+          sku: supply.id.toString(),
+          altSku: '',
+          category: supply.category || '',
+          subCategory: supply.productType || '',
+          mfg: supply.brand || '',
+          mfgPart: '',
+          color: '',
+          size: '',
+          style: '',
+          packSize: '',
+          packUnit: '',
+          sbf: '',
+          unit: 'ea',
+          chargeUnit: 'ea',
+          customField1: supply.specialtySection || '',
+          customField2: '',
+          customField3: '',
+          customField4: '',
+          ebtFood: 'False',
+          ebtCash: 'False',
+          checkAge: '',
+          refundable: 'True',
+          taxableA: 'True',
+          taxableB: 'False',
+          taxableC: 'False',
+          taxableD: 'False',
+          taxIncluded: 'False',
+          overridePrice: 'False',
+          overrideQty: 'False',
+          excludeDisc: 'False',
+          excludePromo: 'False',
+          vendor: '',
+          vendorBuyQty: '',
+          vendorSrp: '',
+          vendorCost: '',
+          vendorPart: '',
+          vendorLeadTime: '',
+        });
+      });
+
+      // Add pets
+      allPets.forEach(pet => {
+        const priceNum = pet.price ? parseFloat(pet.price.toString()) : '';
+        
+        itemsSheet.addRow({
+          active: pet.isAvailable ? 'True' : 'False',
+          description: pet.name || '',
+          descLong: pet.description || pet.name || '',
+          descButton: (pet.name || '').substring(0, 20),
+          descReceipt: pet.name || '',
+          descRemote: pet.name || '',
+          descSticky: pet.name || '',
+          price: priceNum,
+          pricePrompt: '',
+          priceSuggest: '',
+          costIndex: 0,
+          costAvg: '',
+          costRecent: '',
+          costLow: '',
+          costEntered: '',
+          stockType: 2,
+          qtyOnHand: 1,
+          minQty: 0,
+          qtyReorder: 0,
+          limitQty: '',
+          dynamicEnabled: 'False',
+          dynamicQty: '',
+          orderMin: '',
+          sku: 'PET-' + pet.id.toString(),
+          altSku: '',
+          category: 'Live Animals',
+          subCategory: pet.species || '',
+          mfg: '',
+          mfgPart: '',
+          color: '',
+          size: '',
+          style: pet.breed || '',
+          packSize: '',
+          packUnit: '',
+          sbf: '',
+          unit: 'ea',
+          chargeUnit: 'ea',
+          customField1: '',
+          customField2: '',
+          customField3: '',
+          customField4: '',
+          ebtFood: 'False',
+          ebtCash: 'False',
+          checkAge: '',
+          refundable: 'False',
+          taxableA: 'True',
+          taxableB: 'False',
+          taxableC: 'False',
+          taxableD: 'False',
+          taxIncluded: 'False',
+          overridePrice: 'False',
+          overrideQty: 'False',
+          excludeDisc: 'False',
+          excludePromo: 'False',
+          vendor: '',
+          vendorBuyQty: '',
+          vendorSrp: '',
+          vendorCost: '',
+          vendorPart: '',
+          vendorLeadTime: '',
+        });
+      });
+
+      // Generate filename with date
+      const dateStr = new Date().toISOString().split('T')[0];
+      const filename = `AnimalHouse_Exatouch_Import_${dateStr}.xlsx`;
+
+      // Set response headers
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+      // Write to response
+      await workbook.xlsx.write(res);
+      res.end();
+
+    } catch (error) {
+      console.error("Error exporting Exatouch inventory:", error);
+      res.status(500).json({ message: "Failed to export Exatouch inventory" });
+    }
+  });
+
   // Supply routes with pagination
   app.get("/api/supplies", async (req, res) => {
     try {

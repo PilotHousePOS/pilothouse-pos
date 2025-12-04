@@ -7706,9 +7706,9 @@ export default function Admin() {
         </div>
 
         <TabsContent value="inventory" className="space-y-6">
-          {/* Export Inventory Button */}
+          {/* Export Inventory Buttons */}
           {typedUser?.isAdmin && (
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -7719,6 +7719,18 @@ export default function Admin() {
               >
                 <Download className="w-4 h-4 mr-2" />
                 Export to Excel
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                className="bg-green-600 hover:bg-green-700"
+                onClick={() => {
+                  window.location.href = '/api/export/exatouch';
+                }}
+                data-testid="button-export-exatouch"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download for POS
               </Button>
             </div>
           )}
