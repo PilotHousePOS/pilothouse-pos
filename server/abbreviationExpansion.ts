@@ -292,6 +292,164 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'lrg': 'Large',
   'xlg': 'Extra Large',
   
+  // Session Dec 4, 2025 - From user screenshots of Excel export
+  // Aquarium decorations
+  'Wcral': 'Coral',
+  'Baileyinwtr': 'Bailey In Water',
+  'Watrs': 'Waters',
+  
+  // Pet House / Air Fresheners (must be split properly)
+  'Pethouse': 'Pet House',
+  'Atm': 'Autumn',
+  'Hrvst': 'Harvest',
+  'Hrvststck': 'Harvest Stacks',
+  'Cntryhrvst': 'Country Harvest',
+  'Sandlewd': 'Sandalwood',
+  'Mangopeach': 'Mango Peach',
+  
+  // Health Extension product lines
+  'Exten': 'Extension',
+  'Dig Super': 'Digestive Super',
+  'Gen Cook': 'Gently Cooked',
+  'Shin Coat': 'Shiny Coat',
+  
+  // Pet House products
+  'Sandle Wd': 'Sandalwood',
+  'Reed Diff': 'Reed Diffuser',
+  'Sandal Wax': 'Sandalwood Wax',
+  
+  // Oxbow products
+  'Wt': 'Weight',
+  
+  // Smokehouse products
+  'Skewrs': 'Skewers',
+  'Pep Stix': 'Pepperoni Sticks',
+  'Sweet Pot': 'Sweet Potato',
+  
+  // SmartBones size codes
+  '4med': '4 Medium',
+  '24 Mini': '24 Mini',
+  
+  // Skin
+  'Skn': 'Skin',
+  
+  // Dog treats - bones
+  'Bns': 'Bones',
+  'Knotted': 'Knotted',
+  
+  // Dog treats - meat
+  'Prk': 'Pork',
+  'Sft': 'Soft',
+  
+  // Fromm products
+  'Nurti': 'Nutri',
+  'Crunchyos': "Crunchy O's",
+  'Banna': 'Banana',
+  'Pumkin': 'Pumpkin',
+  'Potroast': 'Pot Roast',
+  'Tenderollies': 'Tenderollies',
+  
+  // Blue Buffalo
+  'Healthbr': 'Health Bars',
+  'Truchew': 'True Chews',
+  'Truchews': 'True Chews',
+  
+  // Grandma Lucy's
+  'Gmaw': 'Grandma',
+  
+  // Smokehouse
+  'Smkhouse': 'Smokehouse',
+  
+  // Good n Fun
+  'Goodnfun': "Good 'n' Fun",
+  '3flv': '3 Flavor',
+  
+  // Beggar Bones
+  'Beggarbns': 'Beggar Bones',
+  '3in1': '3 in 1',
+  
+  // Crazydog
+  'Crazydog': 'Crazy Dog',
+  
+  // Nutrichomps
+  'Nutrichomp': 'Nutrichomps',
+  'Nutrichomps': 'Nutrichomps',
+  '4cnt': '4 Count',
+  '8 Cnt': '8 Count',
+  '4count': '4 Count',
+  '6count': '6 Count',
+  
+  // Fruitables
+  'Fruitables': 'Fruitables',
+  
+  // Healthext / Health Extension
+  'Healthext': 'Health Extension',
+  '3.5oz': '3.5 oz',
+  
+  // Charlee Bear - NOTE: Don't expand 'Charlee' → 'Charlee Bear' as it causes duplication
+  
+  // Small animal products
+  'Smanimal': 'Small Animal',
+  'Omniv': 'Omnivore',
+  'Carn': 'Carnivore',
+  'Ns': 'Natural Science',
+  'Supp': 'Support',
+  'Urinary': 'Urinary',
+  'Herb Ab': 'Herbal Antibacterial',
+  
+  // Marshall Bandits
+  'Bann': 'Banana',
+  
+  // Friends Farm
+  'Frndsfrm': 'Friends Farm',
+  'Scrummies': 'Scrummies',
+  
+  // Water bottles
+  'Petwtrbtle': 'Pet Water Bottle',
+  'Petwtrbttle': 'Pet Water Bottle',
+  'Wtrbttl': 'Water Bottle',
+  'Bttl': 'Bottle',
+  
+  // Lock Crock
+  'Crok': 'Crock',
+  'Croc': 'Crock',
+  
+  // Kaytee products
+  'Chew Proof': 'Chew Proof',
+  
+  // Coastal Comfort Walk
+  'Cwmk': 'Comfort Walk',
+  
+  // Coastal cat harness
+  'Catsoftmeshharn': 'Cat Soft Mesh Harness',
+  'Catsoftmeshharness': 'Cat Soft Mesh Harness',
+  
+  // Coastal Collar color codes (from screenshots)
+  'Cc': 'Collar',
+  'Slv': 'Silver',
+  'Mgd': 'Magenta',
+  'Gsa': 'Green Safari',
+  'Mpy': 'Magenta Pink Yellow',
+  'Shc': 'Shamrock',
+  'Tpe': 'Taupe',
+  'Csf': 'Confetti',
+  'Mtm': 'Mint',
+  'Tzx': 'Topaz',
+  'Gks': 'Greek Key',
+  'Gsw': 'Gray Swirl',
+  'Rfl': 'Reflective',
+  'Prl': 'Pearl',
+  'Ste': 'Steel',
+  'Cmo': 'Camo',
+  'Bsr': 'Blue Stripe',
+  'Sog': 'Sage Olive Green',
+  'Sbe': 'Sky Blue',
+  'Dmb': 'Denim Blue',
+  
+  // Vitadrops / Vitamins
+  'Vitadrops': 'Vita Drops',
+  'Pure C': 'Pure Vitamin C',
+  
   // Session Dec 1, 2025 - Common abbreviations and typos (from 94.94% to 99.20% session)
   'Marinelnd': 'Marineland',
   'Marshal': 'Marshall',
