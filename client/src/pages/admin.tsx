@@ -7706,6 +7706,23 @@ export default function Admin() {
         </div>
 
         <TabsContent value="inventory" className="space-y-6">
+          {/* Export Inventory Button */}
+          {typedUser?.isAdmin && (
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  window.location.href = '/api/export/inventory';
+                }}
+                data-testid="button-export-inventory"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export to Excel
+              </Button>
+            </div>
+          )}
+
           {/* Pets Section */}
           <Card>
             <CardHeader>

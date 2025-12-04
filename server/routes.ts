@@ -751,6 +751,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Export inventory to Excel for POS setup
+  app.get("/api/export/inventory", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      const user = await storage.getUser(userId);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      // Get all supplies and pets
+      const allSupplies = await storage.getAllSupplies();
+      const allPets = await storage.getAllPets();
+
+      // Create workbook
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = 'Animal House Pet Store';
+      workbook.created = new Date();
+
+      // Supplies Sheet
+      const suppliesSheet = workbook.addWorksheet('Supplies');
+      suppliesSheet.columns = [
+        { header: 'ID', key: 'id', width: 8 },
+        { header: 'Name', key: 'name', width: 50 },
+        { header: 'Brand', key: 'brand', width: 20 },
+        { header: 'Category', key: 'category', width: 15 },
+        { header: 'Price', key: 'price', width: 10 },
+        { header: 'Stock', key: 'stock', width: 8 },
+        { header: 'Description', key: 'description', width: 60 },
+        { header: 'Specialty Section', key: 'specialtySection', width: 15 },
+        { header: 'Product Type', key: 'productType', width: 15 },
+      ];
+
+      // Style header row
+      suppliesSheet.getRow(1).font = { bold: true };
+      suppliesSheet.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF4472C4' }
+      };
+      suppliesSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+
+      // Add supplies data
+      allSupplies.forEach(supply => {
+        suppliesSheet.addRow({
+          id: supply.id,
+          name: supply.name,
+          brand: supply.brand || '',
+          category: supply.category || '',
+          price: supply.price ? `$${supply.price}` : '',
+          stock: supply.stock || 0,
+          description: supply.description || '',
+          specialtySection: supply.specialtySection || '',
+          productType: supply.productType || '',
+        });
+      });
+
+      // Pets Sheet
+      const petsSheet = workbook.addWorksheet('Pets');
+      petsSheet.columns = [
+        { header: 'ID', key: 'id', width: 8 },
+        { header: 'Name', key: 'name', width: 30 },
+        { header: 'Species', key: 'species', width: 15 },
+        { header: 'Breed', key: 'breed', width: 25 },
+        { header: 'Price', key: 'price', width: 10 },
+        { header: 'Available', key: 'isAvailable', width: 10 },
+        { header: 'Description', key: 'description', width: 60 },
+      ];
+
+      // Style header row
+      petsSheet.getRow(1).font = { bold: true };
+      petsSheet.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF70AD47' }
+      };
+      petsSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+
+      // Add pets data
+      allPets.forEach(pet => {
+        petsSheet.addRow({
+          id: pet.id,
+          name: pet.name,
+          species: pet.species || '',
+          breed: pet.breed || '',
+          price: pet.price ? `$${pet.price}` : '',
+          isAvailable: pet.isAvailable ? 'Yes' : 'No',
+          description: pet.description || '',
+        });
+      });
+
+      // Generate filename with date
+      const dateStr = new Date().toISOString().split('T')[0];
+      const filename = `AnimalHouse_Inventory_${dateStr}.xlsx`;
+
+      // Set response headers
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+      // Write to response
+      await workbook.xlsx.write(res);
+      res.end();
+
+    } catch (error) {
+      console.error("Error exporting inventory:", error);
+      res.status(500).json({ message: "Failed to export inventory" });
+    }
+  });
+
   // Supply routes with pagination
   app.get("/api/supplies", async (req, res) => {
     try {
