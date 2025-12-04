@@ -29,6 +29,9 @@ app.use(cookieParser());
 // Serve uploaded images statically
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
+// Serve stock images from attached_assets
+app.use('/stock-images', express.static(path.join(process.cwd(), 'attached_assets/stock_images')));
+
 // Add cache-busting headers for mobile devices
 app.use((req, res, next) => {
   res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
