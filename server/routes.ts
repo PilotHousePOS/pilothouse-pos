@@ -543,12 +543,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Pet routes with search and pagination
   app.get("/api/pets", async (req, res) => {
     try {
-      const { species, search, page = '0', limit = '20' } = req.query;
+      const { species, search, page = '1', limit = '20' } = req.query;
       
-      // Parse pagination parameters
-      const pageNum = Math.max(0, parseInt(page as string) || 0);
+      // Parse pagination parameters (page is 1-indexed from frontend)
+      const pageNum = Math.max(1, parseInt(page as string) || 1);
       const pageSize = Math.min(100, Math.max(1, parseInt(limit as string) || 20));
-      const offset = pageNum * pageSize;
+      const offset = (pageNum - 1) * pageSize;
       
       let allPets = species 
         ? await storage.getPetsBySpecies(species as string)
