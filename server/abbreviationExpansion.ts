@@ -125,6 +125,125 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Ucn': 'Unicorns',
   'Bigdogtieout': 'Big Dog Tie Out',
   
+  // Coastal Pet Styles Pattern Codes (December 5, 2025)
+  // Reference: https://www.coastalpet.com/products/detail/?id=PSC01 (Styles Adjustable Dog Collar)
+  // Core Styles Patterns
+  'Bbo': 'Black Bones',
+  'Rbo': 'Red Bones',
+  'Spw': 'Special Paws',
+  'Skz': 'Black Skulls',
+  'Skx': 'Black Skulls',  // Alternate code
+  'Btd': 'Bright Tie Dye',
+  'Csr': 'Chevrons & Stars',
+  'Wdf': 'Wildflower',
+  'Htf': 'Hunter Tropical Flower',
+  'Tpd': 'Teal Purple Diamonds',
+  'Pbo': 'Plaid Bones',
+  'Pdt': 'Pink Dots',
+  
+  // Coastal Authorized Dealer Exclusive Patterns
+  // Reference: https://www.coastalpet.com/products/detail/?id=ADC01
+  'Gxy': 'Galaxy',
+  'Hrw': 'Hawaiian',
+  'Lsk': 'Leopard Skin',
+  'Lss': 'Leopard Spots',
+  'Nbp': 'Navy Blue Plaid',
+  'Ppa': 'Pink Paisley',
+  'Pmf': 'Pink Mosaic Flower',
+  'Rwp': 'Red & White Plaid',
+  'Ybc': 'Yellow Bee',
+  'Tsa': 'Teal Safari',
+  'Bmb': 'Blue Marble',
+  
+  // Coastal New Earth Soy Collection Color Codes
+  // Reference: coastalpet.com/by-brand/new-earth-soy/
+  'Sla': 'Slate',
+  'Fsa': 'Fuchsia',
+  'Crn': 'Cranberry',
+  'Ony': 'Onyx',
+  'Cyn': 'Canyon',
+  
+  // Coastal Ribbon/K-9 Explorer Pattern Codes
+  'Mdw': 'Meadow',
+  'Des': 'Desert',
+  'Mlm': 'Millennium',
+  'Mtn': 'Mountain',
+  'Pwy': 'Parkway',
+  'Raf': 'Safari',
+  'Shb': 'Shamrock',
+  'Dgm': 'Diagram',
+  'Lwo': 'Lupine Wildwood',
+  'Oce': 'Ocean',
+  'Lak': 'Lake',
+  'Tel': 'Teal',
+  'Cto': 'Cotton',
+  'Wwl': 'Woodland',
+  'Ctn': 'Cotton',
+  'Fwt': 'Floral White',
+  'Mbn': 'Marine Blue Navy',
+  'Mpw': 'Multi Paw',
+  'Org': 'Orange',
+  'Bzs': 'Bronze Star',
+  
+  // Coastal Pattern Elements
+  'Sob': 'Skull on Black',
+  'Tig': 'Tiger',
+  'Npk': 'Neon Pink',
+  'Bio': 'Biothane',
+  
+  // Coastal Waterproof Collection (Ww prefix)
+  // Reference: Coastal Pro Waterproof line
+  'Ww': 'Waterproof',
+  'Wtrprf': 'Waterproof',
+  
+  // Coastal Product Type Abbreviations
+  'Trncllr': 'Training Collar',
+  'Secclrr': 'Security Collar',
+  'Seccllr': 'Security Collar',
+  'Collr': 'Collar',
+  'Colar': 'Collar',  // Typo fix
+  
+  // Coastal Collar/Leash numeric patterns
+  // Format: PatternSize" Type (e.g., Bbo12" means Black Bones 12" Collar)
+  // Size codes are handled separately
+  
+  // Additional Coastal pattern codes found in database
+  'Dab': 'Dark Blue',
+  'Fhb': 'Fern Harbor Blue',
+  'Fsd': 'Forest',
+  'Gbf': 'Green Blue Floral',
+  'Gbg': 'Green Blue Gray',
+  'Gbt': 'Green Blue Teal',
+  'Ggs': 'Green Gray Stripe',
+  'Gls': 'Green Leopard Spots',
+  'Goc': 'Gold Orange',
+  'Gof': 'Gold Floral',
+  'Gpl': 'Gray Plaid',
+  'Gpq': 'Gray Pink Quatrefoil',
+  'Gxn': 'Gray Neon',
+  'Hph': 'Hot Pink Hearts',
+  'Ldb': 'Light Blue',
+  'Leb': 'Leopard Blue',
+  'Lts': 'Light Stripe',
+  'Mch': 'Magenta Check',
+  'Mgn': 'Magenta',
+  'Pcg': 'Purple Camo Green',
+  'Pcr': 'Purple Camo Red',
+  'Ptr': 'Pink Tiger',
+  'Pur': 'Purple',
+  'Scb': 'Seafoam Blue',
+  'Shn': 'Shamrock',
+  'Smw': 'Smoke White',
+  'Sou': 'Southwest',
+  'Tdp': 'Tie Dye Pink',
+  'Uns': 'Unicorn Stars',
+  'Wrp': 'Wrap',
+  'Zeb': 'Zebra',
+  'Zpk': 'Zebra Pink',
+  'Pby': 'Pink Blue Yellow',
+  'Btr': 'Blue Tiger',
+  'Dpm': 'Diamond Pink',
+  
   // Product type abbreviations
   'Orig': 'Original',
   'Ori': 'Original',
