@@ -213,8 +213,14 @@ export default function Booking() {
     const advanceBookingDays = parseInt(settings.find(s => s.setting === 'advance_booking_days')?.value || '30');
     const maxDate = new Date();
     maxDate.setDate(maxDate.getDate() + advanceBookingDays);
+    // Normalize maxDate to end of day to ensure the full last day is bookable
+    maxDate.setHours(23, 59, 59, 999);
     
-    if (date > maxDate) return false;
+    // Normalize the date being checked to start of day for consistent comparison
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+    
+    if (checkDate > maxDate) return false;
     
     // Prevent same-day bookings for customers only (admins/groomers can book same-day)
     const user = currentUser as any;
