@@ -67,7 +67,8 @@ import {
   Image,
   Camera,
   BookOpen,
-  Zap
+  Zap,
+  CalendarX2
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -1455,9 +1456,19 @@ function ContactsManager() {
                         value={eventContactSearch}
                         onChange={(e) => setEventContactSearch(e.target.value)}
                         onFocus={() => setShowContactDropdown(true)}
-                        className="pl-10"
+                        className="pl-10 pr-10"
                         data-testid="input-contact-search"
                       />
+                      {eventContactSearch && (
+                        <button
+                          type="button"
+                          onClick={() => setEventContactSearch('')}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          data-testid="button-clear-event-contact-search"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
                     {showContactDropdown && allContacts.length > 0 && (
                       <div className="absolute z-50 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
@@ -1556,9 +1567,19 @@ function ContactsManager() {
               placeholder="Search contacts by name, email, or phone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 pr-10"
               data-testid="input-search-contacts"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                data-testid="button-clear-search-contacts"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -5665,6 +5686,13 @@ export default function Admin() {
   const [isAddGroomerOpen, setIsAddGroomerOpen] = useState(false);
   const [editingGroomer, setEditingGroomer] = useState<any>(null);
   const [groomerToDelete, setGroomerToDelete] = useState<any>(null);
+  const [isAddBlockedDayOpen, setIsAddBlockedDayOpen] = useState(false);
+  const [blockedDayFormData, setBlockedDayFormData] = useState({
+    groomerId: '',
+    date: '',
+    reason: 'sick',
+    notes: ''
+  });
   const [isAddBoardingOpen, setIsAddBoardingOpen] = useState(false);
   const [isSyncAppointmentsConfirmOpen, setIsSyncAppointmentsConfirmOpen] = useState(false);
   const [showApprovedAppointments, setShowApprovedAppointments] = useState(false);
@@ -5873,6 +5901,12 @@ export default function Admin() {
   const groomersQuery = useQuery<any[]>({
     queryKey: ["/api/admin/groomers"],
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
+  });
+
+  // Fetch groomer blocked days (sick days, vacation, etc.)
+  const { data: groomerBlockedDays = [] } = useQuery<any[]>({
+    queryKey: ["/api/admin/groomer-blocked-days"],
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
   // Fetch contacts for booking search
@@ -7233,6 +7267,49 @@ export default function Admin() {
     },
   });
 
+  // Groomer blocked days mutations
+  const createBlockedDayMutation = useMutation({
+    mutationFn: async (blockedDayData: { groomerId: number; date: string; reason: string; notes?: string }) => {
+      await apiRequest("POST", "/api/admin/groomer-blocked-days", blockedDayData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Blocked Day Added",
+        description: "Groomer blocked day has been added successfully.",
+      });
+      setIsAddBlockedDayOpen(false);
+      setBlockedDayFormData({ groomerId: '', date: '', reason: 'sick', notes: '' });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/groomer-blocked-days"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to add blocked day.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteBlockedDayMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/admin/groomer-blocked-days/${id}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Blocked Day Removed",
+        description: "Groomer blocked day has been removed successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/groomer-blocked-days"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to remove blocked day.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const pendingAppointments = (appointments as any[]).filter((a: any) => a.status === 'scheduled').length;
   const pendingOrders = (orders as any[]).filter((o: any) => o.status === 'pending').length;
   
@@ -7811,9 +7888,22 @@ export default function Admin() {
                       setPetSearchQuery(e.target.value);
                       setPetsPage(1);
                     }}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue"
+                    className="w-full pl-10 pr-10 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue"
                     data-testid="input-search-pets-admin"
                   />
+                  {petSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPetSearchQuery('');
+                        setPetsPage(1);
+                      }}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      data-testid="button-clear-search-pets"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -8033,9 +8123,19 @@ export default function Admin() {
               placeholder="Search Orders & Appointments by customer name, phone, or pet name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 border-gray-300 rounded-xl"
+              className="pl-10 pr-10 border-gray-300 rounded-xl"
               data-testid="input-search"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                data-testid="button-clear-search-orders"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
           {/* Approved Appointments - Collapsible Button */}
@@ -11044,6 +11144,90 @@ export default function Admin() {
               )}
             </CardContent>
           </Card>
+
+          {/* Groomer Blocked Days Management */}
+          {typedUser?.isAdmin && (
+            <Card className="mt-6">
+              <CardHeader>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <CardTitle className="flex items-center gap-2">
+                    <CalendarX2 className="w-5 h-5" />
+                    Blocked Days (Sick/Vacation)
+                  </CardTitle>
+                  <Button 
+                    onClick={() => setIsAddBlockedDayOpen(true)}
+                    className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700"
+                    data-testid="button-add-blocked-day"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Blocked Day
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {groomerBlockedDays.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <CalendarX2 className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p>No blocked days scheduled</p>
+                    <p className="text-sm mt-1">Click "Add Blocked Day" to block a groomer from being assigned on specific dates</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-gray-300">
+                      <thead>
+                        <tr className="bg-orange-100">
+                          <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold">Groomer</th>
+                          <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold">Date</th>
+                          <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold">Reason</th>
+                          <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold">Notes</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold w-[80px]">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {groomerBlockedDays.map((blockedDay: any) => {
+                          const groomer = groomersQuery.data?.find((g: any) => g.id === blockedDay.groomerId);
+                          return (
+                            <tr key={blockedDay.id} className="hover:bg-gray-50">
+                              <td className="border border-gray-300 px-3 py-2 text-sm">{groomer?.name || 'Unknown'}</td>
+                              <td className="border border-gray-300 px-3 py-2 text-sm">
+                                {new Date(blockedDay.date + 'T00:00:00').toLocaleDateString('en-US', { 
+                                  weekday: 'short', 
+                                  month: 'short', 
+                                  day: 'numeric',
+                                  year: 'numeric'
+                                })}
+                              </td>
+                              <td className="border border-gray-300 px-3 py-2 text-sm capitalize">
+                                <Badge variant={
+                                  blockedDay.reason === 'sick' ? 'destructive' : 
+                                  blockedDay.reason === 'vacation' ? 'default' : 
+                                  'secondary'
+                                }>
+                                  {blockedDay.reason}
+                                </Badge>
+                              </td>
+                              <td className="border border-gray-300 px-3 py-2 text-sm text-gray-600">{blockedDay.notes || '-'}</td>
+                              <td className="border border-gray-300 px-3 py-2 text-center">
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => deleteBlockedDayMutation.mutate(blockedDay.id)}
+                                  disabled={deleteBlockedDayMutation.isPending}
+                                  data-testid={`button-delete-blocked-day-${blockedDay.id}`}
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </Button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="boarding">
@@ -11388,6 +11572,111 @@ export default function Admin() {
         </Dialog>
       )}
 
+      {/* Add Blocked Day Dialog */}
+      <Dialog open={isAddBlockedDayOpen} onOpenChange={setIsAddBlockedDayOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarX2 className="w-5 h-5" />
+              Add Blocked Day
+            </DialogTitle>
+            <DialogDescription>Block a groomer from being assigned on a specific date (sick day, vacation, etc.)</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="blocked-groomer">Groomer *</Label>
+              <Select
+                value={blockedDayFormData.groomerId}
+                onValueChange={(value) => setBlockedDayFormData({ ...blockedDayFormData, groomerId: value })}
+              >
+                <SelectTrigger data-testid="select-blocked-groomer">
+                  <SelectValue placeholder="Select a groomer" />
+                </SelectTrigger>
+                <SelectContent>
+                  {groomersQuery.data?.filter((g: any) => g.isActive).map((groomer: any) => (
+                    <SelectItem key={groomer.id} value={groomer.id.toString()}>
+                      {groomer.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="blocked-date">Date *</Label>
+              <Input
+                id="blocked-date"
+                type="date"
+                value={blockedDayFormData.date}
+                onChange={(e) => setBlockedDayFormData({ ...blockedDayFormData, date: e.target.value })}
+                data-testid="input-blocked-date"
+              />
+            </div>
+            <div>
+              <Label htmlFor="blocked-reason">Reason *</Label>
+              <Select
+                value={blockedDayFormData.reason}
+                onValueChange={(value) => setBlockedDayFormData({ ...blockedDayFormData, reason: value })}
+              >
+                <SelectTrigger data-testid="select-blocked-reason">
+                  <SelectValue placeholder="Select a reason" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sick">Sick</SelectItem>
+                  <SelectItem value="vacation">Vacation</SelectItem>
+                  <SelectItem value="personal">Personal</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="blocked-notes">Notes (Optional)</Label>
+              <Textarea
+                id="blocked-notes"
+                placeholder="Additional notes about why they are blocked..."
+                value={blockedDayFormData.notes}
+                onChange={(e) => setBlockedDayFormData({ ...blockedDayFormData, notes: e.target.value })}
+                data-testid="textarea-blocked-notes"
+              />
+            </div>
+            <div className="flex gap-2 justify-end pt-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsAddBlockedDayOpen(false);
+                  setBlockedDayFormData({ groomerId: '', date: '', reason: 'sick', notes: '' });
+                }}
+                data-testid="button-cancel-blocked-day"
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-orange-600 hover:bg-orange-700"
+                onClick={() => {
+                  if (!blockedDayFormData.groomerId || !blockedDayFormData.date) {
+                    toast({
+                      title: "Missing Information",
+                      description: "Please select a groomer and date.",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  createBlockedDayMutation.mutate({
+                    groomerId: parseInt(blockedDayFormData.groomerId),
+                    date: blockedDayFormData.date,
+                    reason: blockedDayFormData.reason,
+                    notes: blockedDayFormData.notes || undefined
+                  });
+                }}
+                disabled={createBlockedDayMutation.isPending}
+                data-testid="button-save-blocked-day"
+              >
+                {createBlockedDayMutation.isPending ? "Adding..." : "Add Blocked Day"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Book Appointment Modal */}
       <Dialog open={isBookAppointmentOpen} onOpenChange={setIsBookAppointmentOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -11399,17 +11688,33 @@ export default function Admin() {
             {/* Contact Search */}
             <div className="relative">
               <Label>Search Existing Contact</Label>
-              <Input
-                type="text"
-                placeholder="Search by name or phone number..."
-                value={bookingContactSearch}
-                onChange={(e) => {
-                  setBookingContactSearch(e.target.value);
-                  setShowBookingContactDropdown(e.target.value.trim().length > 0);
-                }}
-                onFocus={() => bookingContactSearch.trim().length > 0 && setShowBookingContactDropdown(true)}
-                data-testid="input-booking-contact-search"
-              />
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Search by name or phone number..."
+                  value={bookingContactSearch}
+                  onChange={(e) => {
+                    setBookingContactSearch(e.target.value);
+                    setShowBookingContactDropdown(e.target.value.trim().length > 0);
+                  }}
+                  onFocus={() => bookingContactSearch.trim().length > 0 && setShowBookingContactDropdown(true)}
+                  className="pr-10"
+                  data-testid="input-booking-contact-search"
+                />
+                {bookingContactSearch && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBookingContactSearch('');
+                      setShowBookingContactDropdown(false);
+                    }}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    data-testid="button-clear-booking-contact-search"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
               
               {showBookingContactDropdown && filteredBookingContacts.length > 0 && (
                 <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto">

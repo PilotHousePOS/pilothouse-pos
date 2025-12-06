@@ -3012,6 +3012,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Groomer blocked days routes (sick days, vacation, etc.)
+  app.get("/api/admin/groomer-blocked-days", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const blockedDays = await storage.getAllGroomerBlockedDays();
+      res.json(blockedDays);
+    } catch (error) {
+      console.error("Error fetching groomer blocked days:", error);
+      res.status(500).json({ message: "Failed to fetch groomer blocked days" });
+    }
+  });
+
+  app.get("/api/admin/groomers/:id/blocked-days", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const groomerId = parseInt(req.params.id);
+      const blockedDays = await storage.getGroomerBlockedDays(groomerId);
+      res.json(blockedDays);
+    } catch (error) {
+      console.error("Error fetching groomer blocked days:", error);
+      res.status(500).json({ message: "Failed to fetch groomer blocked days" });
+    }
+  });
+
+  app.post("/api/admin/groomer-blocked-days", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const blockedDayData = req.body;
+      const blockedDay = await storage.createGroomerBlockedDay(blockedDayData);
+      res.json(blockedDay);
+    } catch (error) {
+      console.error("Error creating groomer blocked day:", error);
+      res.status(500).json({ message: "Failed to create groomer blocked day" });
+    }
+  });
+
+  app.delete("/api/admin/groomer-blocked-days/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      await storage.deleteGroomerBlockedDay(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting groomer blocked day:", error);
+      res.status(500).json({ message: "Failed to delete groomer blocked day" });
+    }
+  });
+
   // Push notification subscription endpoint
   app.post("/api/push-subscription", authMiddleware, async (req: any, res) => {
     try {

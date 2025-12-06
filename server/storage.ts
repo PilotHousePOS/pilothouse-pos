@@ -12,6 +12,7 @@ import {
   groomingSettings,
   groomers,
   groomerAvailability,
+  groomerBlockedDays,
   passwordResetTokens,
   wishlistItems,
   contacts,
@@ -48,6 +49,8 @@ import {
   type InsertGroomer,
   type GroomerAvailability,
   type InsertGroomerAvailability,
+  type GroomerBlockedDay,
+  type InsertGroomerBlockedDay,
   type PasswordResetToken,
   type WishlistItem,
   type InsertWishlistItem,
@@ -261,6 +264,13 @@ export interface IStorage {
   setGroomerAvailability(availability: InsertGroomerAvailability): Promise<GroomerAvailability>;
   updateGroomerAvailability(id: number, availability: Partial<InsertGroomerAvailability>): Promise<GroomerAvailability>;
   deleteGroomerAvailability(id: number): Promise<void>;
+
+  // Groomer blocked days operations (sick days, vacation, etc.)
+  getGroomerBlockedDays(groomerId: number): Promise<GroomerBlockedDay[]>;
+  getAllGroomerBlockedDays(): Promise<GroomerBlockedDay[]>;
+  getGroomerBlockedDaysForDate(date: string): Promise<GroomerBlockedDay[]>;
+  createGroomerBlockedDay(blockedDay: InsertGroomerBlockedDay): Promise<GroomerBlockedDay>;
+  deleteGroomerBlockedDay(id: number): Promise<void>;
 
   // Password reset token operations
   createPasswordResetToken(token: string, userId: string, expiresAt: Date): Promise<PasswordResetToken>;
@@ -1968,6 +1978,38 @@ export class DatabaseStorage implements IStorage {
 
   async deleteGroomerAvailability(id: number): Promise<void> {
     await db.delete(groomerAvailability).where(eq(groomerAvailability.id, id));
+  }
+
+  // Groomer blocked days operations (sick days, vacation, etc.)
+  async getGroomerBlockedDays(groomerId: number): Promise<GroomerBlockedDay[]> {
+    return await db
+      .select()
+      .from(groomerBlockedDays)
+      .where(eq(groomerBlockedDays.groomerId, groomerId))
+      .orderBy(groomerBlockedDays.date);
+  }
+
+  async getAllGroomerBlockedDays(): Promise<GroomerBlockedDay[]> {
+    return await db
+      .select()
+      .from(groomerBlockedDays)
+      .orderBy(groomerBlockedDays.date);
+  }
+
+  async getGroomerBlockedDaysForDate(date: string): Promise<GroomerBlockedDay[]> {
+    return await db
+      .select()
+      .from(groomerBlockedDays)
+      .where(eq(groomerBlockedDays.date, date));
+  }
+
+  async createGroomerBlockedDay(blockedDayData: InsertGroomerBlockedDay): Promise<GroomerBlockedDay> {
+    const [blockedDay] = await db.insert(groomerBlockedDays).values(blockedDayData).returning();
+    return blockedDay;
+  }
+
+  async deleteGroomerBlockedDay(id: number): Promise<void> {
+    await db.delete(groomerBlockedDays).where(eq(groomerBlockedDays.id, id));
   }
 
   // Password reset token operations

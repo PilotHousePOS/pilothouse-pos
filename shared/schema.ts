@@ -277,6 +277,18 @@ export const groomerAvailability = pgTable("groomer_availability", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Groomer blocked days (sick days, vacation, etc.)
+export const groomerBlockedDays = pgTable("groomer_blocked_days", {
+  id: serial("id").primaryKey(),
+  groomerId: integer("groomer_id").notNull().references(() => groomers.id, { onDelete: "cascade" }),
+  date: date("date").notNull(), // The specific date when groomer is blocked
+  reason: varchar("reason", { length: 100 }).notNull(), // "sick", "vacation", "personal", "other"
+  notes: text("notes"), // Optional notes about why they're blocked
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  groomerDateIdx: index("groomer_blocked_days_groomer_date_idx").on(table.groomerId, table.date),
+}));
+
 // Manual contacts for admin
 export const contacts = pgTable("contacts", {
   id: serial("id").primaryKey(),
@@ -449,6 +461,11 @@ export const insertGroomerAvailabilitySchema = createInsertSchema(groomerAvailab
   updatedAt: true,
 });
 
+export const insertGroomerBlockedDaySchema = createInsertSchema(groomerBlockedDays).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertPasswordResetTokenSchema = createInsertSchema(passwordResetTokens).omit({
   id: true,
   createdAt: true,
@@ -522,6 +539,8 @@ export type Groomer = typeof groomers.$inferSelect;
 export type InsertGroomer = z.infer<typeof insertGroomerSchema>;
 export type GroomerAvailability = typeof groomerAvailability.$inferSelect;
 export type InsertGroomerAvailability = z.infer<typeof insertGroomerAvailabilitySchema>;
+export type GroomerBlockedDay = typeof groomerBlockedDays.$inferSelect;
+export type InsertGroomerBlockedDay = z.infer<typeof insertGroomerBlockedDaySchema>;
 export type WishlistItem = typeof wishlistItems.$inferSelect;
 export type InsertWishlistItem = z.infer<typeof insertWishlistItemSchema>;
 export type Contact = typeof contacts.$inferSelect;
