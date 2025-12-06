@@ -10680,42 +10680,25 @@ export default function Admin() {
                 </div>
               </div>
 
-              {/* Appointment Capacity */}
+              {/* Appointment Duration */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Default Appointment Limits</h3>
-                <p className="text-sm text-gray-600 mb-3">These are default limits. You can set specific limits for individual dates below.</p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Max Appointments Per Day</label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="50"
-                      defaultValue={groomingSettings.find(s => s.setting === 'max_daily_appointments')?.value || '10'}
-                      className="w-full p-2 border rounded"
-                      onChange={(e) => updateGroomingSettingMutation.mutate({
-                        setting: 'max_daily_appointments',
-                        value: e.target.value
-                      })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Appointment Duration (minutes)</label>
-                    <select
-                      defaultValue={groomingSettings.find(s => s.setting === 'appointment_duration')?.value || '60'}
-                      className="w-full p-2 border rounded"
-                      onChange={(e) => updateGroomingSettingMutation.mutate({
-                        setting: 'appointment_duration',
-                        value: e.target.value
-                      })}
-                    >
-                      <option value="30">30 minutes</option>
-                      <option value="45">45 minutes</option>
-                      <option value="60">1 hour</option>
-                      <option value="90">1.5 hours</option>
-                      <option value="120">2 hours</option>
-                    </select>
-                  </div>
+                <h3 className="text-lg font-semibold">Appointment Settings</h3>
+                <div className="max-w-xs">
+                  <label className="block text-sm font-medium mb-2">Appointment Duration (minutes)</label>
+                  <select
+                    defaultValue={groomingSettings.find(s => s.setting === 'appointment_duration')?.value || '60'}
+                    className="w-full p-2 border rounded"
+                    onChange={(e) => updateGroomingSettingMutation.mutate({
+                      setting: 'appointment_duration',
+                      value: e.target.value
+                    })}
+                  >
+                    <option value="30">30 minutes</option>
+                    <option value="45">45 minutes</option>
+                    <option value="60">1 hour</option>
+                    <option value="90">1.5 hours</option>
+                    <option value="120">2 hours</option>
+                  </select>
                 </div>
               </div>
 
