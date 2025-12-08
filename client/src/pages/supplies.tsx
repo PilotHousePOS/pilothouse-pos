@@ -75,6 +75,21 @@ const AQUATIC_TYPES = [
   { id: 'supplies', label: 'Supplies', emoji: '🏺' },
 ];
 
+const REPTILE_TYPES = [
+  { id: 'reptile-food', label: 'Reptile Food', emoji: '🦗' },
+  { id: 'reptile-supplies', label: 'Supplies', emoji: '🏺' },
+];
+
+const BIRD_TYPES = [
+  { id: 'bird-food', label: 'Bird Food', emoji: '🌾' },
+  { id: 'bird-supplies', label: 'Supplies', emoji: '🏺' },
+];
+
+const SMALL_ANIMAL_PRODUCT_TYPES = [
+  { id: 'small-animal-food', label: 'Food', emoji: '🥕' },
+  { id: 'small-animal-supplies', label: 'Supplies', emoji: '🏺' },
+];
+
 export default function Supplies() {
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -83,6 +98,9 @@ export default function Supplies() {
   const [selectedToyType, setSelectedToyType] = useState('');
   const [selectedHealthcareType, setSelectedHealthcareType] = useState('');
   const [selectedAquaticType, setSelectedAquaticType] = useState('');
+  const [selectedReptileType, setSelectedReptileType] = useState('');
+  const [selectedBirdType, setSelectedBirdType] = useState('');
+  const [selectedSmallAnimalProductType, setSelectedSmallAnimalProductType] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
@@ -100,6 +118,7 @@ export default function Supplies() {
     // Clear animal type when not in small animal category
     if (selectedCategory !== 'smallanimal') {
       setSelectedAnimalType('');
+      setSelectedSmallAnimalProductType('');
     }
     // Clear toy type when not in toys category
     if (selectedCategory !== 'toys') {
@@ -113,12 +132,20 @@ export default function Supplies() {
     if (selectedCategory !== 'aquatics') {
       setSelectedAquaticType('');
     }
+    // Clear reptile type when not in reptiles category
+    if (selectedCategory !== 'reptiles') {
+      setSelectedReptileType('');
+    }
+    // Clear bird type when not in bird supplies category
+    if (selectedCategory !== 'birdSupplies') {
+      setSelectedBirdType('');
+    }
   }, [searchQuery, selectedCategory]);
 
   // Reset page when any sub-filter changes
   useEffect(() => {
     setCurrentPage(0);
-  }, [selectedAnimalType, selectedToyType, selectedHealthcareType, selectedAquaticType]);
+  }, [selectedAnimalType, selectedToyType, selectedHealthcareType, selectedAquaticType, selectedReptileType, selectedBirdType, selectedSmallAnimalProductType]);
 
   const { data, isLoading } = useQuery<{
     items: any[];
@@ -137,7 +164,10 @@ export default function Supplies() {
         ...(selectedAnimalType && { animalType: selectedAnimalType }),
         ...(selectedToyType && { toyType: selectedToyType }),
         ...(selectedHealthcareType && { healthcareType: selectedHealthcareType }),
-        ...(selectedAquaticType && { aquaticType: selectedAquaticType })
+        ...(selectedAquaticType && { aquaticType: selectedAquaticType }),
+        ...(selectedReptileType && { reptileType: selectedReptileType }),
+        ...(selectedBirdType && { birdType: selectedBirdType }),
+        ...(selectedSmallAnimalProductType && { smallAnimalProductType: selectedSmallAnimalProductType })
       }
     ],
   });
@@ -320,6 +350,84 @@ export default function Supplies() {
                 <div className="flex flex-col items-center w-full">
                   <div className="text-lg mb-1">{aquatic.emoji}</div>
                   <div className="text-xs leading-tight">{aquatic.label}</div>
+                </div>
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Reptile Type Filter (shows only for reptiles category) */}
+      {selectedCategory === 'reptiles' && (
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Filter by Product Type:</h3>
+          <div className="grid grid-cols-2 gap-3">
+            {REPTILE_TYPES.map((reptile) => (
+              <Button
+                key={reptile.id}
+                variant="outline"
+                size="sm"
+                className={`text-center py-3 h-auto min-h-[70px] flex items-center justify-center ${
+                  selectedReptileType === reptile.id ? 'bg-green-600 text-white border-green-600' : 'bg-white'
+                }`}
+                onClick={() => setSelectedReptileType(selectedReptileType === reptile.id ? '' : reptile.id)}
+                data-testid={`button-filter-${reptile.id}`}
+              >
+                <div className="flex flex-col items-center w-full">
+                  <div className="text-lg mb-1">{reptile.emoji}</div>
+                  <div className="text-xs leading-tight">{reptile.label}</div>
+                </div>
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Bird Type Filter (shows only for bird supplies category) */}
+      {selectedCategory === 'birdSupplies' && (
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Filter by Product Type:</h3>
+          <div className="grid grid-cols-2 gap-3">
+            {BIRD_TYPES.map((bird) => (
+              <Button
+                key={bird.id}
+                variant="outline"
+                size="sm"
+                className={`text-center py-3 h-auto min-h-[70px] flex items-center justify-center ${
+                  selectedBirdType === bird.id ? 'bg-amber-500 text-white border-amber-500' : 'bg-white'
+                }`}
+                onClick={() => setSelectedBirdType(selectedBirdType === bird.id ? '' : bird.id)}
+                data-testid={`button-filter-${bird.id}`}
+              >
+                <div className="flex flex-col items-center w-full">
+                  <div className="text-lg mb-1">{bird.emoji}</div>
+                  <div className="text-xs leading-tight">{bird.label}</div>
+                </div>
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Small Animal Product Type Filter (shows only for small animal category) */}
+      {selectedCategory === 'smallanimal' && (
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Filter by Product Type:</h3>
+          <div className="grid grid-cols-2 gap-3">
+            {SMALL_ANIMAL_PRODUCT_TYPES.map((productType) => (
+              <Button
+                key={productType.id}
+                variant="outline"
+                size="sm"
+                className={`text-center py-3 h-auto min-h-[70px] flex items-center justify-center ${
+                  selectedSmallAnimalProductType === productType.id ? 'bg-brand-blue text-white border-brand-blue' : 'bg-white'
+                }`}
+                onClick={() => setSelectedSmallAnimalProductType(selectedSmallAnimalProductType === productType.id ? '' : productType.id)}
+                data-testid={`button-filter-${productType.id}`}
+              >
+                <div className="flex flex-col items-center w-full">
+                  <div className="text-lg mb-1">{productType.emoji}</div>
+                  <div className="text-xs leading-tight">{productType.label}</div>
                 </div>
               </Button>
             ))}

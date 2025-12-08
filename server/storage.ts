@@ -741,8 +741,11 @@ export class DatabaseStorage implements IStorage {
     toyType?: string;
     healthcareType?: string;
     aquaticType?: string;
+    reptileType?: string;
+    birdType?: string;
+    smallAnimalProductType?: string;
   }): Promise<{ items: Supply[]; total: number }> {
-    const { limit, offset, category, search, filterType, animalType, foodType, toyType, healthcareType, aquaticType } = params;
+    const { limit, offset, category, search, filterType, animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType } = params;
 
     // Build WHERE conditions based on filters
     let whereConditions: any[] = [eq(supplies.isActive, true)];
@@ -898,6 +901,48 @@ export class DatabaseStorage implements IStorage {
       }
     };
 
+    // Define reptile type keywords for filtering
+    const reptileKeywords: Record<string, { include: string[], exclude: string[], brands?: string[] }> = {
+      'reptile-food': {
+        include: ['food', 'diet', 'feeder', 'cricket', 'mealworm', 'superworm', 'dubia', 'roach', 'waxworm', 'calcium', 'vitamin', 'supplement', 'pellet', 'canned', 'freeze dried', 'frozen'],
+        exclude: ['tank', 'terrarium', 'heat', 'light', 'substrate', 'bedding', 'hide', 'decoration', 'thermometer', 'hygrometer'],
+        brands: ['zoo med', 'exo terra', 'repashy', 'fluker', 'zilla', 'josh frogs', 'timberline']
+      },
+      'reptile-supplies': {
+        include: ['tank', 'terrarium', 'vivarium', 'enclosure', 'heat', 'lamp', 'bulb', 'uvb', 'uva', 'light', 'substrate', 'bedding', 'hide', 'cave', 'decoration', 'branch', 'vine', 'moss', 'thermometer', 'hygrometer', 'thermostat', 'mister', 'fogger', 'dripper', 'water dish', 'food dish'],
+        exclude: ['food', 'diet', 'feeder', 'cricket', 'mealworm', 'calcium', 'vitamin'],
+        brands: ['zoo med', 'exo terra', 'zilla', 'fluker', 'repti', 'arcadia', 'zoo med']
+      }
+    };
+
+    // Define bird type keywords for filtering
+    const birdKeywords: Record<string, { include: string[], exclude: string[], brands?: string[] }> = {
+      'bird-food': {
+        include: ['food', 'seed', 'pellet', 'diet', 'millet', 'fruit', 'vegetable', 'treat', 'nutri-berries', 'avi-cakes', 'mix', 'blend'],
+        exclude: ['cage', 'perch', 'toy', 'swing', 'ladder', 'bath', 'feeder', 'waterer', 'cuttlebone', 'mineral block'],
+        brands: ['zupreem', 'harrison', 'lafeber', 'kaytee', 'higgins', 'roudybush', 'tropican', 'volkman', 'browns', 'fm browns']
+      },
+      'bird-supplies': {
+        include: ['cage', 'perch', 'toy', 'swing', 'ladder', 'bath', 'feeder', 'waterer', 'cuttlebone', 'mineral block', 'vitamin', 'supplement', 'litter', 'liner', 'cover', 'stand', 'play gym', 'travel carrier'],
+        exclude: ['food', 'seed', 'pellet', 'diet', 'millet', 'treat', 'nutri-berries'],
+        brands: ['prevue', 'ware', 'jw', 'penn plax', 'living world', 'you & me']
+      }
+    };
+
+    // Define small animal product type keywords for filtering
+    const smallAnimalProductKeywords: Record<string, { include: string[], exclude: string[], brands?: string[] }> = {
+      'small-animal-food': {
+        include: ['food', 'hay', 'pellet', 'diet', 'timothy', 'alfalfa', 'orchard', 'oat', 'treat', 'veggie', 'fruit', 'seed mix', 'fortidiet'],
+        exclude: ['cage', 'habitat', 'bedding', 'litter', 'wheel', 'ball', 'toy', 'bottle', 'feeder', 'hideout', 'tunnel', 'harness', 'leash', 'carrier', 'brush', 'clipper', 'comb', 'shampoo', 'nest', 'hammock', 'house', 'igloo', 'tube', 'ramp', 'basket'],
+        brands: []
+      },
+      'small-animal-supplies': {
+        include: ['cage', 'habitat', 'bedding', 'litter', 'wheel', 'ball', 'toy', 'bottle', 'feeder', 'waterer', 'hideout', 'tunnel', 'tube', 'house', 'igloo', 'hammock', 'nest', 'carrier', 'harness', 'leash', 'brush', 'nail clipper'],
+        exclude: ['food', 'hay', 'pellet', 'diet', 'timothy', 'treat'],
+        brands: ['kaytee', 'ware', 'oxbow', 'living world', 'prevue', 'midwest', 'super pet', 'small pet select']
+      }
+    };
+
     // Helper function to filter items by keywords with inclusion and exclusion logic
     // Uses word boundary matching to avoid false matches (e.g., "cat" won't match "catfish")
     const filterByKeywords = (items: Supply[], filterType: string, keywords: Record<string, { include: string[], exclude: string[], brands?: string[] }>): Supply[] => {
@@ -979,6 +1024,15 @@ export class DatabaseStorage implements IStorage {
       if (aquaticType) {
         allItems = filterByKeywords(allItems, aquaticType, aquaticKeywords);
       }
+      if (reptileType) {
+        allItems = filterByKeywords(allItems, reptileType, reptileKeywords);
+      }
+      if (birdType) {
+        allItems = filterByKeywords(allItems, birdType, birdKeywords);
+      }
+      if (smallAnimalProductType) {
+        allItems = filterByKeywords(allItems, smallAnimalProductType, smallAnimalProductKeywords);
+      }
       
       // Then apply fuzzy search filtering with typo tolerance
       const filteredItems = fuzzySearchFilter(
@@ -998,7 +1052,7 @@ export class DatabaseStorage implements IStorage {
     }
 
     // If we have any specialty filter but no search, fetch and filter
-    if (animalType || foodType || toyType || healthcareType || aquaticType) {
+    if (animalType || foodType || toyType || healthcareType || aquaticType || reptileType || birdType || smallAnimalProductType) {
       // Fetch all items matching category/filterType first
       let allItems = await db
         .select()
@@ -1021,6 +1075,15 @@ export class DatabaseStorage implements IStorage {
       }
       if (aquaticType) {
         allItems = filterByKeywords(allItems, aquaticType, aquaticKeywords);
+      }
+      if (reptileType) {
+        allItems = filterByKeywords(allItems, reptileType, reptileKeywords);
+      }
+      if (birdType) {
+        allItems = filterByKeywords(allItems, birdType, birdKeywords);
+      }
+      if (smallAnimalProductType) {
+        allItems = filterByKeywords(allItems, smallAnimalProductType, smallAnimalProductKeywords);
       }
       
       const total = allItems.length;
