@@ -23,7 +23,7 @@ export const CATEGORY_SCORING_WEIGHTS: CategoryScoringWeights = {
 // Brand-specific category defaults for overlapping brands
 export const BRAND_CATEGORY_DEFAULTS: Record<string, string> = {
   'KONG': 'toys',          // KONG is primarily a toy brand
-  'Ruffwear': 'leashes',   // Ruffwear is primarily leashes/harnesses
+  'Ruffwear': 'leashesAndCollars',   // Ruffwear is primarily leashes/harnesses
   'Blue Buffalo': 'food',  // Blue Buffalo is primarily food
   'Chuckit': 'toys',       // Chuckit is toys
   'FURminator': 'healthcare', // FURminator is grooming tools
@@ -298,7 +298,7 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
     ],
   },
 
-  leashes: {
+  leashesAndCollars: {
     brands: [
       'Flexi', 'Ruffwear', 'Lupine', 'PetSafe', 'Coastal', 'Blueberry',
       'Max and Neo', 'Mendota', 'EzyDog', 'Kurgo', 'Chai\'s Choice', 'ThunderLeash',

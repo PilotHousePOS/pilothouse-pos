@@ -14,7 +14,7 @@ export function formatCategory(category: string | null | undefined): string {
     food: 'Food',
     toys: 'Toys',
     beds: 'Beds',
-    leashes: 'Collars & Leashes',
+    leashesAndCollars: 'Leashes & Collars',
     healthcare: 'Healthcare',
     accessories: 'Accessories',
     aquatics: 'Aquatics',

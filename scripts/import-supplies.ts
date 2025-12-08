@@ -79,7 +79,7 @@ async function importSupplies() {
         if (category.includes('food')) normalizedCategory = 'food';
         else if (category.includes('toy')) normalizedCategory = 'toys';
         else if (category.includes('bed')) normalizedCategory = 'beds';
-        else if (category.includes('leash') || category.includes('collar')) normalizedCategory = 'leashes';
+        else if (category.includes('leash') || category.includes('collar')) normalizedCategory = 'leashesAndCollars';
         else if (category.includes('health') || category.includes('medical')) normalizedCategory = 'healthcare';
         else normalizedCategory = 'accessories';
         

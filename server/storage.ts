@@ -1341,7 +1341,7 @@ export class DatabaseStorage implements IStorage {
       food: 0,
       toys: 0,
       beds: 0,
-      leashes: 0,
+      leashesAndCollars: 0,
       healthcare: 0,
       accessories: 0,
       smallanimal: 0,
@@ -1359,7 +1359,7 @@ export class DatabaseStorage implements IStorage {
 
     // Valid categories from Excel file - these should be preserved
     const validExcelCategories = new Set([
-      'leashes', 'aquatics', 'accessories', 'reptiles', 'dogFood', 'catFood',
+      'leashesAndCollars', 'aquatics', 'accessories', 'reptiles', 'dogFood', 'catFood',
       'toys', 'dogTreats', 'smallanimal', 'birdSupplies', 'healthcare',
       'catTreats', 'dogCages', 'beds'
     ]);

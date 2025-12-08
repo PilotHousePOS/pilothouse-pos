@@ -10,7 +10,7 @@ const SUPPLY_CATEGORIES = [
   { id: 'food', label: 'Food', emoji: '🍖' },
   { id: 'toys', label: 'Toys', emoji: '🧸' },
   { id: 'beds', label: 'Beds', emoji: '🛏️' },
-  { id: 'leashes', label: 'Collars & Leashes', emoji: '🦮' },
+  { id: 'leashesAndCollars', label: 'Leashes & Collars', emoji: '🦮' },
   { id: 'healthcare', label: 'Healthcare', emoji: '💊' },
   { id: 'accessories', label: 'Accessories', emoji: '🎀' },
   { id: 'aquatics', label: 'Aquatics', emoji: '🐠' },
