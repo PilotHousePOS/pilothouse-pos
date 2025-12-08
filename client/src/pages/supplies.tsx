@@ -7,7 +7,10 @@ import SupplyCard from "@/components/supply-card";
 import CartSidebar from "@/components/cart-sidebar";
 
 const SUPPLY_CATEGORIES = [
-  { id: 'food', label: 'Food', emoji: '🍖' },
+  { id: 'dogFood', label: 'Dog Food', emoji: '🐕' },
+  { id: 'catFood', label: 'Cat Food', emoji: '🐱' },
+  { id: 'dogTreats', label: 'Dog Treats', emoji: '🦴' },
+  { id: 'catTreats', label: 'Cat Treats', emoji: '🐟' },
   { id: 'toys', label: 'Toys', emoji: '🧸' },
   { id: 'beds', label: 'Beds', emoji: '🛏️' },
   { id: 'leashesAndCollars', label: 'Leashes & Collars', emoji: '🦮' },
@@ -18,8 +21,6 @@ const SUPPLY_CATEGORIES = [
   { id: 'birdSupplies', label: 'Bird Supplies', emoji: '🪺' },
   { id: 'dogCages', label: 'Dog Cages', emoji: '🏠' },
   { id: 'smallanimal', label: 'Small Animals', emoji: '🐹' },
-  { id: 'dogTreats', label: 'Dog Treats', emoji: '🦴' },
-  { id: 'catTreats', label: 'Cat Treats', emoji: '🐱' },
 ];
 
 const ITEMS_PER_PAGE = 24;
@@ -53,13 +54,6 @@ const ANIMAL_TYPES = [
   { id: 'chinchilla', label: 'Chinchilla', emoji: '🐭' },
 ];
 
-const FOOD_TYPES = [
-  { id: 'dog-food', label: 'Dog Food', emoji: '🐕' },
-  { id: 'cat-food', label: 'Cat Food', emoji: '🐱' },
-  { id: 'bird-food', label: 'Bird Food', emoji: '🦜' },
-  { id: 'small-animal-food', label: 'Small Animal', emoji: '🐹' },
-];
-
 const TOY_TYPES = [
   { id: 'dog-toys', label: 'Dog Toys', emoji: '🐕' },
   { id: 'cat-toys', label: 'Cat Toys', emoji: '🐱' },
@@ -86,7 +80,6 @@ export default function Supplies() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedAnimalType, setSelectedAnimalType] = useState('');
-  const [selectedFoodType, setSelectedFoodType] = useState('');
   const [selectedToyType, setSelectedToyType] = useState('');
   const [selectedHealthcareType, setSelectedHealthcareType] = useState('');
   const [selectedAquaticType, setSelectedAquaticType] = useState('');
@@ -108,10 +101,6 @@ export default function Supplies() {
     if (selectedCategory !== 'smallanimal') {
       setSelectedAnimalType('');
     }
-    // Clear food type when not in food category
-    if (selectedCategory !== 'food') {
-      setSelectedFoodType('');
-    }
     // Clear toy type when not in toys category
     if (selectedCategory !== 'toys') {
       setSelectedToyType('');
@@ -129,7 +118,7 @@ export default function Supplies() {
   // Reset page when any sub-filter changes
   useEffect(() => {
     setCurrentPage(0);
-  }, [selectedAnimalType, selectedFoodType, selectedToyType, selectedHealthcareType, selectedAquaticType]);
+  }, [selectedAnimalType, selectedToyType, selectedHealthcareType, selectedAquaticType]);
 
   const { data, isLoading } = useQuery<{
     items: any[];
@@ -146,7 +135,6 @@ export default function Supplies() {
         ...(selectedCategory && { category: selectedCategory }),
         ...(searchQuery && { search: searchQuery }),
         ...(selectedAnimalType && { animalType: selectedAnimalType }),
-        ...(selectedFoodType && { foodType: selectedFoodType }),
         ...(selectedToyType && { toyType: selectedToyType }),
         ...(selectedHealthcareType && { healthcareType: selectedHealthcareType }),
         ...(selectedAquaticType && { aquaticType: selectedAquaticType })
@@ -254,32 +242,6 @@ export default function Supplies() {
                 <div className="flex flex-col items-center w-full">
                   <div className="text-lg mb-1">{animal.emoji}</div>
                   <div className="text-xs leading-tight">{animal.label}</div>
-                </div>
-              </Button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Food Type Filter (shows only for food category) */}
-      {selectedCategory === 'food' && (
-        <div className="mb-6">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Filter by Food Type:</h3>
-          <div className="grid grid-cols-3 gap-3">
-            {FOOD_TYPES.map((food) => (
-              <Button
-                key={food.id}
-                variant="outline"
-                size="sm"
-                className={`text-center py-3 h-auto min-h-[70px] flex items-center justify-center ${
-                  selectedFoodType === food.id ? 'bg-brand-blue text-white border-brand-blue' : 'bg-white'
-                }`}
-                onClick={() => setSelectedFoodType(selectedFoodType === food.id ? '' : food.id)}
-                data-testid={`button-filter-${food.id}`}
-              >
-                <div className="flex flex-col items-center w-full">
-                  <div className="text-lg mb-1">{food.emoji}</div>
-                  <div className="text-xs leading-tight">{food.label}</div>
                 </div>
               </Button>
             ))}
