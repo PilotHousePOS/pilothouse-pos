@@ -21,9 +21,11 @@ The Animal House Pet Store project is a mobile-friendly web application designed
 - Supply Filtering: Centralized, research-based filtering system with proper brand/keyword separation (server/filterConfig.ts).
   - Reptile supplies: ZooMed, Exo Terra, Zilla, Fluker's, ReptiCare brands + reptile keywords.
   - Aquatic supplies: Hikari, Tetra, Aqueon, Marineland, API, Fluval, SeaChem, GloFish, Omega One, Ocean Nutrition brands + aquatic keywords.
-  - Cross-category brands (ZooMed): Make both aquatic AND reptile products - not excluded from either category, keywords determine final categorization.
+  - Cross-category brands (ZooMed): Make both aquatic AND reptile products - not excluded from either category, keywords determine final categorization. Zoo Med aquatic products (Aqualog, Aqua Thermometer) properly categorized via aquatic keywords.
   - Keyword priority system: Species-specific keywords (60pts) override brand scoring (40pts) for accurate categorization.
   - Exclusion logic: Brand exclusions prevent brand scoring only; keyword exclusions prevent keyword scoring only.
+  - Pattern name exclusions: "snake print", "lizard print", "turtle print", "frog print" excluded from reptile category (these are dog/cat accessory patterns, not reptile products).
+  - Dog/cat accessory brands (Coastal, Li'l Pals, Comfort Soft) excluded from reptile category.
   - Toy brands hard-excluded from both categories via brand AND keyword exclusions.
   - Aquatic Subcategorization (server/aquaticCategoryEvidence.ts): Evidence-based system with verified product terminology from official product lines. Priority system: Decoration exclusion → Brand-based categorization → Keyword scoring → Default to accessories.
   - Cat/dog food exclusion: Products containing cat/dog keywords excluded from aquatic filterType.
@@ -51,7 +53,7 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Orders & Appointments Search:** Unified search in admin panel by customer name, phone, or pet name.
 - **Pet Boarding/Babysitting System:** Complete boarding management with intelligent cost calculation, flexible date management, status tracking, and admin-only access.
 - **Database Sync Tools:** Staging import with duplicate prevention, supplies-only sync, and full database sync.
-- **Auto-Categorization System:** Single-button operation for specialty section and product type classification based on brand and keyword analysis, including Live Animal Detection and record creation.
+- **Auto-Categorization System:** Single-button operation for specialty section and product type classification based on brand and keyword analysis, including Live Animal Detection and record creation. Includes Category Cleanup step that normalizes category names (kennel→dogCages, smallAnimalSupplies→smallanimal, "cat toy"→toys), splits food→dogFood/catFood, fixes clothing items to accessories, syncs filter_type with category, and corrects misplaced products (beefhide→dogTreats).
 - **Smart Abbreviation Expansion System:** Comprehensive, research-based abbreviation expansion for major pet food and treat brands (server/abbreviationExpansion.ts) with critical verification against official sources. Includes context-aware expansions.
 - **Brand Extraction & Assignment System:** Comprehensive brand database (80+ brands) with automated brand detection via `extractBrand()` function and category-specific brand handling. Includes abbreviation normalization and a brand backfill migration script for automated assignment.
 - **Product Image Management System:** Statistics dashboard, manual and automated batch image search with preview and approval, and admin-only access.
