@@ -11355,6 +11355,12 @@ export default function Admin() {
                     </Badge>
                   </div>
                 </div>
+                {selectedAppointment.notes && (
+                  <div className="border-t pt-3">
+                    <Label className="text-sm font-semibold text-gray-700">Notes</Label>
+                    <p className="text-gray-900 whitespace-pre-wrap">{selectedAppointment.notes}</p>
+                  </div>
+                )}
               </div>
             </div>
             {selectedAppointment.status === 'confirmed' && typedUser?.isAdmin && (
