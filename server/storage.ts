@@ -1327,6 +1327,7 @@ export class DatabaseStorage implements IStorage {
     smallAnimalSupplies: number;
     dogTreats: number;
     catTreats: number;
+    preserved: number;
     unchanged: number;
     total: number;
   }> {
@@ -1351,9 +1352,17 @@ export class DatabaseStorage implements IStorage {
       smallAnimalSupplies: 0,
       dogTreats: 0,
       catTreats: 0,
+      preserved: 0,  // Count of products with existing categories preserved
       unchanged: 0,
       total: 0
     };
+
+    // Valid categories from Excel file - these should be preserved
+    const validExcelCategories = new Set([
+      'leashes', 'aquatics', 'accessories', 'reptiles', 'dogFood', 'catFood',
+      'toys', 'dogTreats', 'smallanimal', 'birdSupplies', 'healthcare',
+      'catTreats', 'dogCages', 'beds'
+    ]);
 
     // Process in batches to avoid memory issues
     for (let i = 0; i < allSupplies.length; i += BATCH_SIZE) {
@@ -1364,22 +1373,26 @@ export class DatabaseStorage implements IStorage {
       // Prepare bulk update using transaction
       await db.transaction(async (tx) => {
         for (const supply of batch) {
+          stats.total++;
+          
+          // PRIORITY 0: Preserve existing valid categories from Excel file
+          // Excel is the source of truth - don't override categories that already exist
+          if (supply.category && validExcelCategories.has(supply.category)) {
+            stats.preserved++;
+            continue;
+          }
+          
           let suggestedCategory = null;
           
-          // PRIORITY 1: If filterType is set to specialty section, ALWAYS use specialty category
-          // User requirement: Fish food must be in 'aquatics' category, NOT 'food'
+          // PRIORITY 1: If filterType is set to specialty section, use specialty category
           if (supply.filterType === 'smallanimal') {
             suggestedCategory = 'smallanimal';
           } else if (supply.filterType === 'aquatic') {
-            // CRITICAL: Aquatic items MUST have category='aquatics' per user requirement
-            // The Aquatics page filters by filterType='aquatic', and subcategory filtering
-            // is handled by the API with additional keyword-based filtering
             suggestedCategory = 'aquatics';
           } else if (supply.filterType === 'reptile') {
-            // Reptile items MUST have category='reptiles' to appear on Reptiles page
             suggestedCategory = 'reptiles';
           } else {
-            // PRIORITY 2: Use standard category determination for other products
+            // PRIORITY 2: Use standard category determination for new products
             suggestedCategory = determineCategory(supply);
           }
           
@@ -1389,11 +1402,12 @@ export class DatabaseStorage implements IStorage {
               .where(eq(supplies.id, supply.id));
 
             // Count categories
-            stats[suggestedCategory as keyof typeof stats]++;
+            if (stats[suggestedCategory as keyof typeof stats] !== undefined) {
+              (stats[suggestedCategory as keyof typeof stats] as number)++;
+            }
           } else {
             stats.unchanged++;
           }
-          stats.total++;
         }
       });
 
