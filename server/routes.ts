@@ -5280,6 +5280,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Step 2c: Auto-categorize product types
       const categoryStats = await storage.autoCategorizeProductCategories();
       
+      // Step 2d: Cleanup categories - fix mismatches, normalize names, split food
+      console.log("Step 2d: Cleaning up categories...");
+      const cleanupStats = await storage.cleanupCategories();
+      
       console.log("Step 3/3: Auditing unknown abbreviations...");
       const { auditUnknownAbbreviations } = await import('./abbreviationAudit');
       const auditResults = await auditUnknownAbbreviations();
@@ -5300,6 +5304,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           brandsAssigned: brandsAssigned,
           filterType: filterStats,
           categories: categoryStats,
+          cleanup: cleanupStats,
           audit: {
             total: auditResults.total,
             catalogHits: auditResults.catalogHits,

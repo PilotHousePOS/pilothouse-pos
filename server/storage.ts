@@ -177,6 +177,20 @@ export interface IStorage {
     total: number;
   }>;
 
+  // Cleanup categories - normalize names, fix mismatches, split food categories
+  cleanupCategories(): Promise<{
+    clothingToAccessories: number;
+    collarsToCollarsLeashes: number;
+    foodSplitToDogFood: number;
+    foodSplitToCatFood: number;
+    kennelToDogCages: number;
+    smallAnimalSuppliesToSmallAnimal: number;
+    catToyToToys: number;
+    filterTypeSynced: number;
+    beefhideFixed: number;
+    total: number;
+  }>;
+
   getSuppliesWithoutImages(limit: number, offset: number): Promise<Supply[]>;
   getSupplyImageStats(): Promise<{
     totalProducts: number;
@@ -1387,6 +1401,153 @@ export class DatabaseStorage implements IStorage {
     }
 
     console.log(`Category Auto-Categorization Complete:`, stats);
+    return stats;
+  }
+
+  // Cleanup categories - normalize names, fix mismatches, split food categories
+  async cleanupCategories(): Promise<{
+    clothingToAccessories: number;
+    collarsToCollarsLeashes: number;
+    foodSplitToDogFood: number;
+    foodSplitToCatFood: number;
+    kennelToDogCages: number;
+    smallAnimalSuppliesToSmallAnimal: number;
+    catToyToToys: number;
+    filterTypeSynced: number;
+    beefhideFixed: number;
+    total: number;
+  }> {
+    const stats = {
+      clothingToAccessories: 0,
+      collarsToCollarsLeashes: 0,
+      foodSplitToDogFood: 0,
+      foodSplitToCatFood: 0,
+      kennelToDogCages: 0,
+      smallAnimalSuppliesToSmallAnimal: 0,
+      catToyToToys: 0,
+      filterTypeSynced: 0,
+      beefhideFixed: 0,
+      total: 0,
+    };
+
+    console.log("Starting category cleanup...");
+
+    // 1. Fix clothing items in wrong categories (dogTreats, leashes) → accessories
+    const clothingKeywords = ['sweater', 'hoodie', 'polo', 'tank top', 'tanktop', 'sweatshirt', 'pj ', 'pajama', 'robe'];
+    const allSupplies = await db.select().from(supplies).where(eq(supplies.isActive, true));
+    
+    for (const supply of allSupplies) {
+      const nameLower = supply.name.toLowerCase();
+      const isClothing = clothingKeywords.some(kw => nameLower.includes(kw));
+      
+      if (isClothing && supply.category !== 'accessories') {
+        await db.update(supplies).set({ category: 'accessories' }).where(eq(supplies.id, supply.id));
+        stats.clothingToAccessories++;
+      }
+    }
+    console.log(`Clothing to accessories: ${stats.clothingToAccessories}`);
+
+    // 2. Fix 'cat toy' category → 'toys'
+    const catToyResult = await db.update(supplies)
+      .set({ category: 'toys' })
+      .where(eq(supplies.category, 'cat toy'))
+      .returning();
+    stats.catToyToToys = catToyResult.length;
+    console.log(`Cat toy to toys: ${stats.catToyToToys}`);
+
+    // 3. Merge 'kennel' → 'dogCages'
+    const kennelResult = await db.update(supplies)
+      .set({ category: 'dogCages' })
+      .where(eq(supplies.category, 'kennel'))
+      .returning();
+    stats.kennelToDogCages = kennelResult.length;
+    console.log(`Kennel to dogCages: ${stats.kennelToDogCages}`);
+
+    // 4. Merge 'smallAnimalSupplies' → 'smallanimal'
+    const smallAnimalResult = await db.update(supplies)
+      .set({ category: 'smallanimal' })
+      .where(eq(supplies.category, 'smallAnimalSupplies'))
+      .returning();
+    stats.smallAnimalSuppliesToSmallAnimal = smallAnimalResult.length;
+    console.log(`SmallAnimalSupplies to smallanimal: ${stats.smallAnimalSuppliesToSmallAnimal}`);
+
+    // 5. Split 'food' category into 'dogFood' and 'catFood'
+    const foodItems = await db.select().from(supplies).where(eq(supplies.category, 'food'));
+    for (const item of foodItems) {
+      const nameLower = item.name.toLowerCase();
+      // Check for cat keywords
+      const isCatFood = nameLower.includes(' cat ') || nameLower.includes(' cat') || 
+                        nameLower.includes('cat ') || nameLower.includes('kitten') || 
+                        nameLower.includes('feline');
+      
+      if (isCatFood) {
+        await db.update(supplies).set({ category: 'catFood' }).where(eq(supplies.id, item.id));
+        stats.foodSplitToCatFood++;
+      } else {
+        await db.update(supplies).set({ category: 'dogFood' }).where(eq(supplies.id, item.id));
+        stats.foodSplitToDogFood++;
+      }
+    }
+    console.log(`Food split - dogFood: ${stats.foodSplitToDogFood}, catFood: ${stats.foodSplitToCatFood}`);
+
+    // 6. Fix beefhide chews in reptiles → dogTreats
+    const beefhideResult = await db.update(supplies)
+      .set({ category: 'dogTreats', filterType: null })
+      .where(
+        and(
+          eq(supplies.category, 'reptiles'),
+          sql`LOWER(${supplies.name}) LIKE '%beefhide%'`
+        )
+      )
+      .returning();
+    stats.beefhideFixed = beefhideResult.length;
+    console.log(`Beefhide fixed: ${stats.beefhideFixed}`);
+
+    // 7. Sync filter_type with category
+    // category='reptiles' should have filter_type='reptile'
+    const reptileSyncResult = await db.update(supplies)
+      .set({ filterType: 'reptile' })
+      .where(
+        and(
+          eq(supplies.category, 'reptiles'),
+          sql`(${supplies.filterType} IS NULL OR ${supplies.filterType} != 'reptile')`
+        )
+      )
+      .returning();
+    stats.filterTypeSynced += reptileSyncResult.length;
+
+    // category='aquatics' should have filter_type='aquatic'
+    const aquaticSyncResult = await db.update(supplies)
+      .set({ filterType: 'aquatic' })
+      .where(
+        and(
+          eq(supplies.category, 'aquatics'),
+          sql`(${supplies.filterType} IS NULL OR ${supplies.filterType} != 'aquatic')`
+        )
+      )
+      .returning();
+    stats.filterTypeSynced += aquaticSyncResult.length;
+
+    // category='smallanimal' should have filter_type='smallanimal'
+    const smallAnimalSyncResult = await db.update(supplies)
+      .set({ filterType: 'smallanimal' })
+      .where(
+        and(
+          eq(supplies.category, 'smallanimal'),
+          sql`(${supplies.filterType} IS NULL OR ${supplies.filterType} != 'smallanimal')`
+        )
+      )
+      .returning();
+    stats.filterTypeSynced += smallAnimalSyncResult.length;
+
+    console.log(`Filter type synced: ${stats.filterTypeSynced}`);
+
+    stats.total = stats.clothingToAccessories + stats.collarsToCollarsLeashes + 
+                  stats.foodSplitToDogFood + stats.foodSplitToCatFood + 
+                  stats.kennelToDogCages + stats.smallAnimalSuppliesToSmallAnimal + 
+                  stats.catToyToToys + stats.filterTypeSynced + stats.beefhideFixed;
+
+    console.log(`Category cleanup complete. Total fixes: ${stats.total}`);
     return stats;
   }
 
