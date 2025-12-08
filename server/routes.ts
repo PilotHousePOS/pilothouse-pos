@@ -4132,16 +4132,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
             continue;
           }
 
-          // Normalize category
+          // Preserve Excel category as-is, only normalize known variants
+          // The Excel file is the authoritative source for categories
           let normalizedCategory = category;
-          if (category.includes('food')) normalizedCategory = 'food';
-          else if (category.includes('toy')) normalizedCategory = 'toys';
-          else if (category.includes('bed')) normalizedCategory = 'beds';
-          else if (category.includes('treat')) normalizedCategory = 'treats';
-          else if (category.includes('health') || category.includes('medicine')) normalizedCategory = 'health';
-          else if (category.includes('collar') || category.includes('leash')) normalizedCategory = 'accessories';
-          else if (category.includes('crate') || category.includes('carrier')) normalizedCategory = 'accessories';
-          else normalizedCategory = 'accessories';
+          
+          // Normalize known category name variants
+          const categoryMap: Record<string, string> = {
+            'cat toy': 'toys',
+            'dog toy': 'toys',
+            'kennel': 'dogCages',
+            'smallanimalsupplies': 'smallanimal',
+            'health': 'healthcare',
+            'treats': 'dogTreats',
+            'doghouse': 'dogCages',
+          };
+          
+          // Check if category needs normalization
+          const lowerCategory = category.toLowerCase();
+          if (categoryMap[lowerCategory]) {
+            normalizedCategory = categoryMap[lowerCategory];
+          } else {
+            // Keep the Excel category as-is (leashes, aquatics, reptiles, etc.)
+            normalizedCategory = category;
+          }
 
           // Generate image URL (placeholder)
           const imageUrl = '/placeholder-supply.jpg';
@@ -5316,6 +5329,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error in process-all:', error);
       res.status(500).json({ message: "Failed to complete processing" });
+    }
+  });
+
+  // Sync categories from Excel file (Admin only)
+  // Uses the Excel file as the authoritative source for product categories
+  app.post("/api/admin/supplies/sync-categories-from-excel", authMiddleware, excelUpload.single('file'), async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      console.log("Syncing categories from Excel file...");
+
+      // Parse Excel file
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(req.file.buffer);
+      const worksheet = workbook.worksheets[0];
+
+      // Build map of product name -> category from Excel
+      const excelCategories = new Map<string, string>();
+      worksheet.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return; // Skip header
+
+        const name = row.getCell(2).value?.toString().trim().toLowerCase();
+        const category = row.getCell(4).value?.toString().trim();
+
+        if (name && category && !category.startsWith('$')) {
+          excelCategories.set(name, category);
+        }
+      });
+
+      console.log(`Found ${excelCategories.size} products in Excel file`);
+
+      // Get all supplies and update categories
+      const allSupplies = await storage.getAllSupplies();
+      let updated = 0;
+      let unchanged = 0;
+      let notFound = 0;
+
+      for (const supply of allSupplies) {
+        const nameLower = supply.name.toLowerCase().trim();
+        const excelCategory = excelCategories.get(nameLower);
+
+        if (excelCategory) {
+          // Normalize category names
+          let normalizedCategory = excelCategory;
+          const categoryNormalization: Record<string, string> = {
+            'cat toy': 'toys',
+            'dog toy': 'toys',
+            'kennel': 'dogCages',
+            'smallanimalsupplies': 'smallanimal',
+            'health': 'healthcare',
+            'doghouse': 'dogCages',
+          };
+          if (categoryNormalization[excelCategory.toLowerCase()]) {
+            normalizedCategory = categoryNormalization[excelCategory.toLowerCase()];
+          }
+
+          if (supply.category !== normalizedCategory) {
+            await storage.updateSupply(supply.id, { category: normalizedCategory });
+            updated++;
+          } else {
+            unchanged++;
+          }
+        } else {
+          notFound++;
+        }
+      }
+
+      console.log(`Category sync complete: ${updated} updated, ${unchanged} unchanged, ${notFound} not in Excel`);
+
+      res.json({
+        message: "Category sync completed",
+        stats: {
+          excelProducts: excelCategories.size,
+          updated,
+          unchanged,
+          notFound
+        }
+      });
+    } catch (error) {
+      console.error('Error syncing categories from Excel:', error);
+      res.status(500).json({ message: "Failed to sync categories from Excel" });
     }
   });
 

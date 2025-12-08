@@ -29,6 +29,7 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Toy brands hard-excluded from both categories via brand AND keyword exclusions.
   - Aquatic Subcategorization (server/aquaticCategoryEvidence.ts): Evidence-based system with verified product terminology from official product lines. Priority system: Decoration exclusion → Brand-based categorization → Keyword scoring → Default to accessories.
   - Cat/dog food exclusion: Products containing cat/dog keywords excluded from aquatic filterType.
+  - Shampoo categorization: Medicated/therapeutic shampoos (Zymox, Adams, Advantage, flea/tick) go to healthcare; grooming shampoos (Furminator, Freshnclean, carpet shampoo) go to accessories per Excel file.
 
 ## System Architecture
 The application is a full-stack web application featuring a React frontend (Vite, TypeScript, Tailwind CSS, shadcn/ui) and an Express.js backend (TypeScript) connected to a PostgreSQL database via Drizzle ORM.

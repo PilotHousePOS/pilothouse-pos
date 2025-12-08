@@ -337,8 +337,11 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       // Flea & tick
       'flea collar', 'tick collar', 'flea treatment', 'tick treatment',
       'flea spray', 'tick spray', 'preventive',
-      // Grooming & hygiene
-      'shampoo', 'conditioner', 'ear therapy', 'ear cleaner', 'ear wipes',
+      // Grooming & hygiene - medicated/therapeutic products
+      'medicated shampoo', 'flea shampoo', 'tick shampoo', 'antiseptic shampoo',
+      'antifungal shampoo', 'antibacterial shampoo', 'itch shampoo', 'allergy shampoo',
+      'zymox shampoo', 'adams shampoo', 'advantage shampoo', 'precor shampoo',
+      'conditioner', 'ear therapy', 'ear cleaner', 'ear wipes',
       'dental wipes', 'ear therapy wipes', 'deepcleansing',
       'grooming brush', 'slicker brush', 'deshedding tool', 'nail clipper',
       // Medical supplies
@@ -371,6 +374,10 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'tanktop', 'tank top', 'sweater', 'coat', 'jacket', 'raincoat', 'hoodie',
       'costume', 'dress', 'tutu', 'shirt', 't-shirt', 'tee', 'vest',
       'pajamas', 'pjs', 'bathrobe', 'robe',
+      // Grooming shampoos (non-medicated) - per Excel file
+      'deshedding shampoo', 'scented shampoo', 'carpet shampoo', 'freshening shampoo',
+      'oatmeal shampoo', 'whitening shampoo', 'brightening shampoo',
+      'furminator shampoo', 'freshnclean shampoo',
       // Decorative items
       'bell', 'bells', 'charm', 'tag charm', 'id tag', 'decorative tag',
       'sticker', 'stickers', 'decal', 'decals', 'patch', 'patches',
@@ -392,7 +399,8 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
     exclusionKeywords: [
       'food', 'kibble', 'treat', 'meal', 'toy', 'ball', 'chew',
       'aquarium', 'cage', 'crate', 'carrier',
-      'shampoo', 'brush', 'clipper', 'bed',
+      // Note: 'shampoo' removed - some grooming shampoos belong in accessories per Excel
+      'brush', 'clipper', 'bed',
     ],
   },
 
