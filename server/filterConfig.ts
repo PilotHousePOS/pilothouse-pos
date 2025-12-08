@@ -34,7 +34,9 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
       // Dog toy brands - Rascals makes latex dog toys (frog, fish, etc.) NOT reptile products
       'Rascals', 'Multipet', 'Benebone', 'Spot', 'SPOT', 'Tuffy', 'Ethical Pet',
       // Bird supply brands - should go to birdSupplies, not reptiles
-      'Birdlife', 'Birdlif', 'A & E', 'A&E'
+      'Birdlife', 'Birdlif', 'A & E', 'A&E',
+      // Dog/cat accessory brands (make harnesses, collars, leashes with animal print patterns)
+      'Coastal', 'Li\'l Pals', 'Comfort Soft'
     ],
     excludeKeywords: [
       'fish', 'aquarium', 'aquatic', 'glo fish', 'betta', 'pleco', 'plecostomus',
@@ -49,7 +51,11 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
       // Cat products - should go to accessories/toys, not reptiles
       'catit', 'cat fountain', 'cat filter', 'fountain filter',
       // Small animal products - should go to smallanimal, not reptiles
-      'bathing sand', 'chinchilla', 'hamster', 'guinea pig'
+      'bathing sand', 'chinchilla', 'hamster', 'guinea pig',
+      // Pattern names that contain reptile words but are NOT reptile products
+      'snake print', 'lizard print', 'turtle print', 'frog print',
+      // Aquarium thermometers/tools - "aqua" in product name indicates aquatic
+      'aqua thermometer', 'aqualog', 'aqua log'
     ]
   },
   aquatic: {
@@ -70,7 +76,9 @@ export const SUPPLY_FILTERS: Record<FilterType, FilterConfig> = {
       'tropical fish', 'freshwater', 'saltwater', 'reef', 'marine', 'koi',
       'cichlid', 'tetra', 'guppy', 'molly', 'platy', 'pleco', 'plecostomus',
       'swordtail', 'angelfish', 'barb', 'danio', 'rasbora', 'loach', 'catfish',
-      'corydoras', 'cory', 'shrimp', 'snail', 'hermit crab'
+      'corydoras', 'cory', 'shrimp', 'snail', 'hermit crab',
+      // Zoo Med aquatic products (aqualog, aqua thermometer, etc.)
+      'aqualog', 'aqua thermometer', 'aqua log'
     ],
     // Exclude reptile brands (including Tetrafauna which is Tetra's reptile line)
     // Exclude toy brands that make sea-themed toys (Kong, Spot, Rascals, etc.)
