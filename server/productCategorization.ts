@@ -862,6 +862,7 @@ export function standardizeBrandName(brand: string): string {
     'MidWest Homes for Pets': 'MidWest Homes For Pets',
     'Midwest': 'MidWest Homes For Pets',
     'Precision Pet': 'PetCrest',
+    'Petcrest': 'PetCrest',
   };
   
   return brandMappings[brand] || brand;
