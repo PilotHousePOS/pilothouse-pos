@@ -351,12 +351,27 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'flea collar', 'tick collar', 'flea treatment', 'tick treatment',
       'flea spray', 'tick spray', 'preventive',
       // ALL GROOMING PRODUCTS - shampoos, brushes, combs go to healthcare
-      'shampoo', 'conditioner', 'deshedding', 'deshed', 'dematting', 'dematter',
-      'brush', 'slicker', 'bristle brush', 'pin brush', 'combo brush',
-      'comb', 'flea comb', 'shedding comb', 'grooming comb',
-      'rake', 'shedding rake', 'undercoat rake',
+      // Note: "shampoo" is specific enough - always grooming
+      'shampoo',
+      // Grooming conditioners ONLY (NOT water conditioner for aquariums)
+      'coat conditioner', 'fur conditioner', 'deshedding conditioner', 'pet conditioner',
+      'dog conditioner', 'cat conditioner', 'leave-in conditioner', 'detangling conditioner',
+      // Deshedding/dematting tools
+      'deshedding', 'deshed', 'dematting', 'dematter',
+      // Dog/cat brushes ONLY (NOT aquarium algae brushes)
+      'dog brush', 'cat brush', 'pet brush', 'grooming brush',
+      'slicker brush', 'slicker', 'bristle brush', 'pin brush', 'combo brush',
+      'curry brush', 'massage brush', 'self cleaning brush',
+      // Dog/cat combs ONLY
+      'dog comb', 'cat comb', 'pet comb', 'grooming comb',
+      'flea comb', 'shedding comb', 'dematting comb', 'double sided comb',
+      // Rakes (grooming tools)
+      'shedding rake', 'undercoat rake', 'grooming rake',
+      // Nail care
       'nail clipper', 'nail trimmer', 'nail file', 'grinding tips',
-      'grooming', 'grooming tool', 'grooming kit',
+      // General grooming
+      'grooming tool', 'grooming kit',
+      // Brand-specific grooming (these brands make grooming products for dogs/cats)
       'furminator', 'safari', 'petcrest',
       // Ear care
       'ear therapy', 'ear cleaner', 'ear wipes', 'ear solution',
@@ -372,6 +387,12 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
     ],
     exclusionKeywords: [
       'toy', 'ball', 'bed', 'crate', 'carrier', 'bowl', 'feeder',
+      // CRITICAL: Exclude aquarium water conditioners - these are NOT grooming products
+      'water conditioner', 'tap water', 'betta conditioner', 'stress coat',
+      'aquasafe', 'turtle water', 'crab water', 'salt water conditioner',
+      'axolotl conditioner', 'fish conditioner',
+      // Exclude aquarium brushes
+      'algae brush', 'algae scraper', 'tank brush', 'aquarium brush',
     ],
   },
 
@@ -413,9 +434,12 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
     exclusionKeywords: [
       'food', 'kibble', 'treat', 'meal', 'toy', 'ball', 'chew',
       'aquarium', 'cage', 'crate', 'carrier', 'bed',
-      // ALL grooming products go to healthcare, not accessories
-      'shampoo', 'conditioner', 'brush', 'comb', 'clipper', 'rake',
-      'slicker', 'deshed', 'dematt', 'furminator', 'grooming',
+      // Dog/cat grooming products go to healthcare, not accessories
+      // Note: be specific - "brush" alone would catch paint brushes, cleaning brushes etc.
+      'shampoo', 'slicker brush', 'bristle brush', 'pin brush', 'combo brush',
+      'flea comb', 'shedding comb', 'grooming comb', 'nail clipper',
+      'deshed', 'dematt', 'furminator', 'grooming tool', 'grooming kit',
+      'coat conditioner', 'fur conditioner', 'deshedding conditioner',
     ],
   },
 
