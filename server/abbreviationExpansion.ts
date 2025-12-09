@@ -36,6 +36,24 @@ const GALLON_AQUARIUM_BRANDS = [
  * Value: full expansion
  */
 const ABBREVIATION_MAPPINGS: Record<string, string> = {
+  // === BRAND PREFIX ABBREVIATIONS (at start of name) ===
+  // These are expanded when they appear at the start of a product name
+  // Verified against brand database December 2025
+  'Vict': 'VICTOR',
+  'Euk': 'Eukanuba',
+  'Jw': 'JW Pet',
+  'Spt': 'Spot',
+  'Mamm': 'Mammoth',
+  'Zig': 'Zignature',
+  'Cand': 'Canidae',
+  'Zila': 'Zilla',
+  'Vari': 'Vari-Kennel',
+  'Kfc': 'KFC',
+  'Ae': 'A&E',
+  'Lsu': 'LSU',
+  'Nola': 'New Orleans Saints',
+  'Knf': 'Kong',
+  
   // Size abbreviations
   'Lg': 'Large',
   // NOTE: 'Med' removed - handled separately with negative lookbehind to protect "Zoo Med"
@@ -96,6 +114,28 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Thermoneter': 'Thermometer',
   'Greeniues': 'Greenies',
   'Wishbne': 'Wishbone',
+  'Puppt': 'Puppy',
+  'Seniior': 'Senior',
+  
+  // Compound word spacing fixes
+  'Naturesmiracle': "Nature's Miracle",
+  'Milkbne': 'Milk-Bone',
+  'Milkbone': 'Milk-Bone',
+  'Prettypets': 'Pretty Pets',
+  'Jollypet': 'Jolly Pets',
+  'Sweetharvest': 'Sweet Harvest',
+  'Worldsbestcatlitter': "World's Best Cat Litter",
+  'AssortedMedium': 'Assorted Medium',
+  
+  // Mammoth toy internal abbreviations
+  'Xtr': 'Extra',
+  'Clth': 'Cloth',
+  'Tb': 'TireBiter',
+  'Tpr': 'TPR',
+  'Xfresh': 'Extra Fresh',
+  '3knt': '3 Knot',
+  'Tirebite': 'TireBiter',
+  'Tirebitii': 'TireBiter II',
   
   // Kaytee/Oxbow small animal products (verified from official websites)
   'Rainbw': 'Rainbow',
@@ -876,6 +916,18 @@ export async function expandAbbreviationsAsync(
   
   // Fix "Pethonesty" → "Pet Honesty" (brand name spacing)
   preProcessed = preProcessed.replace(/\bPethonesty\b/gi, 'Pet Honesty');
+  
+  // Fix spacing for titles with periods (Dr., St., Mr.)
+  preProcessed = preProcessed.replace(/\bDr\.elseys\b/gi, "Dr. Elsey's");
+  preProcessed = preProcessed.replace(/\bSt\.roccos\b/gi, "St. Rocco's");
+  preProcessed = preProcessed.replace(/\bMr\.bill\b/gi, 'Mr. Bill');
+  preProcessed = preProcessed.replace(/\bDr\.noyz\b/gi, 'Dr. Noyz');
+  
+  // Fix Valu-Pak formatting
+  preProcessed = preProcessed.replace(/\bValu Pak\b/gi, 'Valu-Pak');
+  
+  // Fix Li'l Pals
+  preProcessed = preProcessed.replace(/\bLil Pals\b/gi, "Li'l Pals");
   
   // Fix common typos
   preProcessed = preProcessed.replace(/\bWoodn\b/gi, 'Wooden');

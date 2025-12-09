@@ -188,6 +188,7 @@ export interface IStorage {
     catToyToToys: number;
     filterTypeSynced: number;
     beefhideFixed: number;
+    groomingToHealthcare: number;
     total: number;
   }>;
 
@@ -1504,6 +1505,7 @@ export class DatabaseStorage implements IStorage {
       catToyToToys: 0,
       filterTypeSynced: 0,
       beefhideFixed: 0,
+      groomingToHealthcare: 0,
       total: 0,
     };
 
@@ -1619,10 +1621,41 @@ export class DatabaseStorage implements IStorage {
 
     console.log(`Filter type synced: ${stats.filterTypeSynced}`);
 
+    // 8. Move grooming products (shampoos, conditioners, sprays, etc.) to healthcare
+    // Grooming brands: TropiClean, Skout's Honor, Four Paws (Magic Coat), Nature's Miracle grooming,
+    // Earthbath, PetAg (Fresh'n'Clean), Wee-Away, Bio Groom, Beautifur, Ethical Pet colognes
+    console.log("Moving grooming products to healthcare...");
+    
+    // Grooming keyword patterns
+    const groomingKeywords = [
+      'shampoo', 'shamp', 'conditioner', 'cologne', 'deodor', 'spritz',
+      'itch relief', 'hot spot', 'skunk', 'oxymed', 'lavish', 'whitening',
+      'coat spray', 'freshing spray', 'hypoallergenic', 'oatmeal', 'tearless',
+      '2in1', 'shed control', 'tangle', 'waterless', 'grooming wipes', 'paw spray'
+    ];
+    
+    // Get all supplies in accessories category that match grooming patterns
+    const accessoriesSupplies = await db.select().from(supplies)
+      .where(eq(supplies.category, 'accessories'));
+    
+    for (const supply of accessoriesSupplies) {
+      const nameLower = supply.name.toLowerCase();
+      const isGrooming = groomingKeywords.some(kw => nameLower.includes(kw));
+      
+      if (isGrooming) {
+        await db.update(supplies)
+          .set({ category: 'healthcare' })
+          .where(eq(supplies.id, supply.id));
+        stats.groomingToHealthcare++;
+      }
+    }
+    console.log(`Grooming products moved to healthcare: ${stats.groomingToHealthcare}`);
+
     stats.total = stats.clothingToAccessories + stats.collarsToCollarsLeashes + 
                   stats.foodSplitToDogFood + stats.foodSplitToCatFood + 
                   stats.kennelToDogCages + stats.smallAnimalSuppliesToSmallAnimal + 
-                  stats.catToyToToys + stats.filterTypeSynced + stats.beefhideFixed;
+                  stats.catToyToToys + stats.filterTypeSynced + stats.beefhideFixed +
+                  stats.groomingToHealthcare;
 
     console.log(`Category cleanup complete. Total fixes: ${stats.total}`);
     return stats;
