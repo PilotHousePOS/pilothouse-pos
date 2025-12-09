@@ -765,6 +765,44 @@ export function standardizeProductName(name: string): string {
     'desert.': 'desert',
     'Galap.': 'Galapagos',
     'galap.': 'galapagos',
+    'Sub.': 'Substrate',
+    'sub.': 'substrate',
+    'Ass.': 'Assorted',
+    'ass.': 'assorted',
+    'Assort.': 'Assorted',
+    'assort.': 'assorted',
+    'Comfrt.': 'Comfort',
+    'comfrt.': 'comfort',
+    'Adv.': 'Advanced',
+    'adv.': 'advanced',
+    'Rept.': 'Reptile',
+    'rept.': 'reptile',
+    'Sys.': 'System',
+    'sys.': 'system',
+    'Repto.': 'Reptology',
+    'repto.': 'reptology',
+    'Cartridge.': 'Cartridge',
+    'cartridge.': 'cartridge',
+    '16ct.': '16 Count',
+    'Spec.': 'Special',
+    'spec.': 'special',
+    'Unsc.': 'Unscented',
+    'unsc.': 'unscented',
+    'Vegetable.': 'Vegetable',
+    'vegetable.': 'vegetable',
+    'Original.': 'Original',
+    'original.': 'original',
+    'Replacement.': 'Replacement',
+    'replacement.': 'replacement',
+    'Regular.': 'Regular',
+    'regular.': 'regular',
+    'Orange.': 'Orange',
+    'orange.': 'orange',
+    'Com Fl.': 'Compact Fluorescent',
+    'Com. Fl.': 'Compact Fluorescent',
+    'Envi.': 'Environment',
+    'envi.': 'environment',
+    '16 Oz.': '16oz',
   };
   
   for (const [abbrev, expanded] of Object.entries(abbreviations)) {
@@ -777,7 +815,23 @@ export function standardizeProductName(name: string): string {
     'xlrg': 'xlarge',
     'Blck': 'Black',
     'blck': 'black',
+    'Gloplnt': 'GloPlant',
+    'gloplnt': 'gloplant',
+    'Frzn': 'Frozen',
+    'frzn': 'frozen',
+    'Rcky Moun': 'Rocky Mountain',
+    'rcky moun': 'rocky mountain',
+    'Vitaless': 'Vital Essentials',
+    'vitaless': 'vital essentials',
   };
+  
+  // Expand prefix abbreviations (at start of name)
+  if (result.startsWith('Mw ')) {
+    result = 'MidWest ' + result.substring(3);
+  }
+  if (result.startsWith('Pc ')) {
+    result = 'PetCrest ' + result.substring(3);
+  }
   
   for (const [abbrev, expanded] of Object.entries(noPeriodsAbbreviations)) {
     result = result.replace(new RegExp(`\\b${abbrev}\\b`, 'g'), expanded);
@@ -807,6 +861,7 @@ export function standardizeBrandName(brand: string): string {
     'JollyPet': 'Jolly Pets',
     'MidWest Homes for Pets': 'MidWest Homes For Pets',
     'Midwest': 'MidWest Homes For Pets',
+    'Precision Pet': 'PetCrest',
   };
   
   return brandMappings[brand] || brand;

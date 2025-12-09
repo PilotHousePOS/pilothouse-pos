@@ -152,6 +152,9 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
     exclusionKeywords: [
       'food', 'treat', 'kibble', 'meal', 'dinner', 'nutrition', 'gravy', 'stew',
       'shampoo', 'wipes', 'collar', 'leash', 'harness', 'bed', 'crate',
+      // Edible chews are treats, not toys
+      'edible', 'rawhide', 'beefhide', 'knotted bone', 'bully stick',
+      'easy treat', 'treat spinner', 'treatster', 'chewy bites',
       // CRITICAL: Exclude ALL aquarium-related terms to prevent fish products from appearing in toys
       // Note: Don't exclude "fish" alone (catches "fishbone" toys) - use specific fish names instead
       'aquarium', 'fish tank', 'betta', 'glo fish', 'goldfish', 'tropical fish',
@@ -179,6 +182,8 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'Smartbones', 'DreamBone', 'Good\'n\'Fun', 'Himalayan', 'Himalayan Dog Chew',
       // Training treat brands
       'Stewart', 'Bil-Jac', 'Crazy Dog', 'Blue Buffalo Wilderness Trail Treats',
+      // Rawhide/chew treat brands - NOT toys
+      'Cadet', 'IMS Trading', 'Redbarn', 'Nature Gnaws', 'Bones & Chews',
     ],
     nameKeywords: [
       // Explicit treat terms
@@ -187,10 +192,15 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       // Dental treats
       'dental treat', 'dental chew', 'dentastix', 'greenies', 'breath treat',
       'teeth cleaning', 'tartar control', 'dental stick', 'toothbrush treat',
-      // Chew treats (not toys)
+      // Chew treats (not toys) - Cadet knotted bones are edible treats
       'bully stick', 'rawhide', 'collagen stick', 'pizzle stick', 'beef stick',
       'pig ear', 'cow ear', 'lamb ear', 'jerky stick', 'trachea',
       'tendon', 'gullet', 'tripe', 'esophagus', 'beef cheek',
+      'knotted bone', 'beefhide', 'cadet bone', 'cadet knotted',
+      // Nylabone edibles - these are treats, not toys
+      'healthy edible', 'edible chew', 'edible treat', 'chewy bites',
+      // Kong treat dispensing products - these are treat fillings/dispensers
+      'easy treat', 'treat spinner', 'treatster',
       // Soft treats
       'soft chew', 'soft treat', 'training bite', 'mini treat', 'tiny treat',
       'chewy treat', 'moist treat', 'semi-moist', 'tender bite',
@@ -329,6 +339,9 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'FURminator', 'Safari', 'Oster', 'Wahl', 'Andis', 'TropiClean', 'Earthbath',
       'Burt\'s Bees', 'Veterinary Formula', 'Douxo', 'Malaseb', 'Zymox',
       'Topiclean', 'Adams', 'PetOdor',
+      // Grooming tool brands - ALL grooming products go to healthcare
+      'Petcrest', 'Four Paws', 'Magic Coat', 'Hagen', 'Le Salon', 'Durvet',
+      'Happy Jack', 'PetAg', 'Freshnclean', "Li'l Pals",
     ],
     nameKeywords: [
       // Supplements & medications
@@ -337,13 +350,18 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       // Flea & tick
       'flea collar', 'tick collar', 'flea treatment', 'tick treatment',
       'flea spray', 'tick spray', 'preventive',
-      // Grooming & hygiene - medicated/therapeutic products
-      'medicated shampoo', 'flea shampoo', 'tick shampoo', 'antiseptic shampoo',
-      'antifungal shampoo', 'antibacterial shampoo', 'itch shampoo', 'allergy shampoo',
-      'zymox shampoo', 'adams shampoo', 'advantage shampoo', 'precor shampoo',
-      'conditioner', 'ear therapy', 'ear cleaner', 'ear wipes',
-      'dental wipes', 'ear therapy wipes', 'deepcleansing',
-      'grooming brush', 'slicker brush', 'deshedding tool', 'nail clipper',
+      // ALL GROOMING PRODUCTS - shampoos, brushes, combs go to healthcare
+      'shampoo', 'conditioner', 'deshedding', 'deshed', 'dematting', 'dematter',
+      'brush', 'slicker', 'bristle brush', 'pin brush', 'combo brush',
+      'comb', 'flea comb', 'shedding comb', 'grooming comb',
+      'rake', 'shedding rake', 'undercoat rake',
+      'nail clipper', 'nail trimmer', 'nail file', 'grinding tips',
+      'grooming', 'grooming tool', 'grooming kit',
+      'furminator', 'safari', 'petcrest',
+      // Ear care
+      'ear therapy', 'ear cleaner', 'ear wipes', 'ear solution',
+      // Dental care
+      'dental wipes', 'toothbrush', 'toothpaste', 'dental kit',
       // Medical supplies
       'wound care', 'first aid', 'antiseptic', 'ointment', 'bandage',
       // Odor control (not litter)
@@ -374,10 +392,6 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
       'tanktop', 'tank top', 'sweater', 'coat', 'jacket', 'raincoat', 'hoodie',
       'costume', 'dress', 'tutu', 'shirt', 't-shirt', 'tee', 'vest',
       'pajamas', 'pjs', 'bathrobe', 'robe',
-      // Grooming shampoos (non-medicated) - per Excel file
-      'deshedding shampoo', 'scented shampoo', 'carpet shampoo', 'freshening shampoo',
-      'oatmeal shampoo', 'whitening shampoo', 'brightening shampoo',
-      'furminator shampoo', 'freshnclean shampoo',
       // Decorative items
       'bell', 'bells', 'charm', 'tag charm', 'id tag', 'decorative tag',
       'sticker', 'stickers', 'decal', 'decals', 'patch', 'patches',
@@ -398,9 +412,10 @@ export const CATEGORY_MAPPINGS: Record<string, CategoryMapping> = {
     ],
     exclusionKeywords: [
       'food', 'kibble', 'treat', 'meal', 'toy', 'ball', 'chew',
-      'aquarium', 'cage', 'crate', 'carrier',
-      // Note: 'shampoo' removed - some grooming shampoos belong in accessories per Excel
-      'brush', 'clipper', 'bed',
+      'aquarium', 'cage', 'crate', 'carrier', 'bed',
+      // ALL grooming products go to healthcare, not accessories
+      'shampoo', 'conditioner', 'brush', 'comb', 'clipper', 'rake',
+      'slicker', 'deshed', 'dematt', 'furminator', 'grooming',
     ],
   },
 
