@@ -10074,308 +10074,11 @@ export default function Admin() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Type className="w-5 h-5" />
-                Expand Abbreviations
-              </CardTitle>
-              <CardDescription>
-                Smart expansion of abbreviations in product names (Ph → Prevue Hendrix or pH, Phos → Phosphate, Lg → Large, etc.)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-semibold text-green-800 dark:text-green-300 mb-2">Context-Aware Expansion</p>
-                    <div className="space-y-2">
-                      <div>
-                        <p className="font-medium text-green-700 dark:text-green-400">Water Chemistry (keeps pH):</p>
-                        <ul className="list-disc list-inside space-y-1 text-green-600 dark:text-green-500 ml-2">
-                          <li>"Api Ph Test Kit" → "Api pH Test Kit"</li>
-                          <li>"Api Ph Down" → "Api pH Down"</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <p className="font-medium text-green-700 dark:text-green-400">Brand Name (expands):</p>
-                        <ul className="list-disc list-inside space-y-1 text-green-600 dark:text-green-500 ml-2">
-                          <li>"Ph Cozy Corner Lg" → "Prevue Hendrix Cozy Corner Large"</li>
-                          <li>"Aqueon Phos Remove" → "Aqueon Phosphate Remove"</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <p className="font-medium text-green-700 dark:text-green-400">Food & Flavors:</p>
-                        <ul className="list-disc list-inside space-y-1 text-green-600 dark:text-green-500 ml-2">
-                          <li>"Red B Chicken Food" → "RedBarn Chicken Food"</li>
-                          <li>"White Gr Formula" → "With Grain Formula"</li>
-                          <li>"Blubrede Treats" → "Blueberry Treats"</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <p className="font-medium text-green-700 dark:text-green-400">Size & Other:</p>
-                        <ul className="list-disc list-inside space-y-1 text-green-600 dark:text-green-500 ml-2">
-                          <li>Sizes: Lg/Med/Sm/Xs → Large/Medium/Small/Extra Small</li>
-                          <li>Colors: Bk → Black, Dk → Dark, Lt → Light</li>
-                          <li>Quality: Hvy Dty → Heavy Duty</li>
-                          <li>Animals: Eleph → Elephant</li>
-                          <li>Misc: Cmfrt → Comfort, Asst → Assorted, Kng → Kong</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <Button
-                onClick={async () => {
-                  if (!confirm('Expand abbreviations in all product names and descriptions? This will update products with smart context detection (Ph → Prevue Hendrix or pH based on context).')) {
-                    return;
-                  }
-                  setIsCategorizing(true);
-                  try {
-                    const res = await apiRequest('POST', '/api/admin/supplies/expand-abbreviations');
-                    const data = await res.json();
-                    
-                    // Validate response structure
-                    if (!data || !data.stats) {
-                      throw new Error('Invalid response from server');
-                    }
-                    
-                    toast({
-                      title: "Abbreviation Expansion Complete",
-                      description: `Updated ${data.stats.updated || 0} products in ${data.stats.duration || 'N/A'}`,
-                    });
-                    
-                    // Refresh supplies data
-                    queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
-                  } catch (error: any) {
-                    console.error('Abbreviation expansion error:', error);
-                    toast({
-                      title: "Error",
-                      description: error.message || "Failed to expand abbreviations",
-                      variant: "destructive",
-                    });
-                  } finally {
-                    setIsCategorizing(false);
-                  }
-                }}
-                disabled={isCategorizing}
-                className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white"
-                data-testid="button-expand-abbreviations"
-              >
-                {isCategorizing ? (
-                  <>Processing...</>
-                ) : (
-                  <>
-                    <Type className="w-4 h-4 mr-2" />
-                    Expand All Abbreviations
-                  </>
-                )}
-              </Button>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Smart expansion with context detection - water chemistry vs brand names
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5" />
-                Auto-Categorize All Products
-              </CardTitle>
-              <CardDescription>
-                Detects live animals, organizes all products into 11 categories AND specialty sections (Aquatics/Reptiles)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-semibold text-blue-800 dark:text-blue-300 mb-2">Combined Categorization (4 Steps)</p>
-                    <div className="space-y-2">
-                      <div>
-                        <p className="font-medium text-purple-700 dark:text-purple-400">Step 0a: Duplicate Cleanup</p>
-                        <ul className="list-disc list-inside space-y-1 text-purple-600 dark:text-purple-500 ml-2">
-                          <li>Removes pets that have exact name matches with supplies (proven duplicates)</li>
-                          <li>Skips pets with existing orders/appointments (preserves data integrity)</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <p className="font-medium text-green-700 dark:text-green-400">Step 0b: Live Animal Detection</p>
-                        <ul className="list-disc list-inside space-y-1 text-green-600 dark:text-green-500 ml-2">
-                          <li>Scans all supplies for live animals (fish, reptiles, small animals, birds)</li>
-                          <li>Automatically moves detected live animals to Pets inventory</li>
-                          <li>Excludes toy brands (Turbo, Spot, Kong) and materials (felt, fleece, yarn)</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <p className="font-medium text-blue-700 dark:text-blue-400">Step 1: Specialty Sections (filterType)</p>
-                        <ul className="list-disc list-inside space-y-1 text-blue-600 dark:text-blue-500 ml-2">
-                          <li>Aquatics: fish tanks, filters, aquatic brands (Tetra, Fluval, API)</li>
-                          <li>Reptiles: terrariums, heat lamps, reptile brands (ZooMed, Exo Terra)</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <p className="font-medium text-purple-700 dark:text-purple-400">Step 2: Product Categories (11 types)</p>
-                        <ul className="list-disc list-inside space-y-1 text-purple-600 dark:text-purple-500 ml-2">
-                          <li>Food, Toys, Beds, Collars & Leashes, Healthcare, Accessories</li>
-                          <li>Aquatics, Reptiles, Bird Supplies, Dog Cages, Small Animal Supplies</li>
-                          <li>Brand scoring: KONG → Toys, Fluval → Aquatics (25 pts)</li>
-                          <li>Keyword scoring: "aquarium" → Aquatics, "bird cage" → Bird Supplies (15 pts each)</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                onClick={async () => {
-                  try {
-                    toast({
-                      title: "Categorizing all products...",
-                      description: "Detecting live animals and setting specialty sections + 11 product categories. This may take a moment for 7,316 products."
-                    });
-
-                    const response = await fetch('/api/admin/supplies/auto-categorize', {
-                      method: 'POST',
-                      credentials: 'include'
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (!response.ok) {
-                      throw new Error(result.message || 'Categorization failed');
-                    }
-                    
-                    const { stats } = result;
-                    const liveAnimals = stats.liveAnimals || { movedToPets: 0, skippedDueToReferences: 0 };
-                    const filterStats = stats.filterType;
-                    const categoryStats = stats.categories;
-                    const duplicatesRemoved = stats.duplicatesRemoved || 0;
-                    const duplicatesSkipped = stats.duplicatesSkipped || 0;
-                    
-                    let statusMsg = '';
-                    if (duplicatesRemoved > 0 || duplicatesSkipped > 0) {
-                      statusMsg = `🧹 Duplicates: ${duplicatesRemoved} removed`;
-                      if (duplicatesSkipped > 0) {
-                        statusMsg += `, ${duplicatesSkipped} skipped`;
-                      }
-                      statusMsg += ' | ';
-                    }
-                    if (liveAnimals.movedToPets > 0) {
-                      statusMsg += `🐾 Moved ${liveAnimals.movedToPets} live animals to Pets`;
-                      if (liveAnimals.skippedDueToReferences > 0) {
-                        statusMsg += ` (${liveAnimals.skippedDueToReferences} skipped)`;
-                      }
-                      statusMsg += ' | ';
-                    }
-                    
-                    toast({
-                      title: "Categorization complete!",
-                      description: `${statusMsg}Specialty: Aquatic ${filterStats.aquatic} • Reptile ${filterStats.reptile} | Categories: Food ${categoryStats.food} • Toys ${categoryStats.toys} • Aquatics ${categoryStats.aquatics} • Reptiles ${categoryStats.reptiles} (${stats.duration})`
-                    });
-                    
-                    setTimeout(() => window.location.reload(), 1500);
-                  } catch (error) {
-                    console.error('Categorization error:', error);
-                    toast({
-                      title: "Categorization failed",
-                      description: error instanceof Error ? error.message : "Failed to categorize products",
-                      variant: "destructive"
-                    });
-                  }
-                }}
-                className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white"
-                data-testid="button-auto-categorize"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Auto-Categorize All Products
-              </Button>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Processes all {7316} active products in 4 steps: remove duplicates → detect live animals (excludes toys) → specialty sections (Aquatics/Reptiles) → 11 product categories
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Search className="w-5 h-5" />
-                Audit Unknown Abbreviations
-              </CardTitle>
-              <CardDescription>
-                Scan inventory to identify abbreviations that need brand catalog research
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-semibold text-yellow-800 dark:text-yellow-300 mb-2">Identifies Research Opportunities</p>
-                    <ul className="list-disc list-inside space-y-1 text-yellow-700 dark:text-yellow-500">
-                      <li>Scans all supplies for potential unknown abbreviations</li>
-                      <li>Shows which products used brand catalog vs generic fallbacks</li>
-                      <li>Highlights uppercase sequences and short words needing research</li>
-                      <li>Helps you prioritize what to add to Brand Catalog</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                onClick={async () => {
-                  try {
-                    const res = await fetch('/api/admin/supplies/audit-abbreviations', {
-                      method: 'POST',
-                      credentials: 'include',
-                    });
-                    
-                    if (!res.ok) {
-                      if (res.status === 401 || res.status === 403) {
-                        throw new Error('Unauthorized');
-                      }
-                      throw new Error('Failed to audit abbreviations');
-                    }
-                    
-                    const result = await res.json();
-                    const { stats } = result;
-                    
-                    toast({
-                      title: "Abbreviation Audit Complete",
-                      description: `Found ${stats.unknownAbbreviations.length} supplies with suspected abbreviations. Catalog hits: ${stats.catalogHits}/${stats.total}`,
-                    });
-                  } catch (error) {
-                    toast({
-                      title: "Error",
-                      description: error instanceof Error && error.message === 'Unauthorized' 
-                        ? "Authentication required" 
-                        : "Failed to audit abbreviations",
-                      variant: "destructive"
-                    });
-                  }
-                }}
-                className="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white"
-                data-testid="button-audit-abbreviations"
-              >
-                <Search className="w-4 h-4 mr-2" />
-                Audit Unknown Abbreviations
-              </Button>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Quick scan to identify abbreviations that need brand research for the catalog
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
                 <Zap className="w-5 h-5" />
-                Process All (3-in-1)
+                Process All
               </CardTitle>
               <CardDescription>
-                Run all 3 operations in sequence: Expand → Categorize → Audit
+                Complete automation: Expand abbreviations → Auto-categorize → Move grooming to healthcare → Audit
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -10383,10 +10086,12 @@ export default function Admin() {
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-semibold text-purple-800 dark:text-purple-300 mb-2">Automated Processing Pipeline</p>
+                    <p className="font-semibold text-purple-800 dark:text-purple-300 mb-2">Complete Automation Pipeline</p>
                     <ul className="list-disc list-inside space-y-1 text-purple-700 dark:text-purple-500">
-                      <li><strong>Step 1:</strong> Expand abbreviations using brand catalog</li>
-                      <li><strong>Step 2:</strong> Auto-categorize all products (live animals, specialty sections, categories)</li>
+                      <li><strong>Step 1:</strong> Expand abbreviations (Vict→VICTOR, Euk→Eukanuba, Ph→Prevue Hendrix or pH)</li>
+                      <li><strong>Step 2:</strong> Auto-categorize (live animals, specialty sections, 11 product categories)</li>
+                      <li><strong>Step 2a:</strong> Assign brands to products without brands</li>
+                      <li><strong>Step 2b-d:</strong> Cleanup categories, split food, move grooming products to healthcare</li>
                       <li><strong>Step 3:</strong> Audit for unknown abbreviations needing research</li>
                     </ul>
                     <p className="mt-2 text-purple-600 dark:text-purple-400 font-medium">⏱️ Estimated time: 10-20 seconds for 7,000+ products</p>
@@ -10399,7 +10104,7 @@ export default function Admin() {
                   try {
                     toast({
                       title: "Processing Started",
-                      description: "Running all 3 operations... This may take 10-20 seconds",
+                      description: "Running complete automation... This may take 10-20 seconds",
                     });
 
                     const res = await fetch('/api/admin/supplies/process-all', {
@@ -10418,10 +10123,11 @@ export default function Admin() {
                     const { stats, totalDuration } = result;
                     
                     const specialtyCount = (stats.filterType?.aquatic || 0) + (stats.filterType?.reptile || 0);
+                    const groomingMoved = stats.cleanup?.groomingToHealthcare || 0;
                     
                     toast({
                       title: "All Processing Complete",
-                      description: `✓ Expanded ${stats.expand.changed} names (${stats.expand.catalogHits} catalog hits) | ✓ Categorized ${specialtyCount} specialty items | ✓ Found ${stats.audit.unknownCount} unknown abbreviations | Duration: ${totalDuration}`,
+                      description: `✓ Expanded ${stats.expand.changed} names | ✓ ${specialtyCount} specialty items | ✓ ${groomingMoved} grooming→healthcare | ✓ ${stats.audit.unknownCount} unknown abbrevs | ${totalDuration}`,
                     });
 
                     queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
@@ -10440,10 +10146,10 @@ export default function Admin() {
                 data-testid="button-process-all"
               >
                 <Zap className="w-4 h-4 mr-2" />
-                Process All (Expand → Categorize → Audit)
+                Process All
               </Button>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Convenience wrapper - runs all automation in one click. Individual buttons still available if you need to re-run specific steps.
+                One-click automation: abbreviations, categories, brands, grooming, and audit
               </p>
             </CardContent>
           </Card>
