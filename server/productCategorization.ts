@@ -406,6 +406,23 @@ export function detectLiveAnimal(itemName: string): {
     return { isLiveAnimal: false, species: null, detectedKeywords: [] };
   }
   
+  // **EARLY REJECTION: Check for multi-pack patterns** (e.g., "3pk", "12 pack", "variety pack")
+  // These patterns indicate bundled products, not live animals
+  const multiPackPatterns = [
+    /\d+\s*pk\b/i,        // Matches: 3pk, 12pk, 3 pk
+    /\d+\s*pack\b/i,      // Matches: 3pack, 12 pack
+    /\d+\s*ct\b/i,        // Matches: 6ct, 12 ct (count)
+    /\d+\s*count\b/i,     // Matches: 6 count
+    /variety\s*pack/i,    // Matches: variety pack
+    /value\s*pack/i,      // Matches: value pack
+    /combo\s*pack/i,      // Matches: combo pack
+    /starter\s*kit/i,     // Matches: starter kit
+  ];
+  
+  if (multiPackPatterns.some(pattern => pattern.test(normalized))) {
+    return { isLiveAnimal: false, species: null, detectedKeywords: [] };
+  }
+  
   // Tokenize into words, strip possessives
   const words = normalized
     .split(/[\s\-\/]+/)
@@ -448,10 +465,20 @@ export function detectLiveAnimal(itemName: string): {
     'skull', 'gazer', 'squeak', 'dura', 'fused', 'mammoth', 'squeaker',
     'whisp', 'whisper', 'filt', 'cartridge', 'crt', 'crb', 'carbon', 'biobag', 'ex20', 'ex30', 'ex45', 'ex70',
     'pump550', 'pump1000', 'pond', 'whsip',
-    'swimming', 'baby', 'family', '&fam'
+    'swimming', 'baby', 'family', '&fam',
+    // Food flavors and product types - strong supply indicators
+    // Note: 'cherry' is excluded because "Cherry Red Shrimp" and "Cherry Barb" are real fish/shrimp names
+    'tropical', 'blueberry', 'strawberry', 'banana', 'mango', 'watermelon', 'plum', 'apple', 'grape',
+    // Note: 'shrimp' excluded because "Cherry Red Shrimp", "Amano Shrimp" are real shrimp names
+    'chicken', 'beef', 'salmon', 'tuna', 'liver', 'bacon', 'peanut', 'butter',
+    'can', 'cans', 'canned', 'jar', 'jars', 'tube', 'tubes', 'pouch', 'pouches', 'refill', 'refills',
+    'feeder', 'feeders', 'feeding', 'fed', 'freeze', 'dried', 'frozen', 'live',
+    // Product identifier patterns
+    'repashy', 'biothane', 'fauna', 'whis', 'whisper', 'repti', 'reptihab', 'reptisafe'
   ]);
   
   // **2. SUPPLY BRANDS** (-100 points each - very strong negative signal)
+  // These brands are checked anywhere in the name
   const supplyBrands = new Set([
     'api', 'aqueon', 'marineland', 'fluval', 'seachem', 'hikari', 'omega', 'aquaclear', 'penn', 'plax', 'imagitarium',
     'zoomed', 'exoterra', 'zilla', 'flukers', 'repticare',
@@ -460,13 +487,33 @@ export function detectLiveAnimal(itemName: string): {
     'kong', 'nylabone', 'chuckit', 'spot', 'spt', 'turbo', 'ethical', 'zippypaws', 'tuffy',
     'buddy', 'guard', 'shield', 'safe', 'safestart', 'aquasafe', 'bettasafe',
     'bioscrub', 'bio', 'scrub', 'max', 'plus', 'pro', 'premium', 'ultimate', 'activ',
-    'friends', 'farm', 'barbie', 'barbies', 'spongebob', 'frozen', 'dory'
+    'friends', 'farm', 'barbie', 'barbies', 'spongebob', 'frozen', 'dory',
+    // Additional major pet supply brands
+    'tetrafauna', 'tetramin', 'tetrapro',
+    'repashy', 'mazuri', 'purina', 'iams', 'eukanuba', 'royal', 'canin',
+    'nutro', 'wellness', 'merrick', 'orijen', 'acana',
+    'fromm', 'science', 'hills', 'proplan', 'beneful', 'pedigree', 'cesar'
   ]);
+  
+  // **2b. POSITION-SENSITIVE BRANDS** - Only reject if brand appears at BEGINNING of name
+  // These could be confused with species names when appearing later in the name
+  // e.g., "Tetra Whisper Filter" (brand) vs "Neon Tetra Reg" (species)
+  // e.g., "Zoo Med Crested Gecko Food" (brand) vs actual crested gecko
+  const firstWordBrands = new Set(['tetra', 'zoo', 'med', 'blue', 'buffalo', 'taste', 'wild', 'fancy', 'feast']);
   
   // Calculate supply score
   for (const word of words) {
     if (supplyKeywords.has(word)) supplyScore -= 100;
     if (supplyBrands.has(word)) supplyScore -= 100;
+  }
+  
+  // Check if first word is a position-sensitive brand
+  if (words.length > 0 && firstWordBrands.has(words[0])) {
+    supplyScore -= 100;
+  }
+  // Also check first two words for "Zoo Med" pattern
+  if (words.length >= 2 && words[0] === 'zoo' && words[1] === 'med') {
+    supplyScore -= 200; // Very strong signal - definitely Zoo Med brand
   }
   
   // If heavy supply score, immediately reject
