@@ -1782,6 +1782,37 @@ export class DatabaseStorage implements IStorage {
       .returning();
     filterTypeCleared += turboAquaticFix.length;
     
+    // Healthcare products with smallanimal filter_type (ferret shampoos, small animal meds)
+    // Healthcare is not a specialty category, so filter_type should be NULL
+    const healthcareSmallAnimalFix = await db.update(supplies)
+      .set({ filterType: null })
+      .where(and(
+        eq(supplies.category, 'healthcare'),
+        eq(supplies.filterType, 'smallanimal')
+      ))
+      .returning();
+    filterTypeCleared += healthcareSmallAnimalFix.length;
+    
+    // Accessories with smallanimal filter_type (cage crocks, water bottles)
+    const accessoriesSmallAnimalFix = await db.update(supplies)
+      .set({ filterType: null })
+      .where(and(
+        eq(supplies.category, 'accessories'),
+        eq(supplies.filterType, 'smallanimal')
+      ))
+      .returning();
+    filterTypeCleared += accessoriesSmallAnimalFix.length;
+    
+    // Accessories with reptile filter_type (dual-use bowls)
+    const accessoriesReptileFix = await db.update(supplies)
+      .set({ filterType: null })
+      .where(and(
+        eq(supplies.category, 'accessories'),
+        eq(supplies.filterType, 'reptile')
+      ))
+      .returning();
+    filterTypeCleared += accessoriesReptileFix.length;
+    
     console.log(`Filter type cleared for non-specialty items: ${filterTypeCleared}`);
 
     stats.total = stats.clothingToAccessories + stats.collarsToCollarsLeashes + 
