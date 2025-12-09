@@ -4975,6 +4975,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const speciesMap: Record<string, string> = {
         mice: 'Small Animals',
+        mouse: 'Small Animals',
         hamster: 'Small Animals',
         guineapig: 'Small Animals',
         gerbil: 'Small Animals',
@@ -4982,6 +4983,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ferret: 'Small Animals',
         rabbit: 'Small Animals',
         rat: 'Small Animals',
+        hedgehog: 'Small Animals',
         goldfish: 'Fish',
         betta: 'Fish',
         guppy: 'Fish',
@@ -4999,6 +5001,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         cichlid: 'Fish',
         discus: 'Fish',
         koi: 'Fish',
+        shrimp: 'Other',
+        algaeeater: 'Other',
+        feederfish: 'Fish',
+        arowana: 'Fish',
         gecko: 'Reptiles',
         beardeddragon: 'Reptiles',
         chameleon: 'Reptiles',
@@ -5191,6 +5197,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`Processing ${totalSupplies} supplies...`);
 
+      // Import standardization functions
+      const { standardizeProductName, standardizeBrandName } = await import('./productCategorization');
+      
       for (const supply of supplies) {
         const nameResult = await expandAbbreviationsAsync(supply.name, storage);
         const descResult = await expandAbbreviationsAsync(supply.description, storage);
@@ -5199,10 +5208,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           catalogHits++;
         }
 
-        if (nameResult.expanded !== supply.name || descResult.expanded !== supply.description) {
+        // Apply standardization (spelling fixes, abbreviation expansion)
+        let finalName = standardizeProductName(nameResult.expanded);
+        const finalBrand = standardizeBrandName(supply.brand || '');
+        
+        // Truncate name if it exceeds 255 characters (database column limit)
+        if (finalName.length > 255) {
+          console.log(`Truncating long name (${finalName.length} chars): ${finalName.substring(0, 50)}...`);
+          finalName = finalName.substring(0, 252) + '...';
+        }
+
+        const needsUpdate = 
+          finalName !== supply.name || 
+          descResult.expanded !== supply.description ||
+          (finalBrand && finalBrand !== supply.brand);
+
+        if (needsUpdate) {
           await storage.updateSupply(supply.id, {
-            name: nameResult.expanded,
-            description: descResult.expanded
+            name: finalName,
+            description: descResult.expanded,
+            ...(finalBrand && finalBrand !== supply.brand ? { brand: finalBrand } : {})
           });
           expandChanged++;
         } else {
@@ -5881,6 +5906,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // This is a live animal - add to pets instead of supplies
             const speciesMap: Record<string, string> = {
               mice: 'Small Animals',
+              mouse: 'Small Animals',
               hamster: 'Small Animals',
               guineapig: 'Small Animals',
               gerbil: 'Small Animals',
@@ -5888,6 +5914,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               ferret: 'Small Animals',
               rabbit: 'Small Animals',
               rat: 'Small Animals',
+              hedgehog: 'Small Animals',
               goldfish: 'Fish',
               betta: 'Fish',
               guppy: 'Fish',
@@ -5905,6 +5932,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               cichlid: 'Fish',
               discus: 'Fish',
               koi: 'Fish',
+              shrimp: 'Other',
+              algaeeater: 'Other',
+              feederfish: 'Fish',
+              arowana: 'Fish',
               gecko: 'Reptiles',
               beardeddragon: 'Reptiles',
               chameleon: 'Reptiles',
