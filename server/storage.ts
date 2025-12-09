@@ -1651,11 +1651,144 @@ export class DatabaseStorage implements IStorage {
     }
     console.log(`Grooming products moved to healthcare: ${stats.groomingToHealthcare}`);
 
+    // 9. Clear incorrect filter_type for non-specialty categories
+    // Penn-Plax makes both aquatic AND general pet products - clear filter_type for non-aquatic categories
+    console.log("Clearing incorrect filter_type assignments...");
+    let filterTypeCleared = 0;
+    
+    // Penn-Plax bird supplies incorrectly marked as aquatic
+    const birdAquaticFix = await db.update(supplies)
+      .set({ filterType: null })
+      .where(and(
+        eq(supplies.category, 'birdSupplies'),
+        eq(supplies.filterType, 'aquatic')
+      ))
+      .returning();
+    filterTypeCleared += birdAquaticFix.length;
+    
+    // Penn-Plax accessories incorrectly marked as aquatic (cat/dog items)
+    const accessoriesAquaticFix = await db.update(supplies)
+      .set({ filterType: null })
+      .where(and(
+        eq(supplies.category, 'accessories'),
+        eq(supplies.filterType, 'aquatic'),
+        eq(supplies.brand, 'Penn-Plax')
+      ))
+      .returning();
+    filterTypeCleared += accessoriesAquaticFix.length;
+    
+    // Penn-Plax healthcare incorrectly marked as aquatic
+    const healthcareAquaticFix = await db.update(supplies)
+      .set({ filterType: null })
+      .where(and(
+        eq(supplies.category, 'healthcare'),
+        eq(supplies.filterType, 'aquatic'),
+        eq(supplies.brand, 'Penn-Plax')
+      ))
+      .returning();
+    filterTypeCleared += healthcareAquaticFix.length;
+    
+    // Penn-Plax toys incorrectly marked as aquatic
+    const toysAquaticFix = await db.update(supplies)
+      .set({ filterType: null })
+      .where(and(
+        eq(supplies.category, 'toys'),
+        eq(supplies.filterType, 'aquatic'),
+        eq(supplies.brand, 'Penn-Plax')
+      ))
+      .returning();
+    filterTypeCleared += toysAquaticFix.length;
+    
+    // Mammoth snake toys incorrectly marked as reptile (dog toys with "snake" in name)
+    const mammothReptileFix = await db.update(supplies)
+      .set({ filterType: null })
+      .where(and(
+        eq(supplies.category, 'toys'),
+        eq(supplies.filterType, 'reptile'),
+        eq(supplies.brand, 'Mammoth')
+      ))
+      .returning();
+    filterTypeCleared += mammothReptileFix.length;
+    
+    // dogCages incorrectly marked as aquatic
+    const dogCagesAquaticFix = await db.update(supplies)
+      .set({ filterType: null })
+      .where(and(
+        eq(supplies.category, 'dogCages'),
+        eq(supplies.filterType, 'aquatic')
+      ))
+      .returning();
+    filterTypeCleared += dogCagesAquaticFix.length;
+    
+    // catTreats incorrectly marked as aquatic
+    const catTreatsAquaticFix = await db.update(supplies)
+      .set({ filterType: null })
+      .where(and(
+        eq(supplies.category, 'catTreats'),
+        eq(supplies.filterType, 'aquatic')
+      ))
+      .returning();
+    filterTypeCleared += catTreatsAquaticFix.length;
+    
+    // dogFood incorrectly marked as smallanimal (e.g., "Rabbit" in name)
+    const dogFoodSmallAnimalFix = await db.update(supplies)
+      .set({ filterType: null })
+      .where(and(
+        eq(supplies.category, 'dogFood'),
+        eq(supplies.filterType, 'smallanimal')
+      ))
+      .returning();
+    filterTypeCleared += dogFoodSmallAnimalFix.length;
+    
+    // Bird supplies incorrectly marked as smallanimal (Kaytee makes both)
+    const birdSmallAnimalFix = await db.update(supplies)
+      .set({ filterType: null })
+      .where(and(
+        eq(supplies.category, 'birdSupplies'),
+        eq(supplies.filterType, 'smallanimal')
+      ))
+      .returning();
+    filterTypeCleared += birdSmallAnimalFix.length;
+    
+    // Pet beds incorrectly marked as smallanimal (Squishmallow beds are for cats/dogs)
+    const bedsSmallAnimalFix = await db.update(supplies)
+      .set({ filterType: null })
+      .where(and(
+        eq(supplies.category, 'beds'),
+        eq(supplies.filterType, 'smallanimal')
+      ))
+      .returning();
+    filterTypeCleared += bedsSmallAnimalFix.length;
+    
+    // Li'l Pals plush toys incorrectly marked as smallanimal (dog toys)
+    const lilPalsSmallAnimalFix = await db.update(supplies)
+      .set({ filterType: null })
+      .where(and(
+        eq(supplies.category, 'toys'),
+        eq(supplies.filterType, 'smallanimal'),
+        eq(supplies.brand, "Li'l Pals")
+      ))
+      .returning();
+    filterTypeCleared += lilPalsSmallAnimalFix.length;
+    
+    // Turbo toys incorrectly marked as aquatic (cat toys)
+    const turboAquaticFix = await db.update(supplies)
+      .set({ filterType: null })
+      .where(and(
+        eq(supplies.category, 'toys'),
+        eq(supplies.filterType, 'aquatic'),
+        eq(supplies.brand, 'Turbo')
+      ))
+      .returning();
+    filterTypeCleared += turboAquaticFix.length;
+    
+    console.log(`Filter type cleared for non-specialty items: ${filterTypeCleared}`);
+
     stats.total = stats.clothingToAccessories + stats.collarsToCollarsLeashes + 
                   stats.foodSplitToDogFood + stats.foodSplitToCatFood + 
                   stats.kennelToDogCages + stats.smallAnimalSuppliesToSmallAnimal + 
                   stats.catToyToToys + stats.filterTypeSynced + stats.beefhideFixed +
-                  stats.groomingToHealthcare;
+                  stats.groomingToHealthcare + filterTypeCleared;
 
     console.log(`Category cleanup complete. Total fixes: ${stats.total}`);
     return stats;
