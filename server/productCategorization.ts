@@ -688,12 +688,21 @@ export function detectLiveAnimal(itemName: string): {
   }
   
   // Check live indicators
-  for (const indicator of liveIndicators) {
+  const liveIndicatorsArray = Array.from(liveIndicators);
+  for (const indicator of liveIndicatorsArray) {
     if (wordSet.has(indicator)) {
       liveScore += 20;
       detectedKeywords.push(indicator);
       break;
     }
+  }
+  
+  // **SPECIAL CASE: Feeder fish** - "Feeder Rosy Red" pattern
+  // These are live fish being sold as feeders
+  if (normalized.includes('feeder rosy') || normalized.includes('rosy red')) {
+    liveScore += 80;
+    detectedSpecies = 'feederfish';
+    detectedKeywords.push('feeder', 'rosy red');
   }
   
   // **DECISION LOGIC**
@@ -706,4 +715,99 @@ export function detectLiveAnimal(itemName: string): {
   
   // Default: Not a live animal
   return { isLiveAnimal: false, species: null, detectedKeywords: [] };
+}
+
+/**
+ * Standardize product names by fixing common spelling errors and expanding abbreviations
+ * This should be called during import/auto-categorization to ensure data quality
+ */
+export function standardizeProductName(name: string): string {
+  let result = name;
+  
+  // Fix spelling errors
+  const spellingFixes: Record<string, string> = {
+    'Gourment': 'Gourmet',
+    'gourment': 'gourmet',
+    'Enviroment': 'Environment',
+    'enviroment': 'environment',
+    'Enviromental': 'Environmental',
+    'enviromental': 'environmental',
+    'Cannibas': 'Cannabis',
+    'cannibas': 'cannabis',
+    'Naturalisic': 'Naturalistic',
+    'naturalisic': 'naturalistic',
+    'Palidirum': 'Paludarium',
+    'palidirum': 'paludarium',
+    'Mediterranin': 'Mediterranean',
+    'mediterranin': 'mediterranean',
+    ' Steal ': ' Steel ',
+    'Galaop.': 'Galapagos',
+    'galaop.': 'galapagos',
+  };
+  
+  for (const [wrong, correct] of Object.entries(spellingFixes)) {
+    result = result.replace(new RegExp(wrong, 'g'), correct);
+  }
+  
+  // Expand abbreviations (with periods that indicate abbreviation)
+  const abbreviations: Record<string, string> = {
+    'Juv.': 'Juvenile',
+    'juv.': 'juvenile',
+    'Small.': 'Small',
+    'small.': 'small',
+    'Medium.': 'Medium',
+    'medium.': 'medium',
+    'Large.': 'Large',
+    'large.': 'large',
+    'Tropical.': 'Tropical',
+    'tropical.': 'tropical',
+    'Desert.': 'Desert',
+    'desert.': 'desert',
+    'Galap.': 'Galapagos',
+    'galap.': 'galapagos',
+  };
+  
+  for (const [abbrev, expanded] of Object.entries(abbreviations)) {
+    result = result.replace(new RegExp(abbrev.replace('.', '\\.'), 'g'), expanded);
+  }
+  
+  // Expand common abbreviations without periods
+  const noPeriodsAbbreviations: Record<string, string> = {
+    'Xlrg': 'XLarge',
+    'xlrg': 'xlarge',
+    'Blck': 'Black',
+    'blck': 'black',
+  };
+  
+  for (const [abbrev, expanded] of Object.entries(noPeriodsAbbreviations)) {
+    result = result.replace(new RegExp(`\\b${abbrev}\\b`, 'g'), expanded);
+  }
+  
+  return result;
+}
+
+/**
+ * Standardize brand names to ensure consistency
+ * This should be called during import/auto-categorization
+ */
+export function standardizeBrandName(brand: string): string {
+  if (!brand) return brand;
+  
+  const brandMappings: Record<string, string> = {
+    'Penn Plax': 'Penn-Plax',
+    'ZooMed': 'Zoo Med',
+    'Tropiclean': 'TropiClean',
+    'Coastal Pet': 'Coastal',
+    'Bio-Groom': 'Bio Groom',
+    'Prevue Pet Products': 'Prevue',
+    'Mammoth Pet Products': 'Mammoth',
+    "Lee's Aquarium & Pet Products": "Lee's",
+    'Victor': 'VICTOR',
+    'Galápagos': 'Galapagos',
+    'JollyPet': 'Jolly Pets',
+    'MidWest Homes for Pets': 'MidWest Homes For Pets',
+    'Midwest': 'MidWest Homes For Pets',
+  };
+  
+  return brandMappings[brand] || brand;
 }
