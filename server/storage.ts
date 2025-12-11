@@ -1131,17 +1131,33 @@ export class DatabaseStorage implements IStorage {
   ): Promise<Supply[]> {
     const allSupplies = await db.select().from(supplies);
     
-    // Filter out products with no images, placeholder images, or broken /uploads/ images
-    let withoutImages = allSupplies.filter(s => {
-      if (!s.imageUrl || s.imageUrl === '') return true;
-      if (s.imageUrl.startsWith('/uploads/')) return true; // Broken local uploads
-      if (s.imageUrl === '/placeholder-supply.jpg') return true; // Placeholder images
-      return false;
-    });
+    // When searching by name, search ALL products (so admins can find any product)
+    // When browsing by brand/category only, filter to products without images
+    const hasSearchQuery = search && search.trim();
+    
+    let filteredSupplies: Supply[];
+    
+    if (hasSearchQuery) {
+      // Search ALL products when a search term is provided
+      const searchLower = search.toLowerCase().trim();
+      filteredSupplies = allSupplies.filter(s =>
+        s.name?.toLowerCase().includes(searchLower) ||
+        s.description?.toLowerCase().includes(searchLower) ||
+        s.brand?.toLowerCase().includes(searchLower)
+      );
+    } else {
+      // Filter to products without images when just browsing
+      filteredSupplies = allSupplies.filter(s => {
+        if (!s.imageUrl || s.imageUrl === '') return true;
+        if (s.imageUrl.startsWith('/uploads/')) return true; // Broken local uploads
+        if (s.imageUrl === '/placeholder-supply.jpg') return true; // Placeholder images
+        return false;
+      });
+    }
     
     // Apply brand filter
     if (brand) {
-      withoutImages = withoutImages.filter(s => {
+      filteredSupplies = filteredSupplies.filter(s => {
         // Handle "Unknown" brand (null or empty in database)
         if (brand.toLowerCase() === 'unknown') {
           return !s.brand || s.brand === '';
@@ -1152,22 +1168,12 @@ export class DatabaseStorage implements IStorage {
     
     // Apply category filter
     if (category) {
-      withoutImages = withoutImages.filter(s => 
+      filteredSupplies = filteredSupplies.filter(s => 
         s.category?.toLowerCase() === category.toLowerCase()
       );
     }
     
-    // Apply search filter (case-insensitive, searches name and description)
-    if (search && search.trim()) {
-      const searchLower = search.toLowerCase().trim();
-      withoutImages = withoutImages.filter(s =>
-        s.name?.toLowerCase().includes(searchLower) ||
-        s.description?.toLowerCase().includes(searchLower) ||
-        s.brand?.toLowerCase().includes(searchLower)
-      );
-    }
-    
-    return withoutImages.slice(offset, offset + limit);
+    return filteredSupplies.slice(offset, offset + limit);
   }
 
   async getSupplyImageStats() {
