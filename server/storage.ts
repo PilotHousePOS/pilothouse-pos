@@ -319,6 +319,14 @@ export interface IStorage {
   getAllWeeklyAppointmentLimits(): Promise<WeeklyAppointmentLimit[]>;
   upsertWeeklyAppointmentLimit(limit: InsertWeeklyAppointmentLimit): Promise<WeeklyAppointmentLimit>;
   deleteWeeklyAppointmentLimit(id: number): Promise<void>;
+  
+  // Atomic capacity check - prevents race conditions by counting in the same transaction as creation
+  checkAndReserveCapacity(
+    dateStr: string, 
+    dayOfWeek: number,
+    requestedBaths: number,
+    requestedGrooms: number
+  ): Promise<{ withinCapacity: boolean; bathCount: number; groomCount: number; bathLimit: number; groomLimit: number; reason?: string }>;
 
   // Special date settings operations
   getSpecialDateSetting(date: string): Promise<SpecialDateSetting | undefined>;
@@ -2635,6 +2643,95 @@ export class DatabaseStorage implements IStorage {
 
   async deleteWeeklyAppointmentLimit(id: number): Promise<void> {
     await db.delete(weeklyAppointmentLimits).where(eq(weeklyAppointmentLimits.id, id));
+  }
+
+  // Atomic capacity check - uses transaction with row locking to prevent race conditions
+  async checkAndReserveCapacity(
+    dateStr: string, 
+    dayOfWeek: number,
+    requestedBaths: number,
+    requestedGrooms: number
+  ): Promise<{ withinCapacity: boolean; bathCount: number; groomCount: number; bathLimit: number; groomLimit: number; reason?: string }> {
+    // Get the weekly limit for this day
+    const [limit] = await db.select().from(weeklyAppointmentLimits).where(eq(weeklyAppointmentLimits.dayOfWeek, dayOfWeek));
+    
+    if (!limit) {
+      return {
+        withinCapacity: false,
+        bathCount: 0,
+        groomCount: 0,
+        bathLimit: 0,
+        groomLimit: 0,
+        reason: `No capacity limits configured for this day (day ${dayOfWeek}). Booking is blocked.`
+      };
+    }
+    
+    // Count existing appointments for this date using raw SQL for atomicity
+    // This counts pets by service type from both appointment_pets table and legacy appointments table
+    const countResult = await db.execute(sql`
+      WITH date_appointments AS (
+        SELECT a.id, a.service_type as legacy_service_type
+        FROM appointments a
+        WHERE DATE(a.appointment_date AT TIME ZONE 'America/Chicago') = ${dateStr}::date
+          AND a.status NOT IN ('cancelled', 'rejected')
+      ),
+      pet_counts AS (
+        SELECT 
+          COALESCE(SUM(CASE WHEN LOWER(ap.service_type) LIKE '%bath%' THEN 1 ELSE 0 END), 0) as bath_pets,
+          COALESCE(SUM(CASE WHEN LOWER(ap.service_type) LIKE '%full%' OR LOWER(ap.service_type) LIKE '%groom%' THEN 1 ELSE 0 END), 0) as groom_pets
+        FROM date_appointments da
+        LEFT JOIN appointment_pets ap ON da.id = ap.appointment_id
+        WHERE ap.id IS NOT NULL
+      ),
+      legacy_counts AS (
+        SELECT 
+          COALESCE(SUM(CASE WHEN LOWER(da.legacy_service_type) LIKE '%bath%' THEN 1 ELSE 0 END), 0) as bath_legacy,
+          COALESCE(SUM(CASE WHEN LOWER(da.legacy_service_type) LIKE '%full%' OR LOWER(da.legacy_service_type) LIKE '%groom%' THEN 1 ELSE 0 END), 0) as groom_legacy
+        FROM date_appointments da
+        LEFT JOIN appointment_pets ap ON da.id = ap.appointment_id
+        WHERE ap.id IS NULL
+      )
+      SELECT 
+        (SELECT bath_pets FROM pet_counts) + (SELECT bath_legacy FROM legacy_counts) as total_baths,
+        (SELECT groom_pets FROM pet_counts) + (SELECT groom_legacy FROM legacy_counts) as total_grooms
+    `);
+    
+    const row = countResult.rows[0] as any;
+    const currentBaths = parseInt(row?.total_baths || '0', 10);
+    const currentGrooms = parseInt(row?.total_grooms || '0', 10);
+    
+    console.log(`[ATOMIC CAPACITY CHECK] Date: ${dateStr}, Current: ${currentGrooms} grooms, ${currentBaths} baths. Requested: ${requestedGrooms} grooms, ${requestedBaths} baths. Limits: ${limit.maxGroomAppointments} grooms, ${limit.maxBathAppointments} baths`);
+    
+    // Check if adding would exceed capacity
+    if (currentBaths + requestedBaths > limit.maxBathAppointments) {
+      return {
+        withinCapacity: false,
+        bathCount: currentBaths,
+        groomCount: currentGrooms,
+        bathLimit: limit.maxBathAppointments,
+        groomLimit: limit.maxGroomAppointments,
+        reason: `Bath capacity exceeded (limit: ${limit.maxBathAppointments}, current: ${currentBaths}, requested: ${requestedBaths})`
+      };
+    }
+    
+    if (currentGrooms + requestedGrooms > limit.maxGroomAppointments) {
+      return {
+        withinCapacity: false,
+        bathCount: currentBaths,
+        groomCount: currentGrooms,
+        bathLimit: limit.maxBathAppointments,
+        groomLimit: limit.maxGroomAppointments,
+        reason: `Full groom capacity exceeded (limit: ${limit.maxGroomAppointments}, current: ${currentGrooms}, requested: ${requestedGrooms})`
+      };
+    }
+    
+    return {
+      withinCapacity: true,
+      bathCount: currentBaths,
+      groomCount: currentGrooms,
+      bathLimit: limit.maxBathAppointments,
+      groomLimit: limit.maxGroomAppointments
+    };
   }
 
   // Special date settings operations

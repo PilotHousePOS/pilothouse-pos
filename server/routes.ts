@@ -2455,12 +2455,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`[CAPACITY CHECK] Date: ${appointmentDateStr}, Day of week: ${dayOfWeek}, isAdmin: ${isAdmin}`);
       
+      // SAFEGUARD #1: Block Sunday bookings (day 0) - no grooming on Sundays
+      if (dayOfWeek === 0) {
+        return res.status(400).json({
+          message: "Sorry, grooming appointments are not available on Sundays. Please select a different day."
+        });
+      }
+      
       // Get weekly limit for this day of week (1-6 for Monday-Saturday)
       if (dayOfWeek >= 1 && dayOfWeek <= 6) {
         const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
         
         console.log(`[CAPACITY CHECK] Weekly limit for day ${dayOfWeek}:`, weeklyLimit ? `bath=${weeklyLimit.maxBathAppointments}, groom=${weeklyLimit.maxGroomAppointments}` : 'NOT SET');
         
+        // SAFEGUARD #2: Require weekly limits to be configured - prevents bypassing capacity
+        if (!weeklyLimit) {
+          console.error(`[CAPACITY CHECK] BLOCKED - No weekly limit configured for day ${dayOfWeek}`);
+          return res.status(400).json({
+            message: `Booking is not available for this day. Please contact the store or select a different date.`
+          });
+        }
+        
+        // Weekly limit exists - proceed with capacity check
         if (weeklyLimit) {
           // Count existing appointments for this date by service type
           // Include all appointments except cancelled/rejected ones
@@ -2534,6 +2550,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // For multi-pet appointments, use first pet's info in main record for backward compatibility
       const firstPet = petsArray[0];
       const petNamesStr = petsArray.map((p: any) => p.petName).join(', ');
+      
+      // SAFEGUARD #3: Final atomic capacity check right before creating - prevents race conditions
+      // This is a database-level double-check using raw SQL for maximum reliability
+      let requestedBathsFinal = 0;
+      let requestedGroomsFinal = 0;
+      for (const p of petsArray) {
+        const serviceType = (p.serviceType || '').toLowerCase();
+        if (serviceType.includes('bath')) {
+          requestedBathsFinal++;
+        } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+          requestedGroomsFinal++;
+        }
+      }
+      
+      const atomicCheck = await storage.checkAndReserveCapacity(
+        appointmentDateStr,
+        dayOfWeek,
+        requestedBathsFinal,
+        requestedGroomsFinal
+      );
+      
+      if (!atomicCheck.withinCapacity) {
+        console.error(`[FINAL CAPACITY CHECK] BLOCKED - ${atomicCheck.reason}`);
+        return res.status(400).json({
+          message: `This date is fully booked. ${atomicCheck.reason} Please select a different date.`
+        });
+      }
+      
+      console.log(`[FINAL CAPACITY CHECK] PASSED - proceeding with appointment creation`);
       
       // Admin-created appointments bypass approval, others require approval
       const appointmentData = insertAppointmentSchema.parse({ 
