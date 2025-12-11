@@ -1,0 +1,80 @@
+{
+  "brandSources": {
+    "Penn-Plax": {
+      "primary": "chewy",
+      "urlTemplate": "https://image.chewy.com/catalog/general/images/penn-plax-{slug}/img-{id}._AC_SL1200_QL100_V1_.jpg",
+      "fallback": "petco"
+    },
+    "Kong": {
+      "primary": "chewy",
+      "urlTemplate": "https://image.chewy.com/catalog/general/images/kong-{slug}/img-{id}._AC_SL1200_QL100_V1_.jpg",
+      "fallback": "petsmart"
+    },
+    "Zilla": {
+      "primary": "chewy",
+      "urlTemplate": "https://image.chewy.com/catalog/general/images/zilla-{slug}/img-{id}._AC_SL1200_QL100_V1_.jpg",
+      "fallback": "petco"
+    },
+    "Fluval": {
+      "primary": "chewy",
+      "urlTemplate": "https://image.chewy.com/catalog/general/images/fluval-{slug}/img-{id}._AC_SL1200_QL100_V1_.jpg",
+      "fallback": "petco"
+    },
+    "API": {
+      "primary": "chewy",
+      "urlTemplate": "https://image.chewy.com/catalog/general/images/api-{slug}/img-{id}._AC_SL1200_QL100_V1_.jpg",
+      "fallback": "petco"
+    },
+    "Fromm": {
+      "primary": "manufacturer",
+      "urlTemplate": "https://frommfamily.com/uploads/products/{slug}.png",
+      "fallback": "gofromm"
+    },
+    "Nutrisource": {
+      "primary": "manufacturer", 
+      "urlTemplate": "https://discovernutrisource.com/cdn/shop/products/{slug}.png",
+      "fallback": "amazon"
+    },
+    "Kaytee": {
+      "primary": "chewy",
+      "urlTemplate": "https://image.chewy.com/catalog/general/images/kaytee-{slug}/img-{id}._AC_SL1200_QL100_V1_.jpg",
+      "fallback": "petco"
+    },
+    "Oxbow": {
+      "primary": "chewy",
+      "urlTemplate": "https://image.chewy.com/catalog/general/images/oxbow-{slug}/img-{id}._AC_SL1200_QL100_V1_.jpg",
+      "fallback": "petco"
+    },
+    "Marineland": {
+      "primary": "chewy",
+      "urlTemplate": "https://image.chewy.com/catalog/general/images/marineland-{slug}/img-{id}._AC_SL1200_QL100_V1_.jpg",
+      "fallback": "petco"
+    },
+    "Tetra": {
+      "primary": "chewy",
+      "urlTemplate": "https://image.chewy.com/catalog/general/images/tetra-{slug}/img-{id}._AC_SL1200_QL100_V1_.jpg",
+      "fallback": "petco"
+    },
+    "Exo Terra": {
+      "primary": "chewy",
+      "urlTemplate": "https://image.chewy.com/catalog/general/images/exo-terra-{slug}/img-{id}._AC_SL1200_QL100_V1_.jpg",
+      "fallback": "petco"
+    },
+    "Science Diet": {
+      "primary": "chewy",
+      "urlTemplate": "https://image.chewy.com/catalog/general/images/hills-science-diet-{slug}/img-{id}._AC_SL1200_QL100_V1_.jpg",
+      "fallback": "petsmart"
+    },
+    "Nylabone": {
+      "primary": "chewy",
+      "urlTemplate": "https://image.chewy.com/catalog/general/images/nylabone-{slug}/img-{id}._AC_SL1200_QL100_V1_.jpg",
+      "fallback": "petco"
+    }
+  },
+  "knownProductMappings": {
+    "Spngeb Pinapple Home": "https://image.chewy.com/catalog/general/images/penn-plax-spongebob-pineapple-home-aquarium-ornament-6-5in/img-48100._AC_SL1200_QL100_V1_.jpg",
+    "Kong Easy Treat Pepperoni": "https://image.chewy.com/catalog/general/images/moe/068e6c03-86f4-7229-8000-24574108d8b6._AC_SL1200_QL100_V1_.jpg",
+    "Zilla Day White Light Bulb 50w": "https://image.chewy.com/catalog/general/images/zilla-day-white-incandescent-reptile-terrarium-lamp-50-watt/img-6173._AC_SL1200_QL100_V1_.jpg",
+    "Treasure Chest": "https://image.chewy.com/catalog/general/images/penn-plax-treasure-chest-aquarium-decor/img-38408._AC_SL1200_QL100_V1_.jpg"
+  }
+}

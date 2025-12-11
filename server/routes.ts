@@ -660,7 +660,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // File upload endpoint (legacy - stores locally, will be lost on redeploy)
+  // File upload endpoint - now stores in Object Storage for persistence
   app.post("/api/upload", authMiddleware, upload.single('image'), async (req: any, res) => {
     try {
       const userId = (req as any).user?.id;
@@ -676,13 +676,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No file uploaded" });
       }
 
-      const imageUrl = `/uploads/${req.file.filename}`;
+      // Read the uploaded file and store it in Object Storage for persistence
+      const fs = await import('fs');
+      const filePath = req.file.path;
+      const fileBuffer = fs.readFileSync(filePath);
+      
+      const { ObjectStorageService } = await import('./objectStorageService');
+      const { setObjectAclPolicy } = await import('./objectStorageAcl');
+      const objectStorageService = new ObjectStorageService();
+      
+      // Generate a unique filename
+      const uniqueId = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const extension = req.file.originalname.split('.').pop() || 'jpg';
+      const objectFileName = `uploads/${uniqueId}.${extension}`;
+      
+      // Get the public bucket path and upload
+      const publicPaths = objectStorageService.getPublicObjectSearchPaths();
+      if (publicPaths.length === 0) {
+        // Fallback to legacy local storage if Object Storage not configured
+        const imageUrl = `/uploads/${req.file.filename}`;
+        return res.json({ imageUrl });
+      }
+      
+      const fullPath = `${publicPaths[0]}/${objectFileName}`;
+      const { bucketName, objectName } = parseObjectPathForUpload(fullPath);
+      
+      const { Storage } = await import('@google-cloud/storage');
+      const { objectStorageClient } = await import('./objectStorageService');
+      const bucket = objectStorageClient.bucket(bucketName);
+      const file = bucket.file(objectName);
+      
+      await file.save(fileBuffer, {
+        contentType: req.file.mimetype,
+        metadata: {
+          cacheControl: 'public, max-age=31536000',
+        },
+      });
+      
+      // Set public ACL
+      await setObjectAclPolicy(file, { visibility: 'public' });
+      
+      // Clean up local file
+      fs.unlinkSync(filePath);
+      
+      const imageUrl = `/public-objects/${objectFileName}`;
       res.json({ imageUrl });
     } catch (error) {
       console.error("Error uploading file:", error);
       res.status(500).json({ message: "Failed to upload file" });
     }
   });
+  
+  // Helper function for parsing object paths
+  function parseObjectPathForUpload(path: string): { bucketName: string; objectName: string } {
+    if (!path.startsWith("/")) {
+      path = `/${path}`;
+    }
+    const pathParts = path.split("/");
+    if (pathParts.length < 3) {
+      throw new Error("Invalid path: must contain at least a bucket name");
+    }
+    const bucketName = pathParts[1];
+    const objectName = pathParts.slice(2).join("/");
+    return { bucketName, objectName };
+  }
 
   // Object Storage endpoints for persistent file storage (survives redeployments)
   // Get presigned upload URL for object storage
