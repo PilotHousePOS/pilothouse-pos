@@ -2425,9 +2425,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Use timezone-aware date functions to prevent UTC/CST mismatch bugs
       const { getLocalDateString, getLocalDayOfWeek } = await import('./scheduler');
       
+      // CRITICAL FIX: The frontend sends a date string like "2025-12-11" which represents
+      // the user's selected date in their local timezone (CST). We must NOT let JavaScript
+      // reinterpret this as UTC midnight (which would shift it back one day when converted to CST).
+      // Instead, parse the date string directly and use those components.
+      const rawDateStr = req.body.appointmentDate; // "YYYY-MM-DD" format from frontend
+      let appointmentDateStr: string;
+      let dayOfWeek: number;
+      
+      // Parse the date string directly to get the intended date components
+      if (typeof rawDateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(rawDateStr)) {
+        // Date string format - use it directly as the date
+        appointmentDateStr = rawDateStr;
+        // Parse year, month, day from string
+        const [year, month, day] = rawDateStr.split('-').map(Number);
+        // Create date in local timezone (noon to avoid any edge cases)
+        const localDate = new Date(year, month - 1, day, 12, 0, 0);
+        dayOfWeek = localDate.getDay(); // 0=Sunday, 1=Monday, etc.
+        console.log(`[DATE PARSING] Raw: ${rawDateStr}, Parsed local date: ${localDate.toDateString()}, Day of week: ${dayOfWeek}`);
+      } else {
+        // Fallback for other date formats - use timezone conversion
+        const appointmentDate = new Date(rawDateStr);
+        appointmentDateStr = getLocalDateString(appointmentDate);
+        dayOfWeek = getLocalDayOfWeek(appointmentDate);
+        console.log(`[DATE PARSING] Fallback - Raw: ${rawDateStr}, Converted: ${appointmentDateStr}, Day of week: ${dayOfWeek}`);
+      }
+      
       // Check special date settings first (overrides weekly limits)
-      const appointmentDate = new Date(req.body.appointmentDate);
-      const appointmentDateStr = getLocalDateString(appointmentDate);
+      const appointmentDate = new Date(rawDateStr);
       const specialDate = await storage.getSpecialDateWithTimes(appointmentDateStr);
       
       if (specialDate) {
@@ -2451,8 +2476,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }];
 
       // Check weekly appointment limits for the selected day of week
-      const dayOfWeek = getLocalDayOfWeek(appointmentDate); // 0=Sunday, 1=Monday, ..., 6=Saturday
-      
+      // dayOfWeek was already calculated above using the raw date string
       console.log(`[CAPACITY CHECK] Date: ${appointmentDateStr}, Day of week: ${dayOfWeek}, isAdmin: ${isAdmin}`);
       
       // SAFEGUARD #1: Block Sunday bookings (day 0) - no grooming on Sundays
@@ -2482,8 +2506,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Include all appointments except cancelled/rejected ones
           const allAppointments = await storage.getAppointments();
           const appointmentsOnDate = allAppointments.filter((apt: any) => {
-            const aptDateStr = getLocalDateString(new Date(apt.appointmentDate));
-            return aptDateStr === appointmentDateStr && 
+            // Match against both the raw stored date and timezone-converted date
+            const aptDate = new Date(apt.appointmentDate);
+            const storedDateStr = aptDate.toISOString().split('T')[0]; // The raw date that was stored
+            const localDateStr = getLocalDateString(aptDate); // Timezone-converted date
+            const matches = (storedDateStr === appointmentDateStr || localDateStr === appointmentDateStr);
+            return matches && 
                    apt.status !== 'cancelled' && 
                    apt.status !== 'rejected';
           });
