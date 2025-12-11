@@ -2453,9 +2453,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check weekly appointment limits for the selected day of week
       const dayOfWeek = getLocalDayOfWeek(appointmentDate); // 0=Sunday, 1=Monday, ..., 6=Saturday
       
+      console.log(`[CAPACITY CHECK] Date: ${appointmentDateStr}, Day of week: ${dayOfWeek}, isAdmin: ${isAdmin}`);
+      
       // Get weekly limit for this day of week (1-6 for Monday-Saturday)
       if (dayOfWeek >= 1 && dayOfWeek <= 6) {
         const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
+        
+        console.log(`[CAPACITY CHECK] Weekly limit for day ${dayOfWeek}:`, weeklyLimit ? `bath=${weeklyLimit.maxBathAppointments}, groom=${weeklyLimit.maxGroomAppointments}` : 'NOT SET');
         
         if (weeklyLimit) {
           // Count existing appointments for this date by service type
@@ -2507,6 +2511,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               requestedGrooms++;
             }
           }
+          
+          console.log(`[CAPACITY CHECK] Existing: ${groomDogs} grooms, ${bathDogs} baths. Requested: ${requestedGrooms} grooms, ${requestedBaths} baths. Limits: ${weeklyLimit.maxGroomAppointments} grooms, ${weeklyLimit.maxBathAppointments} baths`);
+          console.log(`[CAPACITY CHECK] Would total: ${groomDogs + requestedGrooms} grooms (limit ${weeklyLimit.maxGroomAppointments}), ${bathDogs + requestedBaths} baths (limit ${weeklyLimit.maxBathAppointments})`);
           
           // HARD LIMIT: Cannot be bypassed by anyone, including admins
           // This ensures grooming capacity is never exceeded
