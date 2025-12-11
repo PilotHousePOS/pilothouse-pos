@@ -2485,6 +2485,34 @@ function ProductImageManager() {
     },
   });
 
+  // Download and store image permanently in object storage
+  const downloadImageMutation = useMutation({
+    mutationFn: async ({ productId, externalUrl }: { productId: number; externalUrl: string }) => {
+      const response = await apiRequest('POST', `/api/admin/supplies/${productId}/download-image`, { externalUrl });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/image-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/without-images'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
+      
+      toast({
+        title: 'Success',
+        description: 'Image downloaded and stored permanently',
+      });
+      setSelectedProduct(null);
+      setImageUrl('');
+      refetchProducts();
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to download and store image',
+        variant: 'destructive',
+      });
+    },
+  });
+
   // Start batch search for images
   const handleStartBatchSearch = async () => {
     if (!products || products.length === 0) {
@@ -2814,7 +2842,7 @@ function ProductImageManager() {
                 )}
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button
                   onClick={() => {
                     updateImageMutation.mutate({
@@ -2826,7 +2854,20 @@ function ProductImageManager() {
                   data-testid="button-save-image"
                   className="bg-green-600 hover:bg-green-700"
                 >
-                  {updateImageMutation.isPending ? 'Saving...' : 'Save Image'}
+                  {updateImageMutation.isPending ? 'Saving...' : 'Save URL'}
+                </Button>
+                <Button
+                  onClick={() => {
+                    downloadImageMutation.mutate({
+                      productId: selectedProduct.id,
+                      externalUrl: imageUrl,
+                    });
+                  }}
+                  disabled={!imageUrl || downloadImageMutation.isPending}
+                  data-testid="button-download-store-image"
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  {downloadImageMutation.isPending ? 'Downloading...' : 'Download & Store Permanently'}
                 </Button>
                 <Button
                   variant="outline"
@@ -2839,6 +2880,9 @@ function ProductImageManager() {
                   Cancel
                 </Button>
               </div>
+              <p className="text-xs text-gray-500 mt-2">
+                "Save URL" stores the external link (may break over time). "Download & Store Permanently" saves the image to your local storage for reliable long-term access.
+              </p>
             </div>
           )}
         </CardContent>

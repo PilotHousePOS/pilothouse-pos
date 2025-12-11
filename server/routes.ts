@@ -5364,6 +5364,122 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Download and store product image permanently from external URL (Admin only)
+  app.post("/api/admin/supplies/:id/download-image", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { id } = req.params;
+      const { externalUrl } = req.body;
+
+      if (!externalUrl) {
+        return res.status(400).json({ message: "External URL is required" });
+      }
+
+      const supply = await storage.getSupply(parseInt(id));
+      if (!supply) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      const { ObjectStorageService } = await import('./objectStorageService');
+      const objectStorageService = new ObjectStorageService();
+      
+      const result = await objectStorageService.downloadAndStoreProductImage(
+        externalUrl,
+        supply.id,
+        supply.name,
+        supply.brand || 'unknown'
+      );
+
+      if (!result.success) {
+        return res.status(400).json({ message: result.error || "Failed to download image" });
+      }
+
+      await storage.updateSupply(supply.id, { imageUrl: result.storedPath! });
+
+      res.json({
+        success: true,
+        productId: supply.id,
+        storedPath: result.storedPath
+      });
+    } catch (error: any) {
+      console.error('Error downloading and storing product image:', error);
+      res.status(500).json({ message: "Failed to download and store image", error: error.message });
+    }
+  });
+
+  // Batch download and store product images from external URLs (Admin only)
+  app.post("/api/admin/supplies/batch-download-images", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { products } = req.body;
+
+      if (!products || !Array.isArray(products) || products.length === 0) {
+        return res.status(400).json({ message: "Products array is required" });
+      }
+
+      if (products.length > 20) {
+        return res.status(400).json({ message: "Maximum 20 products per batch" });
+      }
+
+      const { ObjectStorageService } = await import('./objectStorageService');
+      const objectStorageService = new ObjectStorageService();
+
+      const results: any[] = [];
+      for (const product of products) {
+        if (!product.id || !product.externalUrl) {
+          results.push({ id: product.id, success: false, error: 'Missing id or externalUrl' });
+          continue;
+        }
+
+        const supply = await storage.getSupply(product.id);
+        if (!supply) {
+          results.push({ id: product.id, success: false, error: 'Product not found' });
+          continue;
+        }
+
+        const result = await objectStorageService.downloadAndStoreProductImage(
+          product.externalUrl,
+          supply.id,
+          supply.name,
+          supply.brand || 'unknown'
+        );
+
+        if (result.success && result.storedPath) {
+          await storage.updateSupply(supply.id, { imageUrl: result.storedPath });
+        }
+
+        results.push({
+          id: supply.id,
+          name: supply.name,
+          success: result.success,
+          storedPath: result.storedPath,
+          error: result.error
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+
+      res.json({
+        success: true,
+        processed: results.length,
+        successful: results.filter(r => r.success).length,
+        failed: results.filter(r => !r.success).length,
+        results
+      });
+    } catch (error: any) {
+      console.error('Error batch downloading product images:', error);
+      res.status(500).json({ message: "Failed to batch download images", error: error.message });
+    }
+  });
+
   // ============================================
   // ORDER PHOTO UPLOAD & EXTRACTION ROUTES
   // ============================================

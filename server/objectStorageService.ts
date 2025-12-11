@@ -8,6 +8,7 @@ import {
   getObjectAclPolicy,
   setObjectAclPolicy,
 } from "./objectAcl";
+import { Readable } from "stream";
 
 const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
 
@@ -207,6 +208,82 @@ export class ObjectStorageService {
       objectFile,
       requestedPermission: requestedPermission ?? ObjectPermission.READ,
     });
+  }
+
+  async downloadAndStoreProductImage(
+    externalUrl: string,
+    productId: number,
+    productName: string,
+    brand: string
+  ): Promise<{ success: boolean; storedPath?: string; error?: string }> {
+    try {
+      const response = await fetch(externalUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+      });
+      
+      if (!response.ok) {
+        return { success: false, error: `Failed to fetch image: ${response.status}` };
+      }
+
+      const contentType = response.headers.get('content-type') || 'image/jpeg';
+      const extension = contentType.includes('png') ? 'png' : 
+                       contentType.includes('gif') ? 'gif' : 
+                       contentType.includes('webp') ? 'webp' : 'jpg';
+
+      const sanitizedBrand = (brand || 'unknown').toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+      const sanitizedName = productName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 50);
+      const fileName = `products/${sanitizedBrand}/${sanitizedName}-${productId}.${extension}`;
+
+      const publicPaths = this.getPublicObjectSearchPaths();
+      if (publicPaths.length === 0) {
+        return { success: false, error: 'No public object storage paths configured' };
+      }
+
+      const fullPath = `${publicPaths[0]}/${fileName}`;
+      const { bucketName, objectName } = parseObjectPath(fullPath);
+      const bucket = objectStorageClient.bucket(bucketName);
+      const file = bucket.file(objectName);
+
+      const imageBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(imageBuffer);
+
+      await file.save(buffer, {
+        contentType,
+        metadata: {
+          cacheControl: 'public, max-age=31536000',
+        },
+      });
+
+      await setObjectAclPolicy(file, { visibility: 'public' });
+
+      const storedPath = `/public-objects/${fileName}`;
+      return { success: true, storedPath };
+    } catch (error: any) {
+      console.error('Error downloading and storing product image:', error);
+      return { success: false, error: error.message || 'Unknown error' };
+    }
+  }
+
+  async batchDownloadProductImages(
+    products: Array<{ id: number; name: string; brand: string; externalUrl: string }>
+  ): Promise<Array<{ id: number; success: boolean; storedPath?: string; error?: string }>> {
+    const results: Array<{ id: number; success: boolean; storedPath?: string; error?: string }> = [];
+    
+    for (const product of products) {
+      const result = await this.downloadAndStoreProductImage(
+        product.externalUrl,
+        product.id,
+        product.name,
+        product.brand
+      );
+      results.push({ id: product.id, ...result });
+      
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
+    
+    return results;
   }
 }
 
