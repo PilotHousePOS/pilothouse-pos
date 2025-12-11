@@ -116,28 +116,12 @@ function PhoneNumberDisplay({ phoneNumber }: { phoneNumber: string }) {
   return <span className="break-all">{phoneNumber}</span>;
 }
 
-// Calendar component for confirmed appointments and Google Calendar events
+// Calendar component for confirmed appointments
 function AppointmentCalendar({ appointments }: { appointments: any[] }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   
-  // Fetch Google Calendar events for the selected date
-  const { data: googleEvents = [] } = useQuery({
-    queryKey: ["/api/admin/calendar/events/date", selectedDate.toISOString().split('T')[0]],
-    queryFn: async () => {
-      const dateStr = selectedDate.toISOString().split('T')[0];
-      const response = await fetch(`/api/admin/calendar/events/date?date=${dateStr}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
-          return [];
-        }
-        throw new Error('Failed to fetch calendar events');
-      }
-      return response.json();
-    },
-    retry: false,
-  });
+  // Google Calendar integration removed - transition period complete
+  const googleEvents: any[] = [];
 
   // Filter confirmed and completed appointments for the selected date
   const confirmedAppointments = appointments.filter((apt: any) => 
@@ -699,17 +683,6 @@ function ContactFullHistoryDialog({ contactId, contactName, isOpen, onClose }: {
 
 function ContactsManager() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedContacts, setSelectedContacts] = useState<any[]>([]);
-  const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
-  const [eventContactSearch, setEventContactSearch] = useState('');
-  const [showContactDropdown, setShowContactDropdown] = useState(false);
-  const [eventFormData, setEventFormData] = useState({
-    summary: '',
-    description: '',
-    date: '',
-    startTime: '',
-    endTime: '',
-  });
   const [isAddContactOpen, setIsAddContactOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<any>(null);
   const [contactFormData, setContactFormData] = useState({
@@ -826,56 +799,7 @@ function ContactsManager() {
     },
   });
 
-  const syncContactsMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest("POST", "/api/admin/calendar/sync-contacts");
-    },
-    onSuccess: (data: any) => {
-      toast({
-        title: "Sync Complete",
-        description: data.message || "Contacts synced successfully from calendar.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
-    },
-    onError: (error) => {
-      toast({
-        title: "Sync Failed",
-        description: "Failed to sync contacts from calendar.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const createEventMutation = useMutation({
-    mutationFn: async (eventData: any) => {
-      await apiRequest("POST", "/api/admin/calendar/events", eventData);
-    },
-    onSuccess: () => {
-      toast({
-        title: "Event Created",
-        description: "Calendar event has been created successfully.",
-      });
-      setIsCreateEventOpen(false);
-      setSelectedContacts([]);
-      setEventFormData({
-        summary: '',
-        description: '',
-        date: '',
-        startTime: '',
-        endTime: '',
-      });
-      // Invalidate both the general events list and all date-specific queries
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/calendar/events"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/calendar/events/date"] });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to create calendar event.",
-        variant: "destructive",
-      });
-    },
-  });
+  // Google Calendar sync removed - transition period complete
 
   // Map database contacts - all database contacts are editable (both manual and google_calendar sourced)
   const allContacts = allDatabaseContacts.map((c: any) => ({
@@ -978,15 +902,6 @@ function ContactsManager() {
     }
   };
 
-  const toggleContactSelection = (contact: any) => {
-    const contactId = contact.resourceName || contact.email || contact.id;
-    if (selectedContacts.find(c => (c.resourceName || c.email || c.id) === contactId)) {
-      setSelectedContacts(selectedContacts.filter(c => (c.resourceName || c.email || c.id) !== contactId));
-    } else {
-      setSelectedContacts([...selectedContacts, contact]);
-    }
-  };
-
   const handleAddContact = () => {
     const trimmedName = contactFormData.name.trim();
     const trimmedPhone = contactFormData.phoneNumber.trim();
@@ -1070,47 +985,6 @@ function ContactsManager() {
     }
   };
 
-  const handleCreateEvent = () => {
-    if (!eventFormData.summary || !eventFormData.date || !eventFormData.startTime || !eventFormData.endTime) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const startDateTime = `${eventFormData.date}T${eventFormData.startTime}:00`;
-    const endDateTime = `${eventFormData.date}T${eventFormData.endTime}:00`;
-
-    // Filter out contacts without email addresses
-    const validAttendees = selectedContacts
-      .filter(c => c.email)
-      .map(c => ({ email: c.email, displayName: c.displayName || c.name }));
-
-    createEventMutation.mutate({
-      summary: eventFormData.summary,
-      description: eventFormData.description,
-      startDateTime,
-      endDateTime,
-      attendees: validAttendees,
-    });
-  };
-
-  // Close contact dropdown when clicking outside or when dialog closes
-  const handleCloseContactDropdown = () => {
-    setShowContactDropdown(false);
-  };
-
-  // Reset form when dialog closes
-  const handleDialogChange = (open: boolean) => {
-    setIsCreateEventOpen(open);
-    if (!open) {
-      setShowContactDropdown(false);
-      setEventContactSearch('');
-    }
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -1126,17 +1000,6 @@ function ContactsManager() {
             </CardDescription>
           </div>
           <div className="flex flex-col gap-2 sm:flex-shrink-0">
-            <Button 
-              variant="secondary" 
-              onClick={() => syncContactsMutation.mutate()}
-              disabled={syncContactsMutation.isPending}
-              data-testid="button-sync-contacts"
-              className="w-full sm:w-auto"
-              size="sm"
-            >
-              <RefreshCw className={`w-4 h-4 mr-2 ${syncContactsMutation.isPending ? 'animate-spin' : ''}`} />
-              <span className="truncate">{syncContactsMutation.isPending ? 'Syncing...' : 'Sync from Calendar'}</span>
-            </Button>
             <Dialog open={isAddContactOpen} onOpenChange={setIsAddContactOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" data-testid="button-add-contact" className="w-full sm:w-auto" size="sm">
@@ -1379,183 +1242,6 @@ function ContactsManager() {
                 </div>
               </DialogContent>
             </Dialog>
-            <Dialog open={isCreateEventOpen} onOpenChange={handleDialogChange}>
-              <DialogTrigger asChild>
-                <Button data-testid="button-create-event" className="w-full sm:w-auto" size="sm">
-                  <CalendarIcon className="w-4 h-4 mr-2" />
-                  Create Event
-                </Button>
-              </DialogTrigger>
-            <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Create Calendar Event</DialogTitle>
-                <DialogDescription>Create a new event in Google Calendar.</DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="event-summary">Event Title *</Label>
-                  <Input
-                    id="event-summary"
-                    data-testid="input-event-summary"
-                    placeholder="Meeting with client"
-                    value={eventFormData.summary}
-                    onChange={(e) => setEventFormData({ ...eventFormData, summary: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="event-description">Description</Label>
-                  <Textarea
-                    id="event-description"
-                    data-testid="input-event-description"
-                    placeholder="Optional event description"
-                    value={eventFormData.description}
-                    onChange={(e) => setEventFormData({ ...eventFormData, description: e.target.value })}
-                    rows={3}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="event-date">Date *</Label>
-                  <Input
-                    id="event-date"
-                    data-testid="input-event-date"
-                    type="date"
-                    value={eventFormData.date}
-                    onChange={(e) => setEventFormData({ ...eventFormData, date: e.target.value })}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="event-start-time">Start Time *</Label>
-                    <Input
-                      id="event-start-time"
-                      data-testid="input-event-start-time"
-                      type="time"
-                      value={eventFormData.startTime}
-                      onChange={(e) => setEventFormData({ ...eventFormData, startTime: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="event-end-time">End Time *</Label>
-                    <Input
-                      id="event-end-time"
-                      data-testid="input-event-end-time"
-                      type="time"
-                      value={eventFormData.endTime}
-                      onChange={(e) => setEventFormData({ ...eventFormData, endTime: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="contact-selector">Add Attendees</Label>
-                  <div className="relative mt-2">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                      <Input
-                        id="contact-selector"
-                        placeholder="Search contacts to add..."
-                        value={eventContactSearch}
-                        onChange={(e) => setEventContactSearch(e.target.value)}
-                        onFocus={() => setShowContactDropdown(true)}
-                        className="pl-10 pr-10"
-                        data-testid="input-contact-search"
-                      />
-                      {eventContactSearch && (
-                        <button
-                          type="button"
-                          onClick={() => setEventContactSearch('')}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                          data-testid="button-clear-event-contact-search"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                    {showContactDropdown && allContacts.length > 0 && (
-                      <div className="absolute z-50 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                        {allContacts
-                          .filter((contact: any) => 
-                            contact.displayName?.toLowerCase().includes(eventContactSearch.toLowerCase()) ||
-                            contact.name?.toLowerCase().includes(eventContactSearch.toLowerCase()) ||
-                            contact.email?.toLowerCase().includes(eventContactSearch.toLowerCase())
-                          )
-                          .map((contact: any, index: number) => {
-                            const isAlreadySelected = selectedContacts.find(c => (c.email === contact.email || c.id === contact.id));
-                            return (
-                              <div
-                                key={contact.email || contact.id || index}
-                                className={`flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 ${
-                                  isAlreadySelected ? 'bg-blue-50' : ''
-                                }`}
-                                onClick={() => {
-                                  toggleContactSelection(contact);
-                                  setEventContactSearch('');
-                                }}
-                                data-testid={`dropdown-contact-${index}`}
-                              >
-                                <div className="flex-1">
-                                  <p className="text-sm font-medium">{contact.displayName || contact.name}</p>
-                                  <p className="text-xs text-gray-500">{contact.email}</p>
-                                </div>
-                                {isAlreadySelected && (
-                                  <Badge variant="default" className="bg-blue-600 text-xs">
-                                    Selected
-                                  </Badge>
-                                )}
-                              </div>
-                            );
-                          })}
-                        {allContacts.filter((contact: any) => 
-                          contact.displayName?.toLowerCase().includes(eventContactSearch.toLowerCase()) ||
-                          contact.email?.toLowerCase().includes(eventContactSearch.toLowerCase())
-                        ).length === 0 && (
-                          <div className="p-4 text-center text-sm text-gray-500">
-                            No contacts found
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  
-                  {selectedContacts.length > 0 && (
-                    <div className="mt-3">
-                      <p className="text-xs text-gray-600 mb-2">Selected Attendees ({selectedContacts.length})</p>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedContacts.map((contact, idx) => (
-                          <Badge 
-                            key={contact.email} 
-                            variant="secondary" 
-                            className="text-xs flex items-center gap-1 relative"
-                          >
-                            <span className="pointer-events-none">{contact.displayName}</span>
-                            <button
-                              type="button"
-                              className="w-3 h-3 cursor-pointer hover:text-red-600 inline-flex items-center justify-center"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleContactSelection(contact);
-                              }}
-                              aria-label={`Remove ${contact.displayName}`}
-                              data-testid={`remove-contact-${idx}`}
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <Button 
-                  onClick={handleCreateEvent} 
-                  className="w-full"
-                  disabled={createEventMutation.isPending}
-                  data-testid="button-submit-event"
-                >
-                  {createEventMutation.isPending ? 'Creating...' : 'Create Event'}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
         </div>
         </div>
       </CardHeader>
@@ -1604,7 +1290,6 @@ function ContactsManager() {
               onTouchEnd={handleTouchEnd}
             >
                 {paginatedContacts.map((contact: any, index: number) => {
-              const isSelected = selectedContacts.find(c => (c.email === contact.email && c.email) || c.resourceName === contact.resourceName || c.id === contact.id);
               const isExpanded = expandedContactId === (contact.id || contact.resourceName || contact.email);
               // Create a unique key combining multiple fields to avoid duplicates
               const uniqueKey = contact.id 
@@ -1616,17 +1301,10 @@ function ContactsManager() {
               return (
                 <div 
                   key={uniqueKey} 
-                  className={`border rounded-lg p-4 transition-all cursor-pointer hover:bg-gray-50 ${
-                    isSelected ? 'bg-blue-50 border-blue-500' : ''
-                  } ${isExpanded ? 'ring-2 ring-blue-400' : ''}`}
+                  className={`border rounded-lg p-4 transition-all cursor-pointer hover:bg-gray-50 ${isExpanded ? 'ring-2 ring-blue-400' : ''}`}
                   onClick={() => {
-                    if (contact.isDatabaseContact) {
-                      // Toggle expand/collapse for database contacts
-                      setExpandedContactId(isExpanded ? null : (contact.id || contact.resourceName || contact.email));
-                    } else {
-                      // For Google Calendar contacts, select them
-                      toggleContactSelection(contact);
-                    }
+                    // Toggle expand/collapse for contacts
+                    setExpandedContactId(isExpanded ? null : (contact.id || contact.resourceName || contact.email));
                   }}
                   data-testid={`contact-card-${index}`}
                 >
@@ -1776,23 +1454,6 @@ function ContactsManager() {
             );
           })()}
         </>
-        )}
-        
-        {selectedContacts.length > 0 && (
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-sm font-medium text-blue-900 mb-2">
-              {selectedContacts.length} contact{selectedContacts.length > 1 ? 's' : ''} selected
-            </p>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setIsCreateEventOpen(true)}
-              className="w-full"
-            >
-              <CalendarIcon className="w-4 h-4 mr-2" />
-              Create Event with Selected Contacts
-            </Button>
-          </div>
         )}
         
         {/* Full History Dialog */}
@@ -5694,7 +5355,6 @@ export default function Admin() {
     notes: ''
   });
   const [isAddBoardingOpen, setIsAddBoardingOpen] = useState(false);
-  const [isSyncAppointmentsConfirmOpen, setIsSyncAppointmentsConfirmOpen] = useState(false);
   const [showApprovedAppointments, setShowApprovedAppointments] = useState(false);
   const [showDeniedAppointments, setShowDeniedAppointments] = useState(false);
   const [filterByHere, setFilterByHere] = useState(false);
@@ -5806,10 +5466,6 @@ export default function Admin() {
   const [appointmentsTouchStart, setAppointmentsTouchStart] = useState(0);
   const [appointmentsTouchEnd, setAppointmentsTouchEnd] = useState(0);
   
-  // Pagination state for calendar events
-  const [calendarEventsPage, setCalendarEventsPage] = useState(0);
-  const [calendarEventsTouchStart, setCalendarEventsTouchStart] = useState(0);
-  const [calendarEventsTouchEnd, setCalendarEventsTouchEnd] = useState(0);
 
   // Search and pagination state for pets
   const [petSearchQuery, setPetSearchQuery] = useState('');
@@ -5892,11 +5548,6 @@ export default function Admin() {
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
 
-  const { data: calendarEvents = [], isError: calendarEventsError } = useQuery<any[]>({
-    queryKey: ["/api/admin/calendar/events"],
-    enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
-    retry: false,
-  });
 
   const groomersQuery = useQuery<any[]>({
     queryKey: ["/api/admin/groomers"],
@@ -6668,30 +6319,7 @@ export default function Admin() {
     },
   });
 
-  const syncAppointmentsMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest("POST", "/api/admin/calendar/sync-appointments");
-    },
-    onSuccess: (data: any) => {
-      toast({
-        title: "Appointments Synced",
-        description: data.message || "All appointments replaced with Google Calendar events.",
-      });
-      // Invalidate both appointments and unapproved appointments to refresh the UI
-      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments/unapproved"] });
-      queryClient.invalidateQueries({ predicate: (query) => 
-        Array.isArray(query.queryKey) && query.queryKey.some(k => k === "appointments")
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Sync Failed",
-        description: "Failed to sync appointments from calendar.",
-        variant: "destructive",
-      });
-    },
-  });
+  // Google Calendar sync appointments removed - transition period complete
 
   const cleanupPastAppointmentsMutation = useMutation({
     mutationFn: async (statuses?: string[]) => {
@@ -6757,25 +6385,7 @@ export default function Admin() {
     },
   });
 
-  const deleteCalendarEventMutation = useMutation({
-    mutationFn: async (eventId: string) => {
-      return await apiRequest("DELETE", `/api/admin/calendar/events/${eventId}`, {});
-    },
-    onSuccess: () => {
-      toast({
-        title: "Event Deleted",
-        description: "Calendar event has been deleted successfully.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/calendar/events"] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Delete Failed",
-        description: error.message || "Failed to delete calendar event",
-        variant: "destructive",
-      });
-    },
-  });
+  // deleteCalendarEventMutation removed - Google Calendar integration removed
 
 
   // Clamp approved appointments pagination when list shrinks
@@ -7378,45 +6988,11 @@ export default function Admin() {
     setAppointmentsTouchEnd(0);
   };
 
-  // Calendar events pagination handlers
-  const handleCalendarEventsTouchStart = (e: React.TouchEvent) => {
-    setCalendarEventsTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleCalendarEventsTouchMove = (e: React.TouchEvent) => {
-    setCalendarEventsTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleCalendarEventsTouchEnd = () => {
-    if (!calendarEventsTouchStart || !calendarEventsTouchEnd) return;
-    
-    const distance = calendarEventsTouchStart - calendarEventsTouchEnd;
-    const minSwipeDistance = 50;
-    const totalCalendarPages = Math.ceil((calendarEvents as any[]).length / ITEMS_PER_PAGE);
-    
-    if (distance > minSwipeDistance && calendarEventsPage < totalCalendarPages - 1) {
-      setCalendarEventsPage(prev => prev + 1);
-    }
-    
-    if (distance < -minSwipeDistance && calendarEventsPage > 0) {
-      setCalendarEventsPage(prev => prev - 1);
-    }
-    
-    setCalendarEventsTouchStart(0);
-    setCalendarEventsTouchEnd(0);
-  };
-
   // Calculate paginated data
   const totalAppointmentPages = Math.ceil((appointments as any[]).length / ITEMS_PER_PAGE);
   const paginatedAppointments = (appointments as any[]).slice(
     appointmentsPage * ITEMS_PER_PAGE,
     (appointmentsPage + 1) * ITEMS_PER_PAGE
-  );
-
-  const totalCalendarPages = Math.ceil((calendarEvents as any[]).length / ITEMS_PER_PAGE);
-  const paginatedCalendarEvents = (calendarEvents as any[]).slice(
-    calendarEventsPage * ITEMS_PER_PAGE,
-    (calendarEventsPage + 1) * ITEMS_PER_PAGE
   );
 
   if (isLoading) {
@@ -8539,17 +8115,6 @@ export default function Admin() {
                   Pending Appointments ({(appointments as any[]).filter((a: any) => a.status === 'scheduled').length})
                 </CardTitle>
                 <div className="flex flex-col gap-2 w-full sm:w-auto">
-                  <Button 
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsSyncAppointmentsConfirmOpen(true)}
-                    disabled={syncAppointmentsMutation.isPending}
-                    data-testid="button-sync-appointments-groomer"
-                    className="w-full sm:w-auto bg-blue-50 border-blue-200 hover:bg-blue-100 text-blue-700"
-                  >
-                    <RefreshCw className={`w-4 h-4 mr-2 ${syncAppointmentsMutation.isPending ? 'animate-spin' : ''}`} />
-                    {syncAppointmentsMutation.isPending ? 'Syncing...' : 'Sync from Calendar'}
-                  </Button>
                   {typedUser?.isAdmin && (
                     <Button 
                       variant="outline"
@@ -9420,133 +8985,6 @@ export default function Admin() {
             );
           })()}
 
-          {/* Google Calendar Events Section */}
-          {calendarEvents && calendarEvents.length > 0 && (
-            <Card className="border-2 border-purple-200 bg-purple-50/30">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-purple-700">
-                  <CalendarIcon className="w-5 h-5" />
-                  Google Calendar Events ({calendarEvents.length})
-                </CardTitle>
-                <CardDescription className="text-purple-600">
-                  Events from your connected Google Calendar (Read-only)
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="relative">
-                  {/* Previous page button */}
-                  {calendarEventsPage > 0 && (
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg"
-                      onClick={() => setCalendarEventsPage(prev => prev - 1)}
-                    >
-                      <ArrowLeft className="w-5 h-5" />
-                    </Button>
-                  )}
-
-                  {/* Calendar events grid with swipe support */}
-                  <div
-                    key={`calendar-events-${calendarEventsPage}`}
-                    className="space-y-4"
-                    onTouchStart={handleCalendarEventsTouchStart}
-                    onTouchMove={handleCalendarEventsTouchMove}
-                    onTouchEnd={handleCalendarEventsTouchEnd}
-                  >
-                    {paginatedCalendarEvents.map((event: any) => (
-                      <div key={event.id} className="flex items-center justify-between p-4 border-2 border-purple-200 rounded-lg bg-white">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge className="bg-purple-600 text-white">
-                              <CalendarIcon className="w-3 h-3 mr-1" />
-                              Google Calendar
-                            </Badge>
-                          </div>
-                          <h3 className="font-semibold text-purple-900">{event.summary || 'Untitled Event'}</h3>
-                          {event.description && (
-                            <p className="text-sm text-gray-600 mt-1">{event.description}</p>
-                          )}
-                          <div className="mt-2 space-y-1">
-                            <p className="text-sm text-gray-600">
-                              <strong>Start:</strong> {new Date(event.start?.dateTime || event.start?.date).toLocaleString()}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              <strong>End:</strong> {new Date(event.end?.dateTime || event.end?.date).toLocaleString()}
-                            </p>
-                            {event.attendees && event.attendees.length > 0 && (
-                              <p className="text-sm text-gray-600">
-                                <strong>Attendees:</strong> {event.attendees.map((a: any) => a.email).join(', ')}
-                              </p>
-                            )}
-                            {event.linkedContacts && event.linkedContacts.length > 0 && (
-                              <div className="mt-2 p-2 bg-purple-50 rounded border border-purple-200">
-                                <p className="text-xs font-semibold text-purple-700 mb-1">Linked Contacts:</p>
-                                {event.linkedContacts.map((contact: any, idx: number) => (
-                                  <div key={idx} className="text-xs text-gray-700 ml-2">
-                                    <span className="font-medium">{contact.name}</span>
-                                    {contact.animalType && (
-                                      <span className="ml-2">
-                                        🐾 <span className="capitalize">{contact.animalType.replace('_', ' ')}</span>
-                                        {contact.breed && contact.animalType === 'dog' && (
-                                          <span> - {contact.breed}</span>
-                                        )}
-                                      </span>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                          {event.htmlLink && (
-                            <a
-                              href={event.htmlLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-purple-600 hover:underline mt-2 inline-block"
-                            >
-                              View in Google Calendar →
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Next page button */}
-                  {calendarEventsPage < totalCalendarPages - 1 && (
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg"
-                      onClick={() => setCalendarEventsPage(prev => prev + 1)}
-                    >
-                      <ArrowLeft className="w-5 h-5 rotate-180" />
-                    </Button>
-                  )}
-                </div>
-
-                {/* Page indicators */}
-                {totalCalendarPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 mt-4">
-                    <span className="text-xs text-gray-500">
-                      Page {calendarEventsPage + 1} of {totalCalendarPages}
-                    </span>
-                    <div className="flex gap-1">
-                      {Array.from({ length: totalCalendarPages }).map((_, i) => (
-                        <div
-                          key={i}
-                          className={`h-2 w-2 rounded-full ${
-                            i === calendarEventsPage ? 'bg-purple-600' : 'bg-gray-300'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
         </TabsContent>
 
         <TabsContent value="users" className="space-y-6">
@@ -9636,119 +9074,6 @@ export default function Admin() {
         <TabsContent value="calendar" className="space-y-6">
           {/* Appointment Calendar */}
           <AppointmentCalendar appointments={appointments} />
-          
-          {/* Google Calendar Events */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CalendarIcon className="w-5 h-5" />
-                Google Calendar Events
-                <Badge variant="secondary" className="ml-2 text-xs">Shared Across All Admins</Badge>
-              </CardTitle>
-              <CardDescription>
-                All admin accounts have access to the same workspace Google Calendar
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {calendarEventsError ? (
-                <div className="text-center py-8">
-                  <p className="text-sm text-gray-500 mb-2">
-                    Google Calendar not connected or error fetching events
-                  </p>
-                  <p className="text-xs text-gray-400 mb-3">
-                    Make sure your Google Calendar is properly connected in the integrations
-                  </p>
-                  <p className="text-xs text-blue-600 font-medium">
-                    ℹ️ All admin accounts share the same workspace calendar
-                  </p>
-                </div>
-              ) : calendarEvents.length === 0 ? (
-                <div className="text-center py-8">
-                  <CalendarIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500">No upcoming events found</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {calendarEvents.map((event: any, index: number) => (
-                    <div 
-                      key={event.id || index} 
-                      className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-sm mb-1">
-                            {event.summary || 'Untitled Event'}
-                          </h4>
-                          {event.start && (
-                            <p className="text-xs text-gray-600 mb-1">
-                              {new Date(event.start.dateTime || event.start.date).toLocaleString('en-US', {
-                                weekday: 'short',
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric',
-                                hour: event.start.dateTime ? 'numeric' : undefined,
-                                minute: event.start.dateTime ? 'numeric' : undefined,
-                              })}
-                            </p>
-                          )}
-                          {event.description && (
-                            <p className="text-xs text-gray-500 line-clamp-2 mt-1">
-                              {event.description}
-                            </p>
-                          )}
-                          {event.attendees && event.attendees.length > 0 && (
-                            <div className="mt-2 flex flex-wrap gap-1">
-                              {event.attendees.slice(0, 3).map((attendee: any, i: number) => (
-                                <Badge key={i} variant="outline" className="text-xs">
-                                  {attendee.displayName || attendee.email}
-                                </Badge>
-                              ))}
-                              {event.attendees.length > 3 && (
-                                <Badge variant="outline" className="text-xs">
-                                  +{event.attendees.length - 3} more
-                                </Badge>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex flex-col gap-2 items-end">
-                          {event.htmlLink && (
-                            <a
-                              href={event.htmlLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-brand-blue text-xs hover:underline"
-                              data-testid={`link-view-event-${event.id}`}
-                            >
-                              View
-                            </a>
-                          )}
-                          {typedUser?.isAdmin && (
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => {
-                                if (confirm('Are you sure you want to delete this calendar event? This action cannot be undone.')) {
-                                  deleteCalendarEventMutation.mutate(event.id);
-                                }
-                              }}
-                              disabled={deleteCalendarEventMutation.isPending}
-                              data-testid={`button-delete-event-${event.id}`}
-                              className="h-7 text-xs"
-                            >
-                              <Trash2 className="w-3 h-3 mr-1" />
-                              Delete
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
         </TabsContent>
 
         <TabsContent value="contacts" className="space-y-6">
@@ -11180,59 +10505,6 @@ export default function Admin() {
           </DialogContent>
         </Dialog>
       )}
-
-      {/* Delete Groomer Confirmation Dialog */}
-      <Dialog open={isSyncAppointmentsConfirmOpen} onOpenChange={setIsSyncAppointmentsConfirmOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-orange-500" />
-              Sync Appointments from Google Calendar
-            </DialogTitle>
-            <DialogDescription>Confirm syncing appointments from Google Calendar.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="p-4 bg-orange-50 dark:bg-orange-950 rounded-lg border border-orange-200 dark:border-orange-800">
-              <p className="text-sm text-orange-800 dark:text-orange-200 font-semibold mb-2">
-                ⚠️ Warning: This action cannot be undone!
-              </p>
-              <p className="text-sm text-orange-700 dark:text-orange-300">
-                This will permanently delete <strong>ALL existing appointments</strong> and replace them with events from your Google Calendar.
-              </p>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Calendar events will be converted to appointments with:
-            </p>
-            <ul className="text-sm text-gray-600 dark:text-gray-400 list-disc list-inside space-y-1">
-              <li>Pet and owner info extracted from event details</li>
-              <li>Service type determined from event title</li>
-              <li>Phone numbers parsed from descriptions</li>
-              <li>Automatic approval for synced appointments</li>
-            </ul>
-            <div className="flex gap-2 justify-end pt-2">
-              <Button
-                variant="outline"
-                onClick={() => setIsSyncAppointmentsConfirmOpen(false)}
-                data-testid="button-cancel-sync-appointments"
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  syncAppointmentsMutation.mutate();
-                  setIsSyncAppointmentsConfirmOpen(false);
-                }}
-                disabled={syncAppointmentsMutation.isPending}
-                data-testid="button-confirm-sync-appointments"
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${syncAppointmentsMutation.isPending ? 'animate-spin' : ''}`} />
-                {syncAppointmentsMutation.isPending ? "Syncing..." : "Yes, Sync Now"}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {groomerToDelete && (
         <Dialog open={!!groomerToDelete} onOpenChange={() => setGroomerToDelete(null)}>
