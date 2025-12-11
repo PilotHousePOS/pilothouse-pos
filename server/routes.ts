@@ -1735,6 +1735,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const id = parseInt(req.params.id);
+      
+      // Get appointment to check capacity before approving
+      const appointmentToApprove = await storage.getAppointment(id);
+      if (!appointmentToApprove) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+      
+      // CAPACITY CHECK: Ensure we don't exceed limits when approving
+      const { getLocalDateString, getLocalDayOfWeek } = await import('./scheduler');
+      const appointmentDate = new Date(appointmentToApprove.appointmentDate);
+      const appointmentDateStr = getLocalDateString(appointmentDate);
+      const dayOfWeek = getLocalDayOfWeek(appointmentDate);
+      
+      // Get appointment pets to count service types
+      const appointmentPets = await storage.getAppointmentPets(id);
+      
+      // Check weekly limits for Monday-Saturday (1-6)
+      if (dayOfWeek >= 1 && dayOfWeek <= 6) {
+        const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
+        
+        if (weeklyLimit) {
+          // Count existing appointments on this date (excluding cancelled/rejected and THIS appointment)
+          const allAppointments = await storage.getAppointments();
+          const appointmentsOnDate = allAppointments.filter((apt: any) => {
+            const aptDateStr = getLocalDateString(new Date(apt.appointmentDate));
+            return aptDateStr === appointmentDateStr && 
+                   apt.id !== id && // Exclude the appointment being approved
+                   apt.status !== 'cancelled' && 
+                   apt.status !== 'rejected';
+          });
+          
+          // Count existing dogs by service type
+          let bathDogs = 0;
+          let groomDogs = 0;
+          
+          for (const apt of appointmentsOnDate) {
+            const aptPets = await storage.getAppointmentPets(apt.id);
+            if (aptPets && aptPets.length > 0) {
+              for (const p of aptPets) {
+                const serviceType = (p.serviceType || '').toLowerCase();
+                if (serviceType.includes('bath')) {
+                  bathDogs++;
+                } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+                  groomDogs++;
+                }
+              }
+            } else {
+              const serviceType = (apt.serviceType || '').toLowerCase();
+              if (serviceType.includes('bath')) {
+                bathDogs++;
+              } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+                groomDogs++;
+              }
+            }
+          }
+          
+          // Count pets in the appointment being approved
+          let requestedBaths = 0;
+          let requestedGrooms = 0;
+          
+          if (appointmentPets && appointmentPets.length > 0) {
+            for (const p of appointmentPets) {
+              const serviceType = (p.serviceType || '').toLowerCase();
+              if (serviceType.includes('bath')) {
+                requestedBaths++;
+              } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+                requestedGrooms++;
+              }
+            }
+          } else {
+            const serviceType = (appointmentToApprove.serviceType || '').toLowerCase();
+            if (serviceType.includes('bath')) {
+              requestedBaths++;
+            } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+              requestedGrooms++;
+            }
+          }
+          
+          // HARD LIMIT: Cannot approve if it would exceed capacity
+          if (bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
+            return res.status(400).json({
+              message: `Cannot approve: Bath grooming capacity is full for this date (limit: ${weeklyLimit.maxBathAppointments} dogs, ${bathDogs} already booked). Please reject this appointment or move it to a different date.`
+            });
+          }
+          
+          if (groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
+            return res.status(400).json({
+              message: `Cannot approve: Full grooming capacity is full for this date (limit: ${weeklyLimit.maxGroomAppointments} dogs, ${groomDogs} already booked). Please reject this appointment or move it to a different date.`
+            });
+          }
+        }
+      }
+
       const appointment = await storage.approveAppointment(id);
       
       res.json(appointment);
@@ -2116,9 +2209,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get appointment details before updating for customer notification
       const oldAppointment = await storage.getAppointment(id);
       
+      if (!oldAppointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+      
       // Groomers can only edit already-approved appointments, not approve pending ones
       if (user?.isGroomer && !user?.isAdmin && oldAppointment?.status === 'scheduled') {
         return res.status(403).json({ message: "Only admins can approve pending appointments" });
+      }
+      
+      // CAPACITY CHECK: When changing status to 'confirmed', check capacity limits
+      if (status === 'confirmed' && oldAppointment.status !== 'confirmed') {
+        const { getLocalDateString, getLocalDayOfWeek } = await import('./scheduler');
+        const appointmentDate = new Date(oldAppointment.appointmentDate);
+        const appointmentDateStr = getLocalDateString(appointmentDate);
+        const dayOfWeek = getLocalDayOfWeek(appointmentDate);
+        
+        // Get appointment pets to count service types
+        const appointmentPets = await storage.getAppointmentPets(id);
+        
+        // Check weekly limits for Monday-Saturday (1-6)
+        if (dayOfWeek >= 1 && dayOfWeek <= 6) {
+          const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
+          
+          if (weeklyLimit) {
+            // Count existing appointments on this date (excluding cancelled/rejected and THIS appointment)
+            const allAppointments = await storage.getAppointments();
+            const appointmentsOnDate = allAppointments.filter((apt: any) => {
+              const aptDateStr = getLocalDateString(new Date(apt.appointmentDate));
+              return aptDateStr === appointmentDateStr && 
+                     apt.id !== id && // Exclude the appointment being confirmed
+                     apt.status !== 'cancelled' && 
+                     apt.status !== 'rejected';
+            });
+            
+            // Count existing dogs by service type
+            let bathDogs = 0;
+            let groomDogs = 0;
+            
+            for (const apt of appointmentsOnDate) {
+              const aptPets = await storage.getAppointmentPets(apt.id);
+              if (aptPets && aptPets.length > 0) {
+                for (const p of aptPets) {
+                  const serviceType = (p.serviceType || '').toLowerCase();
+                  if (serviceType.includes('bath')) {
+                    bathDogs++;
+                  } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+                    groomDogs++;
+                  }
+                }
+              } else {
+                const serviceType = (apt.serviceType || '').toLowerCase();
+                if (serviceType.includes('bath')) {
+                  bathDogs++;
+                } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+                  groomDogs++;
+                }
+              }
+            }
+            
+            // Count pets in the appointment being confirmed
+            let requestedBaths = 0;
+            let requestedGrooms = 0;
+            
+            if (appointmentPets && appointmentPets.length > 0) {
+              for (const p of appointmentPets) {
+                const serviceType = (p.serviceType || '').toLowerCase();
+                if (serviceType.includes('bath')) {
+                  requestedBaths++;
+                } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+                  requestedGrooms++;
+                }
+              }
+            } else {
+              const serviceType = (oldAppointment.serviceType || '').toLowerCase();
+              if (serviceType.includes('bath')) {
+                requestedBaths++;
+              } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+                requestedGrooms++;
+              }
+            }
+            
+            // HARD LIMIT: Cannot confirm if it would exceed capacity
+            if (bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
+              return res.status(400).json({
+                message: `Cannot confirm: Bath grooming capacity is full for this date (limit: ${weeklyLimit.maxBathAppointments} dogs, ${bathDogs} already booked). Please reject this appointment or move it to a different date.`
+              });
+            }
+            
+            if (groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
+              return res.status(400).json({
+                message: `Cannot confirm: Full grooming capacity is full for this date (limit: ${weeklyLimit.maxGroomAppointments} dogs, ${groomDogs} already booked). Please reject this appointment or move it to a different date.`
+              });
+            }
+          }
+        }
       }
       
       const appointment = await storage.updateAppointmentStatus(id, status);
@@ -3724,9 +3909,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`${newAppointments.length} new appointments to import, ${calendarAppointments.length - newAppointments.length} already exist`);
 
-      // Prepare new appointments with user ID matched by phone number
+      // Prepare new appointments with user ID matched by phone number AND capacity check
       const { phoneNumbersMatch } = await import("./phoneUtils");
+      const { getLocalDateString, getLocalDayOfWeek } = await import('./scheduler');
       const allUsers = await storage.getAllUsers();
+      
+      // Group appointments by date for capacity checking
+      const appointmentsByDate = new Map<string, any[]>();
       
       const appointmentsToCreate = await Promise.all(newAppointments.map(async (apt: any) => {
         // Try to find the user by matching phone number
@@ -3738,10 +3927,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // This ensures appointments can still be created even if customer isn't registered
         const assignedUserId = matchedUser?.id || user.id;
         
-        return {
+        // CAPACITY CHECK: Check if this appointment would exceed limits
+        const appointmentDate = new Date(apt.appointmentDate);
+        const appointmentDateStr = getLocalDateString(appointmentDate);
+        const dayOfWeek = getLocalDayOfWeek(appointmentDate);
+        
+        let status = apt.status || 'pending';
+        let rejectionReason = apt.rejectionReason;
+        
+        // Check weekly limits for Monday-Saturday (1-6)
+        if (dayOfWeek >= 1 && dayOfWeek <= 6) {
+          const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
+          
+          if (weeklyLimit) {
+            // Count existing appointments on this date (excluding cancelled/rejected)
+            const existingApptsOnDate = remainingAppointments.filter((existing: any) => {
+              const existingDateStr = getLocalDateString(new Date(existing.appointmentDate));
+              return existingDateStr === appointmentDateStr && 
+                     existing.status !== 'cancelled' && 
+                     existing.status !== 'rejected';
+            });
+            
+            // Also count previously processed appointments from this sync batch
+            const batchApptsOnDate = appointmentsByDate.get(appointmentDateStr) || [];
+            
+            // Count existing dogs by service type
+            let bathDogs = 0;
+            let groomDogs = 0;
+            
+            for (const existing of existingApptsOnDate) {
+              const existingPets = await storage.getAppointmentPets(existing.id);
+              if (existingPets && existingPets.length > 0) {
+                for (const p of existingPets) {
+                  const svc = (p.serviceType || '').toLowerCase();
+                  if (svc.includes('bath')) bathDogs++;
+                  else if (svc.includes('full') || svc.includes('groom')) groomDogs++;
+                }
+              } else {
+                const svc = (existing.serviceType || '').toLowerCase();
+                if (svc.includes('bath')) bathDogs++;
+                else if (svc.includes('full') || svc.includes('groom')) groomDogs++;
+              }
+            }
+            
+            // Count from batch
+            for (const batchApt of batchApptsOnDate) {
+              if (batchApt.status !== 'rejected') {
+                const svc = (batchApt.serviceType || '').toLowerCase();
+                if (svc.includes('bath')) bathDogs++;
+                else if (svc.includes('full') || svc.includes('groom')) groomDogs++;
+              }
+            }
+            
+            // Count this appointment
+            const aptServiceType = (apt.serviceType || '').toLowerCase();
+            const isBath = aptServiceType.includes('bath');
+            const isGroom = aptServiceType.includes('full') || aptServiceType.includes('groom');
+            
+            // Check capacity
+            if (isBath && bathDogs + 1 > weeklyLimit.maxBathAppointments) {
+              status = 'rejected';
+              rejectionReason = `Auto-rejected during sync: Bath capacity exceeded (limit: ${weeklyLimit.maxBathAppointments})`;
+              console.log(`Rejecting calendar appointment due to bath capacity: ${apt.ownerLastName} on ${appointmentDateStr}`);
+            } else if (isGroom && groomDogs + 1 > weeklyLimit.maxGroomAppointments) {
+              status = 'rejected';
+              rejectionReason = `Auto-rejected during sync: Full groom capacity exceeded (limit: ${weeklyLimit.maxGroomAppointments})`;
+              console.log(`Rejecting calendar appointment due to groom capacity: ${apt.ownerLastName} on ${appointmentDateStr}`);
+            }
+          }
+        }
+        
+        const appointmentData = {
           ...apt,
           userId: assignedUserId,
+          status,
+          rejectionReason,
         };
+        
+        // Track for batch counting
+        if (!appointmentsByDate.has(appointmentDateStr)) {
+          appointmentsByDate.set(appointmentDateStr, []);
+        }
+        appointmentsByDate.get(appointmentDateStr)!.push(appointmentData);
+        
+        return appointmentData;
       }));
 
       // Validate that all required fields are present
@@ -3753,19 +4022,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create new appointments
       let createdAppointments: any[] = [];
+      let rejectedCount = 0;
       if (appointmentsToCreate.length > 0) {
         createdAppointments = await storage.bulkCreateAppointments(appointmentsToCreate);
-        console.log(`Created ${createdAppointments.length} new appointments from calendar`);
+        rejectedCount = appointmentsToCreate.filter((apt: any) => apt.status === 'rejected').length;
+        console.log(`Created ${createdAppointments.length} new appointments from calendar (${rejectedCount} auto-rejected due to capacity)`);
       }
 
       res.json({ 
         message: appointmentsToDelete.length > 0 
-          ? `Cleaned up ${appointmentsToDelete.length} old appointments and imported ${createdAppointments.length} new appointments from Google Calendar`
-          : `Successfully imported ${createdAppointments.length} new appointments from Google Calendar`,
+          ? `Cleaned up ${appointmentsToDelete.length} old appointments and imported ${createdAppointments.length} new appointments from Google Calendar${rejectedCount > 0 ? ` (${rejectedCount} auto-rejected due to capacity limits)` : ''}`
+          : `Successfully imported ${createdAppointments.length} new appointments from Google Calendar${rejectedCount > 0 ? ` (${rejectedCount} auto-rejected due to capacity limits)` : ''}`,
         appointments: createdAppointments,
         newCount: createdAppointments.length,
         skippedCount: calendarAppointments.length - newAppointments.length,
         deletedCount: appointmentsToDelete.length,
+        rejectedCount,
       });
     } catch (error) {
       console.error("Error syncing appointments from calendar:", error);
