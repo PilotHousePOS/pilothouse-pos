@@ -84,8 +84,9 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
     default: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200"
   };
 
-  const images = supply.imageUrls?.filter((url: string) => url && url.startsWith('http') && !url.includes('placeholder')) || 
-                (supply.imageUrl && supply.imageUrl.startsWith('http') && !supply.imageUrl.includes('placeholder') ? [supply.imageUrl] : []);
+  const filteredImageUrls = supply.imageUrls?.filter((url: string) => url && url.startsWith('http') && !url.includes('placeholder')) || [];
+  const singleImageUrl = supply.imageUrl && supply.imageUrl.startsWith('http') && !supply.imageUrl.includes('placeholder') ? [supply.imageUrl] : [];
+  const images = filteredImageUrls.length > 0 ? filteredImageUrls : singleImageUrl;
   const hasMultipleImages = images.length > 1;
   const fallbackImage = defaultImages[supply.category] || defaultImages.default;
   const imageUrl = imageError || images.length === 0 ? fallbackImage : (images[currentImageIndex] || fallbackImage);
