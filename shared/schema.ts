@@ -181,6 +181,7 @@ export const appointmentPets = pgTable("appointment_pets", {
   petName: varchar("pet_name", { length: 255 }).notNull(),
   petType: varchar("pet_type", { length: 100 }).notNull(), // Dog or Cat
   serviceType: varchar("service_type", { length: 100 }).notNull(), // "Bath Only" or "Full Grooming"
+  specialNotes: text("special_notes"), // Per-pet special notes/instructions
   groomerId: integer("groomer_id").references(() => groomers.id, { onDelete: "set null" }), // Per-pet groomer assignment (overrides appointment-level)
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
