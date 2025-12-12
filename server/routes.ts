@@ -6503,6 +6503,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Import product image URLs (for use in production) (Admin only)
+  // IMPORTANT: Matches by NAME + BRAND first (not ID) since IDs differ between environments
   app.post("/api/admin/supplies/image-sync/import", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
@@ -6516,37 +6517,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid data format. Expected { data: [...] }" });
       }
 
+      // Load all supplies once for efficient matching
+      const allSupplies = await storage.getAllSupplies();
+      
+      // Build lookup maps for fast matching
+      const supplyByNameBrand = new Map<string, typeof allSupplies[0]>();
+      const supplyByName = new Map<string, typeof allSupplies[0][]>();
+      
+      for (const supply of allSupplies) {
+        // Exact name + brand key (normalized)
+        const key = `${supply.name.toLowerCase().trim()}|${(supply.brand || '').toLowerCase().trim()}`;
+        supplyByNameBrand.set(key, supply);
+        
+        // Also index by name only for fallback
+        const nameKey = supply.name.toLowerCase().trim();
+        if (!supplyByName.has(nameKey)) {
+          supplyByName.set(nameKey, []);
+        }
+        supplyByName.get(nameKey)!.push(supply);
+      }
+
       const stats = {
         attempted: data.length,
         updated: 0,
         skipped: 0,
         notFound: 0,
+        matchedByNameBrand: 0,
+        matchedByNameOnly: 0,
         errors: [] as string[]
       };
 
-      const updates: { id: number; name: string; oldUrl: string | null; newUrl: string }[] = [];
+      const updates: { id: number; name: string; brand: string | null; oldUrl: string | null; newUrl: string; matchType: string }[] = [];
+      const notFoundItems: { name: string; brand: string | null }[] = [];
 
       for (const item of data) {
-        if (!item.id || !item.imageUrl) {
+        if (!item.imageUrl) {
           stats.skipped++;
           continue;
         }
 
         try {
-          // Try to find by ID first
-          let supply = await storage.getSupply(item.id);
-          
-          // If not found by ID, try to match by name + brand
+          let supply: typeof allSupplies[0] | undefined;
+          let matchType = 'none';
+
+          // PRIORITY 1: Match by exact name + brand (most reliable)
+          if (item.name) {
+            const key = `${item.name.toLowerCase().trim()}|${(item.brand || '').toLowerCase().trim()}`;
+            supply = supplyByNameBrand.get(key);
+            if (supply) {
+              matchType = 'name+brand';
+              stats.matchedByNameBrand++;
+            }
+          }
+
+          // PRIORITY 2: Match by name only (if brand didn't match but name is unique)
           if (!supply && item.name) {
-            const allSupplies = await storage.getAllSupplies();
-            supply = allSupplies.find(s => 
-              s.name.toLowerCase() === item.name.toLowerCase() &&
-              (s.brand || '').toLowerCase() === (item.brand || '').toLowerCase()
-            );
+            const nameKey = item.name.toLowerCase().trim();
+            const matches = supplyByName.get(nameKey);
+            if (matches && matches.length === 1) {
+              supply = matches[0];
+              matchType = 'name-only';
+              stats.matchedByNameOnly++;
+            }
           }
 
           if (!supply) {
             stats.notFound++;
+            notFoundItems.push({ name: item.name, brand: item.brand });
             continue;
           }
 
@@ -6559,8 +6596,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           updates.push({
             id: supply.id,
             name: supply.name,
+            brand: supply.brand,
             oldUrl: supply.imageUrl,
-            newUrl: item.imageUrl
+            newUrl: item.imageUrl,
+            matchType
           });
 
           if (!dryRun) {
@@ -6568,7 +6607,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           stats.updated++;
         } catch (error: any) {
-          stats.errors.push(`ID ${item.id}: ${error.message}`);
+          stats.errors.push(`${item.name}: ${error.message}`);
         }
       }
 
@@ -6576,9 +6615,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         dryRun,
         stats,
-        updates: dryRun ? updates : undefined,
+        updates: dryRun ? updates.slice(0, 50) : undefined, // Limit preview for large imports
+        notFound: notFoundItems.slice(0, 20), // Show first 20 not found items
         message: dryRun 
-          ? `Dry run complete. ${stats.updated} products would be updated.`
+          ? `Dry run complete. ${stats.updated} products would be updated (${stats.matchedByNameBrand} by name+brand, ${stats.matchedByNameOnly} by name only).`
           : `Sync complete. ${stats.updated} products updated.`
       });
     } catch (error) {
