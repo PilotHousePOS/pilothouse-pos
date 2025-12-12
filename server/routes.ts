@@ -2736,7 +2736,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid appointment data", errors: error.errors });
       }
-      res.status(500).json({ message: "Failed to create appointment" });
+      // Return more specific error message for debugging production issues
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error("Appointment creation failed with:", errorMessage);
+      res.status(500).json({ message: `Failed to create appointment: ${errorMessage}` });
     }
   });
 

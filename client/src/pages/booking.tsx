@@ -337,10 +337,10 @@ export default function Booking() {
         return;
       }
       
-      // For other errors, show toast
+      // For other errors, show toast with actual error message
       toast({
         title: "Booking Failed",
-        description: "Failed to book appointment. Please try again.",
+        description: errorText || "Failed to book appointment. Please try again.",
         variant: "destructive",
       });
     },
