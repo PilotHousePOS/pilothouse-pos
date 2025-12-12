@@ -5804,6 +5804,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Restore Object Storage image references by scanning the bucket (Admin only)
+  // This fixes products that have null image_url but have files in Object Storage
+  app.post("/api/admin/supplies/restore-image-references", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { objectStorageClient } = await import('./objectStorageService');
+      const { db } = await import('./db');
+      const { sql } = await import('drizzle-orm');
+
+      // Get bucket name from environment
+      const publicPaths = process.env.PUBLIC_OBJECT_SEARCH_PATHS;
+      if (!publicPaths) {
+        return res.status(500).json({ message: "PUBLIC_OBJECT_SEARCH_PATHS not configured" });
+      }
+
+      const firstPath = publicPaths.split(';')[0];
+      const bucketMatch = firstPath.match(/^([^/]+)/);
+      if (!bucketMatch) {
+        return res.status(500).json({ message: "Could not parse bucket name from PUBLIC_OBJECT_SEARCH_PATHS" });
+      }
+      const bucketName = bucketMatch[1];
+
+      console.log(`Scanning Object Storage bucket: ${bucketName}/public/products/`);
+
+      // List all files in the products directory
+      const bucket = objectStorageClient.bucket(bucketName);
+      const [files] = await bucket.getFiles({ prefix: 'public/products/' });
+
+      console.log(`Found ${files.length} files in Object Storage`);
+
+      // Extract product IDs from file names and build a map
+      const fileMap = new Map<number, string>();
+      for (const file of files) {
+        // File names are like: public/products/brand/product-name-123.jpg
+        const match = file.name.match(/-(\d+)\.(jpg|png|gif|webp)$/i);
+        if (match) {
+          const productId = parseInt(match[1]);
+          const storedPath = `/public-objects/${file.name.replace(/^public\//, '')}`;
+          fileMap.set(productId, storedPath);
+        }
+      }
+
+      console.log(`Matched ${fileMap.size} files to product IDs`);
+
+      // Get all products with null image_url
+      const nullImageProducts = await db.execute(sql`
+        SELECT id FROM supplies WHERE image_url IS NULL
+      `);
+
+      let restored = 0;
+      for (const row of nullImageProducts.rows) {
+        const productId = row.id as number;
+        if (fileMap.has(productId)) {
+          const storedPath = fileMap.get(productId)!;
+          await db.execute(sql`
+            UPDATE supplies SET image_url = ${storedPath} WHERE id = ${productId}
+          `);
+          restored++;
+        }
+      }
+
+      console.log(`Restored ${restored} image references from Object Storage`);
+
+      res.json({
+        success: true,
+        filesInStorage: files.length,
+        matchedToProducts: fileMap.size,
+        productsWithNullImage: nullImageProducts.rows.length,
+        restored,
+        message: `Restored ${restored} image references from Object Storage`
+      });
+    } catch (error: any) {
+      console.error('Error restoring image references:', error);
+      res.status(500).json({ message: "Failed to restore image references", error: error.message });
+    }
+  });
+
   // Direct file upload for supply images (Admin only)
   // Also applies abbreviation expansion to correct product names
   app.post("/api/admin/supplies/:id/upload-image", authMiddleware, upload.single('image'), async (req: any, res) => {
