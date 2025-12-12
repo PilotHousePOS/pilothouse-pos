@@ -5608,6 +5608,166 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Bulk download ALL external URL images to Object Storage (Admin only)
+  // Processes supplies with external URLs in configurable batches by brand
+  app.post("/api/admin/supplies/bulk-download-all-images", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { 
+        brand = null,           // Filter by brand (null = all brands)
+        batchSize = 50,         // Products per batch
+        delayMs = 200,          // Delay between downloads
+        offset = 0,             // Starting offset for pagination
+        maxProducts = 100       // Max products to process in this request
+      } = req.body;
+
+      // Get all supplies with external URLs
+      let query = `
+        SELECT id, name, brand, image_url 
+        FROM supplies 
+        WHERE image_url LIKE 'http%'
+      `;
+      
+      if (brand) {
+        query += ` AND LOWER(brand) = LOWER('${brand.replace(/'/g, "''")}')`;
+      }
+      
+      query += ` ORDER BY brand, id LIMIT ${Math.min(maxProducts, 200)} OFFSET ${offset}`;
+
+      const { db } = await import('./db');
+      const { sql } = await import('drizzle-orm');
+      const products = await db.execute(sql.raw(query));
+      
+      if (!products.rows || products.rows.length === 0) {
+        return res.json({
+          success: true,
+          message: "No products with external URLs found",
+          processed: 0,
+          successful: 0,
+          failed: 0,
+          nextOffset: null
+        });
+      }
+
+      const { ObjectStorageService } = await import('./objectStorageService');
+      const objectStorageService = new ObjectStorageService();
+
+      const results: any[] = [];
+      let successful = 0;
+      let failed = 0;
+
+      for (const row of products.rows as any[]) {
+        try {
+          const result = await objectStorageService.downloadAndStoreProductImage(
+            row.image_url,
+            row.id,
+            row.name,
+            row.brand || 'unknown'
+          );
+
+          if (result.success && result.storedPath) {
+            await storage.updateSupply(row.id, { imageUrl: result.storedPath });
+            successful++;
+            results.push({
+              id: row.id,
+              name: row.name,
+              brand: row.brand,
+              success: true,
+              storedPath: result.storedPath
+            });
+          } else {
+            failed++;
+            results.push({
+              id: row.id,
+              name: row.name,
+              brand: row.brand,
+              success: false,
+              error: result.error
+            });
+          }
+
+          // Rate limiting
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+        } catch (error: any) {
+          failed++;
+          results.push({
+            id: row.id,
+            name: row.name,
+            brand: row.brand,
+            success: false,
+            error: error.message
+          });
+        }
+      }
+
+      // Calculate next offset for pagination
+      const hasMore = products.rows.length === Math.min(maxProducts, 200);
+      const nextOffset = hasMore ? offset + products.rows.length : null;
+
+      res.json({
+        success: true,
+        processed: results.length,
+        successful,
+        failed,
+        offset,
+        nextOffset,
+        hasMore,
+        brandFilter: brand || 'all',
+        results
+      });
+    } catch (error: any) {
+      console.error('Error bulk downloading images:', error);
+      res.status(500).json({ message: "Failed to bulk download images", error: error.message });
+    }
+  });
+
+  // Get statistics on supplies with external URLs vs Object Storage (Admin only)
+  app.get("/api/admin/supplies/image-download-stats", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { db } = await import('./db');
+      const { sql } = await import('drizzle-orm');
+
+      // Get overall stats
+      const overallStats = await db.execute(sql`
+        SELECT 
+          COUNT(*) as total,
+          COUNT(CASE WHEN image_url LIKE '/public-objects/%' THEN 1 END) as in_object_storage,
+          COUNT(CASE WHEN image_url LIKE 'http%' THEN 1 END) as external_urls,
+          COUNT(CASE WHEN image_url IS NULL OR image_url = '' THEN 1 END) as no_image
+        FROM supplies
+      `);
+
+      // Get stats by brand for external URLs
+      const brandStats = await db.execute(sql`
+        SELECT 
+          COALESCE(brand, 'Unknown') as brand,
+          COUNT(*) as external_count
+        FROM supplies 
+        WHERE image_url LIKE 'http%'
+        GROUP BY brand
+        ORDER BY COUNT(*) DESC
+        LIMIT 50
+      `);
+
+      res.json({
+        overall: overallStats.rows[0],
+        byBrand: brandStats.rows
+      });
+    } catch (error: any) {
+      console.error('Error getting image download stats:', error);
+      res.status(500).json({ message: "Failed to get image download stats", error: error.message });
+    }
+  });
+
   // Direct file upload for supply images (Admin only)
   // Also applies abbreviation expansion to correct product names
   app.post("/api/admin/supplies/:id/upload-image", authMiddleware, upload.single('image'), async (req: any, res) => {
