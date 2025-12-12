@@ -2873,7 +2873,21 @@ export class DatabaseStorage implements IStorage {
   async upsertSupply(supply: any): Promise<void> {
     const existing = await db.select().from(supplies).where(eq(supplies.id, supply.id)).limit(1);
     if (existing.length > 0) {
-      await db.update(supplies).set(supply).where(eq(supplies.id, supply.id));
+      // Preserve existing Object Storage images if import has null/undefined imageUrl
+      const updateData = { ...supply };
+      if (updateData.imageUrl === null || updateData.imageUrl === undefined) {
+        // Keep existing imageUrl if the new one is null
+        if (existing[0].imageUrl) {
+          delete updateData.imageUrl;
+        }
+      }
+      if (updateData.imageUrls === null || updateData.imageUrls === undefined) {
+        // Keep existing imageUrls if the new one is null
+        if (existing[0].imageUrls) {
+          delete updateData.imageUrls;
+        }
+      }
+      await db.update(supplies).set(updateData).where(eq(supplies.id, supply.id));
     } else {
       await db.insert(supplies).values(supply);
     }
@@ -2900,8 +2914,10 @@ export class DatabaseStorage implements IStorage {
                 brand: sql`EXCLUDED.brand`,
                 price: sql`EXCLUDED.price`,
                 description: sql`EXCLUDED.description`,
-                imageUrl: sql`EXCLUDED.image_url`,
-                imageUrls: sql`EXCLUDED.image_urls`,
+                // IMPORTANT: Preserve existing Object Storage images if import has null
+                // Use COALESCE to keep existing image_url when EXCLUDED is null
+                imageUrl: sql`COALESCE(EXCLUDED.image_url, supplies.image_url)`,
+                imageUrls: sql`COALESCE(EXCLUDED.image_urls, supplies.image_urls)`,
                 stockQuantity: sql`EXCLUDED.stock_quantity`,
                 isActive: sql`EXCLUDED.is_active`,
                 weight: sql`EXCLUDED.weight`,
