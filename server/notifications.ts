@@ -1,23 +1,11 @@
-import { MailService } from '@sendgrid/mail';
+import { getUncachableSendGridClient } from './sendgridIntegration';
 
 // Email notification service
 class EmailService {
-  private mailService: MailService;
-
-  constructor() {
-    this.mailService = new MailService();
-    if (process.env.SENDGRID_API_KEY) {
-      this.mailService.setApiKey(process.env.SENDGRID_API_KEY);
-    }
-  }
-
   async sendAdminNewOrderEmail(adminEmail: string, orderId: number, customerName: string, totalAmount: string): Promise<boolean> {
-    if (!process.env.SENDGRID_API_KEY) {
-      console.log('SendGrid not configured, admin email notification skipped');
-      return false;
-    }
-
     try {
+      const { client, fromEmail } = await getUncachableSendGridClient();
+      
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
@@ -36,9 +24,7 @@ class EmailService {
         </div>
       `;
 
-      const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@animalhouse.com';
-      
-      await this.mailService.send({
+      await client.send({
         to: adminEmail,
         from: fromEmail,
         subject: `New Order #${orderId} - Animal House Admin Alert`,
@@ -53,12 +39,9 @@ class EmailService {
   }
 
   async sendAdminNewAppointmentEmail(adminEmail: string, appointmentId: number, customerName: string, serviceType: string, appointmentDate: string, appointmentTime: string): Promise<boolean> {
-    if (!process.env.SENDGRID_API_KEY) {
-      console.log('SendGrid not configured, admin email notification skipped');
-      return false;
-    }
-
     try {
+      const { client, fromEmail } = await getUncachableSendGridClient();
+      
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
@@ -78,9 +61,7 @@ class EmailService {
         </div>
       `;
 
-      const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@animalhouse.com';
-      
-      await this.mailService.send({
+      await client.send({
         to: adminEmail,
         from: fromEmail,
         subject: `New Appointment #${appointmentId} - Animal House Admin Alert`,
@@ -95,12 +76,9 @@ class EmailService {
   }
 
   async sendOrderStatusEmail(to: string, firstName: string, orderId: number, status: string): Promise<boolean> {
-    if (!process.env.SENDGRID_API_KEY) {
-      console.log('SendGrid not configured, email notification skipped');
-      return false;
-    }
-
     try {
+      const { client, fromEmail } = await getUncachableSendGridClient();
+      
       const statusMessages = {
         'in_progress': {
           subject: 'Your Order is Being Prepared - Animal House',
@@ -138,9 +116,7 @@ class EmailService {
         </div>
       `;
 
-      const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@animalhousepetstore.com';
-      
-      await this.mailService.send({
+      await client.send({
         to,
         from: fromEmail,
         subject: statusInfo.subject,
@@ -157,6 +133,8 @@ class EmailService {
 
   async sendAppointmentConfirmedEmail(to: string, firstName: string, appointmentId: number, serviceType: string, appointmentDate: string, appointmentTime: string): Promise<boolean> {
     try {
+      const { client, fromEmail } = await getUncachableSendGridClient();
+      
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px;">
@@ -188,9 +166,7 @@ class EmailService {
         </div>
       `;
 
-      const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@animalhousepetstore.com';
-      
-      await this.mailService.send({
+      await client.send({
         to,
         from: fromEmail,
         subject: `Appointment Confirmed - ${serviceType} on ${new Date(appointmentDate).toLocaleDateString()}`,
@@ -206,12 +182,9 @@ class EmailService {
   }
 
   async sendAppointmentRejectedEmail(to: string, firstName: string, appointmentId: number, serviceType: string, appointmentDate: string, appointmentTime: string): Promise<boolean> {
-    if (!process.env.SENDGRID_API_KEY) {
-      console.log('SendGrid not configured, email notification skipped');
-      return false;
-    }
-
     try {
+      const { client, fromEmail } = await getUncachableSendGridClient();
+      
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #1e40af; color: white; padding: 20px; text-align: center;">
@@ -230,9 +203,7 @@ class EmailService {
         </div>
       `;
 
-      const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@animalhousepetstore.com';
-      
-      await this.mailService.send({
+      await client.send({
         to,
         from: fromEmail,
         subject: 'Animal House - Appointment Update',
