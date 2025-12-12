@@ -2388,6 +2388,189 @@ function OrderPhotoUploadManager() {
   );
 }
 
+// Product Image Upload Zone - Supports drag & drop, paste, and file browse
+function ProductImageUploadZone({ productId, onImageUploaded }: { 
+  productId: number; 
+  onImageUploaded: (storedPath: string) => void;
+}) {
+  const dropZoneRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const [pasteActive, setPasteActive] = useState(false);
+  const { toast } = useToast();
+
+  const handleFileUpload = useCallback(async (file: File) => {
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid File",
+        description: "Please select an image file (JPG, PNG, GIF, or WebP).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please select an image under 10MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch(`/api/admin/supplies/${productId}/upload-image`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Upload failed');
+      }
+
+      const data = await response.json();
+      onImageUploaded(data.storedPath);
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Upload Failed",
+        description: error.message || "Failed to upload image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  }, [productId, onImageUploaded, toast]);
+
+  // Handle clipboard paste (Ctrl+V / Cmd+V)
+  const handlePaste = useCallback((e: ClipboardEvent) => {
+    if (!pasteActive) return;
+    
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.startsWith('image/')) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (file) {
+          handleFileUpload(file);
+          return;
+        }
+      }
+    }
+    
+    toast({
+      title: "No Image Found",
+      description: "No image was found in your clipboard. Try copying an image first.",
+      variant: "destructive",
+    });
+  }, [pasteActive, handleFileUpload, toast]);
+
+  // Register paste event listener when component is focused
+  useEffect(() => {
+    if (pasteActive) {
+      document.addEventListener('paste', handlePaste);
+      return () => document.removeEventListener('paste', handlePaste);
+    }
+  }, [pasteActive, handlePaste]);
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFileUpload(file);
+  };
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-base font-semibold">Upload Image Directly</Label>
+      <div 
+        ref={dropZoneRef}
+        tabIndex={0}
+        className={`border-2 border-dashed rounded-lg p-6 transition-all cursor-pointer text-center ${
+          uploading ? 'opacity-50 pointer-events-none' :
+          dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 
+          pasteActive ? 'border-green-500 bg-green-50 dark:bg-green-900/20 ring-2 ring-green-300' : 
+          'border-gray-300 hover:border-gray-400'
+        }`}
+        onDrop={handleDrop}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
+        onFocus={() => setPasteActive(true)}
+        onBlur={() => setPasteActive(false)}
+        onClick={() => dropZoneRef.current?.focus()}
+        data-testid="image-upload-zone"
+      >
+        {uploading ? (
+          <div className="py-4">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-500 mb-2" />
+            <p className="text-sm text-gray-600">Uploading to Object Storage...</p>
+          </div>
+        ) : pasteActive ? (
+          <div className="py-4">
+            <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-sm p-3 rounded mb-3">
+              Ready! Press <strong>Ctrl+V</strong> (or Cmd+V on Mac) to paste an image
+            </div>
+            <p className="text-xs text-gray-500">Or drag & drop, or click below to browse</p>
+          </div>
+        ) : (
+          <div className="py-4">
+            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+              Click here to enable paste, or drag & drop
+            </p>
+            <p className="text-xs text-gray-500">
+              Supports: Copy image from Central/dealer site → Click here → Ctrl+V
+            </p>
+          </div>
+        )}
+        
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleFileUpload(file);
+            e.target.value = '';
+          }}
+          className="hidden"
+          data-testid="input-image-file"
+        />
+        
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="mt-2"
+          onClick={(e) => {
+            e.stopPropagation();
+            fileInputRef.current?.click();
+          }}
+          disabled={uploading}
+          data-testid="button-browse-image"
+        >
+          Browse Files
+        </Button>
+      </div>
+      <p className="text-xs text-gray-500">
+        Images are permanently stored and won't disappear.
+      </p>
+    </div>
+  );
+}
+
 // Product Image Manager Component
 function ProductImageManager() {
   const { toast } = useToast();
@@ -2838,69 +3021,72 @@ function ProductImageManager() {
                 <p className="text-sm text-gray-600">Category: {formatCategory(selectedProduct.category)}</p>
               </div>
 
-              <div className="space-y-2">
-                <Label>Image URL</Label>
-                <Input
-                  placeholder="Paste image URL from distributor website..."
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  data-testid="input-image-url"
-                />
-                {imageUrl && (
-                  <div className="border rounded p-2 bg-white">
-                    <img 
-                      src={imageUrl} 
-                      alt="Preview" 
-                      className="max-w-xs max-h-48 object-contain mx-auto"
-                      onError={(e) => {
-                        e.currentTarget.src = '/placeholder-supply.jpg';
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
+              {/* Direct Image Upload Zone */}
+              <ProductImageUploadZone 
+                productId={selectedProduct.id}
+                onImageUploaded={(storedPath) => {
+                  queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/image-stats'] });
+                  queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/by-filter'] });
+                  queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
+                  toast({
+                    title: 'Success',
+                    description: 'Image uploaded and stored permanently!',
+                  });
+                  setSelectedProduct(null);
+                  setImageUrl('');
+                  refetchProducts();
+                }}
+              />
 
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  onClick={() => {
-                    updateImageMutation.mutate({
-                      productId: selectedProduct.id,
-                      imageUrl,
-                    });
-                  }}
-                  disabled={!imageUrl || updateImageMutation.isPending}
-                  data-testid="button-save-image"
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  {updateImageMutation.isPending ? 'Saving...' : 'Save URL'}
-                </Button>
-                <Button
-                  onClick={() => {
-                    downloadImageMutation.mutate({
-                      productId: selectedProduct.id,
-                      externalUrl: imageUrl,
-                    });
-                  }}
-                  disabled={!imageUrl || downloadImageMutation.isPending}
-                  data-testid="button-download-store-image"
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  {downloadImageMutation.isPending ? 'Downloading...' : 'Download & Store Permanently'}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSelectedProduct(null);
-                    setImageUrl('');
-                  }}
-                  data-testid="button-cancel-image"
-                >
-                  Cancel
-                </Button>
+              <div className="border-t pt-4 mt-4">
+                <p className="text-sm font-medium mb-2">Or use a URL:</p>
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Paste image URL from distributor website..."
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    data-testid="input-image-url"
+                  />
+                  {imageUrl && (
+                    <div className="border rounded p-2 bg-white">
+                      <img 
+                        src={imageUrl} 
+                        alt="Preview" 
+                        className="max-w-xs max-h-48 object-contain mx-auto"
+                        onError={(e) => {
+                          e.currentTarget.src = '/placeholder-supply.jpg';
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <Button
+                    onClick={() => {
+                      downloadImageMutation.mutate({
+                        productId: selectedProduct.id,
+                        externalUrl: imageUrl,
+                      });
+                    }}
+                    disabled={!imageUrl || downloadImageMutation.isPending}
+                    data-testid="button-download-store-image"
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    {downloadImageMutation.isPending ? 'Downloading...' : 'Download & Store from URL'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedProduct(null);
+                      setImageUrl('');
+                    }}
+                    data-testid="button-cancel-image"
+                  >
+                    Cancel
+                  </Button>
+                </div>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
-                "Save URL" stores the external link (may break over time). "Download & Store Permanently" saves the image to your local storage for reliable long-term access.
-              </p>
             </div>
           )}
         </CardContent>
