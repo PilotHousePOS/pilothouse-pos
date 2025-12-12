@@ -6504,6 +6504,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Import product image URLs (for use in production) (Admin only)
   // IMPORTANT: Matches by NAME + BRAND first (not ID) since IDs differ between environments
+  // NEW: Downloads external URLs to Object Storage for permanent storage
   app.post("/api/admin/supplies/image-sync/import", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
@@ -6511,10 +6512,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      const { data, dryRun = false } = req.body;
+      const { data, dryRun = false, downloadToStorage = false } = req.body;
 
       if (!data || !Array.isArray(data)) {
         return res.status(400).json({ message: "Invalid data format. Expected { data: [...] }" });
+      }
+
+      // Load Object Storage service if downloading
+      let objectStorageService: any = null;
+      if (downloadToStorage && !dryRun) {
+        const { ObjectStorageService } = await import('./objectStorageService');
+        objectStorageService = new ObjectStorageService();
       }
 
       // Load all supplies once for efficient matching
@@ -6544,10 +6552,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         notFound: 0,
         matchedByNameBrand: 0,
         matchedByNameOnly: 0,
+        downloadedToStorage: 0,
+        downloadFailed: 0,
         errors: [] as string[]
       };
 
-      const updates: { id: number; name: string; brand: string | null; oldUrl: string | null; newUrl: string; matchType: string }[] = [];
+      const updates: { id: number; name: string; brand: string | null; oldUrl: string | null; newUrl: string; matchType: string; downloaded?: boolean }[] = [];
       const notFoundItems: { name: string; brand: string | null }[] = [];
 
       for (const item of data) {
@@ -6593,17 +6603,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
             continue;
           }
 
+          let finalImageUrl = item.imageUrl;
+          let downloaded = false;
+
+          // If downloadToStorage is enabled and URL is external, download to Object Storage
+          if (downloadToStorage && !dryRun && objectStorageService && item.imageUrl.startsWith('http')) {
+            try {
+              const result = await objectStorageService.downloadAndStoreProductImage(
+                item.imageUrl,
+                supply.id,
+                supply.name,
+                supply.brand || 'unknown'
+              );
+              if (result.success && result.storedPath) {
+                finalImageUrl = result.storedPath;
+                downloaded = true;
+                stats.downloadedToStorage++;
+              } else {
+                stats.downloadFailed++;
+                stats.errors.push(`${supply.name}: Download failed - ${result.error}`);
+                continue;
+              }
+            } catch (downloadError: any) {
+              stats.downloadFailed++;
+              stats.errors.push(`${supply.name}: Download error - ${downloadError.message}`);
+              continue;
+            }
+          }
+
           updates.push({
             id: supply.id,
             name: supply.name,
             brand: supply.brand,
             oldUrl: supply.imageUrl,
-            newUrl: item.imageUrl,
-            matchType
+            newUrl: finalImageUrl,
+            matchType,
+            downloaded
           });
 
           if (!dryRun) {
-            await storage.updateSupply(supply.id, { imageUrl: item.imageUrl });
+            await storage.updateSupply(supply.id, { imageUrl: finalImageUrl });
           }
           stats.updated++;
         } catch (error: any) {
@@ -6614,12 +6653,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         success: true,
         dryRun,
+        downloadToStorage,
         stats,
-        updates: dryRun ? updates.slice(0, 50) : undefined, // Limit preview for large imports
-        notFound: notFoundItems.slice(0, 20), // Show first 20 not found items
+        updates: dryRun ? updates.slice(0, 50) : undefined,
+        notFound: notFoundItems.slice(0, 20),
         message: dryRun 
           ? `Dry run complete. ${stats.updated} products would be updated (${stats.matchedByNameBrand} by name+brand, ${stats.matchedByNameOnly} by name only).`
-          : `Sync complete. ${stats.updated} products updated.`
+          : downloadToStorage
+            ? `Sync complete. ${stats.updated} products updated. ${stats.downloadedToStorage} images downloaded to storage.`
+            : `Sync complete. ${stats.updated} products updated.`
       });
     } catch (error) {
       console.error('Error importing image URLs:', error);
