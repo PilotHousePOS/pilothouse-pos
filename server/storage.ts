@@ -192,7 +192,8 @@ export interface IStorage {
     total: number;
   }>;
 
-  getSuppliesWithoutImages(limit: number, offset: number): Promise<Supply[]>;
+  getSuppliesWithoutImages(limit: number, offset: number, brand?: string, category?: string, search?: string): Promise<Supply[]>;
+  getSuppliesByFilter(limit: number, offset: number, brand?: string, category?: string, search?: string): Promise<Supply[]>;
   getSupplyImageStats(): Promise<{
     totalProducts: number;
     withImages: number;
@@ -1159,6 +1160,47 @@ export class DatabaseStorage implements IStorage {
     if (brand) {
       filteredSupplies = filteredSupplies.filter(s => {
         // Handle "Unknown" brand (null or empty in database)
+        if (brand.toLowerCase() === 'unknown') {
+          return !s.brand || s.brand === '';
+        }
+        return s.brand?.toLowerCase() === brand.toLowerCase();
+      });
+    }
+    
+    // Apply category filter
+    if (category) {
+      filteredSupplies = filteredSupplies.filter(s => 
+        s.category?.toLowerCase() === category.toLowerCase()
+      );
+    }
+    
+    return filteredSupplies.slice(offset, offset + limit);
+  }
+
+  async getSuppliesByFilter(
+    limit: number, 
+    offset: number, 
+    brand?: string, 
+    category?: string, 
+    search?: string
+  ): Promise<Supply[]> {
+    const allSupplies = await db.select().from(supplies);
+    
+    let filteredSupplies = allSupplies;
+    
+    // Apply search filter
+    if (search && search.trim()) {
+      const searchLower = search.toLowerCase().trim();
+      filteredSupplies = filteredSupplies.filter(s =>
+        s.name?.toLowerCase().includes(searchLower) ||
+        s.description?.toLowerCase().includes(searchLower) ||
+        s.brand?.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Apply brand filter
+    if (brand) {
+      filteredSupplies = filteredSupplies.filter(s => {
         if (brand.toLowerCase() === 'unknown') {
           return !s.brand || s.brand === '';
         }

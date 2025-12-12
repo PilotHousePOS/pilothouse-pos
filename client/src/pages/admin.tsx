@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import type { User } from "@shared/schema";
@@ -2398,6 +2398,7 @@ function ProductImageManager() {
   const [imageUrl, setImageUrl] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [showProducts, setShowProducts] = useState(false);
+  const [showMissingOnly, setShowMissingOnly] = useState(true); // Toggle for missing vs all
   
   // Batch search state
   const [isBatchSearching, setIsBatchSearching] = useState(false);
@@ -2412,16 +2413,17 @@ function ProductImageManager() {
     queryKey: ['/api/admin/supplies/image-stats'],
   });
 
-  // Fetch products without images
+  // Fetch products (with option to show all or just missing images)
   const { data: productsData, isLoading: productsLoading, refetch: refetchProducts } = useQuery({
-    queryKey: ['/api/admin/supplies/without-images', selectedBrand, selectedCategory, searchQuery],
+    queryKey: ['/api/admin/supplies/by-filter', selectedBrand, selectedCategory, searchQuery, showMissingOnly],
     queryFn: async () => {
-      const params = new URLSearchParams({ limit: '50', offset: '0' });
+      const params = new URLSearchParams({ limit: '100', offset: '0' });
       if (selectedBrand) params.append('brand', selectedBrand);
       if (selectedCategory) params.append('category', selectedCategory);
       if (searchQuery.trim()) params.append('search', searchQuery.trim());
+      params.append('missingOnly', showMissingOnly ? 'true' : 'false');
       
-      const response = await fetch(`/api/admin/supplies/without-images?${params}`, {
+      const response = await fetch(`/api/admin/supplies/by-filter?${params}`, {
         credentials: 'include',
       });
       if (!response.ok) throw new Error('Failed to fetch products');
@@ -2695,7 +2697,19 @@ function ProductImageManager() {
 
               {/* Category Breakdown */}
               <div>
-                <h3 className="font-semibold mb-3">Categories Needing Images</h3>
+                <h3 className="font-semibold mb-3">Categories</h3>
+                <div className="flex items-center gap-4 mb-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={showMissingOnly}
+                      onChange={(e) => setShowMissingOnly(e.target.checked)}
+                      className="rounded"
+                      data-testid="checkbox-missing-only"
+                    />
+                    Show only products missing images
+                  </label>
+                </div>
                 <div className="space-y-2 max-h-60 overflow-y-auto">
                   {((imageStats as any).byCategory || []).slice(0, 10).map((cat: any) => (
                     <div key={cat.category} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded">
@@ -2709,7 +2723,7 @@ function ProductImageManager() {
                           onClick={() => handleCategorySearch(cat.category)}
                           data-testid={`button-select-category-${cat.category}`}
                         >
-                          Search
+                          {showMissingOnly ? 'Missing' : 'All'}
                         </Button>
                       </div>
                     </div>
@@ -11208,9 +11222,38 @@ function SupplyImageUpload({ supplyId, currentImageUrl, onImageUploaded }: {
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [pasteActive, setPasteActive] = useState(false);
   const { toast } = useToast();
 
-  const handleFileUpload = async (file: File) => {
+  // Handle clipboard paste (Ctrl+V / Cmd+V)
+  const handlePaste = useCallback(async (e: ClipboardEvent) => {
+    if (!pasteActive) return;
+    
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.startsWith('image/')) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (file) {
+          handleFileUploadInternal(file);
+          return;
+        }
+      }
+    }
+  }, [pasteActive]);
+
+  // Register paste event listener when component is focused
+  useEffect(() => {
+    if (pasteActive) {
+      document.addEventListener('paste', handlePaste);
+      return () => document.removeEventListener('paste', handlePaste);
+    }
+  }, [pasteActive, handlePaste]);
+
+  const handleFileUploadInternal = async (file: File) => {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
@@ -11269,7 +11312,7 @@ function SupplyImageUpload({ supplyId, currentImageUrl, onImageUploaded }: {
     e.preventDefault();
     setDragOver(false);
     const file = e.dataTransfer.files?.[0];
-    if (file) handleFileUpload(file);
+    if (file) handleFileUploadInternal(file);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -11289,13 +11332,23 @@ function SupplyImageUpload({ supplyId, currentImageUrl, onImageUploaded }: {
       <Label>Product Image (Object Storage)</Label>
       <div 
         ref={dropZoneRef}
-        className={`border-2 border-dashed rounded-lg p-4 transition-colors ${
-          dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300'
+        tabIndex={0}
+        className={`border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer ${
+          dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 
+          pasteActive ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-300'
         }`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
+        onFocus={() => setPasteActive(true)}
+        onBlur={() => setPasteActive(false)}
+        onClick={() => dropZoneRef.current?.focus()}
       >
+        {pasteActive && (
+          <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-sm p-2 rounded mb-2 text-center">
+            Ready to paste! Press Ctrl+V (or Cmd+V on Mac) to paste an image
+          </div>
+        )}
         {currentImageUrl ? (
           <div className="space-y-3">
             <div className="relative">
@@ -11316,10 +11369,10 @@ function SupplyImageUpload({ supplyId, currentImageUrl, onImageUploaded }: {
           <div className="text-center py-6">
             <Upload className="w-10 h-10 text-gray-400 mx-auto mb-2" />
             <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Drag & drop an image here
+              Drag & drop or paste an image here
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              or click the button below to browse
+              Click here first, then Ctrl+V to paste
             </p>
           </div>
         )}
@@ -11329,7 +11382,7 @@ function SupplyImageUpload({ supplyId, currentImageUrl, onImageUploaded }: {
           accept="image/*"
           onChange={(e) => {
             const file = e.target.files?.[0];
-            if (file) handleFileUpload(file);
+            if (file) handleFileUploadInternal(file);
             e.target.value = '';
           }}
           className="hidden"
@@ -11352,7 +11405,7 @@ function SupplyImageUpload({ supplyId, currentImageUrl, onImageUploaded }: {
         </Button>
       </div>
       <p className="text-xs text-gray-500">
-        Images are permanently stored in Object Storage and remain available even after sessions end.
+        Drag & drop, paste (Ctrl+V), or browse to upload. Images are permanently stored.
       </p>
     </div>
   );

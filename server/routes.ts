@@ -5299,6 +5299,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get products by filter - supports showing all or just missing images (Admin only)
+  app.get("/api/admin/supplies/by-filter", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { limit = '100', offset = '0', brand, category, search, missingOnly = 'true' } = req.query;
+      const showMissingOnly = missingOnly === 'true';
+      
+      if (showMissingOnly) {
+        // Use existing method for missing images only
+        const supplies = await storage.getSuppliesWithoutImages(
+          parseInt(limit as string), 
+          parseInt(offset as string),
+          brand as string,
+          category as string,
+          search as string
+        );
+        res.json(supplies);
+      } else {
+        // Get all supplies matching filters (with or without images)
+        const supplies = await storage.getSuppliesByFilter(
+          parseInt(limit as string), 
+          parseInt(offset as string),
+          brand as string,
+          category as string,
+          search as string
+        );
+        res.json(supplies);
+      }
+    } catch (error) {
+      console.error('Error getting products by filter:', error);
+      res.status(500).json({ message: "Failed to get products" });
+    }
+  });
+
   // Get counts by brand and category (Admin only)
   app.get("/api/admin/supplies/image-stats", authMiddleware, async (req: any, res) => {
     try {
