@@ -2592,10 +2592,8 @@ function ProductImageManager() {
   const [showBatchResults, setShowBatchResults] = useState(false);
   
   // Image URL Sync state (for syncing between dev and production)
-  const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [importResult, setImportResult] = useState<any>(null);
-  const importFileRef = useRef<HTMLInputElement>(null);
 
   // Fetch image stats
   const { data: imageStats, isLoading: statsLoading } = useQuery({
@@ -2827,98 +2825,6 @@ function ProductImageManager() {
     setShowProducts(true);
   };
 
-  // Export image URLs for syncing to production
-  const handleExportImageUrls = async () => {
-    setIsExporting(true);
-    try {
-      const response = await fetch('/api/admin/supplies/export-image-urls', {
-        credentials: 'include',
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to export image URLs');
-      }
-      
-      const data = await response.json();
-      
-      // Create and download the JSON file
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `image-urls-export-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      toast({
-        title: 'Export Complete',
-        description: `Exported ${data.totalProducts} image URLs. Use this file to sync images to production.`,
-      });
-    } catch (error: any) {
-      toast({
-        title: 'Export Failed',
-        description: error.message || 'Failed to export image URLs',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
-  // Import image URLs from export file
-  const handleImportImageUrls = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsImporting(true);
-    setImportResult(null);
-    
-    try {
-      const text = await file.text();
-      const data = JSON.parse(text);
-      
-      if (!data.data || !Array.isArray(data.data)) {
-        throw new Error('Invalid export file format');
-      }
-      
-      const response = await fetch('/api/admin/supplies/import-image-urls', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ data: data.data }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to import image URLs');
-      }
-      
-      const result = await response.json();
-      setImportResult(result);
-      
-      // Refresh stats
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/image-stats'] });
-      
-      toast({
-        title: 'Import Complete',
-        description: `Updated ${result.updated} product image URLs`,
-      });
-    } catch (error: any) {
-      toast({
-        title: 'Import Failed',
-        description: error.message || 'Failed to import image URLs',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsImporting(false);
-      // Reset file input
-      if (importFileRef.current) {
-        importFileRef.current.value = '';
-      }
-    }
-  };
-
   const products = productsData || [];
 
   return (
@@ -3016,64 +2922,82 @@ function ProductImageManager() {
         </CardContent>
       </Card>
 
-      {/* Image URL Sync for Production */}
+      {/* Sync Images by Name */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <RefreshCw className="w-5 h-5" />
-            Sync Images to Production
+            Sync Images by Name
           </CardTitle>
           <CardDescription>
-            Export image URLs from development and import them into production. Images are stored in shared storage - only the database references need syncing.
+            Match images from Object Storage to products by name/brand. Works across environments where product IDs differ.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-wrap gap-4">
-            <Button
-              onClick={handleExportImageUrls}
-              disabled={isExporting}
-              data-testid="button-export-image-urls"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              {isExporting ? 'Exporting...' : 'Export Image URLs'}
-            </Button>
-            
-            <div>
-              <input
-                type="file"
-                ref={importFileRef}
-                accept=".json"
-                onChange={handleImportImageUrls}
-                className="hidden"
-                data-testid="input-import-file"
-              />
-              <Button
-                variant="outline"
-                onClick={() => importFileRef.current?.click()}
-                disabled={isImporting}
-                data-testid="button-import-image-urls"
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                {isImporting ? 'Importing...' : 'Import Image URLs'}
-              </Button>
-            </div>
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-sm">
+            <p className="text-blue-800 dark:text-blue-300">
+              Images are stored in shared Object Storage. This matches products to images by their name and brand instead of ID.
+            </p>
           </div>
           
-          {importResult && (
+          <Button
+            onClick={async () => {
+              setIsImporting(true);
+              setImportResult(null);
+              try {
+                const response = await fetch('/api/admin/supplies/sync-images-by-name', {
+                  method: 'POST',
+                  credentials: 'include',
+                });
+                
+                if (!response.ok) {
+                  throw new Error('Sync failed');
+                }
+                
+                const result = await response.json();
+                setImportResult({
+                  totalImages: result.totalImages,
+                  matched: result.matched,
+                  unmatched: result.unmatched,
+                  totalProducts: result.totalProducts
+                });
+                
+                toast({
+                  title: "Sync Complete",
+                  description: `Matched ${result.matched} products to images`
+                });
+                
+                queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
+                queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/image-stats'] });
+              } catch (error) {
+                toast({
+                  title: "Sync failed",
+                  description: error instanceof Error ? error.message : "Failed to sync images",
+                  variant: "destructive"
+                });
+              } finally {
+                setIsImporting(false);
+              }
+            }}
+            disabled={isImporting}
+            className="bg-green-600 hover:bg-green-700 text-white"
+            data-testid="button-sync-images-by-name"
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${isImporting ? 'animate-spin' : ''}`} />
+            {isImporting ? 'Syncing...' : 'Sync Images by Name'}
+          </Button>
+          
+          {importResult && importResult.matched !== undefined && (
             <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg text-sm">
-              <div className="font-semibold text-green-700 dark:text-green-400 mb-2">Import Results</div>
+              <div className="font-semibold text-green-700 dark:text-green-400 mb-2">Sync Results</div>
               <div className="grid grid-cols-2 gap-2 text-gray-700 dark:text-gray-300">
-                <div>Total in file: {importResult.totalInImport}</div>
-                <div className="text-green-600">Updated: {importResult.updated}</div>
-                <div className="text-yellow-600">Skipped: {importResult.skipped}</div>
-                <div className="text-red-600">Not found: {importResult.notFound}</div>
+                <div>Images in storage: {importResult.totalImages}</div>
+                <div>Products in database: {importResult.totalProducts}</div>
+                <div className="text-green-600">Matched: {importResult.matched}</div>
+                <div className="text-yellow-600">Unmatched: {importResult.unmatched}</div>
               </div>
             </div>
           )}
-          
-          <p className="text-xs text-gray-500">
-            <strong>How to sync:</strong> 1) Export from development, 2) Publish your app, 3) Go to the published app's admin and Import the file.
-          </p>
         </CardContent>
       </Card>
 
@@ -9803,166 +9727,72 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          {/* Image URL Sync Card */}
+          {/* Sync Images by Name Card */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Image className="w-5 h-5" />
-                Image URL Sync (Dev → Production)
+                Sync Images by Name
               </CardTitle>
               <CardDescription>
-                Sync only product image URLs to production - keeps appointments, orders, and customers intact
+                Match images from Object Storage to products by name/brand - safe for production
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Info Banner */}
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <CardContent className="space-y-4">
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-500 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="w-5 h-5 text-green-600 dark:text-green-500 flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-semibold text-blue-800 dark:text-blue-300 mb-1">Safe for Production</p>
-                    <ul className="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-400">
+                    <p className="font-semibold text-green-800 dark:text-green-300 mb-1">Safe for Production</p>
+                    <ul className="list-disc list-inside space-y-1 text-green-700 dark:text-green-400">
                       <li>Only updates product image URLs - nothing else</li>
-                      <li>Appointments, orders, customers, and all other data stay untouched</li>
-                      <li>Images are already in Object Storage - this just updates the references</li>
-                      <li>Matches products by ID first, then by name+brand as fallback</li>
+                      <li>Appointments, orders, customers stay untouched</li>
+                      <li>Matches by product name and brand (not ID)</li>
                     </ul>
                   </div>
                 </div>
               </div>
-
-              {/* Export Section */}
-              <div className="space-y-3">
-                <div>
-                  <h3 className="font-semibold text-lg mb-1">Step 1: Export Image URLs (in Development)</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Download all product image URLs from development database
-                  </p>
-                </div>
-                <Button
-                  onClick={async () => {
-                    try {
-                      const response = await fetch('/api/admin/supplies/image-sync/export', {
-                        credentials: 'include'
-                      });
-                      
-                      if (!response.ok) {
-                        throw new Error('Export failed');
-                      }
-                      
-                      const data = await response.json();
-                      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                      const url = window.URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = `image-urls-export-${Date.now()}.json`;
-                      document.body.appendChild(a);
-                      a.click();
-                      window.URL.revokeObjectURL(url);
-                      document.body.removeChild(a);
-                      
-                      toast({
-                        title: "Export successful",
-                        description: `Exported ${data.productsWithImages} product image URLs`
-                      });
-                    } catch (error) {
-                      console.error('Export error:', error);
-                      toast({
-                        title: "Export failed",
-                        description: "Failed to export image URLs",
-                        variant: "destructive"
-                      });
+              
+              <Button
+                onClick={async () => {
+                  try {
+                    toast({
+                      title: "Syncing images...",
+                      description: "Matching products to images by name"
+                    });
+                    
+                    const response = await fetch('/api/admin/supplies/sync-images-by-name', {
+                      method: 'POST',
+                      credentials: 'include',
+                    });
+                    
+                    if (!response.ok) {
+                      throw new Error('Sync failed');
                     }
-                  }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                  data-testid="button-export-image-urls"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Export Image URLs
-                </Button>
-              </div>
-
-              {/* Import Section */}
-              <div className="space-y-3 pt-4 border-t">
-                <div>
-                  <h3 className="font-semibold text-lg mb-1">Step 2: Import Image URLs (in Production)</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    After publishing, upload the exported file to update production image URLs
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <input
-                    type="file"
-                    accept="application/json"
-                    id="image-url-import-file"
-                    className="hidden"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-
-                      try {
-                        toast({
-                          title: "Importing image URLs...",
-                          description: "Please wait while we update product images."
-                        });
-
-                        const text = await file.text();
-                        const importData = JSON.parse(text);
-                        
-                        if (!importData.data || !Array.isArray(importData.data)) {
-                          throw new Error('Invalid export file format');
-                        }
-                        
-                        const response = await fetch('/api/admin/supplies/image-sync/import', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          credentials: 'include',
-                          body: JSON.stringify({ data: importData.data })
-                        });
-                        
-                        const result = await response.json();
-                        
-                        if (!response.ok) {
-                          throw new Error(result.message || 'Import failed');
-                        }
-                        
-                        toast({
-                          title: "Import successful",
-                          description: `Updated ${result.stats.updated} images, skipped ${result.stats.skipped}, not found ${result.stats.notFound}`
-                        });
-                        
-                        queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
-                        queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/image-stats'] });
-                      } catch (error) {
-                        toast({
-                          title: "Import failed",
-                          description: error instanceof Error ? error.message : "Failed to import image URLs",
-                          variant: "destructive"
-                        });
-                      }
-                      
-                      e.target.value = '';
-                    }}
-                    data-testid="input-import-image-urls"
-                  />
-                  <Button
-                    onClick={() => {
-                      document.getElementById('image-url-import-file')?.click();
-                    }}
-                    variant="outline"
-                    className="border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                    data-testid="button-import-image-urls"
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Import Image URLs
-                  </Button>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Select an image URL export file to sync to this environment
-                  </p>
-                </div>
-              </div>
+                    
+                    const result = await response.json();
+                    
+                    toast({
+                      title: "Sync Complete",
+                      description: `Matched ${result.matched} of ${result.totalProducts} products`
+                    });
+                    
+                    queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
+                    queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/image-stats'] });
+                  } catch (error) {
+                    toast({
+                      title: "Sync failed",
+                      description: error instanceof Error ? error.message : "Failed to sync images",
+                      variant: "destructive"
+                    });
+                  }
+                }}
+                className="bg-green-600 hover:bg-green-700 text-white"
+                data-testid="button-sync-images-by-name-db"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Sync Images by Name
+              </Button>
             </CardContent>
           </Card>
 
