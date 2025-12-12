@@ -2693,7 +2693,7 @@ export class DatabaseStorage implements IStorage {
       pet_counts AS (
         SELECT 
           COALESCE(SUM(CASE WHEN LOWER(ap.service_type) LIKE '%bath%' THEN 1 ELSE 0 END), 0) as bath_pets,
-          COALESCE(SUM(CASE WHEN LOWER(ap.service_type) LIKE '%full%' OR LOWER(ap.service_type) LIKE '%groom%' THEN 1 ELSE 0 END), 0) as groom_pets
+          COALESCE(SUM(CASE WHEN LOWER(ap.service_type) LIKE '%full%' OR (LOWER(ap.service_type) LIKE '%groom%' AND LOWER(ap.service_type) NOT LIKE '%bath%') THEN 1 ELSE 0 END), 0) as groom_pets
         FROM date_appointments da
         LEFT JOIN appointment_pets ap ON da.id = ap.appointment_id
         WHERE ap.id IS NOT NULL
@@ -2701,7 +2701,7 @@ export class DatabaseStorage implements IStorage {
       legacy_counts AS (
         SELECT 
           COALESCE(SUM(CASE WHEN LOWER(da.legacy_service_type) LIKE '%bath%' THEN 1 ELSE 0 END), 0) as bath_legacy,
-          COALESCE(SUM(CASE WHEN LOWER(da.legacy_service_type) LIKE '%full%' OR LOWER(da.legacy_service_type) LIKE '%groom%' THEN 1 ELSE 0 END), 0) as groom_legacy
+          COALESCE(SUM(CASE WHEN LOWER(da.legacy_service_type) LIKE '%full%' OR (LOWER(da.legacy_service_type) LIKE '%groom%' AND LOWER(da.legacy_service_type) NOT LIKE '%bath%') THEN 1 ELSE 0 END), 0) as groom_legacy
         FROM date_appointments da
         LEFT JOIN appointment_pets ap ON da.id = ap.appointment_id
         WHERE ap.id IS NULL
