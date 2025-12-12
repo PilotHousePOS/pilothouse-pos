@@ -2674,20 +2674,12 @@ export class DatabaseStorage implements IStorage {
     
     // Count existing appointments for this date using raw SQL for atomicity
     // This counts pets by service type from both appointment_pets table and legacy appointments table
-    // IMPORTANT: dateStr is the user's selected date (e.g., "2025-12-11"). We need to match appointments
-    // that were STORED for that date, which were created with the same date string.
-    // The appointment_date column stores dates at midnight UTC, so we need to match carefully.
+    // IMPORTANT: Only match the exact stored date - no timezone conversion to avoid counting adjacent days
     const countResult = await db.execute(sql`
       WITH date_appointments AS (
         SELECT a.id, a.service_type as legacy_service_type
         FROM appointments a
-        WHERE (
-          -- Match the exact date string that was stored (comparing the date portion)
-          DATE(a.appointment_date) = ${dateStr}::date
-          OR
-          -- Also check timezone-converted date for older records
-          DATE(a.appointment_date AT TIME ZONE 'America/Chicago') = ${dateStr}::date
-        )
+        WHERE DATE(a.appointment_date) = ${dateStr}::date
           AND a.status NOT IN ('cancelled', 'rejected')
       ),
       pet_counts AS (
