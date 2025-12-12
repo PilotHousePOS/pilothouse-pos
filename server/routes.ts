@@ -5885,6 +5885,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Export image URLs for syncing to production (Admin only)
+  // Downloads a JSON file with all product IDs and their image_url values
+  app.get("/api/admin/supplies/export-image-urls", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { db } = await import('./db');
+      const { sql } = await import('drizzle-orm');
+
+      // Get all products with non-null image URLs
+      const result = await db.execute(sql`
+        SELECT id, image_url FROM supplies 
+        WHERE image_url IS NOT NULL AND image_url != ''
+        ORDER BY id
+      `);
+
+      const imageData = result.rows.map((row: any) => ({
+        id: row.id,
+        image_url: row.image_url
+      }));
+
+      console.log(`Exporting ${imageData.length} image URLs for sync`);
+
+      // Set headers for JSON download
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', 'attachment; filename=image-urls-export.json');
+      
+      res.json({
+        exportedAt: new Date().toISOString(),
+        totalProducts: imageData.length,
+        data: imageData
+      });
+    } catch (error: any) {
+      console.error('Error exporting image URLs:', error);
+      res.status(500).json({ message: "Failed to export image URLs", error: error.message });
+    }
+  });
+
+  // Import image URLs from development to production (Admin only)
+  // Accepts JSON with array of {id, image_url} objects
+  app.post("/api/admin/supplies/import-image-urls", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { data } = req.body;
+      
+      if (!data || !Array.isArray(data)) {
+        return res.status(400).json({ message: "Invalid data format. Expected { data: [{id, image_url}, ...] }" });
+      }
+
+      const { db } = await import('./db');
+      const { sql } = await import('drizzle-orm');
+
+      let updated = 0;
+      let skipped = 0;
+      let notFound = 0;
+
+      for (const item of data) {
+        if (!item.id || !item.image_url) {
+          skipped++;
+          continue;
+        }
+
+        try {
+          // Check if product exists
+          const existsResult = await db.execute(sql`
+            SELECT id FROM supplies WHERE id = ${item.id}
+          `);
+
+          if (existsResult.rows.length === 0) {
+            notFound++;
+            continue;
+          }
+
+          // Update the image_url
+          await db.execute(sql`
+            UPDATE supplies SET image_url = ${item.image_url} WHERE id = ${item.id}
+          `);
+          updated++;
+        } catch (itemError) {
+          console.error(`Error updating product ${item.id}:`, itemError);
+          skipped++;
+        }
+      }
+
+      console.log(`Import complete: ${updated} updated, ${skipped} skipped, ${notFound} not found`);
+
+      res.json({
+        success: true,
+        totalInImport: data.length,
+        updated,
+        skipped,
+        notFound,
+        message: `Successfully updated ${updated} product image URLs`
+      });
+    } catch (error: any) {
+      console.error('Error importing image URLs:', error);
+      res.status(500).json({ message: "Failed to import image URLs", error: error.message });
+    }
+  });
+
   // Direct file upload for supply images (Admin only)
   // Also applies abbreviation expansion to correct product names
   app.post("/api/admin/supplies/:id/upload-image", authMiddleware, upload.single('image'), async (req: any, res) => {
