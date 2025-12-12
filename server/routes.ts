@@ -5609,6 +5609,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Direct file upload for supply images (Admin only)
+  // Also applies abbreviation expansion to correct product names
   app.post("/api/admin/supplies/:id/upload-image", authMiddleware, upload.single('image'), async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
@@ -5647,13 +5648,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: result.error || "Failed to store image" });
       }
 
-      await storage.updateSupply(supply.id, { imageUrl: result.storedPath! });
+      // Apply abbreviation expansion to correct product name
+      const { expandAbbreviationsAsync } = await import('./abbreviationExpansion');
+      const nameResult = await expandAbbreviationsAsync(supply.name, storage);
+      const correctedName = nameResult.expanded;
+      const nameWasCorrected = correctedName !== supply.name;
+
+      // Update both image and corrected name
+      await storage.updateSupply(supply.id, { 
+        imageUrl: result.storedPath!,
+        ...(nameWasCorrected ? { name: correctedName } : {})
+      });
 
       res.json({
         success: true,
         productId: supply.id,
-        productName: supply.name,
-        storedPath: result.storedPath
+        productName: nameWasCorrected ? correctedName : supply.name,
+        storedPath: result.storedPath,
+        nameCorrected: nameWasCorrected,
+        originalName: nameWasCorrected ? supply.name : undefined
       });
     } catch (error: any) {
       console.error('Error uploading supply image:', error);
@@ -6451,6 +6464,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(500).json({ error: 'Failed to download file' });
       }
     });
+  });
+
+  // ============================================
+  // IMAGE URL SYNC (Dev to Production)
+  // ============================================
+  
+  // Export all product image URLs for syncing to production (Admin only)
+  app.get("/api/admin/supplies/image-sync/export", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const supplies = await storage.getAllSupplies();
+      
+      // Export only necessary fields for image sync
+      const imageData = supplies
+        .filter(s => s.imageUrl && s.imageUrl.trim() !== '')
+        .map(s => ({
+          id: s.id,
+          name: s.name,
+          brand: s.brand || null,
+          imageUrl: s.imageUrl
+        }));
+
+      res.json({
+        exportedAt: new Date().toISOString(),
+        totalProducts: supplies.length,
+        productsWithImages: imageData.length,
+        data: imageData
+      });
+    } catch (error) {
+      console.error('Error exporting image URLs:', error);
+      res.status(500).json({ message: "Failed to export image URLs" });
+    }
+  });
+
+  // Import product image URLs (for use in production) (Admin only)
+  app.post("/api/admin/supplies/image-sync/import", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { data, dryRun = false } = req.body;
+
+      if (!data || !Array.isArray(data)) {
+        return res.status(400).json({ message: "Invalid data format. Expected { data: [...] }" });
+      }
+
+      const stats = {
+        attempted: data.length,
+        updated: 0,
+        skipped: 0,
+        notFound: 0,
+        errors: [] as string[]
+      };
+
+      const updates: { id: number; name: string; oldUrl: string | null; newUrl: string }[] = [];
+
+      for (const item of data) {
+        if (!item.id || !item.imageUrl) {
+          stats.skipped++;
+          continue;
+        }
+
+        try {
+          // Try to find by ID first
+          let supply = await storage.getSupply(item.id);
+          
+          // If not found by ID, try to match by name + brand
+          if (!supply && item.name) {
+            const allSupplies = await storage.getAllSupplies();
+            supply = allSupplies.find(s => 
+              s.name.toLowerCase() === item.name.toLowerCase() &&
+              (s.brand || '').toLowerCase() === (item.brand || '').toLowerCase()
+            );
+          }
+
+          if (!supply) {
+            stats.notFound++;
+            continue;
+          }
+
+          // Check if imageUrl is different
+          if (supply.imageUrl === item.imageUrl) {
+            stats.skipped++;
+            continue;
+          }
+
+          updates.push({
+            id: supply.id,
+            name: supply.name,
+            oldUrl: supply.imageUrl,
+            newUrl: item.imageUrl
+          });
+
+          if (!dryRun) {
+            await storage.updateSupply(supply.id, { imageUrl: item.imageUrl });
+          }
+          stats.updated++;
+        } catch (error: any) {
+          stats.errors.push(`ID ${item.id}: ${error.message}`);
+        }
+      }
+
+      res.json({
+        success: true,
+        dryRun,
+        stats,
+        updates: dryRun ? updates : undefined,
+        message: dryRun 
+          ? `Dry run complete. ${stats.updated} products would be updated.`
+          : `Sync complete. ${stats.updated} products updated.`
+      });
+    } catch (error) {
+      console.error('Error importing image URLs:', error);
+      res.status(500).json({ message: "Failed to import image URLs" });
+    }
   });
 
   const httpServer = createServer(app);

@@ -9644,6 +9644,169 @@ export default function Admin() {
             </CardContent>
           </Card>
 
+          {/* Image URL Sync Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Image className="w-5 h-5" />
+                Image URL Sync (Dev → Production)
+              </CardTitle>
+              <CardDescription>
+                Sync only product image URLs to production - keeps appointments, orders, and customers intact
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Info Banner */}
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-500 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-semibold text-blue-800 dark:text-blue-300 mb-1">Safe for Production</p>
+                    <ul className="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-400">
+                      <li>Only updates product image URLs - nothing else</li>
+                      <li>Appointments, orders, customers, and all other data stay untouched</li>
+                      <li>Images are already in Object Storage - this just updates the references</li>
+                      <li>Matches products by ID first, then by name+brand as fallback</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Export Section */}
+              <div className="space-y-3">
+                <div>
+                  <h3 className="font-semibold text-lg mb-1">Step 1: Export Image URLs (in Development)</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Download all product image URLs from development database
+                  </p>
+                </div>
+                <Button
+                  onClick={async () => {
+                    try {
+                      const response = await fetch('/api/admin/supplies/image-sync/export', {
+                        credentials: 'include'
+                      });
+                      
+                      if (!response.ok) {
+                        throw new Error('Export failed');
+                      }
+                      
+                      const data = await response.json();
+                      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `image-urls-export-${Date.now()}.json`;
+                      document.body.appendChild(a);
+                      a.click();
+                      window.URL.revokeObjectURL(url);
+                      document.body.removeChild(a);
+                      
+                      toast({
+                        title: "Export successful",
+                        description: `Exported ${data.productsWithImages} product image URLs`
+                      });
+                    } catch (error) {
+                      console.error('Export error:', error);
+                      toast({
+                        title: "Export failed",
+                        description: "Failed to export image URLs",
+                        variant: "destructive"
+                      });
+                    }
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  data-testid="button-export-image-urls"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export Image URLs
+                </Button>
+              </div>
+
+              {/* Import Section */}
+              <div className="space-y-3 pt-4 border-t">
+                <div>
+                  <h3 className="font-semibold text-lg mb-1">Step 2: Import Image URLs (in Production)</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    After publishing, upload the exported file to update production image URLs
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <input
+                    type="file"
+                    accept="application/json"
+                    id="image-url-import-file"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+
+                      try {
+                        toast({
+                          title: "Importing image URLs...",
+                          description: "Please wait while we update product images."
+                        });
+
+                        const text = await file.text();
+                        const importData = JSON.parse(text);
+                        
+                        if (!importData.data || !Array.isArray(importData.data)) {
+                          throw new Error('Invalid export file format');
+                        }
+                        
+                        const response = await fetch('/api/admin/supplies/image-sync/import', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          credentials: 'include',
+                          body: JSON.stringify({ data: importData.data })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (!response.ok) {
+                          throw new Error(result.message || 'Import failed');
+                        }
+                        
+                        toast({
+                          title: "Import successful",
+                          description: `Updated ${result.stats.updated} images, skipped ${result.stats.skipped}, not found ${result.stats.notFound}`
+                        });
+                        
+                        queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
+                        queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/image-stats'] });
+                      } catch (error) {
+                        toast({
+                          title: "Import failed",
+                          description: error instanceof Error ? error.message : "Failed to import image URLs",
+                          variant: "destructive"
+                        });
+                      }
+                      
+                      e.target.value = '';
+                    }}
+                    data-testid="input-import-image-urls"
+                  />
+                  <Button
+                    onClick={() => {
+                      document.getElementById('image-url-import-file')?.click();
+                    }}
+                    variant="outline"
+                    className="border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                    data-testid="button-import-image-urls"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Import Image URLs
+                  </Button>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Select an image URL export file to sync to this environment
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
