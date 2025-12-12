@@ -2590,6 +2590,12 @@ function ProductImageManager() {
   const [batchSearchResults, setBatchSearchResults] = useState<BatchSearchResult[]>([]);
   const [maxProducts, setMaxProducts] = useState(20);
   const [showBatchResults, setShowBatchResults] = useState(false);
+  
+  // Image URL Sync state (for syncing between dev and production)
+  const [isExporting, setIsExporting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importResult, setImportResult] = useState<any>(null);
+  const importFileRef = useRef<HTMLInputElement>(null);
 
   // Fetch image stats
   const { data: imageStats, isLoading: statsLoading } = useQuery({
@@ -2821,6 +2827,98 @@ function ProductImageManager() {
     setShowProducts(true);
   };
 
+  // Export image URLs for syncing to production
+  const handleExportImageUrls = async () => {
+    setIsExporting(true);
+    try {
+      const response = await fetch('/api/admin/supplies/export-image-urls', {
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to export image URLs');
+      }
+      
+      const data = await response.json();
+      
+      // Create and download the JSON file
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `image-urls-export-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Export Complete',
+        description: `Exported ${data.totalProducts} image URLs. Use this file to sync images to production.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Export Failed',
+        description: error.message || 'Failed to export image URLs',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  // Import image URLs from export file
+  const handleImportImageUrls = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    setImportResult(null);
+    
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      
+      if (!data.data || !Array.isArray(data.data)) {
+        throw new Error('Invalid export file format');
+      }
+      
+      const response = await fetch('/api/admin/supplies/import-image-urls', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ data: data.data }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to import image URLs');
+      }
+      
+      const result = await response.json();
+      setImportResult(result);
+      
+      // Refresh stats
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/image-stats'] });
+      
+      toast({
+        title: 'Import Complete',
+        description: `Updated ${result.updated} product image URLs`,
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Import Failed',
+        description: error.message || 'Failed to import image URLs',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsImporting(false);
+      // Reset file input
+      if (importFileRef.current) {
+        importFileRef.current.value = '';
+      }
+    }
+  };
+
   const products = productsData || [];
 
   return (
@@ -2915,6 +3013,67 @@ function ProductImageManager() {
               </div>
             </div>
           ) : null}
+        </CardContent>
+      </Card>
+
+      {/* Image URL Sync for Production */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <RefreshCw className="w-5 h-5" />
+            Sync Images to Production
+          </CardTitle>
+          <CardDescription>
+            Export image URLs from development and import them into production. Images are stored in shared storage - only the database references need syncing.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap gap-4">
+            <Button
+              onClick={handleExportImageUrls}
+              disabled={isExporting}
+              data-testid="button-export-image-urls"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              {isExporting ? 'Exporting...' : 'Export Image URLs'}
+            </Button>
+            
+            <div>
+              <input
+                type="file"
+                ref={importFileRef}
+                accept=".json"
+                onChange={handleImportImageUrls}
+                className="hidden"
+                data-testid="input-import-file"
+              />
+              <Button
+                variant="outline"
+                onClick={() => importFileRef.current?.click()}
+                disabled={isImporting}
+                data-testid="button-import-image-urls"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                {isImporting ? 'Importing...' : 'Import Image URLs'}
+              </Button>
+            </div>
+          </div>
+          
+          {importResult && (
+            <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg text-sm">
+              <div className="font-semibold text-green-700 dark:text-green-400 mb-2">Import Results</div>
+              <div className="grid grid-cols-2 gap-2 text-gray-700 dark:text-gray-300">
+                <div>Total in file: {importResult.totalInImport}</div>
+                <div className="text-green-600">Updated: {importResult.updated}</div>
+                <div className="text-yellow-600">Skipped: {importResult.skipped}</div>
+                <div className="text-red-600">Not found: {importResult.notFound}</div>
+              </div>
+            </div>
+          )}
+          
+          <p className="text-xs text-gray-500">
+            <strong>How to sync:</strong> 1) Export from development, 2) Publish your app, 3) Go to the published app's admin and Import the file.
+          </p>
         </CardContent>
       </Card>
 
