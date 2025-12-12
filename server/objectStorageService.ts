@@ -329,12 +329,21 @@ export class ObjectStorageService {
     }
   }
 
+  isObjectStorageConfigured(): boolean {
+    const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";
+    return pathsStr.trim().length > 0;
+  }
+
   async listAllProductImages(): Promise<Array<{
     fullPath: string;
     brandSlug: string;
     productSlug: string;
     storedPath: string;
   }>> {
+    if (!this.isObjectStorageConfigured()) {
+      throw new Error('Object Storage is not configured. Please set up Object Storage in the Replit tools panel first.');
+    }
+    
     const publicPaths = this.getPublicObjectSearchPaths();
     if (publicPaths.length === 0) {
       throw new Error('No public object storage paths configured');

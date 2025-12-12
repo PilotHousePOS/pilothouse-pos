@@ -6004,6 +6004,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { ObjectStorageService } = await import('./objectStorageService');
       const objectStorageService = new ObjectStorageService();
 
+      // Check if Object Storage is configured
+      if (!objectStorageService.isObjectStorageConfigured()) {
+        return res.status(400).json({ 
+          message: "Object Storage is not configured in this environment. Please set up Object Storage in the Replit tools panel first, or ensure the PUBLIC_OBJECT_SEARCH_PATHS secret is set.",
+          error: "OBJECT_STORAGE_NOT_CONFIGURED"
+        });
+      }
+
       console.log('Starting image sync by name...');
 
       // Step 1: List all images from Object Storage
