@@ -5992,6 +5992,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Sync images by product name/brand (for production sync where IDs differ)
+  // Matches Object Storage images to products by name slug instead of ID
+  app.post("/api/admin/supplies/sync-images-by-name", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { ObjectStorageService } = await import('./objectStorageService');
+      const objectStorageService = new ObjectStorageService();
+
+      console.log('Starting image sync by name...');
+
+      // Step 1: List all images from Object Storage
+      const allImages = await objectStorageService.listAllProductImages();
+      console.log(`Found ${allImages.length} images in Object Storage`);
+
+      // Step 2: Build a map of brandSlug/productSlug -> storedPath
+      // Handle multiple images with same slug (different IDs) by keeping the first one
+      const imageMap = new Map<string, string>();
+      const duplicates: string[] = [];
+      
+      for (const img of allImages) {
+        const key = `${img.brandSlug}/${img.productSlug}`;
+        if (!imageMap.has(key)) {
+          imageMap.set(key, img.storedPath);
+        } else {
+          duplicates.push(key);
+        }
+      }
+      console.log(`Built image map with ${imageMap.size} unique entries, ${duplicates.length} duplicates ignored`);
+
+      // Step 3: Get all products from database
+      const { db } = await import('./db');
+      const { sql } = await import('drizzle-orm');
+      
+      const result = await db.execute(sql`
+        SELECT id, name, brand FROM supplies ORDER BY id
+      `);
+      
+      const products = result.rows as Array<{ id: number; name: string; brand: string | null }>;
+      console.log(`Found ${products.length} products in database`);
+
+      // Step 4: Match products to images and update
+      let matched = 0;
+      let unmatched = 0;
+      const unmatchedProducts: Array<{ id: number; name: string; brand: string | null }> = [];
+
+      for (const product of products) {
+        const { brandSlug, productSlug } = objectStorageService.generateProductSlug(
+          product.name,
+          product.brand || 'unknown'
+        );
+        const key = `${brandSlug}/${productSlug}`;
+        
+        if (imageMap.has(key)) {
+          const storedPath = imageMap.get(key)!;
+          await db.execute(sql`
+            UPDATE supplies SET image_url = ${storedPath} WHERE id = ${product.id}
+          `);
+          matched++;
+        } else {
+          unmatched++;
+          if (unmatchedProducts.length < 100) {
+            unmatchedProducts.push(product);
+          }
+        }
+      }
+
+      console.log(`Sync complete: ${matched} matched, ${unmatched} unmatched`);
+
+      res.json({
+        success: true,
+        totalImages: allImages.length,
+        uniqueImageSlugs: imageMap.size,
+        totalProducts: products.length,
+        matched,
+        unmatched,
+        duplicatesIgnored: duplicates.length,
+        sampleUnmatched: unmatchedProducts.slice(0, 20),
+        message: `Successfully matched ${matched} products to images`
+      });
+    } catch (error: any) {
+      console.error('Error syncing images by name:', error);
+      res.status(500).json({ message: "Failed to sync images by name", error: error.message });
+    }
+  });
+
   // Direct file upload for supply images (Admin only)
   // Also applies abbreviation expansion to correct product names
   app.post("/api/admin/supplies/:id/upload-image", authMiddleware, upload.single('image'), async (req: any, res) => {

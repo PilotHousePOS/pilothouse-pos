@@ -328,6 +328,63 @@ export class ObjectStorageService {
       return { success: false, error: error.message || 'Unknown error' };
     }
   }
+
+  async listAllProductImages(): Promise<Array<{
+    fullPath: string;
+    brandSlug: string;
+    productSlug: string;
+    storedPath: string;
+  }>> {
+    const publicPaths = this.getPublicObjectSearchPaths();
+    if (publicPaths.length === 0) {
+      throw new Error('No public object storage paths configured');
+    }
+
+    const results: Array<{
+      fullPath: string;
+      brandSlug: string;
+      productSlug: string;
+      storedPath: string;
+    }> = [];
+
+    for (const searchPath of publicPaths) {
+      const productsPath = `${searchPath}/products`;
+      const { bucketName, objectName } = parseObjectPath(productsPath);
+      const bucket = objectStorageClient.bucket(bucketName);
+
+      try {
+        const [files] = await bucket.getFiles({ prefix: objectName });
+        
+        for (const file of files) {
+          const fileName = file.name;
+          const match = fileName.match(/products\/([^/]+)\/([^/]+)-\d+\.(jpg|jpeg|png|gif|webp)$/i);
+          
+          if (match) {
+            const brandSlug = match[1];
+            const productSlug = match[2];
+            const storedPath = `/public-objects/${fileName.replace(objectName.replace('products', ''), '')}`;
+            
+            results.push({
+              fullPath: fileName,
+              brandSlug,
+              productSlug,
+              storedPath: `/public-objects/products/${brandSlug}/${fileName.split('/').pop()}`
+            });
+          }
+        }
+      } catch (error) {
+        console.error(`Error listing files in ${productsPath}:`, error);
+      }
+    }
+
+    return results;
+  }
+
+  generateProductSlug(productName: string, brand: string): { brandSlug: string; productSlug: string } {
+    const sanitizedBrand = (brand || 'unknown').toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+    const sanitizedName = productName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 50);
+    return { brandSlug: sanitizedBrand, productSlug: sanitizedName };
+  }
 }
 
 function parseObjectPath(path: string): {
