@@ -285,6 +285,49 @@ export class ObjectStorageService {
     
     return results;
   }
+
+  async storeUploadedProductImage(
+    fileBuffer: Buffer,
+    mimeType: string,
+    productId: number,
+    productName: string,
+    brand: string
+  ): Promise<{ success: boolean; storedPath?: string; error?: string }> {
+    try {
+      const extension = mimeType.includes('png') ? 'png' : 
+                       mimeType.includes('gif') ? 'gif' : 
+                       mimeType.includes('webp') ? 'webp' : 'jpg';
+
+      const sanitizedBrand = (brand || 'unknown').toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+      const sanitizedName = productName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 50);
+      const fileName = `products/${sanitizedBrand}/${sanitizedName}-${productId}.${extension}`;
+
+      const publicPaths = this.getPublicObjectSearchPaths();
+      if (publicPaths.length === 0) {
+        return { success: false, error: 'No public object storage paths configured' };
+      }
+
+      const fullPath = `${publicPaths[0]}/${fileName}`;
+      const { bucketName, objectName } = parseObjectPath(fullPath);
+      const bucket = objectStorageClient.bucket(bucketName);
+      const file = bucket.file(objectName);
+
+      await file.save(fileBuffer, {
+        contentType: mimeType,
+        metadata: {
+          cacheControl: 'public, max-age=31536000',
+        },
+      });
+
+      await setObjectAclPolicy(file, { visibility: 'public' });
+
+      const storedPath = `/public-objects/${fileName}`;
+      return { success: true, storedPath };
+    } catch (error: any) {
+      console.error('Error storing uploaded product image:', error);
+      return { success: false, error: error.message || 'Unknown error' };
+    }
+  }
 }
 
 function parseObjectPath(path: string): {

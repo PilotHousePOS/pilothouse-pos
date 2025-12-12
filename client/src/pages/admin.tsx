@@ -11187,14 +11187,174 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
           rows={3}
         />
       </div>
-      <MultiImageUpload 
-        imageUrls={formData.imageUrls || []} 
-        onImagesChange={(urls) => setFormData({ ...formData, imageUrls: urls })} 
+      <SupplyImageUpload 
+        supplyId={supply.id}
+        currentImageUrl={formData.imageUrl}
+        onImageUploaded={(newUrl) => setFormData({ ...formData, imageUrl: newUrl })}
       />
       <Button type="submit" className="w-full bg-brand-blue hover:bg-blue-600">
         Update Supply
       </Button>
     </form>
+  );
+}
+
+function SupplyImageUpload({ supplyId, currentImageUrl, onImageUploaded }: { 
+  supplyId: number; 
+  currentImageUrl: string; 
+  onImageUploaded: (url: string) => void;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropZoneRef = useRef<HTMLDivElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const { toast } = useToast();
+
+  const handleFileUpload = async (file: File) => {
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid File",
+        description: "Please select an image file (JPG, PNG, GIF, or WebP).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please select an image under 10MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch(`/api/admin/supplies/${supplyId}/upload-image`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Upload failed');
+      }
+
+      const data = await response.json();
+      onImageUploaded(data.storedPath);
+      toast({
+        title: "Image Uploaded",
+        description: "Image has been uploaded and stored permanently.",
+      });
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Upload Failed",
+        description: error.message || "Failed to upload image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFileUpload(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+  };
+
+  const isObjectStorageImage = currentImageUrl?.startsWith('/public-objects/');
+
+  return (
+    <div className="space-y-3">
+      <Label>Product Image (Object Storage)</Label>
+      <div 
+        ref={dropZoneRef}
+        className={`border-2 border-dashed rounded-lg p-4 transition-colors ${
+          dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300'
+        }`}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+      >
+        {currentImageUrl ? (
+          <div className="space-y-3">
+            <div className="relative">
+              <img 
+                src={currentImageUrl} 
+                alt="Current product" 
+                className="w-full h-40 object-contain rounded bg-gray-100 dark:bg-gray-800" 
+              />
+              {isObjectStorageImage && (
+                <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                  Stored Permanently
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 break-all">{currentImageUrl}</p>
+          </div>
+        ) : (
+          <div className="text-center py-6">
+            <Upload className="w-10 h-10 text-gray-400 mx-auto mb-2" />
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              Drag & drop an image here
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              or click the button below to browse
+            </p>
+          </div>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleFileUpload(file);
+            e.target.value = '';
+          }}
+          className="hidden"
+          data-testid="input-supply-image-upload"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full mt-3"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          data-testid="button-supply-upload-image"
+        >
+          {uploading ? (
+            <>
+              <span className="animate-spin mr-2">⏳</span>
+              Uploading to Object Storage...
+            </>
+          ) : currentImageUrl ? 'Replace Image' : 'Upload Image'}
+        </Button>
+      </div>
+      <p className="text-xs text-gray-500">
+        Images are permanently stored in Object Storage and remain available even after sessions end.
+      </p>
+    </div>
   );
 }
 

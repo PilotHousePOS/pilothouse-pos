@@ -5542,6 +5542,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Direct file upload for supply images (Admin only)
+  app.post("/api/admin/supplies/:id/upload-image", authMiddleware, upload.single('image'), async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { id } = req.params;
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file uploaded" });
+      }
+
+      const supply = await storage.getSupply(parseInt(id));
+      if (!supply) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      const fs = await import('fs/promises');
+      const fileBuffer = await fs.readFile(req.file.path);
+      
+      const { ObjectStorageService } = await import('./objectStorageService');
+      const objectStorageService = new ObjectStorageService();
+      
+      const result = await objectStorageService.storeUploadedProductImage(
+        fileBuffer,
+        req.file.mimetype,
+        supply.id,
+        supply.name,
+        supply.brand || 'unknown'
+      );
+
+      await fs.unlink(req.file.path).catch(() => {});
+
+      if (!result.success) {
+        return res.status(400).json({ message: result.error || "Failed to store image" });
+      }
+
+      await storage.updateSupply(supply.id, { imageUrl: result.storedPath! });
+
+      res.json({
+        success: true,
+        productId: supply.id,
+        productName: supply.name,
+        storedPath: result.storedPath
+      });
+    } catch (error: any) {
+      console.error('Error uploading supply image:', error);
+      res.status(500).json({ message: "Failed to upload image", error: error.message });
+    }
+  });
+
   // ============================================
   // ORDER PHOTO UPLOAD & EXTRACTION ROUTES
   // ============================================
