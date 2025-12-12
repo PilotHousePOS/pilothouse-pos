@@ -5768,6 +5768,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Clear all broken external URLs by setting them to null (Admin only)
+  // This removes references to broken external images so products show as "no image"
+  app.post("/api/admin/supplies/clear-broken-external-urls", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { db } = await import('./db');
+      const { sql } = await import('drizzle-orm');
+
+      // Count how many will be affected
+      const countResult = await db.execute(sql`
+        SELECT COUNT(*) as count FROM supplies WHERE image_url LIKE 'http%'
+      `);
+      const affectedCount = parseInt(countResult.rows[0]?.count as string || '0');
+
+      // Clear all external URLs by setting to null
+      await db.execute(sql`
+        UPDATE supplies SET image_url = NULL WHERE image_url LIKE 'http%'
+      `);
+
+      console.log(`Cleared ${affectedCount} broken external URLs from supplies`);
+
+      res.json({
+        success: true,
+        clearedCount: affectedCount,
+        message: `Cleared ${affectedCount} external URL references. These products now show as 'no image'.`
+      });
+    } catch (error: any) {
+      console.error('Error clearing broken external URLs:', error);
+      res.status(500).json({ message: "Failed to clear broken external URLs", error: error.message });
+    }
+  });
+
   // Direct file upload for supply images (Admin only)
   // Also applies abbreviation expansion to correct product names
   app.post("/api/admin/supplies/:id/upload-image", authMiddleware, upload.single('image'), async (req: any, res) => {
