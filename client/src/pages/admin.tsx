@@ -123,13 +123,15 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
   // Google Calendar integration removed - transition period complete
   const googleEvents: any[] = [];
 
-  // Filter confirmed and completed appointments for the selected date
+  // Filter appointments for the selected date - include ALL statuses that count toward capacity
+  // (everything except cancelled and rejected, to match the backend capacity check)
   const confirmedAppointments = appointments.filter((apt: any) => 
-    (apt.status === 'confirmed' || apt.status === 'completed') && 
+    apt.status !== 'cancelled' && apt.status !== 'rejected' && 
     parseLocalDate(apt.appointmentDate).toDateString() === selectedDate.toDateString()
   );
   
   // Calculate separate counts for bath vs full groom dogs (exclude cats)
+  // IMPORTANT: "grooming-bath" contains "groom", so we must exclude bath from groom count
   const dogCounts = confirmedAppointments.reduce((counts: { bathDogs: number; fullGroomDogs: number }, apt: any) => {
     if (apt.pets && apt.pets.length > 0) {
       apt.pets.forEach((pet: any) => {
@@ -141,9 +143,10 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
           const serviceType = (pet.serviceType || apt.serviceType || '').toLowerCase();
           
           // Use substring matching to handle variants (grooming-bath, bath, grooming-full, full groom, etc.)
+          // Bath check comes first, and groom excludes bath to avoid double-counting
           if (serviceType.includes('bath')) {
             counts.bathDogs++;
-          } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+          } else if (serviceType.includes('full') || (serviceType.includes('groom') && !serviceType.includes('bath'))) {
             counts.fullGroomDogs++;
           }
         }
@@ -154,9 +157,10 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
       if (petType === 'dog') {
         const serviceType = (apt.serviceType || 'grooming-bath').toLowerCase();
         
+        // Bath check comes first, and groom excludes bath to avoid double-counting
         if (serviceType.includes('bath')) {
           counts.bathDogs++;
-        } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+        } else if (serviceType.includes('full') || (serviceType.includes('groom') && !serviceType.includes('bath'))) {
           counts.fullGroomDogs++;
         }
       }
