@@ -2584,18 +2584,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
               // Multi-pet appointment - count each pet's service type with substring matching
               for (const p of aptPets) {
                 const serviceType = (p.serviceType || '').toLowerCase();
+                // Bath check first, then groom excludes bath to avoid any overlap
                 if (serviceType.includes('bath')) {
                   bathDogs++;
-                } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+                } else if (serviceType.includes('full') || (serviceType.includes('groom') && !serviceType.includes('bath'))) {
                   groomDogs++;
                 }
               }
             } else {
               // Legacy single-pet appointment - use appointment's serviceType with substring matching
               const serviceType = (apt.serviceType || '').toLowerCase();
+              // Bath check first, then groom excludes bath to avoid any overlap
               if (serviceType.includes('bath')) {
                 bathDogs++;
-              } else if (serviceType.includes('full') || serviceType.includes('groom')) {
+              } else if (serviceType.includes('full') || (serviceType.includes('groom') && !serviceType.includes('bath'))) {
                 groomDogs++;
               }
             }
