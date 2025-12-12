@@ -5465,6 +5465,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Download and store product image permanently from external URL (Admin only)
+  // Also applies abbreviation expansion to correct product names
   app.post("/api/admin/supplies/:id/download-image", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
@@ -5498,12 +5499,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: result.error || "Failed to download image" });
       }
 
-      await storage.updateSupply(supply.id, { imageUrl: result.storedPath! });
+      // Apply abbreviation expansion to correct product name
+      const { expandAbbreviationsAsync } = await import('./abbreviationExpansion');
+      const nameResult = await expandAbbreviationsAsync(supply.name, storage);
+      const correctedName = nameResult.expanded;
+      const nameWasCorrected = correctedName !== supply.name;
+
+      // Update both image and corrected name
+      await storage.updateSupply(supply.id, { 
+        imageUrl: result.storedPath!,
+        ...(nameWasCorrected ? { name: correctedName } : {})
+      });
 
       res.json({
         success: true,
         productId: supply.id,
-        storedPath: result.storedPath
+        storedPath: result.storedPath,
+        nameCorrected: nameWasCorrected,
+        originalName: nameWasCorrected ? supply.name : undefined,
+        correctedName: nameWasCorrected ? correctedName : undefined
       });
     } catch (error: any) {
       console.error('Error downloading and storing product image:', error);
@@ -5512,6 +5526,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Batch download and store product images from external URLs (Admin only)
+  // Also applies abbreviation expansion to correct product names
   app.post("/api/admin/supplies/batch-download-images", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
@@ -5531,8 +5546,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { ObjectStorageService } = await import('./objectStorageService');
       const objectStorageService = new ObjectStorageService();
+      const { expandAbbreviationsAsync } = await import('./abbreviationExpansion');
 
       const results: any[] = [];
+      let namesCorrected = 0;
+      
       for (const product of products) {
         if (!product.id || !product.externalUrl) {
           results.push({ id: product.id, success: false, error: 'Missing id or externalUrl' });
@@ -5553,7 +5571,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         );
 
         if (result.success && result.storedPath) {
-          await storage.updateSupply(supply.id, { imageUrl: result.storedPath });
+          // Apply abbreviation expansion to correct product name
+          const nameResult = await expandAbbreviationsAsync(supply.name, storage);
+          const correctedName = nameResult.expanded;
+          const nameWasCorrected = correctedName !== supply.name;
+          
+          await storage.updateSupply(supply.id, { 
+            imageUrl: result.storedPath,
+            ...(nameWasCorrected ? { name: correctedName } : {})
+          });
+          
+          if (nameWasCorrected) namesCorrected++;
         }
 
         results.push({
