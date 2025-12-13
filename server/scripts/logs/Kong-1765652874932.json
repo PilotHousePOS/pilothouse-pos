@@ -1,0 +1,52 @@
+[
+  {
+    "productId": 1798,
+    "productName": "Kong Ez Soft Collar Small",
+    "brand": "Kong",
+    "imageUrl": null,
+    "source": "chewy",
+    "confidence": 0,
+    "status": "error",
+    "error": "HTTP 429"
+  },
+  {
+    "productId": 3183,
+    "productName": "Kong Treatster Large",
+    "brand": "Kong",
+    "imageUrl": null,
+    "source": "chewy",
+    "confidence": 0,
+    "status": "error",
+    "error": "HTTP 429"
+  },
+  {
+    "productId": 3015,
+    "productName": "Kong Maxx Star Small/Medium",
+    "brand": "Kong",
+    "imageUrl": null,
+    "source": "chewy",
+    "confidence": 0,
+    "status": "error",
+    "error": "HTTP 429"
+  },
+  {
+    "productId": 3182,
+    "productName": "Kong Squeez Flex Bone Medium",
+    "brand": "Kong",
+    "imageUrl": null,
+    "source": "chewy",
+    "confidence": 0,
+    "status": "error",
+    "error": "HTTP 429"
+  },
+  {
+    "productId": 3066,
+    "productName": "Kong Sport Soft Balls 2pk Large",
+    "brand": "Kong",
+    "imageUrl": null,
+    "source": "chewy",
+    "confidence": 0,
+    "status": "error",
+    "error": "HTTP 429"
+  }
+]
