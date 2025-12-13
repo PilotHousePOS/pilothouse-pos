@@ -112,6 +112,13 @@ export default function Supplies() {
     setSearchQuery(searchInput.trim());
   };
 
+  // Auto-reset search when input is cleared (backspace or X button)
+  useEffect(() => {
+    if (searchInput === '' && searchQuery !== '') {
+      setSearchQuery('');
+    }
+  }, [searchInput, searchQuery]);
+
   // Reset page and filters when category changes
   useEffect(() => {
     setCurrentPage(0);
