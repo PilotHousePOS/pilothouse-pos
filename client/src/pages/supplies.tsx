@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, X } from "lucide-react";
 import SupplyCard from "@/components/supply-card";
 import CartSidebar from "@/components/cart-sidebar";
 
@@ -207,10 +207,23 @@ export default function Supplies() {
             placeholder="Search supplies..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="pl-10 bg-gray-100 border-none rounded-xl"
+            className="pl-10 pr-10 bg-gray-100 border-none rounded-xl"
             data-testid="input-search-supplies"
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          {searchInput && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchInput('');
+                setSearchQuery('');
+              }}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+              data-testid="button-clear-search"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
         <Button 
           type="submit" 
@@ -219,19 +232,6 @@ export default function Supplies() {
         >
           Search
         </Button>
-        {searchQuery && (
-          <Button 
-            type="button" 
-            variant="outline"
-            onClick={() => {
-              setSearchInput('');
-              setSearchQuery('');
-            }}
-            data-testid="button-clear-search"
-          >
-            Clear
-          </Button>
-        )}
       </form>
 
       {/* Category Grid */}

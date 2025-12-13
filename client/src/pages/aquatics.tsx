@@ -167,10 +167,20 @@ export default function AquaticsPage() {
               placeholder="Search aquatic animals..."
               value={petSearchInput}
               onChange={(e) => setPetSearchInput(e.target.value)}
-              className="pl-10 bg-white border-gray-200 rounded-xl"
+              className="pl-10 pr-10 bg-white border-gray-200 rounded-xl"
               data-testid="input-search-aquatic-animals"
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            {petSearchInput && (
+              <button
+                type="button"
+                onClick={() => setPetSearchInput('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                data-testid="button-clear-pet-search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
           
           {isLoading ? (
@@ -326,10 +336,20 @@ export default function AquaticsPage() {
               placeholder="Search aquatic supplies..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-10 bg-white border-gray-200 rounded-xl"
+              className="pl-10 pr-10 bg-white border-gray-200 rounded-xl"
               data-testid="input-search-aquatic-supplies"
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            {searchInput && (
+              <button
+                type="button"
+                onClick={() => setSearchInput('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                data-testid="button-clear-search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
           {isLoading ? (
