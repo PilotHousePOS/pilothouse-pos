@@ -3011,12 +3011,25 @@ function ProductImageManager() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
-            <Input
-              placeholder="Search by product name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              data-testid="input-product-search"
-            />
+            <div className="relative flex-1">
+              <Input
+                placeholder="Search by product name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pr-10"
+                data-testid="input-product-search"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  data-testid="button-clear-product-search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
             <Button 
               variant="outline" 
               onClick={handleManualSearch}

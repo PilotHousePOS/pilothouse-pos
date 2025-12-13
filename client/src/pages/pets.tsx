@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, X } from "lucide-react";
 import PetCard from "@/components/pet-card";
 import { useDebounce } from "@/hooks/use-debounce";
 
@@ -104,9 +104,19 @@ export default function Pets() {
             placeholder="Search pets by name, species, breed..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="pl-10 bg-white border-gray-300 rounded-xl h-12"
+            className="pl-10 pr-10 bg-white border-gray-300 rounded-xl h-12"
             data-testid="input-search-pets"
           />
+          {searchInput && (
+            <button
+              type="button"
+              onClick={() => setSearchInput('')}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+              data-testid="button-clear-search-pets"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 
