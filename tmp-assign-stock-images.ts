@@ -49,20 +49,26 @@ function getImageCategory(productName: string, brandName: string): string {
   const name = productName.toLowerCase();
   const brand = brandName.toLowerCase();
   
-  if (brand.includes('marineland') || brand.includes('cascade')) return 'aquarium';
-  if (brand.includes('reptology') || brand.includes('pangea')) return 'reptile';
-  if (brand.includes('diamond') || brand.includes('victor')) return 'dogfood';
-  if (brand.includes('benebone') || brand.includes('tuffy') || brand.includes('rascals')) return 'toys';
-  if (brand.includes('lupine') || brand.includes('valhoma') || brand.includes('petcrest')) return 'collar';
-  if (brand.includes('wee-wee') || brand.includes('four paws') || brand.includes('ethical')) return 'treats';
+  // Brand-based categorization for final batch
+  if (brand.includes('lee') || brand.includes('bpv')) return 'aquarium';
+  if (brand.includes('crazy cat')) return 'toys';
+  if (brand.includes('max') || brand.includes('meijer') || brand.includes('ideal')) return 'dogfood';
+  if (brand.includes('dog life') || brand.includes('ranch remedy') || brand.includes('pierce') || brand.includes('pet elite')) return 'treats';
+  if (brand.includes('beautifur') || brand.includes('cardinal') || brand.includes('insight')) return 'treats';
+  if (brand.includes('nation') || brand.includes('5strands') || brand.includes('dockstel') || brand.includes('pet mate')) return 'collar';
   
-  if (name.includes('toy') || name.includes('ball') || name.includes('chew') || name.includes('bone')) return 'toys';
-  if (name.includes('treat') || name.includes('biscuit') || name.includes('snack') || name.includes('pad')) return 'treats';
-  if (name.includes('food') || name.includes('kibble') || name.includes('diet')) return 'dogfood';
-  if (name.includes('fish') || name.includes('aqua') || name.includes('tank') || name.includes('filter')) return 'aquarium';
-  if (name.includes('reptile') || name.includes('heat') || name.includes('lamp') || name.includes('gecko')) return 'reptile';
-  if (name.includes('collar') || name.includes('lead')) return 'collar';
+  // Name-based categorization
+  if (name.includes('toy') || name.includes('ball') || name.includes('chew') || name.includes('plush') || name.includes('squeaky')) return 'toys';
+  if (name.includes('treat') || name.includes('biscuit') || name.includes('snack') || name.includes('pad') || name.includes('jerky') || name.includes('chews')) return 'treats';
+  if (name.includes('food') || name.includes('kibble') || name.includes('diet') || name.includes('recipe')) return 'dogfood';
+  if (name.includes('fish') || name.includes('aqua') || name.includes('tank') || name.includes('filter') || name.includes('marine') || name.includes('coral')) return 'aquarium';
+  if (name.includes('reptile') || name.includes('heat') || name.includes('lamp') || name.includes('gecko') || name.includes('terrarium')) return 'reptile';
+  if (name.includes('hamster') || name.includes('guinea') || name.includes('rabbit') || name.includes('bird') || name.includes('ferret')) return 'smallanimal';
+  if (name.includes('collar') || name.includes('lead') || name.includes('leash')) return 'collar';
   if (name.includes('harness')) return 'harness';
+  if (name.includes('shampoo') || name.includes('spray') || name.includes('clean') || name.includes('grooming')) return 'treats';
+  if (name.includes('cat')) return 'toys';
+  if (name.includes('dog')) return 'toys';
   
   return 'collar';
 }
@@ -96,25 +102,23 @@ async function uploadAndAssign() {
   console.log('Stock images uploaded');
 
   const brands = [
-    { pattern: '%wee-wee%', name: 'Wee-Wee' },
-    { pattern: '%four paws%', name: 'Four Paws' },
-    { pattern: '%ethical%', name: 'Ethical Pet' },
-    { pattern: '%benebone%', name: 'Benebone' },
-    { pattern: '%petcrest%', name: 'PetCrest' },
-    { pattern: '%diamond%', name: 'Diamond' },
-    { pattern: '%specialty%', name: 'Specialty' },
-    { pattern: '%tuffy%', name: 'Tuffy' },
-    { pattern: '%quiet time%', name: 'Quiet Time' },
-    { pattern: '%victor%', name: 'VICTOR' },
-    { pattern: '%marineland%', name: 'Marineland' },
-    { pattern: '%pets first%', name: 'Pets First' },
-    { pattern: '%lupine%', name: 'Lupine' },
-    { pattern: '%reptology%', name: 'Reptology' },
-    { pattern: '%rascals%', name: 'Rascals' },
-    { pattern: '%cascade%', name: 'Cascade' },
-    { pattern: '%pangea%', name: 'Pangea' },
-    { pattern: '%pethouse%', name: 'Pethouse' },
-    { pattern: '%van ness%', name: 'Van Ness' },
+    { pattern: '%max%', name: 'Max' },
+    { pattern: '%dog life%', name: 'Dog Life' },
+    { pattern: '%lee%', name: "Lee's" },
+    { pattern: '%ideal%', name: 'Ideal' },
+    { pattern: '%insight%', name: 'Insight' },
+    { pattern: '%cardinal%', name: 'Cardinal' },
+    { pattern: '%meijer%', name: 'Meijer' },
+    { pattern: '%crazy cat%', name: 'Crazy Cat' },
+    { pattern: '%beautifur%', name: 'Beautifur' },
+    { pattern: '%bpv%', name: 'BPV Environmental' },
+    { pattern: '%pet mate%', name: 'Pet Mate' },
+    { pattern: '%pierce%', name: "Pierce's" },
+    { pattern: '%5strands%', name: '5Strands' },
+    { pattern: '%ranch remedy%', name: 'Ranch Remedy' },
+    { pattern: '%nation%', name: 'Nation' },
+    { pattern: '%dockstel%', name: 'Dockstel' },
+    { pattern: '%pet elite%', name: 'Pet Elite' },
   ];
 
   let totalUpdated = 0;
@@ -142,6 +146,29 @@ async function uploadAndAssign() {
       totalUpdated++;
     }
     console.log(`${brand.name}: ${products.length} updated`);
+  }
+
+  // Handle products without brands
+  const noBrandProducts = await db.select({ id: supplies.id, name: supplies.name, brand: supplies.brand })
+    .from(supplies)
+    .where(and(
+      or(isNull(supplies.brand), eq(supplies.brand, '')),
+      or(isNull(supplies.imageUrl), eq(supplies.imageUrl, ''))
+    ))
+    .limit(100);
+
+  for (const product of noBrandProducts) {
+    const category = getImageCategory(product.name, '');
+    counters[category] = (counters[category] || 0) + 1;
+    
+    const images = uploadedImages[category] || uploadedImages.collar;
+    const imageUrl = images[counters[category] % images.length];
+
+    await db.update(supplies).set({ imageUrl, updatedAt: new Date() }).where(eq(supplies.id, product.id));
+    totalUpdated++;
+  }
+  if (noBrandProducts.length > 0) {
+    console.log(`No Brand: ${noBrandProducts.length} updated`);
   }
 
   console.log(`\nTotal: ${totalUpdated} products updated`);
