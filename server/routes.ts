@@ -84,7 +84,7 @@ const excelUpload = multer({
   }
 });
 
-export async function registerRoutes(app: Express): Promise<Server> {
+export async function registerRoutes(app: Express, server?: Server): Promise<void> {
 
   // Customer signup
   app.post('/api/auth/signup', async (req, res) => {
@@ -7152,6 +7152,5 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
-  return httpServer;
+  // Server is now created externally in index.ts
 }

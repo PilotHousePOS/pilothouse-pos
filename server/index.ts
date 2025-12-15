@@ -1,28 +1,30 @@
 import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import path from "path";
-import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
-import NotificationWebSocketServer from "./websocket";
-import { initializeScheduledTasks } from "./scheduler";
+import http from "http";
 
 const app = express();
 app.set("trust proxy", 1);
 
-// Track initialization state for health checks
+// Track initialization state
 let isFullyInitialized = false;
 
-// Immediate health check endpoint - responds before any heavy initialization
-// This must be registered BEFORE any async middleware or database connections
-app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'ok', 
-    ready: isFullyInitialized,
-    timestamp: new Date().toISOString()
-  });
+// Simple logging function (avoid importing vite module early)
+function log(message: string) {
+  const time = new Date().toLocaleTimeString("en-US", { hour12: true });
+  console.log(`${time} [express] ${message}`);
+}
+
+// CRITICAL: Health check endpoints FIRST - must respond instantly
+app.get('/health', (_req, res) => {
+  res.status(200).json({ status: 'ok', ready: isFullyInitialized });
 });
 
-// Enable CORS for cookies
+app.get('/__health', (_req, res) => {
+  res.status(200).send('OK');
+});
+
+// Basic middleware (lightweight, no heavy imports)
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
@@ -39,23 +41,22 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 app.use(cookieParser());
 
-// Serve uploaded images statically
+// Serve static files
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-
-// Serve stock images from attached_assets
 app.use('/stock-images', express.static(path.join(process.cwd(), 'attached_assets/stock_images')));
 
-// Add cache-busting headers for mobile devices
-app.use((req, res, next) => {
+// Cache headers
+app.use((_req, res, next) => {
   res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.header('Pragma', 'no-cache');
   res.header('Expires', '0');
   next();
 });
 
+// Request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
-  const path = req.path;
+  const reqPath = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
   const originalResJson = res.json;
@@ -66,16 +67,14 @@ app.use((req, res, next) => {
 
   res.on("finish", () => {
     const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+    if (reqPath.startsWith("/api")) {
+      let logLine = `${req.method} ${reqPath} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
-
       if (logLine.length > 80) {
         logLine = logLine.slice(0, 79) + "…";
       }
-
       log(logLine);
     }
   });
@@ -83,58 +82,64 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
-  // Register routes - this creates the HTTP server
-  const server = await registerRoutes(app);
+// Create HTTP server and START LISTENING IMMEDIATELY
+const server = http.createServer(app);
+const port = 5000;
+
+server.listen({ port, host: "0.0.0.0", reusePort: true }, () => {
+  log(`Server listening on port ${port} - health checks ready`);
   
-  // ALWAYS serve the app on port 5000
-  // Start listening IMMEDIATELY to pass health checks
-  // (health check endpoint is already registered synchronously above)
-  const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`Server listening on port ${port} - continuing initialization...`);
+  // NOW start heavy initialization asynchronously
+  initializeApp().catch(err => {
+    console.error('Failed to initialize app:', err);
   });
+});
 
-  // Continue with remaining initialization asynchronously
+// Heavy initialization - runs AFTER server is already listening
+async function initializeApp() {
   try {
-    // Initialize WebSocket server for admin notifications
-    const wsServer = new NotificationWebSocketServer(server);
+    log('Starting app initialization...');
     
-    // Make WebSocket server available globally for notifications
+    // Dynamically import heavy modules
+    const { registerRoutes } = await import('./routes');
+    const { default: NotificationWebSocketServer } = await import('./websocket');
+    const { initializeScheduledTasks } = await import('./scheduler');
+    
+    // Register all routes (this no longer creates server, just adds routes)
+    await registerRoutes(app, server);
+    
+    // Initialize WebSocket server
+    const wsServer = new NotificationWebSocketServer(server);
     (global as any).wsServer = wsServer;
-
-    // Initialize scheduled tasks (deferred)
+    
+    // Defer scheduled tasks
     setImmediate(() => {
       initializeScheduledTasks();
     });
-
+    
+    // Error handler
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
       const message = err.message || "Internal Server Error";
-
       if (!res.headersSent) {
         res.status(status).json({ message });
       }
       console.error('Error:', err);
     });
-
-    // importantly only setup vite in development and after
-    // setting up all the other routes so the catch-all route
-    // doesn't interfere with the other routes
+    
+    // Setup Vite (dev) or static serving (prod)
     if (app.get("env") === "development") {
+      const { setupVite } = await import('./vite');
       await setupVite(app, server);
     } else {
+      const { serveStatic } = await import('./vite');
       serveStatic(app);
     }
-
-    // Mark as fully initialized
+    
     isFullyInitialized = true;
-    log(`Server fully initialized and ready`);
+    log('Server fully initialized and ready');
   } catch (error) {
-    console.error('Failed to initialize server:', error);
+    console.error('Initialization error:', error);
+    throw error;
   }
-})();
+}
