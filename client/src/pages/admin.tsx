@@ -385,9 +385,9 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                                       </p>
                                     )}
                                     {pet.specialNotes && (
-                                      <p className="text-xs text-gray-500 mt-1">
+                                      <div className="text-xs text-gray-500 mt-1 whitespace-pre-wrap">
                                         Notes: {pet.specialNotes}
-                                      </p>
+                                      </div>
                                     )}
                                   </div>
                                 ))}
@@ -8291,9 +8291,9 @@ export default function Admin() {
                               <p className="text-gray-500">{parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
                             </div>
                             {currentAppointment.specialNotes && (
-                              <p className="text-xs text-gray-700 mt-1.5 break-words" data-testid={`appointment-notes-${currentAppointment.id}`}>
+                              <div className="text-xs text-gray-700 mt-1.5 break-words whitespace-pre-wrap" data-testid={`appointment-notes-${currentAppointment.id}`}>
                                 <span className="font-medium">Notes:</span> {currentAppointment.specialNotes}
-                              </p>
+                              </div>
                             )}
                             {currentAppointment.price && (
                               <p className="text-xs text-green-700 font-medium mt-1" data-testid={`appointment-price-${currentAppointment.id}`}>
@@ -8523,7 +8523,7 @@ export default function Admin() {
                         <p className="text-sm text-gray-600">Phone: {currentAppointment.ownerPhoneNumber}</p>
                         <p className="text-xs text-gray-500">Date: {parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
                         {currentAppointment.specialNotes && (
-                          <p className="text-xs text-gray-500 mt-1">Notes: {currentAppointment.specialNotes}</p>
+                          <div className="text-xs text-gray-500 mt-1 whitespace-pre-wrap">Notes: {currentAppointment.specialNotes}</div>
                         )}
                         <p className="text-xs text-gray-500">Booked: {new Date(currentAppointment.createdAt).toLocaleString()}</p>
                         {hasMultiple && (
