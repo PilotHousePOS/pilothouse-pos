@@ -9824,7 +9824,21 @@ export default function Admin() {
                     Upload a supplies-only export file to update inventory (e.g., import to production with updated names)
                   </p>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="full-sync-checkbox"
+                      className="w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                      data-testid="checkbox-full-sync"
+                    />
+                    <label htmlFor="full-sync-checkbox" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Full Sync (delete items not in import file)
+                    </label>
+                  </div>
+                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-2 text-xs text-amber-700 dark:text-amber-400">
+                    <strong>Warning:</strong> Full Sync will delete any supplies that exist in the database but are not in the import file. Use this to keep development in sync with production.
+                  </div>
                   <input
                     type="file"
                     accept="application/json"
@@ -9834,10 +9848,13 @@ export default function Admin() {
                       const file = e.target.files?.[0];
                       if (!file) return;
 
+                      const fullSyncCheckbox = document.getElementById('full-sync-checkbox') as HTMLInputElement;
+                      const fullSync = fullSyncCheckbox?.checked || false;
+
                       try {
                         toast({
-                          title: "Importing supplies...",
-                          description: "Please wait while we process your file."
+                          title: fullSync ? "Full sync importing..." : "Importing supplies...",
+                          description: fullSync ? "This will also delete items not in the file." : "Please wait while we process your file."
                         });
 
                         const text = await file.text();
@@ -9846,6 +9863,9 @@ export default function Admin() {
                         if (data.type !== 'supplies-only') {
                           throw new Error('This file is not a supplies-only export. Please use the correct export file.');
                         }
+                        
+                        // Add fullSync flag to data
+                        data.fullSync = fullSync;
                         
                         const response = await fetch('/api/admin/supplies/import', {
                           method: 'POST',
@@ -9863,16 +9883,17 @@ export default function Admin() {
                         }
                         
                         const errorCount = result.stats?.errorCount || 0;
+                        const deletedCount = result.stats?.deleted || 0;
                         if (errorCount > 0) {
                           toast({
                             title: "Import completed with errors",
-                            description: `Imported ${result.stats?.supplies || 0} supplies, ${errorCount} failed.`,
+                            description: `Imported ${result.stats?.supplies || 0} supplies${deletedCount > 0 ? `, deleted ${deletedCount}` : ''}, ${errorCount} failed.`,
                             variant: "destructive"
                           });
                         } else {
                           toast({
                             title: "Import successful",
-                            description: `Imported ${result.stats?.supplies || 0} supplies`
+                            description: `Imported ${result.stats?.supplies || 0} supplies${deletedCount > 0 ? `, deleted ${deletedCount} items not in file` : ''}`
                           });
                         }
                         

@@ -4141,6 +4141,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       }
 
       const updateExisting = req.body.updateExisting === 'true';
+      const fullSync = req.body.fullSync === 'true'; // Delete items not in import file
       
       // Parse Excel file from buffer using exceljs
       const workbook = new ExcelJS.Workbook();
@@ -4171,7 +4172,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       });
 
       console.log(`Processing ${data.length} rows from Excel file...`);
-      console.log(`Mode: ${updateExisting ? 'Update Existing' : 'Add New Only'}`);
+      console.log(`Mode: ${updateExisting ? 'Update Existing' : 'Add New Only'}${fullSync ? ' + Full Sync (delete missing)' : ''}`);
 
       // Get existing supplies if updating
       let existingSuppliesMap = new Map();
@@ -4191,8 +4192,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         added: 0,
         updated: 0,
         skipped: 0,
+        deleted: 0,
         errors: [] as string[]
       };
+      
+      // Track names from import file for full sync deletion
+      const importedNames = new Set<string>();
 
       for (let i = 0; i < data.length; i++) {
         const row: any = data[i];
@@ -4225,6 +4230,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
             stats.skipped++;
             continue;
           }
+          
+          // Track this name for full sync deletion
+          importedNames.add(name.toLowerCase().trim());
 
           // Preserve Excel category as-is, only normalize known variants
           // The Excel file is the authoritative source for categories
@@ -4292,12 +4300,29 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         }
       }
 
-      console.log(`Import complete: ${stats.added} added, ${stats.updated} updated, ${stats.skipped} skipped, ${stats.errors.length} errors`);
+      // Full sync: Delete items that exist in database but not in import file
+      if (fullSync && importedNames.size > 0) {
+        const allExistingSupplies = await storage.getAllSupplies();
+        for (const supply of allExistingSupplies) {
+          const supplyNameLower = supply.name.toLowerCase().trim();
+          if (!importedNames.has(supplyNameLower)) {
+            try {
+              await storage.deleteSupply(supply.id);
+              stats.deleted++;
+              console.log(`Deleted supply not in import: ${supply.name}`);
+            } catch (err: any) {
+              stats.errors.push(`Failed to delete ${supply.name}: ${err.message}`);
+            }
+          }
+        }
+      }
+
+      console.log(`Import complete: ${stats.added} added, ${stats.updated} updated, ${stats.deleted} deleted, ${stats.skipped} skipped, ${stats.errors.length} errors`);
 
       res.json({
         success: true,
         stats,
-        message: `Import complete: ${stats.added} added, ${stats.updated} updated, ${stats.skipped} skipped`
+        message: `Import complete: ${stats.added} added, ${stats.updated} updated${fullSync ? `, ${stats.deleted} deleted` : ''}, ${stats.skipped} skipped`
       });
     } catch (error: any) {
       console.error('Excel import error:', error);
@@ -4772,10 +4797,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(400).json({ message: "Invalid import data format - supplies must be an array" });
       }
 
+      const fullSync = importData.fullSync === true; // Delete items not in import
+      
       console.log("Starting supplies-only import...");
       console.log("Import data version:", importData.version);
       console.log("Source environment:", importData.environment);
       console.log(`Processing ${importData.data.supplies.length} supplies...`);
+      console.log(`Full Sync mode: ${fullSync ? 'YES - will delete missing items' : 'NO'}`);
 
       // Sanitize all supplies data first (convert timestamp strings to Date objects)
       const sanitizedSupplies = importData.data.supplies.map((supply: any) => ({
@@ -4786,18 +4814,45 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
       // Use bulk upsert for performance
       const result = await storage.bulkUpsertSupplies(sanitizedSupplies);
+      
+      // Full sync: Delete items not in import file
+      let deletedCount = 0;
+      const deleteErrors: string[] = [];
+      
+      if (fullSync) {
+        // Create set of IDs from import file
+        const importedIds = new Set(sanitizedSupplies.map((s: any) => s.id));
+        
+        // Get all existing supplies
+        const existingSupplies = await storage.getAllSupplies();
+        
+        // Delete supplies that are not in the import
+        for (const supply of existingSupplies) {
+          if (!importedIds.has(supply.id)) {
+            try {
+              await storage.deleteSupply(supply.id);
+              deletedCount++;
+              console.log(`Deleted supply not in import: ${supply.name} (ID: ${supply.id})`);
+            } catch (err: any) {
+              deleteErrors.push(`Failed to delete ${supply.name}: ${err.message}`);
+            }
+          }
+        }
+        console.log(`Full sync: deleted ${deletedCount} supplies not in import`);
+      }
 
-      console.log(`Supplies import complete: ${result.imported} supplies imported, ${result.failed} failed, ${result.errors.length} errors`);
+      console.log(`Supplies import complete: ${result.imported} imported, ${result.failed} failed, ${deletedCount} deleted, ${result.errors.length} errors`);
 
       res.json({ 
-        message: result.errors.length === 0 
-          ? "Supplies import completed successfully" 
-          : `Supplies import completed with ${result.errors.length} error(s)`,
+        message: result.errors.length === 0 && deleteErrors.length === 0
+          ? `Supplies import completed successfully${fullSync ? ` (${deletedCount} deleted)` : ''}`
+          : `Supplies import completed with ${result.errors.length + deleteErrors.length} error(s)`,
         stats: {
           supplies: result.imported,
           failed: result.failed,
-          errorCount: result.errors.length,
-          errors: result.errors.slice(0, 20) // Return first 20 errors for debugging
+          deleted: deletedCount,
+          errorCount: result.errors.length + deleteErrors.length,
+          errors: [...result.errors.slice(0, 10), ...deleteErrors.slice(0, 10)]
         }
       });
     } catch (error) {
