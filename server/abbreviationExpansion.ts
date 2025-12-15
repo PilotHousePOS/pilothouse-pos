@@ -39,6 +39,11 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   // === BRAND PREFIX ABBREVIATIONS (at start of name) ===
   // These are expanded when they appear at the start of a product name
   // Verified against brand database December 2025
+  'Sd': 'Science Diet',
+  'Nb': 'Natural Balance',
+  'Tow': 'Taste of the Wild',
+  'Toe': 'Taste of the Wild',
+  'Diam': 'Diamond',
   'Vict': 'VICTOR',
   'Euk': 'Eukanuba',
   'Jw': 'JW Pet',
@@ -53,6 +58,16 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Lsu': 'LSU',
   'Nola': 'New Orleans Saints',
   'Knf': 'Kong',
+  
+  // Product line abbreviations
+  'Ck': 'Chicken',
+  'Lam': 'Lamb',
+  'Br': 'Breed',
+  'Anc': 'Ancient',
+  'Perf': 'Perfect',
+  'Sensi': 'Sensitive',
+  'Gr': 'Grain',
+  'Fr': 'Free',
   
   // Size abbreviations
   'Lg': 'Large',

@@ -4861,6 +4861,135 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Assign SKUs from spreadsheet data (Admin only)
+  app.post("/api/admin/supplies/assign-skus", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { skuData } = req.body;
+      if (!skuData || !Array.isArray(skuData)) {
+        return res.status(400).json({ message: "skuData array required" });
+      }
+
+      console.log(`[SKU-ASSIGN] Starting SKU assignment for ${skuData.length} items...`);
+      
+      const { expandAbbreviations } = await import('./abbreviationExpansion');
+      
+      // Get all supplies from database
+      const allSupplies = await storage.getAllSupplies();
+      console.log(`[SKU-ASSIGN] Found ${allSupplies.length} supplies in database`);
+      
+      // Create normalized lookup maps for matching
+      const supplyByNormalizedName = new Map<string, typeof allSupplies[0]>();
+      const supplyByExactName = new Map<string, typeof allSupplies[0]>();
+      
+      for (const supply of allSupplies) {
+        // Store by exact lowercase name
+        const exactKey = supply.name.toLowerCase().trim();
+        supplyByExactName.set(exactKey, supply);
+        
+        // Also create normalized version without special chars
+        const normalizedName = supply.name
+          .toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        supplyByNormalizedName.set(normalizedName, supply);
+      }
+      
+      let matched = 0;
+      let notFound = 0;
+      const errors: string[] = [];
+      const notFoundItems: string[] = [];
+      
+      for (const item of skuData) {
+        const { sku, abbreviatedName } = item;
+        if (!sku || !abbreviatedName) continue;
+        
+        // Expand the abbreviated name using our abbreviation system
+        const expandedName = expandAbbreviations(abbreviatedName);
+        
+        // Try multiple matching strategies
+        let foundSupply = null;
+        
+        // Strategy 1: Exact match on expanded name
+        const expandedLower = expandedName.toLowerCase().trim();
+        foundSupply = supplyByExactName.get(expandedLower);
+        
+        // Strategy 2: Normalized match
+        if (!foundSupply) {
+          const normalizedExpanded = expandedName
+            .toLowerCase()
+            .replace(/[^a-z0-9\s]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+          foundSupply = supplyByNormalizedName.get(normalizedExpanded);
+        }
+        
+        // Strategy 3: Fuzzy match - find best match by similarity
+        if (!foundSupply) {
+          const expandedWords = expandedName.toLowerCase().split(/\s+/).filter(w => w.length > 1);
+          let bestMatch = null;
+          let bestScore = 0;
+          
+          for (const supply of allSupplies) {
+            const supplyWords = supply.name.toLowerCase().split(/\s+/).filter(w => w.length > 1);
+            let matchCount = 0;
+            
+            for (const word of expandedWords) {
+              if (supplyWords.some(sw => sw.includes(word) || word.includes(sw))) {
+                matchCount++;
+              }
+            }
+            
+            const score = matchCount / Math.max(expandedWords.length, 1);
+            if (score > bestScore && score >= 0.6) {
+              bestScore = score;
+              bestMatch = supply;
+            }
+          }
+          
+          if (bestMatch) {
+            foundSupply = bestMatch;
+          }
+        }
+        
+        if (foundSupply) {
+          // Update SKU
+          try {
+            await storage.updateSupply(foundSupply.id, { sku });
+            matched++;
+            console.log(`[SKU-ASSIGN] Matched: "${abbreviatedName}" -> "${foundSupply.name}" (SKU: ${sku})`);
+          } catch (err: any) {
+            errors.push(`Failed to update ${foundSupply.name}: ${err.message}`);
+          }
+        } else {
+          notFound++;
+          notFoundItems.push(`${sku}: ${abbreviatedName}`);
+        }
+      }
+      
+      console.log(`[SKU-ASSIGN] Complete: ${matched} matched, ${notFound} not found`);
+      
+      res.json({
+        message: `SKU assignment complete: ${matched} matched, ${notFound} not found`,
+        stats: {
+          matched,
+          notFound,
+          total: skuData.length
+        },
+        notFoundItems: notFoundItems.slice(0, 50),
+        errors: errors.slice(0, 20)
+      });
+    } catch (error) {
+      console.error('[SKU-ASSIGN] Error:', error);
+      res.status(500).json({ message: "Failed to assign SKUs" });
+    }
+  });
+
   // Fix Kong toys in Reptiles section (One-time fix - Admin only)
   app.post("/api/admin/supplies/fix-kong-reptiles", authMiddleware, async (req: any, res) => {
     try {
