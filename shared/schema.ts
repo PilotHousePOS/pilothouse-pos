@@ -104,6 +104,7 @@ export const supplies = pgTable("supplies", {
   isActive: boolean("is_active").default(true),
   weight: varchar("weight", { length: 50 }),
   size: varchar("size", { length: 50 }),
+  sku: varchar("sku", { length: 100 }), // Product SKU from original supply list
   filterType: varchar("filter_type", { length: 20 }), // 'aquatic', 'reptile', or null for general
   // POS Integration & Priority Tracking
   priceSource: varchar("price_source", { length: 20 }).default("default"), // manual, pos, ai_extraction, import, default
