@@ -682,7 +682,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const fileBuffer = fs.readFileSync(filePath);
       
       const { ObjectStorageService } = await import('./objectStorageService');
-      const { setObjectAclPolicy } = await import('./objectStorageAcl');
+      const { setObjectAclPolicy } = await import('./objectAcl');
       const objectStorageService = new ObjectStorageService();
       
       // Generate a unique filename
