@@ -3001,6 +3001,115 @@ function ProductImageManager() {
         </CardContent>
       </Card>
 
+      {/* Export/Import Image URLs for Production Sync */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Download className="w-5 h-5" />
+            Export/Import Image URLs
+          </CardTitle>
+          <CardDescription>
+            Export image URLs from development and import them into the published app to sync all product photos.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 text-sm">
+            <p className="text-amber-800 dark:text-amber-300">
+              <strong>Step 1:</strong> Export image URLs from this development environment.<br/>
+              <strong>Step 2:</strong> Open the published app's admin panel and import the JSON file.
+            </p>
+          </div>
+          
+          <div className="flex flex-wrap gap-3">
+            <Button
+              onClick={() => {
+                window.open('/api/admin/supplies/export-image-urls', '_blank');
+                toast({
+                  title: "Export Started",
+                  description: "Downloading image URLs JSON file..."
+                });
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              data-testid="button-export-image-urls"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export Image URLs
+            </Button>
+
+            <div className="relative">
+              <input
+                type="file"
+                accept=".json"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  
+                  setIsImporting(true);
+                  try {
+                    const text = await file.text();
+                    const data = JSON.parse(text);
+                    
+                    const response = await fetch('/api/admin/supplies/import-image-urls', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      credentials: 'include',
+                      body: JSON.stringify(data)
+                    });
+                    
+                    if (!response.ok) {
+                      const error = await response.json();
+                      throw new Error(error.message || 'Import failed');
+                    }
+                    
+                    const result = await response.json();
+                    setImportResult(result);
+                    
+                    toast({
+                      title: "Import Complete",
+                      description: `Updated ${result.updated} product image URLs`
+                    });
+                    
+                    queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
+                    queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/image-stats'] });
+                  } catch (error) {
+                    toast({
+                      title: "Import failed",
+                      description: error instanceof Error ? error.message : "Failed to import image URLs",
+                      variant: "destructive"
+                    });
+                  } finally {
+                    setIsImporting(false);
+                    e.target.value = '';
+                  }
+                }}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                disabled={isImporting}
+                data-testid="input-import-image-urls"
+              />
+              <Button
+                className="bg-green-600 hover:bg-green-700 text-white pointer-events-none"
+                disabled={isImporting}
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                {isImporting ? 'Importing...' : 'Import Image URLs'}
+              </Button>
+            </div>
+          </div>
+          
+          {importResult && importResult.updated !== undefined && (
+            <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg text-sm">
+              <div className="font-semibold text-green-700 dark:text-green-400 mb-2">Import Results</div>
+              <div className="grid grid-cols-2 gap-2 text-gray-700 dark:text-gray-300">
+                <div>Total in file: {importResult.totalInImport}</div>
+                <div className="text-green-600">Updated: {importResult.updated}</div>
+                <div className="text-yellow-600">Skipped: {importResult.skipped}</div>
+                <div className="text-red-600">Not found: {importResult.notFound}</div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Manual Product Search */}
       <Card>
         <CardHeader>
