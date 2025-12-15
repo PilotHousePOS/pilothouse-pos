@@ -10902,10 +10902,10 @@ export default function Admin() {
                               <Label className="text-xs font-semibold text-gray-600">Service</Label>
                               <p className="text-gray-900">{formatServiceType(pet.serviceType)}</p>
                             </div>
-                            {pet.specialNotes && (
+                            {(pet.specialNotes || pet.notes) && (
                               <div className="col-span-2">
                                 <Label className="text-xs font-semibold text-gray-600">Notes</Label>
-                                <p className="text-gray-900 text-sm whitespace-pre-wrap">{pet.specialNotes}</p>
+                                <p className="text-gray-900 text-sm whitespace-pre-wrap">{pet.specialNotes || pet.notes}</p>
                               </div>
                             )}
                             {pet.price && (
