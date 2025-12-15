@@ -733,7 +733,8 @@ export class DatabaseStorage implements IStorage {
           or(
             ilike(supplies.name, `%${query}%`),
             ilike(supplies.brand, `%${query}%`),
-            ilike(supplies.description, `%${query}%`)
+            ilike(supplies.description, `%${query}%`),
+            ilike(supplies.sku, `%${query}%`)
           )
         )
       )
@@ -1048,7 +1049,7 @@ export class DatabaseStorage implements IStorage {
       const filteredItems = fuzzySearchFilter(
         allItems,
         trimmedSearch,
-        (item) => [item.name || '', item.brand || '', item.description || ''],
+        (item) => [item.name || '', item.brand || '', item.description || '', item.sku || ''],
         70 // 70% similarity threshold for typo tolerance
       );
       

@@ -11689,6 +11689,7 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
     imageUrls: supply.imageUrls || [],
     stockQuantity: supply.stockQuantity || 0,
     nonRestockable: supply.nonRestockable || false,
+    sku: supply.sku || "",
   });
   
   const handleNonRestockableChange = (checked: boolean) => {
@@ -11736,6 +11737,17 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
           value={formData.brand}
           onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
           className="w-full p-2 border rounded"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">SKU</label>
+        <input
+          type="text"
+          value={formData.sku}
+          onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+          className="w-full p-2 border rounded bg-gray-50 dark:bg-gray-800"
+          placeholder="Product SKU number"
+          data-testid="input-supply-sku"
         />
       </div>
       <div>
