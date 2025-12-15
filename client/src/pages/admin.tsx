@@ -11584,6 +11584,8 @@ function EditPetForm({ pet, onSubmit }: { pet: any; onSubmit: (data: any) => voi
 }
 
 function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: any) => void }) {
+  const NON_RESTOCKABLE_TEXT = "⚠️ This item will not be restocked once sold out.";
+  
   const [formData, setFormData] = useState({
     name: supply.name || "",
     brand: supply.brand || "",
@@ -11593,7 +11595,29 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
     imageUrl: supply.imageUrl || "",
     imageUrls: supply.imageUrls || [],
     stockQuantity: supply.stockQuantity || 0,
+    nonRestockable: supply.nonRestockable || false,
   });
+  
+  const handleNonRestockableChange = (checked: boolean) => {
+    let newDescription = formData.description || "";
+    
+    if (checked) {
+      if (!newDescription.includes(NON_RESTOCKABLE_TEXT)) {
+        newDescription = newDescription.trim() 
+          ? `${newDescription.trim()}\n\n${NON_RESTOCKABLE_TEXT}`
+          : NON_RESTOCKABLE_TEXT;
+      }
+    } else {
+      newDescription = newDescription.replace(NON_RESTOCKABLE_TEXT, "").trim();
+      newDescription = newDescription.replace(/\n\n$/, "");
+    }
+    
+    setFormData({ 
+      ...formData, 
+      nonRestockable: checked, 
+      description: newDescription 
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -11661,6 +11685,27 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
           rows={3}
         />
       </div>
+      
+      <div className="flex items-center space-x-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
+        <Checkbox
+          id="non-restockable"
+          checked={formData.nonRestockable}
+          onCheckedChange={handleNonRestockableChange}
+          data-testid="checkbox-non-restockable"
+        />
+        <div className="flex-1">
+          <label 
+            htmlFor="non-restockable" 
+            className="text-sm font-medium cursor-pointer text-amber-800 dark:text-amber-300"
+          >
+            Non-Restockable Item
+          </label>
+          <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+            Mark this item as not being restocked once sold out
+          </p>
+        </div>
+      </div>
+      
       <SupplyImageUpload 
         supplyId={supply.id}
         currentImageUrl={formData.imageUrl}

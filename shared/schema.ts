@@ -112,6 +112,7 @@ export const supplies = pgTable("supplies", {
   manualQuantityOverride: boolean("manual_quantity_override").default(false), // If true, POS won't override quantity
   posProductId: varchar("pos_product_id", { length: 255 }), // External POS system product ID
   posLastSyncedAt: timestamp("pos_last_synced_at"), // Last time POS data was synced
+  nonRestockable: boolean("non_restockable").default(false), // Flag for items that won't be restocked
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
