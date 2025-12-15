@@ -14,7 +14,7 @@ async function main() {
   
   const excelBySku = new Map<string, { original: string; expanded: string }>();
   sheet.eachRow((row, rowNumber) => {
-    if (rowNumber === 1) return;
+    if (rowNumber === 1 || rowNumber > 3175) return; // Only clean section before duplicates
     const sku = String(row.getCell(1).value || '').trim();
     const name = String(row.getCell(2).value || '').trim();
     if (sku && name) {
