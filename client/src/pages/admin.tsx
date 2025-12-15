@@ -7937,38 +7937,42 @@ export default function Admin() {
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {(pets as any[]).map((pet: any) => (
-                  <div key={pet.id} className="flex items-center gap-4 p-4 border rounded-lg">
-                    {/* Pet Thumbnail */}
-                    <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
-                      {pet.imageUrl ? (
-                        <img 
-                          src={pet.imageUrl} 
-                          alt={pet.name}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                            (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-                          }}
-                          data-testid={`img-pet-thumbnail-${pet.id}`}
-                        />
-                      ) : null}
-                      <div className={`w-full h-full flex items-center justify-center ${pet.imageUrl ? 'hidden' : ''}`}>
-                        <PawPrint className="w-6 h-6 text-gray-400" />
+                  <div key={pet.id} className="p-3 border rounded-lg">
+                    <div className="flex gap-3">
+                      {/* Pet Thumbnail */}
+                      <div className="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                        {pet.imageUrl ? (
+                          <img 
+                            src={pet.imageUrl} 
+                            alt={pet.name}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                              (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                            }}
+                            data-testid={`img-pet-thumbnail-${pet.id}`}
+                          />
+                        ) : null}
+                        <div className={`w-full h-full flex items-center justify-center ${pet.imageUrl ? 'hidden' : ''}`}>
+                          <PawPrint className="w-5 h-5 text-gray-400" />
+                        </div>
+                      </div>
+                      {/* Name gets full remaining width */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm leading-snug" title={pet.name}>{pet.name}</h3>
+                        <p className="text-xs text-gray-600 mt-0.5">{pet.species} • {pet.breed} • ${pet.price}</p>
                       </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm leading-tight line-clamp-3" title={pet.name}>{pet.name}</h3>
-                      <p className="text-xs text-gray-600 mt-1">{pet.species} • {pet.breed} • ${pet.price}</p>
-                    </div>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <Badge variant={pet.isAvailable ? "default" : "secondary"} className="text-xs px-2 py-0.5">
-                        {pet.isAvailable ? "Avail" : "Sold"}
+                    {/* Actions on separate row */}
+                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+                      <Badge variant={pet.isAvailable ? "default" : "secondary"} className="text-xs">
+                        {pet.isAvailable ? "Available" : "Sold"}
                       </Badge>
                       {typedUser?.isAdmin && (
-                        <>
+                        <div className="flex gap-1">
                           <Button
                             size="sm"
                             variant="outline"
@@ -7984,7 +7988,7 @@ export default function Admin() {
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
-                        </>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -8079,39 +8083,42 @@ export default function Admin() {
                   )}
                 </div>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {(supplies as any[]).map((supply: any) => (
-                  <div key={supply.id} className="flex items-center gap-4 p-4 border rounded-lg">
-                    {/* Supply Thumbnail */}
-                    <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
-                      {supply.imageUrl ? (
-                        <img 
-                          src={supply.imageUrl} 
-                          alt={supply.name}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                            (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-                          }}
-                          data-testid={`img-supply-thumbnail-${supply.id}`}
-                        />
-                      ) : null}
-                      <div className={`w-full h-full flex items-center justify-center ${supply.imageUrl ? 'hidden' : ''}`}>
-                        <Package className="w-6 h-6 text-gray-400" />
+                  <div key={supply.id} className="p-3 border rounded-lg">
+                    <div className="flex gap-3">
+                      {/* Supply Thumbnail */}
+                      <div className="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                        {supply.imageUrl ? (
+                          <img 
+                            src={supply.imageUrl} 
+                            alt={supply.name}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                              (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                            }}
+                            data-testid={`img-supply-thumbnail-${supply.id}`}
+                          />
+                        ) : null}
+                        <div className={`w-full h-full flex items-center justify-center ${supply.imageUrl ? 'hidden' : ''}`}>
+                          <Package className="w-5 h-5 text-gray-400" />
+                        </div>
+                      </div>
+                      {/* Name gets full remaining width */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm leading-snug" title={supply.name}>{supply.name}</h3>
+                        <p className="text-xs text-gray-600 mt-0.5">{supply.brand} • ${supply.price} • Stock: {supply.stockQuantity}</p>
                       </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm leading-tight line-clamp-3" title={supply.name}>{supply.name}</h3>
-                      <p className="text-xs text-gray-600 mt-1">{supply.brand} • ${supply.price}</p>
-                      <p className="text-xs text-gray-500">Stock: {supply.stockQuantity}</p>
-                    </div>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <Badge variant={supply.stockQuantity > 0 ? "default" : "destructive"} className="text-xs px-2 py-0.5">
-                        {supply.stockQuantity > 0 ? "In Stock" : "Out"}
+                    {/* Actions on separate row */}
+                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+                      <Badge variant={supply.stockQuantity > 0 ? "default" : "destructive"} className="text-xs">
+                        {supply.stockQuantity > 0 ? "In Stock" : "Out of Stock"}
                       </Badge>
                       {typedUser?.isAdmin && (
-                        <>
+                        <div className="flex gap-1">
                           <Button
                             size="sm"
                             variant="outline"
@@ -8127,7 +8134,7 @@ export default function Admin() {
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
-                        </>
+                        </div>
                       )}
                     </div>
                   </div>
