@@ -30,9 +30,10 @@ async function checkAppointmentCapacity(
   appointmentDate: Date, 
   pets: Array<{ serviceType: string }>
 ): Promise<{ withinCapacity: boolean; reason?: string }> {
-  // Get day of week in America/New_York timezone (not UTC)
+  // Get day of week in America/Chicago timezone (not UTC)
   const dayOfWeek = getLocalDayOfWeek(appointmentDate); // 0=Sunday, 1=Monday, ..., 6=Saturday
-  const appointmentDateStr = getLocalDateString(appointmentDate);
+  // Use stored date for matching (consistent with SQL atomic check)
+  const appointmentDateStr = appointmentDate.toISOString().split('T')[0];
   
   // Sunday has no limits
   if (dayOfWeek === 0) {
@@ -48,10 +49,10 @@ async function checkAppointmentCapacity(
     }
     
     // Count existing appointments for this date by service type
-    // Use local timezone for both dates to avoid UTC shift mismatches
+    // Use stored date for matching (consistent with SQL atomic check)
     const allAppointments = await storage.getAppointments();
     const appointmentsOnDate = allAppointments.filter((apt: any) => {
-      const aptDateStr = getLocalDateString(new Date(apt.appointmentDate));
+      const aptDateStr = new Date(apt.appointmentDate).toISOString().split('T')[0];
       return aptDateStr === appointmentDateStr && 
              apt.status !== 'cancelled' && 
              apt.status !== 'rejected';

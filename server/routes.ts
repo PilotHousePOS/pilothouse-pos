@@ -1800,9 +1800,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // CAPACITY CHECK: Ensure we don't exceed limits when approving
-      const { getLocalDateString, getLocalDayOfWeek } = await import('./scheduler');
+      const { getLocalDayOfWeek } = await import('./scheduler');
       const appointmentDate = new Date(appointmentToApprove.appointmentDate);
-      const appointmentDateStr = getLocalDateString(appointmentDate);
+      // Use stored date for matching (consistent with SQL atomic check)
+      const appointmentDateStr = appointmentDate.toISOString().split('T')[0];
       const dayOfWeek = getLocalDayOfWeek(appointmentDate);
       
       // Get appointment pets to count service types
@@ -1816,7 +1817,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Count existing appointments on this date (excluding cancelled/rejected and THIS appointment)
           const allAppointments = await storage.getAppointments();
           const appointmentsOnDate = allAppointments.filter((apt: any) => {
-            const aptDateStr = getLocalDateString(new Date(apt.appointmentDate));
+            const aptDateStr = new Date(apt.appointmentDate).toISOString().split('T')[0];
             return aptDateStr === appointmentDateStr && 
                    apt.id !== id && // Exclude the appointment being approved
                    apt.status !== 'cancelled' && 
@@ -2054,9 +2055,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Use new date if provided, otherwise use current
       const dateToCheck = appointmentDate ? new Date(appointmentDate) : new Date(currentAppointment.appointmentDate);
-      // Use timezone-aware functions to prevent UTC/CST mismatch bugs
-      const { getLocalDateString, getLocalDayOfWeek } = await import('./scheduler');
-      const appointmentDateStr = getLocalDateString(dateToCheck);
+      // Use stored date for matching (consistent with SQL atomic check)
+      const { getLocalDayOfWeek } = await import('./scheduler');
+      const appointmentDateStr = dateToCheck.toISOString().split('T')[0];
       const dayOfWeek = getLocalDayOfWeek(dateToCheck);
       
       // Get the pets/services that will be in this appointment after the update
@@ -2093,8 +2094,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Count existing appointments on the target date (excluding this one and cancelled/rejected)
           const allAppointments = await storage.getAppointments();
           const appointmentsOnDate = allAppointments.filter((apt: any) => {
-            // Use timezone-aware date comparison to prevent UTC/CST mismatch
-            const aptDateStr = getLocalDateString(new Date(apt.appointmentDate));
+            // Use stored date for matching (consistent with SQL atomic check)
+            const aptDateStr = new Date(apt.appointmentDate).toISOString().split('T')[0];
             return aptDateStr === appointmentDateStr && 
                    apt.id !== id && // Exclude current appointment being updated
                    apt.status !== 'cancelled' && 
@@ -2277,9 +2278,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // CAPACITY CHECK: When changing status to 'confirmed', check capacity limits
       if (status === 'confirmed' && oldAppointment.status !== 'confirmed') {
-        const { getLocalDateString, getLocalDayOfWeek } = await import('./scheduler');
+        const { getLocalDayOfWeek } = await import('./scheduler');
         const appointmentDate = new Date(oldAppointment.appointmentDate);
-        const appointmentDateStr = getLocalDateString(appointmentDate);
+        // Use stored date for matching (consistent with SQL atomic check)
+        const appointmentDateStr = appointmentDate.toISOString().split('T')[0];
         const dayOfWeek = getLocalDayOfWeek(appointmentDate);
         
         // Get appointment pets to count service types
@@ -2293,7 +2295,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Count existing appointments on this date (excluding cancelled/rejected and THIS appointment)
             const allAppointments = await storage.getAppointments();
             const appointmentsOnDate = allAppointments.filter((apt: any) => {
-              const aptDateStr = getLocalDateString(new Date(apt.appointmentDate));
+              // Use stored date for matching (consistent with SQL atomic check)
+              const aptDateStr = new Date(apt.appointmentDate).toISOString().split('T')[0];
               return aptDateStr === appointmentDateStr && 
                      apt.id !== id && // Exclude the appointment being confirmed
                      apt.status !== 'cancelled' && 
@@ -2561,14 +2564,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (weeklyLimit) {
           // Count existing appointments for this date by service type
           // Include all appointments except cancelled/rejected ones
+          // IMPORTANT: Only match the stored date (not timezone-converted) to match SQL atomic check behavior
           const allAppointments = await storage.getAppointments();
           const appointmentsOnDate = allAppointments.filter((apt: any) => {
-            // Match against both the raw stored date and timezone-converted date
             const aptDate = new Date(apt.appointmentDate);
-            const storedDateStr = aptDate.toISOString().split('T')[0]; // The raw date that was stored
-            const localDateStr = getLocalDateString(aptDate); // Timezone-converted date
-            const matches = (storedDateStr === appointmentDateStr || localDateStr === appointmentDateStr);
-            return matches && 
+            // Only use the stored date, not timezone-converted - matches SQL: DATE(a.appointment_date) = ${dateStr}::date
+            const storedDateStr = aptDate.toISOString().split('T')[0];
+            return storedDateStr === appointmentDateStr && 
                    apt.status !== 'cancelled' && 
                    apt.status !== 'rejected';
           });
