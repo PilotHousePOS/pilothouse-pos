@@ -10852,12 +10852,25 @@ export default function Admin() {
                             {pet.specialNotes && (
                               <div className="col-span-2">
                                 <Label className="text-xs font-semibold text-gray-600">Notes</Label>
-                                <p className="text-gray-900 text-sm">{pet.specialNotes}</p>
+                                <p className="text-gray-900 text-sm whitespace-pre-wrap">{pet.specialNotes}</p>
+                              </div>
+                            )}
+                            {pet.price && (
+                              <div className="col-span-2">
+                                <Label className="text-xs font-semibold text-gray-600">Price</Label>
+                                <p className="text-gray-900 text-sm font-medium text-green-700">${pet.price}</p>
                               </div>
                             )}
                           </div>
                         </div>
                       ))}
+                      {/* Show appointment-level notes for multi-pet appointments */}
+                      {selectedAppointment.specialNotes && (
+                        <div className="mt-3 bg-amber-50 p-3 rounded-lg border border-amber-200">
+                          <Label className="text-sm font-semibold text-amber-800">Appointment Notes</Label>
+                          <p className="text-gray-900 whitespace-pre-wrap mt-1">{selectedAppointment.specialNotes}</p>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <>
@@ -10874,7 +10887,7 @@ export default function Admin() {
                       {selectedAppointment.specialNotes && (
                         <div className="mt-3">
                           <Label className="text-sm font-semibold text-gray-700">Special Notes</Label>
-                          <p className="text-gray-900">{selectedAppointment.specialNotes}</p>
+                          <p className="text-gray-900 whitespace-pre-wrap">{selectedAppointment.specialNotes}</p>
                         </div>
                       )}
                     </>
