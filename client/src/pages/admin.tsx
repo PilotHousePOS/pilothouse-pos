@@ -11977,14 +11977,13 @@ function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageCha
 
       const response = await fetch('/api/upload', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        },
+        credentials: 'include',
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('Upload failed');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Upload failed');
       }
 
       const data = await response.json();
@@ -11997,7 +11996,7 @@ function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageCha
       console.error('Upload error:', error);
       toast({
         title: "Upload Failed",
-        description: "Failed to upload image. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to upload image. Please try again.",
         variant: "destructive",
       });
     } finally {
