@@ -8290,9 +8290,23 @@ export default function Admin() {
                               <p>Phone: {currentAppointment.ownerPhoneNumber}</p>
                               <p className="text-gray-500">{parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
                             </div>
-                            {currentAppointment.specialNotes && (
+                            {/* Show all notes - appointment level and per-pet */}
+                            {(currentAppointment.specialNotes || (currentAppointment.pets && currentAppointment.pets.some((p: any) => p.specialNotes))) && (
                               <div className="text-xs text-gray-700 mt-1.5 break-words whitespace-pre-wrap" data-testid={`appointment-notes-${currentAppointment.id}`}>
-                                <span className="font-medium">Notes:</span> {currentAppointment.specialNotes}
+                                <span className="font-medium">Notes:</span>{' '}
+                                {currentAppointment.pets && currentAppointment.pets.length > 1 ? (
+                                  // Multi-pet: show each pet's notes with pet name
+                                  currentAppointment.pets
+                                    .filter((p: any) => p.specialNotes)
+                                    .map((p: any, idx: number) => (
+                                      <div key={idx} className="ml-2 mt-1">
+                                        <span className="font-medium text-purple-700">{capitalizeWords(p.petName)}:</span> {p.specialNotes}
+                                      </div>
+                                    ))
+                                ) : (
+                                  // Single pet or appointment-level notes
+                                  currentAppointment.specialNotes || (currentAppointment.pets?.[0]?.specialNotes)
+                                )}
                               </div>
                             )}
                             {currentAppointment.price && (
