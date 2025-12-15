@@ -6124,8 +6124,9 @@ export default function Admin() {
     let lastName = '';
     let fallbackPetName = '';
     
-    // Check if this is a Google Calendar contact
-    if (contact.source === 'google_calendar') {
+    // Database contacts store name as "FirstName LastName" format
+    // Only use Google Calendar parsing for non-database Google Calendar contacts
+    if (contact.source === 'google_calendar' && !contact.isDatabaseContact) {
       // Parse the contact name which may contain: LastName PetName PhoneNumber Groomer
       // The name field might have the full summary or just the last name (depending on when it was synced)
       const nameWords = (contact.name || '').trim().split(/\s+/);
