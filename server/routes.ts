@@ -4224,6 +4224,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           const stockQuantity = parseInt(row.QtyOnHand || '0', 10) || 0;
           const size = (row.Size || '').toString().trim();
           const description = (row.DescLong || row.Description || '').toString().trim();
+          const sku = (row.SKU || '').toString().trim() || null;
 
           // Skip if no name or price
           if (!name || name === '' || price <= 0) {
@@ -4273,7 +4274,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
               imageUrl: existingSupply.imageUrl || imageUrl,
               stockQuantity,
               brand,
-              size
+              size,
+              sku
             });
             stats.updated++;
           } else if (!existingSupply) {
@@ -4286,7 +4288,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
               imageUrl,
               stockQuantity,
               brand,
-              size
+              size,
+              sku
             });
             stats.added++;
           } else {
