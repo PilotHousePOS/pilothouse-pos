@@ -2051,6 +2051,7 @@ export class DatabaseStorage implements IStorage {
         petType: appointmentPets.petType,
         serviceType: appointmentPets.serviceType,
         price: appointmentPets.price,
+        specialNotes: appointmentPets.specialNotes,
         groomerId: appointmentPets.groomerId,
         groomerName: groomers.name,
         createdAt: appointmentPets.createdAt,
