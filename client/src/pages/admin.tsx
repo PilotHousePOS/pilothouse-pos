@@ -7938,13 +7938,32 @@ export default function Admin() {
 
               <div className="space-y-4">
                 {(pets as any[]).map((pet: any) => (
-                  <div key={pet.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{pet.name}</h3>
-                      <p className="text-sm text-gray-600">{pet.species} • {pet.breed} • ${pet.price}</p>
-                      <p className="text-xs text-gray-500">{pet.description}</p>
+                  <div key={pet.id} className="flex items-center gap-4 p-4 border rounded-lg">
+                    {/* Pet Thumbnail */}
+                    <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                      {pet.imageUrl ? (
+                        <img 
+                          src={pet.imageUrl} 
+                          alt={pet.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                          }}
+                          data-testid={`img-pet-thumbnail-${pet.id}`}
+                        />
+                      ) : null}
+                      <div className={`w-full h-full flex items-center justify-center ${pet.imageUrl ? 'hidden' : ''}`}>
+                        <PawPrint className="w-6 h-6 text-gray-400" />
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold truncate">{pet.name}</h3>
+                      <p className="text-sm text-gray-600 truncate">{pet.species} • {pet.breed} • ${pet.price}</p>
+                      <p className="text-xs text-gray-500 truncate">{pet.description}</p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <Badge variant={pet.isAvailable ? "default" : "secondary"}>
                         {pet.isAvailable ? "Available" : "Adopted"}
                       </Badge>
@@ -8062,13 +8081,32 @@ export default function Admin() {
               </div>
               <div className="space-y-4">
                 {(supplies as any[]).map((supply: any) => (
-                  <div key={supply.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{supply.name}</h3>
-                      <p className="text-sm text-gray-600">{supply.brand} • {formatCategory(supply.category)} • ${supply.price}</p>
+                  <div key={supply.id} className="flex items-center gap-4 p-4 border rounded-lg">
+                    {/* Supply Thumbnail */}
+                    <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                      {supply.imageUrl ? (
+                        <img 
+                          src={supply.imageUrl} 
+                          alt={supply.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                          }}
+                          data-testid={`img-supply-thumbnail-${supply.id}`}
+                        />
+                      ) : null}
+                      <div className={`w-full h-full flex items-center justify-center ${supply.imageUrl ? 'hidden' : ''}`}>
+                        <Package className="w-6 h-6 text-gray-400" />
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold truncate">{supply.name}</h3>
+                      <p className="text-sm text-gray-600 truncate">{supply.brand} • {formatCategory(supply.category)} • ${supply.price}</p>
                       <p className="text-xs text-gray-500">Stock: {supply.stockQuantity}</p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <Badge variant={supply.stockQuantity > 0 ? "default" : "destructive"}>
                         {supply.stockQuantity > 0 ? "In Stock" : "Out of Stock"}
                       </Badge>
