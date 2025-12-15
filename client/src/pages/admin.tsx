@@ -7959,14 +7959,13 @@ export default function Admin() {
                         <PawPrint className="w-6 h-6 text-gray-400" />
                       </div>
                     </div>
-                    <div className="flex-1 min-w-0 max-w-[200px] sm:max-w-none">
-                      <h3 className="font-semibold text-sm sm:text-base line-clamp-2" title={pet.name}>{pet.name}</h3>
-                      <p className="text-xs sm:text-sm text-gray-600 truncate">{pet.species} • {pet.breed} • ${pet.price}</p>
-                      <p className="text-xs text-gray-500 line-clamp-1">{pet.description}</p>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm leading-tight line-clamp-3" title={pet.name}>{pet.name}</h3>
+                      <p className="text-xs text-gray-600 mt-1">{pet.species} • {pet.breed} • ${pet.price}</p>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <Badge variant={pet.isAvailable ? "default" : "secondary"}>
-                        {pet.isAvailable ? "Available" : "Adopted"}
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <Badge variant={pet.isAvailable ? "default" : "secondary"} className="text-xs px-2 py-0.5">
+                        {pet.isAvailable ? "Avail" : "Sold"}
                       </Badge>
                       {typedUser?.isAdmin && (
                         <>
@@ -8102,14 +8101,14 @@ export default function Admin() {
                         <Package className="w-6 h-6 text-gray-400" />
                       </div>
                     </div>
-                    <div className="flex-1 min-w-0 max-w-[200px] sm:max-w-none">
-                      <h3 className="font-semibold text-sm sm:text-base line-clamp-2" title={supply.name}>{supply.name}</h3>
-                      <p className="text-xs sm:text-sm text-gray-600 truncate">{supply.brand} • ${supply.price}</p>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm leading-tight line-clamp-3" title={supply.name}>{supply.name}</h3>
+                      <p className="text-xs text-gray-600 mt-1">{supply.brand} • ${supply.price}</p>
                       <p className="text-xs text-gray-500">Stock: {supply.stockQuantity}</p>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <Badge variant={supply.stockQuantity > 0 ? "default" : "destructive"}>
-                        {supply.stockQuantity > 0 ? "In Stock" : "Out of Stock"}
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <Badge variant={supply.stockQuantity > 0 ? "default" : "destructive"} className="text-xs px-2 py-0.5">
+                        {supply.stockQuantity > 0 ? "In Stock" : "Out"}
                       </Badge>
                       {typedUser?.isAdmin && (
                         <>
