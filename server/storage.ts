@@ -2924,6 +2924,7 @@ export class DatabaseStorage implements IStorage {
                 isActive: sql`EXCLUDED.is_active`,
                 weight: sql`EXCLUDED.weight`,
                 size: sql`EXCLUDED.size`,
+                sku: sql`EXCLUDED.sku`,
                 updatedAt: sql`EXCLUDED.updated_at`,
               },
             });
