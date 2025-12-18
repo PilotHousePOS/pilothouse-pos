@@ -1,0 +1,87 @@
+                                                                                                                                     INVOICE NO: 06272567
+                                                                        INVOICE
+                                                                                                                                     DATE:       02/22/25 09:32:47
+                                                                      *** REPRINT ***                                                ORDER:         06547929
+4038 ROCK QUARRY RD              Ph: 214-210-4112
+DALLAS, TX 75211                 Fax: 214-331-6425                                                                                   PAGE:          1 OF 2
+
+BILL TO: 530572                                          REMIT TO ADDRESS FOR MAILING PAYMENTS                      SHIP TO:
+ ANIMAL HOUSE                                          CENTRAL PET DALLAS                                             ANIMAL HOUSE
+ ANGELA SKIPPER                                        PO BOX 840167                                                  2934 CYPRESS ST
+ 2934 CYPRESS ST                                       DALLAS, TX 75284                                               WEST MONROE, LA 71294
+ WEST MONROE, LA 71294                                 PHONE: 877-219-7019
+
+
+           **Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+
+                  TERMS                              CUSTOMER P.O.                         SHIP VIA                           SALES REP                  WRITTEN BY
+
+                   COD                               REDBARN 9392                        OUR TRUCK                                                           BGA
+LINE PRODUCT                                                                                             ORDER SHIPPED
+                       UPC        *CPN/VPN                DESCRIPTION                   RETAIL UM                             LIST            NET        EXTENDED CDE
+/ REL NUMBER                                                                                              QTY    QTY
+ 1/1   51812007   785184120071                RBP DRY W/G LAND 4#                                   EA       15        15      15.244           14.020         210.30      OV
+ 2/1   51812007   785184120071                RBP DRY W/G LAND 4#                                   EA        5         5      15.244            0.000           0.00      OV
+       REDBARN 9392
+ 3/1   51812008   785184120088                RBP DRY W/G SKY 4#                                    EA       15        15      13.872           12.760         191.40      OV
+ 4/1   51812008   785184120088                RBP DRY W/G SKY 4#                                    EA        5         5      13.872            0.000           0.00      OV
+       REDBARN 9392
+ 5/1   51812009   785184120095                RBP DRY W/G OCN 4#                                    EA       15        15      13.859           12.750         191.25      OV
+ 6/1   51812009   785184120095                RBP DRY W/G OCN 4#                                    EA        5         5      13.859            0.000           0.00      OV
+       REDBARN9392
+ 7/1   51812012   785184120125                RBP DRY G/F LAND 22#                                  EA         1         1     54.317            0.000            0.00     OV
+       REDBARN 9392
+ 8/1   51812014   785184120149                RBP DRY G/F OCN 22#                                   EA         5         5     50.988           49.458         247.29      OV
+ 9/1   51812015   785184120156                RBP DRY W/G LAND 22#                                  EA         5         5     51.463           47.350         236.75      OV
+10/1   51812016   785184120163                RBP DRY W/G SKY 22#                                   EA         2         2     42.683            0.000           0.00      OV
+       REDBARN 9392
+11/1   51812017   785184120170                RBP DRY W/G OCN 22#                                   EA        5          5     46.866           43.120         215.60      OV
+12/1   51812500   785184125007                RBP DRY G/F PUP 22#                                   EA        5          5     48.780           36.585         182.93      OV
+13/    51812506   785184125069                RBP DRY W/G PUP 4#                                    EA       15          0     15.769           14.510           0.00      OV
+14/    51812506   785184125069                RBP DRY W/G PUP 4#                                    EA        5          0     15.769            0.000           0.00      OV
+15/1   51812507   785184125076                RBP DRY W/G PUP 22#                                   EA        1          1     47.561            0.000           0.00      OV
+       REDBARN 9392
+                                                                                                            -----     -----                                    ---------
+                                              Dog                                                           104         84                                   1,475.52
+                                                                                                            -----     -----                                    ---------
+
+       DELIVERY SURCHARGE                                                                                                                                       21.00
+
+       ********************************************
+       * OV Price Override                        *
+       ********************************************
+
+
+
+                                                                                                                                               ** Continued **
+                                                                                                                                   INVOICE NO: 06272567
+                                                                        INVOICE
+                                                                                                                                   DATE:       02/22/25 09:32:47
+                                                                       *** REPRINT ***                                             ORDER:          06547929
+4038 ROCK QUARRY RD            Ph: 214-210-4112
+DALLAS, TX 75211               Fax: 214-331-6425                                                                                   PAGE:           2 OF 2
+
+BILL TO: 530572                                         REMIT TO ADDRESS FOR MAILING PAYMENTS                      SHIP TO:
+ ANIMAL HOUSE                                         CENTRAL PET DALLAS                                             ANIMAL HOUSE
+ ANGELA SKIPPER                                       PO BOX 840167                                                  2934 CYPRESS ST
+ 2934 CYPRESS ST                                      DALLAS, TX 75284                                               WEST MONROE, LA 71294
+ WEST MONROE, LA 71294                                PHONE: 877-219-7019
+
+
+          **Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+
+                  TERMS                             CUSTOMER P.O.                         SHIP VIA                         SALES REP                   WRITTEN BY
+
+                  COD                               REDBARN 9392                        OUR TRUCK                   667 CRAIG BORGSTEDE                     BGA
+LINE PRODUCT                                                                                            ORDER SHIPPED
+                      UPC        *CPN/VPN                DESCRIPTION                   RETAIL UM                            LIST             NET      EXTENDED CDE
+/ REL NUMBER                                                                                             QTY    QTY
+
+                   CATEGORY TOTALS:
+                    Dog                                     1,475.52
+
+
+
+
+MDSE TOTAL 1,475.52         HANDLING 0.00              MISC CHGS 21.00                  TAX      0.00             FREIGHT     0.00             TOTAL        1,496.52
+

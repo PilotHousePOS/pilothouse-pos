@@ -1,0 +1,433 @@
+                                                                                                                                   INVOICE NO: 06271054
+                                                                        INVOICE
+                                                                                                                                   DATE:       02/15/25 09:39:32
+                                                                      *** REPRINT ***                                              ORDER:           06546903
+4038 ROCK QUARRY RD              Ph: 214-210-4112
+DALLAS, TX 75211                 Fax: 214-331-6425                                                                                 PAGE:            1 OF 8
+
+BILL TO: 530572                                          REMIT TO ADDRESS FOR MAILING PAYMENTS                      SHIP TO:
+ ANIMAL HOUSE                                          CENTRAL PET DALLAS                                             ANIMAL HOUSE
+ ANGELA SKIPPER                                        PO BOX 840167                                                  2934 CYPRESS ST
+ 2934 CYPRESS ST                                       DALLAS, TX 75284                                               WEST MONROE, LA 71294
+ WEST MONROE, LA 71294                                 PHONE: 877-219-7019
+
+
+           **Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+
+                  TERMS                              CUSTOMER P.O.                         SHIP VIA                         SALES REP                    WRITTEN BY
+
+                   COD                                                                   OUR TRUCK                                                           WEB
+LINE PRODUCT                                                                                             ORDER SHIPPED
+                       UPC        *CPN/VPN                DESCRIPTION                   RETAIL UM                           LIST              NET        EXTENDED CDE
+/ REL NUMBER                                                                                              QTY    QTY
+ 1/2   00800247   015905002479                AQE FLTR Q-FLOW ST XS 5G                              EA        1         1    15.909             10.660         10.66   OV
+ 2/1   00801230   015905012300                AQE HEATER FLAT 7.5W                                  EA        1         1     9.309              6.980          6.98   OV
+ 3/2   00806183   015905061834                AQE FOOD CCHLD PLLT MD 7.5OZ                          EA        2         2     4.309              3.230          6.46   OV
+ 4/2   00806188   015905061889                AQE FOOD SHRMP PLLTS 3.25OZ                           EA        3         3     2.564              1.920          5.76   OV
+ 5/1   04000352   017163003526    AR-52C      API COND WTR TAP 16OZ                                 EA        1         1     9.705              6.310          6.31   OV
+ 6/1   04000552   017163005520    AR-52E      API DSP COND TAP WTR 12/1OZ                           EA       12        12     1.841              1.200         14.40   OV
+ 7/2   04001106   317163011065    AR-106      API COND AQUARIUM SALT 16OZ                           EA        1         1     4.341              2.820          2.82   OV
+ 8/1   04003085   317163030851    AR-85B      API COND STRESS COAT 4OZ                              EA        3         3     4.932              3.210          9.63   OV
+ 9/3   04003111   317163031117                API COND AQCLR 8OZ                                    EA        1         1     8.591              5.580          5.58   OV
+10/1   04004111   317163041116    AR-111B     API COND AQCLR 4OZ                                    EA        1         1     5.500              3.580          3.58   OV
+11/1   04007033   317163070338                API TEST STRP 5-IN-1 25CT                             EA        1         1    15.795             10.270         10.27   OV
+12/1   32521328   042055213288    U-21328     HIK FOOD ALGAE WFRS 250GM                             EA        1         1    13.213              8.590          8.59   OV
+13/6   32532300   042055323000                HIK FOOD FRZN BABY BRINE 1.75Z                        EA        3         3     4.937              3.210          9.63   OV
+14/6   32532320   042055323208    U-32320     HIK FOOD FRZN BRINE CB 3.5OZ                          EA        3         3     2.962              1.930          5.79   OV
+15/1   32533103   042055331036    U-33103     HIK FOOD FD TUBIFEX WORM .78OZ                        EA        3         3     6.005              3.900         11.70   OV
+16/1   32533201   042055332019    U-33201     HIK FOOD FD BLDWRMS .42OZ                             EA        2         2     6.559              4.260          8.52   OV
+17/1   32533551   042055335515                HIK FOOD FD SPIR BRINESHRMP.43                        EA        1         1     6.098              3.960          3.96   OV
+18/5   38201603   819603016031                ATP FXTR SKYAQUA LED 65K 30-36                        EA        1         1    80.805             48.480         48.48   OV
+19/5   39270015   029904700151                WWI GRVL SNOW WH 5#                                   EA        6         6     2.806              1.960         11.76   OV
+20/5   39270302   029904703022                WWI GRVL NEON RNBW 2#                                 EA        6         6     2.115              1.480          8.88   OV
+21/6   67040100   000945401009                SFB FOOD FRZN NA BRINE SHRMP3Z                        EA        3         3     2.875              1.870          5.61   OV
+22/6   67040200   000945402006                SFB FOOD FRZN NA BLDWRM 3.5Z                          EA        4         4     3.125              2.030          8.12   OV
+23/6   67088045   000945880453    SB-88045    SFB FOOD FRZN CCHLD CB 100GM                          EA        1         1     6.375              4.140          4.14   OV
+                                              ** MFR TEMP OUT ETA 2/10/25 *
+24/1   67104340   000116043403    SA-434      SLI COND PRIME 50ML                                   EA       2          2     3.280              2.300          4.60   OV
+25/1   67104350   000116043502    SA-435      SLI COND PRIME 100ML                                  EA       3          3     4.416              3.090          9.27   OV
+26/1   67104360   000116043601    SA-436      SLI COND PRIME 250ML                                  EA       2          2     8.976              6.280         12.56   OV
+27/1   67104560   000116045605    SA-456      SLI SPLMT FLOURISH EXCEL 250ML                        EA       1          1     6.768              4.740          4.74   OV
+28/1   67112360   000116123600                SLI SPLMT FLOURISH ADV 250ML                          EA       1          1     8.112              5.680          5.68   OV
+29/2   75077076   046798770763                TET FOOD PRO GF CRISPS 3.04OZ                         EA       2          2     6.636              4.310          8.62   OV
+30/2   75077077   046798770770                TET FOOD PRO GF CRISPS 7.9OZ                          EA       1          1    17.432             11.330         11.33   OV
+31/2   75077251   046798772514                TET FOOD TETCLR PLUS 7.06OZ                           EA       1          1    19.136             12.440         12.44   OV
+
+                                                                                                                                               ** Continued **
+                                                                                                                                     INVOICE NO: 06271054
+                                                                         INVOICE
+                                                                                                                                     DATE:       02/15/25 09:39:32
+                                                                        *** REPRINT ***                                              ORDER:         06546903
+4038 ROCK QUARRY RD              Ph: 214-210-4112
+DALLAS, TX 75211                 Fax: 214-331-6425                                                                                   PAGE:          2 OF 8
+
+BILL TO: 530572                                            REMIT TO ADDRESS FOR MAILING PAYMENTS                    SHIP TO:
+ ANIMAL HOUSE                                            CENTRAL PET DALLAS                                           ANIMAL HOUSE
+ ANGELA SKIPPER                                          PO BOX 840167                                                2934 CYPRESS ST
+ 2934 CYPRESS ST                                         DALLAS, TX 75284                                             WEST MONROE, LA 71294
+ WEST MONROE, LA 71294                                   PHONE: 877-219-7019
+
+
+           **Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+
+                  TERMS                                 CUSTOMER P.O.                      SHIP VIA                           SALES REP                  WRITTEN BY
+
+                   COD                                                                   OUR TRUCK                                                           WEB
+LINE PRODUCT                                                                                             ORDER SHIPPED
+                       UPC        *CPN/VPN                  DESCRIPTION                 RETAIL UM                             LIST            NET        EXTENDED CDE
+/ REL NUMBER                                                                                              QTY    QTY
+32/2   75077256   046798772569                TET FOOD BETTA MINI PLLT 1.2Z                         EA         3         3      2.432            1.580          4.74     OV
+33/2   75078301   046798783015                TET FOOD GLOFSH BETTA FLK .7OZ                        EA         2         2      2.818            1.830          3.66     OV
+34/3   85024009   097612240092                ZML FLTR INTRNL CLN BETTA 10G                         EA         1         1     18.029            9.920          9.92     OV
+35/3   85024050   097612240504                ZML BETTA CERAMIC LOG SM                              EA         1         1      5.401            2.970          2.97     OV
+36/2   85024071   097612240719                ZML BETTA TUNNEL ASST                                 EA         1         1      5.336            2.930          2.93     OV
+                                                                                                            -----     -----                                  ---------
+                                              Aquatic                                                         82        82                                   311.09
+                                                                                                            -----     -----                                  ---------
+37/5   38094238   071859942384                KAY TRT FDPH HNY PRRT 7OZ                             EA         2         2      5.247            4.460          8.92     OV
+38/5   38094240   071859942407                KAY TRT FDPH HNY STC TIEL 8OZ                         EA         2         2      5.247            4.460          8.92     OV
+39/5   38094867   071859948676                KAY FOOD FDPH KEET 2#                                 EA         2         2      4.658            3.960          7.92     OV
+                                                                                                            -----     -----                                  ---------
+                                              Bird                                                             6         6                                     25.76
+                                                                                                            -----     -----                                  ---------
+40/3   17500607   076484006074                COA GRMG CT SAFARI NAIL TRMR                          EA         2         2      4.435            3.990          7.98     OV
+41/5   38160094   034846600940                MPF SPORTMX CT GOURMET 15#                            EA         2         2     13.375           12.300         24.60     OV
+42/5   43571245   019014712458                IAM DRY CT PAH INDR WT/HBALL7#                        EA         1         1     18.427           17.510         17.51     OV
+43/    48200621   645095006218                TRO SHMP CT BRY/CCNUT 12OZ                            EA         1         0      4.155            3.740          0.00     OV
+44/7   56211343   724089113436                ELA MED CT TAPE WORM 3CT                              EA         1         1     13.214           13.214         13.21
+45/1   90404730   704959047306                HOM MED CT WRM CLR 15ML                               EA         1         1     15.278           11.460         11.46     OV
+                                              CAT WORMER
+                                                                                                            -----     -----                                  ---------
+                                              Cat                                                              8         7                                     74.76
+                                                                                                            -----     -----                                  ---------
+46/1   03400216   895352002167                NTN TRT FRTBL PMPKN/CRN 7OZ                           EA         1         1      4.609            3.230          3.23     OV
+47/3   10328308   021653283084                BDL SHMP PK JASMINE 8OZ                               EA         2         2      8.524            8.524         17.05
+48/1   10351308   021653513082    BDE-5130    BDL CLGN GROOM N FRSH 8OZ                             EA         3         3      8.756            8.320         24.96     OV
+49/1   14703698   797801036986                GAR STOOL EATING DETERRENT 70C                        EA         1         1      8.394            7.550          7.55     OV
+50/1   14703699   797801036993                GAR SPLMT ENZYME/PROBIOTIC70CT                        EA         2         2     11.636           10.470         20.94     OV
+51/1   16821571   071860215712                PBG CLGN FNC 12OZ                                     EA         1         1     13.405            8.040          8.04     OV
+52/3   17551064   076484510649    C-51064     COA GRMG W6105G GUILOTINE TRMR                        EA         3         3      5.276            4.750         14.25     OV
+                                              W6105G
+
+                                                                                                                                               ** Continued **
+                                                                                                                                   INVOICE NO: 06271054
+                                                                        INVOICE
+                                                                                                                                   DATE:       02/15/25 09:39:32
+                                                                      *** REPRINT ***                                              ORDER:           06546903
+4038 ROCK QUARRY RD              Ph: 214-210-4112
+DALLAS, TX 75211                 Fax: 214-331-6425                                                                                 PAGE:            3 OF 8
+
+BILL TO: 530572                                          REMIT TO ADDRESS FOR MAILING PAYMENTS                      SHIP TO:
+ ANIMAL HOUSE                                          CENTRAL PET DALLAS                                             ANIMAL HOUSE
+ ANGELA SKIPPER                                        PO BOX 840167                                                  2934 CYPRESS ST
+ 2934 CYPRESS ST                                       DALLAS, TX 75284                                               WEST MONROE, LA 71294
+ WEST MONROE, LA 71294                                 PHONE: 877-219-7019
+
+
+           **Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+
+                  TERMS                              CUSTOMER P.O.                         SHIP VIA                         SALES REP                    WRITTEN BY
+
+                   COD                                                                   OUR TRUCK                                                           WEB
+LINE PRODUCT                                                                                             ORDER SHIPPED
+                       UPC        *CPN/VPN                DESCRIPTION                   RETAIL UM                           LIST              NET        EXTENDED CDE
+/ REL NUMBER                                                                                              QTY    QTY
+53/3   17551066   076484510663    C-51066     COA GRMG W6107G NAIL TRMR LG                          EA        1         1      9.443             8.500           8.50   OV
+                                              W6107G
+54/4   33505887   039079058872                FAR F/T ADAMS HOME SPRY 24OZ                          EA        1         1    12.398              9.300          9.30    OV
+55/1   36543112   618940431121    JW-43112    JWP TOY HOL-EE ROLLER LG                              EA        1         1     8.636              6.910          6.91    OV
+56/5   38155005   034846550054                MPF BSCT WHSM GRMT PNUT 3#                            EA        1         1     4.500              4.140          4.14    OV
+57/5   38155006   034846550061                MPF BSCT WHSM GRMT CHS 3#                             EA        1         1     4.500              4.140          4.14    OV
+58/5   38708100   035585081007    KC-EK4      KON E-CLLR EZ-CLEAR XXL                               EA        2         2    17.856             12.500         25.00    OV
+59/5   38708101   035585081014    KC-EXL12    KON E-CLLR EZ-CLEAR XL                                EA        1         1    14.706             10.290         10.29    OV
+60/3   38749959   035585499598                KON TOY LOW STUFF STRP PIG MD                         EA        1         1     8.370              5.860          5.86    OV
+61/3   38749960   035585499604                KON TOY LOW STUFF STRP DNKY MD                        EA        1         1     8.370              5.860          5.86    OV
+62/3   38750314   035585503141                KON TOY SHIELDZ GECKO MD                              EA        1         1     9.810              6.870          6.87    OV
+63/3   38752322   035585523224                KON TOY WILD SHIELDZ PERCH MD                         EA        1         1     8.982              6.290          6.29    OV
+64/4   40204117   642863041174                GRE TRT DNTL ORIG REG 12OZ                            EA        2         2    13.800             12.970         25.94    OV
+65/4   40204541   642863045417                GRE TRT PILLP CAPSL CHKN 7.9OZ                        EA        1         1     7.114              6.690          6.69    OV
+66/4   40210127   642863101274                GRE TRT PILLP CAPSL HCKRY 7.9Z                        EA        1         1     7.114              6.690          6.69    OV
+67/4   40210128   642863101281                GRE TRT PILLP CAPSL PB 7.9OZ                          EA        2         2     7.114              6.690         13.38    OV
+68/4   40210291   642863102912                GRE TRT DNTL ORIG XS 6OZ                              EA        2         2     6.529              6.140         12.28    OV
+69/4   40210294   642863102943                GRE TRT DNTL ORIG LG 6OZ                              EA        1         1     6.529              6.140          6.14    OV
+70/4   40210480   642863104800                GRE TRT DNTL BLBRRY PETT 12OZ                         EA        1         1    13.800             12.970         12.97    OV
+71/4   40211129   642863111297                GRE TRT PILLP CAPSL PB 15.8Z                          EA        1         1    13.003             12.220         12.22    OV
+72/2   42100202   892383002029                PMX TRT SMBN CHKN MINI 24CT                           EA        2         2    12.327              9.250         18.50    OV
+73/5   42512295   840139122958                BAR TRT BF CHEEK RLL PB LG                            EA        3         3     6.718              5.710         17.13    OV
+74/4   43720012   746772200124                MAM TOY COLR 3KNT RP TUG MD                           EA        1         1     4.330              3.030          3.03    OV
+75/1   43720014   746772200148                MAM TOY COLR 3KNOT ROPE TUG LG                        EA        2         2     5.958              4.170          8.34    OV
+76/1   43751012   746772510124                MAM TUG COLR 3 KNT/2 BALL MD                          EA        1         1     7.256              5.080          5.08    OV
+77/    44700144   853994001443                ETT TRT CRNCH CHS/BCN 5IN                             EA       24         0     0.695              0.630          0.00    OV
+78/3   48200197   645095001978                TRO DNTL WTR ADD CARE 2.2OZ                           EA        1         1     5.535              4.980          4.98    OV
+79/1   48200332   645095003323                TRO SHMP OXYMED MEDICATED 20OZ                        EA        1         1     7.183              6.460          6.46    OV
+80/2   48216002   645095160026                TRO F/T NAT DOG & BED SPRY 16Z                        EA        2         2     6.887              6.200         12.40    OV
+81/1   48220216   645095202160                TRO SHMP OAT & TEA TREE 20OZ                          EA        1         1     6.915              6.220          6.22    OV
+82/    48286901   645095869011                TRO SHMP WTRLSS DEEP CLN 7.4OZ                        EA        1         0     6.113              5.500          0.00    OV
+83/5   51810509   785184105092                RBP CAN STEW TRKY/CRRT 12OZ                           EA       12        12     2.731              2.510         30.12    OV
+
+                                                                                                                                               ** Continued **
+                                                                                                                                      INVOICE NO: 06271054
+                                                                         INVOICE
+                                                                                                                                      DATE:       02/15/25 09:39:32
+                                                                       *** REPRINT ***                                                ORDER:         06546903
+4038 ROCK QUARRY RD               Ph: 214-210-4112
+DALLAS, TX 75211                  Fax: 214-331-6425                                                                                   PAGE:          4 OF 8
+
+BILL TO: 530572                                           REMIT TO ADDRESS FOR MAILING PAYMENTS                      SHIP TO:
+ ANIMAL HOUSE                                           CENTRAL PET DALLAS                                             ANIMAL HOUSE
+ ANGELA SKIPPER                                         PO BOX 840167                                                  2934 CYPRESS ST
+ 2934 CYPRESS ST                                        DALLAS, TX 75284                                               WEST MONROE, LA 71294
+ WEST MONROE, LA 71294                                  PHONE: 877-219-7019
+
+
+            **Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+
+                   TERMS                              CUSTOMER P.O.                         SHIP VIA                           SALES REP                  WRITTEN BY
+
+                    COD                                                                   OUR TRUCK                                                           WEB
+LINE PRODUCT                                                                                              ORDER SHIPPED
+                        UPC        *CPN/VPN                DESCRIPTION                   RETAIL UM                             LIST            NET        EXTENDED CDE
+/ REL NUMBER                                                                                               QTY    QTY
+84/5    51812007   785184120071                RBP DRY W/G LAND 4#                                   EA        2         2      15.244           14.020         28.04     OV
+85/5    51825550   785184255506                RBP TRT BF CHEEK ROLL CHKN LG                         EA       12        12       7.597            6.460         77.52     OV
+                                               CASE #91058
+86/5    51892649   785184926499                RBP TRT CLLGN SLCS 12OZ                               EA         1         1     12.903           10.970         10.97     OV
+87/5    53277748   723633777483                NBP DRY LID SLMN/SWPOT 4#                             EA         1         1     14.910           13.720         13.72     OV
+                                               ** REPLACES 53242033
+88/2    64453301   079100533015                DMF TRT PUP-PERONI MIG/BCN5.6Z                        EA         1         1      4.259            4.050          4.05     OV
+89/1    68163172   810002631726                FCF TRT NTH FLP CHIP PB 8P                            EA         1         1      7.697            7.697          7.70
+90/3    69101478   736990014788                SYN MED WIPES EAR THERAPY 100C                        EA         1         1     11.667            8.170          8.17     OV
+91/1    73083467   018214834670                NYL HLTHY EDBL BNE VENISN LG                          EA         1         1      4.793            3.360          3.36     OV
+92/1    73083674   018214836742                NYL DURA ALT FEMUR BF LG                              EA         1         1     15.750           12.915         12.92
+93/1    73084604   018214846048                NYL HLTHY EDBL PB SOUPER                              EA         1         1      7.963            5.570          5.57     OV
+94/1    73085306   018214853060                NYL PWR CHW BAGUETTE CHKN LG                          EA         1         1     12.326            7.400          7.40     OV
+95/3    73807400   842982074002                LOV BOWL BELLA CLSC PK SM                             EA         3         3      2.864            2.290          6.87     OV
+96/1    73807401   842982074019                LOV BOWL BELLA CLSC PK MD                             EA         3         3      4.688            3.750         11.25     OV
+97/3    75406786   030521067862    TP-06786    TOM SPLMT NUTRI-CAL 4.25OZ                            EA         2         2     12.081           10.870         21.74     OV
+                                                                                                             -----     -----                                  ---------
+                                               Dog                                                           118         93                                   617.03
+                                                                                                             -----     -----                                  ---------
+98/1    75016467   046798164678    TE-16467    TET FOOD SPRING/FALL DIET 7OZ                         EA         2         2      8.167            5.310         10.62     OV
+99/2    75016469   046798164692    TE-16469    TET FOOD SPRING/FALL DIET 3#                          EA         2         2     41.313           26.850         53.70     OV
+                                                                                                             -----     -----                                  ---------
+                                               Pond                                                             4         4                                     64.32
+                                                                                                             -----     -----                                  ---------
+100/1   05931003   091197310034                FLU LEAD/HRNS REPTA-LEASH MD                          EA         2         2      6.364            4.140          8.28     OV
+101/    05970064   091197700644                FLU FOOD C-C TORTSE 6.75 OZ                           EA         1         0      7.064            4.940          0.00     OV
+102/2   05972030   091197720307                FLU TRT GRUB BAG TRTL SHRMP6OZ                        EA         2         1     10.238            6.650          6.65     OV
+103/2   05978005   091197780059                FLU FOOD CAN GRMT DUBIA 1.2OZ                         EA         1         1      5.243            3.410          3.41     OV
+104/1   13459241   783178592415    NZO-5924    NZP RMDY FUNGUS BATH TRTL 2OZ                         EA         1         1      5.537            4.980          4.98     OV
+105/1   13459261   783178592613                NZP RMDY SHLL SAVER TRTL 2OZ                          EA         1         1      5.537            4.980          4.98     OV
+106/2   28400408   788286004089                REP FOOD MAINT BOX TRTL 12OZ                          EA         1         1      6.115            4.280          4.28     OV
+107/1   28400815   788286008155    REP-0081    REP FOOD ADLT BRD DRGN 8OZ                            EA         1         1      5.900            4.130          4.13     OV
+
+                                                                                                                                                ** Continued **
+                                                                                                                                    INVOICE NO: 06271054
+                                                                         INVOICE
+                                                                                                                                    DATE:       02/15/25 09:39:32
+                                                                       *** REPRINT ***                                              ORDER:           06546903
+4038 ROCK QUARRY RD               Ph: 214-210-4112
+DALLAS, TX 75211                  Fax: 214-331-6425                                                                                 PAGE:            5 OF 8
+
+BILL TO: 530572                                           REMIT TO ADDRESS FOR MAILING PAYMENTS                      SHIP TO:
+ ANIMAL HOUSE                                           CENTRAL PET DALLAS                                             ANIMAL HOUSE
+ ANGELA SKIPPER                                         PO BOX 840167                                                  2934 CYPRESS ST
+ 2934 CYPRESS ST                                        DALLAS, TX 75284                                               WEST MONROE, LA 71294
+ WEST MONROE, LA 71294                                  PHONE: 877-219-7019
+
+
+            **Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+
+                   TERMS                              CUSTOMER P.O.                         SHIP VIA                         SALES REP                    WRITTEN BY
+
+                    COD                                                                   OUR TRUCK                                                           WEB
+LINE PRODUCT                                                                                              ORDER SHIPPED
+                        UPC        *CPN/VPN                DESCRIPTION                   RETAIL UM                           LIST              NET        EXTENDED CDE
+/ REL NUMBER                                                                                               QTY    QTY
+108/2   32520611   042055206112                HIK FOOD CRESTGEL 1.76OZ                              EA       2          2     6.638              4.310          8.62   OV
+109/2   32520631   042055206310                HIK FOOD MULBERIFIC 7.7OZ                             EA       1          1    13.152              8.550          8.55   OV
+110/2   48593180   784369931808                KOM TRT GROW DANDELIONS 6.5IN                         EA       2          2     3.943              2.760          5.52   OV
+111/2   48593181   784369931815                KOM TRT GROW TORTOISE GRASS6.5                        EA       2          2     3.943              2.760          5.52   OV
+112/3   50705350   759834053507                GAL KIT STARTER F/HUMID ENVIR                         EA       1          1    14.490             11.882         11.88
+113/3   50705351   759834053514                GAL KIT STARTER F/ARID ENVIR                          EA       2          2    14.490             10.140         20.28   OV
+114/3   75309627   096316096271                ZIL REPT MUNCHIES FRUIT 2.5OZ                         EA       2          2     8.909              6.680         13.36   OV
+115/5   75311304   096316113046                ZIL BEDNG JUNGLE MIX 8QT                              EA       1          1     6.127              4.600          4.60   OV
+116/5   75311305   096316113053                ZIL BEDNG JUNGLE MIX 24QT                             EA       4          4    13.618             10.210         40.84   OV
+117/2   75367059   096316670594                ZIL DOME REFL CERM SLVR 5.5IN                         EA       1          1    10.600              7.950          7.95   OV
+118/3   75367135   096316671355                ZIL BULB DAY WH INC 100W BOX                          EA       2          2     4.727              3.550          7.10   OV
+119/3   75367151   096316671515                ZIL BULB SPOT DAY WH 100W BOX                         EA       2          2     4.436              3.330          6.66   OV
+120/3   75367155   096316671553                ZIL BULB SPOT NIGHT BK 100WBOX                        EA       3          3     5.200              3.900         11.70   OV
+121/2   75368522   096316685222                ZIL BOWL KIDNEY CERAMIC 5.25IN                        EA       1          1     2.891              2.170          2.17   OV
+122/2   75370003   096316700031                ZIL SPLMT CRICKET CAL DRNK16OZ                        EA       1          1     4.800              3.600          3.60   OV
+123/5   75370045   096316700451                ZIL BEDNG DESERT BLEND 5QT                            EA       2          2     4.509              3.380          6.76   OV
+124/2   75370059   096316700598                ZIL LINER TERRARIUM GN 30G                            EA       1          1     5.091              3.820          3.82   OV
+125/5   85009052   097612090529                ZML TERRM DBL DOOR 30X12X16                           EA       1          1   165.278             90.900         90.90   OV
+126/5   85009155   097612091557                ZML KIT REPTIHABITAT DSRT 10G                         EA       1          1   101.511             55.830         55.83   OV
+127/2   85010401   097612104011                ZML SPLMT TRTL BONE                                   EA       1          1     3.204              1.760          1.76   OV
+128/3   85011052   097612110524                ZML FDR BANQUET TRTL GNT                              EA       1          1     2.482              1.370          1.37   OV
+129/3   85011055   097612110555                ZML FDR BANQUET TORTSE                                EA       1          1     4.030              2.220          2.22   OV
+130/2   85020029   097612200294                ZML PLNT MOSS SPHAGNUM                                EA       3          3     7.686              4.230         12.69   OV
+131/2   85020091   097612200911                ZML ORNMT AFR MOPANI WOOD SM                          EA       1          1     5.433              2.990          2.99   OV
+132/2   85020092   097612200928                ZML ORNMT AFR MOPANI WOOD MD                          EA       2          2     9.014              4.960          9.92   OV
+133/5   85021011   097612210118                ZML ORNMT NAT CORK BRK FLAT MD                        EA       3          3    10.403              4.580         13.74   OV
+134/5   85021012   097612210125                ZML ORNMT NAT CORK BRK FLAT LG                        EA       1          1    15.202              8.360          8.36   OV
+135/2   85021021   097612210217                ZML ORNMT CORK BRK ROUND MD                           EA       2          2     9.919              5.460         10.92   OV
+136/3   85031025   097612310252                ZML HEATER CERAMIC NANO 25W                           EA       1          1    15.755              8.670          8.67   OV
+137/3   85032512   097612325126                ZML TERRM MESH 12X12                                  EA       1          1     3.701              2.040          2.04   OV
+138/3   85032805   097612328059                ZML BULB LED NANO 5W                                  EA       1          1    10.786              5.930          5.93   OV
+139/3   85033125   097612331257                ZML BULB HEAT INFRARED NANO25W                        EA       2          2     7.378              4.060          8.12   OV
+
+                                                                                                                                                ** Continued **
+                                                                                                                                      INVOICE NO: 06271054
+                                                                          INVOICE
+                                                                                                                                      DATE:       02/15/25 09:39:32
+                                                                         *** REPRINT ***                                              ORDER:         06546903
+4038 ROCK QUARRY RD               Ph: 214-210-4112
+DALLAS, TX 75211                  Fax: 214-331-6425                                                                                   PAGE:          6 OF 8
+
+BILL TO: 530572                                             REMIT TO ADDRESS FOR MAILING PAYMENTS                    SHIP TO:
+ ANIMAL HOUSE                                             CENTRAL PET DALLAS                                           ANIMAL HOUSE
+ ANGELA SKIPPER                                           PO BOX 840167                                                2934 CYPRESS ST
+ 2934 CYPRESS ST                                          DALLAS, TX 75284                                             WEST MONROE, LA 71294
+ WEST MONROE, LA 71294                                    PHONE: 877-219-7019
+
+
+            **Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+
+                   TERMS                                 CUSTOMER P.O.                      SHIP VIA                           SALES REP                  WRITTEN BY
+
+                    COD                                                                   OUR TRUCK                                                           WEB
+LINE PRODUCT                                                                                              ORDER SHIPPED
+                        UPC        *CPN/VPN                  DESCRIPTION                 RETAIL UM                             LIST            NET        EXTENDED CDE
+/ REL NUMBER                                                                                               QTY    QTY
+140/3   85036021   097612360219                ZML BULB BASKING SPOT NANO 40W                        EA         2         2      5.411            2.980          5.96     OV
+141/2   85040183   097612401837                ZML FOOD AXOLOTL/NEWT 2OZ                             EA         2         2      3.361            1.850          3.70     OV
+142/3   85040308   097612403084                ZML FOOD CRSTD GECKO TRPCL 2OZ                        EA         1         1      5.332            2.930          2.93     OV
+143/3   85040309   097612403091                ZML FOOD CRSTD GECKO TRPCL 4OZ                        EA         2         2     10.564            5.810         11.62     OV
+144/2   85075204   097612752045                ZML BEDNG REPTISOIL 4QT                               EA         3         3      4.737            2.610          7.83     OV
+145/5   85075210   097612752106                ZML BEDNG REPTISOIL 10QT                              EA         3         3      9.956            5.480         16.44     OV
+146/5   85075224   097612752243                ZML BEDNG REPTISOIL 24QT                              EA         3         3     26.079           14.340         43.02     OV
+147/2   85079011   097612790115                ZML BEDNG ECO EARTH CNUT 1PK                          EA         2         2      3.324            1.830          3.66     OV
+148/5   85079021   097612790214                ZML BEDNG ECO EARTH CNUT 3PK                          EA         4         4      6.666            3.670         14.68     OV
+149/2   85080030   097612800302                ZML MED EYE DROPS TURTLE                              EA         1         1      4.909            2.700          2.70     OV
+150/2   85084002   097612840025    ZO-WC2      ZML COND REPTISAFE 2.25OZ                             EA         2         2      3.576            1.970          3.94     OV
+151/2   85084004   097612840049    ZO-WC4      ZML COND REPTISAFE 4.25OZ                             EA         2         2      5.177            2.850          5.70     OV
+152/2   85084008   097612840087                ZML COND REPTISAFE 8.75OZ                             EA         2         2      7.246            3.990          7.98     OV
+153/2   85092010   097612920109    ZO-WD10     ZML BOWL REPTIROCK WTR XS                             EA         2         2      3.848            2.120          4.24     OV
+                                                                                                             -----     -----                                  ---------
+                                               Reptile                                                         93        91                                   575.50
+                                                                                                             -----     -----                                  ---------
+154/5   02300431   066380004311                HLP BEDNG CF COLRS PR 23L                             EA         1         1     12.287           11.060         11.06     OV
+155/5   02300434   066380004342                HLP BEDNG CF COLRS BL 23L                             EA         2         2     12.287           11.060         22.12     OV
+156/5   02300435   066380004359                HLP BEDNG CF COLRS BL 50L                             EA         2         2     20.397           18.360         36.72     OV
+157/5   02300630   066380006308                HLP BEDNG CF SPEC SEA GLASS23L                        EA         1         1     12.287           11.060         11.06     OV
+158/5   26585006   716432850068                PTT FOOD SGR GLIDER 12OZ                              EA         1         1      5.521            4.970          4.97     OV
+159/5   27411102   744845111025                OXB BEDNG PURE CMFT 72L                               EA         1         1     13.279            9.960          9.96     OV
+160/5   27440229   744845402291                OXB TRT WESTRN TMTHY 90OZ                             EA         4         4     14.059           11.950         47.80     OV
+161/5   27440255   744845402550                OXB FOOD ESSNTL YOUNG RBBT 10#                        EA         1         1     12.691           10.790         10.79     OV
+162/5   27440272   744845402727                OXB FOOD ESSNTL CHINCH 10#                            EA         2         2     15.235           12.950         25.90     OV
+163/5   27440280   744845402802                OXB FOOD ESSNTL YOUNG GPIG 5#                         EA         2         2      7.647            6.500         13.00     OV
+164/5   27440281   744845402819                OXB FOOD ESSNTL YOUNG GPIG 10#                        EA         1         1     13.882           11.800         11.80     OV
+165/5   27440289   744845402895                OXB FOOD ESSNTL ADLT RBBT 10#                         EA         2         2     14.147           12.020         24.04     OV
+166/2   27440311   744845403113                OXB HIDEAWAY TMTHY TNNL                               EA         1         1      8.676            7.370          7.37     OV
+167/5   27440401   744845404011                OXB FOOD ESSNTL ADLT RAT 3#                           EA         3         3      8.456            7.190         21.57     OV
+168/5   27481007   744845810072                OXB TRT TMTHY ORC HAY 90Z                             EA         2         2     14.118           12.000         24.00     OV
+
+                                                                                                                                                ** Continued **
+                                                                                                                                      INVOICE NO: 06271054
+                                                                         INVOICE
+                                                                                                                                      DATE:       02/15/25 09:39:32
+                                                                       *** REPRINT ***                                                ORDER:         06546903
+4038 ROCK QUARRY RD               Ph: 214-210-4112
+DALLAS, TX 75211                  Fax: 214-331-6425                                                                                   PAGE:          7 OF 8
+
+BILL TO: 530572                                               REMIT TO ADDRESS FOR MAILING PAYMENTS                  SHIP TO:
+ ANIMAL HOUSE                                            CENTRAL PET DALLAS                                            ANIMAL HOUSE
+ ANGELA SKIPPER                                          PO BOX 840167                                                 2934 CYPRESS ST
+ 2934 CYPRESS ST                                         DALLAS, TX 75284                                              WEST MONROE, LA 71294
+ WEST MONROE, LA 71294                                   PHONE: 877-219-7019
+
+
+            **Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+
+                   TERMS                               CUSTOMER P.O.                        SHIP VIA                           SALES REP                  WRITTEN BY
+
+                    COD                                                                   OUR TRUCK                                                           WEB
+LINE PRODUCT                                                                                              ORDER SHIPPED
+                        UPC        *CPN/VPN                    DESCRIPTION               RETAIL UM                             LIST            NET        EXTENDED CDE
+/ REL NUMBER                                                                                               QTY    QTY
+169/3   27496017   744845960173                OXB TRT BAKED CRRT/DILL 3OZ                           EA         1         1      2.471            2.100          2.10     OV
+170/2   27496315   744845963150                OXB TOY APPL STC DANGLY                               EA         1         1      2.824            2.400          2.40     OV
+171/5   27496351   744845963518                OXB CAGE HABITAT W/PLY YARD XL                        EA         1         1    167.426          142.310       142.31      OV
+172/5   38000002   071859000022                KAY FOOD FDPH RBBT ADLT 5#                            EA         1         1      6.369            5.410          5.41     OV
+173/5   38000021   071859000213                KAY FOOD GOURMET HAM/GERBIL 3#                        EA         2         2      4.380            3.720          7.44     OV
+174/    38001554   071859015545    KT-50120    KAY FOOD SUPR MOUSE/RAT 4#                            EA         3         0      6.000            5.100          0.00     OV
+175/5   38094272   071859942728                KAY TRT HLTHY TOP MXD FRT SA                          EA         2         1      1.803            1.350          1.35     OV
+176/5   38094273   071859942735                KAY TRT HLTHY TOP PAPAYA SA                           EA         1         1      1.803            1.350          1.35     OV
+177/5   38099877   071859998770                KAY FOOD FIESTA RBBT 6.5#                             EA         2         2     13.730           11.670         23.34     OV
+178/5   38099994   071859999944                KAY FOOD FDPH MOUSE/RAT 3#                            EA         2         2      5.945            5.050         10.10     OV
+179/3   44800300   766501003000                MFP TOY FRRT OCTOPLAY                                 EA         1         1     34.361           22.330         22.33     OV
+180/3   44800388   766501003888                MFP RMDY FRRT LAX 3OZ                                 EA         1         1     14.512            9.430          9.43     OV
+181/3   52400964   644472009644                AEC TOY LOOFAH HEARTS                                 EA         1         1      3.062            2.300          2.30     OV
+182/3   52400969   644472009699                AEC TOY LOOFAH BUNCH OF FRUIT                         EA         1         1      3.062            2.300          2.30     OV
+183/    52400970   644472009705                AEC TOY LOOFAH BON BONS                               EA         1         0      2.336            1.750          0.00     OV
+184/1   52401052   644472010527                AEC WHEEL HAM/MOUSE 4IN                               EA         1         1      4.472            3.350          3.35     OV
+185/5   52401486   644472014860                AEC CAGE HAM 2STRY14X15 4PK                           EA         4         4     22.107           19.900         79.60     OV
+186/2   55560400   045125604009                PTS HIDEOUT STUMP NAT SM                              EA         1         1      4.584            2.750          2.75     OV
+187/5   55560402   045125604023                PTS HIDEOUT STUMP NAT LG                              EA         2         2     12.766            7.660         15.32     OV
+188/1   55560575   045125605754    PI-60575    PTS CRITTERTRAIL VALUE PACK #4                        EA         1         1     15.711           10.210         10.21     OV
+189/2   55560597   045125605976                PTS CRITTERTRAIL PLAYPEN W/MAT                        EA         1         1     23.743           15.430         15.43     OV
+190/    55561971   045125619713                PTS CLEARWATER BOTTLE 8OZ                             EA         3         0      4.007            2.800          0.00     OV
+191/2   55561972   045125619720                PTS CLEARWATER BOTTLE 16OZ                            EA         2         2      5.218            3.650          7.30     OV
+192/2   55561973   045125619737                PTS CLEARWATER BOTTLE 32OZ                            EA         2         2      6.411            4.490          8.98     OV
+193/5   55562168   045125621686                PTS LTTR CRITTER LITTER 8#                            EA         1         1     11.293            7.910          7.91     OV
+194/2   55562272   045125622720                PTS BED CUDDLE CUP                                    EA         1         1     12.225            8.560          8.56     OV
+                                                                                                             -----     -----                                  ---------
+                                               Small Animal                                                    66        58                                   673.73
+                                                                                                             -----     -----                                  ---------
+
+        DELIVERY SURCHARGE                                                                                                                                      21.00
+
+
+                                                                                                                                                ** Continued **
+                                                                                                                                   INVOICE NO: 06271054
+                                                                       INVOICE
+                                                                                                                                   DATE:       02/15/25 09:39:32
+                                                                      *** REPRINT ***                                              ORDER:          06546903
+4038 ROCK QUARRY RD            Ph: 214-210-4112
+DALLAS, TX 75211               Fax: 214-331-6425                                                                                   PAGE:           8 OF 8
+
+BILL TO: 530572                                         REMIT TO ADDRESS FOR MAILING PAYMENTS                      SHIP TO:
+ ANIMAL HOUSE                                         CENTRAL PET DALLAS                                             ANIMAL HOUSE
+ ANGELA SKIPPER                                       PO BOX 840167                                                  2934 CYPRESS ST
+ 2934 CYPRESS ST                                      DALLAS, TX 75284                                               WEST MONROE, LA 71294
+ WEST MONROE, LA 71294                                PHONE: 877-219-7019
+
+
+          **Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+
+                  TERMS                             CUSTOMER P.O.                         SHIP VIA                         SALES REP                   WRITTEN BY
+
+                  COD                                                                   OUR TRUCK                   667 CRAIG BORGSTEDE                     WEB
+LINE PRODUCT                                                                                            ORDER SHIPPED
+                      UPC        *CPN/VPN                DESCRIPTION                   RETAIL UM                            LIST             NET      EXTENDED CDE
+/ REL NUMBER                                                                                             QTY    QTY
+
+      ********************************************
+      * OV Price Override                        *
+      ********************************************
+
+                   CATEGORY TOTALS:
+                    Aquatic                                  311.09
+                    Bird                                      25.76
+                    Cat                                       74.76
+                    Dog                                      617.03
+                    Pond                                      64.32
+                    Reptile                                  575.50
+                    Small Animal                             673.73
+
+
+
+
+MDSE TOTAL 2,342.19         HANDLING 0.00              MISC CHGS 21.00                  TAX      0.00             FREIGHT     0.00             TOTAL        2,363.19
+
