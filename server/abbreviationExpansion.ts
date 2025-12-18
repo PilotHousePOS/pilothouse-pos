@@ -368,11 +368,34 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Riv': 'River',
   'Cich': 'Cichlid',
   'Pel': 'Pellets',
+  'Pllts': 'Pellets',
   'Sup': 'Super',
   'Col': 'Color',
   'Nib': 'Nibbles',
   'Pat': 'Pate',
   'Crip': 'Crisp',
+  'Crisp': 'Crisps',
+  
+  // Fish/Aquarium Food (Dec 18, 2025)
+  'Frzn': 'Frozen',
+  'Fz': 'Frozen',
+  'Fd': 'Frozen',  // Common abbreviation for Frozen in fish food
+  'Bldwrm': 'Bloodworm',
+  'Bldwrms': 'Bloodworms',
+  'Shrmp': 'Shrimp',
+  'Shrm': 'Shrimp',
+  'Brineshrmp': 'Brine Shrimp',
+  'GF': 'Goldfish Crisps',
+  'Spir': 'Spirulina',
+  'Na': '',  // Remove Na from frozen foods (packaging notation)
+  
+  // Small Animal Food (Dec 18, 2025)
+  'Essntl': 'Essentials',
+  'Mse': 'Mouse',
+  'Ham': 'Hamster',
+  'Gerb': 'Gerbil',
+  'Dspnsr': 'Dispenser',
+  'Fdph': 'Food Depot Hamster',  // Food Depot brand for small animals
   // 'Tndr Bts': 'Tender Bites',  // MOVED TO BRAND CATALOG
   // 'Lil Bts': 'Little Bites',  // MOVED TO BRAND CATALOG
   // 'Little Bts': 'Little Bites',  // MOVED TO BRAND CATALOG
