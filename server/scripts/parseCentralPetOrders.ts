@@ -2,11 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import { db } from '../db';
 import { supplies } from '@shared/schema';
-import { eq, sql, ilike, or } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
+import { brandAbbreviations, wordAbbreviations, expandAbbreviations } from './centralPetAbbreviations';
 
 interface OrderItem {
   upc: string;
   description: string;
+  expanded: string;
   vendorPart?: string;
 }
 
@@ -16,63 +18,20 @@ function parseInvoiceText(content: string): OrderItem[] {
   
   for (const line of lines) {
     // Match lines with UPC codes (12 digits)
-    // Format: LINE# PRODUCT UPC [VENDOR_PART] DESCRIPTION ...
     const match = line.match(/^\s*\d+\/\S*\s+\d{8}\s+(\d{12})\s+(?:([A-Z0-9-]+)\s+)?(.+?)\s+EA\s+/);
     if (match) {
       const upc = match[1];
       const vendorPart = match[2] || undefined;
-      let description = match[3].trim();
+      let description = match[3].trim().replace(/\s+/g, ' ');
       
-      // Clean up description
-      description = description.replace(/\s+/g, ' ').trim();
+      // Expand abbreviations
+      const expanded = expandAbbreviations(description);
       
-      items.push({ upc, description, vendorPart });
+      items.push({ upc, description, expanded, vendorPart });
     }
   }
   
   return items;
-}
-
-function expandBrandAbbreviation(abbrev: string): string {
-  const brands: Record<string, string> = {
-    'AQE': 'Aqueon',
-    'API': 'API',
-    'HIK': 'Hikari',
-    'TET': 'Tetra',
-    'SLI': 'Seachem',
-    'FLU': 'Fluker\'s',
-    'ZIL': 'Zilla',
-    'ZOO': 'Zoo Med',
-    'ZMD': 'Zoo Med',
-    'KOM': 'Komodo',
-    'REP': 'Rep-Cal',
-    'EXO': 'Exo Terra',
-    'GAL': 'Galápagos',
-    'KMP': 'Kaytee',
-    'KAY': 'Kaytee',
-    'JWP': 'JW Pet',
-    'NYL': 'Nylabone',
-    'COA': 'Coastal',
-    'ETH': 'Ethical Pet',
-    'KON': 'Kong',
-    'BLI': 'Bergan',
-    'ZUP': 'ZuPreem',
-    'EPC': 'Litter Genie',
-    'N/M': 'Nature\'s Miracle',
-    'NZP': 'Natural Chemistry',
-    'ATP': 'Aquatop',
-    'WWI': 'Worldwide Imports',
-    'MAR': 'Marineland',
-    'MBL': 'MarineLand',
-    'VIT': 'Vitakraft',
-    'SUP': 'Super Pet',
-    'OXB': 'Oxbow',
-    'LIV': 'Living World',
-    'CAR': 'Carib Sea',
-    'CBS': 'Carib Sea',
-  };
-  
-  return brands[abbrev] || abbrev;
 }
 
 function normalizeForMatching(str: string): string {
@@ -83,8 +42,36 @@ function normalizeForMatching(str: string): string {
     .trim();
 }
 
+function getWords(str: string): string[] {
+  return normalizeForMatching(str).split(' ').filter(w => w.length > 2);
+}
+
+function calculateSimilarity(invoice: string, db: string): number {
+  const invoiceWords = getWords(invoice);
+  const dbWords = getWords(db);
+  
+  if (invoiceWords.length === 0 || dbWords.length === 0) return 0;
+  
+  let matchScore = 0;
+  for (const w of invoiceWords) {
+    if (dbWords.includes(w)) {
+      matchScore += 1;
+    } else {
+      // Partial match for longer words
+      for (const dw of dbWords) {
+        if (dw.includes(w) || w.includes(dw)) {
+          matchScore += 0.5;
+          break;
+        }
+      }
+    }
+  }
+  
+  return matchScore / Math.max(invoiceWords.length, dbWords.length);
+}
+
 async function main() {
-  console.log('[CENTRAL-PET] Parsing Central Pet invoice files...');
+  console.log('[CENTRAL-PET] Parsing Central Pet invoice files with expanded abbreviations...');
   
   const orderDir = 'attached_assets/extracted_orders';
   const files = fs.readdirSync(orderDir).filter(f => f.endsWith('.txt'));
@@ -92,7 +79,7 @@ async function main() {
   console.log(`[CENTRAL-PET] Found ${files.length} invoice text files`);
   
   // Collect all items from invoices
-  const allItems = new Map<string, OrderItem>(); // UPC -> item (deduped)
+  const allItems = new Map<string, OrderItem>();
   
   for (const file of files) {
     const content = fs.readFileSync(path.join(orderDir, file), 'utf-8');
@@ -107,12 +94,12 @@ async function main() {
   
   console.log(`[CENTRAL-PET] Extracted ${allItems.size} unique UPCs from invoices`);
   
-  // Show some examples
-  console.log('\n[CENTRAL-PET] Sample items from invoices:');
+  // Show expanded examples
+  console.log('\n[CENTRAL-PET] Sample abbreviation expansions:');
   let count = 0;
   for (const [upc, item] of allItems) {
-    if (count < 15) {
-      console.log(`  ${upc}: ${item.description}`);
+    if (count < 20 && item.description !== item.expanded) {
+      console.log(`  "${item.description}" → "${item.expanded}"`);
       count++;
     }
   }
@@ -137,7 +124,7 @@ async function main() {
   };
   
   const updates: { id: number; sku: string; reason: string }[] = [];
-  const notFound: { upc: string; description: string }[] = [];
+  const notFound: { upc: string; description: string; expanded: string }[] = [];
   const assignedDbIds = new Set<number>();
   
   for (const [upc, item] of allItems) {
@@ -148,40 +135,35 @@ async function main() {
       continue;
     }
     
-    // Try to match by description
-    const descNorm = normalizeForMatching(item.description);
-    const descWords = descNorm.split(' ').filter(w => w.length > 2);
-    
+    // Try to match using expanded description
     let bestMatch: typeof allSupplies[0] | null = null;
     let bestScore = 0;
     
     for (const s of allSupplies) {
-      if (s.sku) continue; // Skip items with SKU
+      if (s.sku) continue;
       if (assignedDbIds.has(s.id)) continue;
       
-      const dbNorm = normalizeForMatching(s.name);
-      const dbWords = dbNorm.split(' ').filter(w => w.length > 2);
+      // Try both original and expanded description
+      const score1 = calculateSimilarity(item.description, s.name);
+      const score2 = calculateSimilarity(item.expanded, s.name);
+      const score = Math.max(score1, score2);
       
-      // Count matching words
-      const matchingWords = descWords.filter(w => dbWords.includes(w));
-      const score = matchingWords.length / Math.max(descWords.length, dbWords.length);
-      
-      if (score > bestScore && score >= 0.5) {
+      if (score > bestScore && score >= 0.6) {
         bestScore = score;
         bestMatch = s;
       }
     }
     
-    if (bestMatch && bestScore >= 0.6) {
+    if (bestMatch && bestScore >= 0.65) {
       assignedDbIds.add(bestMatch.id);
       updates.push({
         id: bestMatch.id,
         sku: upc,
-        reason: `"${item.description}" → "${bestMatch.name}" (${(bestScore * 100).toFixed(0)}% match)`
+        reason: `"${item.expanded}" → "${bestMatch.name}" (${(bestScore * 100).toFixed(0)}%)`
       });
       stats.newSkuAssigned++;
     } else {
-      notFound.push({ upc, description: item.description });
+      notFound.push({ upc, description: item.description, expanded: item.expanded });
       stats.notFound++;
     }
   }
@@ -192,17 +174,20 @@ async function main() {
   console.log(`Not matched: ${stats.notFound}`);
   
   console.log('\n[CENTRAL-PET] === UPDATES TO APPLY ===');
-  for (const u of updates.slice(0, 30)) {
+  for (const u of updates.slice(0, 40)) {
     console.log(`  ID ${u.id}: ${u.reason}`);
   }
-  if (updates.length > 30) {
-    console.log(`  ... and ${updates.length - 30} more`);
+  if (updates.length > 40) {
+    console.log(`  ... and ${updates.length - 40} more`);
   }
   
   if (notFound.length > 0) {
-    console.log('\n[CENTRAL-PET] === NOT MATCHED (first 20) ===');
-    for (const nf of notFound.slice(0, 20)) {
+    console.log('\n[CENTRAL-PET] === NOT MATCHED (first 30) ===');
+    for (const nf of notFound.slice(0, 30)) {
       console.log(`  ${nf.upc}: ${nf.description}`);
+      if (nf.description !== nf.expanded) {
+        console.log(`          → ${nf.expanded}`);
+      }
     }
   }
   
