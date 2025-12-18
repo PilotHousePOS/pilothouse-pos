@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { supplies } from '@shared/schema';
-import { eq, sql, isNull, or, and } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { pennPlaxOrderItems } from './orderData';
 
 function normalizeForMatching(str: string): string {
@@ -42,7 +42,7 @@ async function main() {
   
   // Load all supplies
   const allSupplies = await db.select().from(supplies);
-  console.log(`[SYNC-SKU] Total supplies in database: 7252`);
+  console.log(`[SYNC-SKU] Total supplies in database: ${allSupplies.length}`);
   
   // Build lookup maps
   const dbBySku = new Map<string, typeof allSupplies[0]>();
@@ -66,6 +66,9 @@ async function main() {
     notFound: 0,
   };
   
+  // Track which DB IDs have already been assigned to prevent duplicates
+  const assignedDbIds = new Set<number>();
+  
   const updates: { id: number; sku?: string; name?: string; reason: string }[] = [];
   const notFound: { sku: string; name: string }[] = [];
   
@@ -76,6 +79,7 @@ async function main() {
     if (existingBySku) {
       // SKU exists - verify and fix name if needed
       stats.skuVerified++;
+      assignedDbIds.add(existingBySku.id);
       
       // Update to official Penn-Plax name if different
       if (existingBySku.name !== orderItem.name) {
@@ -93,16 +97,18 @@ async function main() {
       // Exact normalized match
       let matches = dbByNormName.get(normOrderName) || [];
       
-      // If no exact match, try fuzzy matching
+      // If no exact match, try fuzzy matching with high threshold
       if (matches.length === 0) {
         let bestMatch: typeof allSupplies[0] | null = null;
         let bestScore = 0;
         
         for (const s of allSupplies) {
           if (s.sku) continue; // Skip items that already have SKU
+          if (assignedDbIds.has(s.id)) continue; // Skip already assigned
           
           const sim = similarity(s.name, orderItem.name);
-          if (sim > bestScore && sim >= 0.5) {
+          // Require very high similarity (70%+) to prevent false matches
+          if (sim > bestScore && sim >= 0.7) {
             bestScore = sim;
             bestMatch = s;
           }
@@ -113,10 +119,11 @@ async function main() {
         }
       }
       
-      // Filter to items without SKU
-      const noSkuMatches = matches.filter(m => !m.sku);
+      // Filter to items without SKU and not already assigned
+      const noSkuMatches = matches.filter(m => !m.sku && !assignedDbIds.has(m.id));
       
-      if (noSkuMatches.length >= 1) {
+      if (noSkuMatches.length === 1) {
+        assignedDbIds.add(noSkuMatches[0].id);
         updates.push({
           id: noSkuMatches[0].id,
           sku: orderSku,
@@ -138,21 +145,18 @@ async function main() {
   console.log(`Not found in DB: ${stats.notFound}`);
   
   if (notFound.length > 0) {
-    console.log('\n[SYNC-SKU] === NOT FOUND IN DB (first 20) ===');
-    for (const nf of notFound.slice(0, 20)) {
+    console.log('\n[SYNC-SKU] === NOT FOUND IN DB (first 30) ===');
+    for (const nf of notFound.slice(0, 30)) {
       console.log(`  ${nf.sku}: ${nf.name}`);
     }
-    if (notFound.length > 20) {
-      console.log(`  ... and ${notFound.length - 20} more`);
+    if (notFound.length > 30) {
+      console.log(`  ... and ${notFound.length - 30} more`);
     }
   }
   
-  console.log('\n[SYNC-SKU] === SAMPLE UPDATES (first 30) ===');
-  for (const u of updates.slice(0, 30)) {
+  console.log('\n[SYNC-SKU] === UPDATES TO APPLY ===');
+  for (const u of updates) {
     console.log(`  ID ${u.id}: ${u.reason}`);
-  }
-  if (updates.length > 30) {
-    console.log(`  ... and ${updates.length - 30} more`);
   }
   
   // Apply updates
@@ -168,6 +172,8 @@ async function main() {
     }
     
     console.log('[SYNC-SKU] Updates applied successfully!');
+  } else {
+    console.log('\n[SYNC-SKU] No updates needed.');
   }
   
   // Final count
