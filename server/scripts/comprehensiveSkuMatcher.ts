@@ -255,16 +255,47 @@ async function runMatcher() {
       }
     }
     
-    // High threshold for fuzzy matches to avoid false positives
-    if (bestScore >= 55) {
-      await db.update(supplies)
-        .set({ sku: bestUpc })
-        .where(eq(supplies.id, supply.id));
+    // Lower threshold but with additional validation
+    if (bestScore >= 40) {
+      // Additional validation: key word must match
+      const supplyLower = supply.name.toLowerCase();
+      const bestLower = bestName.toLowerCase();
       
-      usedUpcs.add(bestUpc);
-      fuzzyMatches++;
-      matchLog.push(`[FUZZY ${bestScore.toFixed(1)}] "${supply.name}" -> "${bestName}" (${bestUpc})`);
-    } else if (bestScore >= 35) {
+      // Check for key product identifiers
+      const keyMatches = 
+        (supplyLower.includes('barrel') && bestLower.includes('barrel')) ||
+        (supplyLower.includes('castle') && bestLower.includes('castle')) ||
+        (supplyLower.includes('bridge') && bestLower.includes('bridge')) ||
+        (supplyLower.includes('driftwood') && bestLower.includes('driftwood')) ||
+        (supplyLower.includes('crystal') && bestLower.includes('crystal')) ||
+        (supplyLower.includes('thermometer') && bestLower.includes('thermometer')) ||
+        (supplyLower.includes('igloo') && bestLower.includes('igloo')) ||
+        (supplyLower.includes('hideout') && bestLower.includes('hideout')) ||
+        (supplyLower.includes('filter') && bestLower.includes('filter')) ||
+        (supplyLower.includes('collagen') && bestLower.includes('collagen')) ||
+        (supplyLower.includes('bully') && bestLower.includes('bully')) ||
+        (supplyLower.includes('shampoo') && bestLower.includes('shampoo')) ||
+        (supplyLower.includes('treat') && bestLower.includes('treat')) ||
+        (supplyLower.includes('food') && bestLower.includes('food')) ||
+        (supplyLower.includes('toy') && bestLower.includes('toy')) ||
+        (supplyLower.includes('cave') && bestLower.includes('cave')) ||
+        (supplyLower.includes('plant') && bestLower.includes('plant')) ||
+        (supplyLower.includes('vine') && bestLower.includes('vine')) ||
+        (supplyLower.includes('general cure') && bestLower.includes('general cure')) ||
+        bestScore >= 50; // Allow high scores without key match
+      
+      if (keyMatches) {
+        await db.update(supplies)
+          .set({ sku: bestUpc })
+          .where(eq(supplies.id, supply.id));
+        
+        usedUpcs.add(bestUpc);
+        fuzzyMatches++;
+        matchLog.push(`[FUZZY ${bestScore.toFixed(1)}] "${supply.name}" -> "${bestName}" (${bestUpc})`);
+      } else {
+        nearMatches.push(`[${bestScore.toFixed(1)}] "${supply.name}" ~ "${bestName}" (${bestUpc})`);
+      }
+    } else if (bestScore >= 30) {
       nearMatches.push(`[${bestScore.toFixed(1)}] "${supply.name}" ~ "${bestName}" (${bestUpc})`);
     }
     
