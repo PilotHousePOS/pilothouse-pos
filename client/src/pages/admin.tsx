@@ -10084,6 +10084,60 @@ export default function Admin() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Unmatched Invoice Items
+              </CardTitle>
+              <CardDescription>
+                577 items from supplier invoices that couldn't be matched to products in the database
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={async () => {
+                  try {
+                    const response = await fetch('/api/admin/unmatched-invoice-items', {
+                      credentials: 'include'
+                    });
+                    
+                    if (!response.ok) {
+                      throw new Error('Download failed');
+                    }
+                    
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'unmatched_invoice_items.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    toast({
+                      title: "Download Complete",
+                      description: "CSV file downloaded successfully"
+                    });
+                  } catch (error) {
+                    console.error('Download error:', error);
+                    toast({
+                      title: "Download Failed",
+                      description: "Failed to download file",
+                      variant: "destructive"
+                    });
+                  }
+                }}
+                className="bg-brand-blue hover:bg-blue-600"
+                data-testid="button-download-unmatched-items"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download Unmatched Items CSV
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
                 <Database className="w-5 h-5" />
                 Full Database Sync (Development Only)
               </CardTitle>

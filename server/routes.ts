@@ -4065,6 +4065,29 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Download unmatched invoice items CSV (Admin only)
+  app.get("/api/admin/unmatched-invoice-items", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const filePath = path.join(process.cwd(), 'attached_assets', 'unmatched_invoice_items.csv');
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: "Unmatched invoice items file not found" });
+      }
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename="unmatched_invoice_items.csv"');
+      res.sendFile(filePath);
+    } catch (error) {
+      console.error('Error downloading unmatched invoice items:', error);
+      res.status(500).json({ message: "Failed to download file" });
+    }
+  });
+
   // Export entire database to JSON (Admin only)
   app.get("/api/admin/database/export", authMiddleware, async (req: any, res) => {
     try {
