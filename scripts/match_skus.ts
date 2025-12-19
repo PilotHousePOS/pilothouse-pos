@@ -65,7 +65,7 @@ async function main() {
   }
   console.log(`Products without SKU: ${products.length}`);
   
-  const upcDB = fs.readFileSync('.local/state/memory/comprehensive_upc_database.txt', 'utf-8');
+  const upcDB = fs.readFileSync('.local/state/memory/inventory_maybe_upcs.txt', 'utf-8');
   const upcEntries: Array<{upc: string; rawName: string; tokens: string[]}> = [];
   
   for (const line of upcDB.split('\n')) {
