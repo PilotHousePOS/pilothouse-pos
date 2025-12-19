@@ -4,7 +4,7 @@ const fs = require('fs');
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 // Load UPC database (it's already an object: { upc: name })
-const upcMap = JSON.parse(fs.readFileSync('/tmp/all_upcs.json', 'utf8'));
+const upcMap = JSON.parse(fs.readFileSync('/tmp/master_upc_db.json', 'utf8'));
 
 // Extract all numbers from a string (sizes, weights, wattages)
 function extractNumbers(str) {
