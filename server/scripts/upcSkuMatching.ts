@@ -43,8 +43,21 @@ const BRAND_MAP: Record<string, string> = {
   'nb': 'natural balance',
   'nulo': 'nulo',
   'cand': 'canidae',
+  'canid': 'canidae',
   'pure': 'purevita',
   'purevita': 'purevita',
+  'orij': 'orijen',
+  'orijen': 'orijen',
+  'prim': 'primal',
+  'prime fd': 'primal freeze dried',
+  'wholso': 'wholesome',
+  'wholeso': 'wholesome',
+  'health exten': 'healthy extension',
+  'valu pak': 'value pak',
+  'wellness': 'wellness',
+  'nutro': 'nutro',
+  'greenies': 'greenies',
+  'greeniues': 'greenies',
 };
 
 // Word abbreviations
@@ -52,15 +65,28 @@ const ABBREV_MAP: Record<string, string> = {
   'ck': 'chicken', 'chk': 'chicken', 'chkn': 'chicken',
   'lam': 'lamb', 'sal': 'salmon', 'salm': 'salmon',
   'bf': 'beef', 'trk': 'turkey', 'turk': 'turkey',
-  'pup': 'puppy', 'pyppu': 'puppy', 'kit': 'kitten', 'sr': 'senior',
-  'sm': 'small', 'lg': 'large', 'med': 'medium', 'lb': 'large',
+  'pup': 'puppy', 'pyppu': 'puppy', 'puppt': 'puppy', 'kit': 'kitten', 'sr': 'senior',
+  'sm': 'small', 'lg': 'large', 'med': 'medium',
   'br': 'breed', 'min': 'mini', 'anc': 'ancient',
   'gr': 'grain', 'fr': 'free', 'gf': 'grain free',
-  'wh': 'with', 'who': 'wholesome',
+  'wh': 'whole', 'who': 'wholesome',
   'sensi': 'sensitive', 'perf': 'perfect',
   'hairba': 'hairball', 'urin': 'urinary', 'indo': 'indoor',
   'wilder': 'wilderness', 'pacif': 'pacific', 'stre': 'stream',
   'flvr': 'flavor', 'essntl': 'essential',
+  'kitr': 'kibble in the raw',
+  'top': 'topper',
+  'en': 'entree', 'ent': 'entree',
+  'pt': 'petite',
+  'grav': 'gravy',
+  'purpl': 'purple', 'bla': 'black', 'rd': 'red',
+  'multi': 'multi protein',
+  'gen cook': 'gently cooked',
+  'dig sup': 'digestive support',
+  'shin coat': 'skin coat',
+  'vitality': 'vitality',
+  'roast': 'roasted',
+  'be': 'beef',
 };
 
 // Normalize: lowercase, expand abbrevs, remove punctuation, sort words
@@ -97,6 +123,10 @@ function normalizeName(name: string): string {
   result = result.replace(/\bgourment\b/g, 'gourmet');
   result = result.replace(/\bhyrdo\b/g, 'hydro');
   result = result.replace(/\benviroment\b/g, 'environment');
+  result = result.replace(/\bpurrsnickety\b/g, 'purrsnickitty');
+  result = result.replace(/\bhealthy extensions\b/g, 'healthy extension');
+  result = result.replace(/\bflexistix\b/g, 'flexi stix');
+  result = result.replace(/\bflexi stix\b/g, 'flexi stix');
   
   // Expand # and $ to lb (before other processing)
   result = result.replace(/(\d+\.?\d*)\s*[#$]/g, '$1lb');
