@@ -62,15 +62,36 @@ const ABBREV_MAP: Record<string, string> = {
 function normalizeName(name: string): string {
   let result = name.toLowerCase().trim();
   
-  // Fix brand name spacing issues FIRST
+  // Fix brand name spacing and typos FIRST
   result = result.replace(/\bzoomed\b/g, 'zoo med');
+  result = result.replace(/\bzoomeds\b/g, 'zoo med');
   result = result.replace(/\bexoterra\b/g, 'exo terra');
   result = result.replace(/\bexoterr\b/g, 'exo terra');
-  result = result.replace(/\bgalap\./g, 'galapagos');
+  result = result.replace(/\bgalap\.\s*/g, 'galapagos ');
   result = result.replace(/\bgalap\b/g, 'galapagos');
+  result = result.replace(/\bzila\b/g, 'zilla');  // Common typo
+  result = result.replace(/\bflukers\b/g, 'fluker');
+  result = result.replace(/\bfluker's\b/g, 'fluker');
+  result = result.replace(/\brep-cal\b/g, 'repcal');
+  result = result.replace(/\blees\b/g, 'lee');
+  result = result.replace(/\breptomin\b/g, 'tetra reptomin');
   result = result.replace(/\blrg\b/g, 'large');
+  result = result.replace(/\bmed\.\s*/g, 'medium ');
+  result = result.replace(/\bsup\.\s*/g, 'supplement ');
   result = result.replace(/\bsub\.\s*/g, 'substrate ');
   result = result.replace(/\bsub\s+/g, 'substrate ');
+  result = result.replace(/\bveg\.\s*/g, 'vegetable ');
+  result = result.replace(/\benvi\.\s*/g, 'environment ');
+  result = result.replace(/\bdes\.\s*/g, 'desert ');
+  result = result.replace(/\btrop\.\s*/g, 'tropical ');
+  result = result.replace(/\bcom\.\s*/g, 'compact ');
+  result = result.replace(/\bfl\.\s*/g, 'fluorescent ');
+  result = result.replace(/\bjuvi\b/g, 'juvenile');
+  result = result.replace(/\bmain\.\s*/g, 'maintenance ');
+  result = result.replace(/\b3\s*pk\b/g, '3 pack');
+  result = result.replace(/\bgourment\b/g, 'gourmet');
+  result = result.replace(/\bhyrdo\b/g, 'hydro');
+  result = result.replace(/\benviroment\b/g, 'environment');
   
   // Expand # and $ to lb (before other processing)
   result = result.replace(/(\d+\.?\d*)\s*[#$]/g, '$1lb');
