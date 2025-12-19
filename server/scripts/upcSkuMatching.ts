@@ -33,6 +33,9 @@ const BRAND_MAP: Record<string, string> = {
   'blue b': 'blue buffalo',
   'tow': 'taste of the wild',
   'nutri sou': 'nutrisource',
+  'red b': 'redbarn',
+  'rede b': 'redbarn',
+  'euk': 'eukanuba',
   'diam': 'diamond',
   'fromm': 'fromm',
   'zign': 'zignature',
@@ -49,13 +52,15 @@ const ABBREV_MAP: Record<string, string> = {
   'ck': 'chicken', 'chk': 'chicken', 'chkn': 'chicken',
   'lam': 'lamb', 'sal': 'salmon', 'salm': 'salmon',
   'bf': 'beef', 'trk': 'turkey', 'turk': 'turkey',
-  'pup': 'puppy', 'kit': 'kitten', 'sr': 'senior',
-  'sm': 'small', 'lg': 'large', 'med': 'medium',
+  'pup': 'puppy', 'pyppu': 'puppy', 'kit': 'kitten', 'sr': 'senior',
+  'sm': 'small', 'lg': 'large', 'med': 'medium', 'lb': 'large',
   'br': 'breed', 'min': 'mini', 'anc': 'ancient',
   'gr': 'grain', 'fr': 'free', 'gf': 'grain free',
+  'wh': 'with', 'who': 'wholesome',
   'sensi': 'sensitive', 'perf': 'perfect',
   'hairba': 'hairball', 'urin': 'urinary', 'indo': 'indoor',
   'wilder': 'wilderness', 'pacif': 'pacific', 'stre': 'stream',
+  'flvr': 'flavor', 'essntl': 'essential',
 };
 
 // Normalize: lowercase, expand abbrevs, remove punctuation, sort words
