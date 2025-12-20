@@ -2078,11 +2078,33 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         }
       }
 
-      // ONLY CHECK CAPACITY when date or services are changing
+      // ONLY CHECK CAPACITY when date or services are ACTUALLY changing
       // If just editing owner info, notes, price, time - skip capacity check
       const { serviceType } = req.body; // Get serviceType from request body for inline edits
-      const isDateChanging = appointmentDate !== undefined;
-      const isServiceChanging = pets !== undefined || serviceType !== undefined;
+      
+      // Check if date is actually changing (not just present in request)
+      const currentDateStr = new Date(currentAppointment.appointmentDate).toISOString().split('T')[0];
+      const newDateStr = appointmentDate ? new Date(appointmentDate).toISOString().split('T')[0] : currentDateStr;
+      const isDateChanging = newDateStr !== currentDateStr;
+      
+      // Check if services are actually changing (compare old vs new)
+      let isServiceChanging = serviceType !== undefined; // Inline edit always means service change
+      if (pets !== undefined && !isServiceChanging) {
+        // Full edit dialog - check if services actually changed
+        const existingPets = await storage.getAppointmentPets(id);
+        if (existingPets && existingPets.length > 0) {
+          // Compare service types - only count as change if different
+          const oldServices = existingPets.map((p: any) => (p.serviceType || '').toLowerCase()).sort().join(',');
+          const newServices = pets.map((p: any) => (p.serviceType || '').toLowerCase()).sort().join(',');
+          isServiceChanging = oldServices !== newServices || existingPets.length !== pets.length;
+        } else {
+          // Legacy single-pet - compare with appointment's serviceType
+          const oldService = (currentAppointment.serviceType || '').toLowerCase();
+          const newService = pets.length > 0 ? (pets[0].serviceType || '').toLowerCase() : '';
+          isServiceChanging = oldService !== newService || pets.length !== 1;
+        }
+      }
+      
       const needsCapacityCheck = isDateChanging || isServiceChanging;
       
       console.log(`[EDIT DEBUG] needsCapacityCheck=${needsCapacityCheck} (dateChanging=${isDateChanging}, serviceChanging=${isServiceChanging})`);
