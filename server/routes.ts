@@ -2078,10 +2078,14 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         }
       }
 
-      // ALWAYS CHECK CAPACITY LIMITS for any edit that might affect capacity
-      // This includes: date changes, pets array changes, OR direct serviceType changes
-      // The inline edit UI sends serviceType directly without pets array, so we must check for that too
+      // ONLY CHECK CAPACITY when date or services are changing
+      // If just editing owner info, notes, price, time - skip capacity check
       const { serviceType } = req.body; // Get serviceType from request body for inline edits
+      const isDateChanging = appointmentDate !== undefined;
+      const isServiceChanging = pets !== undefined || serviceType !== undefined;
+      const needsCapacityCheck = isDateChanging || isServiceChanging;
+      
+      console.log(`[EDIT DEBUG] needsCapacityCheck=${needsCapacityCheck} (dateChanging=${isDateChanging}, serviceChanging=${isServiceChanging})`);
       
       // Use new date if provided, otherwise use current
       const dateToCheck = appointmentDate ? new Date(appointmentDate) : new Date(currentAppointment.appointmentDate);
@@ -2116,11 +2120,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         }
       }
       
-      // Check weekly limits for Monday-Saturday (1-6)
-      console.log(`[EDIT DEBUG] ===== CAPACITY CHECK =====`);
-      console.log(`[EDIT DEBUG] dayOfWeek=${dayOfWeek}, dateStr=${appointmentDateStr}, appointmentId=${id}`);
-      console.log(`[EDIT DEBUG] finalPets count: ${finalPets?.length}, services: ${finalPets?.map((p: any) => p.serviceType).join(', ')}`);
-      if (dayOfWeek >= 1 && dayOfWeek <= 6) {
+      // Only check capacity if date or services are changing
+      // Skip capacity check for edits that don't affect capacity (owner info, notes, price, time, groomer)
+      if (needsCapacityCheck && dayOfWeek >= 1 && dayOfWeek <= 6) {
+        console.log(`[EDIT DEBUG] ===== CAPACITY CHECK =====`);
+        console.log(`[EDIT DEBUG] dayOfWeek=${dayOfWeek}, dateStr=${appointmentDateStr}, appointmentId=${id}`);
+        console.log(`[EDIT DEBUG] finalPets count: ${finalPets?.length}, services: ${finalPets?.map((p: any) => p.serviceType).join(', ')}`);
         const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
         console.log(`[EDIT DEBUG] Weekly limit for day ${dayOfWeek}:`, JSON.stringify(weeklyLimit));
         
