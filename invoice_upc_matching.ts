@@ -112,12 +112,257 @@ const PRODUCT_TYPE_CODES: Record<string, string> = {
   'S/O': 'Stain & Odor',
 };
 
+// Fish/aquatic product abbreviations
+const AQUATIC_CODES: Record<string, string> = {
+  'CCHLD': 'Cichlid',
+  'CCHLID': 'Cichlid',
+  'PLLT': 'Pellet',
+  'PLLTS': 'Pellets',
+  'PELLET': 'Pellet',
+  'PELLAT': 'Pellet',
+  'FLK': 'Flake',
+  'FLAKE': 'Flake',
+  'SINK': 'Sinking',
+  'GLD': 'Gold',
+  'GOLD': 'Gold',
+  'ESNTL': 'Essentials',
+  'ESSNTL': 'Essentials',
+  'ESSNTLS': 'Essentials',
+  'FW': 'Freshwater',
+  'SW': 'Saltwater',
+  'TRPCL': 'Tropical',
+  'TROP': 'Tropical',
+  'BETTA': 'Betta',
+  'KOI': 'Koi',
+  'GLDFISH': 'Goldfish',
+  'GLDFI': 'Goldfish',
+  'ALGAE': 'Algae',
+  'ALG': 'Algae',
+  'WAFER': 'Wafer',
+  'WAFR': 'Wafer',
+  'WFRS': 'Wafers',
+  'WFR': 'Wafer',
+  'WAFRS': 'Wafers',
+  'STICKS': 'Sticks',
+  'STKS': 'Sticks',
+  'GRANULE': 'Granule',
+  'GRAN': 'Granule',
+  'CRUMB': 'Crumble',
+  'CRUMBL': 'Crumble',
+  'BLOODWORM': 'Bloodworm',
+  'BLDWRM': 'Bloodworm',
+  'BRINE': 'Brine',
+  'SHRIMP': 'Shrimp',
+  'SHRMP': 'Shrimp',
+  'DAPHNIA': 'Daphnia',
+  'TUBIFEX': 'Tubifex',
+  'FREEZE': 'Freeze',
+  'FRZN': 'Frozen',
+  'FROZEN': 'Frozen',
+  'DRIED': 'Dried',
+  'DRY': 'Dry',
+  'AQUAR': 'Aquarium',
+  'AQURM': 'Aquarium',
+  'AQCLR': 'AquaClear',
+  'GLOFSH': 'GloFish',
+  'OCN': 'Ocean',
+  'ORNMT': 'Ornament',
+  'PRIME': 'Prime',
+};
+
+// Size abbreviations
+const SIZE_CODES: Record<string, string> = {
+  'MINI': 'Mini',
+  'SM': 'Small',
+  'MD': 'Medium',
+  'MED': 'Medium',
+  'LG': 'Large',
+  'XS': 'Extra Small',
+  'XL': 'Extra Large',
+  'XXL': 'XXL',
+  'REG': 'Regular',
+  'JMB': 'Jumbo',
+  'GNT': 'Giant',
+  'NANO': 'Nano',
+  'GAL': 'Gallon',
+  'GALL': 'Gallon',
+  'GALLON': 'Gallon',
+};
+
+// Color abbreviations
+const COLOR_CODES: Record<string, string> = {
+  'WH': 'White',
+  'BK': 'Black',
+  'RD': 'Red',
+  'OR': 'Orange',
+  'PK': 'Pink',
+  'BL': 'Blue',
+  'GR': 'Green',
+  'GY': 'Gray',
+  'GN': 'Green',
+  'CLR': 'Clear',
+  'COLRS': 'Colors',
+  'ASST': 'Assorted',
+  'NAT': 'Natural',
+  'STRP': 'Stripe',
+  'FSHN': 'Fashion',
+  'TXTRD': 'Textured',
+};
+
+// Animal abbreviations
+const ANIMAL_CODES: Record<string, string> = {
+  'RBBT': 'Rabbit',
+  'GPIG': 'Guinea Pig',
+  'KTTN': 'Kitten',
+  'KEET': 'Parakeet',
+  'PRRT': 'Parrot',
+  'FRRT': 'Ferret',
+  'HRMT': 'Hermit',
+  'TIEL': 'Cockatiel',
+  'CRAB': 'Crab',
+  'CRICKET': 'Cricket',
+  'BIRD': 'Bird',
+  'CT': 'Cat',
+  'PUP': 'Puppy',
+  'ADLT': 'Adult',
+  'YOUNG': 'Young',
+};
+
+// Food type abbreviations
+const FOOD_CODES: Record<string, string> = {
+  'CHKN': 'Chicken',
+  'BCN': 'Bacon',
+  'SWPOT': 'Sweet Potato',
+  'GRMT': 'Gourmet',
+  'FRT': 'Fruit',
+  'HAY': 'Hay',
+  'MIX': 'Mix',
+  'ORIG': 'Original',
+  'TMTHY': 'Timothy',
+  'SWTHRVST': 'Sweet Harvest',
+  'PB': 'Peanut Butter',
+  'HLTHY': 'Healthy',
+  'PURE': 'Pure',
+  'FDPH': 'Forti-Diet Pro Health',
+};
+
+// Product type abbreviations (additional)
+const PRODUCT_CODES: Record<string, string> = {
+  'CHW': 'Chew',
+  'BNE': 'Bone',
+  'BALL': 'Ball',
+  'CABLE': 'Cable',
+  'LINER': 'Liner',
+  'BOX': 'Box',
+  'CARRIER': 'Carrier',
+  'CAPSL': 'Capsule',
+  'PILLP': 'Pill Pocket',
+  'SCOOP': 'Scoop',
+  'LAMP': 'Lamp',
+  'LED': 'LED',
+  'BOTTLE': 'Bottle',
+  'WIPES': 'Wipes',
+  'PASTE': 'Paste',
+  'SPLMT': 'Supplement',
+  'BEDNG': 'Bedding',
+  'DNTL': 'Dental',
+  'EDBL': 'Edible',
+  'TERRM': 'Terrarium',
+  'HIDEOUT': 'Hideout',
+  'RUN': 'Run',
+  'IGLOO': 'Igloo',
+  'SQKR': 'Squeaker',
+  'PLSH': 'Plush',
+  'WUBBA': 'Wubba',
+  'QUENCHER': 'Quencher',
+  'SPRY': 'Spray',
+  'STC': 'Stick',
+  'JUNGLE': 'Jungle',
+  'WESTRN': 'Western',
+  'ACTIV': 'Active',
+  'COMFT': 'Comfort',
+  'COAT': 'Coat',
+  'STRESS': 'Stress',
+  'ORAL': 'Oral',
+  'CARE': 'Care',
+  'ECO': 'Eco',
+  'EASY': 'Easy',
+  'EARTH': 'Earth',
+  'CLASSIC': 'Classic',
+  'SAFE': 'Safe',
+  'BRKW': 'Breakaway',
+  'LP': 'Loop',
+  'WTR': 'Water',
+  'SKY': 'Sky',
+  'SPOT': 'Spot',
+  'DAY': 'Day',
+  'TOP': 'Top',
+  'AIR': 'Air',
+  'LAND': 'Land',
+  'REPTA': 'Reptile',
+  'DRGN': 'Dragon',
+  'TRTL': 'Turtle',
+  'FLO': 'Flo',
+  'INC': 'Incandescent',
+  'WHSM': 'Whimsy',
+  'VE': 'Vegetable',
+  'BLL': 'Bell',
+  'BRK': 'Brick',
+  'ORC': 'Orchid',
+  'PAN': 'Pan',
+  'PR': 'Pair',
+};
+
+// Reptile abbreviations
+const REPTILE_CODES: Record<string, string> = {
+  'REPTILE': 'Reptile',
+  'REPT': 'Reptile',
+  'REPTI': 'Reptile',
+  'GECKO': 'Gecko',
+  'LEOPARD': 'Leopard',
+  'BEARD': 'Bearded',
+  'BEARDED': 'Bearded',
+  'DRAGON': 'Dragon',
+  'SNAKE': 'Snake',
+  'PYTHON': 'Python',
+  'TORTOISE': 'Tortoise',
+  'TURTLE': 'Turtle',
+  'CHAMELEON': 'Chameleon',
+  'IGUANA': 'Iguana',
+  'TERRARIUM': 'Terrarium',
+  'TERR': 'Terrarium',
+  'BASKING': 'Basking',
+  'BASK': 'Basking',
+  'UVA': 'UVA',
+  'UVB': 'UVB',
+  'CERAMIC': 'Ceramic',
+  'CERM': 'Ceramic',
+  'INFRARED': 'Infrared',
+  'HEAT': 'Heat',
+  'EMITTER': 'Emitter',
+  'EMIT': 'Emitter',
+  'WATT': 'Watt',
+  'W': 'Watt',
+};
+
 interface UPCEntry {
   upc: string;
   rawName: string;
   expandedName: string;
   source: string;
 }
+
+// All code dictionaries for expansion
+const ALL_CODE_DICTS = [
+  PRODUCT_TYPE_CODES,
+  AQUATIC_CODES,
+  SIZE_CODES,
+  COLOR_CODES,
+  ANIMAL_CODES,
+  FOOD_CODES,
+  PRODUCT_CODES,
+  REPTILE_CODES,
+];
 
 // Expand invoice description using brand codes and abbreviations
 function expandInvoiceDescription(description: string): string {
@@ -142,10 +387,12 @@ function expandInvoiceDescription(description: string): string {
     }
   }
   
-  // Expand product type codes
-  for (const [code, full] of Object.entries(PRODUCT_TYPE_CODES)) {
-    const regex = new RegExp(`\\b${code}\\b`, 'gi');
-    expanded = expanded.replace(regex, full);
+  // Expand all code dictionaries
+  for (const dict of ALL_CODE_DICTS) {
+    for (const [code, full] of Object.entries(dict)) {
+      const regex = new RegExp(`\\b${code}\\b`, 'gi');
+      expanded = expanded.replace(regex, full);
+    }
   }
   
   // Use the abbreviation expansion system for remaining abbreviations
@@ -343,17 +590,21 @@ async function main() {
   
   console.log(`\nProducts without SKU: ${productsWithoutSku.length}`);
   
-  // Build multiple matching indexes
-  const byNormalized = new Map<string, typeof productsWithoutSku[0]>();
-  const byNoSpace = new Map<string, typeof productsWithoutSku[0]>();
+  // Build multiple matching indexes - store ARRAYS to handle duplicates
+  const byNormalized = new Map<string, Array<typeof productsWithoutSku[0]>>();
+  const byNoSpace = new Map<string, Array<typeof productsWithoutSku[0]>>();
   const productKeywords = new Map<number, string[]>();
   
   for (const product of productsWithoutSku) {
     const norm = normalize(product.name);
     const noSpace = noSpaceNormalize(product.name);
     
-    if (!byNormalized.has(norm)) byNormalized.set(norm, product);
-    if (!byNoSpace.has(noSpace)) byNoSpace.set(noSpace, product);
+    // Store ALL products with same normalized name (handles duplicates)
+    if (!byNormalized.has(norm)) byNormalized.set(norm, []);
+    byNormalized.get(norm)!.push(product);
+    
+    if (!byNoSpace.has(noSpace)) byNoSpace.set(noSpace, []);
+    byNoSpace.get(noSpace)!.push(product);
     
     // Store keywords for fuzzy matching
     productKeywords.set(product.id, extractKeyWords(product.name));
@@ -376,47 +627,58 @@ async function main() {
   for (const entry of allUPCs) {
     if (matchedUPCs.has(entry.upc)) continue;
     
-    // Strategy 1: Exact normalized match
+    // Strategy 1: Exact normalized match - match ALL products with same name
     const normalized = normalize(entry.expandedName);
-    let product = byNormalized.get(normalized);
+    const products = byNormalized.get(normalized);
     
-    if (product && !matchedProductIds.has(product.id)) {
-      matches.push({
-        productId: product.id,
-        productName: product.name,
-        sourceName: entry.rawName,
-        expandedName: entry.expandedName,
-        upc: entry.upc,
-        matchType: 'exact',
-        score: 1.0
-      });
-      matchedProductIds.add(product.id);
-      matchedUPCs.add(entry.upc);
-      continue;
+    if (products && products.length > 0) {
+      // Find products not yet matched
+      const unmatched = products.filter(p => !matchedProductIds.has(p.id));
+      if (unmatched.length > 0) {
+        for (const product of unmatched) {
+          matches.push({
+            productId: product.id,
+            productName: product.name,
+            sourceName: entry.rawName,
+            expandedName: entry.expandedName,
+            upc: entry.upc,
+            matchType: 'exact',
+            score: 1.0
+          });
+          matchedProductIds.add(product.id);
+        }
+        matchedUPCs.add(entry.upc);
+        continue;
+      }
     }
     
-    // Strategy 2: No-space match
+    // Strategy 2: No-space match - match ALL products with same name
     const noSpace = noSpaceNormalize(entry.expandedName);
-    product = byNoSpace.get(noSpace);
+    const noSpaceProducts = byNoSpace.get(noSpace);
     
-    if (product && !matchedProductIds.has(product.id)) {
-      matches.push({
-        productId: product.id,
-        productName: product.name,
-        sourceName: entry.rawName,
-        expandedName: entry.expandedName,
-        upc: entry.upc,
-        matchType: 'no-space',
-        score: 0.95
-      });
-      matchedProductIds.add(product.id);
-      matchedUPCs.add(entry.upc);
-      continue;
+    if (noSpaceProducts && noSpaceProducts.length > 0) {
+      const unmatched = noSpaceProducts.filter(p => !matchedProductIds.has(p.id));
+      if (unmatched.length > 0) {
+        for (const product of unmatched) {
+          matches.push({
+            productId: product.id,
+            productName: product.name,
+            sourceName: entry.rawName,
+            expandedName: entry.expandedName,
+            upc: entry.upc,
+            matchType: 'no-space',
+            score: 0.95
+          });
+          matchedProductIds.add(product.id);
+        }
+        matchedUPCs.add(entry.upc);
+        continue;
+      }
     }
     
-    // Strategy 3: High keyword overlap (for products with same brand and key terms)
+    // Strategy 3: High keyword overlap - find ALL products with same high score
     const sourceKeywords = extractKeyWords(entry.expandedName);
-    let bestMatch: { product: typeof productsWithoutSku[0], score: number } | null = null;
+    const keywordMatches: Array<{ product: typeof productsWithoutSku[0], score: number }> = [];
     
     for (const product of productsWithoutSku) {
       if (matchedProductIds.has(product.id)) continue;
@@ -427,23 +689,43 @@ async function main() {
       // Require high overlap (>= 70%) and at least 3 matching words
       const matchingWords = sourceKeywords.filter(w => productWords.includes(w));
       if (score >= 0.70 && matchingWords.length >= 3) {
-        if (!bestMatch || score > bestMatch.score) {
-          bestMatch = { product, score };
-        }
+        keywordMatches.push({ product, score });
       }
     }
     
-    if (bestMatch) {
-      matches.push({
-        productId: bestMatch.product.id,
-        productName: bestMatch.product.name,
-        sourceName: entry.rawName,
-        expandedName: entry.expandedName,
-        upc: entry.upc,
-        matchType: 'keyword',
-        score: bestMatch.score
-      });
-      matchedProductIds.add(bestMatch.product.id);
+    // Group by product name and find best score for each unique name
+    const byName = new Map<string, { product: typeof productsWithoutSku[0], score: number }[]>();
+    for (const m of keywordMatches) {
+      const name = normalize(m.product.name);
+      if (!byName.has(name)) byName.set(name, []);
+      byName.get(name)!.push(m);
+    }
+    
+    // Find the highest scoring name group
+    let bestScore = 0;
+    let bestName = '';
+    for (const [name, group] of byName) {
+      const maxScore = Math.max(...group.map(g => g.score));
+      if (maxScore > bestScore) {
+        bestScore = maxScore;
+        bestName = name;
+      }
+    }
+    
+    // Add all products with that name
+    if (bestName && byName.has(bestName)) {
+      for (const m of byName.get(bestName)!) {
+        matches.push({
+          productId: m.product.id,
+          productName: m.product.name,
+          sourceName: entry.rawName,
+          expandedName: entry.expandedName,
+          upc: entry.upc,
+          matchType: 'keyword',
+          score: m.score
+        });
+        matchedProductIds.add(m.product.id);
+      }
       matchedUPCs.add(entry.upc);
     }
   }
