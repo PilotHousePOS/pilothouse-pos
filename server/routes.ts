@@ -22,9 +22,33 @@ import { notificationService } from './notifications';
 import { sendPasswordResetEmail } from './sendgrid';
 // Google Calendar integration removed - transition period complete
 import { normalizePhoneNumber } from './phoneUtils';
-import { db } from './db';
+import { db, resetPool } from './db';
 import { eq } from 'drizzle-orm';
 import { expandProductAbbreviations } from './abbreviationExpansion';
+
+// Retry helper for transient database errors
+async function withRetry<T>(operation: () => Promise<T>, maxRetries = 3, delayMs = 1000): Promise<T> {
+  let lastError: Error | null = null;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error: any) {
+      lastError = error;
+      const isTransient = error?.code === '57P01' || 
+                          error?.code === 'ECONNRESET' ||
+                          error?.message?.includes('connection') ||
+                          error?.message?.includes('terminating');
+      if (isTransient && attempt < maxRetries) {
+        console.log(`Database operation failed (attempt ${attempt}/${maxRetries}), retrying in ${delayMs}ms...`);
+        resetPool();
+        await new Promise(r => setTimeout(r, delayMs * attempt));
+      } else {
+        throw error;
+      }
+    }
+  }
+  throw lastError;
+}
 import { extractOrderFromPhoto, apply99Pricing } from './orderPhotoProcessor';
 import { categorizeProduct, detectLiveAnimal } from './productCategorization';
 
@@ -2176,30 +2200,32 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         updates.groomerId = firstPet.groomerId || null;
       }
 
-      // TRANSACTION: Update appointment and pets atomically
-      const appointment = await db.transaction(async (tx) => {
-        // Update appointment
-        const updatedAppointment = await storage.updateAppointmentDetails(id, updates);
-        
-        // Update appointment_pets if pets array provided
-        if (pets && Array.isArray(pets)) {
-          // Delete existing appointment_pets
-          await storage.deleteAppointmentPets(id);
+      // TRANSACTION: Update appointment and pets atomically with retry for connection issues
+      const appointment = await withRetry(async () => {
+        return await db.transaction(async (tx) => {
+          // Update appointment
+          const updatedAppointment = await storage.updateAppointmentDetails(id, updates);
           
-          // Create new appointment_pets records
-          const petsWithPrice = pets.map((pet: any) => ({
-            petName: pet.petName,
-            petType: pet.petType,
-            serviceType: pet.serviceType,
-            specialNotes: pet.specialNotes || '',
-            price: pet.price ? pet.price.toString() : '0',
-            groomerId: pet.groomerId || null,
-          }));
+          // Update appointment_pets if pets array provided
+          if (pets && Array.isArray(pets)) {
+            // Delete existing appointment_pets
+            await storage.deleteAppointmentPets(id);
+            
+            // Create new appointment_pets records
+            const petsWithPrice = pets.map((pet: any) => ({
+              petName: pet.petName,
+              petType: pet.petType,
+              serviceType: pet.serviceType,
+              specialNotes: pet.specialNotes || '',
+              price: pet.price ? pet.price.toString() : '0',
+              groomerId: pet.groomerId || null,
+            }));
+            
+            await storage.createAppointmentPets(id, petsWithPrice);
+          }
           
-          await storage.createAppointmentPets(id, petsWithPrice);
-        }
-        
-        return updatedAppointment;
+          return updatedAppointment;
+        });
       });
       
       // Update corresponding contact (outside transaction to avoid blocking)

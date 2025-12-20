@@ -18,13 +18,27 @@ function getPool(): Pool {
     }
     _pool = new Pool({ 
       connectionString: process.env.DATABASE_URL,
-      // Connection pool settings for faster startup and better resource usage
-      connectionTimeoutMillis: 10000,
-      idleTimeoutMillis: 30000,
-      max: 20,
+      connectionTimeoutMillis: 15000,
+      idleTimeoutMillis: 60000,
+      max: 10,
+      allowExitOnIdle: false,
+    });
+    
+    _pool.on('error', (err) => {
+      console.error('Unexpected pool error:', err);
+      _pool = null;
+      _db = null;
     });
   }
   return _pool;
+}
+
+export function resetPool(): void {
+  if (_pool) {
+    _pool.end().catch(console.error);
+  }
+  _pool = null;
+  _db = null;
 }
 
 function getDb(): ReturnType<typeof drizzle> {
