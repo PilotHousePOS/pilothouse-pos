@@ -2034,14 +2034,19 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
   // Update appointment details with multi-pet support (admin and groomer)
   app.patch("/api/admin/appointments/:id/details", authMiddleware, async (req: any, res) => {
+    console.log(`[EDIT DEBUG] ===== PATCH /api/admin/appointments/${req.params.id}/details CALLED =====`);
+    console.log(`[EDIT DEBUG] Request body keys: ${Object.keys(req.body).join(', ')}`);
     try {
       const user = await storage.getUser(req.user?.id);
+      console.log(`[EDIT DEBUG] User: ${user?.email}, isAdmin: ${user?.isAdmin}, isGroomer: ${user?.isGroomer}`);
       if (!user?.isAdmin && !user?.isGroomer) {
+        console.log(`[EDIT DEBUG] Access denied - not admin or groomer`);
         return res.status(403).json({ message: "Admin or groomer access required" });
       }
 
       const id = parseInt(req.params.id);
       const { ownerFirstName, ownerLastName, ownerPhoneNumber, pets, pricingMode, price, appointmentDate, appointmentTime } = req.body;
+      console.log(`[EDIT DEBUG] Editing appointment ${id}, appointmentDate: ${appointmentDate}`);
 
       // VALIDATION: Ensure pets array has at least one pet if provided
       if (pets !== undefined) {
@@ -2112,10 +2117,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       }
       
       // Check weekly limits for Monday-Saturday (1-6)
-      console.log(`Capacity check: dayOfWeek=${dayOfWeek}, dateStr=${appointmentDateStr}, appointmentId=${id}`);
+      console.log(`[EDIT DEBUG] ===== CAPACITY CHECK =====`);
+      console.log(`[EDIT DEBUG] dayOfWeek=${dayOfWeek}, dateStr=${appointmentDateStr}, appointmentId=${id}`);
+      console.log(`[EDIT DEBUG] finalPets count: ${finalPets?.length}, services: ${finalPets?.map((p: any) => p.serviceType).join(', ')}`);
       if (dayOfWeek >= 1 && dayOfWeek <= 6) {
         const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
-        console.log(`Weekly limit for day ${dayOfWeek}:`, weeklyLimit);
+        console.log(`[EDIT DEBUG] Weekly limit for day ${dayOfWeek}:`, JSON.stringify(weeklyLimit));
         
         if (weeklyLimit) {
           // Count existing appointments on the target date (excluding this one and cancelled/rejected)
@@ -2128,7 +2135,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                    apt.status !== 'cancelled' && 
                    apt.status !== 'rejected';
           });
-          console.log(`Appointments on ${appointmentDateStr} (excluding id=${id}): ${appointmentsOnDate.length}`);
+          console.log(`[EDIT DEBUG] Appointments on ${appointmentDateStr} (excluding id=${id}): ${appointmentsOnDate.length}`);
           
           // Count existing dogs by service type with substring matching
           let bathDogs = 0;
@@ -2168,18 +2175,26 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
             }
           }
           
+          // Log final counts before capacity check
+          console.log(`[EDIT DEBUG] Capacity counts - bathDogs=${bathDogs}, groomDogs=${groomDogs}, requestedBaths=${requestedBaths}, requestedGrooms=${requestedGrooms}`);
+          console.log(`[EDIT DEBUG] Limits - maxBath=${weeklyLimit.maxBathAppointments}, maxGroom=${weeklyLimit.maxGroomAppointments}`);
+          
           // Check if update would exceed capacity
           if (bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
+            console.log(`[EDIT DEBUG] *** CAPACITY BLOCKED - BATH: ${bathDogs + requestedBaths} > ${weeklyLimit.maxBathAppointments} ***`);
             return res.status(400).json({
               message: `Cannot update: Bath grooming capacity would be exceeded for this date (limit: ${weeklyLimit.maxBathAppointments} dogs, ${bathDogs} already booked by other appointments). Please select a different date or reduce the number of bath services.`
             });
           }
           
           if (groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
+            console.log(`[EDIT DEBUG] *** CAPACITY BLOCKED - GROOM: ${groomDogs + requestedGrooms} > ${weeklyLimit.maxGroomAppointments} ***`);
             return res.status(400).json({
               message: `Cannot update: Full grooming capacity would be exceeded for this date (limit: ${weeklyLimit.maxGroomAppointments} dogs, ${groomDogs} already booked by other appointments). Please select a different date or reduce the number of full groom services.`
             });
           }
+          
+          console.log(`[EDIT DEBUG] Capacity check PASSED`);
         }
       }
 
@@ -2277,9 +2292,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         }
       }
       
+      console.log(`[EDIT DEBUG] ===== APPOINTMENT ${id} UPDATED SUCCESSFULLY =====`);
       res.json(appointment);
-    } catch (error) {
-      console.error("Error updating appointment details:", error);
+    } catch (error: any) {
+      console.error(`[EDIT DEBUG] ===== ERROR UPDATING APPOINTMENT =====`);
+      console.error(`[EDIT DEBUG] Error type: ${error?.constructor?.name}`);
+      console.error(`[EDIT DEBUG] Error message: ${error?.message}`);
+      console.error(`[EDIT DEBUG] Error stack: ${error?.stack}`);
       res.status(500).json({ message: "Failed to update appointment details" });
     }
   });
