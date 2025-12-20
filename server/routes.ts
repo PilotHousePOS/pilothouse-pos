@@ -2112,8 +2112,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       }
       
       // Check weekly limits for Monday-Saturday (1-6)
+      console.log(`Capacity check: dayOfWeek=${dayOfWeek}, dateStr=${appointmentDateStr}, appointmentId=${id}`);
       if (dayOfWeek >= 1 && dayOfWeek <= 6) {
         const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
+        console.log(`Weekly limit for day ${dayOfWeek}:`, weeklyLimit);
         
         if (weeklyLimit) {
           // Count existing appointments on the target date (excluding this one and cancelled/rejected)
@@ -2126,6 +2128,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                    apt.status !== 'cancelled' && 
                    apt.status !== 'rejected';
           });
+          console.log(`Appointments on ${appointmentDateStr} (excluding id=${id}): ${appointmentsOnDate.length}`);
           
           // Count existing dogs by service type with substring matching
           let bathDogs = 0;
