@@ -1,111 +1,113 @@
-import { Pool } from "@neondatabase/serverless";
-import * as fs from 'fs';
+import ExcelJS from 'exceljs';
+import { db } from './server/db';
+import { supplies } from './shared/schema';
+import { ilike, isNull, or, sql } from 'drizzle-orm';
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const upcMapping = JSON.parse(fs.readFileSync('/tmp/upc_mapping.json', 'utf8'));
+async function extractFromExcel() {
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.readFile('attached_assets/Final Animal House Inventory for EXATOUCH_1762812498989.xlsx');
+  
+  const results: Array<{name: string, upc: string}> = [];
+  const worksheet = workbook.getWorksheet('Items');
+  
+  if (worksheet) {
+    const headers: string[] = [];
+    const firstRow = worksheet.getRow(1);
+    firstRow.eachCell((cell, colNumber) => {
+      headers[colNumber] = String(cell.value || '').toLowerCase();
+    });
+    
+    const skuCol = headers.findIndex(h => h === 'sku');
+    const descCol = headers.findIndex(h => h === 'description');
+    
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return;
+      
+      const upc = String(row.getCell(skuCol).value || '').trim();
+      const name = String(row.getCell(descCol).value || '').trim();
+      
+      if (upc && upc.length >= 8 && /^\d+$/.test(upc) && name) {
+        results.push({ name, upc });
+      }
+    });
+  }
+  
+  console.log(`Extracted ${results.length} items with UPCs from Excel`);
+  return results;
+}
 
-function normalize(text: string | null): string {
-  if (!text) return '';
-  return text.toLowerCase()
-    .replace(/[™®©]/g, '')
-    .replace(/['"]/g, '')
+function normalizeForMatching(str: string): string {
+  return str.toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
-function similarity(str1: string, str2: string): number {
-  const s1 = normalize(str1);
-  const s2 = normalize(str2);
+async function matchAndUpdate() {
+  const excelData = await extractFromExcel();
   
-  if (s1 === s2) return 1.0;
-  if (s1.length === 0 || s2.length === 0) return 0.0;
+  // Get all products without SKU
+  const productsWithoutSku = await db.select({
+    id: supplies.id,
+    name: supplies.name,
+    description: supplies.description,
+  }).from(supplies).where(isNull(supplies.sku));
   
-  // Check if one contains the other
-  if (s1.includes(s2) || s2.includes(s1)) {
-    const longer = Math.max(s1.length, s2.length);
-    const shorter = Math.min(s1.length, s2.length);
-    return shorter / longer;
+  console.log(`Products without SKU: ${productsWithoutSku.length}`);
+  
+  // Build normalized index for fast matching
+  const normalizedIndex = new Map<string, {id: number, name: string}>();
+  for (const product of productsWithoutSku) {
+    const normalized = normalizeForMatching(product.name);
+    normalizedIndex.set(normalized, { id: product.id, name: product.name });
   }
   
-  // Count matching words
-  const words1 = s1.split(/\s+/);
-  const words2 = s2.split(/\s+/);
-  const commonWords = words1.filter(w => words2.includes(w));
+  let matchCount = 0;
+  let updateCount = 0;
+  const matches: Array<{productId: number, productName: string, excelName: string, upc: string}> = [];
   
-  return commonWords.length / Math.max(words1.length, words2.length);
-}
-
-async function matchProducts() {
-  const client = await pool.connect();
-  
-  try {
-    const result = await client.query(`
-      SELECT id, name, brand 
-      FROM supplies 
-      WHERE (sku IS NULL OR sku = '')
-      ORDER BY name
-    `);
-    const products = result.rows;
+  for (const excelItem of excelData) {
+    const normalizedExcel = normalizeForMatching(excelItem.name);
     
-    console.log(`Found ${products.length} products without SKUs`);
-    
-    const upcEntries = Object.entries(upcMapping);
-    const matches: any[] = [];
-    
-    for (const product of products) {
-      let bestMatch: any = null;
-      let bestScore = 0;
-      
-      for (const [upc, upcName] of upcEntries) {
-        const score = similarity(product.name, upcName as string);
-        
-        if (score > bestScore && score >= 0.7) {
-          bestScore = score;
-          bestMatch = { upc, upcName, score };
-        }
-      }
-      
-      if (bestMatch && bestScore >= 0.75) {
-        matches.push({
-          productId: product.id,
-          productName: product.name,
-          upc: bestMatch.upc,
-          upcName: bestMatch.upcName,
-          score: bestMatch.score
-        });
-      }
+    // Try exact normalized match
+    const match = normalizedIndex.get(normalizedExcel);
+    if (match) {
+      matches.push({
+        productId: match.id,
+        productName: match.name,
+        excelName: excelItem.name,
+        upc: excelItem.upc
+      });
+      matchCount++;
+      normalizedIndex.delete(normalizedExcel); // Prevent duplicate matches
     }
-    
-    console.log(`Found ${matches.length} matches (75%+ similarity)`);
-    
-    // Show sample matches
-    console.log('\nSample matches:');
-    for (const match of matches.slice(0, 20)) {
-      console.log(`  ${match.productName} => ${match.upcName} (${match.upc}) [${(match.score * 100).toFixed(0)}%]`);
-    }
-    
-    // Update matches with score >= 0.85
-    const highConfidence = matches.filter(m => m.score >= 0.85);
-    console.log(`\nUpdating ${highConfidence.length} high-confidence matches (85%+ similarity)`);
-    
-    for (const match of highConfidence) {
-      await client.query('UPDATE supplies SET sku = $1 WHERE id = $2', [match.upc, match.productId]);
-    }
-    
-    // Check new coverage
-    const coverageResult = await client.query(`
-      SELECT 
-        COUNT(*) as total_products,
-        COUNT(CASE WHEN sku IS NOT NULL AND sku != '' THEN 1 END) as with_sku,
-        ROUND(100.0 * COUNT(CASE WHEN sku IS NOT NULL AND sku != '' THEN 1 END) / COUNT(*), 2) as coverage_percent
-      FROM supplies;
-    `);
-    console.log('\nNew coverage:', coverageResult.rows[0]);
-    
-  } finally {
-    client.release();
-    await pool.end();
   }
+  
+  console.log(`\nFound ${matchCount} exact matches`);
+  
+  // Apply updates in batches
+  for (let i = 0; i < matches.length; i += 100) {
+    const batch = matches.slice(i, i + 100);
+    for (const match of batch) {
+      await db.update(supplies)
+        .set({ sku: match.upc })
+        .where(sql`${supplies.id} = ${match.productId}`);
+      updateCount++;
+    }
+    console.log(`Updated ${Math.min(i + 100, matches.length)}/${matches.length}`);
+  }
+  
+  // Get new coverage stats
+  const [stats] = await db.select({
+    total: sql<number>`count(*)`,
+    withSku: sql<number>`count(sku)`
+  }).from(supplies);
+  
+  console.log(`\n=== FINAL COVERAGE ===`);
+  console.log(`Products with SKU: ${stats.withSku}/${stats.total} (${(stats.withSku/stats.total*100).toFixed(1)}%)`);
+  console.log(`New matches applied: ${updateCount}`);
+  
+  process.exit(0);
 }
 
-matchProducts().catch(console.error);
+matchAndUpdate().catch(console.error);
