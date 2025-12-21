@@ -1,106 +1,114 @@
 import fs from 'fs';
 import { db } from '../server/db';
 import { supplies } from '../shared/schema';
-import { sql } from 'drizzle-orm';
+import { sql, eq } from 'drizzle-orm';
 
-const brandAbbr: Record<string, string[]> = {
-  'science diet': ['sd', 'scidiet', 'hill', 'hills'],
-  'blue buffalo': ['bb', 'bluebuff', 'blue buff'],
-  'royal canin': ['rc', 'royalc', 'royal can'],
-  'diamond': ['diam'], 'kong': ['kon', 'kng'], 'zilla': ['zil'],
-  'zoo med': ['zm', 'zoomed'], 'exo terra': ['et', 'exoterra'],
-  'tetra': ['tet'], 'hikari': ['hik'], 'aqueon': ['aqe'],
-  'coastal': ['cst'], 'kaytee': ['kay', 'kt'], 'fromm': ['frm'],
-  'nutrisource': ['ns', 'nutri sour'], 'redbarn': ['rb', 'red b'],
-  'orijen': ['orj'], 'acana': ['ac'], 'victor': ['vic'],
-  'pro plan': ['pp', 'proplan'], 'natural balance': ['nb'],
-  'taste of the wild': ['tow', 'totw'], 'wellness': ['well'],
-  'merrick': ['mer'], 'canidae': ['can'], 'nutro': ['nut'],
-  'fluval': ['fluv'], 'seachem': ['sli'], 'api': ['api'],
-  'oxbow': ['ox', 'oxb'], 'prevue': ['prev', 'pv'],
-  'a & e': ['ae', 'a&e'], 'marshall': ['marsh'],
-};
-
-const wordAbbr: Record<string, string[]> = {
-  'small': ['sm', 'sml'], 'medium': ['md', 'med'], 'large': ['lg', 'lrg'],
-  'extra large': ['xl', 'xlg'], 'breed': ['br', 'brd'],
-  'chicken': ['ck', 'chk', 'chkn'], 'lamb': ['lam', 'lmb'],
-  'salmon': ['sal', 'salm'], 'beef': ['bf'], 'turkey': ['trk', 'turk'],
-  'puppy': ['pup', 'ppy'], 'kitten': ['kit', 'ktn'], 'senior': ['sen', 'snr'],
-  'adult': ['adt'], 'light': ['lt', 'lite'], 'grain free': ['gr fr', 'grf'],
-  'original': ['orig'], 'premium': ['prem'], 'maintenance': ['mainten'],
-  'yorkshire': ['york'], 'chihuahua': ['chih'], 'dachshund': ['dach'],
-  'hammock': ['ham'], 'cage': ['cg'], 'collar': ['col'], 'leash': ['lsh'],
-};
-
-function normalize(t: string): string {
-  let s = t.toLowerCase();
-  s = s.replace(/(\d+\.?\d*)\s*(?:lb|lbs|#|pound|oz|ounce)/gi, '$1');
-  s = s.replace(/[^a-z0-9\s]/g, ' ');
-  return s.replace(/\s+/g, ' ').trim();
-}
-
-function expand(t: string): string {
-  let s = normalize(t);
-  for (const [full, abbrs] of Object.entries(brandAbbr)) {
-    for (const a of abbrs) s = s.replace(new RegExp(`\\b${a}\\b`, 'g'), full);
-  }
-  for (const [full, abbrs] of Object.entries(wordAbbr)) {
-    for (const a of abbrs) s = s.replace(new RegExp(`\\b${a}\\b`, 'g'), full);
-  }
-  return s.trim();
-}
-
-function score(src: string, db: string): number {
-  const sWords = new Set(normalize(src).split(' ').filter(w => w.length > 1));
-  const dWords = new Set(normalize(db).split(' ').filter(w => w.length > 1));
-  if (!sWords.size || !dWords.size) return 0;
-  let m = 0;
-  for (const w of sWords) if (dWords.has(w)) m++;
-  const p = m / sWords.size, r = m / dWords.size;
-  return p + r > 0 ? 2 * p * r / (p + r) : 0;
-}
+interface UpcEntry { upc: string; name: string; }
 
 async function main() {
-  const upcs = JSON.parse(fs.readFileSync('.local/state/memory/master_upc_database.json', 'utf-8'));
-  console.log(`Loaded ${upcs.length} UPCs`);
+  console.log("=== Final Specific Matching ===\n");
   
-  const products = await db.select({ id: supplies.id, name: supplies.name }).from(supplies);
-  console.log(`Loaded ${products.length} products`);
+  const upcData: UpcEntry[] = JSON.parse(fs.readFileSync('.local/state/memory/merged_upc_database.json', 'utf-8'));
   
-  const prods = products.map(p => ({ id: p.id, name: p.name, exp: expand(p.name) }));
-  const srcs = upcs.map((u: any) => ({ upc: u.upc, name: u.name, exp: expand(u.name) }));
+  const allProducts = await db.select({
+    id: supplies.id,
+    name: supplies.name,
+    brand: supplies.brand,
+    sku: supplies.sku,
+  }).from(supplies);
   
-  srcs.sort((a: any, b: any) => b.name.length - a.name.length);
+  const usedUpcs = new Set(allProducts.filter(p => p.sku && p.sku.length >= 10).map(p => p.sku!));
+  const needsUpc = allProducts.filter(p => !p.sku || p.sku.length < 10);
   
-  const matches: {upc: string, id: number}[] = [];
-  const used = new Set<number>();
-  const MIN = 0.25;
+  const specificMatches: [RegExp, RegExp][] = [
+    [/exo.*daytime.*heat.*60/i, /exo.*terra.*daytime.*heat.*60/i],
+    [/exo.*daytime.*heat.*100/i, /exo.*terra.*daytime.*heat.*100/i],
+    [/exo.*daytime.*heat.*150/i, /exo.*terra.*daytime.*heat.*150/i],
+    [/exo.*daytime.*heat.*40/i, /exo.*terra.*daytime.*heat.*40/i],
+    [/exo.*daytime.*heat.*25/i, /exo.*terra.*daytime.*heat.*25/i],
+    [/exo.*ceramic.*150/i, /ceramic.*150/i],
+    [/exo.*ceramic.*100/i, /ceramic.*100/i],
+    [/exo.*ceramic.*60/i, /ceramic.*60/i],
+    [/exo.*ceramic.*40/i, /ceramic.*40/i],
+    [/zilla.*day.*blue.*75/i, /zilla.*day.*blue.*75/i],
+    [/zilla.*night.*red.*100/i, /zilla.*night.*red.*100/i],
+    [/zilla.*heat.*mat.*mini/i, /zilla.*heat.*mat.*mini/i],
+    [/zilla.*jungle.*mix/i, /zilla.*jungle.*mix/i],
+    [/zilla.*halogen.*50.*red/i, /zilla.*halogen.*50/i],
+    [/zilla.*halogen.*25.*white/i, /zilla.*halogen.*25/i],
+    [/zilla.*halogen.*25.*blue/i, /zilla.*halogen.*25.*blue/i],
+    [/exo.*cricket.*pen/i, /cricket.*pen|cricket.*keeper/i],
+    [/exo.*thermometer/i, /thermometer/i],
+    [/fluval.*plant.*46/i, /fluval.*plant.*46/i],
+    [/fluval.*betta/i, /fluval.*betta/i],
+    [/fluval.*biofoam.*206/i, /fluval.*biofoam.*206/i],
+    [/fluval.*biomax.*500/i, /fluval.*biomax.*500/i],
+    [/oxbow.*hay.*timothy/i, /oxbow.*hay.*timothy/i],
+    [/kaytee.*chinchilla/i, /kaytee.*chinchilla/i],
+  ];
   
-  for (const s of srcs) {
-    let best: {id: number, sc: number} | null = null;
-    for (const p of prods) {
-      if (used.has(p.id)) continue;
-      const sc = score(s.exp, p.exp);
-      if (sc >= MIN && (!best || sc > best.sc)) best = { id: p.id, sc };
+  const matches: { id: number; name: string; upc: string }[] = [];
+  
+  for (const [productPattern, upcPattern] of specificMatches) {
+    const product = needsUpc.find(p => productPattern.test(p.name));
+    if (!product) continue;
+    if (matches.some(m => m.id === product.id)) continue;
+    
+    const upc = upcData.find(u => upcPattern.test(u.name) && !usedUpcs.has(u.upc));
+    if (!upc) continue;
+    
+    matches.push({ id: product.id, name: product.name, upc: upc.upc });
+    usedUpcs.add(upc.upc);
+    console.log(`✓ "${product.name}" → ${upc.upc}`);
+  }
+  
+  console.log(`\nMatches from specific patterns: ${matches.length}`);
+  
+  for (const p of needsUpc) {
+    if (matches.some(m => m.id === p.id)) continue;
+    
+    const pWords = p.name.toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length >= 5);
+    
+    for (const upc of upcData) {
+      if (usedUpcs.has(upc.upc)) continue;
+      
+      const uWords = upc.name.toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length >= 5);
+      
+      let matchCount = 0;
+      for (const pw of pWords) {
+        if (uWords.includes(pw)) matchCount++;
+      }
+      
+      if (matchCount >= 3 || (matchCount >= 2 && pWords.length <= 3)) {
+        matches.push({ id: p.id, name: p.name, upc: upc.upc });
+        usedUpcs.add(upc.upc);
+        console.log(`✓ "${p.name}" → ${upc.upc} (${matchCount} words)`);
+        break;
+      }
     }
-    if (best) { matches.push({ upc: s.upc, id: best.id }); used.add(best.id); }
   }
   
-  console.log(`Found ${matches.length} matches`);
+  console.log(`\n=== Total matches: ${matches.length} ===`);
   
-  // Apply in batches
-  const BATCH = 500;
-  for (let i = 0; i < matches.length; i += BATCH) {
-    const batch = matches.slice(i, i + BATCH);
-    const ids = batch.map(m => m.id);
-    const caseWhen = batch.map(m => `WHEN id = ${m.id} THEN '${m.upc}'`).join(' ');
-    await db.execute(sql.raw(`UPDATE supplies SET sku = CASE ${caseWhen} END WHERE id IN (${ids.join(',')})`));
-    console.log(`Applied ${Math.min(i + BATCH, matches.length)}/${matches.length}`);
+  if (matches.length > 0) {
+    console.log('\nApplying matches...');
+    for (const m of matches) {
+      await db.update(supplies).set({ sku: m.upc }).where(eq(supplies.id, m.id));
+    }
+    console.log('Done!');
   }
   
-  const res = await db.execute(sql`SELECT COUNT(*) as t, COUNT(sku) as s, COUNT(DISTINCT sku) as u FROM supplies`);
-  console.log('Final:', res.rows[0]);
+  const updated = await db.select({ 
+    total: sql<number>`COUNT(*)`,
+    withUpc: sql<number>`COUNT(CASE WHEN sku IS NOT NULL AND LENGTH(sku) >= 10 THEN 1 END)`
+  }).from(supplies);
+  
+  const total = Number(updated[0].total);
+  const withUpc = Number(updated[0].withUpc);
+  console.log(`\nCurrent coverage: ${withUpc} / ${total} = ${(withUpc/total*100).toFixed(1)}%`);
+  console.log(`Need ${Math.ceil(total * 0.80) - withUpc} more for 80%`);
+  
+  process.exit(0);
 }
 
 main().catch(console.error);

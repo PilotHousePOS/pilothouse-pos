@@ -1,154 +1,116 @@
+import fs from 'fs';
 import { db } from '../server/db';
 import { supplies } from '../shared/schema';
-import { sql, isNull, isNotNull } from 'drizzle-orm';
-import * as fs from 'fs';
-import ExcelJS from 'exceljs';
+import { sql, eq } from 'drizzle-orm';
 
 interface UpcEntry { upc: string; name: string; }
 
-function cleanUpc(upc: string): string { return upc.replace(/[^0-9]/g, ''); }
-
-function normalize(s: string): string {
-  return s.toLowerCase()
-    .replace(/['']/g, '')
-    .replace(/[^\w\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-// Create a signature from important words
-function createSignature(name: string): string {
-  const words = normalize(name).split(' ').filter(w => w.length >= 2);
-  // Remove common size/color words for matching
-  const ignore = new Set(['small', 'medium', 'large', 'sm', 'md', 'lg', 'xl', 'pk', 'oz', 'lb', 'lbs', 'ct', 'pack', 'count']);
-  return words.filter(w => !ignore.has(w) && !/^\d+$/.test(w)).slice(0, 4).sort().join('_');
-}
-
-async function loadAllSources(): Promise<UpcEntry[]> {
-  const all: UpcEntry[] = [];
-  
-  const wb = new ExcelJS.Workbook();
-  await wb.xlsx.readFile('attached_assets/Animal_House_InventoryMaybe_1765838537225.xlsx');
-  const ws = wb.worksheets[0];
-  ws.eachRow((row, rowNum) => {
-    if (rowNum === 1) return;
-    const upc = cleanUpc(String(row.getCell(1).value || ''));
-    const name = String(row.getCell(2).value || '').trim();
-    if (upc.length >= 10 && upc.length <= 14 && name.length > 2) {
-      all.push({ upc, name });
-    }
-  });
-  
-  const csv = fs.readFileSync('scripts/google_sheet_upcs.csv', 'utf-8');
-  for (const line of csv.split('\n').slice(1)) {
-    const parts = line.split(',');
-    if (parts.length >= 2) {
-      const upc = cleanUpc(parts[0]);
-      const name = parts[1].trim();
-      if (upc.length >= 10 && upc.length <= 14 && name.length > 2) {
-        all.push({ upc, name });
-      }
-    }
-  }
-  
-  const inv = fs.readFileSync('.local/state/memory/all_invoice_upcs.txt', 'utf-8');
-  for (const line of inv.split('\n').slice(1)) {
-    const parts = line.split('|');
-    if (parts.length >= 3) {
-      const upc = cleanUpc(parts[0]);
-      const name = parts[2].trim();
-      if (upc.length >= 10 && upc.length <= 14 && name.length > 3) {
-        all.push({ upc, name });
-      }
-    }
-  }
-  
-  return all;
+function extractSignificantWords(s: string): Set<string> {
+  const words = s.toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length >= 4);
+  const stopWords = new Set(['with', 'from', 'that', 'this', 'have', 'pack', 'size', 'small', 'medium', 'large', 'extra', 'mini', 'super', 'item', 'product', 'pcs', 'piece']);
+  return new Set(words.filter(w => !stopWords.has(w)));
 }
 
 async function main() {
-  console.log('=== Aggressive Matching with Word Signature ===\n');
+  console.log("=== Aggressive Single-Word Matching ===\n");
   
-  const noSku = await db.select({
+  const upcData: UpcEntry[] = JSON.parse(fs.readFileSync('.local/state/memory/merged_upc_database.json', 'utf-8'));
+  
+  const allProducts = await db.select({
     id: supplies.id,
-    name: supplies.name
-  }).from(supplies).where(isNull(supplies.sku));
+    name: supplies.name,
+    brand: supplies.brand,
+    sku: supplies.sku,
+  }).from(supplies);
   
-  const hasSku = await db.select({ id: supplies.id }).from(supplies).where(isNotNull(supplies.sku));
+  const usedUpcs = new Set(allProducts.filter(p => p.sku && p.sku.length >= 10).map(p => p.sku!));
+  const needsUpc = allProducts.filter(p => !p.sku || p.sku.length < 10);
   
-  console.log(`Products with SKU: ${hasSku.length}`);
-  console.log(`Products needing SKU: ${noSku.length}\n`);
+  console.log(`Products needing UPCs: ${needsUpc.length}`);
   
-  const allSources = await loadAllSources();
-  console.log(`Total UPC entries: ${allSources.length}\n`);
-  
-  // Build signature index
-  const bySignature = new Map<string, UpcEntry[]>();
-  for (const e of allSources) {
-    const sig = createSignature(e.name);
-    if (sig.length >= 5) {
-      if (!bySignature.has(sig)) bySignature.set(sig, []);
-      bySignature.get(sig)!.push(e);
+  const wordToUpcs = new Map<string, UpcEntry[]>();
+  for (const upc of upcData) {
+    if (usedUpcs.has(upc.upc)) continue;
+    const words = extractSignificantWords(upc.name);
+    for (const w of words) {
+      if (!wordToUpcs.has(w)) wordToUpcs.set(w, []);
+      wordToUpcs.get(w)!.push(upc);
     }
   }
   
-  console.log(`Unique signatures: ${bySignature.size}\n`);
+  console.log(`Indexed ${wordToUpcs.size} unique words\n`);
   
-  const matches: {id: number; upc: string; productName: string; upcName: string}[] = [];
+  const matches: { id: number; name: string; upc: string }[] = [];
+  const TARGET = 50;
   
-  for (const product of noSku) {
-    const pSig = createSignature(product.name);
+  for (const p of needsUpc) {
+    if (matches.length >= TARGET) break;
     
-    if (pSig.length >= 5 && bySignature.has(pSig)) {
-      const candidates = bySignature.get(pSig)!;
-      // Pick the one with closest length
-      const pLen = product.name.length;
-      let best = candidates[0];
-      let bestDiff = Math.abs(best.name.length - pLen);
-      
-      for (const c of candidates) {
-        const diff = Math.abs(c.name.length - pLen);
-        if (diff < bestDiff) {
-          best = c;
-          bestDiff = diff;
+    const pWords = extractSignificantWords(p.name);
+    const brandWord = p.brand ? extractSignificantWords(p.brand).values().next().value : null;
+    
+    const candidates = new Map<string, { upc: UpcEntry, score: number }>();
+    
+    for (const pw of pWords) {
+      const upcs = wordToUpcs.get(pw) || [];
+      for (const upc of upcs) {
+        if (usedUpcs.has(upc.upc)) continue;
+        
+        const uWords = extractSignificantWords(upc.name);
+        const hasBrand = brandWord && uWords.has(brandWord);
+        
+        let matchCount = 0;
+        for (const pw2 of pWords) {
+          if (uWords.has(pw2)) matchCount++;
+        }
+        
+        const score = hasBrand ? matchCount + 0.5 : matchCount;
+        
+        if (!candidates.has(upc.upc) || candidates.get(upc.upc)!.score < score) {
+          candidates.set(upc.upc, { upc, score });
         }
       }
-      
-      matches.push({
-        id: product.id,
-        upc: best.upc,
-        productName: product.name,
-        upcName: best.name
-      });
+    }
+    
+    let best: { upc: UpcEntry, score: number } | null = null;
+    for (const c of candidates.values()) {
+      if (!best || c.score > best.score) best = c;
+    }
+    
+    if (best && best.score >= 1) {
+      matches.push({ id: p.id, name: p.name, upc: best.upc.upc });
+      usedUpcs.add(best.upc.upc);
+      if (matches.length <= 30) {
+        console.log(`✓ "${p.name}" → ${best.upc.upc} (score: ${best.score})`);
+      }
     }
   }
   
-  console.log(`New matches found: ${matches.length}\n`);
-  
-  // Apply
-  for (const m of matches) {
-    await db.update(supplies).set({ sku: m.upc }).where(sql`id = ${m.id}`);
+  if (matches.length > 30) {
+    console.log(`... and ${matches.length - 30} more`);
   }
   
-  // Update permanent
-  const permPath = '.local/state/memory/permanent_upc_matches.json';
-  let perm: Record<string, string> = {};
-  if (fs.existsSync(permPath)) perm = JSON.parse(fs.readFileSync(permPath, 'utf-8'));
-  for (const m of matches) perm[m.id.toString()] = m.upc;
-  fs.writeFileSync(permPath, JSON.stringify(perm, null, 2));
+  console.log(`\n=== Total matches: ${matches.length} ===`);
   
-  // Final
-  const finalHasSku = await db.select({ id: supplies.id }).from(supplies).where(isNotNull(supplies.sku));
-  const total = await db.select({ count: sql<number>`count(*)` }).from(supplies);
-  
-  console.log(`=== UPDATED BASELINE ===`);
-  console.log(`Products with SKU: ${finalHasSku.length} / ${total[0].count}`);
-  console.log(`Coverage: ${(finalHasSku.length / Number(total[0].count) * 100).toFixed(1)}%`);
-  
-  console.log(`\nSample matches:`);
-  for (const m of matches.slice(0, 15)) {
-    console.log(`  "${m.productName}" -> "${m.upcName}"`);
+  if (matches.length > 0) {
+    console.log('\nApplying matches...');
+    for (const m of matches) {
+      await db.update(supplies).set({ sku: m.upc }).where(eq(supplies.id, m.id));
+    }
+    console.log('Done!');
   }
+  
+  const updated = await db.select({ 
+    total: sql<number>`COUNT(*)`,
+    withUpc: sql<number>`COUNT(CASE WHEN sku IS NOT NULL AND LENGTH(sku) >= 10 THEN 1 END)`
+  }).from(supplies);
+  
+  const total = Number(updated[0].total);
+  const withUpc = Number(updated[0].withUpc);
+  console.log(`\nCurrent coverage: ${withUpc} / ${total} = ${(withUpc/total*100).toFixed(1)}%`);
+  console.log(`Need ${Math.ceil(total * 0.80) - withUpc} more for 80%`);
+  
+  process.exit(0);
 }
 
 main().catch(console.error);
