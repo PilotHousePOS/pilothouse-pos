@@ -14,6 +14,43 @@ interface ExtractedItem {
   source: string;
 }
 
+const OUTPUT_FILE = '.local/state/memory/ocr_extracted_upcs.json';
+const PROGRESS_FILE = '.local/state/memory/ocr_progress.json';
+
+function loadExistingData(): { items: ExtractedItem[], processedFiles: Set<string> } {
+  let items: ExtractedItem[] = [];
+  let processedFiles = new Set<string>();
+  
+  if (fs.existsSync(OUTPUT_FILE)) {
+    try {
+      items = JSON.parse(fs.readFileSync(OUTPUT_FILE, 'utf-8'));
+      for (const item of items) {
+        const fileName = item.source.split(':')[0];
+        processedFiles.add(fileName);
+      }
+    } catch (e) {}
+  }
+  
+  if (fs.existsSync(PROGRESS_FILE)) {
+    try {
+      const progress = JSON.parse(fs.readFileSync(PROGRESS_FILE, 'utf-8'));
+      for (const f of progress.processed || []) {
+        processedFiles.add(f);
+      }
+    } catch (e) {}
+  }
+  
+  return { items, processedFiles };
+}
+
+function saveProgress(items: ExtractedItem[], processedFiles: Set<string>) {
+  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(items, null, 2));
+  fs.writeFileSync(PROGRESS_FILE, JSON.stringify({ 
+    processed: Array.from(processedFiles),
+    lastUpdate: new Date().toISOString()
+  }, null, 2));
+}
+
 async function extractFromPdfWithVision(pdfPath: string): Promise<ExtractedItem[]> {
   const items: ExtractedItem[] = [];
   const fileName = path.basename(pdfPath);
@@ -59,7 +96,6 @@ Rules:
         });
         
         const content = response.choices[0]?.message?.content || '[]';
-        // Extract JSON from response
         const jsonMatch = content.match(/\[[\s\S]*\]/);
         if (jsonMatch) {
           try {
@@ -76,9 +112,7 @@ Rules:
                 }
               }
             }
-          } catch (e) {
-            // JSON parse error - skip
-          }
+          } catch (e) {}
         }
       } catch (err: any) {
         console.error(`  Vision API error on page ${pageNum}:`, err.message?.substring(0, 50));
@@ -99,36 +133,40 @@ async function main() {
   
   console.log(`Found ${allPdfs.length} PDF files`);
   
-  // Filter to CamScanner files (the scanned invoices)
+  // Filter to likely invoice PDFs
   const scannerPdfs = allPdfs.filter(f => 
     f.includes('CamScanner') || 
-    !f.includes('order_') // non-order PDFs are likely scanned invoices
+    !f.includes('order_')
   );
   
-  console.log(`Processing ${scannerPdfs.length} likely invoice PDFs`);
+  // Load existing progress
+  const { items: existingItems, processedFiles } = loadExistingData();
+  console.log(`Already processed: ${processedFiles.size} files with ${existingItems.length} items`);
   
-  const allItems: ExtractedItem[] = [];
+  // Filter out already processed
+  const remainingPdfs = scannerPdfs.filter(f => !processedFiles.has(path.basename(f)));
+  console.log(`Remaining to process: ${remainingPdfs.length} PDFs`);
+  
+  if (remainingPdfs.length === 0) {
+    console.log('All PDFs already processed!');
+    return;
+  }
+  
+  const allItems = [...existingItems];
   let processed = 0;
   
-  // Process in batches to avoid rate limits
-  const BATCH_SIZE = 5;
-  
-  for (let i = 0; i < scannerPdfs.length; i += BATCH_SIZE) {
-    const batch = scannerPdfs.slice(i, i + BATCH_SIZE);
+  for (const pdfPath of remainingPdfs) {
+    const fileName = path.basename(pdfPath);
+    console.log(`[${++processed}/${remainingPdfs.length}] ${fileName}`);
     
-    for (const pdfPath of batch) {
-      console.log(`[${++processed}/${scannerPdfs.length}] ${path.basename(pdfPath)}`);
-      const items = await extractFromPdfWithVision(pdfPath);
-      console.log(`  Extracted ${items.length} items`);
-      allItems.push(...items);
-    }
+    const items = await extractFromPdfWithVision(pdfPath);
+    console.log(`  Extracted ${items.length} items`);
+    allItems.push(...items);
+    processedFiles.add(fileName);
     
-    // Save progress after each batch
-    if (allItems.length > 0) {
-      fs.writeFileSync('.local/state/memory/ocr_extracted_upcs.json', JSON.stringify(allItems, null, 2));
-    }
-    
-    console.log(`Progress: ${processed}/${scannerPdfs.length}, Total items: ${allItems.length}`);
+    // Save after each file
+    saveProgress(allItems, processedFiles);
+    console.log(`  Total: ${allItems.length} items from ${processedFiles.size} files`);
   }
   
   // Deduplicate
