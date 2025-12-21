@@ -1,0 +1,142 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06307684
+	08/19/25
+	06587635
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+redbarn 12775
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:09:10
+BGA
+667 CRAIG BORGSTEDE
+354.85
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+354.85
+Associated Credit Applied Seperately
+	On Credit Memo# 06588702 Invoice# 06307591
+1/1
+ 
+51892621
+ 
+785184926215
+ 
+RBP TRT CLLGN STC XL
+ 
+EA
+ 
+50 
+50 
+7.097
+ 
+7.097
+ 
+354.85
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+50 
+50 
+354.85
+-----
+ 
+-----
+ 
+---------
+CATEGORY TOTALS:
+	Dog
+ 
+354.85
+
+-- 1 of 1 --
+

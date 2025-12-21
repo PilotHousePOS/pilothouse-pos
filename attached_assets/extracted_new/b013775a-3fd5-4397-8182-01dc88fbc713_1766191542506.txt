@@ -1,0 +1,153 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06303498
+	07/26/25
+	06577499-2
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:11:51
+WEB
+667 CRAIG BORGSTEDE
+732.81
+ 
+0.00
+ 
+21.00
+ 
+0.00
+ 
+0.00
+ 
+753.81
+1/5
+ 
+75026926
+ 
+047497269268
+ 
+TET TANK DLX REPTOHABITAT 75G
+ 
+EA
+ 
+3 
+3 
+325.693
+ 
+244.270
+ 
+732.81
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Reptile
+ 
+3 
+3 
+732.81
+-----
+ 
+-----
+ 
+---------
+DELIVERY SURCHARGE
+ 
+21.00
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Reptile
+ 
+732.81
+
+-- 1 of 1 --
+

@@ -1,0 +1,213 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06297063
+	06/21/25
+	06566978-2
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+425SMKDSP25
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:18:02
+BGA
+667 CRAIG BORGSTEDE
+313.75
+ 
+0.00
+ 
+21.00
+ 
+0.00
+ 
+0.00
+ 
+334.75
+1/6
+ 
+42513200
+ 
+840139132001
+ 
+BAR TRT SMKD CHEEKY CHW 5-6IN
+ 
+EA
+ 
+50 
+50 
+3.521
+ 
+2.289
+ 
+114.45
+ 
+OV
+2/6
+ 
+42513205
+ 
+840139132056
+ 
+BAR TRT SMKD DUCK FEET
+ 
+EA
+ 
+50 
+50 
+0.915
+ 
+0.595
+ 
+29.75
+ 
+OV
+3/6
+ 
+42513208
+ 
+840139132087
+ 
+BAR TRT SMKD GULLET STC 5-6IN
+ 
+EA
+ 
+75 
+75 
+1.197
+ 
+0.778
+ 
+58.35
+ 
+OV
+4/6
+ 
+42513211
+ 
+840139132117
+ 
+BAR TRT SMKD BULLY STC 10-12IN
+ 
+EA
+ 
+35 
+35 
+4.887
+ 
+3.177
+ 
+111.20
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+210
+ 
+210
+ 
+313.75
+-----
+ 
+-----
+ 
+---------
+DELIVERY SURCHARGE
+ 
+21.00
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Dog
+ 
+313.75
+
+-- 1 of 1 --
+

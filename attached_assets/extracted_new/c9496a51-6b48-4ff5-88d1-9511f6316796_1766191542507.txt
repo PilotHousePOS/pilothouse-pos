@@ -1,0 +1,382 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06301063
+	07/14/25
+	06580644
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+SINGLE SHIP WAREHOUSE
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:14:12
+WEB
+667 CRAIG BORGSTEDE
+109.52
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+109.52
+1/1
+ 
+68052075
+ 
+077234520758
+ 
+ETH TOY SHMMR GLMR FISH CATNIP
+ 
+EA
+ 
+2 
+2 
+1.977
+ 
+1.780
+ 
+3.56
+ 
+OV
+2/1
+ 
+68052117
+ 
+077234521175
+ 
+ETH TOY CT HUG'N KICKS FISHIN
+ 
+EA
+ 
+2 
+2 
+3.445
+ 
+3.100
+ 
+6.20
+ 
+OV
+3/1
+ 
+68052157
+ 
+077234521571
+ 
+ETH TOY CT YARN BLLS 2.5IN 2PK
+ 
+EA
+ 
+2 
+2 
+2.952
+ 
+2.660
+ 
+5.32
+ 
+OV
+4/1
+ 
+68052191
+ 
+077234521915
+ 
+ETH TOY CT BZZNG INSCT 5IN
+ 
+EA
+ 
+2 
+2 
+3.028
+ 
+2.730
+ 
+5.46
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Cat
+ 
+8 
+8 
+20.54
+-----
+ 
+-----
+ 
+---------
+5/1
+ 
+37010542
+ 
+729849105423
+ 
+RS-10228
+ 
+RAD BATTERY 6V LITH
+ 
+EA
+ 
+4 
+4 
+6.569
+ 
+6.240
+ 
+24.96
+ 
+OV
+** RFA-67D-11
+6/1
+ 
+68054169
+ 
+077234541692
+ 
+ETH TOY SOOTHERS BLANKET 10IN
+ 
+EA
+ 
+3 
+3 
+4.745
+ 
+4.270
+ 
+12.81
+ 
+OV
+7/1
+ 
+68054189
+ 
+077234541890
+ 
+ETH TOY SKINZ XTRM SQRL 23IN
+ 
+EA
+ 
+2 
+2 
+7.605
+ 
+6.840
+ 
+13.68
+ 
+OV
+8/1
+ 
+68054216
+ 
+077234542163
+ 
+ETH TOY SKINZ XTRM FOX 14IN
+ 
+EA
+ 
+2 
+2 
+5.070
+ 
+4.560
+ 
+9.12
+ 
+OV
+9/1
+ 
+68054853
+ 
+077234548530
+ 
+ETH TOY STHRS TABBIE LMB 8IN
+ 
+EA
+ 
+3 
+3 
+4.328
+ 
+3.900
+ 
+11.70
+ 
+OV
+10/1
+ 
+68054962
+ 
+077234549629
+ 
+ETH TOY AXOLOTL ASST 6IN
+ 
+EA
+ 
+3 
+3 
+3.458
+ 
+3.110
+ 
+9.33
+ 
+OV
+*MFTR TEMP OUT, ETA AUG*
+11/
+ 
+68054963
+ 
+077234549636
+ 
+ETH TOY AXOLOTL W/HAT ASST 6IN
+ 
+EA
+ 
+3 
+0 
+3.458
+ 
+3.110
+ 
+0.00
+ 
+OV
+*MFTR TEMP OUT, ETA AUG*
+12/1
+ 
+68058628
+ 
+077234586280
+ 
+ETH BOWL PORTOFINO PK 5IN
+ 
+EA
+ 
+2 
+2 
+4.095
+ 
+3.690
+ 
+7.38
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+22 
+19 
+88.98
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Cat
+ 
+20.54
+Dog
+ 
+88.98
+
+-- 1 of 1 --
+

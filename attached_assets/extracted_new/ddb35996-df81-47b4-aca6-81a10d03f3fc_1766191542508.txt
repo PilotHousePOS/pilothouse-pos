@@ -1,0 +1,228 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06320598
+	10/28/25
+	06601251-1
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+08:59:37
+WEB
+667 CRAIG BORGSTEDE
+43.46
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+43.46
+1/ 
+72401311
+ 
+811794013110
+ 
+FMN SHMP DESHDDNG W/PMP 1G
+ 
+EA
+ 
+2 
+0 
+42.206
+ 
+29.540
+ 
+0.00
+ 
+OV
+2/ 
+72492913
+ 
+811794929138
+ 
+FMN GRMG DESHDDNG S/H LG
+ 
+EA
+ 
+1 
+0 
+27.698
+ 
+19.390
+ 
+0.00
+ 
+OV
+3/10
+ 
+27440272
+ 
+744845402727
+ 
+OXB FOOD ESSNTL CHINCH 10#
+ 
+EA
+ 
+2 
+2 
+15.235
+ 
+11.000
+ 
+22.00
+ 
+OV
+4/9
+ 
+27496684
+ 
+744845966847
+ 
+OXB TOY TMTHY WAFFLE
+ 
+EA
+ 
+2 
+2 
+3.309
+ 
+2.480
+ 
+4.96
+ 
+OV
+5/10
+ 
+55561416
+ 
+045125614169
+ 
+PTS WHEEL SILENT SPINNER LG
+ 
+EA
+ 
+1 
+1 
+36.305
+ 
+16.500
+ 
+16.50
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Small Animal
+ 
+5 
+5 
+43.46
+-----
+ 
+-----
+ 
+---------
+DELIVERY SURCHARGE
+ 
+0.00
+Applied To S/O: 06599954	
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Small Animal
+ 
+43.46
+
+-- 1 of 1 --
+

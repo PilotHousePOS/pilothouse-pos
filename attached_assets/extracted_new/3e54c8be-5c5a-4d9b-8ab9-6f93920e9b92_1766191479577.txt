@@ -1,0 +1,213 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06319219
+	10/21/25
+	06600829
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+REDBARN 14099
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:01:58
+CEC
+667 CRAIG BORGSTEDE
+483.70
+ 
+0.00
+ 
+21.00
+ 
+0.00
+ 
+0.00
+ 
+504.70
+1/1
+ 
+51812015
+ 
+785184120156
+ 
+RBP DRY W/G LAND 22#
+ 
+EA
+ 
+5 
+5 
+54.268
+ 
+51.555
+ 
+257.78
+ 
+OV
+2/1
+ 
+51812015
+ 
+785184120156
+ 
+RBP DRY W/G LAND 22#
+ 
+EA
+ 
+1 
+1 
+54.268
+ 
+0.000
+ 
+0.00
+ 
+OV
+SUSAN HOWELL 14099
+3/1
+ 
+51812016
+ 
+785184120163
+ 
+RBP DRY W/G SKY 22#
+ 
+EA
+ 
+5 
+5 
+47.561
+ 
+45.183
+ 
+225.92
+ 
+OV
+4/1
+ 
+51812016
+ 
+785184120163
+ 
+RBP DRY W/G SKY 22#
+ 
+EA
+ 
+1 
+1 
+47.561
+ 
+0.000
+ 
+0.00
+ 
+OV
+SUSAN HOWELL 14099
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+12 
+12 
+483.70
+-----
+ 
+-----
+ 
+---------
+DELIVERY SURCHARGE
+ 
+21.00
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Dog
+ 
+483.70
+
+-- 1 of 1 --
+

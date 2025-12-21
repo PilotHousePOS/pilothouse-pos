@@ -1,0 +1,367 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06311997
+	09/11/25
+	06592820
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+SINGLE SHIP WAREHOUSE
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:06:45
+WEB
+667 CRAIG BORGSTEDE
+86.05
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+86.05
+1/1
+ 
+68052084
+ 
+077234520840
+ 
+ETH TOY FUZZY MSE FREDDY 3.5IN
+ 
+EA
+ 
+3 
+3 
+2.457
+ 
+2.457
+ 
+7.37
+-----
+ 
+-----
+ 
+---------
+Cat
+ 
+3 
+3 
+7.37
+-----
+ 
+-----
+ 
+---------
+2/1
+ 
+48911305
+ 
+657546113055
+ 
+NPI USA TTHING PUP RING CHKN3C
+ 
+EA
+ 
+3 
+3 
+3.646
+ 
+3.646
+ 
+10.94
+3/1
+ 
+48991254
+ 
+657546912542
+ 
+NPI TRT TTHING PUP CHKN 3CT
+ 
+EA
+ 
+3 
+3 
+4.050
+ 
+4.050
+ 
+12.15
+4/1
+ 
+68005022
+ 
+077234050224
+ 
+ETH TOY FLEECE SLIPPER 8IN
+ 
+EA
+ 
+2 
+2 
+3.743
+ 
+3.370
+ 
+6.74
+ 
+OV
+5/1
+ 
+68005024
+ 
+077234050248
+ 
+ETH TOY FLEECE RABBIT 9IN
+ 
+EA
+ 
+2 
+2 
+4.420
+ 
+3.980
+ 
+7.96
+ 
+OV
+6/1
+ 
+68054904
+ 
+077234549049
+ 
+ETH TOY STRONG FLX FIG-8 10IN
+ 
+EA
+ 
+2 
+2 
+6.500
+ 
+5.850
+ 
+11.70
+ 
+OV
+7/1
+ 
+68054905
+ 
+077234549056
+ 
+ETH TOY STRONG FLX DBL KNT14IN
+ 
+EA
+ 
+2 
+2 
+6.500
+ 
+5.850
+ 
+11.70
+ 
+OV
+8/ 
+68054962
+ 
+077234549629
+ 
+ETH TOY AXOLOTL ASST 6IN
+ 
+EA
+ 
+3 
+0 
+3.458
+ 
+3.110
+ 
+0.00
+ 
+OV
+9/1
+ 
+68054963
+ 
+077234549636
+ 
+ETH TOY AXOLOTL W/HAT ASST 6IN
+ 
+EA
+ 
+3 
+3 
+3.458
+ 
+3.110
+ 
+9.33
+ 
+OV
+10/
+ 
+68054968
+ 
+077234549681
+ 
+ETH TOY AXOLOTL ASST 14IN
+ 
+EA
+ 
+3 
+0 
+4.758
+ 
+4.280
+ 
+0.00
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+23 
+17 
+70.52
+-----
+ 
+-----
+ 
+---------
+11/1
+ 
+48980098
+ 
+657546800986
+ 
+NPI TRT FRRT STC CHKN 1.87OZ
+ 
+EA
+ 
+3 
+3 
+2.720
+ 
+2.720
+ 
+8.16
+-----
+ 
+-----
+ 
+---------
+Small Animal
+ 
+3 
+3 
+8.16
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Cat
+ 
+7.37
+Dog
+ 
+70.52
+Small Animal
+ 
+8.16
+
+-- 1 of 1 --
+

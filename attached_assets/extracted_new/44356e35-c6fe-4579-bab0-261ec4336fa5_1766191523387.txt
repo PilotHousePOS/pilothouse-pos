@@ -1,0 +1,1356 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06307685
+	08/19/25
+	06587886
+	1 OF 3
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+** Continued **
+09:09:32
+WEB
+1/4
+ 
+00800196
+ 
+015905001960
+ 
+AQE KIT MINI BOW LED BLK 1G
+ 
+EA
+ 
+2 
+2 
+34.535
+ 
+23.140
+ 
+46.28
+ 
+OV
+2/4
+ 
+00800197
+ 
+015905001977
+ 
+AQE KIT MINI BOW LED BL 1G
+ 
+EA
+ 
+2 
+2 
+34.535
+ 
+22.450
+ 
+44.90
+ 
+OV
+3/4
+ 
+00800198
+ 
+015905001984
+ 
+AQE KIT BETTA BOW LED BLK 2.5G
+ 
+EA
+ 
+1 
+1 
+56.293
+ 
+37.720
+ 
+37.72
+ 
+OV
+4/1
+ 
+00806051
+ 
+015905060516
+ 
+AQE FOOD BETTA FOOD .95OZ
+ 
+EA
+ 
+6 
+6 
+1.855
+ 
+1.210
+ 
+7.26
+ 
+OV
+5/1
+ 
+00806188
+ 
+015905061889
+ 
+AQE FOOD SHRMP PLLTS 3.25OZ
+ 
+EA
+ 
+6 
+6 
+2.564
+ 
+1.670
+ 
+10.02
+ 
+OV
+6/1
+ 
+00806189
+ 
+015905061896
+ 
+AQE FOOD SHRMP PLLTS 6.5OZ
+ 
+EA
+ 
+6 
+6 
+4.164
+ 
+2.710
+ 
+16.26
+ 
+OV
+7/4
+ 
+02010010
+ 
+015905100106
+ 
+AGA TNK BK 20X10X12 10G
+ 
+EA
+ 
+6 
+6 
+19.428
+ 
+13.600
+ 
+81.60
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Aquatic
+ 
+29 
+29 
+244.04
+-----
+ 
+-----
+ 
+---------
+8/4
+ 
+38042644
+ 
+071859426440
+ 
+KAY FOOD FIESTA PRRT 4.5#
+ 
+EA
+ 
+6 
+6 
+18.958
+ 
+13.650
+ 
+81.90
+ 
+OV
+9/4
+ 
+38042646
+ 
+071859426464
+ 
+KAY FOOD FIESTA CONURE 4.5#
+ 
+EA
+ 
+6 
+6 
+17.117
+ 
+12.320
+ 
+73.92
+ 
+OV
+10/4
+ 
+38094916
+ 
+071859949161
+ 
+KAY FOOD BIG BITE PRRT 4#
+ 
+EA
+ 
+6 
+6 
+17.505
+ 
+12.600
+ 
+75.60
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Bird
+ 
+18 
+18 
+231.42
+-----
+ 
+-----
+ 
+---------
+11/3
+ 
+27000340
+ 
+045663003401
+ 
+FP-340
+ 
+FOU BRUSH CT TT SLICKER KTTN
+ 
+EA
+ 
+4 
+4 
+7.983
+ 
+4.390
+ 
+17.56
+ 
+OV
+12/2
+ 
+27001732
+ 
+045663017323
+ 
+FP-1732
+ 
+FOU RMDY CT EAR MITE 1OZ
+ 
+EA
+ 
+4 
+4 
+7.124
+ 
+3.920
+ 
+15.68
+ 
+OV
+13/2
+ 
+27001844
+ 
+045663018443
+ 
+FOU GRMG CT LOVE GLOVE
+ 
+EA
+ 
+4 
+4 
+9.555
+ 
+5.260
+ 
+21.04
+ 
+OV
+14/1
+ 
+33500308
+ 
+039079003087
+ 
+FAR F/T SHMP C ADAMS-P FOAM10Z
+ 
+EA
+ 
+4 
+4 
+10.858
+ 
+7.270
+ 
+29.08
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Cat
+ 
+16 
+16 
+83.36
+-----
+ 
+-----
+ 
+---------
+15/2
+ 
+27000002
+ 
+045663000028
+ 
+FOU DSP NURSE BTTL 2OZ 24PK
+ 
+EA
+ 
+3 
+3 
+37.671
+ 
+20.720
+ 
+62.16
+ 
+OV
+16/3
+ 
+27000177
+ 
+045663001773
+ 
+FP-177
+ 
+FOU COMB FLEA SINGLE ROW
+ 
+EA
+ 
+4 
+4 
+5.510
+ 
+3.030
+ 
+12.12
+ 
+OV
+17/
+ 
+27001915
+ 
+045663019150
+ 
+FP-1915
+ 
+FOU PILL DISPENSER QUICKN EZ
+ 
+EA
+ 
+2 
+0 
+3.519
+ 
+1.940
+ 
+0.00
+ 
+OV
+18/2
+ 
+27011345
+ 
+045663113452
+ 
+FP-11345
+ 
+FOU GRMG BRUSH MC SLKR PUP
+ 
+EA
+ 
+4 
+4 
+9.786
+ 
+5.380
+ 
+21.52
+ 
+OV
+19/
+ 
+27019100
+ 
+045663191009
+ 
+FP-1910
+ 
+FOU EASY FDR SYRINGE
+ 
+EA
+ 
+4 
+0 
+5.112
+ 
+2.810
+ 
+0.00
+ 
+OV
+20/
+ 
+27097608
+ 
+045663976088
+ 
+FOU GRMG MC PRO NON-SLIP COMB
+ 
+EA
+ 
+4 
+0 
+7.395
+ 
+4.070
+ 
+0.00
+ 
+OV
+** MFR TEMP OUT ETA 2/7/24 **
+21/2
+ 
+27097615
+ 
+045663976156
+ 
+FOU GRMG MC PRO DLX GLOVE
+ 
+EA
+ 
+4 
+4 
+16.343
+ 
+8.990
+ 
+35.96
+ 
+OV
+**REPLACES #27097557**
+
+-- 1 of 3 --
+
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06307685
+	08/19/25
+	06587886
+	2 OF 3
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+** Continued **
+09:09:32
+WEB
+22/2
+ 
+27097639
+ 
+045663976392
+ 
+FOU SHMP/COND MC 2N1 16OZ
+ 
+EA
+ 
+4 
+4 
+7.019
+ 
+3.860
+ 
+15.44
+ 
+OV
+23/2
+ 
+27097640
+ 
+045663976408
+ 
+FOU SHMP MC REDUCES ODOR 16OZ
+ 
+EA
+ 
+4 
+4 
+7.019
+ 
+3.860
+ 
+15.44
+ 
+OV
+24/2
+ 
+27097643
+ 
+045663976439
+ 
+FOU SHMP MC BRIGHT WH 16OZ
+ 
+EA
+ 
+4 
+4 
+7.019
+ 
+3.860
+ 
+15.44
+ 
+OV
+25/2
+ 
+27097644
+ 
+045663976446
+ 
+FOU SHMP MC REDUCES SHDDNG 16Z
+ 
+EA
+ 
+4 
+4 
+7.019
+ 
+3.860
+ 
+15.44
+ 
+OV
+26/2
+ 
+27097647
+ 
+045663976477
+ 
+FOU SHMP MC MED 16OZ
+ 
+EA
+ 
+2 
+2 
+7.019
+ 
+3.860
+ 
+7.72
+ 
+OV
+27/2
+ 
+27097648
+ 
+045663976484
+ 
+FOU SHMP MC DETANGLER 16OZ
+ 
+EA
+ 
+4 
+4 
+7.019
+ 
+3.860
+ 
+15.44
+ 
+OV
+28/3
+ 
+33500187
+ 
+039079001878
+ 
+FAR SULFODENE H/S ITCH 8OZ
+ 
+EA
+ 
+6 
+6 
+5.505
+ 
+4.130
+ 
+24.78
+ 
+OV
+REPLACES # 33500713
+29/1
+ 
+33500257
+ 
+039079002578
+ 
+FAR F/T SHMP ADAMS FOAMING 10Z
+ 
+EA
+ 
+4 
+4 
+10.858
+ 
+7.270
+ 
+29.08
+ 
+OV
+30/1
+ 
+33500740
+ 
+039079007405
+ 
+FAR F/T ADAMS-P CLLR DG LG
+ 
+EA
+ 
+6 
+6 
+7.808
+ 
+5.230
+ 
+31.38
+ 
+OV
+REPLACES # 33506025
+31/1
+ 
+33502457
+ 
+039079024570
+ 
+FAR SULFODENE 3WAY OINTMNT 2OZ
+ 
+EA
+ 
+6 
+6 
+6.817
+ 
+5.110
+ 
+30.66
+ 
+OV
+* REPLACES # 33503869
+32/1
+ 
+33503854
+ 
+039079038546
+ 
+FAR EAR CLEANER SULFODENE 4OZ
+ 
+EA
+ 
+6 
+6 
+5.673
+ 
+4.250
+ 
+25.50
+ 
+OV
+33/3
+ 
+33505887
+ 
+039079058872
+ 
+FAR F/T ADAMS HOME SPRY 24OZ
+ 
+EA
+ 
+4 
+4 
+12.398
+ 
+8.310
+ 
+33.24
+ 
+OV
+34/1
+ 
+33505896
+ 
+039079058964
+ 
+FAR F/T ADAMS-P SPRY 16OZ
+ 
+EA
+ 
+6 
+6 
+11.057
+ 
+7.410
+ 
+44.46
+ 
+OV
+* REPLACES # 33509011
+35/1
+ 
+33505897
+ 
+039079058971
+ 
+FAR F/T ADAMS-P SPRY 32OZ
+ 
+EA
+ 
+6 
+6 
+20.160
+ 
+13.510
+ 
+81.06
+ 
+OV
+* REPLACES # 33509001
+36/1
+ 
+33509002
+ 
+039079090025
+ 
+FAR SHMP F/T ADAMS PRECOR 12Z
+ 
+EA
+ 
+6 
+6 
+13.053
+ 
+8.750
+ 
+52.50
+ 
+OV
+* REPLACES # 33505941
+37/1
+ 
+82527830
+ 
+041535278304
+ 
+ZOD F/T PWD DOG/CAT 6OZ
+ 
+EA
+ 
+6 
+6 
+7.533
+ 
+5.050
+ 
+30.30
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+103
+ 
+93 
+599.64
+-----
+ 
+-----
+ 
+---------
+38/1
+ 
+75311759
+ 
+096316117594
+ 
+ZIL LINER TERRARIUM BR 40/50G
+ 
+EA
+ 
+3 
+3 
+8.509
+ 
+5.530
+ 
+16.59
+ 
+OV
+39/2
+ 
+75367143
+ 
+096316671430
+ 
+ZIL BULB DAY BL INC 100W BOX
+ 
+EA
+ 
+3 
+3 
+3.909
+ 
+2.540
+ 
+7.62
+ 
+OV
+40/2
+ 
+75367149
+ 
+096316671492
+ 
+ZIL BULB SPOT DAY WH 50W BOX
+ 
+EA
+ 
+4 
+4 
+4.109
+ 
+2.670
+ 
+10.68
+ 
+OV
+41/2
+ 
+75367150
+ 
+096316671508
+ 
+ZIL BULB SPOT DAY WH 75W BOX
+ 
+EA
+ 
+6 
+6 
+4.109
+ 
+2.670
+ 
+16.02
+ 
+OV
+42/2
+ 
+75367151
+ 
+096316671515
+ 
+ZIL BULB SPOT DAY WH 100W BOX
+ 
+EA
+ 
+4 
+4 
+4.436
+ 
+2.880
+ 
+11.52
+ 
+OV
+43/2
+ 
+75367152
+ 
+096316671522
+ 
+ZIL BULB SPOT DAY WH 150W BOX
+ 
+EA
+ 
+4 
+4 
+5.273
+ 
+3.430
+ 
+13.72
+ 
+OV
+44/1
+ 
+75370054
+ 
+096316700543
+ 
+ZIL LINER TERRARIUM GN 10G
+ 
+EA
+ 
+1 
+1 
+3.000
+ 
+1.950
+ 
+1.95
+ 
+OV
+
+-- 2 of 3 --
+
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06307685
+	08/19/25
+	06587886
+	3 OF 3
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:09:32
+WEB
+667 CRAIG BORGSTEDE
+1,360.42
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+1,360.42
+45/1
+ 
+75370058
+ 
+096316700581
+ 
+ZIL LINER TERRARIUM GN 20/29
+ 
+EA
+ 
+3 
+3 
+4.800
+ 
+3.120
+ 
+9.36
+ 
+OV
+46/1
+ 
+75370064
+ 
+096316700642
+ 
+ZIL LINER TERRARIUM GN 40/50G
+ 
+EA
+ 
+3 
+3 
+8.509
+ 
+5.530
+ 
+16.59
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Reptile
+ 
+31 
+31 
+104.05
+-----
+ 
+-----
+ 
+---------
+47/4
+ 
+38000002
+ 
+071859000022
+ 
+KAY FOOD FDPH RBBT ADLT 5#
+ 
+EA
+ 
+6 
+6 
+6.369
+ 
+4.590
+ 
+27.54
+ 
+OV
+48/4
+ 
+38099877
+ 
+071859998770
+ 
+KAY FOOD FIESTA RBBT 6.5#
+ 
+EA
+ 
+3 
+3 
+13.730
+ 
+9.890
+ 
+29.67
+ 
+OV
+49/4
+ 
+38099986
+ 
+071859999869
+ 
+KAY FOOD FDPH HAM/GERB 3#
+ 
+EA
+ 
+6 
+6 
+4.786
+ 
+3.450
+ 
+20.70
+ 
+OV
+50/4
+ 
+38099990
+ 
+071859999906
+ 
+KAY FOOD FDPH GPIG 5#
+ 
+EA
+ 
+4 
+4 
+6.939
+ 
+5.000
+ 
+20.00
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Small Animal
+ 
+19 
+19 
+97.91
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Aquatic
+ 
+244.04
+Bird
+ 
+231.42
+Cat
+ 
+83.36
+Dog
+ 
+599.64
+Reptile
+ 
+104.05
+Small Animal
+ 
+97.91
+
+-- 3 of 3 --
+

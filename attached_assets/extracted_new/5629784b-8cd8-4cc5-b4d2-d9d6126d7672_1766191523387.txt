@@ -1,0 +1,227 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06321876
+	11/04/25
+	06603682
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+AH NB ISO
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+08:58:33
+CEC
+667 CRAIG BORGSTEDE
+163.25
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+163.25
+1/1
+ 
+53200684
+ 
+723633006842
+ 
+NBP DRY CT ULT PRO CHKN 6#
+ 
+EA
+ 
+2 
+2 
+21.769
+ 
+16.327
+ 
+32.65
+ 
+OV
+2/1
+ 
+53200687
+ 
+723633006873
+ 
+NBP DRY KTTN ULT PRO CHKN 6#
+ 
+EA
+ 
+2 
+2 
+21.769
+ 
+16.327
+ 
+32.65
+ 
+OV
+3/1
+ 
+53200689
+ 
+723633006897
+ 
+NBP DRY CT ULT PRO SLMN/CHKN6#
+ 
+EA
+ 
+2 
+2 
+21.769
+ 
+16.327
+ 
+32.65
+ 
+OV
+4/1
+ 
+53200692
+ 
+723633006927
+ 
+NBP DRY CT ULT PRO IM/DGST 5#
+ 
+EA
+ 
+2 
+2 
+21.769
+ 
+16.327
+ 
+32.65
+ 
+OV
+5/1
+ 
+53200694
+ 
+723633006941
+ 
+NBP DRY CT ULT PRO S/C/DGST 5#
+ 
+EA
+ 
+2 
+2 
+21.769
+ 
+16.327
+ 
+32.65
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Cat
+ 
+10 
+10 
+163.25
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Cat
+ 
+163.25
+
+-- 1 of 1 --
+

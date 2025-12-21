@@ -1,0 +1,81 @@
+Order# 223460
+https://eorder.pennplax.com
+Date: Tuesday, May 6, 2025
+Billing Information:
+Company: ANIMAL HOUSE
+Name: ANIMAL HOUSE
+Phone:
+Address: 2934 CYPRESS ST
+WEST MONROE, Louisiana 71291
+United States
+Payment method: EBizCharge Standard
+EBizCharge.ChargeAmount: 454.57
+Shipping Information:
+Company: ANIMAL HOUSE
+Name: ANIMAL HOUSE
+Phone:
+Address: 2934 CYPRESS ST
+WEST MONROE, Louisiana 71291
+United States
+Shipping method: Handling
+Product(s)
+Name SKU Price Qty Total
+Small World Habitat Plastic Tank - 1 Gallon 030172090561 $4.15 6.00 $24.90
+Small World Habitat Plastic Tank - 4 Gallons 030172091032 $12.00 2.00 $24.00
+Small World Habitat Plastic Tank - 0.6 Gallon 030172090318 $2.60 6.00 $15.60
+shorefins™ Pro Balance™ Vacation Feeder - 7-Day -
+Crab Shape - 1-Pack
+030172005404 $1.33 3.00 $3.99
+Barbie™ Barbie Mermaid with Star Base - Medium 030172115479 $7.30 1.00 $7.30
+Barbie™ Barbie's Friend Mermaid with Shell Base -
+Medium
+030172115486 $7.30 1.00 $7.30
+Tide & Treasure™ Granite Hideaway - 2-Piece - Large
+& Extra Large
+030172078583 $23.93 1.00 $23.93
+Tide & Treasure™ Stone Hideaway - 1-Piece - Large 030172078552 $9.87 2.00 $19.74
+Tide & Treasure™ Sea Turtle & Coral - Small 030172078439 $3.13 1.00 $3.13
+Tide & Treasure™ Shipwreck Bow - Medium 030172014567 $22.27 1.00 $22.27
+Tide & Treasure™ Magical Castle Section B - Extra
+Large
+030172027352 $42.48 1.00 $42.48
+Tide & Treasure™ Magical Castle Section A - Extra
+Large
+030172027345 $26.00 1.00 $26.00
+Cascade™ 150 or 200 Filter Replacement Sponge - 1-
+Pack - Fits CPF3, CPF3F, CPF4, CPF4F Filters
+030172018466 $1.77 3.00 $5.31
+Cascade™ Carbon Infused Media Pad 10" x 18" 030172082245 $3.85 2.00 $7.70
+Cascade™ Polyfiber Pad 30" x 18" 030172082283 $3.58 2.00 $7.16
+Cascade™ Polyfiber Plus Pad 10" x 18" 030172082290 $4.28 4.00 $17.12
+shorefins™ Betta World Aquarium Filter - Small 030172390067 $4.11 1.00 $4.11
+shorefins™ Bubble Wall UG Filter Replacement - 28" 030172335280 $4.06 2.00 $8.12
+Cascade™ Lok-Tite® 3-Gang Valve 030172191305 $4.09 2.00 $8.18
+Cascade™ Gravel-Vac 5" Cylinder 030172005572 $6.62 2.00 $13.24
+Cascade™ Quick-Net - 10" x 7" Net 030172230103 $4.00 2.00 $8.00
+Bird Life™ e-Cuttlebone™ Mineral Block - 2-Pack -
+Fruit Dipped
+030172096853 $2.74 3.00 $8.22
+
+-- 1 of 2 --
+
+Bird Life™ Perch Covers - Large 030172902956 $2.26 3.00 $6.78
+Bird Life™ Geo Balls with Bell 030172082795 $1.14 3.00 $3.42
+Cat Life™ Activity Tree Post with 3 Swatting Toys 030172071614 $13.44 1.00 $13.44
+Small Animal Life™ The Hydrator Water Bottles - 34.
+Oz. 6-Piece Display
+030172045943 $5.59 6.00 $33.54
+Reptology™ Turtle Platform Ramp 030172077340 $14.17 2.00 $28.34
+Reptology™ Turtle Topper™ Above-Tank Basking
+Platform
+030172061936 $45.61 1.00 $45.61
+Reptology™ Fossil Rock Food/Water Dish - Large 030172071973 $6.65 2.00 $13.30
+PurchaseOrderNumber: 56
+Sub-total: $452.23
+Discount: -$22.61
+Shipping: $24.95
+Tax: $0.00
+Order total: $454.57
+
+-- 2 of 2 --
+

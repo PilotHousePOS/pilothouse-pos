@@ -1,0 +1,407 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06286477
+	04/26/25
+	06563079
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+DROP SHIP(USE ORDER TYP
+530572
+DS-CSTL5898931
+NET 7 DAYS
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:24:10
+SCH
+667 CRAIG BORGSTEDE
+536.03
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+536.03
+1/ 
+17553381
+ 
+076484533815
+ 
+COA SCRATCHER RACE CAR
+ 
+EA
+ 
+2 
+2 
+16.576
+ 
+12.432
+ 
+24.86
+ 
+OV
+2/ 
+17559600
+ 
+076484596001
+ 
+COA SCRATCHER MILK CARTON BL
+ 
+EA
+ 
+2 
+2 
+14.864
+ 
+11.148
+ 
+22.30
+ 
+OV
+3/ 
+17559601
+ 
+076484596018
+ 
+COA SCRATCHER TURBO RCT YL
+ 
+EA
+ 
+2 
+2 
+5.525
+ 
+4.144
+ 
+8.29
+ 
+OV
+4/ 
+17559602
+ 
+076484596025
+ 
+COA SCRATCHER INFINITY GN
+ 
+EA
+ 
+2 
+2 
+14.966
+ 
+11.225
+ 
+22.45
+ 
+OV
+5/ 
+17559603
+ 
+076484596032
+ 
+COA SCRATCHER TRUCK RD
+ 
+EA
+ 
+2 
+2 
+18.949
+ 
+14.212
+ 
+28.42
+ 
+OV
+6/ 
+17559604
+ 
+076484596049
+ 
+COA SCRATCHER STACK RNBW
+ 
+EA
+ 
+2 
+2 
+15.034
+ 
+11.276
+ 
+22.55
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Cat
+ 
+12 
+12 
+128.87
+-----
+ 
+-----
+ 
+---------
+7/ 
+11600900
+ 
+879213009007
+ 
+BLI CARRIER COMFT SM BK/BR
+ 
+EA
+ 
+2 
+2 
+28.567
+ 
+21.425
+ 
+42.85
+ 
+OV
+8/ 
+11600910
+ 
+879213009106
+ 
+BLI CARRIER COMFT SM TP
+ 
+EA
+ 
+2 
+2 
+28.567
+ 
+21.425
+ 
+42.85
+ 
+OV
+9/ 
+11600913
+ 
+879213009137
+ 
+BLI CARRIER COMFT SM BERMUDA
+ 
+EA
+ 
+2 
+2 
+28.567
+ 
+21.425
+ 
+42.85
+ 
+OV
+10/
+ 
+11600917
+ 
+879213009175
+ 
+BLI CARRIER COMFT SM BRY
+ 
+EA
+ 
+2 
+2 
+28.567
+ 
+21.425
+ 
+42.85
+ 
+OV
+11/
+ 
+11600918
+ 
+879213009182
+ 
+BLI CARRIER COMFT LG BK/BR
+ 
+EA
+ 
+2 
+2 
+39.294
+ 
+29.471
+ 
+58.94
+ 
+OV
+12/
+ 
+11600919
+ 
+879213009199
+ 
+BLI CARRIER COMFT LG TP
+ 
+EA
+ 
+2 
+2 
+39.294
+ 
+29.471
+ 
+58.94
+ 
+OV
+13/
+ 
+11600920
+ 
+879213009205
+ 
+BLI CARRIER COMFT LG BERMUDA
+ 
+EA
+ 
+2 
+2 
+39.294
+ 
+29.471
+ 
+58.94
+ 
+OV
+14/
+ 
+11600921
+ 
+879213009212
+ 
+BLI CARRIER COMFT LG BRY
+ 
+EA
+ 
+2 
+2 
+39.294
+ 
+29.471
+ 
+58.94
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+16 
+16 
+407.16
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Cat
+ 
+128.87
+Dog
+ 
+407.16
+
+-- 1 of 1 --
+

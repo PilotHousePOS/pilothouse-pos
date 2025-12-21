@@ -1,0 +1,376 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06325239
+	11/19/25
+	06607467
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+SINGLE SHIP WAREHOUSE
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+08:55:41
+WEB
+667 CRAIG BORGSTEDE
+103.68
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+103.68
+1/1
+ 
+68052058
+ 
+077234520581
+ 
+ETH TEASR CAT PRANCER 44IN
+ 
+EA
+ 
+2 
+2 
+2.945
+ 
+2.650
+ 
+5.30
+ 
+OV
+2/1
+ 
+68052060
+ 
+077234520604
+ 
+ETH TOY CT TRT DSPNSR SPNABOUT
+ 
+EA
+ 
+2 
+2 
+12.318
+ 
+11.090
+ 
+22.18
+ 
+OV
+*MFTR TEMP OUT, ETA DEC*
+3/1
+ 
+68052111
+ 
+077234521113
+ 
+ETH TOY CT HUG'N KICK SHIMMER
+ 
+EA
+ 
+2 
+2 
+3.395
+ 
+3.060
+ 
+6.12
+ 
+OV
+4/1
+ 
+68052178
+ 
+077234521786
+ 
+ETH HLDY CT ELF HAT CTNP 4IN
+ 
+EA
+ 
+2 
+2 
+1.750
+ 
+3.50
+ 
+OV
+5/1
+ 
+68053928
+ 
+077234539286
+ 
+ETH HLDY TOY CT DONUT ASST 4IN
+ 
+EA
+ 
+2 
+2 
+2.158
+ 
+1.940
+ 
+3.88
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Cat
+ 
+10 
+10 
+40.98
+-----
+ 
+-----
+ 
+---------
+6/1
+ 
+68033229
+ 
+077234332290
+ 
+ETH TOY KFC FRIES/DRUMETTE 2PK
+ 
+EA
+ 
+2 
+2 
+4.485
+ 
+4.040
+ 
+8.08
+ 
+OV
+7/1
+ 
+68054852
+ 
+077234548523
+ 
+ETH TOY STHRS WARM HUG BNE12IN
+ 
+EA
+ 
+2 
+2 
+4.978
+ 
+4.480
+ 
+8.96
+ 
+OV
+8/1
+ 
+68054853
+ 
+077234548530
+ 
+ETH TOY STHRS TABBIE LMB 8IN
+ 
+EA
+ 
+2 
+2 
+4.978
+ 
+4.480
+ 
+8.96
+ 
+OV
+9/1
+ 
+68054962
+ 
+077234549629
+ 
+ETH TOY AXOLOTL ASST 6IN
+ 
+EA
+ 
+3 
+3 
+3.977
+ 
+3.580
+ 
+10.74
+ 
+OV
+10/1
+ 
+68054963
+ 
+077234549636
+ 
+ETH TOY AXOLOTL W/HAT ASST 6IN
+ 
+EA
+ 
+2 
+2 
+3.977
+ 
+3.580
+ 
+7.16
+ 
+OV
+11/1
+ 
+68054964
+ 
+077234549643
+ 
+ETH TOY AXOLOTL BTTRBALL 7IN
+ 
+EA
+ 
+2 
+2 
+4.978
+ 
+4.480
+ 
+8.96
+ 
+OV
+12/1
+ 
+68054965
+ 
+077234549650
+ 
+ETH TOY AXOLOTL MERMD 10IN
+ 
+EA
+ 
+2 
+2 
+5.472
+ 
+4.920
+ 
+9.84
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+15 
+15 
+62.70
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Cat
+ 
+40.98
+Dog
+ 
+62.70
+
+-- 1 of 1 --
+

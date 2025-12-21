@@ -1,0 +1,5327 @@
+[
+  {
+    "upc": "015905004503",
+    "name": "AQE BULB T8 COLORMAX 18IN 15W",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905060516",
+    "name": "AQE FOOD BETTA FOOD .95OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905061803",
+    "name": "AQE FOOD CCHLD PLLT MINI 4.5OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905062329",
+    "name": "AQE CLNR GRVL VAC W/BULB 10IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905211017",
+    "name": "AQE FXTR LED STRIPLIGHT BK 24",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163001264",
+    "name": "AR-26",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163030851",
+    "name": "AR-85B",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163034231",
+    "name": "API COND AQUA ESNTL 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055044288",
+    "name": "U-04428",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055046206",
+    "name": "HIK FOOD CCHLD SINK MINI 3.5Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "810074880572",
+    "name": "ATP FXTR SKYAQUA LED PRO 18W",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029904701653",
+    "name": "WWI GRVL RAINBOW 5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000116043403",
+    "name": "SA-434",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000116372305",
+    "name": "SLI SBSTRT FLOURITE BK 7.7#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798196297",
+    "name": "TET ORNMT GLOFSH CLAM SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798290254",
+    "name": "TET GRVL GLOFSH WH 5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798770039",
+    "name": "TET FOOD GLOFSH FLK 1.59OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "720101105205",
+    "name": "KMP FOOD SWTHRVST TIEL NOSF20#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "618940312154",
+    "name": "JWP PERCH SAND T SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "618940312161",
+    "name": "JWP PERCH SAND T REG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "618940313014",
+    "name": "JWP WATERER BIRD SILO LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859002576",
+    "name": "KAY TRT SPRFD STC BIRD BLBRY5Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859003016",
+    "name": "KT-50379",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859942360",
+    "name": "KAY TRT FDPH HNY KEET 7OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859942384",
+    "name": "KAY TRT FDPH HNY PRRT 7OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859948706",
+    "name": "KAY FOOD FDPH W/SAF TIEL 4#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859949161",
+    "name": "KAY FOOD BIG BITE PRRT 4#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "762177320205",
+    "name": "ZUP FOOD SELECTS TIEL/LVBR2.5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "762177820200",
+    "name": "ZUP FOOD FRT BLND TIEL 2#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "666594208002",
+    "name": "EPC LTTR GENIE RFILL 1PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585517001",
+    "name": "KON TEASR CT SCRATTLES",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585524030",
+    "name": "KON TOY CT ZEN DEN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018065981707",
+    "name": "N/M S/O OR OXY JFC TRGGR 24OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234021316",
+    "name": "ET-2131",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234029145",
+    "name": "ET-2914B",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234061190",
+    "name": "ETH CROCK CAT RTL CERAMIC 5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "021653204089",
+    "name": "BDE-2040",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071860215712",
+    "name": "PBG CLGN FNC 12OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045663976408",
+    "name": "FOU SHMP MC REDUCES ODOR 16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "034846550047",
+    "name": "MPF BSCT WHSM GRMT SMKY 3#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "034846550115",
+    "name": "MPF BSCT WHSM GRMT ORIG LG 3#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "034846727036",
+    "name": "MPF TRT G/F JRKY CHKN 25OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585111124",
+    "name": "KC-O",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585131313",
+    "name": "KC-S",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585159010",
+    "name": "KON TOY COZIE ELMER ELPHNT MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585159096",
+    "name": "KON TOY COZIE ALI ALIGATOR MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585361277",
+    "name": "KON TRT MARATHON PB SM 2CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585475257",
+    "name": "KON DSPNSR BAMBOO DUMBBELL MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585483009",
+    "name": "KON TOY CRUNCHAIR BALL MD 3PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585498980",
+    "name": "KON TOY CUTESEAS OCTOPUS MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585503158",
+    "name": "KON TOY SHIELDZ OCTOPUS MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585523163",
+    "name": "KON TOY DAILY NEWSPAPER XL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863102943",
+    "name": "GRE TRT DNTL ORIG LG 6OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863109317",
+    "name": "GRE TRT PILLP CAPSL CHS 15.8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863111297",
+    "name": "GRE TRT PILLP CAPSL PB 15.8Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863117923",
+    "name": "GRE TRT DNTL PUP XS 6OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "019014610907",
+    "name": "IAM DRY PAH MINI CHK 15#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "019014700714",
+    "name": "IAM DRY PAH MINICHUNKS 30#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "746772200148",
+    "name": "MAM TOY COLR 3KNOT ROPE TUG LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "746772510407",
+    "name": "MAM TOY 3KNT/2BALL RP MINI",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095006133",
+    "name": "TRO SHMP/COND 2IN1 WTRMLN 20OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369376739",
+    "name": "MUL TOY DAZZLE FLYING DUCK13IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184120071",
+    "name": "RBP DRY W/G LAND 4#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184420010",
+    "name": "RBP TRT BNE KNUCKLE SMOKED",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184926208",
+    "name": "RBP TRT CLLGN STC SM 5CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "723633429856",
+    "name": "NBP DRY LID VENISN/SWPOT 22#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "723633606080",
+    "name": "NBP TRT LIT VENISN/SWPOT S/B8Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "723633777483",
+    "name": "NBP DRY LID SLMN/SWPOT 4#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "723633778053",
+    "name": "NBP DRY LID SLMN/SWPOT S/B 4#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "079100533015",
+    "name": "DMF TRT PUP-PERONI MIG/BCN5.6Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234541302",
+    "name": "ETH TOY CUDDLE BUNNIES 13IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234543160",
+    "name": "ETH TOY BAMBNE BNE CHKN 5.75IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234543184",
+    "name": "ETH TOY BAMBNE BNE CHKN 7.25IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "811794933203",
+    "name": "FMN COND SENS SKIN 16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214816300",
+    "name": "NYL HLTHY EDBL ROAST BF SOUPER",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214832430",
+    "name": "NYL FLEXI CHW VARPK REG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214837428",
+    "name": "NYL TOY TUG PUP BL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214853824",
+    "name": "NYL HLTHY EDBL MEATY REG 4CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197270024",
+    "name": "FLU CLAMP LAMP CERM 5.5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197710001",
+    "name": "FLU FOOD HI-CAL CRICKET 11.5OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197712012",
+    "name": "FLU CRICKET QUENCHER CALC 16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197730030",
+    "name": "FLU SPLMT REPTA VIT 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197780073",
+    "name": "FLU FOOD GRMT INSCT MIX 2.75OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "783178593412",
+    "name": "NZP RMDY MITE GRD LQ 8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369931709",
+    "name": "KOM FOOD TORTOISE HAY 24OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369932034",
+    "name": "KOM PLNT WDLAND CANOPY 42CM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369932041",
+    "name": "KOM PLNT RAINFORST CANOPY 10IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369933727",
+    "name": "KOM PLNT SPOTTED BEGONIA 18IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369933734",
+    "name": "KOM PLNT MONSTERA LEAF 18IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "759834050827",
+    "name": "GAL SAND TRPCL MIX HC 4QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316113053",
+    "name": "ZIL BEDNG JUNGLE MIX 24QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316116597",
+    "name": "ZIL BOWL DURABLE GY MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316116627",
+    "name": "ZIL DEN DURABLE GY SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316670365",
+    "name": "ZIL DOME REFL CERM BK 8.5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671355",
+    "name": "ZIL BULB DAY WH INC 100W BOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671386",
+    "name": "ZIL BULB NGHT BK INC 75W BOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671461",
+    "name": "ZIL BULB NIGHT INC RD 75W BOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671492",
+    "name": "ZIL BULB SPOT DAY WH 50W BOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316700468",
+    "name": "ZIL BEDNG DESERT BLEND 10QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316700567",
+    "name": "ZIL LINER TERRARIUM BR 20/29",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612008609",
+    "name": "ZML FOOD CREATURE JELLY CUP3PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612008807",
+    "name": "ZML BEDNG CREATURES SOIL 1QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612009613",
+    "name": "ZML FOOD HRMT CRAB FRUIT SALAD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612009903",
+    "name": "ZML COND WTR HRMT CRAB",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612009910",
+    "name": "ZML COND S/W HRMT CRAB",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612200829",
+    "name": "ZO-HHM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612210200",
+    "name": "ZML ORNMT CORK BRK ROUND SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612210217",
+    "name": "ZML ORNMT CORK BRK ROUND MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612300246",
+    "name": "ZML THERMOMETER DIGITAL TERRM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612300314",
+    "name": "ZML GAUGE THERM HUMDTY DIGITAL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612320923",
+    "name": "ZML HOOD REPTISUN LED SUNR22.5",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612321029",
+    "name": "ZML HOOD REPTISUN LED CMB 24IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612322354",
+    "name": "ZML FXTR NANO DOME LAMP",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612348248",
+    "name": "ZML BULB T5 HO REPTISUN10 22IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612360202",
+    "name": "ZML BULB BASKING SPOT NANO 25W",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612410112",
+    "name": "ZO-ZM11B",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612751246",
+    "name": "ZML BEDNG ASPEN SNAKE 24QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612754087",
+    "name": "ZML BEDNG BIOBLEND TRPCL 8QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612800319",
+    "name": "ZML RMDY SHEDDING AID 2.25OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612923308",
+    "name": "ZML BOWL REPRIROCK COMBO MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612924107",
+    "name": "ZML BOWL REPTI RAMP MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612925203",
+    "name": "ZML BOWL REPTIROCK CRNR WTR SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612925500",
+    "name": "ZML BOWL REPTIROCK CRNR WTR XL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "066380004311",
+    "name": "HLP BEDNG CF COLRS PR 23L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "066380004359",
+    "name": "HLP BEDNG CF COLRS BL 50L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "066380006308",
+    "name": "HLP BEDNG CF SPEC SEA GLASS23L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "730582206360",
+    "name": "SPF SAND CHINCH BATH 52.8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845302096",
+    "name": "OXB FOOD ESSNTL HAM/GERB 1#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845302102",
+    "name": "OXB FOOD ESSNTL CHINCH 3#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845402291",
+    "name": "OXB TRT WESTRN TMTHY 90OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845402819",
+    "name": "OXB FOOD ESSNTL YOUNG GPIG 10#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845403113",
+    "name": "OXB HIDEAWAY TMTHY TNNL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845403137",
+    "name": "OXB HIDEAWAY TMTHY BUNGALOW MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845810072",
+    "name": "OXB TRT TMTHY ORC HAY 90Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845960173",
+    "name": "OXB TRT BAKED CRRT/DILL 3OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845960234",
+    "name": "OXB TRT BAKED APPL/BAN 3OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845963785",
+    "name": "OXB BTTL DRIPLESS 15OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845966427",
+    "name": "OXB LTTR PAN RECT W/SHIELD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845967912",
+    "name": "OXB HUT TMTHY SA MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845968339",
+    "name": "OXB FOOD ESSNTL FRRT 4#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859000022",
+    "name": "KAY FOOD FDPH RBBT ADLT 5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859000817",
+    "name": "KAY TRT TMTHY HIDEOUT SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859005324",
+    "name": "KT-50019",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859008097",
+    "name": "KT-50034",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859998718",
+    "name": "KAY TRT TMTHY-P MARIGOLD 24Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "644472002867",
+    "name": "AEC TOY NIBBLE ICE CR CHW",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "644472009064",
+    "name": "AEC CAGE SHELF CRNR LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "644472010527",
+    "name": "AEC WHEEL HAM/MOUSE 4IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125603842",
+    "name": "PTS TOY LAVA LEDGE",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125604078",
+    "name": "PTS HIDEOUT IGLOO GNT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125605518",
+    "name": "PTS CRITTERTRAIL ACCESS KIT 1",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125605525",
+    "name": "PTS CRITTERTRAIL ACCESS KIT 2",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125611328",
+    "name": "PTS CHEW KABOB ECONOMY LARGE",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125613773",
+    "name": "PTS BALL RUN ABOUT GIANT CLR",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125613841",
+    "name": "PTS WHEEL COMFORT LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125614145",
+    "name": "PTS WHEEL SILENT SPINNER MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125614169",
+    "name": "PTS WHEEL SILENT SPINNER LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125619102",
+    "name": "PTS FDR HAY BUFFET W/LID",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125619713",
+    "name": "PTS CLEARWATER BOTTLE 8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125619737",
+    "name": "PTS CLEARWATER BOTTLE 32OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125621433",
+    "name": "PI-62143",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125621686",
+    "name": "PTS LTTR CRITTER LITTER 8#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125622720",
+    "name": "PTS BED CUDDLE CUP",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125622928",
+    "name": "PI-62292",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484067082",
+    "name": "COA CLLR CT SAFE FSHN SKP 12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484067099",
+    "name": "COA CLLR CT SAFE FSHN SKZ 12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484067242",
+    "name": "COA CLLR KTTN LP BRKW PSC 8",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484067259",
+    "name": "COA CLLR KTTN LP BRKW DMC 8",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484067297",
+    "name": "COA CLLR KTTN LP BRKW WDF 8",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484067532",
+    "name": "COA CLLR CT SAFE FSHN WDF 12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484067556",
+    "name": "COA CLLR CT SAFE GID GBF 12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484067570",
+    "name": "COA CLLR CT SAFE GID GOF 12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484067822",
+    "name": "COA CLLR CT SAFE FSHN TIG 12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484067860",
+    "name": "COA CLLR CT SAFE FSHN DAB 12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484670213",
+    "name": "COA CLLR SAFE HRT BCKL DPM XS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484670244",
+    "name": "COA CLLR CT SAFE FSHN PCG 12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484670374",
+    "name": "COA CLLR CT SAFE GALAXY 8-12IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484670381",
+    "name": "COA CLLR CT SAFE RAINY DAY8-12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484670398",
+    "name": "COA CLLR CT SAFE SHINE DMD8-12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484670718",
+    "name": "COA CLLR CT SAFE EMB FHSN PK12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484670725",
+    "name": "COA CLLR CT SAFE EMB FHSN RD12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484670749",
+    "name": "COA CLLR CT SAFE EMB FHSN OR12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484672200",
+    "name": "COA CLLR KTTN LP BRKW CBB 8",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484672217",
+    "name": "COA CLLR KTTN LP BRKW FWB 8",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484672224",
+    "name": "COA CLLR KTTN LP BRKW GPG 8",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484672231",
+    "name": "COA CLLR KTTN LP BRKW LEB 8",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484672248",
+    "name": "COA CLLR KTTN LP BRKW HTF 8",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484672255",
+    "name": "COA CLLR KTTN LP BRKW PBY 8",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484672262",
+    "name": "COA CLLR KTTN LP BRKW RMC 8",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484672279",
+    "name": "COA CLLR KTTN LP BRKW SKR 8",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484673115",
+    "name": "COA CLLR CT SAFE RND FSHN CAMO",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484673146",
+    "name": "COA CLLR CT SAFE RND FSHN STRP",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484677502",
+    "name": "COA CLLR CT SAFE GID GBG 12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484761003",
+    "name": "COA CLLR CT SAFE BFLY 8-12IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484761010",
+    "name": "COA CLLR CT SAFE CONSTLLN 8-12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484761034",
+    "name": "COA CLLR CT SAFE LADYBUG8-12IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484761041",
+    "name": "COA CLLR CT SAFE M-GRDN 8-12IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484761058",
+    "name": "COA CLLR CT SAFE CHTH PK8-12IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484773112",
+    "name": "COA CLLR KTTN LP RND NDT 8IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484773129",
+    "name": "COA CLLR KTTN LP RND SQA 8IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484773136",
+    "name": "COA CLLR KTTN LP RND STW 8IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "879213009007",
+    "name": "BLI CARRIER COMFT SM BK/BR",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "879213009106",
+    "name": "BLI CARRIER COMFT SM TP",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "879213009137",
+    "name": "BLI CARRIER COMFT SM BERMUDA",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "879213009175",
+    "name": "BLI CARRIER COMFT SM BRY",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "879213009199",
+    "name": "BLI CARRIER COMFT LG TP",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "879213009205",
+    "name": "BLI CARRIER COMFT LG BERMUDA",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "879213009212",
+    "name": "BLI CARRIER COMFT LG BRY",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484512087",
+    "name": "COA T/O 89080 CABLE GNT 10FT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484512094",
+    "name": "COA T/O 89081 CABLE GNT 15FT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484512117",
+    "name": "COA T/O 89083 CABLE GNT 30FT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484513091",
+    "name": "COA COMB W6162 FLEA PLSTC 100",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484890512",
+    "name": "COA T/O 89051 CABLE MD 15FT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484890536",
+    "name": "COA T/O 89053 CABLE MD 30FT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484943201",
+    "name": "COA BRUSH RBBR CURRY DOG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484946202",
+    "name": "COA BRUSH SLKR FIRM SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484946400",
+    "name": "COA BRUSH SLKR FIRM MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484946608",
+    "name": "COA BRUSH SLKR FIRM LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484986000",
+    "name": "COA CAR ADJ TETHER BK 1X13-20",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905290241",
+    "name": "AGA VERSATOP GLASS HNGD 24IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163011065",
+    "name": "AR-106",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163020937",
+    "name": "AR-93B",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163080856",
+    "name": "AR-85A",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055032117",
+    "name": "U-03211",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055034289",
+    "name": "U-03428",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055213073",
+    "name": "U-21307",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055213288",
+    "name": "U-21328",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055301206",
+    "name": "U-30120",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055323208",
+    "name": "U-32320",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055324403",
+    "name": "U-32440",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055325509",
+    "name": "HIK FOOD FRZN SPIR MYSIS 3.5Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055332019",
+    "name": "U-33201",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029904109619",
+    "name": "WWI BIO ACTIV BETTA SOLUTION",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000116012607",
+    "name": "SLI COND STABILITY 250ML",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000116052603",
+    "name": "SLI COND STRESSGUARD 250ML",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000116060608",
+    "name": "SA-455",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798163503",
+    "name": "TE-16350",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "720101103201",
+    "name": "KMP FOOD SWTHRVST KEET VE 20#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "618940312000",
+    "name": "JWP PERCH SAND SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "618940313083",
+    "name": "JWP FRD WTR BIRD CUP SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "762177786001",
+    "name": "ZUP FOOD PRRT FRT BREEDER 40#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695291111",
+    "name": "DOS LTTR SCOOP WH LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "666594208040",
+    "name": "EPC LTTR GENIE RFILL JMB 2PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "729849142299",
+    "name": "LLL LTTR TRAY SCOOPFREE SNGL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585460055",
+    "name": "KON TEASR CT PURRSUIT BFLY",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "777979213259",
+    "name": "INS LTTR ODORLOCK LAV 25#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095869042",
+    "name": "TRO SHMP CT WTRLSS DEEP CLN7.4",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234020241",
+    "name": "ET-2024",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234020906",
+    "name": "ET-2090",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234027721",
+    "name": "ETH TOY 100% CTNP CRAVERS 2PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "686960000887",
+    "name": "NTN TRT FRTBL APL/BCN 12OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "818582010238",
+    "name": "INV MED-P ANTIMIC EYE GEL 3OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "810032680015",
+    "name": "ZIP TOY SQKY CAN ZIPPY COLA",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "797801035613",
+    "name": "GAR RMDY CRNBRRY RELIEF 50G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "797801036917",
+    "name": "GAR SPLMT ALL-IN-ONE SFT 60CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "797801036955",
+    "name": "GAR QUIET MOMENT MELATONIN70CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "797801048071",
+    "name": "GAR RMDY ALLER-911 SPRY 8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "797801059312",
+    "name": "GAR QUIET MOMENTS HEMP 60CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071860225841",
+    "name": "PBG SHMP FNC ORIG 18OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045663972318",
+    "name": "FOU DIAPER WEE WEE DSPL SM 12C",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045663976460",
+    "name": "FOU SHMP MC PUP TEARLESS 16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "768303011184",
+    "name": "IMS BNE STFD PB LG 5-6IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "768303011696",
+    "name": "IMS BNE STERILZR STFD BF 5-6IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "768303013867",
+    "name": "IMS TRT SWPOT STEAK FRY 1#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "034846550023",
+    "name": "MPF BSCT WHSM ORIG PUP 2#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585012131",
+    "name": "KON TOY SQZ TNNS BLL BULK MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585181127",
+    "name": "KC-BB1",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585495378",
+    "name": "KON TUG JAXX BRIGHT W/BALL MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585509181",
+    "name": "KON DSPNSR TRT GOODIEZ RNG MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863041310",
+    "name": "GRE TRT DNTL ORIG XS 12OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863101069",
+    "name": "GRE TRT DNTL ORIG LG 36OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863101250",
+    "name": "GRE TRT PILLP TAB HCKRY 3.2OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863101281",
+    "name": "GRE TRT PILLP CAPSL PB 7.9OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863102912",
+    "name": "GRE TRT DNTL ORIG XS 6OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863104107",
+    "name": "GRE TRT PILLP CAPSL CHKN 15.8Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863106552",
+    "name": "GRE TRT PILLP CAPSL HCKRY 15.8",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863118494",
+    "name": "GRE SPLMT SFT CHW H/J 30CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "746772350140",
+    "name": "MAM TOY TRBTR 2 6IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095001831",
+    "name": "TRO DNTL WTR ADD-P H/J 33.8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095007437",
+    "name": "TRO SHMP F/T CT NO RINSE 7.4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095700574",
+    "name": "TRO CLGN SPA FOR HIM 16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "669125804056",
+    "name": "NTN MED BITTER BANDAGE 3IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184105092",
+    "name": "RBP CAN STEW TRKY/CRRT 12OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184120095",
+    "name": "RBP DRY W/G OCN 4#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184120132",
+    "name": "RBP DRY G/F SKY 22#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184120156",
+    "name": "RBP DRY W/G LAND 22#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184403037",
+    "name": "RBP TRT BNE FLLD PB SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184403044",
+    "name": "RBP TRT BNE FLLD CHS/BCN SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184403068",
+    "name": "RBP TRT BNE FLLD CHKN SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184505014",
+    "name": "RBP TRT PRK SLICE 1.5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "723633001564",
+    "name": "NBP CAN LID SLMN/SWPOT 13OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "723633014496",
+    "name": "NBP DRY LID PLNT PWR VEG 24#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "723633605083",
+    "name": "NBP TRT LIT FSH/SWPOT S/B 8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "724089113443",
+    "name": "ELA MED TAPE WORM 5CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "079100220533",
+    "name": "DMF BSCT MB BAKED PB 12OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234546260",
+    "name": "ETH TOY BAMBNE DNTL BNE PB 6IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "810002631450",
+    "name": "FCF TRT NTH ROLL CHKN LG2P",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "810002631467",
+    "name": "FCF TRT NTH TWST CHKN SM10",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "811794933197",
+    "name": "FMN SHMP SENS SKIN 16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214813842",
+    "name": "NYL TOY TTHNG KEYS PUP SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214820871",
+    "name": "NYL TOY TTHNG PACIFIER XS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214828068",
+    "name": "NYL DNTL AOC NAT TOOTHPASTE",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214832416",
+    "name": "NYL TOY CHW WSHBN PUP BL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "842982071605",
+    "name": "LOV BOWL DOLCE WOOF SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "842982074019",
+    "name": "LOV BOWL BELLA CLSC PK MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "842982074095",
+    "name": "LOV BOWL BELLA CLSC BL MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "079441002010",
+    "name": "VN-A1",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "079441002126",
+    "name": "VN-DD2",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "745801177031",
+    "name": "DUI WRMR 3X WORMER MD/LG 2CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "748406003354",
+    "name": "EAP CLNG PUP/KTTN BABY PWD 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197270000",
+    "name": "FLU CLAMP LAMP CERM 8.5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197510144",
+    "name": "FLU DECOR REPTA VINES IVY 6FT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197510151",
+    "name": "FLU DECOR REPTA VINE POTHOS 6F",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197720345",
+    "name": "FLU TRT GRUB BAG BRD DRGN 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197720369",
+    "name": "FLU TRT GRUB BAG MLWORM 3.75Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197730054",
+    "name": "FLU SPLMT REPTA CAL 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197730191",
+    "name": "FLU SPLMT CAL D3 STRWBRY/BAN4Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197730306",
+    "name": "FLU SPLMT REPTA BST",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "783178562265",
+    "name": "NZP FOOD BNB JUV DRGN 2.76OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369933567",
+    "name": "KOM LINER CCNUT TERRM 12X30",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798258452",
+    "name": "TET CRTRDG REPTO FLTR 3PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798292524",
+    "name": "TE-16598",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316096271",
+    "name": "ZIL REPT MUNCHIES FRUIT 2.5OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316117594",
+    "name": "ZIL LINER TERRARIUM BR 40/50G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316670822",
+    "name": "ZIL BULB FLO COIL TRPCL 20W",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316670839",
+    "name": "ZIL BULB FLO COIL DSRT 20W",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316670952",
+    "name": "ZIL BULB FLO DSRT T8 18IN 15W",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671379",
+    "name": "ZIL BULB NGHT BK INC 50W BOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671423",
+    "name": "ZIL BULB DAY BL INC 75W BOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671430",
+    "name": "ZIL BULB DAY BL INC 100W BOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671522",
+    "name": "ZIL BULB SPOT DAY WH 150W BOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671560",
+    "name": "ZIL BULB SPOT NIGHT BK 150WBOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316700543",
+    "name": "ZIL LINER TERRARIUM GN 10G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316700581",
+    "name": "ZIL LINER TERRARIUM GN 20/29",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612008906",
+    "name": "ZML KIT CREATURES ISOPOD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612200225",
+    "name": "ZO-CF2M",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612200867",
+    "name": "ZML HUT COCO NUT HOUSE",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612321906",
+    "name": "ZML FXTR DEEP DOME MINI COMBO",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612400724",
+    "name": "ZO-M72",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612401035",
+    "name": "ZML FOOD GRMT BRD DRGN 8.25Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612403084",
+    "name": "ZML FOOD CRSTD GECKO TRPCL 2OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612403091",
+    "name": "ZML FOOD CRSTD GECKO TRPCL 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612410211",
+    "name": "ZO-ZM21B",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612622119",
+    "name": "ZML FEEDING TONGS SS ANGLED",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612790085",
+    "name": "ZML BEDNG ECO EARTH LOOSE 8QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612790214",
+    "name": "ZML BEDNG ECO EARTH CNUT 3PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612920505",
+    "name": "ZO-WD50",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612925401",
+    "name": "ZML BOWL REPTIROCK CRNR WTR LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "066380004182",
+    "name": "HLP BEDNG CF NAT WH 10L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "066380004342",
+    "name": "HLP BEDNG CF COLRS BL 23L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "720101352043",
+    "name": "KMP FOOD GPIG & MORE 4#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845110028",
+    "name": "OXB BEDNG PURE CMFT 36L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845111025",
+    "name": "OXB BEDNG PURE CMFT 72L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845402451",
+    "name": "OXB FOOD ESSNTL YOUNG RBBT5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845402550",
+    "name": "OXB FOOD ESSNTL YOUNG RBBT 10#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845402895",
+    "name": "OXB FOOD ESSNTL ADLT RBBT 10#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845402901",
+    "name": "OXB FOOD ESSNTL ADLT GPIG 5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845402963",
+    "name": "OXB TRT ORC GRSS 40OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845965291",
+    "name": "OXB TOY CLBRTN CUPCAKE",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845966731",
+    "name": "OXB TOY WLL PLY CB",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845966847",
+    "name": "OXB TOY TMTHY WAFFLE",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845969831",
+    "name": "OXB TRT WESTRN TMTHY/ORC 15Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859015545",
+    "name": "KT-50120",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859944821",
+    "name": "KAY TRT TMTHY BAKED APL 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125604047",
+    "name": "PI-60404",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125604061",
+    "name": "PI-60406",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125604115",
+    "name": "PI-60411",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125604207",
+    "name": "PTS TOY CHIN-CHILLER",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125604320",
+    "name": "KAY TOY TREE OF LIFE 3IN1 LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125605259",
+    "name": "PI-60525",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125613506",
+    "name": "PI-61350",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125613544",
+    "name": "PI-61354",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125613780",
+    "name": "PI-61378",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125613827",
+    "name": "PTS WHEEL COMFORT SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125619126",
+    "name": "PI-61912",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125619706",
+    "name": "PTS CLEARWATER BOTTLE 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125619720",
+    "name": "PTS CLEARWATER BOTTLE 16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125619836",
+    "name": "PTS BTTL CHEW PROOF LG 26OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125623055",
+    "name": "PTS CARRIER COME ALONG LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204031998",
+    "name": "FAS PJS MOON/STARS BL XS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204032124",
+    "name": "FAS PJS TIE DYE YL SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234800478",
+    "name": "FAS SWTR CLASSIC CABLE PK XS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234800485",
+    "name": "FAS SWTR CLASSIC CABLE PK SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234800492",
+    "name": "FAS SWTR CLASSIC CABLE PK MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234543429",
+    "name": "ETH TOY SIR-SQKS-ALOT AST 19IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234545898",
+    "name": "ETH TOY FUN FOOD DOGRITOS 14IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "180181005039",
+    "name": "VIP TOU TUFF SPRT TUG-O-WAR YL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "180181906350",
+    "name": "VIP TOY ULT 3WAY TUG BL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184120088",
+    "name": "RBP DRY W/G SKY 4#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184120125",
+    "name": "RBP DRY G/F LAND 22#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184120149",
+    "name": "RBP DRY G/F OCN 22#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184120163",
+    "name": "RBP DRY W/G SKY 22#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184120170",
+    "name": "RBP DRY W/G OCN 22#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184125007",
+    "name": "RBP DRY G/F PUP 22#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184125069",
+    "name": "RBP DRY W/G PUP 4#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184125076",
+    "name": "RBP DRY W/G PUP 22#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204010566",
+    "name": "FAS COAT RAINY DAY YL LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204026284",
+    "name": "FAS PJS UNICORN PK SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204030472",
+    "name": "FAS SWTR UNTUCKED PLD LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204031837",
+    "name": "FAS HOODIE COSMIC NVY XS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204031844",
+    "name": "FAS HOODIE COSMIC NVY SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204032025",
+    "name": "FAS PJS MOON/STARS BL LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204032063",
+    "name": "FAS PJS GRDN GNOMES PK SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204032087",
+    "name": "FAS PJS GRDN GNOMES PK LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234302064",
+    "name": "FAS BOOT ALL WTHR RD LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "657546800993",
+    "name": "NPI TRT FRRT STC SLMN 1.87OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234520581",
+    "name": "ETH TEASR CAT PRANCER 44IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234521120",
+    "name": "ETH TEASR CT BFLY & MYLAR ASST",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234521311",
+    "name": "ETH TOY CT SONGBIRD CTNP 5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234521588",
+    "name": "ETH TOY CT YARN BLLS 3.5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234800324",
+    "name": "FAS SWTR CLASSIC CABLE RD XXS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234800560",
+    "name": "FAS SWTR CLASSIC CABLE RD XXXS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "657546113031",
+    "name": "NPI USA TTHING PUP RING CHKN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234548509",
+    "name": "ETH TOY STHRS WARM HUG PAL10IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905001908",
+    "name": "AQE KIT BETTA BOW QUICKCLN 1G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905060530",
+    "name": "AQE FOOD GF GRNLRS 5.8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905061889",
+    "name": "AQE FOOD SHRMP PLLTS 3.25OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163010525",
+    "name": "API COND WTR TAP 8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163031117",
+    "name": "API COND AQCLR 8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163040898",
+    "name": "API COND QUICK START 8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163041116",
+    "name": "AR-111B",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163080337",
+    "name": "API TEST STRP 5-IN-1 4CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "008479113290",
+    "name": "CRS ROCK DRGN STONE SM 25#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055215213",
+    "name": "U-21521",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055221023",
+    "name": "U-22102",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055302401",
+    "name": "U-30240",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029904300917",
+    "name": "WWI GRVL CUMBERLAND RIVER25#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029904700113",
+    "name": "WWI GRVL SNOW WH 25#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000945880453",
+    "name": "SB-88045",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000116011303",
+    "name": "SLI MEDIA MATRIX 500ML",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000116043601",
+    "name": "SA-436",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798290858",
+    "name": "TET GRVL GLOFSH PK/GN/BL 5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798770244",
+    "name": "TET FOOD SHRMP WFR 3OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798770251",
+    "name": "TE-77025",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798771265",
+    "name": "TE-77126",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "720101103027",
+    "name": "KMP FOOD SWTHRVST KEET VE 2#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859942445",
+    "name": "KAY TRT HLTHY BIT PARR 4.5OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859942643",
+    "name": "KAY SPLMT FDPH JAR MOLTING 11Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859942667",
+    "name": "KAY TRT HLTHY TOP PAPAYA BIRD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "762177756004",
+    "name": "ZUP FOOD PRRT NAT BREEDER 40#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "762177830209",
+    "name": "ZUP FOOD FRT BLND PRRT/CNR 2#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "762177840208",
+    "name": "ZUP FOOD FRTBLND LG PRRT 2#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "762177922003",
+    "name": "ZUP FOOD TIEL NAT 2.5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "723503504157",
+    "name": "DOS LTTR LNR CLEANSTEP JMB 8PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "797801036450",
+    "name": "GAR SPLMT CT DGST PROBIO/ENZ60",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "797801037327",
+    "name": "GAR SPLMT CT L-LYSINE CHW 60CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695220623",
+    "name": "DOS LTTR TOP ENTRY PAN SLVR/WH",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695292484",
+    "name": "DOS LTTR LINER TOP ENTRY PAN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045663017323",
+    "name": "FP-1732",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "039079003001",
+    "name": "FAR RMDY CLLR COMFT ZONE",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585404028",
+    "name": "KON GRMG CONNECTS KITTY COMB",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "033200022060",
+    "name": "CND LTTR A/H MULTICAT 20#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "724089579522",
+    "name": "ELA F/T CLLR CT SERESTO",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234025055",
+    "name": "ETH TOY STRINGY MICE/CATNIP 4P",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "079441004120",
+    "name": "VN-L2",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "079441004199",
+    "name": "VAN LTTR SIFT PAN LINER 10PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "021653140042",
+    "name": "BDE-1400",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "021653513082",
+    "name": "BDE-5130",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "797801036719",
+    "name": "GAR SPLMT BLADDER-PCRN SFT60CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "797801048309",
+    "name": "GAR SPLMT ADV PROBIO/ENZ PWD4Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "797801090001",
+    "name": "GAR SPRY BITTER YUCK 8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484004049",
+    "name": "C-00404",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045663016494",
+    "name": "FOU PADS WEE WEE XL 40CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045663158309",
+    "name": "FOU WEE WEE PATCH MD 20X30IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045663970932",
+    "name": "FOU GRMG MC 3-IN-1 SCISSORS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "854111004019",
+    "name": "BEN CHW WSHBN PB MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "854111004095",
+    "name": "BEN CHW WSHBN PB LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "854111004965",
+    "name": "BEN CHW WSHBN PB GNT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "768303705557",
+    "name": "IMS TRT BULLY HIDE STC SM 9CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "034846580105",
+    "name": "MPF DRY WHSM SENS SLMN 30#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585010489",
+    "name": "KON TRT EASY PASTE BCN CHS 80Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585081335",
+    "name": "KON E-CLLR CLOUD SOFT SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585081342",
+    "name": "KON E-CLLR CLOUD SOFT MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585129174",
+    "name": "KON TOY FLYER RD SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585360584",
+    "name": "KON TOY SHAKERS LUVS GIRAFFELG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585360591",
+    "name": "KON TOY SHAKERS LUVS GIRAFFESM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585499932",
+    "name": "KON TOY SNUZZLE FROG XS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585499956",
+    "name": "KON TOY SNUZZLE DUCK XS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585503059",
+    "name": "KON TOY BALLSTC GATOR MD/LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585505572",
+    "name": "KON TOY RP RALLY BNE MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585509433",
+    "name": "KON TOY JUMBLER TUF S/M",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585775159",
+    "name": "KON TOY AIR SQKR BALL SM 3CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863045394",
+    "name": "GRE TRT PILLP TAB CHKN 3.2Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863104732",
+    "name": "GRE TRT DNTL FRSH REG 12OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863109294",
+    "name": "GRE TRT PILLP TAB CHS 3.2OZ.",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863117732",
+    "name": "GRE TUB S/T CHKN/BF 2OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863117824",
+    "name": "GRE TUB S/T CHKN/DUCK 2OZ/8PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863117848",
+    "name": "GRE TUB S/T CHKN/BF 2OZ/8PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "892383002029",
+    "name": "PMX TRT SMBN CHKN MINI 24CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "810833029426",
+    "name": "PMX TRT SMBN SMRT TWISTS 50PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095001282",
+    "name": "TRO DNTL KIT ORAL CARE SM 3PC",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095700611",
+    "name": "TRO SHMP SPA WH COAT 16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369372441",
+    "name": "MUL TOY WOODY WOODPECKER 11IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369483710",
+    "name": "MUL TOY LMB CHOP 6IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369483758",
+    "name": "MUL TOY LMB CHOP 10IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369510836",
+    "name": "MUL TOY TRP LGHT UP BALL 2.5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369610949",
+    "name": "MUL TOY LATEX ANIMALS MINI 3IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "079105117814",
+    "name": "NUT CAN ADLT CHKN/RC S/B 3.5OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "079105117838",
+    "name": "NUT CAN ADLT SMMRD BF/POT3.5",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184011300",
+    "name": "RBP DNTL C-A-B HYDRANT SM 24CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184105160",
+    "name": "RBP CAN STEW CHKN/PMPKN 12OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184421000",
+    "name": "RBP TRT BNE MEATY 9IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184506448",
+    "name": "RBP TRT HOOVES FLLD CHS/BCN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184506455",
+    "name": "RBP TRT FILLED HOOVES PB",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "724089579607",
+    "name": "ELA F/T CLLR SERESTO LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018065284129",
+    "name": "N/M SHMP/COND OATML 16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018065284143",
+    "name": "N/M SHMP/COND PUP 16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018065284174",
+    "name": "N/M SHMP/COND LAV 16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234053669",
+    "name": "ETH TOY PLUSH SKINNEEEZ RABBIT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234055014",
+    "name": "ETH TOY PLSH SKIN RCCN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234060629",
+    "name": "ET-6062",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234541197",
+    "name": "ETH TOY SKINZ XTRM OCTOPUS 16",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "811794933173",
+    "name": "FMN SHMP DESHDDNG ULT PREM 16Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214841593",
+    "name": "NYL HLTHY EDBL PUP VARPK PETT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "748406003323",
+    "name": "EAP CLNG CALM LAV/CHMML 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197710131",
+    "name": "FLU FOOD DUBIA ROACH HI CAL7OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197713019",
+    "name": "FLU FOOD OR CB CRICKET 12OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197760440",
+    "name": "FLU FOOD B-B BRD DRGN 7.5OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "788286004058",
+    "name": "REP FOOD ADLT IGUANA 2#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369932355",
+    "name": "KOM BOWL SMART 5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369933574",
+    "name": "KOM LINER CCNUT TERRM 18X36",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "759834054221",
+    "name": "GAL BKGD CLING DESERT 15X36",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798169680",
+    "name": "TE-16968",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316116634",
+    "name": "ZIL DEN DURABLE GY MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671072",
+    "name": "ZIL BULB FLO TRPCL T8 18IN 15W",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671454",
+    "name": "ZIL BULB NIGHT INC RD 50W BOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316700574",
+    "name": "ZIL LINER TERRARIUM BR 30G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612327113",
+    "name": "ZML TIMER REPTICARE TERRM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612400168",
+    "name": "ZML FOOD AQ FROG/TADPOLE 2OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612410501",
+    "name": "ZO-M50B",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612740202",
+    "name": "ZML CLAY EXCAVATOR BURROW 20#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612752243",
+    "name": "ZML BEDNG REPTISOIL 24QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612762358",
+    "name": "ZML SAND VITA GOBI GLD 10#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612780086",
+    "name": "ZO-CM8",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612780246",
+    "name": "ZML BEDNG FRST FLOOR 24QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612790245",
+    "name": "ZML BEDNG ECO EARTH LOOSE 24QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "066380004168",
+    "name": "HLP BEDNG CF NAT 60L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "730582211609",
+    "name": "SPF TRT HAZEL LOVELIES 4.2OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "730582211708",
+    "name": "SPF FOOD REGGIE RAT/M MOUSE2#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845402864",
+    "name": "OXB FOOD ESSNTL ADLT RBBT 25#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845403168",
+    "name": "OXB TRT TMTHY MAT LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845963150",
+    "name": "OXB TOY APPL STC DANGLY",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859000213",
+    "name": "KAY FOOD GOURMET HAM/GERBIL 3#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859007083",
+    "name": "KT-50035",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859008110",
+    "name": "KT-50036",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859949314",
+    "name": "KAY BEDNG PINE 3200CI",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859999944",
+    "name": "KAY FOOD FDPH MOUSE/RAT 3#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076711004880",
+    "name": "LIX FEEDING DROPPER SYRINGE",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "766501003819",
+    "name": "MFP FOOD FRRT PREM DIET 22OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125621310",
+    "name": "PI-62131",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125621648",
+    "name": "PTS LTTR CRITTER LITTER 4#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125622904",
+    "name": "PI-62290",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204030243",
+    "name": "FAS SWTR TXTRD CABLE GR SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204030458",
+    "name": "FAS SWTR UNTUCKED PLD SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204030465",
+    "name": "FAS SWTR UNTUCKED PLD MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204030489",
+    "name": "FAS SWTR UNTUCKED PLD XL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204030496",
+    "name": "FAS SWTR STRP GY XS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204030519",
+    "name": "FAS SWTR STRP GY MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204030793",
+    "name": "FAS SWTR TWISTED CABLE FRST XS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234043431",
+    "name": "ETH TOY GIGGLER PLSH CHKN 12IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234541692",
+    "name": "ETH TOY SOOTHERS BLANKET 10IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234541708",
+    "name": "ETH TOY SOOTHERS CRINKLE 13IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234543641",
+    "name": "ETH TOY SLITHERY SNAKES 35IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234548271",
+    "name": "ETH TOY SKINZ STRETCHEEZ 22IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234548516",
+    "name": "ETH TOY STHRS WARM HUG BNE 9IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234548530",
+    "name": "ETH TOY STHRS TABBIE LMB 8IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234548547",
+    "name": "ETH TOY STHRS TABBIE LMB 12IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "047431504363",
+    "name": "AQA PART B/W ASSM 200B/350B",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234029572",
+    "name": "ET-2957",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204030236",
+    "name": "FAS SWTR TXTRD CABLE GR XS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204030250",
+    "name": "FAS SWTR TXTRD CABLE GR MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204030267",
+    "name": "FAS SWTR TXTRD CABLE GR LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204030274",
+    "name": "FAS SWTR TXTRD CABLE GR XL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204031431",
+    "name": "FAS SWTR BNE ACCENT OR XS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "729849105423",
+    "name": "RS-10228",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "657546113024",
+    "name": "NPI USA TTHING PUP RING PMPK3C",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "657546113055",
+    "name": "NPI USA TTHING PUP RING CHKN3C",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234547724",
+    "name": "ETH TOY BAMBNE TRPL BISON 4IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "180181011016",
+    "name": "VIP TOY TUFF JR'S TUFF RING RD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "180181020148",
+    "name": "VIP TOY TUFF SEA CRTRS LOBSTER",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "180181903748",
+    "name": "VIP TOY DSRT LIZZY LIZARD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234520765",
+    "name": "ETH TOY SHMMR GLMR TRTL CATNIP",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234520857",
+    "name": "ETH TOY BERTHA MOUSE CTNP 7IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204010542",
+    "name": "FAS COAT RAINY DAY YL SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204010559",
+    "name": "FAS COAT RAINY DAY YL MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204031240",
+    "name": "FAS SWTR TWSTD CABLE PK SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204031448",
+    "name": "FAS SWTR BNE ACCENT OR SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204031455",
+    "name": "FAS SWTR BNE ACCENT OR MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204031462",
+    "name": "FAS SWTR BNE ACCENT OR LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204031479",
+    "name": "FAS SWTR BNE ACCENT OR XL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234302019",
+    "name": "FAS BOOT ALL WTHR RD XXXS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234302026",
+    "name": "FAS BOOT ALL WRTH RD XXS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234546086",
+    "name": "ETH TOY LUNA-CORN PLSH 10IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905000697",
+    "name": "AQE HEATER FLAT 5W UP TO 2G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "017163001218",
+    "name": "AR-21",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "017163003526",
+    "name": "AR-52C",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163010891",
+    "name": "API COND QUICK START 1OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "034652067067",
+    "name": "CLI SND AQUTC BK 25#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "008479007728",
+    "name": "CRS SAND ECO CMPLT CCHLD 20#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "008479008206",
+    "name": "CRS SAND SN MOONLIGHT 20#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055033114",
+    "name": "U-03311",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055033282",
+    "name": "U-03328",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055047203",
+    "name": "HIK FOOD CCHLD SINK MED 3.5Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055214032",
+    "name": "HIK FOOD ALGAE WFR MINI .77Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055222150",
+    "name": "HIK FOOD VIBRA BITES 2.57OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055302456",
+    "name": "HIK FOOD FRZN BLDWRM JMBCB 3.5",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055325202",
+    "name": "U-32520",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055960403",
+    "name": "HIK FLTR BACTO-SURGE FOAM 40G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055960441",
+    "name": "HIK FLTR BACTO-SURGE FOAM 75G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "819603018547",
+    "name": "ATP FDR AUTO FISH PROGRAMMABLE",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000116031271",
+    "name": "SLI SEALANT SILICONE CLR 3OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798162506",
+    "name": "TE-16250",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798771609",
+    "name": "TE-77160",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798772422",
+    "name": "TET FOOD TETRAMIN PLUS 2.2OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798772507",
+    "name": "TET FOOD TETCLR PLUS 2.2OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798780434",
+    "name": "TET PLNT GLOFSH FLO OR/YL SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798780441",
+    "name": "TET PLNT GLOFSH FLO OR/YL MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798780922",
+    "name": "TET PLNT GLOFSH FLO PR/WH MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612240719",
+    "name": "ZML BETTA TUNNEL ASST",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "720101103041",
+    "name": "KMP FOOD SWTHRVST KEET VE 4#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "618940313137",
+    "name": "JWP HOLDER CUTTLEBONE",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "644472014785",
+    "name": "A&E HOLDER CUTBNE/TRT 2PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "644472016697",
+    "name": "AEC TRT CUTBNE NAT 6IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "762177850306",
+    "name": "ZUP FOOD NUT BLEND MD/LG 3.25#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "033200150206",
+    "name": "CND LTTR A/H DEOD 20OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "033200150299",
+    "name": "CND LTTR A/H DEOD DBL DUTY 30Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "019014712571",
+    "name": "IAM DRY CT PAH ORIG CHKN 7#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660048202202",
+    "name": "CAN TOY WHISTLE BLL MD 2CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "010279105931",
+    "name": "BRM DIAPER WASHBL MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "797801036986",
+    "name": "GAR STOOL EATING DETERRENT 70C",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695268045",
+    "name": "DO-25871",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695323133",
+    "name": "CAN TOY MAX GLW BLL MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045663016470",
+    "name": "FOU PADS WEE WEE XL 14CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045663188993",
+    "name": "FOU DIAPER WEE WEE LINER 24CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045663975746",
+    "name": "FOU PAD WEE WEE GRASS SCT 10CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "854111004088",
+    "name": "BEN CHW WSHBN BCN LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "854111004484",
+    "name": "BEN CHW STC BCN LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "768303705540",
+    "name": "IMS TRT BULLY HIDE STC SM 12CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "729849100329",
+    "name": "RS-10032",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "729849164468",
+    "name": "RAD CLLR RCHRGB LITE BRK CNTRL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "729849177581",
+    "name": "RAD CLLR NANOBARK SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "034846550061",
+    "name": "MPF BSCT WHSM GRMT CHS 3#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585009858",
+    "name": "KON TRT ZIGGIES CHKN SM 6OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585010502",
+    "name": "KON TRT EASY PASTE PUP CHKN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585034355",
+    "name": "KON DSPNSR TRT TNNS BALL LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585111025",
+    "name": "KON TOY XTRM KONG BK XL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585137001",
+    "name": "KON TRT EASY PASTE PEPPERONI8Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585361260",
+    "name": "KON TRT MARATHON PB MD 2CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585421209",
+    "name": "KON TOY PATCHES GIRAFFE XL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585498270",
+    "name": "KON DSPNSR TRT WALLY MD/LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585498607",
+    "name": "KON TOY FRIZZLE ZAZZLE MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585498997",
+    "name": "KON TOY CUTESEAS LBSTR SM/MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585499871",
+    "name": "KON TOY SCRUFFS CHKN MD/LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585775173",
+    "name": "KON TOY AIR SQKR TENN BALL LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863045417",
+    "name": "GRE TRT PILLP CAPSL CHKN 7.9OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863101274",
+    "name": "GRE TRT PILLP CAPSL HCKRY 7.9Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863102929",
+    "name": "GRE TRT DNTL ORIG PETT 6OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863114434",
+    "name": "GRE TRT ANYTIME BTS BLBRY10.3Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "019014803446",
+    "name": "IAM DRY PAH S/B 7#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "746772200865",
+    "name": "MAM TOY FLOSSY CHW BALL SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "746772235904",
+    "name": "MAM TOY CLOTH RP 3KNT W/SQKR10",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "746772250204",
+    "name": "MAM TOY XTRA MNKY FIST 3.5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "746772350041",
+    "name": "MAM TOY TRBTR 2 W/RPE 3.75",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095002340",
+    "name": "TRO DNTL SPRY ORAL CARE PB 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095010093",
+    "name": "TRO WIPES HYPO 100CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095869028",
+    "name": "TRO SHMP WTRLSS HYPO 7.4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184120057",
+    "name": "RBP DRY G/F SKY 4#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "079100508563",
+    "name": "DMF BSCT MB FLVR SNACK MINI15Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214808022",
+    "name": "T-NEB105",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214832393",
+    "name": "NYL TOY TTHNG CHW PUP BL PETT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214853060",
+    "name": "NYL PWR CHW BAGUETTE CHKN LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "842982072572",
+    "name": "LOV BOWL SS R-N-T DMD 3QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "842982073579",
+    "name": "LOV MAT BELLA SPILL PROOF BKLG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197712005",
+    "name": "FLU CRICKET QUENCHER 16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055273091",
+    "name": "U-27309",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369931808",
+    "name": "KOM TRT GROW DANDELIONS 6.5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369931815",
+    "name": "KOM TRT GROW TORTOISE GRASS6.5",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "759834051541",
+    "name": "GAL OAK LEAVES LIVE NAT 4QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316096264",
+    "name": "ZIL REPT MUNCHIES VEG 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316099517",
+    "name": "ZIL FOOD MUNCHIE MLWORM 3.75Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316113046",
+    "name": "ZIL BEDNG JUNGLE MIX 8QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671362",
+    "name": "ZIL BULB DAY WH INC 150W BOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316700482",
+    "name": "ZIL BEDNG DESERT BLEND 25QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612009217",
+    "name": "ZML SAND HRMT CRAB WH 2#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612091243",
+    "name": "ZML KIT NATURALISTIC FROG 10G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612210248",
+    "name": "ZML ORNMT CORK BRK ROUND JMB",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612325188",
+    "name": "ZML TERRM MESH 18X18",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612348392",
+    "name": "ZML BULB T5 HO REPTISUN10 34IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612400304",
+    "name": "ZO-M30C",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612610109",
+    "name": "ZO-61010",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "066380004144",
+    "name": "HLP BEDNG CF NAT 14L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "066380004250",
+    "name": "HLP BEDNG CF COLRS CNFTT 50",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "066380004335",
+    "name": "HLP BEDNG CF COLRS BL 10L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "720101362028",
+    "name": "KMP FOOD HAM & MORE 2#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "730582000623",
+    "name": "SPF FOOD TFF RUSSEL RBBT 5.5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "716432830008",
+    "name": "PTT FOOD HDGHOG MAINT 3#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845402758",
+    "name": "OXB TRT WESTRN TMTHY 40OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845402888",
+    "name": "OXB FOOD ESSNTL ADLT RBBT 5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845402918",
+    "name": "OXB FOOD ESSNTL ADLT GPIG 10#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845963631",
+    "name": "OXB FOOD GRDN MSE/RAT 2#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859006147",
+    "name": "KT-50016",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859999906",
+    "name": "KAY FOOD FDPH GPIG 5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "766501003888",
+    "name": "MFP RMDY FRRT LAX 3OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "766501003901",
+    "name": "MFP SPLMT FERRET FURO-TONE 6OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "048054800627",
+    "name": "OA-M460",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "759023085357",
+    "name": "PPR LEAD CWM KITTY KTN SM BK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "660204030441",
+    "name": "FAS SWTR UNTUCKED PLD XS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234521113",
+    "name": "ETH TOY CT HUG'N KICK SHIMMER",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234057322",
+    "name": "ETH TOY SKIN PLUS PENQUIN 15IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "180181011047",
+    "name": "VIP TOY TUFF JR'S TUFF RING BL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "180181905285",
+    "name": "VIP TOY TUFF OCTOPUS TGR SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "180181908101",
+    "name": "VIP TOY TUFF ZOO ELPHNT JR",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905000888",
+    "name": "AQE PMP CRCLTN 700 30-55G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905002196",
+    "name": "AQE CLNR ALGAE PROSCRPR16-25IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905002509",
+    "name": "AQE CRTRDG ECORENEW XS 3PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905002530",
+    "name": "AQE CRTRDG ECORENEW MD 3PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905060905",
+    "name": "AQE CLNR WTR CHANGER 50FT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905061704",
+    "name": "AQE CLNR ALGAE MAG SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905061711",
+    "name": "AQE CLNR ALGAE MAG MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905061902",
+    "name": "AQE FOOD TRPCL GRNLRS 3.25OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905062268",
+    "name": "AQE CLNR GRVL VAC MINI 5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905062282",
+    "name": "AQE CLNR GRVL VAC 5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905062299",
+    "name": "AQE CLNR GRVL VAC 9IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905653541",
+    "name": "AQE BULB T8 FLO 24IN 17W",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163030899",
+    "name": "API COND QUICK START 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055042116",
+    "name": "U-04211",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "810281018652",
+    "name": "ATP PART VLVE AIR CHECK/FLTR",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029904702650",
+    "name": "WWI GRVL NEON GREEN 5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "047431905481",
+    "name": "AQA PLNT BAMBOO 3FT LONG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000116001205",
+    "name": "SLI MONITOR ALERTS COMBO PK6MO",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000116769006",
+    "name": "SLI TOOL AV SS CURVED FRCPS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798168386",
+    "name": "TE-16838",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798771272",
+    "name": "TE-77127",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798780168",
+    "name": "TET ORNMT GLOFSH CASTLE LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798780885",
+    "name": "TET PLNT GLOFSH FLO PR/PK MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612240030",
+    "name": "ZML LEAF BETTA BED HAMMOCK REG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612240047",
+    "name": "ZML HEATER BETTA THERM 7.5W",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612240092",
+    "name": "ZML FLTR INTRNL CLN BETTA 10G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612240504",
+    "name": "ZML BETTA CERAMIC LOG SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "618940310013",
+    "name": "JWP TOY BIRD DBL AXIS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859002583",
+    "name": "KAY TRT SPRFD STC BIRD NUTS 5Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "644472017144",
+    "name": "AEC SEED CATCHER LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695291128",
+    "name": "DOS LTTR SCOOP WH JMB",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695291135",
+    "name": "DOS LTTR SCOOP WH GNT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "039079003087",
+    "name": "FAR F/T SHMP C ADAMS-P FOAM10Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "039079003186",
+    "name": "FAR F/T ADAMS-P C SPT ON <5#3M",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585450155",
+    "name": "KON CTNP PREM 1OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585459516",
+    "name": "KON TOY CT FLINGAROO TUTU",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585524047",
+    "name": "KON TOY CT ACT BBBL ASST",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863101403",
+    "name": "GRE TRT SMRTBT CT HRBLL TUNA2Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "724089792730",
+    "name": "ELA SHMP F/T CT ADVANTAGE 8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "871864007104",
+    "name": "PAG SCRATCHER EASYLIFE HAMMOCK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234023020",
+    "name": "ETH TOY SPONGE SCCR BALL 4PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "818786018399",
+    "name": "ZIP TOY NOMNOMZ FRIES MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "797801059350",
+    "name": "GAR SPLMT HEMP QUIET LIQ 1OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "797801090117",
+    "name": "GAR TRNG AID POTTY HERE SPRY8Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "797801602396",
+    "name": "GAR SPLMT 24/7 CALM AID 120CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "700603701778",
+    "name": "OWH TOY SF FOX OR MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695240874",
+    "name": "DOS FOOD SCOOP MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695244940",
+    "name": "DOS WATERER REPLENDISH GY SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695244988",
+    "name": "DOS WATERER REPLENDISH SLVR LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695291562",
+    "name": "DOS BOWL KNNL SNGL LG 21OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695319310",
+    "name": "CAN TOY AIR FETCH BLL SM 2CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695323140",
+    "name": "CAN TOY MAX GLW BLL LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045663170004",
+    "name": "FP-1700",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045663976248",
+    "name": "FOU WIPES DG/CT EYE CARE 35CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "078565854314",
+    "name": "SMO TRT CHKN SWPOT 8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "039079002578",
+    "name": "FAR F/T SHMP ADAMS FOAMING 10Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "039079003698",
+    "name": "FAR F/T ADAMS-P SPT ON XL 3M",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "039079090049",
+    "name": "FAR SHMP F/T ADAMS 12OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "618940431121",
+    "name": "JW-43112",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "618940431176",
+    "name": "JWP TOY HOL-EE FTBALL MINI",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "618940436003",
+    "name": "JWP TOY LATTICE BALL MINI",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "729849161177",
+    "name": "RAD CLLR TRNR REMOTE 300 YRD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "034846727029",
+    "name": "MPF TRT G/F JRKY BF 25OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585009834",
+    "name": "KON TRT ZIGGIES CHKN LG 6OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585011134",
+    "name": "KON TRT EASY PASTE PB 8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585081113",
+    "name": "KC-E112",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585111216",
+    "name": "KC-M",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585131214",
+    "name": "KC-S",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585191010",
+    "name": "KON TRT STUFF N SWPOT 5OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585361888",
+    "name": "KON TRT ZIGGIES PUP PLNTBSD 8Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585402017",
+    "name": "KON TOY KNTS FLOPPY FOX S/M",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585402031",
+    "name": "KON TOY KNTS FLOPPY HIPPO S/M",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585402062",
+    "name": "KON TOY KNTS FLOPPY BUNNY M/L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585475240",
+    "name": "KON DSPNSR BAMBOO BALL MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585495323",
+    "name": "KON TOY FLYANGLE ASST LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585499963",
+    "name": "KON TOY KNT FROG LG/XL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585509334",
+    "name": "KON TOY MAXX STC S/M",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585511115",
+    "name": "KC-ZG2",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585523170",
+    "name": "KON ACESS FILL OR FREEZE TRAY",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585747125",
+    "name": "KC-ADK1",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585775296",
+    "name": "KON TOY AIR SQKR BNE MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585800646",
+    "name": "KON TOY WUBBA TUGGA LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863101045",
+    "name": "GRE TRT DNTL ORIG REG 36OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "742174140624",
+    "name": "LEN RWHD ROLL PB 9-10IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "746772350089",
+    "name": "MAM TOY TRBTR 2 5in",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "746772350102",
+    "name": "MAM TOY TRBTR 2 W/RPE 5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "746772350164",
+    "name": "MAM TOY TRBTR 2 W/RPE 6IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "856595005490",
+    "name": "ETT TRT PREM CRNCHY DEER 4.5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095410022",
+    "name": "TRO CLNR EAR DUAL ACTN 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369203158",
+    "name": "MUL TOY GLOBLET PIG LTX MINI",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369479850",
+    "name": "MUL TOY LOOFA ROPE BODY 11IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "669125344002",
+    "name": "NTN MED EYE CLEANSE 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "810359002057",
+    "name": "SMP SUPR BNE KNT BF 4-5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184011317",
+    "name": "RBP DNTL C-A-B HYDRANT MD 12CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184310083",
+    "name": "RBP TRT LMB EAR",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184450017",
+    "name": "RBP TRT BNE MAMMOTH",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "724089204028",
+    "name": "ELA F/T K9 ADVANTIX II LG 6PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "724089792143",
+    "name": "ELA SHMP F/T ADVANTAGE 8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234543177",
+    "name": "ETH TOY BAMBNE BNE BCN 5.75IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "810002631511",
+    "name": "FCF TRT NTH ROLL BF SM 2CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214816218",
+    "name": "NYL DURA CHW BNE BCN PETT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214829270",
+    "name": "NYL HLTHY EDBL BCN CHW PETT 8C",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214838487",
+    "name": "NYL HLTHY EDBL ANTLERS MD 2CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "842982073555",
+    "name": "LOV MAT BELLA SPILL PROOF BKSM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "079441006315",
+    "name": "VN-FS2",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "748406003903",
+    "name": "EAP SHMP 2IN1 SHMP & COND 20OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163021699",
+    "name": "AR-169B",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163021781",
+    "name": "API MED P/C PIMAFIX 16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "047497269237",
+    "name": "TET TANK REPTOHABITAT 75G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316096295",
+    "name": "ZIL FOOD MUNCHIE VEG CAL 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671508",
+    "name": "ZIL BULB SPOT DAY WH 75W BOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671515",
+    "name": "ZIL BULB SPOT DAY WH 100W BOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612090611",
+    "name": "ZML CAGE PALUDARIUM 18X18X36",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612300086",
+    "name": "ZO-RH7",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612321005",
+    "name": "ZO-LF10",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612321036",
+    "name": "ZML HOOD REPTISUN LED CMB 30IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612326000",
+    "name": "ZML HOOD REPTISUN FLO 20IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612402056",
+    "name": "ZML FOOD CRSTD GECKO VARPK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612752045",
+    "name": "ZML BEDNG REPTISOIL 4QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612840025",
+    "name": "ZO-WC2",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612921205",
+    "name": "ZML BOWL REPTIROCK FOOD SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "066380006377",
+    "name": "HLP BEDNG CF TUTTI FRUTTI 23L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "730582205530",
+    "name": "SPF TRT GERTY SCRUMMIES 4.2OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845105024",
+    "name": "OXB BEDNG PURE CMFT WH 36L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845108025",
+    "name": "OXB BEDNG PURE CMFT NAT 56L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845402253",
+    "name": "OXB TRT WESTRN TMTHY 15OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845402727",
+    "name": "OXB FOOD ESSNTL CHINCH 10#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845404011",
+    "name": "OXB FOOD ESSNTL ADLT RAT 3#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845404042",
+    "name": "OXB FOOD ESSNTL MSE/RAT 2.5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845405001",
+    "name": "OXB TRT BOTANICAL HAY 15OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845965475",
+    "name": "OXB TOY TMTHY H/S MAT SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859426532",
+    "name": "KAY FOOD FIESTA GPIG 2.5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859942551",
+    "name": "KAY TRT HLTHY BIT HAM/GER 4Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859999869",
+    "name": "KAY FOOD FDPH HAM/GERB 3#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076711003456",
+    "name": "LIX BTTL GPIG BEST BUY W/R16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076711003500",
+    "name": "LIX BTTL RBBT BEST BUY W/R32OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "644472004328",
+    "name": "AEC TOY NIBBLE STRW BLL CHW",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "644472010299",
+    "name": "AEC TOY NIBBLE PALM STAR CHW",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125603743",
+    "name": "PTS HIDEOUT WOODLAND MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125605181",
+    "name": "KAY CRITTERTRAIL EXTREME",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125605426",
+    "name": "PTS CRITTERTRAIL FOOD DSPNSR",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125619812",
+    "name": "PTS BTTL CHEW PROOF SM 6OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "640461003051",
+    "name": "CDA DRY ALS MULTI-PRO 40#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234400166",
+    "name": "ETH TOY SPOTBRITES LED CATBALL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234521571",
+    "name": "ETH TOY CT YARN BLLS 2.5IN 2PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234521939",
+    "name": "ETH TOY CT JITTERY HDGHOG 3IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "788169040654",
+    "name": "JOL TOY TUG-N-TOSS PR 6IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "788169060621",
+    "name": "JOL TOY ROMP-N-ROLL BL 6IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234545591",
+    "name": "ETH TOY BAMBNE-P STC CHKN 9.5",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "077234547144",
+    "name": "ETH TOY WD COFF CHW MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "180181011023",
+    "name": "VIP TOY TUFF JR'S TUFF RING PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "180181016011",
+    "name": "VIP TOY TUFF JR'S BOWMERANG RD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "180181906329",
+    "name": "VIP TUG TUFFY DRBL 3 WAY JR",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905000734",
+    "name": "AQE FXTR CLIP ON PLNTED LED",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905012300",
+    "name": "AQE HEATER FLAT 7.5W",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905060844",
+    "name": "AQE CRTRDG Q-FLOW 10 MD 3PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905061896",
+    "name": "AQE FOOD SHRMP PLLTS 6.5OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "017163002529",
+    "name": "AR-52B",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163010853",
+    "name": "AR-85G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163035771",
+    "name": "API SPLMT ROOT TABS 10CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "017163125310",
+    "name": "AR-31A",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055194044",
+    "name": "HIK FOOD SHRMP CUISINE .35OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055213165",
+    "name": "U-21316",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055303200",
+    "name": "U-30320",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055309202",
+    "name": "U-30920",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055962155",
+    "name": "HIK ORNMT CRL BRANCH 5.1IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029904109916",
+    "name": "WWI BIO ACTIV BETTA NEON PK 1#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000945540852",
+    "name": "SFB FOOD FRZN BF HEART-P 3.5OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000116043502",
+    "name": "SA-435",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000116076203",
+    "name": "SLI MED POLYGUARD 10GM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000116126106",
+    "name": "SLI MEDIA PHOSBOND 250ML",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798261582",
+    "name": "SN-6201",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798770190",
+    "name": "TET FOOD BETTA PLLTS 1.02OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798770312",
+    "name": "TET FOOD SELECT-A-FOOD 2.4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798772514",
+    "name": "TET FOOD TETCLR PLUS 7.06OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "720101200054",
+    "name": "KMP TRT SWTHRVST PMPKN SEED 5Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "720101211258",
+    "name": "KMP TRT SWTHRVST VEGS 2.5 OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "720101288052",
+    "name": "KMP TRT SWTHRVST FRT MIX 5OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695221835",
+    "name": "DOS LTTR PAN BSC GY LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695274596",
+    "name": "ASP BED CT PUFFY ROUND 18IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585459172",
+    "name": "KON TOY CT PURRSUIT WHIRLWIND",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "033200022039",
+    "name": "CND LTTR A/H ULTRA LAST 20#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "033200300007",
+    "name": "CND LTTR A/H 4EVER FRSH LAV20#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "079441004182",
+    "name": "VAN LTTR LINER DRAWSTRING XG15",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "855736003326",
+    "name": "ZIP TOY PLSH CATERPLLR LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029695219474",
+    "name": "DOS KNNL VARI TP/BK 28IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045663972325",
+    "name": "FOU DIAPER WEE WEE DSPL MD 12C",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045663976439",
+    "name": "FOU SHMP MC BRIGHT WH 16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585081359",
+    "name": "KON E-CLLR CLOUD SOFT LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585402079",
+    "name": "KON TOY KNTS FLOPPY HIPPO M/L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585498973",
+    "name": "KON TOY CUTESEAS SHARK MD/LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585499918",
+    "name": "KON TOY SCAMPER RD PANDA MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585503004",
+    "name": "KON TOY BALLSTC RHINO MD/LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585509341",
+    "name": "KON TOY MAXX BNE S/M",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585775197",
+    "name": "KON TOY AIR SQKR BALL BDAYMD3P",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585799971",
+    "name": "KON TOY WUBBA BALLSTC FRND SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585800035",
+    "name": "KON TOY WUBBA PUP",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585801858",
+    "name": "KON TOY WUBBA NOSTUFF CHTAH LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "746772510148",
+    "name": "MAM TUG COLR 3KNT/4IN BALL LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095001022",
+    "name": "TRO DNTL FOAM ORAL CARE 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095010109",
+    "name": "TRO WIPES DEEP CLN 100CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095010116",
+    "name": "TRO GRMG WIPES EAR 50CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095160002",
+    "name": "TRO GRMG TANGLE RMVR SPRY 16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369275254",
+    "name": "MUL TOY LOOFA FLOPPY 18IN ASST",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369377064",
+    "name": "MUL TOY DUCKWORTH 4IN ASST",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369430103",
+    "name": "MUL TOY WRINKLEEZ PLUSH",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "723633014731",
+    "name": "NBP TRT REWARDS STIX DUCK 4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "723633852197",
+    "name": "NBP TRT MINI REWARD TRKY 5.3OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585020310",
+    "name": "DRN TOY TEDDY BEAR XS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "815181022419",
+    "name": "FUR BED LNGR OVAL PLSH CR SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214807995",
+    "name": "T-NEB102",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214850014",
+    "name": "NYL TOY CHW PUP BNE VAN SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "842982052338",
+    "name": "LOV TRT FLVRFULLZ PB 6OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197310034",
+    "name": "FLU LEAD/HRNS REPTA-LEASH MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "788286004010",
+    "name": "REP FOOD JUV IGUANA 6OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055206310",
+    "name": "HIK FOOD MULBERIFIC 7.7OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "010838201654",
+    "name": "LEE BOWL MLWORM CURVED SIDES",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "784369934502",
+    "name": "KOM CAGE CRICKET KEEPER 10.6IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "759834053507",
+    "name": "GAL KIT STARTER F/HUMID ENVIR",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798162551",
+    "name": "TE-16255",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671393",
+    "name": "ZIL BULB NGHT BK INC 100W BOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671539",
+    "name": "ZIL BULB SPOT NIGHT BK 50W BOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316700222",
+    "name": "ZIL WTR PILLOW CRICKET 6PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316700550",
+    "name": "ZIL LINER TERRARIUM BR 10G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612134032",
+    "name": "ZML SPLMT REPTI CAL W/D3 3OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612200836",
+    "name": "ZO-HHL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612322309",
+    "name": "ZML LGHT KIT TRPCL HEAT UVB",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612621525",
+    "name": "ZML FDR PLATFORM ARBOREAL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612621532",
+    "name": "ZML FDR CUP ARBOREAL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612622201",
+    "name": "ZML FDR MLWORM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612660050",
+    "name": "ZML FLOATING DOCK MINI",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612752106",
+    "name": "ZML BEDNG REPTISOIL 10QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612790108",
+    "name": "ZO-79010",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612790207",
+    "name": "ZO-79020",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "716432850068",
+    "name": "PTT FOOD SGR GLIDER 12OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845403199",
+    "name": "OXB TRT TMTHY TWSTS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845963273",
+    "name": "OXB TOY CRAZY HAY BLL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845963365",
+    "name": "OXB TOY RLL AROUNDS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "766501002270",
+    "name": "MFP SHMP ALOE VERA 8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "048054802546",
+    "name": "NOV SPLMT VITA PURE C GPIG 2OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125604030",
+    "name": "PTS HIDEOUT IGLOO ITTY BITTY",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "840673102218",
+    "name": "WBC BEDNG B2N 15L",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905002479",
+    "name": "AQE FLTR Q-FLOW ST XS 5G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "015905061834",
+    "name": "AQE FOOD CCHLD PLLT MD 7.5OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "017163005520",
+    "name": "AR-52E",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "317163070338",
+    "name": "API TEST STRP 5-IN-1 25CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055323000",
+    "name": "HIK FOOD FRZN BABY BRINE 1.75Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055331036",
+    "name": "U-33103",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055335515",
+    "name": "HIK FOOD FD SPIR BRINESHRMP.43",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "819603016031",
+    "name": "ATP FXTR SKYAQUA LED 65K 30-36",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029904700151",
+    "name": "WWI GRVL SNOW WH 5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "029904703022",
+    "name": "WWI GRVL NEON RNBW 2#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000945401009",
+    "name": "SFB FOOD FRZN NA BRINE SHRMP3Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000945402006",
+    "name": "SFB FOOD FRZN NA BLDWRM 3.5Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000116045605",
+    "name": "SA-456",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "000116123600",
+    "name": "SLI SPLMT FLOURISH ADV 250ML",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798770763",
+    "name": "TET FOOD PRO GF CRISPS 3.04OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798770770",
+    "name": "TET FOOD PRO GF CRISPS 7.9OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798772569",
+    "name": "TET FOOD BETTA MINI PLLT 1.2Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798783015",
+    "name": "TET FOOD GLOFSH BETTA FLK .7OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859942407",
+    "name": "KAY TRT FDPH HNY STC TIEL 8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859948676",
+    "name": "KAY FOOD FDPH KEET 2#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484006074",
+    "name": "COA GRMG CT SAFARI NAIL TRMR",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "034846600940",
+    "name": "MPF SPORTMX CT GOURMET 15#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "019014712458",
+    "name": "IAM DRY CT PAH INDR WT/HBALL7#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095006218",
+    "name": "TRO SHMP CT BRY/CCNUT 12OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "724089113436",
+    "name": "ELA MED CT TAPE WORM 3CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "704959047306",
+    "name": "HOM MED CT WRM CLR 15ML",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "895352002167",
+    "name": "NTN TRT FRTBL PMPKN/CRN 7OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "021653283084",
+    "name": "BDL SHMP PK JASMINE 8OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "797801036993",
+    "name": "GAR SPLMT ENZYME/PROBIOTIC70CT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484510649",
+    "name": "C-51064",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "076484510663",
+    "name": "C-51066",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "039079058872",
+    "name": "FAR F/T ADAMS HOME SPRY 24OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "034846550054",
+    "name": "MPF BSCT WHSM GRMT PNUT 3#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585081007",
+    "name": "KC-EK4",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585081014",
+    "name": "KC-EXL12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585499598",
+    "name": "KON TOY LOW STUFF STRP PIG MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585499604",
+    "name": "KON TOY LOW STUFF STRP DNKY MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585503141",
+    "name": "KON TOY SHIELDZ GECKO MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "035585523224",
+    "name": "KON TOY WILD SHIELDZ PERCH MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863041174",
+    "name": "GRE TRT DNTL ORIG REG 12OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "642863104800",
+    "name": "GRE TRT DNTL BLBRRY PETT 12OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "840139122958",
+    "name": "BAR TRT BF CHEEK RLL PB LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "746772200124",
+    "name": "MAM TOY COLR 3KNT RP TUG MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "746772510124",
+    "name": "MAM TUG COLR 3 KNT/2 BALL MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "853994001443",
+    "name": "ETT TRT CRNCH CHS/BCN 5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095001978",
+    "name": "TRO DNTL WTR ADD CARE 2.2OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095003323",
+    "name": "TRO SHMP OXYMED MEDICATED 20OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095160026",
+    "name": "TRO F/T NAT DOG & BED SPRY 16Z",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095202160",
+    "name": "TRO SHMP OAT & TEA TREE 20OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "645095869011",
+    "name": "TRO SHMP WTRLSS DEEP CLN 7.4OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184255506",
+    "name": "RBP TRT BF CHEEK ROLL CHKN LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "785184926499",
+    "name": "RBP TRT CLLGN SLCS 12OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "810002631726",
+    "name": "FCF TRT NTH FLP CHIP PB 8P",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "736990014788",
+    "name": "SYN MED WIPES EAR THERAPY 100C",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214834670",
+    "name": "NYL HLTHY EDBL BNE VENISN LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214836742",
+    "name": "NYL DURA ALT FEMUR BF LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "018214846048",
+    "name": "NYL HLTHY EDBL PB SOUPER",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "842982074002",
+    "name": "LOV BOWL BELLA CLSC PK SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "030521067862",
+    "name": "TP-06786",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798164678",
+    "name": "TE-16467",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "046798164692",
+    "name": "TE-16469",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197700644",
+    "name": "FLU FOOD C-C TORTSE 6.75 OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197720307",
+    "name": "FLU TRT GRUB BAG TRTL SHRMP6OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "091197780059",
+    "name": "FLU FOOD CAN GRMT DUBIA 1.2OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "783178592415",
+    "name": "NZO-5924",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "783178592613",
+    "name": "NZP RMDY SHLL SAVER TRTL 2OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "788286004089",
+    "name": "REP FOOD MAINT BOX TRTL 12OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "788286008155",
+    "name": "REP-0081",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "042055206112",
+    "name": "HIK FOOD CRESTGEL 1.76OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "759834053514",
+    "name": "GAL KIT STARTER F/ARID ENVIR",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316670594",
+    "name": "ZIL DOME REFL CERM SLVR 5.5IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316671553",
+    "name": "ZIL BULB SPOT NIGHT BK 100WBOX",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316685222",
+    "name": "ZIL BOWL KIDNEY CERAMIC 5.25IN",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316700031",
+    "name": "ZIL SPLMT CRICKET CAL DRNK16OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316700451",
+    "name": "ZIL BEDNG DESERT BLEND 5QT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "096316700598",
+    "name": "ZIL LINER TERRARIUM GN 30G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612090529",
+    "name": "ZML TERRM DBL DOOR 30X12X16",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612091557",
+    "name": "ZML KIT REPTIHABITAT DSRT 10G",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612104011",
+    "name": "ZML SPLMT TRTL BONE",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612110524",
+    "name": "ZML FDR BANQUET TRTL GNT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612110555",
+    "name": "ZML FDR BANQUET TORTSE",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612200294",
+    "name": "ZML PLNT MOSS SPHAGNUM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612200911",
+    "name": "ZML ORNMT AFR MOPANI WOOD SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612200928",
+    "name": "ZML ORNMT AFR MOPANI WOOD MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612210118",
+    "name": "ZML ORNMT NAT CORK BRK FLAT MD",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612210125",
+    "name": "ZML ORNMT NAT CORK BRK FLAT LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612310252",
+    "name": "ZML HEATER CERAMIC NANO 25W",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612325126",
+    "name": "ZML TERRM MESH 12X12",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612328059",
+    "name": "ZML BULB LED NANO 5W",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612331257",
+    "name": "ZML BULB HEAT INFRARED NANO25W",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612360219",
+    "name": "ZML BULB BASKING SPOT NANO 40W",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612401837",
+    "name": "ZML FOOD AXOLOTL/NEWT 2OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612790115",
+    "name": "ZML BEDNG ECO EARTH CNUT 1PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612800302",
+    "name": "ZML MED EYE DROPS TURTLE",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612840049",
+    "name": "ZO-WC4",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612840087",
+    "name": "ZML COND REPTISAFE 8.75OZ",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "097612920109",
+    "name": "ZO-WD10",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845402802",
+    "name": "OXB FOOD ESSNTL YOUNG GPIG 5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "744845963518",
+    "name": "OXB CAGE HABITAT W/PLY YARD XL",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859942728",
+    "name": "KAY TRT HLTHY TOP MXD FRT SA",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859942735",
+    "name": "KAY TRT HLTHY TOP PAPAYA SA",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "071859998770",
+    "name": "KAY FOOD FIESTA RBBT 6.5#",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "766501003000",
+    "name": "MFP TOY FRRT OCTOPLAY",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "644472009644",
+    "name": "AEC TOY LOOFAH HEARTS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "644472009699",
+    "name": "AEC TOY LOOFAH BUNCH OF FRUIT",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "644472009705",
+    "name": "AEC TOY LOOFAH BON BONS",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "644472014860",
+    "name": "AEC CAGE HAM 2STRY14X15 4PK",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125604009",
+    "name": "PTS HIDEOUT STUMP NAT SM",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125604023",
+    "name": "PTS HIDEOUT STUMP NAT LG",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125605754",
+    "name": "PI-60575",
+    "source": "invoice_pdf"
+  },
+  {
+    "upc": "045125605976",
+    "name": "PTS CRITTERTRAIL PLAYPEN W/MAT",
+    "source": "invoice_pdf"
+  }
+]

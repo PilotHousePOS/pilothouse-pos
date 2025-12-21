@@ -1,0 +1,374 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06314092
+	09/23/25
+	06595448
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+GURU PET/STARMARK
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:05:15
+MLG
+667 CRAIG BORGSTEDE
+78.06
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+78.06
+1/ 
+57975666
+ 
+850050756668
+ 
+GUR HLDY FRY GUY MR.C RD LG
+ 
+EA
+ 
+2 
+0 
+6.507
+ 
+6.507
+ 
+0.00
+2/ 
+57975667
+ 
+850050756675
+ 
+GUR HLDY FRY GUY MRS.C RD LG
+ 
+EA
+ 
+2 
+0 
+6.507
+ 
+6.507
+ 
+0.00
+3/ 
+57975668
+ 
+850050756682
+ 
+GUR HLDY FRY GUY HAPPY RD LG
+ 
+EA
+ 
+2 
+0 
+6.507
+ 
+6.507
+ 
+0.00
+4/ 
+57975669
+ 
+850050756699
+ 
+GUR HLDY FRY GUY CRANKY GN LG
+ 
+EA
+ 
+2 
+0 
+6.507
+ 
+6.507
+ 
+0.00
+5/ 
+57975670
+ 
+850050756705
+ 
+GUR HLDY FRY GUY CHRIS WH LG
+ 
+EA
+ 
+2 
+0 
+6.507
+ 
+6.507
+ 
+0.00
+6/ 
+57975671
+ 
+850050756712
+ 
+GUR HLDY FRY GUY CHILLY WH LG
+ 
+EA
+ 
+2 
+0 
+6.507
+ 
+6.507
+ 
+0.00
+7/ 
+57975672
+ 
+850050756729
+ 
+GUR HLDY FRY GUY CANDY LG
+ 
+EA
+ 
+2 
+0 
+6.507
+ 
+6.507
+ 
+0.00
+8/ 
+57975673
+ 
+850050756736
+ 
+GUR HLDY FRY GUY YETI BL LG
+ 
+EA
+ 
+2 
+0 
+6.507
+ 
+6.507
+ 
+0.00
+9/1
+ 
+74200479
+ 
+873199004797
+ 
+TCD TRT DNTL COOKIE CUP LG
+ 
+EA
+ 
+2 
+2 
+7.514
+ 
+6.011
+ 
+12.02
+ 
+OV
+10/1
+ 
+74200480
+ 
+873199004803
+ 
+TCD TRT DNTL COOKIE CUP MD
+ 
+EA
+ 
+2 
+2 
+5.332
+ 
+4.266
+ 
+8.53
+ 
+OV
+11/1
+ 
+74200481
+ 
+873199004810
+ 
+TCD TRT DNTL COOKIE CUP SM
+ 
+EA
+ 
+2 
+2 
+3.982
+ 
+3.186
+ 
+6.37
+ 
+OV
+12/1
+ 
+74200483
+ 
+873199004834
+ 
+TCD TOY DNTL COOKIE CUP JAR LG
+ 
+EA
+ 
+2 
+2 
+14.332
+ 
+11.466
+ 
+22.93
+ 
+OV
+13/1
+ 
+74200484
+ 
+873199004841
+ 
+TCD TOY DNTL COOKIE CUP JAR MD
+ 
+EA
+ 
+2 
+2 
+10.882
+ 
+8.706
+ 
+17.41
+ 
+OV
+14/1
+ 
+74200485
+ 
+873199004858
+ 
+TCD TOY DNTL COOKIE CUP JAR SM
+ 
+EA
+ 
+2 
+2 
+6.750
+ 
+5.400
+ 
+10.80
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+28 
+12 
+78.06
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Dog
+ 
+78.06
+
+-- 1 of 1 --
+

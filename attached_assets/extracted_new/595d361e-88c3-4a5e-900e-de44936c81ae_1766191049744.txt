@@ -1,0 +1,473 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06289111
+	05/10/25
+	06566978
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+425SMKDSP25
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:22:07
+BGA
+667 CRAIG BORGSTEDE
+220.10
+ 
+0.00
+ 
+21.00
+ 
+0.00
+ 
+0.00
+ 
+241.10
+1/1
+ 
+42513071
+ 
+840139130717
+ 
+BAR TRT SMKD FILLET CHKN MD 4Z
+ 
+EA
+ 
+3 
+3 
+6.690
+ 
+4.349
+ 
+13.05
+ 
+OV
+2/1
+ 
+42513072
+ 
+840139130724
+ 
+BAR TRT SMKD BEEFY STC5-6IN/15
+ 
+EA
+ 
+3 
+3 
+8.028
+ 
+5.218
+ 
+15.65
+ 
+OV
+3/1
+ 
+42513164
+ 
+840139131646
+ 
+BAR TRT SMKD GULLET 5-6IN/10CT
+ 
+EA
+ 
+3 
+3 
+8.732
+ 
+5.676
+ 
+17.03
+ 
+OV
+4/1
+ 
+42513165
+ 
+840139131653
+ 
+BAR TRT SMKD GULLET BTS 5OZ
+ 
+EA
+ 
+3 
+3 
+4.225
+ 
+2.746
+ 
+8.24
+ 
+OV
+5/1
+ 
+42513166
+ 
+840139131660
+ 
+BAR TRT SMKD BULLY BTS 6OZ
+ 
+EA
+ 
+3 
+3 
+5.831
+ 
+3.790
+ 
+11.37
+ 
+OV
+6/2
+ 
+42513172
+ 
+840139131721
+ 
+BAR TRT SMKD COW EAR 5CT
+ 
+EA
+ 
+3 
+3 
+7.465
+ 
+4.852
+ 
+14.56
+ 
+OV
+7/1
+ 
+42513175
+ 
+840139131752
+ 
+BAR TRT SMKD TENDON STRP 3CT
+ 
+EA
+ 
+3 
+3 
+7.465
+ 
+4.852
+ 
+14.56
+ 
+OV
+8/1
+ 
+42513176
+ 
+840139131769
+ 
+BAR TRT SMKD MARROW BNE 2PCT
+ 
+EA
+ 
+3 
+3 
+5.704
+ 
+3.708
+ 
+11.12
+ 
+OV
+9/ 
+42513200
+ 
+840139132001
+ 
+BAR TRT SMKD CHEEKY CHW 5-6IN
+ 
+EA
+ 
+50 
+0 
+3.521
+ 
+2.289
+ 
+0.00
+ 
+OV
+10/3
+ 
+42513203
+ 
+840139132032
+ 
+BAR TRT SMKD RIB BNE
+ 
+EA
+ 
+25 
+25 
+1.577
+ 
+1.025
+ 
+25.63
+ 
+OV
+11/
+ 
+42513205
+ 
+840139132056
+ 
+BAR TRT SMKD DUCK FEET
+ 
+EA
+ 
+50 
+0 
+0.915
+ 
+0.595
+ 
+0.00
+ 
+OV
+12/
+ 
+42513206
+ 
+840139132063
+ 
+BAR TRT SMKD YAK CHS LG
+ 
+EA
+ 
+20 
+0 
+5.211
+ 
+3.387
+ 
+0.00
+ 
+OV
+13/3
+ 
+42513207
+ 
+840139132070
+ 
+BAR TRT SMKD TRACHEA LG11-12IN
+ 
+EA
+ 
+24 
+24 
+2.000
+ 
+1.300
+ 
+31.20
+ 
+OV
+14/
+ 
+42513208
+ 
+840139132087
+ 
+BAR TRT SMKD GULLET STC 5-6IN
+ 
+EA
+ 
+75 
+0 
+1.197
+ 
+0.778
+ 
+0.00
+ 
+OV
+15/3
+ 
+42513209
+ 
+840139132094
+ 
+BAR TRT SMKD MARROW BNE 5-6IN
+ 
+EA
+ 
+12 
+12 
+3.451
+ 
+2.243
+ 
+26.92
+ 
+OV
+16/3
+ 
+42513210
+ 
+840139132100
+ 
+BAR TRT SMKD TRACHEA 10-12IN
+ 
+EA
+ 
+12 
+12 
+3.944
+ 
+2.564
+ 
+30.77
+ 
+OV
+17/
+ 
+42513211
+ 
+840139132117
+ 
+BAR TRT SMKD BULLY STC 10-12IN
+ 
+EA
+ 
+35 
+0 
+4.887
+ 
+3.177
+ 
+0.00
+ 
+OV
+18/4
+ 
+42513216
+ 
+840139132162
+ 
+BAR DSP SMO FLRSTND EMPTY
+ 
+EA
+ 
+1 
+1 
+0.000
+ 
+0.00
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+328
+ 
+98 
+220.10
+-----
+ 
+-----
+ 
+---------
+DELIVERY SURCHARGE
+ 
+21.00
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Dog
+ 
+220.10
+
+-- 1 of 1 --
+

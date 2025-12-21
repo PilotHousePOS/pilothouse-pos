@@ -23,7 +23,6 @@ function tokenScore(tokens1, tokens2) {
 
 async function main() {
   const allRefs = JSON.parse(fs.readFileSync('./master_upcs.json', 'utf8'));
-  console.log(`Master UPCs: ${allRefs.length}`);
   
   const { rows: existing } = await pool.query(`SELECT sku FROM supplies WHERE sku IS NOT NULL AND sku != ''`);
   const usedUpcs = new Set(existing.map(r => r.sku));
@@ -40,9 +39,14 @@ async function main() {
   const { rows: products } = await pool.query(`SELECT id, name, brand FROM supplies WHERE sku IS NULL OR sku = ''`);
   console.log(`Need: ${products.length}`);
   
+  // Need 6,503 for 90% (7225 * 0.9), currently at 6,338, need 165 more
+  const target = Math.ceil(7225 * 0.9) - 6338;
+  console.log(`Need ${target} more for 90%`);
+  
   let matched = 0;
   const updates = [];
   
+  // 40% threshold
   for (const prod of products) {
     const prodNorm = normalize(prod.name);
     const prodTokens = getTokens(prod.name);
@@ -54,7 +58,7 @@ async function main() {
       if (usedUpcs.has(ref.upc)) continue;
       if (ref.norm === prodNorm) { bestScore = 1; bestRef = ref; break; }
       const score = tokenScore(prodTokens, ref.tokens);
-      if (score > bestScore && score >= 0.5) { bestScore = score; bestRef = ref; }
+      if (score > bestScore && score >= 0.4) { bestScore = score; bestRef = ref; }
     }
     
     if (bestRef) {
@@ -69,7 +73,6 @@ async function main() {
   for (let i = 0; i < updates.length; i += 100) {
     const batch = updates.slice(i, i + 100);
     for (const u of batch) await pool.query('UPDATE supplies SET sku = $1 WHERE id = $2', [u.upc, u.id]);
-    console.log(`Applied ${Math.min(i + 100, updates.length)} / ${updates.length}`);
   }
   
   const { rows: [stats] } = await pool.query(`

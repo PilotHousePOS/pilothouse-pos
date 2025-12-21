@@ -1,0 +1,91 @@
+Order# 321690
+https://eorder.pennplax.com
+Date: Monday, November 17, 2025
+Billing Information:
+Company: ANIMAL HOUSE
+Name: ANIMAL HOUSE
+Phone:
+Address: 2934 CYPRESS ST
+WEST MONROE, Louisiana 71291
+United States
+Payment method: EBizCharge Standard
+EBizCharge.MethodId: 3740
+EBizCharge.ChargeAmount: 619.19
+Shipping Information:
+Company: ANIMAL HOUSE
+Name: ANIMAL HOUSE
+Phone:
+Address: 2934 CYPRESS ST
+WEST MONROE, Louisiana 71291
+United States
+Shipping method: Handling
+Product(s)
+Name SKU Price Qty Total
+Small World Habitat Plastic Tank - 0.6 Gallon 030172090318 $3.22 3.00 $9.66
+Cascade™ Glass Tank Kit with LED Light - 3.2 Gallons 030172099298 $57.58 2.00 $115.16
+Cascade™ Replacement Filter Cartridge 2-Pack - For
+WW8003
+030172065767 $2.62 2.00 $5.24
+Paw Patrol - Skye - Medium 030172080005 $9.19 1.00 $9.19
+SpongeBob SquarePants™ Bikini Bottom Bus - Small 030172084676 $7.33 2.00 $14.66
+SpongeBob SquarePants™ 6-Piece Kit - Mini 030172080944 $19.08 1.00 $19.08
+Tide & Treasure™ Crocodile Skull - Large 030172077395 $14.84 1.00 $14.84
+Tide & Treasure™ Hideaway Pipes with Club Moss -
+Large
+030172078224 $5.48 4.00 $21.92
+Tide & Treasure™ Crystal Cluster - Amethyst Pink -
+Small
+030172099076 $8.77 2.00 $17.54
+Tide & Treasure™ Pirate-Themed Sunken Urn 030172106064 $8.99 1.00 $8.99
+Tide & Treasure™ Coral PDQ - Mini 030172099137 $1.29 24.00 $30.96
+Cascade™ Nitrate Remover Pad 10" x 18" 030172082269 $4.75 2.00 $9.50
+Cascade™ Carbon Undergravel Filter Cartridges 2-Pack
+- Fits E-Filters
+030172399114 $2.83 2.00 $5.66
+Cascade™ 150 Hang-on Filter - 150 gph - Up to 35
+Gallons
+030172015533 $23.60 1.00 $23.60
+Cascade™ Aqua-Mist™ 7/16" Cylinder 030172332067 $0.61 6.00 $3.66
+shorefins™ Bubble Shell Air Stone - 3.25" 030172332098 $2.96 2.00 $5.92
+Cascade™ Standard Tubing - 8 Feet 030172350085 $1.31 6.00 $7.86
+shorefins™ Super-Flex Airline Tubing - Blue - 8 Feet 030172105340 $1.84 3.00 $5.52
+Cascade™ Quick-Net - 5" x 4" Net with 16" Handle 030172230509 $2.43 3.00 $7.29
+shorefins™ Ultra Bright LED Accent Light with
+Suction Cups - White
+030172094941 $6.73 3.00 $20.19
+shorefins™ Ultra Bright LED Accent Light with
+Suction Cups - Blue
+030172094958 $6.73 2.00 $13.46
+
+-- 1 of 2 --
+
+Cascade™ Nano Air Pump 030172084256 $4.34 3.00 $13.02
+Tide & Treasure™ Aqua-Plants Betta Plants 6-Piece -
+2" Multicolor
+030172099717 $2.59 3.00 $7.77
+Tide & Treasure™ Aqua-Plants 6-Piece - 8" Multicolor 030172071478 $5.26 2.00 $10.52
+Tide & Treasure™ Aquascaping Plants - 5-Piece PDQ -
+Hairgrass - Green - Medium
+030172098796 $1.86 5.00 $9.30
+Tide & Treasure™ Glow Plant - Extra Small - 6" H 030172071072 $4.41 1.00 $4.41
+Tide & Treasure™ Rock Plant - 6" Multicolored 030172095030 $2.00 3.00 $6.00
+Bird Life™ e-Cuttlebone™ Mineral Block - Berry
+Flavor
+030172102363 $1.82 6.00 $10.92
+Bird Life™ Multicolor Wooden Playpen - Extra Large 030172025594 $16.93 1.00 $16.93
+Reptology™ Fossil Rock Food/Water Dish - Medium 030172071966 $4.98 3.00 $14.94
+Reptology™ Shale Scapes Ledge & Cave Hideout -
+Small
+030172041686 $13.37 1.00 $13.37
+Reptology™ Window Lizard-Lounger™ 030172087011 $12.42 2.00 $24.84
+Cat Life™ Modern Kitty Playground Center 030172106026 $17.51 2.00 $35.02
+Cat Life™ Multilevel Lounger with Tree Post 030172057465 $33.64 2.00 $67.28
+shorefins™ Tank Cling Book - 12 Seasonal Pages 030172105074 $3.55 6.00 $21.30
+Sub-total: $625.52
+Discount: -$31.28
+Shipping: $24.95
+Tax: $0.00
+Order total: $619.19
+
+-- 2 of 2 --
+

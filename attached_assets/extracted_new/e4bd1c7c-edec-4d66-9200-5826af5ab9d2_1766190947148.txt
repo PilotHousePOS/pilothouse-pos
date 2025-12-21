@@ -1,0 +1,263 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06281796
+	04/05/25
+	06558778
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+KTEASTER25
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:26:58
+BGA
+667 CRAIG BORGSTEDE
+221.91
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+221.91
+1/1
+ 
+38042641
+ 
+071859426419
+ 
+KAY FOOD FIESTA TIEL 2.5#
+ 
+EA
+ 
+4 
+4 
+9.277
+ 
+7.422
+ 
+29.69
+ 
+OV
+2/1
+ 
+38042644
+ 
+071859426440
+ 
+KAY FOOD FIESTA PRRT 4.5#
+ 
+EA
+ 
+4 
+4 
+18.958
+ 
+15.166
+ 
+60.66
+ 
+OV
+3/1
+ 
+38042645
+ 
+071859426457
+ 
+KAY FOOD FIESTA MACAW 4.5#
+ 
+EA
+ 
+2 
+2 
+20.523
+ 
+16.418
+ 
+32.84
+ 
+OV
+4/1
+ 
+38042646
+ 
+071859426464
+ 
+KAY FOOD FIESTA CONURE 4.5#
+ 
+EA
+ 
+4 
+4 
+17.117
+ 
+13.694
+ 
+54.78
+ 
+OV
+5/ 
+38094916
+ 
+071859949161
+ 
+KAY FOOD BIG BITE PRRT 4#
+ 
+EA
+ 
+6 
+0 
+17.505
+ 
+14.004
+ 
+0.00
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Bird
+ 
+20 
+14 
+177.97
+-----
+ 
+-----
+ 
+---------
+6/1
+ 
+38099877
+ 
+071859998770
+ 
+KAY FOOD FIESTA RBBT 6.5#
+ 
+EA
+ 
+4 
+4 
+13.730
+ 
+10.984
+ 
+43.94
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Small Animal
+ 
+4 
+4 
+43.94
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Bird
+ 
+177.97
+Small Animal
+ 
+43.94
+
+-- 1 of 1 --
+

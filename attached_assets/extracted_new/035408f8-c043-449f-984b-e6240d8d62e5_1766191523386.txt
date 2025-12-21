@@ -1,0 +1,270 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06324649
+	11/18/25
+	06606923
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+REDBARN 15451
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+08:56:04
+CEC
+667 CRAIG BORGSTEDE
+185.40
+ 
+0.00
+ 
+21.00
+ 
+0.00
+ 
+0.00
+ 
+206.40
+1/2
+ 
+51800250
+ 
+785184002506
+ 
+RBP TRT BULLY SLICES BBQ 9OZ
+ 
+EA
+ 
+6 
+6 
+8.774
+ 
+6.142
+ 
+36.85
+ 
+OV
+2/2
+ 
+51812012
+ 
+785184120125
+ 
+RBP DRY G/F LAND 22#
+ 
+EA
+ 
+2 
+2 
+54.317
+ 
+0.000
+ 
+0.00
+ 
+OV
+SUSAN HOWELL 15451
+3/2
+ 
+51812015
+ 
+785184120156
+ 
+RBP DRY W/G LAND 22#
+ 
+EA
+ 
+1 
+1 
+54.268
+ 
+0.000
+ 
+0.00
+ 
+OV
+SUSAN HOWELL 15451
+4/1
+ 
+51825500
+ 
+785184255001
+ 
+RBP TRT BULLY SLICES 9OZ
+ 
+EA
+ 
+6 
+6 
+9.048
+ 
+6.334
+ 
+38.00
+ 
+OV
+5/3
+ 
+51825514
+ 
+785184255148
+ 
+RBP TRT BULLY SLICES PB 9OZ
+ 
+EA
+ 
+6 
+6 
+8.774
+ 
+6.142
+ 
+36.85
+ 
+OV
+6/2
+ 
+51825515
+ 
+785184255155
+ 
+RBP TRT BULLY SLICES VAN 9OZ
+ 
+EA
+ 
+6 
+6 
+8.774
+ 
+6.142
+ 
+36.85
+ 
+OV
+7/2
+ 
+51825516
+ 
+785184255162
+ 
+RBP TRT BULLY SLICES FRTOAST9Z
+ 
+EA
+ 
+6 
+6 
+8.774
+ 
+6.142
+ 
+36.85
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+33 
+33 
+185.40
+-----
+ 
+-----
+ 
+---------
+DELIVERY SURCHARGE
+ 
+21.00
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Dog
+ 
+185.40
+
+-- 1 of 1 --
+

@@ -1,0 +1,79 @@
+Order# 308549
+https://eorder.pennplax.com
+Date: Thursday, October 23, 2025
+Billing Information:
+Company: ANIMAL HOUSE
+Name: ANIMAL HOUSE
+Phone:
+Address: 2934 CYPRESS ST
+WEST MONROE, Louisiana 71291
+United States
+Payment method: EBizCharge Standard
+EBizCharge.MethodId: 3641
+EBizCharge.ChargeAmount: 416.48
+Shipping Information:
+Company: ANIMAL HOUSE
+Name: ANIMAL HOUSE
+Phone:
+Address: 2934 CYPRESS ST
+WEST MONROE, Louisiana 71291
+United States
+Shipping method: Handling
+Product(s)
+Name SKU Price Qty Total
+Small World Habitat Plastic Tank - 0.6 Gallon 030172090318 $2.99 3.00 $8.97
+Tide & Treasure™ Driftwood - Small - 6-8" 030172104626 $3.30 6.00 $19.80
+Tide & Treasure™ Pirate-Themed Ship Steering Wheel 030172106057 $8.34 2.00 $16.68
+Tide & Treasure™ Cambodian Rock Face - Small 030172062384 $6.64 1.00 $6.64
+Tide & Treasure™ Bonsai Plant - 7" - Green 030172098710 $3.09 2.00 $6.18
+Tide & Treasure™ Bonsai Plant - 7" - Purple 030172098727 $3.09 2.00 $6.18
+Tide & Treasure™ Bonsai Plant - 11" - Green 030172098734 $4.38 2.00 $8.76
+Tide & Treasure™ Bonsai Plant - 11" - Pink 030172098741 $4.38 2.00 $8.76
+Tide & Treasure™ Aqua-Plants 6-Piece - 8" Green 030172071461 $4.49 2.00 $8.98
+Tide & Treasure™ Aqua-Plants 6-Piece - 4" Green 030172071447 $2.79 3.00 $8.37
+Tide & Treasure™ Aqua-Plants 6-Piece - 4" Multicolor 030172071454 $2.96 2.00 $5.92
+Tide & Treasure™ Floral Spike - Green - 13" 030172055553 $3.75 2.00 $7.50
+Tide & Treasure™ Water Hyacinth - Pink - 5" 030172055348 $2.38 2.00 $4.76
+Tide & Treasure™ Glow Plants - 5-Piece PDQ -
+Green/Pink - Medium
+030172101045 $1.73 5.00 $8.65
+Cascade™ Aqua-Mist™ Air Stone Bar - 4" L 030172333040 $1.39 3.00 $4.17
+Cascade™ Standard Tubing - 8 Feet 030172350085 $1.22 3.00 $3.66
+Cascade™ Lok-Tite® 2-Gang Valve 030172191206 $3.58 2.00 $7.16
+shorefins™ The Wizard™ Glass Scraper & Scrubber
+Combo Kit
+030172092060 $7.49 1.00 $7.49
+Cascade™ Cichlid Hut 030172065927 $3.52 2.00 $7.04
+shorefins™ Mini-Tank Heater - 4" - 10 Watt 030172094835 $9.86 3.00 $29.58
+shorefins™ Mini-Tank Heater - 6" - 25 Watt 030172094842 $9.06 3.00 $27.18
+Cascade™ 100 Hang-on Filter - 100 gph - Up to 20
+Gallons
+030172014949 $18.02 1.00 $18.02
+
+-- 1 of 2 --
+
+Cascade™ 150 Hang-on Filter - 150 gph - Up to 35
+Gallons
+030172015533 $21.88 2.00 $43.76
+Cascade™ 20 Hang-on Filter - 20 gph - Up to 7 Gallons 030172070990 $9.80 2.00 $19.60
+Cascade™ 100 Hang-on Filter Replacement Cartridge -
+3-Pack - Fits CPF2 Filter
+030172016691 $5.43 2.00 $10.86
+shorefins™ Betta World Pump & Filter Kit 030172391286 $17.03 1.00 $17.03
+shorefins™ Betta Starter Kit 030172102745 $12.52 2.00 $25.04
+Bird Life™ High Back Cups - 4 oz - 12-Piece Display 030172902673 $0.89 12.00 $10.68
+Bird Life™ Trimmer Perch - Extra Large - 12" 030172012969 $8.36 1.00 $8.36
+Reptology™ Shale Scapes Ledge & Cave Hideout -
+Large
+030172050213 $9.04 1.00 $9.04
+Reptology™ Fossil Rock Food/Water Dish - Medium 030172071966 $4.62 1.00 $4.62
+Reptology™ Lizard-Lounger™ - Large 030172086816 $18.08 1.00 $18.08
+Reptology™ Lizard-Lounger™ with Vines 030172087431 $14.62 1.00 $14.62
+Sub-total: $412.14
+Discount: -$20.61
+Shipping: $24.95
+Tax: $0.00
+Order total: $416.48
+
+-- 2 of 2 --
+

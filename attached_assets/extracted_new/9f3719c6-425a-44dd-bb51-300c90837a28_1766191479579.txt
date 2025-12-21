@@ -1,0 +1,322 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06321872
+	11/04/25
+	06603372
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+ETHOS 18619
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+08:58:12
+CEC
+667 CRAIG BORGSTEDE
+410.36
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+410.36
+1/1
+ 
+53200707
+ 
+723633007078
+ 
+NBP CAN SPEC SENS S-S 12.7OZ
+ 
+EA
+ 
+12 
+12 
+3.103
+ 
+2.327
+ 
+27.92
+ 
+OV
+2/1
+ 
+53200708
+ 
+723633007085
+ 
+NBP CAN SPEC JNT/MUSCLE 12.7OZ
+ 
+EA
+ 
+12 
+12 
+3.103
+ 
+2.327
+ 
+27.92
+ 
+OV
+3/1
+ 
+53200709
+ 
+723633007092
+ 
+NBP CAN SPEC DGST/IMMUNE 12.7Z
+ 
+EA
+ 
+12 
+12 
+3.103
+ 
+2.327
+ 
+27.92
+ 
+OV
+4/1
+ 
+53200713
+ 
+723633007139
+ 
+NBP DRY SPEC SENS S-S 3.5#
+ 
+EA
+ 
+2 
+2 
+13.154
+ 
+9.866
+ 
+19.73
+ 
+OV
+5/1
+ 
+53200714
+ 
+723633007146
+ 
+NBP DRY SPEC SENS S-S 22#
+ 
+EA
+ 
+2 
+2 
+55.037
+ 
+41.278
+ 
+82.56
+ 
+OV
+6/1
+ 
+53200715
+ 
+723633007153
+ 
+NBP DRY SPEC JNT/MUSCLE 3.5#
+ 
+EA
+ 
+2 
+2 
+13.154
+ 
+9.866
+ 
+19.73
+ 
+OV
+7/1
+ 
+53200716
+ 
+723633007160
+ 
+NBP DRY SPEC JNT/MUSCLE 22#
+ 
+EA
+ 
+2 
+2 
+55.037
+ 
+41.278
+ 
+82.56
+ 
+OV
+8/1
+ 
+53200717
+ 
+723633007177
+ 
+NBP DRY SPEC DGST/IMMUNE 3.5#
+ 
+EA
+ 
+2 
+2 
+13.154
+ 
+9.866
+ 
+19.73
+ 
+OV
+9/1
+ 
+53200718
+ 
+723633007184
+ 
+NBP DRY SPEC DGST/IMMUNE 22#
+ 
+EA
+ 
+2 
+2 
+55.037
+ 
+41.278
+ 
+82.56
+ 
+OV
+10/1
+ 
+53200719
+ 
+723633007191
+ 
+NBP DRY SPEC S/B DGST/JNT 3.5#
+ 
+EA
+ 
+2 
+2 
+13.154
+ 
+9.866
+ 
+19.73
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+50 
+50 
+410.36
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Dog
+ 
+410.36
+
+-- 1 of 1 --
+

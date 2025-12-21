@@ -1,0 +1,321 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06318397
+	10/14/25
+	06599956
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+SINGLE SHIP WAREHOUSE
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:04:06
+WEB
+667 CRAIG BORGSTEDE
+138.65
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+138.65
+1/1
+ 
+68002984
+ 
+077234029848
+ 
+ET-2984
+ 
+ETH TOY JUTE/FEATHER SACK
+ 
+EA
+ 
+2 
+2 
+2.362
+ 
+2.130
+ 
+4.26
+ 
+OV
+2/1
+ 
+68052111
+ 
+077234521113
+ 
+ETH TOY CT HUG'N KICK SHIMMER
+ 
+EA
+ 
+2 
+2 
+3.395
+ 
+3.060
+ 
+6.12
+ 
+OV
+3/1
+ 
+68058627
+ 
+077234586273
+ 
+ETH BOWL CT PORTOFINO PK 6IN
+ 
+EA
+ 
+1 
+1 
+4.187
+ 
+3.770
+ 
+3.77
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Cat
+ 
+5 
+5 
+14.15
+-----
+ 
+-----
+ 
+---------
+4/1
+ 
+04956133
+ 
+850015561337
+ 
+KRA DSP CBD BLISS 15MG PB
+ 
+EA
+ 
+12 
+12 
+4.373
+ 
+4.373
+ 
+52.48
+5/1
+ 
+23902620
+ 
+660204026208
+ 
+FAS PJS BFFL PLAID RD XXS
+ 
+EA
+ 
+2 
+2 
+10.128
+ 
+9.120
+ 
+18.24
+ 
+OV
+6/1
+ 
+23902621
+ 
+660204026215
+ 
+FAS PJS BFFL PLAID RD XS
+ 
+EA
+ 
+2 
+2 
+10.128
+ 
+9.120
+ 
+18.24
+ 
+OV
+7/1
+ 
+23902627
+ 
+660204026277
+ 
+FAS PJS UNICORN PK XS
+ 
+EA
+ 
+1 
+1 
+10.128
+ 
+9.120
+ 
+9.12
+ 
+OV
+8/1
+ 
+68054850
+ 
+077234548509
+ 
+ETH TOY STHRS WARM HUG PAL10IN
+ 
+EA
+ 
+2 
+2 
+6.473
+ 
+5.830
+ 
+11.66
+ 
+OV
+9/1
+ 
+68054968
+ 
+077234549681
+ 
+ETH TOY AXOLOTL ASST 14IN
+ 
+EA
+ 
+3 
+3 
+5.472
+ 
+4.920
+ 
+14.76
+ 
+OV
+*MFTR TEMP OUT, ETA NOV*
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+22 
+22 
+124.50
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Cat
+ 
+14.15
+Dog
+ 
+124.50
+
+-- 1 of 1 --
+

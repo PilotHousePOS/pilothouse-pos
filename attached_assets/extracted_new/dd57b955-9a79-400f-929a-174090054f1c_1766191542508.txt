@@ -1,0 +1,336 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06298262
+	06/27/25
+	06577499
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:15:21
+WEB
+667 CRAIG BORGSTEDE
+583.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+583.00
+1/2
+ 
+45010560
+ 
+047497105603
+ 
+AQA TNK 56 CLMN BK 30X18X24
+ 
+EA
+ 
+1 
+1 
+156.526
+ 
+117.390
+ 
+117.39
+ 
+OV
+30X18X24
+2/ 
+45011110
+ 
+047497111109
+ 
+AQA TNK 110XH BK 48X18X30
+ 
+EA
+ 
+1 
+0 
+464.887
+ 
+348.670
+ 
+0.00
+ 
+OV
+3/2
+ 
+45034300
+ 
+047497343005
+ 
+AQA CANOPY HNGD GLASS 30X18
+ 
+EA
+ 
+1 
+1 
+31.063
+ 
+23.300
+ 
+23.30
+ 
+OV
+56 COLUMN
+4/ 
+45034485
+ 
+047497344859
+ 
+AQA CANOPY GLASS HINGED 48X18
+ 
+EA
+ 
+1 
+0 
+45.579
+ 
+34.180
+ 
+0.00
+ 
+OV
+5/2
+ 
+45068303
+ 
+047497683033
+ 
+AQA STND MAJESTY BK 30X18
+ 
+EA
+ 
+1 
+1 
+206.353
+ 
+154.760
+ 
+154.76
+ 
+OV
+6/ 
+45068483
+ 
+047497684832
+ 
+AQA STND MAJESTY BK 48X18
+ 
+EA
+ 
+1 
+0 
+257.971
+ 
+193.480
+ 
+0.00
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Aquatic
+ 
+6 
+3 
+295.45
+-----
+ 
+-----
+ 
+---------
+7/ 
+75026917
+ 
+047497269176
+ 
+TET TANK REPTO HABITAT DLX40BR
+ 
+EA
+ 
+3 
+0 
+203.846
+ 
+152.880
+ 
+0.00
+ 
+OV
+8/1
+ 
+75026921
+ 
+047497269213
+ 
+TET REPTO HABITAT 20L
+ 
+EA
+ 
+6 
+5 
+76.676
+ 
+57.510
+ 
+287.55
+ 
+OV
+9/ 
+75026923
+ 
+047497269237
+ 
+TET TANK REPTOHABITAT 75G
+ 
+EA
+ 
+3 
+0 
+237.279
+ 
+177.960
+ 
+0.00
+ 
+OV
+10/
+ 
+75026926
+ 
+047497269268
+ 
+TET TANK DLX REPTOHABITAT 75G
+ 
+EA
+ 
+3 
+0 
+325.693
+ 
+244.270
+ 
+0.00
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Reptile
+ 
+15 
+5 
+287.55
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Aquatic
+ 
+295.45
+Reptile
+ 
+287.55
+
+-- 1 of 1 --
+

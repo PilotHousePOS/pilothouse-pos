@@ -1,0 +1,358 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06284164
+	04/16/25
+	06560993
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+SINGLE SHIP WAREHOUSE
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:25:25
+WEB
+667 CRAIG BORGSTEDE
+105.69
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+105.69
+1/1
+ 
+12902500
+ 
+767451025005
+ 
+EXC TRT VAN CREME 8OZ
+ 
+EA
+ 
+2 
+2 
+2.678
+ 
+2.678
+ 
+5.36
+2/1
+ 
+17606062
+ 
+788169060621
+ 
+JOL TOY ROMP-N-ROLL BL 6IN
+ 
+EA
+ 
+1 
+1 
+12.786
+ 
+11.510
+ 
+11.51
+ 
+OV
+3/1
+ 
+17672042
+ 
+788169720426
+ 
+JOL TOY SCCR BLL BL 4IN
+ 
+EA
+ 
+1 
+1 
+5.950
+ 
+5.360
+ 
+5.36
+ 
+OV
+4/1
+ 
+17672043
+ 
+788169720433
+ 
+JOL TOY SCCR BLL GN 4IN
+ 
+EA
+ 
+1 
+1 
+5.950
+ 
+5.360
+ 
+5.36
+ 
+OV
+5/1
+ 
+17672063
+ 
+788169720631
+ 
+JOL TOY SCCR BALL GN 5.5IN
+ 
+EA
+ 
+1 
+1 
+10.034
+ 
+9.030
+ 
+9.03
+ 
+OV
+6/1
+ 
+68033224
+ 
+077234332245
+ 
+ETH TOY KFC VNL FAMOUS BOWL4IN
+ 
+EA
+ 
+1 
+1 
+3.028
+ 
+2.730
+ 
+2.73
+ 
+OV
+7/1
+ 
+68033229
+ 
+077234332290
+ 
+ETH TOY KFC FRIES/DRUMETTE 2PK
+ 
+EA
+ 
+1 
+1 
+3.900
+ 
+3.510
+ 
+3.51
+ 
+OV
+8/1
+ 
+68033231
+ 
+077234332313
+ 
+ETH TOY KFC CHKN BOX 7IN
+ 
+EA
+ 
+1 
+1 
+3.900
+ 
+3.510
+ 
+3.51
+ 
+OV
+9/1
+ 
+68054849
+ 
+077234548493
+ 
+ETH TOY STHRS HB BUNNY 12IN
+ 
+EA
+ 
+2 
+2 
+7.800
+ 
+7.020
+ 
+14.04
+ 
+OV
+10/1
+ 
+68054853
+ 
+077234548530
+ 
+ETH TOY STHRS TABBIE LMB 8IN
+ 
+EA
+ 
+2 
+2 
+4.328
+ 
+3.900
+ 
+7.80
+ 
+OV
+11/1
+ 
+68054968
+ 
+077234549681
+ 
+ETH TOY AXOLOTL ASST 14IN
+ 
+EA
+ 
+2 
+2 
+4.758
+ 
+4.280
+ 
+8.56
+ 
+OV
+*MFTR TEMP OUT, ETA MAY*
+12/1
+ 
+73200081
+ 
+898323000810
+ 
+PSG TRT PASTRY DONUT SWPOT 2CT
+ 
+EA
+ 
+12 
+12 
+2.679
+ 
+2.410
+ 
+28.92
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+27 
+27 
+105.69
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Dog
+ 
+105.69
+
+-- 1 of 1 --
+

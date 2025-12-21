@@ -1,0 +1,424 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06282185
+	04/07/25
+	06559157
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+SINGLE SHIP WAREHOUSE
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:26:09
+WEB
+667 CRAIG BORGSTEDE
+103.86
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+103.86
+1/1
+ 
+77788978
+ 
+891049889783
+ 
+SEV BKGD AQWILD/SLATEWAY 18X50
+ 
+EA
+ 
+1 
+1 
+29.310
+ 
+29.310
+ 
+29.31
+-----
+ 
+-----
+ 
+---------
+Aquatic
+ 
+1 
+1 
+29.31
+-----
+ 
+-----
+ 
+---------
+2/1
+ 
+68002984
+ 
+077234029848
+ 
+ET-2984
+ 
+ETH TOY JUTE/FEATHER SACK
+ 
+EA
+ 
+2 
+2 
+2.053
+ 
+1.850
+ 
+3.70
+ 
+OV
+3/ 
+68052020
+ 
+077234520208
+ 
+ETH SCRATCHER ROCKIN 10IN
+ 
+EA
+ 
+2 
+0 
+8.607
+ 
+7.750
+ 
+0.00
+ 
+OV
+4/1
+ 
+68052076
+ 
+077234520765
+ 
+ETH TOY SHMMR GLMR TRTL CATNIP
+ 
+EA
+ 
+2 
+2 
+1.977
+ 
+1.780
+ 
+3.56
+ 
+OV
+5/1
+ 
+68052077
+ 
+077234520772
+ 
+ETH TOY SHMMR GLMR BFLY CATNIP
+ 
+EA
+ 
+2 
+2 
+1.977
+ 
+1.780
+ 
+3.56
+ 
+OV
+6/1
+ 
+68052111
+ 
+077234521113
+ 
+ETH TOY CT HUG'N KICK SHIMMER
+ 
+EA
+ 
+3 
+3 
+2.952
+ 
+2.660
+ 
+7.98
+ 
+OV
+7/1
+ 
+68052157
+ 
+077234521571
+ 
+ETH TOY CT YARN BLLS 2.5IN 2PK
+ 
+EA
+ 
+1 
+1 
+2.952
+ 
+2.660
+ 
+2.66
+ 
+OV
+8/1
+ 
+68052158
+ 
+077234521588
+ 
+ETH TOY CT YARN BLLS 3.5IN
+ 
+EA
+ 
+1 
+1 
+2.600
+ 
+2.340
+ 
+2.34
+ 
+OV
+9/1
+ 
+68052175
+ 
+077234521755
+ 
+ETH TOY CT LV EARTH BARNYRD4IN
+ 
+EA
+ 
+2 
+2 
+2.730
+ 
+2.460
+ 
+4.92
+ 
+OV
+10/1
+ 
+68052227
+ 
+077234522271
+ 
+ETH TOY CT CUDDLY 3PK
+ 
+EA
+ 
+2 
+2 
+3.028
+ 
+2.730
+ 
+5.46
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Cat
+ 
+17 
+15 
+34.18
+-----
+ 
+-----
+ 
+---------
+11/1
+ 
+78800501
+ 
+180181005015
+ 
+VIP TOY TUFF SPRT TUG-O-WAR RD
+ 
+EA
+ 
+1 
+1 
+10.544
+ 
+10.544
+ 
+10.54
+12/1
+ 
+78800504
+ 
+180181005046
+ 
+VIP TOY TUFF SPRT TUG-O-WAR BL
+ 
+EA
+ 
+1 
+1 
+10.544
+ 
+10.544
+ 
+10.54
+13/1
+ 
+78800601
+ 
+180181006012
+ 
+VIP TOY TUFF SPORT BOWMERNG RD
+ 
+EA
+ 
+1 
+1 
+8.822
+ 
+8.822
+ 
+8.82
+14/1
+ 
+78802014
+ 
+180181020148
+ 
+VIP TOY TUFF SEA CRTRS LOBSTER
+ 
+EA
+ 
+1 
+1 
+10.473
+ 
+10.473
+ 
+10.47
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+4 
+4 
+40.37
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Aquatic
+ 
+29.31
+Cat
+ 
+34.18
+Dog
+ 
+40.37
+
+-- 1 of 1 --
+

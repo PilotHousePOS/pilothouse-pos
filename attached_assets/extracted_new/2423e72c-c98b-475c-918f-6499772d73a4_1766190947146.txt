@@ -1,0 +1,396 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06291753
+	05/23/25
+	06570092
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+SINGLE SHIP WAREHOUSE
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:21:12
+WEB
+667 CRAIG BORGSTEDE
+101.33
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+101.33
+1/1
+ 
+18807610
+ 
+759023076102
+ 
+PPR LEAD CWM KITTY KTN SM RD
+ 
+EA
+ 
+2 
+2 
+9.663
+ 
+9.100
+ 
+18.20
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Cat
+ 
+2 
+2 
+18.20
+-----
+ 
+-----
+ 
+---------
+2/1
+ 
+68054752
+ 
+077234547526
+ 
+ETH TOY LOVE EARTH CROC 14IN
+ 
+EA
+ 
+1 
+1 
+4.978
+ 
+4.480
+ 
+4.48
+ 
+OV
+3/1
+ 
+68054851
+ 
+077234548516
+ 
+ETH TOY STHRS WARM HUG BNE 9IN
+ 
+EA
+ 
+3 
+3 
+3.028
+ 
+2.730
+ 
+8.19
+ 
+OV
+4/1
+ 
+68054852
+ 
+077234548523
+ 
+ETH TOY STHRS WARM HUG BNE12IN
+ 
+EA
+ 
+2 
+2 
+4.328
+ 
+3.900
+ 
+7.80
+ 
+OV
+5/1
+ 
+68054853
+ 
+077234548530
+ 
+ETH TOY STHRS TABBIE LMB 8IN
+ 
+EA
+ 
+1 
+1 
+4.328
+ 
+3.900
+ 
+3.90
+ 
+OV
+6/1
+ 
+68054958
+ 
+077234549582
+ 
+ETH TOY BALL IN A VINO ASST
+ 
+EA
+ 
+1 
+1 
+4.758
+ 
+4.280
+ 
+4.28
+ 
+OV
+7/1
+ 
+68054962
+ 
+077234549629
+ 
+ETH TOY AXOLOTL ASST 6IN
+ 
+EA
+ 
+2 
+2 
+3.458
+ 
+3.110
+ 
+6.22
+ 
+OV
+8/1
+ 
+68054963
+ 
+077234549636
+ 
+ETH TOY AXOLOTL W/HAT ASST 6IN
+ 
+EA
+ 
+2 
+2 
+3.458
+ 
+3.110
+ 
+6.22
+ 
+OV
+9/1
+ 
+68054964
+ 
+077234549643
+ 
+ETH TOY AXOLOTL BTTRBALL 7IN
+ 
+EA
+ 
+2 
+2 
+4.328
+ 
+3.900
+ 
+7.80
+ 
+OV
+10/1
+ 
+68054965
+ 
+077234549650
+ 
+ETH TOY AXOLOTL MERMD 10IN
+ 
+EA
+ 
+2 
+2 
+4.758
+ 
+4.280
+ 
+8.56
+ 
+OV
+11/1
+ 
+68054966
+ 
+077234549667
+ 
+ETH TOY AXOLOTL SWIMWEAR 10IN
+ 
+EA
+ 
+2 
+2 
+4.758
+ 
+4.280
+ 
+8.56
+ 
+OV
+12/1
+ 
+68054967
+ 
+077234549674
+ 
+ETH TOY AXOLOTL DUCK TUBE 10IN
+ 
+EA
+ 
+2 
+2 
+4.758
+ 
+4.280
+ 
+8.56
+ 
+OV
+13/1
+ 
+68054968
+ 
+077234549681
+ 
+ETH TOY AXOLOTL ASST 14IN
+ 
+EA
+ 
+2 
+2 
+4.758
+ 
+4.280
+ 
+8.56
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+22 
+22 
+83.13
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Cat
+ 
+18.20
+Dog
+ 
+83.13
+
+-- 1 of 1 --
+

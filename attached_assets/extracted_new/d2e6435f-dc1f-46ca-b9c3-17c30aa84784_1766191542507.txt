@@ -1,0 +1,433 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06298415
+	06/27/25
+	06577728
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+SINGLE SHIP WAREHOUSE
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:15:41
+WEB
+667 CRAIG BORGSTEDE
+138.48
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+138.48
+1/1
+ 
+18807613
+ 
+759023076133
+ 
+PPR LEAD CWM KITTY KTN RBL SM
+ 
+EA
+ 
+1 
+1 
+9.663
+ 
+9.663
+ 
+9.66
+2/1
+ 
+18807616
+ 
+759023076164
+ 
+PPR HRNS CWM KITTY SM PR
+ 
+EA
+ 
+1 
+1 
+9.663
+ 
+9.663
+ 
+9.66
+3/1
+ 
+18807617
+ 
+759023076171
+ 
+PPR HRNS CWM KITTY MD PR
+ 
+EA
+ 
+1 
+1 
+9.663
+ 
+9.663
+ 
+9.66
+4/1
+ 
+18808536
+ 
+759023085364
+ 
+PPR LEAD CWM KITTY MD BK
+ 
+EA
+ 
+1 
+1 
+9.663
+ 
+9.663
+ 
+9.66
+5/1
+ 
+68052157
+ 
+077234521571
+ 
+ETH TOY CT YARN BLLS 2.5IN 2PK
+ 
+EA
+ 
+1 
+1 
+2.952
+ 
+2.952
+ 
+2.95
+6/1
+ 
+68052233
+ 
+077234522332
+ 
+ETH TOY CT TWST DINO/POM POM
+ 
+EA
+ 
+2 
+2 
+2.600
+ 
+2.600
+ 
+5.20
+7/1
+ 
+78600138
+ 
+878968001380
+ 
+PTI PUREBITES CT MINNOW 1.09Z
+ 
+EA
+ 
+2 
+2 
+3.202
+ 
+3.202
+ 
+6.40
+*MFTR TEMP OUT, NO ETA*
+-----
+ 
+-----
+ 
+---------
+Cat
+ 
+9 
+9 
+53.19
+-----
+ 
+-----
+ 
+---------
+8/1
+ 
+48911115
+ 
+657546111150
+ 
+NPI DNTL TTHING PUP 3.74OZ
+ 
+EA
+ 
+3 
+3 
+3.600
+ 
+3.600
+ 
+10.80
+9/1
+ 
+68054444
+ 
+077234544440
+ 
+ETH TOY FUN FOOD RUFFUS 8IN
+ 
+EA
+ 
+1 
+1 
+3.938
+ 
+3.540
+ 
+3.54
+ 
+OV
+10/1
+ 
+68054905
+ 
+077234549056
+ 
+ETH TOY STRONG FLX DBL KNT14IN
+ 
+EA
+ 
+1 
+1 
+6.500
+ 
+5.850
+ 
+5.85
+ 
+OV
+11/1
+ 
+68054918
+ 
+077234549186
+ 
+ETH TOY BAMBNE-P TRIPOD BISON5
+ 
+EA
+ 
+2 
+2 
+2.600
+ 
+2.600
+ 
+5.20
+12/1
+ 
+68054930
+ 
+077234549308
+ 
+ETH TOY LIL SPOT DONUT 7IN
+ 
+EA
+ 
+2 
+2 
+3.028
+ 
+2.730
+ 
+5.46
+ 
+OV
+13/1
+ 
+68054933
+ 
+077234549339
+ 
+ETH TOY LIL SPOT SQRL 7IN
+ 
+EA
+ 
+1 
+1 
+4.328
+ 
+3.900
+ 
+3.90
+ 
+OV
+14/
+ 
+68054963
+ 
+077234549636
+ 
+ETH TOY AXOLOTL W/HAT ASST 6IN
+ 
+EA
+ 
+1 
+0 
+3.458
+ 
+3.110
+ 
+0.00
+ 
+OV
+*MFTR TEMP OUT, ETA AUG*
+15/1
+ 
+73200081
+ 
+898323000810
+ 
+PSG TRT PASTRY DONUT SWPOT 2CT
+ 
+EA
+ 
+12 
+12 
+2.679
+ 
+2.679
+ 
+32.15
+16/1
+ 
+78890373
+ 
+180181903731
+ 
+VIP TOY TUFFY DRBL ALIEN GN
+ 
+EA
+ 
+1 
+1 
+18.387
+ 
+18.387
+ 
+18.39
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+24 
+23 
+85.29
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Cat
+ 
+53.19
+Dog
+ 
+85.29
+
+-- 1 of 1 --
+

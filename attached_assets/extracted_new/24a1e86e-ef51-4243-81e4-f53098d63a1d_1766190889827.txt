@@ -1,0 +1,257 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06281794
+	04/05/25
+	06557928
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+REDBARN 10562
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:26:30
+BGA
+667 CRAIG BORGSTEDE
+2,088.17
+ 
+0.00
+ 
+21.00
+ 
+0.00
+ 
+0.00
+ 
+2,109.17
+1/1
+ 
+51812012
+ 
+785184120125
+ 
+RBP DRY G/F LAND 22#
+ 
+EA
+ 
+10 
+10 
+54.317
+ 
+54.317
+ 
+543.17
+2/1
+ 
+51812013
+ 
+785184120132
+ 
+RBP DRY G/F SKY 22#
+ 
+EA
+ 
+10 
+10 
+45.573
+ 
+45.573
+ 
+455.73
+3/1
+ 
+51812014
+ 
+785184120149
+ 
+RBP DRY G/F OCN 22#
+ 
+EA
+ 
+5 
+5 
+50.988
+ 
+50.988
+ 
+254.94
+4/1
+ 
+51812015
+ 
+785184120156
+ 
+RBP DRY W/G LAND 22#
+ 
+EA
+ 
+10 
+10 
+51.463
+ 
+51.463
+ 
+514.63
+5/1
+ 
+51812016
+ 
+785184120163
+ 
+RBP DRY W/G SKY 22#
+ 
+EA
+ 
+2 
+2 
+42.683
+ 
+42.683
+ 
+85.37
+6/1
+ 
+51812016
+ 
+785184120163
+ 
+RBP DRY W/G SKY 22#
+ 
+EA
+ 
+8 
+8 
+42.683
+ 
+0.000
+ 
+0.00
+ 
+OV
+B10G2F REDBARN 10562
+7/1
+ 
+51812017
+ 
+785184120170
+ 
+RBP DRY W/G OCN 22#
+ 
+EA
+ 
+5 
+5 
+46.866
+ 
+46.866
+ 
+234.33
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+50 
+50 
+2,088.17
+-----
+ 
+-----
+ 
+---------
+DELIVERY SURCHARGE
+ 
+21.00
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Dog
+ 
+2,088.17
+
+-- 1 of 1 --
+

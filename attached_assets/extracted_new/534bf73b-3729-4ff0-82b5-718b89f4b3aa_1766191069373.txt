@@ -1,0 +1,333 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06273189
+	02/26/25
+	06548461
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+SINGLE SHIP WAREHOUSE
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:32:28
+WEB
+667 CRAIG BORGSTEDE
+101.27
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+101.27
+1/1
+ 
+68052058
+ 
+077234520581
+ 
+ETH TEASR CAT PRANCER 44IN
+ 
+EA
+ 
+1 
+1 
+2.562
+ 
+2.310
+ 
+2.31
+ 
+OV
+2/1
+ 
+68052112
+ 
+077234521120
+ 
+ETH TEASR CT BFLY & MYLAR ASST
+ 
+EA
+ 
+3 
+3 
+2.457
+ 
+2.210
+ 
+6.63
+ 
+OV
+3/1
+ 
+68052131
+ 
+077234521311
+ 
+ETH TOY CT SONGBIRD CTNP 5IN
+ 
+EA
+ 
+2 
+2 
+3.938
+ 
+3.540
+ 
+7.08
+ 
+OV
+4/1
+ 
+68052158
+ 
+077234521588
+ 
+ETH TOY CT YARN BLLS 3.5IN
+ 
+EA
+ 
+2 
+2 
+2.600
+ 
+2.340
+ 
+4.68
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Cat
+ 
+8 
+8 
+20.70
+-----
+ 
+-----
+ 
+---------
+5/1
+ 
+23980032
+ 
+077234800324
+ 
+FAS SWTR CLASSIC CABLE RD XXS
+ 
+EA
+ 
+10 
+10 
+6.385
+ 
+5.750
+ 
+57.50
+ 
+OV
+6/ 
+23980056
+ 
+077234800560
+ 
+FAS SWTR CLASSIC CABLE RD XXXS
+ 
+EA
+ 
+4 
+0 
+6.385
+ 
+0.000
+ 
+0.00
+ 
+OV
+7/1
+ 
+48911303
+ 
+657546113031
+ 
+NPI USA TTHING PUP RING CHKN
+ 
+EA
+ 
+3 
+3 
+1.589
+ 
+1.589
+ 
+4.77
+8/1
+ 
+68054850
+ 
+077234548509
+ 
+ETH TOY STHRS WARM HUG PAL10IN
+ 
+EA
+ 
+2 
+2 
+5.628
+ 
+5.070
+ 
+10.14
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+19 
+15 
+72.41
+-----
+ 
+-----
+ 
+---------
+9/1
+ 
+48980099
+ 
+657546800993
+ 
+NPI TRT FRRT STC SLMN 1.87OZ
+ 
+EA
+ 
+3 
+3 
+2.720
+ 
+2.720
+ 
+8.16
+-----
+ 
+-----
+ 
+---------
+Small Animal
+ 
+3 
+3 
+8.16
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Cat
+ 
+20.70
+Dog
+ 
+72.41
+Small Animal
+ 
+8.16
+
+-- 1 of 1 --
+

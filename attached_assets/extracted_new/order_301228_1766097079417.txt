@@ -1,0 +1,99 @@
+Order# 301228
+https://eorder.pennplax.com
+Date: Monday, October 6, 2025
+Billing Information:
+Company: ANIMAL HOUSE
+Name: ANIMAL HOUSE
+Phone:
+Address: 2934 CYPRESS ST
+WEST MONROE, Louisiana 71291
+United States
+Payment method: EBizCharge Standard
+EBizCharge.MethodId: 3740
+EBizCharge.ChargeAmount: 722.83
+Shipping Information:
+Company: ANIMAL HOUSE
+Name: ANIMAL HOUSE
+Phone:
+Address: 2934 CYPRESS ST
+WEST MONROE, Louisiana 71291
+United States
+Shipping method: Handling
+Product(s)
+Name SKU Price Qty Total
+shorefins™ Betta Tank Kit with LED Light & Internal
+Filter - 1.5 Gallons
+030172097690 $35.02 2.00 $70.04
+SpongeBob SquarePants™ Betta Tank Kit - 0.7 Gallons
+- Bow-Shaped
+030172092039 $13.75 1.00 $13.75
+Small World Habitat Plastic Tank - 0.6 Gallon 030172090318 $2.99 3.00 $8.97
+Small World Habitat Plastic Tank - 2.2 Gallons 030172091018 $8.05 4.00 $32.20
+Small World Habitat Plastic Tank - 4 Gallons 030172091032 $13.80 2.00 $27.60
+Action-Air™ Treasure Chest - Medium 030172010156 $7.80 1.00 $7.80
+Action-Air™ Treasure Diver - Medium 030172010651 $10.03 2.00 $20.06
+SpongeBob SquarePants™ Patrick - Mini 030172040504 $2.99 3.00 $8.97
+Tide & Treasure™ Dragon Skull Gazer - Small 030172082177 $4.90 2.00 $9.80
+Tide & Treasure™ Plane Coral Scape - Blue - Extra
+Large
+030172083518 $32.90 1.00 $32.90
+Tide & Treasure™ Pirate-Themed Ship Steering Wheel 030172106057 $8.34 2.00 $16.68
+Tide & Treasure™ Sunken Treasure Ship - Small 030172048272 $5.50 1.00 $5.50
+Cascade™ 150 Hang-on Filter - 150 gph - Up to 35
+Gallons
+030172015533 $21.88 1.00 $21.88
+shorefins™ Pro Balance™ Vacation-Feeder - 14-Day -
+Fish Shape - 2-Pack
+030172085987 $2.02 3.00 $6.06
+Cascade™ Quick-Net - 2" x 1.75" Net 030172230028 $1.25 4.00 $5.00
+Cascade™ Quick-Net - 3" x 2.25" Net 030172230035 $1.30 4.00 $5.20
+Cascade™ Quick-Net - 4" x 3' Net 030172230042 $1.36 3.00 $4.08
+Cascade™ Quick-Net - 5" x 4" Net with 16" Handle 030172230509 $2.25 3.00 $6.75
+Cascade™ Gravel-Vac 5" Cylinder 030172005572 $7.61 2.00 $15.22
+shorefins™ Air-Tech 2K1 - For Aquariums up to 10
+Gallons
+030172290480 $8.64 2.00 $17.28
+shorefins™ Mini-Tank Heater - 6" - 25 Watt 030172094842 $9.06 2.00 $18.12
+
+-- 1 of 2 --
+
+shorefins™ Therma-Temp™ Digital Thermometer 030172372018 $2.97 4.00 $11.88
+Cascade™ Therma-Temp™ Floating Thermometer 030172371011 $1.87 4.00 $7.48
+shorefins™ Betta Resting Decor Comfort Cave 030172105685 $4.31 2.00 $8.62
+Bird Life™ Tweet Eats - Corn Puffs 030172101212 $5.03 1.00 $5.03
+Bird Life™ Jumbo Fountain Feeder 030172902284 $5.59 2.00 $11.18
+Bird Life™ Universal Cage Clips for Treats - 4-Pack 030172906206 $1.59 2.00 $3.18
+Bird Life™ Spray Millet Holder with Bells 030172902628 $1.54 4.00 $6.16
+Bird Life™ Trimmer Perch - Large - 10" 030172012952 $6.14 2.00 $12.28
+Bird Life™ Trimmer Perch - Extra Large - 12" 030172012969 $8.36 2.00 $16.72
+Bird Life™ Perch Covers - Small 030172902949 $2.06 3.00 $6.18
+Bird Life™ Trimmer Cement Perch - Small/Medium -
+7"
+030172005367 $11.86 2.00 $23.72
+Bird Life™ Trimmer Perch - Large - 10" 030172005466 $7.56 2.00 $15.12
+Bird Life™ Natural Weave Kabob Climbing Toy - 18" 030172077838 $8.80 2.00 $17.60
+Bird Life™ Natural Weave Kabob Climbing Toy - 21" 030172080432 $10.13 1.00 $10.13
+Bird Life™ Natural Weave Playground Climbing Mat 030172081446 $8.08 2.00 $16.16
+Bird Life™ Coconut Kabob 030172088285 $18.96 1.00 $18.96
+Cat Life™ Super Mouse Balls - 18-Piece Display 030172830082 $1.73 18.00 $31.14
+Dry-Tech™ Housebreaking Pads - 30 Pack - 23" x 24" 030172029905 $8.49 1.00 $8.49
+Small Animal Life™ Food/Water Dish Display Box -
+Large
+030172013829 $1.13 12.00 $13.56
+Small Animal Life™ Friend Fries 030172097423 $1.82 4.00 $7.28
+Reptology™ Internal Filter - 175 GPH - Up to 50
+Gallons
+030172060724 $28.07 2.00 $56.14
+Reptology™ Internal Filter - 70 GPH - Up to 15 Gallons 030172060779 $11.58 2.00 $23.16
+Reptology™ Hanging Vines™ 12" Green 030172087493 $4.80 2.00 $9.60
+Reptology™ Hanging Vines™ 24" Green & Red 030172094781 $7.18 2.00 $14.36
+Reptology™ Lizard-Lounger™ - Small 030172086809 $13.31 2.00 $26.62
+Purchase Order Number: 106
+Sub-total: $734.61
+Discount: -$36.73
+Shipping: $24.95
+Tax: $0.00
+Order total: $722.83
+
+-- 2 of 2 --
+

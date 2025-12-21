@@ -1,0 +1,202 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06274793
+	03/04/25
+	06550171
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+SINGLE SHIP WAREHOUSE
+530572
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:30:31
+WEB
+667 CRAIG BORGSTEDE
+112.36
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+112.36
+1/1
+ 
+48911115
+ 
+657546111150
+ 
+NPI DNTL TTHING PUP 3.74OZ
+ 
+EA
+ 
+3 
+3 
+3.600
+ 
+3.600
+ 
+10.80
+2/1
+ 
+78802014
+ 
+180181020148
+ 
+VIP TOY TUFF SEA CRTRS LOBSTER
+ 
+EA
+ 
+1 
+1 
+10.473
+ 
+10.473
+ 
+10.47
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+4 
+4 
+21.27
+-----
+ 
+-----
+ 
+---------
+3/1
+ 
+14967250
+ 
+749778672506
+ 
+GEN BAG PLSTC FSH 10x18 1000BX
+ 
+EA
+ 
+1 
+1 
+101.208
+ 
+91.090
+ 
+91.09
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Non Supply Items
+ 
+1 
+1 
+91.09
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Dog
+ 
+21.27
+Non Supply Item
+ 
+91.09
+
+-- 1 of 1 --
+

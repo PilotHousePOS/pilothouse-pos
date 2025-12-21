@@ -1,0 +1,82 @@
+Order# 229778
+https://eorder.pennplax.com
+Date: Wednesday, May 21, 2025
+Billing Information:
+Company: ANIMAL HOUSE
+Name: ANIMAL HOUSE
+Phone:
+Address: 2934 CYPRESS ST
+WEST MONROE, Louisiana 71291
+United States
+Payment method: EBizCharge Standard
+EBizCharge.MethodId: 2975
+EBizCharge.ChargeAmount: 435.86
+Shipping Information:
+Company: ANIMAL HOUSE
+Name: ANIMAL HOUSE
+Phone:
+Address: 2934 CYPRESS ST
+WEST MONROE, Louisiana 71291
+United States
+Shipping method: Handling
+Product(s)
+Name SKU Price Qty Total
+Tide & Treasure™ Driftwood - Large - 12-16" 030172104640 $7.96 4.00 $31.84
+Tide & Treasure™ Driftwood - Medium - 8-12" 030172104633 $4.69 4.00 $18.76
+Tide & Treasure™ Driftwood - Small - 6-8" 030172104626 $2.87 6.00 $17.22
+Action-Air™ Rice Mill - Medium 030172010491 $6.24 1.00 $6.24
+SpongeBob SquarePants™ Krusty Krab - Medium 030172059261 $7.66 2.00 $15.32
+Tide & Treasure™ Crocodile Skull - Large 030172077395 $11.97 1.00 $11.97
+Tide & Treasure™ Car Wreck - Medium 030172014529 $15.93 1.00 $15.93
+Tide & Treasure™ Magical Castle Section B - Extra
+Large
+030172027352 $42.48 1.00 $42.48
+Tide & Treasure™ Bonsai Plant - 7" - Purple 030172098727 $2.69 3.00 $8.07
+Tide & Treasure™ Bonsai Plant - 11" - Green 030172098734 $3.81 3.00 $11.43
+Tide & Treasure™ Glow Plants - 5-Piece PDQ - Green -
+Medium
+030172101038 $1.50 5.00 $7.50
+Tide & Treasure™ Aqua-Plants 6-Piece - 4" Green 030172071447 $2.43 2.00 $4.86
+Tide & Treasure™ Aqua-Plants 6-Piece - 8" Green 030172071461 $3.90 1.00 $3.90
+Tide & Treasure™ Water Lily - Red - 10" 030172055485 $2.49 2.00 $4.98
+Cascade™ Pro-Carb™ Activated Carbon - Small - 17
+oz
+030172015410 $8.09 2.00 $16.18
+Cascade™ Pro-Z™ Activated Carbon & Zeolite
+Crystals - Medium - 34 oz
+030172015502 $9.65 2.00 $19.30
+Cascade™ 325 Internal Corner Filter - 85 gph - Up to
+10 Gallons
+030172071928 $12.99 1.00 $12.99
+Cascade™ Air Pod Aquarium Pump - Up to 20 Gallons 030172047206 $9.25 1.00 $9.25
+Cascade™ Air Pod Aquarium Pump - Up to 75 Gallons 030172047237 $16.08 2.00 $32.16
+shorefins™ Aqua-Mist™ 1 3/16" Sphere 030172332074 $0.64 3.00 $1.92
+shorefins™ Bubble Wall UG Filter Replacement - 10" 030172335105 $2.44 2.00 $4.88
+Cascade™ Standard Tubing - 25 Feet 030172350252 $2.79 3.00 $8.37
+
+-- 1 of 2 --
+
+Cascade™ Standard Tubing - 8 Feet 030172350085 $1.06 3.00 $3.18
+Cascade™ Silicone Tubing - 8 Feet 030172350078 $1.27 3.00 $3.81
+Cascade™ Therma-Temp™ Stainless Steel
+Thermometer
+030172371059 $2.44 6.00 $14.64
+Cascade™ Quick-Net - 5" x 4" Net 030172230059 $1.42 4.00 $5.68
+Bird Life™ Cuttlebone with Holder - Twin Pack 030172902833 $2.65 3.00 $7.95
+Bird Life™ Natural Weave Playground Climbing Mat 030172081446 $7.03 2.00 $14.06
+Bird Life™ 5-Step Ladder 030172902109 $1.85 1.00 $1.85
+Bird Life™ Perch with Mirror & Beads 030172902451 $1.59 3.00 $4.77
+Dog's Life™ Pet Steps - Felt - 13" 030172102301 $34.00 1.00 $34.00
+Dog's Life™ Diamond Bit Nail Grinder 030172101397 $15.44 1.00 $15.44
+Reptology™ Shale Scapes Ledge & Cave Hideout -
+Medium
+030172041693 $14.96 1.00 $14.96
+Reptology™ Fossil Rock Food/Water Dish - Large 030172071973 $6.65 1.00 $6.65
+Sub-total: $432.54
+Discount: -$21.63
+Shipping: $24.95
+Tax: $0.00
+Order total: $435.86
+
+-- 2 of 2 --
+

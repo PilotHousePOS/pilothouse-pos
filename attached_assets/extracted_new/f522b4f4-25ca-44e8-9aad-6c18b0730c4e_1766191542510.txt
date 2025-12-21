@@ -1,0 +1,406 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06319222
+	10/21/25
+	06601496
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+KELLY AH1130
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:02:37
+CEC
+667 CRAIG BORGSTEDE
+431.76
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+0.00
+ 
+431.76
+Associated Credit Applied Seperately
+	On Credit Memo# 06601720 Invoice# 06319217
+1/1
+ 
+11302031
+ 
+602644020316
+ 
+EAR-0203
+ 
+EAR SHMP COAT BRIGHTENING 16Z
+ 
+EA
+ 
+3 
+3 
+15.789
+ 
+14.210
+ 
+42.63
+ 
+OV
+2/ 
+11302034
+ 
+602644020347
+ 
+EAR-0203
+ 
+EAR SHMP COAT BRIGHTENING 1G
+ 
+EA
+ 
+1 
+0 
+75.852
+ 
+0.000
+ 
+0.00
+ 
+OV
+3/2
+ 
+11302051
+ 
+602644020514
+ 
+EAR-0205
+ 
+EAR SHMP HYPO FF 16OZ
+ 
+EA
+ 
+3 
+3 
+15.789
+ 
+14.210
+ 
+42.63
+ 
+OV
+*
+4/1
+ 
+11302081
+ 
+602644020811
+ 
+EAR-0208
+ 
+EAR COND OATML/ALOE 16OZ
+ 
+EA
+ 
+3 
+3 
+15.789
+ 
+14.210
+ 
+42.63
+ 
+OV
+5/2
+ 
+11302091
+ 
+602644020910
+ 
+EAR-0209
+ 
+EAR SHMP 2-IN-1 MANGO 16OZ
+ 
+EA
+ 
+3 
+3 
+15.789
+ 
+14.210
+ 
+42.63
+ 
+OV
+*
+6/2
+ 
+11302131
+ 
+602644021313
+ 
+EAR-0213
+ 
+EAR SHMP ULT MILD PUP 16OZ
+ 
+EA
+ 
+3 
+3 
+15.789
+ 
+14.210
+ 
+42.63
+ 
+OV
+7/2
+ 
+11302192
+ 
+602644021924
+ 
+EAR COND SHED CNTRL 16OZ
+ 
+EA
+ 
+3 
+3 
+15.789
+ 
+14.210
+ 
+42.63
+ 
+OV
+8/2
+ 
+11302201
+ 
+602644022013
+ 
+EAR-0220
+ 
+EAR REM SPRZ HOT SPT 8OZ
+ 
+EA
+ 
+3 
+3 
+10.863
+ 
+9.777
+ 
+29.33
+ 
+OV
+9/1
+ 
+11302203
+ 
+602644022037
+ 
+EAR-0220
+ 
+EAR DEOD SPRZ VAN ALMOND8Z
+ 
+EA
+ 
+3 
+3 
+10.863
+ 
+9.777
+ 
+29.33
+ 
+OV
+10/1
+ 
+11302204
+ 
+602644022044
+ 
+EAR-0220
+ 
+EAR DEOD SPRZ MANGO TANGO 8OZ
+ 
+EA
+ 
+3 
+3 
+10.863
+ 
+9.777
+ 
+29.33
+ 
+OV
+11/1
+ 
+11302205
+ 
+602644022051
+ 
+EAR-0220
+ 
+EAR DEOD SPRZ LAV 8OZ
+ 
+EA
+ 
+3 
+3 
+10.863
+ 
+9.777
+ 
+29.33
+ 
+OV
+12/2
+ 
+11302206
+ 
+602644022068
+ 
+EAR-0220
+ 
+EAR DEOD SPRZ MEDITERR 8OZ
+ 
+EA
+ 
+3 
+3 
+10.863
+ 
+9.777
+ 
+29.33
+ 
+OV
+13/1
+ 
+11302207
+ 
+602644022075
+ 
+EAR-0220
+ 
+EAR DEOD SPRZ PUP CHRY 8OZ
+ 
+EA
+ 
+3 
+3 
+10.863
+ 
+9.777
+ 
+29.33
+ 
+OV
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+37 
+36 
+431.76
+-----
+ 
+-----
+ 
+---------
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Dog
+ 
+431.76
+
+-- 1 of 1 --
+

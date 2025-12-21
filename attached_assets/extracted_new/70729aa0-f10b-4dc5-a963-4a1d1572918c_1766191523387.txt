@@ -1,0 +1,310 @@
+DATE:
+	ORDER:
+	PAGE:
+LINE
+	/ REL
+ 
+DESCRIPTION
+ 
+ORDER
+QTY
+ 
+LIST
+ 
+NET
+SHIPPED
+QTY
+ 
+EXTENDED
+PRODUCT
+	NUMBER
+ 
+UPC
+ 
+*CPN/VPN
+ 
+UM
+ 
+CDE
+BILL TO:
+ 
+SHIP TO:
+TERMS
+ 
+CUSTOMER P.O.
+ 
+SHIP VIA
+ 
+SALES REP
+ 
+WRITTEN BY
+HANDLING
+ 
+MISC CHGS
+ 
+FREIGHT
+ 
+TOTAL
+Ph:
+Fax:
+RETAIL
+INVOICE NO:
+MDSE TOTAL
+ 
+TAX
+REMIT TO ADDRESS FOR MAILING PAYMENTS
+CENTRAL PET DALLAS
+	PO BOX 840167
+	DALLAS, TX 75284
+	PHONE: 877-219-7019
+**Please Note: Past due balances are subject to 1.5% srvc chrg. We impose a surcharge on credit card payments that is not greater than our cost. **
+INVOICE
+ 
+06310015
+	08/30/25
+	06588581
+	1 OF 1
+214-210-4112
+ANIMAL HOUSE
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+***
+ 
+REPRINT
+ 
+***
+ANIMAL HOUSE
+	ANGELA SKIPPER
+	2934 CYPRESS ST
+	WEST MONROE, LA 71294
+OUR TRUCK
+530572
+REDBARN 13314
+COD
+4038 ROCK QUARRY RD
+	DALLAS, TX 75211
+ 
+214-331-6425
+09:08:04
+MLG
+667 CRAIG BORGSTEDE
+816.92
+ 
+0.00
+ 
+21.00
+ 
+0.00
+ 
+0.00
+ 
+837.92
+1/1
+ 
+51820009
+ 
+785184200094
+ 
+RBP ANTLER ELK SPLIT S/M
+ 
+EA
+ 
+12 
+12 
+6.169
+ 
+4.935
+ 
+59.22
+ 
+OV
+2/1
+ 
+51826201
+ 
+785184262016
+ 
+RBP TRT COLLAGEN STC LG
+ 
+EA
+ 
+35 
+35 
+3.323
+ 
+2.658
+ 
+93.03
+ 
+OV
+CASE #96201
+3/1
+ 
+51826231
+ 
+785184262313
+ 
+RBP TRT CLLGN ESOPHGS STC LG
+ 
+EA
+ 
+30 
+30 
+4.032
+ 
+3.226
+ 
+96.78
+ 
+OV
+4/1
+ 
+51826233
+ 
+785184262337
+ 
+RBP TRT BULLY CLLGN STC MD30CT
+ 
+EA
+ 
+30 
+30 
+2.661
+ 
+2.129
+ 
+63.87
+ 
+OV
+5/1
+ 
+51842600
+ 
+785184426005
+ 
+RBP TRT BNE MEATY 6IN
+ 
+EA
+ 
+25 
+25 
+3.516
+ 
+2.813
+ 
+70.33
+ 
+OV
+6/1
+ 
+51850446
+ 
+785184504468
+ 
+TEST-100
+ 
+RBP TRT SOW EAR PUFFED
+ 
+EA
+ 
+40 
+40 
+2.661
+ 
+2.661
+ 
+106.44
+CASE #99042
+7/1
+ 
+51850501
+ 
+785184505014
+ 
+RBP TRT PRK SLICE 1.5#
+ 
+EA
+ 
+8 
+8 
+16.935
+ 
+13.548
+ 
+108.38
+ 
+OV
+8/1
+ 
+51899033
+ 
+785184990339
+ 
+RBP TRT COW EAR BULK BX 100CT
+ 
+EA
+ 
+1 
+1 
+143.548
+ 
+114.838
+ 
+114.84
+ 
+OV
+1 BULK BOX OF 100
+9/1
+ 
+51899043
+ 
+785184990438
+ 
+RBP TRT PIG SNOUT BULK BX 50CT
+ 
+EA
+ 
+1 
+1 
+104.032
+ 
+104.032
+ 
+104.03
+1 BULK BOX OF 50
+-----
+ 
+-----
+ 
+---------
+Dog
+ 
+182
+ 
+182
+ 
+816.92
+-----
+ 
+-----
+ 
+---------
+DELIVERY SURCHARGE
+ 
+21.00
+********************************************
+	* OV
+ 
+Price
+ 
+Override
+ 
+*
+********************************************
+CATEGORY TOTALS:
+	Dog
+ 
+816.92
+
+-- 1 of 1 --
+
