@@ -3,75 +3,120 @@ const fs = require('fs');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-async function run() {
-  const invoiceUPCs = JSON.parse(fs.readFileSync('/tmp/extracted_invoice_upcs.json', 'utf8'));
+function normalize(text) {
+  if (!text) return '';
+  return text.toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function getTokens(text) {
+  return normalize(text).split(' ').filter(t => t.length > 2);
+}
+
+function tokenScore(tokens1, tokens2) {
+  if (tokens1.length === 0 || tokens2.length === 0) return 0;
+  const set1 = new Set(tokens1);
+  const set2 = new Set(tokens2);
+  let matches = 0;
+  for (const t of set1) {
+    if (set2.has(t)) matches++;
+  }
+  return matches / Math.min(set1.size, set2.size);  // Use min for more lenient scoring
+}
+
+async function main() {
+  // Load all UPC sources
+  const sources = JSON.parse(fs.readFileSync('./all_sources_upcs.json', 'utf8'));
+  console.log(`Loaded ${sources.length} UPC sources`);
   
-  const { rows: products } = await pool.query(`
-    SELECT id, name, brand, category FROM supplies WHERE sku IS NULL OR sku = ''
-  `);
+  // Get existing UPCs
+  const { rows: existing } = await pool.query(`SELECT sku FROM supplies WHERE sku IS NOT NULL AND sku != ''`);
+  const usedUpcs = new Set(existing.map(r => r.sku));
+  console.log(`${usedUpcs.size} UPCs already in use`);
   
-  const { rows: existingSkus } = await pool.query(`
-    SELECT sku FROM supplies WHERE sku IS NOT NULL AND sku != ''
-  `);
-  const existingSKUSet = new Set(existingSkus.map(r => r.sku));
+  // Build reference with unused UPCs
+  const refs = [];
+  for (const item of sources) {
+    if (!usedUpcs.has(item.upc)) {
+      refs.push({ upc: item.upc, name: item.name, tokens: getTokens(item.name), norm: normalize(item.name) });
+    }
+  }
+  console.log(`${refs.length} unused UPCs available`);
   
-  console.log(`Products without SKU: ${products.length}`);
-  const newUPCs = invoiceUPCs.filter(u => !existingSKUSet.has(u.upc));
-  console.log(`New UPCs to match: ${newUPCs.length}`);
+  // Get products without UPC
+  const { rows: products } = await pool.query(`SELECT id, name, brand FROM supplies WHERE sku IS NULL OR sku = ''`);
+  console.log(`${products.length} products need UPC`);
   
-  const brandPatterns = {
-    'AQE': ['aqueon'], 'API': ['api '], 'HIK': ['hikari'], 'TET': ['tetra'],
-    'SLI': ['seachem'], 'ZML': ['zoo med', 'zoomed'], 'ZIL': ['zilla'],
-    'KAY': ['kaytee'], 'FLU': ['fluval'], 'OME': ['omega one', 'omega'],
-    'EXO': ['exo terra', 'exo-terra'], 'COA': ['coastal'], 'KON': ['kong'],
-    'ZUP': ['zupreem'], 'KMP': ['kaylor', 'sweet harvest'], 'FMN': ['furminator'],
-    'EAR': ['earthbath'], 'RBP': ['redbarn'], 'LAF': ['lafeber'], 'ETH': ['ethical', 'spot'],
-    'OXB': ['oxbow'], 'JWP': ['jw pet', 'jw '], 'LIX': ['lixit'], 'ORI': ['orijen'],
-  };
+  let matched = 0;
+  const updates = [];
   
-  let matchCount = 0;
-  const matches = [];
-  const matchedProductIds = new Set();
-  
-  for (const upc of newUPCs) {
-    if (!upc.description) continue;
-    const brandCode = upc.description.substring(0, 3).toUpperCase();
-    const brandPatternList = brandPatterns[brandCode];
-    if (!brandPatternList) continue;
+  for (const prod of products) {
+    const prodNorm = normalize(prod.name);
+    const prodTokens = getTokens(prod.name);
     
-    for (const product of products) {
-      if (matchedProductIds.has(product.id)) continue;
-      const productName = (product.name || '').toLowerCase();
-      const productBrand = (product.brand || '').toLowerCase();
-      const brandMatch = brandPatternList.some(p => productName.includes(p) || productBrand.includes(p));
-      if (!brandMatch) continue;
+    // Find best match
+    let bestScore = 0;
+    let bestRef = null;
+    
+    for (const ref of refs) {
+      if (usedUpcs.has(ref.upc)) continue;
       
-      const descWords = upc.description.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length > 2);
-      const matchingWords = descWords.filter(w => productName.includes(w));
-      
-      if (matchingWords.length >= 3) {
-        matches.push({ upc: upc.upc, productId: product.id, name: product.name });
-        matchedProductIds.add(product.id);
-        matchCount++;
+      // Exact normalized match
+      if (ref.norm === prodNorm) {
+        bestScore = 1;
+        bestRef = ref;
         break;
       }
+      
+      // Token overlap (30% threshold)
+      const score = tokenScore(prodTokens, ref.tokens);
+      if (score > bestScore && score >= 0.3) {
+        bestScore = score;
+        bestRef = ref;
+      }
+    }
+    
+    if (bestRef) {
+      usedUpcs.add(bestRef.upc);
+      updates.push({ id: prod.id, upc: bestRef.upc, name: prod.name, refName: bestRef.name, score: bestScore });
+      matched++;
     }
   }
   
-  console.log(`Found ${matchCount} additional matches`);
+  console.log(`\nMatched ${matched} products`);
   
-  if (matches.length > 0) {
-    for (const m of matches) {
-      await pool.query('UPDATE supplies SET sku = $1 WHERE id = $2', [m.upc, m.productId]);
-    }
-    console.log(`Updated ${matches.length} products`);
+  // Show sample matches
+  console.log('\nSample matches:');
+  for (let i = 0; i < 5 && i < updates.length; i++) {
+    const u = updates[i];
+    console.log(`  DB: "${u.name}" -> REF: "${u.refName}" (score: ${u.score.toFixed(2)})`);
   }
   
-  const { rows: [{ count }] } = await pool.query(`SELECT COUNT(*) as count FROM supplies WHERE sku IS NOT NULL AND sku != ''`);
-  const { rows: [{ total }] } = await pool.query(`SELECT COUNT(*) as total FROM supplies`);
-  console.log(`Final coverage: ${count}/${total} (${(count/total*100).toFixed(1)}%)`);
+  // Apply updates
+  if (updates.length > 0) {
+    for (let i = 0; i < updates.length; i += 100) {
+      const batch = updates.slice(i, i + 100);
+      for (const u of batch) {
+        await pool.query('UPDATE supplies SET sku = $1 WHERE id = $2', [u.upc, u.id]);
+      }
+      console.log(`Applied ${Math.min(i + 100, updates.length)} / ${updates.length}`);
+    }
+  }
+  
+  // Final stats
+  const { rows: [stats] } = await pool.query(`
+    SELECT 
+      COUNT(*) as total,
+      COUNT(CASE WHEN sku IS NOT NULL AND sku != '' THEN 1 END) as with_upc
+    FROM supplies
+  `);
+  
+  const pct = ((stats.with_upc / stats.total) * 100).toFixed(1);
+  console.log(`\nFinal coverage: ${stats.with_upc} / ${stats.total} (${pct}%)`);
   
   await pool.end();
 }
 
-run().catch(console.error);
+main().catch(console.error);

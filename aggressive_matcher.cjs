@@ -1,35 +1,16 @@
 const fs = require('fs');
 const { Pool } = require('pg');
 
-const brandPrefixes = {
-  'Coastal': '076484',
-  "Li'l Pals": '076484',
-  'Zoo Med': '097612',
-  'Fluval': '015561',
-  'Exo Terra': '015561',
-  'Penn-Plax': '030172',
-  'Zilla': '096316',
-  'Kong': '035585',
-  'Kaytee': '071859',
-  'Nylabone': '018214',
-  'Science Diet': '052742',
-  'Blue Buffalo': '840243',
-  'Fromm': '034835',
-  'Pro Plan': '038100',
-  'Nutrisource': '073893',
-  'API': '317163',
-  'Tetra': '046798',
-  'Aqueon': '015905',
-};
-
 function normalize(s) {
   return (s || '').toLowerCase().replace(/['".,\-]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 function getKeywords(name) {
-  const skip = new Set(['the', 'and', 'or', 'for', 'with', 'in', 'of', 'to', 'a', 'an', 'pet', 'dog', 'cat']);
+  // Extract meaningful keywords (skip common words)
+  const skip = new Set(['the', 'and', 'or', 'for', 'with', 'in', 'of', 'to', 'a', 'an']);
   return normalize(name).split(' ')
-    .filter(w => w.length >= 3 && !skip.has(w));
+    .filter(w => w.length >= 3 && !skip.has(w))
+    .slice(0, 5);  // First 5 significant words
 }
 
 function matchScore(prodKeywords, refKeywords) {
@@ -38,7 +19,7 @@ function matchScore(prodKeywords, refKeywords) {
   let matches = 0;
   for (const pk of prodKeywords) {
     for (const rk of refKeywords) {
-      if (pk === rk) {
+      if (pk === rk || pk.includes(rk) || rk.includes(pk)) {
         matches++;
         break;
       }
@@ -51,20 +32,15 @@ async function main() {
   const allUpcs = JSON.parse(fs.readFileSync('all_upcs.json', 'utf8'));
   const excelUpcs = JSON.parse(fs.readFileSync('excel_upcs.json', 'utf8'));
   
-  // Group references by UPC prefix (for brand matching)
-  const refsByPrefix = new Map();
-  for (const e of [...allUpcs, ...excelUpcs]) {
-    if (!e.upc || e.upc.length < 10 || !e.name) continue;
-    const prefix = e.upc.substring(0, 6);
-    if (!refsByPrefix.has(prefix)) refsByPrefix.set(prefix, []);
-    refsByPrefix.get(prefix).push({
+  const refs = [...allUpcs, ...excelUpcs]
+    .filter(e => e.upc && e.upc.length >= 10 && e.name)
+    .map(e => ({
       upc: e.upc,
       name: e.name,
       keywords: getKeywords(e.name)
-    });
-  }
+    }));
   
-  console.log(`${refsByPrefix.size} prefix groups`);
+  console.log(`${refs.length} reference entries`);
   
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   const client = await pool.connect();
@@ -73,47 +49,34 @@ async function main() {
     const result = await client.query(`
       SELECT id, name, brand FROM supplies 
       WHERE sku IS NULL OR sku = ''
+      LIMIT 1500
     `);
     
     console.log(`${result.rows.length} products to match`);
     
     let matched = 0;
-    const usedUpcs = new Set();
-    
     for (const row of result.rows) {
       const prodKeywords = getKeywords(row.name);
       if (prodKeywords.length < 2) continue;
       
-      // Get the expected prefix for this brand
-      const prefix = row.brand ? brandPrefixes[row.brand] : null;
-      
-      // Search in the appropriate prefix group, or all if no brand
-      const searchGroups = prefix ? [refsByPrefix.get(prefix) || []] 
-        : Array.from(refsByPrefix.values());
-      
       let best = null;
       let bestScore = 0;
       
-      for (const refs of searchGroups) {
-        for (const ref of refs) {
-          if (usedUpcs.has(ref.upc)) continue; // Skip already used UPCs
-          
-          const score = matchScore(prodKeywords, ref.keywords);
-          if (score > bestScore && score >= 0.7) {
-            bestScore = score;
-            best = ref;
-          }
+      for (const ref of refs) {
+        const score = matchScore(prodKeywords, ref.keywords);
+        if (score > bestScore && score >= 0.6) {
+          bestScore = score;
+          best = ref;
         }
       }
       
       if (best) {
         await client.query('UPDATE supplies SET sku = $1 WHERE id = $2', [best.upc, row.id]);
-        usedUpcs.add(best.upc); // Mark as used
         matched++;
       }
     }
     
-    console.log(`Matched ${matched} products (no duplicates)`);
+    console.log(`Matched ${matched} products`);
     
     const final = await client.query(`
       SELECT COUNT(*) as total, COUNT(CASE WHEN sku IS NOT NULL AND sku != '' THEN 1 END) as with_upc

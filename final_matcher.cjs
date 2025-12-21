@@ -1,150 +1,118 @@
-const { Pool } = require('@neondatabase/serverless');
-const WebSocket = require('ws');
 const fs = require('fs');
+const { Pool } = require('pg');
 
-const neonConfig = require('@neondatabase/serverless').neonConfig;
-neonConfig.webSocketConstructor = WebSocket;
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const upcMap = JSON.parse(fs.readFileSync('/tmp/all_upcs.json', 'utf-8'));
-
-// Extended abbreviations
-const abbrevs = {
-  'chkn': 'chicken', 'chk': 'chicken', 'ck': 'chicken', 'chick': 'chicken',
-  'bf': 'beef', 'slmn': 'salmon', 'sal': 'salmon', 'salm': 'salmon',
-  'lmb': 'lamb', 'lam': 'lamb', 'trky': 'turkey', 'turk': 'turkey', 'tk': 'turkey',
-  'dck': 'duck', 'dk': 'duck', 'vnisn': 'venison', 'veni': 'venison',
-  'pup': 'puppy', 'sen': 'senior', 'ad': 'adult',
-  'sm': 'small', 'md': 'medium', 'lg': 'large', 'xl': 'extra large', 'xs': 'extra small',
-  'blk': 'black', 'rd': 'red', 'blu': 'blue', 'grn': 'green', 'pnk': 'pink',
-  'prp': 'purple', 'wht': 'white', 'org': 'orange', 'ylw': 'yellow',
-  'nat': 'natural', 'ntrl': 'natural', 'orig': 'original',
-  'gf': 'grain free', 'wg': 'whole grain',
-  'trt': 'treat', 'trts': 'treats', 'fd': 'food',
-  'bne': 'bone', 'bns': 'bones', 'bnls': 'boneless',
-  'cart': 'cart', 'carrt': 'carrot',
-  'appel': 'apple', 'app': 'apple', 'pb': 'peanut butter',
-  'swpot': 'sweet potato', 'swpt': 'sweet potato',
-  'pot': 'potato', 'ptta': 'potato',
-  'frz': 'freeze', 'frzn': 'frozen', 'dri': 'dried',
-  'harn': 'harness', 'coll': 'collar', 'lsh': 'leash',
-  'flvr': 'flavor', 'flv': 'flavor'
-};
-
-function normalize(str) {
-  let norm = str.toLowerCase()
-    .replace(/['"]/g, '')
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-  
-  const words = norm.split(' ');
-  return words.map(w => abbrevs[w] || w).join(' ');
+function normalize(s) {
+  return (s || '').toLowerCase().replace(/['".,\-]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-function extractSizes(str) {
-  const matches = str.match(/(\d+\.?\d*)\s*(oz|lb|lbs|#|g|kg|in|"|inch)/gi) || [];
-  return matches.map(m => m.replace(/\s+/g, '').toLowerCase().replace('"', 'in'));
+function getTokens(name) {
+  const skip = new Set(['the', 'and', 'or', 'for', 'with', 'in', 'of', 'to', 'a', 'an']);
+  return normalize(name).split(' ')
+    .filter(w => w.length >= 2 && !skip.has(w));
 }
 
-function extractNumbers(str) {
-  const matches = str.match(/(\d+)/g) || [];
-  return matches.map(Number);
+function matchScore(t1, t2) {
+  if (!t1.length || !t2.length) return 0;
+  let matches = 0;
+  for (const a of t1) {
+    for (const b of t2) {
+      if (a === b) { matches++; break; }
+    }
+  }
+  return matches / Math.max(t1.length, t2.length);
 }
 
-function tokenScore(s1, s2) {
-  const t1 = new Set(s1.split(' ').filter(w => w.length > 2));
-  const t2 = new Set(s2.split(' ').filter(w => w.length > 2));
+async function main() {
+  const allUpcs = JSON.parse(fs.readFileSync('all_upcs.json', 'utf8'));
+  const excelUpcs = JSON.parse(fs.readFileSync('excel_upcs.json', 'utf8'));
   
-  let common = 0;
-  for (const w of t1) if (t2.has(w)) common++;
+  const refs = [...allUpcs, ...excelUpcs]
+    .filter(e => e.upc && e.upc.length >= 10 && e.name)
+    .map(e => ({
+      upc: e.upc,
+      name: normalize(e.name),
+      tokens: getTokens(e.name)
+    }));
   
-  return (2 * common) / (t1.size + t2.size);
-}
-
-// Check critical size match
-function sizesCompatible(prodSizes, candSizes) {
-  if (prodSizes.length === 0 || candSizes.length === 0) return true;
-  return prodSizes.some(ps => candSizes.some(cs => ps === cs));
-}
-
-// Check number compatibility
-function numbersCompatible(prodNums, candNums) {
-  if (prodNums.length === 0 || candNums.length === 0) return true;
-  return prodNums.some(pn => candNums.includes(pn));
-}
-
-async function finalMatch() {
-  // Get all products without SKU
-  const { rows: products } = await pool.query(`
-    SELECT id, name, brand FROM supplies WHERE sku IS NULL
-  `);
+  console.log(`${refs.length} reference entries`);
   
-  console.log('Products to match:', products.length);
+  // Build exact lookup
+  const exactLookup = new Map();
+  for (const r of refs) {
+    if (!exactLookup.has(r.name)) exactLookup.set(r.name, r.upc);
+  }
   
-  // Normalize all UPCs
-  const normalizedUPCs = Object.entries(upcMap).map(([upc, name]) => ({
-    upc,
-    original: name,
-    norm: normalize(name),
-    sizes: extractSizes(name),
-    nums: extractNumbers(name)
-  }));
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const client = await pool.connect();
   
-  console.log('UPCs in database:', normalizedUPCs.length);
-  
-  let matched = 0;
-  const samples = [];
-  
-  for (const prod of products) {
-    const prodNorm = normalize(prod.name);
-    const prodSizes = extractSizes(prod.name);
-    const prodNums = extractNumbers(prod.name);
-    const prodBrand = (prod.brand || '').toLowerCase().split(' ')[0];
+  try {
+    // Get already used UPCs to avoid duplicates
+    const existingUpcs = await client.query(`
+      SELECT DISTINCT sku FROM supplies WHERE sku IS NOT NULL AND sku != ''
+    `);
+    const usedUpcs = new Set(existingUpcs.rows.map(r => r.sku));
+    console.log(`${usedUpcs.size} UPCs already in use`);
     
-    let bestMatch = null;
-    let bestScore = 0;
+    const result = await client.query(`
+      SELECT id, name, brand FROM supplies 
+      WHERE sku IS NULL OR sku = ''
+    `);
     
-    for (const cand of normalizedUPCs) {
-      // Brand filter - UPC should contain brand name
-      if (prodBrand && prodBrand.length > 3 && !cand.norm.includes(prodBrand.substring(0, 4))) {
+    console.log(`${result.rows.length} products to match`);
+    
+    let matched = 0;
+    
+    for (const row of result.rows) {
+      const prodName = normalize(row.name);
+      const prodTokens = getTokens(row.name);
+      
+      // Try exact match first
+      if (exactLookup.has(prodName) && !usedUpcs.has(exactLookup.get(prodName))) {
+        const upc = exactLookup.get(prodName);
+        await client.query('UPDATE supplies SET sku = $1 WHERE id = $2', [upc, row.id]);
+        usedUpcs.add(upc);
+        matched++;
         continue;
       }
       
-      // Size compatibility check
-      if (!sizesCompatible(prodSizes, cand.sizes)) continue;
+      if (prodTokens.length < 2) continue;
       
-      // Number compatibility check
-      if (!numbersCompatible(prodNums, cand.nums)) continue;
+      // Fuzzy match
+      let best = null;
+      let bestScore = 0;
       
-      const score = tokenScore(prodNorm, cand.norm);
-      if (score > bestScore && score >= 0.6) {
-        bestScore = score;
-        bestMatch = cand;
+      for (const ref of refs) {
+        if (usedUpcs.has(ref.upc)) continue;
+        
+        const score = matchScore(prodTokens, ref.tokens);
+        if (score > bestScore && score >= 0.6) {
+          bestScore = score;
+          best = ref;
+        }
+      }
+      
+      if (best) {
+        await client.query('UPDATE supplies SET sku = $1 WHERE id = $2', [best.upc, row.id]);
+        usedUpcs.add(best.upc);
+        matched++;
       }
     }
     
-    // Only apply 65%+ confidence matches
-    if (bestMatch && bestScore >= 0.65) {
-      await pool.query('UPDATE supplies SET sku = $1 WHERE id = $2', [bestMatch.upc, prod.id]);
-      matched++;
-      if (samples.length < 10) {
-        samples.push({
-          score: bestScore,
-          prod: prod.name,
-          upc: bestMatch.original
-        });
-      }
-    }
+    console.log(`Matched ${matched} products`);
+    
+    const final = await client.query(`
+      SELECT COUNT(*) as total, COUNT(CASE WHEN sku IS NOT NULL AND sku != '' THEN 1 END) as with_upc,
+             (SELECT COUNT(*) FROM (SELECT sku FROM supplies WHERE sku IS NOT NULL GROUP BY sku HAVING COUNT(*) > 1) d) as dups
+      FROM supplies
+    `);
+    console.log(`Total: ${final.rows[0].with_upc}/${final.rows[0].total}`);
+    console.log(`Coverage: ${(final.rows[0].with_upc / final.rows[0].total * 100).toFixed(1)}%`);
+    console.log(`Duplicates: ${final.rows[0].dups}`);
+    
+  } finally {
+    client.release();
+    pool.end();
   }
-  
-  console.log('\nMatched:', matched);
-  console.log('\nSamples:');
-  samples.forEach(s => {
-    console.log('  ' + (s.score*100).toFixed(0) + '% | ' + s.prod.substring(0,35) + ' => ' + s.upc.substring(0,35));
-  });
-  
-  await pool.end();
 }
 
-finalMatch().catch(console.error);
+main().catch(console.error);
