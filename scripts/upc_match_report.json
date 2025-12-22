@@ -1,0 +1,609 @@
+{
+  "generatedAt": "2025-12-22T17:10:53.177Z",
+  "threshold": "90%",
+  "totalSupplies": 7225,
+  "matchedSupplies": 1881,
+  "coverage": "26.0%",
+  "sampleMatches": [
+    {
+      "supply": "Zilla Heat Mat Mini",
+      "catalog": "Zilla Heat Mat Mini",
+      "similarity": "100%",
+      "upc": "096316680333"
+    },
+    {
+      "supply": "Dogswell Liquid Bandage",
+      "catalog": "Dogswell Liquid Bandage",
+      "similarity": "100%",
+      "upc": "012104434049"
+    },
+    {
+      "supply": "Zilla Mini Halogen Bulb 50w Red",
+      "catalog": "Zilla Mini Halogen Bulb 50W Red",
+      "similarity": "100%",
+      "upc": "096316156357"
+    },
+    {
+      "supply": "Kaytee Healthy Bits Treats",
+      "catalog": "Kaytee Healthy Bits Treats",
+      "similarity": "100%",
+      "upc": "071859942445"
+    },
+    {
+      "supply": "Living World Mineral Block",
+      "catalog": "Living World Mineral Block",
+      "similarity": "100%",
+      "upc": "080605821903"
+    },
+    {
+      "supply": "Zilla Grey 40/50g",
+      "catalog": "Zilla Grey 40/50g",
+      "similarity": "100%",
+      "upc": "096316117594"
+    },
+    {
+      "supply": "Petcrest Poop Bags",
+      "catalog": "PetCrest Poop Bags",
+      "similarity": "100%",
+      "upc": "784099025655"
+    },
+    {
+      "supply": "Fluval Moss Ball",
+      "catalog": "FLUVAL moss ball",
+      "similarity": "100%",
+      "upc": "076484996498"
+    },
+    {
+      "supply": "Tetra Glo Barrels",
+      "catalog": "TETRA glo barrels",
+      "similarity": "100%",
+      "upc": "046798290681"
+    },
+    {
+      "supply": "Reptology Digtial Thermo",
+      "catalog": "Reptology Digtial Thermo",
+      "similarity": "100%",
+      "upc": "030172060366"
+    },
+    {
+      "supply": "Tropiclean Kiwi Blossom Spray",
+      "catalog": "TropiClean Kiwi Blossom Spray",
+      "similarity": "100%",
+      "upc": "645095869066"
+    },
+    {
+      "supply": "Coastal Leash Tpd6' 666",
+      "catalog": "COASTAL LEASH TPD6' 666",
+      "similarity": "100%",
+      "upc": "096316700604"
+    },
+    {
+      "supply": "Adams Flea Spray 16floz",
+      "catalog": "Adams Flea Spray 16floz",
+      "similarity": "100%",
+      "upc": "039079058964"
+    },
+    {
+      "supply": "Coastal Soft Basket Muzzle Size 1",
+      "catalog": "Coastal Soft Basket Muzzle Size 1",
+      "similarity": "100%",
+      "upc": "076484136054"
+    },
+    {
+      "supply": "Coastal Sla12' Soy Collar",
+      "catalog": "COASTAL SLA12' SOY COLLAR",
+      "similarity": "100%",
+      "upc": "091197780059"
+    },
+    {
+      "supply": "Coastal Shb26\" Collar",
+      "catalog": "COASTAL SHB26\" COLLAR",
+      "similarity": "100%",
+      "upc": "096316671515"
+    },
+    {
+      "supply": "Petag Esbilac Milk",
+      "catalog": "PetAg Esbilac Milk",
+      "similarity": "100%",
+      "upc": "020279998129"
+    },
+    {
+      "supply": "Nature Zone Bearded Elctro",
+      "catalog": "Nature Zone Bearded Elctro",
+      "similarity": "100%",
+      "upc": "8317854714"
+    },
+    {
+      "supply": "Exoterra Halogen 100w",
+      "catalog": "ExoTerra Halogen 100W",
+      "similarity": "100%",
+      "upc": "1556122183"
+    },
+    {
+      "supply": "Adams Yard Spray",
+      "catalog": "Adams Yard Spray",
+      "similarity": "100%",
+      "upc": "039079060226"
+    },
+    {
+      "supply": "Zilla Mini Halogen Bulb 25w White",
+      "catalog": "Zilla Mini Halogen Bulb 25W White",
+      "similarity": "100%",
+      "upc": "096316156302"
+    },
+    {
+      "supply": "Circle 20\" Bro 1788s Collar",
+      "catalog": "CIRCLE 20\" BRO 1788S COLLAR",
+      "similarity": "100%",
+      "upc": "076484178801"
+    },
+    {
+      "supply": "Coastal Ww206 Leash",
+      "catalog": "COASTAL WW206 LEASH",
+      "similarity": "100%",
+      "upc": "784369933574"
+    },
+    {
+      "supply": "Komodo Forest Log",
+      "catalog": "Komodo Forest Log",
+      "similarity": "100%",
+      "upc": "84369932317"
+    },
+    {
+      "supply": "Turbo Stick and Ball",
+      "catalog": "Turbo Stick and ball",
+      "similarity": "100%",
+      "upc": "076484536090"
+    },
+    {
+      "supply": "Zilla Digital Temp Control",
+      "catalog": "Zilla Digital Temp Control",
+      "similarity": "100%",
+      "upc": "096316001589"
+    },
+    {
+      "supply": "Weewee Super Absorbant 40pk",
+      "catalog": "WeeWee Super Absorbant 40pk",
+      "similarity": "100%",
+      "upc": "045663971144"
+    },
+    {
+      "supply": "Turbo Yarn Ball",
+      "catalog": "Turbo Yarn Ball",
+      "similarity": "100%",
+      "upc": "076484835278"
+    },
+    {
+      "supply": "Coastal Collar Wdf12\"",
+      "catalog": "COASTAL COLLAR WDF12\"",
+      "similarity": "100%",
+      "upc": "015561227681"
+    },
+    {
+      "supply": "Exoterra Large Wide",
+      "catalog": "ExoTerra Large Wide",
+      "similarity": "100%",
+      "upc": "15561226134"
+    },
+    {
+      "supply": "Catit Crab 2.8oz",
+      "catalog": "CATIT crab 2.8oz",
+      "similarity": "100%",
+      "upc": "022517447161"
+    },
+    {
+      "supply": "Exoterra Coco Husk",
+      "catalog": "ExoTerra Coco Husk",
+      "similarity": "100%",
+      "upc": "015561227872"
+    },
+    {
+      "supply": "Circle Lat22\" Collar",
+      "catalog": "CIRCLE LAT22\" COLLAR",
+      "similarity": "100%",
+      "upc": "076484118524"
+    },
+    {
+      "supply": "Coastal Mlm12\" Collar",
+      "catalog": "COASTAL MLM12\" COLLAR",
+      "similarity": "100%",
+      "upc": "096316671546"
+    },
+    {
+      "supply": "Seachem Alert Combo",
+      "catalog": "SEACHEM alert combo",
+      "similarity": "100%",
+      "upc": "000116000130"
+    },
+    {
+      "supply": "Catit Creamy Salmon 12pk",
+      "catalog": "Catit Creamy Salmon 12pk",
+      "similarity": "100%",
+      "upc": "022517444429"
+    },
+    {
+      "supply": "Coastal Ww506 Leash",
+      "catalog": "COASTAL WW506 LEASH",
+      "similarity": "100%",
+      "upc": "015561225656"
+    },
+    {
+      "supply": "Zupreem Nutblend Parrot & Conure",
+      "catalog": "ZuPreem NutBlend Parrot&Conure",
+      "similarity": "100%",
+      "upc": "762177850306"
+    },
+    {
+      "supply": "Catit Salmon 50pk",
+      "catalog": "Catit Salmon 50pk",
+      "similarity": "100%",
+      "upc": "022517444375"
+    },
+    {
+      "supply": "Weeaway Flea Spray",
+      "catalog": "WeeAway Flea Spray",
+      "similarity": "100%",
+      "upc": "50024364318"
+    },
+    {
+      "supply": "Lilpals Plush Gator",
+      "catalog": "LILPALS PLUSH GATOR",
+      "similarity": "100%",
+      "upc": "076484799099"
+    },
+    {
+      "supply": "Coastal Collar Nbp26\"",
+      "catalog": "COASTAL COLLAR NBP26\"",
+      "similarity": "100%",
+      "upc": "015561231152"
+    },
+    {
+      "supply": "Living Natural Coco Mat 12x30",
+      "catalog": "Living Natural coco mat 12x30",
+      "similarity": "100%",
+      "upc": "784369933567"
+    },
+    {
+      "supply": "Zodiac Flea and Tick Powder",
+      "catalog": "Zodiac Flea and tick Powder",
+      "similarity": "100%",
+      "upc": "041535278304"
+    },
+    {
+      "supply": "Coastal Collar Btd26\"",
+      "catalog": "COASTAL COLLAR BTD26\"",
+      "similarity": "100%",
+      "upc": "015561231381"
+    },
+    {
+      "supply": "Zilla Turtle Mircale Ball",
+      "catalog": "Zilla Turtle Mircale Ball",
+      "similarity": "100%",
+      "upc": "96316003286"
+    },
+    {
+      "supply": "Exoterra Calcium + D3",
+      "catalog": "ExoTerra Calcium + D3",
+      "similarity": "100%",
+      "upc": "1556121855"
+    },
+    {
+      "supply": "Zilla Terrarium Cleaner",
+      "catalog": "Zilla Terrarium Cleaner",
+      "similarity": "100%",
+      "upc": "9631670018"
+    },
+    {
+      "supply": "Hikari Shrimp Cuisine .35oz",
+      "catalog": "HIKARI shrimp cuisine .35oz",
+      "similarity": "100%",
+      "upc": "076484065248"
+    },
+    {
+      "supply": "Coastal Collar Gxy26\"",
+      "catalog": "COASTAL COLLAR GXY26\"",
+      "similarity": "100%",
+      "upc": "015561219563"
+    },
+    {
+      "supply": "Titan Leash Red04 4' Fine",
+      "catalog": "TITAN LEASH RED04 4' FINE",
+      "similarity": "100%",
+      "upc": "076484092718"
+    },
+    {
+      "supply": "Catit Flowfoun Filter 2x",
+      "catalog": "Catit FlowFoun Filter 2X",
+      "similarity": "100%",
+      "upc": "022517437384"
+    },
+    {
+      "supply": "Coastal Red30\" Leash",
+      "catalog": "COASTAL RED30\" LEASH",
+      "similarity": "100%",
+      "upc": "097612009125"
+    },
+    {
+      "supply": "Coastal Shb14\" Collar",
+      "catalog": "COASTAL SHB14\" COLLAR",
+      "similarity": "100%",
+      "upc": "096316671539"
+    },
+    {
+      "supply": "Coastal Collar Wdf20\"",
+      "catalog": "COASTAL COLLAR WDF20\"",
+      "similarity": "100%",
+      "upc": "759834053507"
+    },
+    {
+      "supply": "Weewee Pad 7pk",
+      "catalog": "WeeWee pad 7pk",
+      "similarity": "100%",
+      "upc": "045663160005"
+    },
+    {
+      "supply": "Coastal Collar Ybc26\"",
+      "catalog": "COASTAL COLLAR YBC26\"",
+      "similarity": "100%",
+      "upc": "097612740103"
+    },
+    {
+      "supply": "Exoterra Reptiflo 200",
+      "catalog": "ExoTerra ReptiFlo 200",
+      "similarity": "100%",
+      "upc": "015561220903"
+    },
+    {
+      "supply": "Exoterra Night Heat 50w",
+      "catalog": "ExoTerra Night Heat 50W",
+      "similarity": "100%",
+      "upc": "1556122126"
+    },
+    {
+      "supply": "Fluval Bottom Feed 1.6oz",
+      "catalog": "FLUVAl bottom feed 1.6oz",
+      "similarity": "100%",
+      "upc": "015561165860"
+    },
+    {
+      "supply": "Exoterra Instense Basking 50w",
+      "catalog": "ExoTerra Instense Basking 50W",
+      "similarity": "100%",
+      "upc": "1665122135"
+    },
+    {
+      "supply": "Coastal Collar Gxy18\"",
+      "catalog": "COASTAL COLLAR GXY18\"",
+      "similarity": "100%",
+      "upc": "015561219662"
+    },
+    {
+      "supply": "Skoutshonor Skunk Odor Elminator",
+      "catalog": "SkoutsHonor Skunk Odor Elminator",
+      "similarity": "100%",
+      "upc": "856713005289"
+    },
+    {
+      "supply": "Coastal Suf06' Leash",
+      "catalog": "COASTAL SUF06' LEASH",
+      "similarity": "100%",
+      "upc": "9631609625"
+    },
+    {
+      "supply": "Brilliant Salmon Oil",
+      "catalog": "Brilliant Salmon Oil",
+      "similarity": "100%",
+      "upc": "7072160101388"
+    },
+    {
+      "supply": "Spot Fun Sloth 13\"",
+      "catalog": "SPOT FUN SLOTH 13\"",
+      "similarity": "100%",
+      "upc": "077234544952"
+    },
+    {
+      "supply": "Exoterra Water Dish Small",
+      "catalog": "ExoTerra Water Dish Small",
+      "similarity": "100%",
+      "upc": "015561228015"
+    },
+    {
+      "supply": "Coastal Ww020 Collar",
+      "catalog": "COASTAL WW020 COLLAR",
+      "similarity": "100%",
+      "upc": "096316700611"
+    },
+    {
+      "supply": "Coastal Collar Tpd20\"",
+      "catalog": "COASTAL COLLAR TPD20\"",
+      "similarity": "100%",
+      "upc": "015561231831"
+    },
+    {
+      "supply": "Zilla Day Blue Light 75w",
+      "catalog": "Zilla Day Blue Light 75W",
+      "similarity": "100%",
+      "upc": "096316671423"
+    },
+    {
+      "supply": "Coastal Pwy06' 12926 Leash",
+      "catalog": "COASTAL PWY06' 12926 LEASH",
+      "similarity": "100%",
+      "upc": "097612750041"
+    },
+    {
+      "supply": "Coastal Cyn06' Leash",
+      "catalog": "COASTAL CYN06' LEASH",
+      "similarity": "100%",
+      "upc": "9761284002"
+    },
+    {
+      "supply": "Exoterra Primate Skull",
+      "catalog": "ExoTerra Primate Skull",
+      "similarity": "100%",
+      "upc": "015561228558"
+    },
+    {
+      "supply": "Exoterra Forest Branch Large",
+      "catalog": "ExoTerra Forest Branch Large",
+      "similarity": "100%",
+      "upc": "015561230773"
+    },
+    {
+      "supply": "Petcrest Shedding Comb",
+      "catalog": "PetCrest Shedding Comb",
+      "similarity": "100%",
+      "upc": "784099026126"
+    },
+    {
+      "supply": "Coastal Collar Rwp26\"",
+      "catalog": "COASTAL COLLAR RWP26\"",
+      "similarity": "100%",
+      "upc": "097612790108"
+    },
+    {
+      "supply": "Sunseed Dove & Pigeon Diet",
+      "catalog": "SunSeed Dove&Pigeon Diet",
+      "similarity": "100%",
+      "upc": "087535361516"
+    },
+    {
+      "supply": "Komodo Raptor Skull",
+      "catalog": "Komodo Raptor Skull",
+      "similarity": "100%",
+      "upc": "784369932126"
+    },
+    {
+      "supply": "Birdlife Weave Kabob",
+      "catalog": "BirdLife Weave Kabob",
+      "similarity": "100%",
+      "upc": "030172080432"
+    },
+    {
+      "supply": "Pangea Green Repltile Vine",
+      "catalog": "Pangea Green Repltile Vine",
+      "similarity": "100%",
+      "upc": "850005832317"
+    },
+    {
+      "supply": "Coastal Cto20 Collar",
+      "catalog": "COASTAL CTO20 COLLAR",
+      "similarity": "100%",
+      "upc": "097612402742"
+    },
+    {
+      "supply": "Coastal Leash Csr6' 966",
+      "catalog": "COASTAL LEASH CSR6' 966",
+      "similarity": "100%",
+      "upc": "096316117594"
+    },
+    {
+      "supply": "Skoutshonor Prodeodorizer Doginwood",
+      "catalog": "SkoutsHonor ProDeodorizer DoginWood",
+      "similarity": "100%",
+      "upc": "850004314487"
+    },
+    {
+      "supply": "Coastal Collar Wdf12",
+      "catalog": "COASTAL COLLAR WDF12\"",
+      "similarity": "100%",
+      "upc": "015561227681"
+    },
+    {
+      "supply": "Naturvet Anti-dirrhea",
+      "catalog": "NaturVet Anti-Dirrhea",
+      "similarity": "100%",
+      "upc": "797801001656"
+    },
+    {
+      "supply": "Higgins Vitaseed Canary",
+      "catalog": "Higgins VitaSeed Canary",
+      "similarity": "100%",
+      "upc": "046706210350"
+    },
+    {
+      "supply": "Flukers High -calcium Dubia Diet",
+      "catalog": "Flukers High -Calcium Dubia diet",
+      "similarity": "100%",
+      "upc": "9119771013"
+    },
+    {
+      "supply": "Coastal Bzs12\" Collar",
+      "catalog": "COASTAL BZS12\" COLLAR",
+      "similarity": "100%",
+      "upc": "096316671560"
+    },
+    {
+      "supply": "Exoterra T5 Top 24w 24\"",
+      "catalog": "ExoTerra T5 Top 24W 24\"",
+      "similarity": "100%",
+      "upc": "015561242561"
+    },
+    {
+      "supply": "Coastal Collar Pmf12\"",
+      "catalog": "COASTAL COLLAR PMF12\"",
+      "similarity": "100%",
+      "upc": "030172087462"
+    },
+    {
+      "supply": "Flukers Tortoise Diet",
+      "catalog": "Flukers Tortoise Diet",
+      "similarity": "100%",
+      "upc": "091197700644"
+    },
+    {
+      "supply": "Petag Dyne 16 oz",
+      "catalog": "PETAG Dyne 16 oz",
+      "similarity": "100%",
+      "upc": "020279205104"
+    },
+    {
+      "supply": "Lilpals Leash Gbn06",
+      "catalog": "LilPals Leash GBN06",
+      "similarity": "100%",
+      "upc": "076484062063"
+    },
+    {
+      "supply": "Natures Miracle Bird Cage Cleaner",
+      "catalog": "Natures Miracle bird Cage cleaner",
+      "similarity": "100%",
+      "upc": "18065984692"
+    },
+    {
+      "supply": "Coastal Bzs06' Leash",
+      "catalog": "COASTAL BZS06' LEASH",
+      "similarity": "100%",
+      "upc": "015561221863"
+    },
+    {
+      "supply": "Kong Refillables Chameleon",
+      "catalog": "KONG Refillables Chameleon",
+      "similarity": "100%",
+      "upc": "035585458090"
+    },
+    {
+      "supply": "Coastal Cto06 Leash",
+      "catalog": "COASTAL CTO06 LEASH",
+      "similarity": "100%",
+      "upc": "015561225663"
+    },
+    {
+      "supply": "Coastal Des26\" Collar",
+      "catalog": "COASTAL DES26\" COLLAR",
+      "similarity": "100%",
+      "upc": "9119731001"
+    },
+    {
+      "supply": "Coastal Fwt14\" Collar",
+      "catalog": "COASTAL FWT14\" COLLAR",
+      "similarity": "100%",
+      "upc": "015561228251"
+    },
+    {
+      "supply": "Coastal Leash Btd06' 366",
+      "catalog": "COASTAL LEASH BTD06' 366",
+      "similarity": "100%",
+      "upc": "015561228084"
+    }
+  ]
+}
