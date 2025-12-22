@@ -116,7 +116,11 @@ async function main() {
   
   for (const entry of masterData.entries) {
     const originalName = entry.name;
-    const expandedName = expandAbbreviations(originalName);
+    // Pre-process Coastal color codes followed by dimensions (e.g., "AWN06'" -> "AWN 06'")
+    // Only split specific color abbreviation patterns, not all letter+digit combinations
+    const preSplit = originalName
+      .replace(/\b(AWN|LWO|NPK|HNT|PUR|BLK|GRY|PNK|RED|GRN|BLU|ORG|YLW|TAN|BRN|WHT|SLV|GLD)(\d)/gi, '$1 $2');
+    const expandedName = expandAbbreviations(preSplit);
     
     if (expandedName !== originalName) expanded++;
     

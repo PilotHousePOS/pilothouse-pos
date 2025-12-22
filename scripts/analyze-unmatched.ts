@@ -1,93 +1,73 @@
-import { db } from '../server/db';
-import { supplies } from '../shared/schema';
-import { sql, isNull } from 'drizzle-orm';
-import * as fs from 'fs';
-import ExcelJS from 'exceljs';
-
-function cleanUpc(upc: string): string { return upc.replace(/[^0-9]/g, ''); }
-function normalize(s: string): string {
-  return s.toLowerCase().replace(/['']/g, '').replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
-}
+import { db } from "../server/db";
+import { supplies } from "../shared/schema";
+import { sql } from "drizzle-orm";
+import * as fs from "fs";
+import { expandAbbreviations } from "../server/abbreviationExpansion";
 
 async function main() {
-  // Get unmatched products
-  const noSku = await db.select({
+  // Get unmatched supplies
+  const unmatched = await db.select({
     id: supplies.id,
     name: supplies.name,
     brand: supplies.brand
-  }).from(supplies).where(isNull(supplies.sku));
+  }).from(supplies).where(sql`${supplies.upc} IS NULL`);
   
-  console.log(`Unmatched products: ${noSku.length}\n`);
+  console.log(`Total unmatched: ${unmatched.length}\n`);
   
-  // Load all UPC sources into single searchable list
-  const sources: {upc: string; name: string; source: string}[] = [];
+  // Load master index
+  const masterData = JSON.parse(fs.readFileSync('scripts/master_upc_index.json', 'utf-8'));
   
-  // Load Maybe Inventory
-  const wb = new ExcelJS.Workbook();
-  await wb.xlsx.readFile('attached_assets/Animal_House_InventoryMaybe_1765838537225.xlsx');
-  const ws = wb.worksheets[0];
-  ws.eachRow((row, rowNum) => {
-    if (rowNum === 1) return;
-    const upc = cleanUpc(String(row.getCell(1).value || ''));
-    const name = String(row.getCell(2).value || '').trim();
-    if (upc.length >= 10 && name.length > 2) {
-      sources.push({ upc, name, source: 'Excel' });
-    }
+  // Group by brand
+  const byBrand: Record<string, string[]> = {};
+  unmatched.forEach(s => {
+    const brand = s.brand || 'Unknown';
+    if (!byBrand[brand]) byBrand[brand] = [];
+    byBrand[brand].push(s.name);
   });
   
-  // Load Google Sheet
-  const csv = fs.readFileSync('scripts/google_sheet_upcs.csv', 'utf-8');
-  for (const line of csv.split('\n').slice(1)) {
-    const parts = line.split(',');
-    if (parts.length >= 2) {
-      const upc = cleanUpc(parts[0]);
-      const name = parts[1].trim();
-      if (upc.length >= 10 && name.length > 2) {
-        sources.push({ upc, name, source: 'Google' });
+  // Sort by count
+  const sorted = Object.entries(byBrand).sort((a, b) => b[1].length - a[1].length);
+  
+  console.log("=== UNMATCHED BY BRAND (top 20) ===");
+  sorted.slice(0, 20).forEach(([brand, names]) => {
+    console.log(`\n${brand}: ${names.length} unmatched`);
+    names.slice(0, 3).forEach(n => console.log(`  - ${n}`));
+  });
+  
+  // Find potential matches in catalog for top unmatched brands
+  console.log("\n\n=== POTENTIAL MATCHES IN CATALOG ===");
+  const topBrands = ['Science Diet', 'Blue Buffalo', 'Pro Plan', 'Natural Balance', 'Royal Canin'];
+  
+  for (const targetBrand of topBrands) {
+    const brandUnmatched = unmatched.filter(s => s.brand === targetBrand).slice(0, 5);
+    if (brandUnmatched.length === 0) continue;
+    
+    console.log(`\n--- ${targetBrand} ---`);
+    for (const supply of brandUnmatched) {
+      const expandedSupply = expandAbbreviations(supply.name);
+      console.log(`\nSupply: "${supply.name}"`);
+      console.log(`Expanded: "${expandedSupply}"`);
+      
+      // Find similar catalog entries
+      const supplyLower = expandedSupply.toLowerCase();
+      const candidates = masterData.entries.filter((e: any) => {
+        const catalogLower = expandAbbreviations(e.name).toLowerCase();
+        // Check if they share the brand and some key words
+        return catalogLower.includes(targetBrand.toLowerCase().split(' ')[0]) ||
+               e.name.toLowerCase().startsWith(targetBrand.toLowerCase().substring(0, 3));
+      }).slice(0, 3);
+      
+      if (candidates.length > 0) {
+        console.log("Catalog candidates:");
+        candidates.forEach((c: any) => {
+          const expanded = expandAbbreviations(c.name);
+          console.log(`  "${c.name}" -> "${expanded}"`);
+        });
       }
     }
   }
   
-  // Load Invoices
-  const inv = fs.readFileSync('.local/state/memory/all_invoice_upcs.txt', 'utf-8');
-  for (const line of inv.split('\n').slice(1)) {
-    const parts = line.split('|');
-    if (parts.length >= 3) {
-      const upc = cleanUpc(parts[0]);
-      const name = parts[2].trim();
-      if (upc.length >= 10 && name.length > 3) {
-        sources.push({ upc, name, source: 'Invoice' });
-      }
-    }
-  }
-  
-  console.log(`Total source entries: ${sources.length}\n`);
-  
-  // For each unmatched, search sources for potential matches
-  console.log('=== Analyzing Top Unmatched Products ===\n');
-  
-  const samples = noSku.slice(0, 50);
-  for (const p of samples) {
-    const pNorm = normalize(p.name);
-    const pWords = pNorm.split(' ').filter(w => w.length >= 3);
-    
-    // Find sources that share first word
-    const firstWord = pWords[0];
-    const candidates = sources.filter(s => {
-      const sNorm = normalize(s.name);
-      return sNorm.startsWith(firstWord) || sNorm.includes(firstWord);
-    });
-    
-    console.log(`\n[${p.brand}] ${p.name}`);
-    console.log(`  Normalized: "${pNorm}"`);
-    console.log(`  Candidates sharing "${firstWord}": ${candidates.length}`);
-    
-    if (candidates.length > 0 && candidates.length <= 10) {
-      for (const c of candidates.slice(0, 5)) {
-        console.log(`    -> [${c.source}] ${c.name}`);
-      }
-    }
-  }
+  process.exit(0);
 }
 
 main().catch(console.error);

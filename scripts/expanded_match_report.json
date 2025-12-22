@@ -1,224 +1,224 @@
 {
-  "generatedAt": "2025-12-22T18:00:25.024Z",
+  "generatedAt": "2025-12-22T18:27:05.741Z",
   "indexEntries": 8430,
-  "expandedNames": 3967,
+  "expandedNames": 4705,
   "totalSupplies": 7225,
-  "matchedSupplies": 4037,
-  "coverage": "55.9%",
+  "matchedSupplies": 4251,
+  "coverage": "58.8%",
   "byMethod": {
-    "exact": 3765,
-    "90%_jaccard": 153,
-    "75%_brand": 89,
-    "75%_overlap": 30
+    "exact": 3912,
+    "75%_brand": 106,
+    "90%_jaccard": 182,
+    "75%_overlap": 47
   },
   "sampleMatches": [
     {
-      "supply": "Coastal 6' Aliens 969 Leash",
-      "catalogOriginal": "COASTAL 6' ALN 969 LEASH",
-      "catalogExpanded": "COASTAL 6' Aliens 969 LEASH",
+      "supply": "Lilpals Small Collar 2bl12",
+      "catalogOriginal": "LILPALS SM COLLAR 2BL12",
+      "catalogExpanded": "LILPALS Small COLLAR 2BL12",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Science Diet Cat 11+ 15lb",
-      "catalogOriginal": "SD cat 11+ 15#",
-      "catalogExpanded": "Science Diet cat 11+ 15#",
+      "supply": "Blue Buffalo Freedom Small Breed 11lb",
+      "catalogOriginal": "BLUE B freedom sm br 11#",
+      "catalogExpanded": "Blue Buffalo freedom Small Breed 11#",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Safari the Complete Cat Brush",
-      "catalogOriginal": "Safari The Complete Cat Brush",
-      "catalogExpanded": "Safari The Complete Cat Brush",
+      "supply": "Zilla Slimeline T8 Tropical Fixture 18\"",
+      "catalogOriginal": "Zilla Slimeline T8 Trop. Fixture 18\"",
+      "catalogExpanded": "Zilla Slimeline T8 Tropical. Fixture 18\"",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Zoo Med Mini Tropical Uvb Combo",
-      "catalogOriginal": "ZooMed Mini trop. UVB Combo",
-      "catalogExpanded": "Zoo Med Mini Tropical. UVB Combo",
+      "supply": "Oasis Alive & Well Probiotics",
+      "catalogOriginal": "Oasis Alive&Well Probiotics",
+      "catalogExpanded": "Oasis Alive & Well Probiotics",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Sodapup Mini Honey Emat",
-      "catalogOriginal": "SodaPup Mini Honey Emat",
-      "catalogExpanded": "SodaPup Mini Honey Emat",
+      "supply": "Vital Essentials Pork Mini Nibbles 12oz",
+      "catalogOriginal": "VIT ESSEN pork min nib 12oz",
+      "catalogExpanded": "Vital Essentials pork Mini Nibbles 12oz",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Zoo Med Snake Starter Kit 20 g",
-      "catalogOriginal": "ZooMed Snake Starter Kit 20 g",
-      "catalogExpanded": "Zoo Med Snake Starter Kit 20 g",
+      "supply": "Pet Honesty Multivita 10in1",
+      "catalogOriginal": "PetHonesty MultiVita 10in1",
+      "catalogExpanded": "Pet Honesty MultiVita 10in1",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Lilpals Extra Small Collar Zpk08",
-      "catalogOriginal": "LILPALS XS COLLAR ZPK08",
-      "catalogExpanded": "LILPALS Extra Small COLLAR ZPK08",
+      "supply": "Hikari Frozen Baby Brine Shrimp 1.75oz",
+      "catalogOriginal": "HIKARI froz baby brine shri 1.75oz",
+      "catalogExpanded": "HIKARI Frozen baby brine Shrimp 1.75oz",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Blue Wilderness Chick & Turkey Treat",
-      "catalogOriginal": "Blue Wilderness Chick&Turkey Treat",
-      "catalogExpanded": "Blue Wilderness Chick & Turkey Treat",
+      "supply": "Feline Greenies Salmon Clean Breath",
+      "catalogOriginal": "Feline Greenies Salmon Clean Breath",
+      "catalogExpanded": "Feline Greenies Salmon Clean Breath",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Nature Zone Bearded Color",
-      "catalogOriginal": "Nature Zone bearded Color",
-      "catalogExpanded": "Nature Zone bearded Color",
+      "supply": "Coastal Collar Prl12",
+      "catalogOriginal": "COASTAL CC PRL12",
+      "catalogExpanded": "COASTAL Collar PRL12",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Kong Shakers Wingz Small/Medium",
-      "catalogOriginal": "KONG SHAKERS WINGZ SM/MD",
-      "catalogExpanded": "KONG SHAKERS WINGZ Small/Medium",
+      "supply": "Birdie Basics Perch Small -Medium 7/16x16",
+      "catalogOriginal": "Birdie Basics Perch Sm -Med 7/16x16",
+      "catalogExpanded": "Birdie Basics Perch Small -Medium 7/16x16",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Exoterra Screen Cover 40/50gal Breed",
-      "catalogOriginal": "ExoTerra Screen Cover 40/50Gal Breed",
-      "catalogExpanded": "ExoTerra Screen Cover 40/50Gal Breed",
+      "supply": "Naturally Fresh Clumping 14lb",
+      "catalogOriginal": "Naturally Fresh Clumping 14lb",
+      "catalogExpanded": "Naturally Fresh Clumping 14lb",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Freshnews Orginal Litter 12lb",
-      "catalogOriginal": "FreshNews Orginal Litter 12lb",
-      "catalogExpanded": "FreshNews Orginal Litter 12lb",
+      "supply": "Health Extension Healthy Belly 3.5 oz",
+      "catalogOriginal": "HEALTH EXTEN healthy belly 3.5oz",
+      "catalogExpanded": "HEALTH Extension healthy belly 3.5 oz",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Prevue House Style Tiel Cage",
-      "catalogOriginal": "Prevue House Style Tiel Cage",
-      "catalogExpanded": "Prevue House Style Tiel Cage",
+      "supply": "Blue Buffalo Wilderness Salmon 4.5lb",
+      "catalogOriginal": "BLUE B wilderness salmon 4.5#",
+      "catalogExpanded": "Blue Buffalo wilderness salmon 4.5#",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Zoo Med Reptitemp Digital Thermo",
-      "catalogOriginal": "ZooMed Reptitemp Digital Thermo",
-      "catalogExpanded": "Zoo Med Reptitemp Digital Thermo",
+      "supply": "Jolly Pets 6\" Soccerball Green",
+      "catalogOriginal": "JOLLYPET 6\" SOCCERBALL GREEN",
+      "catalogExpanded": "Jolly Pets 6\" SOCCERBALL GREEN",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Nature's Miracle No Marking",
-      "catalogOriginal": "NaturesMiracle No marking",
-      "catalogExpanded": "Nature's Miracle No marking",
+      "supply": "Lafebers Pellet Berries",
+      "catalogOriginal": "Lafebers Pellet Berries",
+      "catalogExpanded": "Lafebers Pellet Berries",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Petmate Hibck Drwstin 12 Liner Large",
-      "catalogOriginal": "PetMate HiBck DrwStin 12 Liner Lg",
-      "catalogExpanded": "PetMate HiBck DrwStin 12 Liner Large",
+      "supply": "Zippypaws Birthday Cake -Blue",
+      "catalogOriginal": "ZIPPYPAWS BIRTHDAY CAKE -BLU",
+      "catalogExpanded": "ZIPPYPAWS BIRTHDAY CAKE -Blue",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Hikari Staple Mini 8.8oz",
-      "catalogOriginal": "HIKARI staple mini 8.8oz",
-      "catalogExpanded": "HIKARI staple mini 8.8oz",
+      "supply": "Mypet Universal Pet Gate 26\"x26\"",
+      "catalogOriginal": "MyPet Universal Pet Gate 26\"x26\"",
+      "catalogExpanded": "MyPet Universal Pet Gate 26\"x26\"",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Turbo Sports Ball",
-      "catalogOriginal": "Turbo Sports Ball",
-      "catalogExpanded": "Turbo Sports Ball",
+      "supply": "Vital Cat Salmon Bites",
+      "catalogOriginal": "Vital Cat Salmon Bites",
+      "catalogExpanded": "Vital Cat Salmon Bites",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Pro Plan Chicken Shred 15lb",
-      "catalogOriginal": "PRO PLAN ck shred 15#",
-      "catalogExpanded": "PRO PLAN Chicken shred 15#",
+      "supply": "Sodapup Ebowl Great Outdoors",
+      "catalogOriginal": "SodaPup EBowl Great outdoors",
+      "catalogExpanded": "SodaPup EBowl Great outdoors",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Zoo Med Moonlite Reptile Bulb 60w",
-      "catalogOriginal": "ZooMed Moonlite reptile Bulb 60W",
-      "catalogExpanded": "Zoo Med Moonlite reptile Bulb 60W",
+      "supply": "Exoterra Abutilon Silk Small",
+      "catalogOriginal": "ExoTerra Abutilon Silk Small",
+      "catalogExpanded": "ExoTerra Abutilon Silk Small",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Zoo Med Crab Salt Water Conditioner",
-      "catalogOriginal": "ZooMed Crab Salt Water Con",
-      "catalogExpanded": "Zoo Med Crab Salt Water Conditioner",
+      "supply": "Zilla Turtle Pure Water Care",
+      "catalogOriginal": "Zilla Turtle Pure water care",
+      "catalogExpanded": "Zilla Turtle Pure water care",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Coastal Collar Tpd14\"",
-      "catalogOriginal": "COASTAL COLLAR TPD14\"",
-      "catalogExpanded": "COASTAL COLLAR TPD14\"",
+      "supply": "Science Diet Grain Free Frozen Crunch",
+      "catalogOriginal": "SD gr fr crunch",
+      "catalogExpanded": "Science Diet Grain Free crunch",
+      "similarity": "83%",
+      "method": "75%_brand"
+    },
+    {
+      "supply": "Petmate Top Entry Litter Box",
+      "catalogOriginal": "PetMate Top Entry Litter Box",
+      "catalogExpanded": "PetMate Top Entry Litter Box",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Feline Greenies Pill Pockets Chicken",
-      "catalogOriginal": "Feline Greenies Pill Pockets Chkn",
-      "catalogExpanded": "Feline Greenies Pill Pockets Chicken",
+      "supply": "Naturvet Calcium-phosphorus Powder",
+      "catalogOriginal": "Naturvet Calcium-Phosphorus Powder",
+      "catalogExpanded": "Naturvet Calcium-Phosphorus Powder",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Natural Bal Plant 13oz",
-      "catalogOriginal": "NAT BAL plant 13oz",
-      "catalogExpanded": "Natural BAL plant 13oz",
+      "supply": "Coastal Soft Basket Muzzle Size 4",
+      "catalogOriginal": "Coastal Soft Basket Muzzle Size 4",
+      "catalogExpanded": "Coastal Soft Basket Muzzle Size 4",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Higgins Sunburst Cockatiel",
-      "catalogOriginal": "Higgins Sunburts Cockatiel",
-      "catalogExpanded": "Higgins Sunburst Cockatiel",
+      "supply": "Lilpals Small Collar Lbp12",
+      "catalogOriginal": "LILPALS SM COLLAR LBP12",
+      "catalogExpanded": "LILPALS Small COLLAR LBP12",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Coastal 6' Llamas 469 Leash",
-      "catalogOriginal": "COASTAL 6' LLM 469 LEASH",
-      "catalogExpanded": "COASTAL 6' Llamas 469 LEASH",
+      "supply": "Reptology Turtle Platform",
+      "catalogOriginal": "Reptology Turtle Platform",
+      "catalogExpanded": "Reptology Turtle Platform",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Seachem De Nitrate 500ml",
-      "catalogOriginal": "SEACHEM de nitrate 500ml",
-      "catalogExpanded": "SEACHEM de nitrate 500ml",
+      "supply": "Carpenter Creations Bendable Ladder",
+      "catalogOriginal": "Carpenter Creations Bendable Ladder",
+      "catalogExpanded": "Carpenter Creations Bendable Ladder",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Vari-Kennel-Kennel-Kennel-Kennel Kennel 28\"",
-      "catalogOriginal": "\"vari kennel 28\"\"\"",
-      "catalogExpanded": "\"Vari-Kennel kennel 28\"\"\"",
-      "similarity": "100%",
-      "method": "90%_jaccard"
-    },
-    {
-      "supply": "Tropiclean Hypoallergenic Coconut Sham",
-      "catalogOriginal": "TropiClean Hypoallergenic Coconut Sham",
-      "catalogExpanded": "TropiClean Hypoallergenic Coconut Sham",
+      "supply": "Exoterra Calcium 15.9 oz",
+      "catalogOriginal": "ExoTerra Calcium 15.9 oz",
+      "catalogExpanded": "ExoTerra Calcium 15.9 oz",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Lilpals Plush Hotdog Toy",
-      "catalogOriginal": "LILPALS PLUSH HOTDOG TOY",
-      "catalogExpanded": "LILPALS PLUSH HOTDOG TOY",
+      "supply": "Prevue Hendrix Snuggle Hut Medium",
+      "catalogOriginal": "PH Snuggle Hut MD",
+      "catalogExpanded": "Prevue Hendrix Snuggle Hut Medium",
       "similarity": "100%",
       "method": "exact"
     }
