@@ -1,224 +1,225 @@
 {
-  "generatedAt": "2025-12-22T18:38:43.305Z",
-  "indexEntries": 8430,
-  "expandedNames": 4713,
+  "generatedAt": "2025-12-22T19:45:14.169Z",
+  "indexEntries": 9055,
+  "expandedNames": 5524,
   "totalSupplies": 7225,
-  "matchedSupplies": 4251,
-  "coverage": "58.8%",
+  "matchedSupplies": 4316,
+  "coverage": "59.7%",
   "byMethod": {
-    "exact": 3927,
-    "75%_brand": 103,
-    "75%_overlap": 50,
-    "90%_jaccard": 171
+    "exact": 3930,
+    "65%_upc_verified": 106,
+    "90%_jaccard": 155,
+    "75%_brand": 87,
+    "75%_overlap": 38
   },
   "sampleMatches": [
     {
-      "supply": "Lilpals Small Collar 2bl12",
-      "catalogOriginal": "LILPALS SM COLLAR 2BL12",
-      "catalogExpanded": "LILPALS Small COLLAR 2BL12",
+      "supply": "Seachem Pristine 8.5oz",
+      "catalogOriginal": "SEACHEM pristine 8.5oz",
+      "catalogExpanded": "SEACHEM pristine 8.5oz",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Science Diet Vitality 12.5lb",
-      "catalogOriginal": "SD vitality 12.5#",
-      "catalogExpanded": "Science Diet vitality 12.5#",
+      "supply": "Lilpals Collar Wdf08",
+      "catalogOriginal": "Lilpals CC WDF08",
+      "catalogExpanded": "Lilpals Collar WDF08",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Petcrest Tie Out Stake",
-      "catalogOriginal": "PetCrest Tie Out Stake",
-      "catalogExpanded": "PetCrest Tie Out Stake",
+      "supply": "Coastal Red20' 901 Collar",
+      "catalogOriginal": "COASTAL RED20' 901 CLLR",
+      "catalogExpanded": "COASTAL RED 20' 901 Collar",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Vital Essentials Chicken Mini Nibbles 14oz",
-      "catalogOriginal": "VIT ESSEN ck min nib 14oz",
-      "catalogExpanded": "Vital Essentials Chicken Mini Nibbles 14oz",
+      "supply": "Diamond Original 50lb",
+      "catalogOriginal": "DIAM orig 50#",
+      "catalogExpanded": "Diamond Original 50#",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Safari Combo Brush Small & Medium",
-      "catalogOriginal": "Safari Combo Brush Sm&Med",
-      "catalogExpanded": "Safari Combo Brush Small & Medium",
+      "supply": "Nylabone Durachew Ring Large",
+      "catalogOriginal": "NYLABONE DURACHEW RING LRG",
+      "catalogExpanded": "NYLABONE DURACHEW RING Large",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Blue Buffalo Freedom Small Breed 11lb",
-      "catalogOriginal": "BLUE B freedom sm br 11#",
-      "catalogExpanded": "Blue Buffalo freedom Small Breed 11#",
+      "supply": "Hikari Sinking Medium 3.5 oz",
+      "catalogOriginal": "HIKARI sinking md 3.5oz",
+      "catalogExpanded": "HIKARI sinking Medium 3.5 oz",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Zilla Slimeline T8 Tropical Fixture 18\"",
-      "catalogOriginal": "Zilla Slimeline T8 Trop. Fixture 18\"",
-      "catalogExpanded": "Zilla Slimeline T8 Tropical. Fixture 18\"",
+      "supply": "Tetra Glo Large Purple/White Plant",
+      "catalogOriginal": "TETRA glo lg pur/wh plant",
+      "catalogExpanded": "Tetra glo Large Purple/wh plant",
+      "similarity": "71%",
+      "method": "65%_upc_verified"
+    },
+    {
+      "supply": "Coastal Purple38 Harness",
+      "catalogOriginal": "COASTAL PUR38 HARNESS",
+      "catalogExpanded": "COASTAL Purple 38 HARNESS",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Oasis Alive & Well Probiotics",
-      "catalogOriginal": "Oasis Alive&Well Probiotics",
-      "catalogExpanded": "Oasis Alive & Well Probiotics",
+      "supply": "50lbs Pet Food Container",
+      "catalogOriginal": "50lbs Pet Food Container",
+      "catalogExpanded": "50lbs Pet Food Container",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Vital Essentials Pork Mini Nibbles 12oz",
-      "catalogOriginal": "VIT ESSEN pork min nib 12oz",
-      "catalogExpanded": "Vital Essentials pork Mini Nibbles 12oz",
+      "supply": "Blue Buffalo Wilder Small Breed 4.5lb",
+      "catalogOriginal": "BLUE B wilder sm br 4.5#",
+      "catalogExpanded": "Blue Buffalo wilder Small Breed 4.5#",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Feline Greenies Salmon Clean Breath",
-      "catalogOriginal": "Feline Greenies Salmon Clean Breath",
-      "catalogExpanded": "Feline Greenies Salmon Clean Breath",
+      "supply": "Lilpals Extra Small Collar Gbn08",
+      "catalogOriginal": "LILPALS XS COLLAR GBN08",
+      "catalogExpanded": "LILPALS Extra Small COLLAR GBN08",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Science Diet Perf Digest Chicken 3.5lb",
-      "catalogOriginal": "SD perf digest ck 3.5#",
-      "catalogExpanded": "Science Diet Perfect digest Chicken 3.5#",
+      "supply": "VICTOR Lamb & Sweet Potato 30lb",
+      "catalogOriginal": "VICT lam & sw pot 30#",
+      "catalogExpanded": "VICTOR Lamb & Sweet Potato 30#",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Pet Honesty Multivita 10in1",
-      "catalogOriginal": "PetHonesty MultiVita 10in1",
-      "catalogExpanded": "Pet Honesty MultiVita 10in1",
+      "supply": "Birdlife Coconut with Ladder",
+      "catalogOriginal": "BirdLife Coconut with ladder",
+      "catalogExpanded": "BirdLife Coconut with ladder",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Arm & Hammer Doubleduty Litter Deo",
-      "catalogOriginal": "Arm&Hammer DoubleDuty Litter Deo",
-      "catalogExpanded": "Arm & Hammer DoubleDuty Litter Deo",
+      "supply": "Vanness Xg 10 Liners Sifting",
+      "catalogOriginal": "VanNess XG 10 Liners Sifting",
+      "catalogExpanded": "VanNess XG 10 Liners Sifting",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Science Diet Cat Hairball Control 15.5lb",
-      "catalogOriginal": "SD cat hairba 15.5#",
-      "catalogExpanded": "Science Diet cat Hairball 15.5#",
-      "similarity": "86%",
-      "method": "75%_brand"
-    },
-    {
-      "supply": "Coastal Black 15' Cotton Train Leash",
-      "catalogOriginal": "Coastal BLK 15' Cotton Train Leash",
-      "catalogExpanded": "Coastal Black 15' Cotton Train Leash",
+      "supply": "VICTOR Beef & Vegetable 13.2oz",
+      "catalogOriginal": "VICT beef & veg 13.2oz",
+      "catalogExpanded": "VICTOR Beef & Vegetable 13.2oz",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Coastal Cc Btr12",
-      "catalogOriginal": "COASTAL CC BTR12",
-      "catalogExpanded": "COASTAL Collar BTR12",
+      "supply": "Coastal Black14\" Security Collar",
+      "catalogOriginal": "COASTAL BLK14\" SECCLLR",
+      "catalogExpanded": "COASTAL Black 14\" Security Collar",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Tetra Crisp Select a Food 2.4oz",
-      "catalogOriginal": "TETRA crisp select a food 2.4oz",
-      "catalogExpanded": "TETRA Crisps select a food 2.4oz",
+      "supply": "San Franci Cichlid Delight 3.5 oz",
+      "catalogOriginal": "SAN FRANCI cich delight 3.5oz",
+      "catalogExpanded": "SAN FRANCI Cichlid delight 3.5 oz",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Vital Cat Chicken Hearts",
-      "catalogOriginal": "Vital Cat chicken hearts",
-      "catalogExpanded": "Vital Cat chicken hearts",
+      "supply": "Thunder Shirt Sport L",
+      "catalogOriginal": "Thunder Shirt Sport L",
+      "catalogExpanded": "Thunder Shirt Sport L",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Science Diet Cat Indoor 15.5lb",
-      "catalogOriginal": "SD cat indo 15.5#",
-      "catalogExpanded": "Science Diet cat Indoor 15.5#",
+      "supply": "Science Diet Cat 7+ 16lb",
+      "catalogOriginal": "SD cat 7+ 16#",
+      "catalogExpanded": "Science Diet cat 7+ 16#",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Fromm Kitten 10lb",
-      "catalogOriginal": "FROMM kitten 10#",
-      "catalogExpanded": "FROMM kitten 10#",
+      "supply": "Reptology Basking Arch",
+      "catalogOriginal": "Reptology Basking Arch",
+      "catalogExpanded": "Reptology Basking Arch",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Zilla Tropical Series 25 T8 18\" 15w",
-      "catalogOriginal": "Zilla Trop. Series 25 T8 18\" 15W",
-      "catalogExpanded": "Zilla Tropical. Series 25 T8 18\" 15W",
+      "supply": "Drytech Puppy Pad 14pk",
+      "catalogOriginal": "DryTech Puppy PAd 14pk",
+      "catalogExpanded": "DryTech Puppy PAd 14pk",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Magiccoat Prof Series Oats Puppy",
-      "catalogOriginal": "MagicCoat Prof Series oats  Puppy",
-      "catalogExpanded": "MagicCoat Prof Series oats Puppy",
+      "supply": "Blue Buffalo Wilderness Turkey 12.5oz",
+      "catalogOriginal": "BL BUF wild turk 12.5oz",
+      "catalogExpanded": "Blue Buffalo Buffalo Wilderness Turkey 12.5oz",
+      "similarity": "100%",
+      "method": "90%_jaccard"
+    },
+    {
+      "supply": "Fluval Bug Bite Color Enhan 3.17oz",
+      "catalogOriginal": "FLUVAL bug bite color enhan 3.17oz",
+      "catalogExpanded": "FLUVAL bug bite color enhan 3.17oz",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Replendish Steel Small Water 1g",
-      "catalogOriginal": "Replendish Steel Sm Wtr 1g",
-      "catalogExpanded": "Replendish Steel Small Water 1g",
+      "supply": "Nature's Miracle Hard Floor Cleaner",
+      "catalogOriginal": "NaturesMiracle Hard floor Cleaner",
+      "catalogExpanded": "Nature's Miracle Hard floor Cleaner",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Fromm Gold Large Breed Puppy 15lb",
-      "catalogOriginal": "FROMM gold lg br puppy 15#",
-      "catalogExpanded": "FROMM gold Large Breed puppy 15#",
+      "supply": "Coastal Cyn30 Harness",
+      "catalogOriginal": "COASTAL CYN30 HRNESS",
+      "catalogExpanded": "COASTAL CYN30 Harness",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Coastal Collar Gxy18\"",
-      "catalogOriginal": "COASTAL COLLAR GXY18\"",
-      "catalogExpanded": "COASTAL COLLAR GXY18\"",
+      "supply": "Reptology Orange Hanging Vines 24\"",
+      "catalogOriginal": "Repto. Orange Hanging Vines 24\"",
+      "catalogExpanded": "Reptology. Orange Hanging Vines 24\"",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Hikari Frozen Baby Brine Shrimp 1.75oz",
-      "catalogOriginal": "HIKARI froz baby brine shri 1.75oz",
-      "catalogExpanded": "HIKARI Frozen baby brine Shrimp 1.75oz",
+      "supply": "Feline Greenies Chicken Cleans Breath",
+      "catalogOriginal": "Feline Greenies Chkn Cleans breath",
+      "catalogExpanded": "Feline Greenies Chicken Cleans breath",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Coastal Purple18\" 901 Collar",
-      "catalogOriginal": "COASTAL PUR18\" 901 CLLR",
-      "catalogExpanded": "COASTAL Purple 18\" 901 Collar",
+      "supply": "Skudo Extra Small",
+      "catalogOriginal": "skudo xsm",
+      "catalogExpanded": "skudo Extra Small",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Exoterra Cricket Pen Large",
-      "catalogOriginal": "ExoTerra Cricket Pen large",
-      "catalogExpanded": "ExoTerra Cricket Pen large",
+      "supply": "Sweet Harvest Papaya",
+      "catalogOriginal": "SweetHarvest Papaya",
+      "catalogExpanded": "Sweet Harvest Papaya",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Hikari Algae Waffer Mini .77oz",
-      "catalogOriginal": "HIKARI algae waf mini .77oz",
-      "catalogExpanded": "HIKARI algae Waffer mini .77oz",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Vital Essentials Chicken Ground Top 6oz",
-      "catalogOriginal": "VIT ESSEN ck ground top 6oz",
-      "catalogExpanded": "Vital Essentials Chicken ground top 6oz",
+      "supply": "Pro Plan Shred Puppy 6lb",
+      "catalogOriginal": "PRO PLAN shred puppy 6#",
+      "catalogExpanded": "Pro Plan PLAN shred puppy 6#",
       "similarity": "100%",
       "method": "exact"
     }

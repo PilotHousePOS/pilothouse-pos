@@ -108,7 +108,27 @@ async function main() {
     expandedName: string;
     tokens: string[];
     brand: string;
+    upcBrand: string; // Brand inferred from UPC prefix
     isCoastal: boolean;
+  };
+  
+  // UPC prefix to brand mapping - helps match when invoice names don't include brand
+  const upcPrefixBrands: Record<string, string> = {
+    '030172': 'pennplax',
+    '097612': 'zoomed',
+    '015561': 'fluval',
+    '046798': 'tetra',
+    '042055': 'hikari',
+    '076484': 'coastal',
+    '045663': 'fourpaws',
+    '077234': 'api',
+    '785184': 'redbarnet',
+    '071860': 'arknaturals',
+    '030027': 'acme',
+    '041693': 'kaytee',
+    '017800': 'zilla',
+    '015905': 'marineland',
+    '090653': 'exoterra'
   };
   
   const index: IndexEntry[] = [];
@@ -124,12 +144,17 @@ async function main() {
     
     if (expandedName !== originalName) expanded++;
     
+    // Get brand from UPC prefix
+    const upcPrefix = entry.upc.slice(0, 6);
+    const upcBrand = upcPrefixBrands[upcPrefix] || '';
+    
     index.push({
       upc: entry.upc,
       originalName,
       expandedName,
       tokens: tokenize(expandedName),
       brand: extractBrand(expandedName),
+      upcBrand,
       isCoastal: entry.isCoastal || originalName.toLowerCase().includes('coastal')
     });
   }
@@ -210,47 +235,83 @@ async function main() {
     
     // SLOW PATH: Fuzzy matching if no exact match
     if (!bestMatch) {
-      for (const entry of index) {
-        if (usedUpcs.has(entry.upc) && !entry.isCoastal) continue;
+      // PASS 1: Brand-filtered matching with UPC prefix confirmation
+      // When supply has a brand AND we find entries with matching UPC prefix brand,
+      // we can use a lower threshold (65%) because the UPC prefix confirms the brand
+      if (supplyBrand) {
+        const brandCandidates = index.filter(e => 
+          e.upcBrand === supplyBrand && 
+          (!usedUpcs.has(e.upc) || e.isCoastal)
+        );
         
-        const similarity = jaccardSimilarity(supplyTokens, entry.tokens);
+        for (const entry of brandCandidates) {
+          const similarity = jaccardSimilarity(supplyTokens, entry.tokens);
+          
+          // 65% threshold for UPC-prefix-verified brand matches
+          if (similarity >= 0.65) {
+            // Additional check: at least 3 significant tokens must match
+            const supplySet = new Set(supplyTokens);
+            const matchingTokens = entry.tokens.filter(t => supplySet.has(t) && t.length > 2);
+            if (matchingTokens.length >= 3 || (matchingTokens.length >= 2 && supplyTokens.length <= 4)) {
+              if (!bestMatch || similarity > bestMatch.similarity) {
+                bestMatch = { 
+                  upc: entry.upc, 
+                  originalName: entry.originalName,
+                  expandedName: entry.expandedName,
+                  similarity, 
+                  method: '65%_upc_verified' 
+                };
+              }
+            }
+          }
+        }
+      }
       
-        // 90%+ threshold
-        if (similarity >= 0.90) {
-          if (!bestMatch || similarity > bestMatch.similarity) {
-            bestMatch = { 
-              upc: entry.upc, 
-              originalName: entry.originalName,
-              expandedName: entry.expandedName,
-              similarity, 
-              method: '90%_jaccard' 
-            };
+      // PASS 2: Standard fuzzy matching if brand-filtered didn't find a match
+      if (!bestMatch) {
+        for (const entry of index) {
+          if (usedUpcs.has(entry.upc) && !entry.isCoastal) continue;
+          
+          const similarity = jaccardSimilarity(supplyTokens, entry.tokens);
+        
+          // 90%+ threshold
+          if (similarity >= 0.90) {
+            if (!bestMatch || similarity > bestMatch.similarity) {
+              bestMatch = { 
+                upc: entry.upc, 
+                originalName: entry.originalName,
+                expandedName: entry.expandedName,
+                similarity, 
+                method: '90%_jaccard' 
+              };
+            }
           }
-        }
-        // 75%+ with brand match (lowered from 80% to catch more abbreviation variants)
-        else if (similarity >= 0.75 && supplyBrand && entry.brand === supplyBrand) {
-          if (!bestMatch || similarity > bestMatch.similarity) {
-            bestMatch = { 
-              upc: entry.upc, 
-              originalName: entry.originalName,
-              expandedName: entry.expandedName,
-              similarity, 
-              method: '75%_brand' 
-            };
+          // 75%+ with brand match (from name OR UPC prefix)
+          else if (similarity >= 0.75 && supplyBrand && 
+                   (entry.brand === supplyBrand || entry.upcBrand === supplyBrand)) {
+            if (!bestMatch || similarity > bestMatch.similarity) {
+              bestMatch = { 
+                upc: entry.upc, 
+                originalName: entry.originalName,
+                expandedName: entry.expandedName,
+                similarity, 
+                method: entry.upcBrand === supplyBrand ? '75%_upc_brand' : '75%_brand' 
+              };
+            }
           }
-        }
-        // 75%+ with high token overlap
-        else if (similarity >= 0.75) {
-          const supplySet = new Set(supplyTokens);
-          const overlap = entry.tokens.filter(t => supplySet.has(t)).length;
-          if (overlap >= supplyTokens.length * 0.85 && (!bestMatch || similarity > bestMatch.similarity)) {
-            bestMatch = { 
-              upc: entry.upc, 
-              originalName: entry.originalName,
-              expandedName: entry.expandedName,
-              similarity, 
-              method: '75%_overlap' 
-            };
+          // 75%+ with high token overlap
+          else if (similarity >= 0.75) {
+            const supplySet = new Set(supplyTokens);
+            const overlap = entry.tokens.filter(t => supplySet.has(t)).length;
+            if (overlap >= supplyTokens.length * 0.85 && (!bestMatch || similarity > bestMatch.similarity)) {
+              bestMatch = { 
+                upc: entry.upc, 
+                originalName: entry.originalName,
+                expandedName: entry.expandedName,
+                similarity, 
+                method: '75%_overlap' 
+              };
+            }
           }
         }
       }

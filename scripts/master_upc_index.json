@@ -1,8 +1,8 @@
 {
-  "createdAt": "2025-12-22T17:09:03.544Z",
+  "createdAt": "2025-12-22T19:11:42.337Z",
   "nonCoastalUpcs": 7346,
   "coastalUpcs": 987,
-  "totalUniqueUpcs": 8333,
+  "totalUniqueUpcs": 7990,
   "totalEntries": 8429,
   "entries": [
     {
@@ -50583,6 +50583,3131 @@
       "upc": ".072705108015",
       "name": "FROMM trout 26#",
       "source": "google_sheet"
+    },
+    {
+      "upc": "076484672320",
+      "name": "LP Sublm Ktn Clr 5/16x08 CBE",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484672559",
+      "name": "LP Sublm Ktn Clr 5/16x08 DMC",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484672571",
+      "name": "LP Sublm Ktn Clr 5/16x08 END",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484672716",
+      "name": "LP Sublm Ktn Clr 5/16x08 GND",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484672284",
+      "name": "LP Sublm Ktn Clr 5/16x08 LEE",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484672327",
+      "name": "LP Sublm Ktn Clr 5/16x08 PSC",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484672729",
+      "name": "LP Sublm Ktn Clr 5/16x08 SRK",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484672334",
+      "name": "LP Sublt Cat Clr 3/8x08-12 SLV",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484693300",
+      "name": "CP SubPush Clr 1x16-20 ALM",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484693349",
+      "name": "CP SubPush Clr 1x16-20 LLM",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484609345",
+      "name": "CP C/Wrap Harns 1x26-36 BLU",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484609316",
+      "name": "CP C/Wrap Harns 1x26-36 RED",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484689309",
+      "name": "CP C/Sp Harn 1x28-36 BLU",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484689002",
+      "name": "CP Refl Wrap Hrn 1x28-36 RED",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484689616",
+      "name": "CP Refl Wrap Hrn 1x28-36 MBL",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484689637",
+      "name": "CP Refl Wrap Hrn 1x28-36 WBL",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484077500",
+      "name": "Assembly - 07752 : 07752 ST",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484077571",
+      "name": "Assembly - 07752 : 07752 LP",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484807644",
+      "name": "PW Retractable Leash Small BLK",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484807688",
+      "name": "PW Retractable Leash X-Sml PNK",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484807761",
+      "name": "PW Retractable Leash X-Sml BLU",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484814391",
+      "name": "Assembly - 14345 : 14345 EPB",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484814203",
+      "name": "Assembly - 14401 : 14401 CR",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484814301",
+      "name": "Assembly - 14406 : 14406 CR",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484814400",
+      "name": "Assembly - 14410 : 14410 CR",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484814509",
+      "name": "Assembly - 14445 : 14445 FS",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484814601",
+      "name": "Assembly - 14601 : 14601 FS",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484814636",
+      "name": "Assembly - 14601 : 14601 F",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484814524",
+      "name": "Assembly - 14605 : 14605 FS",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484079203",
+      "name": "WN Nylon Leash 1\"x06' SOR",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484079210",
+      "name": "WN Sublimated Leash 1\"x05' WN1",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484079227",
+      "name": "WN Sublimated Leash 1\"x05' WN2",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484079234",
+      "name": "WN Sublimated Leash 1\"x05' WN3",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484992748",
+      "name": "WW Subn Collar 3/4\"x10-14 WW2",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484976988",
+      "name": "WW Printed Collar 1\"x18-26 CIN",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484967975",
+      "name": "WW Printed Collar 1\"x18-26 CTO",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484769947",
+      "name": "WW Printed Collar 1\"x14-20 CIN",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484729924",
+      "name": "WW Printed Collar 1\"x14-20 CTO",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484892608",
+      "name": "WW Printed Leash 1\"x06' CIN",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484892615",
+      "name": "WW Printed Leash 1\"x06' CTO",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484769951",
+      "name": "WW Printed Collar 1\"x14-20 WWL",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484769955",
+      "name": "WF Printed Collar 1\"x14-20 WWL",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484800010",
+      "name": "SAF Self-Clean Slicker Brush MD",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484800034",
+      "name": "SAF Flexible Slicker Brush SM",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484403031",
+      "name": "SAF Massage Brush",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484861848",
+      "name": "SAF Cry Firm Sticker Longhair LG",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484962150",
+      "name": "SAF ShedMagic Med-Long Hair SM",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484962174",
+      "name": "SAF ShedMagic Short Hair LG",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484009754",
+      "name": "CP Nylon Leash",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076483009555",
+      "name": "CP Subln Leash",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484944562",
+      "name": "CP Nylon Leash 5/8\"x06' PUR",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484305649",
+      "name": "CP Nylon Leash 5/8\"x06' FBD",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484305656",
+      "name": "CP Nylon Leash 5/8\"x06' PKB",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484305663",
+      "name": "CP Nylon Leash 5/8\"x06' RDT",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484078465",
+      "name": "CP Subhn Leash 3/4\"x06' SPF",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076481948454",
+      "name": "CP Subhn Leash 3/4\"x06' DNS",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484094959",
+      "name": "CP SubhPlus Leash UCN",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484094971",
+      "name": "CP Cotton Web Lsh 5/8\"x8' BLK",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484948293",
+      "name": "CP Subln Leash 5/8\" SPR",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484801770",
+      "name": "CP Subln Leash 1\"x06' PDT",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484886602",
+      "name": "CP Subln Leash 3/4\"x06' SPX",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484886626",
+      "name": "CP Subln Leash 3/4\"x06' NEW",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484886603",
+      "name": "CP Subhn Leash 1\"x06' FDF",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484166808",
+      "name": "CP Subln Leash 1\"x06' BBD",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484965644",
+      "name": "CP SubPlush Leash 1\"x6' FNO",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484706670",
+      "name": "CP BestFit Mesh Muzzle 03 BLK",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484706770",
+      "name": "CP BestFit Mesh Muzzle 04 BLK",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484991328",
+      "name": "TN Chain Collar 2.0mm*16\" CHR",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484021240",
+      "name": "CP Seaway Clr 5/8*08-12 RED",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484774010",
+      "name": "CP Sublim Collar 3/8*08-12 RED",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484774027",
+      "name": "CP Sublim Collar 3/8*08-12 PDT",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484351024",
+      "name": "CP Sublim Collar 3/8*08-12 SMP",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484321627",
+      "name": "CP Sublim Collar 3/8*08-12 WDF",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484404125",
+      "name": "CP C/Wrap Harns 3/8*12-18 HUN",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484345320",
+      "name": "CP C/Wrap Harns 3/8*12-18 LIM",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484345353",
+      "name": "CP C/Wrap Harns 3/8*12-18 ORD",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484345346",
+      "name": "CP C/Wrap Harns 3/8*12-18 PKR",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484041125",
+      "name": "CP C/Wrap Harns 3/8*12-18 PUR",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484041207",
+      "name": "CP C/Wrap Harns 3/8*12-18 RED",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484306114",
+      "name": "CP C/S Wrap Hrn 5/8x14-16 BUI",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484305893",
+      "name": "CP C/S Wrap Hrn 5/8x14-16 PKB",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484305505",
+      "name": "CP C/W Sport Hrn 3/8x16-19 GUT",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484774050",
+      "name": "CP Sublim Clr 5/8*10-14 PDT",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484148082",
+      "name": "CP Sublush Clr 5/8*08-12 FDN",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484964553",
+      "name": "CP C/Wrap Harns 5/8*16-24 ALM",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484964545",
+      "name": "CP C/Wrap Harns 5/8*16-24 HUN",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484964560",
+      "name": "CP C/Wrap Harns 5/8*16-24 LIM",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484964584",
+      "name": "CP C/S Wrap Hrn 5/8x16-19 ORD",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484864843",
+      "name": "CP C/W Sport Hrn 5/8x16-19 GYP",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484864836",
+      "name": "CP Refl Wrap Hrn 5/8x16-19 LIT",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484864829",
+      "name": "CP Refl Wrap Hrn 5/8x16-19 MXK",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484826274",
+      "name": "CP Sublim Clr 3/4*14-20 SPW",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484126120",
+      "name": "CP Sublim Clr 3/4*14-20 WDF",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484906953",
+      "name": "CP 3/4\" Conf Wrap Hrns BLK",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484906960",
+      "name": "CP 3/4\" Conf Wrap Hrns MPK",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484906946",
+      "name": "CP 3/4\" Conf Wrap Hrns RED",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484406536",
+      "name": "CP 3/4\" Conf Wrap Hrns TEAL",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484706569",
+      "name": "SC Sblm Cat Clr 3/8*08-12 DAB",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484706576",
+      "name": "SC Sblm Cat Clr 3/8*08-12 HPF",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484706590",
+      "name": "SC Sblm Cat Clr 3/8*08-12 LKS",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484706737",
+      "name": "SC Sb Cm Hb Cat Clr 3/8*08-12 PM",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484706714",
+      "name": "SC Sb Cm Hb Cat Clr 3/8*08-12 PTR",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484706378",
+      "name": "SC Sb Cm Hb Cat Clr 3/8*08-12 RAF",
+      "source": "camscanner"
+    },
+    {
+      "upc": "076484707071",
+      "name": "SC Embsh Cat Clr 3/8x12-18 PM",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081073610",
+      "name": "Play Tower",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081085042",
+      "name": "Clean Life Bird Cage - Black",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081980118",
+      "name": "Conure Manor Graphic Carton",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081010808",
+      "name": "Grassy Nibblers Squash",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081010822",
+      "name": "Grassy Nibblers Carrot",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081217153",
+      "name": "Hamsteroids - BAGGED product",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081999202",
+      "name": "ZZZs Suede Tunnel",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081913512",
+      "name": "Playtop Bird Cage Kit - Black",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081626375",
+      "name": "Fiesta Ball",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081626047",
+      "name": "Fiesta Handbag",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081602607",
+      "name": "Lava Cubes & Spheres",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081011522",
+      "name": "Parakeet Covered Nest",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081003725",
+      "name": "14\" x 3/8\" diam. Bird Perches",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081003787",
+      "name": "19\" x 3/4\" diam. Bird Perches",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081311677",
+      "name": "Small Snuggle Sack (Green)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081211670",
+      "name": "Small Snuggle Sack (Blue)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081999028",
+      "name": "ZZZs Suede Hammock",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048060070075",
+      "name": "Sway 'n Play",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081990011",
+      "name": "ZZZ's Sleep Sack",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081990028",
+      "name": "ZZZ's Suede Hammock",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081990202",
+      "name": "ZZZ's Suede Tunnel",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081004319",
+      "name": "Ferret Delight",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081004951",
+      "name": "Critter Animal Cage",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081004258",
+      "name": "Small Animal Home - Coco",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081920015",
+      "name": "Single Story Hamster/Gerbil Home, Multipack",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081020111",
+      "name": "Hamster Haven 2-Story Starter Home",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048801021262",
+      "name": "30' Tie-out Chain Heavy Duty",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048801021118",
+      "name": "18\" Spiral Stake Heavy Duty",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048801021125",
+      "name": "24\" Spiral Stake Heavy Duty",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048801031575",
+      "name": "Empire Large Bird Cage",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048801315156",
+      "name": "Playtop Bird Home - Sage Green",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048801315231",
+      "name": "Playtop Bird Home - Pewter White",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048801012004",
+      "name": "Prevue Pet Products Pacific Perch Cosmic Crunch Small",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048801012028",
+      "name": "Prevue Pet Products Pacific Perch Cosmic Crunch Medium",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081720602",
+      "name": "Deluxe Hamster & Gerbil Cage - Green",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081820605",
+      "name": "Deluxe Hamster & Gerbil Cage - Red",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081020555",
+      "name": "Critter Clubhouse",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081110324",
+      "name": "Saguaro Hideaway Small",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081110331",
+      "name": "Saguaro Hideaway Medium",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081920251",
+      "name": "Guinea Pig/Rabbit Home, Multipack",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081625095",
+      "name": "Coconut Fun",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081010709",
+      "name": "Small Oval Pet Nest",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081013083",
+      "name": "Softcase Bird Travel Carrier - Small",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081013090",
+      "name": "Softcase Bird Travel Carrier - Medium",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081621554",
+      "name": "Typhoon",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081010059",
+      "name": "Coco Bedding - 1 ounce",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081609545",
+      "name": "Abacus",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081625088",
+      "name": "Knots of Fun",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081626627",
+      "name": "Wild-n-Wooley",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081626658",
+      "name": "Caterpillar",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081626115",
+      "name": "Fancy Dance",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081625101",
+      "name": "Cookies & Knots",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081602614",
+      "name": "Lava Crunchers",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081316009",
+      "name": "Square Roof Bird Cage / Graphic Carton",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081718049",
+      "name": "Cockatiel Flight Bird Cage - Red/White",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081311691",
+      "name": "Large Snuggle Sack (Green)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081111697",
+      "name": "Large Snuggle Sack (Purple)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081001059",
+      "name": "Coco Bedding - 1 ounce",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081111017",
+      "name": "Finch Nest Box",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081626191",
+      "name": "Eggman",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081620601",
+      "name": "Club",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081620654",
+      "name": "Short Stack",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081628010",
+      "name": "Coco Hideaway w/Bird Ladder",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081999011",
+      "name": "ZZZs Sleep Sack",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081007082",
+      "name": "Bounce 'n Spring",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081021224",
+      "name": "20' Tie-out Cable Heavy Duty",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081071526",
+      "name": "Kitty's Strong Paws Scratching Post",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081076071",
+      "name": "Kitty's Getaway Cabana Cube",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081110706",
+      "name": "Alfalfa Carrot Crunch",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081110768",
+      "name": "Natural Flower Chew Sticks",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081110775",
+      "name": "Festival Chews",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081020128",
+      "name": "Hamster Haven 3-Story Happy Home",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081010068",
+      "name": "Prevue Pet Products Pacific Perch Beach Walk Medium",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081010099",
+      "name": "Prevue Pet Products Pacific Perch Beach Walk X-Large",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081623909",
+      "name": "Mineral Blocks / Dice shapes w/toys",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081012215",
+      "name": "Hooded Bird Cage Cup w/Bird Perch Replacement Bird Cage Cup",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081012222",
+      "name": "Small Bird Cage Replacement Cups",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081612255",
+      "name": "30 oz. Coop Cup",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081211694",
+      "name": "Large Snuggle Sack (Blue)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081116197",
+      "name": "Large Snuggle Sack (Purple)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081625132",
+      "name": "Confetti Kazoo",
+      "source": "camscanner"
+    },
+    {
+      "upc": "040081620047",
+      "name": "Fetch Handbag",
+      "source": "camscanner"
+    },
+    {
+      "upc": "040081624501",
+      "name": "Surf's Rite",
+      "source": "camscanner"
+    },
+    {
+      "upc": "040081626177",
+      "name": "Rainfeeder",
+      "source": "camscanner"
+    },
+    {
+      "upc": "040081626207",
+      "name": "Whirly Bird",
+      "source": "camscanner"
+    },
+    {
+      "upc": "040081623970",
+      "name": "Volcano Flower",
+      "source": "camscanner"
+    },
+    {
+      "upc": "040081625153",
+      "name": "Tug & Twirl",
+      "source": "camscanner"
+    },
+    {
+      "upc": "040081624038",
+      "name": "Spindle Spokes",
+      "source": "camscanner"
+    },
+    {
+      "upc": "040081625057",
+      "name": "Shells & Sticks",
+      "source": "camscanner"
+    },
+    {
+      "upc": "040081623770",
+      "name": "Sisal Hoops",
+      "source": "camscanner"
+    },
+    {
+      "upc": "040081627453",
+      "name": "Banquet",
+      "source": "camscanner"
+    },
+    {
+      "upc": "040081625071",
+      "name": "Party Time",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081609538",
+      "name": "Akimbo",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081625514",
+      "name": "Naturals - Lady",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081621615",
+      "name": "Cyclone",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081054857",
+      "name": "485 GRILLE COVERS",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081034859",
+      "name": "485 COVER SET",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081511473",
+      "name": "6-inch Cuttlebone (Bulk) / 5LB box",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081400906",
+      "name": "Small Pet Playpen",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081980040",
+      "name": "Two-Story Hamster Gerbil Home - Blue",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081021484",
+      "name": "5-inch Cuttlebone (Bulk) / 25pc box",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081012659",
+      "name": "6 oz. Bird Perch Cup/12-count Bulk Box",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081211632",
+      "name": "Small Snuggle Hut (Blue)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081211639",
+      "name": "Small Snuggle Hut (Green)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081199262",
+      "name": "ZZ25 Suede Hammock",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081199411",
+      "name": "ZZ25 Sleep Sack",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081005292",
+      "name": "Small Animal Cage Small, Multipack",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081005285",
+      "name": "Small Animal Home Universal / Cottage",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081010933",
+      "name": "ZZ01 Tunnel",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081005057",
+      "name": "Parakeet Cage Kit Graphic Carton",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081989011",
+      "name": "Hamster Heaven - Blue (Graphic Carton)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081990400",
+      "name": "Two-Story Hamster Gerbil Home - Blue (Graphic)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081017814",
+      "name": "Hanging Bird Cage Stand",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081131646",
+      "name": "Medium Snuggle Hut (Green)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081125007",
+      "name": "Plastic Bird Bath",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081315231",
+      "name": "Playtop Bird Home - Pewter White",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081361646",
+      "name": "Assorted Small/Medium Bird Cages, Multipack",
+      "source": "camscanner"
+    },
+    {
+      "upc": "080803029046",
+      "name": "Corner Platform Small",
+      "source": "camscanner"
+    },
+    {
+      "upc": "080803010147",
+      "name": "11\" E-Z Roller Exercise Wheel chinchilla, rat",
+      "source": "camscanner"
+    },
+    {
+      "upc": "606919000105",
+      "name": "Prevue Quiet Wheel 9 1/2\"",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081011012",
+      "name": "Prevue Pet Products Pacific Perch Beach Branch Medium",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081011112",
+      "name": "Prevue Pet Products Pacific Perch Beach Branch Small",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081001005",
+      "name": "Prevue Pet Products Pacific Perch Beach Branch Small",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081762186",
+      "name": "Wacky Wood Bird Swing",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081730267",
+      "name": "Large Bird Swing",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081732243",
+      "name": "Small Bird Swing",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081604222",
+      "name": "2-sided Mirror w/ Bell",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081716494",
+      "name": "Large Snuggle Sack (Blue)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081716500",
+      "name": "Medium Snuggle Sack (Purple)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081602737",
+      "name": "Volcano Flower",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081602590",
+      "name": "Party Snack",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081622077",
+      "name": "Whitly Bird",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081626247",
+      "name": "Fiesta Handbag",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081010222",
+      "name": "Prevue Pet Products Pacific Perch, Cosmic Crunch Medium",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081010983",
+      "name": "Grass Tunnel",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081022724",
+      "name": "20' Tie-out Cable Heavy Duty",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081022749",
+      "name": "50' Tie-out Cable Trolley Set",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081073056",
+      "name": "Kitty Power Paws Tiger Hideaway",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081003718",
+      "name": "12\" x 3/8\" diam. Bird Perches",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081003770",
+      "name": "17\" x 3/4\" diam. Bird Perches",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081211656",
+      "name": "Jumbo Snuggle Sack (Blue)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081311653",
+      "name": "Jumbo Snuggle Sack (Green)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081311684",
+      "name": "Medium Snuggle Sack (Green)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081111680",
+      "name": "Medium Snuggle Sack (Purple)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081005224",
+      "name": "Small Animal Tubby",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081005231",
+      "name": "Small Animal Tubby",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081005248",
+      "name": "Small Animal Tubby",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081980033",
+      "name": "One-Story Hamster Gerbil Home - Purple (Graphic Carton)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081900147",
+      "name": "11\" E-Z Roller Exercise Wheel / chinchilla, rat",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081628126",
+      "name": "Critter Hut",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081111031",
+      "name": "Parakeet Breeding Nest Box",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081012024",
+      "name": "Bullet Feeder",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081005255",
+      "name": "Small Animal Tubby",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081625118",
+      "name": "Up & Away",
+      "source": "camscanner"
+    },
+    {
+      "upc": "004081862047",
+      "name": "Fiesta Mashbag",
+      "source": "camscanner"
+    },
+    {
+      "upc": "004081853122",
+      "name": "Comfort Kazoo",
+      "source": "camscanner"
+    },
+    {
+      "upc": "004081820315",
+      "name": "Coco Bundle",
+      "source": "camscanner"
+    },
+    {
+      "upc": "004081820351",
+      "name": "Jungle Bird Ladder",
+      "source": "camscanner"
+    },
+    {
+      "upc": "004081822605",
+      "name": "Mini Dock Kits",
+      "source": "camscanner"
+    },
+    {
+      "upc": "004081853169",
+      "name": "Medium Snuggle Hut (Blue)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "004081801004",
+      "name": "Prevue Pet Products Pacific Perch Beach Walk X-",
+      "source": "camscanner"
+    },
+    {
+      "upc": "004081812286",
+      "name": "Mesh Seed Catcher (White)",
+      "source": "camscanner"
+    },
+    {
+      "upc": "004081802355",
+      "name": "Chirp Clubhouse",
+      "source": "camscanner"
+    },
+    {
+      "upc": "004081875056",
+      "name": "Twisty's Snacks Bird Toy",
+      "source": "camscanner"
+    },
+    {
+      "upc": "640816725375",
+      "name": "Flick-a-Ball",
+      "source": "camscanner"
+    },
+    {
+      "upc": "640816428421",
+      "name": "Loco-Knots",
+      "source": "camscanner"
+    },
+    {
+      "upc": "640816428338",
+      "name": "Spindles + Spokes",
+      "source": "camscanner"
+    },
+    {
+      "upc": "640816126067",
+      "name": "Lava Cubes & Spheres",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081010938",
+      "name": "Small Grass Ball",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081010976",
+      "name": "Medium Grass Hut",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081073377",
+      "name": "X-tra Fun Kitty Center Blue",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081010082",
+      "name": "Prevue Pet Products Pacific Perch Beach Walk Large",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081315217",
+      "name": "Playtop Bird Home - Black",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081315293",
+      "name": "Playtop Bird Home - Blush",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081000427",
+      "name": "Flight Bird Cage - Blush",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081011003",
+      "name": "Large Grass Hut",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081920602",
+      "name": "Deluxe Hamster & Gerbil Cage, Multipack",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081625156",
+      "name": "Bow Dangles",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081625538",
+      "name": "Naturals - Princess",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081625583",
+      "name": "Naturals - Prince",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081110782",
+      "name": "Very Pear-y Chew Sticks",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081111123",
+      "name": "Say Cheese! Mineral Block",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081015522",
+      "name": "Parakeet Covered Nest",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081004883",
+      "name": "Corner Litter Pan",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081900185",
+      "name": "Prevue Quiet Wheel 9 1/2",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081481185",
+      "name": "Assorted Tall Bird Cages",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081110546",
+      "name": "Bendy Bridge / small",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081110867",
+      "name": "Chomper",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081612262",
+      "name": "20 oz. Coop Cup",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081612286",
+      "name": "10 oz. Coop Cup",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081020067",
+      "name": "Hamster Playhouse",
+      "source": "camscanner"
+    },
+    {
+      "upc": "048081400968",
+      "name": "Playpen Mat/Cover",
+      "source": "camscanner"
+    },
+    {
+      "upc": "015561224314",
+      "name": "Exo Terra Reptile T5 UVB300 Bulb 22\"",
+      "source": "camscanner"
+    },
+    {
+      "upc": "015561224321",
+      "name": "Exo Terra Reptile T5 UVB300 Bulb 34\"",
+      "source": "camscanner"
+    },
+    {
+      "upc": "015561242554",
+      "name": "Exo Terra T5 Terrarium Top 14\"",
+      "source": "camscanner"
+    },
+    {
+      "upc": "015561242578",
+      "name": "Exo Terra T5 Terrarium Top 35\"",
+      "source": "camscanner"
+    },
+    {
+      "upc": "015561242608",
+      "name": "Exo Terra T5 Terrarium Top Cable 24\"",
+      "source": "camscanner"
+    },
+    {
+      "upc": "015561242615",
+      "name": "Exo Terra T5 Terrarium Top Power Cable",
+      "source": "camscanner"
+    },
+    {
+      "upc": "080605618572",
+      "name": "LW Deluxe Habitat, Standard",
+      "source": "camscanner"
+    },
+    {
+      "upc": "080605618589",
+      "name": "LW Deluxe Habitat, Large",
+      "source": "camscanner"
+    },
+    {
+      "upc": "080605618596",
+      "name": "LW Deluxe Habitat, Extra Large",
+      "source": "camscanner"
+    },
+    {
+      "upc": "030027009165",
+      "name": "ACE CLINAR CARE FORM SCRP SHIRT",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030027009172",
+      "name": "ACE CLINAR CARE FORM BW SRPK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "071860215601",
+      "name": "AR AGAIL SILI TREAT 4OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "071860215632",
+      "name": "AR AGAIL SILI TREAT 4OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "071860215649",
+      "name": "AR AGAIL SILI TREAT 4OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "071860602020",
+      "name": "AP BACON TIT RA SIZE MEDIUM",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "071860880152",
+      "name": "AP BACON STRIP WRAP 16 OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "071860880169",
+      "name": "AP BACON STRIP WRAP 16 OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "717108367002",
+      "name": "MIKEFUBATQ SNACKSMEDULE SFOGLIAT GLUCK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "717108367019",
+      "name": "MIKEFU N VI SA 8 SNAPCRA 12OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "717108986212",
+      "name": "AP CU INT MA CB BA AR",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "785184022063",
+      "name": "RBP TRT BULLY SLICES 90OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "515450441516",
+      "name": "RBP TRT BULLY SLICES 90OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "515450493021",
+      "name": "RBP TRT BULLY SLICES 90OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "515450535162",
+      "name": "RBP TRT BULLY SLICES ROAST 9Z",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668904004",
+      "name": "ACE FOOD - GR-LG, 50 OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668901804",
+      "name": "ACE CLAY - LG 10 PK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668905303",
+      "name": "ACE FOOD - FRZN-AM, MYSIS SHRIMP-8Z",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234003508",
+      "name": "API LIQUID TROPICAL 8OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163050506",
+      "name": "API PERFECT START-45G",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000945707428",
+      "name": "HIK-CICHLID-SP-Baby",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055043006",
+      "name": "LIL DMND-NG-10PK CS",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055700146",
+      "name": "LIL DMND ROUND-10 GOLD",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000256000576",
+      "name": "SPFLD FRZN FD, ADULT MBRRY",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000575105001",
+      "name": "SPFLD FRZN-TinyLand GrimeO",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055600273",
+      "name": "LIL DMND SPGRY SGL-METAL",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051658904014",
+      "name": "ACE FOOD-4 LB PERF DOG-MP",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051658904021",
+      "name": "ACE FOOD-4 LB G/F LAMB",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051658904038",
+      "name": "ACE FOOD-4 LB G/F SALMON",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000764940251",
+      "name": "AP CARD WALK SMALL - BLK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000764940244",
+      "name": "AP CARD WALK SMALL - RED",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000764940220",
+      "name": "AP CARD WALK MED - BLK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000764940237",
+      "name": "AP CARD WALK MED - RED",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000764940206",
+      "name": "AP CARD WALK LARGE - RED",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000764940213",
+      "name": "AP CARD WALK LARGE - BLK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000764940282",
+      "name": "AP OUT TIE TX-A",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000764940299",
+      "name": "AP OUT TIE TX-B",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163050502",
+      "name": "GR ASSDI - SMALL BRUSH",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163050519",
+      "name": "GR ASSDI - LARGE BRUSH",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163050526",
+      "name": "GR CAT COMB",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163010546",
+      "name": "GR CAT LARGE WIRED",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934028501",
+      "name": "HIJK PERCH AST 14INX3/4IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934131010",
+      "name": "HIJK PERCH AST 14INX1IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934129001",
+      "name": "HIJK PERCH AST 14IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934042905",
+      "name": "GRASS FOURWTHE HAND FEED",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934404159",
+      "name": "GR ICE GREEN 24 PACK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934404166",
+      "name": "GR ICE METAL-PACK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "50000395765",
+      "name": "GURL HDY BUV-MRC R LG",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "50000395772",
+      "name": "GURL HDY BUV-MRC CH LG",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "50000395789",
+      "name": "GURL HDY BUV-MRC AP LG",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "50000395796",
+      "name": "GURL HDY BUV-MRC WH LG",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "50000395802",
+      "name": "GURL HDY BUV-MRC BK LG",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "50000395819",
+      "name": "GURL HDY BUV-MRC N LG",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "723633035121",
+      "name": "TOO DY TNTL COOKIE JAR LG",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "723633035107",
+      "name": "TOO DY TNTL COOKIE JAR SM",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "015561102101",
+      "name": "ACE 55561 FLR WD SHRMP 5G",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "015561165919",
+      "name": "ACE TEST STRIP 25CT",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "015561175376",
+      "name": "ACE FILTR FOAM LV3",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "015561175451",
+      "name": "ACE LTR FOAM LV4 WD 2PK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "015561176014",
+      "name": "ACE LTR LFP LVL2 WD 10 IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "015561318001",
+      "name": "ACE TANK T40X 40B GALLON SNGL",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051378005741",
+      "name": "AG PT UVLK-4WAYWUBBL TOY BIN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051378208061",
+      "name": "AGRSTAY & CALL CLASSIC RED LG",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051378712147",
+      "name": "AG RF ADJ NYLN CLR-LGE 1IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051378934814",
+      "name": "AG RF ADNRUS NYBLUE CH STPD SM",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055214329",
+      "name": "HIK HLPLD POCK PURR 48-20OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055214336",
+      "name": "HIK HLPLD POCK PURR 826-B1.02",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055214343",
+      "name": "HIK HLPLD POCK PURR RS SPCS-10",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055214380",
+      "name": "HIK HLPLD POCK PURR TUN-5SP6OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055943887",
+      "name": "APL HLPLD DOG ADLT CS-5-20LB",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055943917",
+      "name": "APL HLPLD DOG PRF ADLT 2213",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055944172",
+      "name": "APL HLPLD CAT ADULT CHK&TRSM",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055944196",
+      "name": "APL HLPLD CAT ADLT CHCK 728",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055944233",
+      "name": "APL HLPLD CAT ADLT CHKN&LVRT",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "753182479108",
+      "name": "LCR REMOTE CTR DIG VERT",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "075467451126",
+      "name": "COA SCRATCHER RACE CAR CTY BL",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "075467451140",
+      "name": "COA SCRATCHER ROUND CTY L",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "75534990081",
+      "name": "COA SCRATCHER IN TRAY BL",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "75534990074",
+      "name": "COA SCRATCHER HACKIN BL/RBW",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "75534990067",
+      "name": "COA SCRATCHER JACK RBW",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "89792800004",
+      "name": "BLI CARRIER COMFT S/M BKBR",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "89792800021",
+      "name": "BLI CARRIER COMFT S/L RBBR",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "89792800038",
+      "name": "BLI CARRIER COMFT FT S BKBR",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "89792800045",
+      "name": "BLI CARRIER COMFORT L/S BKBR",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "075490590291",
+      "name": "COA SCRATCHER RAC CARD BL",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "075490590307",
+      "name": "COA SCRATCHER MIN RAC CRT YL",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "075490590314",
+      "name": "COA SCRATCHER MIN RAC CRT L",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "075490590290",
+      "name": "COA SCRATCHER RAC JAC KBRBW",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "075490590283",
+      "name": "COA SCRATCHER RAC JACK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "097258001399",
+      "name": "BLI CARRIER COMFT SM BERMUDA",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "097258001405",
+      "name": "BLI CARRIER COMFT SN BERMUDA",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "097258001450",
+      "name": "BLI CARRIER COMFT ST BERMUDA",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668935122",
+      "name": "ACE COND WI RENEWAL 6-14-4OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668935139",
+      "name": "ACE COND WI RENEWAL 6-14-4OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668935146",
+      "name": "ACE AC TROP GF GLOW 6PK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668935153",
+      "name": "ACE CLIP ACT W/CAN MINID",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163000247",
+      "name": "API WPO MIN APT KH2 1OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163000254",
+      "name": "API WPO MIN APT PH2 1OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163000261",
+      "name": "API WPO MIN APT KH2 1OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163000278",
+      "name": "API WPO MIN APT PH2 1OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163006226",
+      "name": "API AMMO LOCK+ 16OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163016394",
+      "name": "API AHL PRO VAC S M/L",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163046550",
+      "name": "API SCLR APT STUN&BOOSTN 16OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163091992",
+      "name": "API AMMO LOCK+ 2OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163091824",
+      "name": "API ACCLAIM APT/GROSS 5ML",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051000011223",
+      "name": "ACE COND VIT RENAVABLE (12X11.4OZ)",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "015561102915",
+      "name": "ACE CRITTER GRAVEL UNI PK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "071859003805",
+      "name": "ACE FOOD GOLDFISH CRINST 8.5-OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "071859003812",
+      "name": "ACE FOOD GOLDFISH CRINST 32-OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "044600015619",
+      "name": "AGA CLEAN SNM-2 GALV 18/18 SMI-DR WINDL",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "044600017509",
+      "name": "AROUND TAP FOR-4-40OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051000056070",
+      "name": "AP-ODOR CNTR 24-CAN (12/2",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "071859000000",
+      "name": "AP FOOD CARLPURE 1OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "021535232700",
+      "name": "HIK-MICRO-O CR MAX N+H 0X TV",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "796841040122",
+      "name": "COA (ALL) LR BRWN/PC S",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "796841032272",
+      "name": "COA (ALL) LR BRWN/PC M",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "796841032289",
+      "name": "COA (ALL) LR BRWN/PC L",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "796841032296",
+      "name": "COA (ALL) LR BRWN/PC XL",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "076484117246",
+      "name": "COA (ALL) HILL'S SAFE.T/CATH 10-8",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "076484917211",
+      "name": "COA (ALL) HILL'S SAFE.T/DK 15-8M",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "076484131298",
+      "name": "COA (ALL) HILL'S SAFE TABLE K-12",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "076484717621",
+      "name": "COA (ALL) CATMATE FILTER 12PK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "076484017412",
+      "name": "COA (ALL) COA P STK TURBO STRING MICE50",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234532574",
+      "name": "ETH TOY LUV EMZ CHOG 4-IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234532581",
+      "name": "ETH TOY LUV EMZ BUN BEE 2N",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234532598",
+      "name": "ETH TOY SIER RAM LAMB GN 2N",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234532604",
+      "name": "ETH TOY LA BLA MINI LOB 2N",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234532611",
+      "name": "ETH TOY BALL RAW BLU ASST 6N",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234532628",
+      "name": "ETH TOY BALL RAW PNK ASST 6N",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234532635",
+      "name": "ETH TOY AXIDOLL SQMR WHALI 10N",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234532642",
+      "name": "ETH TOY AXIDOLL SQMR WAVE 10N",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234532659",
+      "name": "ETH TOY AXIDOLL ASST LYN RI M 6N",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234532666",
+      "name": "ETH TOY AXIDOLL EMR HEADYON 10N",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234532673",
+      "name": "ETH TOY AXIDOLL ASST 14N",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234551728",
+      "name": "ETH TOY LMS EARTH DOG 4-11IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234551735",
+      "name": "ETH TOY STR MRML LLDBN 9IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234551880",
+      "name": "ETH TOY STR MRML LLBONE 2IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234537821",
+      "name": "ETH TOY BAL DOGS MINI 6IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234537913",
+      "name": "ETH TOY AY XLOFT WHALE AST 6IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234537937",
+      "name": "ETH TOY AY XLOFT LLAMA AST 6IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234537944",
+      "name": "ETH TOY AY XOLOFT UNICORN 6IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234537982",
+      "name": "ETH TOY AY XOLOFT BEAVER AST 10IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234538100",
+      "name": "ETH TOY AY XOLOFT LLAMA AST 14IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "785184201252",
+      "name": "RBP DRY GF LAND 22#",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "785184201269",
+      "name": "RBP DRY GF OCEAN 22#",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "51552120116",
+      "name": "RBP DRY WK SKY 22#",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "51552120163",
+      "name": "RBP DRY WK ICON 22#",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "785184201270",
+      "name": "RBP DRY WK ICON 22#",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668953625",
+      "name": "ACE FOOD CAT FOOD 5 GNZL",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668953649",
+      "name": "ACE FOOD CAT FOOD 10LB-BM",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668954302",
+      "name": "ACE FOOD CAT FOOD 4 1/2C POUCH 24/CS",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668954319",
+      "name": "ACE FOOD CAT FOOD 6LB",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668961350",
+      "name": "ACE FOOD DOG FOOD ORIGINAL 4LB",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668961374",
+      "name": "ACE FOOD DOG FOOD ORIGINAL 12LB",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668962028",
+      "name": "ACE FOOD DOG FOOD SM/LRG BITE",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668963062",
+      "name": "ACE FOOD DOG FOOD SM ADULT 20LB",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000415491554",
+      "name": "ST LOUIS CHEESEBURG",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000415491546",
+      "name": "STL CHEESBURG",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "032700163155",
+      "name": "HIK NEW Tailored Diets SML ARSTK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "032700163162",
+      "name": "HIK Tailored SML Adult Rich 112154",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668954413",
+      "name": "ACE FO Cat Cat Adult 8lb Original",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "075505014515",
+      "name": "32314512 FP SHAMPOO",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "075505014681",
+      "name": "CARE FP BRIS",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668963260",
+      "name": "ACE F&D CTPU-20LB ORIGINAL 18LB",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668963284",
+      "name": "ACE F&D BZLT10LB",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668961404",
+      "name": "ACE DOG FOOD OGLAD",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668961428",
+      "name": "ACE FOOD DOG FOOD SM/LRG LIGHT 4LB",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668961442",
+      "name": "ACE DOG OD",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "71421801401",
+      "name": "SPH M SPR SHT CMP",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "71421811401",
+      "name": "SPH M SPR FLV CMP",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668923292",
+      "name": "ACE FOOD RT CL BRO ISRMD6/2-4G",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668923316",
+      "name": "ACE FOOD RT CL BRO ISRMD8/2-4G",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "888500034007",
+      "name": "APO CAN ULTRA WET 12.5OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "371661001216",
+      "name": "APO CAN NATURALS WET 12.5OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "044400000128",
+      "name": "API TSRTCUP 100C",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "044400004026",
+      "name": "API GH TEST KIT",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "044400183895",
+      "name": "API CANISTER / RENA XPM",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "044400445200",
+      "name": "API STRESSCOAT 64OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "050198501151",
+      "name": "HILL C/D MRS DSH W SLMN 24/3.5OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "052742001340",
+      "name": "HILL P/D LAMB 24/#5.5OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "052742007969",
+      "name": "HILL P/D CAN 24/13OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000611968155",
+      "name": "SF FOOD CAN CAT 6OZ 10PK - GM",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000611968162",
+      "name": "SF FOOD CAN CAT 1QTYMR6",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000611969002",
+      "name": "TET FOOD PARR SAM NZ/2PK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "095668253192",
+      "name": "TET CRYPTO BIOBAG JR MD",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "350605000989",
+      "name": "ACE GSB 1# PUL SHRIMP 5#",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "350605006554",
+      "name": "ACE MITY DWARF RAINB 6-8/1-1/2",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "350605004036",
+      "name": "ACE COOK SHRINK SHRMP 60/70",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055123210",
+      "name": "HIK KOI GOLD MINI 5# 2 - 34 OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055163342",
+      "name": "HIK KOI GOLDEN SPFC MINI 11#",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042205780552",
+      "name": "HIK CO BLOODWM 22# (5.5KG)-1T",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "076484004812",
+      "name": "COA CLT SAFE HSN SKP-12",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "076484004829",
+      "name": "COA CLT SAFE HSN XS-12",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "076484004836",
+      "name": "COA CLT SAFE HSN SM-12",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "076484004843",
+      "name": "COA CLT SAFE HSN MD-12",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "076484004850",
+      "name": "COA CLT SAFE HSN LG-12",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "076484004867",
+      "name": "COA CLT SAFE HSN XL-12",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "076484004874",
+      "name": "COA CLT SAFE HSN XX-12",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "076484004881",
+      "name": "COA CLT SAFE HSN AB-12",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030300012277",
+      "name": "ACE EXTR LG CLIP W/HD PK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000116018303",
+      "name": "TETRA TETRACOLOR 7.06OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000116018310",
+      "name": "TETRA TETRACOLOR 14.8OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000116018785",
+      "name": "TET FOODS TETRABITS 5.65OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000116018793",
+      "name": "TET FOODS TETRABITS 10.58OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000116016888",
+      "name": "TET FOOD TETRAMIN LG 7.25OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000116046693",
+      "name": "TET FOOD CRISPS 2.24 OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000116020256",
+      "name": "TET FOOD TETRAMINFLK 1.00Z",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030000012027",
+      "name": "ACE EXTRA LG CLW - HD PK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030000012034",
+      "name": "ACE EXTRA SM CLW - HD PK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030000012041",
+      "name": "ACE GRP CLW MINI - PK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030000012058",
+      "name": "APT BK DISK EQ MIX 20CT",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030000012065",
+      "name": "APT BK DISK MIX KT 40OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030000012072",
+      "name": "APT VEG ALG MD STX 6-13",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030000012089",
+      "name": "HIK ADT CHD STX BLND 2.2",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030000012096",
+      "name": "HIK HD AQ GERM WFR 2.2L",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030000012102",
+      "name": "HIK HD PEACOCK MINI 2CM3",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030000012119",
+      "name": "HIR DBL DEP PAN KM PLMNT",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030000012126",
+      "name": "HIR MID RANGE LED 25MM",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030000012133",
+      "name": "HIR OUTRIDER PEANUT 6X6",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "750199033292",
+      "name": "SILGON CLRM FLM KN VZ-15G",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "750199033322",
+      "name": "SILGON TERM CHNL 12P-G-6",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "750199033339",
+      "name": "SILGON TERM MULT GROPS",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "750199033346",
+      "name": "SILGON TRFLNX GEN ADPT",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "750199033353",
+      "name": "SILGON CLRMAN BPR BIO-9L",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "750199033360",
+      "name": "TET FOOD FRT MIX 4-8",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "750199033377",
+      "name": "TET FOOD HERB COINS 1.2OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "750199033384",
+      "name": "TET FOOD PLTBS LG 2.5OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "750199033391",
+      "name": "TET FOOD CATF SHR 1.2OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "750199033407",
+      "name": "TET FOOD CRISPZ 12 COLO 70G",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "750199033414",
+      "name": "TET FOOD THRMNL FLK 1-4OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030050420000",
+      "name": "ACE HEATER FLAT 15W-0002",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030050215000",
+      "name": "ACE FROG AQUA CULT LR RP",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "00094586248",
+      "name": "ACE FROG GRWLNG LTD MIX",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "00094586255",
+      "name": "ACE FROG GRWLNG SUP MIX",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030050905479",
+      "name": "API FROG CHLD WND 27-6C",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030050905583",
+      "name": "API FROG CHLD WNDLR 27-6C",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "31716301638",
+      "name": "API POND AQUACLR 32OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "31716301404",
+      "name": "API POND ACCU17GAL 16OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "31716301624",
+      "name": "API POND ACCUCLR 32OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "31716301602",
+      "name": "API POND ACCUCLR 64OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "31716301285",
+      "name": "API POND CHLORCLR 16OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "31716301248",
+      "name": "API POND STRESS AL-8OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "31716301262",
+      "name": "API POND MELAFIX 16 OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "04205502904",
+      "name": "HIK FOOD STKMD AFL 2.68-OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "04205505917",
+      "name": "HIK FOOD BAB BITES 2.05-OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "0956682003",
+      "name": "ACE HEATER FLAT 15W 4\"-000Z",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "0956682004",
+      "name": "ACE HEATER FLAT 15W 8\"-000Z",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "0956682020",
+      "name": "ACE CORD GRUM BLK 7PK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "0956682023",
+      "name": "ACE CORD GRUM LDY 3PK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "0956687020",
+      "name": "ACE INTRO GOLDFISH LED 3.5OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "0956687023",
+      "name": "ACE INTRO CICHLID HD LED 3.5OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "0956687024",
+      "name": "APAPI CHEWY APP DOG B20/26T1G",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "0956687025",
+      "name": "APAPI GRAIN CAT N6OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "0956687026",
+      "name": "APAPI DUCK/RICE CAT T120Z",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "0956687027",
+      "name": "APAPI CAN DOG FOOD",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "0956687035",
+      "name": "HIK FOOD CAR M/REG 8.8OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "0956687036",
+      "name": "HIK FOOD BI-CARB/JNGHDOG LRG-26MB",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "0956687037",
+      "name": "HIK FOOD SYN KOI 9M",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "0956687038",
+      "name": "HIK FOOD BARS BITES-2.65OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "040515932001",
+      "name": "BAR TRT SKNM CHK B/CHEW 6-5IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "040515932018",
+      "name": "BAR TRT SKNM CHK DUCK LC 5'S",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "040515932063",
+      "name": "BAR TRTMX VAC 6'S",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "040515932117",
+      "name": "BAR TRT SKNM BDLILY STC 10-12IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "09566893000",
+      "name": "ACE DOG FOOD LAMB/RICE 5#",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "09566893119",
+      "name": "ACE CAT FOOD CHKN/RICE 35OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "09566893133",
+      "name": "ACE DOG FOOD LAMB/RICE 5#",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "09566893140",
+      "name": "ARC CATNIP XMAX 1OZ TIN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "09566893157",
+      "name": "ARC CAT CAVE 12X14 MULTI 10IN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "09566893164",
+      "name": "ARC CAT TOY PLUSH PACK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "09566893171",
+      "name": "ASST JOINT MAX DOG 30PK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934123001",
+      "name": "AQUA DREAM NATURAL 4ZCK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934123018",
+      "name": "AQUA DREAM GOLDMAX F5-500M",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934463057",
+      "name": "HIK GOLDSPINULUS RL SRGM",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934463071",
+      "name": "HIK GOLDSPINULUS SM SRGM",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934463095",
+      "name": "HIK KOR F/TAGL NIGHTB KRD2",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934463101",
+      "name": "HIK KOR F/TAGL NND BK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934700260",
+      "name": "HIK RO/US GK CKLIST 08X35",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934700277",
+      "name": "HIK THK GM/WHT 24STSN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934700321",
+      "name": "HIK GOLD K/D TAC STRG4",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934700338",
+      "name": "HIK KOR PFD THIS CORN TO 8Z",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042934700345",
+      "name": "HIK KOR PFD HAIR SHLD LRG",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "015561135297",
+      "name": "ACE HEATER, AQUA W/BP 100W",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "015561135273",
+      "name": "ACE HEATER, AQUA W/BP 50W",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055001314",
+      "name": "ACE FOOD GOLDFISH MIN 8OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055001321",
+      "name": "ACE FOOD GOLDFISH MIN 2OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055001857",
+      "name": "APL CON. ANUR SCRM WINDL",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234933048",
+      "name": "APL KITTY CAN SLDCT 10Z",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077234933031",
+      "name": "APL SA CLP CTPR 3.0Z RC 1",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "073091125288",
+      "name": "APL DOG TRE CHBP LIVER",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051135099287",
+      "name": "ACE HEATER DELUX W/TO 30-60W",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051135090582",
+      "name": "ACE LT W/COLLRED MR LED A",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "040094055016",
+      "name": "ACE FOOD G LT ML MID-20Z",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "040094055023",
+      "name": "ACE CAL CURE G W/MID",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "037177303894",
+      "name": "APP NAT GF SALMON 12/12.5PZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "037177303917",
+      "name": "APP NAT CUT GF 12/12OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030968073812",
+      "name": "CAT HC CANYN CRK 12/12PZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030968030819",
+      "name": "APP NT CRK NEW FORMULA 5OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030968070505",
+      "name": "CAT NAN NC CANLINSTADIN",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030968015091",
+      "name": "APP NAT GF COUNTRY CHKNFP -12.5",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030968018893",
+      "name": "APP NAT GR W/GRVY",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030968015046",
+      "name": "APP NAT GF FRESH UNICR23S",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "020274586038",
+      "name": "APP NAT GF DEH SALMON 3PZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051035022105",
+      "name": "ACE KIT MINI BOWL DB-1 KG",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051035095190",
+      "name": "ACE PET TIDY BWL DBL-1.5G",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051035400086",
+      "name": "ACE PET FOOD-SHP ETLB-15#",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051035400185",
+      "name": "ACE PET FOOD-SHP PLT-25#",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051035400184",
+      "name": "ACE PET FOOD-SHPR PHTR-50#",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "051035601191",
+      "name": "ACE PET FOOD-SHRIMP 2#",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "030651732181",
+      "name": "KAY FOOD PARROT FRUITS-4.5#",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "077633040440",
+      "name": "FOU BRUSH CAT SLICKER L TR",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "045663019301",
+      "name": "FOU DOG BEDS RECT CMI-L 7Z",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "045663029328",
+      "name": "FOU COLLAR DOG GLD-BRD CM-L",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "045663049333",
+      "name": "FOU HARNESS BREATH EZRD CM-M",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000056886901",
+      "name": "ACE FOOD SHRIMP HBH MINI 1.50Z",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000056886918",
+      "name": "ACE STICKS TROPICAL MINI 5W",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "000056886925",
+      "name": "ACE TUB TROPICAL MINI 25PK",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163004877",
+      "name": "HIK FOOD BETTA BIO GOLD 2.5Z",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "042055001111",
+      "name": "API STRESS COAT + 8OZ",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163004891",
+      "name": "HIK FOOD BRINE SHRIMP 2.5Z",
+      "source": "pdf_ocr"
+    },
+    {
+      "upc": "317163004914",
+      "name": "HIK FOOD AMINO COLOBEN MIN",
+      "source": "pdf_ocr"
     }
   ]
 }
