@@ -1,0 +1,111 @@
+ADD: "ExoTerra Bio Drain" -> "Exoterra Biothane Drain" = 015561231152
+ADD: "Exoterra 40g. Sand mat" -> "Exoterra 40 Gallon Sand Mat" = 015561225670
+ADD: "ExoTerra 60g. Sand Mat" -> "Exoterra 60 Gallon Sand Mat" = 015561225687
+ADD: "galap. Forest enviroment Cling" -> "Galapagos Forest Environment Cling" = 759834054214
+ADD: "ZooMed Juv. Dragon Food" -> "Zoo Med Juvenile Dragon Food" = 097612402742
+ADD: "Rep-Cal Juv. Iguana Food" -> "Rep-cal Juvenile Iguana Food" = 788286004010
+CORRECT: "Gourmet Bearded Dragon Food" 097612401035 -> 097612401042
+CORRECT: "Flukers Buffet Blend Juv, Bearded" 091197760525 -> 091197760426
+ADD: "ZooMed Juv.  Iguana Food" -> "Zoo Med Juvenile Iguana Food" = 097612400809
+CORRECT: "Zoomed Crested Gecko Plum" 9761240315 -> 9761240319
+CORRECT: "Zoomed Crested Gecko Plum" 9761240315 -> 9761240308
+CORRECT: "Exoterra Daytime Heat 100w" 1556122111 -> 1556122112
+ADD: "Zilla Canopy Series Trop. 13W" -> "Zilla Canopy Series Tropical 13w" = 096316280953
+CORRECT: "Zilla Slimeline T8 Desert Fixture 18"" 96316007260 -> 096316007284
+ADD: "ExoTerra UVB100 13W Trop." -> "Exoterra Uvb100 13w Tropical" = 015561221863
+ADD: "ExoTerra UVB100 26W Trop." -> "Exoterra Uvb100 26w Tropical" = 015561221870
+ADD: "ZooMed Palidirum Hood 18"" -> "Zoo Med Paludarium Hood 18"" = 097612325706
+CORRECT: "Zoo Med Reptirock Medium" 097612920109 -> 97612920307
+CORRECT: "Zoo Med Box Turtle Food" 097612400991 -> 97612410211
+ADD: "ZooMed Gourment Box Turtle Food" -> "Zoo Med Gourmet Box Turtle Food" = 097612400991
+ADD: "Reptology Bio Sponge 70 replace" -> "Reptology Biothane Sponge 70 Replace" = 30172060830
+ADD: "ZooMed Enviromental Control Center" -> "Zoo Med Environmental Control Center" = 097612375039
+CORRECT: "Zoo Med Paludarium Filter 20" 97612510119 -> 097612511116
+ADD: "ZooMed Aquasun Aquarium Contr" -> "Zoo Med Aquasun Aquarium Controller" = 97612120110
+CORRECT: "Exoterra Hygrometer" 15561224772 -> 15561224666
+ADD: "Tropiclean Natural Flea &Tic Yard" -> "Tropiclean Natural Flea & Tick Yard" = 645095320031
+ADD: "Bio-Groom Repel 35" -> "Biothane-groom Repel 35" = 021653080164
+ADD: "BIo Groom Flea Shampoo" -> "Biothane Groom Flea Shampoo" = 21653101128
+CORRECT: "Birdlife Cuttle Bone" 030172031519 -> 030172902826
+CORRECT: "Happy Beaks Wood Bridge" 644472117653 -> 644472008685
+CORRECT: "Playfuls Club" 048081626061 -> 04808162606
+CORRECT: "Prevue Keet Cage" 048081980101 -> 048081210086
+CORRECT: "Prevue Large Cage" 048081252512 -> 048081500415
+CORRECT: "Safari Wire Pin Brush Large" 076484512940 -> 076484512926
+CORRECT: "Safari Flea Comb Long Hair" 076484577178 -> 076484577833
+CORRECT: "Safari Nail Trimmer Small Dogs" 076484510694 -> 076484510656
+CORRECT: "Safari Shedding Comb" 076484005633 -> 076484959509
+CORRECT: "Dogit Go Slow M Blue" 022517737163 -> 022517737026
+CORRECT: "Skidstop Jumbo" 618940632429 -> 618940642787
+CORRECT: "Coastal Black 15' Cotton Train Leash" 076484043086 -> 076484043079
+CORRECT: "Coastal Black 30' Cotton Train Leash" 076484044090 -> 076484044083
+CORRECT: "Zippy Paws Medium Life Jacket" 818786014995 -> 818786014971
+ADD: "WeeWeed Dispo Liner pads 10pk" -> "Wee-Wee Dispo Liner Pads 10pk" = 045663972288
+ADD: "WeeWee Dispo MaleWrap Med/Lg 12" -> "Weewee Dispo Malewrap Medium/Large 12" = 045663972271
+CORRECT: "Safari Cat Nail Trimmer" 076484611407 -> 076484006074
+CORRECT: "Naturesmiracle No More Spraying" 018065284044 -> 018065057815
+CORRECT: "Coastal Cc Pnk12" 076484672323 -> 076484670718
+ADD: "Meowee Savory Spoonables 3 flvr" -> "Meowee Savory Spoonables 3 Flavor" = 615650000036
+CORRECT: "Churo Tuna 4pk" 850006715756 -> 855958006556
+CORRECT: "Feline Greenies Pill Pockets Salmon" 642863021428 -> 642863021411
+ADD: "1QT Mirrow Finish SS dish" -> "1qt Mirror Finish Ss Dish" = 077234060612
+CORRECT: "Petmate Medium Basic Open Litter Box" 029695221842 -> 029695221828
+ADD: "Catit AirSift Reg. Litter Box" -> "Catit Airsift Regular Litter Box" = 022517507025
+CORRECT: "Lilpals Small Collar Red10" 076484302473 -> 076484322273
+CORRECT: "Circle Tan04' Leash" 076484114847 -> 076484114441
+ADD: "CIRCLE 10" BLK 1703K COLLAR" -> "Circle 10" Black 1703k Collar" = 076484514678
+ADD: "CIRCLE 22" BLK 1208 COLLAR" -> "Circle 22" Black 1208 Collar" = 076484108709
+CORRECT: "Circle 24" Red 1208 Collar" 076484108914 -> 076484108907
+ADD: "CIRCLE 20" BLK 1206 COLLAR" -> "Circle 20" Black 1206 Collar" = 076484108501
+ADD: "COASTAL 6' DNS 469 LEASH" -> "Coastal 6' Unicorns 469 Leash" = 76484994654
+ADD: "COASTAL 6' ALN 469 LEASH" -> "Coastal 6' Unicorns 469 Leash" = 076484994647
+ADD: "COASTAL 6' ALN 969 LEASH" -> "Coastal 6' Unicorns 969 Leash" = 076484969003
+ADD: "COASTAL 6' FDN 469 LEASH" -> "Coastal 6' Unicorns 469 Leash" = 076484065248
+ADD: "COASTAL 6' UCN 469 LEASH" -> "Coastal 6' Unicorns 469 Leash" = 076484994692
+ADD: "COASTAL 6' UCN 969 LEASH" -> "Coastal 6' Unicorns 969 Leash" = 076484969065
+ADD: "COASTAL 6' LLM 469 LEASH" -> "Coastal 6' Unicorns 469 Leash" = 076484994678
+ADD: "COASTAL 6' LLM 969 LEASH" -> "Coastal 6' Unicorns 969 Leash" = 076484969041
+ADD: "COASTAL 6' PIA 469 LEASH" -> "Coastal 6' Unicorns 469 Leash" = 076484065255
+ADD: "COASTAL 6' PIA 969 LEASH" -> "Coastal 6' Unicorns 969 Leash" = 076484065651
+ADD: "TITAN TRINCOLLAR HVY 18" 5530" -> "Titan Trincollar Heavy 18" 5530" = 076484093302
+ADD: "TITAN TRAINCLLR HVY 20" 5530" -> "Titan Traincllr Heavy 20" 5530" = 076484093319
+ADD: "TITAN TRAINCLLR HVY 22" 5530" -> "Titan Traincllr Heavy 22" 5530" = 076484093326
+ADD: "TITAN TRAINCLLR HVY 24" 5530" -> "Titan Traincllr Heavy 24" 5530" = 076484093333
+ADD: "TITAN TRAINCLLR HVY 26" 5530" -> "Titan Traincllr Heavy 26" 5530" = 076484093340
+ADD: "TITAN LEASH BLK04 4' FNE" -> "Titan Leash Black04 4' Fne" = 076484092701
+CORRECT: "Rascals 3" Hamburger" 076484830228 -> 076484093890
+ADD: "SPT SOOTH TABBIE LAMBIE 8"" -> "Spot Sooth Tabbie Lambie 8"" = 077234548530
+ADD: "SPT SOOTH BLANKET TOY 10"" -> "Spot Sooth Blanket Toy 10"" = 077234541692
+ADD: "SPT SOOTH CRINKLE TOY 13"" -> "Spot Sooth Crinkle Toy 13"" = 077234541708
+ADD: "ZIPPY PAWS NOMNOM CUPCAKE PNK" -> "Zippy Paws Nomnom Cupcake Pink" = 818786019129
+ADD: "SPT AXOLOTL W DUCK TUBE" -> "Spot Axolotl W Duck Tube" = 077234549674
+ADD: "TUFFY T-JR-BR-RP" -> "Tuffy T-junior-br-rp" = 180181016011
+ADD: "TUFFY T-JR-3WT-CB" -> "Tuffy T-junior-3wt-cb" = 180181906329
+ADD: "TUFFY-OC-JR-FISH-OR" -> "Tuffy-oc-junior-fish-or" = 180181908576
+CORRECT: "Tuffy T-u-b-rp" 180181002014 -> 180181020117
+ADD: "TUFFY T-JR-Z-ELEPHANT" -> "Tuffy T-junior-z-elephant" = 180181908101
+ADD: "TUFFY T-JR-B-CB" -> "Tuffy T-junior-b-cb" = 180181020124
+ADD: "TUFFY T-JR-R-YB" -> "Tuffy T-junior-r-yb" = 180181011030
+ADD: "TUFFY T-JR-R-RP" -> "Tuffy T-junior-r-rp" = 180181011016
+ADD: "MAMMOTH MED SQK SHARK 15"" -> "Mammoth Medium Squeak Shark 15"" = 746772750124
+ADD: "MAMMOTH SM MONKEY FIST BLL" -> "Mammoth Small Extra Monkey Fist" = 746772200865
+CORRECT: "Kong Wubba Assort Extra Large" 035585800011 -> 035585800004
+ADD: "KONG SHEILD TROP FROG MED" -> "Kong Sheild Tropical Frog Medium" = 035585503134
+ADD: "KONG KNOTS SNAKE ASS MD/LG" -> "Kong Knots Snake Ass Medium/Large" = 035585499611
+ADD: "KONG KNOTS TWISTS ASS. SM/MD" -> "Kong Knots Twists Ass Medium/Large" = 035585503363
+ADD: "KONG KNOTS TWISTS ASS MD/LG" -> "Kong Knots Twists Ass Medium/Large" = 035585503370
+ADD: "KONG KNOTS BELLY GORILLA MD/LG" -> "Kong Knots Belly Gorilla Medium/Large" = 035585505350
+ADD: "KONG KNOTS BELLY HIPPO MD/LG" -> "Kong Knots Belly Hippo Medium/Large" = 035585505343
+CORRECT: "Kong Shak Crump Sloth Extra Large" 035585498911 -> 035585498935
+ADD: "KNG FLOPPY KNOTS HIPPO MD/LG" -> "Kong Floppy Knots Hippo Medium/Large" = 035585402079
+ADD: "KNG COZIE TUGGZ CHEET MD/LG" -> "Kong Cozie Tuggz Cheet Medium/Large" = 035585509068
+ADD: "KNG DYNOS ROARS BLUE MD/LG" -> "Kong Dynos Roars Blue Medium/Large" = 035585499536
+ADD: "KNG DYNOS ROARS GREEN MD/LG" -> "Kong Dynos Roars Green Medium/Large" = 035585499543
+ADD: "KNG ROPE RALLY TUG MD/LG" -> "Kong Rope Rally Tug Medium/Large" = 035585505596
+ADD: "KNG AIRDOG SQK PAW MD" -> "Kong Airdog Squeak Paw Medium" = 035585502175
+ADD: "KNG SQUEEZ GOOMZ FTBLL LG" -> "Kong Squeez Goomz Football Large" = 035585495064
+ADD: "KNG DUOS DENTAL BONE MD/LG" -> "Kong Duos Dental Bone Medium/Large" = 035585506241
+ADD: "KNG BUNJI HIGHVIZ BLL LG" -> "Kong Bunji Highviz Ball Large" = 035585529226
+ADD: "KNG ZIGGIES ENHANCE MD/LG 8OZ" -> "Kong Ziggies Enhance Medium/Large 8oz" = 035585361864
+ADD: "KNG PUPPY ACTIVITY BLL MD" -> "Kong Puppy Activity Ball Medium" = 035585131245
+ADD: "KNG SQUEEZ FLEX BNE MD" -> "Kong Squeez Flex Bone Medium" = 035585506463
