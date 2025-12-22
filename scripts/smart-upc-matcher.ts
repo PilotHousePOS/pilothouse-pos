@@ -1,11 +1,13 @@
 import fs from 'fs';
 import { db } from '../server/db';
 import { supplies } from '../shared/schema';
+import { expandAbbreviations } from '../server/abbreviationExpansion';
 
 interface UpcCatalogEntry {
   upc: string;
   names: string[];
   primaryName: string;
+  expandedNames?: string[];
 }
 
 interface UpcCatalog {
@@ -18,6 +20,7 @@ interface Match {
   supplyBrand: string | null;
   upc: string;
   catalogName: string;
+  expandedName: string;
   score: number;
   method: string;
 }
@@ -170,17 +173,24 @@ async function smartMatch() {
   console.log(`Supplies needing UPC: ${needsUpc.length}`);
   console.log(`Supplies with UPC: ${hasUpc.length}`);
 
-  console.log('\nBuilding brand index...');
+  console.log('\nExpanding catalog abbreviations and building index...');
+  console.log('(Using primaryName only to avoid conflicting multi-source data)');
   const brandIndex = new Map<string, UpcCatalogEntry[]>();
-  const allEntries: { entry: UpcCatalogEntry; tokens: string[]; nums: string[]; brand: string }[] = [];
+  const allEntries: { entry: UpcCatalogEntry; tokens: string[]; nums: string[]; brand: string; expandedName: string }[] = [];
   
   for (const entry of catalog.entries) {
-    const allNames = entry.names.join(' ');
-    const brand = extractBrand(allNames);
-    const tokens = extractTokens(allNames);
-    const nums = extractNumbers(allNames);
+    // Use ONLY primaryName - the names array often has conflicting products from different sources
+    const originalName = entry.primaryName;
+    const expandedName = expandAbbreviations(originalName);
     
-    allEntries.push({ entry, tokens, nums, brand });
+    // Extract brand from expanded name
+    const brand = extractBrand(expandedName) || extractBrand(originalName);
+    
+    // Tokenize from BOTH original and expanded for best matching
+    const tokens = [...new Set([...extractTokens(originalName), ...extractTokens(expandedName)])];
+    const nums = extractNumbers(originalName);
+    
+    allEntries.push({ entry, tokens, nums, brand, expandedName });
     
     if (brand) {
       if (!brandIndex.has(brand)) brandIndex.set(brand, []);
@@ -188,6 +198,17 @@ async function smartMatch() {
     }
   }
   console.log(`Brands indexed: ${brandIndex.size}`);
+  
+  // Log sample expansions for verification
+  console.log('\n=== SAMPLE ABBREVIATION EXPANSIONS ===');
+  const samples = allEntries.filter(e => 
+    e.entry.primaryName.includes('SD ') || 
+    e.entry.primaryName.includes('BLUE B') ||
+    e.entry.primaryName.includes('NUTRI')
+  ).slice(0, 15);
+  for (const s of samples) {
+    console.log(`  "${s.entry.primaryName}" -> "${s.expandedName}"`);
+  }
 
   const matches: Match[] = [];
   let processed = 0;
@@ -214,12 +235,17 @@ async function smartMatch() {
       candidates = allEntries.filter(e => brandEntries.includes(e.entry));
     }
 
-    let bestMatch: { entry: UpcCatalogEntry; score: number; name: string } | null = null;
+    let bestMatch: { entry: UpcCatalogEntry; score: number; name: string; expandedName: string } | null = null;
 
     for (const cand of candidates) {
       const score = scoreMatch(supplyTokens, cand.tokens, supplyNums, cand.nums);
       if (score > 0.5 && (!bestMatch || score > bestMatch.score)) {
-        bestMatch = { entry: cand.entry, score, name: cand.entry.primaryName };
+        bestMatch = { 
+          entry: cand.entry, 
+          score, 
+          name: cand.entry.primaryName,
+          expandedName: cand.expandedName
+        };
       }
     }
 
@@ -230,6 +256,7 @@ async function smartMatch() {
         supplyBrand: supply.brand,
         upc: bestMatch.entry.upc,
         catalogName: bestMatch.name,
+        expandedName: bestMatch.expandedName,
         score: bestMatch.score,
         method: supplyBrand ? 'brand+tokens' : 'tokens'
       });
@@ -254,13 +281,32 @@ async function smartMatch() {
   console.log('\n=== SAMPLE HIGH CONFIDENCE ===');
   for (const m of highConf.slice(0, 15)) {
     console.log(`[${(m.score*100).toFixed(0)}%] "${m.supplyName}"`);
-    console.log(`    -> "${m.catalogName}" | UPC: ${m.upc}`);
+    console.log(`    -> "${m.catalogName}" => "${m.expandedName}" | UPC: ${m.upc}`);
   }
 
   console.log('\n=== SAMPLE MEDIUM CONFIDENCE ===');
   for (const m of medConf.slice(0, 10)) {
     console.log(`[${(m.score*100).toFixed(0)}%] "${m.supplyName}"`);
-    console.log(`    -> "${m.catalogName}" | UPC: ${m.upc}`);
+    console.log(`    -> "${m.catalogName}" => "${m.expandedName}" | UPC: ${m.upc}`);
+  }
+  
+  // Show specific brand coverage
+  console.log('\n=== BRAND-SPECIFIC MATCHES ===');
+  const sdMatches = matches.filter(m => m.expandedName.toLowerCase().includes('science diet'));
+  const bbMatches = matches.filter(m => m.expandedName.toLowerCase().includes('blue buffalo'));
+  const nsMatches = matches.filter(m => m.expandedName.toLowerCase().includes('nutrisource'));
+  console.log(`Science Diet: ${sdMatches.length} matches`);
+  console.log(`Blue Buffalo: ${bbMatches.length} matches`);
+  console.log(`Nutrisource: ${nsMatches.length} matches`);
+  
+  for (const m of sdMatches.slice(0, 5)) {
+    console.log(`  SD: "${m.supplyName}" -> "${m.expandedName}" [${(m.score*100).toFixed(0)}%]`);
+  }
+  for (const m of bbMatches.slice(0, 5)) {
+    console.log(`  BB: "${m.supplyName}" -> "${m.expandedName}" [${(m.score*100).toFixed(0)}%]`);
+  }
+  for (const m of nsMatches.slice(0, 5)) {
+    console.log(`  NS: "${m.supplyName}" -> "${m.expandedName}" [${(m.score*100).toFixed(0)}%]`);
   }
 }
 

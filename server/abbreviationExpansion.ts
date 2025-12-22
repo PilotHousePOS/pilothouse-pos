@@ -849,6 +849,29 @@ export function expandAbbreviations(text: string | null | undefined, storage?: I
   // Fix "Bluebuffalo" → "Blue Buffalo" (brand name spacing)
   result = result.replace(/\bBluebuffalo\b/gi, 'Blue Buffalo');
   
+  // === BRAND START ABBREVIATION EXPANSIONS ===
+  // Blue Buffalo: "BLUE B wilder sm br 4.5#" → "Blue Buffalo wilder sm br 4.5#"
+  result = result.replace(/^BLUE\s+B\b/gi, 'Blue Buffalo');
+  
+  // Science Diet: "SD perf weight 12#" → "Science Diet perf weight 12#"
+  result = result.replace(/^SD\s+/gi, 'Science Diet ');
+  
+  // Nutrisource variations: "NUTRI SOU", "NUTRI SOUR", "NUTRISRC"
+  result = result.replace(/^NUTRI\s+SOU(?:R)?\b/gi, 'Nutrisource');
+  result = result.replace(/^NUTRISRC\b/gi, 'Nutrisource');
+  result = result.replace(/^NTRISRC\b/gi, 'Nutrisource');
+  
+  // VICTOR: "VICT sensi lam 5#" → "VICTOR sensi lam 5#"
+  result = result.replace(/^VICT\s+/gi, 'VICTOR ');
+  
+  // Diamond: "DIAM lamb 40#" → "Diamond lamb 40#"
+  result = result.replace(/^DIAM\s+/gi, 'Diamond ');
+  
+  // Fromm: "FROMM" already correct, just ensure space
+  
+  // Kong: "KNG" → "Kong"
+  result = result.replace(/^KNG\s+/gi, 'Kong ');
+  
   // Fix "A & e" → "A&E" (brand name formatting for A&E Cage Co)
   result = result.replace(/\bA & e\b/gi, 'A&E');
   result = result.replace(/\bA &e\b/gi, 'A&E');
