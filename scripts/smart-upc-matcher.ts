@@ -22,6 +22,24 @@ interface Match {
   method: string;
 }
 
+const BRAND_ABBREVIATIONS: Record<string, string> = {
+  'sd ': 'science diet',
+  'sd$': 'science diet',
+  'blue b ': 'blue buffalo',
+  'bluebuff': 'blue buffalo',
+  'bb ': 'blue buffalo',
+  'ns ': 'nutrisource',
+  'totw': 'taste of the wild',
+  'pp ': 'penn plax',
+  'penn-plax': 'penn plax',
+  'pennplax': 'penn plax',
+  'rc ': 'royal canin',
+  'zm ': 'zoo med',
+  'et ': 'exo terra',
+  'ff ': 'fromm',
+  'frm ': 'fromm',
+};
+
 function extractBrand(name: string): string {
   const brands = [
     'zoomed', 'zoo med', 'api', 'tetra', 'hikari', 'fluval', 'aqueon', 'marineland',
@@ -34,7 +52,7 @@ function extractBrand(name: string): string {
     'jw', 'starmark', 'busy buddy', 'west paw', 'ruffwear',
     'furminator', 'andis', 'wahl', 'oster', 'conair', 'safari', 'millers forge',
     'earthbath', 'tropiclean', 'natures miracle', 'simple solution',
-    'aquatop', 'penn plax', 'marina', 'seachem', 'fritz', 'brightwell',
+    'aquatop', 'penn plax', 'penn-plax', 'marina', 'seachem', 'fritz', 'brightwell',
     'caribsea', 'fluval', 'eheim', 'hydor', 'aquaclear', 'cascade',
     'prevue', 'vision', 'ware', 'kaytee', 'super pet', 'habitrail',
     'marshall', 'ferplast', 'living world', 'oxbow', 'vitakraft',
@@ -42,17 +60,79 @@ function extractBrand(name: string): string {
     'stella', 'primal', 'answers', 'smallbatch', 'vital essentials'
   ];
   const lower = name.toLowerCase();
+  
+  for (const [abbrev, fullBrand] of Object.entries(BRAND_ABBREVIATIONS)) {
+    if (abbrev.endsWith('$')) {
+      const pattern = abbrev.slice(0, -1);
+      if (lower.endsWith(pattern) || lower.includes(pattern + ' ')) return fullBrand;
+    } else if (lower.includes(abbrev) || lower.startsWith(abbrev.trim())) {
+      return fullBrand;
+    }
+  }
+  
   for (const brand of brands) {
     if (lower.includes(brand)) return brand;
   }
   return '';
 }
 
+const TOKEN_EXPANSIONS: Record<string, string> = {
+  'perf': 'perfect',
+  'sensi': 'sensitive',
+  'sens': 'sensitive',
+  'sm': 'small',
+  'lg': 'large',
+  'med': 'medium',
+  'br': 'breed',
+  'ck': 'chicken',
+  'sal': 'salmon',
+  'salm': 'salmon',
+  'bf': 'beef',
+  'lam': 'lamb',
+  'turk': 'turkey',
+  'wt': 'weight',
+  'dig': 'digest',
+  'digest': 'digestion',
+  'min': 'mini',
+  'pup': 'puppy',
+  'kit': 'kitten',
+  'adlt': 'adult',
+  'wild': 'wilderness',
+  'wilder': 'wilderness',
+  'grav': 'gravy',
+  'stw': 'stew',
+  'frz': 'frozen',
+  'frzn': 'frozen',
+  'grn': 'grain',
+  'hlth': 'health',
+  'hrbl': 'hairball',
+  'trky': 'turkey',
+  'bflo': 'buffalo',
+  'buf': 'buffalo',
+};
+
+function expandTokens(tokens: string[]): string[] {
+  const expanded: string[] = [];
+  for (const t of tokens) {
+    expanded.push(t);
+    if (TOKEN_EXPANSIONS[t]) {
+      expanded.push(TOKEN_EXPANSIONS[t]);
+    }
+    for (const [abbrev, full] of Object.entries(TOKEN_EXPANSIONS)) {
+      if (full === t && !expanded.includes(abbrev)) {
+        expanded.push(abbrev);
+      }
+    }
+  }
+  return [...new Set(expanded)];
+}
+
 function extractTokens(str: string): string[] {
-  return str.toLowerCase()
+  const tokens = str.toLowerCase()
     .replace(/[^a-z0-9\s]/g, ' ')
     .split(/\s+/)
     .filter(t => t.length >= 2);
+  return expandTokens(tokens);
 }
 
 function extractNumbers(str: string): string[] {
@@ -118,7 +198,11 @@ async function smartMatch() {
     processed++;
     if (processed % 500 === 0) console.log(`  ${processed}/${needsUpc.length}`);
 
-    const supplyBrand = extractBrand(supply.name);
+    let supplyBrand = extractBrand(supply.name);
+    if (!supplyBrand && supply.brand) {
+      supplyBrand = extractBrand(supply.brand);
+      if (!supplyBrand) supplyBrand = supply.brand.toLowerCase().trim();
+    }
     const supplyTokens = extractTokens(supply.name);
     const supplyNums = extractNumbers(supply.name);
 
