@@ -1,0 +1,267 @@
+{
+  "exact": [
+    {
+      "supplyId": 4799,
+      "supplyName": "Nutrisource Chompy Chompers Beef & Boar",
+      "catalogName": "NUTRI SOUR beef & ri 1203oz",
+      "expandedCatalog": "Nutrisource Beef & Ri 1203oz",
+      "upc": "073893021094",
+      "matchType": "good_match | matched: [beef], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 5942,
+      "supplyName": "Science Diet Chicken 15lb",
+      "catalogName": "SD ck 15#",
+      "expandedCatalog": "Science Diet Chicken 15lb",
+      "upc": "052742020419",
+      "matchType": "exact | keys: [chicken], size: 15lb",
+      "confidence": 1
+    },
+    {
+      "supplyId": 4795,
+      "supplyName": "Nutrisource Soft & Tender Bites Chicken Recipe",
+      "catalogName": "NUTRI SOUR cat ck 5.5oz",
+      "expandedCatalog": "Nutrisource cat Chicken 5.5oz",
+      "upc": "073893020158",
+      "matchType": "good_match | matched: [chicken], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 4757,
+      "supplyName": "Fromm Nutri Mobility",
+      "catalogName": "FROMM mobility 13oz",
+      "expandedCatalog": "FROMM mobility 13oz",
+      "upc": "072705136100",
+      "matchType": "good_match | matched: [mobility], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 6230,
+      "supplyName": "Blue Buffalo Puppy 15lb",
+      "catalogName": "BLUE B puppy 15#",
+      "expandedCatalog": "Blue Buffalo puppy 15lb",
+      "upc": "859610000036",
+      "matchType": "exact | keys: [puppy], size: 15lb",
+      "confidence": 1
+    },
+    {
+      "supplyId": 6520,
+      "supplyName": "Nutrisource PureVita Beef Entree 12.5oz",
+      "catalogName": "NUTRI SOUR pv beef entre 12.5oz",
+      "expandedCatalog": "Nutrisource pv Beef entre 12.5oz",
+      "upc": "073893962045",
+      "matchType": "exact | keys: [beef], size: 12.5oz",
+      "confidence": 1
+    },
+    {
+      "supplyId": 4790,
+      "supplyName": "Nutrisource Grillin' Grillers Turkey",
+      "catalogName": "NUTRISRC LITTLE BTS TURKEY",
+      "expandedCatalog": "Nutrisource LITTLE Bites TURKEY",
+      "upc": "015561223362",
+      "matchType": "good_match | matched: [turkey], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 6595,
+      "supplyName": "Blue Buffalo Chicken Stew 12.5oz",
+      "catalogName": "BLUE BUF cat ck morsels",
+      "expandedCatalog": "BLUE BUF cat Chicken morsels",
+      "upc": "840243140701",
+      "matchType": "good_match | matched: [chicken], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 6289,
+      "supplyName": "Nutrisource Lamb Meal & Rice Recipe 4lb",
+      "catalogName": "NUTRI SOU lamb 4#",
+      "expandedCatalog": "Nutrisource lamb 4lb",
+      "upc": "073893266044",
+      "matchType": "exact | keys: [lamb], size: 4lb",
+      "confidence": 1
+    },
+    {
+      "supplyId": 5946,
+      "supplyName": "Science Diet Small Bite Chicken 35lb",
+      "catalogName": "SD sm bite ck 35#",
+      "expandedCatalog": "Science Diet Small bite Chicken 35lb",
+      "upc": "052742015989",
+      "matchType": "exact | keys: [chicken], size: 35lb",
+      "confidence": 1
+    },
+    {
+      "supplyId": 6222,
+      "supplyName": "Blue Buffalo Lamb 15lb",
+      "catalogName": "BLUE B lamb 15#",
+      "expandedCatalog": "Blue Buffalo lamb 15lb",
+      "upc": "859610000357",
+      "matchType": "exact | keys: [lamb], size: 15lb",
+      "confidence": 1
+    },
+    {
+      "supplyId": 6509,
+      "supplyName": "Nutrisource Beef & Rice Recipe 12.3oz",
+      "catalogName": "NUTRI SOUR pooch beef",
+      "expandedCatalog": "Nutrisource pooch Beef",
+      "upc": "073893905028",
+      "matchType": "good_match | matched: [beef], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 6290,
+      "supplyName": "Nutrisource Lamb Meal & Rice Recipe 12lb",
+      "catalogName": "NUTRI SOU lamb 12#",
+      "expandedCatalog": "Nutrisource lamb 12lb",
+      "upc": "073893266068",
+      "matchType": "exact | keys: [lamb], size: 12lb",
+      "confidence": 1
+    },
+    {
+      "supplyId": 4788,
+      "supplyName": "Nutrisource Chicken Big Bites",
+      "catalogName": "NUTRI SOUR cat ck 5.5oz",
+      "expandedCatalog": "Nutrisource cat Chicken 5.5oz",
+      "upc": "073893020158",
+      "matchType": "good_match | matched: [chicken], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 4781,
+      "supplyName": "Nutrisource Chicken Little Bites",
+      "catalogName": "NUTRI SOUR cat ck 5.5oz",
+      "expandedCatalog": "Nutrisource cat Chicken 5.5oz",
+      "upc": "073893020158",
+      "matchType": "good_match | matched: [chicken], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 6514,
+      "supplyName": "Nutrisource Come-Pooch-A Turkey Bone Broth Recipe",
+      "catalogName": "NUTRISRC LITTLE BTS TURKEY",
+      "expandedCatalog": "Nutrisource LITTLE Bites TURKEY",
+      "upc": "015561223362",
+      "matchType": "good_match | matched: [turkey], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 6286,
+      "supplyName": "Nutrisource Beef 4lb",
+      "catalogName": "NUTRI SOUR pooch beef",
+      "expandedCatalog": "Nutrisource pooch Beef",
+      "upc": "073893905028",
+      "matchType": "good_match | matched: [beef], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 6212,
+      "supplyName": "Blue Buffalo Senior 15lb",
+      "catalogName": "BLUE B senior 15#",
+      "expandedCatalog": "Blue Buffalo senior 15lb",
+      "upc": "859610000159",
+      "matchType": "exact | keys: [senior], size: 15lb",
+      "confidence": 1
+    },
+    {
+      "supplyId": 6515,
+      "supplyName": "Nutrisource Come-Pooch-A Chicken Bone Broth Recipe",
+      "catalogName": "NUTRI SOUR cat ck 5.5oz",
+      "expandedCatalog": "Nutrisource cat Chicken 5.5oz",
+      "upc": "073893020158",
+      "matchType": "good_match | matched: [chicken], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 4785,
+      "supplyName": "Nutrisource Crispy Crispers Turkey & Venison",
+      "catalogName": "NUTRISRC LITTLE BTS TURKEY",
+      "expandedCatalog": "Nutrisource LITTLE Bites TURKEY",
+      "upc": "015561223362",
+      "matchType": "good_match | matched: [turkey], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 6291,
+      "supplyName": "Nutrisource Lamb Meal & Rice Recipe 26lb",
+      "catalogName": "NUTRI SOU lamb 26#",
+      "expandedCatalog": "Nutrisource lamb 26lb",
+      "upc": "073893266051",
+      "matchType": "exact | keys: [lamb], size: 26lb",
+      "confidence": 1
+    },
+    {
+      "supplyId": 6617,
+      "supplyName": "Blue Buffalo Chicken 12.5 oz",
+      "catalogName": "BLUE BUF cat ck morsels",
+      "expandedCatalog": "BLUE BUF cat Chicken morsels",
+      "upc": "840243140701",
+      "matchType": "good_match | matched: [chicken], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 6621,
+      "supplyName": "Blue Buffalo Delight Ro Chicken 3.5 oz",
+      "catalogName": "BLUE BUF cat ck morsels",
+      "expandedCatalog": "BLUE BUF cat Chicken morsels",
+      "upc": "840243140701",
+      "matchType": "good_match | matched: [chicken], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 6516,
+      "supplyName": "Nutrisource Come-Pooch-A Beef Bone Broth Recipe",
+      "catalogName": "NUTRI SOUR beef & ri 1203oz",
+      "expandedCatalog": "Nutrisource Beef & Ri 1203oz",
+      "upc": "073893021094",
+      "matchType": "good_match | matched: [beef], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 4739,
+      "supplyName": "Blue Buffalo True Chews Chicken Pie",
+      "catalogName": "BLUE BUF cat wild ck 6#",
+      "expandedCatalog": "BLUE BUF cat wild Chicken 6lb",
+      "upc": "076484062438",
+      "matchType": "good_match | matched: [chicken], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 5943,
+      "supplyName": "Science Diet Chicken 35lb",
+      "catalogName": "SD sm bite ck 35#",
+      "expandedCatalog": "Science Diet Small bite Chicken 35lb",
+      "upc": "052742015989",
+      "matchType": "exact | keys: [chicken], size: 35lb",
+      "confidence": 1
+    },
+    {
+      "supplyId": 5945,
+      "supplyName": "Science Diet Small Bite Chicken 15lb",
+      "catalogName": "SD ck 15#",
+      "expandedCatalog": "Science Diet Chicken 15lb",
+      "upc": "052742020419",
+      "matchType": "exact | keys: [chicken], size: 15lb",
+      "confidence": 1
+    },
+    {
+      "supplyId": 5995,
+      "supplyName": "Science Diet Grain Free Frozen Crunch",
+      "catalogName": "SD gr fr crunch",
+      "expandedCatalog": "Science Diet Grain Free crunch",
+      "upc": "052742303208",
+      "matchType": "good_match | matched: [grainfree], unmatched: []",
+      "confidence": 0.95
+    },
+    {
+      "supplyId": 4730,
+      "supplyName": "Blue Buffalo Biscuits Duck",
+      "catalogName": "BLUE BUF cat wild duck 3oz",
+      "expandedCatalog": "BLUE BUF cat wild Duck 3oz",
+      "upc": "076484163838",
+      "matchType": "good_match | matched: [duck], unmatched: []",
+      "confidence": 0.95
+    }
+  ],
+  "highConf": [],
+  "medium": []
+}
