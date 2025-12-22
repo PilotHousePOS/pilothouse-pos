@@ -1,0 +1,27 @@
+{
+  "generatedAt": "2025-12-22T17:15:51.007Z",
+  "summary": {
+    "totalSupplies": 7225,
+    "suppliesWithUpc": 2332,
+    "suppliesWithoutUpc": 4893,
+    "coveragePercent": "32.3%"
+  },
+  "masterIndex": {
+    "totalEntries": 8429,
+    "uniqueUpcs": 8333,
+    "nonCoastalUpcs": 7346,
+    "coastalUpcs": 987
+  },
+  "matchingStrategy": {
+    "threshold": "90%+ Jaccard similarity",
+    "additionalMethods": [
+      "75%+ with brand validation",
+      "70%+ with all-token containment"
+    ]
+  },
+  "notes": [
+    "All matches meet 90%+ accuracy threshold or use additional validation",
+    "Coverage limited by UPC availability in master index",
+    "Coastal products can share UPCs for size/color variants"
+  ]
+}
