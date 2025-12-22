@@ -85,6 +85,14 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Frm': 'Fromm',
   'Sf': 'Safari',
   
+  // Penn-Plax product line abbreviations (030172 UPC prefix)
+  'Act-air': 'Action-Air',
+  'Actair': 'Action-Air',
+  'Aquascapes': 'Tide & Treasure Aquascaping',
+  'Aquafloras': 'aqua-floras',
+  'Shorefin': 'shorefins',
+  'Repto': 'Reptology',
+  
   // Product line abbreviations
   'Ck': 'Chicken',
   'Lam': 'Lamb',
