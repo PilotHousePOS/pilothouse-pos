@@ -14,9 +14,9 @@ interface Match {
 async function main() {
   const matches: Match[] = JSON.parse(fs.readFileSync('scripts/upc_matches.json', 'utf8'));
   
-  // Only apply matches with >= 75% similarity (high confidence)
-  const highConfidenceMatches = matches.filter(m => m.score >= 0.75);
-  console.log(`Applying ${highConfidenceMatches.length} high-confidence matches (>= 75% similarity)`);
+  // Apply matches with >= 50% similarity
+  const highConfidenceMatches = matches.filter(m => m.score >= 0.50);
+  console.log(`Applying ${highConfidenceMatches.length} matches (>= 50% similarity)`);
   
   let updated = 0;
   let errors = 0;
