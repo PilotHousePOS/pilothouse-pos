@@ -122,6 +122,12 @@ function extractBrand(name: string): string {
     { pattern: /^(hills)\b/i, brand: 'hills' },
     { pattern: /^(redbarn|rbp)\b/i, brand: 'redbarn' },
     { pattern: /^(spot|eth)\b/i, brand: 'spot' },
+    { pattern: /^(smartbones?)/i, brand: 'smartbones' },
+    { pattern: /^(barkworthies)/i, brand: 'barkworthies' },
+    { pattern: /^(vitakraft)/i, brand: 'vitakraft' },
+    { pattern: /^(nylabone|nyl)\b/i, brand: 'nylabone' },
+    { pattern: /^(hartz)\b/i, brand: 'hartz' },
+    { pattern: /^(nutro)\b/i, brand: 'nutro' },
   ];
   
   for (const { pattern, brand } of brandPatterns) {
@@ -234,12 +240,15 @@ async function main() {
   
   for (const entry of masterData.entries) {
     const originalName = entry.name;
+    // Use pre-expanded name from master if available
+    let expandedName = entry.expandedName || originalName;
+    
     // Pre-expand brand abbreviations FIRST (sd → Science Diet, rbp → Redbarn, etc.)
-    const brandExpanded = preExpandBrands(originalName);
+    const brandExpanded = preExpandBrands(expandedName);
     // Pre-process Coastal color codes followed by dimensions (e.g., "AWN06'" -> "AWN 06'")
     const preSplit = brandExpanded
       .replace(/\b(AWN|LWO|NPK|HNT|PUR|BLK|GRY|PNK|RED|GRN|BLU|ORG|YLW|TAN|BRN|WHT|SLV|GLD)(\d)/gi, '$1 $2');
-    const expandedName = expandAbbreviations(preSplit);
+    expandedName = expandAbbreviations(preSplit);
     
     if (expandedName !== originalName) expanded++;
     
@@ -343,7 +352,17 @@ async function main() {
         details: string;
       }> = [];
       
-      for (const entry of index) {
+      // OPTIMIZATION: Filter candidates by brand first, then fallback to all
+      let candidateEntries = supplyBrand 
+        ? index.filter(e => e.brand === supplyBrand || e.upcBrand === supplyBrand)
+        : [];
+      
+      // If no brand-filtered candidates or too few, use all
+      if (candidateEntries.length < 5) {
+        candidateEntries = index;
+      }
+      
+      for (const entry of candidateEntries) {
         if (usedUpcs.has(entry.upc) && !entry.isCoastal) continue;
         
         const entryNorm = normalize(entry.expandedName);
@@ -503,14 +522,10 @@ async function main() {
   console.log(`   Generated SQL script at /tmp/apply_upcs.sql`);
   console.log(`   Run: psql $DATABASE_URL -f /tmp/apply_upcs.sql`);
   
-  // Final count
-  const finalCount = await db.select({ count: sql<number>`count(*)::int` })
-    .from(supplies).where(sql`${supplies.upc} IS NOT NULL`);
-  
-  console.log(`\n=== FINAL RESULTS ===`);
+  console.log(`\n=== RESULTS ===`);
   console.log(`Total supplies: ${allSupplies.length}`);
-  console.log(`Supplies with UPC: ${finalCount[0].count}`);
-  console.log(`Coverage: ${((finalCount[0].count / allSupplies.length) * 100).toFixed(1)}%`);
+  console.log(`Total matches: ${allMatchMap.size}`);
+  console.log(`Coverage: ${((allMatchMap.size / allSupplies.length) * 100).toFixed(1)}%`);
   
   // Save report
   fs.writeFileSync('scripts/expanded_match_report.json', JSON.stringify({
@@ -518,8 +533,8 @@ async function main() {
     indexEntries: index.length,
     expandedNames: expanded,
     totalSupplies: allSupplies.length,
-    matchedSupplies: finalCount[0].count,
-    coverage: ((finalCount[0].count / allSupplies.length) * 100).toFixed(1) + '%',
+    matchedSupplies: allMatchMap.size,
+    coverage: ((allMatchMap.size / allSupplies.length) * 100).toFixed(1) + '%',
     byMethod,
     sampleMatches: matches.slice(0, 30).map(m => ({
       supply: m.supplyName,
@@ -530,7 +545,7 @@ async function main() {
     }))
   }, null, 2));
   
-  console.log("\nSaved report to scripts/expanded_match_report.json");
+  console.log("\nDone!");
   process.exit(0);
 }
 

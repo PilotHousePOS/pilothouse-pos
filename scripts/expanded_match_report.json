@@ -1,18 +1,18 @@
 {
-  "generatedAt": "2025-12-22T22:13:42.659Z",
-  "indexEntries": 9055,
-  "expandedNames": 6391,
+  "generatedAt": "2025-12-22T22:50:39.620Z",
+  "indexEntries": 7145,
+  "expandedNames": 4852,
   "totalSupplies": 7225,
-  "matchedSupplies": 4808,
-  "coverage": "66.5%",
+  "matchedSupplies": 5906,
+  "coverage": "81.7%",
   "byMethod": {
-    "exact": 3799,
-    "65%_upc_verified": 368,
-    "75%_overlap": 50,
-    "50%_weight_brand": 224,
-    "containment_brand": 100,
-    "90%_jaccard": 36,
-    "4tok_brand": 63
+    "exact": 2353,
+    "brand_match": 849,
+    "high_jaccard": 92,
+    "brand_tokens": 1183,
+    "exact_fuzzy": 110,
+    "containment": 68,
+    "combined": 14
   },
   "sampleMatches": [
     {
@@ -23,179 +23,67 @@
       "method": "exact"
     },
     {
-      "supply": "Coastal Autumn12\" Collar",
-      "catalogOriginal": "COASTAL AWN12\" COLLAR",
-      "catalogExpanded": "COASTAL Autumn 12\" Collar",
+      "supply": "Fluval Aquarientorf 500g",
+      "catalogOriginal": "FLUVAL BIOMAX 500G",
+      "catalogExpanded": "FLUVAL BIOMAX 500G",
+      "similarity": "55%",
+      "method": "brand_match"
+    },
+    {
+      "supply": "Fromm Gold Large Breed 30lb",
+      "catalogOriginal": "FROMM gold lg br 30#",
+      "catalogExpanded": "Fromm gold Large Breed 30#",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Bellabowl Blue Large",
-      "catalogOriginal": "BellaBowl Blue Lg",
-      "catalogExpanded": "BellaBowl Blue Buffalo Large",
+      "supply": "Benebone Small Fishbone",
+      "catalogOriginal": "BENEBONE SM ZAGGLER BCN",
+      "catalogExpanded": "BENEBONE Small ZAGGLER Bacon",
+      "similarity": "61%",
+      "method": "brand_match"
+    },
+    {
+      "supply": "Aquatop Vibrant Pass Yellw Plant 16\"",
+      "catalogOriginal": "AQUATOP VIB PASS YELLOW PLNT 6\"",
+      "catalogExpanded": "AQUATOP Vibrant PASS YELLOW Plant 6\"",
+      "similarity": "63%",
+      "method": "high_jaccard"
+    },
+    {
+      "supply": "Fluval Ac70 Filter",
+      "catalogOriginal": "FLUVAL AC50 FILTER",
+      "catalogExpanded": "FLUVAL AC50 FILTER",
+      "similarity": "69%",
+      "method": "brand_match"
+    },
+    {
+      "supply": "Kaytee Itty Bitty Igloo",
+      "catalogOriginal": "KAYTEE ITTY BITTY IGLOO",
+      "catalogExpanded": "KAYTEE ITTY BITTY IGLOO",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Feline Greenies Chicken Skin & Fur Health",
-      "catalogOriginal": "Feline Greenies Chkn Skin&Fur Health",
-      "catalogExpanded": "Feline Greenies Chicken Skin & Fur Health",
+      "supply": "Forza Replace Filter Pad Fz7uv",
+      "catalogOriginal": "FORZA REPLACE FILTER PD FZ7UV",
+      "catalogExpanded": "FORZA REPLACE FILTER Pad FZ7UV",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Naturals 9\" Java Wood Perch",
-      "catalogOriginal": "Naturals 9\" Java Wood Perch",
-      "catalogExpanded": "Naturals 9\" Java Wood Perch",
+      "supply": "Redbarn Chewabulls Brush Small",
+      "catalogOriginal": "REDBARN CHEWABULLS BRUSH SM",
+      "catalogExpanded": "REDBARN CHEWABULLS BRUSH Small",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Lilpals Extra Small Collar Dpm08",
-      "catalogOriginal": "LILPALS XS COLLAR DPM08",
-      "catalogExpanded": "LILPALS Extra Small Collar DPM08",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Zoo Med Aquatic Turtle Food Hatching",
-      "catalogOriginal": "ZooMed Aquatic Turtle Food Hatching",
-      "catalogExpanded": "Zoo Med Aquatic Turtle Food Hatching",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Nylabone Oral Care Dental Spray",
-      "catalogOriginal": "NylaBone Oral Care Dental Spray",
-      "catalogExpanded": "NylaBone Oral Care Dental Spray",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Exoterra Compact Top Small",
-      "catalogOriginal": "ExoTerra Compact Top Small",
-      "catalogExpanded": "ExoTerra Compact Top Small",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Flavorfullz Salmon",
-      "catalogOriginal": "FlavorFullz Salmon",
-      "catalogExpanded": "FlavorFullz Salmon",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Zoo Med Ecoearth 3 Pack",
-      "catalogOriginal": "ZooMed EcoEarth 3 pk",
-      "catalogExpanded": "Zoo Med EcoEarth 3 Pack",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Coastal Mdw06' Leash",
-      "catalogOriginal": "COASTAL MDW06' LEASH",
-      "catalogExpanded": "COASTAL MDW06' Leash",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Zoo Med Reptirock Extra Large",
-      "catalogOriginal": "ZooMed ReptiRock XL",
-      "catalogExpanded": "Zoo Med ReptiRock Extra Large",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Petmate Cafe Feeder 12lb",
-      "catalogOriginal": "Petmate cafe feeder 12Lb",
-      "catalogExpanded": "Petmate cafe feeder 12Lb",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Coastal Collar Red12",
-      "catalogOriginal": "COASTAL CC RED12",
-      "catalogExpanded": "COASTAL Cat Collar Red 12",
-      "similarity": "80%",
-      "method": "65%_upc_verified"
-    },
-    {
-      "supply": "Playfuls Barn Dance",
-      "catalogOriginal": "Playfuls barn Dance",
-      "catalogExpanded": "Playfuls barn Dance",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Zilla Day White Light Spot 50w",
-      "catalogOriginal": "Zilla Day White Light Spot 50W",
-      "catalogExpanded": "Zilla Day White Light Spot 50W",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Zoo Med Combo Deep Dome",
-      "catalogOriginal": "ZooMed Combo Deep Dome",
-      "catalogExpanded": "Zoo Med Combo Deep Dome",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Veterinary Formula Ear Therapy Wipes",
-      "catalogOriginal": "Veterinary Formula Ear Therapy Wipes",
-      "catalogExpanded": "Veterinary Formula Ear Therapy Wipes",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Coastal Red 30' Cotton Train Leash",
-      "catalogOriginal": "Coastal RD 30' Cotton train Leash",
-      "catalogExpanded": "Coastal Red 30' Cotton train Leash",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Coastal Leash Pbo06' 666",
-      "catalogOriginal": "COASTAL LEASH PBO06' 666",
-      "catalogExpanded": "COASTAL Leash PBO06' 666",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Spot Love the Earth Barnyard Bird",
-      "catalogOriginal": "SPOT Love the earth Barnyard Bird",
-      "catalogExpanded": "Spot Love the earth Barnyard Bird",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Flukers Repti Calcium D3 & Phosphate Free",
-      "catalogOriginal": "Flukers Repti Calcium D3 & Phos Free",
-      "catalogExpanded": "Flukers Reptile Calcium D3 & Phosphate Free",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Circle 14\" Bro 1786s Collar",
-      "catalogOriginal": "CIRCLE 14\" BRO 1786S COLLAR",
-      "catalogExpanded": "Circle 14\" BRO 1786S Collar",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Kong Ringaroos Elephant Medium",
-      "catalogOriginal": "KONG RINGAROOS ELEPH MD",
-      "catalogExpanded": "Kong RINGAROOS Elephant Medium",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Pro Plan Live Clear 5.5lb",
-      "catalogOriginal": "PRO PLAN live clear 5.5#",
-      "catalogExpanded": "Pro Plan PLAN live clear 5.5#",
-      "similarity": "100%",
-      "method": "exact"
+      "supply": "Bubble-shell",
+      "catalogOriginal": "shorefins™ Bubble Shell Air Stone - 3.25\"",
+      "catalogExpanded": "shorefins™ Bubble Shell Air Stone - 3.25\"",
+      "similarity": "58%",
+      "method": "brand_match"
     },
     {
       "supply": "Lilpals Small Collar Zpk12",
@@ -205,23 +93,135 @@
       "method": "exact"
     },
     {
-      "supply": "Coastal Cat Soft Mesh Harness Black",
-      "catalogOriginal": "COASTAL CATSOFTMESHHARN BLK",
-      "catalogExpanded": "COASTAL Cat Soft Mesh Harness Black",
+      "supply": "Kong Jumbler Tug Medium/Large",
+      "catalogOriginal": "KNG JUMBLER TUG SM/MD",
+      "catalogExpanded": "Kong JUMBLER Tug Small/Medium",
+      "similarity": "92%",
+      "method": "brand_tokens"
+    },
+    {
+      "supply": "Zilla Black Heat Bulb 150w",
+      "catalogOriginal": "Zilla Day White Light Bulb 150W",
+      "catalogExpanded": "Zilla Day White Light Bulb 150W",
+      "similarity": "65%",
+      "method": "brand_tokens"
+    },
+    {
+      "supply": "Zoo Med Turltle Dock Small",
+      "catalogOriginal": "ZooMed Corner Bowl Sm",
+      "catalogExpanded": "Zoo Med Corner Bowl Small",
+      "similarity": "67%",
+      "method": "brand_tokens"
+    },
+    {
+      "supply": "Nutrisource Chicken & Rice Cat Formula 12lb",
+      "catalogOriginal": "NUTRI SOUR cat ck 12#",
+      "catalogExpanded": "Nutrisource cat Chicken 12#",
+      "similarity": "75%",
+      "method": "brand_tokens"
+    },
+    {
+      "supply": "Nutrisource Chicken, Turkey & Lamb Cat Formula & Salmon Select 12lb",
+      "catalogOriginal": "NUTRI SOUR cat ck 4#",
+      "catalogExpanded": "Nutrisource cat Chicken 4#",
+      "similarity": "65%",
+      "method": "brand_tokens"
+    },
+    {
+      "supply": "Earthbath Stress Release Spritz Euc & Peppermint",
+      "catalogOriginal": "EarthBath Stress Release Spritz Euc&Pep",
+      "catalogExpanded": "EarthBath Stress Release Spritz Euc & Pep",
+      "similarity": "60%",
+      "method": "high_jaccard"
+    },
+    {
+      "supply": "Fluval Carbon 3pk",
+      "catalogOriginal": "FLUVAL CARBON 3PK",
+      "catalogExpanded": "FLUVAL CARBON 3PK",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Simplesolution Large Washmale Wrap",
-      "catalogOriginal": "SimpleSolution Lg WashMale Wrap",
-      "catalogExpanded": "SimpleSolution Large WashMale Wrap",
+      "supply": "Oxbow Critical Care Herbal Antibacterial",
+      "catalogOriginal": "OXBOW CRITICAL CARE HERB 36G",
+      "catalogExpanded": "OXBOW CRITICAL CARE HERB 36G",
+      "similarity": "57%",
+      "method": "brand_tokens"
+    },
+    {
+      "supply": "Starmark Large Cookie Cup Chicken",
+      "catalogOriginal": "STARMARK LG COOKIE CUP CHKN",
+      "catalogExpanded": "STARMARK Large COOKIE CUP Chicken",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Science Diet Cat Per Dig Chicken 2.9oz",
-      "catalogOriginal": "SD cat per dig ck 2.9oz",
-      "catalogExpanded": "Science Diet cat per dig Chicken 2.9oz",
+      "supply": "Starmark Medium Cookie Cup Chicken",
+      "catalogOriginal": "STARMARK MD COOKIE CUP CHKN",
+      "catalogExpanded": "STARMARK Medium COOKIE CUP Chicken",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Blue Buffalo Kitten 3oz",
+      "catalogOriginal": "BLUE BUF kitten 3oz",
+      "catalogExpanded": "Blue Buffalo Buffalo kitten 3oz",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Freshbreath Toothbrush Large",
+      "catalogOriginal": "FreshBreath ToothBrush Large",
+      "catalogExpanded": "FreshBreath ToothBrush Large",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Coastal Autumn12\" Collar",
+      "catalogOriginal": "COASTAL RBG12\" COLLAR",
+      "catalogExpanded": "COASTAL RBG12\" Collar",
+      "similarity": "69%",
+      "method": "brand_match"
+    },
+    {
+      "supply": "RedBarn Large Breed Grain Free Frozen 15lb",
+      "catalogOriginal": "RED b lg br gr fr 15#",
+      "catalogExpanded": "RedBarn Large Breed Grain Free 15#",
+      "similarity": "100%",
+      "method": "brand_tokens"
+    },
+    {
+      "supply": "Blue Buffalo Cat Chicken Gravy 5.5oz",
+      "catalogOriginal": "BLUE BUF cat ck grav 5.5oz",
+      "catalogExpanded": "Blue Buffalo Buffalo cat Chicken Gravy 5.5oz",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Coastal Ony30\" Soy Harness",
+      "catalogOriginal": "COASTAL ONY30\" SOY HARNESS",
+      "catalogExpanded": "COASTAL ONY30\" SOY HARNESS",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Coastal Lwo06' 12926 Leash",
+      "catalogOriginal": "COASTAL FWT06' 12926 LEASH",
+      "catalogExpanded": "COASTAL FWT06' 12926 Leash",
+      "similarity": "87%",
+      "method": "brand_tokens"
+    },
+    {
+      "supply": "Zoo Med Reptirock Extra Large",
+      "catalogOriginal": "ZooMed  ReptiRock Lg.",
+      "catalogExpanded": "Zoo Med ReptiRock Large.",
+      "similarity": "97%",
+      "method": "brand_tokens"
+    },
+    {
+      "supply": "Valhoma 28 Ro Collar",
+      "catalogOriginal": "VALHOMA 28 RO COLLAR",
+      "catalogExpanded": "VALHOMA 28 RO Collar",
       "similarity": "100%",
       "method": "exact"
     }
