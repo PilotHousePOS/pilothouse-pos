@@ -6,6 +6,7 @@ import * as fs from "fs";
 
 function normalize(text: string): string {
   return text.toLowerCase()
+    .replace(/\bmarineland\b/gi, 'marina')  // Normalize brand: Marineland → Marina
     .replace(/(\d+)#/g, '$1lb')         // Convert weight symbol: "3.5#" -> "3.5lb"
     .replace(/#(\d+)/g, 'lb$1')         // Handle "#5" -> "lb5"
     .replace(/([a-z])(\d)/gi, '$1 $2')  // Split letters from digits: "Black14" -> "Black 14"
@@ -47,18 +48,18 @@ function extractBrand(name: string): string {
     { pattern: /^(fluker)/i, brand: 'fluker' },
     { pattern: /^(kaytee)\b/i, brand: 'kaytee' },
     { pattern: /^(fromm)\b/i, brand: 'fromm' },
-    { pattern: /^(coastal)\b/i, brand: 'coastal' },
+    { pattern: /^(coastal|coa|cp)\b/i, brand: 'coastal' },
     { pattern: /^(kong)\b/i, brand: 'kong' },
     { pattern: /^(greenies)/i, brand: 'greenies' },
     { pattern: /^(benebone)/i, brand: 'benebone' },
     { pattern: /^(oxbow)/i, brand: 'oxbow' },
-    { pattern: /^(tetra)\b/i, brand: 'tetra' },
+    { pattern: /^(tetra|tet)\b/i, brand: 'tetra' },
     { pattern: /^(fluval)\b/i, brand: 'fluval' },
-    { pattern: /^(hikari)/i, brand: 'hikari' },
-    { pattern: /^(marineland)/i, brand: 'marineland' },
+    { pattern: /^(hikari|hik)\b/i, brand: 'hikari' },
+    { pattern: /^(marineland|marina)\b/i, brand: 'marina' },
     { pattern: /^(aqueon)/i, brand: 'aqueon' },
-    { pattern: /^(api)\b/i, brand: 'api' },
-    { pattern: /^(penn[\s-]?plax)/i, brand: 'pennplax' },
+    { pattern: /^(api|ap)\b/i, brand: 'api' },
+    { pattern: /^(penn[\s-]?plax|ph)\b/i, brand: 'pennplax' },
     { pattern: /^(eukanuba)\b/i, brand: 'eukanuba' },
     { pattern: /^(adams)\b/i, brand: 'adams' },
     { pattern: /^(tropiclean)/i, brand: 'tropiclean' },
@@ -74,6 +75,8 @@ function extractBrand(name: string): string {
     { pattern: /^(natures\s?variety|nv)\b/i, brand: 'naturesvariety' },
     { pattern: /^(instinct)/i, brand: 'instinct' },
     { pattern: /^(hills)\b/i, brand: 'hills' },
+    { pattern: /^(redbarn|rbp)\b/i, brand: 'redbarn' },
+    { pattern: /^(spot|eth)\b/i, brand: 'spot' },
   ];
   
   for (const { pattern, brand } of brandPatterns) {

@@ -821,6 +821,8 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Zoomed': 'Zoo Med',
   'ZooMed': 'Zoo Med',  // Sometimes written as one word
   'Zoomd': 'Zoo Med',
+  // Marina is Marineland/Fluval family - but DON'T expand, master uses "Marina"
+  'Marinland': 'Marineland',
   
   // Coastal Pet Products Pattern Names - Color/Pattern Abbreviations
   // Reference: Coastal 2024 Product Catalog patterns analysis
