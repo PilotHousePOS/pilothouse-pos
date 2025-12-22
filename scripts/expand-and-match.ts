@@ -10,6 +10,10 @@ function normalize(text: string): string {
     .replace(/#(\d+)/g, 'lb$1')         // Handle "#5" -> "lb5"
     .replace(/([a-z])(\d)/gi, '$1 $2')  // Split letters from digits: "Black14" -> "Black 14"
     .replace(/(\d)([a-z])/gi, '$1 $2')  // Split digits from letters: "14inch" -> "14 inch"
+    .replace(/['']s\b/g, 's')           // Handle possessives: "Elsey's" -> "Elseys"
+    .replace(/['']/g, '')               // Remove remaining apostrophes: "n't" -> "nt"
+    .replace(/\./g, '')                 // Remove periods: "Dr." -> "Dr"
+    .replace(/&/g, ' and ')             // Normalize ampersand
     .replace(/[^a-z0-9\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
@@ -114,21 +118,47 @@ async function main() {
   
   // UPC prefix to brand mapping - helps match when invoice names don't include brand
   const upcPrefixBrands: Record<string, string> = {
+    // Pet food brands
+    '052742': 'sciencediet',   // Hill's Science Diet
+    '073893': 'nutrisource',   // NutriSource
+    '840243': 'bluebuffalo',   // Blue Buffalo
+    '023100': 'royalcanin',    // Royal Canin
+    '038100': 'proplan',       // Purina Pro Plan
+    '723633': 'tasteofthewild', // Taste of the Wild
+    '072705': 'fromm',         // Fromm
+    '769949': 'victor',        // Victor
+    '074198': 'diamond',       // Diamond
+    '884308': 'canidae',       // Canidae
+    '022808': 'merrick',       // Merrick
+    '076344': 'wellness',      // Wellness
+    '064992': 'orijen',        // Orijen
+    '064992': 'acana',         // Acana (shared with Orijen)
+    '769949': 'naturalbalance', // Natural Balance
+    '079105': 'primal',        // Primal
+    
+    // Aquatics/Reptile brands
     '030172': 'pennplax',
     '097612': 'zoomed',
     '015561': 'fluval',
     '046798': 'tetra',
     '042055': 'hikari',
+    '077234': 'api',
+    '015905': 'marineland',
+    '090653': 'exoterra',
+    '017800': 'zilla',
+    
+    // Accessories brands
     '076484': 'coastal',
     '045663': 'fourpaws',
-    '077234': 'api',
-    '785184': 'redbarnet',
+    '785184': 'redbarn',
     '071860': 'arknaturals',
     '030027': 'acme',
-    '041693': 'kaytee',
-    '017800': 'zilla',
-    '015905': 'marineland',
-    '090653': 'exoterra'
+    '071859': 'kaytee',
+    '018065': 'tropiclean',
+    '013227': 'kong',
+    '018214': 'nylabone',
+    '642863': 'greenies',
+    '875854': 'benebone'
   };
   
   const index: IndexEntry[] = [];
@@ -236,7 +266,7 @@ async function main() {
     if (!bestMatch) {
       // PASS 1: Brand-filtered matching with UPC prefix confirmation
       // When supply has a brand AND we find entries with matching UPC prefix brand,
-      // we can use a lower threshold (65%) because the UPC prefix confirms the brand
+      // we can use smarter matching because the UPC prefix confirms the brand
       if (supplyBrand) {
         const brandCandidates = index.filter(e => 
           e.upcBrand === supplyBrand && 
@@ -245,22 +275,39 @@ async function main() {
         
         for (const entry of brandCandidates) {
           const similarity = jaccardSimilarity(supplyTokens, entry.tokens);
+          const supplySet = new Set(supplyTokens);
+          const matchingTokens = entry.tokens.filter(t => supplySet.has(t));
+          const significantMatching = matchingTokens.filter(t => t.length > 2);
           
-          // 65% threshold for UPC-prefix-verified brand matches
-          if (similarity >= 0.65) {
-            // Additional check: at least 3 significant tokens must match
-            const supplySet = new Set(supplyTokens);
-            const matchingTokens = entry.tokens.filter(t => supplySet.has(t) && t.length > 2);
-            if (matchingTokens.length >= 3 || (matchingTokens.length >= 2 && supplyTokens.length <= 4)) {
-              if (!bestMatch || similarity > bestMatch.similarity) {
-                bestMatch = { 
-                  upc: entry.upc, 
-                  originalName: entry.originalName,
-                  expandedName: entry.expandedName,
-                  similarity, 
-                  method: '65%_upc_verified' 
-                };
-              }
+          // Check for containment: if almost all master tokens are in supply, it's likely the same product
+          // This handles cases where master is abbreviated (e.g., "NUTRI SOU lg br 26#") 
+          // and supply is verbose (e.g., "Nutrisource Large Breed Puppy Chicken & Rice Recipe 26lb")
+          const containmentRatio = matchingTokens.length / entry.tokens.length;
+          
+          // MATCH if:
+          // 1. 65%+ Jaccard AND 3+ significant tokens match, OR
+          // 2. 90%+ of master tokens are contained in supply AND brand+weight match (containment match)
+          if (similarity >= 0.65 && (significantMatching.length >= 3 || (significantMatching.length >= 2 && supplyTokens.length <= 4))) {
+            if (!bestMatch || similarity > bestMatch.similarity) {
+              bestMatch = { 
+                upc: entry.upc, 
+                originalName: entry.originalName,
+                expandedName: entry.expandedName,
+                similarity, 
+                method: '65%_upc_verified' 
+              };
+            }
+          } else if (containmentRatio >= 0.90 && significantMatching.length >= 3) {
+            // Containment match: master tokens are a subset of supply tokens
+            // This is safe when brand is verified by UPC prefix
+            if (!bestMatch || containmentRatio > (bestMatch.similarity || 0)) {
+              bestMatch = { 
+                upc: entry.upc, 
+                originalName: entry.originalName,
+                expandedName: entry.expandedName,
+                similarity: containmentRatio, 
+                method: 'containment_upc_verified' 
+              };
             }
           }
         }

@@ -1,64 +1,171 @@
 {
-  "generatedAt": "2025-12-22T20:05:47.454Z",
+  "generatedAt": "2025-12-22T20:48:33.398Z",
   "indexEntries": 9055,
-  "expandedNames": 6321,
+  "expandedNames": 6391,
   "totalSupplies": 7225,
-  "matchedSupplies": 4331,
-  "coverage": "59.9%",
+  "matchedSupplies": 4419,
+  "coverage": "61.2%",
   "byMethod": {
-    "exact": 3861,
-    "65%_upc_verified": 159,
-    "90%_jaccard": 157,
-    "75%_brand": 90,
-    "75%_overlap": 52
+    "exact": 3894,
+    "65%_upc_verified": 300,
+    "containment_upc_verified": 30,
+    "75%_overlap": 47,
+    "90%_jaccard": 108,
+    "75%_brand": 39,
+    "75%_upc_brand": 1
   },
   "sampleMatches": [
     {
-      "supply": "Red Barn Chicken Stew 12oz",
-      "catalogOriginal": "RED BARN ck stew 12oz",
-      "catalogExpanded": "Red BARN Chicken stew 12oz",
+      "supply": "Durvet Ivermectin Pour on",
+      "catalogOriginal": "Durvet Ivermectin Pour On",
+      "catalogExpanded": "Durvet Ivermectin Pour On",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Petsafe Scoopfree Crystal Tray",
-      "catalogOriginal": "PetSafe ScoopFree Crystal Tray",
-      "catalogExpanded": "PetSafe ScoopFree Crystal Tray",
+      "supply": "Nylabone Oral Care Dental Spray",
+      "catalogOriginal": "NylaBone Oral Care Dental Spray",
+      "catalogExpanded": "NylaBone Oral Care Dental Spray",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Lilpals Small Harness Pkbpsm",
-      "catalogOriginal": "LILPALS SM HARNESS PKBPSM",
-      "catalogExpanded": "LILPALS Small HARNESS PKBPSM",
+      "supply": "Pro Plan Beef & Rice 13oz",
+      "catalogOriginal": "PRO PLAN beef & ri 13oz",
+      "catalogExpanded": "Pro Plan PLAN Beef & Ri 13oz",
+      "similarity": "75%",
+      "method": "65%_upc_verified"
+    },
+    {
+      "supply": "Coastal Sla38\" Soy Harness",
+      "catalogOriginal": "COASTAL SLA38\" SOY HARNESS",
+      "catalogExpanded": "COASTAL SLA38\" SOY HARNESS",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Quiettime Extra Large White Bed",
-      "catalogOriginal": "Quiettime XL white bed",
-      "catalogExpanded": "Quiettime Extra Large white bed",
+      "supply": "Science Diet Cat Salmon 7lb",
+      "catalogOriginal": "SD cat salm 7#",
+      "catalogExpanded": "Science Diet cat Salmon 7#",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Living World Finch Nest",
-      "catalogOriginal": "Living World Finch Nest",
-      "catalogExpanded": "Living World Finch Nest",
+      "supply": "Birdlife Cuttle Bones 2pk",
+      "catalogOriginal": "BirdLife Cuttle Bones 2pk",
+      "catalogExpanded": "BirdLife Cuttle Bones 2pk",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Fromm Surf & Turf 4lb",
-      "catalogOriginal": "FROMM surf & turf 4#",
-      "catalogExpanded": "Fromm surf & Turf 4#",
+      "supply": "Coastal Red 10' Cotton Training Leash",
+      "catalogOriginal": "Coastal RD 10' Cotton training leash",
+      "catalogExpanded": "Coastal Red 10' Cotton training Leash",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Vitakraft Sticks Apricot & Cherry Conur",
-      "catalogOriginal": "VitaKraft Sticks Apricot&Cherry Conur",
-      "catalogExpanded": "VitaKraft Sticks Apricot & Cherry Conur",
+      "supply": "Fromm Cat Game Bird Recipe 10lb",
+      "catalogOriginal": "FROMM game bird 4#",
+      "catalogExpanded": "Fromm game bird 4#",
+      "similarity": "100%",
+      "method": "containment_upc_verified"
+    },
+    {
+      "supply": "Coastal Soft Basket Muzzle Size 4",
+      "catalogOriginal": "Coastal Soft Basket Muzzle Size 4",
+      "catalogExpanded": "Coastal Soft Basket Muzzle Size 4",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Science Diet Mobility Small Bite 4lb",
+      "catalogOriginal": "SD mobility sm bite 4#",
+      "catalogExpanded": "Science Diet mobility Small bite 4#",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Catlife Purple Activiy & Scratch",
+      "catalogOriginal": "CATLIFE Purple Activiy&Scartch",
+      "catalogExpanded": "CATLIFE Purple Activiy & Scartch",
+      "similarity": "67%",
+      "method": "65%_upc_verified"
+    },
+    {
+      "supply": "Science Diet Cat Salmon 3.5lb",
+      "catalogOriginal": "SD cat salm 3.5#",
+      "catalogExpanded": "Science Diet cat Salmon 3.5#",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Coastal Purple26\" 2901 Collar",
+      "catalogOriginal": "COASTAL PUR26\" 2901 CLLR",
+      "catalogExpanded": "COASTAL Purple 26\" 2901 Collar",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Coastal Purple06' 906 Leash",
+      "catalogOriginal": "COASTAL PUR06' 906 LEASH",
+      "catalogExpanded": "COASTAL Purple 06' 906 Leash",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Basking Platform Filter",
+      "catalogOriginal": "Basking Platform Filter",
+      "catalogExpanded": "Basking Platform Filter",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Naturvet Calcium-phosphorus Powder",
+      "catalogOriginal": "Naturvet Calcium-Phosphorus Powder",
+      "catalogExpanded": "Naturvet Calcium-Phosphorus Powder",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Zoo Med Creature Habitat Kit",
+      "catalogOriginal": "ZooMed Creature Habitat Kit",
+      "catalogExpanded": "Zoo Med Creature Habitat Kitten",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Fromm Chicken Fromm Bites 12.5oz",
+      "catalogOriginal": "FROMM clasic ck 12.5oz",
+      "catalogExpanded": "Fromm clasic Chicken 12.5oz",
+      "similarity": "67%",
+      "method": "65%_upc_verified"
+    },
+    {
+      "supply": "Petmate Top Entry Litter Box",
+      "catalogOriginal": "PetMate Top Entry Litter Box",
+      "catalogExpanded": "PetMate Top Entry Litter Box",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Exoterra Mini Sand Mat",
+      "catalogOriginal": "ExoTerra Mini Sand mat",
+      "catalogExpanded": "ExoTerra Mini Sand mat",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Vital Essentials Cat Frozen Turkey 28oz",
+      "catalogOriginal": "VITAL ESSEN cat fro tur 28oz",
+      "catalogExpanded": "VITAL Essentials cat fro Turkey 28oz",
+      "similarity": "75%",
+      "method": "75%_overlap"
+    },
+    {
+      "supply": "Aqueon Shrimp Pellets 3.25oz",
+      "catalogOriginal": "AQUEON shrimp pel 3.25oz",
+      "catalogExpanded": "AQUEON shrimp Pellets 3.25oz",
       "similarity": "100%",
       "method": "exact"
     },
@@ -70,156 +177,51 @@
       "method": "exact"
     },
     {
-      "supply": "Vital Essentials Pork Mini Nibbles 12oz",
-      "catalogOriginal": "VIT ESSEN pork min nib 12oz",
-      "catalogExpanded": "Vital Essentials pork Mini Nibbles 12oz",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Tetramin Plus 1oz",
-      "catalogOriginal": "TETRA tetramin plus 1oz",
-      "catalogExpanded": "Tetra tetramin plus 1oz",
-      "similarity": "75%",
-      "method": "65%_upc_verified"
-    },
-    {
-      "supply": "Exoterra Small Waterfall",
-      "catalogOriginal": "ExoTerra Small Waterfall",
-      "catalogExpanded": "ExoTerra Small Waterfall",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Science Diet Cat Chicken 5.5oz",
-      "catalogOriginal": "SD cat ck 5.5oz",
-      "catalogExpanded": "Science Diet cat Chicken 5.5oz",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Zoo Med Waterfall Kit",
-      "catalogOriginal": "ZooMed Waterfall kit",
-      "catalogExpanded": "Zoo Med Waterfall kit",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Playfuls Voracious",
-      "catalogOriginal": "PlayFuls Voracious",
-      "catalogExpanded": "PlayFuls Voracious",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Science Diet Puppy Small Bite 12.5lb",
-      "catalogOriginal": "SD puppy sm bite 12.5#",
-      "catalogExpanded": "Science Diet puppy Small bite 12.5#",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Zoo Med Combo Gauge",
-      "catalogOriginal": "ZooMed Combo Gauge",
-      "catalogExpanded": "Zoo Med Combo Gauge",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Sunburst Sticks Island Fruits",
-      "catalogOriginal": "SunBurst Sticks Island Fruits",
-      "catalogExpanded": "SunBurst Sticks Island Fruits",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Pro Plan Beef Shred 5lb",
-      "catalogOriginal": "PRO PLAN beef shred 5#",
-      "catalogExpanded": "Pro Plan PLAN Beef shred 5#",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Zilla Cricket Drink with Calcium",
-      "catalogOriginal": "Zilla Cricket Drink with Calcium",
-      "catalogExpanded": "Zilla Cricket Drink with Calcium",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Tetra 6in1 Test Strip 25 Count",
-      "catalogOriginal": "TETRA 6in1 test strip 25 count",
-      "catalogExpanded": "Tetra 6in1 test strip 25 count",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Seachem Cupramine 1.7oz",
-      "catalogOriginal": "SEACHEM cupramine 1.7oz",
-      "catalogExpanded": "SEACHEM cupramine 1.7oz",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "JW Pet Pet Pet Pet Tall Silo Waterer",
-      "catalogOriginal": "JW Tall Silo Waterer",
-      "catalogExpanded": "JW Pet Tall Silo Waterer",
+      "supply": "Vari-Kennel-Kennel-Kennel-Kennel Kennel Giant",
+      "catalogOriginal": "vari kennel giant",
+      "catalogExpanded": "Vari-Kennel kennel giant",
       "similarity": "100%",
       "method": "90%_jaccard"
     },
     {
-      "supply": "Fromm Lamb & Sweet Potato 12.2oz",
-      "catalogOriginal": "FROMM lam & sw pot 12.2oz",
-      "catalogExpanded": "Fromm Lamb & Sweet Potato 12.2oz",
+      "supply": "Zoo Med High Range Reptile Thermometer",
+      "catalogOriginal": "Zoomed High range Reptile Therm",
+      "catalogExpanded": "Zoo Med High range Reptile Thermometer",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Exoterra Grow Mushrooms",
-      "catalogOriginal": "ExoTerra Grow Mushrooms",
-      "catalogExpanded": "ExoTerra Grow Mushrooms",
+      "supply": "Natural Bal Duck 13.2oz",
+      "catalogOriginal": "NAT BAL duck 13.2oz",
+      "catalogExpanded": "Natural BAL Duck 13.2oz",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Exoterra Medium Wide",
-      "catalogOriginal": "ExoTerra Med Wide",
-      "catalogExpanded": "ExoTerra Medium Wide",
+      "supply": "Coastal Collar Bsr12",
+      "catalogOriginal": "COASTAL CC BSR12",
+      "catalogExpanded": "COASTAL Cat Collar BSR12",
+      "similarity": "80%",
+      "method": "65%_upc_verified"
+    },
+    {
+      "supply": "Zoo Med Aquatic Turtle Food Growth",
+      "catalogOriginal": "ZooMed Aquatic Turtle Food Growth",
+      "catalogExpanded": "Zoo Med Aquatic Turtle Food Growth",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Titan Traincllr Heavy 22\" 5530",
-      "catalogOriginal": "TITAN TRAINCLLR HVY 22\" 5530",
-      "catalogExpanded": "TITAN TRAINCLLR Heavy 22\" 5530",
+      "supply": "Tropiclean Bbypwder Pet Spray",
+      "catalogOriginal": "Tropiclean BbyPwder Pet Spray",
+      "catalogExpanded": "Tropiclean BbyPwder Pet Spray",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Marina Fire Grass Plant",
-      "catalogOriginal": "MARINA fire grass plant",
-      "catalogExpanded": "MARINA fire grass plant",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Zoo Med Chestnut Bromeland",
-      "catalogOriginal": "ZooMed chestnut bromeland",
-      "catalogExpanded": "Zoo Med chestnut bromeland",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Penn Plax Quick Net 10 in",
-      "catalogOriginal": "PENN PLAX quick net 10 in",
-      "catalogExpanded": "PENN PLAX quick net 10 in",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Exoterra Corner Cave Large",
-      "catalogOriginal": "ExoTerra Corner Cave lg",
-      "catalogExpanded": "ExoTerra Corner Cave Large",
+      "supply": "Diamond Cat Chicken 5.5oz",
+      "catalogOriginal": "DIAM cat ck 5.5oz",
+      "catalogExpanded": "Diamond cat Chicken 5.5oz",
       "similarity": "100%",
       "method": "exact"
     }

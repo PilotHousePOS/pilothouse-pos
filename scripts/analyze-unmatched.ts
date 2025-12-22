@@ -1,73 +1,60 @@
-import { db } from "../server/db";
-import { supplies } from "../shared/schema";
-import { sql } from "drizzle-orm";
-import * as fs from "fs";
-import { expandAbbreviations } from "../server/abbreviationExpansion";
+import { db } from '../server/db';
+import { supplies } from '../shared/schema';
+import { isNull } from 'drizzle-orm';
+import { expandAbbreviations } from '../server/abbreviationExpansion';
+import * as fs from 'fs';
 
 async function main() {
-  // Get unmatched supplies
-  const unmatched = await db.select({
-    id: supplies.id,
-    name: supplies.name,
-    brand: supplies.brand
-  }).from(supplies).where(sql`${supplies.upc} IS NULL`);
+  const masterData = JSON.parse(fs.readFileSync('./scripts/master_upc_index.json', 'utf-8'));
   
-  console.log(`Total unmatched: ${unmatched.length}\n`);
+  const unmatched = await db.select().from(supplies).where(isNull(supplies.upc));
   
-  // Load master index
-  const masterData = JSON.parse(fs.readFileSync('scripts/master_upc_index.json', 'utf-8'));
+  console.log('=== UNMATCHED SUPPLY ANALYSIS ===');
+  console.log('Total unmatched:', unmatched.length);
+  console.log('Master index entries:', masterData.entries.length);
+  console.log();
   
-  // Group by brand
-  const byBrand: Record<string, string[]> = {};
-  unmatched.forEach(s => {
-    const brand = s.brand || 'Unknown';
-    if (!byBrand[brand]) byBrand[brand] = [];
-    byBrand[brand].push(s.name);
-  });
+  console.log('=== WHY THESE DONT MATCH ===\n');
   
-  // Sort by count
-  const sorted = Object.entries(byBrand).sort((a, b) => b[1].length - a[1].length);
-  
-  console.log("=== UNMATCHED BY BRAND (top 20) ===");
-  sorted.slice(0, 20).forEach(([brand, names]) => {
-    console.log(`\n${brand}: ${names.length} unmatched`);
-    names.slice(0, 3).forEach(n => console.log(`  - ${n}`));
-  });
-  
-  // Find potential matches in catalog for top unmatched brands
-  console.log("\n\n=== POTENTIAL MATCHES IN CATALOG ===");
-  const topBrands = ['Science Diet', 'Blue Buffalo', 'Pro Plan', 'Natural Balance', 'Royal Canin'];
-  
-  for (const targetBrand of topBrands) {
-    const brandUnmatched = unmatched.filter(s => s.brand === targetBrand).slice(0, 5);
-    if (brandUnmatched.length === 0) continue;
+  for (const s of unmatched.slice(0, 10)) {
+    const expanded = expandAbbreviations(s.name);
+    const words = expanded.toLowerCase().split(/\s+/).filter((w: string) => w.length > 2);
+    const firstWord = words[0] || '';
     
-    console.log(`\n--- ${targetBrand} ---`);
-    for (const supply of brandUnmatched) {
-      const expandedSupply = expandAbbreviations(supply.name);
-      console.log(`\nSupply: "${supply.name}"`);
-      console.log(`Expanded: "${expandedSupply}"`);
-      
-      // Find similar catalog entries
-      const supplyLower = expandedSupply.toLowerCase();
-      const candidates = masterData.entries.filter((e: any) => {
-        const catalogLower = expandAbbreviations(e.name).toLowerCase();
-        // Check if they share the brand and some key words
-        return catalogLower.includes(targetBrand.toLowerCase().split(' ')[0]) ||
-               e.name.toLowerCase().startsWith(targetBrand.toLowerCase().substring(0, 3));
-      }).slice(0, 3);
-      
-      if (candidates.length > 0) {
-        console.log("Catalog candidates:");
-        candidates.forEach((c: any) => {
-          const expanded = expandAbbreviations(c.name);
-          console.log(`  "${c.name}" -> "${expanded}"`);
-        });
-      }
+    const candidates = masterData.entries.filter((e: any) => 
+      e.name.toLowerCase().includes(firstWord)
+    ).slice(0, 2);
+    
+    console.log('SUPPLY:', s.name);
+    if (expanded !== s.name) console.log('  Expanded:', expanded);
+    if (candidates.length > 0) {
+      console.log('  Closest matches in master index:');
+      candidates.forEach((c: any) => console.log('    -', c.name));
+    } else {
+      console.log('  NO entries contain word "' + firstWord + '"');
+    }
+    console.log();
+  }
+  
+  // Count categories
+  let noMatch = 0;
+  const noMatchSamples: string[] = [];
+  for (const s of unmatched) {
+    const words = s.name.toLowerCase().split(/\s+/).filter((w: string) => w.length > 3);
+    const hasAny = words.some((w: string) => 
+      masterData.entries.some((e: any) => e.name.toLowerCase().includes(w))
+    );
+    if (!hasAny) {
+      noMatch++;
+      if (noMatchSamples.length < 8) noMatchSamples.push(s.name);
     }
   }
+  
+  console.log('=== PRODUCTS NOT IN MASTER INDEX AT ALL ===');
+  console.log('Count:', noMatch, 'of', unmatched.length);
+  noMatchSamples.forEach(n => console.log('  -', n));
   
   process.exit(0);
 }
 
-main().catch(console.error);
+main();
