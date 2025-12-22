@@ -1,0 +1,205 @@
+{
+  "oxbow": [
+    {
+      "upc": "744845302096",
+      "description": "OXB FOOD ESSNTL HAM/GERB 1#"
+    },
+    {
+      "upc": "744845302102",
+      "description": "OXB FOOD ESSNTL CHINCH 3#"
+    },
+    {
+      "upc": "744845402291",
+      "description": "OXB TRT WESTRN TMTHY 90OZ"
+    },
+    {
+      "upc": "744845402819",
+      "description": "OXB FOOD ESSNTL YOUNG GPIG 10#"
+    },
+    {
+      "upc": "744845403113",
+      "description": "OXB HIDEAWAY TMTHY TNNL"
+    },
+    {
+      "upc": "744845403137",
+      "description": "OXB HIDEAWAY TMTHY BUNGALOW MD"
+    },
+    {
+      "upc": "744845810072",
+      "description": "OXB TRT TMTHY ORC HAY 90Z"
+    },
+    {
+      "upc": "744845960173",
+      "description": "OXB TRT BAKED CRRT/DILL 3OZ"
+    },
+    {
+      "upc": "744845960234",
+      "description": "OXB TRT BAKED APPL/BAN 3OZ"
+    },
+    {
+      "upc": "744845963785",
+      "description": "OXB BTTL DRIPLESS 15OZ"
+    },
+    {
+      "upc": "744845966427",
+      "description": "OXB LTTR PAN RECT W/SHIELD"
+    },
+    {
+      "upc": "744845967912",
+      "description": "OXB HUT TMTHY SA MD"
+    },
+    {
+      "upc": "744845968339",
+      "description": "OXB FOOD ESSNTL FRRT 4#"
+    },
+    {
+      "upc": "744845110028",
+      "description": "OXB BEDNG PURE CMFT 36L"
+    },
+    {
+      "upc": "744845111025",
+      "description": "OXB BEDNG PURE CMFT 72L"
+    },
+    {
+      "upc": "744845402451",
+      "description": "OXB FOOD ESSNTL YOUNG RBBT5#"
+    },
+    {
+      "upc": "744845402550",
+      "description": "OXB FOOD ESSNTL YOUNG RBBT 10#"
+    },
+    {
+      "upc": "744845402895",
+      "description": "OXB FOOD ESSNTL ADLT RBBT 10#"
+    },
+    {
+      "upc": "744845402901",
+      "description": "OXB FOOD ESSNTL ADLT GPIG 5#"
+    },
+    {
+      "upc": "744845402963",
+      "description": "OXB TRT ORC GRSS 40OZ"
+    },
+    {
+      "upc": "744845965291",
+      "description": "OXB TOY CLBRTN CUPCAKE"
+    },
+    {
+      "upc": "744845966731",
+      "description": "OXB TOY WLL PLY CB"
+    },
+    {
+      "upc": "744845966847",
+      "description": "OXB TOY TMTHY WAFFLE"
+    },
+    {
+      "upc": "744845969831",
+      "description": "OXB TRT WESTRN TMTHY/ORC 15Z"
+    },
+    {
+      "upc": "744845402864",
+      "description": "OXB FOOD ESSNTL ADLT RBBT 25#"
+    },
+    {
+      "upc": "744845403168",
+      "description": "OXB TRT TMTHY MAT LG"
+    },
+    {
+      "upc": "744845963150",
+      "description": "OXB TOY APPL STC DANGLY"
+    },
+    {
+      "upc": "744845402758",
+      "description": "OXB TRT WESTRN TMTHY 40OZ"
+    },
+    {
+      "upc": "744845402888",
+      "description": "OXB FOOD ESSNTL ADLT RBBT 5#"
+    },
+    {
+      "upc": "744845402918",
+      "description": "OXB FOOD ESSNTL ADLT GPIG 10#"
+    },
+    {
+      "upc": "744845963631",
+      "description": "OXB FOOD GRDN MSE/RAT 2#"
+    },
+    {
+      "upc": "744845105024",
+      "description": "OXB BEDNG PURE CMFT WH 36L"
+    },
+    {
+      "upc": "744845108025",
+      "description": "OXB BEDNG PURE CMFT NAT 56L"
+    },
+    {
+      "upc": "744845402253",
+      "description": "OXB TRT WESTRN TMTHY 15OZ"
+    },
+    {
+      "upc": "744845402727",
+      "description": "OXB FOOD ESSNTL CHINCH 10#"
+    },
+    {
+      "upc": "744845404011",
+      "description": "OXB FOOD ESSNTL ADLT RAT 3#"
+    },
+    {
+      "upc": "744845404042",
+      "description": "OXB FOOD ESSNTL MSE/RAT 2.5#"
+    },
+    {
+      "upc": "744845405001",
+      "description": "OXB TRT BOTANICAL HAY 15OZ"
+    },
+    {
+      "upc": "744845965475",
+      "description": "OXB TOY TMTHY H/S MAT SM"
+    },
+    {
+      "upc": "744845403199",
+      "description": "OXB TRT TMTHY TWSTS"
+    },
+    {
+      "upc": "744845963273",
+      "description": "OXB TOY CRAZY HAY BLL"
+    },
+    {
+      "upc": "744845963365",
+      "description": "OXB TOY RLL AROUNDS"
+    },
+    {
+      "upc": "744845402802",
+      "description": "OXB FOOD ESSNTL YOUNG GPIG 5#"
+    },
+    {
+      "upc": "744845963518",
+      "description": "OXB CAGE HABITAT W/PLY YARD XL"
+    }
+  ],
+  "smartbones": [],
+  "benebone": [
+    {
+      "upc": "854111004019",
+      "description": "BEN CHW WSHBN PB MD"
+    },
+    {
+      "upc": "854111004095",
+      "description": "BEN CHW WSHBN PB LG"
+    },
+    {
+      "upc": "854111004965",
+      "description": "BEN CHW WSHBN PB GNT"
+    },
+    {
+      "upc": "854111004088",
+      "description": "BEN CHW WSHBN BCN LG"
+    },
+    {
+      "upc": "854111004484",
+      "description": "BEN CHW STC BCN LG"
+    }
+  ],
+  "barkworthies": [],
+  "pennplax": []
+}

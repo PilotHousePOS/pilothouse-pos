@@ -155,8 +155,10 @@ async function main() {
   
   // Load master UPC index (enriched index has data quality issues)
   console.log("1. Loading master UPC index...");
-  const masterData = JSON.parse(fs.readFileSync('scripts/master_upc_index.json', 'utf-8'));
-  console.log(`   Loaded ${masterData.entries.length} entries\n`);
+  const masterDataRaw = JSON.parse(fs.readFileSync('scripts/master_upc_index.json', 'utf-8'));
+  // Support both array format and object with entries property
+  const masterEntries = Array.isArray(masterDataRaw) ? masterDataRaw : (masterDataRaw.entries || []);
+  console.log(`   Loaded ${masterEntries.length} entries\n`);
   
   // Expand all catalog names using the abbreviation system
   console.log("2. Expanding abbreviations in catalog names...");
@@ -238,7 +240,7 @@ async function main() {
   const index: IndexEntry[] = [];
   let expanded = 0;
   
-  for (const entry of masterData.entries) {
+  for (const entry of masterEntries) {
     const originalName = entry.name;
     // Use pre-expanded name from master if available
     let expandedName = entry.expandedName || originalName;

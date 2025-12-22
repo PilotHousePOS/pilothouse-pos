@@ -1,18 +1,18 @@
 {
-  "generatedAt": "2025-12-22T22:50:39.620Z",
-  "indexEntries": 7145,
-  "expandedNames": 4852,
+  "generatedAt": "2025-12-22T23:11:16.159Z",
+  "indexEntries": 7009,
+  "expandedNames": 5214,
   "totalSupplies": 7225,
-  "matchedSupplies": 5906,
-  "coverage": "81.7%",
+  "matchedSupplies": 6712,
+  "coverage": "92.9%",
   "byMethod": {
-    "exact": 2353,
-    "brand_match": 849,
-    "high_jaccard": 92,
-    "brand_tokens": 1183,
-    "exact_fuzzy": 110,
-    "containment": 68,
-    "combined": 14
+    "exact": 2196,
+    "brand_match": 464,
+    "containment": 31,
+    "brand_tokens": 490,
+    "high_jaccard": 60,
+    "exact_fuzzy": 100,
+    "combined": 7
   },
   "sampleMatches": [
     {
@@ -23,10 +23,10 @@
       "method": "exact"
     },
     {
-      "supply": "Fluval Aquarientorf 500g",
-      "catalogOriginal": "FLUVAL BIOMAX 500G",
-      "catalogExpanded": "FLUVAL BIOMAX 500G",
-      "similarity": "55%",
+      "supply": "Greenies Sweet Potato Regular 12oz",
+      "catalogOriginal": "GREENIES ORG REG 12OZ",
+      "catalogExpanded": "GREENIES Orange Regular 12OZ",
+      "similarity": "68%",
       "method": "brand_match"
     },
     {
@@ -37,30 +37,51 @@
       "method": "exact"
     },
     {
+      "supply": "Fluval Aquarientorf 500g",
+      "catalogOriginal": "FLUVAL AQUARIENTORF 500G",
+      "catalogExpanded": "FLUVAL AQUARIENTORF 500G",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
       "supply": "Benebone Small Fishbone",
-      "catalogOriginal": "BENEBONE SM ZAGGLER BCN",
-      "catalogExpanded": "BENEBONE Small ZAGGLER Bacon",
-      "similarity": "61%",
-      "method": "brand_match"
+      "catalogOriginal": "BENEBONE SM FISHBONE",
+      "catalogExpanded": "BENEBONE Small FISHBONE",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Dog Polo Pruple Extra Large",
+      "catalogOriginal": "DOG POLO PRUPLE XL",
+      "catalogExpanded": "DOG POLO PRUPLE Extra Large",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Bailey In Water Small",
+      "catalogOriginal": "BAILEYINWTR SM",
+      "catalogExpanded": "Bailey In Water Small",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Redbarn Filled Hoof Chee & Bacon",
+      "catalogOriginal": "REDBARN FILLED HOOF CHEE&BCN",
+      "catalogExpanded": "REDBARN FILLED HOOF CHEE & Bacon",
+      "similarity": "100%",
+      "method": "exact"
     },
     {
       "supply": "Aquatop Vibrant Pass Yellw Plant 16\"",
-      "catalogOriginal": "AQUATOP VIB PASS YELLOW PLNT 6\"",
-      "catalogExpanded": "AQUATOP Vibrant PASS YELLOW Plant 6\"",
-      "similarity": "63%",
-      "method": "high_jaccard"
+      "catalogOriginal": "AQUATOP VIB PASS YELLW PLNT 16\"",
+      "catalogExpanded": "AQUATOP Vibrant PASS Yellow Plant 16\"",
+      "similarity": "100%",
+      "method": "exact"
     },
     {
       "supply": "Fluval Ac70 Filter",
-      "catalogOriginal": "FLUVAL AC50 FILTER",
-      "catalogExpanded": "FLUVAL AC50 FILTER",
-      "similarity": "69%",
-      "method": "brand_match"
-    },
-    {
-      "supply": "Kaytee Itty Bitty Igloo",
-      "catalogOriginal": "KAYTEE ITTY BITTY IGLOO",
-      "catalogExpanded": "KAYTEE ITTY BITTY IGLOO",
+      "catalogOriginal": "FLUVAL AC70 FILTER",
+      "catalogExpanded": "FLUVAL AC70 FILTER",
       "similarity": "100%",
       "method": "exact"
     },
@@ -68,6 +89,27 @@
       "supply": "Forza Replace Filter Pad Fz7uv",
       "catalogOriginal": "FORZA REPLACE FILTER PD FZ7UV",
       "catalogExpanded": "FORZA REPLACE FILTER Pad FZ7UV",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Basic Hoodie Rasberry Small",
+      "catalogOriginal": "BASIC HOODIE RASBERRY SM",
+      "catalogExpanded": "BASIC HOODIE RASBERRY Small",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Fluval Biothane-stratum 4.4lb",
+      "catalogOriginal": "FLUVAL STRATUM 4.4LB",
+      "catalogExpanded": "FLUVAL STRATUM 4.4LB",
+      "similarity": "77%",
+      "method": "brand_match"
+    },
+    {
+      "supply": "Kong Jumbler Tug Medium/Large",
+      "catalogOriginal": "KNG JUMBLER TUG MD/LG",
+      "catalogExpanded": "Kong JUMBLER Tug Medium/Large",
       "similarity": "100%",
       "method": "exact"
     },
@@ -80,37 +122,51 @@
     },
     {
       "supply": "Bubble-shell",
-      "catalogOriginal": "shorefins™ Bubble Shell Air Stone - 3.25\"",
-      "catalogExpanded": "shorefins™ Bubble Shell Air Stone - 3.25\"",
-      "similarity": "58%",
-      "method": "brand_match"
-    },
-    {
-      "supply": "Lilpals Small Collar Zpk12",
-      "catalogOriginal": "LILPALS SM COLLAR ZPK12",
-      "catalogExpanded": "LILPALS Small Collar ZPK12",
+      "catalogOriginal": "BUBBLE-SHELL",
+      "catalogExpanded": "BUBBLE-SHELL",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Kong Jumbler Tug Medium/Large",
-      "catalogOriginal": "KNG JUMBLER TUG SM/MD",
-      "catalogExpanded": "Kong JUMBLER Tug Small/Medium",
-      "similarity": "92%",
-      "method": "brand_tokens"
+      "supply": "Shawl Collar Sweater Large Gray",
+      "catalogOriginal": "SHAWL COLLR SWTR LG GRAY",
+      "catalogExpanded": "SHAWL Collar SWTR Large GRAY",
+      "similarity": "67%",
+      "method": "containment"
     },
     {
-      "supply": "Zilla Black Heat Bulb 150w",
-      "catalogOriginal": "Zilla Day White Light Bulb 150W",
-      "catalogExpanded": "Zilla Day White Light Bulb 150W",
-      "similarity": "65%",
-      "method": "brand_tokens"
+      "supply": "Fruitables Sweet Potato",
+      "catalogOriginal": "FRUITABLES SWEET POT",
+      "catalogExpanded": "Fruitables Sweet Potato",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Kaytee Giant Strt Tube",
+      "catalogOriginal": "KAYTEE GIANT CMFRT WHEEL",
+      "catalogExpanded": "KAYTEE GIANT Comfort WHEEL",
+      "similarity": "58%",
+      "method": "brand_match"
+    },
+    {
+      "supply": "Kaytee Hammock W Stand",
+      "catalogOriginal": "KAYTEE HAMMOCK W STAND",
+      "catalogExpanded": "KAYTEE HAMMOCK W STAND",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Bam-bones 5.75\"",
+      "catalogOriginal": "BAM-BONES 5.75\"",
+      "catalogExpanded": "BAM-BONES 5.75\"",
+      "similarity": "100%",
+      "method": "exact"
     },
     {
       "supply": "Zoo Med Turltle Dock Small",
-      "catalogOriginal": "ZooMed Corner Bowl Sm",
-      "catalogExpanded": "Zoo Med Corner Bowl Small",
-      "similarity": "67%",
+      "catalogOriginal": "ZOOMED AQUALOG SM",
+      "catalogExpanded": "Zoo Med AQUALOG Small",
+      "similarity": "70%",
       "method": "brand_tokens"
     },
     {
@@ -122,17 +178,10 @@
     },
     {
       "supply": "Nutrisource Chicken, Turkey & Lamb Cat Formula & Salmon Select 12lb",
-      "catalogOriginal": "NUTRI SOUR cat ck 4#",
-      "catalogExpanded": "Nutrisource cat Chicken 4#",
-      "similarity": "65%",
+      "catalogOriginal": "NUTRI SOUR cat ck,salm 12#",
+      "catalogExpanded": "Nutrisource cat Chicken,Salmon 12#",
+      "similarity": "77%",
       "method": "brand_tokens"
-    },
-    {
-      "supply": "Earthbath Stress Release Spritz Euc & Peppermint",
-      "catalogOriginal": "EarthBath Stress Release Spritz Euc&Pep",
-      "catalogExpanded": "EarthBath Stress Release Spritz Euc & Pep",
-      "similarity": "60%",
-      "method": "high_jaccard"
     },
     {
       "supply": "Fluval Carbon 3pk",
@@ -142,11 +191,11 @@
       "method": "exact"
     },
     {
-      "supply": "Oxbow Critical Care Herbal Antibacterial",
-      "catalogOriginal": "OXBOW CRITICAL CARE HERB 36G",
-      "catalogExpanded": "OXBOW CRITICAL CARE HERB 36G",
-      "similarity": "57%",
-      "method": "brand_tokens"
+      "supply": "Kaytee Crinkle Tunnel",
+      "catalogOriginal": "KAYTEE CRINKLE TUNNEL",
+      "catalogExpanded": "KAYTEE CRINKLE TUNNEL",
+      "similarity": "100%",
+      "method": "exact"
     },
     {
       "supply": "Starmark Large Cookie Cup Chicken",
@@ -156,9 +205,16 @@
       "method": "exact"
     },
     {
-      "supply": "Starmark Medium Cookie Cup Chicken",
-      "catalogOriginal": "STARMARK MD COOKIE CUP CHKN",
-      "catalogExpanded": "STARMARK Medium COOKIE CUP Chicken",
+      "supply": "Laguna Powerjet",
+      "catalogOriginal": "LAGUNA POWERJET",
+      "catalogExpanded": "LAGUNA POWERJET",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Wholesome Rewards Medium Original",
+      "catalogOriginal": "WHLSM RWRDS MD ORIGINAL",
+      "catalogExpanded": "Wholesome Rewards Medium ORIGINAL",
       "similarity": "100%",
       "method": "exact"
     },
@@ -166,62 +222,6 @@
       "supply": "Blue Buffalo Kitten 3oz",
       "catalogOriginal": "BLUE BUF kitten 3oz",
       "catalogExpanded": "Blue Buffalo Buffalo kitten 3oz",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Freshbreath Toothbrush Large",
-      "catalogOriginal": "FreshBreath ToothBrush Large",
-      "catalogExpanded": "FreshBreath ToothBrush Large",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Coastal Autumn12\" Collar",
-      "catalogOriginal": "COASTAL RBG12\" COLLAR",
-      "catalogExpanded": "COASTAL RBG12\" Collar",
-      "similarity": "69%",
-      "method": "brand_match"
-    },
-    {
-      "supply": "RedBarn Large Breed Grain Free Frozen 15lb",
-      "catalogOriginal": "RED b lg br gr fr 15#",
-      "catalogExpanded": "RedBarn Large Breed Grain Free 15#",
-      "similarity": "100%",
-      "method": "brand_tokens"
-    },
-    {
-      "supply": "Blue Buffalo Cat Chicken Gravy 5.5oz",
-      "catalogOriginal": "BLUE BUF cat ck grav 5.5oz",
-      "catalogExpanded": "Blue Buffalo Buffalo cat Chicken Gravy 5.5oz",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Coastal Ony30\" Soy Harness",
-      "catalogOriginal": "COASTAL ONY30\" SOY HARNESS",
-      "catalogExpanded": "COASTAL ONY30\" SOY HARNESS",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Coastal Lwo06' 12926 Leash",
-      "catalogOriginal": "COASTAL FWT06' 12926 LEASH",
-      "catalogExpanded": "COASTAL FWT06' 12926 Leash",
-      "similarity": "87%",
-      "method": "brand_tokens"
-    },
-    {
-      "supply": "Zoo Med Reptirock Extra Large",
-      "catalogOriginal": "ZooMed  ReptiRock Lg.",
-      "catalogExpanded": "Zoo Med ReptiRock Large.",
-      "similarity": "97%",
-      "method": "brand_tokens"
-    },
-    {
-      "supply": "Valhoma 28 Ro Collar",
-      "catalogOriginal": "VALHOMA 28 RO COLLAR",
-      "catalogExpanded": "VALHOMA 28 RO Collar",
       "similarity": "100%",
       "method": "exact"
     }
