@@ -1,291 +1,292 @@
-import { db } from '../server/db';
-import { supplies } from '../shared/schema';
-import { eq } from 'drizzle-orm';
-import * as fs from 'fs';
+import { db } from "../server/db";
+import { supplies } from "../shared/schema";
+import { eq, sql } from "drizzle-orm";
+import * as fs from "fs";
 
-interface UPCEntry {
-  upc: string;
-  name: string;
-  source: string;
-}
-
-const BRAND_ABBREVS: Record<string, string> = {
-  'zml': 'zoo med', 'zm': 'zoo med',
-  'zil': 'zilla',
-  'gal': 'galapagos',
-  'flu': 'flukers', 'fluk': 'flukers',
-  'exo': 'exo terra', 'ext': 'exo terra',
-  'oxb': 'oxbow',
-  'kay': 'kaytee',
-  'hik': 'hikari',
-  'tet': 'tetra',
-  'aqu': 'aqueon',
-  'api': 'api',
-  'mar': 'marineland',
-  'sec': 'seachem',
-  'flu': 'fluval',
-  'gre': 'greenies',
-  'kon': 'kong',
-  'nyl': 'nylabone',
-  'ben': 'benebone',
-  'cos': 'coastal',
-  'lup': 'lupine',
-  'sd': 'science diet',
-  'rc': 'royal canin',
-  'nb': 'natural balance',
-  'bb': 'blue buffalo',
-  'frm': 'fromm',
-  'prm': 'primal',
-  'vict': 'victor',
-  'diam': 'diamond',
-  'zig': 'zignature', 'zign': 'zignature',
-  'cand': 'canidae',
-  'nutr': 'nutrisource',
-  'omeg': 'omega one',
-  'oce': 'ocean nutrition',
-  'van': 'van ness', 'vann': 'van ness',
-  'pet': 'petmate',
-  'mid': 'midwest',
-  'ware': 'ware',
-  'prev': 'prevue',
-  'saf': 'safari',
-  'furm': 'furminator',
-  'trp': 'tropiclean', 'trop': 'tropiclean',
-  'nat': 'naturvet',
-  'skout': 'skouts honor',
-  'zym': 'zymox',
-  'four': 'four paws', 'fourp': 'four paws',
-  'jw': 'jw pet',
-  'ae': 'a&e',
-  'bird': 'birdlife',
-  'vita': 'vitakraft',
-  'care': 'carefresh',
-  'cas': 'cascade',
-  'penn': 'penn plax',
-  'aq': 'aquatop',
-  'frit': 'fritz',
-  'rep': 'reptile systems',
-  'reps': 'reptile systems',
-};
-
-const WORD_ABBREVS: Record<string, string> = {
-  'froz': 'frozen', 'fro': 'frozen', 'frz': 'frozen',
-  'bedng': 'bedding', 'bedg': 'bedding',
-  'ck': 'chicken', 'chk': 'chicken', 'chkn': 'chicken',
-  'bf': 'beef',
-  'lam': 'lamb', 'lmb': 'lamb',
-  'slm': 'salmon', 'sal': 'salmon', 'salm': 'salmon',
-  'trk': 'turkey', 'turk': 'turkey',
-  'dck': 'duck',
-  'veg': 'vegetable',
-  'frt': 'fruit',
-  'sm': 'small',
-  'med': 'medium', 'md': 'medium',
-  'lg': 'large', 'lrg': 'large',
-  'xl': 'extra large', 'xlg': 'extra large',
-  'oz': 'ounce',
-  'lb': 'pound', 'lbs': 'pounds',
-  'pk': 'pack',
-  'ct': 'count',
-  'pc': 'piece',
-  'fd': 'freeze dried',
-  'gr': 'grain', 'grn': 'grain',
-  'gf': 'grain free',
-  'sens': 'sensitive', 'sensi': 'sensitive',
-  'pup': 'puppy',
-  'kit': 'kitten',
-  'sr': 'senior',
-  'adlt': 'adult',
-  'col': 'collar', 'cllr': 'collar',
-  'lsh': 'leash',
-  'hrn': 'harness',
-  'bwl': 'bowl',
-  'fdr': 'feeder',
-  'trt': 'treat', 'trts': 'treats',
-  'dntl': 'dental',
-  'orig': 'original',
-  'prem': 'premium',
-  'asst': 'assorted',
-  'shri': 'shrimp', 'shrim': 'shrimp',
-  'brin': 'brine',
-  'cnut': 'coconut',
-  'cich': 'cichlid',
-  'pel': 'pellet', 'pell': 'pellets',
-  'waf': 'wafer',
-  'enhan': 'enhancing',
-  'terrm': 'terrarium', 'terr': 'terrarium',
-  'liner': 'liner',
-  'bkgd': 'background',
-  'cling': 'cling',
-  'des': 'desert',
-  'sil': 'screen',
-  'bulb': 'bulb',
-  'fixt': 'fixture', 'fix': 'fixture',
-  'sup': 'super',
-  'stw': 'stew',
-  'pron': 'pronto',
-  'jum': 'jumbo',
-  'bld': 'blend',
-  'coco': 'coconut',
-  'clay': 'clay',
-  'hydro': 'hydro',
-  'ball': 'balls',
-  'eco': 'eco',
-  'earth': 'earth',
-  'loos': 'loose',
-  'qt': 'quart',
-  'gal': 'gallon',
-  'snak': 'snack',
-  'pv': 'pure vita',
-  'ind': 'indoor',
-  'shred': 'shredded',
-  'belly': 'belly',
-  'shin': 'shiny',
-  'coat': 'coat',
-  'health': 'healthy',
-  'bugu': 'bug bite',
-  'bug': 'bug',
-  'bite': 'bites',
-  'algae': 'algae',
-  'crisp': 'crisps',
-  'color': 'color',
-  'spirul': 'spirulina',
-  'plank': 'plankton',
-  'blood': 'blood',
-  'worm': 'worm',
-  'prazi': 'prazipro',
-  'herbal': 'herbal',
-  'betta': 'betta',
-  'revive': 'revive',
-  'rep': 'reptile',
-  'sys': 'systems',
-  'zone': 'zone',
-  't5': 't5',
-  'uv': 'uv', 'uvb': 'uvb',
-  'durable': 'durable',
-  'dish': 'dish',
-  'water': 'water',
-};
-
-function expandName(text: string): string {
-  let expanded = text.toLowerCase().trim();
+// Comprehensive abbreviation mappings for BOTH directions
+const EXPAND_MAP: Record<string, string[]> = {
+  // Brands
+  'sd': ['science diet', 'sciencediet'],
+  'nb': ['natural balance', 'naturalbalance'],
+  'bb': ['blue buffalo', 'bluebuffalo', 'blue'],
+  'pp': ['pro plan', 'proplan'],
+  'totw': ['taste of the wild', 'tasteofthewild'],
+  'tow': ['taste of the wild', 'tasteofthewild'],
+  'ns': ['nutrisource', 'nutri source'],
+  'rc': ['royal canin', 'royalcanin'],
+  'euk': ['eukanuba'],
+  'frm': ['fromm'],
+  'zm': ['zoo med', 'zoomed'],
   
-  const words = expanded.split(/[\s\-_]+/);
-  if (words.length > 0) {
-    const firstWord = words[0].replace(/[^a-z]/g, '');
-    if (BRAND_ABBREVS[firstWord]) {
-      words[0] = BRAND_ABBREVS[firstWord];
+  // Size/Weight
+  '#': ['lb', 'lbs', 'pound', 'pounds'],
+  'oz': ['ounce', 'ounces'],
+  'floz': ['fl oz', 'fluid ounce'],
+  'lg': ['large'],
+  'lrg': ['large'],
+  'med': ['medium'],
+  'sm': ['small'],
+  'mini': ['mini', 'min'],
+  'xl': ['extra large', 'xlarge'],
+  'xs': ['extra small', 'xsmall'],
+  
+  // Products
+  'ck': ['chicken', 'chk', 'chkn'],
+  'chk': ['chicken', 'ck', 'chkn'],
+  'chkn': ['chicken', 'ck', 'chk'],
+  'sal': ['salmon', 'salm'],
+  'salm': ['salmon', 'sal'],
+  'lam': ['lamb'],
+  'bef': ['beef'],
+  'trky': ['turkey', 'turk'],
+  'turk': ['turkey', 'trky'],
+  
+  // Age
+  'pup': ['puppy'],
+  'kit': ['kitten'],
+  'adt': ['adult'],
+  'adlt': ['adult'],
+  'sr': ['senior'],
+  'jr': ['junior'],
+  
+  // Descriptors
+  'sensi': ['sensitive'],
+  'perf': ['perfect'],
+  'sens': ['sensitive'],
+  'gf': ['grain free', 'grainfree'],
+  'wt': ['weight'],
+  'hlth': ['health', 'healthy'],
+  'nat': ['natural'],
+  'org': ['organic'],
+  
+  // Products
+  'fd': ['food'],
+  'trt': ['treat', 'treats'],
+  'trts': ['treats', 'treat'],
+  'sham': ['shampoo'],
+  'cond': ['conditioner'],
+  'coll': ['collar'],
+  'lsh': ['leash'],
+  'hrns': ['harness']
+};
+
+function createTokenVariants(token: string): string[] {
+  const variants = [token];
+  const tokenLower = token.toLowerCase();
+  
+  // Add expansions
+  if (EXPAND_MAP[tokenLower]) {
+    variants.push(...EXPAND_MAP[tokenLower]);
+  }
+  
+  // Check if token is an expansion
+  for (const [abbr, expansions] of Object.entries(EXPAND_MAP)) {
+    if (expansions.includes(tokenLower)) {
+      variants.push(abbr);
+      variants.push(...expansions.filter(e => e !== tokenLower));
     }
   }
   
-  const expandedWords = words.map(w => {
-    const clean = w.replace(/[^a-z0-9]/g, '');
-    return WORD_ABBREVS[clean] || w;
-  });
+  // Handle size with numbers (e.g., "16#" -> "16lb")
+  const sizeMatch = token.match(/^(\d+(?:\.\d+)?)(#|lb|lbs|oz|kg)$/i);
+  if (sizeMatch) {
+    const num = sizeMatch[1];
+    variants.push(`${num}lb`, `${num}lbs`, `${num}#`, `${num}oz`);
+  }
   
-  return expandedWords.join(' ')
-    .replace(/[™®©'"#]/g, '')
+  return [...new Set(variants)];
+}
+
+function normalize(text: string): string {
+  return text.toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
-function tokenize(text: string): Set<string> {
-  const expanded = expandName(text);
-  const tokens = expanded
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .split(/\s+/)
-    .filter(t => t.length > 1);
-  return new Set(tokens);
+function tokenize(text: string): string[] {
+  return normalize(text).split(' ').filter(t => t.length > 0);
 }
 
-function matchScore(dbTokens: Set<string>, srcTokens: Set<string>): number {
-  if (dbTokens.size === 0 || srcTokens.size === 0) return 0;
+function flexibleMatch(supplyTokens: string[], catalogTokens: string[]): number {
+  const supplyVariants = supplyTokens.flatMap(createTokenVariants);
+  const catalogVariants = catalogTokens.flatMap(createTokenVariants);
   
+  const supplySet = new Set(supplyVariants.map(t => t.toLowerCase()));
+  const catalogSet = new Set(catalogVariants.map(t => t.toLowerCase()));
+  
+  // Count matches
   let matches = 0;
-  for (const t of dbTokens) {
-    if (srcTokens.has(t)) {
-      matches++;
-    } else {
-      for (const s of srcTokens) {
-        if ((t.length > 3 && s.includes(t)) || (s.length > 3 && t.includes(s))) {
-          matches += 0.5;
-          break;
-        }
-      }
-    }
+  for (const t of supplySet) {
+    if (catalogSet.has(t)) matches++;
   }
   
-  return matches / Math.max(dbTokens.size, srcTokens.size);
+  // Calculate overlap ratio based on original token count
+  const minTokens = Math.min(supplyTokens.length, catalogTokens.length);
+  return minTokens > 0 ? matches / (minTokens + 2) : 0;
+}
+
+function extractBrand(name: string): string {
+  const brandPatterns = [
+    { pattern: /^(science\s?diet|sd)\b/i, brand: 'sciencediet' },
+    { pattern: /^(blue\s?buffalo|bb|blue)\b/i, brand: 'bluebuffalo' },
+    { pattern: /^(pro\s?plan|pp|purina\s?pro)\b/i, brand: 'proplan' },
+    { pattern: /^(natural\s?balance|nb)\b/i, brand: 'naturalbalance' },
+    { pattern: /^(taste\s?of\s?the\s?wild|totw|tow)\b/i, brand: 'tasteofthewild' },
+    { pattern: /^(nutri\s?source|ns)\b/i, brand: 'nutrisource' },
+    { pattern: /^(royal\s?canin|rc)\b/i, brand: 'royalcanin' },
+    { pattern: /^(zoo\s?med|zm)\b/i, brand: 'zoomed' },
+    { pattern: /^(exo\s?terra)\b/i, brand: 'exoterra' },
+    { pattern: /^(zilla)\b/i, brand: 'zilla' },
+    { pattern: /^(fluker)/i, brand: 'fluker' },
+    { pattern: /^(kaytee|kt)\b/i, brand: 'kaytee' },
+    { pattern: /^(fromm|frm)\b/i, brand: 'fromm' },
+    { pattern: /^(coastal)\b/i, brand: 'coastal' },
+    { pattern: /^(kong)\b/i, brand: 'kong' },
+    { pattern: /^(greenies)/i, brand: 'greenies' },
+    { pattern: /^(benebone)/i, brand: 'benebone' },
+    { pattern: /^(oxbow)/i, brand: 'oxbow' },
+    { pattern: /^(tetra)\b/i, brand: 'tetra' },
+    { pattern: /^(fluval)\b/i, brand: 'fluval' },
+    { pattern: /^(hikari)/i, brand: 'hikari' },
+    { pattern: /^(marineland)/i, brand: 'marineland' },
+    { pattern: /^(aqueon)/i, brand: 'aqueon' },
+    { pattern: /^(api)\b/i, brand: 'api' },
+    { pattern: /^(penn[\s-]?plax)/i, brand: 'pennplax' },
+    { pattern: /^(eukanuba|euk)\b/i, brand: 'eukanuba' },
+    { pattern: /^(adams)\b/i, brand: 'adams' },
+    { pattern: /^(tropiclean)/i, brand: 'tropiclean' },
+    { pattern: /^(dogswell)/i, brand: 'dogswell' },
+    { pattern: /^(weewee|wee[\s-]?wee)/i, brand: 'weewee' },
+    { pattern: /^(jw\s?pet|jw)\b/i, brand: 'jwpet' },
+  ];
+  
+  for (const { pattern, brand } of brandPatterns) {
+    if (pattern.test(name)) return brand;
+  }
+  return '';
 }
 
 async function main() {
-  console.log('=== RESETTING ALL SKUs ===');
-  await db.update(supplies).set({ sku: null });
+  console.log("=== SMART UPC MATCHING ===\n");
   
-  const allMaybe: UPCEntry[] = JSON.parse(fs.readFileSync('maybe_upcs.json', 'utf-8'));
-  const goodMaybe = allMaybe.slice(0, 3171);
+  // Load all UPC sources
+  console.log("1. Loading UPC sources...");
+  const masterData = JSON.parse(fs.readFileSync('scripts/master_upc_index.json', 'utf-8'));
+  console.log(`   Master index: ${masterData.entries.length} entries`);
   
-  const master: UPCEntry[] = JSON.parse(fs.readFileSync('scripts/master_verified_upcs.json', 'utf-8'));
-  const googleSheet = master.filter(e => e.source === 'google_sheet');
-  const pdfInvoices = master.filter(e => e.source.includes('.txt'));
+  // Build index with flexible matching data
+  type IndexEntry = {
+    upc: string;
+    name: string;
+    tokens: string[];
+    brand: string;
+    isCoastal: boolean;
+  };
   
-  console.log(`Good Maybe: ${goodMaybe.length}`);
-  console.log(`Google Sheet: ${googleSheet.length}`);
-  console.log(`PDF Invoices: ${pdfInvoices.length}`);
+  const index: IndexEntry[] = masterData.entries.map((e: any) => ({
+    upc: e.upc,
+    name: e.name,
+    tokens: tokenize(e.name),
+    brand: extractBrand(e.name),
+    isCoastal: e.isCoastal || e.name.toLowerCase().includes('coastal')
+  }));
   
-  const allSources = [...goodMaybe, ...googleSheet, ...pdfInvoices];
-  console.log(`Total source entries: ${allSources.length}`);
-  
-  const sourceIndex: { tokens: Set<string>; entry: UPCEntry }[] = [];
-  for (const entry of allSources) {
-    sourceIndex.push({
-      tokens: tokenize(entry.name),
-      entry
-    });
-  }
-  
-  const products = await db.select({
+  // Get supplies
+  console.log("\n2. Fetching supplies...");
+  const allSupplies = await db.select({
     id: supplies.id,
-    name: supplies.name
+    name: supplies.name,
+    brand: supplies.brand
   }).from(supplies);
+  console.log(`   Found ${allSupplies.length} supplies`);
   
-  console.log(`\nTotal products: ${products.length}`);
+  // Match
+  console.log("\n3. Matching...");
+  const matches: Array<{
+    id: number;
+    upc: string;
+    supplyName: string;
+    catalogName: string;
+    score: number;
+    method: string;
+  }> = [];
+  const usedUpcs = new Set<string>();
   
-  let matched = 0;
-  const THRESHOLD = 0.55;
-  
-  for (const product of products) {
-    const productTokens = tokenize(product.name);
-    if (productTokens.size < 2) continue;
+  for (const supply of allSupplies) {
+    const supplyTokens = tokenize(supply.name);
+    if (supplyTokens.length < 2) continue;
     
-    let bestMatch: UPCEntry | null = null;
-    let bestScore = 0;
+    const supplyBrand = extractBrand(supply.name) || (supply.brand || '').toLowerCase().replace(/[^a-z]/g, '');
     
-    for (const { tokens, entry } of sourceIndex) {
-      const score = matchScore(productTokens, tokens);
-      if (score > bestScore) {
-        bestScore = score;
-        bestMatch = entry;
+    let bestMatch: { upc: string; name: string; score: number; method: string } | null = null;
+    
+    for (const entry of index) {
+      if (usedUpcs.has(entry.upc) && !entry.isCoastal) continue;
+      
+      // Brand must match if both have brands
+      if (supplyBrand && entry.brand && supplyBrand !== entry.brand) continue;
+      
+      const score = flexibleMatch(supplyTokens, entry.tokens);
+      
+      // High score match
+      if (score >= 0.7) {
+        if (!bestMatch || score > bestMatch.score) {
+          bestMatch = { 
+            upc: entry.upc, 
+            name: entry.name, 
+            score, 
+            method: score >= 0.9 ? 'high_flex' : 'med_flex' 
+          };
+        }
       }
     }
     
-    if (bestMatch && bestScore >= THRESHOLD) {
-      await db.update(supplies)
-        .set({ sku: bestMatch.upc })
-        .where(eq(supplies.id, product.id));
-      matched++;
-      
-      if (matched <= 30 || matched % 500 === 0) {
-        console.log(`[${(bestScore * 100).toFixed(0)}%] "${product.name}" => "${bestMatch.name}"`);
-      }
+    if (bestMatch) {
+      matches.push({
+        id: supply.id,
+        upc: bestMatch.upc,
+        supplyName: supply.name,
+        catalogName: bestMatch.name,
+        score: bestMatch.score,
+        method: bestMatch.method
+      });
+      usedUpcs.add(bestMatch.upc);
     }
   }
   
-  console.log(`\nTotal matched: ${matched}`);
+  console.log(`\n   Found ${matches.length} matches`);
   
-  const final = await db.select({ id: supplies.id, sku: supplies.sku }).from(supplies);
-  const withSku = final.filter(p => p.sku && p.sku.trim() !== '').length;
-  console.log(`\n=== FINAL: ${withSku}/${final.length} (${((withSku / final.length) * 100).toFixed(1)}%) ===`);
+  // Apply
+  console.log("\n4. Applying matches...");
+  await db.update(supplies).set({ upc: null });
+  
+  for (const match of matches) {
+    await db.update(supplies).set({ upc: match.upc }).where(eq(supplies.id, match.id));
+  }
+  
+  const finalCount = await db.select({ count: sql<number>`count(*)::int` })
+    .from(supplies).where(sql`${supplies.upc} IS NOT NULL`);
+  
+  console.log(`\n=== RESULTS ===`);
+  console.log(`Total supplies: ${allSupplies.length}`);
+  console.log(`Matched: ${finalCount[0].count}`);
+  console.log(`Coverage: ${((finalCount[0].count / allSupplies.length) * 100).toFixed(1)}%`);
+  
+  // Save sample
+  fs.writeFileSync('scripts/smart_match_report.json', JSON.stringify({
+    generatedAt: new Date().toISOString(),
+    total: allSupplies.length,
+    matched: finalCount[0].count,
+    coverage: ((finalCount[0].count / allSupplies.length) * 100).toFixed(1) + '%',
+    samples: matches.slice(0, 30).map(m => ({
+      supply: m.supplyName,
+      catalog: m.catalogName,
+      score: (m.score * 100).toFixed(0) + '%'
+    }))
+  }, null, 2));
+  
+  process.exit(0);
 }
 
 main().catch(console.error);

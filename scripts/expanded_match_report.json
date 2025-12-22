@@ -1,0 +1,226 @@
+{
+  "generatedAt": "2025-12-22T18:00:25.024Z",
+  "indexEntries": 8430,
+  "expandedNames": 3967,
+  "totalSupplies": 7225,
+  "matchedSupplies": 4037,
+  "coverage": "55.9%",
+  "byMethod": {
+    "exact": 3765,
+    "90%_jaccard": 153,
+    "75%_brand": 89,
+    "75%_overlap": 30
+  },
+  "sampleMatches": [
+    {
+      "supply": "Coastal 6' Aliens 969 Leash",
+      "catalogOriginal": "COASTAL 6' ALN 969 LEASH",
+      "catalogExpanded": "COASTAL 6' Aliens 969 LEASH",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Science Diet Cat 11+ 15lb",
+      "catalogOriginal": "SD cat 11+ 15#",
+      "catalogExpanded": "Science Diet cat 11+ 15#",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Safari the Complete Cat Brush",
+      "catalogOriginal": "Safari The Complete Cat Brush",
+      "catalogExpanded": "Safari The Complete Cat Brush",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Zoo Med Mini Tropical Uvb Combo",
+      "catalogOriginal": "ZooMed Mini trop. UVB Combo",
+      "catalogExpanded": "Zoo Med Mini Tropical. UVB Combo",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Sodapup Mini Honey Emat",
+      "catalogOriginal": "SodaPup Mini Honey Emat",
+      "catalogExpanded": "SodaPup Mini Honey Emat",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Zoo Med Snake Starter Kit 20 g",
+      "catalogOriginal": "ZooMed Snake Starter Kit 20 g",
+      "catalogExpanded": "Zoo Med Snake Starter Kit 20 g",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Lilpals Extra Small Collar Zpk08",
+      "catalogOriginal": "LILPALS XS COLLAR ZPK08",
+      "catalogExpanded": "LILPALS Extra Small COLLAR ZPK08",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Blue Wilderness Chick & Turkey Treat",
+      "catalogOriginal": "Blue Wilderness Chick&Turkey Treat",
+      "catalogExpanded": "Blue Wilderness Chick & Turkey Treat",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Nature Zone Bearded Color",
+      "catalogOriginal": "Nature Zone bearded Color",
+      "catalogExpanded": "Nature Zone bearded Color",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Kong Shakers Wingz Small/Medium",
+      "catalogOriginal": "KONG SHAKERS WINGZ SM/MD",
+      "catalogExpanded": "KONG SHAKERS WINGZ Small/Medium",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Exoterra Screen Cover 40/50gal Breed",
+      "catalogOriginal": "ExoTerra Screen Cover 40/50Gal Breed",
+      "catalogExpanded": "ExoTerra Screen Cover 40/50Gal Breed",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Freshnews Orginal Litter 12lb",
+      "catalogOriginal": "FreshNews Orginal Litter 12lb",
+      "catalogExpanded": "FreshNews Orginal Litter 12lb",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Prevue House Style Tiel Cage",
+      "catalogOriginal": "Prevue House Style Tiel Cage",
+      "catalogExpanded": "Prevue House Style Tiel Cage",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Zoo Med Reptitemp Digital Thermo",
+      "catalogOriginal": "ZooMed Reptitemp Digital Thermo",
+      "catalogExpanded": "Zoo Med Reptitemp Digital Thermo",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Nature's Miracle No Marking",
+      "catalogOriginal": "NaturesMiracle No marking",
+      "catalogExpanded": "Nature's Miracle No marking",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Petmate Hibck Drwstin 12 Liner Large",
+      "catalogOriginal": "PetMate HiBck DrwStin 12 Liner Lg",
+      "catalogExpanded": "PetMate HiBck DrwStin 12 Liner Large",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Hikari Staple Mini 8.8oz",
+      "catalogOriginal": "HIKARI staple mini 8.8oz",
+      "catalogExpanded": "HIKARI staple mini 8.8oz",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Turbo Sports Ball",
+      "catalogOriginal": "Turbo Sports Ball",
+      "catalogExpanded": "Turbo Sports Ball",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Pro Plan Chicken Shred 15lb",
+      "catalogOriginal": "PRO PLAN ck shred 15#",
+      "catalogExpanded": "PRO PLAN Chicken shred 15#",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Zoo Med Moonlite Reptile Bulb 60w",
+      "catalogOriginal": "ZooMed Moonlite reptile Bulb 60W",
+      "catalogExpanded": "Zoo Med Moonlite reptile Bulb 60W",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Zoo Med Crab Salt Water Conditioner",
+      "catalogOriginal": "ZooMed Crab Salt Water Con",
+      "catalogExpanded": "Zoo Med Crab Salt Water Conditioner",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Coastal Collar Tpd14\"",
+      "catalogOriginal": "COASTAL COLLAR TPD14\"",
+      "catalogExpanded": "COASTAL COLLAR TPD14\"",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Feline Greenies Pill Pockets Chicken",
+      "catalogOriginal": "Feline Greenies Pill Pockets Chkn",
+      "catalogExpanded": "Feline Greenies Pill Pockets Chicken",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Natural Bal Plant 13oz",
+      "catalogOriginal": "NAT BAL plant 13oz",
+      "catalogExpanded": "Natural BAL plant 13oz",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Higgins Sunburst Cockatiel",
+      "catalogOriginal": "Higgins Sunburts Cockatiel",
+      "catalogExpanded": "Higgins Sunburst Cockatiel",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Coastal 6' Llamas 469 Leash",
+      "catalogOriginal": "COASTAL 6' LLM 469 LEASH",
+      "catalogExpanded": "COASTAL 6' Llamas 469 LEASH",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Seachem De Nitrate 500ml",
+      "catalogOriginal": "SEACHEM de nitrate 500ml",
+      "catalogExpanded": "SEACHEM de nitrate 500ml",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Vari-Kennel-Kennel-Kennel-Kennel Kennel 28\"",
+      "catalogOriginal": "\"vari kennel 28\"\"\"",
+      "catalogExpanded": "\"Vari-Kennel kennel 28\"\"\"",
+      "similarity": "100%",
+      "method": "90%_jaccard"
+    },
+    {
+      "supply": "Tropiclean Hypoallergenic Coconut Sham",
+      "catalogOriginal": "TropiClean Hypoallergenic Coconut Sham",
+      "catalogExpanded": "TropiClean Hypoallergenic Coconut Sham",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Lilpals Plush Hotdog Toy",
+      "catalogOriginal": "LILPALS PLUSH HOTDOG TOY",
+      "catalogExpanded": "LILPALS PLUSH HOTDOG TOY",
+      "similarity": "100%",
+      "method": "exact"
+    }
+  ]
+}

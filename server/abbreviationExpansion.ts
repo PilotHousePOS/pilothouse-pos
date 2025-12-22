@@ -75,6 +75,8 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Md': 'Medium',
   'Sm': 'Small',
   'Min': 'Mini',
+  'Lb': 'lb',
+  'Oz': 'oz',
   'Xlg': 'Extra Large',
   'Xl': 'Extra Large',
   'Xxl': 'Extra Extra Large',
@@ -97,7 +99,9 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Grn': 'Green',
   'Pkf': 'Pink',
   'Ylw': 'Yellow',
+  'Yellw': 'Yellow',
   'Gry': 'Gray',
+  'Prpl': 'Purple',
   
   // Comfort/General
   'Cmfrt': 'Comfort',
@@ -117,6 +121,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Jr': 'Junior',
   'Sr': 'Senior',
   'Juvi': 'Juvenile',
+  'Yng': 'Young',
   
   // Animals
   'Eleph': 'Elephant',
@@ -141,6 +146,9 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Sweetharvest': 'Sweet Harvest',
   'Worldsbestcatlitter': "World's Best Cat Litter",
   'AssortedMedium': 'Assorted Medium',
+  'Pwrwalker': 'PowerWalker',
+  'Quietflow': 'QuietFlow ',
+  'Smartbones': 'SmartBones',
   
   // Mammoth toy internal abbreviations
   'Xtr': 'Extra',
@@ -159,6 +167,9 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Runabutball': 'Run-About Ball',
   'Clr': 'Clear',
   'Pebb': 'Pebbles',
+  'Grdnsel': 'Garden Select',
+  'Chinhut': 'Chin Hut',
+  'Chinchla': 'Chinchilla',
   
   // Collar/Leash abbreviations
   'Cllr': 'Collar',
@@ -168,6 +179,11 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Adj': 'Adjustable',
   'Nyl': 'Nylon',
   'Lth': 'Leather',
+  'Buc': 'Buckle',
+  'Buck': 'Buckle',
+  'Jlly': 'Jolly',
+  'Jll': 'Jolly',
+  'Pr': 'Prong',
   
   // Coastal Pet Products Pattern Names (Authorized Dealer Styles)
   // Reference: https://coastalpet.com/media/nd3izx2w/2024productcatalog.pdf (Page 11)
@@ -418,6 +434,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Crt': 'Cartridge',
   'Cart': 'Cartridge',
   'Crb': 'Carbon',
+  'Crbn': 'Carbon',
   'Therm': 'Thermometer',
   'Therma': 'Thermal',
   'Spng': 'Sponge',

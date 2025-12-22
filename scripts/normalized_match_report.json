@@ -1,0 +1,135 @@
+{
+  "generatedAt": "2025-12-22T17:20:59.121Z",
+  "indexEntries": 7364,
+  "totalSupplies": 7225,
+  "matchedSupplies": 1949,
+  "coverage": "27.0%",
+  "byMethod": {
+    "exact_normalized": 1886,
+    "80%_brand": 33,
+    "75%_tokens": 17,
+    "90%_jaccard": 13
+  },
+  "sampleMatches": [
+    {
+      "supply": "Exoterra Glow Light Large",
+      "catalog": "ExoTerra Glow Light Large",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Tetra Glofish Flake 1.59oz",
+      "catalog": "TETRA glofish flake 1.59oz",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Lilpals Latex Cofee Macroons",
+      "catalog": "LILPALS LATEX COFEE MACROONS",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Exoterra Mealworms",
+      "catalog": "ExoTerra MealWorms",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Zilla Day Blue Light 100w",
+      "catalog": "Zilla Day Blue Light 100W",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Natures Micracle Catnip Train Spray",
+      "catalog": "Natures Micracle Catnip Train Spray",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Flukers Grub Bag Turtle Treats",
+      "catalog": "Flukers Grub Bag Turtle Treats",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Zilla Aquatic Turtle Kit 20l",
+      "catalog": "Zilla Aquatic Turtle kit 20L",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Exoterra Terraskyuv 9w",
+      "catalog": "ExoTerra TerraSkyUV 9W",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Zilla Heat Mat Mini",
+      "catalog": "Zilla Heat Mat Mini",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Dogswell Liquid Bandage",
+      "catalog": "Dogswell Liquid Bandage",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Zilla Mini Halogen Bulb 50w Red",
+      "catalog": "Zilla Mini Halogen Bulb 50W Red",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Kaytee Healthy Bits Treats",
+      "catalog": "Kaytee Healthy Bits Treats",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Living World Mineral Block",
+      "catalog": "Living World Mineral Block",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Kaytee Treat Stick Honey Multipk Keet",
+      "catalog": "Kaytee Treat Stick Honey Multipk keet",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Komodo Tortoise Seed Kid",
+      "catalog": "Komodo Tortoise Seed Kid",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Tetrafaune Deluxe Reptohabitat 40",
+      "catalog": "TetraFaune Deluxe Reptohabitat 40",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Kong Batabout Vibez Butterfly 2pk",
+      "catalog": "KONG Batabout Vibez Butterfly 2pk",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Exoterra Intense Basking 75w",
+      "catalog": "ExoTerra Intense Basking 75W",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    },
+    {
+      "supply": "Livingworld Sand Perch Covers",
+      "catalog": "LivingWorld Sand perch Covers",
+      "similarity": "100%",
+      "method": "exact_normalized"
+    }
+  ]
+}
