@@ -8,7 +8,9 @@ function normalize(text: string): string {
   return text.toLowerCase()
     .replace(/\bmarineland\b/gi, 'marina')  // Normalize brand: Marineland → Marina
     .replace(/(\d+)#/g, '$1lb')         // Convert weight symbol: "3.5#" -> "3.5lb"
-    .replace(/#(\d+)/g, 'lb$1')         // Handle "#5" -> "lb5"
+    .replace(/#(\d+)/g, '$1lb')         // Handle "#5" -> "5lb"
+    .replace(/(\d+)\s*lbs?\b/gi, '$1lb') // Normalize "13 lb" or "13lbs" to "13lb"
+    .replace(/(\d+)\s*oz\b/gi, '$1oz')   // Normalize "8 oz" to "8oz"
     .replace(/([a-z])(\d)/gi, '$1 $2')  // Split letters from digits: "Black14" -> "Black 14"
     .replace(/(\d)([a-z])/gi, '$1 $2')  // Split digits from letters: "14inch" -> "14 inch"
     .replace(/['']s\b/g, 's')           // Handle possessives: "Elsey's" -> "Elseys"
@@ -18,6 +20,49 @@ function normalize(text: string): string {
     .replace(/[^a-z0-9\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+// Pre-expand common brand abbreviations BEFORE main expansion
+function preExpandBrands(text: string): string {
+  const brandExpansions: [RegExp, string][] = [
+    [/\bsd\b/gi, 'Science Diet'],
+    [/\bbb\b/gi, 'Blue Buffalo'],
+    [/\bpp\b/gi, 'Pro Plan'],
+    [/\bnb\b/gi, 'Natural Balance'],
+    [/\bns\b/gi, 'Nutrisource'],
+    [/\brc\b/gi, 'Royal Canin'],
+    [/\btow\b/gi, 'Taste of the Wild'],
+    [/\btotw\b/gi, 'Taste of the Wild'],
+    [/\bzm\b/gi, 'Zoo Med'],
+    [/\brbp\b/gi, 'Redbarn'],
+    [/\bkt\b/gi, 'Kaytee'],
+    [/\bkay\b/gi, 'Kaytee'],
+    [/\bhik\b/gi, 'Hikari'],
+    [/\btet\b/gi, 'Tetra'],
+    [/\bcoa\b/gi, 'Coastal'],
+    [/\bcp\b/gi, 'Coastal'],
+    [/\bap\b/gi, 'API'],
+    [/\bph\b/gi, 'Penn Plax'],
+    [/\beth\b/gi, 'Ethical Pet'],
+    [/\bkng\b/gi, 'Kong'],
+    [/\bnyl\b/gi, 'Nylabone'],
+    [/\bgrn\b/gi, 'Greenies'],
+    [/\bflv\b/gi, 'Fluval'],
+    [/\baq\b/gi, 'Aqueon'],
+    [/\bmar\b/gi, 'Marineland'],
+    [/\bvict\b/gi, 'Victor'],
+    [/\bdiam\b/gi, 'Diamond'],
+    [/\beuk\b/gi, 'Eukanuba'],
+    [/\bfrm\b/gi, 'Fromm'],
+    [/\bzig\b/gi, 'Zignature'],
+    [/\bnutri\s?sou?\b/gi, 'Nutrisource'],
+  ];
+  
+  let result = text;
+  for (const [pattern, replacement] of brandExpansions) {
+    result = result.replace(pattern, replacement);
+  }
+  return result;
 }
 
 function tokenize(text: string): string[] {
@@ -135,33 +180,53 @@ async function main() {
     '022808': 'merrick',       // Merrick
     '076344': 'wellness',      // Wellness
     '064992': 'orijen',        // Orijen
-    '064992': 'acana',         // Acana (shared with Orijen)
-    '769949': 'naturalbalance', // Natural Balance
+    '082413': 'nutro',         // Nutro
     '079105': 'primal',        // Primal
+    '859610': 'zignature',     // Zignature
+    
+    // RedBarn - CRITICAL: uses multiple prefixes!
+    '758541': 'redbarn',       // RedBarn (dry food)
+    '785184': 'redbarn',       // RedBarn (dry food alt)
+    '515450': 'redbarn',       // RedBarn (treats - bully slices)
     
     // Aquatics/Reptile brands
     '030172': 'pennplax',
     '097612': 'zoomed',
-    '015561': 'fluval',
+    '015561': 'fluval',        // Also Marina/Hagen
     '046798': 'tetra',
     '042055': 'hikari',
     '077234': 'api',
+    '317163': 'api',           // API alternate
     '015905': 'marineland',
     '090653': 'exoterra',
     '017800': 'zilla',
+    '096316': 'zilla',         // Zilla alternate
+    '048081': 'pennplax',      // Penn-Plax alternate (PH prefix)
     
-    // Accessories brands
+    // Small animal / Treats brands
+    '071859': 'kaytee',
+    '884244': 'vitakraft',     // Vitakraft
+    '086783': 'oxbow',         // Oxbow (for those in master)
+    
+    // Accessories/Toys brands
     '076484': 'coastal',
+    '052742': 'coastal',       // Coastal alternate (COA)
     '045663': 'fourpaws',
-    '785184': 'redbarn',
     '071860': 'arknaturals',
     '030027': 'acme',
-    '071859': 'kaytee',
     '018065': 'tropiclean',
     '013227': 'kong',
-    '018214': 'nylabone',
-    '642863': 'greenies',
-    '875854': 'benebone'
+    '035585': 'kong',          // Kong primary
+    '018214': 'nylabone',      // Nylabone
+    '871864': 'nylabone',      // Nylabone alternate
+    '642863': 'greenies',      // Greenies
+    '875854': 'benebone',      // Benebone
+    
+    // Dog treats - priority
+    '895777': 'smokehouse',    // Smokehouse
+    '073101': 'fieldcrestfarms', // Fieldcrest Farms
+    '084279': 'nutrisource',   // NutriSource treats
+    '810028': 'smartbones',    // SmartBones
   };
   
   const index: IndexEntry[] = [];
@@ -169,8 +234,10 @@ async function main() {
   
   for (const entry of masterData.entries) {
     const originalName = entry.name;
+    // Pre-expand brand abbreviations FIRST (sd → Science Diet, rbp → Redbarn, etc.)
+    const brandExpanded = preExpandBrands(originalName);
     // Pre-process Coastal color codes followed by dimensions (e.g., "AWN06'" -> "AWN 06'")
-    const preSplit = originalName
+    const preSplit = brandExpanded
       .replace(/\b(AWN|LWO|NPK|HNT|PUR|BLK|GRY|PNK|RED|GRN|BLU|ORG|YLW|TAN|BRN|WHT|SLV|GLD)(\d)/gi, '$1 $2');
     const expandedName = expandAbbreviations(preSplit);
     
@@ -185,7 +252,7 @@ async function main() {
       originalName,
       expandedName,
       tokens: tokenize(expandedName),
-      brand: extractBrand(expandedName),
+      brand: extractBrand(expandedName) || upcBrand, // Use UPC brand if name doesn't have it
       upcBrand,
       isCoastal: entry.isCoastal || originalName.toLowerCase().includes('coastal')
     });
@@ -236,12 +303,14 @@ async function main() {
   let fuzzyMatches = 0;
   
   for (const supply of allSupplies) {
-    // CRITICAL: Expand abbreviations in supply names too!
-    const expandedSupplyName = expandAbbreviations(supply.name);
+    // CRITICAL: Pre-expand brand abbreviations THEN expand other abbreviations
+    const brandExpanded = preExpandBrands(supply.name);
+    const expandedSupplyName = expandAbbreviations(brandExpanded);
     const normalizedSupplyName = normalize(expandedSupplyName);
     const supplyTokens = tokenize(expandedSupplyName);
     if (supplyTokens.length < 2) continue;
     
+    // Get brand from name extraction OR from supply.brand field
     const supplyBrand = extractBrand(expandedSupplyName) || (supply.brand || '').toLowerCase().replace(/[^a-z]/g, '');
     
     let bestMatch: { 
@@ -265,106 +334,122 @@ async function main() {
       exactMatches++;
     }
     
-    // SLOW PATH: Fuzzy matching if no exact match
+    // SMART MATCHING: Combine ALL methods with weighted scoring
     if (!bestMatch) {
-      // PASS 1: Brand-filtered matching with UPC prefix confirmation
-      // When supply has a brand AND we find entries with matching UPC prefix brand,
-      // we can use smarter matching because the UPC prefix confirms the brand
-      if (supplyBrand) {
-        const brandCandidates = index.filter(e => 
-          e.upcBrand === supplyBrand && 
-          (!usedUpcs.has(e.upc) || e.isCoastal)
-        );
+      let candidates: Array<{
+        entry: IndexEntry;
+        score: number;
+        method: string;
+        details: string;
+      }> = [];
+      
+      for (const entry of index) {
+        if (usedUpcs.has(entry.upc) && !entry.isCoastal) continue;
         
-        for (const entry of brandCandidates) {
-          const similarity = jaccardSimilarity(supplyTokens, entry.tokens);
-          const supplySet = new Set(supplyTokens);
-          const matchingTokens = entry.tokens.filter(t => supplySet.has(t));
-          const significantMatching = matchingTokens.filter(t => t.length > 2);
-          
-          // Check for containment: if almost all master tokens are in supply, it's likely the same product
-          // This handles cases where master is abbreviated (e.g., "NUTRI SOU lg br 26#") 
-          // and supply is verbose (e.g., "Nutrisource Large Breed Puppy Chicken & Rice Recipe 26lb")
-          const containmentRatio = matchingTokens.length / entry.tokens.length;
-          
-          // MATCH if:
-          // 1. 65%+ Jaccard AND 3+ significant tokens match, OR
-          // 2. 90%+ of master tokens are contained in supply AND brand+weight match (containment match)
-          if (similarity >= 0.65 && (significantMatching.length >= 3 || (significantMatching.length >= 2 && supplyTokens.length <= 4))) {
-            if (!bestMatch || similarity > bestMatch.similarity) {
-              bestMatch = { 
-                upc: entry.upc, 
-                originalName: entry.originalName,
-                expandedName: entry.expandedName,
-                similarity, 
-                method: '65%_upc_verified' 
-              };
-            }
-          } else if (containmentRatio >= 0.90 && significantMatching.length >= 3) {
-            // Containment match: master tokens are a subset of supply tokens
-            // This is safe when brand is verified by UPC prefix
-            if (!bestMatch || containmentRatio > (bestMatch.similarity || 0)) {
-              bestMatch = { 
-                upc: entry.upc, 
-                originalName: entry.originalName,
-                expandedName: entry.expandedName,
-                similarity: containmentRatio, 
-                method: 'containment_upc_verified' 
-              };
-            }
-          }
+        const entryNorm = normalize(entry.expandedName);
+        const supplySet = new Set(supplyTokens);
+        const entrySet = new Set(entry.tokens);
+        
+        // Calculate all matching factors
+        const jaccard = jaccardSimilarity(supplyTokens, entry.tokens);
+        const matchingTokens = entry.tokens.filter(t => supplySet.has(t));
+        const significantMatching = matchingTokens.filter(t => t.length > 2);
+        const reverseMatching = supplyTokens.filter(t => entrySet.has(t));
+        
+        // Containment ratios (bidirectional)
+        const masterContainment = matchingTokens.length / Math.max(entry.tokens.length, 1);
+        const supplyContainment = reverseMatching.length / Math.max(supplyTokens.length, 1);
+        
+        // Brand match check
+        const brandMatch = supplyBrand && (entry.upcBrand === supplyBrand || entry.brand === supplyBrand);
+        
+        // Weight/size match check
+        const weightPattern = /(\d+(?:\.\d+)?)(lb|oz|kg|g|qt|gal)/i;
+        const supplyWeight = normalizedSupplyName.match(weightPattern);
+        const entryWeight = entryNorm.match(weightPattern);
+        const weightMatch = supplyWeight && entryWeight && 
+          supplyWeight[1] === entryWeight[1] && supplyWeight[2].toLowerCase() === entryWeight[2].toLowerCase();
+        
+        // Product type keywords
+        const productTypes = ['bully', 'stick', 'treat', 'chew', 'bone', 'food', 'dry', 'wet', 'can', 'kibble', 
+          'slice', 'ring', 'braid', 'knuckle', 'jerky', 'rawhide', 'dental', 'puppy', 'adult', 'senior',
+          'small', 'medium', 'large', 'giant', 'mini', 'toy', 'collar', 'leash', 'harness', 'bed',
+          'filter', 'heater', 'light', 'lamp', 'bulb', 'substrate', 'bedding', 'hay', 'pellet'];
+        const supplyProductTypes = supplyTokens.filter(t => productTypes.includes(t));
+        const entryProductTypes = entry.tokens.filter(t => productTypes.includes(t));
+        const productTypeMatch = supplyProductTypes.some(t => entryProductTypes.includes(t));
+        
+        // === COMBINED SCORING ===
+        let score = 0;
+        let method = '';
+        let details = '';
+        
+        // Base score from Jaccard
+        score += jaccard * 0.4;
+        
+        // Brand match bonus (+0.25)
+        if (brandMatch) {
+          score += 0.25;
+          details += 'brand+';
+        }
+        
+        // Weight match bonus (+0.15)
+        if (weightMatch) {
+          score += 0.15;
+          details += 'weight+';
+        }
+        
+        // Product type match bonus (+0.10)
+        if (productTypeMatch) {
+          score += 0.10;
+          details += 'type+';
+        }
+        
+        // Significant token bonus (scaled by count)
+        if (significantMatching.length >= 2) {
+          score += Math.min(significantMatching.length * 0.05, 0.20);
+          details += `${significantMatching.length}tok+`;
+        }
+        
+        // High containment bonus
+        if (masterContainment >= 0.8 || supplyContainment >= 0.8) {
+          score += 0.10;
+          details += 'contain+';
+        }
+        
+        // Determine method based on primary factor
+        if (jaccard >= 0.90) method = 'exact_fuzzy';
+        else if (brandMatch && weightMatch) method = 'brand_weight';
+        else if (brandMatch && significantMatching.length >= 3) method = 'brand_tokens';
+        else if (brandMatch) method = 'brand_match';
+        else if (weightMatch && significantMatching.length >= 2) method = 'weight_tokens';
+        else if (jaccard >= 0.70) method = 'high_jaccard';
+        else if (masterContainment >= 0.80) method = 'containment';
+        else method = 'combined';
+        
+        // Threshold: require minimum score of 0.55 to be considered
+        // With brand match, lower to 0.45
+        const threshold = brandMatch ? 0.45 : 0.55;
+        
+        if (score >= threshold) {
+          candidates.push({ entry, score, method, details });
         }
       }
       
-      // PASS 2: Standard fuzzy matching if brand-filtered didn't find a match
-      if (!bestMatch) {
-        for (const entry of index) {
-          if (usedUpcs.has(entry.upc) && !entry.isCoastal) continue;
-          
-          const similarity = jaccardSimilarity(supplyTokens, entry.tokens);
-        
-          // 90%+ threshold
-          if (similarity >= 0.90) {
-            if (!bestMatch || similarity > bestMatch.similarity) {
-              bestMatch = { 
-                upc: entry.upc, 
-                originalName: entry.originalName,
-                expandedName: entry.expandedName,
-                similarity, 
-                method: '90%_jaccard' 
-              };
-            }
-          }
-          // 75%+ with brand match (from name OR UPC prefix)
-          else if (similarity >= 0.75 && supplyBrand && 
-                   (entry.brand === supplyBrand || entry.upcBrand === supplyBrand)) {
-            if (!bestMatch || similarity > bestMatch.similarity) {
-              bestMatch = { 
-                upc: entry.upc, 
-                originalName: entry.originalName,
-                expandedName: entry.expandedName,
-                similarity, 
-                method: entry.upcBrand === supplyBrand ? '75%_upc_brand' : '75%_brand' 
-              };
-            }
-          }
-          // 75%+ with high token overlap
-          else if (similarity >= 0.75) {
-            const supplySet = new Set(supplyTokens);
-            const overlap = entry.tokens.filter(t => supplySet.has(t)).length;
-            if (overlap >= supplyTokens.length * 0.85 && (!bestMatch || similarity > bestMatch.similarity)) {
-              bestMatch = { 
-                upc: entry.upc, 
-                originalName: entry.originalName,
-                expandedName: entry.expandedName,
-                similarity, 
-                method: '75%_overlap' 
-              };
-            }
-          }
-        }
+      // Sort by score and pick the best
+      candidates.sort((a, b) => b.score - a.score);
+      
+      if (candidates.length > 0) {
+        const best = candidates[0];
+        bestMatch = {
+          upc: best.entry.upc,
+          originalName: best.entry.originalName,
+          expandedName: best.entry.expandedName,
+          similarity: best.score,
+          method: best.method
+        };
+        fuzzyMatches++;
       }
-      if (bestMatch) fuzzyMatches++;
     }
     
     if (bestMatch) {
@@ -391,16 +476,32 @@ async function main() {
   console.log("\n   By method:");
   Object.entries(byMethod).forEach(([k, v]) => console.log(`     ${k}: ${v}`));
   
-  // Apply matches
-  console.log("\n5. Applying matches to database...");
-  await db.update(supplies).set({ upc: null });
+  // Save matches to file - database apply done separately
+  console.log("\n5. Saving matches...");
   
-  let applied = 0;
-  for (const match of matches) {
-    await db.update(supplies).set({ upc: match.upc }).where(eq(supplies.id, match.id));
-    applied++;
-    if (applied % 500 === 0) console.log(`   Applied ${applied}...`);
+  // Merge confirmed + new matches
+  const allMatchMap = new Map<number, string>();
+  for (const [id, upc] of confirmedMatches) {
+    allMatchMap.set(id, upc);
   }
+  for (const m of matches) {
+    allMatchMap.set(m.id, m.upc);
+  }
+  
+  console.log(`   Total unique matches: ${allMatchMap.size}`);
+  
+  // Save to confirmed file
+  const allEntries = Array.from(allMatchMap.entries());
+  const savedMatches = allEntries.map(([id, upc]) => ({ supplyId: id, upc }));
+  fs.writeFileSync(confirmedFile, JSON.stringify({ matches: savedMatches }, null, 2));
+  console.log(`   Saved ${savedMatches.length} matches to confirmed file`);
+  
+  // Generate SQL file for bulk apply
+  const values = allEntries.map(([id, upc]) => `(${id},'${upc.replace(/'/g, "''")}')`).join(',');
+  const sqlScript = `UPDATE supplies SET upc = NULL;\nUPDATE supplies SET upc = v.upc FROM (VALUES ${values}) AS v(id, upc) WHERE supplies.id = v.id;`;
+  fs.writeFileSync('/tmp/apply_upcs.sql', sqlScript);
+  console.log(`   Generated SQL script at /tmp/apply_upcs.sql`);
+  console.log(`   Run: psql $DATABASE_URL -f /tmp/apply_upcs.sql`);
   
   // Final count
   const finalCount = await db.select({ count: sql<number>`count(*)::int` })

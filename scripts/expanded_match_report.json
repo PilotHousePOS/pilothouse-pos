@@ -1,192 +1,52 @@
 {
-  "generatedAt": "2025-12-22T21:25:31.710Z",
+  "generatedAt": "2025-12-22T22:13:42.659Z",
   "indexEntries": 9055,
   "expandedNames": 6391,
   "totalSupplies": 7225,
-  "matchedSupplies": 4421,
-  "coverage": "61.2%",
+  "matchedSupplies": 4808,
+  "coverage": "66.5%",
   "byMethod": {
-    "90%_jaccard": 106,
-    "exact": 3901,
-    "containment_upc_verified": 34,
-    "65%_upc_verified": 291,
-    "75%_overlap": 48,
-    "75%_brand": 39,
-    "75%_upc_brand": 1
+    "exact": 3799,
+    "65%_upc_verified": 368,
+    "75%_overlap": 50,
+    "50%_weight_brand": 224,
+    "containment_brand": 100,
+    "90%_jaccard": 36,
+    "4tok_brand": 63
   },
   "sampleMatches": [
     {
-      "supply": "JW Pet Pet Pet Pet Hol-ee Roller Jumbo",
-      "catalogOriginal": "JW HOL-EE ROLLER JUMBO",
-      "catalogExpanded": "JW Pet HOL-EE ROLLER JUMBO",
-      "similarity": "100%",
-      "method": "90%_jaccard"
-    },
-    {
-      "supply": "Spot Sooth Wrm Hug Bone 9\"",
-      "catalogOriginal": "SPT SOOTH WRM HUG BONE 9\"",
-      "catalogExpanded": "Spot SOOTH Worm HUG BONE 9\"",
+      "supply": "Penn Plax Gravel Vac 16",
+      "catalogOriginal": "PENN PLAX gravel vac 16",
+      "catalogExpanded": "PENN PLAX gravel Vacuum 16",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Livingworld Sand Perch Covers",
-      "catalogOriginal": "LivingWorld Sand perch Covers",
-      "catalogExpanded": "LivingWorld Sand perch Covers",
+      "supply": "Coastal Autumn12\" Collar",
+      "catalogOriginal": "COASTAL AWN12\" COLLAR",
+      "catalogExpanded": "COASTAL Autumn 12\" Collar",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Pro Plan Senior Large Breed Puppy Salmon 24lb",
-      "catalogOriginal": "PRO PLAN puppy 6#",
-      "catalogExpanded": "Pro Plan PLAN puppy 6#",
-      "similarity": "100%",
-      "method": "containment_upc_verified"
-    },
-    {
-      "supply": "Zoo Med Under Tank Heater 50-60 Gal",
-      "catalogOriginal": "ZooMed Under tank Heater 50-60 Gal",
-      "catalogExpanded": "Zoo Med Under tank Heater 50-60 Gallon",
+      "supply": "Bellabowl Blue Large",
+      "catalogOriginal": "BellaBowl Blue Lg",
+      "catalogExpanded": "BellaBowl Blue Buffalo Large",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Nutrisource Large Breed Puppy Chicken & Rice Recipe 26lb",
-      "catalogOriginal": "NUTRI SOU lg br 26#",
-      "catalogExpanded": "Nutrisource Large Breed 26#",
-      "similarity": "100%",
-      "method": "containment_upc_verified"
-    },
-    {
-      "supply": "Kong Sheilds Tropics Octo Medium",
-      "catalogOriginal": "KONG SHEILDS TROPICS OCTO MED",
-      "catalogExpanded": "Kong SHEILDS TROPICS OCTO Medium",
+      "supply": "Feline Greenies Chicken Skin & Fur Health",
+      "catalogOriginal": "Feline Greenies Chkn Skin&Fur Health",
+      "catalogExpanded": "Feline Greenies Chicken Skin & Fur Health",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Spot Luna-corn",
-      "catalogOriginal": "SPOT LUNA-CORN",
-      "catalogExpanded": "Spot LUNA-CORN",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Tropiclean Oxymed Hypoallergenic Spray",
-      "catalogOriginal": "TropiClean OXYMED HypoAllergenic Spray",
-      "catalogExpanded": "TropiClean OXYMED HypoAllergenic Spray",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Flukers High Calcium Cricket Diet",
-      "catalogOriginal": "Flukers High Calcium Cricket Diet",
-      "catalogExpanded": "Flukers High Calcium Cricket Diet",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Lilpals Small Collar 2ba12",
-      "catalogOriginal": "LILPALS SM COLLAR 2BA12",
-      "catalogExpanded": "LILPALS Small Collar 2BA12",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Fromm Gold Small Beef 15lb",
-      "catalogOriginal": "FROMM gold sm be 15#",
-      "catalogExpanded": "Fromm gold Small Beef 15#",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Science Diet Cat Tend Chicken 5.5oz",
-      "catalogOriginal": "SD cat tend ck 5.5oz",
-      "catalogExpanded": "Science Diet cat tend Chicken 5.5oz",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Zoo Med Hermit Crab Habitat Kit",
-      "catalogOriginal": "ZooMed Hermit Crab Habitat kit",
-      "catalogExpanded": "Zoo Med Hermit Crab Habitat Kitten",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Weewee Springactiongrss Scp Medium",
-      "catalogOriginal": "WeeWee SpringActionGrss Scp  Med",
-      "catalogExpanded": "WeeWee SpringActionGrss Scp Medium",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Coastal Sla08\" Soy Collar",
-      "catalogOriginal": "COASTAL SLA08\" SOY COLLAR",
-      "catalogExpanded": "COASTAL SLA08\" SOY Collar",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Exoterra Infrared Basking 100w",
-      "catalogOriginal": "ExoTerra Infrared Basking 100W",
-      "catalogExpanded": "ExoTerra Infrared Basking 100W",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Vital Essentials Cat Duck 28oz",
-      "catalogOriginal": "VITAL ESSEN cat duck 28oz",
-      "catalogExpanded": "VITAL Essentials cat Duck 28oz",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Zoo Med Juvenile Iguana Food",
-      "catalogOriginal": "ZooMed Juv.  Iguana Food",
-      "catalogExpanded": "Zoo Med Juvenile. Iguana Food",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Lilpals Extra Small Collar Wdf08",
-      "catalogOriginal": "LILPALS XS COLLAR WDF08",
-      "catalogExpanded": "LILPALS Extra Small Collar WDF08",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Tetra Cichlid Flake 2.82oz",
-      "catalogOriginal": "TETRA cichlid flake 2.82oz",
-      "catalogExpanded": "Tetra cichlid flake 2.82oz",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Zilla Vegetable Mix + Calcium",
-      "catalogOriginal": "Zilla Veg. Mix + Calcium",
-      "catalogExpanded": "Zilla Vegetable. Mix + Calcium",
-      "similarity": "100%",
-      "method": "exact"
-    },
-    {
-      "supply": "Zoo Med Banquet Feeder Pleco ",
-      "catalogOriginal": "ZOO MED feeder pleco",
-      "catalogExpanded": "ZOO MED feeder pleco",
-      "similarity": "80%",
-      "method": "65%_upc_verified"
-    },
-    {
-      "supply": "Blue Buffalo Wilderness Healthy Weight 12.5oz",
-      "catalogOriginal": "BL BUF wild he wei 12.5oz",
-      "catalogExpanded": "Blue Buffalo Buffalo Buffalo Wilderness Healthy Weight 12.5oz",
-      "similarity": "100%",
-      "method": "65%_upc_verified"
-    },
-    {
-      "supply": "Prevue Scartching Post Grey",
-      "catalogOriginal": "Prevue Scartching post GREY",
-      "catalogExpanded": "Prevue Scartching post GREY",
+      "supply": "Naturals 9\" Java Wood Perch",
+      "catalogOriginal": "Naturals 9\" Java Wood Perch",
+      "catalogExpanded": "Naturals 9\" Java Wood Perch",
       "similarity": "100%",
       "method": "exact"
     },
@@ -198,30 +58,170 @@
       "method": "exact"
     },
     {
-      "supply": "Science Diet Jerky Beef",
-      "catalogOriginal": "SD jerky beef",
-      "catalogExpanded": "Science Diet jerky Beef",
+      "supply": "Zoo Med Aquatic Turtle Food Hatching",
+      "catalogOriginal": "ZooMed Aquatic Turtle Food Hatching",
+      "catalogExpanded": "Zoo Med Aquatic Turtle Food Hatching",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Aqueon Water Changer 50ft",
-      "catalogOriginal": "AQUEON water changer 50ft",
-      "catalogExpanded": "AQUEON water changer 50ft",
+      "supply": "Nylabone Oral Care Dental Spray",
+      "catalogOriginal": "NylaBone Oral Care Dental Spray",
+      "catalogExpanded": "NylaBone Oral Care Dental Spray",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Freshbreathe Hip & Joint 16oz",
-      "catalogOriginal": "FreshBreathe Hip&Joint 16oz",
-      "catalogExpanded": "FreshBreathe Hip & Joint 16oz",
+      "supply": "Exoterra Compact Top Small",
+      "catalogOriginal": "ExoTerra Compact Top Small",
+      "catalogExpanded": "ExoTerra Compact Top Small",
       "similarity": "100%",
       "method": "exact"
     },
     {
-      "supply": "Comfort Walk Medium Blue",
-      "catalogOriginal": "CWMK MED BLUE",
-      "catalogExpanded": "Comfort Walk Medium Blue Buffalo",
+      "supply": "Flavorfullz Salmon",
+      "catalogOriginal": "FlavorFullz Salmon",
+      "catalogExpanded": "FlavorFullz Salmon",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Zoo Med Ecoearth 3 Pack",
+      "catalogOriginal": "ZooMed EcoEarth 3 pk",
+      "catalogExpanded": "Zoo Med EcoEarth 3 Pack",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Coastal Mdw06' Leash",
+      "catalogOriginal": "COASTAL MDW06' LEASH",
+      "catalogExpanded": "COASTAL MDW06' Leash",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Zoo Med Reptirock Extra Large",
+      "catalogOriginal": "ZooMed ReptiRock XL",
+      "catalogExpanded": "Zoo Med ReptiRock Extra Large",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Petmate Cafe Feeder 12lb",
+      "catalogOriginal": "Petmate cafe feeder 12Lb",
+      "catalogExpanded": "Petmate cafe feeder 12Lb",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Coastal Collar Red12",
+      "catalogOriginal": "COASTAL CC RED12",
+      "catalogExpanded": "COASTAL Cat Collar Red 12",
+      "similarity": "80%",
+      "method": "65%_upc_verified"
+    },
+    {
+      "supply": "Playfuls Barn Dance",
+      "catalogOriginal": "Playfuls barn Dance",
+      "catalogExpanded": "Playfuls barn Dance",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Zilla Day White Light Spot 50w",
+      "catalogOriginal": "Zilla Day White Light Spot 50W",
+      "catalogExpanded": "Zilla Day White Light Spot 50W",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Zoo Med Combo Deep Dome",
+      "catalogOriginal": "ZooMed Combo Deep Dome",
+      "catalogExpanded": "Zoo Med Combo Deep Dome",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Veterinary Formula Ear Therapy Wipes",
+      "catalogOriginal": "Veterinary Formula Ear Therapy Wipes",
+      "catalogExpanded": "Veterinary Formula Ear Therapy Wipes",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Coastal Red 30' Cotton Train Leash",
+      "catalogOriginal": "Coastal RD 30' Cotton train Leash",
+      "catalogExpanded": "Coastal Red 30' Cotton train Leash",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Coastal Leash Pbo06' 666",
+      "catalogOriginal": "COASTAL LEASH PBO06' 666",
+      "catalogExpanded": "COASTAL Leash PBO06' 666",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Spot Love the Earth Barnyard Bird",
+      "catalogOriginal": "SPOT Love the earth Barnyard Bird",
+      "catalogExpanded": "Spot Love the earth Barnyard Bird",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Flukers Repti Calcium D3 & Phosphate Free",
+      "catalogOriginal": "Flukers Repti Calcium D3 & Phos Free",
+      "catalogExpanded": "Flukers Reptile Calcium D3 & Phosphate Free",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Circle 14\" Bro 1786s Collar",
+      "catalogOriginal": "CIRCLE 14\" BRO 1786S COLLAR",
+      "catalogExpanded": "Circle 14\" BRO 1786S Collar",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Kong Ringaroos Elephant Medium",
+      "catalogOriginal": "KONG RINGAROOS ELEPH MD",
+      "catalogExpanded": "Kong RINGAROOS Elephant Medium",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Pro Plan Live Clear 5.5lb",
+      "catalogOriginal": "PRO PLAN live clear 5.5#",
+      "catalogExpanded": "Pro Plan PLAN live clear 5.5#",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Lilpals Small Collar Zpk12",
+      "catalogOriginal": "LILPALS SM COLLAR ZPK12",
+      "catalogExpanded": "LILPALS Small Collar ZPK12",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Coastal Cat Soft Mesh Harness Black",
+      "catalogOriginal": "COASTAL CATSOFTMESHHARN BLK",
+      "catalogExpanded": "COASTAL Cat Soft Mesh Harness Black",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Simplesolution Large Washmale Wrap",
+      "catalogOriginal": "SimpleSolution Lg WashMale Wrap",
+      "catalogExpanded": "SimpleSolution Large WashMale Wrap",
+      "similarity": "100%",
+      "method": "exact"
+    },
+    {
+      "supply": "Science Diet Cat Per Dig Chicken 2.9oz",
+      "catalogOriginal": "SD cat per dig ck 2.9oz",
+      "catalogExpanded": "Science Diet cat per dig Chicken 2.9oz",
       "similarity": "100%",
       "method": "exact"
     }
