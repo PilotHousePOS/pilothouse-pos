@@ -1,0 +1,170 @@
+[
+  {
+    "supplyId": 6283,
+    "supplyName": "Nutrisource Senior 4lb",
+    "catalogName": "NUTRI SOU weight 4#",
+    "expandedCatalog": "Nutrisource weight 4lb",
+    "upc": "073893212584",
+    "score": 0.6666666666666666
+  },
+  {
+    "supplyId": 6286,
+    "supplyName": "Nutrisource Beef 4lb",
+    "catalogName": "NUTRI SOU weight 4#",
+    "expandedCatalog": "Nutrisource weight 4lb",
+    "upc": "073893212584",
+    "score": 0.6666666666666666
+  },
+  {
+    "supplyId": 6307,
+    "supplyName": "Nutrisource Performance 40lb",
+    "catalogName": "NUTRI SOU perfor 40#",
+    "expandedCatalog": "Nutrisource perfor 40lb",
+    "upc": "073893212300",
+    "score": 0.6666666666666666
+  },
+  {
+    "supplyId": 6504,
+    "supplyName": "\\Nutrisource Grain Free Chicken 13oz",
+    "catalogName": "NUTRI SOUR ck lam & fish 13oz",
+    "expandedCatalog": "Nutrisource Chicken Lamb & Fish 13oz",
+    "upc": "073893020103",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6740,
+    "supplyName": "Fromm Cat Hasen Duckenpfeffer 10lb",
+    "catalogName": "FROMM cat adult 10#",
+    "expandedCatalog": "FROMM cat adult 10lb",
+    "upc": "072705115631",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6739,
+    "supplyName": "Fromm Cat Hasen Duckenpfeffer 4lb",
+    "catalogName": "FROMM hasen duck 4#",
+    "expandedCatalog": "FROMM hasen Duck 4lb",
+    "upc": "072705114641",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5963,
+    "supplyName": "Science Diet 7+ 15lb",
+    "catalogName": "SD 7+ 15#",
+    "expandedCatalog": "Science Diet 7+ 15lb",
+    "upc": "052742020495",
+    "score": 1
+  },
+  {
+    "supplyId": 6797,
+    "supplyName": "Science Diet Cat Hairball Control 7+ 3.5lb",
+    "catalogName": "SD cat urina 3.5#",
+    "expandedCatalog": "Science Diet cat urina 3.5lb",
+    "upc": "052742002156",
+    "score": 0.6666666666666666
+  },
+  {
+    "supplyId": 6781,
+    "supplyName": "Science Diet Cat Hairball Control 7lb",
+    "catalogName": "SD cat urin 7#",
+    "expandedCatalog": "Science Diet cat urin 7lb",
+    "upc": "052742002170",
+    "score": 0.6666666666666666
+  },
+  {
+    "supplyId": 6798,
+    "supplyName": "Science Diet Cat Hairball Control 7+ 7lb",
+    "catalogName": "SD cat urin 7#",
+    "expandedCatalog": "Science Diet cat urin 7lb",
+    "upc": "052742002170",
+    "score": 0.6666666666666666
+  },
+  {
+    "supplyId": 6780,
+    "supplyName": "Science Diet Cat Hairball Control 3.5lb",
+    "catalogName": "SD cat urina 3.5#",
+    "expandedCatalog": "Science Diet cat urina 3.5lb",
+    "upc": "052742002156",
+    "score": 0.6666666666666666
+  },
+  {
+    "supplyId": 5960,
+    "supplyName": "Science Diet 7+ Small Bite 15lb",
+    "catalogName": "SD 7+ sm bite 15#",
+    "expandedCatalog": "Science Diet 7+ Small bite 15lb",
+    "upc": "052742020426",
+    "score": 1
+  },
+  {
+    "supplyId": 6783,
+    "supplyName": "Science Diet hairball 7+ 3.5lb",
+    "catalogName": "SD kitten 3.5#",
+    "expandedCatalog": "Science Diet kitten 3.5lb",
+    "upc": "052742712307",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6905,
+    "supplyName": "Primal Frozen Pronto Chicken 3/4lb",
+    "catalogName": "PRIMAL fro pron ck 3/4#",
+    "expandedCatalog": "PRIMAL fro pron Chicken 3/4lb",
+    "upc": "076484104909",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6904,
+    "supplyName": "Primal Frozen Pronto Beef 3/4lb",
+    "catalogName": "PRIMAL fro pront beef 4#",
+    "expandedCatalog": "PRIMAL fro pront Beef 4lb",
+    "upc": "076484103704",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6897,
+    "supplyName": "Primal Frozen Nuggets Venison 3lb",
+    "catalogName": "PRIMAL fro nug ven 3#",
+    "expandedCatalog": "PRIMAL fro nug Venison 3lb",
+    "upc": "076484210204",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6900,
+    "supplyName": "Primal Frozen Pronto Lamb 4lb",
+    "catalogName": "PRIMAL fro pron lamb 4#",
+    "expandedCatalog": "PRIMAL fro pron lamb 4lb",
+    "upc": "076484118548",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6892,
+    "supplyName": "Primal Frozen Beef Nuggets 3lb",
+    "catalogName": "PRIMAL fro beef nug 3#",
+    "expandedCatalog": "PRIMAL fro Beef nug 3lb",
+    "upc": "850334004003",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6898,
+    "supplyName": "Primal Frozen Nuggets Lamb 3lb",
+    "catalogName": "PRIMAL fro nug lamb 3#",
+    "expandedCatalog": "PRIMAL fro nug lamb 3lb",
+    "upc": "076484118401",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6894,
+    "supplyName": "Primal Frozen Nuggets Pork 3lb",
+    "catalogName": "PRIMAL fro nug pork 3#",
+    "expandedCatalog": "PRIMAL fro nug pork 3lb",
+    "upc": "850334004263",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6899,
+    "supplyName": "Primal Frozen Pronto Chicken 4lb",
+    "catalogName": "PRIMAL fro pron ck 3/4#",
+    "expandedCatalog": "PRIMAL fro pron Chicken 3/4lb",
+    "upc": "076484104909",
+    "score": 0.6
+  }
+]

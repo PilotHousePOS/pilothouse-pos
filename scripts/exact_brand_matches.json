@@ -9,15 +9,6 @@
     "confidence": 0.95
   },
   {
-    "supplyId": 5942,
-    "supplyName": "Science Diet Chicken 15lb",
-    "catalogName": "SD ck 15#",
-    "expandedCatalog": "Science Diet Chicken 15lb",
-    "upc": "052742020419",
-    "matchType": "exact | keys: [chicken], size: 15lb",
-    "confidence": 1
-  },
-  {
     "supplyId": 4795,
     "supplyName": "Nutrisource Soft & Tender Bites Chicken Recipe",
     "catalogName": "NUTRI SOUR cat ck 5.5oz",
@@ -34,24 +25,6 @@
     "upc": "072705136100",
     "matchType": "good_match | matched: [mobility], unmatched: []",
     "confidence": 0.95
-  },
-  {
-    "supplyId": 6230,
-    "supplyName": "Blue Buffalo Puppy 15lb",
-    "catalogName": "BLUE B puppy 15#",
-    "expandedCatalog": "Blue Buffalo puppy 15lb",
-    "upc": "859610000036",
-    "matchType": "exact | keys: [puppy], size: 15lb",
-    "confidence": 1
-  },
-  {
-    "supplyId": 6520,
-    "supplyName": "Nutrisource PureVita Beef Entree 12.5oz",
-    "catalogName": "NUTRI SOUR pv beef entre 12.5oz",
-    "expandedCatalog": "Nutrisource pv Beef entre 12.5oz",
-    "upc": "073893962045",
-    "matchType": "exact | keys: [beef], size: 12.5oz",
-    "confidence": 1
   },
   {
     "supplyId": 4790,
@@ -72,33 +45,6 @@
     "confidence": 0.95
   },
   {
-    "supplyId": 6289,
-    "supplyName": "Nutrisource Lamb Meal & Rice Recipe 4lb",
-    "catalogName": "NUTRI SOU lamb 4#",
-    "expandedCatalog": "Nutrisource lamb 4lb",
-    "upc": "073893266044",
-    "matchType": "exact | keys: [lamb], size: 4lb",
-    "confidence": 1
-  },
-  {
-    "supplyId": 5946,
-    "supplyName": "Science Diet Small Bite Chicken 35lb",
-    "catalogName": "SD sm bite ck 35#",
-    "expandedCatalog": "Science Diet Small bite Chicken 35lb",
-    "upc": "052742015989",
-    "matchType": "exact | keys: [chicken], size: 35lb",
-    "confidence": 1
-  },
-  {
-    "supplyId": 6222,
-    "supplyName": "Blue Buffalo Lamb 15lb",
-    "catalogName": "BLUE B lamb 15#",
-    "expandedCatalog": "Blue Buffalo lamb 15lb",
-    "upc": "859610000357",
-    "matchType": "exact | keys: [lamb], size: 15lb",
-    "confidence": 1
-  },
-  {
     "supplyId": 6509,
     "supplyName": "Nutrisource Beef & Rice Recipe 12.3oz",
     "catalogName": "NUTRI SOUR pooch beef",
@@ -106,15 +52,6 @@
     "upc": "073893905028",
     "matchType": "good_match | matched: [beef], unmatched: []",
     "confidence": 0.95
-  },
-  {
-    "supplyId": 6290,
-    "supplyName": "Nutrisource Lamb Meal & Rice Recipe 12lb",
-    "catalogName": "NUTRI SOU lamb 12#",
-    "expandedCatalog": "Nutrisource lamb 12lb",
-    "upc": "073893266068",
-    "matchType": "exact | keys: [lamb], size: 12lb",
-    "confidence": 1
   },
   {
     "supplyId": 4788,
@@ -153,15 +90,6 @@
     "confidence": 0.95
   },
   {
-    "supplyId": 6212,
-    "supplyName": "Blue Buffalo Senior 15lb",
-    "catalogName": "BLUE B senior 15#",
-    "expandedCatalog": "Blue Buffalo senior 15lb",
-    "upc": "859610000159",
-    "matchType": "exact | keys: [senior], size: 15lb",
-    "confidence": 1
-  },
-  {
     "supplyId": 6515,
     "supplyName": "Nutrisource Come-Pooch-A Chicken Bone Broth Recipe",
     "catalogName": "NUTRI SOUR cat ck 5.5oz",
@@ -178,15 +106,6 @@
     "upc": "015561223362",
     "matchType": "good_match | matched: [turkey], unmatched: []",
     "confidence": 0.95
-  },
-  {
-    "supplyId": 6291,
-    "supplyName": "Nutrisource Lamb Meal & Rice Recipe 26lb",
-    "catalogName": "NUTRI SOU lamb 26#",
-    "expandedCatalog": "Nutrisource lamb 26lb",
-    "upc": "073893266051",
-    "matchType": "exact | keys: [lamb], size: 26lb",
-    "confidence": 1
   },
   {
     "supplyId": 6617,
@@ -223,24 +142,6 @@
     "upc": "076484062438",
     "matchType": "good_match | matched: [chicken], unmatched: []",
     "confidence": 0.95
-  },
-  {
-    "supplyId": 5943,
-    "supplyName": "Science Diet Chicken 35lb",
-    "catalogName": "SD sm bite ck 35#",
-    "expandedCatalog": "Science Diet Small bite Chicken 35lb",
-    "upc": "052742015989",
-    "matchType": "exact | keys: [chicken], size: 35lb",
-    "confidence": 1
-  },
-  {
-    "supplyId": 5945,
-    "supplyName": "Science Diet Small Bite Chicken 15lb",
-    "catalogName": "SD ck 15#",
-    "expandedCatalog": "Science Diet Chicken 15lb",
-    "upc": "052742020419",
-    "matchType": "exact | keys: [chicken], size: 15lb",
-    "confidence": 1
   },
   {
     "supplyId": 5995,
