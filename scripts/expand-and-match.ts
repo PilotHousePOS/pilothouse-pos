@@ -95,7 +95,7 @@ async function main() {
     console.log("   No confirmed matches file found, starting fresh\n");
   }
   
-  // Load master UPC index
+  // Load master UPC index (enriched index has data quality issues)
   console.log("1. Loading master UPC index...");
   const masterData = JSON.parse(fs.readFileSync('scripts/master_upc_index.json', 'utf-8'));
   console.log(`   Loaded ${masterData.entries.length} entries\n`);
@@ -137,7 +137,6 @@ async function main() {
   for (const entry of masterData.entries) {
     const originalName = entry.name;
     // Pre-process Coastal color codes followed by dimensions (e.g., "AWN06'" -> "AWN 06'")
-    // Only split specific color abbreviation patterns, not all letter+digit combinations
     const preSplit = originalName
       .replace(/\b(AWN|LWO|NPK|HNT|PUR|BLK|GRY|PNK|RED|GRN|BLU|ORG|YLW|TAN|BRN|WHT|SLV|GLD)(\d)/gi, '$1 $2');
     const expandedName = expandAbbreviations(preSplit);

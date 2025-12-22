@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-12-22T19:51:37.435Z",
+  "generatedAt": "2025-12-22T19:57:47.776Z",
   "totalEntries": 9885,
   "bySource": {
     "maybe_inventory": 2253,
@@ -157,7 +157,7 @@
     {
       "upc": "097612742107",
       "originalName": "ZooMed River Pebbles",
-      "expandedName": "Zoo MediumRiver Pebbles",
+      "expandedName": "Zoo Med River Pebbles",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -184,7 +184,7 @@
     {
       "upc": "097612720105",
       "originalName": "ZooMed Hyrdo Balls",
-      "expandedName": "Zoo MediumHyrdo Balls",
+      "expandedName": "Zoo Med Hyrdo Balls",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -193,7 +193,7 @@
     {
       "upc": "015561231152",
       "originalName": "ExoTerra Bio Drain",
-      "expandedName": "ExoTerra Biothane Drain",
+      "expandedName": "ExoTerra Bio Drain",
       "source": "maybe_inventory",
       "inferredBrand": "Fluval",
       "isCoastal": false,
@@ -220,7 +220,7 @@
     {
       "upc": "097612752045",
       "originalName": "ZooMed ReptiSoil 4QT",
-      "expandedName": "Zoo MediumReptiSoil 4QT",
+      "expandedName": "Zoo Med ReptiSoil 4QT",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -229,7 +229,7 @@
     {
       "upc": "0976120088007",
       "originalName": "ZooMed Creature Soil 1 QT",
-      "expandedName": "Zoo MediumCreature Soil 1 Quart",
+      "expandedName": "Zoo Med Creature Soil 1 Quart",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -238,7 +238,7 @@
     {
       "upc": "097612008715",
       "originalName": "ZooMed Creature Floor",
-      "expandedName": "Zoo MediumCreature Floor",
+      "expandedName": "Zoo Med Creature Floor",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -247,7 +247,7 @@
     {
       "upc": "097612008210",
       "originalName": "ZooMed Creature Sand",
-      "expandedName": "Zoo MediumCreature Sand",
+      "expandedName": "Zoo Med Creature Sand",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -256,7 +256,7 @@
     {
       "upc": "097612762358",
       "originalName": "ZooMed Vita Sand Gold",
-      "expandedName": "Zoo MediumVita Sand Gold",
+      "expandedName": "Zoo Med Vita Sand Gold",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -274,7 +274,7 @@
     {
       "upc": "097612752106",
       "originalName": "ZooMed Reptisoil 8QT",
-      "expandedName": "Zoo MediumReptisoil 8QT",
+      "expandedName": "Zoo Med Reptisoil 8QT",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -283,7 +283,7 @@
     {
       "upc": "097612790085",
       "originalName": "ZooMed EcoEarth 8Qt",
-      "expandedName": "Zoo MediumEcoEarth 8Qt",
+      "expandedName": "Zoo Med EcoEarth 8Qt",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -292,7 +292,7 @@
     {
       "upc": "097612754087",
       "originalName": "ZooMed BioBlend",
-      "expandedName": "Zoo MediumBioBlend",
+      "expandedName": "Zoo Med BioBlend",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -310,7 +310,7 @@
     {
       "upc": "097612752243",
       "originalName": "ZooMed Reptisoil 24QT",
-      "expandedName": "Zoo MediumReptisoil 24QT",
+      "expandedName": "Zoo Med Reptisoil 24QT",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -319,7 +319,7 @@
     {
       "upc": "097612790245",
       "originalName": "ZooMed EcoEarth 24QT",
-      "expandedName": "Zoo MediumEcoEarth 24QT",
+      "expandedName": "Zoo Med EcoEarth 24QT",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -364,7 +364,7 @@
     {
       "upc": "097612200225",
       "originalName": "ZooMed Terrarium Moss Med.",
-      "expandedName": "Zoo MediumTerrarium Moss Medium.",
+      "expandedName": "Zoo Med Terrarium Moss Medium.",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -373,7 +373,7 @@
     {
       "upc": "097612200294",
       "originalName": "ZooMed Sphagnum Moss",
-      "expandedName": "Zoo MediumSphagnum Moss",
+      "expandedName": "Zoo Med Sphagnum Moss",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -382,7 +382,7 @@
     {
       "upc": "097612740103",
       "originalName": "ZooMed Excavator sub. 10lbs.",
-      "expandedName": "Zoo MediumExcavator sub. 10lbs.",
+      "expandedName": "Zoo Med Excavator sub. 10lbs.",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -391,7 +391,7 @@
     {
       "upc": "097612740202",
       "originalName": "ZooMed Excavator sub. 20lbs.",
-      "expandedName": "Zoo MediumExcavator sub. 20lbs.",
+      "expandedName": "Zoo Med Excavator sub. 20lbs.",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -400,7 +400,7 @@
     {
       "upc": "097612790115",
       "originalName": "ZooMed Coconut Chips 1lbs",
-      "expandedName": "Zoo MediumCoconut Chips 1lbs",
+      "expandedName": "Zoo Med Coconut Chips 1lbs",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -409,7 +409,7 @@
     {
       "upc": "097612790214",
       "originalName": "ZooMed Coconut Chips 3 pk",
-      "expandedName": "Zoo MediumCoconut Chips 3 Pack",
+      "expandedName": "Zoo Med Coconut Chips 3 Pack",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -418,7 +418,7 @@
     {
       "upc": "097612790511",
       "originalName": "ZooMed Coconut Chips JUMBO",
-      "expandedName": "Zoo MediumCoconut Chips JUMBO",
+      "expandedName": "Zoo Med Coconut Chips JUMBO",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -427,7 +427,7 @@
     {
       "upc": "097612790108",
       "originalName": "ZooMed EcoEarth",
-      "expandedName": "Zoo MediumEcoEarth",
+      "expandedName": "Zoo Med EcoEarth",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -436,7 +436,7 @@
     {
       "upc": "097612790207",
       "originalName": "ZooMed EcoEarth 3 pk",
-      "expandedName": "Zoo MediumEcoEarth 3 Pack",
+      "expandedName": "Zoo Med EcoEarth 3 Pack",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -445,7 +445,7 @@
     {
       "upc": "097612762150",
       "originalName": "ZooMed Vita Sand White",
-      "expandedName": "Zoo MediumVita Sand White",
+      "expandedName": "Zoo Med Vita Sand White",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -490,7 +490,7 @@
     {
       "upc": "097612008708",
       "originalName": "ZooMed Creatures EcoSoil",
-      "expandedName": "Zoo MediumCreatures EcoSoil",
+      "expandedName": "Zoo Med Creatures EcoSoil",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -508,7 +508,7 @@
     {
       "upc": "097612751086",
       "originalName": "Zoomed Aspen 8 QT",
-      "expandedName": "Zoo MediumAspen 8 Quart",
+      "expandedName": "Zoo Med Aspen 8 Quart",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -517,7 +517,7 @@
     {
       "upc": "097612751048",
       "originalName": "Zoomed Aspen 4Qt",
-      "expandedName": "Zoo MediumAspen 4Qt",
+      "expandedName": "Zoo Med Aspen 4Qt",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -526,7 +526,7 @@
     {
       "upc": "097612750041",
       "originalName": "ZooMed ReptiBark 4Qt",
-      "expandedName": "Zoo MediumReptiBark 4Qt",
+      "expandedName": "Zoo Med ReptiBark 4Qt",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -535,7 +535,7 @@
     {
       "upc": "097612750089",
       "originalName": "ZooMed ReptiBark 8QT",
-      "expandedName": "Zoo MediumReptiBark 8QT",
+      "expandedName": "Zoo Med ReptiBark 8QT",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -544,7 +544,7 @@
     {
       "upc": "097612780086",
       "originalName": "ZooMed Forest Floor 8QT",
-      "expandedName": "Zoo MediumForest Floor 8QT",
+      "expandedName": "Zoo Med Forest Floor 8QT",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -553,7 +553,7 @@
     {
       "upc": "097612750249",
       "originalName": "ZooMed Reptibark 24QT",
-      "expandedName": "Zoo MediumReptibark 24QT",
+      "expandedName": "Zoo Med Reptibark 24QT",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -571,7 +571,7 @@
     {
       "upc": "097612780246",
       "originalName": "ZooMed Forest Floor 24QT",
-      "expandedName": "Zoo MediumForest Floor 24QT",
+      "expandedName": "Zoo Med Forest Floor 24QT",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -580,7 +580,7 @@
     {
       "upc": "097612740011",
       "originalName": "ZooMed Cavern Kit",
-      "expandedName": "Zoo MediumCavern Kit",
+      "expandedName": "Zoo Med Cavern Kit",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -697,7 +697,7 @@
     {
       "upc": "097612325188",
       "originalName": "ZooMed  Mesh Lrg",
-      "expandedName": "Zoo MediumMesh Large",
+      "expandedName": "Zoo Med Mesh Large",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -706,7 +706,7 @@
     {
       "upc": "097612325126",
       "originalName": "Zoo Med Sm. Mesh",
-      "expandedName": "Zoo MediumSmall. Mesh",
+      "expandedName": "Zoo Med Small. Mesh",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -715,7 +715,7 @@
     {
       "upc": "097612092080",
       "originalName": "ZooMed Humidty Plus",
-      "expandedName": "Zoo MediumHumidty Plus",
+      "expandedName": "Zoo Med Humidty Plus",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -868,7 +868,7 @@
     {
       "upc": "097612402742",
       "originalName": "ZooMed Juv. Dragon Food",
-      "expandedName": "Zoo MediumJuv. Dragon Food",
+      "expandedName": "Zoo Med Juvenile. Dragon Food",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -877,7 +877,7 @@
     {
       "upc": "097612402797",
       "originalName": "ZooMed Adult Dragon Food",
-      "expandedName": "Zoo MediumAdult Dragon Food",
+      "expandedName": "Zoo Med Adult Dragon Food",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -913,7 +913,7 @@
     {
       "upc": "097612400861",
       "originalName": "ZooMed Adult Iguana Food",
-      "expandedName": "Zoo MediumAdult Iguana Food",
+      "expandedName": "Zoo Med Adult Iguana Food",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -967,7 +967,7 @@
     {
       "upc": "097612400809",
       "originalName": "ZooMed Juv.  Iguana Food",
-      "expandedName": "Zoo MediumJuv. Iguana Food",
+      "expandedName": "Zoo Med Juvenile. Iguana Food",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -976,7 +976,7 @@
     {
       "upc": "097612400656",
       "originalName": "ZooMed Zoo Menu Iguana Food",
-      "expandedName": "Zoo MediumZoo Menu Iguana Food",
+      "expandedName": "Zoo Med Zoo Menu Iguana Food",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -985,7 +985,7 @@
     {
       "upc": "097612400724",
       "originalName": "ZooMed Zoo Menu Bearded food",
-      "expandedName": "Zoo MediumZoo Menu Bearded Food",
+      "expandedName": "Zoo Med Zoo Menu Bearded Food",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -994,7 +994,7 @@
     {
       "upc": "097612400120",
       "originalName": "ZooMed Anole Food",
-      "expandedName": "Zoo MediumAnole Food",
+      "expandedName": "Zoo Med Anole Food",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -1003,7 +1003,7 @@
     {
       "upc": "097612401806",
       "originalName": "ZooMed PacMan Frog Food",
-      "expandedName": "Zoo MediumPacMan Frog Food",
+      "expandedName": "Zoo Med PacMan Frog Food",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -1012,7 +1012,7 @@
     {
       "upc": "097612400168",
       "originalName": "ZooMed Aquatic Frog &Tadpole",
-      "expandedName": "Zoo MediumAquatic Frog & Tadpole",
+      "expandedName": "Zoo Med Aquatic Frog & Tadpole",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -1120,7 +1120,7 @@
     {
       "upc": "097612400410",
       "originalName": "ZooMed Can O Crickets",
-      "expandedName": "Zoo MediumCan O Crickets",
+      "expandedName": "Zoo Med Can O Crickets",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -1147,7 +1147,7 @@
     {
       "upc": "097612403091",
       "originalName": "ZooMed Crested Gecko Can",
-      "expandedName": "Zoo MediumCrested Gecko Can",
+      "expandedName": "Zoo Med Crested Gecko Can",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -1156,7 +1156,7 @@
     {
       "upc": "097612008630",
       "originalName": "ZooMed Creatures Isopod Food",
-      "expandedName": "Zoo MediumCreatures Isopod Food",
+      "expandedName": "Zoo Med Creatures Isopod Food",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -1363,7 +1363,7 @@
     {
       "upc": "9761284008",
       "originalName": "ZooMed ReptiSafe 8.75Floz",
-      "expandedName": "Zoo MediumReptiSafe 8.75Floz",
+      "expandedName": "Zoo Med ReptiSafe 8.75Floz",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1372,7 +1372,7 @@
     {
       "upc": "9761284004",
       "originalName": "ZooMed ReptiSafe 4.25FLOZ",
-      "expandedName": "Zoo MediumReptiSafe 4.25FLOZ",
+      "expandedName": "Zoo Med ReptiSafe 4.25FLOZ",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1381,7 +1381,7 @@
     {
       "upc": "9761284002",
       "originalName": "ZooMed Reptisafe 2.25 FLOZ",
-      "expandedName": "Zoo MediumReptisafe 2.25 FLOZ",
+      "expandedName": "Zoo Med Reptisafe 2.25 FLOZ",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1417,7 +1417,7 @@
     {
       "upc": "9761213303",
       "originalName": "ZooMed Repti Calcium",
-      "expandedName": "Zoo MediumRepti Calcium",
+      "expandedName": "Zoo Med Reptile Calcium",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1579,7 +1579,7 @@
     {
       "upc": "9761200820",
       "originalName": "ZooMed Glow In the Dark Tong",
-      "expandedName": "Zoo MediumGlow In the Dark Tong",
+      "expandedName": "Zoo Med Glow In the Dark Tong",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1588,7 +1588,7 @@
     {
       "upc": "9761262210",
       "originalName": "ZooMed 10\" Stainless Steel",
-      "expandedName": "Zoo Medium10\" Stainless Steel",
+      "expandedName": "Zoo Med 10\" Stainless Steel",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1597,7 +1597,7 @@
     {
       "upc": "9761262211",
       "originalName": "ZooMed Angled 10\" Tongs",
-      "expandedName": "Zoo MediumAngled 10\" Tongs",
+      "expandedName": "Zoo Med Angled 10\" Tongs",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1678,7 +1678,7 @@
     {
       "upc": "9761262154",
       "originalName": "ZooMed Arboreal cup refill",
-      "expandedName": "Zoo MediumArboreal cup refill",
+      "expandedName": "Zoo Med Arboreal cup refill",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1687,7 +1687,7 @@
     {
       "upc": "9761262153",
       "originalName": "ZooMed Arboreal Feeding cup",
-      "expandedName": "Zoo MediumArboreal Feeding cup",
+      "expandedName": "Zoo Med Arboreal Feeding cup",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1696,7 +1696,7 @@
     {
       "upc": "9761262220",
       "originalName": "ZooMed Mealworm Feeder",
-      "expandedName": "Zoo MediumMealworm Feeder",
+      "expandedName": "Zoo Med Mealworm Feeder",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1795,7 +1795,7 @@
     {
       "upc": "9761280031",
       "originalName": "ZooMed Repti Shedding Aid",
-      "expandedName": "Zoo MediumRepti Shedding Aid",
+      "expandedName": "Zoo Med Reptile Shedding Aid",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1813,7 +1813,7 @@
     {
       "upc": "9761240205",
       "originalName": "Crested Gecko Variety pack ZooMed",
-      "expandedName": "Crested Gecko Variety pack Zoo Medium",
+      "expandedName": "Crested Gecko Variety pack Zoo Med",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1822,7 +1822,7 @@
     {
       "upc": "9761240203",
       "originalName": "ZooMed Leo gecko Value pack",
-      "expandedName": "Zoo MediumLeo gecko Value pack",
+      "expandedName": "Zoo Med Leo gecko Value pack",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1831,7 +1831,7 @@
     {
       "upc": "9761240202",
       "originalName": "ZooMed Bearded Value Pack",
-      "expandedName": "Zoo MediumBearded Value Pack",
+      "expandedName": "Zoo Med Bearded Value Pack",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1840,7 +1840,7 @@
     {
       "upc": "9761200860",
       "originalName": "ZooMed Creatures Jelly Cup",
-      "expandedName": "Zoo MediumCreatures Jelly Cup",
+      "expandedName": "Zoo Med Creatures Jelly Cup",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1894,7 +1894,7 @@
     {
       "upc": "9761240301",
       "originalName": "ZooMed Crested gecko diet watm.",
-      "expandedName": "Zoo MediumCrested gecko diet watm.",
+      "expandedName": "Zoo Med Crested gecko diet watm.",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1903,7 +1903,7 @@
     {
       "upc": "9761240319",
       "originalName": "ZooMed Crested Gecko  BluBrede",
-      "expandedName": "Zoo MediumCrested Gecko Blueberry",
+      "expandedName": "Zoo Med Crested Gecko Blueberry",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1912,7 +1912,7 @@
     {
       "upc": "9761240308",
       "originalName": "ZooMed Crested Gecko Trop.",
-      "expandedName": "Zoo MediumCrested Gecko Tropical.",
+      "expandedName": "Zoo Med Crested Gecko Tropical.",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1921,7 +1921,7 @@
     {
       "upc": "9761240315",
       "originalName": "ZooMed Crested Gecko Plum",
-      "expandedName": "Zoo MediumCrested Gecko Plum",
+      "expandedName": "Zoo Med Crested Gecko Plum",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1930,7 +1930,7 @@
     {
       "upc": "9761240143",
       "originalName": "ZooMed Lizard flower topper",
-      "expandedName": "Zoo MediumLizard flower topper",
+      "expandedName": "Zoo Med Lizard flower topper",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -1939,7 +1939,7 @@
     {
       "upc": "9761211060",
       "originalName": "ZooMed Cricket Block",
-      "expandedName": "Zoo MediumCricket Block",
+      "expandedName": "Zoo Med Cricket Block",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -2578,7 +2578,7 @@
     {
       "upc": "097612348545",
       "originalName": "ZooMed ReptiSun 46\"T5 54W",
-      "expandedName": "Zoo MediumReptiSun 46\"T5 54W",
+      "expandedName": "Zoo Med ReptiSun 46\"T5 54W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2587,7 +2587,7 @@
     {
       "upc": "097612348392",
       "originalName": "ZooMed ReptiSun 34\" T5 39W",
-      "expandedName": "Zoo MediumReptiSun 34\" T5 39W",
+      "expandedName": "Zoo Med ReptiSun 34\" T5 39W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2596,7 +2596,7 @@
     {
       "upc": "097612343243",
       "originalName": "ZooMed ReptiSun 24' T8 17W",
-      "expandedName": "Zoo MediumReptiSun 24' T8 17W",
+      "expandedName": "Zoo Med ReptiSun 24' T8 17W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2605,7 +2605,7 @@
     {
       "upc": "097612343182",
       "originalName": "ZooMed ReptiSun 18\" T8 15W",
-      "expandedName": "Zoo MediumReptiSun 18\" T8 15W",
+      "expandedName": "Zoo Med ReptiSun 18\" T8 15W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2614,7 +2614,7 @@
     {
       "upc": "097612340051",
       "originalName": "ZooMed ReptiSun 5.0 Trop. 26W",
-      "expandedName": "Zoo MediumReptiSun 5.0 Tropical. 26W",
+      "expandedName": "Zoo Med ReptiSun 5.0 Tropical. 26W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2623,7 +2623,7 @@
     {
       "upc": "097612340105",
       "originalName": "ZooMed ReptiSun 10.0 Des. 26W",
-      "expandedName": "Zoo MediumReptiSun 10.0 Desert. 26W",
+      "expandedName": "Zoo Med ReptiSun 10.0 Desert. 26W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2632,7 +2632,7 @@
     {
       "upc": "097612348156",
       "originalName": "ZooMed ReptiSun 12\" T5 15W",
-      "expandedName": "Zoo MediumReptiSun 12\" T5 15W",
+      "expandedName": "Zoo Med ReptiSun 12\" T5 15W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2641,7 +2641,7 @@
     {
       "upc": "097612340068",
       "originalName": "ZooMed ReptiSun 5.0 Trop. 13W",
-      "expandedName": "Zoo MediumReptiSun 5.0 Tropical. 13W",
+      "expandedName": "Zoo Med ReptiSun 5.0 Tropical. 13W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2650,7 +2650,7 @@
     {
       "upc": "097612340112",
       "originalName": "ZooMed ReptiSun 10.0 Des. 13W",
-      "expandedName": "Zoo MediumReptiSun 10.0 Desert. 13W",
+      "expandedName": "Zoo Med ReptiSun 10.0 Desert. 13W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2659,7 +2659,7 @@
     {
       "upc": "097612391060",
       "originalName": "ZooMed Moonlite reptile Bulb 60W",
-      "expandedName": "Zoo MediumMoonlite reptile Bulb 60W",
+      "expandedName": "Zoo Med Moonlite reptile Bulb 60W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2668,7 +2668,7 @@
     {
       "upc": "097612391046",
       "originalName": "ZooMed Moonlite Reptile Bulb 40W",
-      "expandedName": "Zoo MediumMoonlite Reptile Bulb 40W",
+      "expandedName": "Zoo Med Moonlite Reptile Bulb 40W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2686,7 +2686,7 @@
     {
       "upc": "097612340020",
       "originalName": "ZooMed ReptiSun NANO UVB 5W",
-      "expandedName": "Zoo MediumReptiSun NANO UVB 5W",
+      "expandedName": "Zoo Med ReptiSun NANO UVB 5W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2695,7 +2695,7 @@
     {
       "upc": "097612328059",
       "originalName": "ZooMed Nano LED 5W",
-      "expandedName": "Zoo MediumNano LED 5W",
+      "expandedName": "Zoo Med Nano LED 5W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2704,7 +2704,7 @@
     {
       "upc": "097612970357",
       "originalName": "ZooMed Nano Halogen Heat Lamp 35W",
-      "expandedName": "Zoo MediumNano Halogen Heat Lamp 35W",
+      "expandedName": "Zoo Med Nano Halogen Heat Lamp 35W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2713,7 +2713,7 @@
     {
       "upc": "097612360202",
       "originalName": "ZooMed Nano Bsking Lmp 25W",
-      "expandedName": "Zoo MediumNano Bsking Lmp 25W",
+      "expandedName": "Zoo Med Nano Bsking Lmp 25W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2722,7 +2722,7 @@
     {
       "upc": "097612360219",
       "originalName": "ZooMed Nano Bskin Lmp 40W",
-      "expandedName": "Zoo MediumNano Bskin Lmp 40W",
+      "expandedName": "Zoo Med Nano Bskin Lmp 40W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2731,7 +2731,7 @@
     {
       "upc": "97612310252",
       "originalName": "ZooMed Nano Cermaic 25W",
-      "expandedName": "Zoo MediumNano Cermaic 25W",
+      "expandedName": "Zoo Med Nano Cermaic 25W",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -2740,7 +2740,7 @@
     {
       "upc": "097612310405",
       "originalName": "ZooMed Nano Ceramic 40W",
-      "expandedName": "Zoo MediumNano Ceramic 40W",
+      "expandedName": "Zoo Med Nano Ceramic 40W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2749,7 +2749,7 @@
     {
       "upc": "097612331257",
       "originalName": "Zoomed Nano Infrared Heat 25W",
-      "expandedName": "Zoo MediumNano Infrared Heat 25W",
+      "expandedName": "Zoo Med Nano Infrared Heat 25W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2758,7 +2758,7 @@
     {
       "upc": "097612331400",
       "originalName": "ZooMed Nano Infrared Heat 40W",
-      "expandedName": "Zoo MediumNano Infrared Heat 40W",
+      "expandedName": "Zoo Med Nano Infrared Heat 40W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2767,7 +2767,7 @@
     {
       "upc": "097612321036",
       "originalName": "ZooMed T5 Hood LED UVB 30\"",
-      "expandedName": "Zoo MediumT5 Hood LED UVB 30\"",
+      "expandedName": "Zoo Med T5 Hood LED UVB 30\"",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2776,7 +2776,7 @@
     {
       "upc": "097612326000",
       "originalName": "ZooMed T8 Hood 20\"",
-      "expandedName": "Zoo MediumT8 Hood 20\"",
+      "expandedName": "Zoo Med T8 Hood 20\"",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2785,7 +2785,7 @@
     {
       "upc": "97612326109",
       "originalName": "ZooMed T8 Hood 24\"",
-      "expandedName": "Zoo MediumT8 Hood 24\"",
+      "expandedName": "Zoo Med T8 Hood 24\"",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -2794,7 +2794,7 @@
     {
       "upc": "097612326307",
       "originalName": "ZooMed T8 Hood 36\"",
-      "expandedName": "Zoo MediumT8 Hood 36\"",
+      "expandedName": "Zoo Med T8 Hood 36\"",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2803,7 +2803,7 @@
     {
       "upc": "097612320787",
       "originalName": "ZooMed T5 Hood \"36",
-      "expandedName": "Zoo MediumT5 Hood \"36",
+      "expandedName": "Zoo Med T5 Hood \"36",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2812,7 +2812,7 @@
     {
       "upc": "097612320749",
       "originalName": "ZooMed T5 Hood 48\"",
-      "expandedName": "Zoo MediumT5 Hood 48\"",
+      "expandedName": "Zoo Med T5 Hood 48\"",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2839,7 +2839,7 @@
     {
       "upc": "097612910018",
       "originalName": "ZooMed Big dripper",
-      "expandedName": "Zoo MediumBig dripper",
+      "expandedName": "Zoo Med Big dripper",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2848,7 +2848,7 @@
     {
       "upc": "097612910025",
       "originalName": "ZooMed Little Dripper",
-      "expandedName": "Zoo MediumLittle Dripper",
+      "expandedName": "Zoo Med Little Dripper",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2893,7 +2893,7 @@
     {
       "upc": "097612910506",
       "originalName": "ZooMed Waterfall kit",
-      "expandedName": "Zoo MediumWaterfall kit",
+      "expandedName": "Zoo Med Waterfall kit",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2911,7 +2911,7 @@
     {
       "upc": "97612950175",
       "originalName": "ZooMed Multiport Fogger Attachment",
-      "expandedName": "Zoo MediumMultiport Fogger Attachment",
+      "expandedName": "Zoo Med Multiport Fogger Attachment",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -2920,7 +2920,7 @@
     {
       "upc": "97612950151",
       "originalName": "ZooMed ReptiFogger",
-      "expandedName": "Zoo MediumReptiFogger",
+      "expandedName": "Zoo Med ReptiFogger",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -2929,7 +2929,7 @@
     {
       "upc": "097612950106",
       "originalName": "ZooMed ReptiRain",
-      "expandedName": "Zoo MediumReptiRain",
+      "expandedName": "Zoo Med ReptiRain",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2974,7 +2974,7 @@
     {
       "upc": "097612910247",
       "originalName": "ZooMed ReptiRapids WD Md Wtrfal",
-      "expandedName": "Zoo MediumReptiRapids WD Medium Wtrfal",
+      "expandedName": "Zoo Med ReptiRapids WD Medium Wtrfal",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2983,7 +2983,7 @@
     {
       "upc": "097612910261",
       "originalName": "ZooMed ReptiRapids Skul Sm Watrfl",
-      "expandedName": "Zoo MediumReptiRapids Skul Small Watrfl",
+      "expandedName": "Zoo Med ReptiRapids Skul Small Watrfl",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -2992,7 +2992,7 @@
     {
       "upc": "97612910278",
       "originalName": "ZooMed ReptiRapid Skul Md. Watrfl",
-      "expandedName": "Zoo MediumReptiRapid Skul Medium. Watrfl",
+      "expandedName": "Zoo Med ReptiRapid Skul Medium. Watrfl",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -3010,7 +3010,7 @@
     {
       "upc": "97612322002",
       "originalName": "ZooMed Lamp Stand Lg",
-      "expandedName": "Zoo MediumLamp Stand Large",
+      "expandedName": "Zoo Med Lamp Stand Large",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -3019,7 +3019,7 @@
     {
       "upc": "097612322019",
       "originalName": "ZooMed Lamp Stand SM",
-      "expandedName": "Zoo MediumLamp Stand Small",
+      "expandedName": "Zoo Med Lamp Stand Small",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3091,7 +3091,7 @@
     {
       "upc": "097612980905",
       "originalName": "ZooMed ReptiTuff 90W Splshpro Halo",
-      "expandedName": "Zoo MediumReptiTuff 90W Splshpro Halo",
+      "expandedName": "Zoo Med ReptiTuff 90W Splshpro Halo",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3577,7 +3577,7 @@
     {
       "upc": "097612151244",
       "originalName": "ZooMed FloraSun",
-      "expandedName": "Zoo MediumFloraSun",
+      "expandedName": "Zoo Med FloraSun",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3811,7 +3811,7 @@
     {
       "upc": "097612322309",
       "originalName": "ZooMed Trop. UVB&Heat Kit",
-      "expandedName": "Zoo MediumTrop. UVB & Heat Kit",
+      "expandedName": "Zoo Med Tropical. UVB & Heat Kit",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3820,7 +3820,7 @@
     {
       "upc": "097612322354",
       "originalName": "ZooMed Nano Dome 40W",
-      "expandedName": "Zoo MediumNano Dome 40W",
+      "expandedName": "Zoo Med Nano Dome 40W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3829,7 +3829,7 @@
     {
       "upc": "097612322361",
       "originalName": "ZooMed Nano Combo Dome 80W",
-      "expandedName": "Zoo MediumNano Combo Dome 80W",
+      "expandedName": "Zoo Med Nano Combo Dome 80W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3838,7 +3838,7 @@
     {
       "upc": "97612008357",
       "originalName": "ZooMed Creatures Dome  40W",
-      "expandedName": "Zoo MediumCreatures Dome 40W",
+      "expandedName": "Zoo Med Creatures Dome 40W",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -3847,7 +3847,7 @@
     {
       "upc": "097612008364",
       "originalName": "ZooMed Creatures Dome Combo 80W",
-      "expandedName": "Zoo MediumCreatures Dome Combo 80W",
+      "expandedName": "Zoo Med Creatures Dome Combo 80W",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3856,7 +3856,7 @@
     {
       "upc": "097612325706",
       "originalName": "ZooMed Palidirum Hood 18\"",
-      "expandedName": "Zoo MediumPalidirum Hood 18\"",
+      "expandedName": "Zoo Med Palidirum Hood 18\"",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3865,7 +3865,7 @@
     {
       "upc": "97612325607",
       "originalName": "ZooMed Paludarium Hood 12\"",
-      "expandedName": "Zoo MediumPaludarium Hood 12\"",
+      "expandedName": "Zoo Med Paludarium Hood 12\"",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -3874,7 +3874,7 @@
     {
       "upc": "97612321005",
       "originalName": "ZooMed Wire Cage Clamp Lamp",
-      "expandedName": "Zoo MediumWire Cage Clamp Lamp",
+      "expandedName": "Zoo Med Wire Cage Clamp Lamp",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -3883,7 +3883,7 @@
     {
       "upc": "097612322255",
       "originalName": "ZooMed Combo Deep Dome",
-      "expandedName": "Zoo MediumCombo Deep Dome",
+      "expandedName": "Zoo Med Combo Deep Dome",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3892,7 +3892,7 @@
     {
       "upc": "097612322286",
       "originalName": "ZooMed Mini trop. UVB Combo",
-      "expandedName": "Zoo MediumMini Tropical. UVB Combo",
+      "expandedName": "Zoo Med Mini Tropical. UVB Combo",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3901,7 +3901,7 @@
     {
       "upc": "097612322316",
       "originalName": "ZooMed Des. UVB&Heat Kit",
-      "expandedName": "Zoo MediumDes. UVB & Heat Kit",
+      "expandedName": "Zoo Med Desert. UVB & Heat Kit",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3910,7 +3910,7 @@
     {
       "upc": "097612322279",
       "originalName": "ZooMed Min Des. UVB Combo",
-      "expandedName": "Zoo MediumMin Desert. UVB Combo",
+      "expandedName": "Zoo Med Mini Desert. UVB Combo",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3919,7 +3919,7 @@
     {
       "upc": "097612321708",
       "originalName": "ZooMed Deep Dome",
-      "expandedName": "Zoo MediumDeep Dome",
+      "expandedName": "Zoo Med Deep Dome",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3928,7 +3928,7 @@
     {
       "upc": "097612322385",
       "originalName": "ZooMed Palubarium UVB &Plant",
-      "expandedName": "Zoo MediumPalubarium UVB & Plant",
+      "expandedName": "Zoo Med Palubarium UVB & Plant",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3937,7 +3937,7 @@
     {
       "upc": "097612321906",
       "originalName": "ZooMed Mini Combo Deep Dome",
-      "expandedName": "Zoo MediumMini Combo Deep Dome",
+      "expandedName": "Zoo Med Mini Combo Deep Dome",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3946,7 +3946,7 @@
     {
       "upc": "097612321807",
       "originalName": "ZooMed Mini Deep Dome",
-      "expandedName": "Zoo MediumMini Deep Dome",
+      "expandedName": "Zoo Med Mini Deep Dome",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3955,7 +3955,7 @@
     {
       "upc": "097612925500",
       "originalName": "ZooMed Corner Bowl Lg",
-      "expandedName": "Zoo MediumCorner Bowl Large",
+      "expandedName": "Zoo Med Corner Bowl Large",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3964,7 +3964,7 @@
     {
       "upc": "097612925401",
       "originalName": "ZooMed Corner Bowl Med.",
-      "expandedName": "Zoo MediumCorner Bowl Medium.",
+      "expandedName": "Zoo Med Corner Bowl Medium.",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3973,7 +3973,7 @@
     {
       "upc": "097612925203",
       "originalName": "ZooMed Corner Bowl Sm",
-      "expandedName": "Zoo MediumCorner Bowl Small",
+      "expandedName": "Zoo Med Corner Bowl Small",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3982,7 +3982,7 @@
     {
       "upc": "097612924107",
       "originalName": "ZooMed ReptiRamp Bowl Med.",
-      "expandedName": "Zoo MediumReptiRamp Bowl Medium.",
+      "expandedName": "Zoo Med ReptiRamp Bowl Medium.",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -3991,7 +3991,7 @@
     {
       "upc": "97612924114",
       "originalName": "ZooMed ReptiRampBowl Lrg.",
-      "expandedName": "Zoo MediumReptiRampBowl Large.",
+      "expandedName": "Zoo Med ReptiRampBowl Large.",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -4000,7 +4000,7 @@
     {
       "upc": "97612920406",
       "originalName": "ZooMed  ReptiRock Lg.",
-      "expandedName": "Zoo MediumReptiRock Large.",
+      "expandedName": "Zoo Med ReptiRock Large.",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -4009,7 +4009,7 @@
     {
       "upc": "97612920307",
       "originalName": "ZooMed ReptiRock Med",
-      "expandedName": "Zoo MediumReptiRock Medium",
+      "expandedName": "Zoo Med ReptiRock Medium",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -4018,7 +4018,7 @@
     {
       "upc": "97612920208",
       "originalName": "ZooMed ReptiRock Sm.",
-      "expandedName": "Zoo MediumReptiRock Small.",
+      "expandedName": "Zoo Med ReptiRock Small.",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -4027,7 +4027,7 @@
     {
       "upc": "097612920109",
       "originalName": "ZooMed ReptiRock XS",
-      "expandedName": "Zoo MediumReptiRock Extra Small",
+      "expandedName": "Zoo Med ReptiRock Extra Small",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4036,7 +4036,7 @@
     {
       "upc": "097612923407",
       "originalName": "ZooMed ReptiRock Combo Lg",
-      "expandedName": "Zoo MediumReptiRock Combo Large",
+      "expandedName": "Zoo Med ReptiRock Combo Large",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4045,7 +4045,7 @@
     {
       "upc": "097612923308",
       "originalName": "ZooMed ReptiRock Combo Med.",
-      "expandedName": "Zoo MediumReptiRock Combo Medium.",
+      "expandedName": "Zoo Med ReptiRock Combo Medium.",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4054,7 +4054,7 @@
     {
       "upc": "097612923209",
       "originalName": "ZooMed ReptiRock Combo Sm",
-      "expandedName": "Zoo MediumReptiRock Combo Small",
+      "expandedName": "Zoo Med ReptiRock Combo Small",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4063,7 +4063,7 @@
     {
       "upc": "097612921502",
       "originalName": "ZooMed ReptiRock XL",
-      "expandedName": "Zoo MediumReptiRock Extra Large",
+      "expandedName": "Zoo Med ReptiRock Extra Large",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4072,7 +4072,7 @@
     {
       "upc": "097612921403",
       "originalName": "ZooMed ReptiRock L",
-      "expandedName": "Zoo MediumReptiRock L",
+      "expandedName": "Zoo Med ReptiRock L",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4081,7 +4081,7 @@
     {
       "upc": "097612921304",
       "originalName": "ZooMed ReptiRock M",
-      "expandedName": "Zoo MediumReptiRock M",
+      "expandedName": "Zoo Med ReptiRock M",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4117,7 +4117,7 @@
     {
       "upc": "097612923612",
       "originalName": "ZooMed Glow Bowls Combo M",
-      "expandedName": "Zoo MediumGlow Bowls Combo M",
+      "expandedName": "Zoo Med Glow Bowls Combo M",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4126,7 +4126,7 @@
     {
       "upc": "097612923629",
       "originalName": "ZooMed Glow Bowls Combo Lg.",
-      "expandedName": "Zoo MediumGlow Bowls Combo Large.",
+      "expandedName": "Zoo Med Glow Bowls Combo Large.",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4288,7 +4288,7 @@
     {
       "upc": "097612660104",
       "originalName": "ZooMed Turltle Dock Sm",
-      "expandedName": "Zoo MediumTurltle Dock Small",
+      "expandedName": "Zoo Med Turltle Dock Small",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4297,7 +4297,7 @@
     {
       "upc": "097612660203",
       "originalName": "ZooMed Turltle Dock Med",
-      "expandedName": "Zoo MediumTurltle Dock Medium",
+      "expandedName": "Zoo Med Turltle Dock Medium",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4324,7 +4324,7 @@
     {
       "upc": "097612660050",
       "originalName": "ZooMed Floating Dock Mini",
-      "expandedName": "Zoo MediumFloating Dock Mini",
+      "expandedName": "Zoo Med Floating Dock Mini",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4432,7 +4432,7 @@
     {
       "upc": "097612400564",
       "originalName": "ZooMed Aquatic Turtle Food Hatching",
-      "expandedName": "Zoo MediumAquatic Turtle Food Hatching",
+      "expandedName": "Zoo Med Aquatic Turtle Food Hatching",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4441,7 +4441,7 @@
     {
       "upc": "097612410501",
       "originalName": "ZooMed Aquatic Turtle Food Growth",
-      "expandedName": "Zoo MediumAquatic Turtle Food Growth",
+      "expandedName": "Zoo Med Aquatic Turtle Food Growth",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4459,7 +4459,7 @@
     {
       "upc": "97612410211",
       "originalName": "ZooMed Box Turtle Food",
-      "expandedName": "Zoo MediumBox Turtle Food",
+      "expandedName": "Zoo Med Box Turtle Food",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -4468,7 +4468,7 @@
     {
       "upc": "097612400991",
       "originalName": "ZooMed Gourment Box Turtle Food",
-      "expandedName": "Zoo MediumGourment Box Turtle Food",
+      "expandedName": "Zoo Med Gourment Box Turtle Food",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4477,7 +4477,7 @@
     {
       "upc": "97612401011",
       "originalName": "ZooMed Gourmet Tortoise Food",
-      "expandedName": "Zoo MediumGourmet Tortoise Food",
+      "expandedName": "Zoo Med Gourmet Tortoise Food",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -4486,7 +4486,7 @@
     {
       "upc": "097612401301",
       "originalName": "ZooMed Grassland Tortoise",
-      "expandedName": "Zoo MediumGrassland Tortoise",
+      "expandedName": "Zoo Med Grassland Tortoise",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4621,7 +4621,7 @@
     {
       "upc": "097612110524",
       "originalName": "ZooMed Aquatic Turtle Food Block",
-      "expandedName": "Zoo MediumAquatic Turtle Food Block",
+      "expandedName": "Zoo Med Aquatic Turtle Food Block",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4630,7 +4630,7 @@
     {
       "upc": "30172060830",
       "originalName": "Reptology Bio Sponge 70 replace",
-      "expandedName": "Reptology Biothane Sponge 70 replace",
+      "expandedName": "Reptology Bio Sponge 70 replace",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -4711,7 +4711,7 @@
     {
       "upc": "097612800302",
       "originalName": "ZooMed Turtle Eye Drops",
-      "expandedName": "Zoo MediumTurtle Eye Drops",
+      "expandedName": "Zoo Med Turtle Eye Drops",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4720,7 +4720,7 @@
     {
       "upc": "097612401400",
       "originalName": "ZooMed TorToise Flower food topper",
-      "expandedName": "Zoo MediumTorToise Flower Food topper",
+      "expandedName": "Zoo Med TorToise Flower Food topper",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4792,7 +4792,7 @@
     {
       "upc": "097612180534",
       "originalName": "ZooMed ReptiVine",
-      "expandedName": "Zoo MediumReptiVine",
+      "expandedName": "Zoo Med ReptiVine",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4801,7 +4801,7 @@
     {
       "upc": "97612180527",
       "originalName": "ZooMed Naturalisic Flora",
-      "expandedName": "Zoo MediumNaturalisic Flora",
+      "expandedName": "Zoo Med Naturalisic Flora",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -4864,7 +4864,7 @@
     {
       "upc": "097612180190",
       "originalName": "ZooMed Madagascar Bamboo sm",
-      "expandedName": "Zoo MediumMadagascar Bamboo Small",
+      "expandedName": "Zoo Med Madagascar Bamboo Small",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4873,7 +4873,7 @@
     {
       "upc": "97612180268",
       "originalName": "ZooMed Med. Cannibas",
-      "expandedName": "Zoo MediumMed. Cannibas",
+      "expandedName": "Zoo Med Medium. Cannibas",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -4882,7 +4882,7 @@
     {
       "upc": "097612180213",
       "originalName": "ZooMed Amazonian Phyllo Med",
-      "expandedName": "Zoo MediumAmazonian Phyllo Medium",
+      "expandedName": "Zoo Med Amazonian Phyllo Medium",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4891,7 +4891,7 @@
     {
       "upc": "097612180305",
       "originalName": "ZooMed Mexican Phyllo Lg.",
-      "expandedName": "Zoo MediumMexican Phyllo Large.",
+      "expandedName": "Zoo Med Mexican Phyllo Large.",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -4900,7 +4900,7 @@
     {
       "upc": "097612180367",
       "originalName": "ZooMed Lg Cannibas",
-      "expandedName": "Zoo MediumLg Cannibas",
+      "expandedName": "Zoo Med Large Cannibas",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5143,7 +5143,7 @@
     {
       "upc": "097612210200",
       "originalName": "ZooMed Small Cork Round",
-      "expandedName": "Zoo MediumSmall Cork Round",
+      "expandedName": "Zoo Med Small Cork Round",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5152,7 +5152,7 @@
     {
       "upc": "097612210217",
       "originalName": "ZooMed Cork Round Med.",
-      "expandedName": "Zoo MediumCork Round Medium.",
+      "expandedName": "Zoo Med Cork Round Medium.",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5161,7 +5161,7 @@
     {
       "upc": "097612210224",
       "originalName": "ZooMed Cork round Lar",
-      "expandedName": "Zoo MediumCork round Lar",
+      "expandedName": "Zoo Med Cork round Lar",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5170,7 +5170,7 @@
     {
       "upc": "097612210248",
       "originalName": "ZooMed Cork Round Jumbo",
-      "expandedName": "Zoo MediumCork Round Jumbo",
+      "expandedName": "Zoo Med Cork Round Jumbo",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5179,7 +5179,7 @@
     {
       "upc": "97612210231",
       "originalName": "ZooMed Cork Round x-large",
-      "expandedName": "Zoo MediumCork Round x-large",
+      "expandedName": "Zoo Med Cork Round x-large",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -5188,7 +5188,7 @@
     {
       "upc": "97612210101",
       "originalName": "ZooMed Cork Flat Sm",
-      "expandedName": "Zoo MediumCork Flat Small",
+      "expandedName": "Zoo Med Cork Flat Small",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -5197,7 +5197,7 @@
     {
       "upc": "97612210118",
       "originalName": "ZooMed Cork Flat Med",
-      "expandedName": "Zoo MediumCork Flat Medium",
+      "expandedName": "Zoo Med Cork Flat Medium",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -5206,7 +5206,7 @@
     {
       "upc": "097612210125",
       "originalName": "ZooMed Cork Flat Lrg",
-      "expandedName": "Zoo MediumCork Flat Large",
+      "expandedName": "Zoo Med Cork Flat Large",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5215,7 +5215,7 @@
     {
       "upc": "097612210019",
       "originalName": "ZooMed Grapevine M",
-      "expandedName": "Zoo MediumGrapevine M",
+      "expandedName": "Zoo Med Grapevine M",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5287,7 +5287,7 @@
     {
       "upc": "097612300086",
       "originalName": "ZooMed Under tank Heater Mini",
-      "expandedName": "Zoo MediumUnder tank Heater Mini",
+      "expandedName": "Zoo Med Under tank Heater Mini",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5296,7 +5296,7 @@
     {
       "upc": "97612300055",
       "originalName": "ZooMed Under tank Heater 10-20Gal",
-      "expandedName": "Zoo MediumUnder tank Heater 10-20Gal",
+      "expandedName": "Zoo Med Under tank Heater 10-20Gal",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -5305,7 +5305,7 @@
     {
       "upc": "097612300062",
       "originalName": "ZooMed Under tank Heater 30-40Gal",
-      "expandedName": "Zoo MediumUnder tank Heater 30-40Gal",
+      "expandedName": "Zoo Med Under tank Heater 30-40Gal",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5314,7 +5314,7 @@
     {
       "upc": "097612300079",
       "originalName": "ZooMed Under tank Heater 50-60 Gal",
-      "expandedName": "Zoo MediumUnder tank Heater 50-60 Gallon",
+      "expandedName": "Zoo Med Under tank Heater 50-60 Gallon",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5323,7 +5323,7 @@
     {
       "upc": "097612375039",
       "originalName": "ZooMed Enviromental Control Center",
-      "expandedName": "Zoo MediumEnviromental Control Center",
+      "expandedName": "Zoo Med Enviromental Control Center",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5341,7 +5341,7 @@
     {
       "upc": "097612376005",
       "originalName": "ZooMed Reptitemp Digital Thermo",
-      "expandedName": "Zoo MediumReptitemp Digital Thermo",
+      "expandedName": "Zoo Med Reptitemp Digital Thermo",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5350,7 +5350,7 @@
     {
       "upc": "097612500257",
       "originalName": "ZooMed Paludarium 25",
-      "expandedName": "Zoo MediumPaludarium 25",
+      "expandedName": "Zoo Med Paludarium 25",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5359,7 +5359,7 @@
     {
       "upc": "097612511116",
       "originalName": "ZooMed Paludarium Filter 20 Cart",
-      "expandedName": "Zoo MediumPaludarium Filter 20 Cartridge",
+      "expandedName": "Zoo Med Paludarium Filter 20 Cartridge",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5368,7 +5368,7 @@
     {
       "upc": "97612510119",
       "originalName": "ZooMed Paludarium Filter 20",
-      "expandedName": "Zoo MediumPaludarium Filter 20",
+      "expandedName": "Zoo Med Paludarium Filter 20",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -5377,7 +5377,7 @@
     {
       "upc": "97612520019",
       "originalName": "ZooMed Paludarium Platform Sm",
-      "expandedName": "Zoo MediumPaludarium Platform Small",
+      "expandedName": "Zoo Med Paludarium Platform Small",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -5386,7 +5386,7 @@
     {
       "upc": "097612008302",
       "originalName": "ZooMed Creaturetherm Heater",
-      "expandedName": "Zoo MediumCreaturetherm Heater",
+      "expandedName": "Zoo Med Creaturetherm Heater",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5395,7 +5395,7 @@
     {
       "upc": "097612327120",
       "originalName": "ZooMed Terraium Controller",
-      "expandedName": "Zoo MediumTerraium Controller",
+      "expandedName": "Zoo Med Terraium Controller",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5404,7 +5404,7 @@
     {
       "upc": "97612120110",
       "originalName": "ZooMed Aquasun Aquarium Contr",
-      "expandedName": "Zoo MediumAquasun Aquarium Controller",
+      "expandedName": "Zoo Med Aquasun Aquarium Controller",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -5413,7 +5413,7 @@
     {
       "upc": "097612300109",
       "originalName": "Zoomed High range Reptile Therm",
-      "expandedName": "Zoo MediumHigh range Reptile Thermometer",
+      "expandedName": "Zoo Med High range Reptile Thermometer",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5422,7 +5422,7 @@
     {
       "upc": "097612300246",
       "originalName": "Zoomed Digital thermo",
-      "expandedName": "Zoo MediumDigital thermo",
+      "expandedName": "Zoo Med Digital thermo",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5440,7 +5440,7 @@
     {
       "upc": "097612327113",
       "originalName": "ZooMed Terrarum Timer",
-      "expandedName": "Zoo MediumTerrarum Timer",
+      "expandedName": "Zoo Med Terrarum Timer",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5449,7 +5449,7 @@
     {
       "upc": "097612300314",
       "originalName": "ZooMed Combo Gauge",
-      "expandedName": "Zoo MediumCombo Gauge",
+      "expandedName": "Zoo Med Combo Gauge",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5458,7 +5458,7 @@
     {
       "upc": "97612322804",
       "originalName": "ZooMed Nano Hold down kit",
-      "expandedName": "Zoo MediumNano Hold down kit",
+      "expandedName": "Zoo Med Nano Hold down kit",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -5467,7 +5467,7 @@
     {
       "upc": "097612322811",
       "originalName": "ZooMed Nano Combo Hold down kit",
-      "expandedName": "Zoo MediumNano Combo Hold down kit",
+      "expandedName": "Zoo Med Nano Combo Hold down kit",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5521,7 +5521,7 @@
     {
       "upc": "097612300321",
       "originalName": "ZooMed Min/Max Thermo",
-      "expandedName": "Zoo MediumMin/Max Thermo",
+      "expandedName": "Zoo Med Mini/Max Thermo",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -5755,7 +5755,7 @@
     {
       "upc": "015561231770",
       "originalName": "ExoTerra Med wet Log",
-      "expandedName": "ExoTerra Mediumwet Log",
+      "expandedName": "ExoTerra Medium wet Log",
       "source": "maybe_inventory",
       "inferredBrand": "Fluval",
       "isCoastal": false,
@@ -5989,7 +5989,7 @@
     {
       "upc": "097612200867",
       "originalName": "Zoomed CocoNut House",
-      "expandedName": "Zoo MediumCocoNut House",
+      "expandedName": "Zoo Med CocoNut House",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6034,7 +6034,7 @@
     {
       "upc": "097612180640",
       "originalName": "ZooMed Tillandsia Air plant",
-      "expandedName": "Zoo MediumTillandsia Air plant",
+      "expandedName": "Zoo Med Tillandsia Air plant",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6043,7 +6043,7 @@
     {
       "upc": "097612180619",
       "originalName": "ZooMed chestnut bromeland",
-      "expandedName": "Zoo Mediumchestnut bromeland",
+      "expandedName": "Zoo Med chestnut bromeland",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6088,7 +6088,7 @@
     {
       "upc": "097612621501",
       "originalName": "ZooMed Small Mushroom ledge",
-      "expandedName": "Zoo MediumSmall Mushroom ledge",
+      "expandedName": "Zoo Med Small Mushroom ledge",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6286,7 +6286,7 @@
     {
       "upc": "97612200850",
       "originalName": "ZooMed Habba Hut Giant",
-      "expandedName": "Zoo MediumHabba Hut Giant",
+      "expandedName": "Zoo Med Habba Hut Giant",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -6295,7 +6295,7 @@
     {
       "upc": "97612200836",
       "originalName": "ZooMed Habba Hut Large",
-      "expandedName": "Zoo MediumHabba Hut Large",
+      "expandedName": "Zoo Med Habba Hut Large",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -6304,7 +6304,7 @@
     {
       "upc": "097612200829",
       "originalName": "ZooMed Habba Hut Med",
-      "expandedName": "Zoo MediumHabba Hut Medium",
+      "expandedName": "Zoo Med Habba Hut Medium",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6313,7 +6313,7 @@
     {
       "upc": "097612200812",
       "originalName": "ZooMed Habba Hut Sm",
-      "expandedName": "Zoo MediumHabba Hut Small",
+      "expandedName": "Zoo Med Habba Hut Small",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6349,7 +6349,7 @@
     {
       "upc": "097612091397",
       "originalName": "ZooMed Hermit Crab Habitat kit",
-      "expandedName": "Zoo MediumHermit Crab Habitat kit",
+      "expandedName": "Zoo Med Hermit Crab Habitat kit",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6367,7 +6367,7 @@
     {
       "upc": "97612251029",
       "originalName": "ZooMed hermit Crab starter kit",
-      "expandedName": "Zoo Mediumhermit Crab starter kit",
+      "expandedName": "Zoo Med hermit Crab starter kit",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -6376,7 +6376,7 @@
     {
       "upc": "97612009255",
       "originalName": "ZooMed Blue Hermit Crab Sand",
-      "expandedName": "Zoo MediumBlue Buffalo Hermit Crab Sand",
+      "expandedName": "Zoo Med Blue Buffalo Hermit Crab Sand",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -6385,7 +6385,7 @@
     {
       "upc": "097612009217",
       "originalName": "ZooMed White Hermit Crab Sand",
-      "expandedName": "Zoo MediumWhite Hermit Crab Sand",
+      "expandedName": "Zoo Med White Hermit Crab Sand",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6403,7 +6403,7 @@
     {
       "upc": "097612009705",
       "originalName": "ZooMed Hermit Soil",
-      "expandedName": "Zoo MediumHermit Soil",
+      "expandedName": "Zoo Med Hermit Soil",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6412,7 +6412,7 @@
     {
       "upc": "097612009507",
       "originalName": "ZooMed Hermit Crab Sponge",
-      "expandedName": "Zoo MediumHermit Crab Sponge",
+      "expandedName": "Zoo Med Hermit Crab Sponge",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6421,7 +6421,7 @@
     {
       "upc": "097612009415",
       "originalName": "ZooMed Neon Crab Shells",
-      "expandedName": "Zoo MediumNeon Crab Shells",
+      "expandedName": "Zoo Med Neon Crab Shells",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6430,7 +6430,7 @@
     {
       "upc": "097612009408",
       "originalName": "ZooMed Mixed Fancy Shells",
-      "expandedName": "Zoo MediumMixed Fancy Shells",
+      "expandedName": "Zoo Med Mixed Fancy Shells",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6439,7 +6439,7 @@
     {
       "upc": "097612009804",
       "originalName": "ZooMed Bright Bowls",
-      "expandedName": "Zoo MediumBright Bowls",
+      "expandedName": "Zoo Med Bright Bowls",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6448,7 +6448,7 @@
     {
       "upc": "097612924091",
       "originalName": "Zoomed ReptiRamp Bowl Sm",
-      "expandedName": "Zoo MediumReptiRamp Bowl Small",
+      "expandedName": "Zoo Med ReptiRamp Bowl Small",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6466,7 +6466,7 @@
     {
       "upc": "097612410112",
       "originalName": "ZooMed Hermit Crab Food",
-      "expandedName": "Zoo MediumHermit Crab Food",
+      "expandedName": "Zoo Med Hermit Crab Food",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6475,7 +6475,7 @@
     {
       "upc": "97612009613",
       "originalName": "ZooMed Hermit Crab Salad",
-      "expandedName": "Zoo MediumHermit Crab Salad",
+      "expandedName": "Zoo Med Hermit Crab Salad",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -6484,7 +6484,7 @@
     {
       "upc": "97612009606",
       "originalName": "ZooMed hermit Crab Crunchies",
-      "expandedName": "Zoo Mediumhermit Crab Crunchies",
+      "expandedName": "Zoo Med hermit Crab Crunchies",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -6493,7 +6493,7 @@
     {
       "upc": "97612009262",
       "originalName": "ZooMed Crab Glow in the dark scoop",
-      "expandedName": "Zoo MediumCrab Glow in the dark scoop",
+      "expandedName": "Zoo Med Crab Glow in the dark scoop",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -6502,7 +6502,7 @@
     {
       "upc": "097612009125",
       "originalName": "ZooMed Crab GITD Dual Meter",
-      "expandedName": "Zoo MediumCrab GITD Dual Meter",
+      "expandedName": "Zoo Med Crab GITD Dual Meter",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6511,7 +6511,7 @@
     {
       "upc": "097612009521",
       "originalName": "ZooMed Crab GITD Climbing Branch",
-      "expandedName": "Zoo MediumCrab GITD Climbing Branch",
+      "expandedName": "Zoo Med Crab GITD Climbing Branch",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6520,7 +6520,7 @@
     {
       "upc": "97612009118",
       "originalName": "ZooMed Crab Combo Gauge",
-      "expandedName": "Zoo MediumCrab Combo Gauge",
+      "expandedName": "Zoo Med Crab Combo Gauge",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -6529,7 +6529,7 @@
     {
       "upc": "097612009101",
       "originalName": "ZooMed Crab thermoter",
-      "expandedName": "Zoo MediumCrab thermoter",
+      "expandedName": "Zoo Med Crab thermoter",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6538,7 +6538,7 @@
     {
       "upc": "097612009903",
       "originalName": "ZooMed Crab Drinking Water con",
-      "expandedName": "Zoo MediumCrab Drinking Water Conditioner",
+      "expandedName": "Zoo Med Crab Drinking Water Conditioner",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6547,7 +6547,7 @@
     {
       "upc": "097612009910",
       "originalName": "ZooMed Crab Salt Water Con",
-      "expandedName": "Zoo MediumCrab Salt Water Conditioner",
+      "expandedName": "Zoo Med Crab Salt Water Conditioner",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6556,7 +6556,7 @@
     {
       "upc": "097612009309",
       "originalName": "Zoomed Crab Heater",
-      "expandedName": "Zoo MediumCrab Heater",
+      "expandedName": "Zoo Med Crab Heater",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6565,7 +6565,7 @@
     {
       "upc": "097612009378",
       "originalName": "ZooMed Growth Shells Lg",
-      "expandedName": "Zoo MediumGrowth Shells Large",
+      "expandedName": "Zoo Med Growth Shells Large",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6574,7 +6574,7 @@
     {
       "upc": "097612009354",
       "originalName": "ZooMed Growth Shells Sm",
-      "expandedName": "Zoo MediumGrowth Shells Small",
+      "expandedName": "Zoo Med Growth Shells Small",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6583,7 +6583,7 @@
     {
       "upc": "097612009538",
       "originalName": "ZooMed Crab Cork Shelter",
-      "expandedName": "Zoo MediumCrab Cork Shelter",
+      "expandedName": "Zoo Med Crab Cork Shelter",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6592,7 +6592,7 @@
     {
       "upc": "097612009385",
       "originalName": "ZooMed Growth Shell XL",
-      "expandedName": "Zoo MediumGrowth Shell Extra Large",
+      "expandedName": "Zoo Med Growth Shell Extra Large",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6601,7 +6601,7 @@
     {
       "upc": "97612009361",
       "originalName": "ZooMed Growth Shell Med",
-      "expandedName": "Zoo MediumGrowth Shell Medium",
+      "expandedName": "Zoo Med Growth Shell Medium",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -6610,7 +6610,7 @@
     {
       "upc": "097612930108",
       "originalName": "ZooMed Hermit Sea Sponge",
-      "expandedName": "Zoo MediumHermit Sea Sponge",
+      "expandedName": "Zoo Med Hermit Sea Sponge",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6619,7 +6619,7 @@
     {
       "upc": "097612091274",
       "originalName": "ZooMed Juv. Bearded Dragon Kit 20g",
-      "expandedName": "Zoo MediumJuv. Bearded Dragon Kit 20g",
+      "expandedName": "Zoo Med Juvenile. Bearded Dragon Kit 20g",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6628,7 +6628,7 @@
     {
       "upc": "097612091557",
       "originalName": "ZooMed Desert Starter Kit 10G.",
-      "expandedName": "Zoo MediumDesert Starter Kit 10G.",
+      "expandedName": "Zoo Med Desert Starter Kit 10G.",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6655,7 +6655,7 @@
     {
       "upc": "097612091045",
       "originalName": "ZooMed 18x18x24 Tall",
-      "expandedName": "Zoo Medium18x18x24 Tall",
+      "expandedName": "Zoo Med 18x18x24 Tall",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6673,7 +6673,7 @@
     {
       "upc": "097612090512",
       "originalName": "ZooMed Reptihabitat 40 Gal",
-      "expandedName": "Zoo MediumReptihabitat 40 Gallon",
+      "expandedName": "Zoo Med Reptihabitat 40 Gallon",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6736,7 +6736,7 @@
     {
       "upc": "097612090413",
       "originalName": "ZooMed tortoise play pen",
-      "expandedName": "Zoo Mediumtortoise play pen",
+      "expandedName": "Zoo Med tortoise play pen",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6790,7 +6790,7 @@
     {
       "upc": "97612091359",
       "originalName": "ZooMed LeoGecko Kit 10G.",
-      "expandedName": "Zoo MediumLeoGecko Kit 10G.",
+      "expandedName": "Zoo Med LeoGecko Kit 10G.",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -6799,7 +6799,7 @@
     {
       "upc": "097612090550",
       "originalName": "ZooMed ReptiHabitat 30Gal",
-      "expandedName": "Zoo MediumReptiHabitat 30Gal",
+      "expandedName": "Zoo Med ReptiHabitat 30Gal",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6808,7 +6808,7 @@
     {
       "upc": "097612091328",
       "originalName": "ZooMed Snake Starter Kit 20 g",
-      "expandedName": "Zoo MediumSnake Starter Kit 20 g",
+      "expandedName": "Zoo Med Snake Starter Kit 20 g",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6844,7 +6844,7 @@
     {
       "upc": "097612091267",
       "originalName": "ZooMed Crested Gecko KIt",
-      "expandedName": "Zoo MediumCrested Gecko KIt",
+      "expandedName": "Zoo Med Crested Gecko KIt",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6853,7 +6853,7 @@
     {
       "upc": "097612091014",
       "originalName": "ZooMed Small and wide",
-      "expandedName": "Zoo MediumSmall and wide",
+      "expandedName": "Zoo Med Small and wide",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6862,7 +6862,7 @@
     {
       "upc": "097612091243",
       "originalName": "ZooMed Frog Kit",
-      "expandedName": "Zoo MediumFrog Kit",
+      "expandedName": "Zoo Med Frog Kit",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6871,7 +6871,7 @@
     {
       "upc": "097612091069",
       "originalName": "ZooMed Creature Habitat Kit",
-      "expandedName": "Zoo MediumCreature Habitat Kit",
+      "expandedName": "Zoo Med Creature Habitat Kit",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6880,7 +6880,7 @@
     {
       "upc": "097612091076",
       "originalName": "ZooMed Creatures den low profile",
-      "expandedName": "Zoo MediumCreatures den low profile",
+      "expandedName": "Zoo Med Creatures den low profile",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6898,7 +6898,7 @@
     {
       "upc": "097612008906",
       "originalName": "ZooMed Rolly Polly Kit",
-      "expandedName": "Zoo MediumRolly Polly Kit",
+      "expandedName": "Zoo Med Rolly Polly Kit",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -6952,7 +6952,7 @@
     {
       "upc": "015561226103",
       "originalName": "ExoTerra Med Wide",
-      "expandedName": "ExoTerra MediumWide",
+      "expandedName": "ExoTerra Medium Wide",
       "source": "maybe_inventory",
       "inferredBrand": "Fluval",
       "isCoastal": false,
@@ -7078,7 +7078,7 @@
     {
       "upc": "097612090604",
       "originalName": "ZooMed Paludarium sm",
-      "expandedName": "Zoo MediumPaludarium Small",
+      "expandedName": "Zoo Med Paludarium Small",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -7087,7 +7087,7 @@
     {
       "upc": "097612090611",
       "originalName": "ZooMed Paludarium Lg",
-      "expandedName": "Zoo MediumPaludarium Large",
+      "expandedName": "Zoo Med Paludarium Large",
       "source": "maybe_inventory",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -7258,7 +7258,7 @@
     {
       "upc": "21653101128",
       "originalName": "BIo Groom Flea Shampoo",
-      "expandedName": "Biothane Groom Flea Shampoo",
+      "expandedName": "BIo Groom Flea Shampoo",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -7816,7 +7816,7 @@
     {
       "upc": "48081008218",
       "originalName": "PH Med Seed Catcher",
-      "expandedName": "Prevue Hendrix MediumSeed Catcher",
+      "expandedName": "Prevue Hendrix Medium Seed Catcher",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -8671,7 +8671,7 @@
     {
       "upc": "048081003732",
       "originalName": "Birdie Basics Perch Sm -Med 7/16x16",
-      "expandedName": "Birdie Basics Perch Small -Medium7/16x16",
+      "expandedName": "Birdie Basics Perch Small -Medium 7/16x16",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -8680,7 +8680,7 @@
     {
       "upc": "048081003763",
       "originalName": "Birdie Basics Perch Med 3/4x15",
-      "expandedName": "Birdie Basics Perch Medium3/4x15",
+      "expandedName": "Birdie Basics Perch Medium 3/4x15",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -10471,7 +10471,7 @@
     {
       "upc": "762177820200",
       "originalName": "ZuPreem FruitBlend Med Bird",
-      "expandedName": "ZuPreem FruitBlend MediumBird",
+      "expandedName": "ZuPreem FruitBlend Medium Bird",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -10489,7 +10489,7 @@
     {
       "upc": "762177922003",
       "originalName": "ZuPreem Naturals Med bird",
-      "expandedName": "ZuPreem Naturals Mediumbird",
+      "expandedName": "ZuPreem Naturals Medium bird",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -10498,7 +10498,7 @@
     {
       "upc": "762177360201",
       "originalName": "ZuPreem PureFun Med Bird",
-      "expandedName": "ZuPreem PureFun MediumBird",
+      "expandedName": "ZuPreem PureFun Medium Bird",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -11479,7 +11479,7 @@
     {
       "upc": "045663976477",
       "originalName": "FOU SHMP MC MED 16OZ",
-      "expandedName": "FOU SHMP MC Medium16OZ",
+      "expandedName": "FOU SHMP MC Medium 16OZ",
       "source": "verified",
       "inferredBrand": "Four Paws",
       "isCoastal": false,
@@ -12298,7 +12298,7 @@
     {
       "upc": "818582010238",
       "originalName": "INV MED-P ANTIMIC EYE GEL 3OZ",
-      "expandedName": "INV MediumP ANTIMIC EYE GEL 3OZ",
+      "expandedName": "INV Medium-P ANTIMIC EYE GEL 3OZ",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -12316,7 +12316,7 @@
     {
       "upc": "818582011969",
       "originalName": "INV MED-P EAR RNS 3OZ",
-      "expandedName": "INV MediumP EAR RNS 3OZ",
+      "expandedName": "INV Medium-P EAR RNS 3OZ",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -12325,7 +12325,7 @@
     {
       "upc": "818582011952",
       "originalName": "INV MED-P HOT SPT GEL 3OZ",
-      "expandedName": "INV MediumP HOT Spot GEL 3OZ",
+      "expandedName": "INV Medium-P HOT Spot GEL 3OZ",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -12586,7 +12586,7 @@
     {
       "upc": "667334229059",
       "originalName": "PKB MED HYDCRTSN CR 1OZ",
-      "expandedName": "PKB MediumHYDCRTSN CR 1OZ",
+      "expandedName": "PKB Medium HYDCRTSN CR 1OZ",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -13234,7 +13234,7 @@
     {
       "upc": "669125804056",
       "originalName": "NTN MED BITTER BANDAGE 3IN",
-      "expandedName": "NTN MediumBITTER BANDAGE 3IN",
+      "expandedName": "NTN Medium BITTER BANDAGE 3IN",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -13828,7 +13828,7 @@
     {
       "upc": "076484577833",
       "originalName": "Safari Flea Comb Short/Med hair",
-      "expandedName": "Safari Flea Compact Short/Mediumhair",
+      "expandedName": "Safari Flea Compact Short/Medium hair",
       "source": "maybe_inventory",
       "inferredBrand": "Coastal",
       "isCoastal": false,
@@ -13981,7 +13981,7 @@
     {
       "upc": "811794929251",
       "originalName": "Furminator Med Dog, Short Hair tool",
-      "expandedName": "Furminator MediumDog, Short Hair tool",
+      "expandedName": "Furminator Medium Dog, Short Hair tool",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -13990,7 +13990,7 @@
     {
       "upc": "811794929145",
       "originalName": "Furminator Med Dog, long Hair Tool",
-      "expandedName": "Furminator MediumDog, long Hair Tool",
+      "expandedName": "Furminator Medium Dog, long Hair Tool",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -15331,7 +15331,7 @@
     {
       "upc": "842982071360",
       "originalName": "Retro Med Blue Bowl",
-      "expandedName": "Retro MediumBlue Buffalo Bowl",
+      "expandedName": "Retro Medium Blue Buffalo Bowl",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -15439,7 +15439,7 @@
     {
       "upc": "842982079861",
       "originalName": "Med Blue Solo Bowl Tvrl",
-      "expandedName": "MediumBlue Buffalo Solo Bowl Tvrl",
+      "expandedName": "Medium Blue Buffalo Solo Bowl Tvrl",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -15781,7 +15781,7 @@
     {
       "upc": "045663856205",
       "originalName": "FourPaws Med 20' Tie out Cable",
-      "expandedName": "FourPaws Medium20' Tie out Cable",
+      "expandedName": "FourPaws Medium 20' Tie out Cable",
       "source": "maybe_inventory",
       "inferredBrand": "Four Paws",
       "isCoastal": false,
@@ -15826,7 +15826,7 @@
     {
       "upc": "818786014995",
       "originalName": "Zippy Paws Med Life Jacket",
-      "expandedName": "Zippy Paws MediumLife Jacket",
+      "expandedName": "Zippy Paws Medium Life Jacket",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -16303,7 +16303,7 @@
     {
       "upc": "045663972271",
       "originalName": "WeeWee Dispo MaleWrap Med/Lg 12",
-      "expandedName": "WeeWee Dispo MaleWrap MediumLg 12",
+      "expandedName": "WeeWee Dispo MaleWrap Medium/Large 12",
       "source": "maybe_inventory",
       "inferredBrand": "Four Paws",
       "isCoastal": false,
@@ -16402,7 +16402,7 @@
     {
       "upc": "010279105931",
       "originalName": "SimpleSolution Med Washable Diaper",
-      "expandedName": "SimpleSolution MediumWashable Diaper",
+      "expandedName": "SimpleSolution Medium Washable Diaper",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -16420,7 +16420,7 @@
     {
       "upc": "010279112410",
       "originalName": "SimpleSolution Med WashMale Warp",
-      "expandedName": "SimpleSolution MediumWashMale Warp",
+      "expandedName": "SimpleSolution Medium WashMale Warp",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -16681,7 +16681,7 @@
     {
       "upc": "027773004882",
       "originalName": "Quiet Time Bolsterd Bed Med White",
-      "expandedName": "Quiet Time Bolsterd Bed MediumWhite",
+      "expandedName": "Quiet Time Bolsterd Bed Medium White",
       "source": "maybe_inventory",
       "inferredBrand": "Petmate",
       "isCoastal": false,
@@ -16798,7 +16798,7 @@
     {
       "upc": "027773005087",
       "originalName": "QuietTime Brown Med Bed",
-      "expandedName": "QuietTime Brown MediumBed",
+      "expandedName": "QuietTime Brown Medium Bed",
       "source": "maybe_inventory",
       "inferredBrand": "Petmate",
       "isCoastal": false,
@@ -16807,7 +16807,7 @@
     {
       "upc": "027773005346",
       "originalName": "QuietTime Black Med bed",
-      "expandedName": "QuietTime Black Mediumbed",
+      "expandedName": "QuietTime Black Medium bed",
       "source": "maybe_inventory",
       "inferredBrand": "Petmate",
       "isCoastal": false,
@@ -17788,7 +17788,7 @@
     {
       "upc": "759023076140",
       "originalName": "CWMK MED BLUE",
-      "expandedName": "Comfort Walk MediumBlue Buffalo",
+      "expandedName": "Comfort Walk Medium Blue Buffalo",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -20173,7 +20173,7 @@
     {
       "upc": "029695221828",
       "originalName": "Petmate Med Basic Open Litter Box",
-      "expandedName": "Petmate MediumBasic Open Litter Box",
+      "expandedName": "Petmate Medium Basic Open Litter Box",
       "source": "maybe_inventory",
       "inferredBrand": "Van Ness",
       "isCoastal": false,
@@ -22126,7 +22126,7 @@
     {
       "upc": "849790155817",
       "originalName": "MED NOLA SAINTS COLLAR",
-      "expandedName": "MediumNew Orleans Saints SAINTS Collar",
+      "expandedName": "Medium New Orleans Saints SAINTS Collar",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -22153,7 +22153,7 @@
     {
       "upc": "849790159273",
       "originalName": "MED NOLA SAINTS LEASH",
-      "expandedName": "MediumNew Orleans Saints SAINTS Leash",
+      "expandedName": "Medium New Orleans Saints SAINTS Leash",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -22180,7 +22180,7 @@
     {
       "upc": "849790155336",
       "originalName": "MED LSU COLLAR",
-      "expandedName": "MediumLSU Collar",
+      "expandedName": "Medium LSU Collar",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -22207,7 +22207,7 @@
     {
       "upc": "849790151666",
       "originalName": "MED LSU LEASH",
-      "expandedName": "MediumLSU Leash",
+      "expandedName": "Medium LSU Leash",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -22423,7 +22423,7 @@
     {
       "upc": "076484093203",
       "originalName": "TITAN TRAINCLLR MED 14\" 5525",
-      "expandedName": "TITAN TRAINCLLR Medium14\" 5525",
+      "expandedName": "TITAN TRAINCLLR Medium 14\" 5525",
       "source": "maybe_inventory",
       "inferredBrand": "Coastal",
       "isCoastal": false,
@@ -22432,7 +22432,7 @@
     {
       "upc": "076484093210",
       "originalName": "TITAN TRAINCLLR MED 16\" 5525",
-      "expandedName": "TITAN TRAINCLLR Medium16\" 5525",
+      "expandedName": "TITAN TRAINCLLR Medium 16\" 5525",
       "source": "maybe_inventory",
       "inferredBrand": "Coastal",
       "isCoastal": false,
@@ -22441,7 +22441,7 @@
     {
       "upc": "076484093227",
       "originalName": "TITAN TRAINCLLR MED 18\" 5525",
-      "expandedName": "TITAN TRAINCLLR Medium18\" 5525",
+      "expandedName": "TITAN TRAINCLLR Medium 18\" 5525",
       "source": "maybe_inventory",
       "inferredBrand": "Coastal",
       "isCoastal": false,
@@ -22450,7 +22450,7 @@
     {
       "upc": "076484093234",
       "originalName": "TITAN TRAINCLLR MED 20\" 5525",
-      "expandedName": "TITAN TRAINCLLR Medium20\" 5525",
+      "expandedName": "TITAN TRAINCLLR Medium 20\" 5525",
       "source": "maybe_inventory",
       "inferredBrand": "Coastal",
       "isCoastal": false,
@@ -24484,7 +24484,7 @@
     {
       "upc": "746772251867",
       "originalName": "MAMM MED XTR MONKEY FIST",
-      "expandedName": "Mammoth MediumXTR MONKEY FIST",
+      "expandedName": "Mammoth Medium Extra MONKEY FIST",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -24664,7 +24664,7 @@
     {
       "upc": "029695321412",
       "originalName": "CHUCKIT AIR FETCHBALL MED 2PK",
-      "expandedName": "CHUCKIT AIR FETCHBALL Medium2PK",
+      "expandedName": "CHUCKIT AIR FETCHBALL Medium 2PK",
       "source": "maybe_inventory",
       "inferredBrand": "Van Ness",
       "isCoastal": false,
@@ -25321,7 +25321,7 @@
     {
       "upc": "035585499611",
       "originalName": "KON TOY KNT SNAKE ASST MD/LG",
-      "expandedName": "KON Toy KNT SNAKE Assorted Medium/Large",
+      "expandedName": "KON Toy KNT SNAKE AssortedMD/Large",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -25393,7 +25393,7 @@
     {
       "upc": "035585503370",
       "originalName": "KONG KNOTS TWISTS ASS MD/LG",
-      "expandedName": "Kong KNOTS TWISTS Assorted Medium/Large",
+      "expandedName": "Kong KNOTS TWISTS AssortedMD/Large",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -25492,7 +25492,7 @@
     {
       "upc": "035585454436",
       "originalName": "KONG MED/LRG SCRUNCH SQUIRELL",
-      "expandedName": "Kong MediumLRG SCRUNCH SQUIRELL",
+      "expandedName": "Kong Medium/Large SCRUNCH SQUIRELL",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -26995,7 +26995,7 @@
     {
       "upc": "035585111254",
       "originalName": "KNG MED AQUA",
-      "expandedName": "Kong MediumAqueon",
+      "expandedName": "Kong Medium Aqueon",
       "source": "maybe_inventory",
       "inferredBrand": "",
       "isCoastal": false,
@@ -28489,7 +28489,7 @@
     {
       "upc": "046798063114",
       "originalName": "GLOF TROPIC MAY MED WAND 8.5\"",
-      "expandedName": "GLOF TROPIC MAY MediumWAND 8.5\"",
+      "expandedName": "GLOF TROPIC MAY Medium WAND 8.5\"",
       "source": "pdf_invoice",
       "inferredBrand": "Tetra",
       "isCoastal": false,
@@ -29911,7 +29911,7 @@
     {
       "upc": "035585009219",
       "originalName": "AKC MED CAC DHS LD 48OZ",
-      "expandedName": "AKC MediumCAC DHS LD 48OZ",
+      "expandedName": "AKC Medium CAC DHS LD 48OZ",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -30325,7 +30325,7 @@
     {
       "upc": "030054108704",
       "originalName": "HIK FOOD OR CAR MED 10 OZ",
-      "expandedName": "Hikari Food OR CAR Medium10 oz",
+      "expandedName": "Hikari Food OR CAR Medium 10 oz",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -30640,7 +30640,7 @@
     {
       "upc": "034585525419",
       "originalName": "KONG EXTREME DOG MED XTRA TUFF",
-      "expandedName": "Kong EXTREME DOG MediumXTRA TUFF",
+      "expandedName": "Kong EXTREME DOG Medium XTRA TUFF",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -31369,7 +31369,7 @@
     {
       "upc": "00094521564",
       "originalName": "ACE BETTA BIO GOLD MINI PELLET 2.5 OZ",
-      "expandedName": "Acme BETTA Biothane GOLD Mini PELLET 2.5 oz",
+      "expandedName": "Acme BETTA BIO GOLD Mini PELLET 2.5 oz",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -31747,7 +31747,7 @@
     {
       "upc": "042055062326",
       "originalName": "Chick Dog Gold Slice/med 12oz",
-      "expandedName": "Chick Dog Gold Slice/Medium12oz",
+      "expandedName": "Chick Dog Gold Slice/Medium 12oz",
       "source": "pdf_invoice",
       "inferredBrand": "Hikari",
       "isCoastal": false,
@@ -31756,7 +31756,7 @@
     {
       "upc": "042055062333",
       "originalName": "Chick Dog Gold Sink Med 12oz",
-      "expandedName": "Chick Dog Gold Sink Medium12oz",
+      "expandedName": "Chick Dog Gold Sink Medium 12oz",
       "source": "pdf_invoice",
       "inferredBrand": "Hikari",
       "isCoastal": false,
@@ -32656,7 +32656,7 @@
     {
       "upc": "317009710057",
       "originalName": "HIK BIO WR MINI BIW W",
-      "expandedName": "Hikari Biothane WR Mini BIW W",
+      "expandedName": "Hikari BIO WR Mini BIW W",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -32665,7 +32665,7 @@
     {
       "upc": "317009710091",
       "originalName": "HIK BIO MINI BIW",
-      "expandedName": "Hikari Biothane Mini BIW",
+      "expandedName": "Hikari BIO Mini BIW",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -35185,7 +35185,7 @@
     {
       "upc": "032544023240",
       "originalName": "HIK FOOD MED KD FORMULA 11#",
-      "expandedName": "Hikari Food MediumKD FORMULA 11#",
+      "expandedName": "Hikari Food Medium KD FORMULA 11#",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -36184,7 +36184,7 @@
     {
       "upc": "021034631006",
       "originalName": "ACE CAP HVAC LRG/MED SWIFT R3",
-      "expandedName": "Acme CAP HVAC Large/MediumSWIFT R3",
+      "expandedName": "Acme CAP HVAC Large/Medium SWIFT R3",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -37084,7 +37084,7 @@
     {
       "upc": "077234031012",
       "originalName": "ETH T-M RP OUT W MED 14OZ",
-      "expandedName": "Ethical Pet T-M RP OUT W Medium14OZ",
+      "expandedName": "Ethical Pet T-M RP OUT W Medium 14OZ",
       "source": "pdf_invoice",
       "inferredBrand": "API",
       "isCoastal": false,
@@ -37354,7 +37354,7 @@
     {
       "upc": "762111019062",
       "originalName": "MILK BONE DRUM STK MED 2#",
-      "expandedName": "MILK BONE DRUM Stick Medium2#",
+      "expandedName": "MILK BONE DRUM Stick Medium 2#",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -37732,7 +37732,7 @@
     {
       "upc": "095668126488",
       "originalName": "ACR SUP BIO 8OZ",
-      "expandedName": "ACR Super Biothane 8OZ",
+      "expandedName": "ACR Super BIO 8OZ",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -38353,7 +38353,7 @@
     {
       "upc": "046798182357",
       "originalName": "HIK FOOD BABY PELLETS MED 2OZ",
-      "expandedName": "Hikari Food BABY PELLETS Medium2OZ",
+      "expandedName": "Hikari Food BABY PELLETS Medium 2OZ",
       "source": "pdf_invoice",
       "inferredBrand": "Tetra",
       "isCoastal": false,
@@ -39055,7 +39055,7 @@
     {
       "upc": "042055072007",
       "originalName": "HIK KOI FOOD MED PEL 4.4LBS",
-      "expandedName": "Hikari KOI Food MediumPEL 4.4LBS",
+      "expandedName": "Hikari KOI Food Medium Pellets 4.4LBS",
       "source": "pdf_invoice",
       "inferredBrand": "Hikari",
       "isCoastal": false,
@@ -39721,7 +39721,7 @@
     {
       "upc": "077234973865",
       "originalName": "SILICON MED PINKEY GRN",
-      "expandedName": "SILICON MediumPINKEY Green",
+      "expandedName": "SILICON Medium PINKEY Green",
       "source": "pdf_invoice",
       "inferredBrand": "API",
       "isCoastal": false,
@@ -39730,7 +39730,7 @@
     {
       "upc": "077234973872",
       "originalName": "SILICON MED PINKEY BLU",
-      "expandedName": "SILICON MediumPINKEY Blue",
+      "expandedName": "SILICON Medium PINKEY Blue",
       "source": "pdf_invoice",
       "inferredBrand": "API",
       "isCoastal": false,
@@ -39739,7 +39739,7 @@
     {
       "upc": "077234973889",
       "originalName": "SILICON MED PINKEY PURP",
-      "expandedName": "SILICON MediumPINKEY Purple",
+      "expandedName": "SILICON Medium PINKEY Purple",
       "source": "pdf_invoice",
       "inferredBrand": "API",
       "isCoastal": false,
@@ -39748,7 +39748,7 @@
     {
       "upc": "077234973896",
       "originalName": "SILICON MED PINKEY RED",
-      "expandedName": "SILICON MediumPINKEY Red",
+      "expandedName": "SILICON Medium PINKEY Red",
       "source": "pdf_invoice",
       "inferredBrand": "API",
       "isCoastal": false,
@@ -39757,7 +39757,7 @@
     {
       "upc": "018065207967",
       "originalName": "SL MED BONE 4-ASST COLOR",
-      "expandedName": "SL MediumBONE 4-AssortedCOLOR",
+      "expandedName": "SL Medium BONE 4-AssortedCOLOR",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -40666,7 +40666,7 @@
     {
       "upc": "84012091749",
       "originalName": "BAR TREAT SWIMO MED P CHKN 6IN",
-      "expandedName": "Barleans Treat SWIMO MediumP Chicken 6IN",
+      "expandedName": "Barleans Treat SWIMO Medium P Chicken 6IN",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -40855,7 +40855,7 @@
     {
       "upc": "042055651629",
       "originalName": "HIK HIK CO FOODS DISCUS BIO GOLD",
-      "expandedName": "Hikari Hikari CO FOODS DISCUS Biothane GOLD",
+      "expandedName": "Hikari Hikari CO FOODS DISCUS BIO GOLD",
       "source": "pdf_invoice",
       "inferredBrand": "Hikari",
       "isCoastal": false,
@@ -40882,7 +40882,7 @@
     {
       "upc": "052742181507",
       "originalName": "ACE XTR D/C CONV MED WG-3/PK",
-      "expandedName": "Acme Extra D/C CONV MediumWG-3/Pack",
+      "expandedName": "Acme Extra D/C CONV Medium WG-3/Pack",
       "source": "pdf_invoice",
       "inferredBrand": "Hills",
       "isCoastal": false,
@@ -40891,7 +40891,7 @@
     {
       "upc": "052742181508",
       "originalName": "ACE XTR D/C CONV MED WG-4/PK",
-      "expandedName": "Acme Extra D/C CONV MediumWG-4/Pack",
+      "expandedName": "Acme Extra D/C CONV Medium WG-4/Pack",
       "source": "pdf_invoice",
       "inferredBrand": "Hills",
       "isCoastal": false,
@@ -40909,7 +40909,7 @@
     {
       "upc": "000240140007",
       "originalName": "AP BIO HLTH+ADA KIT MINI D",
-      "expandedName": "Advantage Biothane Health+ADA KIT Mini D",
+      "expandedName": "Advantage BIO Health+ADA KIT Mini D",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -41251,7 +41251,7 @@
     {
       "upc": "850035209989",
       "originalName": "AP FISH MED/ANITB/ANTIPDX",
-      "expandedName": "Advantage FISH MediumANITB/ANTIPDX",
+      "expandedName": "Advantage FISH Medium/ANITB/ANTIPDX",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -41485,7 +41485,7 @@
     {
       "upc": "042055023165",
       "originalName": "HIK KOI WHEAT GERM MED 17.6OZ",
-      "expandedName": "Hikari KOI WHEAT GERM Medium17.6OZ",
+      "expandedName": "Hikari KOI WHEAT GERM Medium 17.6OZ",
       "source": "pdf_invoice",
       "inferredBrand": "Hikari",
       "isCoastal": false,
@@ -41503,7 +41503,7 @@
     {
       "upc": "042055023530",
       "originalName": "HIKARI STAPLE MED 17.6OZ",
-      "expandedName": "Hikari STAPLE Medium17.6OZ",
+      "expandedName": "Hikari STAPLE Medium 17.6OZ",
       "source": "pdf_invoice",
       "inferredBrand": "Hikari",
       "isCoastal": false,
@@ -45022,7 +45022,7 @@
     {
       "upc": "042053650432",
       "originalName": "HIKARI BETTA BIO-GOLD",
-      "expandedName": "Hikari BETTA Biothane-GOLD",
+      "expandedName": "Hikari BETTA BIO-GOLD",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -46228,7 +46228,7 @@
     {
       "upc": "000011650606",
       "originalName": "TETR BIO SCRUB RLP 60ml",
-      "expandedName": "TETR Biothane SCRUB RLP 60ml",
+      "expandedName": "TETR BIO SCRUB RLP 60ml",
       "source": "pdf_invoice",
       "inferredBrand": "",
       "isCoastal": false,
@@ -46723,7 +46723,7 @@
     {
       "upc": "042055352100",
       "originalName": "HIK FOOD-EXTRA FD MED 2KG",
-      "expandedName": "Hikari Food-EXTRA Frozen Medium2KG",
+      "expandedName": "Hikari Food-EXTRA Frozen Medium 2KG",
       "source": "pdf_invoice",
       "inferredBrand": "Hikari",
       "isCoastal": false,
@@ -49405,7 +49405,7 @@
     {
       "upc": "000094521564",
       "originalName": "ACE BETTA BIO GOLD MINI PELLET 2.5 OZ",
-      "expandedName": "Acme BETTA Biothane GOLD Mini PELLET 2.5 oz",
+      "expandedName": "Acme BETTA BIO GOLD Mini PELLET 2.5 oz",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51574,7 +51574,7 @@
     {
       "upc": "009761200820",
       "originalName": "ZooMed Glow In the Dark Tong",
-      "expandedName": "Zoo MediumGlow In the Dark Tong",
+      "expandedName": "Zoo Med Glow In the Dark Tong",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51583,7 +51583,7 @@
     {
       "upc": "009761200860",
       "originalName": "ZooMed Creatures Jelly Cup",
-      "expandedName": "Zoo MediumCreatures Jelly Cup",
+      "expandedName": "Zoo Med Creatures Jelly Cup",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51601,7 +51601,7 @@
     {
       "upc": "009761211060",
       "originalName": "ZooMed Cricket Block",
-      "expandedName": "Zoo MediumCricket Block",
+      "expandedName": "Zoo Med Cricket Block",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51619,7 +51619,7 @@
     {
       "upc": "009761213303",
       "originalName": "ZooMed Repti Calcium",
-      "expandedName": "Zoo MediumRepti Calcium",
+      "expandedName": "Zoo Med Reptile Calcium",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51628,7 +51628,7 @@
     {
       "upc": "009761240143",
       "originalName": "ZooMed Lizard flower topper",
-      "expandedName": "Zoo MediumLizard flower topper",
+      "expandedName": "Zoo Med Lizard flower topper",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51637,7 +51637,7 @@
     {
       "upc": "009761240202",
       "originalName": "ZooMed Bearded Value Pack",
-      "expandedName": "Zoo MediumBearded Value Pack",
+      "expandedName": "Zoo Med Bearded Value Pack",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51646,7 +51646,7 @@
     {
       "upc": "009761240203",
       "originalName": "ZooMed Leo gecko Value pack",
-      "expandedName": "Zoo MediumLeo gecko Value pack",
+      "expandedName": "Zoo Med Leo gecko Value pack",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51655,7 +51655,7 @@
     {
       "upc": "009761240205",
       "originalName": "Crested Gecko Variety pack ZooMed",
-      "expandedName": "Crested Gecko Variety pack Zoo Medium",
+      "expandedName": "Crested Gecko Variety pack Zoo Med",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51664,7 +51664,7 @@
     {
       "upc": "009761240301",
       "originalName": "ZooMed Crested gecko diet watm.",
-      "expandedName": "Zoo MediumCrested gecko diet watm.",
+      "expandedName": "Zoo Med Crested gecko diet watm.",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51673,7 +51673,7 @@
     {
       "upc": "009761240308",
       "originalName": "ZooMed Crested Gecko Trop.",
-      "expandedName": "Zoo MediumCrested Gecko Tropical.",
+      "expandedName": "Zoo Med Crested Gecko Tropical.",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51682,7 +51682,7 @@
     {
       "upc": "009761240315",
       "originalName": "ZooMed Crested Gecko Plum",
-      "expandedName": "Zoo MediumCrested Gecko Plum",
+      "expandedName": "Zoo Med Crested Gecko Plum",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51691,7 +51691,7 @@
     {
       "upc": "009761240319",
       "originalName": "ZooMed Crested Gecko  BluBrede",
-      "expandedName": "Zoo MediumCrested Gecko Blueberry",
+      "expandedName": "Zoo Med Crested Gecko Blueberry",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51700,7 +51700,7 @@
     {
       "upc": "009761262153",
       "originalName": "ZooMed Arboreal Feeding cup",
-      "expandedName": "Zoo MediumArboreal Feeding cup",
+      "expandedName": "Zoo Med Arboreal Feeding cup",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51709,7 +51709,7 @@
     {
       "upc": "009761262154",
       "originalName": "ZooMed Arboreal cup refill",
-      "expandedName": "Zoo MediumArboreal cup refill",
+      "expandedName": "Zoo Med Arboreal cup refill",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51718,7 +51718,7 @@
     {
       "upc": "009761262210",
       "originalName": "ZooMed 10\" Stainless Steel",
-      "expandedName": "Zoo Medium10\" Stainless Steel",
+      "expandedName": "Zoo Med 10\" Stainless Steel",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51727,7 +51727,7 @@
     {
       "upc": "009761262211",
       "originalName": "ZooMed Angled 10\" Tongs",
-      "expandedName": "Zoo MediumAngled 10\" Tongs",
+      "expandedName": "Zoo Med Angled 10\" Tongs",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51736,7 +51736,7 @@
     {
       "upc": "009761262220",
       "originalName": "ZooMed Mealworm Feeder",
-      "expandedName": "Zoo MediumMealworm Feeder",
+      "expandedName": "Zoo Med Mealworm Feeder",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51745,7 +51745,7 @@
     {
       "upc": "009761280031",
       "originalName": "ZooMed Repti Shedding Aid",
-      "expandedName": "Zoo MediumRepti Shedding Aid",
+      "expandedName": "Zoo Med Reptile Shedding Aid",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51754,7 +51754,7 @@
     {
       "upc": "009761284002",
       "originalName": "ZooMed Reptisafe 2.25 FLOZ",
-      "expandedName": "Zoo MediumReptisafe 2.25 FLOZ",
+      "expandedName": "Zoo Med Reptisafe 2.25 FLOZ",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51763,7 +51763,7 @@
     {
       "upc": "009761284004",
       "originalName": "ZooMed ReptiSafe 4.25FLOZ",
-      "expandedName": "Zoo MediumReptiSafe 4.25FLOZ",
+      "expandedName": "Zoo Med ReptiSafe 4.25FLOZ",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -51772,7 +51772,7 @@
     {
       "upc": "009761284008",
       "originalName": "ZooMed ReptiSafe 8.75Floz",
-      "expandedName": "Zoo MediumReptiSafe 8.75Floz",
+      "expandedName": "Zoo Med ReptiSafe 8.75Floz",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -53122,7 +53122,7 @@
     {
       "upc": "021653101128",
       "originalName": "BIo Groom Flea Shampoo",
-      "expandedName": "Biothane Groom Flea Shampoo",
+      "expandedName": "BIo Groom Flea Shampoo",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -53644,7 +53644,7 @@
     {
       "upc": "030111160027",
       "originalName": "EUK med br 16#",
-      "expandedName": "Eukanuba Mediumbr 16#",
+      "expandedName": "Eukanuba Medium Breed 16#",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -53950,7 +53950,7 @@
     {
       "upc": "030172060830",
       "originalName": "Reptology Bio Sponge 70 replace",
-      "expandedName": "Reptology Biothane Sponge 70 replace",
+      "expandedName": "Reptology Bio Sponge 70 replace",
       "source": "catalog",
       "inferredBrand": "Penn-Plax",
       "isCoastal": false,
@@ -56362,7 +56362,7 @@
     {
       "upc": "048081008218",
       "originalName": "PH Med Seed Catcher",
-      "expandedName": "Prevue Hendrix MediumSeed Catcher",
+      "expandedName": "Prevue Hendrix Medium Seed Catcher",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -62230,7 +62230,7 @@
     {
       "upc": "084012091749",
       "originalName": "BAR TREAT SWIMO MED P CHKN 6IN",
-      "expandedName": "Barleans Treat SWIMO MediumP Chicken 6IN",
+      "expandedName": "Barleans Treat SWIMO Medium P Chicken 6IN",
       "source": "catalog",
       "inferredBrand": "",
       "isCoastal": false,
@@ -62518,7 +62518,7 @@
     {
       "upc": "097612008357",
       "originalName": "ZooMed Creatures Dome  40W",
-      "expandedName": "Zoo MediumCreatures Dome 40W",
+      "expandedName": "Zoo Med Creatures Dome 40W",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62527,7 +62527,7 @@
     {
       "upc": "097612009118",
       "originalName": "ZooMed Crab Combo Gauge",
-      "expandedName": "Zoo MediumCrab Combo Gauge",
+      "expandedName": "Zoo Med Crab Combo Gauge",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62536,7 +62536,7 @@
     {
       "upc": "097612009255",
       "originalName": "ZooMed Blue Hermit Crab Sand",
-      "expandedName": "Zoo MediumBlue Buffalo Hermit Crab Sand",
+      "expandedName": "Zoo Med Blue Buffalo Hermit Crab Sand",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62545,7 +62545,7 @@
     {
       "upc": "097612009262",
       "originalName": "ZooMed Crab Glow in the dark scoop",
-      "expandedName": "Zoo MediumCrab Glow in the dark scoop",
+      "expandedName": "Zoo Med Crab Glow in the dark scoop",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62554,7 +62554,7 @@
     {
       "upc": "097612009361",
       "originalName": "ZooMed Growth Shell Med",
-      "expandedName": "Zoo MediumGrowth Shell Medium",
+      "expandedName": "Zoo Med Growth Shell Medium",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62563,7 +62563,7 @@
     {
       "upc": "097612009606",
       "originalName": "ZooMed hermit Crab Crunchies",
-      "expandedName": "Zoo Mediumhermit Crab Crunchies",
+      "expandedName": "Zoo Med hermit Crab Crunchies",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62572,7 +62572,7 @@
     {
       "upc": "097612009613",
       "originalName": "ZooMed Hermit Crab Salad",
-      "expandedName": "Zoo MediumHermit Crab Salad",
+      "expandedName": "Zoo Med Hermit Crab Salad",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62581,7 +62581,7 @@
     {
       "upc": "097612091359",
       "originalName": "ZooMed LeoGecko Kit 10G.",
-      "expandedName": "Zoo MediumLeoGecko Kit 10G.",
+      "expandedName": "Zoo Med LeoGecko Kit 10G.",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62590,7 +62590,7 @@
     {
       "upc": "097612111002",
       "originalName": "ZOO MED feeder bottom 7 day",
-      "expandedName": "ZOO Mediumfeeder bottom 7 day",
+      "expandedName": "ZOO MED feeder bottom 7 day",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62599,7 +62599,7 @@
     {
       "upc": "097612113006",
       "originalName": "ZOO MED feeder banquet 3-4 day",
-      "expandedName": "ZOO Mediumfeeder banquet 3-4 day",
+      "expandedName": "ZOO MED feeder banquet 3-4 day",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62608,7 +62608,7 @@
     {
       "upc": "097612117103",
       "originalName": "ZOO MED feeder 7 day betta",
-      "expandedName": "ZOO Mediumfeeder 7 day betta",
+      "expandedName": "ZOO MED feeder 7 day betta",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62617,7 +62617,7 @@
     {
       "upc": "097612119084",
       "originalName": "ZOO MED feeder pleco",
-      "expandedName": "ZOO Mediumfeeder pleco",
+      "expandedName": "ZOO MED feeder pleco",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62626,7 +62626,7 @@
     {
       "upc": "097612119114",
       "originalName": "ZOO MED feeder pleco small",
-      "expandedName": "ZOO Mediumfeeder pleco small",
+      "expandedName": "ZOO MED feeder pleco small",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62635,7 +62635,7 @@
     {
       "upc": "097612120110",
       "originalName": "ZooMed Aquasun Aquarium Contr",
-      "expandedName": "Zoo MediumAquasun Aquarium Controller",
+      "expandedName": "Zoo Med Aquasun Aquarium Controller",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62644,7 +62644,7 @@
     {
       "upc": "097612180268",
       "originalName": "ZooMed Med. Cannibas",
-      "expandedName": "Zoo MediumMed. Cannibas",
+      "expandedName": "Zoo Med Medium. Cannibas",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62653,7 +62653,7 @@
     {
       "upc": "097612180527",
       "originalName": "ZooMed Naturalisic Flora",
-      "expandedName": "Zoo MediumNaturalisic Flora",
+      "expandedName": "Zoo Med Naturalisic Flora",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62662,7 +62662,7 @@
     {
       "upc": "097612200836",
       "originalName": "ZooMed Habba Hut Large",
-      "expandedName": "Zoo MediumHabba Hut Large",
+      "expandedName": "Zoo Med Habba Hut Large",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62671,7 +62671,7 @@
     {
       "upc": "097612200850",
       "originalName": "ZooMed Habba Hut Giant",
-      "expandedName": "Zoo MediumHabba Hut Giant",
+      "expandedName": "Zoo Med Habba Hut Giant",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62680,7 +62680,7 @@
     {
       "upc": "097612210101",
       "originalName": "ZooMed Cork Flat Sm",
-      "expandedName": "Zoo MediumCork Flat Small",
+      "expandedName": "Zoo Med Cork Flat Small",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62689,7 +62689,7 @@
     {
       "upc": "097612210118",
       "originalName": "ZooMed Cork Flat Med",
-      "expandedName": "Zoo MediumCork Flat Medium",
+      "expandedName": "Zoo Med Cork Flat Medium",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62698,7 +62698,7 @@
     {
       "upc": "097612210231",
       "originalName": "ZooMed Cork Round x-large",
-      "expandedName": "Zoo MediumCork Round x-large",
+      "expandedName": "Zoo Med Cork Round x-large",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62707,7 +62707,7 @@
     {
       "upc": "097612240016",
       "originalName": "ZOO MED betta mirror",
-      "expandedName": "ZOO Mediumbetta mirror",
+      "expandedName": "ZOO MED betta mirror",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62716,7 +62716,7 @@
     {
       "upc": "097612240023",
       "originalName": "ZOO MED betta log ceramic",
-      "expandedName": "ZOO Mediumbetta log ceramic",
+      "expandedName": "ZOO MED betta log ceramic",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62725,7 +62725,7 @@
     {
       "upc": "097612240047",
       "originalName": "ZOO MED betta heater",
-      "expandedName": "ZOO Mediumbetta heater",
+      "expandedName": "ZOO MED betta heater",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62734,7 +62734,7 @@
     {
       "upc": "097612240061",
       "originalName": "ZOO MED bettamatic",
-      "expandedName": "ZOO Mediumbettamatic",
+      "expandedName": "ZOO MED bettamatic",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62743,7 +62743,7 @@
     {
       "upc": "097612240092",
       "originalName": "ZOO MED betta clean filter",
-      "expandedName": "ZOO Mediumbetta clean filter",
+      "expandedName": "ZOO MED betta clean filter",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62752,7 +62752,7 @@
     {
       "upc": "097612240504",
       "originalName": "ZOO MED betta log ceramic",
-      "expandedName": "ZOO Mediumbetta log ceramic",
+      "expandedName": "ZOO MED betta log ceramic",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62761,7 +62761,7 @@
     {
       "upc": "097612240702",
       "originalName": "ZOO MED lounge",
-      "expandedName": "ZOO Mediumlounge",
+      "expandedName": "ZOO MED lounge",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62770,7 +62770,7 @@
     {
       "upc": "097612240719",
       "originalName": "ZOO MED betta tunnel",
-      "expandedName": "ZOO Mediumbetta tunnel",
+      "expandedName": "ZOO MED betta tunnel",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62779,7 +62779,7 @@
     {
       "upc": "097612241211",
       "originalName": "ZOO MED betta papaya plant",
-      "expandedName": "ZOO Mediumbetta papaya plant",
+      "expandedName": "ZOO MED betta papaya plant",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62788,7 +62788,7 @@
     {
       "upc": "097612241228",
       "originalName": "ZOO MED betta bamboo plant",
-      "expandedName": "ZOO Mediumbetta bamboo plant",
+      "expandedName": "ZOO MED betta bamboo plant",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62797,7 +62797,7 @@
     {
       "upc": "097612241242",
       "originalName": "ZOO MED betta maple plant",
-      "expandedName": "ZOO Mediumbetta maple plant",
+      "expandedName": "ZOO MED betta maple plant",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62806,7 +62806,7 @@
     {
       "upc": "097612241358",
       "originalName": "ZOO MED wipeout 2.25oz",
-      "expandedName": "ZOO Mediumwipeout 2.25oz",
+      "expandedName": "ZOO MED wipeout 2.25oz",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62815,7 +62815,7 @@
     {
       "upc": "097612241402",
       "originalName": "ZOO MED betta kit",
-      "expandedName": "ZOO Mediumbetta kit",
+      "expandedName": "ZOO MED betta kit",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62824,7 +62824,7 @@
     {
       "upc": "097612241419",
       "originalName": "ZOO MED betta tools",
-      "expandedName": "ZOO Mediumbetta tools",
+      "expandedName": "ZOO MED betta tools",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62833,7 +62833,7 @@
     {
       "upc": "097612242058",
       "originalName": "ZOO MED accents",
-      "expandedName": "ZOO Mediumaccents",
+      "expandedName": "ZOO MED accents",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62842,7 +62842,7 @@
     {
       "upc": "097612242119",
       "originalName": "ZOO MED leaf",
-      "expandedName": "ZOO Mediumleaf",
+      "expandedName": "ZOO MED leaf",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62851,7 +62851,7 @@
     {
       "upc": "097612242218",
       "originalName": "ZOO MED betta mermaid",
-      "expandedName": "ZOO Mediumbetta mermaid",
+      "expandedName": "ZOO MED betta mermaid",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62860,7 +62860,7 @@
     {
       "upc": "097612242225",
       "originalName": "ZOO MED betta diver",
-      "expandedName": "ZOO Mediumbetta diver",
+      "expandedName": "ZOO MED betta diver",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62869,7 +62869,7 @@
     {
       "upc": "097612251029",
       "originalName": "ZooMed hermit Crab starter kit",
-      "expandedName": "Zoo Mediumhermit Crab starter kit",
+      "expandedName": "Zoo Med hermit Crab starter kit",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62878,7 +62878,7 @@
     {
       "upc": "097612300055",
       "originalName": "ZooMed Under tank Heater 10-20Gal",
-      "expandedName": "Zoo MediumUnder tank Heater 10-20Gal",
+      "expandedName": "Zoo Med Under tank Heater 10-20Gal",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62887,7 +62887,7 @@
     {
       "upc": "097612300291",
       "originalName": "ZOO MED betta thermoneter",
-      "expandedName": "ZOO Mediumbetta Thermometer",
+      "expandedName": "ZOO MED betta Thermometer",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62896,7 +62896,7 @@
     {
       "upc": "097612310252",
       "originalName": "ZooMed Nano Cermaic 25W",
-      "expandedName": "Zoo MediumNano Cermaic 25W",
+      "expandedName": "Zoo Med Nano Cermaic 25W",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62905,7 +62905,7 @@
     {
       "upc": "097612321005",
       "originalName": "ZooMed Wire Cage Clamp Lamp",
-      "expandedName": "Zoo MediumWire Cage Clamp Lamp",
+      "expandedName": "Zoo Med Wire Cage Clamp Lamp",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62914,7 +62914,7 @@
     {
       "upc": "097612322002",
       "originalName": "ZooMed Lamp Stand Lg",
-      "expandedName": "Zoo MediumLamp Stand Large",
+      "expandedName": "Zoo Med Lamp Stand Large",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62923,7 +62923,7 @@
     {
       "upc": "097612322804",
       "originalName": "ZooMed Nano Hold down kit",
-      "expandedName": "Zoo MediumNano Hold down kit",
+      "expandedName": "Zoo Med Nano Hold down kit",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62932,7 +62932,7 @@
     {
       "upc": "097612325607",
       "originalName": "ZooMed Paludarium Hood 12\"",
-      "expandedName": "Zoo MediumPaludarium Hood 12\"",
+      "expandedName": "Zoo Med Paludarium Hood 12\"",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62941,7 +62941,7 @@
     {
       "upc": "097612326109",
       "originalName": "ZooMed T8 Hood 24\"",
-      "expandedName": "Zoo MediumT8 Hood 24\"",
+      "expandedName": "Zoo Med T8 Hood 24\"",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62950,7 +62950,7 @@
     {
       "upc": "097612401011",
       "originalName": "ZooMed Gourmet Tortoise Food",
-      "expandedName": "Zoo MediumGourmet Tortoise Food",
+      "expandedName": "Zoo Med Gourmet Tortoise Food",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62959,7 +62959,7 @@
     {
       "upc": "097612401837",
       "originalName": "ZOO MED axalotl 2oz",
-      "expandedName": "ZOO Mediumaxalotl 2oz",
+      "expandedName": "ZOO MED axalotl 2oz",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62968,7 +62968,7 @@
     {
       "upc": "097612401844",
       "originalName": "ZOO MED axalotl 11oz",
-      "expandedName": "ZOO Mediumaxalotl 11oz",
+      "expandedName": "ZOO MED axalotl 11oz",
       "source": "verified",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62977,7 +62977,7 @@
     {
       "upc": "097612410211",
       "originalName": "ZooMed Box Turtle Food",
-      "expandedName": "Zoo MediumBox Turtle Food",
+      "expandedName": "Zoo Med Box Turtle Food",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62986,7 +62986,7 @@
     {
       "upc": "097612510119",
       "originalName": "ZooMed Paludarium Filter 20",
-      "expandedName": "Zoo MediumPaludarium Filter 20",
+      "expandedName": "Zoo Med Paludarium Filter 20",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -62995,7 +62995,7 @@
     {
       "upc": "097612520019",
       "originalName": "ZooMed Paludarium Platform Sm",
-      "expandedName": "Zoo MediumPaludarium Platform Small",
+      "expandedName": "Zoo Med Paludarium Platform Small",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -63004,7 +63004,7 @@
     {
       "upc": "097612910278",
       "originalName": "ZooMed ReptiRapid Skul Md. Watrfl",
-      "expandedName": "Zoo MediumReptiRapid Skul Medium. Watrfl",
+      "expandedName": "Zoo Med ReptiRapid Skul Medium. Watrfl",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -63013,7 +63013,7 @@
     {
       "upc": "097612920208",
       "originalName": "ZooMed ReptiRock Sm.",
-      "expandedName": "Zoo MediumReptiRock Small.",
+      "expandedName": "Zoo Med ReptiRock Small.",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -63022,7 +63022,7 @@
     {
       "upc": "097612920307",
       "originalName": "ZooMed ReptiRock Med",
-      "expandedName": "Zoo MediumReptiRock Medium",
+      "expandedName": "Zoo Med ReptiRock Medium",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -63031,7 +63031,7 @@
     {
       "upc": "097612920406",
       "originalName": "ZooMed  ReptiRock Lg.",
-      "expandedName": "Zoo MediumReptiRock Large.",
+      "expandedName": "Zoo Med ReptiRock Large.",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -63040,7 +63040,7 @@
     {
       "upc": "097612924114",
       "originalName": "ZooMed ReptiRampBowl Lrg.",
-      "expandedName": "Zoo MediumReptiRampBowl Large.",
+      "expandedName": "Zoo Med ReptiRampBowl Large.",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -63049,7 +63049,7 @@
     {
       "upc": "097612950151",
       "originalName": "ZooMed ReptiFogger",
-      "expandedName": "Zoo MediumReptiFogger",
+      "expandedName": "Zoo Med ReptiFogger",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -63058,7 +63058,7 @@
     {
       "upc": "097612950175",
       "originalName": "ZooMed Multiport Fogger Attachment",
-      "expandedName": "Zoo MediumMultiport Fogger Attachment",
+      "expandedName": "Zoo Med Multiport Fogger Attachment",
       "source": "catalog",
       "inferredBrand": "Zoo Med",
       "isCoastal": false,
@@ -66775,7 +66775,7 @@
     {
       "upc": "076484962150",
       "originalName": "SAF ShedMagic Med-Long Hair SM",
-      "expandedName": "SAF ShedMagic MediumLong Hair Small",
+      "expandedName": "SAF ShedMagic Medium-Long Hair Small",
       "source": "camscanner",
       "inferredBrand": "Coastal",
       "isCoastal": false,
@@ -71113,7 +71113,7 @@
     {
       "upc": "750199033353",
       "originalName": "SILGON CLRMAN BPR BIO-9L",
-      "expandedName": "SILGON CLRMAN BPR Biothane-9L",
+      "expandedName": "SILGON CLRMAN BPR BIO-9L",
       "source": "pdf_ocr",
       "inferredBrand": "",
       "isCoastal": false,
@@ -71950,7 +71950,7 @@
     {
       "upc": "317163004877",
       "originalName": "HIK FOOD BETTA BIO GOLD 2.5Z",
-      "expandedName": "Hikari Food BETTA Biothane GOLD 2.5Z",
+      "expandedName": "Hikari Food BETTA BIO GOLD 2.5Z",
       "source": "pdf_ocr",
       "inferredBrand": "",
       "isCoastal": false,
@@ -75631,7 +75631,7 @@
     {
       "upc": "080531900086",
       "originalName": "FRI MED METROCLEANSE 400G 20CT",
-      "expandedName": "FRI MediumMETROCLEANSE 400G 20CT",
+      "expandedName": "FRI Medium METROCLEANSE 400G 20CT",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -78070,7 +78070,7 @@
     {
       "upc": "669125121993",
       "originalName": "NTN MED K9 ASPIRIN 300MG 75CT",
-      "expandedName": "NTN MediumK9 ASPIRIN 300MG 75CT",
+      "expandedName": "NTN Medium K9 ASPIRIN 300MG 75CT",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -79222,7 +79222,7 @@
     {
       "upc": "035585035239",
       "originalName": "KON TOY PET STIX NYL ASST MD",
-      "expandedName": "KON Toy PET STIX Nylon Assorted Medium",
+      "expandedName": "KON Toy PET STIX Nylon AssortedMD",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -79510,7 +79510,7 @@
     {
       "upc": "035585533124",
       "originalName": "KON TOY ARMOR FTBALL ASST MD",
-      "expandedName": "KON Toy ARMOR FTBALL Assorted Medium",
+      "expandedName": "KON Toy ARMOR FTBALL AssortedMD",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -80536,7 +80536,7 @@
     {
       "upc": "017163020134",
       "originalName": "API MED FUNGUS CURE LIQ 4OZ",
-      "expandedName": "API MediumFUNGUS CURE LIQ 4OZ",
+      "expandedName": "API Medium FUNGUS CURE LIQ 4OZ",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -81283,7 +81283,7 @@
     {
       "upc": "818582011938",
       "originalName": "INV MED-P HYDROGEL SPRY 3OZ",
-      "expandedName": "INV MediumP HYDROGEL SPRY 3OZ",
+      "expandedName": "INV Medium-P HYDROGEL SPRY 3OZ",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -81292,7 +81292,7 @@
     {
       "upc": "073091026952",
       "originalName": "SER MED ANTIHISTAMINE 100CT",
-      "expandedName": "SER MediumANTIHISTAMINE 100CT",
+      "expandedName": "SER Medium ANTIHISTAMINE 100CT",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -82507,7 +82507,7 @@
     {
       "upc": "645095008830",
       "originalName": "TRO MED HVET EAR DROPS 2OZ",
-      "expandedName": "TRO MediumHVET EAR DROPS 2OZ",
+      "expandedName": "TRO Medium HVET EAR DROPS 2OZ",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -82525,7 +82525,7 @@
     {
       "upc": "818582011914",
       "originalName": "INV MED-P CT WND & SKN 3OZ",
-      "expandedName": "INV MediumP Count WND & Skin 3OZ",
+      "expandedName": "INV Medium-P Count WND & Skin 3OZ",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -84001,7 +84001,7 @@
     {
       "upc": "035585533117",
       "originalName": "KON TOY ARMOR BNE ASST MD",
-      "expandedName": "KON Toy ARMOR Bone Assorted Medium",
+      "expandedName": "KON Toy ARMOR Bone AssortedMD",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -84658,7 +84658,7 @@
     {
       "upc": "724089113436",
       "originalName": "ELA MED CT TAPE WORM 3CT",
-      "expandedName": "ELA MediumCT TAPE WORM 3CT",
+      "expandedName": "ELA Medium Count TAPE WORM 3CT",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -84910,7 +84910,7 @@
     {
       "upc": "704959147020",
       "originalName": "HOM MED NOSE RELIEF 15ML",
-      "expandedName": "HOM MediumNOSE RELIEF 15ML",
+      "expandedName": "HOM Medium NOSE RELIEF 15ML",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -85936,7 +85936,7 @@
     {
       "upc": "704959047306",
       "originalName": "HOM MED CT WRM CLR 15ML",
-      "expandedName": "HOM MediumCT Worm Collar 15ML",
+      "expandedName": "HOM Medium Count Worm Collar 15ML",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -86242,7 +86242,7 @@
     {
       "upc": "704959147143",
       "originalName": "HOM MED WRM CLEAR 15ML",
-      "expandedName": "HOM MediumWRM CLEAR 15ML",
+      "expandedName": "HOM Medium Worm CLEAR 15ML",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -86512,7 +86512,7 @@
     {
       "upc": "042055732161",
       "originalName": "HIK MED AS ICH X 16OZ",
-      "expandedName": "Hikari MediumAS ICH X 16OZ",
+      "expandedName": "Hikari Medium AS ICH X 16OZ",
       "source": "verified",
       "inferredBrand": "Hikari",
       "isCoastal": false,
@@ -87286,7 +87286,7 @@
     {
       "upc": "317163080108",
       "originalName": "API MED PIMAFIX 8OZ",
-      "expandedName": "API MediumPIMAFIX 8OZ",
+      "expandedName": "API Medium PIMAFIX 8OZ",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -87637,7 +87637,7 @@
     {
       "upc": "704959147068",
       "originalName": "HOM MED COUGH 15ML",
-      "expandedName": "HOM MediumCOUGH 15ML",
+      "expandedName": "HOM Medium COUGH 15ML",
       "source": "verified",
       "inferredBrand": "",
       "isCoastal": false,
@@ -87655,7 +87655,7 @@
     {
       "upc": "042055732147",
       "originalName": "HIK MED ICH X 4OZ",
-      "expandedName": "Hikari MediumICH X 4OZ",
+      "expandedName": "Hikari Medium ICH X 4OZ",
       "source": "verified",
       "inferredBrand": "Hikari",
       "isCoastal": false,

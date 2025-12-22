@@ -92,11 +92,9 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'CIRCLE': 'Circle',
   
   // Size and measurement abbreviations
+  // Note: MD/MED removed - conflicts with "Zoo Med" brand; handled in special section
   'SM': 'Small',
   'Sm.': 'Small',
-  'MD': 'Medium',
-  'Med.': 'Medium',
-  'MED': 'Medium',
   'LG': 'Large',
   'Lg.': 'Large',
   'LRG': 'Large',
@@ -561,7 +559,7 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'Sob': 'Skull on Black',
   'Tig': 'Tiger',
   'Npk': 'Neon Pink',
-  'Bio': 'Biothane',
+  // Note: 'Bio' removed - too generic, conflicts with Bio Drain, Bio Clean, etc.
   
   // Coastal Waterproof Collection (Ww prefix)
   // Reference: Coastal Pro Waterproof line
