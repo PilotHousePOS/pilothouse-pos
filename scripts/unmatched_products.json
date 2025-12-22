@@ -35,11 +35,6 @@
     "brand": "Galapagos"
   },
   {
-    "id": 3380,
-    "name": "Coastal Ww206 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 4585,
     "name": "Nylabone Healthy Edibles 8chews Bacon",
     "brand": "Nylabone"
@@ -60,11 +55,6 @@
     "brand": "Himalayan"
   },
   {
-    "id": 3647,
-    "name": "Coastal Bzs12\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 5858,
     "name": "LSU Mesh Jersey Large",
     "brand": "Pets First"
@@ -73,11 +63,6 @@
     "id": 4265,
     "name": "Smackers Banana",
     "brand": "Vitapol"
-  },
-  {
-    "id": 3301,
-    "name": "Coastal Collar Bmb26\"",
-    "brand": "Coastal"
   },
   {
     "id": 4889,
@@ -95,19 +80,9 @@
     "brand": "Specialty Pet Products"
   },
   {
-    "id": 3948,
-    "name": "Coastal Blue18\" 601 Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 4294,
     "name": "Higgins InTune Duets Chicken & Turkey",
     "brand": "Higgins"
-  },
-  {
-    "id": 935,
-    "name": "Sunseed Fantasy Fruit Mix",
-    "brand": "Sunseed"
   },
   {
     "id": 4266,
@@ -128,11 +103,6 @@
     "id": 4034,
     "name": "Oxbow Orchard Grass Hay 15oz",
     "brand": "Oxbow"
-  },
-  {
-    "id": 5344,
-    "name": "Shark Jaw",
-    "brand": "Penn-Plax"
   },
   {
     "id": 5869,
@@ -190,16 +160,6 @@
     "brand": "Fluval"
   },
   {
-    "id": 127,
-    "name": "Exoterra Snails",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1236,
-    "name": "Aromacare Chamomile",
-    "brand": "Professional Pet Products"
-  },
-  {
     "id": 5658,
     "name": "Fluval Ac110 Biofoam",
     "brand": "Fluval"
@@ -212,11 +172,6 @@
   {
     "id": 5370,
     "name": "Crystal Cluster Blue",
-    "brand": "Penn-Plax"
-  },
-  {
-    "id": 5273,
-    "name": "Seasme Big Bird",
     "brand": "Penn-Plax"
   },
   {
@@ -260,11 +215,6 @@
     "brand": "Aquatop"
   },
   {
-    "id": 3229,
-    "name": "Coastal Leash Skx06' 366",
-    "brand": "Coastal"
-  },
-  {
     "id": 5315,
     "name": "Weird Waters Sign",
     "brand": "Penn-Plax"
@@ -275,24 +225,9 @@
     "brand": "Oxbow"
   },
   {
-    "id": 3383,
-    "name": "Coastal Wwl26 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3662,
-    "name": "Coastal Raf26\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 5779,
     "name": "Fritz Pond Barley Water Clarifier",
     "brand": "Fritz Aquatics"
-  },
-  {
-    "id": 3385,
-    "name": "Coastal Ctn26 Collar",
-    "brand": "Coastal"
   },
   {
     "id": 4414,
@@ -303,21 +238,6 @@
     "id": 4587,
     "name": "Nylabone Healthy Edibles Medium Bacn Chew",
     "brand": "Nylabone"
-  },
-  {
-    "id": 5434,
-    "name": "Rock & Branch Scape",
-    "brand": "Penn-Plax"
-  },
-  {
-    "id": 3400,
-    "name": "Coastal Ww214 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3364,
-    "name": "Coastal Autumn26\" Collar",
-    "brand": "Coastal"
   },
   {
     "id": 4899,
@@ -338,11 +258,6 @@
     "id": 4883,
     "name": "PetOdor Mulberry Spice",
     "brand": "Specialty Pet Products"
-  },
-  {
-    "id": 810,
-    "name": "Weeaway Flea Spray",
-    "brand": "Wee-Away"
   },
   {
     "id": 5151,
@@ -375,19 +290,9 @@
     "brand": "Kaytee"
   },
   {
-    "id": 1456,
-    "name": "Petag Esbilac Milk",
-    "brand": "PetAg"
-  },
-  {
     "id": 6277,
     "name": "Nutrisource Large Breed Chicken & Rice Recipe 26lb",
     "brand": "Nutrisource"
-  },
-  {
-    "id": 994,
-    "name": "Birdlife Cross Rope Perch",
-    "brand": "Birdlife"
   },
   {
     "id": 5773,
@@ -410,24 +315,9 @@
     "brand": "Hippie Hounds"
   },
   {
-    "id": 5321,
-    "name": "Destiny in Water Small",
-    "brand": "Penn-Plax"
-  },
-  {
     "id": 3689,
     "name": "Sunburst Pkf12\" Collar",
     "brand": "Sunburst"
-  },
-  {
-    "id": 3393,
-    "name": "Coastal Cto20 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3411,
-    "name": "Coastal Fsa26\" Soy Collar",
-    "brand": "Coastal"
   },
   {
     "id": 3612,
@@ -470,16 +360,6 @@
     "brand": "Lupine"
   },
   {
-    "id": 1220,
-    "name": "Birdlife Gravel Paper 9.5x15",
-    "brand": "Birdlife"
-  },
-  {
-    "id": 3854,
-    "name": "Coastal Black04' 404 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 5897,
     "name": "Cool Stripe Sweater Gray Large",
     "brand": ""
@@ -490,11 +370,6 @@
     "brand": "Lupine"
   },
   {
-    "id": 4391,
-    "name": "Oxbow Small Hidenseek Mat",
-    "brand": "Oxbow"
-  },
-  {
     "id": 4269,
     "name": "Oxbow Sim Rwds Bell Pepper",
     "brand": "Oxbow"
@@ -503,11 +378,6 @@
     "id": 4885,
     "name": "PetOdor Creamy Vanilla",
     "brand": "Specialty Pet Products"
-  },
-  {
-    "id": 3359,
-    "name": "Coastal Autumn14\" Collar",
-    "brand": "Coastal"
   },
   {
     "id": 4815,
@@ -525,11 +395,6 @@
     "brand": "Sunburst"
   },
   {
-    "id": 3282,
-    "name": "Coastal Collar Wdf12\"",
-    "brand": ""
-  },
-  {
     "id": 5931,
     "name": "Science Diet Large Breed 6+ 15lb",
     "brand": "Science Diet"
@@ -545,44 +410,9 @@
     "brand": "Natural Balance"
   },
   {
-    "id": 3252,
-    "name": "Coastal Leash Pdt06' 666",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3526,
-    "name": "Coastal Sls18\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 4722,
-    "name": "Dogswell Hip & Joint Jerky",
-    "brand": "Dogswell"
-  },
-  {
-    "id": 3649,
-    "name": "Coastal Mlm12\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 2077,
     "name": "Coastal Charm Combo Black Extra Small",
     "brand": "Coastal"
-  },
-  {
-    "id": 3223,
-    "name": "Coastal Collar Rwp26\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 836,
-    "name": "Turbo Yarn Ball",
-    "brand": "Turbo"
-  },
-  {
-    "id": 27,
-    "name": "Exoterra Biothane Drain",
-    "brand": "Exo Terra"
   },
   {
     "id": 5531,
@@ -610,34 +440,14 @@
     "brand": "Specialty Pet Products"
   },
   {
-    "id": 3352,
-    "name": "Coastal Autumn06' 12626 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 4398,
     "name": "Ramp Covers 3pk",
     "brand": ""
   },
   {
-    "id": 3198,
-    "name": "Coastal Collar Btd26\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3263,
-    "name": "Coastal Leash Tpd6' 966",
-    "brand": "Coastal"
-  },
-  {
     "id": 5647,
     "name": "Aquatop Skyaqua 13watt",
     "brand": "Aquatop"
-  },
-  {
-    "id": 985,
-    "name": "Birdlife 12\" Wooden Perches",
-    "brand": "Birdlife"
   },
   {
     "id": 5429,
@@ -650,19 +460,9 @@
     "brand": "Tuesday's Natural Dog Company"
   },
   {
-    "id": 3908,
-    "name": "Coastal Hunter06' 906 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 5674,
     "name": "Fluval Ac70 Ac110 Intake Sponge",
     "brand": "Fluval"
-  },
-  {
-    "id": 3982,
-    "name": "Coastal Red12\" 401 Collar",
-    "brand": "Coastal"
   },
   {
     "id": 4270,
@@ -705,29 +505,9 @@
     "brand": "Oxbow"
   },
   {
-    "id": 3650,
-    "name": "Coastal Shb14\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 5308,
     "name": "Flaming Skull Red",
     "brand": "Penn-Plax"
-  },
-  {
-    "id": 3214,
-    "name": "Coastal Collar Wdf20\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3408,
-    "name": "Coastal Crn06' Soy Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3303,
-    "name": "Coastal Collar Lks12\"",
-    "brand": "Coastal"
   },
   {
     "id": 5838,
@@ -735,39 +515,9 @@
     "brand": "Fashion Pet"
   },
   {
-    "id": 3645,
-    "name": "Coastal Dgm12\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 5692,
     "name": "Fluval Quickclr Fx 3pk",
     "brand": "Fluval"
-  },
-  {
-    "id": 1169,
-    "name": "Higgins Vitaseed Canary",
-    "brand": "Higgins"
-  },
-  {
-    "id": 3653,
-    "name": "Coastal Raf12\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3268,
-    "name": "Coastal Leash Btd6' 666",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1515,
-    "name": "Safari Nylon Coated Tip Dog Brush",
-    "brand": "Safari"
-  },
-  {
-    "id": 3417,
-    "name": "Coastal Ony08\" Soy Collar",
-    "brand": "Coastal"
   },
   {
     "id": 3623,
@@ -780,31 +530,6 @@
     "brand": "RedBarn"
   },
   {
-    "id": 3246,
-    "name": "Coastal Collar Tsa12\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 4106,
-    "name": "Sweet Harvest Gpig 4lb",
-    "brand": "Sweet Harvest"
-  },
-  {
-    "id": 2319,
-    "name": "Petmate Jumbo Liner 8",
-    "brand": "Petmate"
-  },
-  {
-    "id": 4180,
-    "name": "Kaytee Critter Play Pen",
-    "brand": "Kaytee"
-  },
-  {
-    "id": 3320,
-    "name": "Coastal Leash Hrw06' 46436",
-    "brand": "Coastal"
-  },
-  {
     "id": 1333,
     "name": "Nature's Miracle Oatmeal",
     "brand": "Nature's Miracle"
@@ -813,6 +538,11 @@
     "id": 5675,
     "name": "Fluval Ac30 Filter",
     "brand": "Fluval"
+  },
+  {
+    "id": 4242,
+    "name": "Lock Crock 10oz",
+    "brand": "Penn-Plax"
   },
   {
     "id": 4901,
@@ -850,19 +580,9 @@
     "brand": "SmartBones"
   },
   {
-    "id": 3226,
-    "name": "Coastal Leash Pbo06' 466",
-    "brand": "Coastal"
-  },
-  {
     "id": 4765,
     "name": "Starmark Medium Cup Jar",
     "brand": "Starmark"
-  },
-  {
-    "id": 3269,
-    "name": "Coastal Leash Csr6' 966",
-    "brand": "Coastal"
   },
   {
     "id": 5836,
@@ -880,29 +600,14 @@
     "brand": "Kaytee"
   },
   {
-    "id": 2889,
-    "name": "Mammoth Small Extra Monkey Fist",
-    "brand": "Mammoth"
-  },
-  {
     "id": 5136,
     "name": "Aquaplants 12\" Various 6pk",
     "brand": "Penn-Plax"
   },
   {
-    "id": 3185,
-    "name": "Coastal Collar Pbo26\"",
-    "brand": "Coastal"
-  },
-  {
     "id": 4700,
     "name": "Grandma Lucy Apple",
     "brand": "Grandma Lucy's"
-  },
-  {
-    "id": 988,
-    "name": "Birdlife 16\" Wooden Perches",
-    "brand": "Birdlife"
   },
   {
     "id": 5127,
@@ -913,16 +618,6 @@
     "id": 4366,
     "name": "Oxbow Loco Ball",
     "brand": "Oxbow"
-  },
-  {
-    "id": 174,
-    "name": "Nature Zone Rot Guard",
-    "brand": "Nature Zone"
-  },
-  {
-    "id": 407,
-    "name": "Exoterra Wire Light",
-    "brand": "Exo Terra"
   },
   {
     "id": 6276,
@@ -950,11 +645,6 @@
     "brand": "Kaytee"
   },
   {
-    "id": 843,
-    "name": "Turbo Animal Prints",
-    "brand": "Turbo"
-  },
-  {
     "id": 4478,
     "name": "7\" Collagen Stick Original",
     "brand": "Barkworthies"
@@ -968,11 +658,6 @@
     "id": 4753,
     "name": "Fromm Tenderollies Bacon",
     "brand": "Fromm"
-  },
-  {
-    "id": 197,
-    "name": "Pangea Ecodish Gray Marble",
-    "brand": "Pangea"
   },
   {
     "id": 4010,
@@ -1035,11 +720,6 @@
     "brand": "Happy Dog of Cape Cod"
   },
   {
-    "id": 3468,
-    "name": "Coastal Oce26\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 4260,
     "name": "Vitakraft Drops Wldberry Flavor",
     "brand": "Vitakraft"
@@ -1060,29 +740,14 @@
     "brand": "Dogswell"
   },
   {
-    "id": 3238,
-    "name": "Coastal Leash Wdf06' 466",
-    "brand": "Coastal"
-  },
-  {
     "id": 4790,
     "name": "Nutrisource Grillin' Grillers Turkey",
     "brand": "Nutrisource"
   },
   {
-    "id": 2105,
-    "name": "Shepherd Boy Freezedried Minnows",
-    "brand": "Shepherd Boy"
-  },
-  {
     "id": 5295,
     "name": "Mopani Wd Small",
     "brand": "Penn-Plax"
-  },
-  {
-    "id": 241,
-    "name": "Exoterra Daylight Basking 50w",
-    "brand": "Exo Terra"
   },
   {
     "id": 5667,
@@ -1110,31 +775,6 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 1060,
-    "name": "Playfuls Preen & Pacify \"shell & Sticks\"",
-    "brand": "Playfuls"
-  },
-  {
-    "id": 1154,
-    "name": "Higgins Sunburst Parrot",
-    "brand": "Higgins"
-  },
-  {
-    "id": 259,
-    "name": "Exoterra Daytime Heat 100w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1450,
-    "name": "Grizzly Omega Plant Based 8oz",
-    "brand": "Grizzly Pet Products"
-  },
-  {
-    "id": 1438,
-    "name": "Naturvet Calcium-phosphorus Powder",
-    "brand": "NaturVet"
-  },
-  {
     "id": 4120,
     "name": "Tiny Friends Farm Russel Rabbit 2lb",
     "brand": "Tiny Friends Farm"
@@ -1145,39 +785,14 @@
     "brand": "RedBarn"
   },
   {
-    "id": 3375,
-    "name": "Coastal Wwo06 Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1262,
-    "name": "Bark2basics Citrus Plus",
-    "brand": "Bark2Basics"
-  },
-  {
-    "id": 1402,
-    "name": "Tomlyn High Calorie Gel Adult Dog",
-    "brand": "Tomlyn"
-  },
-  {
     "id": 1112,
     "name": "Prevue Hendrix Bodacious Bites Large",
     "brand": "Prevue"
   },
   {
-    "id": 766,
-    "name": "Exoterra Mini Tall",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 4278,
     "name": "Kaytee Timothy Biscuits",
     "brand": "Kaytee"
-  },
-  {
-    "id": 907,
-    "name": "Higgins Tuscan Dream",
-    "brand": "Higgins"
   },
   {
     "id": 5215,
@@ -1190,24 +805,9 @@
     "brand": "Aqualife"
   },
   {
-    "id": 2594,
-    "name": "Coastal Large Pineapples26 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3215,
-    "name": "Coastal Collar Btd14\"",
-    "brand": "Coastal"
-  },
-  {
     "id": 5769,
     "name": "Pondmaster 1000 Filter",
     "brand": "Pondmaster"
-  },
-  {
-    "id": 3561,
-    "name": "Coastal Red Medium Harness",
-    "brand": "Coastal"
   },
   {
     "id": 5725,
@@ -1240,26 +840,6 @@
     "brand": "Marineland"
   },
   {
-    "id": 3277,
-    "name": "Coastal Leash Ppa6' 61976",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3201,
-    "name": "Coastal Collar Csr20\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3391,
-    "name": "Coastal Wwl20 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 5437,
-    "name": "Mossy Rock Scape 2",
-    "brand": "Penn-Plax"
-  },
-  {
     "id": 4890,
     "name": "PetOdor Barkery",
     "brand": "Specialty Pet Products"
@@ -1270,11 +850,6 @@
     "brand": "Fluval"
   },
   {
-    "id": 629,
-    "name": "Exoterra Dinosaur Bone",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 4820,
     "name": "Bionic Stuffer",
     "brand": "Bionic"
@@ -1283,21 +858,6 @@
     "id": 5553,
     "name": "Aquatop Eliminator 7w",
     "brand": "Aquatop"
-  },
-  {
-    "id": 3204,
-    "name": "Coastal Collar Pbo12\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1138,
-    "name": "Zymox Avain Care",
-    "brand": "Zymox"
-  },
-  {
-    "id": 5435,
-    "name": "Mossy Rock Scape",
-    "brand": "Penn-Plax"
   },
   {
     "id": 5626,
@@ -1315,44 +875,9 @@
     "brand": "Kaytee"
   },
   {
-    "id": 1274,
-    "name": "Wash Away Green Tea Shamp",
-    "brand": "TropiClean"
-  },
-  {
-    "id": 1378,
-    "name": "Vetericyn Anitmicro Eye Wash",
-    "brand": "Vetericyn"
-  },
-  {
     "id": 4818,
     "name": "Bionic Bone Medium",
     "brand": "Bionic"
-  },
-  {
-    "id": 2435,
-    "name": "Lilpals Extra Small Collar Gbn08",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 1141,
-    "name": "Quiko Red Egg Food",
-    "brand": "Quiko"
-  },
-  {
-    "id": 1459,
-    "name": "Durvet Medicated Itch Spray",
-    "brand": "Durvet"
-  },
-  {
-    "id": 3221,
-    "name": "Coastal Collar Ppa26\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3527,
-    "name": "Coastal Suf18\" Collar",
-    "brand": "Coastal"
   },
   {
     "id": 5650,
@@ -1365,11 +890,6 @@
     "brand": "Oxbow"
   },
   {
-    "id": 3961,
-    "name": "Coastal Red04' 904 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 4911,
     "name": "Pet House Citrus Wax",
     "brand": "Pethouse"
@@ -1380,16 +900,6 @@
     "brand": "Coastal"
   },
   {
-    "id": 1137,
-    "name": "Oasis Vita E-z-mist",
-    "brand": "Kordon"
-  },
-  {
-    "id": 144,
-    "name": "Flukers High Calcium Mealworm Diet",
-    "brand": "Fluker's"
-  },
-  {
     "id": 5755,
     "name": "Fluval 106 Impellar Cover",
     "brand": "Fluval"
@@ -1398,16 +908,6 @@
     "id": 4264,
     "name": "Smackers Popcorn",
     "brand": "Vitapol"
-  },
-  {
-    "id": 71,
-    "name": "Buffalo Worm Dish",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 2286,
-    "name": "Curious Cat Cube",
-    "brand": "MidWest Homes For Pets"
   },
   {
     "id": 4351,
@@ -1430,11 +930,6 @@
     "brand": "Oxbow"
   },
   {
-    "id": 128,
-    "name": "Exoterra Bsf Larvae",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 5227,
     "name": "Aqualife Decoscapes Large",
     "brand": ""
@@ -1448,11 +943,6 @@
     "id": 5493,
     "name": "Acurel Amonia Reduce Pad",
     "brand": "Acurel"
-  },
-  {
-    "id": 3389,
-    "name": "Coastal Ww226 Collar",
-    "brand": "Coastal"
   },
   {
     "id": 4227,
@@ -1480,34 +970,14 @@
     "brand": "Aquatop"
   },
   {
-    "id": 6604,
-    "name": "Blue Buffalo Wilderness Duck 12.5oz",
-    "brand": "Blue Buffalo"
-  },
-  {
-    "id": 917,
-    "name": "Sunburst Fruit to Nuts",
-    "brand": "Sunburst"
-  },
-  {
     "id": 3495,
     "name": "Valhoma Spike 16 Hp Collar",
     "brand": "Valhoma"
   },
   {
-    "id": 302,
-    "name": "Exoterra Moonlite 5w",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 3687,
     "name": "Sunburst Black12\" Collar",
     "brand": "Sunburst"
-  },
-  {
-    "id": 2624,
-    "name": "Coastal 6' Pineapples 969 Leash",
-    "brand": "Coastal"
   },
   {
     "id": 5548,
@@ -1550,26 +1020,6 @@
     "brand": "Spectrastone"
   },
   {
-    "id": 730,
-    "name": "Zoo Med Crab Gitd Climbing Branch",
-    "brand": "Zoo Med"
-  },
-  {
-    "id": 25,
-    "name": "Exoterra Sub Stratum",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 319,
-    "name": "Exoterra Mini Mister",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 219,
-    "name": "Zoomed Crested Gecko Plum",
-    "brand": ""
-  },
-  {
     "id": 5364,
     "name": "Peace & Love Kit",
     "brand": "Penn-Plax"
@@ -1585,11 +1035,6 @@
     "brand": "Diamond"
   },
   {
-    "id": 143,
-    "name": "Flukers High Calcium Cricket Diet",
-    "brand": "Fluker's"
-  },
-  {
     "id": 4245,
     "name": "Nibbles Critter Quencher 32oz",
     "brand": "Nibbles"
@@ -1598,16 +1043,6 @@
     "id": 6580,
     "name": "Science Diet Sensitive Puppy Salmon 12.5oz",
     "brand": "Science Diet"
-  },
-  {
-    "id": 191,
-    "name": "Zilla Non Locking Clips 30g",
-    "brand": "Zilla"
-  },
-  {
-    "id": 1451,
-    "name": "Grizzly Omega Salmon 8oz",
-    "brand": "Grizzly Pet Products"
   },
   {
     "id": 6051,
@@ -1630,49 +1065,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 3285,
-    "name": "Coastal Collar Biothane Blue24\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 4331,
-    "name": "Friend Fries",
-    "brand": "Penn-Plax"
-  },
-  {
-    "id": 4357,
-    "name": "Oxbow Cozy Cave",
-    "brand": "Oxbow"
-  },
-  {
-    "id": 156,
-    "name": "Exoterra Aquatize",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 739,
-    "name": "Zoo Med Growth Shell Extra Large",
-    "brand": "Zoo Med"
-  },
-  {
-    "id": 1273,
-    "name": "Petcrest Lucky Puppy",
-    "brand": "PetCrest"
-  },
-  {
     "id": 5780,
     "name": "Api Pond Salt",
     "brand": "API"
-  },
-  {
-    "id": 125,
-    "name": "Exoterra Crickets",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 3851,
-    "name": "Coastal Black06' 606 Leash",
-    "brand": "Coastal"
   },
   {
     "id": 5291,
@@ -1680,24 +1075,9 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 3278,
-    "name": "Coastal Leash Ppa6' 61476",
-    "brand": "Coastal"
-  },
-  {
     "id": 4215,
     "name": "Back2nature Litter 30l",
     "brand": "Back 2 Nature"
-  },
-  {
-    "id": 3321,
-    "name": "Coastal Leash Bmb06' 46936",
-    "brand": "Coastal"
-  },
-  {
-    "id": 151,
-    "name": "Jurassi Mite",
-    "brand": "SeaChem"
   },
   {
     "id": 4868,
@@ -1715,29 +1095,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 2210,
-    "name": "Spot Silver Vine Cat Toy",
-    "brand": "Spot"
-  },
-  {
-    "id": 2042,
-    "name": "Coastal Cc Grn12",
-    "brand": ""
-  },
-  {
-    "id": 1130,
-    "name": "Hari Clay-cal",
-    "brand": "Hagen"
-  },
-  {
     "id": 4048,
     "name": "Oxbow Purcmfrt 36l White",
     "brand": "Oxbow"
-  },
-  {
-    "id": 4008,
-    "name": "Coastal Red12\" 2912 Leash",
-    "brand": "Coastal"
   },
   {
     "id": 5338,
@@ -1755,21 +1115,6 @@
     "brand": "Lee's"
   },
   {
-    "id": 4918,
-    "name": "Pet House Citrus Spray",
-    "brand": "Pethouse"
-  },
-  {
-    "id": 3659,
-    "name": "Coastal Mlm20\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1399,
-    "name": "Naturvet Arthrisoothe-gold",
-    "brand": "NaturVet"
-  },
-  {
     "id": 4041,
     "name": "Oxbow Western Timhay 40oz",
     "brand": "Oxbow"
@@ -1780,19 +1125,9 @@
     "brand": "Vitapol"
   },
   {
-    "id": 3686,
-    "name": "Sunburst Red10\" Collar",
-    "brand": "Sunburst"
-  },
-  {
     "id": 4271,
     "name": "Oxbow Sim Rwds Timothy Treats",
     "brand": "Oxbow"
-  },
-  {
-    "id": 4933,
-    "name": "Banixx Spray 2fl oz",
-    "brand": "Banixx"
   },
   {
     "id": 4304,
@@ -1805,44 +1140,14 @@
     "brand": "Aqualife"
   },
   {
-    "id": 3237,
-    "name": "Coastal Leash Tdp06' 366",
-    "brand": "Coastal"
-  },
-  {
-    "id": 87,
-    "name": "Exoterra 10g Sand Mat",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 4640,
     "name": "SmartBones 3 Large Chicken",
     "brand": "SmartBones"
   },
   {
-    "id": 3462,
-    "name": "Coastal Mtn26\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 75,
-    "name": "Exoterr Small Sand Mat",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 2223,
-    "name": "Kong Vibes Batabout 2pk",
-    "brand": "Kong"
-  },
-  {
     "id": 4375,
     "name": "Oxbow Willow Play Cube",
     "brand": "Oxbow"
-  },
-  {
-    "id": 2696,
-    "name": "Lilpals Fleece Toy",
-    "brand": "Li'l Pals"
   },
   {
     "id": 4029,
@@ -1853,31 +1158,6 @@
     "id": 4280,
     "name": "Sunburst Peas & Beans",
     "brand": "Sunburst"
-  },
-  {
-    "id": 1353,
-    "name": "Tropiclean Essentials Goatmilk Sham",
-    "brand": "TropiClean"
-  },
-  {
-    "id": 1436,
-    "name": "Freshbreathe Solution 16oz",
-    "brand": "TropiClean"
-  },
-  {
-    "id": 2292,
-    "name": "Catlife Wiggle Wand",
-    "brand": "Penn-Plax"
-  },
-  {
-    "id": 3239,
-    "name": "Coastal Leash Wdf06 366",
-    "brand": "Coastal"
-  },
-  {
-    "id": 615,
-    "name": "Reptology Combo Meters",
-    "brand": "Reptology"
   },
   {
     "id": 4900,
@@ -1893,21 +1173,6 @@
     "id": 5899,
     "name": "Plaid Sweater Red Medium",
     "brand": ""
-  },
-  {
-    "id": 3197,
-    "name": "Coastal Collar Nbp26\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3663,
-    "name": "Coastal Raf20\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1067,
-    "name": "Birdlife Kabob Toy",
-    "brand": "Birdlife"
   },
   {
     "id": 6055,
@@ -1935,29 +1200,14 @@
     "brand": "Kaytee"
   },
   {
-    "id": 1062,
-    "name": "Playfuls Sound & Move\"dollar\"",
-    "brand": "Playfuls"
-  },
-  {
     "id": 5269,
     "name": "Seasme Cookie Monster",
-    "brand": "Penn-Plax"
-  },
-  {
-    "id": 5424,
-    "name": "Rainbow Rock Small",
     "brand": "Penn-Plax"
   },
   {
     "id": 4238,
     "name": "Kaytee Critter Bottle",
     "brand": "Kaytee"
-  },
-  {
-    "id": 3847,
-    "name": "Coastal Purple14\" 401 Collar",
-    "brand": "Coastal"
   },
   {
     "id": 4267,
@@ -1968,26 +1218,6 @@
     "id": 5616,
     "name": "Aqueon T8 Full Spec 18'l",
     "brand": "Aqueon"
-  },
-  {
-    "id": 3974,
-    "name": "Coastal Red20\" Buc Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3830,
-    "name": "Coastal Purple24\" 2901 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 4102,
-    "name": "Kaytee Fiesta Rabbit 6.5 lb",
-    "brand": "Kaytee"
-  },
-  {
-    "id": 1817,
-    "name": "Spot in the Bag Waste Bags",
-    "brand": "Spot"
   },
   {
     "id": 4112,
@@ -2005,11 +1235,6 @@
     "brand": "Aquatop"
   },
   {
-    "id": 556,
-    "name": "Exoterra Abutilon Silk Small",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 5691,
     "name": "Fluval Polymax U2 2pk",
     "brand": "Fluval"
@@ -2018,11 +1243,6 @@
     "id": 5826,
     "name": "Fluval 15 Gal Tank & Stand",
     "brand": "Fluval"
-  },
-  {
-    "id": 920,
-    "name": "Sunburst Sticks Island Fruits",
-    "brand": "Sunburst"
   },
   {
     "id": 5087,
@@ -2040,59 +1260,9 @@
     "brand": "Bionic"
   },
   {
-    "id": 186,
-    "name": "Komodo Smart Dish",
-    "brand": "Komodo"
-  },
-  {
-    "id": 850,
-    "name": "Turbo Twine Ball",
-    "brand": "Turbo"
-  },
-  {
-    "id": 915,
-    "name": "Sunburst Millet Bits",
-    "brand": "Sunburst"
-  },
-  {
-    "id": 239,
-    "name": "Exoterra Daylight Basking 100w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 688,
-    "name": "Exoterra Spider Orchid",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 3290,
-    "name": "Coastal Collar Biothane Red24\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2284,
-    "name": "Petcrest Scratching Post",
-    "brand": "PetCrest"
-  },
-  {
     "id": 5827,
     "name": "Fluval 32.5us Fluval Tank & Stand",
     "brand": "Fluval"
-  },
-  {
-    "id": 2486,
-    "name": "Lilpals Harness Npk14",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 4852,
-    "name": "Tuesdays 12\" Cllgen Peanut Butter",
-    "brand": "Tuesday's Natural Dog Company"
-  },
-  {
-    "id": 557,
-    "name": "Exoterra Abutilon Silk Medium",
-    "brand": "Exo Terra"
   },
   {
     "id": 5901,
@@ -2120,21 +1290,6 @@
     "brand": "Greenies"
   },
   {
-    "id": 772,
-    "name": "Exoterra Small Low",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 3395,
-    "name": "Coastal Ww420 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3531,
-    "name": "Coastal Snp26\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 5395,
     "name": "Pipe Hideaway Large",
     "brand": "Penn-Plax"
@@ -2145,44 +1300,9 @@
     "brand": null
   },
   {
-    "id": 3967,
-    "name": "Coastal Red26\" Mbuc Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3281,
-    "name": "Coastal Leash Wdf6' 966",
-    "brand": ""
-  },
-  {
-    "id": 3454,
-    "name": "Coastal Mdw14\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 19,
-    "name": "Lizard Ladder",
-    "brand": "Penn-Plax"
-  },
-  {
-    "id": 1211,
-    "name": "Ware Keet Nesting Box",
-    "brand": "Ware"
-  },
-  {
-    "id": 3866,
-    "name": "Coastal Black20\" Buck Collar",
-    "brand": ""
-  },
-  {
     "id": 4716,
     "name": "Flvrfullz Cheese",
     "brand": "Loving Pets"
-  },
-  {
-    "id": 3519,
-    "name": "Coastal Snp12\" Collar",
-    "brand": "Coastal"
   },
   {
     "id": 4365,
@@ -2200,11 +1320,6 @@
     "brand": "Coastal"
   },
   {
-    "id": 4570,
-    "name": "Nylabone DuraChew Regular",
-    "brand": "Nylabone"
-  },
-  {
     "id": 5212,
     "name": "Junglepd Small Style 2",
     "brand": "Penn-Plax"
@@ -2213,16 +1328,6 @@
     "id": 5060,
     "name": "Aquamist 7/16\"",
     "brand": "Penn-Plax"
-  },
-  {
-    "id": 3292,
-    "name": "Coastal Collar Biothane Green14\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3864,
-    "name": "Coastal Black18\" 901 Collar",
-    "brand": "Coastal"
   },
   {
     "id": 5535,
@@ -2240,24 +1345,9 @@
     "brand": "Nature's Ocean"
   },
   {
-    "id": 1533,
-    "name": "Safari Wire Pin Brush Large",
-    "brand": "Safari"
-  },
-  {
-    "id": 258,
-    "name": "Exoterra Daytime Heat 150w",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 5397,
     "name": "Marina Naturals Large",
     "brand": "Marineland"
-  },
-  {
-    "id": 3418,
-    "name": "Coastal Crn18\" Soy Collar",
-    "brand": "Coastal"
   },
   {
     "id": 3566,
@@ -2268,11 +1358,6 @@
     "id": 6259,
     "name": "RedBarn Ocean Grain Free Frozen 4lb",
     "brand": "RedBarn"
-  },
-  {
-    "id": 706,
-    "name": "Zoo Med Habba Hut Large",
-    "brand": "Zoo Med"
   },
   {
     "id": 3987,
@@ -2293,11 +1378,6 @@
     "id": 4690,
     "name": "Rewards Crunch Venison 14oz",
     "brand": "Natural Balance"
-  },
-  {
-    "id": 233,
-    "name": "Exoterra Ceramic 60w",
-    "brand": "Exo Terra"
   },
   {
     "id": 5542,
@@ -2330,24 +1410,9 @@
     "brand": "Diamond"
   },
   {
-    "id": 129,
-    "name": "Exoterra Grasshoppers",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 4955,
     "name": "Greenies Petite Puppy 12oz",
     "brand": "Greenies"
-  },
-  {
-    "id": 3456,
-    "name": "Coastal Des14\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3254,
-    "name": "Coastal Leash Pbo06' 666",
-    "brand": "Coastal"
   },
   {
     "id": 3596,
@@ -2370,84 +1435,14 @@
     "brand": "Aquatop"
   },
   {
-    "id": 139,
-    "name": "Flukers Orange Cube",
-    "brand": "Fluker's"
-  },
-  {
     "id": 4623,
     "name": "SmartBones 16 Count Skin & Coat",
     "brand": "SmartBones"
   },
   {
-    "id": 82,
-    "name": "Galapagos Desert Environment Cling",
-    "brand": "Pangea"
-  },
-  {
-    "id": 3360,
-    "name": "Coastal Lwo12\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3406,
-    "name": "Coastal Ony06' Soy Leash",
-    "brand": ""
-  },
-  {
-    "id": 989,
-    "name": "Birdlife 18\" Wooden Perches",
-    "brand": "Birdlife"
-  },
-  {
-    "id": 164,
-    "name": "Flukers Calcium:phosphorus",
-    "brand": "Fluker's"
-  },
-  {
-    "id": 839,
-    "name": "Turbo Foil Ball",
-    "brand": "Turbo"
-  },
-  {
-    "id": 2814,
-    "name": "Multipet Birthday Present",
-    "brand": "Multipet"
-  },
-  {
     "id": 5849,
     "name": "Basic Hoodie Rasberry Large",
     "brand": "Frisco"
-  },
-  {
-    "id": 3361,
-    "name": "Coastal Pwy14\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2973,
-    "name": "Kong Shakrs Honkers Drag Small",
-    "brand": "Kong"
-  },
-  {
-    "id": 853,
-    "name": "E-z Feed 4oz",
-    "brand": "Penn-Plax"
-  },
-  {
-    "id": 6327,
-    "name": "Eukanuba Large Breed 30lb",
-    "brand": "Eukanuba"
-  },
-  {
-    "id": 4307,
-    "name": "Kaytee Chinchiller",
-    "brand": "Kaytee"
-  },
-  {
-    "id": 2019,
-    "name": "Coastal Collar Sog12",
-    "brand": "Coastal"
   },
   {
     "id": 5367,
@@ -2460,11 +1455,6 @@
     "brand": "RedBarn"
   },
   {
-    "id": 2764,
-    "name": "Spot Skinz Plus Duck",
-    "brand": "Spot"
-  },
-  {
     "id": 5892,
     "name": "Dog Tank Top Coral Small",
     "brand": ""
@@ -2473,16 +1463,6 @@
     "id": 4363,
     "name": "Oxbow Timothy Twists",
     "brand": "Oxbow"
-  },
-  {
-    "id": 2634,
-    "name": "Coastal Small Llamas14 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1139,
-    "name": "Oasis Vita Drops Large Birds",
-    "brand": "Kordon"
   },
   {
     "id": 5599,
@@ -2508,11 +1488,6 @@
     "id": 4851,
     "name": "Tuesdays 5\" Beef Cheek Roll",
     "brand": "Tuesday's Natural Dog Company"
-  },
-  {
-    "id": 3453,
-    "name": "Coastal Mtn12\" Collar",
-    "brand": "Coastal"
   },
   {
     "id": 4520,
@@ -2545,44 +1520,9 @@
     "brand": "RedBarn"
   },
   {
-    "id": 2590,
-    "name": "Coastal Large Unicorns26 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1145,
-    "name": "Higgins Vitaseed Parakeet",
-    "brand": "Higgins"
-  },
-  {
-    "id": 1021,
-    "name": "Playfuls Phys & Mental\"Tug of War\"",
-    "brand": "Playfuls"
-  },
-  {
     "id": 4135,
     "name": "Kaytee Woodland Getaway Medium",
     "brand": "Kaytee"
-  },
-  {
-    "id": 919,
-    "name": "Sunburst Sticks Nuts & Berries",
-    "brand": "Sunburst"
-  },
-  {
-    "id": 2919,
-    "name": "Nylabone Cheese Bone Wolf",
-    "brand": "Nylabone"
-  },
-  {
-    "id": 155,
-    "name": "Zilla Tropical Mist Humidity Spray",
-    "brand": "Zilla"
-  },
-  {
-    "id": 2263,
-    "name": "Kong Plauground Garden",
-    "brand": "Kong"
   },
   {
     "id": 4588,
@@ -2595,64 +1535,9 @@
     "brand": "Nibbles"
   },
   {
-    "id": 421,
-    "name": "Exoterra Reptile Dome Nano",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 2485,
-    "name": "Lilpals Harness Wdf14",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 73,
-    "name": "Exoterra Mini Moss Mat",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 377,
-    "name": "Exoterra Screen Cover 40/50gal Breed",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 179,
-    "name": "Flukers Large Repta Leash",
-    "brand": "Fluker's"
-  },
-  {
-    "id": 180,
-    "name": "Flukers X Large Repta Leash",
-    "brand": "Fluker's"
-  },
-  {
     "id": 5552,
     "name": "Aquatop Eliminator 9w",
     "brand": "Aquatop"
-  },
-  {
-    "id": 2523,
-    "name": "Lilpals Extra Small Harness Ordpxs",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 3356,
-    "name": "Coastal Pwy06' 12626 Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1783,
-    "name": "Happy Ride Booster Seat Up to 12",
-    "brand": "Happy"
-  },
-  {
-    "id": 1475,
-    "name": "Happy Jack Kennel Dip Ii",
-    "brand": "Happy"
-  },
-  {
-    "id": 3921,
-    "name": "Coastal Hunter20\" Mbuc Collar",
-    "brand": "Coastal"
   },
   {
     "id": 4281,
@@ -2665,59 +1550,14 @@
     "brand": "Oxbow"
   },
   {
-    "id": 2693,
-    "name": "Lilpals Plushlion",
-    "brand": "Li'l Pals"
-  },
-  {
     "id": 2600,
     "name": "Large New Orleans Saints Saints Leash",
     "brand": "Pets First"
   },
   {
-    "id": 2636,
-    "name": "Coastal Small Pineapples14 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 800,
-    "name": "Harris Diatomacouse Earth Bottle",
-    "brand": "Harris"
-  },
-  {
     "id": 4078,
     "name": "Marshall Furotone 6oz",
     "brand": "Marshall"
-  },
-  {
-    "id": 148,
-    "name": "Exoterra Calcium Liquid",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 667,
-    "name": "Zilla Large Rock Denn",
-    "brand": "Zilla"
-  },
-  {
-    "id": 3296,
-    "name": "Coastal Collar Lsk18\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2352,
-    "name": "Litter Genie Refill 2pk",
-    "brand": "Litter Genie"
-  },
-  {
-    "id": 176,
-    "name": "Flukers Xxsmall Repta Leash",
-    "brand": "Fluker's"
-  },
-  {
-    "id": 1986,
-    "name": "Tomlyn High Calorie Gel Cat",
-    "brand": "Tomlyn"
   },
   {
     "id": 4177,
@@ -2735,16 +1575,6 @@
     "brand": "Coastal"
   },
   {
-    "id": 3412,
-    "name": "Coastal Sla06' Soy Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1229,
-    "name": "Happy Beaks the Voyager",
-    "brand": "Happy"
-  },
-  {
     "id": 4056,
     "name": "Carefresh Natural 30l",
     "brand": "Carefresh"
@@ -2758,21 +1588,6 @@
     "id": 5453,
     "name": "Age of Magic Castle",
     "brand": "Penn-Plax"
-  },
-  {
-    "id": 1132,
-    "name": "Grannicks Bitter Apple",
-    "brand": "Grannick's"
-  },
-  {
-    "id": 81,
-    "name": "Galapagos Forest Environment Cling",
-    "brand": "Pangea"
-  },
-  {
-    "id": 4560,
-    "name": "Nylabone DuraChew Wishbone Regular",
-    "brand": "Nylabone"
   },
   {
     "id": 5217,
@@ -2790,19 +1605,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 3470,
-    "name": "Coastal Cyn26\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 4202,
     "name": "Oxbow Poof Bathing Sand",
     "brand": "Oxbow"
-  },
-  {
-    "id": 2648,
-    "name": "Titan Traincllr Xfine 10\" 5515",
-    "brand": "Titan"
   },
   {
     "id": 5693,
@@ -2810,34 +1615,9 @@
     "brand": "Fluval"
   },
   {
-    "id": 3637,
-    "name": "Coastal Bzs06' Leash",
-    "brand": ""
-  },
-  {
-    "id": 223,
-    "name": "Flukers Bearded Dragon Treats",
-    "brand": "Fluker's"
-  },
-  {
-    "id": 984,
-    "name": "Birdlife 11\" Wooden Perches",
-    "brand": "Birdlife"
-  },
-  {
-    "id": 187,
-    "name": "Petcrest Screen Clips 5-25g",
-    "brand": "PetCrest"
-  },
-  {
     "id": 4037,
     "name": "Oxbow Western Timhay 15oz",
     "brand": "Oxbow"
-  },
-  {
-    "id": 1253,
-    "name": "Skoutshonor Prosham+cond Honeysuck",
-    "brand": "Skout's Honor"
   },
   {
     "id": 4979,
@@ -2845,19 +1625,9 @@
     "brand": "Smokehouse"
   },
   {
-    "id": 3821,
-    "name": "Coastal Purple04' 904 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 5186,
     "name": "Aquatop Vibrant Wild Mixed Plant 6\"",
     "brand": "Aquatop"
-  },
-  {
-    "id": 2082,
-    "name": "Coastal Charm Red18",
-    "brand": "Coastal"
   },
   {
     "id": 3903,
@@ -2865,44 +1635,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 2862,
-    "name": "Tuffy T-ff-hotdog",
-    "brand": "Tuffy"
-  },
-  {
-    "id": 231,
-    "name": "Exoterra Ceramic 150w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1134,
-    "name": "Hagan Tropican Handfeeding Formula",
-    "brand": "Hagen"
-  },
-  {
     "id": 6895,
     "name": "Primal Frozen Nuggets Turkey, Sardine 3lb",
     "brand": "Primal"
-  },
-  {
-    "id": 3249,
-    "name": "Coastal Collar Rwp18\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1466,
-    "name": "Pet Honesty Allergy Support",
-    "brand": "Pet Honesty"
-  },
-  {
-    "id": 2103,
-    "name": "Nacho Duck Liver Cat Treats",
-    "brand": "Nacho"
-  },
-  {
-    "id": 3309,
-    "name": "Coastal Collar Hrw12\"",
-    "brand": "Coastal"
   },
   {
     "id": 4675,
@@ -2915,21 +1650,6 @@
     "brand": "Pets First"
   },
   {
-    "id": 3308,
-    "name": "Coastal Leash Gxy06' 46336",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3291,
-    "name": "Coastal Collar Biothane Ylw14\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3525,
-    "name": "Coastal Rbg18\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 5250,
     "name": "Hippie Hounds 1000mg Dog Drops",
     "brand": "Hippie Hounds"
@@ -2940,39 +1660,9 @@
     "brand": "Oxbow"
   },
   {
-    "id": 3276,
-    "name": "Coastal Leash Nbp6' 61476",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1340,
-    "name": "Freshnclean Creme Rinse",
-    "brand": "PetAg"
-  },
-  {
-    "id": 418,
-    "name": "Exoterra Compact Top Small",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 5593,
     "name": "Marineland Penguin350",
     "brand": "Marineland"
-  },
-  {
-    "id": 2517,
-    "name": "Lilpals Extra Small Harness Blupxs",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 147,
-    "name": "Exoterra Electrolyte",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 3322,
-    "name": "Coastal Leash Bmb06\" 46436",
-    "brand": "Coastal"
   },
   {
     "id": 3347,
@@ -2985,59 +1675,9 @@
     "brand": "Purina"
   },
   {
-    "id": 2956,
-    "name": "Kong Wub Zoo Koala Large",
-    "brand": "Kong"
-  },
-  {
-    "id": 3203,
-    "name": "Coastal Collar Pbo14\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3927,
-    "name": "Coastal Hunter16\" 601 Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 6045,
     "name": "Taste of the Wild Ancient Wetlands 5lb",
     "brand": "Taste of the Wild"
-  },
-  {
-    "id": 3403,
-    "name": "Coastal Ww220 Collar",
-    "brand": ""
-  },
-  {
-    "id": 1480,
-    "name": "Durvet Activated Charcoal",
-    "brand": "Durvet"
-  },
-  {
-    "id": 169,
-    "name": "Nature Zone Coccidia Guard",
-    "brand": "Nature Zone"
-  },
-  {
-    "id": 996,
-    "name": "Happy Beaks Two Sided Mirror",
-    "brand": "Happy"
-  },
-  {
-    "id": 2963,
-    "name": "Kong Snuzzles Bear Medium",
-    "brand": "Kong"
-  },
-  {
-    "id": 838,
-    "name": "Turbo Sports Ball",
-    "brand": "Turbo"
-  },
-  {
-    "id": 2652,
-    "name": "Titan Traincllr Fine 16\" 5520",
-    "brand": "Titan"
   },
   {
     "id": 6896,
@@ -3055,24 +1695,9 @@
     "brand": "PetAg"
   },
   {
-    "id": 499,
-    "name": "Reptisticks Turtle",
-    "brand": "Tetra"
-  },
-  {
-    "id": 3870,
-    "name": "Coastal Black14\" Buck Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 4090,
     "name": "Sunburst Rat & Mouse 2.5 lb",
     "brand": "Higgins"
-  },
-  {
-    "id": 3843,
-    "name": "Coastal Purple12\" 301 Collar",
-    "brand": "Coastal"
   },
   {
     "id": 3573,
@@ -3085,38 +1710,13 @@
     "brand": "Coastal"
   },
   {
-    "id": 3264,
-    "name": "Coastal Leash Tpd6' 666",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3965,
-    "name": "Coastal Red04' 404 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 5682,
     "name": "Fluval Ac50 Filter",
     "brand": "Fluval"
   },
   {
-    "id": 2187,
-    "name": "Spot Colored Plush Mice",
-    "brand": "Spot"
-  },
-  {
-    "id": 3319,
-    "name": "Coastal Leash Hrw06' 46936",
-    "brand": "Coastal"
-  },
-  {
     "id": 3626,
     "name": "Coastal Gray Purple Large Harness",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3989,
-    "name": "Coastal Red16\" Training Collar",
     "brand": "Coastal"
   },
   {
@@ -3125,59 +1725,14 @@
     "brand": "Fluval"
   },
   {
-    "id": 3984,
-    "name": "Coastal Red12\" Buc Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 132,
-    "name": "Flukers Dubia Roaches Small",
-    "brand": "Fluker's"
-  },
-  {
-    "id": 4869,
-    "name": "Wholesome Rewards Peanut Butter",
-    "brand": "Wholesome"
-  },
-  {
-    "id": 3865,
-    "name": "Coastal Black20\" Martingale Collar",
-    "brand": ""
-  },
-  {
     "id": 4977,
     "name": "Smokehouse Trachea 3 Chews",
     "brand": "Smokehouse"
   },
   {
-    "id": 1678,
-    "name": "Ferplast .16 Us Gal Food/Water",
-    "brand": "Ferplast"
-  },
-  {
-    "id": 3827,
-    "name": "Coastal Purple26\" Buck Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 777,
-    "name": "Exoterra Faunarium Jumbo",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 167,
-    "name": "Flukers Reptile Viatmin",
-    "brand": "Fluker's"
-  },
-  {
     "id": 5000,
     "name": "Api Acrylic Algea Scraper",
     "brand": "API"
-  },
-  {
-    "id": 3925,
-    "name": "Coastal Hunter20\" Buc Collar",
-    "brand": ""
   },
   {
     "id": 5739,
@@ -3200,29 +1755,14 @@
     "brand": "Mammoth"
   },
   {
-    "id": 2571,
-    "name": "Circle 16\"bro 1786s Collar",
-    "brand": "Circle T"
-  },
-  {
     "id": 4785,
     "name": "Nutrisource Crispy Crispers Turkey & Venison",
     "brand": "Nutrisource"
   },
   {
-    "id": 2625,
-    "name": "Coastal Small Dinosaurs14 Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 5671,
     "name": "Fluval Ac50 Biomax",
     "brand": "Fluval"
-  },
-  {
-    "id": 2743,
-    "name": "Spot Latex Animal",
-    "brand": "Spot"
   },
   {
     "id": 5271,
@@ -3232,11 +1772,6 @@
   {
     "id": 2626,
     "name": "Coastal Extra Small Dinosaurs12 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2024,
-    "name": "Coastal Collar Rfl12",
     "brand": "Coastal"
   },
   {
@@ -3275,44 +1810,9 @@
     "brand": ""
   },
   {
-    "id": 3859,
-    "name": "Coastal Black22\" 2901 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3374,
-    "name": "Coastal Wwl06 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 3622,
     "name": "Coastal Gray Pink Extra Extra Small Harness",
     "brand": "Coastal"
-  },
-  {
-    "id": 138,
-    "name": "Zilla Cricket Drink with Calcium",
-    "brand": "Zilla"
-  },
-  {
-    "id": 2188,
-    "name": "Spot Animal Print Rattles",
-    "brand": "Spot"
-  },
-  {
-    "id": 1246,
-    "name": "Biogroom Groom Fresh Cologne",
-    "brand": "Bio Groom"
-  },
-  {
-    "id": 2243,
-    "name": "Kong Jellyfish Teaser",
-    "brand": "Kong"
-  },
-  {
-    "id": 2567,
-    "name": "Circle Tan04' Leash",
-    "brand": ""
   },
   {
     "id": 5796,
@@ -3320,34 +1820,9 @@
     "brand": ""
   },
   {
-    "id": 3861,
-    "name": "Coastal Black20\" Martingale Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2642,
-    "name": "Titan Traincllr Xhvy 20\" 5540",
-    "brand": "Titan"
-  },
-  {
     "id": 6039,
     "name": "Natural Balance Plant 24lb",
     "brand": "Natural Balance"
-  },
-  {
-    "id": 3464,
-    "name": "Coastal Mdw26\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3533,
-    "name": "Coastal Sls26\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 751,
-    "name": "Exoterra Leo Gecko Starter Kit 10g",
-    "brand": "Exo Terra"
   },
   {
     "id": 5777,
@@ -3355,19 +1830,9 @@
     "brand": "Tetra"
   },
   {
-    "id": 1218,
-    "name": "Birdlife Gravel Paper 15.5x15.5",
-    "brand": "Birdlife"
-  },
-  {
     "id": 4290,
     "name": "N-Bone Frrt Chew Salmon",
     "brand": "N-Bone"
-  },
-  {
-    "id": 224,
-    "name": "Zilla Omnivore Mix W Calcium",
-    "brand": "Zilla"
   },
   {
     "id": 4958,
@@ -3395,16 +1860,6 @@
     "brand": "Coastal"
   },
   {
-    "id": 2363,
-    "name": "Petmate Large Basic Open Litter Box",
-    "brand": "Petmate"
-  },
-  {
-    "id": 591,
-    "name": "Zilla Heat Mat Medium",
-    "brand": "Zilla"
-  },
-  {
     "id": 5625,
     "name": "Aqueon Led Max Blue Size 36",
     "brand": "Aqueon"
@@ -3430,16 +1885,6 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 3369,
-    "name": "Coastal Pwy26\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2774,
-    "name": "Spot Sknz Ex Quilted Squirell",
-    "brand": "Spot"
-  },
-  {
     "id": 5710,
     "name": "Fluval Ammonia Remove 3pk",
     "brand": "Fluval"
@@ -3455,43 +1900,13 @@
     "brand": "Coastal"
   },
   {
-    "id": 572,
-    "name": "Exoterra Rock Backround",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 5646,
     "name": "Aquatop Skyaqua 10watt",
     "brand": "Aquatop"
   },
   {
-    "id": 2045,
-    "name": "Coastal Collar Btr12",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3365,
-    "name": "Coastal Autumn20\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2728,
-    "name": "Lilpals Outer Space",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 2353,
-    "name": "Tidycat Breeze Pads",
-    "brand": "Purina"
-  },
-  {
     "id": 3781,
     "name": "Coasta; Pkb6' 406 Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3860,
-    "name": "Coastal Black20\" 2901 Collar",
     "brand": "Coastal"
   },
   {
@@ -3530,24 +1945,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 244,
-    "name": "Exoterra Infrared Basking 100w",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 4821,
     "name": "Bionic Urban Stick Small",
     "brand": "Bionic"
-  },
-  {
-    "id": 665,
-    "name": "Buffalo Skull",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 690,
-    "name": "Exoterra Boston Fern",
-    "brand": "Exo Terra"
   },
   {
     "id": 5138,
@@ -3555,19 +1955,9 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 3368,
-    "name": "Coastal Pwy20\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 4586,
     "name": "Nylabone Healthy Edibles Small Bacn Chew",
     "brand": "Nylabone"
-  },
-  {
-    "id": 3998,
-    "name": "Coastal Red12\" Security Collar",
-    "brand": "Coastal"
   },
   {
     "id": 4545,
@@ -3580,29 +1970,9 @@
     "brand": "Bionic"
   },
   {
-    "id": 1231,
-    "name": "Freshnclean Cologne Spray Floral 12",
-    "brand": "PetAg"
-  },
-  {
-    "id": 1375,
-    "name": "Vetericyn Antimicro Wound Care",
-    "brand": "Vetericyn"
-  },
-  {
-    "id": 2375,
-    "name": "Freshnews Orginal Litter 12lb",
-    "brand": "BPV Environmental"
-  },
-  {
     "id": 4717,
     "name": "Flvrfullz Chicken",
     "brand": "Loving Pets"
-  },
-  {
-    "id": 2476,
-    "name": "Lilpals Harness Btd14",
-    "brand": "Li'l Pals"
   },
   {
     "id": 5377,
@@ -3615,34 +1985,14 @@
     "brand": "Greenies"
   },
   {
-    "id": 3222,
-    "name": "Coastal Collar Ppa12\"",
-    "brand": "Coastal"
-  },
-  {
     "id": 5833,
     "name": "Petrainy Daysxlg",
     "brand": "Penn-Plax"
   },
   {
-    "id": 2757,
-    "name": "Outward Hound Stufffree Fox",
-    "brand": "Outward Hound"
-  },
-  {
-    "id": 680,
-    "name": "Zilla Rock Liar Small",
-    "brand": "Zilla"
-  },
-  {
     "id": 3598,
     "name": "Coastal Pink Bright Medium Harness",
     "brand": "Coastal"
-  },
-  {
-    "id": 652,
-    "name": "Exoterra Cholla Cage Medium",
-    "brand": "Exo Terra"
   },
   {
     "id": 5943,
@@ -3660,11 +2010,6 @@
     "brand": "Dingo"
   },
   {
-    "id": 3634,
-    "name": "Coastal Dgm06' Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 5515,
     "name": "Marineland Floss Sleeve Mag200",
     "brand": "Marineland"
@@ -3673,21 +2018,6 @@
     "id": 5861,
     "name": "LSU Stripe Tee Medium",
     "brand": "Pets First"
-  },
-  {
-    "id": 1161,
-    "name": "Safflower Gold Conure & Cockatiel",
-    "brand": "Safflower Gold"
-  },
-  {
-    "id": 1242,
-    "name": "Doggy Bahama Orange",
-    "brand": ""
-  },
-  {
-    "id": 3638,
-    "name": "Coastal Mlm06' Leash",
-    "brand": "Coastal"
   },
   {
     "id": 5905,
@@ -3730,16 +2060,6 @@
     "brand": "Nutrisource"
   },
   {
-    "id": 2544,
-    "name": "Circle 20\" Tan 1106 Collar",
-    "brand": "Circle T"
-  },
-  {
-    "id": 960,
-    "name": "Vision Perch Green",
-    "brand": "Vision"
-  },
-  {
     "id": 4877,
     "name": "PetOdor Kibblez",
     "brand": "Specialty Pet Products"
@@ -3748,21 +2068,6 @@
     "id": 2629,
     "name": "Coastal Extra Small Frosted Donuts12 Collar",
     "brand": "Coastal"
-  },
-  {
-    "id": 4005,
-    "name": "Coastal Red18\" 2918 Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2832,
-    "name": "Spot Fluff Ball 8.5\"",
-    "brand": "Ethical Pet"
-  },
-  {
-    "id": 866,
-    "name": "A & E Treat Clips",
-    "brand": "A&E Cage Co"
   },
   {
     "id": 5468,
@@ -3790,31 +2095,6 @@
     "brand": "Oxbow"
   },
   {
-    "id": 229,
-    "name": "Zilla Mealworms",
-    "brand": "Zilla"
-  },
-  {
-    "id": 256,
-    "name": "Exoterra Night Heat 25w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 3265,
-    "name": "Coastal Leash Wdf6' 966",
-    "brand": "Coastal"
-  },
-  {
-    "id": 349,
-    "name": "Exoterra Swamp 75w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1225,
-    "name": "Sweet Harvest Cockatiel 20lbs",
-    "brand": "Kaylor"
-  },
-  {
     "id": 7381,
     "name": "Feeder Rosy Red 500 Count",
     "brand": null
@@ -3835,11 +2115,6 @@
     "brand": "Coastal"
   },
   {
-    "id": 785,
-    "name": "Faunariam Low Small",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 3571,
     "name": "Coastal Gray Purple Extra Small Harness",
     "brand": "Coastal"
@@ -3848,31 +2123,6 @@
     "id": 3594,
     "name": "Coastal Bluesml Harness",
     "brand": ""
-  },
-  {
-    "id": 2619,
-    "name": "Coastal 6' Unicorns 469 Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3867,
-    "name": "Coastal Black18\" 601 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2864,
-    "name": "Tuffy T-junior-r-rp",
-    "brand": "Tuffy"
-  },
-  {
-    "id": 2280,
-    "name": "Meowijuana Meowi-waui",
-    "brand": "SmarterPaw"
-  },
-  {
-    "id": 1461,
-    "name": "Durvet Remedis Hot Spot Mist",
-    "brand": "Durvet"
   },
   {
     "id": 3260,
@@ -3890,11 +2140,6 @@
     "brand": "Fluval"
   },
   {
-    "id": 1512,
-    "name": "Safari Single Row Rake",
-    "brand": "Safari"
-  },
-  {
     "id": 3555,
     "name": "Coastal Rainbow Extra Extra Small Harness",
     "brand": "Coastal"
@@ -3905,19 +2150,9 @@
     "brand": "Loving Pets"
   },
   {
-    "id": 1479,
-    "name": "Happy Jack Sardex Ii",
-    "brand": "Happy"
-  },
-  {
     "id": 3681,
     "name": "Sunburst Pur10 Collar",
     "brand": "Sunburst"
-  },
-  {
-    "id": 3949,
-    "name": "Coastal Blue16\" 601 Collar",
-    "brand": "Coastal"
   },
   {
     "id": 4930,
@@ -3925,18 +2160,8 @@
     "brand": "Pethouse"
   },
   {
-    "id": 3521,
-    "name": "Coastal Sls12\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 2630,
     "name": "Coastal Small Frosted Donuts14 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 4021,
-    "name": "Coastal Black20\" Leash",
     "brand": "Coastal"
   },
   {
@@ -3975,16 +2200,6 @@
     "brand": "Fluval"
   },
   {
-    "id": 1388,
-    "name": "Pierce's Nu-stock",
-    "brand": "Pierce's"
-  },
-  {
-    "id": 2800,
-    "name": "Spot Slithery Snake",
-    "brand": "Ethical Pet"
-  },
-  {
     "id": 4873,
     "name": "PetOdor Cinnamon Apple",
     "brand": "Specialty Pet Products"
@@ -3995,34 +2210,9 @@
     "brand": "Oxbow"
   },
   {
-    "id": 4931,
-    "name": "Zymox Shampoo Trial",
-    "brand": "Zymox"
-  },
-  {
     "id": 5126,
     "name": "Stoneyriver Beach 5lb",
     "brand": "Estes"
-  },
-  {
-    "id": 1803,
-    "name": "Carelift Rear Support Harness M",
-    "brand": "PetSafe"
-  },
-  {
-    "id": 2575,
-    "name": "Circle 18\" Tan 1206 Collar",
-    "brand": "Circle T"
-  },
-  {
-    "id": 1469,
-    "name": "Pet Honesty Hemp Calming",
-    "brand": "Pet Honesty"
-  },
-  {
-    "id": 1502,
-    "name": "Freshbreathe Gel",
-    "brand": "TropiClean"
   },
   {
     "id": 4881,
@@ -4035,11 +2225,6 @@
     "brand": "Aqueon"
   },
   {
-    "id": 1312,
-    "name": "Tropiclean Vanilla Fascial Cleanser",
-    "brand": "TropiClean"
-  },
-  {
     "id": 5719,
     "name": "Fluval 306/406 Phosphate 6pk",
     "brand": "Fluval"
@@ -4050,49 +2235,14 @@
     "brand": "Coastal"
   },
   {
-    "id": 350,
-    "name": "Exoterra Swamp 50w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 898,
-    "name": "Vitapol Smakers Maxi 2pc",
-    "brand": "Vitapol"
-  },
-  {
     "id": 5794,
     "name": "Tetra Pond Sticks",
     "brand": "Tetra"
   },
   {
-    "id": 3536,
-    "name": "Coastal Pkt26\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 5673,
     "name": "Fluval Ac70 Ac110 Biomax",
     "brand": ""
-  },
-  {
-    "id": 426,
-    "name": "Exoterra Solar Glo 160w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1244,
-    "name": "Beautifur Cologne",
-    "brand": "Beautifur"
-  },
-  {
-    "id": 2704,
-    "name": "Rascals 2.75\" Pig",
-    "brand": "Rascals"
-  },
-  {
-    "id": 1667,
-    "name": "Vittles Vault Elevated Feeder 50 Lbs",
-    "brand": "Gamma2"
   },
   {
     "id": 6057,
@@ -4103,11 +2253,6 @@
     "id": 3585,
     "name": "Coastal Limxsm Harness",
     "brand": ""
-  },
-  {
-    "id": 2807,
-    "name": "Spot Axolotl 6\"",
-    "brand": "Ethical Pet"
   },
   {
     "id": 4093,
@@ -4135,11 +2280,6 @@
     "brand": "Pets First"
   },
   {
-    "id": 3997,
-    "name": "Coastal Red20\" Security Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 3587,
     "name": "Coastal Gray Red Small Harness",
     "brand": "Coastal"
@@ -4148,11 +2288,6 @@
     "id": 3517,
     "name": "Coastal Black White Stripe 06' Leash",
     "brand": "Coastal"
-  },
-  {
-    "id": 2825,
-    "name": "Multipet Large Loofadog Floppy",
-    "brand": "Multipet"
   },
   {
     "id": 5763,
@@ -4165,19 +2300,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 3853,
-    "name": "Coastal Black06' 406 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 6009,
     "name": "Royal Canin Chihuahua 10lb",
     "brand": "Royal Canin"
-  },
-  {
-    "id": 3701,
-    "name": "Coastal Lime 6' 306 Leash",
-    "brand": "Coastal"
   },
   {
     "id": 2090,
@@ -4188,16 +2313,6 @@
     "id": 6650,
     "name": "Zignature Kangaroo 4lb",
     "brand": "Zignature"
-  },
-  {
-    "id": 3271,
-    "name": "Coastal Leash Ybc6' 61976",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3318,
-    "name": "Coastal Leash Gxy06' 46436",
-    "brand": "Coastal"
   },
   {
     "id": 3508,
@@ -4220,16 +2335,6 @@
     "brand": "Coastal"
   },
   {
-    "id": 3424,
-    "name": "Coastal Fsa18\" Soy Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 4007,
-    "name": "Coastal Black12\" 2912 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 6307,
     "name": "Nutrisource Performance 40lb",
     "brand": "Nutrisource"
@@ -4240,19 +2345,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 3962,
-    "name": "Coastal Red06' 606 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 5651,
     "name": "Fluval Aquasky 18 Watts",
     "brand": "Fluval"
-  },
-  {
-    "id": 2611,
-    "name": "Titan G3018 Traincollarprg",
-    "brand": "Titan"
   },
   {
     "id": 4646,
@@ -4260,28 +2355,8 @@
     "brand": "SmartBones"
   },
   {
-    "id": 3694,
-    "name": "Coastal Orange 6' 2906 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 3624,
     "name": "Coastal Gray Pink Large Harness",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2820,
-    "name": "Zippypaws Donutz Rainbow",
-    "brand": "ZippyPaws"
-  },
-  {
-    "id": 245,
-    "name": "Exoterra Infrared Basking 75w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 3994,
-    "name": "Coastal Black14\" Security Collar",
     "brand": "Coastal"
   },
   {
@@ -4315,49 +2390,14 @@
     "brand": "Coastal"
   },
   {
-    "id": 2584,
-    "name": "Coastal Large Dinosaurs26 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1895,
-    "name": "Quiettime Extra Large White Bed",
-    "brand": "Quiet Time"
-  },
-  {
     "id": 3441,
     "name": "Coastal Fsa38\" Soy Harness",
     "brand": "Coastal"
   },
   {
-    "id": 3652,
-    "name": "Coastal Raf14\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3219,
-    "name": "Coastal Collar Tsa26\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2767,
-    "name": "Spot Sknz Crinklers Large Bird",
-    "brand": "Spot"
-  },
-  {
     "id": 5602,
     "name": "Marineland Emporor Pro 450",
     "brand": "Marineland"
-  },
-  {
-    "id": 1251,
-    "name": "Skoutshonor Propuppy Deodorizer",
-    "brand": "Skout's Honor"
-  },
-  {
-    "id": 934,
-    "name": "Lafebers Garden Veggie Nutriberries",
-    "brand": "Lafeber"
   },
   {
     "id": 2080,
@@ -4395,24 +2435,9 @@
     "brand": "Benebone"
   },
   {
-    "id": 3199,
-    "name": "Coastal Collar Btd20\"",
-    "brand": "Coastal"
-  },
-  {
     "id": 4321,
     "name": "Nibbles Pet Chew Calcium",
     "brand": ""
-  },
-  {
-    "id": 513,
-    "name": "TetraFauna Reptofilter 3 Pack",
-    "brand": "Tetra"
-  },
-  {
-    "id": 145,
-    "name": "Small Jelly Pots",
-    "brand": "Komodo"
   },
   {
     "id": 4262,
@@ -4420,29 +2445,9 @@
     "brand": "Vitakraft"
   },
   {
-    "id": 1372,
-    "name": "Natures Miracle Ultra Disenfect",
-    "brand": "Nature's Miracle"
-  },
-  {
     "id": 4459,
     "name": "Redbarn Fillmunch Retrieve Peanut Butter",
     "brand": "RedBarn"
-  },
-  {
-    "id": 2586,
-    "name": "Coastal Large Aliens26 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2020,
-    "name": "Coastal Collar Bsr12",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1055,
-    "name": "Playfuls Sound & Move\"partytime\"",
-    "brand": "Playfuls"
   },
   {
     "id": 4862,
@@ -4453,26 +2458,6 @@
     "id": 5423,
     "name": "Assrt Tiki Theme",
     "brand": "Penn-Plax"
-  },
-  {
-    "id": 4569,
-    "name": "Nylabone DuraChew Chicken Wolf",
-    "brand": "Nylabone"
-  },
-  {
-    "id": 515,
-    "name": "Komodo Tortoise Hay",
-    "brand": "Komodo"
-  },
-  {
-    "id": 1357,
-    "name": "Weeaway Carpet Shampoo",
-    "brand": "Wee-Away"
-  },
-  {
-    "id": 3983,
-    "name": "Coastal Red14\" 401 Collar",
-    "brand": "Coastal"
   },
   {
     "id": 6060,
@@ -4505,11 +2490,6 @@
     "brand": "RedBarn"
   },
   {
-    "id": 2617,
-    "name": "Coastal 6' Frosted Donuts 469 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 4308,
     "name": "Ware Salt Lick",
     "brand": "Ware"
@@ -4520,16 +2500,6 @@
     "brand": "Aquatop"
   },
   {
-    "id": 404,
-    "name": "Exoterra Mounting Clips",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 3832,
-    "name": "Coastal Purple20\" Martingale Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 6821,
     "name": "Taste of the Wild Rocky Mountain 5lb",
     "brand": "Taste of the Wild"
@@ -4538,26 +2508,6 @@
     "id": 5932,
     "name": "Science Diet Large Breed 6+ 33lb",
     "brand": "Science Diet"
-  },
-  {
-    "id": 346,
-    "name": "Exoterra Thermostat 300w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1221,
-    "name": "Vitaseed Caliblend 25lbs",
-    "brand": "Vitakraft"
-  },
-  {
-    "id": 3272,
-    "name": "Coastal Leash Ybc6' 61476",
-    "brand": "Coastal"
-  },
-  {
-    "id": 509,
-    "name": "Nature Zone Turtle Fungus Bath",
-    "brand": "Nature Zone"
   },
   {
     "id": 6281,
@@ -4585,11 +2535,6 @@
     "brand": "Aqueon"
   },
   {
-    "id": 2021,
-    "name": "Coastal Collar Cmo12",
-    "brand": "Coastal"
-  },
-  {
     "id": 3893,
     "name": "Coastal Neon Pink20\" Mbuc Collar",
     "brand": "Coastal"
@@ -4597,11 +2542,6 @@
   {
     "id": 3255,
     "name": "Coastal Leash Black Skulls 06\"' 966",
-    "brand": "Coastal"
-  },
-  {
-    "id": 4009,
-    "name": "Coastal Blue12\" 2912 Leash",
     "brand": "Coastal"
   },
   {
@@ -4615,26 +2555,6 @@
     "brand": "Coastal"
   },
   {
-    "id": 3664,
-    "name": "Coastal Red Small Pwrwalker",
-    "brand": "Coastal"
-  },
-  {
-    "id": 4263,
-    "name": "Drops Veggie",
-    "brand": "Vitakraft"
-  },
-  {
-    "id": 3661,
-    "name": "Coastal Shb20\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3990,
-    "name": "Coastal Gry22\" Training Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 5283,
     "name": "Aquascapes Glw Bunch Medium Green/Pink",
     "brand": "Penn-Plax"
@@ -4645,34 +2565,9 @@
     "brand": "Benebone"
   },
   {
-    "id": 2699,
-    "name": "Rascals 15\" Rooster",
-    "brand": "Rascals"
-  },
-  {
-    "id": 3951,
-    "name": "Coastal Blue14\" Buc Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1238,
-    "name": "Earthbath Stress Release Spritz Euc & Peppermint",
-    "brand": "Earthbath"
-  },
-  {
     "id": 5613,
     "name": "Aqueon Led Colormax Size 20",
     "brand": "Aqueon"
-  },
-  {
-    "id": 1316,
-    "name": "Skoutshonor Probiotic Ear Cleaner",
-    "brand": "Skout's Honor"
-  },
-  {
-    "id": 475,
-    "name": "Exoterra Water Dish Medium",
-    "brand": "Exo Terra"
   },
   {
     "id": 5284,
@@ -4710,11 +2605,6 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 2197,
-    "name": "Spot Plush Mice 2pk",
-    "brand": "Spot"
-  },
-  {
     "id": 4602,
     "name": "Benebone Giant Zaggler Chicken",
     "brand": "Benebone"
@@ -4750,16 +2640,6 @@
     "brand": "Coastal"
   },
   {
-    "id": 1058,
-    "name": "Playfuls Sound & Move \"blockrock\"",
-    "brand": "Playfuls"
-  },
-  {
-    "id": 3914,
-    "name": "Coastal Hunter06' 306 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 5123,
     "name": "Stoneyriver Jumbo Neautral 5lb",
     "brand": "Estes"
@@ -4768,16 +2648,6 @@
     "id": 5381,
     "name": "Barbies Mermaid Medium",
     "brand": "Penn-Plax"
-  },
-  {
-    "id": 2393,
-    "name": "Feline Pine 20lb Litter",
-    "brand": "Arm & Hammer"
-  },
-  {
-    "id": 4000,
-    "name": "Coastal Mpw26\" Security Collar",
-    "brand": "Coastal"
   },
   {
     "id": 3431,
@@ -4790,34 +2660,9 @@
     "brand": "Pethouse"
   },
   {
-    "id": 3402,
-    "name": "Coastal Ww226 Collar",
-    "brand": ""
-  },
-  {
-    "id": 3444,
-    "name": "Coastal Mdw06' Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3778,
-    "name": "Coastal Blue 4' 304 Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2358,
-    "name": "Catit Wood Unscented Litter",
-    "brand": "Catit"
-  },
-  {
     "id": 4347,
     "name": "Kaytee Lava Bites",
     "brand": "Kaytee"
-  },
-  {
-    "id": 2287,
-    "name": "Uc Combo 1 Story",
-    "brand": "Penn-Plax"
   },
   {
     "id": 4296,
@@ -4835,39 +2680,14 @@
     "brand": "Coastal"
   },
   {
-    "id": 3939,
-    "name": "Coastal Blue04' 904 Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 618,
-    "name": "Exoterra Thermometer",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 4223,
     "name": "Livingwrld Ergonomic Dish",
     "brand": "Living World"
   },
   {
-    "id": 717,
-    "name": "Hermit Beach",
-    "brand": "Penn-Plax"
-  },
-  {
-    "id": 2839,
-    "name": "Tuffy T-junior-br-rp",
-    "brand": "Tuffy"
-  },
-  {
     "id": 4665,
     "name": "Fresh Kisses Small Mint Brush",
     "brand": "Merrick"
-  },
-  {
-    "id": 3915,
-    "name": "Coastal Hunter26\" Martingale Collar",
-    "brand": "Coastal"
   },
   {
     "id": 3618,
@@ -4880,34 +2700,9 @@
     "brand": "Nylabone"
   },
   {
-    "id": 232,
-    "name": "Exoterra Ceramic 100w",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 4022,
     "name": "Rndlake Timothy Hay 90oz",
     "brand": "Round Lake Farm"
-  },
-  {
-    "id": 828,
-    "name": "Adams Cat Flea Collar",
-    "brand": "Adams"
-  },
-  {
-    "id": 424,
-    "name": "Exoterra Solar Glo 80w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1477,
-    "name": "Happy Jack Pad Kote",
-    "brand": "Happy"
-  },
-  {
-    "id": 4579,
-    "name": "Nylabone FlexiChew Petite",
-    "brand": "Nylabone"
   },
   {
     "id": 3757,
@@ -4920,49 +2715,14 @@
     "brand": "Cascade"
   },
   {
-    "id": 3520,
-    "name": "Coastal Rbg12\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 3570,
     "name": "Coastal Gray Red Extra Small Harness",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3513,
-    "name": "Coastal Snp06' Leash",
     "brand": "Coastal"
   },
   {
     "id": 5834,
     "name": "Basic Hoodie Gray Extra Small",
     "brand": "Frisco"
-  },
-  {
-    "id": 1361,
-    "name": "Weeaway Odor Fogger Hawain Breeze",
-    "brand": "Wee-Away"
-  },
-  {
-    "id": 2269,
-    "name": "Meowijuana Get Smoked Toy",
-    "brand": "SmarterPaw"
-  },
-  {
-    "id": 1896,
-    "name": "Squishmellow Bed \"lola\" 20in",
-    "brand": "Jazwares"
-  },
-  {
-    "id": 1206,
-    "name": "Vision Compact Cage Lamp",
-    "brand": "Vision"
-  },
-  {
-    "id": 798,
-    "name": "Bug Blaster",
-    "brand": "Penn-Plax"
   },
   {
     "id": 6453,
@@ -4975,49 +2735,14 @@
     "brand": null
   },
   {
-    "id": 3228,
-    "name": "Coastal Leash Skx06' 466",
-    "brand": "Coastal"
-  },
-  {
-    "id": 673,
-    "name": "Exoterra Finger Cactus",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 4745,
     "name": "Milk-Bone Marosnacks",
     "brand": "The J.M. Smucker Company"
   },
   {
-    "id": 2127,
-    "name": "Churo Tuna W Salmon 4pk",
-    "brand": "Inaba"
-  },
-  {
-    "id": 1434,
-    "name": "Freshbreathe Hip & Joint 16oz",
-    "brand": "TropiClean"
-  },
-  {
-    "id": 3384,
-    "name": "Coastal Ww026 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3398,
-    "name": "Coastal Ww514 Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 4218,
     "name": "Back2nature 15l Litter",
     "brand": "Back 2 Nature"
-  },
-  {
-    "id": 2438,
-    "name": "Lilpals Extra Small Collar Zpk08",
-    "brand": "Li'l Pals"
   },
   {
     "id": 4412,
@@ -5045,39 +2770,9 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 3302,
-    "name": "Coastal Collar Bmb18\"",
-    "brand": "Coastal"
-  },
-  {
     "id": 5389,
     "name": "Fighter Jet Wreck Scape",
     "brand": "Penn-Plax"
-  },
-  {
-    "id": 1382,
-    "name": "Banixx Wound Care Cream 8oz",
-    "brand": "Banixx"
-  },
-  {
-    "id": 3971,
-    "name": "Coastal Red22\" 2901 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 507,
-    "name": "Nature Zone Turtle Shell Saver",
-    "brand": "Nature Zone"
-  },
-  {
-    "id": 824,
-    "name": "Adams Carpet Spray",
-    "brand": "Adams"
-  },
-  {
-    "id": 1386,
-    "name": "Banixx Paw Wipes",
-    "brand": "Banixx"
   },
   {
     "id": 5511,
@@ -5085,23 +2780,8 @@
     "brand": "Aqueon"
   },
   {
-    "id": 3644,
-    "name": "Coastal Dgm14\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 3593,
     "name": "Coastal Black Small Harness",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3944,
-    "name": "Coastal Blue26\" Mbuc Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3357,
-    "name": "Coastal Fwt06' 12926 Leash",
     "brand": "Coastal"
   },
   {
@@ -5110,29 +2790,9 @@
     "brand": "Fluval"
   },
   {
-    "id": 791,
-    "name": "Exoterra Cricket Pen Small",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 4175,
     "name": "Kaytee Critter Lazy Lookout",
     "brand": "Kaytee"
-  },
-  {
-    "id": 3920,
-    "name": "Coastal Hunter24\" 2901 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2108,
-    "name": "Purebites Cat Freeze Shrimp",
-    "brand": "PureBites"
-  },
-  {
-    "id": 394,
-    "name": "Reptile System T5 Zone 2 24w 6\"",
-    "brand": "Reptile Systems"
   },
   {
     "id": 3900,
@@ -5150,16 +2810,6 @@
     "brand": "Aquatop"
   },
   {
-    "id": 2769,
-    "name": "Spot Sknz Big Bite Bear",
-    "brand": "Spot"
-  },
-  {
-    "id": 3267,
-    "name": "Coastal Leash Btd6' 966",
-    "brand": "Coastal"
-  },
-  {
     "id": 2597,
     "name": "Large New Orleans Saints Saints Collar",
     "brand": "Pets First"
@@ -5175,24 +2825,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 88,
-    "name": "Exoterra Mini Sand Mat",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 5722,
     "name": "Fluval Fx4 Ammonia 3pk",
     "brand": "Fluval"
-  },
-  {
-    "id": 783,
-    "name": "Exoterra Large Low",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1474,
-    "name": "Happy Jack Mange Medicine",
-    "brand": "Happy"
   },
   {
     "id": 4032,
@@ -5210,11 +2845,6 @@
     "brand": "Icelandic+"
   },
   {
-    "id": 5506,
-    "name": "Aqueon Replace Filter Cartridge Large",
-    "brand": "Aqueon"
-  },
-  {
     "id": 5280,
     "name": "Aquascapes Medium Ostrich Fern Bunch",
     "brand": "Penn-Plax"
@@ -5223,21 +2853,6 @@
     "id": 876,
     "name": "Prevue Hendrix Medium Seed Catcher",
     "brand": "Prevue"
-  },
-  {
-    "id": 238,
-    "name": "Exoterra Halogen 25w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1204,
-    "name": "Ezfill Feeder Bird",
-    "brand": "Penn-Plax"
-  },
-  {
-    "id": 520,
-    "name": "Reptology Biothane Sponge 70 Replace",
-    "brand": "Reptology"
   },
   {
     "id": 4472,
@@ -5250,39 +2865,14 @@
     "brand": "Coastal"
   },
   {
-    "id": 913,
-    "name": "Higgins Duets Conure & Lovebird",
-    "brand": "Higgins"
-  },
-  {
     "id": 5289,
     "name": "Aquafloras Tree Stump",
     "brand": "Penn-Plax"
   },
   {
-    "id": 2913,
-    "name": "Nylabone Peanut Wlf",
-    "brand": "Nylabone"
-  },
-  {
-    "id": 3117,
-    "name": "Kong Dental Bone Medium",
-    "brand": "Kong"
-  },
-  {
     "id": 5020,
     "name": "Aqualife Thermal-temp",
     "brand": "Aqualife"
-  },
-  {
-    "id": 1376,
-    "name": "Vetericyn Antimicro Dressing Gel",
-    "brand": "Vetericyn"
-  },
-  {
-    "id": 995,
-    "name": "Birdlife Hanging Pacifer W Bells",
-    "brand": "Birdlife"
   },
   {
     "id": 6074,
@@ -5293,56 +2883,6 @@
     "id": 3435,
     "name": "Coastal Ony38\" Soy Harness",
     "brand": "Coastal"
-  },
-  {
-    "id": 243,
-    "name": "Exoterra Infrared Basking 150w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1673,
-    "name": "Dogit Go Slow L Blue",
-    "brand": "Hagen"
-  },
-  {
-    "id": 206,
-    "name": "Exoterra Terrarium Lock",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1427,
-    "name": "Nylabone Oral Care Foaming Trtrem",
-    "brand": "Nylabone"
-  },
-  {
-    "id": 1282,
-    "name": "Biogroom Natuscen Tuscan Olive Sham",
-    "brand": "Bio Groom"
-  },
-  {
-    "id": 2444,
-    "name": "Lilpals Extra Small Collar Gnd08",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 2615,
-    "name": "Coastal 6' Aliens 469 Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3669,
-    "name": "Coastal Pink Large Pwrwalker",
-    "brand": "Coastal"
-  },
-  {
-    "id": 242,
-    "name": "Exoterra Daylight Basking 25w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 2849,
-    "name": "Tuffy T-m-oc-alligator",
-    "brand": "Tuffy"
   },
   {
     "id": 4517,
@@ -5360,24 +2900,9 @@
     "brand": "Kong"
   },
   {
-    "id": 2439,
-    "name": "Lilpals Extra Small Collar Lbp08",
-    "brand": "Li'l Pals"
-  },
-  {
     "id": 5125,
     "name": "Stoneyriver Nutmeg",
     "brand": "Estes"
-  },
-  {
-    "id": 3194,
-    "name": "Coastal Collar Tpd26\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 648,
-    "name": "Exoterra Snake Bowl",
-    "brand": "Exo Terra"
   },
   {
     "id": 5278,
@@ -5385,48 +2910,13 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 2416,
-    "name": "Lilpals Leash Lbp06",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 2067,
-    "name": "Coastal Collar Ldb12",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3936,
-    "name": "Coastal Blue06' 2906 Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1491,
-    "name": "Nylabone Toothpaste Peanut Butter",
-    "brand": "Nylabone"
-  },
-  {
     "id": 5069,
     "name": "Act-air Sea Dog",
     "brand": "Penn-Plax"
   },
   {
-    "id": 24,
-    "name": "Exoterra Turtle Pebbles",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 3617,
     "name": "Coastal Cyn30 Harness",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3388,
-    "name": "Coastal Ww426 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3943,
-    "name": "Coastal Blue04' 404 Leash",
     "brand": "Coastal"
   },
   {
@@ -5443,11 +2933,6 @@
     "id": 5529,
     "name": "Aqueon Replace Filter Large",
     "brand": "Aqueon"
-  },
-  {
-    "id": 1561,
-    "name": "Fast Acting Super Clot",
-    "brand": "Cardinal"
   },
   {
     "id": 5741,
@@ -5470,26 +2955,6 @@
     "brand": "Pethouse"
   },
   {
-    "id": 1093,
-    "name": "Prevue Hendrix Bodacious Bites",
-    "brand": "Prevue"
-  },
-  {
-    "id": 1279,
-    "name": "Biogroom Naturscen Lmngrverb Sham",
-    "brand": "Bio Groom"
-  },
-  {
-    "id": 559,
-    "name": "Exoterra Ficus Silk Large",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1283,
-    "name": "Biogroom Natuscen Tuscan Olive Spray",
-    "brand": "Bio Groom"
-  },
-  {
     "id": 3474,
     "name": "Valhoma 16 Large Collar",
     "brand": "Valhoma"
@@ -5500,59 +2965,9 @@
     "brand": "Fluval"
   },
   {
-    "id": 261,
-    "name": "Exoterra Daytime Heat 40w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 2437,
-    "name": "Lilpals Extra Small Collar Leb08",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 2948,
-    "name": "Kong Scamp Lion Medium",
-    "brand": "Kong"
-  },
-  {
-    "id": 2720,
-    "name": "Lilpals 8\" Spiky Gator",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 1095,
-    "name": "Birdlife Leather Kabob Large",
-    "brand": "Birdlife"
-  },
-  {
-    "id": 250,
-    "name": "Exoterra Intense Basking 25w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 2815,
-    "name": "Lambchop Happy Birthday",
-    "brand": "Happy"
-  },
-  {
-    "id": 2034,
-    "name": "Coastal Collar Mgd12",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1484,
-    "name": "Nutri-vet Liquid Bandage",
-    "brand": "Nutri-Vet"
-  },
-  {
     "id": 5430,
     "name": "Algea Ship",
     "brand": "Penn-Plax"
-  },
-  {
-    "id": 825,
-    "name": "Adams Carpet Powder",
-    "brand": "Adams"
   },
   {
     "id": 3817,
@@ -5565,24 +2980,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 2270,
-    "name": "Meowijuana Get Buzzed Toy",
-    "brand": "SmarterPaw"
-  },
-  {
     "id": 5938,
     "name": "Science Diet Puppy Chicken 27.5lb",
     "brand": "Science Diet"
-  },
-  {
-    "id": 3244,
-    "name": "Coastal Collar Ybc12\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 323,
-    "name": "Exoterra Monsoon Multi",
-    "brand": "Exo Terra"
   },
   {
     "id": 5664,
@@ -5605,21 +3005,6 @@
     "brand": "Science Diet"
   },
   {
-    "id": 5634,
-    "name": "Marineland Led Light 30\"",
-    "brand": "Marineland"
-  },
-  {
-    "id": 1203,
-    "name": "Small Bird Nest Happy Beaks",
-    "brand": "Happy"
-  },
-  {
-    "id": 484,
-    "name": "Lagoon Kidney",
-    "brand": "Penn-Plax"
-  },
-  {
     "id": 4728,
     "name": "Blue Buffalo Bits Chicken",
     "brand": "Blue Buffalo"
@@ -5628,16 +3013,6 @@
     "id": 4872,
     "name": "PetOdor White Pumpkin",
     "brand": "Specialty Pet Products"
-  },
-  {
-    "id": 2389,
-    "name": "Tidycats Tidy Feet Litter",
-    "brand": "Purina"
-  },
-  {
-    "id": 2037,
-    "name": "Coastal Cc Pnk12",
-    "brand": ""
   },
   {
     "id": 4861,
@@ -5660,16 +3035,6 @@
     "brand": ""
   },
   {
-    "id": 3862,
-    "name": "Coastal Black20\" Buck Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 4678,
-    "name": "St. Rocco's Salmon 8oz",
-    "brand": "Saint Rocco's"
-  },
-  {
     "id": 6295,
     "name": "Nutrisource Grain Free Lamb 26lb",
     "brand": "Nutrisource"
@@ -5678,21 +3043,6 @@
     "id": 5333,
     "name": "Spongebob Snow Board",
     "brand": "Penn-Plax"
-  },
-  {
-    "id": 2294,
-    "name": "Catlife Silvervine Cat Wand",
-    "brand": "Penn-Plax"
-  },
-  {
-    "id": 3828,
-    "name": "Coastal Purple20\" 2901 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2850,
-    "name": "Tuffy T-ds-lizard",
-    "brand": "Tuffy"
   },
   {
     "id": 5601,
@@ -5705,29 +3055,9 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 2014,
-    "name": "Coastal Collar Goc12",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1064,
-    "name": "Happybeaks Rotating Circle",
-    "brand": "Circle T"
-  },
-  {
     "id": 4489,
     "name": "Redbarn Puff Collagen Braid",
     "brand": "RedBarn"
-  },
-  {
-    "id": 1464,
-    "name": "Durvet Naturals Deo Shampoo",
-    "brand": "Durvet"
-  },
-  {
-    "id": 4577,
-    "name": "Nylabone FlexiChew Wolf",
-    "brand": "Nylabone"
   },
   {
     "id": 4154,
@@ -5745,19 +3075,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 435,
-    "name": "Zoo Med Wire Cage Clamp Lamp",
-    "brand": "Zoo Med"
-  },
-  {
     "id": 4603,
     "name": "Benebone Large Zaggler Chicken",
     "brand": "Benebone"
-  },
-  {
-    "id": 1314,
-    "name": "Healthy Promise Earwash",
-    "brand": "Four Paws"
   },
   {
     "id": 5903,
@@ -5765,24 +3085,9 @@
     "brand": ""
   },
   {
-    "id": 3841,
-    "name": "Coastal Purple14\" Buck Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 4030,
     "name": "Oxbow Harvest Stacks Weight 35oz",
     "brand": "Oxbow"
-  },
-  {
-    "id": 491,
-    "name": "Reptomin Floating Turtle Sticks Jumbo",
-    "brand": "Tetra"
-  },
-  {
-    "id": 2860,
-    "name": "Tuffy T-u-b-yb",
-    "brand": "Tuffy"
   },
   {
     "id": 3790,
@@ -5805,11 +3110,6 @@
     "brand": ""
   },
   {
-    "id": 1395,
-    "name": "Petag Dyne 32oz",
-    "brand": "PetAg"
-  },
-  {
     "id": 3438,
     "name": "Coastal Sla30\" Soy Harness",
     "brand": "Coastal"
@@ -5825,19 +3125,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 2805,
-    "name": "Zippypaws Birthday Cake Pink",
-    "brand": "ZippyPaws"
-  },
-  {
     "id": 4939,
     "name": "Greenies Orange Teenie 12oz",
     "brand": "Greenies"
-  },
-  {
-    "id": 796,
-    "name": "Harris Diatomaceous Earth 4lbs",
-    "brand": "Harris"
   },
   {
     "id": 5936,
@@ -5870,39 +3160,9 @@
     "brand": "Fluval"
   },
   {
-    "id": 3845,
-    "name": "Coastal Purple12\" 401 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 885,
-    "name": "A & E 10oz Jungle Cups",
-    "brand": "A&E Cage Co"
-  },
-  {
-    "id": 3720,
-    "name": "Coastal Lim20\" Buck Collar",
-    "brand": ""
-  },
-  {
     "id": 5772,
     "name": "Ovation-1000 Filter",
     "brand": "Penn-Plax"
-  },
-  {
-    "id": 3485,
-    "name": "Valhoma 24 Hp Collar",
-    "brand": "Valhoma"
-  },
-  {
-    "id": 2715,
-    "name": "Jolly Pets 6\"soccer Ball Bllue",
-    "brand": "Jolly Pets"
-  },
-  {
-    "id": 2748,
-    "name": "Lilpals Happy Birthday Combo",
-    "brand": "Li'l Pals"
   },
   {
     "id": 5927,
@@ -5910,19 +3170,14 @@
     "brand": "Science Diet"
   },
   {
-    "id": 1545,
-    "name": "Safari Comfort Grip Curry Brush",
-    "brand": "Safari"
+    "id": 2094,
+    "name": "Comfort Walk Large Red",
+    "brand": "PetSafe"
   },
   {
     "id": 3504,
     "name": "Valhoma Spike 26 Black Collar",
     "brand": "Valhoma"
-  },
-  {
-    "id": 3656,
-    "name": "Coastal Bzs26\" Collar",
-    "brand": "Coastal"
   },
   {
     "id": 4923,
@@ -5945,16 +3200,6 @@
     "brand": "Forza"
   },
   {
-    "id": 3869,
-    "name": "Coastal Black14\" Martingale Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3992,
-    "name": "Coastal Blue22\" Training Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 4044,
     "name": "Oxbow Hay Blend 90oz",
     "brand": "Oxbow"
@@ -5970,24 +3215,9 @@
     "brand": "Marineland"
   },
   {
-    "id": 2576,
-    "name": "Circle 24\"tan 1208 Collar",
-    "brand": "Circle T"
-  },
-  {
     "id": 5818,
     "name": "Aqueon Glass 10gal",
     "brand": "Aqueon"
-  },
-  {
-    "id": 1036,
-    "name": "Happy Beaks Snuggle Sacklg",
-    "brand": "Happy"
-  },
-  {
-    "id": 2906,
-    "name": "Chuckit Ultra Ball Medium",
-    "brand": "Chuckit!"
   },
   {
     "id": 5600,
@@ -6010,39 +3240,9 @@
     "brand": ""
   },
   {
-    "id": 2291,
-    "name": "Catlife Purple Activiy & Scratch",
-    "brand": "Penn-Plax"
-  },
-  {
-    "id": 1358,
-    "name": "Weeaway Laundry Booster",
-    "brand": "Wee-Away"
-  },
-  {
     "id": 5536,
     "name": "Cascade Biosponge 2pk",
     "brand": "Cascade"
-  },
-  {
-    "id": 1198,
-    "name": "Happybeaks Bird Nest",
-    "brand": "A&E Cage Co"
-  },
-  {
-    "id": 5436,
-    "name": "Grey Rock Scape",
-    "brand": "Penn-Plax"
-  },
-  {
-    "id": 1772,
-    "name": "Fourpaws 30' Cotton Train Leash",
-    "brand": "Four Paws"
-  },
-  {
-    "id": 1776,
-    "name": "Titan Aerial Dog Run",
-    "brand": "Titan"
   },
   {
     "id": 6205,
@@ -6058,16 +3258,6 @@
     "id": 5104,
     "name": "Stoney River Java Sand 5lb",
     "brand": "Estes"
-  },
-  {
-    "id": 228,
-    "name": "Zilla Vegtable Mix",
-    "brand": "Zilla"
-  },
-  {
-    "id": 2361,
-    "name": "Petmate Small Basic Open Litter Box",
-    "brand": "Petmate"
   },
   {
     "id": 5702,
@@ -6090,39 +3280,9 @@
     "brand": "Oxbow"
   },
   {
-    "id": 3929,
-    "name": "Coastal Hunter14\" Buc Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 3793,
     "name": "Coastal Pink Bright26\" 2901 Collar",
     "brand": "Coastal"
-  },
-  {
-    "id": 1059,
-    "name": "Happy Beaks Rope Swing W Frays",
-    "brand": "Happy"
-  },
-  {
-    "id": 1455,
-    "name": "Petag Esbilac Milk Powder",
-    "brand": "PetAg"
-  },
-  {
-    "id": 2637,
-    "name": "Titan Trincollar Heavy 18\" 5530",
-    "brand": "Titan"
-  },
-  {
-    "id": 3451,
-    "name": "Coastal Cyn06' Leash",
-    "brand": ""
-  },
-  {
-    "id": 7395,
-    "name": "Zoo Med Leo Gecko Value Pack",
-    "brand": "Zoo Med"
   },
   {
     "id": 6211,
@@ -6140,21 +3300,6 @@
     "brand": ""
   },
   {
-    "id": 3220,
-    "name": "Coastal Collar Lss26\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 212,
-    "name": "Flukers Dragon Diet Adult",
-    "brand": "Fluker's"
-  },
-  {
-    "id": 2238,
-    "name": "Kong Flingaroo Corny",
-    "brand": "Kong"
-  },
-  {
     "id": 3608,
     "name": "Coastal Gray Purple Medium Harness",
     "brand": "Coastal"
@@ -6163,16 +3308,6 @@
     "id": 5941,
     "name": "Science Diet Chicken 5lb",
     "brand": "Science Diet"
-  },
-  {
-    "id": 2026,
-    "name": "Coastal Gks12",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2733,
-    "name": "Rascals 7\" Grunt Gator",
-    "brand": "Rascals"
   },
   {
     "id": 5514,
@@ -6185,64 +3320,14 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 3977,
-    "name": "Coastal Red20\" Mbuc Collar",
-    "brand": ""
-  },
-  {
     "id": 3429,
     "name": "Coastal Crn24\" Harness",
     "brand": "Coastal"
   },
   {
-    "id": 2285,
-    "name": "Prevue Scartching Post Grey",
-    "brand": "Prevue"
-  },
-  {
-    "id": 1056,
-    "name": "Playfuls Sound & Move\"summer Breeze\"",
-    "brand": "Playfuls"
-  },
-  {
-    "id": 3922,
-    "name": "Coastal Hunter20\" Buc Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2623,
-    "name": "Coastal 6' Pineapples 469 Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2643,
-    "name": "Titan Traincllr Xhvy 22' 5540",
-    "brand": "Titan"
-  },
-  {
-    "id": 1065,
-    "name": "Playfuls Sound & Move \"rope & Shell Things\"",
-    "brand": "Playfuls"
-  },
-  {
-    "id": 2758,
-    "name": "Spot Skinneez Jungle Cat Squeakers",
-    "brand": "Spot"
-  },
-  {
-    "id": 2953,
-    "name": "Kong Wub Friend Ballistic Large",
-    "brand": "Kong"
-  },
-  {
     "id": 3569,
     "name": "Coastal Gray Pink Extra Small Harness",
     "brand": "Coastal"
-  },
-  {
-    "id": 1532,
-    "name": "Safari Bristle Brush Large",
-    "brand": "Safari"
   },
   {
     "id": 5202,
@@ -6260,23 +3345,8 @@
     "brand": "Benebone"
   },
   {
-    "id": 3826,
-    "name": "Coastal Purple26\" Martingale Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2613,
-    "name": "Coastal 6' Dinosaurs 469 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 3803,
     "name": "Coastal Pink Bright26\" Buck Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 4019,
-    "name": "Coastal Green30\" Leash",
     "brand": "Coastal"
   },
   {
@@ -6290,34 +3360,14 @@
     "brand": "Nutrisource"
   },
   {
-    "id": 562,
-    "name": "Exoterra Moss Vine Large",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 6587,
     "name": "Science Diet Perfect Weight Salmon Stew 12.5oz",
     "brand": "Science Diet"
   },
   {
-    "id": 2134,
-    "name": "Fussiecat Sardine Puree 4pk",
-    "brand": "Fussie Cat"
-  },
-  {
     "id": 4693,
     "name": "Smokehouse Chicken Strips",
     "brand": "Smokehouse"
-  },
-  {
-    "id": 4572,
-    "name": "Nylabone DuraChew Giant Bacon",
-    "brand": "Nylabone"
-  },
-  {
-    "id": 2725,
-    "name": "Spot Latex Friends 9\"",
-    "brand": "Spot"
   },
   {
     "id": 5804,
@@ -6350,36 +3400,6 @@
     "brand": "Coastal"
   },
   {
-    "id": 1107,
-    "name": "Happybeaks Ball Hanging",
-    "brand": "A&E Cage Co"
-  },
-  {
-    "id": 2712,
-    "name": "Spot Latex Sea Friend 8.5\"",
-    "brand": "Spot"
-  },
-  {
-    "id": 195,
-    "name": "Pangea Humitidy Hide Sponge",
-    "brand": "Pangea"
-  },
-  {
-    "id": 817,
-    "name": "Adams Plus Pyrthrin Drip",
-    "brand": "Adams"
-  },
-  {
-    "id": 2655,
-    "name": "Titan Traincllr Medium 16\" 5525",
-    "brand": "Titan"
-  },
-  {
-    "id": 1360,
-    "name": "Weeaway Odor Fogger Cm",
-    "brand": "Wee-Away"
-  },
-  {
     "id": 5648,
     "name": "Aquatop Skyaqua 20watt",
     "brand": "Aquatop"
@@ -6388,11 +3408,6 @@
     "id": 2627,
     "name": "Coastal Extra Small Aliens12 Collar",
     "brand": "Coastal"
-  },
-  {
-    "id": 1170,
-    "name": "Higgins Sunburst Canary & Finch",
-    "brand": "Sunburst"
   },
   {
     "id": 4393,
@@ -6405,16 +3420,6 @@
     "brand": "Fluval"
   },
   {
-    "id": 215,
-    "name": "Pangea Gecko Diet Insect",
-    "brand": "Pangea"
-  },
-  {
-    "id": 3850,
-    "name": "Coastal Black06' 906 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 5121,
     "name": "Purewater Pebbles Black Beaty 5lb",
     "brand": "Nature's Ocean"
@@ -6423,16 +3428,6 @@
     "id": 5222,
     "name": "Aqualife Plant Scapes 8\"",
     "brand": ""
-  },
-  {
-    "id": 2676,
-    "name": "Rascals 3\" Hamburger",
-    "brand": ""
-  },
-  {
-    "id": 2826,
-    "name": "Multipet Loofadog Large",
-    "brand": "Multipet"
   },
   {
     "id": 5976,
@@ -6450,44 +3445,9 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 894,
-    "name": "Vitapol Fruite Smackers Cockatiel",
-    "brand": "Vitapol"
-  },
-  {
-    "id": 1462,
-    "name": "Durvet Medicated Antimicrofung Sham",
-    "brand": "Durvet"
-  },
-  {
-    "id": 1549,
-    "name": "Spot Clean Paws Mat",
-    "brand": "Spot"
-  },
-  {
     "id": 4026,
     "name": "Kaytee Timwmari Hay 24oz",
     "brand": "Kaytee"
-  },
-  {
-    "id": 2802,
-    "name": "Zippy Paws Z-stitch- Unicorn",
-    "brand": "ZippyPaws"
-  },
-  {
-    "id": 4291,
-    "name": "Kaytee Healthy Toppings Pap",
-    "brand": "Kaytee"
-  },
-  {
-    "id": 2569,
-    "name": "Circle 14\"btl 1786s Collar",
-    "brand": "Circle T"
-  },
-  {
-    "id": 2490,
-    "name": "Lilpals Extra Small Collar Blu08",
-    "brand": "Li'l Pals"
   },
   {
     "id": 5526,
@@ -6505,19 +3465,9 @@
     "brand": "Nutrisource"
   },
   {
-    "id": 896,
-    "name": "Vitakraft Sticks Apple & Honey Parrot",
-    "brand": "Vitakraft"
-  },
-  {
     "id": 4110,
     "name": "Oxbow Grden Yng Gpig 4lb",
     "brand": "Oxbow"
-  },
-  {
-    "id": 2801,
-    "name": "Spot Snuffle Roll Assorted Pzzle",
-    "brand": "Ethical Pet"
   },
   {
     "id": 5607,
@@ -6525,59 +3475,14 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 1307,
-    "name": "Tropiclean Mango & Kiwi Spray",
-    "brand": "TropiClean"
-  },
-  {
-    "id": 1129,
-    "name": "Hari Oyster Shells",
-    "brand": "Hagen"
-  },
-  {
-    "id": 1356,
-    "name": "Tropiclean Essentials Shea Butter Sham",
-    "brand": "TropiClean"
-  },
-  {
-    "id": 2853,
-    "name": "Tuffy T-ds-scorpion",
-    "brand": "Tuffy"
-  },
-  {
-    "id": 1126,
-    "name": "Kaytee Kay-kob Litter",
-    "brand": "Kaytee"
-  },
-  {
-    "id": 1152,
-    "name": "Higgins Vitaseed Cockateil",
-    "brand": "Higgins"
-  },
-  {
     "id": 1331,
     "name": "Nature's Miracle Hypoallergenic",
     "brand": "Nature's Miracle"
   },
   {
-    "id": 1710,
-    "name": "Vanilla Ness Dual 42oz",
-    "brand": "Van Ness"
-  },
-  {
     "id": 4268,
     "name": "Oxbow Sim Rwds Carrot & Dill",
     "brand": "Oxbow"
-  },
-  {
-    "id": 2842,
-    "name": "Tuffy T-u-t-yb",
-    "brand": "Tuffy"
-  },
-  {
-    "id": 1292,
-    "name": "Tropiclean Facial Cleanser Waterless",
-    "brand": "TropiClean"
   },
   {
     "id": 6280,
@@ -6600,19 +3505,9 @@
     "brand": "Aqueon"
   },
   {
-    "id": 2227,
-    "name": "Kong Connect Peacock",
-    "brand": "Kong"
-  },
-  {
     "id": 5831,
     "name": "Aqueon 55gal Tank7stand",
     "brand": "Aqueon"
-  },
-  {
-    "id": 2330,
-    "name": "Catit Flower Fountain Original",
-    "brand": "Catit"
   },
   {
     "id": 5604,
@@ -6645,29 +3540,9 @@
     "brand": "Natural Balance"
   },
   {
-    "id": 775,
-    "name": "Exoterra Faunarium Medium",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 149,
-    "name": "Flukers Reptiboost",
-    "brand": "Fluker's"
-  },
-  {
-    "id": 2222,
-    "name": "Kong Angler Fish Wrangler",
-    "brand": "Kong"
-  },
-  {
     "id": 4834,
     "name": "Nothin' to Hide 3\" Bagel Peanut Butter",
     "brand": "Fieldcrest Farms"
-  },
-  {
-    "id": 477,
-    "name": "Exoterra Corner Water Dish Medium",
-    "brand": "Exo Terra"
   },
   {
     "id": 5048,
@@ -6690,39 +3565,9 @@
     "brand": "Li'l Pals"
   },
   {
-    "id": 3856,
-    "name": "Coastal Black26\" Martingale Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3840,
-    "name": "Coastal Purple14\" Martingale Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 4138,
     "name": "Oxbow Timothy Club Bungalow Large",
     "brand": "Oxbow"
-  },
-  {
-    "id": 2660,
-    "name": "Titan Leash Red02 2' Xhvy",
-    "brand": "Titan"
-  },
-  {
-    "id": 2766,
-    "name": "Spot Sknz Plus Penguin",
-    "brand": "Spot"
-  },
-  {
-    "id": 2921,
-    "name": "Nylabone Puppy Tactile Stick",
-    "brand": "Nylabone"
-  },
-  {
-    "id": 2137,
-    "name": "Meowee Savory Spoonables 3 Flavor",
-    "brand": "Meowee"
   },
   {
     "id": 3743,
@@ -6730,34 +3575,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 2013,
-    "name": "Coastal Collar Gbg12",
-    "brand": "Coastal"
-  },
-  {
     "id": 4460,
     "name": "Redbarn Fillmunch Retrieve Chicken",
     "brand": "RedBarn"
-  },
-  {
-    "id": 345,
-    "name": "Exoterra Uvb100 26w Tropical",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 247,
-    "name": "Exoterra Intense Basking 100w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1435,
-    "name": "Freshbreathe Hip & Joint 33.8 oz",
-    "brand": "TropiClean"
-  },
-  {
-    "id": 252,
-    "name": "Exoterra Night Heat 100w",
-    "brand": "Exo Terra"
   },
   {
     "id": 3673,
@@ -6768,11 +3588,6 @@
     "id": 7349,
     "name": "Otocinclus Regular",
     "brand": null
-  },
-  {
-    "id": 2806,
-    "name": "Zippypaws Birthday Cake -Blue",
-    "brand": "ZippyPaws"
   },
   {
     "id": 3754,
@@ -6795,19 +3610,9 @@
     "brand": "SmartBones"
   },
   {
-    "id": 211,
-    "name": "Flukers Dragon Diet Juvenile",
-    "brand": "Fluker's"
-  },
-  {
     "id": 2928,
     "name": "Nylabone Power Chew Pretzel Regular",
     "brand": "Nylabone"
-  },
-  {
-    "id": 2585,
-    "name": "Coastal Medium Aliens20 Collar",
-    "brand": "Coastal"
   },
   {
     "id": 5403,
@@ -6825,49 +3630,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 2436,
-    "name": "Lilpals Extra Small Collar Btd08",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 4004,
-    "name": "Coastal Black18\" 2918 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 2587,
     "name": "Coastal Medium Frosted Donuts20 Collar",
     "brand": "Coastal"
-  },
-  {
-    "id": 4309,
-    "name": "Wettail Drops",
-    "brand": "Four Paws"
-  },
-  {
-    "id": 165,
-    "name": "Flukers Repta Calcium with D3 Strb",
-    "brand": "Fluker's"
-  },
-  {
-    "id": 2607,
-    "name": "New Orleans Saints Saints Burger Toy",
-    "brand": "Pets First"
-  },
-  {
-    "id": 3986,
-    "name": "Coastal Red12\" 301 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1369,
-    "name": "Nature's Miracle Stain & Odor Rem Scented",
-    "brand": "Nature's Miracle"
-  },
-  {
-    "id": 203,
-    "name": "Cricket Pen Replacement Foam",
-    "brand": "Lee's"
   },
   {
     "id": 3344,
@@ -6895,109 +3660,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 2570,
-    "name": "Circle 16\" Btl 1786s Collar",
-    "brand": "Circle T"
-  },
-  {
-    "id": 933,
-    "name": "Lafebers El Paso Nutri Berries Parrot",
-    "brand": "Lafeber"
-  },
-  {
-    "id": 3697,
-    "name": "Coastal Orange 6' 404 Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1546,
-    "name": "Safari Double Sided Flea Comb",
-    "brand": "Safari"
-  },
-  {
-    "id": 1226,
-    "name": "Sweet Harvest Parrot 20 Lbs",
-    "brand": "Kaylor"
-  },
-  {
-    "id": 2119,
-    "name": "Grilled Chicken Fillet",
-    "brand": "Inaba"
-  },
-  {
-    "id": 2055,
-    "name": "Coastal Collar Pby08",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3924,
-    "name": "Coastal Hunter20\" Mbuc Collar",
-    "brand": ""
-  },
-  {
     "id": 7383,
     "name": "ReptiFauna Assorted Cryptanthus - Tropical 2\" Pot",
     "brand": "ReptiFauna"
-  },
-  {
-    "id": 3351,
-    "name": "Coastal Autumn6' 12926 Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3919,
-    "name": "Coastal Hunter26\" 2901 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1281,
-    "name": "Biogroom Natuscen Desert Spray",
-    "brand": "Bio Groom"
-  },
-  {
-    "id": 548,
-    "name": "Zoo Med Amazonian Phyllo Medium",
-    "brand": "Zoo Med"
-  },
-  {
-    "id": 213,
-    "name": "Flukers Garden Blend",
-    "brand": "Fluker's"
-  },
-  {
-    "id": 2841,
-    "name": "Tuffy T-mg-gr-tg",
-    "brand": "Tuffy"
-  },
-  {
-    "id": 2487,
-    "name": "Lilpals Harness Blu14",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 2562,
-    "name": "Circle Black06\" Leash",
-    "brand": "Circle T"
-  },
-  {
-    "id": 2044,
-    "name": "Coastal Collar Wrp12",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1550,
-    "name": "Dirty Dog Door Mat",
-    "brand": "Dog Gone Smart"
-  },
-  {
-    "id": 146,
-    "name": "Big Jelly Pots",
-    "brand": "Komodo"
-  },
-  {
-    "id": 1465,
-    "name": "Pet Honesty Allergy Skin Health",
-    "brand": "Pet Honesty"
   },
   {
     "id": 4794,
@@ -7005,39 +3670,9 @@
     "brand": "Nutrisource"
   },
   {
-    "id": 344,
-    "name": "Exoterra Uvb100 13w Tropical",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 4777,
-    "name": "Vital Essentials Chicken Heart 1.9 oz",
-    "brand": "Vital Essentials"
-  },
-  {
-    "id": 2857,
-    "name": "Tuffy T-u-r-pl",
-    "brand": "Tuffy"
-  },
-  {
-    "id": 1216,
-    "name": "Living World Gravel Paper",
-    "brand": "Living World"
-  },
-  {
-    "id": 3300,
-    "name": "Coastal Collar Hrw26\"",
-    "brand": "Coastal"
-  },
-  {
     "id": 6621,
     "name": "Blue Buffalo Delight Ro Chicken 3.5 oz",
     "brand": "Blue Buffalo"
-  },
-  {
-    "id": 2025,
-    "name": "Coastal Collar Gsw12",
-    "brand": "Coastal"
   },
   {
     "id": 4539,
@@ -7045,54 +3680,9 @@
     "brand": ""
   },
   {
-    "id": 1348,
-    "name": "Tropiclean Oxymed Hypoallergenic Spray",
-    "brand": "TropiClean"
-  },
-  {
-    "id": 1303,
-    "name": "Tropiclean Waterless Papaya & Coconut",
-    "brand": "TropiClean"
-  },
-  {
-    "id": 2797,
-    "name": "Spot Sooth Crinkle Toy 13\"",
-    "brand": "Ethical Pet"
-  },
-  {
-    "id": 2606,
-    "name": "Large LSU Leash",
-    "brand": "Pets First"
-  },
-  {
-    "id": 568,
-    "name": "Pangea Brown Reptile Vine",
-    "brand": "Pangea"
-  },
-  {
-    "id": 558,
-    "name": "Exoterra Abutilon Silk Large",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 3577,
     "name": "Coastal Purple Extra Small Harness",
     "brand": "Coastal"
-  },
-  {
-    "id": 3387,
-    "name": "Coastal Ww526 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 91,
-    "name": "Living Natural Coco Mat 10x20",
-    "brand": "Living World"
-  },
-  {
-    "id": 2651,
-    "name": "Titan Traincllr Fine 14\" 5520",
-    "brand": "Titan"
   },
   {
     "id": 4257,
@@ -7103,11 +3693,6 @@
     "id": 5989,
     "name": "Science Diet Sensitive Large Breed 30lb",
     "brand": "Science Diet"
-  },
-  {
-    "id": 649,
-    "name": "Exo Terra Corner Cave Small",
-    "brand": "Exo Terra"
   },
   {
     "id": 456,
@@ -7128,11 +3713,6 @@
     "id": 1045,
     "name": "Prevue Hendrix Wonder Walk Medium",
     "brand": "Prevue"
-  },
-  {
-    "id": 431,
-    "name": "Zoo Med Creatures Dome 40w",
-    "brand": "Zoo Med"
   },
   {
     "id": 5618,
@@ -7160,16 +3740,6 @@
     "brand": "Coastal"
   },
   {
-    "id": 1165,
-    "name": "Sweet Harvest Parrot No Sunflower",
-    "brand": "Kaylor"
-  },
-  {
-    "id": 1878,
-    "name": "Quiet Time Pet Bed Pink 18\"",
-    "brand": "Quiet Time"
-  },
-  {
     "id": 4964,
     "name": "Greenies Plllpcktche Cap 15.8oz",
     "brand": "Greenies"
@@ -7180,49 +3750,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 2772,
-    "name": "Spot Sknz Ex Trpl Squeak Snake",
-    "brand": "Spot"
-  },
-  {
     "id": 6215,
     "name": "Blue Buffalo Small Breed Senior 15lb",
     "brand": "Blue Buffalo"
-  },
-  {
-    "id": 2914,
-    "name": "Nylabone Snr Fill & Treat",
-    "brand": "Nylabone"
-  },
-  {
-    "id": 2961,
-    "name": "Kong Lwstff Mallard Medium",
-    "brand": "Kong"
-  },
-  {
-    "id": 3641,
-    "name": "Coastal Shb06' Leash",
-    "brand": ""
-  },
-  {
-    "id": 1167,
-    "name": "Sweet Harvest Finch",
-    "brand": "Kaylor"
-  },
-  {
-    "id": 3648,
-    "name": "Coastal Mlm14\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2628,
-    "name": "Coastal Small Aliens14 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1860,
-    "name": "Simplesolution Medium Washmale Warp",
-    "brand": "Simple Solution"
   },
   {
     "id": 2598,
@@ -7240,11 +3770,6 @@
     "brand": "Coastal"
   },
   {
-    "id": 348,
-    "name": "Zoo Med Reptituff 90w Splshpro Halo",
-    "brand": "Zoo Med"
-  },
-  {
     "id": 6214,
     "name": "Blue Buffalo Small Breed Senior 5lb",
     "brand": "Blue Buffalo"
@@ -7260,24 +3785,9 @@
     "brand": "Wholesome"
   },
   {
-    "id": 181,
-    "name": "Zoo Med Glow in the Dark Tong",
-    "brand": "Zoo Med"
-  },
-  {
-    "id": 2650,
-    "name": "Titan Traincllr Fine 12\" 5520",
-    "brand": "Titan"
-  },
-  {
     "id": 5767,
     "name": "Pondmaster 1700 System",
     "brand": "Pondmaster"
-  },
-  {
-    "id": 1527,
-    "name": "Safari Self Cleaning Slicker Large",
-    "brand": "Safari"
   },
   {
     "id": 6267,
@@ -7290,34 +3800,14 @@
     "brand": "Specialty Pet Products"
   },
   {
-    "id": 3471,
-    "name": "Coastal Cyn18\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 2596,
     "name": "Medium New Orleans Saints Saints Collar",
     "brand": "Pets First"
   },
   {
-    "id": 136,
-    "name": "Iguana Salad Dressing",
-    "brand": "Penn-Plax"
-  },
-  {
     "id": 4323,
     "name": "Nibbles Tiki",
     "brand": "Nibbles"
-  },
-  {
-    "id": 1879,
-    "name": "Quiet Time Reverseible Bed 18\"",
-    "brand": "Quiet Time"
-  },
-  {
-    "id": 1557,
-    "name": "Hagen Le Salon Essentials Curry Brush",
-    "brand": "Hagen"
   },
   {
     "id": 4219,
@@ -7333,16 +3823,6 @@
     "id": 5958,
     "name": "Science Diet Light Small Bite 30lb",
     "brand": "Science Diet"
-  },
-  {
-    "id": 454,
-    "name": "Zoo Med Reptirock Combo Medium",
-    "brand": "Zoo Med"
-  },
-  {
-    "id": 1728,
-    "name": "Catit Fountain Filter Mini 3pck",
-    "brand": "Catit"
   },
   {
     "id": 6217,
@@ -7370,19 +3850,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 3950,
-    "name": "Coastal Blue14\" Mbuc Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 4027,
     "name": "Kaytee Timwcran Hay 24oz",
     "brand": "Kaytee"
-  },
-  {
-    "id": 1460,
-    "name": "Durvet Remedies Iodine Shampoo",
-    "brand": "Durvet"
   },
   {
     "id": 5279,
@@ -7390,39 +3860,14 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 4345,
-    "name": "Kaytee Ka-bob",
-    "brand": "Kaytee"
-  },
-  {
     "id": 5718,
     "name": "Fluval Biofoam 406/407 6mon",
     "brand": "Fluval"
   },
   {
-    "id": 950,
-    "name": "Birdlife Trimmer Perch 9\"",
-    "brand": "Birdlife"
-  },
-  {
-    "id": 1423,
-    "name": "Naturvet Aller-911 Hot Spot Foam",
-    "brand": "NaturVet"
-  },
-  {
-    "id": 1887,
-    "name": "Quiet Time Bed Pink 30\"",
-    "brand": "Quiet Time"
-  },
-  {
-    "id": 2768,
-    "name": "Spot Sknz Big Bite Jackal",
-    "brand": "Spot"
-  },
-  {
-    "id": 1577,
-    "name": "Safari Shedding Comb",
-    "brand": "Safari"
+    "id": 1038,
+    "name": "Prevue Hendrix Cozy Corner Medium",
+    "brand": "Prevue"
   },
   {
     "id": 5131,
@@ -7430,19 +3875,9 @@
     "brand": "Spectrastone"
   },
   {
-    "id": 3685,
-    "name": "Sunburst Blu10\" Collar",
-    "brand": "Sunburst"
-  },
-  {
     "id": 4592,
     "name": "Nylabone Healthy Edibles Large Chicken Chew",
     "brand": "Nylabone"
-  },
-  {
-    "id": 3835,
-    "name": "Coastal Purple18\" 901 Collar",
-    "brand": "Coastal"
   },
   {
     "id": 5195,
@@ -7452,21 +3887,6 @@
   {
     "id": 3880,
     "name": "Coastal Neon Pink06' 906 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1784,
-    "name": "Kong Ez Cone Collar Small",
-    "brand": "Kong"
-  },
-  {
-    "id": 3299,
-    "name": "Coastal Collar Hrw18\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3420,
-    "name": "Coastal Crn08\" Soy Collar",
     "brand": "Coastal"
   },
   {
@@ -7485,44 +3905,14 @@
     "brand": "Oxbow"
   },
   {
-    "id": 1660,
-    "name": "Bellabowl Black Large",
-    "brand": "Bellabowl"
-  },
-  {
     "id": 4433,
     "name": "Redbarn Chewabulls Brush Medium",
     "brand": "RedBarn"
   },
   {
-    "id": 2829,
-    "name": "Multipet Loofadog Medium",
-    "brand": "Multipet"
-  },
-  {
     "id": 5986,
     "name": "Science Diet Sensitive 4lb",
     "brand": "Science Diet"
-  },
-  {
-    "id": 3210,
-    "name": "Coastal Collar Tpd14\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1563,
-    "name": "Furminator Replacement Grinding Tips",
-    "brand": "FURminator"
-  },
-  {
-    "id": 1339,
-    "name": "Freshnclean Scented Shampoo",
-    "brand": "PetAg"
-  },
-  {
-    "id": 2451,
-    "name": "Lilpals Extra Small Collar Top08",
-    "brand": "Li'l Pals"
   },
   {
     "id": 6299,
@@ -7535,24 +3925,9 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 3394,
-    "name": "Coastal Ww520 Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 4576,
     "name": "Nylabone FlexiChew Giant",
     "brand": "Nylabone"
-  },
-  {
-    "id": 3995,
-    "name": "Coastal Black12\" Security Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 809,
-    "name": "Skouts Honor Flea Yard Spray",
-    "brand": "Skout's Honor"
   },
   {
     "id": 4997,
@@ -7560,19 +3935,14 @@
     "brand": "Aqueon"
   },
   {
+    "id": 1041,
+    "name": "Prevue Hendrix Cozy Corner Large",
+    "brand": "Prevue"
+  },
+  {
     "id": 5157,
     "name": "Aquaplt 8' Plant Green",
     "brand": "Penn-Plax"
-  },
-  {
-    "id": 3421,
-    "name": "Coastal Sla18\" Soy Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1280,
-    "name": "Biogroom Natuscen Desert Sham",
-    "brand": "Bio Groom"
   },
   {
     "id": 4879,
@@ -7605,18 +3975,8 @@
     "brand": "Diamond"
   },
   {
-    "id": 3695,
-    "name": "Coastal Orange 6' 906 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 3581,
     "name": "Coastal Pink Bright Small Harness",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3313,
-    "name": "Coastal Leash Lsk06' 46936",
     "brand": "Coastal"
   },
   {
@@ -7645,24 +4005,9 @@
     "brand": ""
   },
   {
-    "id": 3657,
-    "name": "Coastal Bzs20\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3293,
-    "name": "Coastal Collar Biothane Org14\"",
-    "brand": "Coastal"
-  },
-  {
     "id": 4488,
     "name": "Redbarn Large Collagen Stick",
     "brand": "RedBarn"
-  },
-  {
-    "id": 2723,
-    "name": "Lilpals Latex Cofee Macroons",
-    "brand": "Li'l Pals"
   },
   {
     "id": 5984,
@@ -7685,59 +4030,14 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 2106,
-    "name": "Vital Cat Salmon Bites",
-    "brand": "Vital Essentials"
-  },
-  {
-    "id": 173,
-    "name": "Nature Zone Bearded Color",
-    "brand": "Nature Zone"
-  },
-  {
-    "id": 1318,
-    "name": "Biogroom Ear Mite Treatment",
-    "brand": "Bio Groom"
-  },
-  {
     "id": 5366,
     "name": "Naturals Log Medium",
     "brand": "Prevue"
   },
   {
-    "id": 560,
-    "name": "Exoterra Jungle Vine Large",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 3461,
-    "name": "Coastal Cyn12\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3655,
-    "name": "Coastal Dbm20\" Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3933,
-    "name": "Coastal Hunter12\" Buc Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 470,
-    "name": "Zilla Terraium Dish Medium",
-    "brand": "Zilla"
-  },
-  {
     "id": 5716,
     "name": "Fluval Biofoam 206/207 6month",
     "brand": "Fluval"
-  },
-  {
-    "id": 1447,
-    "name": "Naturvet Cardiovascular Support",
-    "brand": "NaturVet"
   },
   {
     "id": 3782,
@@ -7755,24 +4055,9 @@
     "brand": "Science Diet"
   },
   {
-    "id": 3317,
-    "name": "Coastal Leash Gxy06\" 46936",
-    "brand": "Coastal"
-  },
-  {
     "id": 5778,
     "name": "Replacement Parts",
     "brand": ""
-  },
-  {
-    "id": 1886,
-    "name": "Quiet Time Bed Pink 36\"",
-    "brand": "Quiet Time"
-  },
-  {
-    "id": 3970,
-    "name": "Coastal Red24\" 2901 Collar",
-    "brand": "Coastal"
   },
   {
     "id": 5017,
@@ -7780,29 +4065,14 @@
     "brand": "Marineland"
   },
   {
-    "id": 3518,
-    "name": "Coastal Pkt06' Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 5752,
     "name": "Fluval 105/205 Intake Stem",
     "brand": "Fluval"
   },
   {
-    "id": 3660,
-    "name": "Coastal Shb26\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 4240,
     "name": "Kaytee Water Bottle Holder Small",
     "brand": "Kaytee"
-  },
-  {
-    "id": 343,
-    "name": "Exoterra Uvb150 26w Desert",
-    "brand": "Exo Terra"
   },
   {
     "id": 4536,
@@ -7815,23 +4085,8 @@
     "brand": "Taste of the Wild"
   },
   {
-    "id": 2677,
-    "name": "Rascals 5.5\" Sball Db",
-    "brand": "Rascals"
-  },
-  {
     "id": 3891,
     "name": "Coastal Neon Pink26\" 2901 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1797,
-    "name": "Kong Cloud Large",
-    "brand": "Kong"
-  },
-  {
-    "id": 2583,
-    "name": "Coastal Medium Dinosaurs20 Collar",
     "brand": "Coastal"
   },
   {
@@ -7840,34 +4095,14 @@
     "brand": "Barkworthies"
   },
   {
-    "id": 3371,
-    "name": "Coastal Org14\" Waterproof Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 6273,
     "name": "Nutrisource Large Breed Puppy Chicken & Rice Recipe 26lb",
     "brand": "Nutrisource"
   },
   {
-    "id": 1367,
-    "name": "Nature's Miracle Oxy Set in Stain",
-    "brand": "Nature's Miracle"
-  },
-  {
-    "id": 3289,
-    "name": "Coastal Collar Biothane Ylw24\"",
-    "brand": "Coastal"
-  },
-  {
     "id": 3234,
     "name": "Coastal Leash Black Bones 06\"' 466",
     "brand": "Coastal"
-  },
-  {
-    "id": 492,
-    "name": "Reptomin Floating Turtle Sticks 10.59oz",
-    "brand": "Tetra"
   },
   {
     "id": 3892,
@@ -7900,19 +4135,9 @@
     "brand": "SmartBones"
   },
   {
-    "id": 2040,
-    "name": "Coastal Collar Green12",
-    "brand": "Coastal"
-  },
-  {
     "id": 4618,
     "name": "Benebone Small Wishbone Chicken",
     "brand": "Benebone"
-  },
-  {
-    "id": 2031,
-    "name": "Coastal Collar Shc12",
-    "brand": "Coastal"
   },
   {
     "id": 3616,
@@ -7925,19 +4150,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 1988,
-    "name": "Nature's Miracle Advance No Spray",
-    "brand": "Nature's Miracle"
-  },
-  {
     "id": 2599,
     "name": "Medium New Orleans Saints Saints Leash",
     "brand": "Pets First"
-  },
-  {
-    "id": 324,
-    "name": "Exoterra Monsoon Solo",
-    "brand": "Exo Terra"
   },
   {
     "id": 6678,
@@ -7945,29 +4160,14 @@
     "brand": "Health Extension"
   },
   {
-    "id": 702,
-    "name": "Galap Mossy Dome Hide Small",
-    "brand": "Pangea"
-  },
-  {
     "id": 3763,
     "name": "Coastal Pink Bright30 Harness",
     "brand": "Coastal"
   },
   {
-    "id": 2572,
-    "name": "Circle 14\" Bro 1786s Collar",
-    "brand": "Circle T"
-  },
-  {
     "id": 4088,
     "name": "Oxbow Adult Rat 3lb",
     "brand": "Oxbow"
-  },
-  {
-    "id": 1850,
-    "name": "Weewee Patch Replace Grass Small",
-    "brand": "Wee-Wee"
   },
   {
     "id": 5621,
@@ -7990,19 +4190,9 @@
     "brand": "Wholesome"
   },
   {
-    "id": 1798,
-    "name": "Kong Ez Soft Collar Small",
-    "brand": "Kong"
-  },
-  {
     "id": 5356,
     "name": "Small Plane Wreck",
     "brand": "Penn-Plax"
-  },
-  {
-    "id": 1403,
-    "name": "Ultrajoint for Join Pain Oil",
-    "brand": "Vetriscience"
   },
   {
     "id": 4028,
@@ -8010,39 +4200,14 @@
     "brand": "Kaytee"
   },
   {
-    "id": 1072,
-    "name": "Birdlife Fruit Kabob",
-    "brand": "Birdlife"
-  },
-  {
-    "id": 196,
-    "name": "Pangea Ecodish Mossy Pine",
-    "brand": "Pangea"
-  },
-  {
-    "id": 2653,
-    "name": "Titan Traincllr Fine 18\" 5520",
-    "brand": "Titan"
-  },
-  {
     "id": 5737,
     "name": "Pong Mag Model 5",
     "brand": "Penn-Plax"
   },
   {
-    "id": 1227,
-    "name": "Wild Bird 20 Lbs",
-    "brand": "Kaytee"
-  },
-  {
     "id": 6005,
     "name": "Royal Canin Small Adult Adult Adult Adult 14lb",
     "brand": "Royal Canin"
-  },
-  {
-    "id": 2589,
-    "name": "Coastal Medium Unicorns20 Collar",
-    "brand": "Coastal"
   },
   {
     "id": 6584,
@@ -8060,24 +4225,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 2355,
-    "name": "Tidycat Breeze Litter Pellets",
-    "brand": "Purina"
-  },
-  {
-    "id": 1471,
-    "name": "Pet Honesty Multivita 10in1",
-    "brand": "Pet Honesty"
-  },
-  {
     "id": 6092,
     "name": "Diamond Puppy 6lb",
     "brand": "Diamond"
-  },
-  {
-    "id": 3996,
-    "name": "Coastal Red26\" Security Collar",
-    "brand": "Coastal"
   },
   {
     "id": 5216,
@@ -8090,44 +4240,9 @@
     "brand": "Fluval"
   },
   {
-    "id": 1691,
-    "name": "Vanness 16oz Double",
-    "brand": "Van Ness"
-  },
-  {
     "id": 4897,
     "name": "PetOdor Lavender & Chamomile Car",
     "brand": "Specialty Pet Products"
-  },
-  {
-    "id": 2207,
-    "name": "Spot Jittery Pets Fish",
-    "brand": "Spot"
-  },
-  {
-    "id": 1364,
-    "name": "Skoutshonor Carpet Machine Solution",
-    "brand": "Skout's Honor"
-  },
-  {
-    "id": 759,
-    "name": "Exoterra Aquatic Turtle Kit 20l",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 308,
-    "name": "Zoo Med Nano Cermaic 25w",
-    "brand": "Zoo Med"
-  },
-  {
-    "id": 190,
-    "name": "Zilla Non Locking Clips 29 or Smaller",
-    "brand": "Zilla"
-  },
-  {
-    "id": 1647,
-    "name": "Snappy Fit Stainless Steel Bowls 4c",
-    "brand": "MidWest Homes For Pets"
   },
   {
     "id": 5655,
@@ -8138,21 +4253,6 @@
     "id": 5694,
     "name": "Fluvalsea Cp2 Pump",
     "brand": "Fluval"
-  },
-  {
-    "id": 2495,
-    "name": "Lilpals Extra Small Collar Red08",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 2622,
-    "name": "Coastal 6' Llamas 969 Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2878,
-    "name": "Mammoth Small Color Bone",
-    "brand": "Mammoth"
   },
   {
     "id": 4948,
@@ -8170,26 +4270,6 @@
     "brand": "Grandma Lucy's"
   },
   {
-    "id": 2632,
-    "name": "Coastal Small Unicorns14 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1217,
-    "name": "Birdlife Gravel Paper11x17",
-    "brand": "Birdlife"
-  },
-  {
-    "id": 2229,
-    "name": "Kong Batabout Vibez Butterfly 2pk",
-    "brand": "Kong"
-  },
-  {
-    "id": 2691,
-    "name": "JW Pet Pet Pet Pet Puppy Hol-ee Roller",
-    "brand": "JW Pet"
-  },
-  {
     "id": 5565,
     "name": "Aquaclear Powerhead Attach",
     "brand": "Fluval"
@@ -8200,29 +4280,9 @@
     "brand": "Blue Buffalo"
   },
   {
-    "id": 3863,
-    "name": "Coastal Black20\" 901 Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 6447,
     "name": "Wholesome Sensitive 30lb",
     "brand": "Wholesome"
-  },
-  {
-    "id": 202,
-    "name": "Zilla Water Pillow",
-    "brand": "Zilla"
-  },
-  {
-    "id": 815,
-    "name": "Advantage Shampoo Cat",
-    "brand": "Elanco"
-  },
-  {
-    "id": 1671,
-    "name": "Dogit Go Slow M Black",
-    "brand": "Hagen"
   },
   {
     "id": 5466,
@@ -8235,43 +4295,8 @@
     "brand": "Benebone"
   },
   {
-    "id": 467,
-    "name": "Zilla Terraced Dish Large",
-    "brand": "Zilla"
-  },
-  {
     "id": 3741,
     "name": "Coastal Neon Pink24 Harness",
-    "brand": "Coastal"
-  },
-  {
-    "id": 1156,
-    "name": "California Blend Parrot",
-    "brand": "Higgins"
-  },
-  {
-    "id": 2705,
-    "name": "Lilpals Pigdog Mesh Toy",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 2397,
-    "name": "Naturallyfresh Ultra Odor 14 lb",
-    "brand": "Naturally Fresh"
-  },
-  {
-    "id": 2365,
-    "name": "Vanness Sifting Cat Pan",
-    "brand": "Van Ness"
-  },
-  {
-    "id": 1329,
-    "name": "Nature's Miracle Freshing Spray",
-    "brand": "Nature's Miracle"
-  },
-  {
-    "id": 3988,
-    "name": "Coastal Red22\" Training Collar",
     "brand": "Coastal"
   },
   {
@@ -8295,24 +4320,9 @@
     "brand": "Fluval"
   },
   {
-    "id": 4003,
-    "name": "Coastal Blue24\" 2924 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 4798,
     "name": "Finleys Bkd Blue & Coconut",
     "brand": "Finley's"
-  },
-  {
-    "id": 865,
-    "name": "Birdlife E-cuttlebone 2 Pack",
-    "brand": "Birdlife"
-  },
-  {
-    "id": 2776,
-    "name": "Spot Sknz Ex Quilted Fox",
-    "brand": "Spot"
   },
   {
     "id": 5074,
@@ -8320,19 +4330,9 @@
     "brand": "Hikari"
   },
   {
-    "id": 311,
-    "name": "Zoo Med Nano Infrared Heat 40w",
-    "brand": "Zoo Med"
-  },
-  {
     "id": 6446,
     "name": "Wholesome Sensitive Salmon 30lb",
     "brand": "Wholesome"
-  },
-  {
-    "id": 2022,
-    "name": "Coastal Collar Ste12",
-    "brand": "Coastal"
   },
   {
     "id": 5330,
@@ -8350,11 +4350,6 @@
     "brand": "Science Diet"
   },
   {
-    "id": 3696,
-    "name": "Coastal Orange 6' 406 Leash",
-    "brand": "Coastal"
-  },
-  {
     "id": 5337,
     "name": "Gary Large",
     "brand": "Penn-Plax"
@@ -8362,11 +4357,6 @@
   {
     "id": 2588,
     "name": "Coastal Large Frosted Donuts26 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3460,
-    "name": "Coastal Cyn14\" Collar",
     "brand": "Coastal"
   },
   {
@@ -8380,74 +4370,14 @@
     "brand": "Benebone"
   },
   {
-    "id": 2179,
-    "name": "Spot Colored Burlap Mice 3pk",
-    "brand": "Spot"
-  },
-  {
-    "id": 983,
-    "name": "Birdlife 19\" Cement Perches",
-    "brand": "Birdlife"
-  },
-  {
-    "id": 1003,
-    "name": "Birdlife Twin Rings with Turning Beads",
-    "brand": "Birdlife"
-  },
-  {
     "id": 6279,
     "name": "Nutrisource Adult Small Bites Chicken & Rice Recipe 12lb",
     "brand": "Nutrisource"
   },
   {
-    "id": 2036,
-    "name": "Coastal Collar Blue12",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2612,
-    "name": "Titan G3320 Traincollarprg",
-    "brand": "Titan"
-  },
-  {
-    "id": 795,
-    "name": "Harris Diatomaceous Earth 10.5lb",
-    "brand": "Harris"
-  },
-  {
     "id": 4470,
     "name": "Redbarn Bully Ring",
     "brand": "RedBarn"
-  },
-  {
-    "id": 1487,
-    "name": "Durvet Ivermectin Pour on",
-    "brand": "Durvet"
-  },
-  {
-    "id": 1237,
-    "name": "Topperformance Fresh Pet",
-    "brand": "Freshpet"
-  },
-  {
-    "id": 1768,
-    "name": "Fourpaws 20' Cotton Train Leash",
-    "brand": "Four Paws"
-  },
-  {
-    "id": 1516,
-    "name": "Safari De-matting Comb",
-    "brand": "Safari"
-  },
-  {
-    "id": 2268,
-    "name": "Meowijuana Get Cheesy Toy",
-    "brand": "SmarterPaw"
-  },
-  {
-    "id": 1973,
-    "name": "Petag Kmr 2nd Step Powder",
-    "brand": "PetAg"
   },
   {
     "id": 3123,
@@ -8465,96 +4395,6 @@
     "brand": "SmartBones"
   },
   {
-    "id": 3266,
-    "name": "Coastal Leash Wdf6' 666",
-    "brand": "Coastal"
-  },
-  {
-    "id": 3956,
-    "name": "Coastal Blue10\" 301 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2354,
-    "name": "Tidycat Breeze Litter Box",
-    "brand": "Purina"
-  },
-  {
-    "id": 121,
-    "name": "Nature Zone Bites and Bits Gecko",
-    "brand": "Nature Zone"
-  },
-  {
-    "id": 188,
-    "name": "Exoterra Screen Clips Small",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1398,
-    "name": "Naturvet Emotional Support Daily Aid",
-    "brand": "NaturVet"
-  },
-  {
-    "id": 1937,
-    "name": "Safari Cat Nail Trimmer",
-    "brand": "Safari"
-  },
-  {
-    "id": 1478,
-    "name": "Happy Jack Itch No More Shampoo",
-    "brand": "Happy"
-  },
-  {
-    "id": 1104,
-    "name": "Playfuls Though Puff",
-    "brand": "Playfuls"
-  },
-  {
-    "id": 2480,
-    "name": "Lilpals Harness Lbp14",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 199,
-    "name": "Pangea L Micro Dish",
-    "brand": "Pangea"
-  },
-  {
-    "id": 909,
-    "name": "Vitapol Smackers Snacks Straw",
-    "brand": "Vitapol"
-  },
-  {
-    "id": 2669,
-    "name": "Rascals Jumbo Burger",
-    "brand": "Rascals"
-  },
-  {
-    "id": 2399,
-    "name": "Naturallyfresh Multicat 26lb",
-    "brand": "Naturally Fresh"
-  },
-  {
-    "id": 1409,
-    "name": "Zymox Topical Cream",
-    "brand": "Zymox"
-  },
-  {
-    "id": 508,
-    "name": "Exoterra Turtle Cleaner",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 524,
-    "name": "Exoterra Turtle Island",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 2458,
-    "name": "Lilpals Small Collar Leb12",
-    "brand": "Li'l Pals"
-  },
-  {
     "id": 6659,
     "name": "Zignature Turkey 25lb",
     "brand": "Zignature"
@@ -8563,21 +4403,6 @@
     "id": 3043,
     "name": "Kong Flyer Small",
     "brand": "Kong"
-  },
-  {
-    "id": 2441,
-    "name": "Lilpals Extra Small Collar Dpm08",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 2744,
-    "name": "Doggiejuana Tuffer Chewer",
-    "brand": "SmarterPaw"
-  },
-  {
-    "id": 161,
-    "name": "Exoterra Calcium 15.9 oz",
-    "brand": "Exo Terra"
   },
   {
     "id": 5928,
@@ -8595,16 +4420,6 @@
     "brand": "Diamond"
   },
   {
-    "id": 1562,
-    "name": "Furminator Bathing Brush",
-    "brand": "FURminator"
-  },
-  {
-    "id": 1806,
-    "name": "Thunder Shirt Sport M",
-    "brand": "Thunder Shirt"
-  },
-  {
     "id": 4616,
     "name": "Benebone Large Wishbone Chicken",
     "brand": "Benebone"
@@ -8615,44 +4430,9 @@
     "brand": "Blue Buffalo"
   },
   {
-    "id": 528,
-    "name": "Flukers Grub Bag Turtle Treats",
-    "brand": "Fluker's"
-  },
-  {
     "id": 3805,
     "name": "Coastal Pink Bright14\" Buck Collar",
     "brand": "Coastal"
-  },
-  {
-    "id": 1240,
-    "name": "Timmy Holedigger",
-    "brand": "Penn-Plax"
-  },
-  {
-    "id": 2136,
-    "name": "Fussiecat Mackrel Puree 4pk",
-    "brand": "Fussie Cat"
-  },
-  {
-    "id": 2564,
-    "name": "Circle Black04\" Leash",
-    "brand": ""
-  },
-  {
-    "id": 4635,
-    "name": "SmartBones 6sm Peanut Butter",
-    "brand": "SmartBones"
-  },
-  {
-    "id": 1192,
-    "name": "Prevue 18x18",
-    "brand": "Prevue"
-  },
-  {
-    "id": 840,
-    "name": "Turbo Sponge Ball",
-    "brand": "Turbo"
   },
   {
     "id": 4906,
@@ -8660,54 +4440,9 @@
     "brand": ""
   },
   {
-    "id": 2884,
-    "name": "Mamm Medium Color Bone",
-    "brand": "Mammoth"
-  },
-  {
-    "id": 660,
-    "name": "Exoterra Crocodile Skull",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 2131,
-    "name": "Fussiecat Tuna Puree 4pk",
-    "brand": "Fussie Cat"
-  },
-  {
-    "id": 124,
-    "name": "Exoterra Mealworms",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 6266,
     "name": "RedBarn Large Breed With Grain 22lb",
     "brand": "RedBarn"
-  },
-  {
-    "id": 1540,
-    "name": "Safari Shedding Comb Long Hair",
-    "brand": "Safari"
-  },
-  {
-    "id": 2359,
-    "name": "Catit Peahusk Lavender Litter",
-    "brand": "Catit"
-  },
-  {
-    "id": 1514,
-    "name": "Safari the Complete Dog Brush",
-    "brand": "Safari"
-  },
-  {
-    "id": 2591,
-    "name": "Coastal Medium Llamas20 Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2922,
-    "name": "Nylabone Puppy Teething Rings",
-    "brand": "Nylabone"
   },
   {
     "id": 6405,
@@ -8720,49 +4455,14 @@
     "brand": "RedBarn"
   },
   {
-    "id": 2500,
-    "name": "Lilpals Small Harness Ryppsm",
-    "brand": "Li'l Pals"
-  },
-  {
     "id": 5391,
     "name": "Grotto Crner Medium",
     "brand": "Exo Terra"
   },
   {
-    "id": 2974,
-    "name": "Kong Sheilds Tropics Octo Medium",
-    "brand": "Kong"
-  },
-  {
-    "id": 776,
-    "name": "Exoterra Faunarium Small",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 2724,
-    "name": "Rascals 3\" Hdghog",
-    "brand": "Rascals"
-  },
-  {
     "id": 6302,
     "name": "Nutrisource Grain Free Weight Management 26lb",
     "brand": "Nutrisource"
-  },
-  {
-    "id": 2468,
-    "name": "Lilpals Small Collar Ryp12",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 758,
-    "name": "Zilla Aquatic Turtle Kit 20l",
-    "brand": "Zilla"
-  },
-  {
-    "id": 2507,
-    "name": "Lilpals Extra Small Collar Npk08",
-    "brand": ""
   },
   {
     "id": 5002,
@@ -8775,94 +4475,14 @@
     "brand": "Oxbow"
   },
   {
-    "id": 4002,
-    "name": "Coastal Mbn26\" Security Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 4574,
-    "name": "Nylabone DuraChew Regular Bacon",
-    "brand": "Nylabone"
-  },
-  {
-    "id": 3794,
-    "name": "Coastal Blue 26\" Martingale Collar",
-    "brand": "Coastal"
-  },
-  {
-    "id": 248,
-    "name": "Exoterra Intense Basking 75w",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 411,
-    "name": "Exoterra Glow Light Large",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1261,
-    "name": "Skoutshonor Prohotspot Hydrogel",
-    "brand": "Skout's Honor"
-  },
-  {
-    "id": 1655,
-    "name": "Bellabowl Pink Large",
-    "brand": "Bellabowl"
-  },
-  {
-    "id": 668,
-    "name": "Exoterra Tortoie Cave",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 695,
-    "name": "Pangea Gecko Feeding Ledge",
-    "brand": "Pangea"
-  },
-  {
-    "id": 2525,
-    "name": "Lilpals Extra Small Harness Bllpxs",
-    "brand": "Li'l Pals"
-  },
-  {
     "id": 5130,
     "name": "Aquascapes Midnight River",
     "brand": "Penn-Plax"
   },
   {
-    "id": 676,
-    "name": "Komodo Anthurium Bush",
-    "brand": "Komodo"
-  },
-  {
-    "id": 1818,
-    "name": "Bergan Poo Bag Dispenser",
-    "brand": "Bergan"
-  },
-  {
-    "id": 849,
-    "name": "Turbo Hairy",
-    "brand": "Turbo"
-  },
-  {
-    "id": 2118,
-    "name": "Catit Nibbly Shrimp Grills",
-    "brand": "Catit"
-  },
-  {
-    "id": 1284,
-    "name": "Magiccoat Tangles & Mats",
-    "brand": "Four Paws"
-  },
-  {
     "id": 5830,
     "name": "Marineland 75 Tank & Stand",
     "brand": "Marineland"
-  },
-  {
-    "id": 3463,
-    "name": "Coastal Mtn18\" Collar",
-    "brand": "Coastal"
   },
   {
     "id": 6404,
@@ -8900,16 +4520,6 @@
     "brand": "Cadet"
   },
   {
-    "id": 745,
-    "name": "Exoterra Mini X-tall",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 86,
-    "name": "Exoterra 20g L Sand Mat",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 4910,
     "name": "Pet House Lavender Wax",
     "brand": "Pethouse"
@@ -8918,11 +4528,6 @@
     "id": 4704,
     "name": "Fruitables Sweet Potato",
     "brand": "Fruitables"
-  },
-  {
-    "id": 3396,
-    "name": "Coastal Ww220 Collar",
-    "brand": "Coastal"
   },
   {
     "id": 3554,
@@ -8935,69 +4540,14 @@
     "brand": "Frisco"
   },
   {
-    "id": 1789,
-    "name": "Happy Ride Safty Harness 45-75",
-    "brand": "Happy"
-  },
-  {
-    "id": 1359,
-    "name": "Weeaway Skunk Eliminator",
-    "brand": "Wee-Away"
-  },
-  {
-    "id": 1674,
-    "name": "Petmate 4gal Water Replenisher",
-    "brand": "Petmate"
-  },
-  {
-    "id": 2765,
-    "name": "Spot Skinz Mallard Duck",
-    "brand": "Spot"
-  },
-  {
-    "id": 2775,
-    "name": "Spot Sknz Stretch & Squeak",
-    "brand": "Spot"
-  },
-  {
-    "id": 1840,
-    "name": "Weewee House Breaking Aid Spray",
-    "brand": "Wee-Wee"
-  },
-  {
     "id": 6619,
     "name": "Blue Buffalo Delight Grain Free Chicken 3.5 oz",
     "brand": "Blue Buffalo"
   },
   {
-    "id": 2621,
-    "name": "Coastal 6' Llamas 469 Leash",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2729,
-    "name": "Multipet Small Loofadog",
-    "brand": "Multipet"
-  },
-  {
     "id": 4669,
     "name": "Fresh Kisses Medium Mint Box",
     "brand": "Merrick"
-  },
-  {
-    "id": 200,
-    "name": "Exoterra Food Cup Holder",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 744,
-    "name": "Exoterra Snake Starter Kit 20gal",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 172,
-    "name": "Nature Zone Bearded Viatmin",
-    "brand": "Nature Zone"
   },
   {
     "id": 3590,
@@ -9008,16 +4558,6 @@
     "id": 5744,
     "name": "Aquatop Max Flow 607 Gal",
     "brand": "Aquatop"
-  },
-  {
-    "id": 1385,
-    "name": "Banixx Spray 32 oz",
-    "brand": "Banixx"
-  },
-  {
-    "id": 257,
-    "name": "Exoterra Night Heat 15w",
-    "brand": "Exo Terra"
   },
   {
     "id": 6080,
@@ -9035,39 +4575,9 @@
     "brand": "Aquatop"
   },
   {
-    "id": 2282,
-    "name": "Catlife Jungle Slope Activity Cen",
-    "brand": "Penn-Plax"
-  },
-  {
     "id": 5770,
     "name": "Laguna Float Thermometer",
     "brand": "Hagen"
-  },
-  {
-    "id": 2745,
-    "name": "Doggiejuana Getthe Munchies",
-    "brand": "SmarterPaw"
-  },
-  {
-    "id": 2471,
-    "name": "Lilpals Small Collar Pwh12",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 1439,
-    "name": "Naturvet Stool Ease",
-    "brand": "NaturVet"
-  },
-  {
-    "id": 222,
-    "name": "Komodo Dandelion Kit",
-    "brand": "Komodo"
-  },
-  {
-    "id": 2788,
-    "name": "Spot Fun Candy Twisted Whisker",
-    "brand": "Spot"
   },
   {
     "id": 4355,
@@ -9100,31 +4610,6 @@
     "brand": "RedBarn"
   },
   {
-    "id": 661,
-    "name": "Exoterra Trex Skull",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1410,
-    "name": "Zymox Topical Spray",
-    "brand": "Zymox"
-  },
-  {
-    "id": 3286,
-    "name": "Coastal Collar Biothane Green24\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 729,
-    "name": "Zoo Med Crab Gitd Dual Meter",
-    "brand": "Zoo Med"
-  },
-  {
-    "id": 1787,
-    "name": "Kong Ez Cone Collar X-Large",
-    "brand": "Kong"
-  },
-  {
     "id": 4522,
     "name": "Tuesdays Rocky Mountain Oysters",
     "brand": "Tuesday's Natural Dog Company"
@@ -9135,24 +4620,9 @@
     "brand": "Higgins"
   },
   {
-    "id": 1811,
-    "name": "Weewee Spring Actial Scoop Medium",
-    "brand": "Wee-Wee"
-  },
-  {
     "id": 4742,
     "name": "Blue Buffalo Health Bars Pumpkin",
     "brand": "Blue Buffalo"
-  },
-  {
-    "id": 2947,
-    "name": "Kong Scamp Red Panda Medium",
-    "brand": "Kong"
-  },
-  {
-    "id": 1525,
-    "name": "Safari Long Hair Slicker Medium",
-    "brand": "Safari"
   },
   {
     "id": 5840,
@@ -9165,19 +4635,9 @@
     "brand": "Fluval"
   },
   {
-    "id": 1646,
-    "name": "Small Kennel Cup",
-    "brand": "Penn-Plax"
-  },
-  {
     "id": 5484,
     "name": "Cascade 150/200 Flt Cartridge",
     "brand": "Cascade"
-  },
-  {
-    "id": 380,
-    "name": "Exoterra Terraskyuv 9w",
-    "brand": "Exo Terra"
   },
   {
     "id": 5765,
@@ -9193,16 +4653,6 @@
     "id": 5732,
     "name": "Fluval C2 Active Carbon 3pk",
     "brand": "Fluval"
-  },
-  {
-    "id": 1669,
-    "name": "Dogit Go Slow Extra Small Blue",
-    "brand": "Hagen"
-  },
-  {
-    "id": 2688,
-    "name": "Lilpals 2\" Grnball",
-    "brand": "Li'l Pals"
   },
   {
     "id": 5342,
@@ -9230,29 +4680,9 @@
     "brand": "Fluval"
   },
   {
-    "id": 1207,
-    "name": "Cozy Cotton Nesting Material",
-    "brand": "Lixit"
-  },
-  {
-    "id": 1483,
-    "name": "Ideal Syrflex Bandage",
-    "brand": "Ideal"
-  },
-  {
-    "id": 420,
-    "name": "Exoterra Scorpion Light 15 Led",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 5561,
     "name": "Undergrvel Filter 10g",
     "brand": "Penn-Plax"
-  },
-  {
-    "id": 621,
-    "name": "Exoterra Infrared Thermo",
-    "brand": "Exo Terra"
   },
   {
     "id": 6506,
@@ -9275,11 +4705,6 @@
     "brand": "Science Diet"
   },
   {
-    "id": 716,
-    "name": "Zoo Med White Hermit Crab Sand",
-    "brand": "Zoo Med"
-  },
-  {
     "id": 5559,
     "name": "Aqueon Smart Clean Filter 5-15g",
     "brand": "Aqueon"
@@ -9300,11 +4725,6 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 4214,
-    "name": "Kaytee Pine 9.8l",
-    "brand": "Kaytee"
-  },
-  {
     "id": 12,
     "name": "4 Pound Land Recipe",
     "brand": "RedBarn"
@@ -9315,24 +4735,9 @@
     "brand": "VICTOR"
   },
   {
-    "id": 916,
-    "name": "Sunburst Fruits and Veggies",
-    "brand": "Sunburst"
-  },
-  {
-    "id": 569,
-    "name": "Flukers Bend a Branch",
-    "brand": "Fluker's"
-  },
-  {
     "id": 4098,
     "name": "Round Lake Farm Yng Gpig 4lb",
     "brand": "Round Lake Farm"
-  },
-  {
-    "id": 2139,
-    "name": "Churo Tuna 4pk",
-    "brand": "Inaba"
   },
   {
     "id": 4982,
@@ -9340,39 +4745,14 @@
     "brand": "Smokehouse"
   },
   {
-    "id": 3704,
-    "name": "Coastal Orange 26\" 2901 Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 3235,
     "name": "Coastal Leash Black Bones 06\"' 366",
     "brand": "Coastal"
   },
   {
-    "id": 153,
-    "name": "Zilla Vitamin Super",
-    "brand": "Zilla"
-  },
-  {
     "id": 5513,
     "name": "Undergravel Upgrade Kit",
     "brand": "Penn-Plax"
-  },
-  {
-    "id": 689,
-    "name": "Exoterra Boxwood Bush",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 2479,
-    "name": "Lilpals Harness Zpk14",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 3643,
-    "name": "Coastal Raf06' Leash",
-    "brand": ""
   },
   {
     "id": 3567,
@@ -9385,49 +4765,9 @@
     "brand": "Coastal"
   },
   {
-    "id": 1100,
-    "name": "Happybeaks Stacked Blocks",
-    "brand": "A&E Cage Co"
-  },
-  {
-    "id": 514,
-    "name": "Turtle Pier Extender Clips",
-    "brand": "Zoo Med"
-  },
-  {
-    "id": 1636,
-    "name": "Large Breed Dog Bottle",
-    "brand": "Lixit"
-  },
-  {
-    "id": 2367,
-    "name": "Breederselect Cat Litter 20l",
-    "brand": "Breeder Celect"
-  },
-  {
-    "id": 137,
-    "name": "Zilla Cricket Drink",
-    "brand": "Zilla"
-  },
-  {
-    "id": 341,
-    "name": "Exoterra Uvb200 13w Intense",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 5546,
     "name": "Marineland Active Crbn 10oz",
     "brand": "Marineland"
-  },
-  {
-    "id": 674,
-    "name": "Exoterra Saguard Cactus Small",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 636,
-    "name": "Exoterra Wet Rock Large",
-    "brand": "Exo Terra"
   },
   {
     "id": 4482,
@@ -9440,26 +4780,6 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 707,
-    "name": "Zoo Med Habba Hut Medium",
-    "brand": "Zoo Med"
-  },
-  {
-    "id": 1363,
-    "name": "Perfect Coat Unscented Shamp",
-    "brand": "Perfect Coat"
-  },
-  {
-    "id": 1414,
-    "name": "Naturvet Vitapet Puppy",
-    "brand": "NaturVet"
-  },
-  {
-    "id": 2193,
-    "name": "Blue Wilderness Chick & Turkey Treat",
-    "brand": "Blue Buffalo"
-  },
-  {
     "id": 4535,
     "name": "Benebone Medium Puppy Wishbone Bacon",
     "brand": "Benebone"
@@ -9468,11 +4788,6 @@
     "id": 4330,
     "name": "Kaytee Lava Block",
     "brand": "Kaytee"
-  },
-  {
-    "id": 154,
-    "name": "Zillla Calcium Supplement",
-    "brand": "Zilla"
   },
   {
     "id": 5518,
@@ -9490,11 +4805,6 @@
     "brand": "Science Diet"
   },
   {
-    "id": 3270,
-    "name": "Coastal Leash Csr6' 666",
-    "brand": "Coastal"
-  },
-  {
     "id": 5551,
     "name": "Forza Fz13 Uv Canister Filter",
     "brand": "Forza"
@@ -9503,16 +4813,6 @@
     "id": 6047,
     "name": "Taste of the Wild Ancient Mountain 5lb",
     "brand": "Taste of the Wild"
-  },
-  {
-    "id": 150,
-    "name": "Nature Zone Mite Guard",
-    "brand": "Nature Zone"
-  },
-  {
-    "id": 2110,
-    "name": "Vital Cat Chicken Hearts",
-    "brand": "Vital Essentials"
   },
   {
     "id": 5620,
@@ -9535,11 +4835,6 @@
     "brand": "Zignature"
   },
   {
-    "id": 3646,
-    "name": "Coastal Bzs14\" Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 6219,
     "name": "Blue Buffalo Small Breed 5lb",
     "brand": "Blue Buffalo"
@@ -9548,31 +4843,6 @@
     "id": 6083,
     "name": "Diamond Grain Free Frozen 28lb",
     "brand": "Diamond"
-  },
-  {
-    "id": 1529,
-    "name": "Safari Self Cleaning Slicker Small",
-    "brand": "Safari"
-  },
-  {
-    "id": 1177,
-    "name": "Zupreem Natural Parrot & Conure",
-    "brand": "ZuPreem"
-  },
-  {
-    "id": 1151,
-    "name": "Higgins Sunburst Cockatiel",
-    "brand": "Higgins"
-  },
-  {
-    "id": 914,
-    "name": "Higgins Duets Parrots & Macaws",
-    "brand": "Higgins"
-  },
-  {
-    "id": 2690,
-    "name": "Lilpals 4\" Monkey",
-    "brand": "Li'l Pals"
   },
   {
     "id": 5519,
@@ -9585,16 +4855,6 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 4637,
-    "name": "SmartBones 16 Mini Peanut Butter",
-    "brand": "SmartBones"
-  },
-  {
-    "id": 3842,
-    "name": "Coastal Purple12\" Buck Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 5056,
     "name": "Aqualife Stand Airline Tube 25ft",
     "brand": "Aqualife"
@@ -9603,26 +4863,6 @@
     "id": 5083,
     "name": "Airpod 75g",
     "brand": "Penn-Plax"
-  },
-  {
-    "id": 2958,
-    "name": "Kong Wub Friends Ballis Extra Large",
-    "brand": "Kong"
-  },
-  {
-    "id": 1049,
-    "name": "Birdlife Activity Center Extra Small",
-    "brand": "Birdlife"
-  },
-  {
-    "id": 2911,
-    "name": "Chuckit Fetch Imm 3pk Medium",
-    "brand": "Chuckit!"
-  },
-  {
-    "id": 2751,
-    "name": "Spot Luna-corn",
-    "brand": "Spot"
   },
   {
     "id": 5239,
@@ -9635,11 +4875,6 @@
     "brand": "RedBarn"
   },
   {
-    "id": 162,
-    "name": "Exoterra Calcium 3.2 oz",
-    "brand": "Exo Terra"
-  },
-  {
     "id": 6226,
     "name": "Blue Buffalo Chicken 30lb",
     "brand": "Blue Buffalo"
@@ -9650,24 +4885,9 @@
     "brand": "Scott Pet"
   },
   {
-    "id": 3806,
-    "name": "Coastal Blue 16\" 401 Collar",
-    "brand": "Coastal"
-  },
-  {
     "id": 5160,
     "name": "Aquatip Vibrant Pass Pink Plant 16\"",
     "brand": "Aquatop"
-  },
-  {
-    "id": 3165,
-    "name": "Kong Puppy Large",
-    "brand": "Kong"
-  },
-  {
-    "id": 3469,
-    "name": "Coastal Oce18\" Collar",
-    "brand": "Coastal"
   },
   {
     "id": 6210,
@@ -9695,69 +4915,14 @@
     "brand": "Penn-Plax"
   },
   {
-    "id": 2135,
-    "name": "Fussiecat Oceanfish Puree 4pk",
-    "brand": "Fussie Cat"
-  },
-  {
-    "id": 1392,
-    "name": "Canine Red Cell",
-    "brand": "Farnam"
-  },
-  {
-    "id": 1420,
-    "name": "Naturvet Pet Electrolyte",
-    "brand": "NaturVet"
-  },
-  {
-    "id": 1219,
-    "name": "Birdlife Gravel Paper 9x12",
-    "brand": "Birdlife"
-  },
-  {
     "id": 4996,
     "name": "Aqueon 14\" Led Bbl Wand",
     "brand": "Aqueon"
   },
   {
-    "id": 862,
-    "name": "Birdlife Fruit Dipped Cuttle Bone 2pk",
-    "brand": "Birdlife"
-  },
-  {
     "id": 3683,
     "name": "Sunburst Ord10\" Collar",
     "brand": "Sunburst"
-  },
-  {
-    "id": 724,
-    "name": "Tetra Hermit Crab Cakes",
-    "brand": "Tetra"
-  },
-  {
-    "id": 2392,
-    "name": "Feline Pine 7lb Litter",
-    "brand": "Arm & Hammer"
-  },
-  {
-    "id": 2357,
-    "name": "Catit Peahusk Vanilla Litter",
-    "brand": "Catit"
-  },
-  {
-    "id": 2565,
-    "name": "Circle Brk04\" Leash",
-    "brand": "Circle T"
-  },
-  {
-    "id": 1804,
-    "name": "Carelift Rear Support Harness L",
-    "brand": "PetSafe"
-  },
-  {
-    "id": 2717,
-    "name": "Jolly Pets 8\" Soccerball Blue",
-    "brand": "Jolly Pets"
   },
   {
     "id": 4054,
@@ -9770,26 +4935,6 @@
     "brand": "Kaytee"
   },
   {
-    "id": 2542,
-    "name": "Circle 16\" Tan 1105 Collar",
-    "brand": "Circle T"
-  },
-  {
-    "id": 376,
-    "name": "Exoterra Screen Cover 20 Gallon Long",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 2443,
-    "name": "Lilpals Extra Small Collar Rwb08",
-    "brand": "Li'l Pals"
-  },
-  {
-    "id": 170,
-    "name": "Nature Zone Bearded Dragon Pro",
-    "brand": "Nature Zone"
-  },
-  {
     "id": 4139,
     "name": "Oxbow Timothy Club Bungalow Medium",
     "brand": "Oxbow"
@@ -9800,39 +4945,9 @@
     "brand": "Fluval"
   },
   {
-    "id": 3288,
-    "name": "Coastal Collar Biothane Ylw21\"",
-    "brand": "Coastal"
-  },
-  {
     "id": 5249,
     "name": "Hippie Hounds 250mg Dog Drops",
     "brand": "Hippie Hounds"
-  },
-  {
-    "id": 1255,
-    "name": "Skoutshonor Proitchrelief Shamp",
-    "brand": "Skout's Honor"
-  },
-  {
-    "id": 72,
-    "name": "Exoterra Canopy Worm Dish",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1243,
-    "name": "White Dalmation Cologne",
-    "brand": "Ethical Pet"
-  },
-  {
-    "id": 1905,
-    "name": "Petcrest Brown Round Bed 25in",
-    "brand": "PetCrest"
-  },
-  {
-    "id": 637,
-    "name": "Exoterra Wet Rock Medium",
-    "brand": "Exo Terra"
   },
   {
     "id": 5228,
@@ -9845,21 +4960,6 @@
     "brand": "Nylabone"
   },
   {
-    "id": 3665,
-    "name": "Coastal Red Medium Pwrwalker",
-    "brand": "Coastal"
-  },
-  {
-    "id": 2746,
-    "name": "Doggiejuana Get Outside",
-    "brand": "SmarterPaw"
-  },
-  {
-    "id": 2793,
-    "name": "Spot Sooth Tabbie Lambie 8\"",
-    "brand": "Ethical Pet"
-  },
-  {
     "id": 4434,
     "name": "Redbarn Chewabulls Brush Small",
     "brand": "RedBarn"
@@ -9868,21 +4968,6 @@
     "id": 3802,
     "name": "Coastal Pink Bright14\" Martingale Collar",
     "brand": "Coastal"
-  },
-  {
-    "id": 3193,
-    "name": "Coastal Collar Black Bones 20\"\"",
-    "brand": "Coastal"
-  },
-  {
-    "id": 483,
-    "name": "Lagoon 11\" Oval",
-    "brand": "Penn-Plax"
-  },
-  {
-    "id": 518,
-    "name": "Reptology Carbon Cartridge 175",
-    "brand": "Reptology"
   },
   {
     "id": 4416,
@@ -9905,11 +4990,6 @@
     "brand": "Coastal"
   },
   {
-    "id": 2469,
-    "name": "Lilpals Small Collar Tgd12",
-    "brand": "Li'l Pals"
-  },
-  {
     "id": 4984,
     "name": "Smokehouse Gullet Stick",
     "brand": "Smokehouse"
@@ -9918,11 +4998,6 @@
     "id": 4866,
     "name": "Wholesome Rewards Nut R Nipz",
     "brand": "Wholesome"
-  },
-  {
-    "id": 2178,
-    "name": "Spot House Mouse Helen",
-    "brand": "Spot"
   },
   {
     "id": 4584,
@@ -9945,11 +5020,6 @@
     "brand": "Aquatop"
   },
   {
-    "id": 806,
-    "name": "Tropiclean Natrl Flea & Tick Home Spray",
-    "brand": "TropiClean"
-  },
-  {
     "id": 4578,
     "name": "Nylabone FlexiChew Regular",
     "brand": "Nylabone"
@@ -9970,28 +5040,8 @@
     "brand": "Aquatop"
   },
   {
-    "id": 2491,
-    "name": "Lilpals Small Collar Blu10",
-    "brand": "Li'l Pals"
-  },
-  {
     "id": 3621,
     "name": "Coastal Gray Red Extra Extra Small Harness",
-    "brand": "Coastal"
-  },
-  {
-    "id": 687,
-    "name": "Exoterra Jade Cactus",
-    "brand": "Exo Terra"
-  },
-  {
-    "id": 1733,
-    "name": "Cat/Doglife Filter Cartridge Replace",
-    "brand": "Dog Life"
-  },
-  {
-    "id": 3712,
-    "name": "Coastal Orange 26\" Buck Collar",
     "brand": "Coastal"
   },
   {

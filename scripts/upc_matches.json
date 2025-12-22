@@ -2,8 +2,8 @@
   {
     "productId": 6750,
     "productName": "Fromm PurrSnickety Game Bird Recipe 6oz",
-    "upc": "072705137251",
-    "upcName": "FROMM pur sni game 6oz",
+    "upc": "072705114443",
+    "upcName": "FROMM game bird 4#",
     "score": 0.5
   },
   {
@@ -21,6 +21,13 @@
     "score": 0.5
   },
   {
+    "productId": 3380,
+    "productName": "Coastal Ww206 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
     "productId": 3676,
     "productName": "Coastal Blue Large Pwrwalker",
     "upc": "048081211694",
@@ -35,6 +42,34 @@
     "score": 0.5
   },
   {
+    "productId": 3647,
+    "productName": "Coastal Bzs12\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3301,
+    "productName": "Coastal Collar Bmb26\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3948,
+    "productName": "Coastal Blue18\" 601 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 5344,
+    "productName": "Shark Jaw",
+    "upc": "180181909498",
+    "upcName": "TUFFY T-OC-SHARK-EM",
+    "score": 0.5
+  },
+  {
     "productId": 6559,
     "productName": "IAMS Puppy 13oz",
     "upc": "019014610945",
@@ -42,10 +77,17 @@
     "score": 0.6666666666666666
   },
   {
+    "productId": 5273,
+    "productName": "Seasme Big Bird",
+    "upc": "071859949161",
+    "upcName": "Kaytee Fiesta Big Bird",
+    "score": 0.5
+  },
+  {
     "productId": 5615,
     "productName": "Aqueon T8 Floramax 24\"l",
-    "upc": "015905012300",
-    "upcName": "AQUEON 7.5w heater",
+    "upc": "015905000697",
+    "upcName": "AQUEON 5w heater",
     "score": 0.5
   },
   {
@@ -56,11 +98,60 @@
     "score": 0.5
   },
   {
+    "productId": 3229,
+    "productName": "Coastal Leash Skx06' 366",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3383,
+    "productName": "Coastal Wwl26 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3662,
+    "productName": "Coastal Raf26\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3385,
+    "productName": "Coastal Ctn26 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 4340,
     "productName": "Nibbles Small Pet Chew",
     "upc": "048081010709",
     "upcName": "Small Oval Pet Nest",
     "score": 0.5
+  },
+  {
+    "productId": 5434,
+    "productName": "Rock & Branch Scape",
+    "upc": "030172101922",
+    "upcName": "Reptology Rock Scape",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3400,
+    "productName": "Coastal Ww214 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3364,
+    "productName": "Coastal Autumn26\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
   },
   {
     "productId": 4756,
@@ -70,17 +161,10 @@
     "score": 0.6666666666666666
   },
   {
-    "productId": 531,
-    "productName": "Exoterra Moss Ball",
-    "upc": "015561113441",
-    "upcName": "FLUVAL moss ball",
-    "score": 0.6666666666666666
-  },
-  {
     "productId": 6491,
     "productName": "Zignature Lamb 13oz",
-    "upc": "640461012138",
-    "upcName": "CANID lamb 13oz",
+    "upc": "888641131211",
+    "upcName": "ZIGN lamb 13oz",
     "score": 0.6666666666666666
   },
   {
@@ -91,10 +175,38 @@
     "score": 0.6666666666666666
   },
   {
-    "productId": 83,
-    "productName": "Zoo Med Mesh Large",
-    "upc": "097612300291",
-    "upcName": "ZOO MED betta thermoneter",
+    "productId": 5321,
+    "productName": "Destiny in Water Small",
+    "upc": "015561228015",
+    "upcName": "ExoTerra Water Dish Small",
+    "score": 0.5
+  },
+  {
+    "productId": 3393,
+    "productName": "Coastal Cto20 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3411,
+    "productName": "Coastal Fsa26\" Soy Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3854,
+    "productName": "Coastal Black04' 404 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 4391,
+    "productName": "Oxbow Small Hidenseek Mat",
+    "upc": "015561225625",
+    "upcName": "ExoTerr Small Sand Mat",
     "score": 0.5
   },
   {
@@ -105,10 +217,80 @@
     "score": 0.5
   },
   {
-    "productId": 654,
-    "productName": "Exoterra Cholla Cage Large",
-    "upc": "048801031575",
-    "upcName": "Empire Large Bird Cage",
+    "productId": 3359,
+    "productName": "Coastal Autumn14\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3282,
+    "productName": "Coastal Collar Wdf12\"",
+    "upc": "076484067532",
+    "upcName": "COASTAL CC WDF12",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3252,
+    "productName": "Coastal Leash Pdt06' 666",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3526,
+    "productName": "Coastal Sls18\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 4722,
+    "productName": "Dogswell Hip & Joint Jerky",
+    "upc": "645095001541",
+    "upcName": "FreshBreathe Hip&Joint 16oz",
+    "score": 0.5
+  },
+  {
+    "productId": 3649,
+    "productName": "Coastal Mlm12\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3223,
+    "productName": "Coastal Collar Rwp26\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 27,
+    "productName": "Exoterra Biothane Drain",
+    "upc": "015561231152",
+    "upcName": "ExoTerra Bio Drain",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3352,
+    "productName": "Coastal Autumn06' 12626 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3198,
+    "productName": "Coastal Collar Btd26\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3263,
+    "productName": "Coastal Leash Tpd6' 966",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
@@ -119,11 +301,60 @@
     "score": 0.5
   },
   {
+    "productId": 3908,
+    "productName": "Coastal Hunter06' 906 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3982,
+    "productName": "Coastal Red12\" 401 Collar",
+    "upc": "076484672347",
+    "upcName": "COASTAL CC RED12",
+    "score": 0.5
+  },
+  {
     "productId": 6873,
     "productName": "Blue Buffalo Cat Wilderness Salmon 5.5oz",
-    "upc": "859610007684",
-    "upcName": "BLUE BUF cat wild turkey 5.5oz",
+    "upc": "859610008315",
+    "upcName": "Blue Wilderness Chnk&Duck Cat Treats",
     "score": 0.5
+  },
+  {
+    "productId": 3650,
+    "productName": "Coastal Shb14\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3214,
+    "productName": "Coastal Collar Wdf20\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3408,
+    "productName": "Coastal Crn06' Soy Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3303,
+    "productName": "Coastal Collar Lks12\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3645,
+    "productName": "Coastal Dgm12\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
   },
   {
     "productId": 5253,
@@ -133,6 +364,20 @@
     "score": 0.6
   },
   {
+    "productId": 3653,
+    "productName": "Coastal Raf12\" Collar",
+    "upc": "076484670381",
+    "upcName": "COASTAL CC RAF12",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3268,
+    "productName": "Coastal Leash Btd6' 666",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
     "productId": 4729,
     "productName": "Blue Buffalo Bits Salmon",
     "upc": "840243105359",
@@ -140,10 +385,38 @@
     "score": 0.5
   },
   {
+    "productId": 3417,
+    "productName": "Coastal Ony08\" Soy Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3246,
+    "productName": "Coastal Collar Tsa12\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 869,
     "productName": "JW Pet Pet Pet Pet Clean Cup Small",
-    "upc": "048081010709",
-    "upcName": "Small Oval Pet Nest",
+    "upc": "618940313090",
+    "upcName": "JW Clean Cup MED",
+    "score": 0.5
+  },
+  {
+    "productId": 4106,
+    "productName": "Sweet Harvest Gpig 4lb",
+    "upc": "720101222155",
+    "upcName": "Sweet Harvest Chilli Pepper",
+    "score": 0.5
+  },
+  {
+    "productId": 4180,
+    "productName": "Kaytee Critter Play Pen",
+    "upc": "097612090413",
+    "upcName": "ZooMed tortoise play pen",
     "score": 0.5
   },
   {
@@ -154,10 +427,10 @@
     "score": 0.6666666666666666
   },
   {
-    "productId": 4242,
-    "productName": "Lock Crock 10oz",
-    "upc": "076711007430",
-    "upcName": "LIX BOWL SS CROCK 10OZ",
+    "productId": 3320,
+    "productName": "Coastal Leash Hrw06' 46436",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
@@ -168,17 +441,31 @@
     "score": 0.6
   },
   {
-    "productId": 1061,
-    "productName": "Smartplay Bird Toy",
-    "upc": "004081875056",
-    "upcName": "Twisty's Snacks Bird Toy",
+    "productId": 677,
+    "productName": "Zoo Med Tillandsia Air Plant",
+    "upc": "097612180640",
+    "upcName": "ZooMed Tillandsia Air plant",
+    "score": 0.6
+  },
+  {
+    "productId": 3226,
+    "productName": "Coastal Leash Pbo06' 466",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
-    "productId": 677,
-    "productName": "Zoo Med Tillandsia Air Plant",
-    "upc": "097612241211",
-    "upcName": "ZOO MED betta papaya plant",
+    "productId": 3269,
+    "productName": "Coastal Leash Csr6' 966",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 2889,
+    "productName": "Mammoth Small Extra Monkey Fist",
+    "upc": "746772200865",
+    "upcName": "MAMMOTH SM MONKEY FIST BLL",
     "score": 0.6
   },
   {
@@ -187,6 +474,13 @@
     "upc": "030172085758",
     "upcName": "shorefins™ LED Air Stone",
     "score": 0.5
+  },
+  {
+    "productId": 3185,
+    "productName": "Coastal Collar Pbo26\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
   },
   {
     "productId": 5441,
@@ -245,6 +539,13 @@
     "score": 0.5
   },
   {
+    "productId": 3468,
+    "productName": "Coastal Oce26\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 5050,
     "productName": "Marina Air Stone 10cm",
     "upc": "030172085758",
@@ -266,11 +567,32 @@
     "score": 0.5
   },
   {
+    "productId": 3238,
+    "productName": "Coastal Leash Wdf06' 466",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 2105,
+    "productName": "Shepherd Boy Freezedried Minnows",
+    "upc": "860193002072",
+    "upcName": "Shepboy Freezedried Minnows",
+    "score": 0.5
+  },
+  {
     "productId": 5030,
     "productName": "Lok-tite 4gang Valve",
     "upc": "030172191206",
     "upcName": "Cascade™ Lok-Tite® 2-Gang Valve",
     "score": 0.6
+  },
+  {
+    "productId": 1154,
+    "productName": "Higgins Sunburst Parrot",
+    "upc": "046706302345",
+    "upcName": "Higgins Sunburts Parrot",
+    "score": 0.6666666666666666
   },
   {
     "productId": 5449,
@@ -280,32 +602,95 @@
     "score": 0.6
   },
   {
-    "productId": 864,
-    "productName": "Captain Cuttlebone",
-    "upc": "713733591706",
-    "upcName": "E2 CUTTLEBONE PERCH",
-    "score": 0.5
-  },
-  {
-    "productId": 271,
-    "productName": "Zilla Mini Halogen Bulb 25w Blue",
-    "upc": "096316156302",
-    "upcName": "ZIL LAMP HALOGEN MINI WH 25W",
+    "productId": 3375,
+    "productName": "Coastal Wwo06 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
     "productId": 4187,
     "productName": "Oxbow Rectangle Litter Pan",
-    "upc": "048081004883",
-    "upcName": "Corner Litter Pan",
+    "upc": "029695421761",
+    "upcName": "PetMate Hooded Litter Pan Lg",
     "score": 0.5
+  },
+  {
+    "productId": 2594,
+    "productName": "Coastal Large Pineapples26 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3215,
+    "productName": "Coastal Collar Btd14\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3561,
+    "productName": "Coastal Red Medium Harness",
+    "upc": "076484630347",
+    "upcName": "COASTAL CATSOFTMESHHARN RED",
+    "score": 0.5
+  },
+  {
+    "productId": 3277,
+    "productName": "Coastal Leash Ppa6' 61976",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3201,
+    "productName": "Coastal Collar Csr20\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3391,
+    "productName": "Coastal Wwl20 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 5437,
+    "productName": "Mossy Rock Scape 2",
+    "upc": "030172101922",
+    "upcName": "Reptology Rock Scape",
+    "score": 0.6666666666666666
   },
   {
     "productId": 5884,
     "productName": "Dog Polo Purple Large",
-    "upc": "048081111697",
-    "upcName": "Large Snuggle Sack (Purple)",
+    "upc": "076711006853",
+    "upcName": "Large Breed Dog Bottle",
     "score": 0.5
+  },
+  {
+    "productId": 3204,
+    "productName": "Coastal Collar Pbo12\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 5435,
+    "productName": "Mossy Rock Scape",
+    "upc": "030172101922",
+    "upcName": "Reptology Rock Scape",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 1274,
+    "productName": "Wash Away Green Tea Shamp",
+    "upc": "850024364684",
+    "upcName": "WashAway Green Tea Shamp",
+    "score": 0.6
   },
   {
     "productId": 5040,
@@ -313,6 +698,27 @@
     "upc": "030172002908",
     "upcName": "shorefins™ Bendable Bubble Wall 35.5\"",
     "score": 0.5
+  },
+  {
+    "productId": 2435,
+    "productName": "Lilpals Extra Small Collar Gbn08",
+    "upc": "076484062292",
+    "upcName": "LILPALS XS COLLAR GBN08",
+    "score": 0.6
+  },
+  {
+    "productId": 3221,
+    "productName": "Coastal Collar Ppa26\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3527,
+    "productName": "Coastal Suf18\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
   },
   {
     "productId": 5380,
@@ -329,17 +735,45 @@
     "score": 0.6666666666666666
   },
   {
+    "productId": 3961,
+    "productName": "Coastal Red04' 904 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3389,
+    "productName": "Coastal Ww226 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 6604,
+    "productName": "Blue Buffalo Wilderness Duck 12.5oz",
+    "upc": "859610008315",
+    "upcName": "Blue Wilderness Chnk&Duck Cat Treats",
+    "score": 0.5
+  },
+  {
     "productId": 6169,
     "productName": "Fromm Beef Frittata Veg 12lb",
-    "upc": "072705114122",
-    "upcName": "FROMM beef frittata 12#",
+    "upc": "072705114146",
+    "upcName": "FROMM beef frittata 4# ",
     "score": 0.6
+  },
+  {
+    "productId": 730,
+    "productName": "Zoo Med Crab Gitd Climbing Branch",
+    "upc": "097612009521",
+    "upcName": "ZooMed Crab GITD Climbing Branch",
+    "score": 0.6666666666666666
   },
   {
     "productId": 5343,
     "productName": "Stone Hideaway Small 2in",
-    "upc": "048081110324",
-    "upcName": "Saguaro Hideaway Small",
+    "upc": "030172079887",
+    "upcName": "Reptology Granite Stone hideaway Lg",
     "score": 0.5
   },
   {
@@ -350,13 +784,6 @@
     "score": 0.6666666666666666
   },
   {
-    "productId": 14,
-    "productName": "Lizard Lounger",
-    "upc": "030172086809",
-    "upcName": "Reptology™ Lizard-Lounger™ - Small",
-    "score": 0.5
-  },
-  {
     "productId": 5331,
     "productName": "Medium Sea Patrol Chase",
     "upc": "030172080005",
@@ -364,10 +791,17 @@
     "score": 0.5
   },
   {
+    "productId": 319,
+    "productName": "Exoterra Mini Mister",
+    "upc": "000561224895",
+    "upcName": "ExoTerra Mini Mister",
+    "score": 1
+  },
+  {
     "productId": 6911,
     "productName": "Primal Broth Chicken",
-    "upc": "854496006356",
-    "upcName": "PRIMAL broth turkey",
+    "upc": "854496006325",
+    "upcName": "PRIMAL broth beef",
     "score": 0.6666666666666666
   },
   {
@@ -385,11 +819,18 @@
     "score": 0.5
   },
   {
-    "productId": 2112,
-    "productName": "Vital Cat Duck Liver",
-    "upc": "840199697014",
-    "upcName": "VITAL ESSEN cat duck 28oz",
-    "score": 0.6
+    "productId": 3285,
+    "productName": "Coastal Collar Biothane Blue24\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 4331,
+    "productName": "Friend Fries",
+    "upc": "030172095771",
+    "upcName": "Finch Fries",
+    "score": 0.5
   },
   {
     "productId": 5294,
@@ -413,6 +854,20 @@
     "score": 0.6
   },
   {
+    "productId": 4357,
+    "productName": "Oxbow Cozy Cave",
+    "upc": "842229129571",
+    "upcName": "Sm Furhaven  cozy cave",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 739,
+    "productName": "Zoo Med Growth Shell Extra Large",
+    "upc": "097612009361",
+    "upcName": "ZooMed Growth Shell Med",
+    "score": 0.5
+  },
+  {
     "productId": 5369,
     "productName": "Frozen Elsa",
     "upc": "030172092091",
@@ -420,24 +875,38 @@
     "score": 0.5
   },
   {
+    "productId": 3851,
+    "productName": "Coastal Black06' 606 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
     "productId": 607,
     "productName": "Zoo Med High Range Reptile Thermometer",
-    "upc": "030172060366",
-    "upcName": "Reptology™ High-Range Digital Thermometer",
+    "upc": "097612300109",
+    "upcName": "Zoomed High range Reptile Therm",
+    "score": 0.5
+  },
+  {
+    "productId": 3278,
+    "productName": "Coastal Leash Ppa6' 61476",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
     "productId": 712,
     "productName": "Zoo Med Hermit Crab Habitat Kit",
-    "upc": "097612241402",
-    "upcName": "ZOO MED betta kit",
-    "score": 0.5
+    "upc": "097612091397",
+    "upcName": "ZooMed Hermit Crab Habitat kit",
+    "score": 0.6666666666666666
   },
   {
-    "productId": 1071,
-    "productName": "Playfuls Club",
-    "upc": "048081626061",
-    "upcName": "Club",
+    "productId": 3321,
+    "productName": "Coastal Leash Bmb06' 46936",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
@@ -445,6 +914,34 @@
     "productName": "Cat Chow 3.15lb",
     "upc": "017800150187",
     "upcName": "CAT CHOW ind 3.15#",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 4008,
+    "productName": "Coastal Red12\" 2912 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 4918,
+    "productName": "Pet House Citrus Spray",
+    "upc": "645095861329",
+    "upcName": "Tropiclean BbyPwder Pet Spray",
+    "score": 0.5
+  },
+  {
+    "productId": 3659,
+    "productName": "Coastal Mlm20\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3686,
+    "productName": "Sunburst Red10\" Collar",
+    "upc": "076484322273",
+    "upcName": "LILPALS SM COLLAR RED10",
     "score": 0.6666666666666666
   },
   {
@@ -462,11 +959,25 @@
     "score": 0.5
   },
   {
+    "productId": 4933,
+    "productName": "Banixx Spray 2fl oz",
+    "upc": "897227002036",
+    "upcName": "Banixx Spray 8oz",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 5139,
     "productName": "Sinkers Water Lily White Medium",
     "upc": "030172055492",
     "upcName": "Tide & Treasure™ Water Lily - White - 10\"",
     "score": 0.6
+  },
+  {
+    "productId": 3237,
+    "productName": "Coastal Leash Tdp06' 366",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
   },
   {
     "productId": 4072,
@@ -476,6 +987,13 @@
     "score": 0.6
   },
   {
+    "productId": 3462,
+    "productName": "Coastal Mtn26\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 5262,
     "productName": "Frozen Mini Elsa",
     "upc": "030172092091",
@@ -483,10 +1001,45 @@
     "score": 0.5
   },
   {
+    "productId": 3239,
+    "productName": "Coastal Leash Wdf06 366",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3197,
+    "productName": "Coastal Collar Nbp26\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3663,
+    "productName": "Coastal Raf20\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 5885,
     "productName": "Dog Polo Purple Medium",
     "upc": "048081716500",
     "upcName": "Medium Snuggle Sack (Purple)",
+    "score": 0.5
+  },
+  {
+    "productId": 5424,
+    "productName": "Rainbow Rock Small",
+    "upc": "015561220002",
+    "upcName": "ExoTerra HeatWave Rock Small",
+    "score": 0.5
+  },
+  {
+    "productId": 3847,
+    "productName": "Coastal Purple14\" 401 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
@@ -497,10 +1050,31 @@
     "score": 0.6666666666666666
   },
   {
+    "productId": 3974,
+    "productName": "Coastal Red20\" Buc Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3830,
+    "productName": "Coastal Purple24\" 2901 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 4102,
+    "productName": "Kaytee Fiesta Rabbit 6.5 lb",
+    "upc": "071859426419",
+    "upcName": "Kaytee Fiesta Cockatiel",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 6538,
     "productName": "Greenies Small Top Chicken 2oz",
-    "upc": "642863117657",
-    "upcName": "GREENIES sm top ck & gr bean 2oz",
+    "upc": "642863117695",
+    "upcName": "Greenies sm top duck 2oz",
     "score": 0.6
   },
   {
@@ -511,6 +1085,20 @@
     "score": 0.5
   },
   {
+    "productId": 3290,
+    "productName": "Coastal Collar Biothane Red24\"",
+    "upc": "076484104916",
+    "upcName": "CIRCLE RED24\" COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 4852,
+    "productName": "Tuesdays 12\" Cllgen Peanut Butter",
+    "upc": "018214828068",
+    "upcName": "NylaBone Toothpaste Peanut Butter",
+    "score": 0.5
+  },
+  {
     "productId": 5792,
     "productName": "Tetra Pond Barley & Peat",
     "upc": "046798162940",
@@ -518,38 +1106,136 @@
     "score": 0.5
   },
   {
-    "productId": 2816,
-    "productName": "Squishmallows Dog Toy",
-    "upc": "035585421230",
-    "upcName": "KON TOY SCRUFFS DOG LG",
-    "score": 0.5
+    "productId": 3395,
+    "productName": "Coastal Ww420 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3531,
+    "productName": "Coastal Snp26\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
   },
   {
     "productId": 6624,
     "productName": "Eukanuba Lamb 13.2oz",
-    "upc": "072705118687",
-    "upcName": "FROMM lamb 12.2oz",
+    "upc": "074198612727",
+    "upcName": "DIAM lamb 13.2oz",
     "score": 0.6666666666666666
   },
   {
-    "productId": 15,
-    "productName": "Lizard Lounger Bridge",
-    "upc": "030172086809",
-    "upcName": "Reptology™ Lizard-Lounger™ - Small",
+    "productId": 3967,
+    "productName": "Coastal Red26\" Mbuc Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
-    "productId": 2115,
-    "productName": "Flavorfullz Salmon",
-    "upc": "723633778053",
-    "upcName": "NB salmon sm br 4#",
+    "productId": 3281,
+    "productName": "Coastal Leash Wdf6' 966",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
-    "productId": 1076,
-    "productName": "Playfuls Volcano Flower",
-    "upc": "040081623970",
-    "upcName": "Volcano Flower",
+    "productId": 3454,
+    "productName": "Coastal Mdw14\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3866,
+    "productName": "Coastal Black20\" Buck Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3519,
+    "productName": "Coastal Snp12\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 4570,
+    "productName": "Nylabone DuraChew Regular",
+    "upc": "018214823384",
+    "upcName": "NYLABONE DURACHEW RING LRG",
+    "score": 0.5
+  },
+  {
+    "productId": 3292,
+    "productName": "Coastal Collar Biothane Green14\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3864,
+    "productName": "Coastal Black18\" 901 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3418,
+    "productName": "Coastal Crn18\" Soy Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 706,
+    "productName": "Zoo Med Habba Hut Large",
+    "upc": "097612200836",
+    "upcName": "ZooMed Habba Hut Large",
+    "score": 0.6
+  },
+  {
+    "productId": 3456,
+    "productName": "Coastal Des14\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3254,
+    "productName": "Coastal Leash Pbo06' 666",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 82,
+    "productName": "Galapagos Desert Environment Cling",
+    "upc": "759834054221",
+    "upcName": "Galap. Desert Envi. Cling",
+    "score": 0.5
+  },
+  {
+    "productId": 3360,
+    "productName": "Coastal Lwo12\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3406,
+    "productName": "Coastal Ony06' Soy Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3361,
+    "productName": "Coastal Pwy14\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.6666666666666666
   },
   {
@@ -562,15 +1248,57 @@
   {
     "productId": 6222,
     "productName": "Blue Buffalo Lamb 15lb",
-    "upc": "840243105687",
-    "upcName": "BLUE B sm br lamb 15#",
+    "upc": "840243144129",
+    "upcName": "BLUE B sm br lamb 5#",
     "score": 0.5
+  },
+  {
+    "productId": 6327,
+    "productName": "Eukanuba Large Breed 30lb",
+    "upc": "076711006853",
+    "upcName": "Large Breed Dog Bottle",
+    "score": 0.5
+  },
+  {
+    "productId": 4307,
+    "productName": "Kaytee Chinchiller",
+    "upc": "071859998497",
+    "upcName": "Kaytee Yo Dips",
+    "score": 0.5
+  },
+  {
+    "productId": 2019,
+    "productName": "Coastal Collar Sog12",
+    "upc": "076484670749",
+    "upcName": "COASTAL CC SOG12",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 2634,
+    "productName": "Coastal Small Llamas14 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3453,
+    "productName": "Coastal Mtn12\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
   },
   {
     "productId": 5617,
     "productName": "Aqueon T8 Fullspec 36\"l",
-    "upc": "015905012300",
-    "upcName": "AQUEON 7.5w heater",
+    "upc": "015905000697",
+    "upcName": "AQUEON 5w heater",
+    "score": 0.5
+  },
+  {
+    "productId": 2590,
+    "productName": "Coastal Large Unicorns26 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
@@ -588,24 +1316,45 @@
     "score": 0.6
   },
   {
-    "productId": 617,
-    "productName": "Exoterra Hygrometer",
-    "upc": "030172060342",
-    "upcName": "Reptology™ Hygrometer",
+    "productId": 2523,
+    "productName": "Lilpals Extra Small Harness Ordpxs",
+    "upc": "076484163869",
+    "upcName": "LILPALS XS HARNESS ORDPXS",
+    "score": 0.6
+  },
+  {
+    "productId": 3356,
+    "productName": "Coastal Pwy06' 12626 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
-    "productId": 1831,
-    "productName": "Coastal Mesh Muzzle Size 6",
-    "upc": "076484706670",
-    "upcName": "CP BestFit Mesh Muzzle 03 BLK",
+    "productId": 3921,
+    "productName": "Coastal Hunter20\" Mbuc Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
+  },
+  {
+    "productId": 2636,
+    "productName": "Coastal Small Pineapples14 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3296,
+    "productName": "Coastal Collar Lsk18\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
   },
   {
     "productId": 6875,
     "productName": "Freshpet Beef,Bison 1lb",
-    "upc": "627975011246",
-    "upcName": "\"FRESHPET vit gr fr beef",
+    "upc": "851893001823",
+    "upcName": "\"FRESHPET beef",
     "score": 0.5
   },
   {
@@ -616,11 +1365,39 @@
     "score": 0.5
   },
   {
+    "productId": 3412,
+    "productName": "Coastal Sla06' Soy Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
     "productId": 5785,
     "productName": "Api Pond Simply Clear",
-    "upc": "317163011119",
-    "upcName": "API accu clear 1.25oz",
+    "upc": "317163041116",
+    "upcName": "API accu clear 4oz",
     "score": 0.5
+  },
+  {
+    "productId": 81,
+    "productName": "Galapagos Forest Environment Cling",
+    "upc": "759834054214",
+    "upcName": "galap. Forest enviroment Cling",
+    "score": 0.5
+  },
+  {
+    "productId": 4560,
+    "productName": "Nylabone DuraChew Wishbone Regular",
+    "upc": "018214823384",
+    "upcName": "NYLABONE DURACHEW RING LRG",
+    "score": 0.5
+  },
+  {
+    "productId": 3470,
+    "productName": "Coastal Cyn26\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
   },
   {
     "productId": 6158,
@@ -630,11 +1407,32 @@
     "score": 0.6666666666666666
   },
   {
+    "productId": 3637,
+    "productName": "Coastal Bzs06' Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
     "productId": 6170,
     "productName": "Fromm Beef Frittata Veg 26lb",
-    "upc": "072705114122",
-    "upcName": "FROMM beef frittata 12#",
+    "upc": "072705114146",
+    "upcName": "FROMM beef frittata 4# ",
     "score": 0.6
+  },
+  {
+    "productId": 3821,
+    "productName": "Coastal Purple04' 904 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 2082,
+    "productName": "Coastal Charm Red18",
+    "upc": "076484063466",
+    "upcName": "COASTAL CHARNESS RED18",
+    "score": 0.6666666666666666
   },
   {
     "productId": 5896,
@@ -644,6 +1442,27 @@
     "score": 0.5
   },
   {
+    "productId": 3249,
+    "productName": "Coastal Collar Rwp18\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 1466,
+    "productName": "Pet Honesty Allergy Support",
+    "upc": "850005524434",
+    "upcName": "PetHonesty Allergy support",
+    "score": 0.5
+  },
+  {
+    "productId": 3309,
+    "productName": "Coastal Collar Hrw12\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 5819,
     "productName": "Cascade Desktop Aquarium Kit",
     "upc": "046798291374",
@@ -651,10 +1470,101 @@
     "score": 0.5
   },
   {
+    "productId": 3308,
+    "productName": "Coastal Leash Gxy06' 46336",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3291,
+    "productName": "Coastal Collar Biothane Ylw14\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3525,
+    "productName": "Coastal Rbg18\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3276,
+    "productName": "Coastal Leash Nbp6' 61476",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 2517,
+    "productName": "Lilpals Extra Small Harness Blupxs",
+    "upc": "076484029738",
+    "upcName": "LILPALS XS HARNESS BLUPXS",
+    "score": 0.6
+  },
+  {
+    "productId": 3322,
+    "productName": "Coastal Leash Bmb06\" 46436",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3203,
+    "productName": "Coastal Collar Pbo14\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3927,
+    "productName": "Coastal Hunter16\" 601 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3403,
+    "productName": "Coastal Ww220 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 5043,
     "productName": "Aqualife 48\" Bend Bubble Wall",
     "upc": "030172002908",
     "upcName": "shorefins™ Bendable Bubble Wall 35.5\"",
+    "score": 0.5
+  },
+  {
+    "productId": 3870,
+    "productName": "Coastal Black14\" Buck Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3843,
+    "productName": "Coastal Purple12\" 301 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3264,
+    "productName": "Coastal Leash Tpd6' 666",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3965,
+    "productName": "Coastal Red04' 404 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
@@ -665,17 +1575,80 @@
     "score": 0.5
   },
   {
-    "productId": 851,
-    "productName": "E-z Feed 6oz",
-    "upc": "015561165860",
-    "upcName": "FLUVAl bottom feed 1.6oz",
+    "productId": 3319,
+    "productName": "Coastal Leash Hrw06' 46936",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
+  },
+  {
+    "productId": 3989,
+    "productName": "Coastal Red16\" Training Collar",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3984,
+    "productName": "Coastal Red12\" Buc Collar",
+    "upc": "076484672347",
+    "upcName": "COASTAL CC RED12",
+    "score": 0.5
+  },
+  {
+    "productId": 4869,
+    "productName": "Wholesome Rewards Peanut Butter",
+    "upc": "018214828068",
+    "upcName": "NylaBone Toothpaste Peanut Butter",
+    "score": 0.5
+  },
+  {
+    "productId": 3865,
+    "productName": "Coastal Black20\" Martingale Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3827,
+    "productName": "Coastal Purple26\" Buck Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3925,
+    "productName": "Coastal Hunter20\" Buc Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 2625,
+    "productName": "Coastal Small Dinosaurs14 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 2024,
+    "productName": "Coastal Collar Rfl12",
+    "upc": "076484673139",
+    "upcName": "COASTAL CC RFL12",
+    "score": 0.6666666666666666
   },
   {
     "productId": 6212,
     "productName": "Blue Buffalo Senior 15lb",
-    "upc": "840243105311",
-    "upcName": "BLUE B sm br senior 15#",
+    "upc": "859610000159",
+    "upcName": "BLUE B senior 15#",
+    "score": 0.5
+  },
+  {
+    "productId": 3859,
+    "productName": "Coastal Black22\" 2901 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
@@ -686,17 +1659,38 @@
     "score": 0.5
   },
   {
+    "productId": 3374,
+    "productName": "Coastal Wwl06 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3861,
+    "productName": "Coastal Black20\" Martingale Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3464,
+    "productName": "Coastal Mdw26\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3533,
+    "productName": "Coastal Sls26\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 5146,
     "productName": "Sinkers Ambulia Green Giant",
     "upc": "030172055669",
     "upcName": "Tide & Treasure™ Ambulia - Green - 24\"",
-    "score": 0.5
-  },
-  {
-    "productId": 939,
-    "productName": "Kaytee Spray Millet Small",
-    "upc": "618940313144",
-    "upcName": "JWP HOLDER MILLET SPRAY",
     "score": 0.5
   },
   {
@@ -709,16 +1703,16 @@
   {
     "productId": 4188,
     "productName": "Prevue Hendrix Corner Litter Pan",
-    "upc": "048081004883",
-    "upcName": "Corner Litter Pan",
+    "upc": "079441004687",
+    "upcName": "VanNess Corner Cat litter Pan",
     "score": 0.6
   },
   {
-    "productId": 178,
-    "productName": "Flukers Small Repta Leash",
-    "upc": "076484807644",
-    "upcName": "PW Retractable Leash Small BLK",
-    "score": 0.5
+    "productId": 3369,
+    "productName": "Coastal Pwy26\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
   },
   {
     "productId": 6546,
@@ -735,10 +1729,38 @@
     "score": 0.6
   },
   {
-    "productId": 967,
-    "productName": "Wacky Wood 24\"",
-    "upc": "048081626818",
-    "upcName": "Wacky Wood Bird Swing",
+    "productId": 2045,
+    "productName": "Coastal Collar Btr12",
+    "upc": "076484761003",
+    "upcName": "COASTAL CC BTR12",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3365,
+    "productName": "Coastal Autumn20\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3860,
+    "productName": "Coastal Black20\" 2901 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3368,
+    "productName": "Coastal Pwy20\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3998,
+    "productName": "Coastal Red12\" Security Collar",
+    "upc": "076484672347",
+    "upcName": "COASTAL CC RED12",
     "score": 0.5
   },
   {
@@ -749,11 +1771,46 @@
     "score": 0.5
   },
   {
+    "productId": 3222,
+    "productName": "Coastal Collar Ppa12\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3634,
+    "productName": "Coastal Dgm06' Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
     "productId": 320,
     "productName": "Zoo Med Big Dripper",
-    "upc": "097612300291",
-    "upcName": "ZOO MED betta thermoneter",
+    "upc": "097612325126",
+    "upcName": "Zoo Med Sm. Mesh",
     "score": 0.5
+  },
+  {
+    "productId": 3638,
+    "productName": "Coastal Mlm06' Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 4005,
+    "productName": "Coastal Red18\" 2918 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 2832,
+    "productName": "Spot Fluff Ball 8.5\"",
+    "upc": "077234521588",
+    "upcName": "SPOT SewMuchFun 3.5 Ball",
+    "score": 0.6666666666666666
   },
   {
     "productId": 5358,
@@ -765,15 +1822,29 @@
   {
     "productId": 5800,
     "productName": "Tetra Uv Clarifier",
-    "upc": "046798786771",
-    "upcName": "TETRA sm or/pk plant",
+    "upc": "046798770251",
+    "upcName": "TETRA goldfish .42",
+    "score": 0.5
+  },
+  {
+    "productId": 3265,
+    "productName": "Coastal Leash Wdf6' 966",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
     "productId": 5475,
     "productName": "Treasure Chest Extra Large",
-    "upc": "080605618596",
-    "upcName": "LW Deluxe Habitat, Extra Large",
+    "upc": "030172104640",
+    "upcName": "Tide & Treasure™ Driftwood - Large - 12-16\"",
+    "score": 0.5
+  },
+  {
+    "productId": 1225,
+    "productName": "Sweet Harvest Cockatiel 20lbs",
+    "upc": "720101222155",
+    "upcName": "Sweet Harvest Chilli Pepper",
     "score": 0.5
   },
   {
@@ -781,6 +1852,20 @@
     "productName": "Velociraptors Small",
     "upc": "030172103841",
     "upcName": "Jurassic Park™ Velociraptors - Small",
+    "score": 0.5
+  },
+  {
+    "productId": 3867,
+    "productName": "Coastal Black18\" 601 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 2864,
+    "productName": "Tuffy T-junior-r-rp",
+    "upc": "180181906350",
+    "upcName": "TUFFY T-U-3WT-CB",
     "score": 0.5
   },
   {
@@ -812,6 +1897,34 @@
     "score": 0.5
   },
   {
+    "productId": 3949,
+    "productName": "Coastal Blue16\" 601 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3521,
+    "productName": "Coastal Sls12\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 4021,
+    "productName": "Coastal Black20\" Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 2800,
+    "productName": "Spot Slithery Snake",
+    "upc": "077234522226",
+    "upcName": "SPOT Squiggly Snake",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 4521,
     "productName": "Happydog Jumbo Elk Antler",
     "upc": "785184200094",
@@ -819,10 +1932,31 @@
     "score": 0.5
   },
   {
+    "productId": 4931,
+    "productName": "Zymox Shampoo Trial",
+    "upc": "667334229028",
+    "upcName": "Zymox Shampoo",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 1469,
+    "productName": "Pet Honesty Hemp Calming",
+    "upc": "850005524021",
+    "upcName": "PetHonesty Hemp Calming",
+    "score": 0.5
+  },
+  {
+    "productId": 1312,
+    "productName": "Tropiclean Vanilla Fascial Cleanser",
+    "upc": "645095869035",
+    "upcName": "TropiClean Facial Cleanser Waterless",
+    "score": 0.5
+  },
+  {
     "productId": 3601,
     "productName": "Coastal Blue Medium Harness",
-    "upc": "048081211687",
-    "upcName": "Medium Snuggle Sack (Blue)",
+    "upc": "004081853169",
+    "upcName": "Medium Snuggle Hut (Blue)",
     "score": 0.5
   },
   {
@@ -831,6 +1965,55 @@
     "upc": "784099025044",
     "upcName": "\"PC 42\"\" single door\"",
     "score": 0.6666666666666666
+  },
+  {
+    "productId": 3536,
+    "productName": "Coastal Pkt26\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 2807,
+    "productName": "Spot Axolotl 6\"",
+    "upc": "077234521090",
+    "upcName": "SPOT Funfetti",
+    "score": 0.5
+  },
+  {
+    "productId": 3997,
+    "productName": "Coastal Red20\" Security Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3853,
+    "productName": "Coastal Black06' 406 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3701,
+    "productName": "Coastal Lime 6' 306 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3271,
+    "productName": "Coastal Leash Ybc6' 61976",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3318,
+    "productName": "Coastal Leash Gxy06' 46436",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
   },
   {
     "productId": 4342,
@@ -854,10 +2037,31 @@
     "score": 0.6
   },
   {
+    "productId": 3424,
+    "productName": "Coastal Fsa18\" Soy Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 4007,
+    "productName": "Coastal Black12\" 2912 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3962,
+    "productName": "Coastal Red06' 606 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
     "productId": 4190,
     "productName": "Kaytee Large High Crnr Litter Pan",
-    "upc": "079441004687",
-    "upcName": "VAN LTTR PAN HIGH SIDE CRNR LG",
+    "upc": "079441004694",
+    "upcName": "VanNess Crnr Enclosed Litter Pan",
     "score": 0.5
   },
   {
@@ -868,17 +2072,59 @@
     "score": 0.5
   },
   {
+    "productId": 3694,
+    "productName": "Coastal Orange 6' 2906 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
     "productId": 6759,
     "productName": "Orijen Cat Guardian 8 4lb",
-    "upc": "064992719388",
-    "upcName": "ORIJEN cat du&ck 3oz",
+    "upc": "064992719340",
+    "upcName": "ORIJEN cat orig 3oz",
     "score": 0.5
+  },
+  {
+    "productId": 3994,
+    "productName": "Coastal Black14\" Security Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 2584,
+    "productName": "Coastal Large Dinosaurs26 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 1895,
+    "productName": "Quiettime Extra Large White Bed",
+    "upc": "027773004912",
+    "upcName": "Quiettime XL white bed",
+    "score": 0.6
+  },
+  {
+    "productId": 3652,
+    "productName": "Coastal Raf14\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3219,
+    "productName": "Coastal Collar Tsa26\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
   },
   {
     "productId": 6754,
     "productName": "Fromm PurrSnickety Game Bird Recipe 10lb",
-    "upc": "072705114429",
-    "upcName": "FROMM game bird 12#",
+    "upc": "072705114443",
+    "upcName": "FROMM game bird 4#",
     "score": 0.5
   },
   {
@@ -891,15 +2137,8 @@
   {
     "productId": 6614,
     "productName": "Blue Buffalo Lamb 12.5oz",
-    "upc": "840243103799",
-    "upcName": "BL BUF basic lamb 12.5oz",
-    "score": 0.5
-  },
-  {
-    "productId": 1097,
-    "productName": "Birdlife Shaggy Kabob",
-    "upc": "030172013478",
-    "upcName": "Bird Life™ Shaggy-Kabob - XL",
+    "upc": "840243144129",
+    "upcName": "BLUE B sm br lamb 5#",
     "score": 0.5
   },
   {
@@ -912,15 +2151,43 @@
   {
     "productId": 6171,
     "productName": "Fromm Game Bird Recipe Bird 4lb",
-    "upc": "072705114429",
-    "upcName": "FROMM game bird 12#",
+    "upc": "072705114443",
+    "upcName": "FROMM game bird 4#",
     "score": 0.6
+  },
+  {
+    "productId": 3199,
+    "productName": "Coastal Collar Btd20\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 513,
+    "productName": "TetraFauna Reptofilter 3 Pack",
+    "upc": "046798260493",
+    "upcName": "TetraFauna ReptoFilter 3 pk",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 2586,
+    "productName": "Coastal Large Aliens26 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 2020,
+    "productName": "Coastal Collar Bsr12",
+    "upc": "076484673108",
+    "upcName": "COASTAL CC BSR12",
+    "score": 0.6666666666666666
   },
   {
     "productId": 4107,
     "productName": "Kaytee Fiesta Gpig 4.5lb",
-    "upc": "071859426549",
-    "upcName": "KAY FOOD FIESTA GPIG 4.5#",
+    "upc": "071859426419",
+    "upcName": "Kaytee Fiesta Cockatiel",
     "score": 0.5
   },
   {
@@ -931,11 +2198,32 @@
     "score": 0.6666666666666666
   },
   {
+    "productId": 4569,
+    "productName": "Nylabone DuraChew Chicken Wolf",
+    "upc": "018214823384",
+    "upcName": "NYLABONE DURACHEW RING LRG",
+    "score": 0.5
+  },
+  {
+    "productId": 3983,
+    "productName": "Coastal Red14\" 401 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
     "productId": 5476,
     "productName": "Treasure Chest Large",
     "upc": "030172104640",
     "upcName": "Tide & Treasure™ Driftwood - Large - 12-16\"",
     "score": 0.5
+  },
+  {
+    "productId": 2617,
+    "productName": "Coastal 6' Frosted Donuts 469 Leash",
+    "upc": "076484994654",
+    "upcName": "COASTAL 6' DNS 469 LEASH",
+    "score": 0.6
   },
   {
     "productId": 4146,
@@ -945,11 +2233,25 @@
     "score": 0.6
   },
   {
+    "productId": 3832,
+    "productName": "Coastal Purple20\" Martingale Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
     "productId": 4181,
     "productName": "A & E Large Corner Shelf",
     "upc": "048081033005",
-    "upcName": "Wood Corner Shelf",
+    "upcName": "PH Wood Corner Shelf",
     "score": 0.6666666666666666
+  },
+  {
+    "productId": 3272,
+    "productName": "Coastal Leash Ybc6' 61476",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
   },
   {
     "productId": 5465,
@@ -959,10 +2261,45 @@
     "score": 0.5
   },
   {
-    "productId": 2550,
-    "productName": "Circle 20\" Red 1106 Collar",
-    "upc": "076484774010",
-    "upcName": "CP Sublim Collar 3/8*08-12 RED",
+    "productId": 2021,
+    "productName": "Coastal Collar Cmo12",
+    "upc": "076484673115",
+    "upcName": "COASTAL CC CMO12",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 4009,
+    "productName": "Coastal Blue12\" 2912 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3664,
+    "productName": "Coastal Red Small Pwrwalker",
+    "upc": "076484630347",
+    "upcName": "COASTAL CATSOFTMESHHARN RED",
+    "score": 0.5
+  },
+  {
+    "productId": 4263,
+    "productName": "Drops Veggie",
+    "upc": "645095001978",
+    "upcName": "FreshBreathe Drops",
+    "score": 0.5
+  },
+  {
+    "productId": 3661,
+    "productName": "Coastal Shb20\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3990,
+    "productName": "Coastal Gry22\" Training Collar",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
@@ -973,38 +2310,122 @@
     "score": 0.5
   },
   {
-    "productId": 966,
-    "productName": "Wacky Wood 14\"",
-    "upc": "048081626818",
-    "upcName": "Wacky Wood Bird Swing",
+    "productId": 3951,
+    "productName": "Coastal Blue14\" Buc Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
-    "productId": 1199,
-    "productName": "Living World Finch Nest",
-    "upc": "048081011515",
-    "upcName": "Finch Covered Nest",
+    "productId": 3914,
+    "productName": "Coastal Hunter06' 306 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
-    "productId": 1692,
-    "productName": "Vanness 1.48 L Double",
-    "upc": "784099025136",
-    "upcName": "\"PC 42\"\" double door\"",
+    "productId": 4000,
+    "productName": "Coastal Mpw26\" Security Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3402,
+    "productName": "Coastal Ww226 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3444,
+    "productName": "Coastal Mdw06' Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3778,
+    "productName": "Coastal Blue 4' 304 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3939,
+    "productName": "Coastal Blue04' 904 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 2839,
+    "productName": "Tuffy T-junior-br-rp",
+    "upc": "180181906350",
+    "upcName": "TUFFY T-U-3WT-CB",
+    "score": 0.5
+  },
+  {
+    "productId": 3915,
+    "productName": "Coastal Hunter26\" Martingale Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
     "productId": 6633,
     "productName": "Pro Plan Large Breed 13oz",
-    "upc": "038100026859",
-    "upcName": "PRO PLAN 7+ beef & ri 13oz",
+    "upc": "038100026712",
+    "upcName": "PRO PLAN pup 13oz",
     "score": 0.6
+  },
+  {
+    "productId": 4579,
+    "productName": "Nylabone FlexiChew Petite",
+    "upc": "018214837824",
+    "upcName": "NYLABONE PUPPYx BONE PETITE",
+    "score": 0.5
+  },
+  {
+    "productId": 3520,
+    "productName": "Coastal Rbg12\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3513,
+    "productName": "Coastal Snp06' Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
   },
   {
     "productId": 4364,
     "productName": "Grassy Nibbler Squash",
     "upc": "048081010808",
     "upcName": "Grassy Nibblers Squash",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3228,
+    "productName": "Coastal Leash Skx06' 466",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3384,
+    "productName": "Coastal Ww026 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3398,
+    "productName": "Coastal Ww514 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.6666666666666666
   },
   {
@@ -1022,10 +2443,66 @@
     "score": 0.5
   },
   {
+    "productId": 2438,
+    "productName": "Lilpals Extra Small Collar Zpk08",
+    "upc": "076484622236",
+    "upcName": "LILPALS XS COLLAR ZPK08",
+    "score": 0.6
+  },
+  {
+    "productId": 3302,
+    "productName": "Coastal Collar Bmb18\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3971,
+    "productName": "Coastal Red22\" 2901 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3644,
+    "productName": "Coastal Dgm14\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3944,
+    "productName": "Coastal Blue26\" Mbuc Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3357,
+    "productName": "Coastal Fwt06' 12926 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3920,
+    "productName": "Coastal Hunter24\" 2901 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
     "productId": 5261,
     "productName": "Frozen Ice Castle/Mini",
     "upc": "030172092114",
     "upcName": "Disney® Frozen Anna - Mini",
+    "score": 0.5
+  },
+  {
+    "productId": 3267,
+    "productName": "Coastal Leash Btd6' 966",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
@@ -1036,18 +2513,11 @@
     "score": 0.5
   },
   {
-    "productId": 997,
-    "productName": "Birdie Basics 2-sided Mirror W Bell",
-    "upc": "048081604222",
-    "upcName": "2-sided Mirror w/ Bell",
+    "productId": 5506,
+    "productName": "Aqueon Replace Filter Cartridge Large",
+    "upc": "030172084652",
+    "upcName": "Cat/DogLife Filter Cartridge Replace",
     "score": 0.6
-  },
-  {
-    "productId": 1110,
-    "productName": "Smartplay Stacker",
-    "upc": "048081626344",
-    "upcName": "Straw Stacker",
-    "score": 0.5
   },
   {
     "productId": 5297,
@@ -1057,10 +2527,31 @@
     "score": 0.5
   },
   {
+    "productId": 3117,
+    "productName": "Kong Dental Bone Medium",
+    "upc": "035585013978",
+    "upcName": "Kong Dental Ball large",
+    "score": 0.5
+  },
+  {
+    "productId": 2444,
+    "productName": "Lilpals Extra Small Collar Gnd08",
+    "upc": "076484622144",
+    "upcName": "LILPALS XS COLLAR GND08",
+    "score": 0.6
+  },
+  {
     "productId": 762,
     "productName": "Zoo Med Reptihabitat 30gal",
-    "upc": "097612300291",
-    "upcName": "ZOO MED betta thermoneter",
+    "upc": "097612325126",
+    "upcName": "Zoo Med Sm. Mesh",
+    "score": 0.5
+  },
+  {
+    "productId": 3669,
+    "productName": "Coastal Pink Large Pwrwalker",
+    "upc": "842982071339",
+    "upcName": "Retro Large Pink Bowl",
     "score": 0.5
   },
   {
@@ -1071,10 +2562,31 @@
     "score": 0.5
   },
   {
-    "productId": 1713,
-    "productName": "Retro Small Blue Bowl",
-    "upc": "048081211670",
-    "upcName": "Small Snuggle Sack (Blue)",
+    "productId": 2439,
+    "productName": "Lilpals Extra Small Collar Lbp08",
+    "upc": "076484410130",
+    "upcName": "LILPALS XS COLLAR LBP08",
+    "score": 0.6
+  },
+  {
+    "productId": 3194,
+    "productName": "Coastal Collar Tpd26\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 2067,
+    "productName": "Coastal Collar Ldb12",
+    "upc": "076484761034",
+    "upcName": "COASTAL CC LDB12",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3936,
+    "productName": "Coastal Blue06' 2906 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
@@ -1092,10 +2604,17 @@
     "score": 0.6666666666666666
   },
   {
-    "productId": 2578,
-    "productName": "Circle 24\" Red 1208 Collar",
-    "upc": "076484774010",
-    "upcName": "CP Sublim Collar 3/8*08-12 RED",
+    "productId": 3388,
+    "productName": "Coastal Ww426 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3943,
+    "productName": "Coastal Blue04' 404 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
@@ -1106,11 +2625,46 @@
     "score": 0.6
   },
   {
+    "productId": 1093,
+    "productName": "Prevue Hendrix Bodacious Bites",
+    "upc": "048081619247",
+    "upcName": "PH bodacious bites",
+    "score": 0.5
+  },
+  {
+    "productId": 2437,
+    "productName": "Lilpals Extra Small Collar Leb08",
+    "upc": "076484622199",
+    "upcName": "LILPALS XS COLLAR LEB08",
+    "score": 0.6
+  },
+  {
+    "productId": 2034,
+    "productName": "Coastal Collar Mgd12",
+    "upc": "076484717215",
+    "upcName": "COASTAL CC MGD12",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3244,
+    "productName": "Coastal Collar Ybc12\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 5351,
     "productName": "Shipwreck Stern Large",
     "upc": "030172014598",
     "upcName": "Tide & Treasure™ Shipwreck Stern - Large",
     "score": 0.6
+  },
+  {
+    "productId": 5634,
+    "productName": "Marineland Led Light 30\"",
+    "upc": "015561223652",
+    "upcName": "ExoTerra Scorpion Light 15 LED",
+    "score": 0.5
   },
   {
     "productId": 6180,
@@ -1120,11 +2674,39 @@
     "score": 0.6666666666666666
   },
   {
+    "productId": 3862,
+    "productName": "Coastal Black20\" Buck Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 4678,
+    "productName": "St. Rocco's Salmon 8oz",
+    "upc": "835953000117",
+    "upcName": "Grizzly Omega Salmon 8oz",
+    "score": 0.5
+  },
+  {
     "productId": 4244,
     "productName": "Kaytee Chew Proof 12oz",
     "upc": "045125619829",
     "upcName": "PTS BTTL CHEW PROOF MD 12OZ",
     "score": 0.6
+  },
+  {
+    "productId": 3828,
+    "productName": "Coastal Purple20\" 2901 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 2014,
+    "productName": "Coastal Collar Goc12",
+    "upc": "076484677533",
+    "upcName": "COASTAL CC GOC12",
+    "score": 0.6666666666666666
   },
   {
     "productId": 5352,
@@ -1134,38 +2716,38 @@
     "score": 0.6
   },
   {
+    "productId": 4577,
+    "productName": "Nylabone FlexiChew Wolf",
+    "upc": "018214846550",
+    "upcName": "NYLABONE RHINO CONE WOLF",
+    "score": 0.5
+  },
+  {
+    "productId": 435,
+    "productName": "Zoo Med Wire Cage Clamp Lamp",
+    "upc": "097612321005",
+    "upcName": "ZooMed Wire Cage Clamp Lamp",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3841,
+    "productName": "Coastal Purple14\" Buck Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
     "productId": 6668,
     "productName": "Pro Plan Cat Chicken & Rice 16lb",
-    "upc": "038100170316",
-    "upcName": "PRO PLAN cat tun & shri 3oz",
+    "upc": "038100131348",
+    "upcName": "PRO PLAN cat ck & ri 3.5#",
     "score": 0.5
   },
   {
-    "productId": 640,
-    "productName": "Komodo Jp Rock Den Large",
-    "upc": "096316117709",
-    "upcName": "ZIL DEN ROCK DEN SM",
-    "score": 0.5
-  },
-  {
-    "productId": 374,
-    "productName": "Exoterra Screen Cover 10 Gal",
-    "upc": "096316670266",
-    "upcName": "ZIL COVER SCREEN BK 48X13",
-    "score": 0.5
-  },
-  {
-    "productId": 1604,
-    "productName": "Sodapup Emat Flower Power",
-    "upc": "048081623480",
-    "upcName": "Flower Power",
-    "score": 0.5
-  },
-  {
-    "productId": 711,
-    "productName": "Zilla Durable Den Small",
-    "upc": "096316116627",
-    "upcName": "ZIL DEN DURABLE GY SM",
+    "productId": 3845,
+    "productName": "Coastal Purple12\" 401 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
@@ -1176,18 +2758,53 @@
     "score": 0.6
   },
   {
-    "productId": 2094,
-    "productName": "Comfort Walk Large Red",
-    "upc": "048081628096",
-    "upcName": "Wonder Walk Large",
+    "productId": 3720,
+    "productName": "Coastal Lim20\" Buck Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
-    "productId": 490,
-    "productName": "Basking Platform Filter",
-    "upc": "096316685055",
-    "upcName": "ZIL BASKING PLATFORM CORNER SM",
+    "productId": 3485,
+    "productName": "Valhoma 24 Hp Collar",
+    "upc": "849790155343",
+    "upcName": "SM LSU COLLAR",
     "score": 0.5
+  },
+  {
+    "productId": 2715,
+    "productName": "Jolly Pets 6\"soccer Ball Bllue",
+    "upc": "788169720624",
+    "upcName": "JOLLYPET 6\"SOCCER BALL BLLUE",
+    "score": 0.6
+  },
+  {
+    "productId": 3656,
+    "productName": "Coastal Bzs26\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3869,
+    "productName": "Coastal Black14\" Martingale Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3992,
+    "productName": "Coastal Blue22\" Training Collar",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 5436,
+    "productName": "Grey Rock Scape",
+    "upc": "030172101922",
+    "upcName": "Reptology Rock Scape",
+    "score": 0.6666666666666666
   },
   {
     "productId": 6026,
@@ -1197,17 +2814,45 @@
     "score": 0.5
   },
   {
-    "productId": 1457,
-    "productName": "Petag Nurser Bottle 4oz",
-    "upc": "045125619706",
-    "upcName": "PTS CLEARWATER BOTTLE 4OZ",
+    "productId": 3929,
+    "productName": "Coastal Hunter14\" Buc Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
+  },
+  {
+    "productId": 3451,
+    "productName": "Coastal Cyn06' Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 7395,
+    "productName": "Zoo Med Leo Gecko Value Pack",
+    "upc": "009761240203",
+    "upcName": "ZooMed Leo gecko Value pack",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3220,
+    "productName": "Coastal Collar Lss26\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
   },
   {
     "productId": 4674,
     "productName": "Puppy-peroni",
-    "upc": "785184125007",
-    "upcName": "RED B lg br puppy gr fr 22#",
+    "upc": "035585131214",
+    "upcName": "KNG PUPPY MD",
+    "score": 0.5
+  },
+  {
+    "productId": 3977,
+    "productName": "Coastal Red20\" Mbuc Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
@@ -1220,16 +2865,9 @@
   {
     "productId": 6321,
     "productName": "Max Bully 5lb",
-    "upc": "030626101300",
-    "upcName": "MAX BULLY 30#",
+    "upc": "030626101058",
+    "upcName": "MAX BULLY 5#",
     "score": 0.6666666666666666
-  },
-  {
-    "productId": 2549,
-    "productName": "Circle 18\" Red 1106 Collar",
-    "upc": "076484774010",
-    "upcName": "CP Sublim Collar 3/8*08-12 RED",
-    "score": 0.5
   },
   {
     "productId": 5640,
@@ -1239,11 +2877,18 @@
     "score": 0.5
   },
   {
-    "productId": 2220,
-    "productName": "Catit Creamy Stuff Toy",
-    "upc": "035585141114",
-    "upcName": "KON TOY STUFF A BALL LG",
+    "productId": 3922,
+    "productName": "Coastal Hunter20\" Buc Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
+  },
+  {
+    "productId": 1065,
+    "productName": "Playfuls Sound & Move \"rope & Shell Things\"",
+    "upc": "048081626030",
+    "upcName": "PlayFuls Sound&Move \"Rope&Shellthings\"",
+    "score": 0.6666666666666666
   },
   {
     "productId": 5460,
@@ -1253,10 +2898,10 @@
     "score": 0.5
   },
   {
-    "productId": 140,
-    "productName": "Flukers Cricket Quencher Orange",
-    "upc": "091197712005",
-    "upcName": "FLU CRICKET QUENCHER 16OZ",
+    "productId": 3826,
+    "productName": "Coastal Purple26\" Martingale Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
@@ -1267,11 +2912,25 @@
     "score": 0.5
   },
   {
-    "productId": 630,
-    "productName": "Zilla Herp Hotel Large",
-    "upc": "096316117402",
-    "upcName": "ZIL DEN HERP HOTEL MD",
+    "productId": 4019,
+    "productName": "Coastal Green30\" Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
+  },
+  {
+    "productId": 3850,
+    "productName": "Coastal Black06' 906 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 2826,
+    "productName": "Multipet Loofadog Large",
+    "upc": "784369477184",
+    "upcName": "MULTIPET LOOFADOG LRG",
+    "score": 0.6666666666666666
   },
   {
     "productId": 4065,
@@ -1281,17 +2940,24 @@
     "score": 0.5
   },
   {
-    "productId": 268,
-    "productName": "Zilla Mini Halogen Bulb 25w Red",
-    "upc": "096316156302",
-    "upcName": "ZIL LAMP HALOGEN MINI WH 25W",
-    "score": 0.5
+    "productId": 2490,
+    "productName": "Lilpals Extra Small Collar Blu08",
+    "upc": "076484410017",
+    "upcName": "LILPALS XS COLLAR BLU08",
+    "score": 0.6
   },
   {
-    "productId": 651,
-    "productName": "Exoterra Corner Cave Large",
-    "upc": "048081311622",
-    "upcName": "Large Cozy Corner (Purple)",
+    "productId": 2801,
+    "productName": "Spot Snuffle Roll Assorted Pzzle",
+    "upc": "077234548257",
+    "upcName": "SPT SNUFFLE ROLL ASS. PZZLE",
+    "score": 0.6
+  },
+  {
+    "productId": 1710,
+    "productName": "Vanilla Ness Dual 42oz",
+    "upc": "079441002126",
+    "upcName": "Vaness Dual 42oz",
     "score": 0.5
   },
   {
@@ -1302,10 +2968,24 @@
     "score": 0.6
   },
   {
-    "productId": 1101,
-    "productName": "Playfuls Club",
-    "upc": "048081626061",
-    "upcName": "Club",
+    "productId": 775,
+    "productName": "Exoterra Faunarium Medium",
+    "upc": "015561226042",
+    "upcName": "ExoTerra Medium Low",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3856,
+    "productName": "Coastal Black26\" Martingale Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3840,
+    "productName": "Coastal Purple14\" Martingale Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
@@ -1316,18 +2996,74 @@
     "score": 0.5
   },
   {
-    "productId": 952,
-    "productName": "Birdlife Calcium Perch Small & Medium",
-    "upc": "030172036781",
-    "upcName": "Bird Life™ Rope Perch - Small/Medium",
+    "productId": 2921,
+    "productName": "Nylabone Puppy Tactile Stick",
+    "upc": "018214827924",
+    "upcName": "NylaBone Puppy Dental Kit",
     "score": 0.5
+  },
+  {
+    "productId": 2013,
+    "productName": "Coastal Collar Gbg12",
+    "upc": "076484677502",
+    "upcName": "COASTAL CC GBG12",
+    "score": 0.6666666666666666
   },
   {
     "productId": 5560,
     "productName": "Aqueon Quietflow 5g",
-    "upc": "015905012300",
-    "upcName": "AQUEON 7.5w heater",
+    "upc": "015905000697",
+    "upcName": "AQUEON 5w heater",
     "score": 0.5
+  },
+  {
+    "productId": 2585,
+    "productName": "Coastal Medium Aliens20 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 2436,
+    "productName": "Lilpals Extra Small Collar Btd08",
+    "upc": "076484062278",
+    "upcName": "LILPALS XS COLLAR BTD08",
+    "score": 0.6
+  },
+  {
+    "productId": 4004,
+    "productName": "Coastal Black18\" 2918 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 4309,
+    "productName": "Wettail Drops",
+    "upc": "645095001978",
+    "upcName": "FreshBreathe Drops",
+    "score": 0.5
+  },
+  {
+    "productId": 2607,
+    "productName": "New Orleans Saints Saints Burger Toy",
+    "upc": "849790120723",
+    "upcName": "NOLA SAINTS BURGER TOY",
+    "score": 0.6
+  },
+  {
+    "productId": 3986,
+    "productName": "Coastal Red12\" 301 Collar",
+    "upc": "076484672347",
+    "upcName": "COASTAL CC RED12",
+    "score": 0.5
+  },
+  {
+    "productId": 1369,
+    "productName": "Nature's Miracle Stain & Odor Rem Scented",
+    "upc": "018065969668",
+    "upcName": "NaturesMiracle Stain&Odor Rem Scented",
+    "score": 0.6666666666666666
   },
   {
     "productId": 5360,
@@ -1344,6 +3080,20 @@
     "score": 0.6666666666666666
   },
   {
+    "productId": 3697,
+    "productName": "Coastal Orange 6' 404 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 1226,
+    "productName": "Sweet Harvest Parrot 20 Lbs",
+    "upc": "720101222155",
+    "upcName": "Sweet Harvest Chilli Pepper",
+    "score": 0.5
+  },
+  {
     "productId": 5995,
     "productName": "Science Diet Grain Free Frozen Crunch",
     "upc": "762177696003",
@@ -1353,9 +3103,16 @@
   {
     "productId": 6832,
     "productName": "Fussie Cat Tuna, Salmon 2.47oz",
-    "upc": "888641130535",
-    "upcName": "FUSSIE CAT tuna ocean 2.82oz",
+    "upc": "888641133918",
+    "upcName": "\"FUSSIE CAT tuna",
     "score": 0.6
+  },
+  {
+    "productId": 2055,
+    "productName": "Coastal Collar Pby08",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
   },
   {
     "productId": 5971,
@@ -1365,18 +3122,74 @@
     "score": 0.5
   },
   {
-    "productId": 1050,
-    "productName": "Birdlife Activity Center Small",
-    "upc": "030172101090",
-    "upcName": "Disney® Kitten Activity Center",
+    "productId": 3924,
+    "productName": "Coastal Hunter20\" Mbuc Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
-    "productId": 184,
-    "productName": "Reptology Substrate Scoop",
-    "upc": "030172105388",
-    "upcName": "Reptology™ Corner Reptile Scoop",
+    "productId": 3351,
+    "productName": "Coastal Autumn6' 12926 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
+  },
+  {
+    "productId": 3919,
+    "productName": "Coastal Hunter26\" 2901 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 548,
+    "productName": "Zoo Med Amazonian Phyllo Medium",
+    "upc": "097612180213",
+    "upcName": "ZooMed Amazonian Phyllo Med",
+    "score": 0.6
+  },
+  {
+    "productId": 2562,
+    "productName": "Circle Black06\" Leash",
+    "upc": "076484823084",
+    "upcName": "CIRCLE BLK06\" LEASH",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 2044,
+    "productName": "Coastal Collar Wrp12",
+    "upc": "076484670268",
+    "upcName": "COASTAL CC WRP12",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 1465,
+    "productName": "Pet Honesty Allergy Skin Health",
+    "upc": "850005524168",
+    "upcName": "PetHonesty Allergy Skin Health",
+    "score": 0.6
+  },
+  {
+    "productId": 4777,
+    "productName": "Vital Essentials Chicken Heart 1.9 oz",
+    "upc": "840199694037",
+    "upcName": "Vital Cat chicken hearts",
+    "score": 0.5
+  },
+  {
+    "productId": 3300,
+    "productName": "Coastal Collar Hrw26\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 2025,
+    "productName": "Coastal Collar Gsw12",
+    "upc": "076484717154",
+    "upcName": "COASTAL CC GSW12",
+    "score": 0.6666666666666666
   },
   {
     "productId": 6314,
@@ -1386,10 +3199,31 @@
     "score": 0.5
   },
   {
+    "productId": 2606,
+    "productName": "Large LSU Leash",
+    "upc": "849790158894",
+    "upcName": "SM LSU LEASH",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3387,
+    "productName": "Coastal Ww526 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 6677,
     "productName": "Health Extension Healthy Belly 3.5 oz",
     "upc": "810120991016",
     "upcName": "HEALTH EXTEN healthy belly 3.5oz",
+    "score": 0.6
+  },
+  {
+    "productId": 431,
+    "productName": "Zoo Med Creatures Dome 40w",
+    "upc": "097612008357",
+    "upcName": "ZooMed Creatures Dome  40W",
     "score": 0.6
   },
   {
@@ -1409,15 +3243,8 @@
   {
     "productId": 2091,
     "productName": "Comfort Walk Small Blue",
-    "upc": "048081211670",
-    "upcName": "Small Snuggle Sack (Blue)",
-    "score": 0.5
-  },
-  {
-    "productId": 375,
-    "productName": "Exoterra Screen Cover 15/20 Gal",
-    "upc": "096316670266",
-    "upcName": "ZIL COVER SCREEN BK 48X13",
+    "upc": "842982071353",
+    "upcName": "Retro Small Blue Bowl",
     "score": 0.5
   },
   {
@@ -1428,17 +3255,66 @@
     "score": 0.5
   },
   {
-    "productId": 270,
-    "productName": "Zilla Mini Halogen Bulb 50w Blue",
-    "upc": "096316156333",
-    "upcName": "ZIL LAMP HALOGEN MINI WH 50W",
+    "productId": 1165,
+    "productName": "Sweet Harvest Parrot No Sunflower",
+    "upc": "720101222155",
+    "upcName": "Sweet Harvest Chilli Pepper",
     "score": 0.5
+  },
+  {
+    "productId": 3641,
+    "productName": "Coastal Shb06' Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 1167,
+    "productName": "Sweet Harvest Finch",
+    "upc": "720101222155",
+    "upcName": "Sweet Harvest Chilli Pepper",
+    "score": 0.5
+  },
+  {
+    "productId": 3648,
+    "productName": "Coastal Mlm14\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 2628,
+    "productName": "Coastal Small Aliens14 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 348,
+    "productName": "Zoo Med Reptituff 90w Splshpro Halo",
+    "upc": "097612980905",
+    "upcName": "ZooMed ReptiTuff 90W Splshpro Halo",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 181,
+    "productName": "Zoo Med Glow in the Dark Tong",
+    "upc": "009761200820",
+    "upcName": "ZooMed Glow In the Dark Tong",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3471,
+    "productName": "Coastal Cyn18\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
   },
   {
     "productId": 6634,
     "productName": "Pro Plan Chicken & Rice 13oz",
-    "upc": "038100026859",
-    "upcName": "PRO PLAN 7+ beef & ri 13oz",
+    "upc": "038100026712",
+    "upcName": "PRO PLAN pup 13oz",
     "score": 0.6
   },
   {
@@ -1449,10 +3325,24 @@
     "score": 0.6
   },
   {
+    "productId": 1557,
+    "productName": "Hagen Le Salon Essentials Curry Brush",
+    "upc": "022517912461",
+    "upcName": "LeSalon Essentials Curry Brush",
+    "score": 0.6
+  },
+  {
+    "productId": 454,
+    "productName": "Zoo Med Reptirock Combo Medium",
+    "upc": "097612923308",
+    "upcName": "ZooMed ReptiRock Combo Med.",
+    "score": 0.6
+  },
+  {
     "productId": 4344,
     "productName": "Kaytee Crispy Garden Chew",
-    "upc": "045125611052",
-    "upcName": "KAY CHEW TOY JMB CRISPY GARDEN",
+    "upc": "071859998527",
+    "upcName": "Kaytee Garden Veggie Treat",
     "score": 0.5
   },
   {
@@ -1463,31 +3353,94 @@
     "score": 0.6
   },
   {
-    "productId": 6216,
-    "productName": "Blue Buffalo Senior 5lb",
-    "upc": "840243105311",
-    "upcName": "BLUE B sm br senior 15#",
+    "productId": 3950,
+    "productName": "Coastal Blue14\" Mbuc Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
-    "productId": 1038,
-    "productName": "Prevue Hendrix Cozy Corner Medium",
-    "upc": "048081411612",
-    "upcName": "Medium Cozy Corner (Yellow)",
-    "score": 0.6
+    "productId": 6216,
+    "productName": "Blue Buffalo Senior 5lb",
+    "upc": "859610000159",
+    "upcName": "BLUE B senior 15#",
+    "score": 0.5
+  },
+  {
+    "productId": 4345,
+    "productName": "Kaytee Ka-bob",
+    "upc": "071859998497",
+    "upcName": "Kaytee Yo Dips",
+    "score": 0.5
+  },
+  {
+    "productId": 3685,
+    "productName": "Sunburst Blu10\" Collar",
+    "upc": "076484322259",
+    "upcName": "LILPALS SM COLLAR BLU10",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3835,
+    "productName": "Coastal Purple18\" 901 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3299,
+    "productName": "Coastal Collar Hrw18\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3420,
+    "productName": "Coastal Crn08\" Soy Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
   },
   {
     "productId": 6753,
     "productName": "Fromm PurrSnickety Game Bird Recipe 4lb",
-    "upc": "072705114429",
-    "upcName": "FROMM game bird 12#",
+    "upc": "072705114443",
+    "upcName": "FROMM game bird 4#",
     "score": 0.5
+  },
+  {
+    "productId": 1660,
+    "productName": "Bellabowl Black Large",
+    "upc": "842982074040",
+    "upcName": "BellaBowl Black Sm",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 2829,
+    "productName": "Multipet Loofadog Medium",
+    "upc": "784369477184",
+    "upcName": "MULTIPET LOOFADOG LRG",
+    "score": 0.6666666666666666
   },
   {
     "productId": 1034,
     "productName": "Prevue Hendrix Snuggle Sack Small",
-    "upc": "048081111673",
-    "upcName": "Small Snuggle Sack (Purple)",
+    "upc": "048081311677",
+    "upcName": "Small Snuggle Sack (Green)",
+    "score": 0.6
+  },
+  {
+    "productId": 3210,
+    "productName": "Coastal Collar Tpd14\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 2451,
+    "productName": "Lilpals Extra Small Collar Top08",
+    "upc": "076484162572",
+    "upcName": "LILPALS XS COLLAR TOP08",
     "score": 0.6
   },
   {
@@ -1505,18 +3458,25 @@
     "score": 0.5
   },
   {
-    "productId": 333,
-    "productName": "Zilla Waterfall",
-    "upc": "048081609446",
-    "upcName": "Waterfall",
+    "productId": 3394,
+    "productName": "Coastal Ww520 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3995,
+    "productName": "Coastal Black12\" Security Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
-    "productId": 1041,
-    "productName": "Prevue Hendrix Cozy Corner Large",
-    "upc": "048081311622",
-    "upcName": "Large Cozy Corner (Purple)",
-    "score": 0.6
+    "productId": 3421,
+    "productName": "Coastal Sla18\" Soy Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
   },
   {
     "productId": 5814,
@@ -1535,8 +3495,22 @@
   {
     "productId": 6221,
     "productName": "Blue Buffalo Lamb 5lb",
-    "upc": "840243105687",
-    "upcName": "BLUE B sm br lamb 15#",
+    "upc": "840243144129",
+    "upcName": "BLUE B sm br lamb 5#",
+    "score": 0.5
+  },
+  {
+    "productId": 3695,
+    "productName": "Coastal Orange 6' 906 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3313,
+    "productName": "Coastal Leash Lsk06' 46936",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
@@ -1561,10 +3535,24 @@
     "score": 0.5714285714285714
   },
   {
+    "productId": 3657,
+    "productName": "Coastal Bzs20\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3293,
+    "productName": "Coastal Collar Biothane Org14\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
     "productId": 6174,
     "productName": "Fromm Chicken Frommage 4lb",
-    "upc": "072705114726",
-    "upcName": "FROMM ck frommage 12#",
+    "upc": "072705114740",
+    "upcName": "FROMM ck frommage 4#",
     "score": 0.5
   },
   {
@@ -1572,6 +3560,27 @@
     "productName": "Fluval C4 Impellar",
     "upc": "015561144834",
     "upcName": "FLUVAL forceps",
+    "score": 0.5
+  },
+  {
+    "productId": 3461,
+    "productName": "Coastal Cyn12\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3655,
+    "productName": "Coastal Dbm20\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3933,
+    "productName": "Coastal Hunter12\" Buc Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
@@ -1589,38 +3598,59 @@
     "score": 0.6666666666666666
   },
   {
+    "productId": 3317,
+    "productName": "Coastal Leash Gxy06\" 46936",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3970,
+    "productName": "Coastal Red24\" 2901 Collar",
+    "upc": "076484104916",
+    "upcName": "CIRCLE RED24\" COLLAR",
+    "score": 0.5
+  },
+  {
     "productId": 6671,
     "productName": "Diamond Cat Maint 6lb",
-    "upc": "074198004201",
-    "upcName": "DIAM cat maint 20#",
+    "upc": "074198004065",
+    "upcName": "DIAM cat maint 6#",
     "score": 0.5
   },
   {
     "productId": 6012,
     "productName": "Barn Home 50-90lb",
-    "upc": "029695251139",
-    "upcName": "barn home 25-50#",
+    "upc": "029695251184",
+    "upcName": "barn home xsm",
     "score": 0.6666666666666666
   },
   {
     "productId": 3150,
     "productName": "Kong Ext Extra Large",
-    "upc": "080605618596",
-    "upcName": "LW Deluxe Habitat, Extra Large",
+    "upc": "035585013978",
+    "upcName": "Kong Dental Ball large",
     "score": 0.5
+  },
+  {
+    "productId": 3518,
+    "productName": "Coastal Pkt06' Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3660,
+    "productName": "Coastal Shb26\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
   },
   {
     "productId": 3675,
     "productName": "Coastal Blue Medium Pwrwalker",
-    "upc": "048081211687",
-    "upcName": "Medium Snuggle Sack (Blue)",
-    "score": 0.5
-  },
-  {
-    "productId": 1521,
-    "productName": "Safari Flexible Slicker Medium",
-    "upc": "076484800034",
-    "upcName": "SAF Flexible Slicker Brush SM",
+    "upc": "004081853169",
+    "upcName": "Medium Snuggle Hut (Blue)",
     "score": 0.5
   },
   {
@@ -1631,11 +3661,67 @@
     "score": 0.5
   },
   {
+    "productId": 1797,
+    "productName": "Kong Cloud Large",
+    "upc": "035585081328",
+    "upcName": "Kong Cloud XS",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 2583,
+    "productName": "Coastal Medium Dinosaurs20 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3371,
+    "productName": "Coastal Org14\" Waterproof Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 1367,
+    "productName": "Nature's Miracle Oxy Set in Stain",
+    "upc": "018065981721",
+    "upcName": "NaturesMiracle Oxy Set in Stain",
+    "score": 0.6
+  },
+  {
+    "productId": 3289,
+    "productName": "Coastal Collar Biothane Ylw24\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 2040,
+    "productName": "Coastal Collar Green12",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 2031,
+    "productName": "Coastal Collar Shc12",
+    "upc": "076484717178",
+    "upcName": "COASTAL CC SHC12",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 6492,
     "productName": "Zignature Duck 13oz",
     "upc": "888641131235",
     "upcName": "ZIGN duck 13oz",
     "score": 0.6666666666666666
+  },
+  {
+    "productId": 1988,
+    "productName": "Nature's Miracle Advance No Spray",
+    "upc": "018065284044",
+    "upcName": "NaturesMiracle Advance No spray",
+    "score": 0.5
   },
   {
     "productId": 3563,
@@ -1647,8 +3733,8 @@
   {
     "productId": 4173,
     "productName": "Prevue Hendrix Grass Tunnel",
-    "upc": "048081010921",
-    "upcName": "Small Grass Tunnel",
+    "upc": "048081010983",
+    "upcName": "Grass Tunnel",
     "score": 0.5
   },
   {
@@ -1659,17 +3745,10 @@
     "score": 0.6
   },
   {
-    "productId": 2706,
-    "productName": "Rascals 3\" Ball",
-    "upc": "640816725375",
-    "upcName": "Flick-a-Ball",
-    "score": 0.5
-  },
-  {
     "productId": 6622,
     "productName": "Eukanuba Beef & Vegetable 12.5oz",
-    "upc": "052742007274",
-    "upcName": "SD heal cuis 7+ beef 12.5oz",
+    "upc": "850334004317",
+    "upcName": "PRIM fd beef 5.5oz",
     "score": 0.5
   },
   {
@@ -1680,11 +3759,39 @@
     "score": 0.5
   },
   {
+    "productId": 2589,
+    "productName": "Coastal Medium Unicorns20 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 1471,
+    "productName": "Pet Honesty Multivita 10in1",
+    "upc": "850005524069",
+    "upcName": "PetHonesty MultiVita 10in1",
+    "score": 0.5
+  },
+  {
+    "productId": 3996,
+    "productName": "Coastal Red26\" Security Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
     "productId": 6592,
     "productName": "Science Diet Beef 13oz",
-    "upc": "038100026859",
-    "upcName": "PRO PLAN 7+ beef & ri 13oz",
+    "upc": "052742705606",
+    "upcName": "SD 7+ beef 13oz",
     "score": 0.5
+  },
+  {
+    "productId": 1691,
+    "productName": "Vanness 16oz Double",
+    "upc": "079441002119",
+    "upcName": "VanNess 16 Oz. Double",
+    "score": 0.6666666666666666
   },
   {
     "productId": 4318,
@@ -1708,24 +3815,38 @@
     "score": 0.6666666666666666
   },
   {
-    "productId": 1092,
-    "productName": "Smart Play Tower",
-    "upc": "048081073610",
-    "upcName": "Play Tower",
-    "score": 0.6666666666666666
+    "productId": 308,
+    "productName": "Zoo Med Nano Cermaic 25w",
+    "upc": "097612310252",
+    "upcName": "ZooMed Nano Cermaic 25W",
+    "score": 0.6
+  },
+  {
+    "productId": 2495,
+    "productName": "Lilpals Extra Small Collar Red08",
+    "upc": "076484410031",
+    "upcName": "LILPALS XS COLLAR RED08",
+    "score": 0.6
+  },
+  {
+    "productId": 2632,
+    "productName": "Coastal Small Unicorns14 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
   },
   {
     "productId": 2175,
     "productName": "Blue Wilderness Chunk & Salmon Treats",
-    "upc": "840243105359",
-    "upcName": "BLUE B wilderness salmon 4.5#",
+    "upc": "859610007943",
+    "upcName": "Blue Wilderness Chnk&Salm Treats",
     "score": 0.6
   },
   {
     "productId": 6632,
     "productName": "Pro Plan Large Breed Beef 13oz",
-    "upc": "038100026859",
-    "upcName": "PRO PLAN 7+ beef & ri 13oz",
+    "upc": "038100026774",
+    "upcName": "PRO PLAN lg br beef 13oz",
     "score": 0.6666666666666666
   },
   {
@@ -1733,6 +3854,13 @@
     "productName": "Coastal Purple Medium Harness",
     "upc": "048081716500",
     "upcName": "Medium Snuggle Sack (Purple)",
+    "score": 0.5
+  },
+  {
+    "productId": 3863,
+    "productName": "Coastal Black20\" 901 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
@@ -1752,9 +3880,23 @@
   {
     "productId": 4758,
     "productName": "Fromm Baked Lamb",
-    "upc": "072705114504",
-    "upcName": "FROMM lamb & lentil 26#",
+    "upc": "072705114542",
+    "upcName": "FROMM lamb & lentil 4#",
     "score": 0.6666666666666666
+  },
+  {
+    "productId": 1329,
+    "productName": "Nature's Miracle Freshing Spray",
+    "upc": "018065984685",
+    "upcName": "NaturesMiracle Freshing Spray",
+    "score": 0.5
+  },
+  {
+    "productId": 3988,
+    "productName": "Coastal Red22\" Training Collar",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
   },
   {
     "productId": 6599,
@@ -1764,31 +3906,80 @@
     "score": 0.6
   },
   {
-    "productId": 958,
-    "productName": "Livingworld Sand Perch Covers",
-    "upc": "618940312161",
-    "upcName": "JWP PERCH SAND T REG",
+    "productId": 4003,
+    "productName": "Coastal Blue24\" 2924 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
+  },
+  {
+    "productId": 865,
+    "productName": "Birdlife E-cuttlebone 2 Pack",
+    "upc": "030172095801",
+    "upcName": "BirdLIfe E-CuttleBone 2 pk",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 311,
+    "productName": "Zoo Med Nano Infrared Heat 40w",
+    "upc": "097612331400",
+    "upcName": "ZooMed Nano Infrared Heat 40W",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 2022,
+    "productName": "Coastal Collar Ste12",
+    "upc": "076484673146",
+    "upcName": "COASTAL CC STE12",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3696,
+    "productName": "Coastal Orange 6' 406 Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3460,
+    "productName": "Coastal Cyn14\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 2036,
+    "productName": "Coastal Collar Blue12",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
   },
   {
     "productId": 305,
     "productName": "Zoo Med Nano Halogen Heat Lamp 35w",
     "upc": "097612970357",
-    "upcName": "ZML BULB HEAT HALOGEN NANO 35W",
-    "score": 0.5714285714285714
+    "upcName": "ZooMed Nano Halogen Heat Lamp 35W",
+    "score": 0.7142857142857143
   },
   {
-    "productId": 858,
-    "productName": "Birdlif Mineral Block 2pk",
-    "upc": "048081111123",
-    "upcName": "Say Cheese! Mineral Block",
+    "productId": 3266,
+    "productName": "Coastal Leash Wdf6' 666",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 3956,
+    "productName": "Coastal Blue10\" 301 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
     "productId": 672,
     "productName": "Zoo Med Coconut House",
-    "upc": "097612300291",
-    "upcName": "ZOO MED betta thermoneter",
+    "upc": "097612325126",
+    "upcName": "Zoo Med Sm. Mesh",
     "score": 0.5
   },
   {
@@ -1801,8 +3992,8 @@
   {
     "productId": 6585,
     "productName": "Science Diet 7+ Beef 13oz",
-    "upc": "038100026859",
-    "upcName": "PRO PLAN 7+ beef & ri 13oz",
+    "upc": "052742705606",
+    "upcName": "SD 7+ beef 13oz",
     "score": 0.5
   },
   {
@@ -1811,6 +4002,13 @@
     "upc": "052742187402",
     "upcName": "SD mini jerky beef",
     "score": 0.5
+  },
+  {
+    "productId": 2441,
+    "productName": "Lilpals Extra Small Collar Dpm08",
+    "upc": "076484105012",
+    "upcName": "LILPALS XS COLLAR DPM08",
+    "score": 0.6
   },
   {
     "productId": 4337,
@@ -1822,50 +4020,92 @@
   {
     "productId": 6672,
     "productName": "Diamond Cat Maint 20lb",
-    "upc": "074198004201",
-    "upcName": "DIAM cat maint 20#",
+    "upc": "074198004065",
+    "upcName": "DIAM cat maint 6#",
     "score": 0.5
   },
   {
     "productId": 5413,
     "productName": "Zoo Med Aqualog Large",
-    "upc": "097612300291",
-    "upcName": "ZOO MED betta thermoneter",
-    "score": 0.5
-  },
-  {
-    "productId": 2722,
-    "productName": "Lilpals Plush Hotdog Toy",
-    "upc": "784369430103",
-    "upcName": "MUL TOY WRINKLEEZ PLUSH",
-    "score": 0.5
-  },
-  {
-    "productId": 880,
-    "productName": "Vitapol Mineral Block",
-    "upc": "048081111123",
-    "upcName": "Say Cheese! Mineral Block",
+    "upc": "097612325126",
+    "upcName": "Zoo Med Sm. Mesh",
     "score": 0.5
   },
   {
     "productId": 6746,
     "productName": "Fromm Cat Salmon 4lb",
-    "upc": "072705116430",
-    "upcName": "FROMM salmon a la veg 12#",
+    "upc": "840199694075",
+    "upcName": "Vital Cat Salmon Bites",
+    "score": 0.5
+  },
+  {
+    "productId": 2564,
+    "productName": "Circle Black04\" Leash",
+    "upc": "076484823084",
+    "upcName": "CIRCLE BLK06\" LEASH",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 4635,
+    "productName": "SmartBones 6sm Peanut Butter",
+    "upc": "018214828068",
+    "upcName": "NylaBone Toothpaste Peanut Butter",
     "score": 0.5
   },
   {
     "productId": 6455,
     "productName": "VICTOR Chicken & Rice 13.2oz",
-    "upc": "854524005443",
-    "upcName": "VICT lam & rice 13.2oz",
+    "upc": "854524005429",
+    "upcName": "VICT ck & rice 13.2oz",
     "score": 0.5
   },
   {
     "productId": 3582,
     "productName": "Coastal Blue Small Harness",
-    "upc": "048081211670",
-    "upcName": "Small Snuggle Sack (Blue)",
+    "upc": "842982071353",
+    "upcName": "Retro Small Blue Bowl",
+    "score": 0.5
+  },
+  {
+    "productId": 2591,
+    "productName": "Coastal Medium Llamas20 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 2922,
+    "productName": "Nylabone Puppy Teething Rings",
+    "upc": "018214827924",
+    "upcName": "NylaBone Puppy Dental Kit",
+    "score": 0.5
+  },
+  {
+    "productId": 776,
+    "productName": "Exoterra Faunarium Small",
+    "upc": "015561229104",
+    "upcName": "ExoTerra Small Waterfall",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 2507,
+    "productName": "Lilpals Extra Small Collar Npk08",
+    "upc": "076484410062",
+    "upcName": "LILPALS XS COLLAR NPK08",
+    "score": 0.6
+  },
+  {
+    "productId": 4002,
+    "productName": "Coastal Mbn26\" Security Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3794,
+    "productName": "Coastal Blue 26\" Martingale Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
@@ -1876,53 +4116,81 @@
     "score": 0.6
   },
   {
-    "productId": 937,
-    "productName": "Higgins Spray Millet",
-    "upc": "618940313144",
-    "upcName": "JWP HOLDER MILLET SPRAY",
-    "score": 0.5
+    "productId": 1655,
+    "productName": "Bellabowl Pink Large",
+    "upc": "842982074002",
+    "upcName": "BellaBowl Pink Sm",
+    "score": 0.6666666666666666
   },
   {
-    "productId": 968,
-    "productName": "Wacky Wood 36\"",
-    "upc": "048081626818",
-    "upcName": "Wacky Wood Bird Swing",
-    "score": 0.5
+    "productId": 2525,
+    "productName": "Lilpals Extra Small Harness Bllpxs",
+    "upc": "076484163845",
+    "upcName": "LILPALS XS HARNESS BLLPXS",
+    "score": 0.6
   },
   {
-    "productId": 1690,
-    "productName": "Heavy Weight 11.5oz Bowl",
-    "upc": "052742002019",
-    "upcName": "SD perf weight ck stew 12.5oz",
-    "score": 0.5
+    "productId": 1284,
+    "productName": "Magiccoat Tangles & Mats",
+    "upc": "045663976484",
+    "upcName": "MagicCoat Tangles&Matts",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3463,
+    "productName": "Coastal Mtn18\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3396,
+    "productName": "Coastal Ww220 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 2729,
+    "productName": "Multipet Small Loofadog",
+    "upc": "784369477184",
+    "upcName": "MULTIPET LOOFADOG LRG",
+    "score": 0.6666666666666666
   },
   {
     "productId": 1781,
     "productName": "Red Cross Extra Large Life Jacket",
-    "upc": "030172012969",
-    "upcName": "Bird Life™ Trimmer Perch - Extra Large - 12\"",
-    "score": 0.5
+    "upc": "030172085284",
+    "upcName": "Red Cross XL Life jacket",
+    "score": 0.6666666666666666
   },
   {
     "productId": 605,
     "productName": "Zoo Med Terraium Controller",
-    "upc": "097612300291",
-    "upcName": "ZOO MED betta thermoneter",
+    "upc": "097612325126",
+    "upcName": "Zoo Med Sm. Mesh",
     "score": 0.5
   },
   {
     "productId": 768,
     "productName": "Zoo Med Small and Wide",
-    "upc": "097612119114",
-    "upcName": "ZOO MED feeder pleco small",
+    "upc": "097612091014",
+    "upcName": "ZooMed Small and wide",
     "score": 0.6
   },
   {
-    "productId": 681,
-    "productName": "Zilla Rock Lair Large",
-    "upc": "096316113510",
-    "upcName": "ZIL ROCK LAIR MD",
+    "productId": 3286,
+    "productName": "Coastal Collar Biothane Green24\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
+  },
+  {
+    "productId": 729,
+    "productName": "Zoo Med Crab Gitd Dual Meter",
+    "upc": "097612009125",
+    "upcName": "ZooMed Crab GITD Dual Meter",
+    "score": 0.6666666666666666
   },
   {
     "productId": 5349,
@@ -1932,18 +4200,18 @@
     "score": 0.5
   },
   {
+    "productId": 1669,
+    "productName": "Dogit Go Slow Extra Small Blue",
+    "upc": "022517737026",
+    "upcName": "DOGIT Go Slow Xs Blue",
+    "score": 0.6
+  },
+  {
     "productId": 1032,
     "productName": "Prevue Hendrix Snuggle Sack Medium",
     "upc": "048081716500",
     "upcName": "Medium Snuggle Sack (Purple)",
     "score": 0.6
-  },
-  {
-    "productId": 141,
-    "productName": "Flukers Cricket Quencher Blue",
-    "upc": "091197712005",
-    "upcName": "FLU CRICKET QUENCHER 16OZ",
-    "score": 0.5
   },
   {
     "productId": 5108,
@@ -1953,24 +4221,73 @@
     "score": 0.5
   },
   {
+    "productId": 716,
+    "productName": "Zoo Med White Hermit Crab Sand",
+    "upc": "097612009217",
+    "upcName": "ZooMed White Hermit Crab Sand",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 3158,
     "productName": "Kong Classic Extra Large",
-    "upc": "080605618596",
-    "upcName": "LW Deluxe Habitat, Extra Large",
+    "upc": "035585013978",
+    "upcName": "Kong Dental Ball large",
     "score": 0.5
   },
   {
     "productId": 1657,
     "productName": "Bellabowl Green Medium",
-    "upc": "048081311684",
-    "upcName": "Medium Snuggle Sack (Green)",
+    "upc": "842982074668",
+    "upcName": "BellaBowl Green Sm",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 4214,
+    "productName": "Kaytee Pine 9.8l",
+    "upc": "071859998497",
+    "upcName": "Kaytee Yo Dips",
     "score": 0.5
   },
   {
     "productId": 5574,
     "productName": "Aqueon Quietflow75",
-    "upc": "015905012300",
-    "upcName": "AQUEON 7.5w heater",
+    "upc": "015905000697",
+    "upcName": "AQUEON 5w heater",
+    "score": 0.5
+  },
+  {
+    "productId": 3704,
+    "productName": "Coastal Orange 26\" 2901 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 153,
+    "productName": "Zilla Vitamin Super",
+    "upc": "009631670009",
+    "upcName": "Zilla Vitamin Sup.",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 3643,
+    "productName": "Coastal Raf06' Leash",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
+    "score": 0.5
+  },
+  {
+    "productId": 707,
+    "productName": "Zoo Med Habba Hut Medium",
+    "upc": "097612200829",
+    "upcName": "ZooMed Habba Hut Med",
+    "score": 0.6
+  },
+  {
+    "productId": 3270,
+    "productName": "Coastal Leash Csr6' 666",
+    "upc": "076484042133",
+    "upcName": "Coastal RD 10' Cotton training leash",
     "score": 0.5
   },
   {
@@ -1988,11 +4305,18 @@
     "score": 0.6
   },
   {
-    "productId": 487,
-    "productName": "Floating Turtle Pier Small",
-    "upc": "030172065224",
-    "upcName": "Reptology™ Floating Turtle Pier - Large",
-    "score": 0.6
+    "productId": 3646,
+    "productName": "Coastal Bzs14\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 1151,
+    "productName": "Higgins Sunburst Cockatiel",
+    "upc": "046706302307",
+    "upcName": "Higgins Sunburts Cockatiel",
+    "score": 0.6666666666666666
   },
   {
     "productId": 4380,
@@ -2004,8 +4328,22 @@
   {
     "productId": 642,
     "productName": "Reptology Granite Stone Hideaway Extra Large",
-    "upc": "030172078552",
-    "upcName": "Tide & Treasure™ Stone Hideaway - 1-Piece - Large",
+    "upc": "030172079887",
+    "upcName": "Reptology Granite Stone hideaway Lg",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 4637,
+    "productName": "SmartBones 16 Mini Peanut Butter",
+    "upc": "018214828068",
+    "upcName": "NylaBone Toothpaste Peanut Butter",
+    "score": 0.5
+  },
+  {
+    "productId": 3842,
+    "productName": "Coastal Purple12\" Buck Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
@@ -2016,10 +4354,45 @@
     "score": 0.6
   },
   {
+    "productId": 2958,
+    "productName": "Kong Wub Friends Ballis Extra Large",
+    "upc": "035585799995",
+    "upcName": "KONG WUB FRIENDS BALLIS XL",
+    "score": 0.6666666666666666
+  },
+  {
+    "productId": 1049,
+    "productName": "Birdlife Activity Center Extra Small",
+    "upc": "030172023668",
+    "upcName": "BirdLife Activity Center XS",
+    "score": 0.6
+  },
+  {
+    "productId": 3806,
+    "productName": "Coastal Blue 16\" 401 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.5
+  },
+  {
+    "productId": 3165,
+    "productName": "Kong Puppy Large",
+    "upc": "035585013978",
+    "upcName": "Kong Dental Ball large",
+    "score": 0.5
+  },
+  {
+    "productId": 3469,
+    "productName": "Coastal Oce18\" Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.6666666666666666
+  },
+  {
     "productId": 6745,
     "productName": "Fromm Cat Surf & Turf 4lb",
-    "upc": "072705116522",
-    "upcName": "FROMM surf & turf 12#",
+    "upc": "072705116546",
+    "upcName": "FROMM surf & turf 4#",
     "score": 0.6
   },
   {
@@ -2044,31 +4417,52 @@
     "score": 0.5
   },
   {
-    "productId": 837,
-    "productName": "Turbo Octopus",
-    "upc": "048081625644",
-    "upcName": "Octopus",
+    "productId": 2717,
+    "productName": "Jolly Pets 8\" Soccerball Blue",
+    "upc": "788169720426",
+    "upcName": "JOLLY PETS 4\"JOLLY SCCRBALL",
     "score": 0.5
   },
   {
-    "productId": 1052,
-    "productName": "Birdlife Activity Center Large",
-    "upc": "030172101090",
-    "upcName": "Disney® Kitten Activity Center",
+    "productId": 2443,
+    "productName": "Lilpals Extra Small Collar Rwb08",
+    "upc": "076484410147",
+    "upcName": "LILPALS XS COLLAR RWB08",
+    "score": 0.6
+  },
+  {
+    "productId": 3288,
+    "productName": "Coastal Collar Biothane Ylw21\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
     "productId": 37,
     "productName": "Zoo Med Ecoearth 8qt",
-    "upc": "097612300291",
-    "upcName": "ZOO MED betta thermoneter",
+    "upc": "097612790085",
+    "upcName": "ZooMed EcoEarth 8Qt",
     "score": 0.5
   },
   {
     "productId": 5323,
     "productName": "Clown Fish",
-    "upc": "076344088912",
-    "upcName": "WELLN wh fish 26#",
+    "upc": "076484536014",
+    "upcName": "Turbo Fish",
+    "score": 0.5
+  },
+  {
+    "productId": 3665,
+    "productName": "Coastal Red Medium Pwrwalker",
+    "upc": "076484630347",
+    "upcName": "COASTAL CATSOFTMESHHARN RED",
+    "score": 0.5
+  },
+  {
+    "productId": 3193,
+    "productName": "Coastal Collar Black Bones 20\"\"",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
@@ -2086,17 +4480,17 @@
     "score": 0.6
   },
   {
-    "productId": 2548,
-    "productName": "Circle 14\" Red 1105 Collar",
-    "upc": "076484774010",
-    "upcName": "CP Sublim Collar 3/8*08-12 RED",
+    "productId": 3712,
+    "productName": "Coastal Orange 26\" Buck Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
     "score": 0.5
   },
   {
     "productId": 6743,
     "productName": "Fromm Cat Game Bird Recipe 4lb",
-    "upc": "072705114429",
-    "upcName": "FROMM game bird 12#",
+    "upc": "072705114443",
+    "upcName": "FROMM game bird 4#",
     "score": 0.5
   }
 ]
