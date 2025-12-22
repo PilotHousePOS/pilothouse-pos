@@ -1,0 +1,6383 @@
+[
+  {
+    "supplyId": 6680,
+    "supplyName": "Vital Essentials Cat Chicken Patties 8oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "840199691036",
+    "catalogName": "VIT ESSEN cat ck pat 8oz",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6750,
+    "supplyName": "Fromm PurrSnickety Game Bird Recipe 6oz",
+    "supplyBrand": "Fromm",
+    "upc": "072705137251",
+    "catalogName": "FROMM pur sni game 6oz",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5530,
+    "supplyName": "Aqueon Replace Filter Large 3pk",
+    "supplyBrand": "Aqueon",
+    "upc": "071859999005",
+    "catalogName": "Kaytee Parrot",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5981,
+    "supplyName": "Science Diet Perfect Weight Joint 25lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742060521",
+    "catalogName": "SD perf weight joint 25#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3945,
+    "supplyName": "Coastal Blue26\" Buc Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6529,
+    "supplyName": "Pro Plan Shred Salmon 15lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100101297",
+    "catalogName": "PRO PLAN shred sal 15#",
+    "score": 0.76,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3797,
+    "supplyName": "Coastal Blue 26\" Buck Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4814,
+    "supplyName": "Cadet Knotted Bones 1lb",
+    "supplyBrand": "Cadet",
+    "upc": "031716603001",
+    "catalogName": "API POND FOOD 1.1LB",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6541,
+    "supplyName": "Greenies Chicken,Duck 8/2oz",
+    "supplyBrand": "Greenies",
+    "upc": "642863117695",
+    "catalogName": "Greenies sm top duck 2oz",
+    "score": 0.56,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6734,
+    "supplyName": "Fromm Kitten 10lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705115839",
+    "catalogName": "FROMM kitten 10#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5412,
+    "supplyName": "Zoo Med Fish Log Jumbo",
+    "supplyBrand": "Zoo Med",
+    "upc": "097612240023",
+    "catalogName": "ZOO MED betta log ceramic",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6839,
+    "supplyName": "Fussie Cat Tuna, Anchovy 2.82oz",
+    "supplyBrand": "Fussie Cat",
+    "upc": "888641130535",
+    "catalogName": "FUSSIE CAT tuna ocean 2.82oz",
+    "score": 0.88,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5101,
+    "supplyName": "Fluval Biothane-stratum 4.4lb",
+    "supplyBrand": "Fluval",
+    "upc": "095668821522",
+    "catalogName": "ACE FILT C/FLUVAL C4",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6786,
+    "supplyName": "Science Diet Cat Per Dig Salmon 3.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742038315",
+    "catalogName": "SD cat per dig ck3.5#",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4680,
+    "supplyName": "St. Rocco's Cheeseburger 8oz",
+    "supplyBrand": "Saint Rocco's",
+    "upc": "000116007603",
+    "catalogName": "SEACHEM acid regulator 8.8oz",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 547,
+    "supplyName": "Zoo Med Cannabis Plant Medium",
+    "supplyBrand": "Zoo Med",
+    "upc": "097612241211",
+    "catalogName": "ZOO MED betta papaya plant",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3503,
+    "supplyName": "Valhoma Spike 16 Black Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "044902006201",
+    "catalogName": "DOG COLLAR NYL SM BLU 16\"",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6815,
+    "supplyName": "Victor Cat High Pro 5lb",
+    "supplyBrand": "VICTOR",
+    "upc": "854524005832",
+    "catalogName": "VICTOR cat hi pro 5#",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5489,
+    "supplyName": "Forza Replace Filter Pad Fz7uv",
+    "supplyBrand": "Forza",
+    "upc": "667334451252",
+    "catalogName": "Zymox Avain Care",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3364,
+    "supplyName": "Coastal Autumn26\" Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6159,
+    "supplyName": "Fromm Rancherosa 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114849",
+    "catalogName": "FROMM rancherosa 4#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6115,
+    "supplyName": "Fromm Classic Puppy 15lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105434",
+    "catalogName": "Fromm classic puppy 15#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5235,
+    "supplyName": "Durvet Feline Worm Ease Liquid 4oz",
+    "supplyBrand": "Durvet",
+    "upc": "030172095771",
+    "catalogName": "Finch Fries",
+    "score": 0.6181818181818182,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5674,
+    "supplyName": "Fluval Ac70 Ac110 Intake Sponge",
+    "supplyBrand": "Fluval",
+    "upc": "645095008281",
+    "catalogName": "TropiClean Skunk",
+    "score": 0.7428571428571429,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4624,
+    "supplyName": "SmartBones 16 Count Hip & Joint",
+    "supplyBrand": "SmartBones",
+    "upc": "645095001541",
+    "catalogName": "FreshBreathe Hip&Joint 16oz",
+    "score": 0.5714285714285714,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6432,
+    "supplyName": "VICTOR Sensitive Lamb 15lb",
+    "supplyBrand": "VICTOR",
+    "upc": "854524005832",
+    "catalogName": "VICTOR cat hi pro 5#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4985,
+    "supplyName": "Smokehouse Trachea 10\"",
+    "supplyBrand": "Smokehouse",
+    "upc": "072705115839",
+    "catalogName": "FROMM kitten 10#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5483,
+    "supplyName": "Cascade 80 Filter Cartridge",
+    "supplyBrand": "Cascade",
+    "upc": "037685114623",
+    "catalogName": "Grannicks Bitter Apple",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6532,
+    "supplyName": "Health Extension Gently Cooked Beef 9oz",
+    "supplyBrand": "Health Extension",
+    "upc": "810120990620",
+    "catalogName": "HEALTH EXTEN gen cook beef 9oz",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5248,
+    "supplyName": "Hippie Hounds 5mg Cbd 5.3oz",
+    "supplyBrand": "Hippie Hounds",
+    "upc": "018065984692",
+    "catalogName": "Natures Miracle bird Cage cleaner",
+    "score": 0.5846153846153846,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6165,
+    "supplyName": "Fromm Surf & Turf 26lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116508",
+    "catalogName": "FROMM surf & turf 26#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6376,
+    "supplyName": "Pro Plan Large Breed 34lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100100757",
+    "catalogName": "PRO PLAN sensi salm 4#",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5485,
+    "supplyName": "Cascade 300 Filter Cartridge",
+    "supplyBrand": "Cascade",
+    "upc": "720101102020",
+    "catalogName": "SweetHarvest Finch",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 2035,
+    "supplyName": "Coastal Collar Black12",
+    "supplyBrand": "Coastal",
+    "upc": "034846540215",
+    "catalogName": "EARTHBORN coastal catch 12.5#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5492,
+    "supplyName": "Aquatop Cfu400 3pk Filter Pad",
+    "supplyBrand": "Aquatop",
+    "upc": "087535360694",
+    "catalogName": "Quiko Red Egg Food",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3372,
+    "supplyName": "Coastal Org26\" Waterproof Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6154,
+    "supplyName": "Fromm Pork & Apple 26lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114016",
+    "catalogName": "FROMM pork & apple 26#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6126,
+    "supplyName": "Fromm Gold 5lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105779",
+    "catalogName": "FROMM gold weight 5#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4960,
+    "supplyName": "Greenies Pllpckt Peanut Butter Tab 3.2oz",
+    "supplyBrand": "Greenies",
+    "upc": "642863117671",
+    "catalogName": "GREENIES sm top ck 2oz",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6104,
+    "supplyName": "Diamond Lamb 40lb",
+    "supplyBrand": "Diamond",
+    "upc": "072705114542",
+    "catalogName": "FROMM lamb & lentil 4#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4829,
+    "supplyName": "Nothin' to Hide 10\" Large Chicken Roll 2pk",
+    "supplyBrand": "Fieldcrest Farms",
+    "upc": "030157019959",
+    "catalogName": "ACC FLTR KNPKC WRS MINI-10 2PK",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5218,
+    "supplyName": "Aqualife Plant Scapes 14\"",
+    "supplyBrand": "Aqualife",
+    "upc": "644472014693",
+    "catalogName": "Captain CuttleBone",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4855,
+    "supplyName": "Tuesdays 10\" Beef Cheek Roll Dusted",
+    "supplyBrand": "Tuesday's Natural Dog Company",
+    "upc": "072705117239",
+    "catalogName": "FROMM beef livin 10#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5948,
+    "supplyName": "Science Diet Lamb 33lb",
+    "supplyBrand": "Science Diet",
+    "upc": "850334004034",
+    "catalogName": "PRIMAL fro nug lamb 3#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3940,
+    "supplyName": "Coastal Blue06' 606 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "050005832904",
+    "catalogName": "Pangea Hanging Orchid purple",
+    "score": 0.5636363636363636,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5225,
+    "supplyName": "Aqualife Plant Scapes 10\"",
+    "supplyBrand": "",
+    "upc": "618940313113",
+    "catalogName": "AQUALIFE PLNT SCAPES 10\"",
+    "score": 0.5800000000000001,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3506,
+    "supplyName": "Valhoma Spike 20 Pr Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "001556122729",
+    "catalogName": "ExoTerra Screen Clips Small",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 2016,
+    "supplyName": "Coastal Collar Pink 12",
+    "supplyBrand": "Coastal",
+    "upc": "034846540215",
+    "catalogName": "EARTHBORN coastal catch 12.5#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6682,
+    "supplyName": "Vital Essentials Duck Patties 8oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "840199691050",
+    "catalogName": "VIT ESSEN duck pat 8oz",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6663,
+    "supplyName": "Cat Chow Indoor 3.15lb",
+    "supplyBrand": "Purina",
+    "upc": "017800150149",
+    "catalogName": "CAT CHOW 3.15#",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6234,
+    "supplyName": "Acana Butcher's Chicken 4lb",
+    "supplyBrand": "Acana",
+    "upc": "064992517458",
+    "catalogName": "ACANA wh gr duck 4#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6904,
+    "supplyName": "Primal Frozen Pronto Beef 3/4lb",
+    "supplyBrand": "Primal",
+    "upc": "850334004768",
+    "catalogName": "PRIMAL fro pron beef 3/4#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4196,
+    "supplyName": "Kaytee 5\" Run-About Ball Clear",
+    "supplyBrand": "Kaytee",
+    "upc": "644472991499",
+    "catalogName": "Vitapol Smakers Snack Kiwi Cocktiel",
+    "score": 0.5846153846153846,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4936,
+    "supplyName": "Greenies Orange Teenie 6oz",
+    "supplyBrand": "Greenies",
+    "upc": "000116772105",
+    "catalogName": "AQUAVITRO phosfiltrum 5.6oz",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 7001,
+    "supplyName": "Omega One Cichlid Pellets Super Colo 9oz",
+    "supplyBrand": "Omega One",
+    "upc": "698220854314",
+    "catalogName": "OMEGA ONE cich pel sup colo 9oz",
+    "score": 0.7428571428571429,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6148,
+    "supplyName": "Fromm Whitefish 26lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116317",
+    "catalogName": "FROMM whitefish 26#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3480,
+    "supplyName": "Valhoma 20 Red Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "044902006218",
+    "catalogName": "DOG COLLAR NYL MD BLU 20\"",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4757,
+    "supplyName": "Fromm Nutri Mobility",
+    "supplyBrand": "Fromm",
+    "upc": "072705136100",
+    "catalogName": "FROMM mobility 13oz",
+    "score": 0.6666666666666666,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6072,
+    "supplyName": "Pacific Stream Puppy 5lb",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "074198611157",
+    "catalogName": "pacific stream puppy 5#",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3851,
+    "supplyName": "Coastal Black06' 606 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "050005832904",
+    "catalogName": "Pangea Hanging Orchid purple",
+    "score": 0.5636363636363636,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6347,
+    "supplyName": "Pro Plan Sensit Puppy Salmon 15lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100187642",
+    "catalogName": "PRO PLAN sensit puppy salm 15#",
+    "score": 0.8,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5480,
+    "supplyName": "Tetra Carbon Filter Ex20 2pk Medium",
+    "supplyBrand": "",
+    "upc": "015561824606",
+    "catalogName": "Hari Oyster Shells",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3849,
+    "supplyName": "Coastal Black06' 2906 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "030172077340",
+    "catalogName": "Reptology Turtle Platform",
+    "score": 0.5800000000000001,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 7197,
+    "supplyName": "Tetra Glo Multi 1 Medium & 2 Large",
+    "supplyBrand": "Tetra",
+    "upc": "046798292876",
+    "catalogName": "TETRA glo multi 1md.2lg",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3968,
+    "supplyName": "Coastal Red26\" Buc Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5150,
+    "supplyName": "Aquaplt 4\" Plant Green",
+    "supplyBrand": "Penn-Plax",
+    "upc": "030172093081",
+    "catalogName": "shorefins™ Betta World Plant 4\" Green",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6861,
+    "supplyName": "Blue Buffalo 3oz Fish,Shrimp 3oz",
+    "supplyBrand": "Blue Buffalo",
+    "upc": "071859998278",
+    "catalogName": "FRIS BLUE BUFFALO WET CAT 24/3OZ",
+    "score": 0.7428571428571429,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5255,
+    "supplyName": "Aquaplnt 4\" Green Plant",
+    "supplyBrand": "Penn-Plax",
+    "upc": "030172093081",
+    "catalogName": "shorefins™ Betta World Plant 4\" Green",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3698,
+    "supplyName": "Coastal Lime 6' 2906 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "030172077340",
+    "catalogName": "Reptology Turtle Platform",
+    "score": 0.5800000000000001,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6442,
+    "supplyName": "VICTOR Beef 15lb",
+    "supplyBrand": "VICTOR",
+    "upc": "854524005832",
+    "catalogName": "VICTOR cat hi pro 5#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5947,
+    "supplyName": "Science Diet Lamb 15.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "038100101389",
+    "catalogName": "PRO PLAN lamb shred 15#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3508,
+    "supplyName": "Valhoma Spike 26 Pr Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "009761240319",
+    "catalogName": "ZooMed Crested Gecko  BluBrede",
+    "score": 0.5846153846153846,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6164,
+    "supplyName": "Fromm Surf & Turf 12lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116522",
+    "catalogName": "FROMM surf & turf 12#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3192,
+    "supplyName": "Coastal Collar Black Bones 26\"\"",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6837,
+    "supplyName": "Fussie Cat Tuna, Salmon 2.82oz",
+    "supplyBrand": "Fussie Cat",
+    "upc": "888641130535",
+    "catalogName": "FUSSIE CAT tuna ocean 2.82oz",
+    "score": 0.88,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6787,
+    "supplyName": "Science Diet Cat hairball 7+ 7lb",
+    "supplyBrand": "Science Diet",
+    "upc": "764375815569",
+    "catalogName": "Feline Pine 7lb Litter",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6237,
+    "supplyName": "Acana With Grain Duck 4lb",
+    "supplyBrand": "Acana",
+    "upc": "064992517458",
+    "catalogName": "ACANA wh gr duck 4#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6555,
+    "supplyName": "Royal Canin Starter Mother & Babydog 5.1oz",
+    "supplyBrand": "Royal Canin",
+    "upc": "030111425256",
+    "catalogName": "ROYAL CAN start 5.1oz",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4234,
+    "supplyName": "Kaytee Clear View Bottle 32oz",
+    "supplyBrand": "Kaytee",
+    "upc": "720101277650",
+    "catalogName": "SweetHarvest Papaya",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6803,
+    "supplyName": "Science Diet Cat Hairball Control 7+ 15.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742887401",
+    "catalogName": "SD cat indo 7+ 15.5#",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 7264,
+    "supplyName": "Aquarium Solution Herbal Betta Revive",
+    "supplyBrand": "Hikari",
+    "upc": "042055711029",
+    "catalogName": "AQUAR SOLUT herbal betta revive",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6747,
+    "supplyName": "Fromm Cat Duck À La Vegetable 10lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116638",
+    "catalogName": "FROMM cat duck veg 10#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4854,
+    "supplyName": "Tuesdays 10-12\" Beef Basted Chkrll",
+    "supplyBrand": "Tuesday's Natural Dog Company",
+    "upc": "076484075995",
+    "catalogName": "Coastal Mesh Muzzle Size 1",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5521,
+    "supplyName": "Filter-a-carb Fc3",
+    "supplyBrand": "Penn-Plax",
+    "upc": "046706302253",
+    "catalogName": "Higgins Sunburst Canary&Finch",
+    "score": 0.5714285714285714,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6845,
+    "supplyName": "Tiki Cat Aloha Friends Tuna & Whitefish 3oz",
+    "supplyBrand": "Tiki Cat",
+    "upc": "038100111975",
+    "catalogName": "PRO PLAN cat tuna 3oz",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6685,
+    "supplyName": "Taste of the Wild Can River 5.5oz",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "074198611119",
+    "catalogName": "TOW can riv 5.5oz",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3486,
+    "supplyName": "Valhoma 24 Red Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "027773019602",
+    "catalogName": "\"MW spree kennel red 24\"\"\"",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3719,
+    "supplyName": "Coastal Lim26\" Buck Collar",
+    "supplyBrand": "",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3496,
+    "supplyName": "Valhoma Spike 20 Large Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "044902006218",
+    "catalogName": "DOG COLLAR NYL MD BLU 20\"",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4623,
+    "supplyName": "SmartBones 16 Count Skin & Coat",
+    "supplyBrand": "SmartBones",
+    "upc": "317163051298",
+    "catalogName": "API PET STRESS COAT 16 OZ",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3499,
+    "supplyName": "Valhoma Spike 18 Red Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "000011608541",
+    "catalogName": "JurassiPet Mite Wipes",
+    "score": 0.5800000000000001,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5482,
+    "supplyName": "Cascade 100 Filter Cartridge",
+    "supplyBrand": "Cascade",
+    "upc": "015561824590",
+    "catalogName": "Hari Charcoal",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3484,
+    "supplyName": "Valhoma 22 Red Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "785184120125",
+    "catalogName": "RED B land gr fr 22#",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4956,
+    "supplyName": "Greenies Blueberry Large 12oz",
+    "supplyBrand": "Greenies",
+    "upc": "030157007522",
+    "catalogName": "APA BIRDBATH MIXING-12OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6546,
+    "supplyName": "Nutro Cut Gravy Chicken 3.5 oz",
+    "supplyBrand": "Nutro",
+    "upc": "079105117814",
+    "catalogName": "NUTRO cut grav ck 3.5oz",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6168,
+    "supplyName": "Fromm Beef Frittata Veg 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114146",
+    "catalogName": "FROMM beef frittata 4#",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3488,
+    "supplyName": "Valhoma 24 Black Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "015561110631",
+    "catalogName": "\"FLUVAL easy vac 24\"\"\"",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6520,
+    "supplyName": "Nutrisource PureVita Beef Entree 12.5oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "052742007250",
+    "catalogName": "SD heal cuis beef 12.5oz",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6160,
+    "supplyName": "Fromm Lamb & Lentil 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114542",
+    "catalogName": "FROMM lamb & lentil 4#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6167,
+    "supplyName": "Fromm Pork & Peas 12lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114320",
+    "catalogName": "FROMM pork & peas 12#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6108,
+    "supplyName": "Sportmix Bite Size 40lb",
+    "supplyBrand": "SportMix",
+    "upc": "034846600520",
+    "catalogName": "SPORTMIX bite size 40#",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3501,
+    "supplyName": "Valhoma Spike 20 Black Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "044902006218",
+    "catalogName": "DOG COLLAR NYL MD BLU 20\"",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6169,
+    "supplyName": "Fromm Beef Frittata Veg 12lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114122",
+    "catalogName": "FROMM beef frittata 12#",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6147,
+    "supplyName": "Fromm Whitefish 12lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116331",
+    "catalogName": "FROMM whitefish 12#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6112,
+    "supplyName": "Fromm Classic 30lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105229",
+    "catalogName": "FROMM classic 30#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6329,
+    "supplyName": "Earthborn Meadow 25lb",
+    "supplyBrand": "Earthborn",
+    "upc": "034846540307",
+    "catalogName": "EARTHBORN meadow 25#",
+    "score": 0.8,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6140,
+    "supplyName": "Fromm Chicken À La Veg 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116164",
+    "catalogName": "FROMM ck a la veg 4#",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6852,
+    "supplyName": "Royal Canin Kitten 3oz",
+    "supplyBrand": "Royal Canin",
+    "upc": "030111410184",
+    "catalogName": "ROYAL CAN kitten 3oz",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6801,
+    "supplyName": "Science Diet Cat Urinary & Hairball Control 15.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "017800184953",
+    "catalogName": "CAT CHOW 15#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4558,
+    "supplyName": "Bambne 4 Small Beef",
+    "supplyBrand": "Ethical Products",
+    "upc": "064992723408",
+    "catalogName": "ACANA butch beef 4#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5254,
+    "supplyName": "Foregrounder Fan Palm Red",
+    "supplyBrand": "Penn-Plax",
+    "upc": "030172060962",
+    "catalogName": "Tide & Treasure™ Fan Palm - Red - 3.5'",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3800,
+    "supplyName": "Coastal Pink Bright26\" Martingale Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6501,
+    "supplyName": "Nutrisource Woodlands Select 13oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "019014013326",
+    "catalogName": "IAMS pup 13oz",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6554,
+    "supplyName": "Natural Bal Salmon 13oz",
+    "supplyBrand": "Natural Balance",
+    "upc": "723633001564",
+    "catalogName": "NAT BAL salmon 13oz",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6004,
+    "supplyName": "Royal Canin Small Adult Adult Adult Adult 4lb",
+    "supplyBrand": "Royal Canin",
+    "upc": "000338007771",
+    "catalogName": "Dr.Elseys Cat Attract Litter",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5974,
+    "supplyName": "Science Diet Small Mini Perf Weight 12.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "012104420042",
+    "catalogName": "Dogswell Hydrocortisone",
+    "score": 0.625,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5224,
+    "supplyName": "Aqualife Plant Scapes 10\"",
+    "supplyBrand": "Aqualife",
+    "upc": "618940313113",
+    "catalogName": "AQUALIFE PLNT SCAPES 10\"",
+    "score": 0.5800000000000001,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5968,
+    "supplyName": "Science Diet Perf Digest Chicken 3.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742038292",
+    "catalogName": "SD perf digest ck 3.5#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5953,
+    "supplyName": "Science Diet Salmon 14lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742068619",
+    "catalogName": "SD salmon 14#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6721,
+    "supplyName": "Science Diet Cat Healthy Cuisine Tuna 2.9oz",
+    "supplyBrand": "Science Diet",
+    "upc": "052742007090",
+    "catalogName": "SD cat heal cuis tuna 2.9oz",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5490,
+    "supplyName": "Forza Replace Filter Pad Fz9uv",
+    "supplyBrand": "Forza",
+    "upc": "048054800580",
+    "catalogName": "Oasis Vita Drops Large Birds",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3887,
+    "supplyName": "Coastal Neon Pink26\" Martingale Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6508,
+    "supplyName": "Nutrisource Chicken Lamb & Fish 13oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "640461012138",
+    "catalogName": "CANID lamb 13oz",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6434,
+    "supplyName": "VICTOR Lamb & Rice 15lb",
+    "supplyBrand": "VICTOR",
+    "upc": "854524005832",
+    "catalogName": "VICTOR cat hi pro 5#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6283,
+    "supplyName": "Nutrisource Senior 4lb",
+    "supplyBrand": "Nutrisource",
+    "upc": "073893265061",
+    "catalogName": "NUTR SOU senior 4#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6676,
+    "supplyName": "Vital Essentials Cat Chicken Mini Nibbles 12oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "042055046336",
+    "catalogName": "HIKARI sinking gold mini 12oz",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3209,
+    "supplyName": "Coastal Collar Black Bones 12\"\"",
+    "supplyBrand": "Coastal",
+    "upc": "076484805122",
+    "catalogName": "COASTAL CLT SAFE BRIGHT MAX SZ-12",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4851,
+    "supplyName": "Tuesdays 5\" Beef Cheek Roll",
+    "supplyBrand": "Tuesday's Natural Dog Company",
+    "upc": "038100101310",
+    "catalogName": "PRO PLAN beef shred 5#",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6484,
+    "supplyName": "Fromm Turkey & Pumpkin 12.2oz",
+    "supplyBrand": "Fromm",
+    "upc": "072705118663",
+    "catalogName": "FROMM beef & bar 12.2oz",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5527,
+    "supplyName": "Aqueon Replace Filter 3pk Medium",
+    "supplyBrand": "Aqueon",
+    "upc": "071859999005",
+    "catalogName": "Kaytee Parrot",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6011,
+    "supplyName": "Barn Home 25-50lb",
+    "supplyBrand": "Petmate",
+    "upc": "029695251139",
+    "catalogName": "barn home 25-50#",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3944,
+    "supplyName": "Coastal Blue26\" Mbuc Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6900,
+    "supplyName": "Primal Frozen Pronto Lamb 4lb",
+    "supplyBrand": "Primal",
+    "upc": "850334004454",
+    "catalogName": "PRIMAL fro pron lamb 4#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3779,
+    "supplyName": "Coastal Pink Bright6' 2906 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "030172077340",
+    "catalogName": "Reptology Turtle Platform",
+    "score": 0.5800000000000001,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6332,
+    "supplyName": "Welln Small Breed Weight 4lb",
+    "supplyBrand": "Wellness",
+    "upc": "076344891185",
+    "catalogName": "WELLN sm br weight 4#",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6985,
+    "supplyName": "Tetramin Plus 1oz",
+    "supplyBrand": "Tetra",
+    "upc": "046798772415",
+    "catalogName": "TETRA tetramin plus 1oz",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6381,
+    "supplyName": "Pro Plan Shred Puppy 34lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100142894",
+    "catalogName": "PRO PLAN shred puppy 34#",
+    "score": 0.88,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5232,
+    "supplyName": "Durvet Triple Wormer 12pk Chw Puppy",
+    "supplyBrand": "Durvet",
+    "upc": "048081008218",
+    "catalogName": "DURVET TRIPWRM 12PK CHW PUPPY",
+    "score": 0.5846153846153846,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3716,
+    "supplyName": "Coastal Lime 26\" Buck Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6331,
+    "supplyName": "Earthborn Coastal Catch 25lb",
+    "supplyBrand": "Earthborn",
+    "upc": "034846540208",
+    "catalogName": "EARTHBORN coastal catch 25#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6545,
+    "supplyName": "Nutro Cut Gravy Beef 3.5 oz",
+    "supplyBrand": "Nutro",
+    "upc": "079105117838",
+    "catalogName": "NUTRO cut grav beef 3.5oz",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3916,
+    "supplyName": "Coastal Hunter26\" Buck Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4952,
+    "supplyName": "Greenies Blueberry Teenie 12oz",
+    "supplyBrand": "Greenies",
+    "upc": "030157007522",
+    "catalogName": "APA BIRDBATH MIXING-12OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6236,
+    "supplyName": "Acana Butcher's Salmon 4lb",
+    "supplyBrand": "Acana",
+    "upc": "064992723422",
+    "catalogName": "ACANA butch salmon 4#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3936,
+    "supplyName": "Coastal Blue06' 2906 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "030172077340",
+    "catalogName": "Reptology Turtle Platform",
+    "score": 0.5800000000000001,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5507,
+    "supplyName": "Aqueon Ecorenew Medium 3pk",
+    "supplyBrand": "Aqueon",
+    "upc": "071859999005",
+    "catalogName": "Kaytee Parrot",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5502,
+    "supplyName": "Aqueon Carbon Pad 30-50 4 Count",
+    "supplyBrand": "Aqueon",
+    "upc": "046706302307",
+    "catalogName": "Higgins Sunburts Cockatiel",
+    "score": 0.6666666666666667,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6474,
+    "supplyName": "Fromm Turkey Duck & Sweet Potato 12.2oz",
+    "supplyBrand": "Fromm",
+    "upc": "072705119042",
+    "catalogName": "FROMM ck & duck 12.2oz",
+    "score": 0.7428571428571429,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3388,
+    "supplyName": "Coastal Ww426 Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5245,
+    "supplyName": "Suzie's CBD Apple 6oz",
+    "supplyBrand": "Suzie's CBD",
+    "upc": "000116772105",
+    "catalogName": "AQUAVITRO phosfiltrum 5.6oz",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6123,
+    "supplyName": "Fromm Gold Large Breed Puppy 30lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105519",
+    "catalogName": "FROMM gold lg br puppy 30#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 2144,
+    "supplyName": "Catit Creamy Chicken & Shrimp 12 Pack",
+    "supplyBrand": "Catit",
+    "upc": "022517430217",
+    "catalogName": "EUK be & veg 12.5oz",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3853,
+    "supplyName": "Coastal Black06' 406 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "010838201357",
+    "catalogName": "Lagoon Kidney",
+    "score": 0.5800000000000001,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3498,
+    "supplyName": "Valhoma Spike 26 Large Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "009119770062",
+    "catalogName": "Flukers Garden Blend",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6151,
+    "supplyName": "Fromm Salmon À La Veg 26lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116416",
+    "catalogName": "FROMM salmon a la veg 26#",
+    "score": 0.88,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5219,
+    "supplyName": "Aqualife Plant Scapes 14\"",
+    "supplyBrand": "",
+    "upc": "644472014693",
+    "catalogName": "Captain CuttleBone",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6136,
+    "supplyName": "Fromm Gold Senior 5lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705115471",
+    "catalogName": "FROMM gold senior 5#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3888,
+    "supplyName": "Coastal Neon Pink26\" Buck Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5503,
+    "supplyName": "Aqueon Carbon Pad 10 4 Count",
+    "supplyBrand": "Aqueon",
+    "upc": "046706210145",
+    "catalogName": "Higgins VitaSeed Cockateil",
+    "score": 0.625,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6157,
+    "supplyName": "Fromm Trout 26lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705108015",
+    "catalogName": "FROMM trout 26#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4939,
+    "supplyName": "Greenies Orange Teenie 12oz",
+    "supplyBrand": "Greenies",
+    "upc": "030157007522",
+    "catalogName": "APA BIRDBATH MIXING-12OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5220,
+    "supplyName": "Aqualife Plant Scapes 14\"",
+    "supplyBrand": "",
+    "upc": "644472014693",
+    "catalogName": "Captain CuttleBone",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6834,
+    "supplyName": "Fussie Cat Tuna, Smoked Tuna 2.82oz",
+    "supplyBrand": "Fussie Cat",
+    "upc": "888641130535",
+    "catalogName": "FUSSIE CAT tuna ocean 2.82oz",
+    "score": 0.9,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6339,
+    "supplyName": "IAMS Small Breed 7lb",
+    "supplyBrand": "Iams",
+    "upc": "019014711086",
+    "catalogName": "IAMS mini chu 7#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3694,
+    "supplyName": "Coastal Orange 6' 2906 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "030172077340",
+    "catalogName": "Reptology Turtle Platform",
+    "score": 0.5800000000000001,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3827,
+    "supplyName": "Coastal Purple26\" Buck Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3190,
+    "supplyName": "Coastal Collar Red Bones 26\"\"",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4953,
+    "supplyName": "Greenies Blueberry Petite 12oz",
+    "supplyBrand": "Greenies",
+    "upc": "030157007522",
+    "catalogName": "APA BIRDBATH MIXING-12OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4681,
+    "supplyName": "St. Rocco's Cod 8oz",
+    "supplyBrand": "Saint Rocco's",
+    "upc": "000116007603",
+    "catalogName": "SEACHEM acid regulator 8.8oz",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5511,
+    "supplyName": "Aqueon Phosphate Remove 10 4pk",
+    "supplyBrand": "Aqueon",
+    "upc": "071859948706",
+    "catalogName": "Kaytee Cockatiel",
+    "score": 0.7428571428571429,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4849,
+    "supplyName": "Tuesday 12\" Collagen Sticks Beef",
+    "supplyBrand": "Tuesday Pet",
+    "upc": "072705114122",
+    "catalogName": "FROMM beef frittata 12#",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4937,
+    "supplyName": "Greenies Orange Regular 12oz",
+    "supplyBrand": "Greenies",
+    "upc": "030157007522",
+    "catalogName": "APA BIRDBATH MIXING-12OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6917,
+    "supplyName": "Vital Essentials Cat Frozen Turkey 28oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "840199697014",
+    "catalogName": "VITAL ESSEN cat duck 28oz",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6133,
+    "supplyName": "Fromm Gold Weight 5lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105779",
+    "catalogName": "FROMM gold weight 5#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5234,
+    "supplyName": "Durvet Liquid Wormer 2X Dogs 2oz",
+    "supplyBrand": "Durvet",
+    "upc": "030172105456",
+    "catalogName": "Donut Chew 2pk",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4207,
+    "supplyName": "Kaytee 11.5\" Run-About Ball Rainbow",
+    "supplyBrand": "Kaytee",
+    "upc": "046706303502",
+    "catalogName": "Higgins Duets Parrots&Macaws",
+    "score": 0.6142857142857143,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6369,
+    "supplyName": "Pro Plan Lamb Shred 35lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100101365",
+    "catalogName": "PRO PLAN lamb shred 5#",
+    "score": 0.88,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6634,
+    "supplyName": "Pro Plan Chicken & Rice 13oz",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100026712",
+    "catalogName": "PRO PLAN pup 13oz",
+    "score": 0.76,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6544,
+    "supplyName": "Wellness Petite Entree Beef 3oz",
+    "supplyBrand": "Wellness",
+    "upc": "076344090359",
+    "catalogName": "WELLNESS pt en beef 3oz",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4935,
+    "supplyName": "Greenies Orange Petite 6oz",
+    "supplyBrand": "Greenies",
+    "upc": "000116772105",
+    "catalogName": "AQUAVITRO phosfiltrum 5.6oz",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6636,
+    "supplyName": "Pro Plan Beef & Rice 13oz",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100026736",
+    "catalogName": "PRO PLAN beef & ri 13oz",
+    "score": 0.88,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6540,
+    "supplyName": "Greenies Small Top Chicken & Green Bean 2oz",
+    "supplyBrand": "Greenies",
+    "upc": "642863117657",
+    "catalogName": "GREENIES sm top ck & gr bean 2oz",
+    "score": 0.7428571428571429,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6362,
+    "supplyName": "Pro Plan Beef Shred 5lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100101310",
+    "catalogName": "PRO PLAN beef shred 5#",
+    "score": 0.88,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3504,
+    "supplyName": "Valhoma Spike 26 Black Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "009119770062",
+    "catalogName": "Flukers Garden Blend",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6472,
+    "supplyName": "Fromm Chicken & Sweet Potato 12.2oz",
+    "supplyBrand": "Fromm",
+    "upc": "072705118663",
+    "catalogName": "FROMM beef & bar 12.2oz",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3477,
+    "supplyName": "Valhoma 20 Black Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "044902006218",
+    "catalogName": "DOG COLLAR NYL MD BLU 20\"",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6012,
+    "supplyName": "Barn Home 50-90lb",
+    "supplyBrand": "Petmate",
+    "upc": "029695251146",
+    "catalogName": "barn home 50-90#",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5889,
+    "supplyName": "Dog Tanktop Drk Green Large",
+    "supplyBrand": "",
+    "upc": "076484005565",
+    "catalogName": "Safari Comb Large",
+    "score": 0.5714285714285714,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6149,
+    "supplyName": "Fromm Salmon À La Veg 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116461",
+    "catalogName": "FROMM salmon a la veg 4#",
+    "score": 0.88,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6073,
+    "supplyName": "Pacific Stream Puppy 14lb",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "074198614004",
+    "catalogName": "pacific stream puppy 14#",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6678,
+    "supplyName": "Health Extension Mobility 3.5 oz",
+    "supplyBrand": "Health Extension",
+    "upc": "035585361536",
+    "catalogName": "KNG BITES CHKN 5 OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5524,
+    "supplyName": "Aqueon Replace Filter Small 3pk",
+    "supplyBrand": "Aqueon",
+    "upc": "071859999005",
+    "catalogName": "Kaytee Parrot",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 7139,
+    "supplyName": "Api Tap Water Conditioner 8oz",
+    "supplyBrand": "API",
+    "upc": "317163010525",
+    "catalogName": "API tap wat con 8oz",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6370,
+    "supplyName": "Pro Plan Small Breed Chicken Shred 6lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100130549",
+    "catalogName": "PRO PLAN ck shred 6#",
+    "score": 0.6571428571428571,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6114,
+    "supplyName": "Fromm Classic Puppy 5lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105472",
+    "catalogName": "FROMM classic puppy 5#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6143,
+    "supplyName": "Fromm Duck À La Veg 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116263",
+    "catalogName": "FROMM duck a la veg 4#",
+    "score": 0.88,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6336,
+    "supplyName": "IAMS Mini Chunks 7lb",
+    "supplyBrand": "Iams",
+    "upc": "019014711086",
+    "catalogName": "IAMS mini chu 7#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6163,
+    "supplyName": "Fromm Surf & Turf 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116546",
+    "catalogName": "FROMM surf & turf 4#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6926,
+    "supplyName": "Hikari Frozen Spirulina,Mysis 3.5 oz",
+    "supplyBrand": "Hikari",
+    "upc": "042055309202",
+    "catalogName": "HIKARI froz mysis 3.5oz",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 7235,
+    "supplyName": "Tetra Glo Large Gr/Pack Plant",
+    "supplyBrand": "Tetra",
+    "upc": "046798780335",
+    "catalogName": "TETRA glo lg gr/pk plant",
+    "score": 0.6666666666666666,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6235,
+    "supplyName": "Acana Butcher's Beef 4lb",
+    "supplyBrand": "Acana",
+    "upc": "064992723408",
+    "catalogName": "ACANA butch beef 4#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5484,
+    "supplyName": "Cascade 150/200 Flt Cartridge",
+    "supplyBrand": "Cascade",
+    "upc": "071859475110",
+    "catalogName": "Exact Hand Feeding Formula",
+    "score": 0.6666666666666667,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5765,
+    "supplyName": "Tetra Pond Pump550 Medium",
+    "supplyBrand": "",
+    "upc": "797801036931",
+    "catalogName": "naturVet Tear Stain Chew",
+    "score": 0.625,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5500,
+    "supplyName": "Cascade 20 Filter 3pk",
+    "supplyBrand": "Cascade",
+    "upc": "720101104024",
+    "catalogName": "SweetHarvest Cockatiel w Sunflower",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6155,
+    "supplyName": "Fromm Trout 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705108060",
+    "catalogName": "FROMM trout 4#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 7207,
+    "supplyName": "Tetra Glo Gravel Pink/Green/Blue",
+    "supplyBrand": "Tetra",
+    "upc": "046798290858",
+    "catalogName": "TETRA glo gravel pink/grn/blue",
+    "score": 0.8333333333333334,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6639,
+    "supplyName": "Pro Plan Turkey & Sweet Potato 13oz",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100026712",
+    "catalogName": "PRO PLAN pup 13oz",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4938,
+    "supplyName": "Greenies Orange Petite 12oz",
+    "supplyBrand": "Greenies",
+    "upc": "030157007522",
+    "catalogName": "APA BIRDBATH MIXING-12OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6134,
+    "supplyName": "Fromm Gold Weight 15lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105731",
+    "catalogName": "FROMM gold weight 15#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4437,
+    "supplyName": "10\"collagen Sticks Original",
+    "supplyBrand": "Barkworthies",
+    "upc": "015561110617",
+    "catalogName": "\"FLUVAL easy vac 10\"\"\"",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6103,
+    "supplyName": "Diamond Lamb 20lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198608164",
+    "catalogName": "DIAM lamb 20#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6982,
+    "supplyName": "Tetra Color 7.06oz",
+    "supplyBrand": "Tetra",
+    "upc": "046798161400",
+    "catalogName": "TETRA goldfish 7.06oz",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6358,
+    "supplyName": "Pro Plan Weight 34lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100131874",
+    "catalogName": "PRO PLAN weight 34#",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6534,
+    "supplyName": "Health Extension Gently Cooked Lamb 9oz",
+    "supplyBrand": "Health Extension",
+    "upc": "810120990002",
+    "catalogName": "HEALTH EXTEN dig sup 9oz",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6368,
+    "supplyName": "Pro Plan Lamb Shred 15lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100101365",
+    "catalogName": "PRO PLAN lamb shred 5#",
+    "score": 0.88,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6665,
+    "supplyName": "Kitten Chow 3.15lb",
+    "supplyBrand": "Purina",
+    "upc": "017800150200",
+    "catalogName": "KITTEN CHOW 3.15#",
+    "score": 0.8,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5736,
+    "supplyName": "Aqua-mag Mag Drive Water Pump Model 2",
+    "supplyBrand": "Danner Manufacturing",
+    "upc": "856162000019",
+    "catalogName": "AQUA-MAG MAG DRIVE WTR PUMP MOD 2",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6166,
+    "supplyName": "Fromm Pork & Peas 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114344",
+    "catalogName": "FROMM pork & peas 4#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6322,
+    "supplyName": "Max Bully 30lb",
+    "supplyBrand": "Max",
+    "upc": "030626101300",
+    "catalogName": "MAX BULLY 30#",
+    "score": 0.8,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6418,
+    "supplyName": "Acana Freeze Dried Beef 14oz",
+    "supplyBrand": "Acana",
+    "upc": "064992715670",
+    "catalogName": "ACANA fd beef 14oz",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6319,
+    "supplyName": "Pure Vita Grain Free Frozen Beef 4lb",
+    "supplyBrand": "Pure Vita",
+    "upc": "073893181118",
+    "catalogName": "PURE VITA gr fr beef 4#",
+    "score": 0.6571428571428571,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 2594,
+    "supplyName": "Coastal Large Pineapples26 Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6372,
+    "supplyName": "Pro Plan Small Breed Chicken 6lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100113627",
+    "catalogName": "PRO PLAN puppy 6#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6655,
+    "supplyName": "Zignature Lamb 25lb",
+    "supplyBrand": "Zignature",
+    "upc": "840243144099",
+    "catalogName": "BLUE B lamb 5#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6805,
+    "supplyName": "Science Diet Cat Indoor 15.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "017800184953",
+    "catalogName": "CAT CHOW 15#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6444,
+    "supplyName": "VICTOR Puppy 5lb",
+    "supplyBrand": "VICTOR",
+    "upc": "854524005832",
+    "catalogName": "VICTOR cat hi pro 5#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4770,
+    "supplyName": "Vital Essentials Salmon Bites 2.5oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "072705124107",
+    "catalogName": "Purr Snackitty Salmon",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6374,
+    "supplyName": "Pro Plan Toy 5lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100135407",
+    "catalogName": "PRO PLAN toy puppy 5#",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5915,
+    "supplyName": "Science Diet Puppy Large Breed Chicken 27.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742060187",
+    "catalogName": "SD puppy ck 27.5#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4644,
+    "supplyName": "SmartBones 24 Mini Sweet Potato",
+    "supplyBrand": "SmartBones",
+    "upc": "096316280823",
+    "catalogName": "Zilla Heat&UVB Basking Fixture",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3912,
+    "supplyName": "Coastal Hunter06' 406 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "010838201357",
+    "catalogName": "Lagoon Kidney",
+    "score": 0.5800000000000001,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3822,
+    "supplyName": "Coastal Purple06' 606 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "050005832904",
+    "catalogName": "Pangea Hanging Orchid purple",
+    "score": 0.5636363636363636,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6109,
+    "supplyName": "Sportmix Energy Plus 50lb",
+    "supplyBrand": "SportMix",
+    "upc": "034846700916",
+    "catalogName": "SPORTMIX energy plus 50#",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6110,
+    "supplyName": "Sportmix High Energy 50lb",
+    "supplyBrand": "SportMix",
+    "upc": "034846700435",
+    "catalogName": "SPORTMIX high energy 50#",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6497,
+    "supplyName": "Taste of the Wild Southwest Canyon 13.2oz",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "022517444856",
+    "catalogName": "Catit Nibbly Shrimp Grills",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4006,
+    "supplyName": "Coastal Blue18\" 2918 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "759834050827",
+    "catalogName": "Galap. Hermit Crab Sub",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3500,
+    "supplyName": "Valhoma Spike 24 Red Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "027773019602",
+    "catalogName": "\"MW spree kennel red 24\"\"\"",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6577,
+    "supplyName": "Science Diet Healthy Cuisine 7+ Beef 12.5oz",
+    "supplyBrand": "Science Diet",
+    "upc": "052742007274",
+    "catalogName": "SD heal cuis 7+ beef 12.5oz",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4679,
+    "supplyName": "St. Rocco's Meat Lover 8oz",
+    "supplyBrand": "Saint Rocco's",
+    "upc": "015561242011",
+    "catalogName": "ExoTerra Monsoon Multi",
+    "score": 0.6181818181818182,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3188,
+    "supplyName": "Coastal Collar Special Paws 26\"\"",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3774,
+    "supplyName": "Coastal Blue 6' 2906 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "030172077340",
+    "catalogName": "Reptology Turtle Platform",
+    "score": 0.5800000000000001,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5250,
+    "supplyName": "Hippie Hounds 1000mg Dog Drops",
+    "supplyBrand": "Hippie Hounds",
+    "upc": "644472002355",
+    "catalogName": "Vitapol Fruite Smackers Cockatiel",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6085,
+    "supplyName": "Diamond Large Breed 40lb",
+    "supplyBrand": "Diamond",
+    "upc": "030111487079",
+    "catalogName": "KAY FOOD H PETITE BREED 4#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5481,
+    "supplyName": "Tetra Carbon Filter Ex30, Ex45, Ex70 2pk Large",
+    "supplyBrand": "Tetra",
+    "upc": "080605803336",
+    "catalogName": "Hari Clay-Cal",
+    "score": 0.6727272727272727,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6490,
+    "supplyName": "Zignature Trout & Salmon 13oz",
+    "supplyBrand": "Zignature",
+    "upc": "723633001564",
+    "catalogName": "NAT BAL salmon 13oz",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6130,
+    "supplyName": "Fromm Gold Large Breed 30lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105717",
+    "catalogName": "FROMM gold weight 30#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4551,
+    "supplyName": "Bam-Bone Dental 7.5 X-Bone Apple",
+    "supplyBrand": "Ethical Products",
+    "upc": "035585477084",
+    "catalogName": "KNG DENTAL BONE MD",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6138,
+    "supplyName": "Fromm Gold Senior 30lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705115419",
+    "catalogName": "FROMM gold senior 30#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 7297,
+    "supplyName": "Activ Betta White Sand",
+    "supplyBrand": "World Wide Imports",
+    "upc": "029904109312",
+    "catalogName": "ACTIV BETTA wh sand",
+    "score": 0.75,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5701,
+    "supplyName": "Fluval C4 Foam Pad 2pk",
+    "supplyBrand": "Fluval",
+    "upc": "645095004207",
+    "catalogName": "TropiClean Essentials GoatMilk Sham",
+    "score": 0.6666666666666667,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6624,
+    "supplyName": "Eukanuba Lamb 13.2oz",
+    "supplyBrand": "Eukanuba",
+    "upc": "074198612727",
+    "catalogName": "DIAM lamb 13.2oz",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6637,
+    "supplyName": "Pro Plan Chicken & Carrot 13oz",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100026712",
+    "catalogName": "PRO PLAN pup 13oz",
+    "score": 0.76,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6499,
+    "supplyName": "Taste of the Wild Sierra Mountain 13.2oz",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "022517444856",
+    "catalogName": "Catit Nibbly Shrimp Grills",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4638,
+    "supplyName": "SmartBones 6 Stuff Twist Pork",
+    "supplyBrand": "SmartBones",
+    "upc": "072705114016",
+    "catalogName": "FROMM pork & apple 26#",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3495,
+    "supplyName": "Valhoma Spike 16 Hp Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "009761211850",
+    "catalogName": "Creatures Feeding Block",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5913,
+    "supplyName": "Science Diet Puppy Small Breed 12.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "030172101380",
+    "catalogName": "PennPlex Paw Cleaner",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 2809,
+    "supplyName": "Spot Axolotl Mermaid 10\"",
+    "supplyBrand": "Ethical Pet",
+    "upc": "015561110617",
+    "catalogName": "\"FLUVAL easy vac 10\"\"\"",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6139,
+    "supplyName": "Fromm Gold Ancient 30lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105915",
+    "catalogName": "FROMM gold ancient 30#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4690,
+    "supplyName": "Rewards Crunch Venison 14oz",
+    "supplyBrand": "Natural Balance",
+    "upc": "096316000490",
+    "catalogName": "Zilla Spring Cave",
+    "score": 0.5800000000000001,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6853,
+    "supplyName": "Royal Canin Mother & Babycat 3oz",
+    "supplyBrand": "Royal Canin",
+    "upc": "030111410184",
+    "catalogName": "ROYAL CAN kitten 3oz",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5876,
+    "supplyName": "Moon & Stars Pj Blue Extra Large",
+    "supplyBrand": "",
+    "upc": "076484512995",
+    "catalogName": "Safari Combo Brush large",
+    "score": 0.5555555555555556,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6188,
+    "supplyName": "PetCrest 30\" Double Door",
+    "supplyBrand": "PetCrest",
+    "upc": "784099025112",
+    "catalogName": "\"PC 30\"\" double door\"",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6187,
+    "supplyName": "PetCrest 24\" Double Door",
+    "supplyBrand": "PetCrest",
+    "upc": "784099025105",
+    "catalogName": "\"PC 24\"\" double door\"",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6752,
+    "supplyName": "Fromm PurrSnickety Chicken 10lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705115631",
+    "catalogName": "FROMM cat adult 10#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6686,
+    "supplyName": "Taste of the Wild Rocky Mountain 5.5oz",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "859610007684",
+    "catalogName": "BLUE BUF cat wild turkey 5.5oz",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6748,
+    "supplyName": "Fromm PurrSnickety Salmon 6oz",
+    "supplyBrand": "Fromm",
+    "upc": "072705137053",
+    "catalogName": "FROMM pur sni co 6oz",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5661,
+    "supplyName": "Fluval Ac30 Biothane Foam 3pk",
+    "supplyBrand": "Fluval",
+    "upc": "097227002333",
+    "catalogName": "Banixx Paw Wipes",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6851,
+    "supplyName": "Science Diet Cat Senior Salmon Stew 2.8oz",
+    "supplyBrand": "Science Diet",
+    "upc": "052742075815",
+    "catalogName": "SD cat in do salm stew 2.8oz",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6892,
+    "supplyName": "Primal Frozen Beef Nuggets 3lb",
+    "supplyBrand": "Primal",
+    "upc": "850334004003",
+    "catalogName": "PRIMAL fro beef nug 3#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6798,
+    "supplyName": "Science Diet Cat Hairball Control 7+ 7lb",
+    "supplyBrand": "Science Diet",
+    "upc": "764375815569",
+    "catalogName": "Feline Pine 7lb Litter",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6509,
+    "supplyName": "Nutrisource Beef & Rice Recipe 12.3oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "038100173409",
+    "catalogName": "PRO PLAN cat urin beef 3oz",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6070,
+    "supplyName": "Taste of the Wild High Prairie Puppy 5lb",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "029695235924",
+    "catalogName": "PetMate Travel Bowl Duo",
+    "score": 0.625,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 7308,
+    "supplyName": "Aqueon Essentials Kit 29 Gallon",
+    "supplyBrand": "Aqueon",
+    "upc": "015905002851",
+    "catalogName": "AQUEON essentisl kit 29 ga",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6099,
+    "supplyName": "Diamond Prem 6lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198615674",
+    "catalogName": "DIAM prem 6#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3910,
+    "supplyName": "Coastal Hunter06' 606 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "050005832904",
+    "catalogName": "Pangea Hanging Orchid purple",
+    "score": 0.5636363636363636,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3512,
+    "supplyName": "Valhoma Spike 24 Hw Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "009761211060",
+    "catalogName": "ZooMed Cricket Block",
+    "score": 0.6181818181818182,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4143,
+    "supplyName": "JW Pet Pet Pet Pet Walk Up Hide Medium",
+    "supplyBrand": "JW Pet",
+    "upc": "322512001445",
+    "catalogName": "JW PET LE ROPE/TUG LG",
+    "score": 0.5555555555555556,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6505,
+    "supplyName": "Nutrisource Seafood Select 12.3oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "073893021261",
+    "catalogName": "NUTRI SOUR seafood 12.3oz",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4976,
+    "supplyName": "Smokehouse Gullet Bites 5oz",
+    "supplyBrand": "Smokehouse",
+    "upc": "000116014601",
+    "catalogName": "SEACHEM clarity 8.5oz",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6351,
+    "supplyName": "Pro Plan Sensitive Salmon 30lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100175526",
+    "catalogName": "PRO PLAN sensi salm 30#",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3857,
+    "supplyName": "Coastal Black26\" Buck Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 7002,
+    "supplyName": "Omega One Cichlid Pellets Super Color 4.2oz",
+    "supplyBrand": "Omega One",
+    "upc": "698220833319",
+    "catalogName": "OMEGA ONE cich pel sup col 4.2oz",
+    "score": 0.6571428571428571,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6741,
+    "supplyName": "Fromm Cat Beef Liváttini Veg 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705117208",
+    "catalogName": "FROMM cat beef livin 4#",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6576,
+    "supplyName": "Science Diet Healthy Cuisine Beef 12.5oz",
+    "supplyBrand": "Science Diet",
+    "upc": "052742007250",
+    "catalogName": "SD heal cuis beef 12.5oz",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5244,
+    "supplyName": "Suzie's CBD Pumpkin 6oz",
+    "supplyBrand": "Suzie's CBD",
+    "upc": "000116772105",
+    "catalogName": "AQUAVITRO phosfiltrum 5.6oz",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3511,
+    "supplyName": "Valhoma Spike 16 Hy Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "044902006201",
+    "catalogName": "DOG COLLAR NYL SM BLU 16\"",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5477,
+    "supplyName": "Tetra Whisper Filter Cartridge Small 2pk",
+    "supplyBrand": "Tetra",
+    "upc": "071859005324",
+    "catalogName": "Kaytee Kay-Kob litter",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6315,
+    "supplyName": "Pure Vita Small Bite Grain Free Frozen Turkey 4lb",
+    "supplyBrand": "Pure Vita",
+    "upc": "073893173045",
+    "catalogName": "PURE VITA turkey gr fr 4#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3855,
+    "supplyName": "Coastal Black06' 606 Leash",
+    "supplyBrand": "",
+    "upc": "050005832904",
+    "catalogName": "Pangea Hanging Orchid purple",
+    "score": 0.5636363636363636,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5508,
+    "supplyName": "Aqueon Ecorenew Small 3pk",
+    "supplyBrand": "Aqueon",
+    "upc": "071859999005",
+    "catalogName": "Kaytee Parrot",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6158,
+    "supplyName": "Fromm Zealambder 26lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705115013",
+    "catalogName": "FROMM zealambder 26#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4205,
+    "supplyName": "Kaytee 11.5\" Run-About Ball Clear",
+    "supplyBrand": "Kaytee",
+    "upc": "046706303502",
+    "catalogName": "Higgins Duets Parrots&Macaws",
+    "score": 0.6142857142857143,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6740,
+    "supplyName": "Fromm Cat Hasen Duckenpfeffer 10lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705115631",
+    "catalogName": "FROMM cat adult 10#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4775,
+    "supplyName": "Vital Essentials Minnows 1.0 oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "046798164907",
+    "catalogName": "TET FOOD FLAK-1 OZ",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6128,
+    "supplyName": "Fromm Gold 30lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705115211",
+    "catalogName": "FROMM gold 30#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 2886,
+    "supplyName": "Mammoth Small Extra Fresh 3 Knot Tug",
+    "supplyBrand": "Mammoth",
+    "upc": "746772200100",
+    "catalogName": "MAMMOTH SM COLOR 3 KNOT TUG",
+    "score": 0.625,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 7292,
+    "supplyName": "Marina Gravel Tri Blend",
+    "supplyBrand": "Marineland",
+    "upc": "015561123891",
+    "catalogName": "MARINA gravel tri bl",
+    "score": 0.75,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5206,
+    "supplyName": "Jungle Pds Large Stle 6",
+    "supplyBrand": "Penn-Plax",
+    "upc": "076484835292",
+    "catalogName": "Turbo Twine Ball",
+    "score": 0.5800000000000001,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6784,
+    "supplyName": "Science Diet Kitten Sto 3.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742069432",
+    "catalogName": "SD kitten sen sto 3.5#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4554,
+    "supplyName": "Bambne Wishbone 5.25 Chicken",
+    "supplyBrand": "Ethical Products",
+    "upc": "034846540208",
+    "catalogName": "EARTHBORN coastal catch 25#",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6556,
+    "supplyName": "Royal Canin 5.2oz",
+    "supplyBrand": "Royal Canin",
+    "upc": "030111420152",
+    "catalogName": "ROYAL CAN 5.2oz",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 1711,
+    "supplyName": "Vanilla Ness Single 16oz",
+    "supplyBrand": "Van Ness",
+    "upc": "026851002664",
+    "catalogName": "EAR SHMP OATMEAL 16OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6102,
+    "supplyName": "Diamond Lamb 6lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198608157",
+    "catalogName": "DIAM lamb 6#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6089,
+    "supplyName": "Science Diet Small Mini Perf Weight 4lb",
+    "supplyBrand": "Science Diet",
+    "upc": "012104432083",
+    "catalogName": "DogsWell Diarrhea Aid",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6530,
+    "supplyName": "Nutrisource Seafood Select 26lb",
+    "supplyBrand": "Nutrisource",
+    "upc": "073893430063",
+    "catalogName": "NUTR SOUR seafood 26#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6623,
+    "supplyName": "Eukanuba Chicken & Beef 12.5 oz",
+    "supplyBrand": "Eukanuba",
+    "upc": "072705114122",
+    "catalogName": "FROMM beef frittata 12#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6718,
+    "supplyName": "Science Diet Cat Senior Chicken 2.9oz",
+    "supplyBrand": "Science Diet",
+    "upc": "052742007090",
+    "catalogName": "SD cat heal cuis tuna 2.9oz",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6755,
+    "supplyName": "Fromm PurrSnickety Salmon 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116461",
+    "catalogName": "FROMM salmon a la veg 4#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6348,
+    "supplyName": "Pro Plan Sensitive Small Breed 15lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100101297",
+    "catalogName": "PRO PLAN shred sal 15#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4646,
+    "supplyName": "SmartBones 12 Chicken Sticks",
+    "supplyBrand": "SmartBones",
+    "upc": "091197230059",
+    "catalogName": "Flukers SunGlow Coil Bulb",
+    "score": 0.5636363636363636,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6233,
+    "supplyName": "Acana Butcher's Chicken 17lb",
+    "supplyBrand": "Acana",
+    "upc": "064992723392",
+    "catalogName": "ACANA butch ck 17#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3818,
+    "supplyName": "Coastal Purple06' 2906 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "030172077340",
+    "catalogName": "Reptology Turtle Platform",
+    "score": 0.5800000000000001,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5525,
+    "supplyName": "Aqueon Replace Filter Small 6pk",
+    "supplyBrand": "Aqueon",
+    "upc": "762177932002",
+    "catalogName": "ZuPreem Natural Parrot& Conure",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6353,
+    "supplyName": "Pro Plan Sensitive Lamb 24lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100100757",
+    "catalogName": "PRO PLAN sensi salm 4#",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 2584,
+    "supplyName": "Coastal Large Dinosaurs26 Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 2054,
+    "supplyName": "Coastal Collar Black Skulls 12\"",
+    "supplyBrand": "Coastal",
+    "upc": "076484805122",
+    "catalogName": "COASTAL CLT SAFE BRIGHT MAX SZ-12",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6176,
+    "supplyName": "Fromm Chicken Frommage 26lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114702",
+    "catalogName": "FROMM ck frommage 26#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6361,
+    "supplyName": "Pro Plan Chicken 30/20 37.5lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100520296",
+    "catalogName": "PRO PLAN ck 30/20 37.5#",
+    "score": 0.8285714285714285,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6247,
+    "supplyName": "Orijen Small Breed 4lb",
+    "supplyBrand": "Orijen",
+    "upc": "064992202408",
+    "catalogName": "ORIJEN reg red 4#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6531,
+    "supplyName": "Health Extension Gently Cooked Duck 9oz",
+    "supplyBrand": "Health Extension",
+    "upc": "810120991320",
+    "catalogName": "HEALTH EXTEN gen cook duck 9oz",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4803,
+    "supplyName": "Zignature Treats Trout 12oz",
+    "supplyBrand": "Zignature",
+    "upc": "030157007522",
+    "catalogName": "APA BIRDBATH MIXING-12OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6711,
+    "supplyName": "From PurrSnickety Duck Liv 3oz",
+    "supplyBrand": "Fromm",
+    "upc": "072705113408",
+    "catalogName": "FROM pur sni du liv 3oz",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 7196,
+    "supplyName": "Tetra Glo Grey & White Plant Small",
+    "supplyBrand": "Tetra",
+    "upc": "046798786740",
+    "catalogName": "TETRA glo gre & whi plant small",
+    "score": 0.6666666666666666,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6441,
+    "supplyName": "VICTOR Beef 5lb",
+    "supplyBrand": "VICTOR",
+    "upc": "854524005832",
+    "catalogName": "VICTOR cat hi pro 5#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6848,
+    "supplyName": "Science Diet Cat Urinary & Hairball Control Salmon Stew 2.9oz",
+    "supplyBrand": "Science Diet",
+    "upc": "052742075556",
+    "catalogName": "SD cat urin ck stew 2.9oz",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6375,
+    "supplyName": "Pro Plan Large Breed 18lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100131867",
+    "catalogName": "PRO PLAN weight 18#",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6898,
+    "supplyName": "Primal Frozen Nuggets Lamb 3lb",
+    "supplyBrand": "Primal",
+    "upc": "850334004034",
+    "catalogName": "PRIMAL fro nug lamb 3#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6366,
+    "supplyName": "Pro Plan Chicken Shred 35lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100101310",
+    "catalogName": "PRO PLAN beef shred 5#",
+    "score": 0.76,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6040,
+    "supplyName": "Natural Balance Venisin 22lb",
+    "supplyBrand": "Natural Balance",
+    "upc": "723633429856",
+    "catalogName": "NB venisin 22#",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6894,
+    "supplyName": "Primal Frozen Nuggets Pork 3lb",
+    "supplyBrand": "Primal",
+    "upc": "850334004263",
+    "catalogName": "PRIMAL fro nug pork 3#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6802,
+    "supplyName": "Science Diet Cat Hairball Control Light 15.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742887609",
+    "catalogName": "SD cat hairba light 15.5#",
+    "score": 0.625,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6739,
+    "supplyName": "Fromm Cat Hasen Duckenpfeffer 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114641",
+    "catalogName": "FROMM hasen duck 4#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6150,
+    "supplyName": "Fromm Salmon À La Veg 12lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116430",
+    "catalogName": "FROMM salmon a la veg 12#",
+    "score": 0.88,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3811,
+    "supplyName": "Coastal Blue 12\" Buck Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484805122",
+    "catalogName": "COASTAL CLT SAFE BRIGHT MAX SZ-12",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 7185,
+    "supplyName": "Zoo Med Mini Banquet Feeder Pleco",
+    "supplyBrand": "",
+    "upc": "097612113006",
+    "catalogName": "ZOO MED feeder banquet 3-4 day",
+    "score": 0.6666666666666666,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6391,
+    "supplyName": "Vital Essentials Duck Mini Pate 14oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "064992715632",
+    "catalogName": "ACANA fd duck 14oz",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6875,
+    "supplyName": "Freshpet Beef,Bison 1lb",
+    "supplyBrand": "Freshpet",
+    "upc": "076484062049",
+    "catalogName": "LILPALS HARNESS COMBO PKBPSM",
+    "score": 0.5714285714285714,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6098,
+    "supplyName": "Diamond Mainten 40lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198003402",
+    "catalogName": "DIAM mainten 40#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6761,
+    "supplyName": "Orijen Cat Six 4lb",
+    "supplyBrand": "Orijen",
+    "upc": "064992718527",
+    "catalogName": "ORIJEN cat guard 4#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6770,
+    "supplyName": "Science Diet Cat 7lb",
+    "supplyBrand": "Science Diet",
+    "upc": "019014712571",
+    "catalogName": "IAMS cat ck 7#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4856,
+    "supplyName": "Tuesdays 10\" Beef Cheek Peanut Butter",
+    "supplyBrand": "Tuesday's Natural Dog Company",
+    "upc": "072705117239",
+    "catalogName": "FROMM beef livin 10#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6286,
+    "supplyName": "Nutrisource Beef 4lb",
+    "supplyBrand": "Nutrisource",
+    "upc": "064992723408",
+    "catalogName": "ACANA butch beef 4#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6809,
+    "supplyName": "Sportmix Cat Gourmet 15lb",
+    "supplyBrand": "SportMix",
+    "upc": "034846600940",
+    "catalogName": "SPORTMIX cat gourmet 15#",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6831,
+    "supplyName": "Fussie Cat Tuna, Anchovy 2.47oz",
+    "supplyBrand": "Fussie Cat",
+    "upc": "888641130542",
+    "catalogName": "\"FUSSIE CAT tuna",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5632,
+    "supplyName": "Cascade Plant Growth 12bubl",
+    "supplyBrand": "Cascade",
+    "upc": "021653553088",
+    "catalogName": "BioGroom NatuScen Tuscan Olive Spray",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6113,
+    "supplyName": "Fromm Classic Puppy 30lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105427",
+    "catalogName": "FROMM classic puppy 30#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5523,
+    "supplyName": "Filter-a-carb Fc4",
+    "supplyBrand": "Penn-Plax",
+    "upc": "037175182550",
+    "catalogName": "API AMMO-CARB 14OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6526,
+    "supplyName": "Pro Plan Senior Large Breed Puppy Salmon 24lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100100757",
+    "catalogName": "PRO PLAN sensi salm 4#",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6255,
+    "supplyName": "RedBarn Land Who Grain Free 4lb",
+    "supplyBrand": "RedBarn",
+    "upc": "785184120071",
+    "catalogName": "RED B land who gr 4#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6451,
+    "supplyName": "Canid Multi 40lb",
+    "supplyBrand": "Canidae",
+    "upc": "878968002868",
+    "catalogName": "Purebites cat freeze shrimp",
+    "score": 0.5714285714285714,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 7260,
+    "supplyName": "Marina Accent Gravel Black",
+    "supplyBrand": "Marineland",
+    "upc": "015561123747",
+    "catalogName": "MARINA accent gravel bl",
+    "score": 0.75,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5004,
+    "supplyName": "Aqueon Twist & Click Plastic Blades 3pk",
+    "supplyBrand": "Aqueon",
+    "upc": "071859999005",
+    "catalogName": "Kaytee Parrot",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5447,
+    "supplyName": "Gray Striped Rock 3pc Kit",
+    "supplyBrand": "Penn-Plax",
+    "upc": "644472017878",
+    "catalogName": "HappyBeaks Big Cirlce and Blocks",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6117,
+    "supplyName": "Fromm Classic 15lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105236",
+    "catalogName": "FROMM classic 15#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6086,
+    "supplyName": "Science Diet Small Mini 7+ 15.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "842982073500",
+    "catalogName": "Small Tan Bone Place Mat",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6378,
+    "supplyName": "Pro Plan Large Breed Puppy 34lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100132635",
+    "catalogName": "PRO PLAN lg br puppy 34#",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6737,
+    "supplyName": "Fromm Cat Weight 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705115907",
+    "catalogName": "FROMM cat weight 4#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6246,
+    "supplyName": "Orijen Original 23.5lb",
+    "supplyBrand": "Orijen",
+    "upc": "064992103255",
+    "catalogName": "ORIJEN orig 23.5#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6175,
+    "supplyName": "Fromm Chicken Frommage 12lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114726",
+    "catalogName": "FROMM ck frommage 12#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 7294,
+    "supplyName": "Marina Gravel Black",
+    "supplyBrand": "Marineland",
+    "upc": "015561123808",
+    "catalogName": "MARINA burgund gravel",
+    "score": 0.6666666666666666,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5914,
+    "supplyName": "Science Diet Puppy Large Breed 15.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "019014610945",
+    "catalogName": "IAMS lg br puppy 15#",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6796,
+    "supplyName": "Science Diet Cat Indoor 7+ 7lb",
+    "supplyBrand": "Science Diet",
+    "upc": "764375815569",
+    "catalogName": "Feline Pine 7lb Litter",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4710,
+    "supplyName": "Nutrichomps Mix Braid 4 Count",
+    "supplyBrand": "Scott Pet",
+    "upc": "317163016508",
+    "catalogName": "APTAOON MIX TAP 4OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3535,
+    "supplyName": "Coastal Black White Stripe 26\" Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5934,
+    "supplyName": "Science Diet Puppy Lamb 12.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742059389",
+    "catalogName": "SD puppy lam 12.5#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6419,
+    "supplyName": "Acana Freeze Dried Chicken 14oz",
+    "supplyBrand": "Acana",
+    "upc": "064992715557",
+    "catalogName": "ACANA fd ck 14oz",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3386,
+    "supplyName": "Coastal Cto26 Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4000,
+    "supplyName": "Coastal Mpw26\" Security Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6789,
+    "supplyName": "Science Diet Cat Hairball Control 15.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "017800184953",
+    "catalogName": "CAT CHOW 15#",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4068,
+    "supplyName": "Marshals Furovite 3.5 oz",
+    "supplyBrand": "Marshall",
+    "upc": "035585361536",
+    "catalogName": "KNG BITES CHKN 5 OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6846,
+    "supplyName": "Science Diet Cat Urinary & Hairball Control Chicken Stew 2.9oz",
+    "supplyBrand": "Science Diet",
+    "upc": "052742075556",
+    "catalogName": "SD cat urin ck stew 2.9oz",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6039,
+    "supplyName": "Natural Balance Plant 24lb",
+    "supplyBrand": "Natural Balance",
+    "upc": "723633014496",
+    "catalogName": "NB plant 24#",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 452,
+    "supplyName": "Zoo Med Reptirock Extra Small",
+    "supplyBrand": "Zoo Med",
+    "upc": "097612119114",
+    "catalogName": "ZOO MED feeder pleco small",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3497,
+    "supplyName": "Valhoma Spike 18 Large Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "000011608541",
+    "catalogName": "JurassiPet Mite Wipes",
+    "score": 0.5800000000000001,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3722,
+    "supplyName": "Coastal Orange 12\" Buck Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484805122",
+    "catalogName": "COASTAL CLT SAFE BRIGHT MAX SZ-12",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4946,
+    "supplyName": "Yummy Crumbs L 12oz",
+    "supplyBrand": "YummyCombs",
+    "upc": "030157007522",
+    "catalogName": "APA BIRDBATH MIXING-12OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6013,
+    "supplyName": "Indigo 50-90lb House",
+    "supplyBrand": "Petmate",
+    "upc": "029695259463",
+    "catalogName": "indigo 50-90# house",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6502,
+    "supplyName": "Nutrisource Heartland Select 13oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "073893030027",
+    "catalogName": "NUTRI SOUR heartland 13oz",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3915,
+    "supplyName": "Coastal Hunter26\" Martingale Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6429,
+    "supplyName": "VICTOR Hi Pro 15lb",
+    "supplyBrand": "VICTOR",
+    "upc": "854524005832",
+    "catalogName": "VICTOR cat hi pro 5#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6510,
+    "supplyName": "Nutrisource Lamb Meal & Rice Recipe 12.3oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "073893021063",
+    "catalogName": "NUTRI SOUR lamb 12.3oz",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6760,
+    "supplyName": "Orijen Regional Red Cat 4lb",
+    "supplyBrand": "Orijen",
+    "upc": "064992202408",
+    "catalogName": "ORIJEN reg red 4#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3776,
+    "supplyName": "Coastal Blue 6' 406 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "010838201357",
+    "catalogName": "Lagoon Kidney",
+    "score": 0.5800000000000001,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6664,
+    "supplyName": "Cat Chow 3.15lb",
+    "supplyBrand": "Purina",
+    "upc": "017800150149",
+    "catalogName": "CAT CHOW 3.15#",
+    "score": 0.8,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5950,
+    "supplyName": "Science Diet Lamb Small Bite 15.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "038100101389",
+    "catalogName": "PRO PLAN lamb shred 15#",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6493,
+    "supplyName": "Zignature Kangaroo 13oz",
+    "supplyBrand": "Zignature",
+    "upc": "019014013326",
+    "catalogName": "IAMS pup 13oz",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6318,
+    "supplyName": "Pure Vita Grain Free Frozen Turkey 25lb",
+    "supplyBrand": "Pure Vita",
+    "upc": "073893170020",
+    "catalogName": "PURE VITA ck & br rice 5#",
+    "score": 0.5714285714285714,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6669,
+    "supplyName": "Diamond Kitten 6lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198608775",
+    "catalogName": "DIAM kitten 6#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6762,
+    "supplyName": "Acana Cat Indoor Herring 4lb",
+    "supplyBrand": "Acana",
+    "upc": "064992723941",
+    "catalogName": "ACANA cat ind herring 4#",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3971,
+    "supplyName": "Coastal Red22\" 2901 Collar",
+    "supplyBrand": "Coastal",
+    "upc": "850005832522",
+    "catalogName": "Suculate Garden",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6178,
+    "supplyName": "Fromm Hasen Duck 12lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114627",
+    "catalogName": "FROMM hasen duck 12#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6744,
+    "supplyName": "Fromm Cat Game Bird Recipe 10lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705117031",
+    "catalogName": "FROMM cat game 10#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3186,
+    "supplyName": "Coastal Collar Black Skulls 26\"\"",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6067,
+    "supplyName": "Taste of the Wild High Prairie 5lb",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "074198609628",
+    "catalogName": "TOW high prairie 5#",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4934,
+    "supplyName": "Greenies Orange Large 6oz",
+    "supplyBrand": "Greenies",
+    "upc": "000116772105",
+    "catalogName": "AQUAVITRO phosfiltrum 5.6oz",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4686,
+    "supplyName": "Beggar Bones Mix Large 1pk",
+    "supplyBrand": "Savory Prime",
+    "upc": "042055361413",
+    "catalogName": "AP TRITON FLT LARGE-1PK",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6503,
+    "supplyName": "Nutrisource Prairie Select 12.3oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "073893021216",
+    "catalogName": "NUTRI SOUR prairie 12.3oz",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4825,
+    "supplyName": "Nothin' to Hide 10\" Large Roll Beef",
+    "supplyBrand": "Fieldcrest Farms",
+    "upc": "072705117239",
+    "catalogName": "FROMM beef livin 10#",
+    "score": 0.5714285714285714,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4944,
+    "supplyName": "YummyCombs Extra Large 12oz",
+    "supplyBrand": "YummyCombs",
+    "upc": "030157007522",
+    "catalogName": "APA BIRDBATH MIXING-12OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6325,
+    "supplyName": "Eukanuba Small Breed 4.5lb",
+    "supplyBrand": "Eukanuba",
+    "upc": "030111487079",
+    "catalogName": "KAY FOOD H PETITE BREED 4#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6517,
+    "supplyName": "Nutrisource PureVita Chicken Stew 12.5oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "052742011899",
+    "catalogName": "SD vita ck stew 12.5oz",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5409,
+    "supplyName": "2pk Natural 10 Gal Tank Decor",
+    "supplyBrand": "Penn-Plax",
+    "upc": "048081602409",
+    "catalogName": "PlayFuls Sound&Move \"BlockRock\"",
+    "score": 0.6307692307692307,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3967,
+    "supplyName": "Coastal Red26\" Mbuc Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6081,
+    "supplyName": "Diamond Light 15lb",
+    "supplyBrand": "Diamond",
+    "upc": "052742022147",
+    "catalogName": "SD light 15#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 602,
+    "supplyName": "Zoo Med Paludarium Filter 20",
+    "supplyBrand": "Zoo Med",
+    "upc": "097612240092",
+    "catalogName": "ZOO MED betta clean filter",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4007,
+    "supplyName": "Coastal Black12\" 2912 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "091197660276",
+    "catalogName": "Hermit Beach",
+    "score": 0.5800000000000001,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6373,
+    "supplyName": "Pro Plan Small Breed 18lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100131867",
+    "catalogName": "PRO PLAN weight 18#",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6575,
+    "supplyName": "Science Diet Healthy Cuisine 7+ Chicken 12.5oz",
+    "supplyBrand": "Science Diet",
+    "upc": "052742007212",
+    "catalogName": "SD heal cuis 7+ ck 12.5oz",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4802,
+    "supplyName": "Zignature Treats Duck 12oz",
+    "supplyBrand": "Zignature",
+    "upc": "840199690053",
+    "catalogName": "VIT ESSEN duck min nib 12oz",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4804,
+    "supplyName": "Zignature Treats Lamb 12oz",
+    "supplyBrand": "Zignature",
+    "upc": "785184105191",
+    "catalogName": "RED BARN lamb stew 12oz",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6426,
+    "supplyName": "VICTOR Hi Pro 50lb",
+    "supplyBrand": "VICTOR",
+    "upc": "854524005832",
+    "catalogName": "VICTOR cat hi pro 5#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4975,
+    "supplyName": "Smokehouse Bully Bites 6oz",
+    "supplyBrand": "Smokehouse",
+    "upc": "064992724184",
+    "catalogName": "ORIJ orig bites 6oz",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6729,
+    "supplyName": "Nutrisource Chicken & Rice Cat Formula 4lb",
+    "supplyBrand": "Nutrisource",
+    "upc": "037009604293",
+    "catalogName": "CSHD SHR CAT UNI AC LB 4LB",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5970,
+    "supplyName": "Science Diet Perf Digest Chicken Large Breed 223",
+    "supplyBrand": "Science Diet",
+    "upc": "052742041339",
+    "catalogName": "SD perf digest ck lg br 223",
+    "score": 0.625,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6142,
+    "supplyName": "Fromm Chicken À La Veg 26lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116119",
+    "catalogName": "FROMM ck a la veg 26#",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5549,
+    "supplyName": "Tetra Whis Bio Large 3pk",
+    "supplyBrand": "",
+    "upc": "644472008043",
+    "catalogName": "HappyBeaks Bird Nest",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6186,
+    "supplyName": "PetCrest 42\" Double Door",
+    "supplyBrand": "PetCrest",
+    "upc": "784099025136",
+    "catalogName": "\"PC 42\"\" double door\"",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6100,
+    "supplyName": "Diamond Prem 20lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198010202",
+    "catalogName": "DIAM prem 20#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5921,
+    "supplyName": "Science Diet Small Breed Lamb 15.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "038100101389",
+    "catalogName": "PRO PLAN lamb shred 15#",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6184,
+    "supplyName": "MidWest 30\" Single Door",
+    "supplyBrand": "MidWest Homes For Pets",
+    "upc": "027773021988",
+    "catalogName": "\"MW 30\"\" single door\"",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6153,
+    "supplyName": "Fromm Pork & Apple 12lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114030",
+    "catalogName": "FROMM pork & apple 12#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3762,
+    "supplyName": "Coastal Lime 30 Harness",
+    "supplyBrand": "Coastal",
+    "upc": "076484638671",
+    "catalogName": "COASTAL CHARNCOMBO REDXSM",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6170,
+    "supplyName": "Fromm Beef Frittata Veg 26lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114108",
+    "catalogName": "FROMM beef frittata 26#",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5122,
+    "supplyName": "Purewater Pebbles Rainbow Gems 5lb",
+    "supplyBrand": "Nature's Ocean",
+    "upc": "092366982118",
+    "catalogName": "WW GRAVEL RAINBOW GEMS 5#",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4142,
+    "supplyName": "JW Pet Pet Pet Pet Walk Up Hide Large",
+    "supplyBrand": "JW Pet",
+    "upc": "322512001445",
+    "catalogName": "JW PET LE ROPE/TUG LG",
+    "score": 0.5555555555555556,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6574,
+    "supplyName": "Science Diet Healthy Cuisine Chicken 12.5oz",
+    "supplyBrand": "Science Diet",
+    "upc": "035585516004",
+    "catalogName": "Kong Nibbies Cat Chicken",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6009,
+    "supplyName": "Royal Canin Chihuahua 10lb",
+    "supplyBrand": "Royal Canin",
+    "upc": "030111451415",
+    "catalogName": "royal can york 10#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4190,
+    "supplyName": "Kaytee Large High Crnr Litter Pan",
+    "supplyBrand": "Kaytee",
+    "upc": "044472002393",
+    "catalogName": "KAYTEE HIGH CRNR LITTER PAN",
+    "score": 0.5555555555555556,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6772,
+    "supplyName": "Science Diet Cat Light 4lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742671109",
+    "catalogName": "SD cat light 4#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6882,
+    "supplyName": "Freshpet Beef 1.5lb",
+    "supplyBrand": "Freshpet",
+    "upc": "627975011963",
+    "catalogName": "FRESHPET beef 1.5#",
+    "score": 0.8,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3942,
+    "supplyName": "Coastal Blue06' 406 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "010838201357",
+    "catalogName": "Lagoon Kidney",
+    "score": 0.5800000000000001,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4810,
+    "supplyName": "4.5\" Pressed Bone Natural",
+    "supplyBrand": "Loving Pets",
+    "upc": "099098419012",
+    "catalogName": "WHIRLPOOL NATURAL BLEND 5#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4702,
+    "supplyName": "Health Extension 3.5 oz Salmon",
+    "supplyBrand": "Health Extension",
+    "upc": "035585361536",
+    "catalogName": "KNG BITES CHKN 5 OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6495,
+    "supplyName": "Taste of the Wild Pacific Stream 13.2oz",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "022517444856",
+    "catalogName": "Catit Nibbly Shrimp Grills",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4684,
+    "supplyName": "Rewards Crunch Bison Small Breed Duck 8oz",
+    "supplyBrand": "Natural Balance",
+    "upc": "027774102139",
+    "catalogName": "TET FOOD TETRACOLOR SMALL FISH 8.8OZ",
+    "score": 0.5714285714285714,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4009,
+    "supplyName": "Coastal Blue12\" 2912 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "091197660276",
+    "catalogName": "Hermit Beach",
+    "score": 0.5800000000000001,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6171,
+    "supplyName": "Fromm Game Bird Recipe Bird 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114443",
+    "catalogName": "FROMM game bird 4#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6365,
+    "supplyName": "Pro Plan Chicken Shred 15lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100101297",
+    "catalogName": "PRO PLAN shred sal 15#",
+    "score": 0.76,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6527,
+    "supplyName": "Pro Plan Large Breed Salmon 34lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100100757",
+    "catalogName": "PRO PLAN sensi salm 4#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6097,
+    "supplyName": "Diamond Mainten 20lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198003204",
+    "catalogName": "DIAM mainten 20#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6162,
+    "supplyName": "Fromm Highlander Beef 26lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114917",
+    "catalogName": "FROMM highlander beef 26#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4685,
+    "supplyName": "Rewards Crunch Bison Small Breed Salmon 8oz",
+    "supplyBrand": "Natural Balance",
+    "upc": "027774102139",
+    "catalogName": "TET FOOD TETRACOLOR SMALL FISH 8.8OZ",
+    "score": 0.5714285714285714,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6119,
+    "supplyName": "Fromm Gold Puppy 15lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705115532",
+    "catalogName": "FROMM gold puppy 15#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6127,
+    "supplyName": "Fromm Gold 15lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105779",
+    "catalogName": "FROMM gold weight 5#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3490,
+    "supplyName": "Valhoma 26 Red Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "022517766101",
+    "catalogName": "voyager blue 26.6",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6394,
+    "supplyName": "Vital Essentials Beef Mini Nibbles 14oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "064992715670",
+    "catalogName": "ACANA fd beef 14oz",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 2510,
+    "supplyName": "Lilpals Extra Small Collar 1bl08",
+    "supplyBrand": "Li'l Pals",
+    "upc": "076484029905",
+    "catalogName": "LILPALS XS COLLAR 1BA08",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5938,
+    "supplyName": "Science Diet Puppy Chicken 27.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742060187",
+    "catalogName": "SD puppy ck 27.5#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6068,
+    "supplyName": "Taste of the Wild High Prairie 14lb",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "074198613946",
+    "catalogName": "TOW high prairie 14#",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6189,
+    "supplyName": "PetCrest 36\" Double Door",
+    "supplyBrand": "PetCrest",
+    "upc": "784099025129",
+    "catalogName": "\"PC 36\"\" double door\"",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6710,
+    "supplyName": "From PurrSnickety Duck Stew 3oz",
+    "supplyBrand": "Fromm",
+    "upc": "072705113446",
+    "catalogName": "FROM pur sni du stew 3oz",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5960,
+    "supplyName": "Science Diet 7+ Small Bite 15lb",
+    "supplyBrand": "Science Diet",
+    "upc": "079441008005",
+    "catalogName": "Small Dinner Mat",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5955,
+    "supplyName": "Science Diet Light 15lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742022147",
+    "catalogName": "SD light 15#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6359,
+    "supplyName": "Pro Plan Chicken Shred 6lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100130549",
+    "catalogName": "PRO PLAN ck shred 6#",
+    "score": 0.76,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6240,
+    "supplyName": "Orijen Regional Red 4.5lb",
+    "supplyBrand": "Orijen",
+    "upc": "064992202408",
+    "catalogName": "ORIJEN reg red 4#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6857,
+    "supplyName": "Inaba Dashi Delights Chicken, Salmon 2.5oz",
+    "supplyBrand": "Inaba",
+    "upc": "072705124107",
+    "catalogName": "Purr Snackitty Salmon",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 7239,
+    "supplyName": "Tetra Glo Orange/Yellow Plant",
+    "supplyBrand": "",
+    "upc": "046798784074",
+    "catalogName": "TETRA glo multi plant",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6668,
+    "supplyName": "Pro Plan Cat Chicken & Rice 16lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100131546",
+    "catalogName": "PRO PLAN cat ck & ri 16#",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6690,
+    "supplyName": "Nutrisource Classic Catch Cat 5.5oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "052742177007",
+    "catalogName": "SD cat tend ck 5.5oz",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6670,
+    "supplyName": "Diamond Indoor 6lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198608126",
+    "catalogName": "DIAM indoor 6#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6079,
+    "supplyName": "Diamond Als Chicken 40lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198608201",
+    "catalogName": "DIAM als ck 40#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6774,
+    "supplyName": "Science Diet Cat 16lb",
+    "supplyBrand": "Science Diet",
+    "upc": "019014805112",
+    "catalogName": "IAMS cat sen 6#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6528,
+    "supplyName": "Pro Plan Senior Turkey 16lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100113627",
+    "catalogName": "PRO PLAN puppy 6#",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5414,
+    "supplyName": "Zoo Med Aqualog Small",
+    "supplyBrand": "Zoo Med",
+    "upc": "097612119114",
+    "catalogName": "ZOO MED feeder pleco small",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6056,
+    "supplyName": "Taste of the Wild Wetland 14$",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "074198613908",
+    "catalogName": "TOW wetland 14$",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6487,
+    "supplyName": "Zignature Zssential 13oz",
+    "supplyBrand": "Zignature",
+    "upc": "019014013326",
+    "catalogName": "IAMS pup 13oz",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6693,
+    "supplyName": "Nutrisource Cat Turkey & Turkey Liver Select 5.5oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "859610007684",
+    "catalogName": "BLUE BUF cat wild turkey 5.5oz",
+    "score": 0.7428571428571429,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 550,
+    "supplyName": "Zoo Med Cannabis Plant Large",
+    "supplyBrand": "Zoo Med",
+    "upc": "097612241211",
+    "catalogName": "ZOO MED betta papaya plant",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5237,
+    "supplyName": "RemedyRecovery Pet Wrm 8oz",
+    "supplyBrand": "RemedyRecovery",
+    "upc": "000116007603",
+    "catalogName": "SEACHEM acid regulator 8.8oz",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6889,
+    "supplyName": "Freshpet Vital Grain Free Chicken,Beef,Salmon 1.75lb",
+    "supplyBrand": "Freshpet",
+    "upc": "076484062049",
+    "catalogName": "LILPALS HARNESS COMBO PKBPSM",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6731,
+    "supplyName": "Nutrisource Senior/Weight Management Cat Recipe 4lb",
+    "supplyBrand": "Nutrisource",
+    "upc": "037009604293",
+    "catalogName": "CSHD SHR CAT UNI AC LB 4LB",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6431,
+    "supplyName": "VICTOR Sensitive Lamb 5lb",
+    "supplyBrand": "VICTOR",
+    "upc": "854524005832",
+    "catalogName": "VICTOR cat hi pro 5#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6161,
+    "supplyName": "Fromm Lamb & Lentil 26lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114504",
+    "catalogName": "FROMM lamb & lentil 26#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4965,
+    "supplyName": "Greenies Pllpckt Chicken Tab 3.2oz",
+    "supplyBrand": "Greenies",
+    "upc": "642863117671",
+    "catalogName": "GREENIES sm top ck 2oz",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5491,
+    "supplyName": "Forza Replace Filter Pad Fz13uv",
+    "supplyBrand": "Forza",
+    "upc": "048054802577",
+    "catalogName": "Oasis Vita Drops Small Birds",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6877,
+    "supplyName": "Freshpet Small Breed Multi Protein 1lb",
+    "supplyBrand": "Freshpet",
+    "upc": "627975012717",
+    "catalogName": "FRESHPET sm br multi prot 1#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3856,
+    "supplyName": "Coastal Black26\" Martingale Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6335,
+    "supplyName": "Welln White Fish 26lb",
+    "supplyBrand": "Wellness",
+    "upc": "076344088912",
+    "catalogName": "WELLN wh fish 26#",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6314,
+    "supplyName": "Pure Vita Chicken & Brown Rice 5lb",
+    "supplyBrand": "Pure Vita",
+    "upc": "073893170020",
+    "catalogName": "PURE VITA ck & br rice 5#",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4636,
+    "supplyName": "SmartBones 24 Mini Peanut Butter",
+    "supplyBrand": "SmartBones",
+    "upc": "096316280823",
+    "catalogName": "Zilla Heat&UVB Basking Fixture",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6722,
+    "supplyName": "Science Diet Kitten Salmon 2.9oz",
+    "supplyBrand": "Science Diet",
+    "upc": "052742012650",
+    "catalogName": "SD kitten liv & ck 2.9oz",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6232,
+    "supplyName": "Acana With Grain Sea 4lb",
+    "supplyBrand": "Acana",
+    "upc": "064992585457",
+    "catalogName": "ACANA wh gr sea 4#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6498,
+    "supplyName": "Taste of the Wild High Prairie 13.2oz",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "074198610723",
+    "catalogName": "TOW high prai 13.2oz",
+    "score": 0.625,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4688,
+    "supplyName": "Rewards Jumpin Stix Duck 4oz",
+    "supplyBrand": "Natural Balance",
+    "upc": "015561229104",
+    "catalogName": "ExoTerra Small Waterfall",
+    "score": 0.6181818181818182,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3528,
+    "supplyName": "Coastal Black White Stripe 12\" Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484805122",
+    "catalogName": "COASTAL CLT SAFE BRIGHT MAX SZ-12",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6382,
+    "supplyName": "Pro Plan Puppy 6lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100113627",
+    "catalogName": "PRO PLAN puppy 6#",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6352,
+    "supplyName": "Pro Plan Sensitive Lamb 4lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100100757",
+    "catalogName": "PRO PLAN sensi salm 4#",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6413,
+    "supplyName": "Primal Freeze Dried Lamb 14oz",
+    "supplyBrand": "Primal",
+    "upc": "850334004454",
+    "catalogName": "PRIMAL fro pron lamb 4#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6180,
+    "supplyName": "PetCrest 42\" Single Door",
+    "supplyBrand": "PetCrest",
+    "upc": "784099025044",
+    "catalogName": "\"PC 42\"\" single door\"",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6377,
+    "supplyName": "Pro Plan Large Breed Puppy 18lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100132642",
+    "catalogName": "PRO PLAN lg br puppy 18#",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4678,
+    "supplyName": "St. Rocco's Salmon 8oz",
+    "supplyBrand": "Saint Rocco's",
+    "upc": "015561242356",
+    "catalogName": "ExoTerra Humidifier Extension kit",
+    "score": 0.5636363636363636,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6757,
+    "supplyName": "Orijen Wild Reserve Kitten 3.5lb",
+    "supplyBrand": "Orijen",
+    "upc": "064992726386",
+    "catalogName": "ORIJEN wi re kitten 3.5#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6131,
+    "supplyName": "Fromm Gold Large Breed 5lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105571",
+    "catalogName": "FROMM gold lg br puppy 5#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 2882,
+    "supplyName": "Mammoth Mini 3 Knot With Mini Ball",
+    "supplyBrand": "Mammoth",
+    "upc": "746772200100",
+    "catalogName": "MAMMOTH SM COLOR 3 KNOT TUG",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6334,
+    "supplyName": "Welln Small Breed Core 12lb",
+    "supplyBrand": "Wellness",
+    "upc": "076344884217",
+    "catalogName": "WELLN sm br core 12#",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5987,
+    "supplyName": "Science Diet Sensitive 15.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742007045",
+    "catalogName": "SD sm min sensitive 15#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6191,
+    "supplyName": "MidWest Exercise Pen 24\"",
+    "supplyBrand": "MidWest Homes For Pets",
+    "upc": "027773024811",
+    "catalogName": "\"MW exercise pen 24\"\"\"",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6651,
+    "supplyName": "Zignature Kangaroo 12.5lb",
+    "supplyBrand": "Zignature",
+    "upc": "034846540215",
+    "catalogName": "EARTHBORN coastal catch 12.5#",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 1923,
+    "supplyName": "Penn Plax Felt Steps Dark Grey 13\"h",
+    "supplyBrand": "Penn-Plax",
+    "upc": "030172005381",
+    "catalogName": "PENN PLAX feeder 3 day",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5005,
+    "supplyName": "Aqueon Twist & Click Steel Blade 3pk",
+    "supplyBrand": "Aqueon",
+    "upc": "071859999005",
+    "catalogName": "Kaytee Parrot",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6764,
+    "supplyName": "Science Diet Kitten 7lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742060163",
+    "catalogName": "SD kitten fish 7#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6671,
+    "supplyName": "Diamond Cat Maint 6lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198004065",
+    "catalogName": "DIAM cat maint 6#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6884,
+    "supplyName": "Freshpet Grain Free Frozen Chicken 2lb",
+    "supplyBrand": "Freshpet",
+    "upc": "851893001731",
+    "catalogName": "FRESHPET turky 2lb",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3207,
+    "supplyName": "Coastal Collar Special Paws 12\"\"",
+    "supplyBrand": "Coastal",
+    "upc": "076484805122",
+    "catalogName": "COASTAL CLT SAFE BRIGHT MAX SZ-12",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6026,
+    "supplyName": "Skudo 40lb",
+    "supplyBrand": "MidWest Homes For Pets",
+    "upc": "027773018285",
+    "catalogName": "skudo 40#",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6683,
+    "supplyName": "Vital Essentials Turkey 12oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "030157007522",
+    "catalogName": "APA BIRDBATH MIXING-12OZ",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4838,
+    "supplyName": "Nothin' to Hide 10\" Large Roll Beef 2pk",
+    "supplyBrand": "Fieldcrest Farms",
+    "upc": "030157019959",
+    "catalogName": "ACC FLTR KNPKC WRS MINI-10 2PK",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6469,
+    "supplyName": "Fromm Chicken Fromm Bites 12.5oz",
+    "supplyBrand": "Fromm",
+    "upc": "072705130047",
+    "catalogName": "FROMM clasic ck 12.5oz",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6622,
+    "supplyName": "Eukanuba Beef & Vegetable 12.5oz",
+    "supplyBrand": "Eukanuba",
+    "upc": "072705132089",
+    "catalogName": "FROMM beef frommb 12.5oz",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5941,
+    "supplyName": "Science Diet Chicken 5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "039740049806",
+    "catalogName": "API FOOD BWMNSSH 5LB",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6071,
+    "supplyName": "Taste of the Wild High Prairie Puppy 28lb",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "074198613991",
+    "catalogName": "TOW high prairie puppy 28#",
+    "score": 0.625,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6557,
+    "supplyName": "Royal Canin Puppy 13.5oz",
+    "supplyBrand": "Royal Canin",
+    "upc": "030111420558",
+    "catalogName": "ROYAL CAN pup 13.5oz",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6684,
+    "supplyName": "Vital Essentials Pork Mini Nibbles 12oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "042055046336",
+    "catalogName": "HIKARI sinking gold mini 12oz",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6673,
+    "supplyName": "Kitten Chow 14lb",
+    "supplyBrand": "Purina",
+    "upc": "017800106252",
+    "catalogName": "KITTEN CHOW 14#",
+    "score": 0.8,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6321,
+    "supplyName": "Max Bully 5lb",
+    "supplyBrand": "Max",
+    "upc": "030626101058",
+    "catalogName": "MAX BULLY 5#",
+    "score": 0.8,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6174,
+    "supplyName": "Fromm Chicken Frommage 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114740",
+    "catalogName": "FROMM ck frommage 4#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6129,
+    "supplyName": "Fromm Gold Large Breed 15lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105571",
+    "catalogName": "FROMM gold lg br puppy 5#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6044,
+    "supplyName": "Natural Balance Duck 4lb",
+    "supplyBrand": "Natural Balance",
+    "upc": "064992517458",
+    "catalogName": "ACANA wh gr duck 4#",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6496,
+    "supplyName": "Taste of the Wild Wetland 13.2oz",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "074198610716",
+    "catalogName": "TOW wetland 13.2oz",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5233,
+    "supplyName": "Durvet Worm Ease Liquid 8oz",
+    "supplyBrand": "Durvet",
+    "upc": "030172105319",
+    "catalogName": "BirdLife Casino Kabob",
+    "score": 0.5636363636363636,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6193,
+    "supplyName": "PetCrest Exercise Pen 36\"",
+    "supplyBrand": "PetCrest",
+    "upc": "784099025327",
+    "catalogName": "\"PC exercise pen 36\"\"\"",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6430,
+    "supplyName": "VICTOR Salmon Sensitive 5lb",
+    "supplyBrand": "VICTOR",
+    "upc": "854524005832",
+    "catalogName": "VICTOR cat hi pro 5#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6883,
+    "supplyName": "Freshpet Chicken 1lb",
+    "supplyBrand": "Freshpet",
+    "upc": "851893001366",
+    "catalogName": "FRESHPET ck 1#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6062,
+    "supplyName": "Taste of the Wild Pacific Stream 5lb",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "074198611157",
+    "catalogName": "pacific stream puppy 5#",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6800,
+    "supplyName": "Science Diet Cat Senior Sto 15.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742887807",
+    "catalogName": "SD cat sen sto 15.5#",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6416,
+    "supplyName": "Primal Freeze Dried Beef 14oz",
+    "supplyBrand": "Primal",
+    "upc": "850334004423",
+    "catalogName": "PRIMAL fro pront beef 4#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6843,
+    "supplyName": "Tiki Cat Aloha Friends Tuna & Tilapia 3oz",
+    "supplyBrand": "Tiki Cat",
+    "upc": "878408007057",
+    "catalogName": "BFF cat tuna.tilapia 3oz",
+    "score": 0.7428571428571429,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6850,
+    "supplyName": "Science Diet Cat Indoor Salmon Stew 2.8oz",
+    "supplyBrand": "Science Diet",
+    "upc": "052742075815",
+    "catalogName": "SD cat in do salm stew 2.8oz",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3826,
+    "supplyName": "Coastal Purple26\" Martingale Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6832,
+    "supplyName": "Fussie Cat Tuna, Salmon 2.47oz",
+    "supplyBrand": "Fussie Cat",
+    "upc": "888641130542",
+    "catalogName": "\"FUSSIE CAT tuna",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3509,
+    "supplyName": "Valhoma Spike 18 Tq Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "009761240308",
+    "catalogName": "ZooMed Crested Gecko Trop.",
+    "score": 0.5846153846153846,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6042,
+    "supplyName": "Natural Balance Salmon 4lb",
+    "supplyBrand": "Natural Balance",
+    "upc": "064992723422",
+    "catalogName": "ACANA butch salmon 4#",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6799,
+    "supplyName": "Science Diet Cat Hairball Control Light 7lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742204703",
+    "catalogName": "SD cat light 7#",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6364,
+    "supplyName": "Pro Plan Beef Shred 35lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100101310",
+    "catalogName": "PRO PLAN beef shred 5#",
+    "score": 0.88,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6144,
+    "supplyName": "Fromm Duck À La Veg 12lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116232",
+    "catalogName": "FROMM duck a la veg 12#",
+    "score": 0.88,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6172,
+    "supplyName": "Fromm Game Bird Recipe Bird 12lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114429",
+    "catalogName": "FROMM game bird 12#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6245,
+    "supplyName": "Orijen Original 13lb",
+    "supplyBrand": "Orijen",
+    "upc": "064992103132",
+    "catalogName": "ORIJEN orig 13#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6106,
+    "supplyName": "Diamond Skin 30lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198613847",
+    "catalogName": "DIAM skin 30#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 2588,
+    "supplyName": "Coastal Large Frosted Donuts26 Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6773,
+    "supplyName": "Science Diet Cat Light 7lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742204703",
+    "catalogName": "SD cat light 7#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6500,
+    "supplyName": "Nutrisource High Plains Select Grain Free 13oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "073893021018",
+    "catalogName": "NUTRI SOU high plains 13oz",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5522,
+    "supplyName": "Filter-a-carb Fc2",
+    "supplyBrand": "Penn-Plax",
+    "upc": "087535597649",
+    "catalogName": "Sunseed vitaprima Canary&Finch",
+    "score": 0.5714285714285714,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4954,
+    "supplyName": "Greenies Blueberry Regular 12oz",
+    "supplyBrand": "Greenies",
+    "upc": "030157007522",
+    "catalogName": "APA BIRDBATH MIXING-12OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3696,
+    "supplyName": "Coastal Orange 6' 406 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "010838201357",
+    "catalogName": "Lagoon Kidney",
+    "score": 0.5800000000000001,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6393,
+    "supplyName": "Vital Essentials Beef Mini Pate 14oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "064992715670",
+    "catalogName": "ACANA fd beef 14oz",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6350,
+    "supplyName": "Pro Plan Sensitive Salmon 16lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100113627",
+    "catalogName": "PRO PLAN puppy 6#",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 2036,
+    "supplyName": "Coastal Collar Blue12",
+    "supplyBrand": "Coastal",
+    "upc": "034846540215",
+    "catalogName": "EARTHBORN coastal catch 12.5#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6399,
+    "supplyName": "Vital Essentials Beef Ground Top 6oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "840199682010",
+    "catalogName": "VIT ESSEN beef ground top 6oz",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6316,
+    "supplyName": "Pure Vita Turkey Grain Free Frozen 4lb",
+    "supplyBrand": "Pure Vita",
+    "upc": "073893173045",
+    "catalogName": "PURE VITA turkey gr fr 4#",
+    "score": 0.6571428571428571,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6533,
+    "supplyName": "Health Extension Gently Cooked Chicken 9oz",
+    "supplyBrand": "Health Extension",
+    "upc": "810120990002",
+    "catalogName": "HEALTH EXTEN dig sup 9oz",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6810,
+    "supplyName": "Iams Indoor 7lb",
+    "supplyBrand": "Iams",
+    "upc": "019014711086",
+    "catalogName": "IAMS mini chu 7#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6343,
+    "supplyName": "Pro Plan Small Breed Sensit 4lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100100801",
+    "catalogName": "PRO PLAN sm br sensit 4#",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6121,
+    "supplyName": "Fromm Gold Large Breed Puppy 5lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105571",
+    "catalogName": "FROMM gold lg br puppy 5#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 1708,
+    "supplyName": "Crock Heavyweight 52oz",
+    "supplyBrand": "Ethical Pet",
+    "upc": "046798161219",
+    "catalogName": "TETRA tetramin granule 3.52oz",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4711,
+    "supplyName": "Nutrichomps Mini 8 Count",
+    "supplyBrand": "Scott Pet",
+    "upc": "042055032285",
+    "catalogName": "HIKARI staple mini 8.8oz",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6124,
+    "supplyName": "Fromm Gold Small Breed 5lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105571",
+    "catalogName": "FROMM gold lg br puppy 5#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4683,
+    "supplyName": "Rewards Jumpin Stix Venison 10oz",
+    "supplyBrand": "Natural Balance",
+    "upc": "228633101939",
+    "catalogName": "NP REWARDS STX VENISON 10",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6879,
+    "supplyName": "Freshpet Small Breed Ck1lb",
+    "supplyBrand": "Freshpet",
+    "upc": "627975012090",
+    "catalogName": "FRESHPET sm br ck1#",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5509,
+    "supplyName": "Aqueon Ecorenew Extra Small 3pk",
+    "supplyBrand": "Aqueon",
+    "upc": "071859999005",
+    "catalogName": "Kaytee Parrot",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6371,
+    "supplyName": "Pro Plan Small Breed Chicken Shred 18lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100140241",
+    "catalogName": "PRO PLAN weight shred 18#",
+    "score": 0.6571428571428571,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6812,
+    "supplyName": "IAMS Kitten 3.5lb",
+    "supplyBrand": "Iams",
+    "upc": "019014712496",
+    "catalogName": "IAMS kitten 3.5#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4004,
+    "supplyName": "Coastal Black18\" 2918 Leash",
+    "supplyBrand": "Coastal",
+    "upc": "759834050827",
+    "catalogName": "Galap. Hermit Crab Sub",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6539,
+    "supplyName": "Greenies Small Top Chicken & Beef 2oz",
+    "supplyBrand": "Greenies",
+    "upc": "642863117718",
+    "catalogName": "Greenies sm top beef 2oz",
+    "score": 0.8,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6471,
+    "supplyName": "Fromm Beef & Sweet Potato 12.2oz",
+    "supplyBrand": "Fromm",
+    "upc": "072705118663",
+    "catalogName": "FROMM beef & bar 12.2oz",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6732,
+    "supplyName": "Nutrisource Classic Catch Cat 4lb",
+    "supplyBrand": "Nutrisource",
+    "upc": "073893300175",
+    "catalogName": "NUTRI SOUR cat clasi catch 4#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6320,
+    "supplyName": "Pure Vita Grain Free Frozen Beef 25lb",
+    "supplyBrand": "Pure Vita",
+    "upc": "073893181002",
+    "catalogName": "PURE VITA gr fr beef 25#",
+    "score": 0.6571428571428571,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6392,
+    "supplyName": "Vital Essentials Duck Mini Nibbles 14oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "064992715632",
+    "catalogName": "ACANA fd duck 14oz",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6754,
+    "supplyName": "Fromm PurrSnickety Game Bird Recipe 10lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705117031",
+    "catalogName": "FROMM cat game 10#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5663,
+    "supplyName": "Fluval Ac30 Biothane Foam",
+    "supplyBrand": "Fluval",
+    "upc": "045663017347",
+    "catalogName": "Healthy Promise EarWash",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6006,
+    "supplyName": "Royal Canin Poodle",
+    "supplyBrand": "Royal Canin",
+    "upc": "030111450913",
+    "catalogName": "royal can poodle",
+    "score": 0.6666666666666666,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6736,
+    "supplyName": "Fromm Cat Adult 10lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705115631",
+    "catalogName": "FROMM cat adult 10#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6675,
+    "supplyName": "Cat Chow 15lb",
+    "supplyBrand": "Purina",
+    "upc": "017800184953",
+    "catalogName": "CAT CHOW 15#",
+    "score": 0.8,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6152,
+    "supplyName": "Fromm Pork & Apple 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114061",
+    "catalogName": "FROMM pork & apple 4#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6674,
+    "supplyName": "Cat Chow Indoor 15lb",
+    "supplyBrand": "Purina",
+    "upc": "017800184953",
+    "catalogName": "CAT CHOW 15#",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6340,
+    "supplyName": "IAMS Large Breed Puppy 15lb",
+    "supplyBrand": "Iams",
+    "upc": "019014610945",
+    "catalogName": "IAMS lg br puppy 15#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5959,
+    "supplyName": "Science Diet 7+ Small Bite 5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "079441008005",
+    "catalogName": "Small Dinner Mat",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6709,
+    "supplyName": "From Cat Salmon & Tuna 3oz",
+    "supplyBrand": "Fromm",
+    "upc": "038100111975",
+    "catalogName": "PRO PLAN cat tuna 3oz",
+    "score": 0.76,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6986,
+    "supplyName": "Tetramin Plus 2.2oz",
+    "supplyBrand": "Tetra",
+    "upc": "046798772422",
+    "catalogName": "TETRA tetramin plus 2.2oz",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6388,
+    "supplyName": "Pro Plan Toy Puppy 5lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100135407",
+    "catalogName": "PRO PLAN toy puppy 5#",
+    "score": 0.88,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6807,
+    "supplyName": "Sportmix Cat Original 15lb",
+    "supplyBrand": "SportMix",
+    "upc": "034846600803",
+    "catalogName": "SPORTMIX cat  orig 15#",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 7186,
+    "supplyName": "Zoo Med Banquet Feeder Pleco ",
+    "supplyBrand": "",
+    "upc": "097612113006",
+    "catalogName": "ZOO MED feeder banquet 3-4 day",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6185,
+    "supplyName": "MidWest 36\" Single Door",
+    "supplyBrand": "MidWest Homes For Pets",
+    "upc": "027773021995",
+    "catalogName": "\"MW 36\"\" single door\"",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6063,
+    "supplyName": "Taste of the Wild Pacific Stream 14lb",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "074198613922",
+    "catalogName": "TOW pacific stream 14#",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6753,
+    "supplyName": "Fromm PurrSnickety Game Bird Recipe 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114443",
+    "catalogName": "FROMM game bird 4#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4557,
+    "supplyName": "Bambne + 6 Medium Beef",
+    "supplyBrand": "Ethical Products",
+    "upc": "072705114108",
+    "catalogName": "FROMM beef frittata 26#",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 2040,
+    "supplyName": "Coastal Collar Green12",
+    "supplyBrand": "Coastal",
+    "upc": "034846540215",
+    "catalogName": "EARTHBORN coastal catch 12.5#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6507,
+    "supplyName": "Nutrisource Chicken & Rice Cat Formula 12.3oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "034846600964",
+    "catalogName": "SPORTMIX cat fish 12#",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5528,
+    "supplyName": "Aqueon Replace Filter Medium 6pk",
+    "supplyBrand": "Aqueon",
+    "upc": "762177932002",
+    "catalogName": "ZuPreem Natural Parrot& Conure",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6486,
+    "supplyName": "Fromm Lamb & Sweet Potato 12.2oz",
+    "supplyBrand": "Fromm",
+    "upc": "072705118687",
+    "catalogName": "FROMM lamb 12.2oz",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4301,
+    "supplyName": "Oxbow Natural Science Urinary Support 4.2oz",
+    "supplyBrand": "Oxbow",
+    "upc": "030172902543",
+    "catalogName": "BirdLIfe Bird Bath w Mirror",
+    "score": 0.5636363636363636,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6101,
+    "supplyName": "Diamond Prem 50lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198010509",
+    "catalogName": "DIAM prem 50#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6082,
+    "supplyName": "Diamond Light 30lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198610679",
+    "catalogName": "DIAM light 30#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6384,
+    "supplyName": "Pro Plan Puppy 34lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100132703",
+    "catalogName": "PRO PLAN puppy 34#",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6854,
+    "supplyName": "Royal Canin Mother & Babycat 5.1oz",
+    "supplyBrand": "Royal Canin",
+    "upc": "030111425256",
+    "catalogName": "ROYAL CAN start 5.1oz",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3206,
+    "supplyName": "Coastal Collar Black Skulls 12\"\"",
+    "supplyBrand": "Coastal",
+    "upc": "076484805122",
+    "catalogName": "COASTAL CLT SAFE BRIGHT MAX SZ-12",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4555,
+    "supplyName": "Bambne Wishbone 5.25 Bacon",
+    "supplyBrand": "Ethical Products",
+    "upc": "034846540208",
+    "catalogName": "EARTHBORN coastal catch 25#",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6177,
+    "supplyName": "Fromm Hasen Duck 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114641",
+    "catalogName": "FROMM hasen duck 4#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6182,
+    "supplyName": "MidWest 18\" Single Door",
+    "supplyBrand": "MidWest Homes For Pets",
+    "upc": "027773021964",
+    "catalogName": "\"MW 18\"\" single door\"",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6489,
+    "supplyName": "Zignature White Fish 13oz",
+    "supplyBrand": "Zignature",
+    "upc": "888641131402",
+    "catalogName": "ZIGN wh fish 13oz",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6450,
+    "supplyName": "Valu-Pak 24/20 Red 50lb",
+    "supplyBrand": "Valu-Pak",
+    "upc": "071898431863",
+    "catalogName": "VALU PAK 24/20 rd 50#",
+    "score": 0.8,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5969,
+    "supplyName": "Science Diet Perf Digest Chicken 12lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742038285",
+    "catalogName": "SD perf digest ck 12#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4689,
+    "supplyName": "Rewards Crunch Duck 14oz",
+    "supplyBrand": "Natural Balance",
+    "upc": "064992715632",
+    "catalogName": "ACANA fd duck 14oz",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3387,
+    "supplyName": "Coastal Ww526 Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6742,
+    "supplyName": "Fromm Beef Livattini Vegetable 10lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705117239",
+    "catalogName": "FROMM beef livin 10#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4206,
+    "supplyName": "Kaytee 13\" Runabout Ball Clear",
+    "supplyBrand": "Kaytee",
+    "upc": "046706322503",
+    "catalogName": "SunBurst Fruit To Nuts",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4647,
+    "supplyName": "SmartBones 24 Mini Chicken",
+    "supplyBrand": "",
+    "upc": "015561110631",
+    "catalogName": "\"FLUVAL easy vac 24\"\"\"",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6842,
+    "supplyName": "Earthborn Holistic Harbor Harvest Harvest Harvest Harvest 3oz",
+    "supplyBrand": "Earthborn",
+    "upc": "034846715132",
+    "catalogName": "EARTH cat harbor 3oz",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 1560,
+    "supplyName": "Safari Nail Trimmer Small Dogs",
+    "supplyBrand": "",
+    "upc": "076484611308",
+    "catalogName": "Safari Nail Trimmer Sciccors Med",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6069,
+    "supplyName": "Taste of the Wild High Prairie 28lb",
+    "supplyBrand": "Taste of the Wild",
+    "upc": "074198613953",
+    "catalogName": "TOW high prairie 28#",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 7138,
+    "supplyName": "Api Tap Water Conditioner 4oz",
+    "supplyBrand": "API",
+    "upc": "317163091562",
+    "catalogName": "API TAP-WATER CONDITIONER 4 OZ",
+    "score": 0.88,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6733,
+    "supplyName": "Fromm Kitten 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705115808",
+    "catalogName": "FROMM kitten 4#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6005,
+    "supplyName": "Royal Canin Small Adult Adult Adult Adult 14lb",
+    "supplyBrand": "Royal Canin",
+    "upc": "000338007771",
+    "catalogName": "Dr.Elseys Cat Attract Litter",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5737,
+    "supplyName": "Pong Mag Model 5",
+    "supplyBrand": "Penn-Plax",
+    "upc": "797801603461",
+    "catalogName": "Evolutions Natruvet Advanced Allergy",
+    "score": 0.5714285714285714,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5487,
+    "supplyName": "Forza Replace Fz7uv Cartridge",
+    "supplyBrand": "Forza",
+    "upc": "048054800702",
+    "catalogName": "Oasis Alive&Well Probiotics",
+    "score": 0.625,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6087,
+    "supplyName": "Science Diet Light Small Bite 5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742930107",
+    "catalogName": "SD light sm bite 5#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6767,
+    "supplyName": "Science Diet Cat 7+ 4lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742710402",
+    "catalogName": "SD cat 7+ 4#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6092,
+    "supplyName": "Diamond Puppy 6lb",
+    "supplyBrand": "Diamond",
+    "upc": "038100113627",
+    "catalogName": "PRO PLAN puppy 6#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3996,
+    "supplyName": "Coastal Red26\" Security Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 2175,
+    "supplyName": "Blue Wilderness Chunk & Salmon Treats",
+    "supplyBrand": "Blue Buffalo",
+    "upc": "840243105359",
+    "catalogName": "BLUE B wilderness salmon 4.5#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6356,
+    "supplyName": "Pro Plan Weight Shred 34lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100140265",
+    "catalogName": "PRO PLAN weight shred 34#",
+    "score": 0.88,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 2511,
+    "supplyName": "Lilpals Extra Small Collar 1ba08",
+    "supplyBrand": "Li'l Pals",
+    "upc": "076484029905",
+    "catalogName": "LILPALS XS COLLAR 1BA08",
+    "score": 0.625,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6326,
+    "supplyName": "Eukanuba Medium Br 16lb",
+    "supplyBrand": "Eukanuba",
+    "upc": "030111160027",
+    "catalogName": "EUK med br 16#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6777,
+    "supplyName": "Science Diet Cat 11+ 15lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742146409",
+    "catalogName": "SD cat 11+ 15#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6811,
+    "supplyName": "IAMS Cat Chicken 7lb",
+    "supplyBrand": "Iams",
+    "upc": "019014712571",
+    "catalogName": "IAMS cat ck 7#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3803,
+    "supplyName": "Coastal Pink Bright26\" Buck Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5534,
+    "supplyName": "Marina Slim Biothane Carb 3pk",
+    "supplyBrand": "Marineland",
+    "upc": "048081210086",
+    "catalogName": "Prevue Keet Cage",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6183,
+    "supplyName": "MidWest 24\" Single Door",
+    "supplyBrand": "MidWest Homes For Pets",
+    "upc": "027773021971",
+    "catalogName": "\"MW 24\"\" single door\"",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6543,
+    "supplyName": "Wellness Petite Entree Roast Chicken 3oz",
+    "supplyBrand": "Wellness",
+    "upc": "076344090335",
+    "catalogName": "WELLNESS pt ent roast ck 3oz",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6241,
+    "supplyName": "Orijen Regional Red 13lb",
+    "supplyBrand": "Orijen",
+    "upc": "064992103132",
+    "catalogName": "ORIJEN orig 13#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6383,
+    "supplyName": "Pro Plan Puppy 18lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100132710",
+    "catalogName": "PRO PLAN puppy 18#",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 7295,
+    "supplyName": "Marina Burgundy Gravel",
+    "supplyBrand": "Marineland",
+    "upc": "015561123808",
+    "catalogName": "MARINA burgund gravel",
+    "score": 0.6666666666666666,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4634,
+    "supplyName": "SmartBones 3 Large Beef",
+    "supplyBrand": "SmartBones",
+    "upc": "052742703909",
+    "catalogName": "SD beef 13oz",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 1710,
+    "supplyName": "Vanilla Ness Dual 42oz",
+    "supplyBrand": "Van Ness",
+    "upc": "024144491231",
+    "catalogName": "HIKARI FD BLOODWORMS 0.42OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6173,
+    "supplyName": "Fromm Game Bird Recipe Bird 26lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114405",
+    "catalogName": "FROMM game bird 26#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 7190,
+    "supplyName": "Aqueon Sealant 3oz black",
+    "supplyBrand": "Aqueon",
+    "upc": "015905650038",
+    "catalogName": "AQUEON sealant clear 3oz",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5117,
+    "supplyName": "Spectrastone Blue Special 5lb",
+    "supplyBrand": "Spectrastone",
+    "upc": "039740049806",
+    "catalogName": "API FOOD BWMNSSH 5LB",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6141,
+    "supplyName": "Fromm Chicken À La Veg 12lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116133",
+    "catalogName": "FROMM ck a la veg 12#",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6094,
+    "supplyName": "Diamond Puppy 40lb",
+    "supplyBrand": "Diamond",
+    "upc": "052742059815",
+    "catalogName": "SD puppy lam 4#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6672,
+    "supplyName": "Diamond Cat Maint 20lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198004201",
+    "catalogName": "DIAM cat maint 20#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6105,
+    "supplyName": "Diamond Skin 15lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198613854",
+    "catalogName": "DIAM skin 15#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6681,
+    "supplyName": "Vital Essentials Duck Mini Nibbles 12oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "042055046336",
+    "catalogName": "HIKARI sinking gold mini 12oz",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6181,
+    "supplyName": "PetCrest 48\" Single Door",
+    "supplyBrand": "PetCrest",
+    "upc": "784099025051",
+    "catalogName": "\"PC 48\"\" single door\"",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6397,
+    "supplyName": "Vital Essentials Turkey Ground Top 6oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "840199682010",
+    "catalogName": "VIT ESSEN beef ground top 6oz",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6552,
+    "supplyName": "Natural Bal Plant 13oz",
+    "supplyBrand": "Natural Balance",
+    "upc": "723633065559",
+    "catalogName": "NAT BAL plant 13oz",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6118,
+    "supplyName": "Fromm Gold Puppy 5lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705115570",
+    "catalogName": "FROMM gold puppy 5#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6746,
+    "supplyName": "Fromm Cat Salmon 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705115600",
+    "catalogName": "FROMM cat adult 4#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6804,
+    "supplyName": "Science Diet Cat Indoor 7+ 15.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742887401",
+    "catalogName": "SD cat indo 7+ 15.5#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6156,
+    "supplyName": "Fromm Trout 12lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705108039",
+    "catalogName": "FROMM trout 12#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6311,
+    "supplyName": "Pure Vita Grain Free Frozen Salmon & Pea 5lb",
+    "supplyBrand": "Pure Vita",
+    "upc": "073893177029",
+    "catalogName": "PURE VITA gr fr salm & pea 5#",
+    "score": 0.625,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6190,
+    "supplyName": "PetCrest 48\" Double Door",
+    "supplyBrand": "PetCrest",
+    "upc": "784099025143",
+    "catalogName": "\"PC 48\"\" double door\"",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5958,
+    "supplyName": "Science Diet Light Small Bite 30lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742022222",
+    "catalogName": "SD light sm bite 30#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4642,
+    "supplyName": "Smartsticks 12 Chicken",
+    "supplyBrand": "SmartBones",
+    "upc": "052742012070",
+    "catalogName": "SD vitality 12.5#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6421,
+    "supplyName": "Acana Freeze Dried Turkey 14oz",
+    "supplyBrand": "Acana",
+    "upc": "064992715557",
+    "catalogName": "ACANA fd ck 14oz",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6749,
+    "supplyName": "Fromm PurrSnickitty chicken 6oz",
+    "supplyBrand": "Fromm",
+    "upc": "072705137053",
+    "catalogName": "FROMM pur sni co 6oz",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5937,
+    "supplyName": "Science Diet Puppy Chicken 12.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742059389",
+    "catalogName": "SD puppy lam 12.5#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6125,
+    "supplyName": "Fromm Gold Small Beef 15lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705105571",
+    "catalogName": "FROMM gold lg br puppy 5#",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6726,
+    "supplyName": "Science Diet Kitten Healthy Cuisine 2.8oz",
+    "supplyBrand": "Science Diet",
+    "upc": "052742007175",
+    "catalogName": "SD kitten heal cuis 2.8oz",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6794,
+    "supplyName": "Science Diet Cat 7+ 16lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742006451",
+    "catalogName": "SD cat 7+ 16#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6887,
+    "supplyName": "Freshpet Chicken,Rice 2lb",
+    "supplyBrand": "Freshpet",
+    "upc": "851893001731",
+    "catalogName": "FRESHPET turky 2lb",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6313,
+    "supplyName": "Pure Vita Grain Free Frozen Salmon & Pea 25lb",
+    "supplyBrand": "Pure Vita",
+    "upc": "073893177005",
+    "catalogName": "PURE VITA gr fr salm & pea 25#",
+    "score": 0.625,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 7299,
+    "supplyName": "Activ Betta Gravel Blue",
+    "supplyBrand": "World Wide Imports",
+    "upc": "029904109718",
+    "catalogName": "ACTIV BETTA bl gravel",
+    "score": 0.75,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6093,
+    "supplyName": "Diamond Puppy 20lb",
+    "supplyBrand": "Diamond",
+    "upc": "074198002207",
+    "catalogName": "DIAM puppy 20#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6360,
+    "supplyName": "Pro Plan Chicken 30/20 18lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100150943",
+    "catalogName": "PRO PLAN ck 30/20 18#",
+    "score": 0.8,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6504,
+    "supplyName": "\\Nutrisource Grain Free Chicken 13oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "855958006532",
+    "catalogName": "Grilled Chicken Fillet",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 2564,
+    "supplyName": "Circle Black04\" Leash",
+    "supplyBrand": "",
+    "upc": "076484348006",
+    "catalogName": "CIRCLE BRK04\" LEASH",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4771,
+    "supplyName": "Vital Essentials Beef Tripe Bites 2.3oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "038100173409",
+    "catalogName": "PRO PLAN cat urin beef 3oz",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3794,
+    "supplyName": "Coastal Blue 26\" Martingale Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4002,
+    "supplyName": "Coastal Mbn26\" Security Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6769,
+    "supplyName": "Science Diet Cat 4lb",
+    "supplyBrand": "Science Diet",
+    "upc": "037009604293",
+    "catalogName": "CSHD SHR CAT UNI AC LB 4LB",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6242,
+    "supplyName": "Orijen Large Breed Puppy 23.5lb",
+    "supplyBrand": "Orijen",
+    "upc": "064992102258",
+    "catalogName": "ORIJEN lg br puppy 23.5#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6317,
+    "supplyName": "Pure Vita Turkey Grain Free 12lb",
+    "supplyBrand": "Pure Vita",
+    "upc": "073893175032",
+    "catalogName": "PURE VITA turkey gr fe 12#",
+    "score": 0.7,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4677,
+    "supplyName": "St. Rocco's Cod 3oz",
+    "supplyBrand": "Saint Rocco's",
+    "upc": "097612910025",
+    "catalogName": "ZooMed Little Dripper",
+    "score": 0.5800000000000001,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5246,
+    "supplyName": "Suzie's CBD Original 6oz",
+    "supplyBrand": "Suzie's CBD",
+    "upc": "000116772105",
+    "catalogName": "AQUAVITRO phosfiltrum 5.6oz",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 4945,
+    "supplyName": "YummyCombs Small 12oz",
+    "supplyBrand": "YummyCombs",
+    "upc": "030157007522",
+    "catalogName": "APA BIRDBATH MIXING-12OZ",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6355,
+    "supplyName": "Pro Plan Weight Shred 18lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100140241",
+    "catalogName": "PRO PLAN weight shred 18#",
+    "score": 0.88,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6146,
+    "supplyName": "Fromm Whitefish 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116362",
+    "catalogName": "FROMM whitefish 4#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 1669,
+    "supplyName": "Dogit Go Slow Extra Small Blue",
+    "supplyBrand": "Hagen",
+    "upc": "022517737316",
+    "catalogName": "collapsible crate",
+    "score": 0.6666666666666666,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 12,
+    "supplyName": "4 Pound Land Recipe",
+    "supplyBrand": "RedBarn",
+    "upc": "785184120040",
+    "catalogName": "RED B land gr fr 4#",
+    "score": 0.55,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6694,
+    "supplyName": "Nutrisource Chicken & Rice Cat Formula 5.5oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "052742177007",
+    "catalogName": "SD cat tend ck 5.5oz",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6080,
+    "supplyName": "Diamond Senior 35lb",
+    "supplyBrand": "Diamond",
+    "upc": "072705115471",
+    "catalogName": "FROMM gold senior 5#",
+    "score": 0.6,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6179,
+    "supplyName": "Fromm Coast Weight 26lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705104406",
+    "catalogName": "Fromm coast weight 26#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6692,
+    "supplyName": "Nutrisource Cat Country Select 5.5oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "052742177007",
+    "catalogName": "SD cat tend ck 5.5oz",
+    "score": 0.64,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6312,
+    "supplyName": "Pure Vita Grain Free Frozen Salmon & Pea 12lb",
+    "supplyBrand": "Pure Vita",
+    "upc": "073893177036",
+    "catalogName": "PURE VITA gr fr salm & pea 12#",
+    "score": 0.625,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6511,
+    "supplyName": "Nutrisource Adult Chicken & Rice Recipe 12.3oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "072705133307",
+    "catalogName": "FROM cat adult 3oz",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6758,
+    "supplyName": "Orijen Kitten 4lb",
+    "supplyBrand": "Orijen",
+    "upc": "064992716646",
+    "catalogName": "ORIJEN kitten 4#",
+    "score": 0.8,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5766,
+    "supplyName": "Tetra Pond Pump1000 Large",
+    "supplyBrand": "",
+    "upc": "797801036924",
+    "catalogName": "NaturVet Omega-Gold",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6689,
+    "supplyName": "Tuffy's Cat Chicken & Tuna 5.5oz",
+    "supplyBrand": "Tuffy",
+    "upc": "073893022213",
+    "catalogName": "TUFFY'S cat ck&tun 5.5oz",
+    "score": 0.76,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6506,
+    "supplyName": "Nutrisource Grain Free Lamb 12.3oz",
+    "supplyBrand": "Nutrisource",
+    "upc": "073893021063",
+    "catalogName": "NUTRI SOUR lamb 12.3oz",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5923,
+    "supplyName": "Science Diet Small Breed Light 15.5lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742022130",
+    "catalogName": "SD light sm bite 15#",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6751,
+    "supplyName": "Fromm PurrSnickety Chicken 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705108060",
+    "catalogName": "FROMM trout 4#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6357,
+    "supplyName": "Pro Plan Weight 18lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100131867",
+    "catalogName": "PRO PLAN weight 18#",
+    "score": 0.85,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6658,
+    "supplyName": "Zignature Turkey 4lb",
+    "supplyBrand": "Zignature",
+    "upc": "859610007509",
+    "catalogName": "BLUE B basic turkey 4#",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6745,
+    "supplyName": "Fromm Cat Surf & Turf 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705116546",
+    "catalogName": "FROMM surf & turf 4#",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6535,
+    "supplyName": "Health Extension Digestive Super 9oz",
+    "supplyBrand": "Health Extension",
+    "upc": "810120990002",
+    "catalogName": "HEALTH EXTEN dig sup 9oz",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6120,
+    "supplyName": "Fromm Gold Puppy 30lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705115518",
+    "catalogName": "FROMM gold puppy 30#",
+    "score": 0.85,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5249,
+    "supplyName": "Hippie Hounds 250mg Dog Drops",
+    "supplyBrand": "Hippie Hounds",
+    "upc": "071859998527",
+    "catalogName": "Kaytee Garden Veggie Treat",
+    "score": 0.5636363636363636,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6387,
+    "supplyName": "Pro Plan Lamb Puppy 34lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100132741",
+    "catalogName": "PRO PLAN lamb puppy 34#",
+    "score": 0.88,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6756,
+    "supplyName": "Fromm PurrSnickety Salmon 10lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705115631",
+    "catalogName": "FROMM cat adult 10#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 4248,
+    "supplyName": "Pet Water Bottle 32oz",
+    "supplyBrand": "Penn-Plax",
+    "upc": "317163050215",
+    "catalogName": "API POND-COND TAP WATER 32OZ",
+    "score": 0.6,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 6349,
+    "supplyName": "Pro Plan Sensitive Salmon 4lb",
+    "supplyBrand": "Pro Plan",
+    "upc": "038100100757",
+    "catalogName": "PRO PLAN sensi salm 4#",
+    "score": 0.64,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 5954,
+    "supplyName": "Science Diet Salmon 33lb",
+    "supplyBrand": "Science Diet",
+    "upc": "052742068626",
+    "catalogName": "SD salmon 33#",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 3507,
+    "supplyName": "Valhoma Spike 18 Pr Collar",
+    "supplyBrand": "Valhoma",
+    "upc": "009761240301",
+    "catalogName": "ZooMed Crested gecko diet watm.",
+    "score": 0.5846153846153846,
+    "method": "tokens"
+  },
+  {
+    "supplyId": 3712,
+    "supplyName": "Coastal Orange 26\" Buck Collar",
+    "supplyBrand": "Coastal",
+    "upc": "076484065637",
+    "catalogName": "COASTAL LG PIA26 COLLAR",
+    "score": 0.55,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6398,
+    "supplyName": "Vital Essentials Chicken Ground Top 6oz",
+    "supplyBrand": "Vital Essentials",
+    "upc": "840199682010",
+    "catalogName": "VIT ESSEN beef ground top 6oz",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 7236,
+    "supplyName": "Tetra Glo Extra Large Gr/Black Plant",
+    "supplyBrand": "Tetra",
+    "upc": "046798780335",
+    "catalogName": "TETRA glo lg gr/pk plant",
+    "score": 0.5714285714285714,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6483,
+    "supplyName": "Fromm Chicken & Rice 12.2oz",
+    "supplyBrand": "Fromm",
+    "upc": "072705118663",
+    "catalogName": "FROMM beef & bar 12.2oz",
+    "score": 0.76,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6542,
+    "supplyName": "Wellness Petite Entree Chicken, Ground Beef 3oz",
+    "supplyBrand": "Wellness",
+    "upc": "076344090359",
+    "catalogName": "WELLNESS pt en beef 3oz",
+    "score": 0.6571428571428571,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 6743,
+    "supplyName": "Fromm Cat Game Bird Recipe 4lb",
+    "supplyBrand": "Fromm",
+    "upc": "072705114443",
+    "catalogName": "FROMM game bird 4#",
+    "score": 0.7,
+    "method": "brand+tokens"
+  },
+  {
+    "supplyId": 5231,
+    "supplyName": "Durvet Triple Wormer 2pk Chw Puppy",
+    "supplyBrand": "Durvet",
+    "upc": "048081008201",
+    "catalogName": "DURVET TRIPWRM 2PK CHW PUPPY",
+    "score": 0.5846153846153846,
+    "method": "tokens"
+  }
+]

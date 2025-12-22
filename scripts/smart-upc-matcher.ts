@@ -1,336 +1,183 @@
+import fs from 'fs';
 import { db } from '../server/db';
 import { supplies } from '../shared/schema';
-import { eq } from 'drizzle-orm';
-import * as fs from 'fs';
 
-interface UPCEntry {
+interface UpcCatalogEntry {
   upc: string;
-  name: string;
-  source: string;
+  names: string[];
+  primaryName: string;
 }
 
-// Brand name normalizations - handles spacing and common variations
-const BRAND_NORMALIZATIONS: Record<string, string> = {
-  'zoomed': 'zoo med', 'zoo med': 'zoo med', 'zm': 'zoo med',
-  'exoterra': 'exo terra', 'exo terra': 'exo terra', 'ext': 'exo terra',
-  'bluebuffalo': 'blue buffalo', 'blue buffalo': 'blue buffalo', 'bb': 'blue buffalo',
-  'royalcanin': 'royal canin', 'royal canin': 'royal canin', 'rc': 'royal canin',
-  'sciencediet': 'science diet', 'science diet': 'science diet', 'sd': 'science diet',
-  'naturalbalance': 'natural balance', 'natural balance': 'natural balance', 'nb': 'natural balance',
-  'nutrisource': 'nutri source', 'nutri source': 'nutri source', 'ns': 'nutri source',
-  'pennplax': 'penn plax', 'penn plax': 'penn plax',
-  'fourpaws': 'four paws', 'four paws': 'four paws',
-  'jwpet': 'jw pet', 'jw pet': 'jw pet',
-  'oceannutrition': 'ocean nutrition', 'ocean nutrition': 'ocean nutrition',
-  'omegaone': 'omega one', 'omega one': 'omega one',
-  'healthextension': 'health extension', 'health extension': 'health extension',
-  'purevita': 'pure vita', 'pure vita': 'pure vita', 'pv': 'pure vita',
-};
+interface UpcCatalog {
+  entries: UpcCatalogEntry[];
+}
 
-// Word abbreviation expansions
-const WORD_EXPANSIONS: Record<string, string> = {
-  'sm': 'small', 'sml': 'small',
-  'md': 'medium', 'med': 'medium',
-  'lg': 'large', 'lrg': 'large',
-  'xl': 'extra large', 'xlg': 'extra large',
-  'sub': 'substrate', 'substr': 'substrate',
-  'qt': 'quart', 'qts': 'quart',
-  'lbs': 'lb', 'lb': 'lb',
-  'oz': 'oz', 'ozs': 'oz',
-  'pk': 'pack', 'pck': 'pack',
-  'ct': 'count',
-  'hyrdo': 'hydro', // common typo
-  'repti': 'repti', 'repta': 'repta',
-  'eco': 'eco', 'bio': 'bio',
-  'galap': 'galapagos',
-  'juv': 'juvenile', 'adult': 'adult', 'adlt': 'adult',
-  'envi': 'environment', 'enviro': 'environment', 'enviroment': 'environment',
-  'sup': 'supplement', 'supp': 'supplement',
-  'vit': 'vitamin', 'vitam': 'vitamin',
-  'main': 'maintenance', 'maint': 'maintenance',
-  'gourment': 'gourmet', // common typo
-  '10g': '10 gallon', '20g': '20 gallon', '30g': '30 gallon', '40g': '40 gallon', '55g': '55 gallon', '60g': '60 gallon',
-  '10lbs': '10 lb', '20lbs': '20 lb', '4qt': '4 quart', '8qt': '8 quart', '24qt': '24 quart',
-  'ecoearth': 'eco earth',
-  'biothane': 'bio drain', // mapping variation
-  'flukers': 'flukers', 'flu': 'flukers', 'fluk': 'flukers',
-  'fluval': 'fluval', 'fluv': 'fluval',
-  'hikari': 'hikari', 'hik': 'hikari',
-  'tetra': 'tetra', 'tet': 'tetra',
-  'aqueon': 'aqueon', 'aqu': 'aqueon',
-  'marineland': 'marineland', 'mar': 'marineland',
-  'seachem': 'seachem', 'sec': 'seachem',
-  'kaytee': 'kaytee', 'kay': 'kaytee',
-  'oxbow': 'oxbow', 'oxb': 'oxbow',
-  'zilla': 'zilla', 'zil': 'zilla',
-  'kong': 'kong', 'kng': 'kong',
-  'nylabone': 'nylabone', 'nyl': 'nylabone',
-  'benebone': 'benebone', 'ben': 'benebone',
-  'coastal': 'coastal', 'cos': 'coastal',
-  'greenies': 'greenies', 'gre': 'greenies',
-  'fromm': 'fromm', 'frm': 'fromm',
-  'victor': 'victor', 'vict': 'victor',
-  'diamond': 'diamond', 'diam': 'diamond',
-  'canidae': 'canidae', 'cand': 'canidae',
-  'primal': 'primal', 'prm': 'primal',
-  'zignature': 'zignature', 'zig': 'zignature', 'zign': 'zignature',
-};
+interface Match {
+  supplyId: number;
+  supplyName: string;
+  supplyBrand: string | null;
+  upc: string;
+  catalogName: string;
+  score: number;
+  method: string;
+}
 
-function normalizeText(text: string): string {
-  let result = text.toLowerCase()
-    .replace(/[™®©'"#&]/g, '')
-    .replace(/\./g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+function extractBrand(name: string): string {
+  const brands = [
+    'zoomed', 'zoo med', 'api', 'tetra', 'hikari', 'fluval', 'aqueon', 'marineland',
+    'exo terra', 'exoterra', 'zilla', 'repti', 'flukers', 'komodo', 'kaytee', 
+    'oxbow', 'mazuri', 'zupreem', 'higgins', 'tropican', 'lafeber',
+    'blue buffalo', 'wellness', 'orijen', 'acana', 'taste of the wild', 'merrick',
+    'canidae', 'fromm', 'nutrisource', 'diamond', 'victor', 'purina', 'iams',
+    'science diet', 'royal canin', 'hill', 'eukanuba', 'nutro',
+    'coastal', 'kong', 'nylabone', 'chuckit', 'outward hound', 'mammoth',
+    'jw', 'starmark', 'busy buddy', 'west paw', 'ruffwear',
+    'furminator', 'andis', 'wahl', 'oster', 'conair', 'safari', 'millers forge',
+    'earthbath', 'tropiclean', 'natures miracle', 'simple solution',
+    'aquatop', 'penn plax', 'marina', 'seachem', 'fritz', 'brightwell',
+    'caribsea', 'fluval', 'eheim', 'hydor', 'aquaclear', 'cascade',
+    'prevue', 'vision', 'ware', 'kaytee', 'super pet', 'habitrail',
+    'marshall', 'ferplast', 'living world', 'oxbow', 'vitakraft',
+    'inaba', 'tiki cat', 'weruva', 'fussie cat', 'nulo', 'instinct',
+    'stella', 'primal', 'answers', 'smallbatch', 'vital essentials'
+  ];
+  const lower = name.toLowerCase();
+  for (const brand of brands) {
+    if (lower.includes(brand)) return brand;
+  }
+  return '';
+}
+
+function extractTokens(str: string): string[] {
+  return str.toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(t => t.length >= 2);
+}
+
+function extractNumbers(str: string): string[] {
+  const matches = str.match(/\d+(?:\.\d+)?(?:oz|lb|pk|ct|gal|qt|ml|l|in|ft|"|')?/gi) || [];
+  return matches.map(m => m.toLowerCase());
+}
+
+function scoreMatch(supplyTokens: string[], catalogTokens: string[], supplyNums: string[], catalogNums: string[]): number {
+  let score = 0;
   
-  // Normalize brand names (handle no-space versions)
-  for (const [pattern, replacement] of Object.entries(BRAND_NORMALIZATIONS)) {
-    const regex = new RegExp(`\\b${pattern}\\b`, 'gi');
-    result = result.replace(regex, replacement);
+  const commonTokens = supplyTokens.filter(t => catalogTokens.includes(t));
+  const tokenScore = commonTokens.length / Math.max(supplyTokens.length, catalogTokens.length);
+  score += tokenScore * 0.6;
+  
+  const commonNums = supplyNums.filter(n => catalogNums.some(cn => cn.includes(n) || n.includes(cn)));
+  if (supplyNums.length > 0 && catalogNums.length > 0) {
+    const numScore = commonNums.length / Math.max(supplyNums.length, catalogNums.length);
+    score += numScore * 0.4;
+  } else {
+    score += tokenScore * 0.4;
   }
   
-  // Also handle concatenated brand names without word boundaries
-  result = result.replace(/zoomed/gi, 'zoo med');
-  result = result.replace(/exoterra/gi, 'exo terra');
-  result = result.replace(/bluebuffalo/gi, 'blue buffalo');
-  
-  return result;
+  return score;
 }
 
-function getTokens(text: string): string[] {
-  const normalized = normalizeText(text);
-  const words = normalized.split(/[\s\-_]+/);
+async function smartMatch() {
+  console.log('=== SMART UPC MATCHING ===\n');
+
+  const catalog: UpcCatalog = JSON.parse(fs.readFileSync('scripts/upc_catalog.json', 'utf-8'));
+  console.log(`Catalog: ${catalog.entries.length} UPCs with names`);
+
+  const allSupplies = await db.select().from(supplies);
+  const needsUpc = allSupplies.filter(s => !s.sku || s.sku.trim() === '');
+  const hasUpc = allSupplies.filter(s => s.sku && s.sku.trim() !== '');
+  console.log(`Supplies needing UPC: ${needsUpc.length}`);
+  console.log(`Supplies with UPC: ${hasUpc.length}`);
+
+  console.log('\nBuilding brand index...');
+  const brandIndex = new Map<string, UpcCatalogEntry[]>();
+  const allEntries: { entry: UpcCatalogEntry; tokens: string[]; nums: string[]; brand: string }[] = [];
   
-  const tokens: string[] = [];
-  for (const word of words) {
-    const clean = word.replace(/[^a-z0-9]/g, '');
-    if (!clean) continue;
+  for (const entry of catalog.entries) {
+    const allNames = entry.names.join(' ');
+    const brand = extractBrand(allNames);
+    const tokens = extractTokens(allNames);
+    const nums = extractNumbers(allNames);
     
-    const expanded = WORD_EXPANSIONS[clean] || clean;
-    tokens.push(...expanded.split(' '));
-  }
-  
-  return tokens.filter(t => t.length > 0);
-}
-
-function getTokenSet(text: string): Set<string> {
-  return new Set(getTokens(text));
-}
-
-function getSortedKey(text: string): string {
-  const tokens = getTokens(text);
-  return [...new Set(tokens)].sort().join('');
-}
-
-function tokenOverlap(set1: Set<string>, set2: Set<string>): number {
-  if (set1.size === 0 || set2.size === 0) return 0;
-  
-  let matches = 0;
-  for (const t of set1) {
-    if (set2.has(t)) matches++;
-  }
-  
-  // Use Jaccard similarity
-  const union = new Set([...set1, ...set2]);
-  return matches / union.size;
-}
-
-function tokenContainment(source: Set<string>, target: Set<string>): number {
-  if (source.size === 0) return 0;
-  
-  let matches = 0;
-  for (const t of source) {
-    if (target.has(t)) matches++;
-  }
-  
-  return matches / source.size;
-}
-
-async function main() {
-  console.log('=== SMART UPC MATCHER ===');
-  console.log('This matcher corrects wrong UPCs and fills gaps.\n');
-  
-  // Load all sources
-  const allMaybe: UPCEntry[] = JSON.parse(fs.readFileSync('maybe_upcs.json', 'utf-8'));
-  const goodMaybe = allMaybe.slice(0, 3171);
-  
-  const master: UPCEntry[] = JSON.parse(fs.readFileSync('scripts/master_verified_upcs.json', 'utf-8'));
-  const googleSheet = master.filter(e => e.source === 'google_sheet');
-  const camscanner = master.filter(e => e.source === 'camscanner');
-  
-  console.log('Maybe Inventory entries:', goodMaybe.length);
-  console.log('Google Sheet entries:', googleSheet.length);
-  console.log('Camscanner entries:', camscanner.length);
-  
-  // Get all products
-  const products = await db.select({ 
-    id: supplies.id, 
-    name: supplies.name, 
-    sku: supplies.sku 
-  }).from(supplies);
-  
-  console.log('Total products:', products.length);
-  
-  // Build product lookup maps
-  const productsByKey = new Map<string, typeof products[0]>();
-  const productTokens = new Map<number, { product: typeof products[0], tokens: Set<string> }>();
-  
-  for (const p of products) {
-    const key = getSortedKey(p.name);
-    if (!productsByKey.has(key)) {
-      productsByKey.set(key, p);
-    }
-    productTokens.set(p.id, { product: p, tokens: getTokenSet(p.name) });
-  }
-  
-  console.log('Unique product keys:', productsByKey.size);
-  
-  let updated = 0;
-  let added = 0;
-  let corrected = 0;
-  const usedUPCs = new Set<string>();
-  const matchLog: string[] = [];
-  
-  // Process Maybe Inventory first (highest quality)
-  console.log('\n=== Processing Maybe Inventory ===');
-  
-  for (const entry of goodMaybe) {
-    const entryKey = getSortedKey(entry.name);
-    const entryTokens = getTokenSet(entry.name);
+    allEntries.push({ entry, tokens, nums, brand });
     
-    // Try exact key match first
-    let matchedProduct = productsByKey.get(entryKey);
-    
-    // If no exact match, try token overlap
-    if (!matchedProduct) {
-      let bestScore = 0;
-      let bestProduct: typeof products[0] | null = null;
-      
-      for (const [id, { product, tokens }] of productTokens) {
-        const score = tokenOverlap(entryTokens, tokens);
-        if (score > bestScore && score >= 0.65) {
-          bestScore = score;
-          bestProduct = product;
-        }
-      }
-      
-      if (bestProduct && bestScore >= 0.65) {
-        matchedProduct = bestProduct;
-      }
-    }
-    
-    if (matchedProduct && !usedUPCs.has(entry.upc)) {
-      const currentSku = matchedProduct.sku?.trim() || '';
-      
-      if (!currentSku) {
-        // No UPC - add it
-        await db.update(supplies).set({ sku: entry.upc }).where(eq(supplies.id, matchedProduct.id));
-        added++;
-        usedUPCs.add(entry.upc);
-        matchLog.push(`ADD: "${entry.name}" -> "${matchedProduct.name}" = ${entry.upc}`);
-      } else if (currentSku !== entry.upc) {
-        // Different UPC - maybe_inventory is more trusted, so update
-        await db.update(supplies).set({ sku: entry.upc }).where(eq(supplies.id, matchedProduct.id));
-        corrected++;
-        usedUPCs.add(entry.upc);
-        matchLog.push(`CORRECT: "${matchedProduct.name}" ${currentSku} -> ${entry.upc}`);
-      }
-      
-      updated++;
+    if (brand) {
+      if (!brandIndex.has(brand)) brandIndex.set(brand, []);
+      brandIndex.get(brand)!.push(entry);
     }
   }
+  console.log(`Brands indexed: ${brandIndex.size}`);
+
+  const matches: Match[] = [];
+  let processed = 0;
+
+  console.log('\nMatching...');
   
-  console.log(`Maybe Inventory: ${updated} matches (${added} added, ${corrected} corrected)`);
-  
-  // Process Google Sheet
-  console.log('\n=== Processing Google Sheet ===');
-  let googleUpdated = 0;
-  let googleAdded = 0;
-  
-  for (const entry of googleSheet) {
-    const entryTokens = getTokenSet(entry.name);
-    
-    let bestScore = 0;
-    let bestProduct: typeof products[0] | null = null;
-    
-    for (const [id, { product, tokens }] of productTokens) {
-      // Skip if already has a UPC from maybe_inventory
-      if (usedUPCs.has(product.sku || '')) continue;
-      
-      const score = tokenOverlap(entryTokens, tokens);
-      if (score > bestScore && score >= 0.65) {
-        bestScore = score;
-        bestProduct = product;
+  for (const supply of needsUpc) {
+    processed++;
+    if (processed % 500 === 0) console.log(`  ${processed}/${needsUpc.length}`);
+
+    const supplyBrand = extractBrand(supply.name);
+    const supplyTokens = extractTokens(supply.name);
+    const supplyNums = extractNumbers(supply.name);
+
+    if (supplyTokens.length < 2) continue;
+
+    let candidates = allEntries;
+    if (supplyBrand && brandIndex.has(supplyBrand)) {
+      const brandEntries = brandIndex.get(supplyBrand)!;
+      candidates = allEntries.filter(e => brandEntries.includes(e.entry));
+    }
+
+    let bestMatch: { entry: UpcCatalogEntry; score: number; name: string } | null = null;
+
+    for (const cand of candidates) {
+      const score = scoreMatch(supplyTokens, cand.tokens, supplyNums, cand.nums);
+      if (score > 0.5 && (!bestMatch || score > bestMatch.score)) {
+        bestMatch = { entry: cand.entry, score, name: cand.entry.primaryName };
       }
     }
-    
-    if (bestProduct && !usedUPCs.has(entry.upc)) {
-      const currentSku = bestProduct.sku?.trim() || '';
-      
-      if (!currentSku) {
-        await db.update(supplies).set({ sku: entry.upc }).where(eq(supplies.id, bestProduct.id));
-        googleAdded++;
-        usedUPCs.add(entry.upc);
-      }
-      googleUpdated++;
-    }
-  }
-  
-  console.log(`Google Sheet: ${googleUpdated} matches (${googleAdded} added)`);
-  
-  // Process Camscanner
-  console.log('\n=== Processing Camscanner ===');
-  let camUpdated = 0;
-  let camAdded = 0;
-  
-  for (const entry of camscanner) {
-    const entryKey = getSortedKey(entry.name);
-    const entryTokens = getTokenSet(entry.name);
-    
-    let matchedProduct = productsByKey.get(entryKey);
-    
-    if (!matchedProduct) {
-      let bestScore = 0;
-      
-      for (const [id, { product, tokens }] of productTokens) {
-        if (usedUPCs.has(product.sku || '')) continue;
-        
-        const score = tokenOverlap(entryTokens, tokens);
-        if (score > bestScore && score >= 0.7) {
-          bestScore = score;
-          matchedProduct = product;
-        }
-      }
-    }
-    
-    if (matchedProduct && !usedUPCs.has(entry.upc)) {
-      const currentSku = matchedProduct.sku?.trim() || '';
-      
-      if (!currentSku) {
-        await db.update(supplies).set({ sku: entry.upc }).where(eq(supplies.id, matchedProduct.id));
-        camAdded++;
-        usedUPCs.add(entry.upc);
-      }
-      camUpdated++;
+
+    if (bestMatch && bestMatch.score >= 0.55) {
+      matches.push({
+        supplyId: supply.id,
+        supplyName: supply.name,
+        supplyBrand: supply.brand,
+        upc: bestMatch.entry.upc,
+        catalogName: bestMatch.name,
+        score: bestMatch.score,
+        method: supplyBrand ? 'brand+tokens' : 'tokens'
+      });
     }
   }
-  
-  console.log(`Camscanner: ${camUpdated} matches (${camAdded} added)`);
-  
-  // Final count
-  const finalProducts = await db.select({ id: supplies.id, sku: supplies.sku }).from(supplies);
-  const finalWithSku = finalProducts.filter(p => p.sku && p.sku.trim() !== '');
-  
-  console.log('\n=== FINAL RESULTS ===');
-  console.log(`Total with UPC: ${finalWithSku.length}/${finalProducts.length} (${((finalWithSku.length / finalProducts.length) * 100).toFixed(1)}%)`);
-  console.log(`Added: ${added + googleAdded + camAdded}`);
-  console.log(`Corrected: ${corrected}`);
-  
-  // Save match log
-  fs.writeFileSync('scripts/match_log.txt', matchLog.join('\n'));
-  console.log('\nMatch log saved to scripts/match_log.txt');
-  
-  process.exit(0);
+
+  const highConf = matches.filter(m => m.score >= 0.75);
+  const medConf = matches.filter(m => m.score >= 0.65 && m.score < 0.75);
+  const lowConf = matches.filter(m => m.score >= 0.55 && m.score < 0.65);
+
+  console.log('\n=== RESULTS ===');
+  console.log(`High confidence (>=75%): ${highConf.length}`);
+  console.log(`Medium confidence (65-75%): ${medConf.length}`);
+  console.log(`Low confidence (55-65%): ${lowConf.length}`);
+  console.log(`Total matches: ${matches.length}`);
+
+  const projectedCoverage = hasUpc.length + matches.length;
+  console.log(`\nProjected coverage: ${projectedCoverage}/${allSupplies.length} (${(projectedCoverage/allSupplies.length*100).toFixed(1)}%)`);
+
+  fs.writeFileSync('scripts/smart_matches.json', JSON.stringify(matches, null, 2));
+
+  console.log('\n=== SAMPLE HIGH CONFIDENCE ===');
+  for (const m of highConf.slice(0, 15)) {
+    console.log(`[${(m.score*100).toFixed(0)}%] "${m.supplyName}"`);
+    console.log(`    -> "${m.catalogName}" | UPC: ${m.upc}`);
+  }
+
+  console.log('\n=== SAMPLE MEDIUM CONFIDENCE ===');
+  for (const m of medConf.slice(0, 10)) {
+    console.log(`[${(m.score*100).toFixed(0)}%] "${m.supplyName}"`);
+    console.log(`    -> "${m.catalogName}" | UPC: ${m.upc}`);
+  }
 }
 
-main().catch(console.error);
+smartMatch().catch(console.error);
