@@ -1,0 +1,12 @@
+{
+  "generatedAt": "2025-12-22T17:15:04.687Z",
+  "totalSupplies": 7225,
+  "previouslyMatched": 1881,
+  "newMatches": 451,
+  "byMethod": {
+    "75%_brand_match": 52,
+    "90%_jaccard": 380,
+    "70%_all_tokens": 19
+  },
+  "finalCoverage": "32.3%"
+}
