@@ -1,0 +1,34 @@
+[
+  {
+    "supplyId": 6704,
+    "supplyName": "Pro Plan Cat Urin Chicken 3oz",
+    "upc": "038100027030",
+    "upcName": "PRO PLAN cat urin ck 3oz",
+    "score": 1,
+    "brand": "Pro Plan"
+  },
+  {
+    "supplyId": 6701,
+    "supplyName": "Pro Plan Cat Urin Beef 3oz",
+    "upc": "038100173409",
+    "upcName": "PRO PLAN cat urin beef 3oz",
+    "score": 1,
+    "brand": "Pro Plan"
+  },
+  {
+    "supplyId": 6529,
+    "supplyName": "Pro Plan Shred Salmon 15lb",
+    "upc": "038100101297",
+    "upcName": "PRO PLAN shred sal 15#",
+    "score": 1,
+    "brand": "Pro Plan"
+  },
+  {
+    "supplyId": 6149,
+    "supplyName": "Fromm Salmon À La Veg 4lb",
+    "upc": "072705116461",
+    "upcName": "FROMM salmon a la veg 4#",
+    "score": 1,
+    "brand": "Fromm"
+  }
+]

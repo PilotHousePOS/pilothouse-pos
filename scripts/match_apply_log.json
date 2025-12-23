@@ -8500,5 +8500,37 @@
         "upc": "627975011963"
       }
     ]
+  },
+  {
+    "timestamp": "2025-12-23T03:50:07.470Z",
+    "attempted": 4,
+    "applied": 4,
+    "failed": 0,
+    "details": [
+      {
+        "matchId": "6704-038100027030",
+        "status": "success",
+        "supplyId": 6704,
+        "upc": "038100027030"
+      },
+      {
+        "matchId": "6701-038100173409",
+        "status": "success",
+        "supplyId": 6701,
+        "upc": "038100173409"
+      },
+      {
+        "matchId": "6529-038100101297",
+        "status": "success",
+        "supplyId": 6529,
+        "upc": "038100101297"
+      },
+      {
+        "matchId": "6149-072705116461",
+        "status": "success",
+        "supplyId": 6149,
+        "upc": "072705116461"
+      }
+    ]
   }
 ]

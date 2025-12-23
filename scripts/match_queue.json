@@ -1,12 +1,12 @@
 {
   "version": 3,
-  "lastUpdated": "2025-12-23T03:47:11.282Z",
+  "lastUpdated": "2025-12-23T03:50:08.271Z",
   "totalDiscovered": 859,
   "stats": {
     "pending": 0,
     "accepted": 0,
     "rejected": 28,
-    "applied": 1203
+    "applied": 1207
   },
   "matches": {
     "7018-015561165839": {
@@ -18772,6 +18772,66 @@
       "discoveredAt": "2025-12-23T03:38:57.833Z",
       "reviewedAt": "2025-12-23T03:38:57.833Z",
       "appliedAt": "2025-12-23T03:39:00.258Z"
+    },
+    "6704-038100027030": {
+      "matchId": "6704-038100027030",
+      "supplyId": 6704,
+      "supplyName": "Pro Plan Cat Urin Chicken 3oz",
+      "upc": "038100027030",
+      "upcName": "PRO PLAN cat urin ck 3oz",
+      "score": 1,
+      "brand": "Pro Plan",
+      "status": "applied",
+      "matchType": "corrected_match",
+      "discoveredAt": "2025-12-23T03:50:05.329Z",
+      "reviewedAt": "2025-12-23T03:50:05.329Z",
+      "notes": "Correct match found after audit",
+      "appliedAt": "2025-12-23T03:50:08.198Z"
+    },
+    "6701-038100173409": {
+      "matchId": "6701-038100173409",
+      "supplyId": 6701,
+      "supplyName": "Pro Plan Cat Urin Beef 3oz",
+      "upc": "038100173409",
+      "upcName": "PRO PLAN cat urin beef 3oz",
+      "score": 1,
+      "brand": "Pro Plan",
+      "status": "applied",
+      "matchType": "corrected_match",
+      "discoveredAt": "2025-12-23T03:50:05.329Z",
+      "reviewedAt": "2025-12-23T03:50:05.329Z",
+      "notes": "Correct match found after audit",
+      "appliedAt": "2025-12-23T03:50:08.222Z"
+    },
+    "6529-038100101297": {
+      "matchId": "6529-038100101297",
+      "supplyId": 6529,
+      "supplyName": "Pro Plan Shred Salmon 15lb",
+      "upc": "038100101297",
+      "upcName": "PRO PLAN shred sal 15#",
+      "score": 1,
+      "brand": "Pro Plan",
+      "status": "applied",
+      "matchType": "corrected_match",
+      "discoveredAt": "2025-12-23T03:50:05.329Z",
+      "reviewedAt": "2025-12-23T03:50:05.329Z",
+      "notes": "Correct match found after audit",
+      "appliedAt": "2025-12-23T03:50:08.245Z"
+    },
+    "6149-072705116461": {
+      "matchId": "6149-072705116461",
+      "supplyId": 6149,
+      "supplyName": "Fromm Salmon À La Veg 4lb",
+      "upc": "072705116461",
+      "upcName": "FROMM salmon a la veg 4#",
+      "score": 1,
+      "brand": "Fromm",
+      "status": "applied",
+      "matchType": "corrected_match",
+      "discoveredAt": "2025-12-23T03:50:05.329Z",
+      "reviewedAt": "2025-12-23T03:50:05.329Z",
+      "notes": "Correct match found after audit",
+      "appliedAt": "2025-12-23T03:50:08.269Z"
     }
   }
 }
