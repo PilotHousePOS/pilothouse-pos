@@ -1321,14 +1321,32 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createSupply(supply: InsertSupply): Promise<Supply> {
-    const [newSupply] = await db.insert(supplies).values(supply).returning();
+    // Keep UPC and SKU fields in sync - they should always have the same value
+    const syncedSupply = { ...supply };
+    if (syncedSupply.upc && !syncedSupply.sku) {
+      syncedSupply.sku = syncedSupply.upc;
+    } else if (syncedSupply.sku && !syncedSupply.upc) {
+      syncedSupply.upc = syncedSupply.sku;
+    }
+    const [newSupply] = await db.insert(supplies).values(syncedSupply).returning();
     return newSupply;
   }
 
   async updateSupply(id: number, supply: Partial<InsertSupply>): Promise<Supply> {
+    // Keep UPC and SKU fields in sync - they should always have the same value
+    const syncedSupply = { ...supply };
+    if (syncedSupply.upc !== undefined && syncedSupply.sku === undefined) {
+      syncedSupply.sku = syncedSupply.upc;
+    } else if (syncedSupply.sku !== undefined && syncedSupply.upc === undefined) {
+      syncedSupply.upc = syncedSupply.sku;
+    } else if (syncedSupply.upc !== undefined && syncedSupply.sku !== undefined && syncedSupply.upc !== syncedSupply.sku) {
+      // If both provided but different, prefer UPC
+      syncedSupply.sku = syncedSupply.upc;
+    }
+    
     const [updatedSupply] = await db
       .update(supplies)
-      .set({ ...supply, updatedAt: new Date() })
+      .set({ ...syncedSupply, updatedAt: new Date() })
       .where(eq(supplies.id, id))
       .returning();
     return updatedSupply;
