@@ -1,0 +1,6 @@
+Good: 5
+UPDATE supplies SET upc = '018214851660' WHERE id = 2914;
+UPDATE supplies SET upc = '018214828051' WHERE id = 1427;
+UPDATE supplies SET upc = '018214823285' WHERE id = 2915;
+UPDATE supplies SET upc = '018214855187' WHERE id = 2913;
+UPDATE supplies SET upc = '018214846550' WHERE id = 2916;

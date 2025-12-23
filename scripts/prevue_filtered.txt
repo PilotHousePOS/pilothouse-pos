@@ -1,0 +1,10 @@
+REJECT length: Prevue Hendrix Tieout Chain 15' Medium Duty vs PH TieOut Chain 10' Med Duty
+REJECT length: Prevue Hendrix Tieout Chain 10' Medium Duty vs PH TieOut Chain 15' Med Duty
+Good: 7
+UPDATE supplies SET upc = '048081252512' WHERE id = 1188;
+UPDATE supplies SET upc = '048081416150' WHERE id = 1195;
+UPDATE supplies SET upc = '048081000618' WHERE id = 1191;
+UPDATE supplies SET upc = '048081220061' WHERE id = 1183;
+UPDATE supplies SET upc = '048081018187' WHERE id = 1192;
+UPDATE supplies SET upc = '048081071519' WHERE id = 2285;
+UPDATE supplies SET upc = '048081816165' WHERE id = 1187;

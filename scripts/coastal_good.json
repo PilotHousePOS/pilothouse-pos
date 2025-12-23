@@ -1,0 +1,600 @@
+[
+  {
+    "supplyId": 2463,
+    "supplyName": "Lilpals Small Collar Ptr12",
+    "upc": "076484105043",
+    "upcName": "LILPALS SM COLLAR PTR12",
+    "score": 0.8,
+    "details": {
+      "tokens": "1.00",
+      "size": "small=small",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2460,
+    "supplyName": "Lilpals Small Collar Lbp12",
+    "upc": "076484400025",
+    "upcName": "LILPALS SM COLLAR LBP12",
+    "score": 0.8,
+    "details": {
+      "tokens": "1.00",
+      "size": "small=small",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2528,
+    "supplyName": "Lilpals Small Harness Pkbpsm",
+    "upc": "076484638381",
+    "upcName": "LILPALS SM HARNESS PKBPSM",
+    "score": 0.8,
+    "details": {
+      "tokens": "1.00",
+      "size": "small=small",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2502,
+    "supplyName": "Lilpals Small Harness Tgdpsm",
+    "upc": "076484624940",
+    "upcName": "LILPALS SM HARNESS TGDPSM",
+    "score": 0.8,
+    "details": {
+      "tokens": "1.00",
+      "size": "small=small",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2500,
+    "supplyName": "Lilpals Small Harness Ryppsm",
+    "upc": "076484624926",
+    "upcName": "LILPALS SM HARNESS RYPPSM",
+    "score": 0.8,
+    "details": {
+      "tokens": "1.00",
+      "size": "small=small",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2728,
+    "supplyName": "Lilpals Outer Space",
+    "upc": "076484324819",
+    "upcName": "LILPALS OUTER SPACE",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2418,
+    "supplyName": "Lilpals Leash Dpm06",
+    "upc": "076484105050",
+    "upcName": "LILPALS LEASH DPM06",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2429,
+    "supplyName": "Lilpals Leash Pwh06",
+    "upc": "076484162039",
+    "upcName": "LILPALS LEASH PWH06",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2690,
+    "supplyName": "Lilpals 4\" Monkey",
+    "upc": "076484832802",
+    "upcName": "LILPALS 4\" MONKEY",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2730,
+    "supplyName": "Lilpals Soccerball Rop",
+    "upc": "076484401343",
+    "upcName": "LILPALS SOCCERBALL ROP",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2432,
+    "supplyName": "Lilpals Leash Pnz06",
+    "upc": "076484626630",
+    "upcName": "LILPALS LEASH PNZ06",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2721,
+    "supplyName": "Lilpals Plush Hamburger",
+    "upc": "076484401312",
+    "upcName": "LILPALS PLUSH HAMBURGER",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2428,
+    "supplyName": "Lilpals Leash Top06",
+    "upc": "076484162046",
+    "upcName": "LILPALS LEASH TOP06",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2723,
+    "supplyName": "Lilpals Latex Cofee Macroons",
+    "upc": "076484321085",
+    "upcName": "LILPALS LATEX COFEE MACROONS",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2415,
+    "supplyName": "Lilpals Leash Zpk06",
+    "upc": "076484622694",
+    "upcName": "LilPals Leash ZPK06",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2689,
+    "supplyName": "Lilpals 2.75\" Duck",
+    "upc": "076484832055",
+    "upcName": "LILPALS 2.75\" DUCK",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2693,
+    "supplyName": "Lilpals Plushlion",
+    "upc": "076484799105",
+    "upcName": "LILPALS PLUSHLION",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2666,
+    "supplyName": "Lilpals Potty Bells",
+    "upc": "076484121623",
+    "upcName": "LILPALS POTTY BELLS",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2416,
+    "supplyName": "Lilpals Leash Lbp06",
+    "upc": "076484610509",
+    "upcName": "LILPALS LEASH LBP06",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2480,
+    "supplyName": "Lilpals Harness Lbp14",
+    "upc": "076484624667",
+    "upcName": "LILPALS HARNESS LBP14",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2430,
+    "supplyName": "Lilpals Leash Buz06",
+    "upc": "076484626616",
+    "upcName": "LILPALS LEASH BUZ06",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2426,
+    "supplyName": "Lilpals Leash Tgd06",
+    "upc": "076484062254",
+    "upcName": "LILPALS LEASH TGD06",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2727,
+    "supplyName": "Lilpals Plush Ball",
+    "upc": "076484842092",
+    "upcName": "LILPALS PLUSH BALL",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2488,
+    "supplyName": "Lilpals Harness Red14",
+    "upc": "076484624568",
+    "upcName": "LILPALS HARNESS RED14",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2688,
+    "supplyName": "Lilpals 2\" Grnball",
+    "upc": "076484832062",
+    "upcName": "LILPALS 2\" GRNBALL",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2422,
+    "supplyName": "Lilpals Leash Gnd06",
+    "upc": "076484622663",
+    "upcName": "LILPALS LEASH GND06",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2423,
+    "supplyName": "Lilpals Leash Wdf06",
+    "upc": "076484622687",
+    "upcName": "LILPALS LEASH WDF06",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2414,
+    "supplyName": "Lilpals Leash Leb06",
+    "upc": "076484622625",
+    "upcName": "LilPals Leash LEB06",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2720,
+    "supplyName": "Lilpals 8\" Spiky Gator",
+    "upc": "076484832147",
+    "upcName": "LILPALS 8\" SPIKY GATOR",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2738,
+    "supplyName": "Lilpals 2\" Pnkball",
+    "upc": "076484832086",
+    "upcName": "LILPALS 2\" PNKBALL",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2697,
+    "supplyName": "Lilpals Plush Gator",
+    "upc": "076484799099",
+    "upcName": "LILPALS PLUSH GATOR",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2748,
+    "supplyName": "Lilpals Happy Birthday Combo",
+    "upc": "076484742309",
+    "upcName": "LILPALS HAPPY BIRTHDAY COMBO",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2419,
+    "supplyName": "Lilpals Leash Ptr06",
+    "upc": "076484105067",
+    "upcName": "LILPALS LEASH PTR06",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 1574,
+    "supplyName": "Lilpals Nail Trimmer",
+    "upc": "076484002298",
+    "upcName": "lilpals Nail Trimmer",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2698,
+    "supplyName": "Lilpals 4\" Bludog",
+    "upc": "076484832024",
+    "upcName": "LILPALS 4\" BLUDOG",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2479,
+    "supplyName": "Lilpals Harness Zpk14",
+    "upc": "076484062582",
+    "upcName": "LILPALS HARNESS ZPK14",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2702,
+    "supplyName": "Lilpals Rabdog Mesh Toy",
+    "upc": "076484843648",
+    "upcName": "LILPALS RABDOG MESH TOY",
+    "score": 0.7,
+    "details": {
+      "tokens": "1.00",
+      "size": "-",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2468,
+    "supplyName": "Lilpals Small Collar Ryp12",
+    "upc": "076484001222",
+    "upcName": "LILPALS SM COLLAR 1BA12",
+    "score": 0.6499999999999999,
+    "details": {
+      "tokens": "0.75",
+      "size": "small=small",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2464,
+    "supplyName": "Lilpals Small Collar Rwb12",
+    "upc": "076484001246",
+    "upcName": "LILPALS SM COLLAR 1BL12",
+    "score": 0.6499999999999999,
+    "details": {
+      "tokens": "0.75",
+      "size": "small=small",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2461,
+    "supplyName": "Lilpals Small Collar Fmb12",
+    "upc": "076484001253",
+    "upcName": "LILPALS SM COLLAR 2BL12",
+    "score": 0.6499999999999999,
+    "details": {
+      "tokens": "0.75",
+      "size": "small=small",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2492,
+    "supplyName": "Lilpals Small Collar 1ba12",
+    "upc": "076484322259",
+    "upcName": "LILPALS SM COLLAR BLU10",
+    "score": 0.6499999999999999,
+    "details": {
+      "tokens": "0.75",
+      "size": "small=small",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2494,
+    "supplyName": "Lilpals Small Collar 2pn12",
+    "upc": "076484066375",
+    "upcName": "LILPALS SM COLLAR BTD12",
+    "score": 0.6499999999999999,
+    "details": {
+      "tokens": "0.75",
+      "size": "small=small",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2471,
+    "supplyName": "Lilpals Small Collar Pwh12",
+    "upc": "076484662287",
+    "upcName": "LILPALS SM COLLAR GND12",
+    "score": 0.6499999999999999,
+    "details": {
+      "tokens": "0.75",
+      "size": "small=small",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2458,
+    "supplyName": "Lilpals Small Collar Leb12",
+    "upc": "076484662638",
+    "upcName": "LILPALS SM COLLAR PTV12",
+    "score": 0.6499999999999999,
+    "details": {
+      "tokens": "0.75",
+      "size": "small=small",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2491,
+    "supplyName": "Lilpals Small Collar Blu10",
+    "upc": "076484066269",
+    "upcName": "LILPALS SM COLLAR ZPK12",
+    "score": 0.6499999999999999,
+    "details": {
+      "tokens": "0.75",
+      "size": "small=small",
+      "watt": "-",
+      "weight": "-"
+    }
+  },
+  {
+    "supplyId": 2522,
+    "supplyName": "Lilpals Small Harness Limpsm",
+    "upc": "076484163838",
+    "upcName": "LILPALS SM HARNESS BLLPSM",
+    "score": 0.6499999999999999,
+    "details": {
+      "tokens": "0.75",
+      "size": "small=small",
+      "watt": "-",
+      "weight": "-"
+    }
+  }
+]

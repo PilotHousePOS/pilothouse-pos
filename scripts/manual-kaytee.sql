@@ -1,0 +1,2 @@
+-- KAYTEE VERIFIED MATCHES
+UPDATE supplies SET upc = '071859006239' WHERE id = 4283 AND name LIKE '%Fdinthewld%';

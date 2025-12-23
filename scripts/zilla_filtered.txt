@@ -1,0 +1,14 @@
+REJECT wattage: Zilla Mini Halogen Bulb 25w Red vs Zilla Mini Halogen Bulb 50W Red
+REJECT product mismatch: Zilla Terraced Dish Medium vs Zilla Heat Mat Medium
+Good matches: 11
+UPDATE supplies SET upc = '096316156340' WHERE id = 270;
+UPDATE supplies SET upc = '9631667110' WHERE id = 191;
+UPDATE supplies SET upc = '096316156296' WHERE id = 283;
+UPDATE supplies SET upc = '096316680340' WHERE id = 590;
+UPDATE supplies SET upc = '96316002593' WHERE id = 752;
+UPDATE supplies SET upc = '096316001596' WHERE id = 333;
+UPDATE supplies SET upc = '096316000490' WHERE id = 334;
+UPDATE supplies SET upc = '096316002692' WHERE id = 754;
+UPDATE supplies SET upc = '096316003293' WHERE id = 523;
+UPDATE supplies SET upc = '096316671409' WHERE id = 355;
+UPDATE supplies SET upc = '096316660441' WHERE id = 760;

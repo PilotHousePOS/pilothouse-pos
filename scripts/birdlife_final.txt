@@ -1,0 +1,53 @@
+REJECT dim: Birdlife 12" Wooden Perches vs BirdLife 11" Wooden Perches
+REJECT dim: Birdlife 14" Wooden Perches vs BirdLIfe 12" Wooden Perches
+REJECT product: Birdlife Cuttle Bone vs BirdLife Fruit Dipped Cuttle Bone 2pk
+REJECT dim: Birdlife Gravel Paper 9.5x15 vs BirdLife Gravel Paper 15.5x15.5
+REJECT dim: Birdlife 11" Wooden Perches vs BirdLIfe 14" Wooden Perches
+REJECT dim: Birdlife 3" Wooden Swing vs BirdLife 4" Wooden Swing
+REJECT dim: Birdlife Gravel Paper 15.5x15.5 vs BirdLife Gravel Paper 9.5x15
+REJECT dim: Birdlife 18" Wooden Perches vs BirdLife 16" Wooden Perches
+REJECT dim: Birdlife 16" Wooden Perches vs BirdLIfe 18" Wooden Perches
+REJECT kabob type: Birdlife Leather Kabob Large vs BirdLIfe Kabob toy Lg
+Good: 42
+UPDATE supplies SET upc = '030172021374' WHERE id = 1018;
+UPDATE supplies SET upc = '030172021398' WHERE id = 1017;
+UPDATE supplies SET upc = '030172025594' WHERE id = 1052;
+UPDATE supplies SET upc = '030172023682' WHERE id = 1051;
+UPDATE supplies SET upc = '030172077838' WHERE id = 1125;
+UPDATE supplies SET upc = '030172902505' WHERE id = 1008;
+UPDATE supplies SET upc = '030172902314' WHERE id = 854;
+UPDATE supplies SET upc = '030172000423' WHERE id = 1080;
+UPDATE supplies SET upc = '030172013508' WHERE id = 1109;
+UPDATE supplies SET upc = '030172013485' WHERE id = 1070;
+UPDATE supplies SET upc = '030172036781' WHERE id = 993;
+UPDATE supplies SET upc = '030172005442' WHERE id = 950;
+UPDATE supplies SET upc = '030172095788' WHERE id = 1044;
+UPDATE supplies SET upc = '030172902932' WHERE id = 1217;
+UPDATE supplies SET upc = '030172902918' WHERE id = 1219;
+UPDATE supplies SET upc = '030172088285' WHERE id = 1124;
+UPDATE supplies SET upc = '030172902451' WHERE id = 1005;
+UPDATE supplies SET upc = '030172000461' WHERE id = 1072;
+UPDATE supplies SET upc = '030172082795' WHERE id = 1013;
+UPDATE supplies SET upc = '030172081446' WHERE id = 1116;
+UPDATE supplies SET upc = '030172902543' WHERE id = 1010;
+UPDATE supplies SET upc = '030172906183' WHERE id = 1009;
+UPDATE supplies SET upc = '030172902109' WHERE id = 979;
+UPDATE supplies SET upc = '030172902482' WHERE id = 1012;
+UPDATE supplies SET upc = '030172082818' WHERE id = 1002;
+UPDATE supplies SET upc = '030172902628' WHERE id = 941;
+UPDATE supplies SET upc = '030172082832' WHERE id = 1003;
+UPDATE supplies SET upc = '030172902765' WHERE id = 1001;
+UPDATE supplies SET upc = '030172902178' WHERE id = 1029;
+UPDATE supplies SET upc = '030172100338' WHERE id = 1019;
+UPDATE supplies SET upc = '030172026003' WHERE id = 1097;
+UPDATE supplies SET upc = '030172013454' WHERE id = 1067;
+UPDATE supplies SET upc = '030172085369' WHERE id = 994;
+UPDATE supplies SET upc = '030172098871' WHERE id = 1099;
+UPDATE supplies SET upc = '030172902864' WHERE id = 995;
+UPDATE supplies SET upc = '030172902642' WHERE id = 883;
+UPDATE supplies SET upc = '030172080432' WHERE id = 1117;
+UPDATE supplies SET upc = '030172002564' WHERE id = 959;
+UPDATE supplies SET upc = '030172902192' WHERE id = 1028;
+UPDATE supplies SET upc = '030172102363' WHERE id = 856;
+UPDATE supplies SET upc = '030172902116' WHERE id = 980;
+UPDATE supplies SET upc = '030172025990' WHERE id = 1094;

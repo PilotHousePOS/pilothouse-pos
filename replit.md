@@ -87,3 +87,81 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Server-Side Framework**: Express.js
 - **Query Library**: TanStack Query
 - **Client-Side Router**: Wouter
+
+## UPC Matching System
+
+### Overview
+- **Target**: 90% coverage with 100% accuracy (zero errors tolerated)
+- **Total supplies**: 7,225
+- **Total UPCs available**: 5,302 (from FLAGGED_ALL_UPCS.json)
+- **Current progress**: 54.5% matched (3,941 products)
+- **Philosophy**: NO lower thresholds - improvements come from better abbreviation expansion and text normalization only
+
+### Key Files
+- `scripts/FLAGGED_ALL_UPCS.json` - Master UPC database with 5,302 UPCs, brand-flagged
+- `scripts/smart-match-v2.mjs` - Main strict matching script with brand prefix expansion
+- `scripts/batch-apply.mjs` - Batch application with dimension/cup/length filtering
+- `scripts/audit-abbreviations.mjs` - Audit script to find missing abbreviations by brand
+- `scripts/UPC_MATCHING_RULES.md` - Detailed matching rules documentation
+
+### Validation Rules (STRICT - All Must Pass)
+1. **Size Matching**: xxsmall, xsmall, small, mini, medium, large, xlarge, xxlarge, jumbo, giant (small ≠ xsmall, large ≠ xlarge)
+2. **Wattage Matching**: Extract with `/(\d+)\s*w\b/i` - must match exactly (25W ≠ 50W)
+3. **Weight/Volume Matching**: oz, lb, g, ml, qt, gal - value AND unit must match exactly
+4. **Dimension Matching**: Normalized (5" = 5in = 5inch), must match exactly (13" ≠ 7", 12" ≠ 11")
+5. **Cup/Capacity Matching**: 1 cup ≠ 7 cup
+6. **Length Matching**: Foot measurements (15' ≠ 10', 30' ≠ 20')
+
+### Critical Product Type Exclusions
+- wheel/millet, wheel/spray, wheel/food
+- dish/mat, dish/heater, dish/lamp
+- bowl/mat, bowl/heater
+- cage/food, cage/treat, tank/food, tank/treat
+- bulb/mat, bulb/dish, lamp/dish, lamp/bowl
+- toy/food, toy/treat, collar/food, leash/treat
+
+### Brand Prefix Expansion (40+ mappings)
+UPC names often start with abbreviated brand codes:
+- **AQE/AQA** → Aqueon, **KON/KNG** → Kong, **AEC** → A&E Cage
+- **ZMD/ZM** → Zoo Med, **EXO** → Exo Terra, **ZIL** → Zilla
+- **CST** → Coastal, **PPX** → Penn-Plax, **TET** → Tetra
+- **NYL** → Nylabone, **OXB** → Oxbow, **BEN** → Benebone
+
+### Abbreviation Dictionary (200+ mappings in smart-match-v2.mjs)
+- **Products**: fd→food, trt→treat, chw→chew, bwl→bowl, dsh→dish, fltr→filter, clnr→cleaner, vac→vacuum, grvl→gravel
+- **Sizes**: sm→small, md→medium, lg→large, xl→xlarge, xsm→xsmall, jmb→jumbo, gnt→giant
+- **Colors**: blk→black, blu→blue, wht→white, rd→red, grn→green, ylw→yellow, org→orange
+- **Animals**: dg→dog, ct→cat, fsh→fish, rptl→reptile, brd→bird, ham→hamster, rbbt→rabbit
+
+### Dimension Normalization
+Text is normalized before token matching:
+- `5"` → `5inch`, `5in` → `5inch`, `5 inch` → `5inch`
+- `5'` → `5ft`, `5ft` → `5ft`, `5 feet` → `5ft`
+- `20x10` → `20by10` (dimensions with "x")
+
+### Usage
+```bash
+# Run matching for a brand
+npx tsx scripts/smart-match-v2.mjs "Brand Name" 0.55 50
+
+# Apply matches with dimension filtering
+npx tsx scripts/batch-apply.mjs
+
+# Audit a brand to find missing abbreviations
+npx tsx scripts/audit-abbreviations.mjs "Brand Name"
+```
+
+### Common Errors to Catch
+- Wattage mismatches (25W vs 50W, 75W vs 100W)
+- Dimension mismatches (13" vs 7", 12" vs 11")
+- Size number mismatches (Size 1 vs Size 4)
+- Product type conflicts (Wheel vs Millet, Dish vs Mat)
+- Corner vs non-corner products
+- Length mismatches (15' vs 10', 30' vs 20')
+- Cup mismatches (1 cup vs 7 cup)
+
+### Progress Notes
+- 2024-12: Fixed brand prefix assignments (85 UPCs reassigned based on AQE→Aqueon, KON→Kong, etc.)
+- 2024-12: Added dimension normalization (5" = 5in = 5inch for consistent matching)
+- 2024-12: Batch apply script now filters dimension, cup, and foot length mismatches
+- Remaining gap: Many brands have UPCs available but DB names use completely different product naming conventions (not abbreviation issues)
