@@ -81,17 +81,25 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Target**: 90% coverage with 100% accuracy (zero errors tolerated)
 - **Total supplies**: 7,225
 - **Total UPCs available**: 5,083 (deduplicated from 3 sources: invoice 1,065 + maybe 2,738 + spreadsheet 1,280)
-- **Current progress**: 54.5% matched (3,941 products)
-- **Brand detection**: 2,965 verified (prefix+name match), 12 context-detected, 2,106 unknown
+- **Current progress**: 54.5% matched (3,941 products) + 859 pending in queue (456 fuzzy + 403 direct)
+- **Maybe inventory**: 3,150 verified UPCs - 2,206 already applied, 403 in queue, 459 no name match, 82 duplicates
+- **Brand detection**: 4,089 with brands (80%), 994 unknown (20%)
 - **Philosophy**: NO lower thresholds - improvements come from better abbreviation expansion, text normalization, and VERIFIED brand mappings only
 
+### Matching Pipeline (Stateful - Never Loses Progress)
+1. **Discovery**: `batch-match-all.mjs` finds matches → saves to `all_pending_matches.json`
+2. **Queue**: `merge-matches-to-queue.mjs` merges into `match_queue.json` (deduplicates)
+3. **Review**: Accept matches manually or via `accept-all-high-score.mjs [minScore]`
+4. **Apply**: `apply-accepted-matches.mjs` applies accepted matches to database
+
 ### Key Files
-- `scripts/ALL_UPCS_EXPANDED.json` - Master UPC database with 5,083 UPCs, brand-detected and expanded
-- `scripts/upc-extraction-with-logging.mjs` - Main extraction script with comprehensive logging
-- `scripts/abbreviation_learning_log.json` - Learning log for unknown abbreviations and brand prefixes
-- `scripts/upc_extraction_log.json` - Full extraction log with stats and unverified prefixes
-- `scripts/smart-match-v2.mjs` - Strict matching script with brand prefix expansion
-- `scripts/batch-apply.mjs` - Batch application with dimension/cup/length filtering
+- `scripts/ALL_UPCS_EXPANDED.json` - Master UPC database with 5,083 UPCs, brand-detected
+- `scripts/match_queue.json` - **STATEFUL** queue with status: pending/accepted/rejected/applied
+- `scripts/match_decisions_log.json` - Append-only audit trail of all decisions
+- `scripts/match_apply_log.json` - Log of all apply runs
+- `scripts/upc-extraction-with-logging.mjs` - Extraction script with 160+ brand prefixes
+- `scripts/batch-match-all.mjs` - Batch matching across all brands
+- `scripts/smart-match-v2.mjs` - Single-brand matching with detailed output
 
 ### Validation Rules (STRICT - All Must Pass)
 1. **Size Matching**: xxsmall, xsmall, small, mini, medium, large, xlarge, xxlarge, jumbo, giant
@@ -116,4 +124,7 @@ Never auto-promote unverified prefixes - all mappings must be user-confirmed!
 - 2024-12: Added verified brand prefixes: MUL→Multipet, KOM→Komodo, FOU→Four Paws, DOS→Petmate, VIP→Tuffy, PETAG→PetAg, RED→RedBarn, PRIM→Primal
 - 2024-12: Added context-based detection for GAR (Garmon Corp distributor) → NaturVet products via keywords
 - 2024-12: Established verification workflow: Never auto-promote prefixes - all mappings must be user-confirmed
-- Remaining gap: 2,106 UPCs still have unknown brands - check abbreviation_learning_log.json for candidates
+- 2024-12: Created stateful matching pipeline with match_queue.json tracking all matches
+- 2024-12: Ingested 3,150 maybe inventory UPCs - 2,206 already applied, 403 new direct matches in queue
+- 2024-12: Added 50+ new brand prefixes: ExoTerra, LILPALS, CIRCLE, MARINA, VICT, ZUP, LOV, ELA, FAR, BL, etc.
+- Remaining gap: 994 UPCs still have unknown brands - check abbreviation_learning_log.json for candidates
