@@ -16,6 +16,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -80,6 +90,68 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
+interface DeleteConfirmation {
+  isOpen: boolean;
+  title: string;
+  description: string;
+  itemName: string;
+  onConfirm: () => void;
+}
+
+function DeleteConfirmationDialog({ 
+  confirmation, 
+  onClose 
+}: { 
+  confirmation: DeleteConfirmation; 
+  onClose: () => void;
+}) {
+  return (
+    <AlertDialog open={confirmation.isOpen} onOpenChange={(open) => !open && onClose()}>
+      <AlertDialogContent className="max-w-md" data-testid="delete-confirmation-dialog">
+        <AlertDialogHeader>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+              <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+            </div>
+            <AlertDialogTitle className="text-xl font-bold text-red-600 dark:text-red-400">
+              {confirmation.title}
+            </AlertDialogTitle>
+          </div>
+          <AlertDialogDescription className="text-base pt-2">
+            {confirmation.description}
+          </AlertDialogDescription>
+          {confirmation.itemName && (
+            <div className="mt-3 p-3 bg-muted rounded-lg border-2 border-red-200 dark:border-red-800">
+              <p className="text-sm font-medium text-muted-foreground">Item to be deleted:</p>
+              <p className="text-lg font-bold text-foreground mt-1">{confirmation.itemName}</p>
+            </div>
+          )}
+        </AlertDialogHeader>
+        <AlertDialogFooter className="gap-2 sm:gap-0 mt-4">
+          <AlertDialogCancel 
+            onClick={onClose}
+            className="flex-1 sm:flex-none"
+            data-testid="delete-cancel-button"
+          >
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              confirmation.onConfirm();
+              onClose();
+            }}
+            className="flex-1 sm:flex-none bg-red-600 hover:bg-red-700 text-white"
+            data-testid="delete-confirm-button"
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Yes, Delete Permanently
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
 
 // Helper function to parse date string as local date (not UTC)
 function parseLocalDate(dateString: string): Date {
@@ -5887,6 +5959,29 @@ export default function Admin() {
 
   // Weekly Limit Form State (temporary values for editing)
   const [editingWeeklyLimit, setEditingWeeklyLimit] = useState<{dayOfWeek: number; bathLimit: number; groomLimit: number} | null>(null);
+  
+  const [deleteConfirmation, setDeleteConfirmation] = useState<DeleteConfirmation>({
+    isOpen: false,
+    title: '',
+    description: '',
+    itemName: '',
+    onConfirm: () => {}
+  });
+  
+  const showDeleteConfirmation = (title: string, description: string, itemName: string, onConfirm: () => void) => {
+    setDeleteConfirmation({
+      isOpen: true,
+      title,
+      description,
+      itemName,
+      onConfirm
+    });
+  };
+  
+  const closeDeleteConfirmation = () => {
+    setDeleteConfirmation(prev => ({ ...prev, isOpen: false }));
+  };
+  
   const [specialDateForm, setSpecialDateForm] = useState<{
     id?: number;
     date: string;
@@ -7702,9 +7797,12 @@ export default function Admin() {
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (confirm('Reset ALL "Here" statuses across all appointments? This cannot be undone.')) {
-                    resetAllHereMutation.mutate();
-                  }
+                  showDeleteConfirmation(
+                    'Reset All "Here" Statuses',
+                    'This will reset ALL "Here" statuses across all appointments. This action cannot be undone.',
+                    `${customersHere} appointment(s)`,
+                    () => resetAllHereMutation.mutate()
+                  );
                 }}
                 disabled={resetAllHereMutation.isPending}
                 className="text-xs h-6 px-2"
@@ -7725,9 +7823,12 @@ export default function Admin() {
                 variant="ghost"
                 size="sm"
                 onClick={() => {
-                  if (confirm('Reset ALL "Paid" statuses across all appointments? This cannot be undone.')) {
-                    resetAllPaidMutation.mutate();
-                  }
+                  showDeleteConfirmation(
+                    'Reset All "Paid" Statuses',
+                    'This will reset ALL "Paid" statuses across all appointments. This action cannot be undone.',
+                    `${customersPaid} appointment(s)`,
+                    () => resetAllPaidMutation.mutate()
+                  );
                 }}
                 disabled={resetAllPaidMutation.isPending}
                 className="text-xs h-6 px-2"
@@ -8232,9 +8333,12 @@ export default function Admin() {
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    if (confirm('This will delete all approved appointments with dates in the past. Continue?')) {
-                      cleanupPastAppointmentsMutation.mutate(['confirmed', 'completed']);
-                    }
+                    showDeleteConfirmation(
+                      'Clear Past Approved Appointments',
+                      'This will permanently delete all approved appointments with dates in the past. This action cannot be undone.',
+                      'All past approved appointments',
+                      () => cleanupPastAppointmentsMutation.mutate(['confirmed', 'completed'])
+                    );
                   }}
                   disabled={cleanupPastAppointmentsMutation.isPending}
                   data-testid="button-cleanup-past-approved"
@@ -8632,9 +8736,12 @@ export default function Admin() {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        if (confirm('This will delete all pending appointments with dates in the past. Continue?')) {
-                          cleanupPastAppointmentsMutation.mutate(['scheduled']);
-                        }
+                        showDeleteConfirmation(
+                          'Clear Past Pending Appointments',
+                          'This will permanently delete all pending appointments with dates in the past. This action cannot be undone.',
+                          'All past pending appointments',
+                          () => cleanupPastAppointmentsMutation.mutate(['scheduled'])
+                        );
                       }}
                       disabled={cleanupPastAppointmentsMutation.isPending}
                       data-testid="button-cleanup-past-appointments"
@@ -8751,9 +8858,12 @@ export default function Admin() {
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    if (confirm('This will delete all denied appointments with dates in the past. Continue?')) {
-                      cleanupPastAppointmentsMutation.mutate(['rejected', 'cancelled']);
-                    }
+                    showDeleteConfirmation(
+                      'Clear Past Denied Appointments',
+                      'This will permanently delete all denied appointments with dates in the past. This action cannot be undone.',
+                      'All past denied appointments',
+                      () => cleanupPastAppointmentsMutation.mutate(['rejected', 'cancelled'])
+                    );
                   }}
                   disabled={cleanupPastAppointmentsMutation.isPending}
                   data-testid="button-cleanup-past-denied"
@@ -8881,9 +8991,12 @@ export default function Admin() {
                                 size="sm"
                                 variant="destructive"
                                 onClick={() => {
-                                  if (confirm('Are you sure you want to permanently delete this appointment?')) {
-                                    deleteAppointmentMutation.mutate(currentAppointment.id);
-                                  }
+                                  showDeleteConfirmation(
+                                    'Delete Appointment',
+                                    'Are you sure you want to permanently delete this appointment? This action cannot be undone.',
+                                    `${currentAppointment.ownerFirstName || ''} ${currentAppointment.ownerLastName || ''} - ${currentAppointment.appointmentDate}`,
+                                    () => deleteAppointmentMutation.mutate(currentAppointment.id)
+                                  );
                                 }}
                                 disabled={deleteAppointmentMutation.isPending}
                                 data-testid={`button-delete-appointment-${currentAppointment.id}`}
@@ -9563,9 +9676,12 @@ export default function Admin() {
                             size="sm"
                             className="w-full mt-2"
                             onClick={() => {
-                              if (confirm(`Are you sure you want to delete ${userItem.firstName} ${userItem.lastName}'s account? This action cannot be undone.`)) {
-                                deleteUserMutation.mutate(userItem.id);
-                              }
+                              showDeleteConfirmation(
+                                'Delete User Account',
+                                'Are you sure you want to permanently delete this user account? All associated data will be lost. This action cannot be undone.',
+                                `${userItem.firstName} ${userItem.lastName} (${userItem.email || 'No email'})`,
+                                () => deleteUserMutation.mutate(userItem.id)
+                              );
                             }}
                             disabled={deleteUserMutation.isPending || userItem.id === typedUser?.id}
                             data-testid={`button-delete-user-${userItem.id}`}
@@ -10619,9 +10735,12 @@ export default function Admin() {
                             variant="destructive"
                             size="sm"
                             onClick={() => {
-                              if (confirm(`Delete ${specialDate.name}?`)) {
-                                deleteSpecialDateMutation.mutate(specialDate.id);
-                              }
+                              showDeleteConfirmation(
+                                'Delete Special Date',
+                                'Are you sure you want to delete this special date? This action cannot be undone.',
+                                specialDate.name,
+                                () => deleteSpecialDateMutation.mutate(specialDate.id)
+                              );
                             }}
                             data-testid={`button-delete-special-date-${specialDate.id}`}
                           >
@@ -11068,10 +11187,15 @@ export default function Admin() {
                 <Button
                   variant="destructive"
                   onClick={() => {
-                    if (confirm('Are you sure you want to permanently delete this approved appointment?')) {
-                      deleteAppointmentMutation.mutate(selectedAppointment.id);
-                      setSelectedAppointment(null);
-                    }
+                    showDeleteConfirmation(
+                      'Delete Appointment',
+                      'Are you sure you want to permanently delete this approved appointment? This action cannot be undone.',
+                      `${selectedAppointment.ownerFirstName || ''} ${selectedAppointment.ownerLastName || ''} - ${selectedAppointment.appointmentDate}`,
+                      () => {
+                        deleteAppointmentMutation.mutate(selectedAppointment.id);
+                        setSelectedAppointment(null);
+                      }
+                    );
                   }}
                   disabled={deleteAppointmentMutation.isPending}
                   data-testid={`button-delete-appointment-details-${selectedAppointment.id}`}
@@ -11625,6 +11749,12 @@ export default function Admin() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      
+      {/* Global Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog 
+        confirmation={deleteConfirmation}
+        onClose={closeDeleteConfirmation}
+      />
       </div>
     </div>
   );
