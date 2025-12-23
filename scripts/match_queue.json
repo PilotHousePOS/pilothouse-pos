@@ -1,12 +1,12 @@
 {
   "version": 3,
-  "lastUpdated": "2025-12-23T03:16:02.551Z",
+  "lastUpdated": "2025-12-23T03:22:14.323Z",
   "totalDiscovered": 859,
   "stats": {
     "pending": 0,
     "accepted": 0,
-    "rejected": 0,
-    "applied": 1148
+    "rejected": 198,
+    "applied": 950
   },
   "matches": {
     "7018-015561165839": {
@@ -3629,11 +3629,13 @@
       "upc": "052742204703",
       "upcName": "SD cat light 7#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.635Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6723-052742617404": {
       "matchId": "6723-052742617404",
@@ -3643,11 +3645,13 @@
       "upc": "052742617404",
       "upcName": "SD kitten turk 5.5oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.657Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "5966-052742012070": {
       "matchId": "5966-052742012070",
@@ -3657,11 +3661,13 @@
       "upc": "052742012070",
       "upcName": "SD vitality 12.5#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.681Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6777-052742146409": {
       "matchId": "6777-052742146409",
@@ -3671,11 +3677,13 @@
       "upc": "052742146409",
       "upcName": "SD cat 11+ 15#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.703Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6768-052742146201": {
       "matchId": "6768-052742146201",
@@ -3685,11 +3693,13 @@
       "upc": "052742146201",
       "upcName": "SD cat 11+ 3.5#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.725Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6564-052742496603": {
       "matchId": "6564-052742496603",
@@ -3699,11 +3709,13 @@
       "upc": "052742496603",
       "upcName": "SD beef 5.8oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.748Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6562-052742018164": {
       "matchId": "6562-052742018164",
@@ -3713,11 +3725,13 @@
       "upc": "052742018164",
       "upcName": "SD beef stew 3.5oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.771Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6722-052742069463": {
       "matchId": "6722-052742069463",
@@ -3727,11 +3741,13 @@
       "upc": "052742069463",
       "upcName": "SD kitten sen sal 2.9oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.794Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6765-052742060163": {
       "matchId": "6765-052742060163",
@@ -3741,11 +3757,13 @@
       "upc": "052742060163",
       "upcName": "SD kitten fish 7#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.817Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6716-052742453408": {
       "matchId": "6716-052742453408",
@@ -3755,11 +3773,13 @@
       "upc": "052742453408",
       "upcName": "SD cat ck 5.5oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.840Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6772-052742671109": {
       "matchId": "6772-052742671109",
@@ -3769,11 +3789,13 @@
       "upc": "052742671109",
       "upcName": "SD cat light 4#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.862Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6715-052742453804": {
       "matchId": "6715-052742453804",
@@ -3783,11 +3805,13 @@
       "upc": "052742453804",
       "upcName": "SD cat turk 5.5oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.886Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6784-052742069432": {
       "matchId": "6784-052742069432",
@@ -3797,11 +3821,13 @@
       "upc": "052742069432",
       "upcName": "SD kitten sen sto 3.5#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.908Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6165-072705116508": {
       "matchId": "6165-072705116508",
@@ -3811,11 +3837,13 @@
       "upc": "072705116508",
       "upcName": "FROMM surf & turf 26#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.931Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6143-072705116263": {
       "matchId": "6143-072705116263",
@@ -3825,11 +3853,13 @@
       "upc": "072705116263",
       "upcName": "FROMM duck a la veg 4#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.954Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6150-072705116430": {
       "matchId": "6150-072705116430",
@@ -3839,11 +3869,13 @@
       "upc": "072705116430",
       "upcName": "FROMM salmon a la veg 12#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:26.977Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6166-072705114344": {
       "matchId": "6166-072705114344",
@@ -3853,11 +3885,13 @@
       "upc": "072705114344",
       "upcName": "FROMM pork & peas 4#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.000Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6160-072705114542": {
       "matchId": "6160-072705114542",
@@ -3867,11 +3901,13 @@
       "upc": "072705114542",
       "upcName": "FROMM lamb & lentil 4#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.022Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6152-072705114061": {
       "matchId": "6152-072705114061",
@@ -3881,11 +3917,13 @@
       "upc": "072705114061",
       "upcName": "FROMM pork & apple 4#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.045Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6151-072705116416": {
       "matchId": "6151-072705116416",
@@ -3895,11 +3933,13 @@
       "upc": "072705116416",
       "upcName": "FROMM salmon a la veg 26#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.068Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6153-072705114030": {
       "matchId": "6153-072705114030",
@@ -3909,11 +3949,13 @@
       "upc": "072705114030",
       "upcName": "FROMM pork & apple 12#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.092Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6161-072705114504": {
       "matchId": "6161-072705114504",
@@ -3923,11 +3965,13 @@
       "upc": "072705114504",
       "upcName": "FROMM lamb & lentil 26#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.115Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6145-072705116218": {
       "matchId": "6145-072705116218",
@@ -3937,11 +3981,13 @@
       "upc": "072705116218",
       "upcName": "FROMM duck a la veg 26#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.138Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6154-072705114016": {
       "matchId": "6154-072705114016",
@@ -3951,11 +3997,13 @@
       "upc": "072705114016",
       "upcName": "FROMM pork & apple 26#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.161Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6164-072705116522": {
       "matchId": "6164-072705116522",
@@ -3965,11 +4013,13 @@
       "upc": "072705116522",
       "upcName": "FROMM surf & turf 12#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.184Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6470-072705132089": {
       "matchId": "6470-072705132089",
@@ -3979,11 +4029,13 @@
       "upc": "072705132089",
       "upcName": "FROMM beef frommb 12.5oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.206Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6144-072705116232": {
       "matchId": "6144-072705116232",
@@ -3993,11 +4045,13 @@
       "upc": "072705116232",
       "upcName": "FROMM duck a la veg 12#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.230Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6167-072705114320": {
       "matchId": "6167-072705114320",
@@ -4007,11 +4061,13 @@
       "upc": "072705114320",
       "upcName": "FROMM pork & peas 12#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.256Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6612-840243105540": {
       "matchId": "6612-840243105540",
@@ -4021,11 +4077,13 @@
       "upc": "840243105540",
       "upcName": "BL BUF bac yard bbq 12.5oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.279Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6613-8741702101245": {
       "matchId": "6613-8741702101245",
@@ -4035,11 +4093,13 @@
       "upc": "8741702101245",
       "upcName": "BL BUF wild sen 12.5oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.303Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6611-859610005888": {
       "matchId": "6611-859610005888",
@@ -4049,11 +4109,13 @@
       "upc": "859610005888",
       "upcName": "BL BUF wild b&ck 12.5oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.326Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6695-038100026903": {
       "matchId": "6695-038100026903",
@@ -4063,11 +4125,13 @@
       "upc": "038100026903",
       "upcName": "PRO PLAN kitten ck 3oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.349Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6369-038100130631": {
       "matchId": "6369-038100130631",
@@ -4077,11 +4141,13 @@
       "upc": "038100130631",
       "upcName": "PRO PLAN lamb shred 35#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.372Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6698-038100026965": {
       "matchId": "6698-038100026965",
@@ -4091,11 +4157,13 @@
       "upc": "038100026965",
       "upcName": "PRO PLAN cat ck 3oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.395Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6696-038100111975": {
       "matchId": "6696-038100111975",
@@ -4105,11 +4173,13 @@
       "upc": "038100111975",
       "upcName": "PRO PLAN cat tuna 3oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.419Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6697-038100026972": {
       "matchId": "6697-038100026972",
@@ -4119,11 +4189,13 @@
       "upc": "038100026972",
       "upcName": "PRO PLAN cat salm 3oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.442Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6666-037424191366": {
       "matchId": "6666-037424191366",
@@ -4133,11 +4205,13 @@
       "upc": "037424191366",
       "upcName": "PRO PLAN live clear 5.5#",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.464Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "2654-076484093203": {
       "matchId": "2654-076484093203",
@@ -4147,11 +4221,13 @@
       "upc": "076484093203",
       "upcName": "TITAN TRAINCLLR MED 14\" 5525",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.487Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "2656-076484093227": {
       "matchId": "2656-076484093227",
@@ -4161,11 +4237,13 @@
       "upc": "076484093227",
       "upcName": "TITAN TRAINCLLR MED 18\" 5525",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.510Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "7303-030172390067": {
       "matchId": "7303-030172390067",
@@ -4175,11 +4253,13 @@
       "upc": "030172390067",
       "upcName": "PENN PLAX sm worl filter",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.532Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6918-840199697014": {
       "matchId": "6918-840199697014",
@@ -4189,11 +4269,13 @@
       "upc": "840199697014",
       "upcName": "VITAL ESSEN cat duck 28oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.555Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6558-030111420657": {
       "matchId": "6558-030111420657",
@@ -4203,11 +4285,13 @@
       "upc": "030111420657",
       "upcName": "ROYAL CAN adult 13.5oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.578Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6557-030111420558": {
       "matchId": "6557-030111420558",
@@ -4217,11 +4301,13 @@
       "upc": "030111420558",
       "upcName": "ROYAL CAN pup 13.5oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.601Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6549-076344017554": {
       "matchId": "6549-076344017554",
@@ -4231,11 +4317,13 @@
       "upc": "076344017554",
       "upcName": "WELLN lam stew 12.5oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.624Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "6838-888641130535": {
       "matchId": "6838-888641130535",
@@ -4245,11 +4333,13 @@
       "upc": "888641130535",
       "upcName": "FUSSIE CAT tuna ocean 2.82oz",
       "score": 0.6799999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.648Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%"
     },
     "5931-052742020402": {
       "matchId": "5931-052742020402",
@@ -4259,11 +4349,13 @@
       "upc": "052742020402",
       "upcName": "sd lg br ck 15#",
       "score": 0.66,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.671Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 66%"
     },
     "5924-052742909608": {
       "matchId": "5924-052742909608",
@@ -4273,11 +4365,13 @@
       "upc": "052742909608",
       "upcName": "sd sm br ck 4.5#",
       "score": 0.66,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.695Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 66%"
     },
     "6125-072705105632": {
       "matchId": "6125-072705105632",
@@ -4287,11 +4381,13 @@
       "upc": "072705105632",
       "upcName": "FROMM gold sm be 15#",
       "score": 0.66,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.717Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 66%"
     },
     "6124-072705105670": {
       "matchId": "6124-072705105670",
@@ -4301,11 +4397,13 @@
       "upc": "072705105670",
       "upcName": "FROMM gold sm br 5#",
       "score": 0.66,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.740Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 66%"
     },
     "6227-859610007448": {
       "matchId": "6227-859610007448",
@@ -4315,11 +4413,13 @@
       "upc": "859610007448",
       "upcName": "BLUE B sm bite 15#",
       "score": 0.66,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.764Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 66%"
     },
     "6228-859610007455": {
       "matchId": "6228-859610007455",
@@ -4329,11 +4429,13 @@
       "upc": "859610007455",
       "upcName": "BLUE B sm bite 30#",
       "score": 0.66,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.790Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 66%"
     },
     "6332-076344891185": {
       "matchId": "6332-076344891185",
@@ -4343,11 +4445,13 @@
       "upc": "076344891185",
       "upcName": "WELLN sm br weight 4#",
       "score": 0.66,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.813Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 66%"
     },
     "6334-076344884217": {
       "matchId": "6334-076344884217",
@@ -4357,11 +4461,13 @@
       "upc": "076344884217",
       "upcName": "WELLN sm br core 12#",
       "score": 0.66,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.837Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 66%"
     },
     "5955-052742022154": {
       "matchId": "5955-052742022154",
@@ -4371,11 +4477,13 @@
       "upc": "052742022154",
       "upcName": "SD lg br light 15#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.861Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6586-052742705705": {
       "matchId": "6586-052742705705",
@@ -4385,11 +4493,13 @@
       "upc": "052742705705",
       "upcName": "SD 7+ turk 13oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.883Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6793-052742204505": {
       "matchId": "6793-052742204505",
@@ -4399,11 +4509,13 @@
       "upc": "052742204505",
       "upcName": "SD cat 7#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.907Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6774-052742006437": {
       "matchId": "6774-052742006437",
@@ -4413,11 +4525,13 @@
       "upc": "052742006437",
       "upcName": "SD cat 16#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.929Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6770-052742888101": {
       "matchId": "6770-052742888101",
@@ -4427,11 +4541,13 @@
       "upc": "052742888101",
       "upcName": "SD cat hairba 7#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.953Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6794-052742006444": {
       "matchId": "6794-052742006444",
@@ -4441,11 +4557,13 @@
       "upc": "052742006444",
       "upcName": "SD cat light 16#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:27.975Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6589-052742069814": {
       "matchId": "6589-052742069814",
@@ -4455,11 +4573,13 @@
       "upc": "052742069814",
       "upcName": "SD perf weight sal stew 12.5oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.000Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "5953-052742068619": {
       "matchId": "5953-052742068619",
@@ -4469,11 +4589,13 @@
       "upc": "052742068619",
       "upcName": "SD salmon 14#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.023Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6587-052742002019": {
       "matchId": "6587-052742002019",
@@ -4483,11 +4605,13 @@
       "upc": "052742002019",
       "upcName": "SD perf weight ck stew 12.5oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.045Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6593-052742705606": {
       "matchId": "6593-052742705606",
@@ -4497,11 +4621,13 @@
       "upc": "052742705606",
       "upcName": "SD 7+ beef 13oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.068Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "5952-052742068602": {
       "matchId": "5952-052742068602",
@@ -4511,11 +4637,13 @@
       "upc": "052742068602",
       "upcName": "SD salmon 4.5#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.091Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "5970-052742041339": {
       "matchId": "5970-052742041339",
@@ -4525,11 +4653,13 @@
       "upc": "052742041339",
       "upcName": "SD perf digest ck lg br 223",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.114Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6764-052742939100": {
       "matchId": "6764-052742939100",
@@ -4539,11 +4669,13 @@
       "upc": "052742939100",
       "upcName": "SD kitten 7#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.137Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6763-052742712307": {
       "matchId": "6763-052742712307",
@@ -4553,11 +4685,13 @@
       "upc": "052742712307",
       "upcName": "SD kitten 3.5#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.159Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "5954-052742068626": {
       "matchId": "5954-052742068626",
@@ -4567,11 +4701,13 @@
       "upc": "052742068626",
       "upcName": "SD salmon 33#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.182Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6767-052742710402": {
       "matchId": "6767-052742710402",
@@ -4581,11 +4717,13 @@
       "upc": "052742710402",
       "upcName": "SD cat 7+ 4#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.205Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6584-052742705507": {
       "matchId": "6584-052742705507",
@@ -4595,11 +4733,13 @@
       "upc": "052742705507",
       "upcName": "SD 7+ ck 13oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.228Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6565-052742496702": {
       "matchId": "6565-052742496702",
@@ -4609,11 +4749,13 @@
       "upc": "052742496702",
       "upcName": "SD ck 5.8oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.251Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6769-052742679709": {
       "matchId": "6769-052742679709",
@@ -4623,11 +4765,13 @@
       "upc": "052742679709",
       "upcName": "SD cat 4#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.275Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6177-072705114641": {
       "matchId": "6177-072705114641",
@@ -4637,11 +4781,13 @@
       "upc": "072705114641",
       "upcName": "FROMM hasen duck 4#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.298Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6114-072705105472": {
       "matchId": "6114-072705105472",
@@ -4651,11 +4797,13 @@
       "upc": "072705105472",
       "upcName": "FROMM classic puppy 5#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.320Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6736-072705115631": {
       "matchId": "6736-072705115631",
@@ -4665,11 +4813,13 @@
       "upc": "072705115631",
       "upcName": "FROMM cat adult 10#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.344Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6115-072705105434": {
       "matchId": "6115-072705105434",
@@ -4679,11 +4829,13 @@
       "upc": "072705105434",
       "upcName": "Fromm classic puppy 15#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.367Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6485-072705119066": {
       "matchId": "6485-072705119066",
@@ -4693,11 +4845,13 @@
       "upc": "072705119066",
       "upcName": "FROMM ck & sw pot 12.2oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.390Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6136-072705115471": {
       "matchId": "6136-072705115471",
@@ -4707,11 +4861,13 @@
       "upc": "072705115471",
       "upcName": "FROMM gold senior 5#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.414Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6134-072705105830": {
       "matchId": "6134-072705105830",
@@ -4721,11 +4877,13 @@
       "upc": "072705105830",
       "upcName": "FROMM gold lb br weight 15#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.436Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6162-072705114917": {
       "matchId": "6162-072705114917",
@@ -4735,11 +4893,13 @@
       "upc": "072705114917",
       "upcName": "FROMM highlander beef 26#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.459Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6482-072705119103": {
       "matchId": "6482-072705119103",
@@ -4749,11 +4909,13 @@
       "upc": "072705119103",
       "upcName": "FROMM tur duc & sw pot 12.2oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.481Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6119-072705115532": {
       "matchId": "6119-072705115532",
@@ -4763,11 +4925,13 @@
       "upc": "072705115532",
       "upcName": "FROMM gold puppy 15#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.504Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6120-072705115518": {
       "matchId": "6120-072705115518",
@@ -4777,11 +4941,13 @@
       "upc": "072705115518",
       "upcName": "FROMM gold puppy 30#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.526Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6179-072705104406": {
       "matchId": "6179-072705104406",
@@ -4791,11 +4957,13 @@
       "upc": "072705104406",
       "upcName": "Fromm coast weight 26#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.549Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6133-072705105779": {
       "matchId": "6133-072705105779",
@@ -4805,11 +4973,13 @@
       "upc": "072705105779",
       "upcName": "FROMM gold weight 5#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.572Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6118-072705105571": {
       "matchId": "6118-072705105571",
@@ -4819,11 +4989,13 @@
       "upc": "072705105571",
       "upcName": "FROMM gold lg br puppy 5#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.596Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6737-072705115907": {
       "matchId": "6737-072705115907",
@@ -4833,11 +5005,13 @@
       "upc": "072705115907",
       "upcName": "FROMM cat weight 4#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.618Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6178-072705114627": {
       "matchId": "6178-072705114627",
@@ -4847,11 +5021,13 @@
       "upc": "072705114627",
       "upcName": "FROMM hasen duck 12#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.643Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6113-072705105427": {
       "matchId": "6113-072705105427",
@@ -4861,11 +5037,13 @@
       "upc": "072705105427",
       "upcName": "FROMM classic puppy 30#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.665Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6862-840243140541": {
       "matchId": "6862-840243140541",
@@ -4875,11 +5053,13 @@
       "upc": "840243140541",
       "upcName": "BLUE BUF kitten 3oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.689Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6635-038100026712": {
       "matchId": "6635-038100026712",
@@ -4889,11 +5069,13 @@
       "upc": "038100026712",
       "upcName": "PRO PLAN pup 13oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.712Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6374-038100135438": {
       "matchId": "6374-038100135438",
@@ -4903,11 +5085,13 @@
       "upc": "038100135438",
       "upcName": "PRO PLAN toy 5#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.736Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6828-022517447147": {
       "matchId": "6828-022517447147",
@@ -4917,11 +5101,13 @@
       "upc": "022517447147",
       "upcName": "CATIT wh fish 2.8oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.760Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "7108-000116051606": {
       "matchId": "7108-000116051606",
@@ -4931,11 +5117,13 @@
       "upc": "000116051606",
       "upcName": "SEACHEM flourish 8.5oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.782Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "7095-000116017602": {
       "matchId": "7095-000116017602",
@@ -4945,11 +5133,13 @@
       "upc": "000116017602",
       "upcName": "SEACHEM gartlic guard 8.5oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.805Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6461-074198612734": {
       "matchId": "6461-074198612734",
@@ -4959,11 +5149,13 @@
       "upc": "074198612734",
       "upcName": "DIAM beef 13.2oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.828Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6460-074198612727": {
       "matchId": "6460-074198612727",
@@ -4973,11 +5165,13 @@
       "upc": "074198612727",
       "upcName": "DIAM lamb 13.2oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.851Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6687-074198612758": {
       "matchId": "6687-074198612758",
@@ -4987,11 +5181,13 @@
       "upc": "074198612758",
       "upcName": "DIAM cat whitefish 5.5oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.877Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6552-723633065559": {
       "matchId": "6552-723633065559",
@@ -5001,11 +5197,13 @@
       "upc": "723633065559",
       "upcName": "NAT BAL plant 13oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.901Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "1176-762177360201": {
       "matchId": "1176-762177360201",
@@ -5015,11 +5213,13 @@
       "upc": "762177360201",
       "upcName": "ZuPreem PureFun Med Bird",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.924Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6852-030111410184": {
       "matchId": "6852-030111410184",
@@ -5029,11 +5229,13 @@
       "upc": "030111410184",
       "upcName": "ROYAL CAN kitten 3oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.948Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6624-751486000748": {
       "matchId": "6624-751486000748",
@@ -5043,11 +5245,13 @@
       "upc": "751486000748",
       "upcName": "EUK lamb 13.2oz",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.971Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "6888-627975011949": {
       "matchId": "6888-627975011949",
@@ -5057,11 +5261,13 @@
       "upc": "627975011949",
       "upcName": "FRESHPET vital cuts 1.5#",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:28.995Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "2382-777979210067": {
       "matchId": "2382-777979210067",
@@ -5071,11 +5277,13 @@
       "upc": "777979210067",
       "upcName": "InterSand OdorLock bbyPdr 13lb",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.018Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "2378-777979213068": {
       "matchId": "2378-777979213068",
@@ -5085,11 +5293,13 @@
       "upc": "777979213068",
       "upcName": "InterSand OdorLock Lav 13lb",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.041Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "2383-777979210258": {
       "matchId": "2383-777979210258",
@@ -5099,11 +5309,13 @@
       "upc": "777979210258",
       "upcName": "InterSand OdorLock bbypdr 25lb",
       "score": 0.6499999999999999,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.064Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 65%"
     },
     "5916-052742060170": {
       "matchId": "5916-052742060170",
@@ -5113,11 +5325,13 @@
       "upc": "052742060170",
       "upcName": "sd puppy lg br lam 30#",
       "score": 0.6428571428571428,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.087Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 64%"
     },
     "5918-052742289700": {
       "matchId": "5918-052742289700",
@@ -5127,11 +5341,13 @@
       "upc": "052742289700",
       "upcName": "sd sm br lam 15.5#",
       "score": 0.6428571428571428,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.110Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 64%"
     },
     "6577-052742007250": {
       "matchId": "6577-052742007250",
@@ -5141,11 +5357,13 @@
       "upc": "052742007250",
       "upcName": "SD heal cuis beef 12.5oz",
       "score": 0.6285714285714286,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.132Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 63%"
     },
     "6721-052742007090": {
       "matchId": "6721-052742007090",
@@ -5155,11 +5373,13 @@
       "upc": "052742007090",
       "upcName": "SD cat heal cuis tuna 2.9oz",
       "score": 0.6285714285714286,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.155Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 63%"
     },
     "6579-052742021041": {
       "matchId": "6579-052742021041",
@@ -5169,11 +5389,13 @@
       "upc": "052742021041",
       "upcName": "SD sensi turk stew 12.5oz",
       "score": 0.6285714285714286,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.178Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 63%"
     },
     "6800-052742887807": {
       "matchId": "6800-052742887807",
@@ -5183,11 +5405,13 @@
       "upc": "052742887807",
       "upcName": "SD cat sen sto 15.5#",
       "score": 0.6285714285714286,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.201Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 63%"
     },
     "6569-052742069487": {
       "matchId": "6569-052742069487",
@@ -5197,11 +5421,13 @@
       "upc": "052742069487",
       "upcName": "SD sensi pup sal 12.5oz",
       "score": 0.6285714285714286,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.225Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 63%"
     },
     "6581-052742068510": {
       "matchId": "6581-052742068510",
@@ -5211,11 +5437,13 @@
       "upc": "052742068510",
       "upcName": "SD perf dig ck 12.8oz",
       "score": 0.6285714285714286,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.250Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 63%"
     },
     "6786-052742041544": {
       "matchId": "6786-052742041544",
@@ -5225,11 +5453,13 @@
       "upc": "052742041544",
       "upcName": "SD cat per dig salm 3.5#",
       "score": 0.6285714285714286,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.273Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 63%"
     },
     "7196-046798786740": {
       "matchId": "7196-046798786740",
@@ -5239,11 +5469,13 @@
       "upc": "046798786740",
       "upcName": "TETRA glo gre & whi plant small",
       "score": 0.6285714285714286,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.308Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 63%"
     },
     "1238-602644022020": {
       "matchId": "1238-602644022020",
@@ -5253,11 +5485,13 @@
       "upc": "602644022020",
       "upcName": "EarthBath Stress Release Spritz Euc&Pep",
       "score": 0.6142857142857142,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.330Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 61%"
     },
     "5934-052742060255": {
       "matchId": "5934-052742060255",
@@ -5267,11 +5501,13 @@
       "upc": "052742060255",
       "upcName": "sd puppy sm br 12.5#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.354Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "5929-052742020471": {
       "matchId": "5929-052742020471",
@@ -5281,11 +5517,13 @@
       "upc": "052742020471",
       "upcName": "SD lg br 6+ 15#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.377Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "5968-052742041285": {
       "matchId": "5968-052742041285",
@@ -5295,11 +5533,13 @@
       "upc": "052742041285",
       "upcName": "SD perf digest sm bite 3.5#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.400Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "5956-052742022215": {
       "matchId": "5956-052742022215",
@@ -5309,11 +5549,13 @@
       "upc": "052742022215",
       "upcName": "SD lg br light 30#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.423Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "5982-052742001807": {
       "matchId": "5982-052742001807",
@@ -5323,11 +5565,13 @@
       "upc": "052742001807",
       "upcName": "SD mobility sm bite 4#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.446Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6088-052742203805": {
       "matchId": "6088-052742203805",
@@ -5337,11 +5581,13 @@
       "upc": "052742203805",
       "upcName": "SD lg br lam 33#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.470Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "5919-052742909400": {
       "matchId": "5919-052742909400",
@@ -5351,11 +5597,13 @@
       "upc": "052742909400",
       "upcName": "sd puppy sm br ck 4.5#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.493Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "5938-052742060194": {
       "matchId": "5938-052742060194",
@@ -5365,11 +5613,13 @@
       "upc": "052742060194",
       "upcName": "sd puppy lg br ck 27.5#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.516Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "5928-052742204406": {
       "matchId": "5928-052742204406",
@@ -5379,11 +5629,13 @@
       "upc": "052742204406",
       "upcName": "SD lg br 6+ 33#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.539Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6804-052742887500": {
       "matchId": "6804-052742887500",
@@ -5393,11 +5645,13 @@
       "upc": "052742887500",
       "upcName": "SD cat hairba 15.5#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.561Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "5972-052742007038": {
       "matchId": "5972-052742007038",
@@ -5407,11 +5661,13 @@
       "upc": "052742007038",
       "upcName": "SD sm min sensi 4#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.585Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "5962-052742817804": {
       "matchId": "5962-052742817804",
@@ -5421,11 +5677,13 @@
       "upc": "052742817804",
       "upcName": "SD ck 5#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.608Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6718-052742068411": {
       "matchId": "6718-052742068411",
@@ -5435,11 +5693,13 @@
       "upc": "052742068411",
       "upcName": "SD cat sen duck 2.9oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.631Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6578-052742143002": {
       "matchId": "6578-052742143002",
@@ -5449,11 +5709,13 @@
       "upc": "052742143002",
       "upcName": "SD ck stew 12.8oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.654Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "5927-052742016054": {
       "matchId": "5927-052742016054",
@@ -5463,11 +5725,13 @@
       "upc": "052742016054",
       "upcName": "SD lg br ck 35#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.675Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "5989-052742033204": {
       "matchId": "5989-052742033204",
@@ -5477,11 +5741,13 @@
       "upc": "052742033204",
       "upcName": "SD sensi lg br 30#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.698Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6726-052742007175": {
       "matchId": "6726-052742007175",
@@ -5491,11 +5757,13 @@
       "upc": "052742007175",
       "upcName": "SD kitten heal cuis 2.8oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.721Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6570-052742304090": {
       "matchId": "6570-052742304090",
@@ -5505,11 +5773,13 @@
       "upc": "052742304090",
       "upcName": "SD sensi ck 12.8oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.744Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "5969-052742038285": {
       "matchId": "5969-052742038285",
@@ -5519,11 +5789,13 @@
       "upc": "052742038285",
       "upcName": "SD perf digest ck 12#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.767Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "5981-052742060521": {
       "matchId": "5981-052742060521",
@@ -5533,11 +5805,13 @@
       "upc": "052742060521",
       "upcName": "SD perf weight joint 25#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.790Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6148-072705116317": {
       "matchId": "6148-072705116317",
@@ -5547,11 +5821,13 @@
       "upc": "072705116317",
       "upcName": "FROMM whitefish 26#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.813Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6116-072705105274": {
       "matchId": "6116-072705105274",
@@ -5561,11 +5837,13 @@
       "upc": "072705105274",
       "upcName": "FROMM classic 5#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.836Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6126-072705115570": {
       "matchId": "6126-072705115570",
@@ -5575,11 +5853,13 @@
       "upc": "072705115570",
       "upcName": "FROMM gold puppy 5#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.859Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6147-072705116331": {
       "matchId": "6147-072705116331",
@@ -5589,11 +5869,13 @@
       "upc": "072705116331",
       "upcName": "FROMM whitefish 12#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.882Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6155-072705108060": {
       "matchId": "6155-072705108060",
@@ -5603,11 +5885,13 @@
       "upc": "072705108060",
       "upcName": "FROMM trout 4#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.905Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6159-072705114849": {
       "matchId": "6159-072705114849",
@@ -5617,11 +5901,13 @@
       "upc": "072705114849",
       "upcName": "FROMM rancherosa 4#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.927Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6484-072705119080": {
       "matchId": "6484-072705119080",
@@ -5631,11 +5917,13 @@
       "upc": "072705119080",
       "upcName": "FROMM wh fish & lentil 12.2oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.950Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6158-072705115013": {
       "matchId": "6158-072705115013",
@@ -5645,11 +5933,13 @@
       "upc": "072705115013",
       "upcName": "FROMM zealambder 26#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.972Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6346-072705114825": {
       "matchId": "6346-072705114825",
@@ -5659,11 +5949,13 @@
       "upc": "072705114825",
       "upcName": "FROMM rancharosa 12#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:29.995Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6117-072705105236": {
       "matchId": "6117-072705105236",
@@ -5673,11 +5965,13 @@
       "upc": "072705105236",
       "upcName": "FROMM classic 15#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.018Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6483-072705119004": {
       "matchId": "6483-072705119004",
@@ -5687,11 +5981,13 @@
       "upc": "072705119004",
       "upcName": "FROMM salm & ck 12.2oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.041Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6146-072705116362": {
       "matchId": "6146-072705116362",
@@ -5701,11 +5997,13 @@
       "upc": "072705116362",
       "upcName": "FROMM whitefish 4#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.064Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6345-072705114528": {
       "matchId": "6345-072705114528",
@@ -5715,11 +6013,13 @@
       "upc": "072705114528",
       "upcName": "FROMM lamb 12#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.087Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6121-072705115372": {
       "matchId": "6121-072705115372",
@@ -5729,11 +6029,13 @@
       "upc": "072705115372",
       "upcName": "FROMM gold lg br 5#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.110Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6479-072705119226": {
       "matchId": "6479-072705119226",
@@ -5743,11 +6045,13 @@
       "upc": "072705119226",
       "upcName": "FROMM ck & ri 12.2oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.134Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6112-072705105229": {
       "matchId": "6112-072705105229",
@@ -5757,11 +6061,13 @@
       "upc": "072705105229",
       "upcName": "FROMM classic 30#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.157Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6733-072705115808": {
       "matchId": "6733-072705115808",
@@ -5771,11 +6077,13 @@
       "upc": "072705115808",
       "upcName": "FROMM kitten 4#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.179Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6344-072705105939": {
       "matchId": "6344-072705105939",
@@ -5785,11 +6093,13 @@
       "upc": "072705105939",
       "upcName": "FROMM ancient 15#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.203Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6210-840243105250": {
       "matchId": "6210-840243105250",
@@ -5799,11 +6109,13 @@
       "upc": "840243105250",
       "upcName": "BLUE B lg br h weight 30#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.228Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6206-859610006816": {
       "matchId": "6206-859610006816",
@@ -5813,11 +6125,13 @@
       "upc": "859610006816",
       "upcName": "BLUE B freedom sm br 4#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.251Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6215-840243105311": {
       "matchId": "6215-840243105311",
@@ -5827,11 +6141,13 @@
       "upc": "840243105311",
       "upcName": "BLUE B sm br senior 15#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.274Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6231-840243144181": {
       "matchId": "6231-840243144181",
@@ -5841,11 +6157,13 @@
       "upc": "840243144181",
       "upcName": "BLUE B sm br puppy 5#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.301Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6200-840243148608": {
       "matchId": "6200-840243148608",
@@ -5855,11 +6173,13 @@
       "upc": "840243148608",
       "upcName": "BLUE B wilder sm br 4.5#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.326Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.316Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6872-859610007684": {
       "matchId": "6872-859610007684",
@@ -5869,11 +6189,13 @@
       "upc": "859610007684",
       "upcName": "BLUE BUF cat wild turkey 5.5oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.361Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6214-840243144167": {
       "matchId": "6214-840243144167",
@@ -5883,11 +6205,13 @@
       "upc": "840243144167",
       "upcName": "BLUE B sm br senior 5#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.387Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6205-859610005789": {
       "matchId": "6205-859610005789",
@@ -5897,11 +6221,13 @@
       "upc": "859610005789",
       "upcName": "BLUE B basic sm br 4#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.413Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6217-840243144129": {
       "matchId": "6217-840243144129",
@@ -5911,11 +6237,13 @@
       "upc": "840243144129",
       "upcName": "BLUE B sm br lamb 5#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.436Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6218-840243105687": {
       "matchId": "6218-840243105687",
@@ -5925,11 +6253,13 @@
       "upc": "840243105687",
       "upcName": "BLUE B sm br lamb 15#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.466Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6201-840243148318": {
       "matchId": "6201-840243148318",
@@ -5939,11 +6269,13 @@
       "upc": "840243148318",
       "upcName": "BLUE B wilder sm br 13#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.490Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6606-840243105533": {
       "matchId": "6606-840243105533",
@@ -5953,11 +6285,13 @@
       "upc": "840243105533",
       "upcName": "BL BUF hunters stew 12.5oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.513Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6621-840243120413": {
       "matchId": "6621-840243120413",
@@ -5967,11 +6301,13 @@
       "upc": "840243120413",
       "upcName": "BL BUF delight ro ck 3.5oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.536Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6601-840243104857": {
       "matchId": "6601-840243104857",
@@ -5981,11 +6317,13 @@
       "upc": "840243104857",
       "upcName": "BL BUF wild turk 12.5oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.578Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6866-840243140602": {
       "matchId": "6866-840243140602",
@@ -5995,11 +6333,13 @@
       "upc": "840243140602",
       "upcName": "BLUE BUF cat salm pate 5.5oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.600Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6207-859610006830": {
       "matchId": "6207-859610006830",
@@ -6009,11 +6349,13 @@
       "upc": "859610006830",
       "upcName": "BLUE B freedom sm br 11#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.623Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6211-859610000449": {
       "matchId": "6211-859610000449",
@@ -6023,11 +6365,13 @@
       "upc": "859610000449",
       "upcName": "BLUE B lg br puppy 30#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.647Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6634-038100026743": {
       "matchId": "6634-038100026743",
@@ -6037,11 +6381,13 @@
       "upc": "038100026743",
       "upcName": "PRO PLAN ck & ri 13oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.670Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6348-038100177032": {
       "matchId": "6348-038100177032",
@@ -6051,11 +6397,13 @@
       "upc": "038100177032",
       "upcName": "PRO PLAN sensi sm br 15#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.691Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6642-038100153364": {
       "matchId": "6642-038100153364",
@@ -6065,11 +6413,13 @@
       "upc": "038100153364",
       "upcName": "PRO PLAN ck & car 13oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.714Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6641-038100026859": {
       "matchId": "6641-038100026859",
@@ -6079,11 +6429,13 @@
       "upc": "038100026859",
       "upcName": "PRO PLAN 7+ beef & ri 13oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.737Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6526-038100190550": {
       "matchId": "6526-038100190550",
@@ -6093,11 +6445,13 @@
       "upc": "038100190550",
       "upcName": "PRO PLAN sen lg br pup sal 24#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.759Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6637-038100153388": {
       "matchId": "6637-038100153388",
@@ -6107,11 +6461,13 @@
       "upc": "038100153388",
       "upcName": "PRO PLAN turk & sw po 13oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.783Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6644-038100026750": {
       "matchId": "6644-038100026750",
@@ -6121,11 +6477,13 @@
       "upc": "038100026750",
       "upcName": "PRO PLAN lam & veg 13oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.805Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6518-073893962083": {
       "matchId": "6518-073893962083",
@@ -6135,11 +6493,13 @@
       "upc": "073893962083",
       "upcName": "NUTRI SOUR pv beef stew 12.5oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.828Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "1268-045663976040": {
       "matchId": "1268-045663976040",
@@ -6149,11 +6509,13 @@
       "upc": "045663976040",
       "upcName": "MagicCoat Prof Series Oats Shed con",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.851Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6033-022517413838": {
       "matchId": "6033-022517413838",
@@ -6163,11 +6525,13 @@
       "upc": "022517413838",
       "upcName": "catit red med",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.873Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6030-022517413852": {
       "matchId": "6030-022517413852",
@@ -6177,11 +6541,13 @@
       "upc": "022517413852",
       "upcName": "catit grey med",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.896Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "7101-000116077606": {
       "matchId": "7101-000116077606",
@@ -6191,11 +6557,13 @@
       "upc": "000116077606",
       "upcName": "SEACHEM amguarad 8.5oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.919Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "7103-000116056403": {
       "matchId": "7103-000116056403",
@@ -6205,11 +6573,13 @@
       "upc": "000116056403",
       "upcName": "SEACHEM cupramine 1.7oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.941Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "7092-000116124102": {
       "matchId": "7092-000116124102",
@@ -6219,11 +6589,13 @@
       "upc": "000116124102",
       "upcName": "SEACHEM pristine 8.5oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.964Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "7094-000116014601": {
       "matchId": "7094-000116014601",
@@ -6233,11 +6605,13 @@
       "upc": "000116014601",
       "upcName": "SEACHEM clarity 8.5oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:30.987Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "7102-000116014502": {
       "matchId": "7102-000116014502",
@@ -6247,11 +6621,13 @@
       "upc": "000116014502",
       "upcName": "SEACHEM clarity 3.4oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:31.009Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "7109-000116081368": {
       "matchId": "7109-000116081368",
@@ -6261,11 +6637,13 @@
       "upc": "000116081368",
       "upcName": "SEACHEM axolotl cond 8.5oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:31.032Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "7097-000116047609": {
       "matchId": "7097-000116047609",
@@ -6275,11 +6653,13 @@
       "upc": "000116047609",
       "upcName": "SEACHEM florish iron 8.5oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:31.055Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6689-073893022213": {
       "matchId": "6689-073893022213",
@@ -6289,11 +6669,13 @@
       "upc": "073893022213",
       "upcName": "TUFFY'S cat ck&tun 5.5oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:31.078Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6488-888641131648": {
       "matchId": "6488-888641131648",
@@ -6303,11 +6685,13 @@
       "upc": "888641131648",
       "upcName": "ZIGN pork 13oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:31.101Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6491-888641131211": {
       "matchId": "6491-888641131211",
@@ -6317,11 +6701,13 @@
       "upc": "888641131211",
       "upcName": "ZIGN lamb 13oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:31.124Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6247-064992581404": {
       "matchId": "6247-064992581404",
@@ -6331,11 +6717,13 @@
       "upc": "064992581404",
       "upcName": "ORIJEN sm br 4#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:31.147Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6706-064992719388": {
       "matchId": "6706-064992719388",
@@ -6345,11 +6733,13 @@
       "upc": "064992719388",
       "upcName": "ORIJEN cat du&ck 3oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:31.170Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6556-030111420152": {
       "matchId": "6556-030111420152",
@@ -6359,11 +6749,13 @@
       "upc": "030111420152",
       "upcName": "ROYAL CAN 5.2oz",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:31.193Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6879-627975012717": {
       "matchId": "6879-627975012717",
@@ -6373,11 +6765,13 @@
       "upc": "627975012717",
       "upcName": "FRESHPET sm br multi prot 1#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:31.214Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "6882-627975011963": {
       "matchId": "6882-627975011963",
@@ -6387,11 +6781,13 @@
       "upc": "627975011963",
       "upcName": "FRESHPET beef 1.5#",
       "score": 0.6,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.466Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:31.237Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:22:14.317Z",
+      "rejectReason": "Score below 70% threshold: 60%"
     },
     "19-097612610109": {
       "matchId": "19-097612610109",

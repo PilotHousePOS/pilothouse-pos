@@ -58,5 +58,11 @@
     "applied": 253,
     "failed": 0,
     "remaining": 0
+  },
+  {
+    "action": "rollback_below_70",
+    "timestamp": "2025-12-23T03:22:14.332Z",
+    "count": 198,
+    "reason": "Matches below 70% threshold incorrectly applied"
   }
 ]

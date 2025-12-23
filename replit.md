@@ -81,11 +81,11 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Target**: 90% coverage with 100% accuracy (zero errors tolerated)
 - **Total supplies**: 7,225
 - **Total UPCs available**: 5,083 (deduplicated from 3 sources: invoice 1,065 + maybe 2,738 + spreadsheet 1,280)
-- **Current progress**: 70.4% matched (5,087 products)
-- **Applied through queue**: 1,148 matches (859 initial + 36 lower threshold + 253 aggressive cross-brand)
+- **Current progress**: 67.7% matched (4,889 products)
+- **Applied through queue**: 950 verified matches (after rollback of 198 errors below 70%)
 - **Brand detection**: 4,089 with brands (80%), 994 unknown (20%)
-- **Remaining unmatched**: 2,138 supplies (limited by available UPC data)
-- **Philosophy**: NO lower thresholds - improvements come from better abbreviation expansion, text normalization, and VERIFIED brand mappings only
+- **Remaining unmatched**: 2,336 supplies (limited by available UPC data)
+- **Philosophy**: NO matches below 70% threshold - improvements come from better abbreviation expansion, text normalization, and VERIFIED brand mappings only
 
 ### Matching Pipeline (Stateful - Never Loses Progress)
 1. **Discovery**: `batch-match-all.mjs` finds matches → saves to `all_pending_matches.json`
