@@ -81,14 +81,15 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Target**: 90% coverage with 100% accuracy (zero errors tolerated)
 - **Total supplies**: 7,225
 - **Total UPCs available**: 7,300 (expanded from 3+ sources)
-- **Current progress**: 68.8% matched (4,972 products)
-- **Applied through queue**: 1,033 verified matches (after rollback of 198 errors below 70%)
+- **Current progress**: 71.2% matched (5,146 products)
+- **Applied through queue**: 1,207 verified matches (after protein/product validation)
+- **Rejected**: 24 matches (true protein mismatches - e.g., chicken ≠ turkey)
 - **Brand detection**: 4,089 with brands (80%), 994 unknown (20%)
-- **Remaining unmatched**: 2,253 supplies (limited by available UPC data - 4,537/7,300 UPCs used)
-- **Philosophy**: NO matches below 70% threshold - improvements come from better abbreviation expansion, text normalization, and VERIFIED brand mappings only
+- **Remaining unmatched**: 2,079 supplies (limited by available UPC data)
+- **Philosophy**: Matches validated for protein/product type accuracy, not just similarity threshold
 
 **Known Data Source Notes:**
-- Science Diet: 202 UPCs in Google spreadsheet (all ingested), 90 unmatched supplies remain - some were rejected at <70% threshold due to abbreviation mismatches
+- Science Diet: 202 UPCs in Google spreadsheet (all ingested), matches validated with protein checking
 
 ### Matching Pipeline (Stateful - Never Loses Progress)
 1. **Discovery**: `batch-match-all.mjs` finds matches → saves to `all_pending_matches.json`
