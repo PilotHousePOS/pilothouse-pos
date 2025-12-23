@@ -1,12 +1,12 @@
 {
   "version": 3,
-  "lastUpdated": "2025-12-23T03:45:23.582Z",
+  "lastUpdated": "2025-12-23T03:47:11.282Z",
   "totalDiscovered": 859,
   "stats": {
     "pending": 0,
     "accepted": 0,
-    "rejected": 24,
-    "applied": 1207
+    "rejected": 28,
+    "applied": 1203
   },
   "matches": {
     "7018-015561165839": {
@@ -1739,11 +1739,13 @@
       "upc": "038100173409",
       "upcName": "PRO PLAN cat urin beef 3oz",
       "score": 0.7,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:23.488Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:47:11.278Z",
+      "rejectReason": "PROTEIN: chicken vs beef"
     },
     "6343-038100100801": {
       "matchId": "6343-038100100801",
@@ -1795,11 +1797,13 @@
       "upc": "038100027030",
       "upcName": "PRO PLAN cat urin ck 3oz",
       "score": 0.7,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:23.583Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectedAt": "2025-12-23T03:47:11.279Z",
+      "rejectReason": "PROTEIN: beef vs chicken"
     },
     "6638-038100108005": {
       "matchId": "6638-038100108005",
@@ -15723,12 +15727,14 @@
       "upcName": "PRO PLAN beef shred 15#",
       "upcBrand": "Pro Plan",
       "score": 0.8,
-      "status": "applied",
+      "status": "rejected",
       "matchType": "aggressive_cross_brand",
       "discoveredAt": "2025-12-23T03:15:51.844Z",
       "reviewedAt": "2025-12-23T03:15:51.844Z",
       "notes": "Auto-accepted: cross-brand match >= 70%",
-      "appliedAt": "2025-12-23T03:15:59.887Z"
+      "appliedAt": "2025-12-23T03:15:59.887Z",
+      "rejectedAt": "2025-12-23T03:47:11.279Z",
+      "rejectReason": "PROTEIN: salmon vs beef"
     },
     "6168-072705114146": {
       "matchId": "6168-072705114146",
@@ -15915,12 +15921,14 @@
       "upcName": "FROMM ck a la veg 4#",
       "upcBrand": "Fromm",
       "score": 0.8,
-      "status": "applied",
+      "status": "rejected",
       "matchType": "aggressive_cross_brand",
       "discoveredAt": "2025-12-23T03:15:51.844Z",
       "reviewedAt": "2025-12-23T03:15:51.844Z",
       "notes": "Auto-accepted: cross-brand match >= 70%",
-      "appliedAt": "2025-12-23T03:16:00.166Z"
+      "appliedAt": "2025-12-23T03:16:00.166Z",
+      "rejectedAt": "2025-12-23T03:47:11.279Z",
+      "rejectReason": "PROTEIN: salmon vs chicken"
     },
     "1412-046938070012": {
       "matchId": "1412-046938070012",

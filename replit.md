@@ -81,11 +81,11 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Target**: 90% coverage with 100% accuracy (zero errors tolerated)
 - **Total supplies**: 7,225
 - **Total UPCs available**: 7,300 (expanded from 3+ sources)
-- **Current progress**: 71.2% matched (5,146 products)
-- **Applied through queue**: 1,207 verified matches (after protein/product validation)
-- **Rejected**: 24 matches (true protein mismatches - e.g., chicken ≠ turkey)
+- **Current progress**: 71.2% matched (5,142 products)
+- **Applied through queue**: 1,203 verified matches (after protein/product validation)
+- **Rejected**: 28 matches (true protein mismatches - e.g., chicken ≠ turkey)
 - **Brand detection**: 4,089 with brands (80%), 994 unknown (20%)
-- **Remaining unmatched**: 2,079 supplies (limited by available UPC data)
+- **Remaining unmatched**: 2,083 supplies (limited by available UPC data)
 - **Philosophy**: Matches validated for protein/product type accuracy, not just similarity threshold
 
 **Known Data Source Notes:**

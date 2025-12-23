@@ -1,0 +1,42 @@
+[
+  {
+    "supplyId": 6704,
+    "supplyName": "Pro Plan Cat Urin Chicken 3oz",
+    "upc": "038100173409",
+    "upcName": "PRO PLAN cat urin beef 3oz",
+    "score": 0.7,
+    "issues": [
+      "PROTEIN: chicken vs beef"
+    ]
+  },
+  {
+    "supplyId": 6701,
+    "supplyName": "Pro Plan Cat Urin Beef 3oz",
+    "upc": "038100027030",
+    "upcName": "PRO PLAN cat urin ck 3oz",
+    "score": 0.7,
+    "issues": [
+      "PROTEIN: beef vs chicken"
+    ]
+  },
+  {
+    "supplyId": 6529,
+    "supplyName": "Pro Plan Shred Salmon 15lb",
+    "upc": "038100101334",
+    "upcName": "PRO PLAN beef shred 15#",
+    "score": 0.8,
+    "issues": [
+      "PROTEIN: salmon vs beef"
+    ]
+  },
+  {
+    "supplyId": 6149,
+    "supplyName": "Fromm Salmon À La Veg 4lb",
+    "upc": "072705116164",
+    "upcName": "FROMM ck a la veg 4#",
+    "score": 0.8,
+    "issues": [
+      "PROTEIN: salmon vs chicken"
+    ]
+  }
+]
