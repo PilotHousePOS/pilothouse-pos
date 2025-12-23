@@ -81,12 +81,12 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Target**: 90% coverage with 100% accuracy (zero errors tolerated)
 - **Total supplies**: 7,225
 - **Total UPCs available**: 7,300 (expanded from 3+ sources)
-- **Current progress**: 84.6% matched (6,114 products)
+- **Current progress**: 82.2% matched (5,939 products) - after cleanup of 175 incorrect UPCs
 - **Applied through queue**: 2,177 verified matches (after protein/product validation)
 - **Rejected**: 56 matches (protein/size/color/brand mismatches)
 - **Brand detection**: 4,089 with brands (80%), 994 unknown (20%)
-- **Remaining unmatched**: 1,929 supplies (limited by available UPC data)
-- **Philosophy**: Matches validated for protein/product type accuracy, not just similarity threshold
+- **Remaining unmatched**: 1,286 supplies (limited by available UPC data)
+- **Philosophy**: Matches validated for protein/product type accuracy AND brand-UPC prefix validation
 
 **Known Data Source Notes:**
 - Science Diet: 202 UPCs in Google spreadsheet (all ingested), matches validated with protein checking
@@ -113,6 +113,22 @@ The application is a full-stack web application featuring a React frontend (Vite
 4. **Dimension Matching**: Normalized (5" = 5in = 5inch), must match exactly
 5. **Cup/Capacity Matching**: 1 cup ≠ 7 cup
 6. **Length Matching**: Foot measurements must match (15' ≠ 10')
+7. **Brand-UPC Prefix Validation**: UPC prefix must match product's brand (see below)
+
+### Brand-UPC Prefix Validation (CRITICAL)
+Prevents cross-brand UPC assignments using GS1 manufacturer prefixes. Implemented in `scripts/brand-upc-prefixes.mjs`.
+
+**Known Brand Prefixes:**
+- **Reptile**: Zoo Med=097612, Exo Terra/Hagen=015561, Fluker's=091197, Zilla=096316
+- **Aquatic**: Tetra=046798, Aqueon=015905, Hikari=042055, API=317163, Marineland=047431, Penn-Plax=030172
+- **Small Animal**: Kaytee=071859, Oxbow=034846, Vitakraft=071354
+- **Pet Food**: Orijen/Acana=064992, Hill's=052742, Blue Buffalo=859610, Fromm=072705, Royal Canin=030111
+- **Accessories**: Kong=076484, Coastal=018214, Nylabone=018065, Greenies=642863, RedBarn=785184
+
+**How it works:**
+1. When applying a UPC match, the system checks if the UPC prefix matches the product's brand
+2. If mismatch detected, the match is automatically rejected with reason
+3. Audit script `scripts/audit-upc-brand-prefixes.mjs` finds existing mismatches in database
 
 ### Brand Prefix Expansion (80+ verified mappings)
 Never auto-promote unverified prefixes - all mappings must be user-confirmed!
