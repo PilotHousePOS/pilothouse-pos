@@ -1,0 +1,107 @@
+[
+  {
+    "supplyId": 5758,
+    "supplyName": "Fluval Suction Cups",
+    "upc": "015561112178",
+    "upcName": "FLUVAL suction cup",
+    "score": 1
+  },
+  {
+    "supplyId": 5731,
+    "supplyName": "Fluval C2 Zeo-carb 3pk",
+    "upc": "097227002333",
+    "upcName": "FLUVAL C3 ZEO-CARB 3PK",
+    "score": 0.8
+  },
+  {
+    "supplyId": 5733,
+    "supplyName": "Fluval C3 Active Carbon 3pk",
+    "upc": "097227002333",
+    "upcName": "FLUVAL C3 ZEO-CARB 3PK",
+    "score": 0.8
+  },
+  {
+    "supplyId": 7035,
+    "supplyName": "Penn Plax Divider 10gallon",
+    "upc": "030172014109",
+    "upcName": "PENN PLAX div ider 10gallon",
+    "score": 0.8
+  },
+  {
+    "supplyId": 5434,
+    "supplyName": "Rock & Branch Scape",
+    "upc": "030172068188",
+    "upcName": "penn plax rockscapes",
+    "score": 0.6666666666666666
+  },
+  {
+    "supplyId": 5435,
+    "supplyName": "Mossy Rock Scape",
+    "upc": "030172068188",
+    "upcName": "penn plax rockscapes",
+    "score": 0.6666666666666666
+  },
+  {
+    "supplyId": 5436,
+    "supplyName": "Grey Rock Scape",
+    "upc": "030172068188",
+    "upcName": "penn plax rockscapes",
+    "score": 0.6666666666666666
+  },
+  {
+    "supplyId": 5437,
+    "supplyName": "Mossy Rock Scape 2",
+    "upc": "030172068188",
+    "upcName": "penn plax rockscapes",
+    "score": 0.6666666666666666
+  },
+  {
+    "supplyId": 5738,
+    "supplyName": "Fluval Aquarientorf 500g",
+    "upc": "015561183345",
+    "upcName": "FLUVAL aquar cleaner",
+    "score": 0.6666666666666666
+  },
+  {
+    "supplyId": 5653,
+    "supplyName": "Fluval Carbon Ac70 Ac110 3pk",
+    "upc": "097227002333",
+    "upcName": "FLUVAL C3 ZEO-CARB 3PK",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5659,
+    "supplyName": "Fluval Ac50 Carbon 3pk",
+    "upc": "097227002333",
+    "upcName": "FLUVAL C3 ZEO-CARB 3PK",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5729,
+    "supplyName": "Fluval C4 Activated Carbon 3pk",
+    "upc": "097227002333",
+    "upcName": "FLUVAL C3 ZEO-CARB 3PK",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5732,
+    "supplyName": "Fluval C2 Active Carbon 3pk",
+    "upc": "097227002333",
+    "upcName": "FLUVAL C3 ZEO-CARB 3PK",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5740,
+    "supplyName": "Fluval Carbon 3pk",
+    "upc": "097227002333",
+    "upcName": "FLUVAL C3 ZEO-CARB 3PK",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5741,
+    "supplyName": "Fluval Zeocarb 3pk",
+    "upc": "097227002333",
+    "upcName": "FLUVAL C3 ZEO-CARB 3PK",
+    "score": 0.6
+  }
+]

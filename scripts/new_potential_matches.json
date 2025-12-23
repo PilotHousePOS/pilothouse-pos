@@ -1,0 +1,1682 @@
+[
+  {
+    "supply": {
+      "id": 1194,
+      "name": "Prevue Keet Cage",
+      "brand": ""
+    },
+    "upc": {
+      "upc": "048081210086",
+      "name_original": "Prevue Keet Cage",
+      "name_expanded": "prevue parakeet cage",
+      "brand": "Prevue",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 1184,
+      "name": "A & E Assorted Bird Cage",
+      "brand": "A&E Cage Co"
+    },
+    "upc": {
+      "upc": "048081481185",
+      "name_original": "Assorted Tall Bird Cages",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 5044,
+      "name": "Aqualife 35.5\" Bend Bubble Wall",
+      "brand": "Aqualife"
+    },
+    "upc": {
+      "upc": "030172002908",
+      "name_original": "shorefins™ Bendable Bubble Wall 35.5\"",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 5043,
+      "name": "Aqualife 48\" Bend Bubble Wall",
+      "brand": "Aqualife"
+    },
+    "upc": {
+      "upc": "030172018701",
+      "name_original": "shorefins™ Bendable Bubble Wall 48\"",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 5047,
+      "name": "Aqualife Delux Airline Tube 8ft",
+      "brand": "Aqualife"
+    },
+    "upc": {
+      "upc": "059834053088",
+      "name_original": "AQUALIFE STAND AIRLINE TUBE 8FT",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 5056,
+      "name": "Aqualife Stand Airline Tube 25ft",
+      "brand": "Aqualife"
+    },
+    "upc": {
+      "upc": "059834053088",
+      "name_original": "AQUALIFE STAND AIRLINE TUBE 8FT",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 7007,
+      "name": "Aqueon Tropical Granules 3.25oz",
+      "brand": "Aqueon"
+    },
+    "upc": {
+      "upc": "015905061919",
+      "name_original": "AQUEON trop granules 6.5oz",
+      "name_expanded": "aqueon trop granules 6.5oz",
+      "brand": "Aqueon",
+      "brand_method": "name_match",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "spreadsheet"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 1015,
+      "name": "Birdlife Perchwmirrorbeads & Seed Cup",
+      "brand": "Birdlife"
+    },
+    "upc": {
+      "upc": "030172902741",
+      "name_original": "BirdLIfe PerchwMirrorBeads&Seedcup",
+      "name_expanded": "birdlife perchwmirrorbeads and seedcup",
+      "brand": "Birdlife",
+      "brand_method": "name_match",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 2533,
+      "name": "Circle 14\"tcr1786s Collar",
+      "brand": "Circle T"
+    },
+    "upc": {
+      "upc": "076484178627",
+      "name_original": "CIRCLE 14\"TCR1786S COLLAR",
+      "name_expanded": "circle 14inch tcr1786s collar",
+      "brand": "Circle T",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 2550,
+      "name": "Circle 20\" Red 1106 Collar",
+      "brand": "Circle T"
+    },
+    "upc": {
+      "upc": "076484104510",
+      "name_original": "CIRCLE 20\" RED 1106 COLLAR",
+      "name_expanded": "circle 20inch red 1106 collar",
+      "brand": "Circle T",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 2614,
+      "name": "Coastal 6' Dinosaurs 969 Leash",
+      "brand": "Coastal"
+    },
+    "upc": {
+      "upc": "076484969027",
+      "name_original": "COASTAL 6'DNS 969 LEASH",
+      "name_expanded": "coastal 6inch dns 969 leash",
+      "brand": "Coastal",
+      "brand_method": "name_match",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 2624,
+      "name": "Coastal 6' Pineapples 969 Leash",
+      "brand": "Coastal"
+    },
+    "upc": {
+      "upc": "076484969027",
+      "name_original": "COASTAL 6'DNS 969 LEASH",
+      "name_expanded": "coastal 6inch dns 969 leash",
+      "brand": "Coastal",
+      "brand_method": "name_match",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 2620,
+      "name": "Coastal 6' Unicorns 969 Leash",
+      "brand": "Coastal"
+    },
+    "upc": {
+      "upc": "076484969027",
+      "name_original": "COASTAL 6'DNS 969 LEASH",
+      "name_expanded": "coastal 6inch dns 969 leash",
+      "brand": "Coastal",
+      "brand_method": "name_match",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 3939,
+      "name": "Coastal Blue04' 904 Leash",
+      "brand": "Coastal"
+    },
+    "upc": {
+      "upc": "015561224666",
+      "name_original": "COASTAL HUN04' 904 LEASH",
+      "brand": "Coastal",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 2089,
+      "name": "Coastal Cat Soft Mesh Harness Red",
+      "brand": "Coastal"
+    },
+    "upc": {
+      "upc": "076484630330",
+      "name_original": "COASTAL CAT SOFT MESH HARN PINK",
+      "name_expanded": "coastal cat soft mesh harness pink",
+      "brand": "Coastal",
+      "brand_method": "name_match",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.8333333333333334
+  },
+  {
+    "supply": {
+      "id": 3434,
+      "name": "Coastal Fsa18\" Soy Harness",
+      "brand": "Coastal"
+    },
+    "upc": {
+      "upc": "008436993111",
+      "name_original": "COASTAL ONY30\" SOY HARNESS",
+      "brand": "Coastal",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 3433,
+      "name": "Coastal Fsa24\" Soy Harness",
+      "brand": "Coastal"
+    },
+    "upc": {
+      "upc": "008436993111",
+      "name_original": "COASTAL ONY30\" SOY HARNESS",
+      "brand": "Coastal",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 3911,
+      "name": "Coastal Hunter04' 604 Leash",
+      "brand": "Coastal"
+    },
+    "upc": {
+      "upc": "015561224789",
+      "name_original": "COASTAL PUR06' 604 LEASH",
+      "brand": "Coastal",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 3909,
+      "name": "Coastal Hunter04' 904 Leash",
+      "brand": "Coastal"
+    },
+    "upc": {
+      "upc": "015561224666",
+      "name_original": "COASTAL HUN04' 904 LEASH",
+      "brand": "Coastal",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 3821,
+      "name": "Coastal Purple04' 904 Leash",
+      "brand": "Coastal"
+    },
+    "upc": {
+      "upc": "015561224666",
+      "name_original": "COASTAL HUN04' 904 LEASH",
+      "brand": "Coastal",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 3432,
+      "name": "Coastal Sla18\" Soy Harness",
+      "brand": "Coastal"
+    },
+    "upc": {
+      "upc": "008436993111",
+      "name_original": "COASTAL ONY30\" SOY HARNESS",
+      "brand": "Coastal",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 3431,
+      "name": "Coastal Sla24\" Soy Harness",
+      "brand": "Coastal"
+    },
+    "upc": {
+      "upc": "008436993111",
+      "name_original": "COASTAL ONY30\" SOY HARNESS",
+      "brand": "Coastal",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 2390,
+      "name": "Dr. Elsey's Kitten Attract",
+      "brand": "Dr. Elsey's"
+    },
+    "upc": {
+      "upc": "000338007207",
+      "name_original": "Dr.Elseys Kitten Attract",
+      "name_expanded": "dr.elseys kitten attract",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 4545,
+      "name": "Bam-bones + Stck 9.5\" Chick",
+      "brand": "Ethical Pet"
+    },
+    "upc": {
+      "upc": "005000583283",
+      "name_original": "BAM-BONES WISHBNE 7\" CHICKEN",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 5731,
+      "name": "Fluval C2 Zeo-carb 3pk",
+      "brand": "Fluval"
+    },
+    "upc": {
+      "upc": "097227002333",
+      "name_original": "FLUVAL C3 ZEO-CARB 3PK",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 5733,
+      "name": "Fluval C3 Active Carbon 3pk",
+      "brand": "Fluval"
+    },
+    "upc": {
+      "upc": "097227002333",
+      "name_original": "FLUVAL C3 ZEO-CARB 3PK",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 6835,
+      "name": "Fussie Cat Tuna, Mussel 2.82oz",
+      "brand": "Fussie Cat"
+    },
+    "upc": {
+      "upc": "888641133116",
+      "name_original": "FUSSIE CAT tuna 2.82oz",
+      "name_expanded": "fussie cat tuna 2.82oz",
+      "brand": "Fussie Cat",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "spreadsheet"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 2132,
+      "name": "Fussiecat Tuna & Shrimp Puree 4pk",
+      "brand": "Fussie Cat"
+    },
+    "upc": {
+      "upc": "888641136162",
+      "name_original": "FussieCat Tuna &ShrimpPUr 4pk",
+      "name_expanded": "fussiecat tuna and shrimppur 4pack",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 4520,
+      "name": "Happydog Large Sliced Elk Ant",
+      "brand": "Happy Dog of Cape Cod"
+    },
+    "upc": {
+      "upc": "009761213303",
+      "name_original": "HAPPYDOG JUMBO SLICED ELK ANT",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 6924,
+      "name": "Hikari Frozen Krill 3.5 oz",
+      "brand": "Hikari"
+    },
+    "upc": {
+      "upc": "042055308403",
+      "name_original": "HIKARI froz krill 16oz",
+      "name_expanded": "hikari froz krill 16oz",
+      "brand": "Hikari",
+      "brand_method": "name_match",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "spreadsheet"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 2129,
+      "name": "Churo Skin & Coat Tuna 4pk",
+      "brand": "Inaba"
+    },
+    "upc": {
+      "upc": "850006715756",
+      "name_original": "Churo Skin&Coat Tuna 4pk",
+      "name_expanded": "churo skin and coat tuna 4pack",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 2716,
+      "name": "Jolly Pets 6\" Soccerball Green",
+      "brand": "Jolly Pets"
+    },
+    "upc": {
+      "upc": "788169720631",
+      "name_original": "JOLLYPET 6\" SOCCERBALL GREEN",
+      "name_expanded": "jollypet 6inch soccerball green",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 2715,
+      "name": "Jolly Pets 6\"soccer Ball Bllue",
+      "brand": "Jolly Pets"
+    },
+    "upc": {
+      "upc": "788169720624",
+      "name_original": "JOLLYPET 6\"SOCCER BALL BLLUE",
+      "name_expanded": "jollypet 6inch soccer ball bllue",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 2717,
+      "name": "Jolly Pets 8\" Soccerball Blue",
+      "brand": "Jolly Pets"
+    },
+    "upc": {
+      "upc": "788169720822",
+      "name_original": "JOLLYPET 8\" SOCCERBALL BLUE",
+      "name_expanded": "jollypet 8inch soccerball blue",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 2718,
+      "name": "Jolly Pets 8\" Soccerball Orange",
+      "brand": "Jolly Pets"
+    },
+    "upc": {
+      "upc": "788169720815",
+      "name_original": "JOLLYPET 8\" SOCCERBALL ORANGE",
+      "name_expanded": "jollypet 8inch soccerball orange",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 4197,
+      "name": "Kaytee 5\" Runabout Ball Rainbow",
+      "brand": "Kaytee"
+    },
+    "upc": {
+      "upc": "046706322510",
+      "name_original": "KAYTEE 11.5\" RUNABUTBALL RAINBOW",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 4198,
+      "name": "Kaytee 7\" Runabout Ball Rainbow",
+      "brand": "Kaytee"
+    },
+    "upc": {
+      "upc": "046706322510",
+      "name_original": "KAYTEE 11.5\" RUNABUTBALL RAINBOW",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 4190,
+      "name": "Kaytee Large High Crnr Litter Pan",
+      "brand": "Kaytee"
+    },
+    "upc": {
+      "upc": "044472002393",
+      "name_original": "KAYTEE HIGH CRNR LITTER PAN",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.8333333333333334
+  },
+  {
+    "supply": {
+      "id": 2532,
+      "name": "Lilpals Harness Combo Blackpsm",
+      "brand": "Li'l Pals"
+    },
+    "upc": {
+      "upc": "076484062049",
+      "name_original": "LILPALS HARNESS COMBO PKBPSM",
+      "name_expanded": "lilpals harness combo pkbpsm",
+      "brand": "Li'l Pals",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 2531,
+      "name": "Lilpals Harness Combo Pkbpsm",
+      "brand": "Li'l Pals"
+    },
+    "upc": {
+      "upc": "076484062049",
+      "name_original": "LILPALS HARNESS COMBO PKBPSM",
+      "name_expanded": "lilpals harness combo pkbpsm",
+      "brand": "Li'l Pals",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 2880,
+      "name": "Mammoth Small TPR Bone With Cloth Rope",
+      "brand": "Mammoth"
+    },
+    "upc": {
+      "upc": "746772233009",
+      "name_original": "MAMM SM TPR BONEW CLOTH ROPE",
+      "name_expanded": "mamm small tpr bonew cloth rope",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.7142857142857143
+  },
+  {
+    "supply": {
+      "id": 2883,
+      "name": "Mammoth XLarge Color Bone",
+      "brand": "Mammoth"
+    },
+    "upc": {
+      "upc": "746772200049",
+      "name_original": "MAMMOTH MED COLOR BONE",
+      "name_expanded": "mammoth medium color bone",
+      "brand": "Mammoth",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 4669,
+      "name": "Fresh Kisses Medium Mint Box",
+      "brand": "Merrick"
+    },
+    "upc": {
+      "upc": "097612326109",
+      "name_original": "FRESH KISSES LG MINT BOX",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 4668,
+      "name": "Fresh Kisses Small Mint Box",
+      "brand": "Merrick"
+    },
+    "upc": {
+      "upc": "097612326109",
+      "name_original": "FRESH KISSES LG MINT BOX",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 1968,
+      "name": "Naturvet Digestive Enzymes Cat",
+      "brand": "NaturVet"
+    },
+    "upc": {
+      "upc": "797801036603",
+      "name_original": "NaturVet Digestive Enzymes Powder",
+      "name_expanded": "naturvet digestive enzymes powder",
+      "brand": "NaturVet",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 6553,
+      "name": "Natural Bal Duck 13.2oz",
+      "brand": "Natural Balance"
+    },
+    "upc": {
+      "upc": "723633001540",
+      "name_original": "NAT BAL duck 13.2oz",
+      "name_expanded": "nat ball duck 13.2oz",
+      "brand": "Natural Balance",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "spreadsheet"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 1366,
+      "name": "Nature's Miracle Advanced Stain & Odor",
+      "brand": "Nature's Miracle"
+    },
+    "upc": {
+      "upc": "018065969873",
+      "name_original": "NaturesMiracle Advanced Stain&Odor",
+      "name_expanded": "naturesmiracle advanced stain and odor",
+      "brand": "Nature's Miracle",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 1329,
+      "name": "Nature's Miracle Freshing Spray",
+      "brand": "Nature's Miracle"
+    },
+    "upc": {
+      "upc": "018065984685",
+      "name_original": "NaturesMiracle Freshing Spray",
+      "name_expanded": "naturesmiracle freshing spray",
+      "brand": "Nature's Miracle",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 1368,
+      "name": "Nature's Miracle Hard Floor Cleaner",
+      "brand": "Nature's Miracle"
+    },
+    "upc": {
+      "upc": "018065984814",
+      "name_original": "NaturesMiracle Hard floor Cleaner",
+      "name_expanded": "naturesmiracle hard floor cleaner",
+      "brand": "Nature's Miracle",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 1331,
+      "name": "Nature's Miracle Hypoallergenic",
+      "brand": "Nature's Miracle"
+    },
+    "upc": {
+      "upc": "018065284112",
+      "name_original": "NaturesMiracle HypoAllergenic",
+      "name_expanded": "naturesmiracle hypoallergenic",
+      "brand": "Nature's Miracle",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 1987,
+      "name": "Nature's Miracle No More Spraying",
+      "brand": "Nature's Miracle"
+    },
+    "upc": {
+      "upc": "018065284044",
+      "name_original": "NaturesMiracle Advance No spray",
+      "name_expanded": "naturesmiracle advance no spray",
+      "brand": "Nature's Miracle",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 1327,
+      "name": "Nature's Miracle Skunk Lavender",
+      "brand": "Nature's Miracle"
+    },
+    "upc": {
+      "upc": "018065984227",
+      "name_original": "NaturesMiracle Skunk Lavender",
+      "name_expanded": "naturesmiracle skunk lavender",
+      "brand": "Nature's Miracle",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 1365,
+      "name": "Nature's Miracle Skunk Remover",
+      "brand": "Nature's Miracle"
+    },
+    "upc": {
+      "upc": "018065984203",
+      "name_original": "NaturesMiracle Skunk Remover",
+      "name_expanded": "naturesmiracle skunk remover",
+      "brand": "Nature's Miracle",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 1370,
+      "name": "Nature's Miracle Stain & Odor Remover",
+      "brand": "Nature's Miracle"
+    },
+    "upc": {
+      "upc": "018065969620",
+      "name_original": "NaturesMiracle Stain&Odor Remover",
+      "name_expanded": "naturesmiracle stain and odor remover",
+      "brand": "Nature's Miracle",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 5114,
+      "name": "Purewater Pebble Neon Raibow",
+      "brand": "Nature's Ocean"
+    },
+    "upc": {
+      "upc": "096316002593",
+      "name_original": "PUREWATER PEBBLE NEON PINK",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 1965,
+      "name": "Nutri-Vet Uri-ease Cat Paw Gel",
+      "brand": "Nutri-Vet"
+    },
+    "upc": {
+      "upc": "669125998533",
+      "name_original": "NutriVet Uri-Ease Cat paw Gel",
+      "name_expanded": "nutrivet uri-ease cat paw gel",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.8571428571428571
+  },
+  {
+    "supply": {
+      "id": 6693,
+      "name": "Nutrisource Cat Turkey & Turkey Liver Select 5.5oz",
+      "brand": "Nutrisource"
+    },
+    "upc": {
+      "upc": "073893022077",
+      "name_original": "NUTRI SOUR cat turk sele 5.5oz",
+      "name_expanded": "nutri sour cat turk sele 5.5oz",
+      "brand": "Nutrisource",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "spreadsheet"
+    },
+    "score": 0.8571428571428571
+  },
+  {
+    "supply": {
+      "id": 6502,
+      "name": "Nutrisource Heartland Select 13oz",
+      "brand": "Nutrisource"
+    },
+    "upc": {
+      "upc": "073893030027",
+      "name_original": "NUTRI SOUR heartland 13oz",
+      "name_expanded": "nutri sour heartland 13oz",
+      "brand": "Nutrisource",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "spreadsheet"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 6505,
+      "name": "Nutrisource Seafood Select 12.3oz",
+      "brand": "Nutrisource"
+    },
+    "upc": {
+      "upc": "073893021261",
+      "name_original": "NUTRI SOUR seafood 12.3oz",
+      "name_expanded": "nutri sour seafood 12.3oz",
+      "brand": "Nutrisource",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "spreadsheet"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 6501,
+      "name": "Nutrisource Woodlands Select 13oz",
+      "brand": "Nutrisource"
+    },
+    "upc": {
+      "upc": "073893021032",
+      "name_original": "NUTRI SOU woodland 13oz",
+      "name_expanded": "nutri sou woodland 13oz",
+      "brand": "Nutrisource",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "spreadsheet"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 4575,
+      "name": "Nylabone DuraChew Petite Bacon",
+      "brand": "Nylabone"
+    },
+    "upc": {
+      "upc": "018214823285",
+      "name_original": "NYLABONE DURACHEW BACON WLF",
+      "name_expanded": "nylabone durachew bacon wlf",
+      "brand": "Nylabone",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 4574,
+      "name": "Nylabone DuraChew Regular Bacon",
+      "brand": "Nylabone"
+    },
+    "upc": {
+      "upc": "018214823285",
+      "name_original": "NYLABONE DURACHEW BACON WLF",
+      "name_expanded": "nylabone durachew bacon wlf",
+      "brand": "Nylabone",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 4573,
+      "name": "Nylabone DuraChew Wolf Bacon",
+      "brand": "Nylabone"
+    },
+    "upc": {
+      "upc": "018214823285",
+      "name_original": "NYLABONE DURACHEW BACON WLF",
+      "name_expanded": "nylabone durachew bacon wlf",
+      "brand": "Nylabone",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 81,
+      "name": "Galapagos Forest Environment Cling",
+      "brand": "Pangea"
+    },
+    "upc": {
+      "upc": "759834054214",
+      "name_original": "galap. Forest enviroment Cling",
+      "name_expanded": "galap. forest enviroment cling",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 80,
+      "name": "Galapagos Moss Vine",
+      "brand": "Pangea"
+    },
+    "upc": {
+      "upc": "759834052661",
+      "name_original": "galap. moss vine",
+      "name_expanded": "galap. moss vine",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 704,
+      "name": "Galapagos Mossy Mushroom",
+      "brand": "Pangea"
+    },
+    "upc": {
+      "upc": "759834552710",
+      "name_original": "Galap. Mossy Mushroom",
+      "name_expanded": "galap. mossy mushroom",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 5030,
+      "name": "Lok-tite 4gang Valve",
+      "brand": "Penn-Plax"
+    },
+    "upc": {
+      "upc": "030172191206",
+      "name_original": "Cascade™ Lok-Tite® 2-Gang Valve",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 1208,
+      "name": "Oval Basket Nest Medium",
+      "brand": "Penn-Plax"
+    },
+    "upc": {
+      "upc": "048081010723",
+      "name_original": "Oval Basket Nest LG",
+      "name_expanded": "oval basket nest large",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 7035,
+      "name": "Penn Plax Divider 10gallon",
+      "brand": "Penn-Plax"
+    },
+    "upc": {
+      "upc": "030172014109",
+      "name_original": "PENN PLAX div ider 10gallon",
+      "name_expanded": "penn plax div ider 10gallon",
+      "brand": "Penn-Plax",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "spreadsheet"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 1923,
+      "name": "Penn Plax Felt Steps Dark Grey 13\"h",
+      "brand": "Penn-Plax"
+    },
+    "upc": {
+      "upc": "030172102301",
+      "name_original": "PennPlex Felt Steps Dk Grey 13\"H",
+      "name_expanded": "pennplex felt steps dk grey 13inch h",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.7142857142857143
+  },
+  {
+    "supply": {
+      "id": 1593,
+      "name": "Penn Plax Paw Cleaner",
+      "brand": "Penn-Plax"
+    },
+    "upc": {
+      "upc": "030172101380",
+      "name_original": "PennPlex Paw Cleaner",
+      "name_expanded": "pennplex paw cleaner",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 4423,
+      "name": "Small Oval Basket Nest",
+      "brand": "Penn-Plax"
+    },
+    "upc": {
+      "upc": "048081010723",
+      "name_original": "Oval Basket Nest LG",
+      "name_expanded": "oval basket nest large",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 5473,
+      "name": "Sunken Treasure Ship Medium",
+      "brand": "Penn-Plax"
+    },
+    "upc": {
+      "upc": "030172048302",
+      "name_original": "Tide & Treasure™ Battleship - Medium",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 1465,
+      "name": "Pet Honesty Allergy Skin Health",
+      "brand": "Pet Honesty"
+    },
+    "upc": {
+      "upc": "850005524168",
+      "name_original": "PetHonesty Allergy Skin Health",
+      "name_expanded": "pethonesty allergy skin health",
+      "brand": "Pet Honesty",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 1466,
+      "name": "Pet Honesty Allergy Support",
+      "brand": "Pet Honesty"
+    },
+    "upc": {
+      "upc": "850005524434",
+      "name_original": "PetHonesty Allergy support",
+      "name_expanded": "pethonesty allergy support",
+      "brand": "Pet Honesty",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 1972,
+      "name": "Pet Honesty Digestive Probiotics Cat",
+      "brand": "Pet Honesty"
+    },
+    "upc": {
+      "upc": "850005524540",
+      "name_original": "PetHonesty Digestive Probiotics Cat",
+      "name_expanded": "pethonesty digestive probiotics cat",
+      "brand": "Pet Honesty",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 2121,
+      "name": "Pet Honesty Hairball Support Cat",
+      "brand": "Pet Honesty"
+    },
+    "upc": {
+      "upc": "850038728076",
+      "name_original": "PetHonesty Hairball Support Cat",
+      "name_expanded": "pethonesty hairball support cat",
+      "brand": "Pet Honesty",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 1469,
+      "name": "Pet Honesty Hemp Calming",
+      "brand": "Pet Honesty"
+    },
+    "upc": {
+      "upc": "850005524021",
+      "name_original": "PetHonesty Hemp Calming",
+      "name_expanded": "pethonesty hemp calming",
+      "brand": "Pet Honesty",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 1470,
+      "name": "Pet Honesty Hemp Calming Max",
+      "brand": "Pet Honesty"
+    },
+    "upc": {
+      "upc": "850005524489",
+      "name_original": "PetHonesty Hemp Calming Max",
+      "name_expanded": "pethonesty hemp calming max",
+      "brand": "Pet Honesty",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 1467,
+      "name": "Pet Honesty Hip+joint Health Max",
+      "brand": "Pet Honesty"
+    },
+    "upc": {
+      "upc": "850005524878",
+      "name_original": "PetHonesty Hip+Joint Health Max",
+      "name_expanded": "pethonesty hip joint health max",
+      "brand": "Pet Honesty",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.8333333333333334
+  },
+  {
+    "supply": {
+      "id": 1471,
+      "name": "Pet Honesty Multivita 10in1",
+      "brand": "Pet Honesty"
+    },
+    "upc": {
+      "upc": "850005524069",
+      "name_original": "PetHonesty MultiVita 10in1",
+      "name_expanded": "pethonesty multivita 10in1",
+      "brand": "Pet Honesty",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 1338,
+      "name": "Freshnclean Oat Baking Soda Conditioner",
+      "brand": "PetAg"
+    },
+    "upc": {
+      "upc": "071860224721",
+      "name_original": "FreshnClean OatBakingSoda Cond",
+      "name_expanded": "freshnclean oatbakingsoda conditioner",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 1730,
+      "name": "Petmate Kennel Cup Double",
+      "brand": "Petmate"
+    },
+    "upc": {
+      "upc": "029695231742",
+      "name_original": "Petmate Double cup Sm",
+      "name_expanded": "petmate double cup small",
+      "brand": "Petmate",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 1024,
+      "name": "Playfuls Forage & Engage \"fireball\"",
+      "brand": "Playfuls"
+    },
+    "upc": {
+      "upc": "048081625033",
+      "name_original": "PlayFuls Forage&Eng \"Fireball\"",
+      "name_expanded": "playfuls forage and eng fireball",
+      "brand": "Playfuls",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 1189,
+      "name": "Assorted Keet House Cage",
+      "brand": "Prevue"
+    },
+    "upc": {
+      "upc": "048081416143",
+      "name_original": "Ass. keet house cage",
+      "name_expanded": "ass. parakeet house cage",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 4356,
+      "name": "Grassy Nibbler Carrot",
+      "brand": "Prevue"
+    },
+    "upc": {
+      "upc": "048081010822",
+      "name_original": "Grassy Nibblers Carrot",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 4364,
+      "name": "Grassy Nibbler Squash",
+      "brand": "Prevue"
+    },
+    "upc": {
+      "upc": "048081010808",
+      "name_original": "Grassy Nibblers Squash",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 4380,
+      "name": "Naturals Very Peary Chew",
+      "brand": "Prevue"
+    },
+    "upc": {
+      "upc": "048081110782",
+      "name_original": "Very Pear-y Chew Sticks",
+      "brand": "UNKNOWN",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 1182,
+      "name": "Prevue Econo Keet Cage",
+      "brand": "Prevue"
+    },
+    "upc": {
+      "upc": "048081220061",
+      "name_original": "Prevue Econo Keet Cage",
+      "name_expanded": "prevue econo parakeet cage",
+      "brand": "Prevue",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 6698,
+      "name": "Pro Plan Cat Salmon 3oz",
+      "brand": "Pro Plan"
+    },
+    "upc": {
+      "upc": "038100026972",
+      "name_original": "PRO PLAN cat salm 3oz",
+      "name_expanded": "pro plan cat salm 3oz",
+      "brand": "Pro Plan",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "spreadsheet"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 6350,
+      "name": "Pro Plan Sensitive Salmon 16lb",
+      "brand": "Pro Plan"
+    },
+    "upc": {
+      "upc": "038100175458",
+      "name_original": "PRO PLAN sensi salm 16#",
+      "name_expanded": "pro plan sensi salm 16 pound",
+      "brand": "Pro Plan",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "spreadsheet"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 2707,
+      "name": "Rascals 13\" Pig",
+      "brand": "Rascals"
+    },
+    "upc": {
+      "upc": "076484830907",
+      "name_original": "RASCALS 13\" PIG",
+      "name_expanded": "rascals 13inch pig",
+      "brand": "Rascals",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 2711,
+      "name": "Rascals 4\" Basketball",
+      "brand": "Rascals"
+    },
+    "upc": {
+      "upc": "076484830341",
+      "name_original": "RASCALS 2.5\" BALL",
+      "name_expanded": "rascals 2.5inch ball",
+      "brand": "Rascals",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 2737,
+      "name": "Rascals 5\" Foot",
+      "brand": "Rascals"
+    },
+    "upc": {
+      "upc": "076484827709",
+      "name_original": "RASCALS 4\" FOOTBALL",
+      "name_expanded": "rascals 4inch football",
+      "brand": "Rascals",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 1
+  },
+  {
+    "supply": {
+      "id": 4527,
+      "name": "Redbarn Collagen Sticks",
+      "brand": "RedBarn"
+    },
+    "upc": {
+      "upc": "001556121979",
+      "name_original": "REDBARN XL COLLAGEN STICK",
+      "brand": "RedBarn",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 4493,
+      "name": "Redbarn Small Collagen Stick",
+      "brand": "RedBarn"
+    },
+    "upc": {
+      "upc": "001556121979",
+      "name_original": "REDBARN XL COLLAGEN STICK",
+      "brand": "RedBarn",
+      "source": "expanded_sources"
+    },
+    "score": 0.75
+  },
+  {
+    "supply": {
+      "id": 396,
+      "name": "Reptile System T5 Zone 1 24w 2.4%",
+      "brand": "Reptile Systems"
+    },
+    "upc": {
+      "upc": "3443981170039",
+      "name_original": "Reptile Sys. T5 Zone 2 24W 6\"",
+      "name_expanded": "reptile sys. t5 zone 2 24w 6inch",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 386,
+      "name": "Reptile System T5 Zone 1 Unit 24w 23\"",
+      "brand": "Reptile Systems"
+    },
+    "upc": {
+      "upc": "3443981210230",
+      "name_original": "Reptile Sys. T5 Zone 1 Unit 24W 23\"",
+      "name_expanded": "reptile sys. t5 zone 1 unit 24w 23inch",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.8571428571428571
+  },
+  {
+    "supply": {
+      "id": 394,
+      "name": "Reptile System T5 Zone 2 24w 6\"",
+      "brand": "Reptile Systems"
+    },
+    "upc": {
+      "upc": "3443981170039",
+      "name_original": "Reptile Sys. T5 Zone 2 24W 6\"",
+      "name_expanded": "reptile sys. t5 zone 2 24w 6inch",
+      "brand": "UNKNOWN",
+      "brand_method": "none",
+      "brand_confidence": "none",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.8
+  },
+  {
+    "supply": {
+      "id": 1520,
+      "name": "Safari Soft Slicker Medium",
+      "brand": "Safari"
+    },
+    "upc": {
+      "upc": "076484004063",
+      "name_original": "Safari Soft Slicker lg",
+      "name_expanded": "safari soft slicker large",
+      "brand": "Safari",
+      "brand_method": "prefix",
+      "brand_confidence": "verified",
+      "brand_keyword": null,
+      "source": "maybe"
+    },
+    "score": 0.75
+  }
+]
