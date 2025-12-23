@@ -27,8 +27,9 @@ export const BRAND_UPC_PREFIXES = {
   
   // Small animal/bird brands
   '071859': ['kaytee'],
-  '034846': ['oxbow'],
+  '744845': ['oxbow'],  // Corrected from 034846
   '071354': ['vitakraft'],
+  '048081': ['prevue', 'prevue pet'],
   
   // Pet food brands
   '064992': ['orijen', 'acana', 'champion petfoods'],
@@ -37,21 +38,25 @@ export const BRAND_UPC_PREFIXES = {
   '072705': ['fromm'],
   '030111': ['royal canin', 'royalcanin'],
   '019014': ['nutro'],
-  '769949': ['taste of the wild', 'diamond', 'diamond naturals'],
+  '769949': ['taste of the wild'],
+  '074198': ['diamond', 'diamond naturals'],
   '840243': ['blue buffalo', 'instinct', "nature's variety"],  // Blue Buffalo also uses 840243!
   '038100': ['purina', 'pro plan', 'beneful', 'friskies', 'fancy feast'],
   '023100': ['pedigree', 'iams', 'eukanuba'],
   
   // Dog/cat accessory brands
-  '076484': ['kong', 'coastal'],  // Coastal also uses 076484 prefix (7648... when truncated)
+  '076484': ['kong', 'coastal', "li'l pals", 'lil pals', 'safari', 'titan', 'lazer brite', 'easy rider'],  // Coastal family brands
   '018214': ['nylabone', 'coastal', "li'l pals", 'lil pals', 'lazer brite', 'easy rider'],  // Nylabone uses 018214 prefix!
   '018065': ['nylabone', "nature's miracle", 'natures miracle'],  // Nylabone also uses 018065
-  '810833': ['benebone'],
+  '854111': ['benebone'],  // Corrected from 810833
   '810039': ['smartbones'],
   '785184': ['redbarn', 'red barn'],
   '642863': ['greenies'],
   '871864': ['whimzees'],
   '660048': ['chuckit', 'chuck it'],
+  '029695': ['petmate', 'chuckit', 'chuck it'],  // Petmate owns Chuckit
+  '022517': ['catit'],
+  '073893': ['nutrisource'],
   '077234': ['ethical pet', 'spot', 'colorful springs'],
   '618940': ['jw pet', 'jw'],
   '045663': ['safari', 'four paws', '4 paws'],
