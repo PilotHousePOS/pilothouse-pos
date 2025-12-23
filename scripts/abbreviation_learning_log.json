@@ -217,15 +217,6 @@
       ]
     },
     {
-      "abbr": "red",
-      "count": 39,
-      "examples": [
-        "Zilla Mini Halogen Bulb 25W Red",
-        "Zilla Mini Halogen Bulb 50W Red",
-        "Zilla Night Red Heat 150W"
-      ]
-    },
-    {
       "abbr": "titan",
       "count": 39,
       "examples": [
@@ -628,15 +619,6 @@
         "Brilliant Salmon Oil",
         "NaturVet Salmon Oil",
         "Grizzly Omega Salmon 8oz"
-      ]
-    },
-    {
-      "abbr": "primal",
-      "count": 24,
-      "examples": [
-        "PRIMAL fro beef nug 3#",
-        "PRIMAL fr rab nug 3#",
-        "PRIMAL fro nug pork 3#"
       ]
     },
     {
@@ -1387,39 +1369,12 @@
       ]
     },
     {
-      "abbr": "prim",
-      "count": 13,
-      "examples": [
-        "PRIM kitr puppy 1.5#",
-        "PRIM kitr puppy 9#",
-        "PRIM kitr beef 1.5#"
-      ]
-    },
-    {
       "abbr": "fro",
       "count": 13,
       "examples": [
         "PRIMAL fro beef nug 3#",
         "PRIMAL fro nug pork 3#",
         "\"PRIMAL fro nug tuk"
-      ]
-    },
-    {
-      "abbr": "fou",
-      "count": 12,
-      "examples": [
-        "FOU SHMP MC REDUCES ODOR 16OZ",
-        "FOU DIAPER WEE WEE DSPL SM 12C",
-        "FOU SHMP MC PUP TEARLESS 16OZ"
-      ]
-    },
-    {
-      "abbr": "dos",
-      "count": 12,
-      "examples": [
-        "DOS LTTR SCOOP WH LG",
-        "DOS LTTR LNR CLEANSTEP JMB 8PK",
-        "DOS LTTR TOP ENTRY PAN SLVR/WH"
       ]
     },
     {
@@ -1585,15 +1540,6 @@
       ]
     },
     {
-      "abbr": "vip",
-      "count": 11,
-      "examples": [
-        "VIP TOU TUFF SPRT TUG-O-WAR YL",
-        "VIP TOY ULT 3WAY TUG BL",
-        "VIP TOY TUFF JR'S TUFF RING RD"
-      ]
-    },
-    {
       "abbr": "tuff",
       "count": 11,
       "examples": [
@@ -1699,15 +1645,6 @@
         "Happy Beaks Two Sided Mirror",
         "Birdie basics 2-sided mirror w bell",
         "Birdie basics 2-sided mirror"
-      ]
-    },
-    {
-      "abbr": "petag",
-      "count": 11,
-      "examples": [
-        "PETAG Dyne 16 oz",
-        "PetAG Dyne 32oz",
-        "PetAg Goats Milk Esbilac milk"
       ]
     },
     {
@@ -7884,72 +7821,6 @@
         "Quiet Time Reverseible Bed 18\"",
         "Quiet time Bolster Bed Sm White",
         "Quiet Time Reversible Bed 24\""
-      ]
-    },
-    {
-      "prefix": "prim",
-      "count": 13,
-      "examples": [
-        "PRIM kitr puppy 1.5#",
-        "PRIM kitr puppy 9#",
-        "PRIM kitr beef 1.5#",
-        "PRIM kitr ck 1.5#",
-        "PRIM kitr ck 9#"
-      ]
-    },
-    {
-      "prefix": "fou",
-      "count": 12,
-      "examples": [
-        "FOU SHMP MC REDUCES ODOR 16OZ",
-        "FOU DIAPER WEE WEE DSPL SM 12C",
-        "FOU SHMP MC PUP TEARLESS 16OZ",
-        "FOU PADS WEE WEE XL 40CT",
-        "FOU WEE WEE PATCH MD 20X30IN"
-      ]
-    },
-    {
-      "prefix": "dos",
-      "count": 12,
-      "examples": [
-        "DOS LTTR SCOOP WH LG",
-        "DOS LTTR LNR CLEANSTEP JMB 8PK",
-        "DOS LTTR TOP ENTRY PAN SLVR/WH",
-        "DOS LTTR LINER TOP ENTRY PAN",
-        "DOS LTTR SCOOP WH JMB"
-      ]
-    },
-    {
-      "prefix": "vip",
-      "count": 11,
-      "examples": [
-        "VIP TOU TUFF SPRT TUG-O-WAR YL",
-        "VIP TOY ULT 3WAY TUG BL",
-        "VIP TOY TUFF JR'S TUFF RING RD",
-        "VIP TOY TUFF SEA CRTRS LOBSTER",
-        "VIP TOY DSRT LIZZY LIZARD"
-      ]
-    },
-    {
-      "prefix": "petag",
-      "count": 11,
-      "examples": [
-        "PETAG Dyne 16 oz",
-        "PetAG Dyne 32oz",
-        "PetAg Goats Milk Esbilac milk",
-        "PetAg Esbilac 2nd Step Powder Milk",
-        "PetAg Esbilac Milk Powder"
-      ]
-    },
-    {
-      "prefix": "red",
-      "count": 11,
-      "examples": [
-        "Red Cross XL Life jacket",
-        "RED B land gr fr 4#",
-        "RED B ocean gr fr 4#",
-        "RED b lg br gr fr 15#",
-        "RED B puppy gr fr 4#"
       ]
     },
     {

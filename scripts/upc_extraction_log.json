@@ -1,10 +1,10 @@
 {
-  "timestamp": "2025-12-23T02:20:43.709Z",
+  "timestamp": "2025-12-23T02:40:51.017Z",
   "steps": [
     {
       "step": "Loading invoice UPCs",
       "details": "Checking available files...",
-      "time": "2025-12-23T02:20:43.712Z"
+      "time": "2025-12-23T02:40:51.020Z"
     },
     {
       "step": "Invoice UPCs loaded",
@@ -12,12 +12,12 @@
         "file": "invoice_extracted_upcs.json",
         "count": 1065
       },
-      "time": "2025-12-23T02:20:43.713Z"
+      "time": "2025-12-23T02:40:51.110Z"
     },
     {
       "step": "Loading maybe inventory UPCs",
       "details": "Checking available files...",
-      "time": "2025-12-23T02:20:43.714Z"
+      "time": "2025-12-23T02:40:51.111Z"
     },
     {
       "step": "Maybe UPCs loaded",
@@ -25,12 +25,12 @@
         "file": "scripts/maybe_upcs_clean_3171.json",
         "count": 3150
       },
-      "time": "2025-12-23T02:20:43.718Z"
+      "time": "2025-12-23T02:40:51.115Z"
     },
     {
       "step": "Loading Google sheet UPCs",
       "details": "Checking available files...",
-      "time": "2025-12-23T02:20:43.719Z"
+      "time": "2025-12-23T02:40:51.115Z"
     },
     {
       "step": "Sheet UPCs loaded",
@@ -38,7 +38,7 @@
         "file": "scripts/google_sheet_upcs.csv",
         "count": 1414
       },
-      "time": "2025-12-23T02:20:43.723Z"
+      "time": "2025-12-23T02:40:51.123Z"
     },
     {
       "step": "Combining all sources",
@@ -48,34 +48,34 @@
         "sheet": 1414,
         "total_before_dedup": 5629
       },
-      "time": "2025-12-23T02:20:43.723Z"
+      "time": "2025-12-23T02:40:51.124Z"
     },
     {
       "step": "After deduplication",
       "details": {
         "unique_upcs": 5083
       },
-      "time": "2025-12-23T02:20:43.726Z"
+      "time": "2025-12-23T02:40:51.129Z"
     },
     {
       "step": "Expanding abbreviations and detecting brands",
       "details": "Processing all UPCs...",
-      "time": "2025-12-23T02:20:43.726Z"
+      "time": "2025-12-23T02:40:51.129Z"
     },
     {
       "step": "Processing complete",
       "details": {
         "total": 5083,
-        "verified_brands": 2873,
+        "verified_brands": 2965,
         "context_detected": 12,
-        "unknown_brands": 2198
+        "unknown_brands": 2106
       },
-      "time": "2025-12-23T02:20:44.474Z"
+      "time": "2025-12-23T02:40:52.012Z"
     },
     {
       "step": "Saving results",
       "details": "Writing to files...",
-      "time": "2025-12-23T02:20:44.475Z"
+      "time": "2025-12-23T02:40:52.013Z"
     }
   ],
   "stats": {
@@ -88,7 +88,7 @@
     "by_brand": {
       "Aqueon": 44,
       "API": 43,
-      "UNKNOWN": 2198,
+      "UNKNOWN": 2106,
       "Hikari": 30,
       "Aquatop": 4,
       "World Wide Imports": 8,
@@ -98,6 +98,7 @@
       "JW Pet": 27,
       "Kong": 331,
       "Ethical Pet": 38,
+      "Four Paws": 24,
       "Monster Pet Food": 9,
       "Iams": 10,
       "Mammoth": 21,
@@ -110,11 +111,12 @@
       "Zoo Med": 279,
       "Oxbow": 44,
       "A&E Cage": 18,
-      "Petmate": 51,
+      "Petmate": 63,
       "Coastal": 169,
       "Instinct": 1,
       "NaturVet": 37,
       "Fashion Pet": 38,
+      "Tuffy": 32,
       "Benebone": 5,
       "Nutrisource": 72,
       "Canidae": 5,
@@ -131,14 +133,14 @@
       "Prevue": 10,
       "Earthbath": 2,
       "Furminator": 11,
+      "PetAg": 11,
       "Tomlyn": 4,
       "Safari": 52,
       "Catit": 57,
       "Titan": 39,
-      "Four Paws": 12,
+      "RedBarn": 11,
       "Vital Essentials": 26,
       "Blue Buffalo": 51,
-      "Tuffy": 21,
       "Chuckit": 14,
       "Science Diet": 202,
       "Royal Canin": 11,
@@ -150,23 +152,24 @@
       "Orijen": 18,
       "Eukanuba": 9,
       "Pro Plan": 75,
+      "Primal": 35,
       "Greenies": 4,
       "Wellness": 2,
       "Fluval": 36
     },
     "by_detection_method": {
-      "prefix": 2444,
+      "prefix": 2536,
       "name_match": 429,
       "context": 12,
-      "none": 2198
+      "none": 2106
     },
     "by_confidence": {
-      "verified": 2873,
+      "verified": 2965,
       "high": 12,
       "medium": 0,
-      "none": 2198
+      "none": 2106
     },
-    "unknown_brand_count": 2198
+    "unknown_brand_count": 2106
   },
   "unknownAbbreviations": {
     "bulb": {
@@ -407,14 +410,6 @@
       "contexts": [
         "PBG CLGN FNC 12OZ",
         "PBG SHMP FNC ORIG 18OZ"
-      ]
-    },
-    "fou": {
-      "count": 12,
-      "contexts": [
-        "FOU SHMP MC REDUCES ODOR 16OZ",
-        "FOU DIAPER WEE WEE DSPL SM 12C",
-        "FOU SHMP MC PUP TEARLESS 16OZ"
       ]
     },
     "mc": {
@@ -2010,14 +2005,6 @@
         "JWP FRD WTR BIRD CUP SM"
       ]
     },
-    "dos": {
-      "count": 12,
-      "contexts": [
-        "DOS LTTR SCOOP WH LG",
-        "DOS LTTR LNR CLEANSTEP JMB 8PK",
-        "DOS LTTR TOP ENTRY PAN SLVR/WH"
-      ]
-    },
     "scoop": {
       "count": 18,
       "contexts": [
@@ -3017,14 +3004,6 @@
         "ETH TOY FUN FOOD DOGRITOS 14IN",
         "Spot kitty fun tubes",
         "SPOT Springy Fun w Pom-Pom"
-      ]
-    },
-    "vip": {
-      "count": 11,
-      "contexts": [
-        "VIP TOU TUFF SPRT TUG-O-WAR YL",
-        "VIP TOY ULT 3WAY TUG BL",
-        "VIP TOY TUFF JR'S TUFF RING RD"
       ]
     },
     "tou": {
@@ -6510,14 +6489,6 @@
         "Reptology Lava rock Plant"
       ]
     },
-    "red": {
-      "count": 39,
-      "contexts": [
-        "Zilla Mini Halogen Bulb 25W Red",
-        "Zilla Mini Halogen Bulb 50W Red",
-        "Zilla Night Red Heat 150W"
-      ]
-    },
     "series": {
       "count": 5,
       "contexts": [
@@ -9157,14 +9128,6 @@
       "count": 1,
       "contexts": [
         "Canine Red Cell"
-      ]
-    },
-    "petag": {
-      "count": 11,
-      "contexts": [
-        "PETAG Dyne 16 oz",
-        "PetAG Dyne 32oz",
-        "PetAg Goats Milk Esbilac milk"
       ]
     },
     "dyne": {
@@ -13164,14 +13127,6 @@
         "ORIJ tundra fd 8oz"
       ]
     },
-    "prim": {
-      "count": 13,
-      "contexts": [
-        "PRIM kitr puppy 1.5#",
-        "PRIM kitr puppy 9#",
-        "PRIM kitr beef 1.5#"
-      ]
-    },
     "kitr": {
       "count": 6,
       "contexts": [
@@ -13917,14 +13872,6 @@
         "FRESHPET vital cuts 1.5#"
       ]
     },
-    "primal": {
-      "count": 24,
-      "contexts": [
-        "PRIMAL fro beef nug 3#",
-        "PRIMAL fr rab nug 3#",
-        "PRIMAL fro nug pork 3#"
-      ]
-    },
     "fro": {
       "count": 13,
       "contexts": [
@@ -14584,17 +14531,6 @@
       ],
       "status": "NEEDS_VERIFICATION"
     },
-    "fou": {
-      "count": 12,
-      "examples": [
-        "FOU SHMP MC REDUCES ODOR 16OZ",
-        "FOU DIAPER WEE WEE DSPL SM 12C",
-        "FOU SHMP MC PUP TEARLESS 16OZ",
-        "FOU PADS WEE WEE XL 40CT",
-        "FOU WEE WEE PATCH MD 20X30IN"
-      ],
-      "status": "NEEDS_VERIFICATION"
-    },
     "gre": {
       "count": 26,
       "examples": [
@@ -14706,17 +14642,6 @@
       ],
       "status": "NEEDS_VERIFICATION"
     },
-    "dos": {
-      "count": 12,
-      "examples": [
-        "DOS LTTR SCOOP WH LG",
-        "DOS LTTR LNR CLEANSTEP JMB 8PK",
-        "DOS LTTR TOP ENTRY PAN SLVR/WH",
-        "DOS LTTR LINER TOP ENTRY PAN",
-        "DOS LTTR SCOOP WH JMB"
-      ],
-      "status": "NEEDS_VERIFICATION"
-    },
     "lll": {
       "count": 1,
       "examples": [
@@ -14816,17 +14741,6 @@
         "EAP CLNG PUP/KTTN BABY PWD 4OZ",
         "EAP CLNG CALM LAV/CHMML 4OZ",
         "EAP SHMP 2IN1 SHMP & COND 20OZ"
-      ],
-      "status": "NEEDS_VERIFICATION"
-    },
-    "vip": {
-      "count": 11,
-      "examples": [
-        "VIP TOU TUFF SPRT TUG-O-WAR YL",
-        "VIP TOY ULT 3WAY TUG BL",
-        "VIP TOY TUFF JR'S TUFF RING RD",
-        "VIP TOY TUFF SEA CRTRS LOBSTER",
-        "VIP TOY DSRT LIZZY LIZARD"
       ],
       "status": "NEEDS_VERIFICATION"
     },
@@ -15401,17 +15315,6 @@
       ],
       "status": "NEEDS_VERIFICATION"
     },
-    "petag": {
-      "count": 11,
-      "examples": [
-        "PETAG Dyne 16 oz",
-        "PetAG Dyne 32oz",
-        "PetAg Goats Milk Esbilac milk",
-        "PetAg Esbilac 2nd Step Powder Milk",
-        "PetAg Esbilac Milk Powder"
-      ],
-      "status": "NEEDS_VERIFICATION"
-    },
     "nt": {
       "count": 1,
       "examples": [
@@ -15632,17 +15535,6 @@
         "Zippy Paws Med Life Jacket",
         "Zippy Paws Lg Life Jacket",
         "ZIPPY PAWS JIGGLERZ FOX"
-      ],
-      "status": "NEEDS_VERIFICATION"
-    },
-    "red": {
-      "count": 11,
-      "examples": [
-        "Red Cross XL Life jacket",
-        "RED B land gr fr 4#",
-        "RED B ocean gr fr 4#",
-        "RED b lg br gr fr 15#",
-        "RED B puppy gr fr 4#"
       ],
       "status": "NEEDS_VERIFICATION"
     },
@@ -15954,17 +15846,6 @@
         "ORIJ orig fd 8oz",
         "ORIJ tundra fd 8oz",
         "ORIJ orig bites 6oz"
-      ],
-      "status": "NEEDS_VERIFICATION"
-    },
-    "prim": {
-      "count": 13,
-      "examples": [
-        "PRIM kitr puppy 1.5#",
-        "PRIM kitr puppy 9#",
-        "PRIM kitr beef 1.5#",
-        "PRIM kitr ck 1.5#",
-        "PRIM kitr ck 9#"
       ],
       "status": "NEEDS_VERIFICATION"
     },
@@ -16147,17 +16028,6 @@
       ],
       "status": "needs_review"
     },
-    "fou": {
-      "count": 12,
-      "examples": [
-        "FOU SHMP MC REDUCES ODOR 16OZ",
-        "FOU DIAPER WEE WEE DSPL SM 12C",
-        "FOU SHMP MC PUP TEARLESS 16OZ",
-        "FOU PADS WEE WEE XL 40CT",
-        "FOU WEE WEE PATCH MD 20X30IN"
-      ],
-      "status": "needs_review"
-    },
     "gre": {
       "count": 26,
       "examples": [
@@ -16269,17 +16139,6 @@
       ],
       "status": "needs_review"
     },
-    "dos": {
-      "count": 12,
-      "examples": [
-        "DOS LTTR SCOOP WH LG",
-        "DOS LTTR LNR CLEANSTEP JMB 8PK",
-        "DOS LTTR TOP ENTRY PAN SLVR/WH",
-        "DOS LTTR LINER TOP ENTRY PAN",
-        "DOS LTTR SCOOP WH JMB"
-      ],
-      "status": "needs_review"
-    },
     "lll": {
       "count": 1,
       "examples": [
@@ -16379,17 +16238,6 @@
         "EAP CLNG PUP/KTTN BABY PWD 4OZ",
         "EAP CLNG CALM LAV/CHMML 4OZ",
         "EAP SHMP 2IN1 SHMP & COND 20OZ"
-      ],
-      "status": "needs_review"
-    },
-    "vip": {
-      "count": 11,
-      "examples": [
-        "VIP TOU TUFF SPRT TUG-O-WAR YL",
-        "VIP TOY ULT 3WAY TUG BL",
-        "VIP TOY TUFF JR'S TUFF RING RD",
-        "VIP TOY TUFF SEA CRTRS LOBSTER",
-        "VIP TOY DSRT LIZZY LIZARD"
       ],
       "status": "needs_review"
     },
@@ -16964,17 +16812,6 @@
       ],
       "status": "needs_review"
     },
-    "petag": {
-      "count": 11,
-      "examples": [
-        "PETAG Dyne 16 oz",
-        "PetAG Dyne 32oz",
-        "PetAg Goats Milk Esbilac milk",
-        "PetAg Esbilac 2nd Step Powder Milk",
-        "PetAg Esbilac Milk Powder"
-      ],
-      "status": "needs_review"
-    },
     "nt": {
       "count": 1,
       "examples": [
@@ -17195,17 +17032,6 @@
         "Zippy Paws Med Life Jacket",
         "Zippy Paws Lg Life Jacket",
         "ZIPPY PAWS JIGGLERZ FOX"
-      ],
-      "status": "needs_review"
-    },
-    "red": {
-      "count": 11,
-      "examples": [
-        "Red Cross XL Life jacket",
-        "RED B land gr fr 4#",
-        "RED B ocean gr fr 4#",
-        "RED b lg br gr fr 15#",
-        "RED B puppy gr fr 4#"
       ],
       "status": "needs_review"
     },
@@ -17517,17 +17343,6 @@
         "ORIJ orig fd 8oz",
         "ORIJ tundra fd 8oz",
         "ORIJ orig bites 6oz"
-      ],
-      "status": "needs_review"
-    },
-    "prim": {
-      "count": 13,
-      "examples": [
-        "PRIM kitr puppy 1.5#",
-        "PRIM kitr puppy 9#",
-        "PRIM kitr beef 1.5#",
-        "PRIM kitr ck 1.5#",
-        "PRIM kitr ck 9#"
       ],
       "status": "needs_review"
     },

@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application designed to enhance the store's online presence, service accessibility, and product sales. It supports pet browsing, grooming appointment booking, and pet supply purchasing, including exotic reptiles. The application aims to provide a comprehensive online platform that boosts sales and streamlines operations, integrating inventory management, customer accounts, and administrative functionalities.
+The Animal House Pet Store project is a mobile-friendly web application designed to enhance the store's online presence, service accessibility, and product sales. It supports pet browsing, grooming appointment booking, and pet supply purchasing, including exotic reptiles. The application aims to provide a comprehensive online platform that boosts sales, streamlines operations, and integrates inventory management, customer accounts, and administrative functionalities.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -42,26 +42,13 @@ The application is a full-stack web application featuring a React frontend (Vite
 - Universal back button and force refresh button in admin dashboard.
 
 **Technical Implementations & Feature Specifications:**
-- **Pet & Supply Management:** Multi-image support, extensive inventory, automated brand extraction, specialized reptile supply filtering, case-insensitive search with pagination and touch gestures.
-- **Appointment System:** 15-minute intervals, admin approval, email notifications, Google Calendar sync, customer tracking, weekly limits, special date configurations, groomer assignment, role-based access, multi-pet booking, and comprehensive history with timezone-aware date comparison.
-- **Order & Notification System:** Admin notifications for new orders/appointments, customer notifications for status updates, and detailed order history.
-- **Authentication & Authorization:** JWT tokens in secure cookies, password reset, user settings, admin user management, and a three-tier role system (Customer, Groomer, Admin).
-- **Wishlist System:** Dedicated page with add/remove and quick "Add to Cart."
-- **Google Calendar & Contact Management:** Integrated Google Calendar, unified calendar view, hybrid contact system with multi-pet support, and event creation from contacts.
-- **Groomer Management System:** Admin CRUD operations for groomers.
-- **Content Management:** Dedicated pages for Aquatics and Exotic Reptiles, filtered by species. Aquatics page includes subcategory filters (Fish Food, Medicine, Supplies) with evidence-based categorization.
-- **Admin Order Management:** Displays actual product/pet and customer names in order details.
-- **Orders & Appointments Search:** Unified search in admin panel by customer name, phone, or pet name.
-- **Pet Boarding/Babysitting System:** Complete boarding management with intelligent cost calculation, flexible date management, status tracking, and admin-only access.
-- **Database Sync Tools:** Staging import with duplicate prevention, supplies-only sync, and full database sync.
-- **Auto-Categorization System:** Single-button operation for specialty section and product type classification based on brand and keyword analysis, including Live Animal Detection and record creation. Includes Category Cleanup step that normalizes category names (kennel→dogCages, smallAnimalSupplies→smallanimal, "cat toy"→toys), splits food→dogFood/catFood, fixes clothing items to accessories, syncs filter_type with category, and corrects misplaced products (beefhide→dogTreats).
-- **Smart Abbreviation Expansion System:** Comprehensive, research-based abbreviation expansion for major pet food and treat brands (server/abbreviationExpansion.ts) with critical verification against official sources. Includes context-aware expansions.
-- **Brand Extraction & Assignment System:** Comprehensive brand database (80+ brands) with automated brand detection via `extractBrand()` function and category-specific brand handling. Includes abbreviation normalization and a brand backfill migration script for automated assignment.
-- **Product Image Management System:** Statistics dashboard, manual and automated batch image search with preview and approval, and admin-only access.
-- **Employee & Grooming Schedule Management Systems:** Sectioned schedule views, editable grids, employee/groomer management, flexible time slots, batch save, and admin-only access.
-- **AI-Powered Order Photo Upload System:** Upload supplier order photos to extract items automatically using GPT-5 vision, with adjustable price multipliers, editable extracted items, bulk add to inventory with automatic categorization, and photo management. Includes a production-ready Live Animal Detection System with species categorization rules and custom pricing.
-- **Astro Loyalty Integration:** Customer loyalty program integration including automatic account linking, purchase sync, and frequent buyer program monitoring.
-- **POS Integration System:** Real-time price and inventory synchronization with external Point of Sale systems, priority-based override logic, tracking fields, webhook-based sync, and an admin dashboard.
+- **Core Management**: Pet & Supply Management (multi-image, extensive inventory, automated brand extraction), Appointment System (15-min intervals, admin approval, email notifications, Google Calendar sync), Order & Notification System.
+- **Authentication & Authorization**: JWT tokens, password reset, user settings, admin user management, three-tier role system (Customer, Groomer, Admin).
+- **Specialized Systems**: Wishlist, Google Calendar & Contact Management, Groomer Management, Content Management (Aquatics/Exotic Reptiles pages with subcategory filters), Admin Order Management, Orders & Appointments Search.
+- **Advanced Management**: Pet Boarding/Babysitting, Database Sync Tools (staging import, supplies-only sync, full sync), Auto-Categorization System (brand/keyword analysis, Live Animal Detection, category cleanup), Smart Abbreviation Expansion, Brand Extraction & Assignment.
+- **Admin Tools**: Product Image Management (dashboard, batch search/preview), Employee & Grooming Schedule Management.
+- **AI & Integrations**: AI-Powered Order Photo Upload (GPT-5 Vision for item extraction, auto-categorization, custom pricing), Astro Loyalty Integration, POS Integration (real-time sync, webhooks).
+- **UPC Matching System**: A strict system for matching UPCs to products with 90% coverage and 100% accuracy, employing abbreviation expansion, text normalization, and verified brand mappings. Strict validation rules apply to size, wattage, weight/volume, dimensions, cup/capacity, and length. Includes critical product type exclusions and a comprehensive brand prefix expansion dictionary.
 
 **System Design Choices:**
 - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
@@ -93,75 +80,40 @@ The application is a full-stack web application featuring a React frontend (Vite
 ### Overview
 - **Target**: 90% coverage with 100% accuracy (zero errors tolerated)
 - **Total supplies**: 7,225
-- **Total UPCs available**: 5,302 (from FLAGGED_ALL_UPCS.json)
+- **Total UPCs available**: 5,083 (deduplicated from 3 sources: invoice 1,065 + maybe 2,738 + spreadsheet 1,280)
 - **Current progress**: 54.5% matched (3,941 products)
-- **Philosophy**: NO lower thresholds - improvements come from better abbreviation expansion and text normalization only
+- **Brand detection**: 2,965 verified (prefix+name match), 12 context-detected, 2,106 unknown
+- **Philosophy**: NO lower thresholds - improvements come from better abbreviation expansion, text normalization, and VERIFIED brand mappings only
 
 ### Key Files
-- `scripts/FLAGGED_ALL_UPCS.json` - Master UPC database with 5,302 UPCs, brand-flagged
-- `scripts/smart-match-v2.mjs` - Main strict matching script with brand prefix expansion
+- `scripts/ALL_UPCS_EXPANDED.json` - Master UPC database with 5,083 UPCs, brand-detected and expanded
+- `scripts/upc-extraction-with-logging.mjs` - Main extraction script with comprehensive logging
+- `scripts/abbreviation_learning_log.json` - Learning log for unknown abbreviations and brand prefixes
+- `scripts/upc_extraction_log.json` - Full extraction log with stats and unverified prefixes
+- `scripts/smart-match-v2.mjs` - Strict matching script with brand prefix expansion
 - `scripts/batch-apply.mjs` - Batch application with dimension/cup/length filtering
-- `scripts/audit-abbreviations.mjs` - Audit script to find missing abbreviations by brand
-- `scripts/UPC_MATCHING_RULES.md` - Detailed matching rules documentation
 
 ### Validation Rules (STRICT - All Must Pass)
-1. **Size Matching**: xxsmall, xsmall, small, mini, medium, large, xlarge, xxlarge, jumbo, giant (small ≠ xsmall, large ≠ xlarge)
-2. **Wattage Matching**: Extract with `/(\d+)\s*w\b/i` - must match exactly (25W ≠ 50W)
-3. **Weight/Volume Matching**: oz, lb, g, ml, qt, gal - value AND unit must match exactly
-4. **Dimension Matching**: Normalized (5" = 5in = 5inch), must match exactly (13" ≠ 7", 12" ≠ 11")
+1. **Size Matching**: xxsmall, xsmall, small, mini, medium, large, xlarge, xxlarge, jumbo, giant
+2. **Wattage Matching**: Must match exactly (25W ≠ 50W)
+3. **Weight/Volume Matching**: Value AND unit must match exactly
+4. **Dimension Matching**: Normalized (5" = 5in = 5inch), must match exactly
 5. **Cup/Capacity Matching**: 1 cup ≠ 7 cup
-6. **Length Matching**: Foot measurements (15' ≠ 10', 30' ≠ 20')
+6. **Length Matching**: Foot measurements must match (15' ≠ 10')
 
-### Critical Product Type Exclusions
-- wheel/millet, wheel/spray, wheel/food
-- dish/mat, dish/heater, dish/lamp
-- bowl/mat, bowl/heater
-- cage/food, cage/treat, tank/food, tank/treat
-- bulb/mat, bulb/dish, lamp/dish, lamp/bowl
-- toy/food, toy/treat, collar/food, leash/treat
+### Brand Prefix Expansion (80+ verified mappings)
+Never auto-promote unverified prefixes - all mappings must be user-confirmed!
+- **Aquarium**: AQE/AQA→Aqueon, TET→Tetra, HIK/HKR→Hikari, ATP→Aquatop, WWI→World Wide Imports, SLI/SCM→SeaChem, FLV→Fluval, API→API, GLF→GloFish, PENN→Penn-Plax
+- **Reptile**: ZMD/ZM/ZML→Zoo Med, EXO→Exo Terra, ZIL→Zilla, FLK/FSK/FLU→Flukers, KMD/KOM→Komodo, PGE→Pangea
+- **Dog/Cat**: KON/KNG→Kong, CST/COA→Coastal, NYL→Nylabone, BEN→Benebone, SMB/SMBN→SmartBones, RDB/RED→RedBarn, GRN→Greenies, WHI→Whimzees, CHT→Chuckit, ETH→Ethical Pet, SPT→Spot, JWP/JW→JW Pet, SAF→Safari, TRC/TRP/TRO→TropiClean, FRP/FOU→Four Paws, NVT→NaturVet, FAS→Fashion Pet, PTS/DOS→Petmate, MPS/MRP/MUL→Multipet, MAM→Mammoth, TUF/VIP→Tuffy, CATIT→Catit, PETAG→PetAg
+- **Small Animal/Bird**: KAY/KMP→Kaytee, OXB→Oxbow, VTK→Vitakraft, LAF→Lafebers, AEC→A&E Cage
+- **Food**: SD/HSD→Science Diet, BB/BLU/BLUE→Blue Buffalo, RC→Royal Canin, NUT/NBS/SOU→Nutrisource, FRM/FROMM→Fromm, DIA/DIAM→Diamond, TOW/TAS→Taste of the Wild, PRIM→Primal, INS→Instinct, PP/PRO→Pro Plan, VIT→Vital Essentials
 
-### Brand Prefix Expansion (40+ mappings)
-UPC names often start with abbreviated brand codes:
-- **AQE/AQA** → Aqueon, **KON/KNG** → Kong, **AEC** → A&E Cage
-- **ZMD/ZM** → Zoo Med, **EXO** → Exo Terra, **ZIL** → Zilla
-- **CST** → Coastal, **PPX** → Penn-Plax, **TET** → Tetra
-- **NYL** → Nylabone, **OXB** → Oxbow, **BEN** → Benebone
-
-### Abbreviation Dictionary (200+ mappings in smart-match-v2.mjs)
-- **Products**: fd→food, trt→treat, chw→chew, bwl→bowl, dsh→dish, fltr→filter, clnr→cleaner, vac→vacuum, grvl→gravel
-- **Sizes**: sm→small, md→medium, lg→large, xl→xlarge, xsm→xsmall, jmb→jumbo, gnt→giant
-- **Colors**: blk→black, blu→blue, wht→white, rd→red, grn→green, ylw→yellow, org→orange
-- **Animals**: dg→dog, ct→cat, fsh→fish, rptl→reptile, brd→bird, ham→hamster, rbbt→rabbit
-
-### Dimension Normalization
-Text is normalized before token matching:
-- `5"` → `5inch`, `5in` → `5inch`, `5 inch` → `5inch`
-- `5'` → `5ft`, `5ft` → `5ft`, `5 feet` → `5ft`
-- `20x10` → `20by10` (dimensions with "x")
-
-### Usage
-```bash
-# Run matching for a brand
-npx tsx scripts/smart-match-v2.mjs "Brand Name" 0.55 50
-
-# Apply matches with dimension filtering
-npx tsx scripts/batch-apply.mjs
-
-# Audit a brand to find missing abbreviations
-npx tsx scripts/audit-abbreviations.mjs "Brand Name"
-```
-
-### Common Errors to Catch
-- Wattage mismatches (25W vs 50W, 75W vs 100W)
-- Dimension mismatches (13" vs 7", 12" vs 11")
-- Size number mismatches (Size 1 vs Size 4)
-- Product type conflicts (Wheel vs Millet, Dish vs Mat)
-- Corner vs non-corner products
-- Length mismatches (15' vs 10', 30' vs 20')
-- Cup mismatches (1 cup vs 7 cup)
+**Distributor codes (NOT brands)**: GAR=Garmon Corp distributes NaturVet - use context detection instead
 
 ### Progress Notes
-- 2024-12: Fixed brand prefix assignments (85 UPCs reassigned based on AQE→Aqueon, KON→Kong, etc.)
-- 2024-12: Added dimension normalization (5" = 5in = 5inch for consistent matching)
-- 2024-12: Batch apply script now filters dimension, cup, and foot length mismatches
-- Remaining gap: Many brands have UPCs available but DB names use completely different product naming conventions (not abbreviation issues)
+- 2024-12: Created comprehensive logging system that tracks unknown abbreviations and brand prefixes
+- 2024-12: Added verified brand prefixes: MUL→Multipet, KOM→Komodo, FOU→Four Paws, DOS→Petmate, VIP→Tuffy, PETAG→PetAg, RED→RedBarn, PRIM→Primal
+- 2024-12: Added context-based detection for GAR (Garmon Corp distributor) → NaturVet products via keywords
+- 2024-12: Established verification workflow: Never auto-promote prefixes - all mappings must be user-confirmed
+- Remaining gap: 2,106 UPCs still have unknown brands - check abbreviation_learning_log.json for candidates
