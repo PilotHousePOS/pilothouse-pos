@@ -38,14 +38,14 @@ export const BRAND_UPC_PREFIXES = {
   '030111': ['royal canin', 'royalcanin'],
   '019014': ['nutro'],
   '769949': ['taste of the wild', 'diamond', 'diamond naturals'],
-  '840243': ['instinct', "nature's variety"],
+  '840243': ['blue buffalo', 'instinct', "nature's variety"],  // Blue Buffalo also uses 840243!
   '038100': ['purina', 'pro plan', 'beneful', 'friskies', 'fancy feast'],
   '023100': ['pedigree', 'iams', 'eukanuba'],
   
   // Dog/cat accessory brands
   '076484': ['kong'],
-  '018214': ['coastal', "li'l pals", 'lil pals', 'lazer brite', 'easy rider'],
-  '018065': ['nylabone', "nature's miracle", 'natures miracle'],
+  '018214': ['nylabone', 'coastal', "li'l pals", 'lil pals', 'lazer brite', 'easy rider'],  // Nylabone uses 018214 prefix!
+  '018065': ['nylabone', "nature's miracle", 'natures miracle'],  // Nylabone also uses 018065
   '810833': ['benebone'],
   '810039': ['smartbones'],
   '785184': ['redbarn', 'red barn'],
@@ -56,6 +56,12 @@ export const BRAND_UPC_PREFIXES = {
   '618940': ['jw pet', 'jw'],
   '045663': ['safari', 'four paws', '4 paws'],
   '645095': ['tropiclean', 'tropi clean'],
+  '693804': ['dogswell'],
+  '768303': ['cadet'],
+  
+  // Additional small animal prefixes  
+  '045125': ['kaytee'],  // Kaytee also uses this prefix
+  '730582': ['living world', 'friendsfarm', 'hagen'],
 };
 
 /**
