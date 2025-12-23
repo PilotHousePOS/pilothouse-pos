@@ -5,41 +5,67 @@ import { sql, eq, isNull, and } from 'drizzle-orm';
 
 // ===== BRAND PREFIX EXPANSIONS =====
 const BRAND_PREFIXES = {
+  // Aquarium
   'aqe': 'aqueon', 'aqa': 'aqueon',
-  'kon': 'kong', 'kng': 'kong',
-  'aec': 'ae cage',
-  'zmd': 'zoo med', 'zm': 'zoo med', 'zoomed': 'zoo med',
+  'tet': 'tetra', 'mar': 'marineland', 'flv': 'fluval',
+  'scm': 'seachem', 'sli': 'seachem', 'hkr': 'hikari', 'hik': 'hikari',
+  'atp': 'aquatop', 'api': 'api', 'glf': 'glofish',
+  'penn': 'penn plax', 'ppx': 'penn plax',
+  'marina': 'marina',
+  // Reptile
+  'zmd': 'zoo med', 'zm': 'zoo med', 'zml': 'zoo med', 'zoomed': 'zoo med',
   'exo': 'exo terra', 'exoterra': 'exo terra',
-  'zil': 'zilla',
-  'kay': 'kaytee',
-  'cst': 'coastal',
-  'ppx': 'penn plax', 'pennplax': 'penn plax',
-  'flk': 'flukers',
-  'hkr': 'hikari',
-  'tet': 'tetra',
-  'mar': 'marineland',
-  'flv': 'fluval',
-  'scm': 'seachem',
-  'nyl': 'nylabone',
-  'oxb': 'oxbow',
-  'ben': 'benebone',
-  'smb': 'smartbones', 'smbn': 'smartbones',
-  'bwi': 'barkworthies',
+  'zil': 'zilla', 'zilla': 'zilla',
+  'flk': 'flukers', 'fsk': 'flukers', 'flu': 'flukers',
+  'kmd': 'komodo', 'kom': 'komodo',
+  'pge': 'pangea', 'reptology': 'reptology', 'repto': 'reptology',
+  // Dog/Cat
+  'kon': 'kong', 'kng': 'kong', 'kong': 'kong',
+  'cst': 'coastal', 'coa': 'coastal',
+  'nyl': 'nylabone', 'nyla': 'nylabone',
+  'ben': 'benebone', 'smb': 'smartbones', 'smbn': 'smartbones',
+  'rdb': 'redbarn', 'red': 'redbarn', 'rbp': 'redbarn',
+  'grn': 'greenies', 'gre': 'greenies',
+  'whi': 'whimzees', 'cht': 'chuckit',
+  'eth': 'ethical pet', 'spt': 'spot',
+  'jwp': 'jw pet', 'jw': 'jw pet',
+  'saf': 'safari', 'trc': 'tropiclean', 'trp': 'tropiclean', 'freshbreathe': 'tropiclean',
+  'frp': 'four paws', 'fou': 'four paws', 'weewee': 'four paws', 'magiccoat': 'four paws',
+  'nvt': 'naturvet', 'fas': 'fashion pet',
+  'pts': 'petmate', 'dos': 'petmate',
+  'mps': 'multipet', 'mrp': 'multipet', 'mul': 'multipet',
+  'mam': 'mammoth', 'mamm': 'mammoth',
+  'tit': 'titan', 'prv': 'prevue', 'ph': 'prevue',
   'llp': 'lil pals', 'lilpals': 'lil pals',
-  'spt': 'spot',
-  'tit': 'titan',
-  'prv': 'prevue', 'ph': 'prevue hendrix',
-  'jwp': 'jw pet', 'jw': 'jw',
-  'saf': 'safari',
-  'trc': 'tropiclean',
-  'frp': 'four paws', 'fourpaws': 'four paws',
-  'nvt': 'naturvet',
-  'brd': 'birdlife',
-  'kmd': 'komodo',
-  'vtk': 'vitakraft',
-  'mrp': 'multipet',
-  'tuf': 'tuffy',
-  'pge': 'pangea',
+  'tuf': 'tuffy', 'vip': 'tuffy',
+  'catit': 'catit', 'petag': 'petag',
+  'circle': 'circle t', 'rascals': 'rascals', 'turbo': 'turbo',
+  'naturesmiracle': 'natures miracle', 'skoutshonor': 'skouts honor',
+  'quiettime': 'midwest', 'quiet': 'midwest',
+  'sodapup': 'sodapup', 'vanness': 'van ness',
+  'lov': 'loving pets', 'bellabowl': 'loving pets',
+  'meowijuana': 'meowijuana', 'pethonesty': 'pet honesty',
+  'bli': 'bergan', 'vict': 'victor', 'durvet': 'durvet',
+  'biogroom': 'bio groom', 'happybeaks': 'happy beaks',
+  'ela': 'elanco', 'far': 'farnam',
+  // Small animal/bird
+  'kay': 'kaytee', 'kmp': 'kaytee',
+  'oxb': 'oxbow', 'vtk': 'vitakraft', 'vitapol': 'vitapol',
+  'laf': 'lafebers', 'aec': 'ae cage', 'brd': 'birdlife',
+  'zup': 'zupreem', 'higgins': 'higgins', 'sweetharvest': 'sweet harvest',
+  // Food
+  'sd': 'science diet', 'hsd': 'science diet',
+  'bb': 'blue buffalo', 'blu': 'blue buffalo', 'bl': 'blue buffalo',
+  'rc': 'royal canin', 'nut': 'nutrisource', 'nbs': 'nutrisource',
+  'frm': 'fromm', 'dia': 'diamond', 'diam': 'diamond',
+  'wlns': 'wellness', 'welln': 'wellness',
+  'nat': 'natural balance', 'nbp': 'natural balance',
+  'pp': 'pro plan', 'pro': 'pro plan',
+  'tas': 'taste of the wild', 'tow': 'taste of the wild',
+  'ins': 'instinct', 'prim': 'primal',
+  'zign': 'zignature', 'freshpet': 'freshpet',
+  'fussie': 'fussie cat', 'purebites': 'purebites',
+  'health': 'health extensions',
 };
 
 // ===== ABBREVIATION DICTIONARY =====
@@ -141,6 +167,7 @@ const CRITICAL_EXCLUSIONS = [
 
 // ===== NORMALIZER =====
 function normalize(text) {
+  if (!text) return '';
   let result = text.toLowerCase()
     // Normalize dimensions FIRST: 5" -> 5inch, 5in -> 5inch, 5' -> 5ft
     .replace(/(\d+\.?\d*)\s*["'']/g, '$1inch ')
@@ -176,6 +203,7 @@ function normalize(text) {
 
 // ===== EXTRACTORS =====
 function extractSize(name) {
+  if (!name) return null;
   const lower = name.toLowerCase();
   if (/\b(xx-?small|xxs)\b/i.test(lower)) return 'xxsmall';
   if (/\b(x-?small|xsm|xs)\b/i.test(lower)) return 'xsmall';
@@ -193,11 +221,13 @@ function extractSize(name) {
 }
 
 function extractWattage(name) {
+  if (!name) return null;
   const match = name.match(/(\d+)\s*w\b/i);
   return match ? parseInt(match[1]) : null;
 }
 
 function extractWeight(name) {
+  if (!name) return null;
   const patterns = [
     { regex: /(\d+\.?\d*)\s*oz\b/i, unit: 'oz' },
     { regex: /(\d+\.?\d*)\s*lb\b/i, unit: 'lb' },
@@ -215,6 +245,7 @@ function extractWeight(name) {
 }
 
 function extractColor(name) {
+  if (!name) return null;
   const colors = ['black', 'blue', 'red', 'green', 'yellow', 'orange', 
                   'pink', 'purple', 'white', 'gray', 'brown', 'tan',
                   'silver', 'gold', 'clear'];
@@ -325,7 +356,7 @@ async function main() {
   
   console.log(`\n=== SMART MATCH V2: ${brand} (threshold: ${threshold}) ===\n`);
   
-  const allUpcs = JSON.parse(fs.readFileSync('scripts/FLAGGED_ALL_UPCS.json', 'utf-8'));
+  const allUpcs = JSON.parse(fs.readFileSync('scripts/ALL_UPCS_EXPANDED.json', 'utf-8'));
   const brandUpcs = allUpcs.filter(u => u.brand === brand);
   console.log(`UPCs for ${brand}: ${brandUpcs.length}`);
   
@@ -349,7 +380,7 @@ async function main() {
     for (const upcItem of availableUpcs) {
       if (assignedUpcs.has(upcItem.upc)) continue;
       
-      const result = validateMatch(supply.name, upcItem.name);
+      const result = validateMatch(supply.name, upcItem.name_original || upcItem.name);
       if (result.reject) continue;
       
       if (result.score > bestScore && result.score >= threshold) {
@@ -364,7 +395,7 @@ async function main() {
         supplyId: supply.id,
         supplyName: supply.name,
         upc: bestMatch.upc.upc,
-        upcName: bestMatch.upc.name,
+        upcName: bestMatch.upc.name_original || bestMatch.upc.name,
         score: bestMatch.score,
         details: bestMatch.details,
       });

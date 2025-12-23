@@ -1,0 +1,3650 @@
+[
+  {
+    "supplyId": 7018,
+    "supplyName": "Fluval Goldfish Small to Medium 1.6oz",
+    "brand": "Fluval",
+    "upc": "015561165839",
+    "upcName": "FLUVAL goldfish sm to md 1.6oz",
+    "score": 0.9
+  },
+  {
+    "supplyId": 5973,
+    "supplyName": "Science Diet Mobility Small Bite 15.5lb",
+    "brand": "Science Diet",
+    "upc": "052742923901",
+    "upcName": "SD mobility sm bite 15.5#",
+    "score": 0.8142857142857142
+  },
+  {
+    "supplyId": 5940,
+    "supplyName": "Science Diet Puppy Small Bite 12.5lb",
+    "brand": "Science Diet",
+    "upc": "052742060248",
+    "upcName": "SD puppy sm bite 12.5#",
+    "score": 0.8142857142857142
+  },
+  {
+    "supplyId": 5993,
+    "supplyName": "Science Diet Mini Jerkyck",
+    "brand": "Science Diet",
+    "upc": "052742187501",
+    "upcName": "SD mini jerkyck",
+    "score": 0.8
+  },
+  {
+    "supplyId": 5991,
+    "supplyName": "Science Diet Mini Jerky Beef",
+    "brand": "Science Diet",
+    "upc": "052742187402",
+    "upcName": "SD mini jerky beef",
+    "score": 0.8
+  },
+  {
+    "supplyId": 1500,
+    "supplyName": "Freshbreathe Kit Large",
+    "brand": "TropiClean",
+    "upc": "645095001299",
+    "upcName": "FreshBreathe Kit Large",
+    "score": 0.8
+  },
+  {
+    "supplyId": 7079,
+    "supplyName": "Penn Plax 10w Mini Heater",
+    "brand": "Penn-Plax",
+    "upc": "030172094835",
+    "upcName": "PENN PLAX 10w mini heater",
+    "score": 0.8
+  },
+  {
+    "supplyId": 7078,
+    "supplyName": "Penn Plax 25w Mini Heater",
+    "brand": "Penn-Plax",
+    "upc": "030172094842",
+    "upcName": "PENN PLAX 25w mini heater",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6916,
+    "supplyName": "Primal Beef Bone Small",
+    "brand": "Primal",
+    "upc": "850334004508",
+    "upcName": "PRIMAL beef bone sm",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6915,
+    "supplyName": "Primal Beef Bone Medium",
+    "brand": "Primal",
+    "upc": "850334004515",
+    "upcName": "PRIMAL beef bone md",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6914,
+    "supplyName": "Primal Beef Bone Large",
+    "brand": "Primal",
+    "upc": "850334004522",
+    "upcName": "PRIMAL beef bone lg",
+    "score": 0.8
+  },
+  {
+    "supplyId": 1180,
+    "supplyName": "Zupreem Fruitblend Large Birds",
+    "brand": "ZuPreem",
+    "upc": "762177840307",
+    "upcName": "ZuPreem FruitBlend Large Birds",
+    "score": 0.8
+  },
+  {
+    "supplyId": 5951,
+    "supplyName": "Science Diet Lamb Small Bite 33lb",
+    "brand": "Science Diet",
+    "upc": "052742203706",
+    "upcName": "SD lam sm bite 33lb",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6566,
+    "supplyName": "Science Diet Beef 5.8oz",
+    "brand": "Science Diet",
+    "upc": "052742060347",
+    "upcName": "SD pup beef 5.8oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6719,
+    "supplyName": "Science Diet Cat Per Weig 2.9oz",
+    "brand": "Science Diet",
+    "upc": "052742014135",
+    "upcName": "SD cat per weig 2.9oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 5965,
+    "supplyName": "Science Diet Vitality Small 12.5lb",
+    "brand": "Science Diet",
+    "upc": "052742012049",
+    "upcName": "SD vitality sm 12.5#",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6571,
+    "supplyName": "Science Diet Beef Stew 12.8oz",
+    "brand": "Science Diet",
+    "upc": "052742143101",
+    "upcName": "SD beef stew 12.8oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6087,
+    "supplyName": "Science Diet Light Small Bite 5lb",
+    "brand": "Science Diet",
+    "upc": "052742930107",
+    "upcName": "SD light sm bite 5#",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6594,
+    "supplyName": "Science Diet Puppy 13oz",
+    "brand": "Science Diet",
+    "upc": "052742703602",
+    "upcName": "SD pup 13oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6573,
+    "supplyName": "Science Diet Beef 7+ 12.8oz",
+    "brand": "Science Diet",
+    "upc": "052742143408",
+    "upcName": "SD beef 7+ 12.8oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6568,
+    "supplyName": "Science Diet 7+ Beef 5.8oz",
+    "brand": "Science Diet",
+    "upc": "052742496801",
+    "upcName": "SD 7+ beef 5.8oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 5939,
+    "supplyName": "Science Diet Puppy Small Bite 4.5lb",
+    "brand": "Science Diet",
+    "upc": "052742713908",
+    "upcName": "SD puppy sm bite 4.5#",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6592,
+    "supplyName": "Science Diet Beef 13oz",
+    "brand": "Science Diet",
+    "upc": "052742704005",
+    "upcName": "SD ck & beef 13oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6464,
+    "supplyName": "Fromm Immunity 13oz",
+    "brand": "Fromm",
+    "upc": "072705136209",
+    "upcName": "FROMM immunity 13oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6462,
+    "supplyName": "Fromm Digestive 13oz",
+    "brand": "Fromm",
+    "upc": "072705136001",
+    "upcName": "FROMM digestive 13oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6475,
+    "supplyName": "Fromm Seafood 12.2oz",
+    "brand": "Fromm",
+    "upc": "072705119189",
+    "upcName": "FROMM seafood 12.2oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6465,
+    "supplyName": "Fromm Clasic Puppy 12.5oz",
+    "brand": "Fromm",
+    "upc": "072705130085",
+    "upcName": "FROMM clasic puppy 12.5oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6463,
+    "supplyName": "Fromm Mobility 13oz",
+    "brand": "Fromm",
+    "upc": "072705136100",
+    "upcName": "FROMM mobility 13oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6607,
+    "supplyName": "Blue Buffalo Basic Lamb 12.5oz",
+    "brand": "Blue Buffalo",
+    "upc": "840243103799",
+    "upcName": "BL BUF basic lamb 12.5oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6599,
+    "supplyName": "Blue Buffalo Sun Din 12.5oz",
+    "brand": "Blue Buffalo",
+    "upc": "859610006854",
+    "upcName": "BL BUF sun din 12.5oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6608,
+    "supplyName": "Blue Buffalo Free Puppy 12.5oz",
+    "brand": "Blue Buffalo",
+    "upc": "859610006878",
+    "upcName": "BL BUF free pup 12.5oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6609,
+    "supplyName": "Blue Buffalo Free Lamb 12.5oz",
+    "brand": "Blue Buffalo",
+    "upc": "840243102938",
+    "upcName": "BL BUF free lamb 12.5oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6632,
+    "supplyName": "Pro Plan Large Breed Beef 13oz",
+    "brand": "Pro Plan",
+    "upc": "038100026774",
+    "upcName": "PRO PLAN lg br beef 13oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6628,
+    "supplyName": "Pro Plan Beef 5.5oz",
+    "brand": "Pro Plan",
+    "upc": "038100143655",
+    "upcName": "PRO PLAN beef 5.5oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6630,
+    "supplyName": "Pro Plan Puppy 13oz",
+    "brand": "Pro Plan",
+    "upc": "038100181787",
+    "upcName": "PRO PLAN pup turk 13oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6629,
+    "supplyName": "Pro Plan Puppy 5.5oz",
+    "brand": "Pro Plan",
+    "upc": "038100139412",
+    "upcName": "PRO PLAN pup 5.5oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 1436,
+    "supplyName": "Freshbreathe Solution 16oz",
+    "brand": "TropiClean",
+    "upc": "645095001015",
+    "upcName": "FreshBreathe Solution 16oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 1434,
+    "supplyName": "Freshbreathe Hip & Joint 16oz",
+    "brand": "TropiClean",
+    "upc": "645095001541",
+    "upcName": "FreshBreathe Hip&Joint 16oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 1433,
+    "supplyName": "Freshbreathe Support Skin Health 33.8 oz",
+    "brand": "TropiClean",
+    "upc": "645095001848",
+    "upcName": "FreshBreathe Support Skin Health 33.8 oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6827,
+    "supplyName": "Catit Crab 2.8oz",
+    "brand": "Catit",
+    "upc": "022517447161",
+    "upcName": "CATIT crab 2.8oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7192,
+    "supplyName": "Aqueon Sealant Clear 10.3oz",
+    "brand": "Aqueon",
+    "upc": "015905650106",
+    "upcName": "AQUEON sealant clear 10.3oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7153,
+    "supplyName": "Api Accu Clear 1.25oz",
+    "brand": "API",
+    "upc": "317163011119",
+    "upcName": "API accu clear 1.25oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7087,
+    "supplyName": "Seachem Discus Buffer 8.8oz",
+    "brand": "SeaChem",
+    "upc": "000116026604",
+    "upcName": "SEACHEM discus buffer 8.8oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7086,
+    "supplyName": "Seachem Acid Buffer 10.5oz",
+    "brand": "SeaChem",
+    "upc": "000116024600",
+    "upcName": "SEACHEM acid buffer 10.5oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7089,
+    "supplyName": "Seachem Brackish Salt 10.6oz",
+    "brand": "SeaChem",
+    "upc": "000116022606",
+    "upcName": "SEACHEM brackish salt 10.6oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7085,
+    "supplyName": "Seachem Alkaline Buffer 10.5oz",
+    "brand": "SeaChem",
+    "upc": "000116023603",
+    "upcName": "SEACHEM alkaline buffer 10.5oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7098,
+    "supplyName": "Seachem Stability 3.4oz",
+    "brand": "SeaChem",
+    "upc": "000116012508",
+    "upcName": "SEACHEM stability 3.4oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7088,
+    "supplyName": "Seachem Cichlid Lake 8.8oz",
+    "brand": "SeaChem",
+    "upc": "000116027601",
+    "upcName": "SEACHEM cichlid lake 8.8oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7030,
+    "supplyName": "Fluval Bug Bite Tropical .63oz",
+    "brand": "Fluval",
+    "upc": "015561173308",
+    "upcName": "FLUVAL bug bite tropical .63oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7025,
+    "supplyName": "Fluval Bug Bite Spirulina .63oz",
+    "brand": "Fluval",
+    "upc": "015561173544",
+    "upcName": "FLUVAL bug bite spirulina .63oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7031,
+    "supplyName": "Fluval Bug Bite Tripical 1.58oz",
+    "brand": "Fluval",
+    "upc": "015561173315",
+    "upcName": "FLUVAL bug bite tripical 1.58oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7028,
+    "supplyName": "Fluval Bug Bite Color Enhan 1.58oz",
+    "brand": "Fluval",
+    "upc": "015561173476",
+    "upcName": "FLUVAL bug bite color enhan 1.58oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7024,
+    "supplyName": "Fluval Bug Bite Algae Crisp 3.52oz",
+    "brand": "Fluval",
+    "upc": "015561173612",
+    "upcName": "FLUVAL bug bite algae crisp 3.52oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7029,
+    "supplyName": "Fluval Bug Bite Color Enhan 3.17oz",
+    "brand": "Fluval",
+    "upc": "015561173483",
+    "upcName": "FLUVAL bug bite color enhan 3.17oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7020,
+    "supplyName": "Fluval Bottom Feed 1.6oz",
+    "brand": "Fluval",
+    "upc": "015561165860",
+    "upcName": "FLUVAl bottom feed 1.6oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 7023,
+    "supplyName": "Fluval Bug Bite Goldfish .63oz",
+    "brand": "Fluval",
+    "upc": "015561173384",
+    "upcName": "FLUVAL bug bite goldfish .63oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6907,
+    "supplyName": "Primal Goat Milk 32oz",
+    "brand": "Primal",
+    "upc": "850016300454",
+    "upcName": "PRIMAL goat milk cran 32oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6906,
+    "supplyName": "Primal Goat Milk 16oz",
+    "brand": "Primal",
+    "upc": "850334004645",
+    "upcName": "PRIMAL goat milk 16oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 1394,
+    "supplyName": "Petag Dyne 16 oz",
+    "brand": "PetAg",
+    "upc": "020279205104",
+    "upcName": "PETAG Dyne 16 oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 1457,
+    "supplyName": "Petag Nurser Bottle 4oz",
+    "brand": "PetAg",
+    "upc": "020279998044",
+    "upcName": "PetAg Nurser Bottle 4oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 1395,
+    "supplyName": "Petag Dyne 32oz",
+    "brand": "PetAg",
+    "upc": "020279205135",
+    "upcName": "PetAG Dyne 32oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 6551,
+    "supplyName": "Welln 95% Beef 13.2oz",
+    "brand": "Wellness",
+    "upc": "076344894506",
+    "upcName": "WELLN 95% beef 13.2oz",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 2380,
+    "supplyName": "Intersand Odorlock Clmbree 13lb",
+    "brand": "Intersand",
+    "upc": "777979214065",
+    "upcName": "InterSand OdorLock ClmBree 13lb",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 2377,
+    "supplyName": "Intersand Odorlock Unsc 25lb",
+    "brand": "Intersand",
+    "upc": "777979211255",
+    "upcName": "InterSand OdorLock Unsc 25lb",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 2376,
+    "supplyName": "Intersand Odor Lock Unsc 13lb",
+    "brand": "Intersand",
+    "upc": "777979211064",
+    "upcName": "InterSand Odor Lock Unsc 13lb",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 2381,
+    "supplyName": "Intersand Odorlock Clmbree 25lb",
+    "brand": "Intersand",
+    "upc": "777979214256",
+    "upcName": "InterSand OdorLock ClmBree 25lb",
+    "score": 0.7999999999999999
+  },
+  {
+    "supplyId": 5964,
+    "supplyName": "Science Diet Vitality Small 3.5lb",
+    "brand": "Science Diet",
+    "upc": "052742012032",
+    "upcName": "SD vitality sm 3.5#",
+    "score": 0.7799999999999999
+  },
+  {
+    "supplyId": 5961,
+    "supplyName": "Science Diet 7+ Small Bite 33lb",
+    "brand": "Science Diet",
+    "upc": "052742204307",
+    "upcName": "SD 7+ sm bite 33#",
+    "score": 0.7799999999999999
+  },
+  {
+    "supplyId": 5960,
+    "supplyName": "Science Diet 7+ Small Bite 15lb",
+    "brand": "Science Diet",
+    "upc": "052742033181",
+    "upcName": "SD sensi sm bite 15#",
+    "score": 0.7799999999999999
+  },
+  {
+    "supplyId": 6633,
+    "supplyName": "Pro Plan Large Breed 13oz",
+    "brand": "Pro Plan",
+    "upc": "038100026781",
+    "upcName": "PRO PLAN lg br 13oz",
+    "score": 0.7799999999999999
+  },
+  {
+    "supplyId": 5974,
+    "supplyName": "Science Diet Small Mini Perf Weight 12.5lb",
+    "brand": "Science Diet",
+    "upc": "052742060552",
+    "upcName": "SD sm min perf weight 12.5#",
+    "score": 0.7499999999999999
+  },
+  {
+    "supplyId": 5914,
+    "supplyName": "Science Diet Puppy Large Breed 15.5lb",
+    "brand": "Science Diet",
+    "upc": "052742937601",
+    "upcName": "sd puppy lg br 15.5#",
+    "score": 0.7285714285714285
+  },
+  {
+    "supplyId": 5950,
+    "supplyName": "Science Diet Lamb Small Bite 15.5lb",
+    "brand": "Science Diet",
+    "upc": "052742855707",
+    "upcName": "SD lam sm bite 15.5#",
+    "score": 0.7285714285714285
+  },
+  {
+    "supplyId": 6089,
+    "supplyName": "Science Diet Small Mini Perf Weight 4lb",
+    "brand": "Science Diet",
+    "upc": "052742382104",
+    "upcName": "SD sm min perf weight 4#",
+    "score": 0.7285714285714285
+  },
+  {
+    "supplyId": 6582,
+    "supplyName": "Science Diet Perf Dig Chicken Stew 12.8oz",
+    "brand": "Science Diet",
+    "upc": "052742041445",
+    "upcName": "SD perf dig ck stew 12.8oz",
+    "score": 0.725
+  },
+  {
+    "supplyId": 6720,
+    "supplyName": "Science Diet Cat Per Dig Chicken 2.9oz",
+    "brand": "Science Diet",
+    "upc": "052742041605",
+    "upcName": "SD cat per dig ck 2.9oz",
+    "score": 0.7142857142857142
+  },
+  {
+    "supplyId": 6725,
+    "supplyName": "Science Diet Kitten Liv & Chicken 2.9oz",
+    "brand": "Science Diet",
+    "upc": "052742012650",
+    "upcName": "SD kitten liv & ck 2.9oz",
+    "score": 0.7142857142857142
+  },
+  {
+    "supplyId": 6785,
+    "supplyName": "Science Diet Cat Per Dig Ck3.5lb",
+    "brand": "Science Diet",
+    "upc": "052742038315",
+    "upcName": "SD cat per dig ck3.5#",
+    "score": 0.7142857142857142
+  },
+  {
+    "supplyId": 6583,
+    "supplyName": "Science Diet Vita Chicken Stew 12.5oz",
+    "brand": "Science Diet",
+    "upc": "052742011899",
+    "upcName": "SD vita ck stew 12.5oz",
+    "score": 0.7142857142857142
+  },
+  {
+    "supplyId": 6724,
+    "supplyName": "Science Diet Kitten Liv & Chicken 5.5oz",
+    "brand": "Science Diet",
+    "upc": "052742660004",
+    "upcName": "SD kitten liv & ck 5.5oz",
+    "score": 0.7142857142857142
+  },
+  {
+    "supplyId": 6699,
+    "supplyName": "Pro Plan Cat Tun & Shrimp 3oz",
+    "brand": "Pro Plan",
+    "upc": "038100170316",
+    "upcName": "PRO PLAN cat tun & shri 3oz",
+    "score": 0.7142857142857142
+  },
+  {
+    "supplyId": 5984,
+    "supplyName": "Science Diet Sensitive Small Bite 15lb",
+    "brand": "Science Diet",
+    "upc": "052742020488",
+    "upcName": "SD sm bite ck 15#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6714,
+    "supplyName": "Science Diet Cat Tend Chicken 5.5oz",
+    "brand": "Science Diet",
+    "upc": "052742177007",
+    "upcName": "SD cat tend ck 5.5oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 5945,
+    "supplyName": "Science Diet Small Bite Chicken 15lb",
+    "brand": "Science Diet",
+    "upc": "052742022130",
+    "upcName": "SD light sm bite 15#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 5946,
+    "supplyName": "Science Diet Small Bite Chicken 35lb",
+    "brand": "Science Diet",
+    "upc": "052742015989",
+    "upcName": "SD sm bite ck 35#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 5926,
+    "supplyName": "Science Diet Small Breed 11+ 15.5",
+    "brand": "Science Diet",
+    "upc": "052742253404",
+    "upcName": "SD sm br 11+ 15.5",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6000,
+    "supplyName": "Science Diet Soft Beef",
+    "brand": "Science Diet",
+    "upc": "052742244907",
+    "upcName": "SD soft beef",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6615,
+    "supplyName": "Science Diet Chicken Stew 12.5oz",
+    "brand": "Science Diet",
+    "upc": "052742060217",
+    "upcName": "SD pup stew ck 12.5oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6090,
+    "supplyName": "Science Diet Mobility Large Breed 30lb",
+    "brand": "Science Diet",
+    "upc": "052742923505",
+    "upcName": "SD mobility lg br 30#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6002,
+    "supplyName": "Science Diet Savories Peanut",
+    "brand": "Science Diet",
+    "upc": "052742336008",
+    "upcName": "SD savories peanut",
+    "score": 0.7
+  },
+  {
+    "supplyId": 5957,
+    "supplyName": "Science Diet Light Small Bite 15lb",
+    "brand": "Science Diet",
+    "upc": "052742020426",
+    "upcName": "SD 7+ sm bite 15#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 5925,
+    "supplyName": "Science Diet Small Breed 11+ 4.5lb",
+    "brand": "Science Diet",
+    "upc": "052742253305",
+    "upcName": "SD sm br 11+ 4.5#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6567,
+    "supplyName": "Science Diet Perf Dig Chicken 5.8oz",
+    "brand": "Science Diet",
+    "upc": "052742068749",
+    "upcName": "SD perf dig ck 5.8oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 5922,
+    "supplyName": "Science Diet Small Breed Light 4.5lb",
+    "brand": "Science Diet",
+    "upc": "052742910000",
+    "upcName": "sd sm br light 4.5#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6679,
+    "supplyName": "Science Diet 7+ Small Mini Chicken 5.8oz",
+    "brand": "Science Diet",
+    "upc": "052742496900",
+    "upcName": "SD 7+ sm min ck 5.8oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6091,
+    "supplyName": "Science Diet Small Mini Sensitive 15lb",
+    "brand": "Science Diet",
+    "upc": "052742007045",
+    "upcName": "SD sm min sensitive 15#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6086,
+    "supplyName": "Science Diet Small Mini 7+ 15.5lb",
+    "brand": "Science Diet",
+    "upc": "052742909707",
+    "upcName": "sd sm br ck 15.5#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6453,
+    "supplyName": "Science Diet Training",
+    "brand": "Science Diet",
+    "upc": "052742187907",
+    "upcName": "SD training",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6452,
+    "supplyName": "Science Diet Flexi Stix Beef",
+    "brand": "Science Diet",
+    "upc": "052742368207",
+    "upcName": "SD flexi stix beef",
+    "score": 0.7
+  },
+  {
+    "supplyId": 5971,
+    "supplyName": "Science Diet Perf Digest Salmon 22lb",
+    "brand": "Science Diet",
+    "upc": "052742041421",
+    "upcName": "SD perf digest salmon 22#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 5983,
+    "supplyName": "Science Diet Sensitive Small Bite 4lb",
+    "brand": "Science Diet",
+    "upc": "052742033167",
+    "upcName": "SD sensi sm bite 4#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6713,
+    "supplyName": "Science Diet Cat Hair Chicken 2.9oz",
+    "brand": "Science Diet",
+    "upc": "052742012490",
+    "upcName": "SD cat hair ck 2.9oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 5944,
+    "supplyName": "Science Diet Small Bite Chicken 5lb",
+    "brand": "Science Diet",
+    "upc": "052742818306",
+    "upcName": "SD sm bite ck 5#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 5999,
+    "supplyName": "Science Diet Soft Duck",
+    "brand": "Science Diet",
+    "upc": "052742245003",
+    "upcName": "SD soft duck",
+    "score": 0.7
+  },
+  {
+    "supplyId": 5985,
+    "supplyName": "Science Diet Sensitive Small Bite 30lb",
+    "brand": "Science Diet",
+    "upc": "052742022222",
+    "upcName": "SD light sm bite 30#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 5996,
+    "supplyName": "Science Diet Apple",
+    "brand": "Science Diet",
+    "upc": "052742008998",
+    "upcName": "SD apple",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6849,
+    "supplyName": "Science Diet Kitten Chicken Stew 2.8oz",
+    "brand": "Science Diet",
+    "upc": "052742075839",
+    "upcName": "SD kitten ck stew 2.8oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 5997,
+    "supplyName": "Science Diet Cranberries",
+    "brand": "Science Diet",
+    "upc": "052742008974",
+    "upcName": "SD cranberries",
+    "score": 0.7
+  },
+  {
+    "supplyId": 5992,
+    "supplyName": "Science Diet Jerky Beef",
+    "brand": "Science Diet",
+    "upc": "052742187600",
+    "upcName": "SD jerky beef",
+    "score": 0.7
+  },
+  {
+    "supplyId": 5949,
+    "supplyName": "Science Diet Lamb Small Bite 4.5lb",
+    "brand": "Science Diet",
+    "upc": "052742855509",
+    "upcName": "SD lam sm bite 4.5#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6572,
+    "supplyName": "Science Diet Chicken 7+ Stew 12.8oz",
+    "brand": "Science Diet",
+    "upc": "052742143309",
+    "upcName": "SD ck 7+ stew 12.8oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6003,
+    "supplyName": "Science Diet Savories Beef",
+    "brand": "Science Diet",
+    "upc": "052742335902",
+    "upcName": "SD savories beef",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6478,
+    "supplyName": "Fromm Duck À La Veg 12.2oz",
+    "brand": "Fromm",
+    "upc": "072705119240",
+    "upcName": "FROMM duc a la veg 12.2oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6122,
+    "supplyName": "Fromm Gold Large Breed Puppy 15lb",
+    "brand": "Fromm",
+    "upc": "072705105533",
+    "upcName": "FROMM gold lg br puppy 15#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6480,
+    "supplyName": "Fromm Chicken & Duck 12.2oz",
+    "brand": "Fromm",
+    "upc": "072705119042",
+    "upcName": "FROMM ck & duck 12.2oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6481,
+    "supplyName": "Fromm Beef & Barley 12.2oz",
+    "brand": "Fromm",
+    "upc": "072705118663",
+    "upcName": "FROMM beef & bar 12.2oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6123,
+    "supplyName": "Fromm Gold Large Breed Puppy 30lb",
+    "brand": "Fromm",
+    "upc": "072705105519",
+    "upcName": "FROMM gold lg br puppy 30#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7201,
+    "supplyName": "Tetra Glo Green Fern",
+    "brand": "Tetra",
+    "upc": "046798782803",
+    "upcName": "TETRA glo green fern",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7199,
+    "supplyName": "Tetra Glo Sea Grass",
+    "brand": "Tetra",
+    "upc": "046798782773",
+    "upcName": "TETRA glo sea grass",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7167,
+    "supplyName": "Tetra 6in1 Test Strip 25 Count",
+    "brand": "Tetra",
+    "upc": "046798195429",
+    "upcName": "TETRA 6in1 test strip 25 count",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7203,
+    "supplyName": "Tetra Red Algae",
+    "brand": "Tetra",
+    "upc": "046798782766",
+    "upcName": "TETRA red algae",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7225,
+    "supplyName": "Tetra Glo Small Purple/Gr Plant",
+    "brand": "Tetra",
+    "upc": "046798780472",
+    "upcName": "TETRA glo sm pur/gr plant",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6643,
+    "supplyName": "Pro Plan Beef & Vegetable 13oz",
+    "brand": "Pro Plan",
+    "upc": "038100026736",
+    "upcName": "PRO PLAN beef & ri 13oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6704,
+    "supplyName": "Pro Plan Cat Urin Chicken 3oz",
+    "brand": "Pro Plan",
+    "upc": "038100173409",
+    "upcName": "PRO PLAN cat urin beef 3oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6343,
+    "supplyName": "Pro Plan Small Breed Sensit 4lb",
+    "brand": "Pro Plan",
+    "upc": "038100100801",
+    "upcName": "PRO PLAN sm br sensit 4#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6702,
+    "supplyName": "Pro Plan Cat Urin Salmon 3oz",
+    "brand": "Pro Plan",
+    "upc": "038100175755",
+    "upcName": "PRO PLAN cat urin sal 3oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6636,
+    "supplyName": "Pro Plan Beef & Rice 13oz",
+    "brand": "Pro Plan",
+    "upc": "038100181633",
+    "upcName": "PRO PLAN beef & sal 13oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6701,
+    "supplyName": "Pro Plan Cat Urin Beef 3oz",
+    "brand": "Pro Plan",
+    "upc": "038100027030",
+    "upcName": "PRO PLAN cat urin ck 3oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6638,
+    "supplyName": "Pro Plan 7+ Beef & Rice 13oz",
+    "brand": "Pro Plan",
+    "upc": "038100108005",
+    "upcName": "PRO PLAN beef & veg 13oz",
+    "score": 0.7
+  },
+  {
+    "supplyId": 985,
+    "supplyName": "Birdlife 12\" Wooden Perches",
+    "brand": "Birdlife",
+    "upc": "030172902024",
+    "upcName": "BirdLIfe 12\" Wooden Perches",
+    "score": 0.7
+  },
+  {
+    "supplyId": 986,
+    "supplyName": "Birdlife 14\" Wooden Perches",
+    "brand": "Birdlife",
+    "upc": "030172902031",
+    "upcName": "BirdLIfe 14\" Wooden Perches",
+    "score": 0.7
+  },
+  {
+    "supplyId": 984,
+    "supplyName": "Birdlife 11\" Wooden Perches",
+    "brand": "Birdlife",
+    "upc": "030172902017",
+    "upcName": "BirdLife 11\" Wooden Perches",
+    "score": 0.7
+  },
+  {
+    "supplyId": 989,
+    "supplyName": "Birdlife 18\" Wooden Perches",
+    "brand": "Birdlife",
+    "upc": "030172902055",
+    "upcName": "BirdLIfe 18\" Wooden Perches",
+    "score": 0.7
+  },
+  {
+    "supplyId": 988,
+    "supplyName": "Birdlife 16\" Wooden Perches",
+    "brand": "Birdlife",
+    "upc": "030172902048",
+    "upcName": "BirdLife 16\" Wooden Perches",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1352,
+    "supplyName": "Tropicleanoxymed Pawpad Lotion",
+    "brand": "TropiClean",
+    "upc": "645095004092",
+    "upcName": "TropiCleanOXYMED Pawpad Lotion",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1499,
+    "supplyName": "Freshbreathe Enticers Penut Kit",
+    "brand": "TropiClean",
+    "upc": "645095006379",
+    "upcName": "FreshBreathe Enticers Penut Kit",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1502,
+    "supplyName": "Freshbreathe Gel",
+    "brand": "TropiClean",
+    "upc": "645095001077",
+    "upcName": "FreshBreathe Gel",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1650,
+    "supplyName": "Petmate 7 Cup Bowl",
+    "brand": "Petmate",
+    "upc": "029695230806",
+    "upcName": "PetMate 7 Cup Bowl",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1651,
+    "supplyName": "Petmate 1 Cup Bowl",
+    "brand": "Petmate",
+    "upc": "029695230783",
+    "upcName": "PetMate 2 Cup Bowl",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1263,
+    "supplyName": "Magiccoat 2in1",
+    "brand": "Four Paws",
+    "upc": "045663976392",
+    "upcName": "MagicCoat 2in1",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1958,
+    "supplyName": "Magiccoat Cat Gentle Tearless",
+    "brand": "Four Paws",
+    "upc": "045663976422",
+    "upcName": "MagicCoat Cat Gentle Tearless",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1266,
+    "supplyName": "Magiccoat Reduces Shedding",
+    "brand": "Four Paws",
+    "upc": "045663976446",
+    "upcName": "MagicCoat Reduces Shedding",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1772,
+    "supplyName": "Fourpaws 30' Cotton Train Leash",
+    "brand": "Four Paws",
+    "upc": "045663561307",
+    "upcName": "FourPaws 30' Cotton Train Leash",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1285,
+    "supplyName": "Magiccoat Medicated",
+    "brand": "Four Paws",
+    "upc": "045663976477",
+    "upcName": "MagicCoat Medicated",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1267,
+    "supplyName": "Magiccoat Prof Series Oats Puppy",
+    "brand": "Four Paws",
+    "upc": "045663976019",
+    "upcName": "MagicCoat Prof Series oats  Puppy",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1269,
+    "supplyName": "Magiccoat Profseries 2in1",
+    "brand": "Four Paws",
+    "upc": "045663976033",
+    "upcName": "MagicCoat ProfSeries 2in1",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1768,
+    "supplyName": "Fourpaws 20' Cotton Train Leash",
+    "brand": "Four Paws",
+    "upc": "045663561208",
+    "upcName": "FourPaws 20' Cotton Train leash",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6032,
+    "supplyName": "Catit Red S",
+    "brand": "Catit",
+    "upc": "022517413807",
+    "upcName": "catit red s",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6029,
+    "supplyName": "Catit S Grey",
+    "brand": "Catit",
+    "upc": "022517413821",
+    "upcName": "catit s grey",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2580,
+    "supplyName": "Circle 20\" Btl 1788s Collar",
+    "brand": "Circle T",
+    "upc": "076484178818",
+    "upcName": "CIRCLE 20\"BTL 1788S COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2540,
+    "supplyName": "Circle 12\" Tan 1103 Collar",
+    "brand": "Circle T",
+    "upc": "076484103742",
+    "upcName": "CIRCLE 12\" TAN 1103 COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2573,
+    "supplyName": "Circle 20\" Bro 1788s Collar",
+    "brand": "Circle T",
+    "upc": "076484178801",
+    "upcName": "CIRCLE 20\" BRO 1788S COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2569,
+    "supplyName": "Circle 14\"btl 1786s Collar",
+    "brand": "Circle T",
+    "upc": "076484178610",
+    "upcName": "CIRCLE 14\"BTL 1786S COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2574,
+    "supplyName": "Circle 10\" Black 1703k Collar",
+    "brand": "Circle T",
+    "upc": "076484514678",
+    "upcName": "CIRCLE 10\" BLK 1703K COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2534,
+    "supplyName": "Circle 16\"tcr1786s Collar",
+    "brand": "Circle T",
+    "upc": "076484178665",
+    "upcName": "CIRCLE 16\"TCR1786S COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2575,
+    "supplyName": "Circle 18\" Tan 1206 Collar",
+    "brand": "Circle T",
+    "upc": "076484108341",
+    "upcName": "CIRCLE 18\" TAN 1206 COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2578,
+    "supplyName": "Circle 24\" Red 1208 Collar",
+    "brand": "Circle T",
+    "upc": "076484108914",
+    "upcName": "CIRCLE 24\" RED 1208 COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2570,
+    "supplyName": "Circle 16\" Btl 1786s Collar",
+    "brand": "Circle T",
+    "upc": "076484178658",
+    "upcName": "CIRCLE 16\" BTL 1786S COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2571,
+    "supplyName": "Circle 16\"bro 1786s Collar",
+    "brand": "Circle T",
+    "upc": "076484178641",
+    "upcName": "CIRCLE 16\"BRO 1786S COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2572,
+    "supplyName": "Circle 14\" Bro 1786s Collar",
+    "brand": "Circle T",
+    "upc": "076484178603",
+    "upcName": "CIRCLE 14\" BRO 1786S COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2581,
+    "supplyName": "Circle 24\" Black 1208 Collar",
+    "brand": "Circle T",
+    "upc": "076484108907",
+    "upcName": "CIRCLE 24\" BLK 1208 COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2539,
+    "supplyName": "Circle 10\" Tan 1103 Collar",
+    "brand": "Circle T",
+    "upc": "076484103544",
+    "upcName": "CIRCLE 10\" TAN 1103 COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2547,
+    "supplyName": "Circle 10\" Red 1103 Collar",
+    "brand": "Circle T",
+    "upc": "076484103513",
+    "upcName": "CIRCLE 10\" RED 1103 COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2565,
+    "supplyName": "Circle Brk04\" Leash",
+    "brand": "Circle T",
+    "upc": "076484348006",
+    "upcName": "CIRCLE BRK04\" LEASH",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2544,
+    "supplyName": "Circle 20\" Tan 1106 Collar",
+    "brand": "Circle T",
+    "upc": "076484104541",
+    "upcName": "CIRCLE 20\" TAN 1106 COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2566,
+    "supplyName": "Circle Tan04' Leash",
+    "brand": "Circle T",
+    "upc": "076484114847",
+    "upcName": "CIRCLE TAN04' LEASH",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2576,
+    "supplyName": "Circle 24\"tan 1208 Collar",
+    "brand": "Circle T",
+    "upc": "076484108945",
+    "upcName": "CIRCLE 24\"TAN 1208 COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2546,
+    "supplyName": "Circle 24\" Tan 1108 Collar",
+    "brand": "Circle T",
+    "upc": "076484104947",
+    "upcName": "CIRCLE 24\" TAN 1108 COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2542,
+    "supplyName": "Circle 16\" Tan 1105 Collar",
+    "brand": "Circle T",
+    "upc": "076484115578",
+    "upcName": "CIRCLE 16\" TAN 1105 COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2579,
+    "supplyName": "Circle 22\" Black 1208 Collar",
+    "brand": "Circle T",
+    "upc": "076484108709",
+    "upcName": "CIRCLE 22\" BLK 1208 COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2582,
+    "supplyName": "Circle 20\" Black 1206 Collar",
+    "brand": "Circle T",
+    "upc": "076484108501",
+    "upcName": "CIRCLE 20\" BLK 1206 COLLAR",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7148,
+    "supplyName": "Api Nitrate Test Kit",
+    "brand": "API",
+    "upc": "317163000182",
+    "upcName": "API nitrate test kit",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7106,
+    "supplyName": "Seachem Axolotl Buffer",
+    "brand": "SeaChem",
+    "upc": "000116081467",
+    "upcName": "SEACHEM axolotl buffer",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7082,
+    "supplyName": "Seachem Matrix 500ml",
+    "brand": "SeaChem",
+    "upc": "000116011303",
+    "upcName": "SLI MEDIA MATRIX 500ML",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7162,
+    "supplyName": "Seachem Kanaplex",
+    "brand": "SeaChem",
+    "upc": "000116088107",
+    "upcName": "SEACHEM kanaplex",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7174,
+    "supplyName": "Seachem Alert Combo",
+    "brand": "SeaChem",
+    "upc": "000116000130",
+    "upcName": "SEACHEM alert combo",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7172,
+    "supplyName": "Seachem Ammonia Alert",
+    "brand": "SeaChem",
+    "upc": "000116001007",
+    "upcName": "SEACHEM ammonia alert",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7160,
+    "supplyName": "Seachem Neo Plex",
+    "brand": "SeaChem",
+    "upc": "000116068208",
+    "upcName": "SEACHEM neo plex",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7173,
+    "supplyName": "Seachem pH Alert",
+    "brand": "SeaChem",
+    "upc": "000116002004",
+    "upcName": "SEACHEM ph alert",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7164,
+    "supplyName": "Seachem Focus",
+    "brand": "SeaChem",
+    "upc": "000116064101",
+    "upcName": "SEACHEM focus",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7080,
+    "supplyName": "Seachem Neutral Regul 7.0 1kg",
+    "brand": "SeaChem",
+    "upc": "000116030700",
+    "upcName": "SEACHEM neutral regul 7.0 1kg",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7285,
+    "supplyName": "Seachem Betta Food",
+    "brand": "SeaChem",
+    "upc": "000116000406",
+    "upcName": "SEACHEM betta food",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7081,
+    "supplyName": "Seachem De Nitrate 500ml",
+    "brand": "SeaChem",
+    "upc": "000116013307",
+    "upcName": "SEACHEM de nitrate 500ml",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7165,
+    "supplyName": "Seachem Metro Plex",
+    "brand": "SeaChem",
+    "upc": "000116080101",
+    "upcName": "SEACHEM metro plex",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2648,
+    "supplyName": "Titan Traincllr Xfine 10\" 5515",
+    "brand": "Titan",
+    "upc": "076484093012",
+    "upcName": "TITAN TRAINCLLR XFINE 10\" 5515",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2650,
+    "supplyName": "Titan Traincllr Fine 12\" 5520",
+    "brand": "Titan",
+    "upc": "076484093104",
+    "upcName": "TITAN TRAINCLLR FINE 12\" 5520",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2643,
+    "supplyName": "Titan Traincllr Xhvy 22' 5540",
+    "brand": "Titan",
+    "upc": "076484093425",
+    "upcName": "TITAN TRAINCLLR XHVY 22' 5540",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2651,
+    "supplyName": "Titan Traincllr Fine 14\" 5520",
+    "brand": "Titan",
+    "upc": "076484093111",
+    "upcName": "TITAN TRAINCLLR FINE 14\" 5520",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7052,
+    "supplyName": "Penn Plax Gravel Vac 16",
+    "brand": "Penn-Plax",
+    "upc": "030172001406",
+    "upcName": "PENN PLAX gravel vac 16",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7051,
+    "supplyName": "Penn Plax Gravel Vac 10",
+    "brand": "Penn-Plax",
+    "upc": "030172005619",
+    "upcName": "PENN PLAX gravel vac 10",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7177,
+    "supplyName": "Penn Plax Feeder 10 Day",
+    "brand": "Penn-Plax",
+    "upc": "030172085963",
+    "upcName": "PENN PLAX feeder 10 day",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7034,
+    "supplyName": "Penn Plax Divider 15-20",
+    "brand": "Penn-Plax",
+    "upc": "030172014116",
+    "upcName": "PENN PLAX divider 15-20",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7044,
+    "supplyName": "Penn Plax Quick Net 8 in",
+    "brand": "Penn-Plax",
+    "upc": "030172230080",
+    "upcName": "PENN PLAX quick net 8 in",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7050,
+    "supplyName": "Penn Plax Gravel Vac 9",
+    "brand": "Penn-Plax",
+    "upc": "030172005572",
+    "upcName": "PENN PLAX gravel vac 5",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7179,
+    "supplyName": "Penn Plax Feeder 3 Day",
+    "brand": "Penn-Plax",
+    "upc": "030172005404",
+    "upcName": "PENN PLAX feeder 7 day",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7043,
+    "supplyName": "Penn Plax Quick Net 6 in",
+    "brand": "Penn-Plax",
+    "upc": "030172230066",
+    "upcName": "PENN PLAX quick net 6 in",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7254,
+    "supplyName": "Penn Plax Betta Leaf",
+    "brand": "Penn-Plax",
+    "upc": "030172105432",
+    "upcName": "PENN PLAX betta leaf",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7045,
+    "supplyName": "Penn Plax Quick Net 10 in",
+    "brand": "Penn-Plax",
+    "upc": "030172230103",
+    "upcName": "PENN PLAX quick net 10 in",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7046,
+    "supplyName": "Penn Plax Quick Net 4 in",
+    "brand": "Penn-Plax",
+    "upc": "030172230042",
+    "upcName": "PENN PLAX quick net 4 in",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7250,
+    "supplyName": "Penn Plax Betta Cave",
+    "brand": "Penn-Plax",
+    "upc": "030172105685",
+    "upcName": "PENN PLAX betta cave",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7074,
+    "supplyName": "Penn Plax 100w Heater",
+    "brand": "Penn-Plax",
+    "upc": "030172034695",
+    "upcName": "PENN PLAX 100w heater",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7048,
+    "supplyName": "Penn Plax Quick Net 2 in",
+    "brand": "Penn-Plax",
+    "upc": "030172230028",
+    "upcName": "PENN PLAX quick net 2 in",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7049,
+    "supplyName": "Penn Plax Gravel Vac 5",
+    "brand": "Penn-Plax",
+    "upc": "030172005596",
+    "upcName": "PENN PLAX gravel vac 9",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7194,
+    "supplyName": "Penn Plax Auto Feeder",
+    "brand": "Penn-Plax",
+    "upc": "030172104565",
+    "upcName": "PENN PLAX auto feeder",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7033,
+    "supplyName": "Penn Plax Divider 20 Gallon",
+    "brand": "Penn-Plax",
+    "upc": "030172014161",
+    "upcName": "PENN PLAX divider 20 gallon",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7042,
+    "supplyName": "Penn Plax Quick Net 5l in",
+    "brand": "Penn-Plax",
+    "upc": "030172230509",
+    "upcName": "PENN PLAX quick net 5l in",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7041,
+    "supplyName": "Penn Plax Quick Net 5 in",
+    "brand": "Penn-Plax",
+    "upc": "030172230059",
+    "upcName": "PENN PLAX quick net 5 in",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7053,
+    "supplyName": "Penn Plax Gravel Vac 24",
+    "brand": "Penn-Plax",
+    "upc": "030172001420",
+    "upcName": "PENN PLAX gravel vac 24",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7026,
+    "supplyName": "Fluval Bug Bite Spirulina 1.58",
+    "brand": "Fluval",
+    "upc": "015561173551",
+    "upcName": "FLUVAL bug bite spirulina 1.58",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7324,
+    "supplyName": "Fluval Chamber Pad",
+    "brand": "Fluval",
+    "upc": "015561113373",
+    "upcName": "FLUVAL chamber pad",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7027,
+    "supplyName": "Fluval Bug Bite Color Enhan .63",
+    "brand": "Fluval",
+    "upc": "015561173469",
+    "upcName": "FLUVAL bug bite color enhan .63",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7290,
+    "supplyName": "Fluval Betta Carew Pack",
+    "brand": "Fluval",
+    "upc": "015561183307",
+    "upcName": "FLUVAL betta carew pack",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7069,
+    "supplyName": "Fluval T50 Heater",
+    "brand": "Fluval",
+    "upc": "015561148801",
+    "upcName": "FLUVAL t50 heater",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7064,
+    "supplyName": "Fluval Gravel Vac Kit",
+    "brand": "Fluval",
+    "upc": "015561103701",
+    "upcName": "FLUVAL gravel vac kit",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7067,
+    "supplyName": "Fluval T150 Heater",
+    "brand": "Fluval",
+    "upc": "015561148825",
+    "upcName": "FLUVAL t150 heater",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7068,
+    "supplyName": "Fluval T100 Heater",
+    "brand": "Fluval",
+    "upc": "015561148818",
+    "upcName": "FLUVAL t100 heater",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7065,
+    "supplyName": "Fluval T300 Heater",
+    "brand": "Fluval",
+    "upc": "015561148849",
+    "upcName": "FLUVAL t300 heater",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7066,
+    "supplyName": "Fluval T200 Heater",
+    "brand": "Fluval",
+    "upc": "015561148832",
+    "upcName": "FLUVAL t200 heater",
+    "score": 0.7
+  },
+  {
+    "supplyId": 7284,
+    "supplyName": "Fluval Bug Bite Betta",
+    "brand": "Fluval",
+    "upc": "015561173667",
+    "upcName": "FLUVAL bug bite betta",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6909,
+    "supplyName": "Primal Broth Beef",
+    "brand": "Primal",
+    "upc": "854496006325",
+    "upcName": "PRIMAL broth beef",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6913,
+    "supplyName": "Primal Beef Bone 6pk",
+    "brand": "Primal",
+    "upc": "895135000175",
+    "upcName": "PRIMAL beef bone 6pk",
+    "score": 0.7
+  },
+  {
+    "supplyId": 544,
+    "supplyName": "Repto Green Hanging Vines 24'",
+    "brand": "Reptology",
+    "upc": "030172087523",
+    "upcName": "Repto green hanging Vines 24'",
+    "score": 0.7
+  },
+  {
+    "supplyId": 542,
+    "supplyName": "Repto Pink Hanging Vines 24\"",
+    "brand": "Reptology",
+    "upc": "030172094781",
+    "upcName": "Repto Pink Hanging Vines 24\"",
+    "score": 0.7
+  },
+  {
+    "supplyId": 545,
+    "supplyName": "Repto Green Hanging Vines 12'",
+    "brand": "Reptology",
+    "upc": "030172087493",
+    "upcName": "Repto Green Hanging Vines 12'",
+    "score": 0.7
+  },
+  {
+    "supplyId": 543,
+    "supplyName": "Repto Pink Hanging Vines 12'",
+    "brand": "Reptology",
+    "upc": "030172087516",
+    "upcName": "Repto Pink Hanging Vines 12'",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2111,
+    "supplyName": "Vital Cat Ahi Tuna Bites",
+    "brand": "Vital Essentials",
+    "upc": "840199694006",
+    "upcName": "Vital Cat Ahi Tuna Bites",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2110,
+    "supplyName": "Vital Cat Chicken Hearts",
+    "brand": "Vital Essentials",
+    "upc": "840199694037",
+    "upcName": "Vital Cat chicken hearts",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2113,
+    "supplyName": "Vital Cat Rabbit Bites",
+    "brand": "Vital Essentials",
+    "upc": "840199694068",
+    "upcName": "Vital cat Rabbit Bites",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2109,
+    "supplyName": "Vital Cat Minnows",
+    "brand": "Vital Essentials",
+    "upc": "840199694051",
+    "upcName": "Vital Cat Minnows",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2112,
+    "supplyName": "Vital Cat Duck Liver",
+    "brand": "Vital Essentials",
+    "upc": "840199694044",
+    "upcName": "Vital Cat Duck Liver",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2114,
+    "supplyName": "Vital Cat Chicken Giblets",
+    "brand": "Vital Essentials",
+    "upc": "840199694020",
+    "upcName": "Vital Cat Chicken Giblets",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2106,
+    "supplyName": "Vital Cat Salmon Bites",
+    "brand": "Vital Essentials",
+    "upc": "840199694075",
+    "upcName": "Vital Cat Salmon Bites",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2704,
+    "supplyName": "Rascals 2.75\" Pig",
+    "brand": "Rascals",
+    "upc": "076484830105",
+    "upcName": "RASCALS 2.75\" PIG",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6242,
+    "supplyName": "Orijen Large Breed Puppy 23.5lb",
+    "brand": "Orijen",
+    "upc": "064992102258",
+    "upcName": "ORIJEN lg br puppy 23.5#",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6248,
+    "supplyName": "Orijen Puppy",
+    "brand": "Orijen",
+    "upc": "064992101459",
+    "upcName": "ORIJEN puppy",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1177,
+    "supplyName": "Zupreem Natural Parrot & Conure",
+    "brand": "ZuPreem",
+    "upc": "762177932002",
+    "upcName": "ZuPreem Natural Parrot& Conure",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1172,
+    "supplyName": "Zupreem Naturals 10lbs",
+    "brand": "ZuPreem",
+    "upc": "762177000138",
+    "upcName": "ZuPreem Naturals 10lbs",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1181,
+    "supplyName": "Zupreem Sensible Seed Parrots & Conures",
+    "brand": "ZuPreem",
+    "upc": "762177470207",
+    "upcName": "ZuPreem Sensible Seed Parrots &Conures",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1456,
+    "supplyName": "Petag Esbilac Milk",
+    "brand": "PetAg",
+    "upc": "020279997016",
+    "upcName": "PetAg Esbilac 2nd Step Powder Milk",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1488,
+    "supplyName": "Petag Nursing Kit",
+    "brand": "PetAg",
+    "upc": "020279998006",
+    "upcName": "PetAg Nursing Kit",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1973,
+    "supplyName": "Petag Kmr 2nd Step Powder",
+    "brand": "PetAg",
+    "upc": "020279997047",
+    "upcName": "PetAg KMR 2nd Step Powder",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1455,
+    "supplyName": "Petag Esbilac Milk Powder",
+    "brand": "PetAg",
+    "upc": "020279995005",
+    "upcName": "PetAg Esbilac Milk Powder",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1974,
+    "supplyName": "Petag Kmr Powder",
+    "brand": "PetAg",
+    "upc": "020279995111",
+    "upcName": "PetAg KMR Powder",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6886,
+    "supplyName": "Freshpet Beef 6 3",
+    "brand": "Freshpet",
+    "upc": "627975012014",
+    "upcName": "FRESHPET beef 6 3",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1818,
+    "supplyName": "Bergan Poo Bag Dispenser",
+    "brand": "Bergan",
+    "upc": "879213008833",
+    "upcName": "Bergan Poo bag Dispenser",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1336,
+    "supplyName": "Zymox Advance Enzymatic Conditioner",
+    "brand": "Zymox",
+    "upc": "667334229158",
+    "upcName": "Zymox Advance Enzymatic Conditioner",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1410,
+    "supplyName": "Zymox Topical Spray",
+    "brand": "Zymox",
+    "upc": "667334229042",
+    "upcName": "ZyMox Topical Spray",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1138,
+    "supplyName": "Zymox Avain Care",
+    "brand": "Zymox",
+    "upc": "667334451252",
+    "upcName": "Zymox Avain Care",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1335,
+    "supplyName": "Zymox Leave on Conditioner",
+    "brand": "Zymox",
+    "upc": "667334229035",
+    "upcName": "Zymox Leave on Conditioner",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1409,
+    "supplyName": "Zymox Topical Cream",
+    "brand": "Zymox",
+    "upc": "667334229059",
+    "upcName": "Zymox Topical Cream",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1334,
+    "supplyName": "Zymox Shampoo",
+    "brand": "Zymox",
+    "upc": "667334229028",
+    "upcName": "Zymox Shampoo",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1984,
+    "supplyName": "Tomlyn Hairball Relief Gel for Cats",
+    "brand": "Tomlyn",
+    "upc": "030521068098",
+    "upcName": "Tomlyn Hairball Relief Gel for cats",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1401,
+    "supplyName": "Tomlyn High Calorie Gel Puppy",
+    "brand": "Tomlyn",
+    "upc": "030521067855",
+    "upcName": "Tomlyn High Calorie Gel Puppy",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1985,
+    "supplyName": "Tomlyn High Calorie Gel Kitten",
+    "brand": "Tomlyn",
+    "upc": "030521062188",
+    "upcName": "Tomlyn High Calorie Gel kitten",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1986,
+    "supplyName": "Tomlyn High Calorie Gel Cat",
+    "brand": "Tomlyn",
+    "upc": "030521067879",
+    "upcName": "Tomlyn High Calorie Gel Cat",
+    "score": 0.7
+  },
+  {
+    "supplyId": 1959,
+    "supplyName": "Earthbath Hypoallergenic Cat Shamp",
+    "brand": "Earthbath",
+    "upc": "602644021221",
+    "upcName": "EarthBath HypoAllergenic Cat Shamp",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2107,
+    "supplyName": "Purebites Cat Freeze Tuna",
+    "brand": "PureBites",
+    "upc": "878968001397",
+    "upcName": "purebites cat freeze tuna",
+    "score": 0.7
+  },
+  {
+    "supplyId": 2108,
+    "supplyName": "Purebites Cat Freeze Shrimp",
+    "brand": "PureBites",
+    "upc": "878968002868",
+    "upcName": "Purebites cat freeze shrimp",
+    "score": 0.7
+  },
+  {
+    "supplyId": 6773,
+    "supplyName": "Science Diet Cat Light 7lb",
+    "brand": "Science Diet",
+    "upc": "052742204703",
+    "upcName": "SD cat light 7#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6723,
+    "supplyName": "Science Diet Kitten Turkey 5.5oz",
+    "brand": "Science Diet",
+    "upc": "052742617404",
+    "upcName": "SD kitten turk 5.5oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 5966,
+    "supplyName": "Science Diet Vitality 12.5lb",
+    "brand": "Science Diet",
+    "upc": "052742012070",
+    "upcName": "SD vitality 12.5#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6777,
+    "supplyName": "Science Diet Cat 11+ 15lb",
+    "brand": "Science Diet",
+    "upc": "052742146409",
+    "upcName": "SD cat 11+ 15#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6768,
+    "supplyName": "Science Diet Cat 11+ 3.5lb",
+    "brand": "Science Diet",
+    "upc": "052742146201",
+    "upcName": "SD cat 11+ 3.5#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6564,
+    "supplyName": "Science Diet Puppy Beef 5.8oz",
+    "brand": "Science Diet",
+    "upc": "052742496603",
+    "upcName": "SD beef 5.8oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6562,
+    "supplyName": "Science Diet Beef Stew 3.5 oz",
+    "brand": "Science Diet",
+    "upc": "052742018164",
+    "upcName": "SD beef stew 3.5oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6722,
+    "supplyName": "Science Diet Kitten Salmon 2.9oz",
+    "brand": "Science Diet",
+    "upc": "052742069463",
+    "upcName": "SD kitten sen sal 2.9oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6765,
+    "supplyName": "Science Diet Kitten Fish 7lb",
+    "brand": "Science Diet",
+    "upc": "052742060163",
+    "upcName": "SD kitten fish 7#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6716,
+    "supplyName": "Science Diet Cat Turkey 5.5oz",
+    "brand": "Science Diet",
+    "upc": "052742453408",
+    "upcName": "SD cat ck 5.5oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6772,
+    "supplyName": "Science Diet Cat Light 4lb",
+    "brand": "Science Diet",
+    "upc": "052742671109",
+    "upcName": "SD cat light 4#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6715,
+    "supplyName": "Science Diet Cat Chicken 5.5oz",
+    "brand": "Science Diet",
+    "upc": "052742453804",
+    "upcName": "SD cat turk 5.5oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6784,
+    "supplyName": "Science Diet Kitten Sto 3.5lb",
+    "brand": "Science Diet",
+    "upc": "052742069432",
+    "upcName": "SD kitten sen sto 3.5#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6165,
+    "supplyName": "Fromm Surf & Turf 26lb",
+    "brand": "Fromm",
+    "upc": "072705116508",
+    "upcName": "FROMM surf & turf 26#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6143,
+    "supplyName": "Fromm Duck À La Veg 4lb",
+    "brand": "Fromm",
+    "upc": "072705116263",
+    "upcName": "FROMM duck a la veg 4#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6150,
+    "supplyName": "Fromm Salmon À La Veg 12lb",
+    "brand": "Fromm",
+    "upc": "072705116430",
+    "upcName": "FROMM salmon a la veg 12#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6166,
+    "supplyName": "Fromm Pork & Peas 4lb",
+    "brand": "Fromm",
+    "upc": "072705114344",
+    "upcName": "FROMM pork & peas 4#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6160,
+    "supplyName": "Fromm Lamb & Lentil 4lb",
+    "brand": "Fromm",
+    "upc": "072705114542",
+    "upcName": "FROMM lamb & lentil 4#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6152,
+    "supplyName": "Fromm Pork & Apple 4lb",
+    "brand": "Fromm",
+    "upc": "072705114061",
+    "upcName": "FROMM pork & apple 4#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6151,
+    "supplyName": "Fromm Salmon À La Veg 26lb",
+    "brand": "Fromm",
+    "upc": "072705116416",
+    "upcName": "FROMM salmon a la veg 26#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6153,
+    "supplyName": "Fromm Pork & Apple 12lb",
+    "brand": "Fromm",
+    "upc": "072705114030",
+    "upcName": "FROMM pork & apple 12#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6161,
+    "supplyName": "Fromm Lamb & Lentil 26lb",
+    "brand": "Fromm",
+    "upc": "072705114504",
+    "upcName": "FROMM lamb & lentil 26#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6145,
+    "supplyName": "Fromm Duck À La Veg 26lb",
+    "brand": "Fromm",
+    "upc": "072705116218",
+    "upcName": "FROMM duck a la veg 26#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6154,
+    "supplyName": "Fromm Pork & Apple 26lb",
+    "brand": "Fromm",
+    "upc": "072705114016",
+    "upcName": "FROMM pork & apple 26#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6164,
+    "supplyName": "Fromm Surf & Turf 12lb",
+    "brand": "Fromm",
+    "upc": "072705116522",
+    "upcName": "FROMM surf & turf 12#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6470,
+    "supplyName": "Fromm Beef Fromm Bites 12.5oz",
+    "brand": "Fromm",
+    "upc": "072705132089",
+    "upcName": "FROMM beef frommb 12.5oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6144,
+    "supplyName": "Fromm Duck À La Veg 12lb",
+    "brand": "Fromm",
+    "upc": "072705116232",
+    "upcName": "FROMM duck a la veg 12#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6167,
+    "supplyName": "Fromm Pork & Peas 12lb",
+    "brand": "Fromm",
+    "upc": "072705114320",
+    "upcName": "FROMM pork & peas 12#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6612,
+    "supplyName": "Blue Buffalo Beef 12.5oz",
+    "brand": "Blue Buffalo",
+    "upc": "840243105540",
+    "upcName": "BL BUF bac yard bbq 12.5oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6613,
+    "supplyName": "Blue Buffalo Fish 12.5oz",
+    "brand": "Blue Buffalo",
+    "upc": "8741702101245",
+    "upcName": "BL BUF wild sen 12.5oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6611,
+    "supplyName": "Blue Buffalo Senior 12.5oz",
+    "brand": "Blue Buffalo",
+    "upc": "859610005888",
+    "upcName": "BL BUF wild b&ck 12.5oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6695,
+    "supplyName": "Pro Plan Kitten Chicken 3oz",
+    "brand": "Pro Plan",
+    "upc": "038100026903",
+    "upcName": "PRO PLAN kitten ck 3oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6369,
+    "supplyName": "Pro Plan Lamb Shred 35lb",
+    "brand": "Pro Plan",
+    "upc": "038100130631",
+    "upcName": "PRO PLAN lamb shred 35#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6698,
+    "supplyName": "Pro Plan Cat Salmon 3oz",
+    "brand": "Pro Plan",
+    "upc": "038100026965",
+    "upcName": "PRO PLAN cat ck 3oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6696,
+    "supplyName": "Pro Plan Cat Chicken 3oz",
+    "brand": "Pro Plan",
+    "upc": "038100111975",
+    "upcName": "PRO PLAN cat tuna 3oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6697,
+    "supplyName": "Pro Plan Cat Tuna 3oz",
+    "brand": "Pro Plan",
+    "upc": "038100026972",
+    "upcName": "PRO PLAN cat salm 3oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6666,
+    "supplyName": "Pro Plan Live Clear 5.5lb",
+    "brand": "Pro Plan",
+    "upc": "037424191366",
+    "upcName": "PRO PLAN live clear 5.5#",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 2654,
+    "supplyName": "Titan Traincllr Medium 14\" 5525",
+    "brand": "Titan",
+    "upc": "076484093203",
+    "upcName": "TITAN TRAINCLLR MED 14\" 5525",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 2656,
+    "supplyName": "Titan Traincllr Medium 18\" 5525",
+    "brand": "Titan",
+    "upc": "076484093227",
+    "upcName": "TITAN TRAINCLLR MED 18\" 5525",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 7303,
+    "supplyName": "Penn Plax Small World Filter",
+    "brand": "Penn-Plax",
+    "upc": "030172390067",
+    "upcName": "PENN PLAX sm worl filter",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6918,
+    "supplyName": "Vital Essentials Cat Duck 28oz",
+    "brand": "Vital Essentials",
+    "upc": "840199697014",
+    "upcName": "VITAL ESSEN cat duck 28oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6558,
+    "supplyName": "Royal Canin Adult 13.5oz",
+    "brand": "Royal Canin",
+    "upc": "030111420657",
+    "upcName": "ROYAL CAN adult 13.5oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6557,
+    "supplyName": "Royal Canin Puppy 13.5oz",
+    "brand": "Royal Canin",
+    "upc": "030111420558",
+    "upcName": "ROYAL CAN pup 13.5oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6549,
+    "supplyName": "Welln Lamb Stew 12.5oz",
+    "brand": "Wellness",
+    "upc": "076344017554",
+    "upcName": "WELLN lam stew 12.5oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 6838,
+    "supplyName": "Fussie Cat Tuna, Clams 2.82oz",
+    "brand": "Fussie Cat",
+    "upc": "888641130535",
+    "upcName": "FUSSIE CAT tuna ocean 2.82oz",
+    "score": 0.6799999999999999
+  },
+  {
+    "supplyId": 5931,
+    "supplyName": "Science Diet Large Breed 6+ 15lb",
+    "brand": "Science Diet",
+    "upc": "052742020402",
+    "upcName": "sd lg br ck 15#",
+    "score": 0.66
+  },
+  {
+    "supplyId": 5924,
+    "supplyName": "Science Diet Small Breed 7+ 4.5lb",
+    "brand": "Science Diet",
+    "upc": "052742909608",
+    "upcName": "sd sm br ck 4.5#",
+    "score": 0.66
+  },
+  {
+    "supplyId": 6125,
+    "supplyName": "Fromm Gold Small Beef 15lb",
+    "brand": "Fromm",
+    "upc": "072705105632",
+    "upcName": "FROMM gold sm be 15#",
+    "score": 0.66
+  },
+  {
+    "supplyId": 6124,
+    "supplyName": "Fromm Gold Small Breed 5lb",
+    "brand": "Fromm",
+    "upc": "072705105670",
+    "upcName": "FROMM gold sm br 5#",
+    "score": 0.66
+  },
+  {
+    "supplyId": 6227,
+    "supplyName": "Blue Buffalo Small Bite 15lb",
+    "brand": "Blue Buffalo",
+    "upc": "859610007448",
+    "upcName": "BLUE B sm bite 15#",
+    "score": 0.66
+  },
+  {
+    "supplyId": 6228,
+    "supplyName": "Blue Buffalo Small Bite 30lb",
+    "brand": "Blue Buffalo",
+    "upc": "859610007455",
+    "upcName": "BLUE B sm bite 30#",
+    "score": 0.66
+  },
+  {
+    "supplyId": 6332,
+    "supplyName": "Welln Small Breed Weight 4lb",
+    "brand": "Wellness",
+    "upc": "076344891185",
+    "upcName": "WELLN sm br weight 4#",
+    "score": 0.66
+  },
+  {
+    "supplyId": 6334,
+    "supplyName": "Welln Small Breed Core 12lb",
+    "brand": "Wellness",
+    "upc": "076344884217",
+    "upcName": "WELLN sm br core 12#",
+    "score": 0.66
+  },
+  {
+    "supplyId": 5955,
+    "supplyName": "Science Diet Light 15lb",
+    "brand": "Science Diet",
+    "upc": "052742022154",
+    "upcName": "SD lg br light 15#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6586,
+    "supplyName": "Science Diet 7+ Chicken 13oz",
+    "brand": "Science Diet",
+    "upc": "052742705705",
+    "upcName": "SD 7+ turk 13oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6793,
+    "supplyName": "Science Diet Cat 7+ 7lb",
+    "brand": "Science Diet",
+    "upc": "052742204505",
+    "upcName": "SD cat 7#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6774,
+    "supplyName": "Science Diet Cat 16lb",
+    "brand": "Science Diet",
+    "upc": "052742006437",
+    "upcName": "SD cat 16#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6770,
+    "supplyName": "Science Diet Cat 7lb",
+    "brand": "Science Diet",
+    "upc": "052742888101",
+    "upcName": "SD cat hairba 7#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6794,
+    "supplyName": "Science Diet Cat 7+ 16lb",
+    "brand": "Science Diet",
+    "upc": "052742006444",
+    "upcName": "SD cat light 16#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6589,
+    "supplyName": "Science Diet Perfect Weight Chicken Stew 12.5oz",
+    "brand": "Science Diet",
+    "upc": "052742069814",
+    "upcName": "SD perf weight sal stew 12.5oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 5953,
+    "supplyName": "Science Diet Salmon 14lb",
+    "brand": "Science Diet",
+    "upc": "052742068619",
+    "upcName": "SD salmon 14#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6587,
+    "supplyName": "Science Diet Perfect Weight Salmon Stew 12.5oz",
+    "brand": "Science Diet",
+    "upc": "052742002019",
+    "upcName": "SD perf weight ck stew 12.5oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6593,
+    "supplyName": "Science Diet Chicken 13oz",
+    "brand": "Science Diet",
+    "upc": "052742705606",
+    "upcName": "SD 7+ beef 13oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 5952,
+    "supplyName": "Science Diet Salmon 4.5lb",
+    "brand": "Science Diet",
+    "upc": "052742068602",
+    "upcName": "SD salmon 4.5#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 5970,
+    "supplyName": "Science Diet Perf Digest Chicken Large Breed 223",
+    "brand": "Science Diet",
+    "upc": "052742041339",
+    "upcName": "SD perf digest ck lg br 223",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6764,
+    "supplyName": "Science Diet Kitten 7lb",
+    "brand": "Science Diet",
+    "upc": "052742939100",
+    "upcName": "SD kitten 7#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6763,
+    "supplyName": "Science Diet Kitten 3.5lb",
+    "brand": "Science Diet",
+    "upc": "052742712307",
+    "upcName": "SD kitten 3.5#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 5954,
+    "supplyName": "Science Diet Salmon 33lb",
+    "brand": "Science Diet",
+    "upc": "052742068626",
+    "upcName": "SD salmon 33#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6767,
+    "supplyName": "Science Diet Cat 7+ 4lb",
+    "brand": "Science Diet",
+    "upc": "052742710402",
+    "upcName": "SD cat 7+ 4#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6584,
+    "supplyName": "Science Diet 7+ Turkey 13oz",
+    "brand": "Science Diet",
+    "upc": "052742705507",
+    "upcName": "SD 7+ ck 13oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6565,
+    "supplyName": "Science Diet Chicken 5.8oz",
+    "brand": "Science Diet",
+    "upc": "052742496702",
+    "upcName": "SD ck 5.8oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6769,
+    "supplyName": "Science Diet Cat 4lb",
+    "brand": "Science Diet",
+    "upc": "052742679709",
+    "upcName": "SD cat 4#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6177,
+    "supplyName": "Fromm Hasen Duck 4lb",
+    "brand": "Fromm",
+    "upc": "072705114641",
+    "upcName": "FROMM hasen duck 4#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6114,
+    "supplyName": "Fromm Classic Puppy 5lb",
+    "brand": "Fromm",
+    "upc": "072705105472",
+    "upcName": "FROMM classic puppy 5#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6736,
+    "supplyName": "Fromm Cat Adult 10lb",
+    "brand": "Fromm",
+    "upc": "072705115631",
+    "upcName": "FROMM cat adult 10#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6115,
+    "supplyName": "Fromm Classic Puppy 15lb",
+    "brand": "Fromm",
+    "upc": "072705105434",
+    "upcName": "Fromm classic puppy 15#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6485,
+    "supplyName": "Fromm Turkey 12.2oz",
+    "brand": "Fromm",
+    "upc": "072705119066",
+    "upcName": "FROMM ck & sw pot 12.2oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6136,
+    "supplyName": "Fromm Gold Senior 5lb",
+    "brand": "Fromm",
+    "upc": "072705115471",
+    "upcName": "FROMM gold senior 5#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6134,
+    "supplyName": "Fromm Gold Weight 15lb",
+    "brand": "Fromm",
+    "upc": "072705105830",
+    "upcName": "FROMM gold lb br weight 15#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6162,
+    "supplyName": "Fromm Highlander Beef 26lb",
+    "brand": "Fromm",
+    "upc": "072705114917",
+    "upcName": "FROMM highlander beef 26#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6482,
+    "supplyName": "Fromm Chicken 12.2oz",
+    "brand": "Fromm",
+    "upc": "072705119103",
+    "upcName": "FROMM tur duc & sw pot 12.2oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6119,
+    "supplyName": "Fromm Gold Puppy 15lb",
+    "brand": "Fromm",
+    "upc": "072705115532",
+    "upcName": "FROMM gold puppy 15#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6120,
+    "supplyName": "Fromm Gold Puppy 30lb",
+    "brand": "Fromm",
+    "upc": "072705115518",
+    "upcName": "FROMM gold puppy 30#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6179,
+    "supplyName": "Fromm Coast Weight 26lb",
+    "brand": "Fromm",
+    "upc": "072705104406",
+    "upcName": "Fromm coast weight 26#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6133,
+    "supplyName": "Fromm Gold Weight 5lb",
+    "brand": "Fromm",
+    "upc": "072705105779",
+    "upcName": "FROMM gold weight 5#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6118,
+    "supplyName": "Fromm Gold Puppy 5lb",
+    "brand": "Fromm",
+    "upc": "072705105571",
+    "upcName": "FROMM gold lg br puppy 5#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6737,
+    "supplyName": "Fromm Cat Weight 4lb",
+    "brand": "Fromm",
+    "upc": "072705115907",
+    "upcName": "FROMM cat weight 4#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6178,
+    "supplyName": "Fromm Hasen Duck 12lb",
+    "brand": "Fromm",
+    "upc": "072705114627",
+    "upcName": "FROMM hasen duck 12#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6113,
+    "supplyName": "Fromm Classic Puppy 30lb",
+    "brand": "Fromm",
+    "upc": "072705105427",
+    "upcName": "FROMM classic puppy 30#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6862,
+    "supplyName": "Blue Buffalo Kitten 3oz",
+    "brand": "Blue Buffalo",
+    "upc": "840243140541",
+    "upcName": "BLUE BUF kitten 3oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6635,
+    "supplyName": "Pro Plan Sensitive 13oz",
+    "brand": "Pro Plan",
+    "upc": "038100026712",
+    "upcName": "PRO PLAN pup 13oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6374,
+    "supplyName": "Pro Plan Toy 5lb",
+    "brand": "Pro Plan",
+    "upc": "038100135438",
+    "upcName": "PRO PLAN toy 5#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6828,
+    "supplyName": "Catit White Fish 2.8oz",
+    "brand": "Catit",
+    "upc": "022517447147",
+    "upcName": "CATIT wh fish 2.8oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 7108,
+    "supplyName": "Seachem Flourish Excel 8.5oz",
+    "brand": "SeaChem",
+    "upc": "000116051606",
+    "upcName": "SEACHEM flourish 8.5oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 7095,
+    "supplyName": "Seachem Stress Guard 8.5oz",
+    "brand": "SeaChem",
+    "upc": "000116017602",
+    "upcName": "SEACHEM gartlic guard 8.5oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6461,
+    "supplyName": "Diamond Beef 13.2oz",
+    "brand": "Diamond",
+    "upc": "074198612734",
+    "upcName": "DIAM beef 13.2oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6460,
+    "supplyName": "Diamond Lamb 13.2oz",
+    "brand": "Diamond",
+    "upc": "074198612727",
+    "upcName": "DIAM lamb 13.2oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6687,
+    "supplyName": "Diamond Cat Whitefish 5.5oz",
+    "brand": "Diamond",
+    "upc": "074198612758",
+    "upcName": "DIAM cat whitefish 5.5oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6552,
+    "supplyName": "Natural Bal Plant 13oz",
+    "brand": "Natural Balance",
+    "upc": "723633065559",
+    "upcName": "NAT BAL plant 13oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 1176,
+    "supplyName": "Zupreem Purefun Medium Bird",
+    "brand": "ZuPreem",
+    "upc": "762177360201",
+    "upcName": "ZuPreem PureFun Med Bird",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6852,
+    "supplyName": "Royal Canin Kitten 3oz",
+    "brand": "Royal Canin",
+    "upc": "030111410184",
+    "upcName": "ROYAL CAN kitten 3oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6624,
+    "supplyName": "Eukanuba Lamb 13.2oz",
+    "brand": "Eukanuba",
+    "upc": "751486000748",
+    "upcName": "EUK lamb 13.2oz",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 6888,
+    "supplyName": "Freshpet Vital Cuts 1.5lb",
+    "brand": "Freshpet",
+    "upc": "627975011949",
+    "upcName": "FRESHPET vital cuts 1.5#",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 2382,
+    "supplyName": "Intersand Odorlock Lavender 13lb",
+    "brand": "Intersand",
+    "upc": "777979210067",
+    "upcName": "InterSand OdorLock bbyPdr 13lb",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 2378,
+    "supplyName": "Intersand Odorlock Bbypdr 13lb",
+    "brand": "Intersand",
+    "upc": "777979213068",
+    "upcName": "InterSand OdorLock Lav 13lb",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 2383,
+    "supplyName": "Intersand Odorlock Lavender 25lb",
+    "brand": "Intersand",
+    "upc": "777979210258",
+    "upcName": "InterSand OdorLock bbypdr 25lb",
+    "score": 0.6499999999999999
+  },
+  {
+    "supplyId": 5916,
+    "supplyName": "Science Diet Puppy Large Breed Lamb 30lb",
+    "brand": "Science Diet",
+    "upc": "052742060170",
+    "upcName": "sd puppy lg br lam 30#",
+    "score": 0.6428571428571428
+  },
+  {
+    "supplyId": 5918,
+    "supplyName": "Science Diet Small Breed Chicken 15.5lb",
+    "brand": "Science Diet",
+    "upc": "052742289700",
+    "upcName": "sd sm br lam 15.5#",
+    "score": 0.6428571428571428
+  },
+  {
+    "supplyId": 6577,
+    "supplyName": "Science Diet Healthy Cuisine 7+ Beef 12.5oz",
+    "brand": "Science Diet",
+    "upc": "052742007250",
+    "upcName": "SD heal cuis beef 12.5oz",
+    "score": 0.6285714285714286
+  },
+  {
+    "supplyId": 6721,
+    "supplyName": "Science Diet Cat Healthy Cuisine Tuna 2.9oz",
+    "brand": "Science Diet",
+    "upc": "052742007090",
+    "upcName": "SD cat heal cuis tuna 2.9oz",
+    "score": 0.6285714285714286
+  },
+  {
+    "supplyId": 6579,
+    "supplyName": "Science Diet Sensitive Turkey Stew 12.5oz",
+    "brand": "Science Diet",
+    "upc": "052742021041",
+    "upcName": "SD sensi turk stew 12.5oz",
+    "score": 0.6285714285714286
+  },
+  {
+    "supplyId": 6800,
+    "supplyName": "Science Diet Cat Senior Sto 15.5lb",
+    "brand": "Science Diet",
+    "upc": "052742887807",
+    "upcName": "SD cat sen sto 15.5#",
+    "score": 0.6285714285714286
+  },
+  {
+    "supplyId": 6569,
+    "supplyName": "Science Diet Puppy Stew Chicken 12.5oz",
+    "brand": "Science Diet",
+    "upc": "052742069487",
+    "upcName": "SD sensi pup sal 12.5oz",
+    "score": 0.6285714285714286
+  },
+  {
+    "supplyId": 6581,
+    "supplyName": "Science Diet Perfect Dig Chicken 12.8oz",
+    "brand": "Science Diet",
+    "upc": "052742068510",
+    "upcName": "SD perf dig ck 12.8oz",
+    "score": 0.6285714285714286
+  },
+  {
+    "supplyId": 6786,
+    "supplyName": "Science Diet Cat Per Dig Salmon 3.5lb",
+    "brand": "Science Diet",
+    "upc": "052742041544",
+    "upcName": "SD cat per dig salm 3.5#",
+    "score": 0.6285714285714286
+  },
+  {
+    "supplyId": 7196,
+    "supplyName": "Tetra Glo Grey & White Plant Small",
+    "brand": "Tetra",
+    "upc": "046798786740",
+    "upcName": "TETRA glo gre & whi plant small",
+    "score": 0.6285714285714286
+  },
+  {
+    "supplyId": 1238,
+    "supplyName": "Earthbath Stress Release Spritz Euc & Peppermint",
+    "brand": "Earthbath",
+    "upc": "602644022020",
+    "upcName": "EarthBath Stress Release Spritz Euc&Pep",
+    "score": 0.6142857142857142
+  },
+  {
+    "supplyId": 5934,
+    "supplyName": "Science Diet Puppy Lamb 12.5lb",
+    "brand": "Science Diet",
+    "upc": "052742060255",
+    "upcName": "sd puppy sm br 12.5#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5929,
+    "supplyName": "Science Diet Large Breed Light 15lb",
+    "brand": "Science Diet",
+    "upc": "052742020471",
+    "upcName": "SD lg br 6+ 15#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5968,
+    "supplyName": "Science Diet Perf Digest Chicken 3.5lb",
+    "brand": "Science Diet",
+    "upc": "052742041285",
+    "upcName": "SD perf digest sm bite 3.5#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5956,
+    "supplyName": "Science Diet Light30lb",
+    "brand": "Science Diet",
+    "upc": "052742022215",
+    "upcName": "SD lg br light 30#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5982,
+    "supplyName": "Science Diet Small Mini Sensitive 4lb",
+    "brand": "Science Diet",
+    "upc": "052742001807",
+    "upcName": "SD mobility sm bite 4#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6088,
+    "supplyName": "Science Diet 7+ 33lb",
+    "brand": "Science Diet",
+    "upc": "052742203805",
+    "upcName": "SD lg br lam 33#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5919,
+    "supplyName": "Science Diet Small Breed Chicken 4.5lb",
+    "brand": "Science Diet",
+    "upc": "052742909400",
+    "upcName": "sd puppy sm br ck 4.5#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5938,
+    "supplyName": "Science Diet Puppy Chicken 27.5lb",
+    "brand": "Science Diet",
+    "upc": "052742060194",
+    "upcName": "sd puppy lg br ck 27.5#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5928,
+    "supplyName": "Science Diet Large Breed Lamb 33lb",
+    "brand": "Science Diet",
+    "upc": "052742204406",
+    "upcName": "SD lg br 6+ 33#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6804,
+    "supplyName": "Science Diet Cat Indoor 7+ 15.5lb",
+    "brand": "Science Diet",
+    "upc": "052742887500",
+    "upcName": "SD cat hairba 15.5#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5972,
+    "supplyName": "Science Diet Mobility Small Bite 4lb",
+    "brand": "Science Diet",
+    "upc": "052742007038",
+    "upcName": "SD sm min sensi 4#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5962,
+    "supplyName": "Science Diet 7+ 5lb",
+    "brand": "Science Diet",
+    "upc": "052742817804",
+    "upcName": "SD ck 5#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6718,
+    "supplyName": "Science Diet Cat Senior Chicken 2.9oz",
+    "brand": "Science Diet",
+    "upc": "052742068411",
+    "upcName": "SD cat sen duck 2.9oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6578,
+    "supplyName": "Science Diet Sensitive Chicken 12.8oz",
+    "brand": "Science Diet",
+    "upc": "052742143002",
+    "upcName": "SD ck stew 12.8oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5927,
+    "supplyName": "Science Diet Large Breed Chicken 35lb",
+    "brand": "Science Diet",
+    "upc": "052742016054",
+    "upcName": "SD lg br ck 35#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5989,
+    "supplyName": "Science Diet Sensitive Large Breed 30lb",
+    "brand": "Science Diet",
+    "upc": "052742033204",
+    "upcName": "SD sensi lg br 30#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6726,
+    "supplyName": "Science Diet Kitten Healthy Cuisine 2.8oz",
+    "brand": "Science Diet",
+    "upc": "052742007175",
+    "upcName": "SD kitten heal cuis 2.8oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6570,
+    "supplyName": "Science Diet Chicken Stew 12.8oz",
+    "brand": "Science Diet",
+    "upc": "052742304090",
+    "upcName": "SD sensi ck 12.8oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5969,
+    "supplyName": "Science Diet Perf Digest Chicken 12lb",
+    "brand": "Science Diet",
+    "upc": "052742038285",
+    "upcName": "SD perf digest ck 12#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 5981,
+    "supplyName": "Science Diet Perfect Weight Joint 25lb",
+    "brand": "Science Diet",
+    "upc": "052742060521",
+    "upcName": "SD perf weight joint 25#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6148,
+    "supplyName": "Fromm Whitefish 26lb",
+    "brand": "Fromm",
+    "upc": "072705116317",
+    "upcName": "FROMM whitefish 26#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6116,
+    "supplyName": "Fromm Classic 5lb",
+    "brand": "Fromm",
+    "upc": "072705105274",
+    "upcName": "FROMM classic 5#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6126,
+    "supplyName": "Fromm Gold 5lb",
+    "brand": "Fromm",
+    "upc": "072705115570",
+    "upcName": "FROMM gold puppy 5#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6147,
+    "supplyName": "Fromm Whitefish 12lb",
+    "brand": "Fromm",
+    "upc": "072705116331",
+    "upcName": "FROMM whitefish 12#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6155,
+    "supplyName": "Fromm Trout 4lb",
+    "brand": "Fromm",
+    "upc": "072705108060",
+    "upcName": "FROMM trout 4#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6159,
+    "supplyName": "Fromm Rancherosa 4lb",
+    "brand": "Fromm",
+    "upc": "072705114849",
+    "upcName": "FROMM rancherosa 4#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6484,
+    "supplyName": "Fromm Turkey & Pumpkin 12.2oz",
+    "brand": "Fromm",
+    "upc": "072705119080",
+    "upcName": "FROMM wh fish & lentil 12.2oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6158,
+    "supplyName": "Fromm Zealambder 26lb",
+    "brand": "Fromm",
+    "upc": "072705115013",
+    "upcName": "FROMM zealambder 26#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6346,
+    "supplyName": "Fromm Rancharosa 12lb",
+    "brand": "Fromm",
+    "upc": "072705114825",
+    "upcName": "FROMM rancharosa 12#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6117,
+    "supplyName": "Fromm Classic 15lb",
+    "brand": "Fromm",
+    "upc": "072705105236",
+    "upcName": "FROMM classic 15#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6483,
+    "supplyName": "Fromm Chicken & Rice 12.2oz",
+    "brand": "Fromm",
+    "upc": "072705119004",
+    "upcName": "FROMM salm & ck 12.2oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6146,
+    "supplyName": "Fromm Whitefish 4lb",
+    "brand": "Fromm",
+    "upc": "072705116362",
+    "upcName": "FROMM whitefish 4#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6345,
+    "supplyName": "Fromm Lamb 12lb",
+    "brand": "Fromm",
+    "upc": "072705114528",
+    "upcName": "FROMM lamb 12#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6121,
+    "supplyName": "Fromm Gold Large Breed Puppy 5lb",
+    "brand": "Fromm",
+    "upc": "072705115372",
+    "upcName": "FROMM gold lg br 5#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6479,
+    "supplyName": "Fromm Salmon & Chicken 12.2oz",
+    "brand": "Fromm",
+    "upc": "072705119226",
+    "upcName": "FROMM ck & ri 12.2oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6112,
+    "supplyName": "Fromm Classic 30lb",
+    "brand": "Fromm",
+    "upc": "072705105229",
+    "upcName": "FROMM classic 30#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6733,
+    "supplyName": "Fromm Kitten 4lb",
+    "brand": "Fromm",
+    "upc": "072705115808",
+    "upcName": "FROMM kitten 4#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6344,
+    "supplyName": "Fromm Ancient 15lb",
+    "brand": "Fromm",
+    "upc": "072705105939",
+    "upcName": "FROMM ancient 15#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6210,
+    "supplyName": "Blue Buffalo Large Breed H Weight 30lb",
+    "brand": "Blue Buffalo",
+    "upc": "840243105250",
+    "upcName": "BLUE B lg br h weight 30#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6206,
+    "supplyName": "Blue Buffalo Freedom Small Breed 4lb",
+    "brand": "Blue Buffalo",
+    "upc": "859610006816",
+    "upcName": "BLUE B freedom sm br 4#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6215,
+    "supplyName": "Blue Buffalo Small Breed Senior 15lb",
+    "brand": "Blue Buffalo",
+    "upc": "840243105311",
+    "upcName": "BLUE B sm br senior 15#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6231,
+    "supplyName": "Blue Buffalo Small Breed Puppy 5lb",
+    "brand": "Blue Buffalo",
+    "upc": "840243144181",
+    "upcName": "BLUE B sm br puppy 5#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6200,
+    "supplyName": "Blue Buffalo Wilder Small Breed 4.5lb",
+    "brand": "Blue Buffalo",
+    "upc": "840243148608",
+    "upcName": "BLUE B wilder sm br 4.5#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6872,
+    "supplyName": "Blue Buffalo Cat Wilderness Turkey 5.5oz",
+    "brand": "Blue Buffalo",
+    "upc": "859610007684",
+    "upcName": "BLUE BUF cat wild turkey 5.5oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6214,
+    "supplyName": "Blue Buffalo Small Breed Senior 5lb",
+    "brand": "Blue Buffalo",
+    "upc": "840243144167",
+    "upcName": "BLUE B sm br senior 5#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6205,
+    "supplyName": "Blue Buffalo Basic Small Breed 4lb",
+    "brand": "Blue Buffalo",
+    "upc": "859610005789",
+    "upcName": "BLUE B basic sm br 4#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6217,
+    "supplyName": "Blue Buffalo Small Breed Lamb 5lb",
+    "brand": "Blue Buffalo",
+    "upc": "840243144129",
+    "upcName": "BLUE B sm br lamb 5#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6218,
+    "supplyName": "Blue Buffalo Small Breed Lamb 15lb",
+    "brand": "Blue Buffalo",
+    "upc": "840243105687",
+    "upcName": "BLUE B sm br lamb 15#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6201,
+    "supplyName": "Blue Buffalo Wilder Small Breed 13lb",
+    "brand": "Blue Buffalo",
+    "upc": "840243148318",
+    "upcName": "BLUE B wilder sm br 13#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6606,
+    "supplyName": "Blue Buffalo Basic Turkey 12.5oz",
+    "brand": "Blue Buffalo",
+    "upc": "840243105533",
+    "upcName": "BL BUF hunters stew 12.5oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6621,
+    "supplyName": "Blue Buffalo Delight Ro Chicken 3.5 oz",
+    "brand": "Blue Buffalo",
+    "upc": "840243120413",
+    "upcName": "BL BUF delight ro ck 3.5oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6601,
+    "supplyName": "Blue Buffalo Wilderness Turkey 12.5oz",
+    "brand": "Blue Buffalo",
+    "upc": "840243104857",
+    "upcName": "BL BUF wild turk 12.5oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6866,
+    "supplyName": "Blue Buffalo Cat Salmon Pate 5.5oz",
+    "brand": "Blue Buffalo",
+    "upc": "840243140602",
+    "upcName": "BLUE BUF cat salm pate 5.5oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6207,
+    "supplyName": "Blue Buffalo Freedom Small Breed 11lb",
+    "brand": "Blue Buffalo",
+    "upc": "859610006830",
+    "upcName": "BLUE B freedom sm br 11#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6211,
+    "supplyName": "Blue Buffalo Large Breed Puppy 30lb",
+    "brand": "Blue Buffalo",
+    "upc": "859610000449",
+    "upcName": "BLUE B lg br puppy 30#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6634,
+    "supplyName": "Pro Plan Chicken & Rice 13oz",
+    "brand": "Pro Plan",
+    "upc": "038100026743",
+    "upcName": "PRO PLAN ck & ri 13oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6348,
+    "supplyName": "Pro Plan Sensitive Small Breed 15lb",
+    "brand": "Pro Plan",
+    "upc": "038100177032",
+    "upcName": "PRO PLAN sensi sm br 15#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6642,
+    "supplyName": "Pro Plan Turkey & Vegetable 13oz",
+    "brand": "Pro Plan",
+    "upc": "038100153364",
+    "upcName": "PRO PLAN ck & car 13oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6641,
+    "supplyName": "Pro Plan Lamb & Vegetable 13oz",
+    "brand": "Pro Plan",
+    "upc": "038100026859",
+    "upcName": "PRO PLAN 7+ beef & ri 13oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6526,
+    "supplyName": "Pro Plan Senior Large Breed Puppy Salmon 24lb",
+    "brand": "Pro Plan",
+    "upc": "038100190550",
+    "upcName": "PRO PLAN sen lg br pup sal 24#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6637,
+    "supplyName": "Pro Plan Chicken & Carrot 13oz",
+    "brand": "Pro Plan",
+    "upc": "038100153388",
+    "upcName": "PRO PLAN turk & sw po 13oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6644,
+    "supplyName": "Pro Plan Chicken & Vegetable 13oz",
+    "brand": "Pro Plan",
+    "upc": "038100026750",
+    "upcName": "PRO PLAN lam & veg 13oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6518,
+    "supplyName": "Nutrisource PureVita Beef Stew 12.5oz",
+    "brand": "Nutrisource",
+    "upc": "073893962083",
+    "upcName": "NUTRI SOUR pv beef stew 12.5oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 1268,
+    "supplyName": "Magiccoat Prof Series Oats Shed Conditioner",
+    "brand": "Four Paws",
+    "upc": "045663976040",
+    "upcName": "MagicCoat Prof Series Oats Shed con",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6033,
+    "supplyName": "Catit Red Medium",
+    "brand": "Catit",
+    "upc": "022517413838",
+    "upcName": "catit red med",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6030,
+    "supplyName": "Catit Grey Medium",
+    "brand": "Catit",
+    "upc": "022517413852",
+    "upcName": "catit grey med",
+    "score": 0.6
+  },
+  {
+    "supplyId": 7101,
+    "supplyName": "Seachem Prime 8.5oz",
+    "brand": "SeaChem",
+    "upc": "000116077606",
+    "upcName": "SEACHEM amguarad 8.5oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 7103,
+    "supplyName": "Seachem Prime 1.7oz",
+    "brand": "SeaChem",
+    "upc": "000116056403",
+    "upcName": "SEACHEM cupramine 1.7oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 7092,
+    "supplyName": "Seachem Paraguard 8.5oz",
+    "brand": "SeaChem",
+    "upc": "000116124102",
+    "upcName": "SEACHEM pristine 8.5oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 7094,
+    "supplyName": "Seachem Pristine 8.5oz",
+    "brand": "SeaChem",
+    "upc": "000116014601",
+    "upcName": "SEACHEM clarity 8.5oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 7102,
+    "supplyName": "Seachem Prime 3.4oz",
+    "brand": "SeaChem",
+    "upc": "000116014502",
+    "upcName": "SEACHEM clarity 3.4oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 7109,
+    "supplyName": "Seachem Flourish 8.5oz",
+    "brand": "SeaChem",
+    "upc": "000116081368",
+    "upcName": "SEACHEM axolotl cond 8.5oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 7097,
+    "supplyName": "Seachem Stability 8.5oz",
+    "brand": "SeaChem",
+    "upc": "000116047609",
+    "upcName": "SEACHEM florish iron 8.5oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6689,
+    "supplyName": "Tuffy's Cat Chicken & Tuna 5.5oz",
+    "brand": "Tuffy",
+    "upc": "073893022213",
+    "upcName": "TUFFY'S cat ck&tun 5.5oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6488,
+    "supplyName": "Zignature Pork 13oz",
+    "brand": "Zignature",
+    "upc": "888641131648",
+    "upcName": "ZIGN pork 13oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6491,
+    "supplyName": "Zignature Lamb 13oz",
+    "brand": "Zignature",
+    "upc": "888641131211",
+    "upcName": "ZIGN lamb 13oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6247,
+    "supplyName": "Orijen Small Breed 4lb",
+    "brand": "Orijen",
+    "upc": "064992581404",
+    "upcName": "ORIJEN sm br 4#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6706,
+    "supplyName": "Orijen Cat Duck & Chicken 3oz",
+    "brand": "Orijen",
+    "upc": "064992719388",
+    "upcName": "ORIJEN cat du&ck 3oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6556,
+    "supplyName": "Royal Canin 5.2oz",
+    "brand": "Royal Canin",
+    "upc": "030111420152",
+    "upcName": "ROYAL CAN 5.2oz",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6879,
+    "supplyName": "Freshpet Small Breed Ck1lb",
+    "brand": "Freshpet",
+    "upc": "627975012717",
+    "upcName": "FRESHPET sm br multi prot 1#",
+    "score": 0.6
+  },
+  {
+    "supplyId": 6882,
+    "supplyName": "Freshpet Beef 1.5lb",
+    "brand": "Freshpet",
+    "upc": "627975011963",
+    "upcName": "FRESHPET beef 1.5#",
+    "score": 0.6
+  }
+]

@@ -154,15 +154,6 @@
       ]
     },
     {
-      "abbr": "circle",
-      "count": 45,
-      "examples": [
-        "HappyBeaks rotating Circle",
-        "CIRCLE 14\"TCR1786S COLLAR",
-        "CIRCLE 16\"TCR1786S COLLAR"
-      ]
-    },
-    {
       "abbr": "lamb",
       "count": 45,
       "examples": [
@@ -334,15 +325,6 @@
       ]
     },
     {
-      "abbr": "ph",
-      "count": 33,
-      "examples": [
-        "PH Cage Saver",
-        "PH Sm Seed Catcher",
-        "PH Med Seed Catcher"
-      ]
-    },
-    {
       "abbr": "weight",
       "count": 33,
       "examples": [
@@ -385,24 +367,6 @@
         "ZML MED EYE DROPS TURTLE",
         "ExoTerra Turtle Pebbles",
         "ExoTerra Turtle bank"
-      ]
-    },
-    {
-      "abbr": "marina",
-      "count": 32,
-      "examples": [
-        "MARINA 50w heater",
-        "MARINA 150w heater",
-        "MARINA 200w heater"
-      ]
-    },
-    {
-      "abbr": "rbp",
-      "count": 30,
-      "examples": [
-        "RBP DRY W/G LAND 4#",
-        "RBP TRT BNE KNUCKLE SMOKED",
-        "RBP TRT CLLGN STC SM 5CT"
       ]
     },
     {
@@ -451,15 +415,6 @@
       ]
     },
     {
-      "abbr": "vict",
-      "count": 29,
-      "examples": [
-        "VICT seniior 40#",
-        "VICT hi energy 40#",
-        "VICT perfor 40#"
-      ]
-    },
-    {
       "abbr": "fish",
       "count": 28,
       "examples": [
@@ -469,30 +424,12 @@
       ]
     },
     {
-      "abbr": "weewee",
-      "count": 28,
-      "examples": [
-        "WeeWee Patch Indoor Potty sm",
-        "WeeWee Spring Action Scoop Sm",
-        "WeeWee SpringActionGrss Scp  Med"
-      ]
-    },
-    {
       "abbr": "turk",
       "count": 28,
       "examples": [
         "WELLN sm br turk 4#",
         "VIT ESS turk min pat 14oz",
         "VIT ESS turk min nib 14oz"
-      ]
-    },
-    {
-      "abbr": "gre",
-      "count": 27,
-      "examples": [
-        "GRE TRT DNTL ORIG LG 6OZ",
-        "GRE TRT PILLP CAPSL CHS 15.8OZ",
-        "GRE TRT PILLP CAPSL PB 15.8Z"
       ]
     },
     {
@@ -649,15 +586,6 @@
       ]
     },
     {
-      "abbr": "zign",
-      "count": 23,
-      "examples": [
-        "ZIGN zssen 13oz",
-        "ZIGN pork 13oz",
-        "ZIGN wh fish 13oz"
-      ]
-    },
-    {
       "abbr": "lttr",
       "count": 22,
       "examples": [
@@ -682,15 +610,6 @@
         "ZooMed Min Des. UVB Combo",
         "ExoTerra Min/Max Thermo",
         "ZooMed Min/Max Thermo"
-      ]
-    },
-    {
-      "abbr": "turbo",
-      "count": 22,
-      "examples": [
-        "Turbo Cat ball",
-        "Turbo Yarn Ball",
-        "Turbo Octopus"
       ]
     },
     {
@@ -799,15 +718,6 @@
         "DOS LTTR SCOOP WH LG",
         "DOS LTTR SCOOP WH JMB",
         "DOS LTTR SCOOP WH GNT"
-      ]
-    },
-    {
-      "abbr": "quiet",
-      "count": 18,
-      "examples": [
-        "GAR QUIET MOMENT MELATONIN70CT",
-        "GAR QUIET MOMENTS HEMP 60CT",
-        "GAR SPLMT HEMP QUIET LIQ 1OZ"
       ]
     },
     {
@@ -973,15 +883,6 @@
       ]
     },
     {
-      "abbr": "health",
-      "count": 16,
-      "examples": [
-        "FreshBreathe Support Skin Health 33.8 oz",
-        "PetHonesty Allergy Skin Health",
-        "PetHonesty Hip+Joint Health Max"
-      ]
-    },
-    {
       "abbr": "essen",
       "count": 16,
       "examples": [
@@ -1087,15 +988,6 @@
         "NylaBone Senior Dental Kit",
         "DIAM senior 35#",
         "FROMM gold senior 5#"
-      ]
-    },
-    {
-      "abbr": "fussie",
-      "count": 15,
-      "examples": [
-        "FUSSIE cat salm 10#",
-        "Fussie cat salm 3.5#",
-        "\"FUSSIE CAT tuna"
       ]
     },
     {
@@ -1756,15 +1648,6 @@
       ]
     },
     {
-      "abbr": "hlp",
-      "count": 10,
-      "examples": [
-        "HLP BEDNG CF COLRS PR 23L",
-        "HLP BEDNG CF COLRS BL 50L",
-        "HLP BEDNG CF SPEC SEA GLASS23L"
-      ]
-    },
-    {
       "abbr": "cf",
       "count": 10,
       "examples": [
@@ -1873,24 +1756,6 @@
       ]
     },
     {
-      "abbr": "durvet",
-      "count": 10,
-      "examples": [
-        "Durvet Chlorhexidine Solution",
-        "Durvet Medicated itch Spray",
-        "Durvet Remedies Iodine Shampoo"
-      ]
-    },
-    {
-      "abbr": "nyla",
-      "count": 10,
-      "examples": [
-        "NYLA SNEAKY SNACKER WOLF",
-        "NYLA PUP TACTILE STICK",
-        "NYLA PUP TEETHING RINGS"
-      ]
-    },
-    {
       "abbr": "airdog",
       "count": 10,
       "examples": [
@@ -1924,15 +1789,6 @@
         "KAY FOOD BIG BITE PRRT 4#",
         "Big Jelly Pots",
         "ZooMed Big dripper"
-      ]
-    },
-    {
-      "abbr": "nbp",
-      "count": 9,
-      "examples": [
-        "NBP DRY LID VENISN/SWPOT 22#",
-        "NBP TRT LIT VENISN/SWPOT S/B8Z",
-        "NBP DRY LID SLMN/SWPOT 4#"
       ]
     },
     {
@@ -2278,15 +2134,6 @@
       ]
     },
     {
-      "abbr": "zup",
-      "count": 8,
-      "examples": [
-        "ZUP FOOD SELECTS TIEL/LVBR2.5#",
-        "ZUP FOOD FRT BLND TIEL 2#",
-        "ZUP FOOD PRRT FRT BREEDER 40#"
-      ]
-    },
-    {
       "abbr": "den",
       "count": 8,
       "examples": [
@@ -2347,15 +2194,6 @@
         "BLI CARRIER COMFT SM BK/BR",
         "BLI CARRIER COMFT SM TP",
         "BLI CARRIER COMFT SM BERMUDA"
-      ]
-    },
-    {
-      "abbr": "lov",
-      "count": 8,
-      "examples": [
-        "LOV BOWL DOLCE WOOF SM",
-        "LOV BOWL BELLA CLSC PK MD",
-        "LOV BOWL BELLA CLSC BL MD"
       ]
     },
     {
@@ -2782,39 +2620,12 @@
       ]
     },
     {
-      "abbr": "bli",
-      "count": 7,
-      "examples": [
-        "BLI CARRIER COMFT SM BK/BR",
-        "BLI CARRIER COMFT SM TP",
-        "BLI CARRIER COMFT SM BERMUDA"
-      ]
-    },
-    {
-      "abbr": "ela",
-      "count": 7,
-      "examples": [
-        "ELA MED TAPE WORM 5CT",
-        "ELA F/T CLLR CT SERESTO",
-        "ELA F/T CLLR SERESTO LG"
-      ]
-    },
-    {
       "abbr": "bag",
       "count": 7,
       "examples": [
         "FLU TRT GRUB BAG BRD DRGN 4OZ",
         "FLU TRT GRUB BAG MLWORM 3.75Z",
         "FLU TRT GRUB BAG TRTL SHRMP6OZ"
-      ]
-    },
-    {
-      "abbr": "repto",
-      "count": 7,
-      "examples": [
-        "TET CRTRDG REPTO FLTR 3PK",
-        "Repto Treat Turtle",
-        "Repto Orange Hanging Vines 12\""
       ]
     },
     {
@@ -2842,15 +2653,6 @@
         "FAS PJS TIE DYE YL SM",
         "VIP TOU TUFF SPRT TUG-O-WAR YL",
         "FAS COAT RAINY DAY YL LG"
-      ]
-    },
-    {
-      "abbr": "far",
-      "count": 7,
-      "examples": [
-        "FAR RMDY CLLR COMFT ZONE",
-        "FAR F/T SHMP C ADAMS-P FOAM10Z",
-        "FAR F/T ADAMS-P C SPT ON <5#3M"
       ]
     },
     {
@@ -3157,15 +2959,6 @@
         "TOW anc mount 5#",
         "TOW anc mount 14#",
         "TOW sierra mount 5#"
-      ]
-    },
-    {
-      "abbr": "welln",
-      "count": 7,
-      "examples": [
-        "WELLN sm br weight 4#",
-        "WELLN sm br turk 4#",
-        "WELLN sm br core 12#"
       ]
     },
     {
@@ -7725,116 +7518,6 @@
   ],
   "potential_brand_prefixes": [
     {
-      "prefix": "rbp",
-      "count": 30,
-      "examples": [
-        "RBP DRY W/G LAND 4#",
-        "RBP TRT BNE KNUCKLE SMOKED",
-        "RBP TRT CLLGN STC SM 5CT",
-        "RBP CAN STEW TRKY/CRRT 12OZ",
-        "RBP DRY W/G OCN 4#"
-      ]
-    },
-    {
-      "prefix": "ph",
-      "count": 30,
-      "examples": [
-        "PH Cage Saver",
-        "PH Sm Seed Catcher",
-        "PH Med Seed Catcher",
-        "PH Snuggle Sack Med",
-        "PH Snuggle Sack XL"
-      ]
-    },
-    {
-      "prefix": "vict",
-      "count": 29,
-      "examples": [
-        "VICT seniior 40#",
-        "VICT hi energy 40#",
-        "VICT perfor 40#",
-        "VICT yukon 30#",
-        "VICT hi pro 50#"
-      ]
-    },
-    {
-      "prefix": "gre",
-      "count": 26,
-      "examples": [
-        "GRE TRT DNTL ORIG LG 6OZ",
-        "GRE TRT PILLP CAPSL CHS 15.8OZ",
-        "GRE TRT PILLP CAPSL PB 15.8Z",
-        "GRE TRT DNTL PUP XS 6OZ",
-        "GRE TRT DNTL ORIG XS 12OZ"
-      ]
-    },
-    {
-      "prefix": "bl",
-      "count": 26,
-      "examples": [
-        "BL BUF ck stew 12.5oz",
-        "BL BUF hunters stew 12.5oz",
-        "BL BUF beef stew",
-        "BL BUF bac yard bbq 12.5oz",
-        "BL BUF sun din 12.5oz"
-      ]
-    },
-    {
-      "prefix": "zign",
-      "count": 23,
-      "examples": [
-        "ZIGN zssen 13oz",
-        "ZIGN pork 13oz",
-        "ZIGN wh fish 13oz",
-        "ZIGN tr & salm 13oz",
-        "ZIGN lamb 13oz"
-      ]
-    },
-    {
-      "prefix": "turbo",
-      "count": 22,
-      "examples": [
-        "Turbo Cat ball",
-        "Turbo Yarn Ball",
-        "Turbo Octopus",
-        "Turbo Sports Ball",
-        "Turbo Foil Ball"
-      ]
-    },
-    {
-      "prefix": "happy",
-      "count": 20,
-      "examples": [
-        "Happy Beaks Two Sided Mirror",
-        "Happy Beaks Snuggle Sack MD",
-        "Happy Beaks Snuggle SackLG",
-        "Happy Beaks Tent",
-        "Happy Beaks Cozy Corner Sm"
-      ]
-    },
-    {
-      "prefix": "quiet",
-      "count": 14,
-      "examples": [
-        "Quiet Time Pet bed Blue 18\"",
-        "Quiet time pet bed Pink 18\"",
-        "Quiet Time Reverseible Bed 18\"",
-        "Quiet time Bolster Bed Sm White",
-        "Quiet Time Reversible Bed 24\""
-      ]
-    },
-    {
-      "prefix": "hlp",
-      "count": 10,
-      "examples": [
-        "HLP BEDNG CF COLRS PR 23L",
-        "HLP BEDNG CF COLRS BL 50L",
-        "HLP BEDNG CF SPEC SEA GLASS23L",
-        "HLP BEDNG CF NAT WH 10L",
-        "HLP BEDNG CF COLRS BL 23L"
-      ]
-    },
-    {
       "prefix": "small",
       "count": 10,
       "examples": [
@@ -7843,17 +7526,6 @@
         "Small world Habitat 4Gal",
         "Small world Habitat 2.2 Gal",
         "Small World Habitat 1G"
-      ]
-    },
-    {
-      "prefix": "nyla",
-      "count": 10,
-      "examples": [
-        "NYLA SNEAKY SNACKER WOLF",
-        "NYLA PUP TACTILE STICK",
-        "NYLA PUP TEETHING RINGS",
-        "NYLA CHILL&CHEW BONE REG",
-        "NYLA PWR CHW TWIST GIANT"
       ]
     },
     {
@@ -7868,36 +7540,14 @@
       ]
     },
     {
-      "prefix": "nbp",
+      "prefix": "happy",
       "count": 9,
       "examples": [
-        "NBP DRY LID VENISN/SWPOT 22#",
-        "NBP TRT LIT VENISN/SWPOT S/B8Z",
-        "NBP DRY LID SLMN/SWPOT 4#",
-        "NBP DRY LID SLMN/SWPOT S/B 4#",
-        "NBP CAN LID SLMN/SWPOT 13OZ"
-      ]
-    },
-    {
-      "prefix": "zup",
-      "count": 8,
-      "examples": [
-        "ZUP FOOD SELECTS TIEL/LVBR2.5#",
-        "ZUP FOOD FRT BLND TIEL 2#",
-        "ZUP FOOD PRRT FRT BREEDER 40#",
-        "ZUP FOOD PRRT NAT BREEDER 40#",
-        "ZUP FOOD FRT BLND PRRT/CNR 2#"
-      ]
-    },
-    {
-      "prefix": "lov",
-      "count": 8,
-      "examples": [
-        "LOV BOWL DOLCE WOOF SM",
-        "LOV BOWL BELLA CLSC PK MD",
-        "LOV BOWL BELLA CLSC BL MD",
-        "LOV BOWL SS R-N-T DMD 3QT",
-        "LOV MAT BELLA SPILL PROOF BKLG"
+        "Happy Jack Mange Medicine",
+        "Happy Jack Kennel Dip II",
+        "Happy Jack Xylecide",
+        "Happy Jack Pad Kote",
+        "Happy Jack Itch No more Shampoo"
       ]
     },
     {
@@ -7923,39 +7573,6 @@
       ]
     },
     {
-      "prefix": "bli",
-      "count": 7,
-      "examples": [
-        "BLI CARRIER COMFT SM BK/BR",
-        "BLI CARRIER COMFT SM TP",
-        "BLI CARRIER COMFT SM BERMUDA",
-        "BLI CARRIER COMFT SM BRY",
-        "BLI CARRIER COMFT LG TP"
-      ]
-    },
-    {
-      "prefix": "ela",
-      "count": 7,
-      "examples": [
-        "ELA MED TAPE WORM 5CT",
-        "ELA F/T CLLR CT SERESTO",
-        "ELA F/T CLLR SERESTO LG",
-        "ELA SHMP F/T CT ADVANTAGE 8OZ",
-        "ELA F/T K9 ADVANTIX II LG 6PK"
-      ]
-    },
-    {
-      "prefix": "far",
-      "count": 7,
-      "examples": [
-        "FAR RMDY CLLR COMFT ZONE",
-        "FAR F/T SHMP C ADAMS-P FOAM10Z",
-        "FAR F/T ADAMS-P C SPT ON <5#3M",
-        "FAR F/T SHMP ADAMS FOAMING 10Z",
-        "FAR F/T ADAMS-P SPT ON XL 3M"
-      ]
-    },
-    {
       "prefix": "sm",
       "count": 7,
       "examples": [
@@ -7975,28 +7592,6 @@
         "CWMK SM PURP",
         "CWMK LG RED",
         "CWMK MED BLUE"
-      ]
-    },
-    {
-      "prefix": "welln",
-      "count": 7,
-      "examples": [
-        "WELLN sm br weight 4#",
-        "WELLN sm br turk 4#",
-        "WELLN sm br core 12#",
-        "WELLN wh fish 26#",
-        "WELLN lam stew 12.5oz"
-      ]
-    },
-    {
-      "prefix": "repto",
-      "count": 6,
-      "examples": [
-        "Repto Treat Turtle",
-        "Repto Orange Hanging Vines 12\"",
-        "Repto Pink Hanging Vines 24\"",
-        "Repto Pink Hanging Vines 12'",
-        "Repto green hanging Vines 24'"
       ]
     },
     {
