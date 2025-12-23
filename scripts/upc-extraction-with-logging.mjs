@@ -49,75 +49,113 @@ const BRAND_PREFIXES = {
   'wwi': 'World Wide Imports',
   'api': 'API',
   'glf': 'GloFish',
+  'penn': 'Penn-Plax',
   
   // Reptile brands
-  'zmd': 'Zoo Med', 'zm': 'Zoo Med', 'zml': 'Zoo Med',
+  'zmd': 'Zoo Med', 'zm': 'Zoo Med', 'zml': 'Zoo Med', 'zoomed': 'Zoo Med',
   'exo': 'Exo Terra',
-  'zil': 'Zilla',
-  'flk': 'Flukers', 'fsk': 'Flukers',
+  'zil': 'Zilla', 'zilla': 'Zilla',
+  'flk': 'Flukers', 'fsk': 'Flukers', 'flu': 'Flukers', 'flukers': 'Flukers',
   'kmd': 'Komodo',
   'pge': 'Pangea',
   
   // Dog/Cat brands
-  'kon': 'Kong', 'kng': 'Kong',
+  'kon': 'Kong', 'kng': 'Kong', 'kong': 'Kong',
   'cst': 'Coastal', 'coa': 'Coastal',
-  'nyl': 'Nylabone',
-  'ben': 'Benebone',
+  'nyl': 'Nylabone', 'nylabone': 'Nylabone',
+  'ben': 'Benebone', 'benebone': 'Benebone',
   'smb': 'SmartBones', 'smbn': 'SmartBones',
   'bwi': 'Barkworthies',
-  'rdb': 'RedBarn',
-  'grn': 'Greenies',
-  'whi': 'Whimzees',
-  'cht': 'Chuckit',
+  'rdb': 'RedBarn', 'redbarn': 'RedBarn',
+  'grn': 'Greenies', 'greenies': 'Greenies',
+  'whi': 'Whimzees', 'whimzees': 'Whimzees',
+  'cht': 'Chuckit', 'chuckit': 'Chuckit',
   'eth': 'Ethical Pet',
-  'spt': 'Spot',
+  'spt': 'Spot', 'spot': 'Spot',
   'jwp': 'JW Pet', 'jw': 'JW Pet',
-  'saf': 'Safari',
-  'trc': 'TropiClean', 'trp': 'TropiClean',
-  'frp': 'Four Paws',
-  'nvt': 'NaturVet',
+  'saf': 'Safari', 'safari': 'Safari',
+  'trc': 'TropiClean', 'trp': 'TropiClean', 'tro': 'TropiClean', 'tropiclean': 'TropiClean',
+  'frp': 'Four Paws', 'fourpaws': 'Four Paws',
+  'nvt': 'NaturVet', 'naturvet': 'NaturVet',
+  // NOTE: 'gar' is Garmon Corp (distributor), NOT a brand - use context detection instead
   'fas': 'Fashion Pet',
-  'pts': 'Petmate',
-  'mps': 'Multipet', 'mrp': 'Multipet',
+  'pts': 'Petmate', 'petmate': 'Petmate',
+  'mps': 'Multipet', 'mrp': 'Multipet', 'multipet': 'Multipet',
+  'mam': 'Mammoth', 'mammoth': 'Mammoth',
   'tit': 'Titan',
-  'prv': 'Prevue',
+  'prv': 'Prevue', 'prevue': 'Prevue',
   'llp': "Li'l Pals",
-  'tuf': 'Tuffy',
+  'tuf': 'Tuffy', 'tuffy': 'Tuffy',
+  'catit': 'Catit',
   
   // Small animal/bird brands
-  'kay': 'Kaytee', 'kmp': 'Kaytee',
-  'oxb': 'Oxbow',
-  'vtk': 'Vitakraft',
-  'laf': 'Lafebers',
-  'aec': 'A&E Cage',
+  'kay': 'Kaytee', 'kmp': 'Kaytee', 'kaytee': 'Kaytee',
+  'oxb': 'Oxbow', 'oxbow': 'Oxbow',
+  'vtk': 'Vitakraft', 'vitakraft': 'Vitakraft',
+  'laf': 'Lafebers', 'lafebers': 'Lafebers',
+  'aec': 'A&E Cage', 'a&e': 'A&E Cage',
   'brd': 'Birdlife',
   'ppx': 'Penn-Plax',
-  'mar': 'Marshall',
+  'marshall': 'Marshall',
   
   // Food brands
   'sd': 'Science Diet', 'hsd': 'Science Diet',
-  'bb': 'Blue Buffalo', 'blu': 'Blue Buffalo',
-  'rc': 'Royal Canin',
-  'nut': 'Nutrisource', 'nbs': 'Nutrisource',
-  'frm': 'Fromm',
-  'dia': 'Diamond',
-  'wlns': 'Wellness',
+  'bb': 'Blue Buffalo', 'blu': 'Blue Buffalo', 'blue': 'Blue Buffalo',
+  'rc': 'Royal Canin', 'royal': 'Royal Canin',
+  'nut': 'Nutrisource', 'nbs': 'Nutrisource', 'sou': 'Nutrisource', 'nutri': 'Nutrisource',
+  'frm': 'Fromm', 'fromm': 'Fromm',
+  'dia': 'Diamond', 'diam': 'Diamond', 'diamond': 'Diamond',
+  'wlns': 'Wellness', 'wellness': 'Wellness',
   'nat': 'Natural Balance', 'nb': 'Natural Balance',
-  'iam': 'Iams',
-  'prna': 'Purina',
-  'pp': 'Pro Plan',
+  'iam': 'Iams', 'iams': 'Iams',
+  'prna': 'Purina', 'purina': 'Purina',
+  'pp': 'Pro Plan', 'pro': 'Pro Plan',
   'nulo': 'Nulo',
-  'aca': 'Acana',
-  'ori': 'Orijen',
-  'mer': 'Merrick',
-  'can': 'Canidae',
-  'tas': 'Taste of the Wild',
-  'ins': 'Instinct',
-  'euk': 'Eukanuba',
-  'pds': 'Pedigree',
-  'csr': 'Cesar',
+  'aca': 'Acana', 'acana': 'Acana',
+  'ori': 'Orijen', 'orijen': 'Orijen',
+  'mer': 'Merrick', 'merrick': 'Merrick',
+  'can': 'Canidae', 'canidae': 'Canidae',
+  'tas': 'Taste of the Wild', 'tow': 'Taste of the Wild',
+  'ins': 'Instinct', 'instinct': 'Instinct',
+  'euk': 'Eukanuba', 'eukanuba': 'Eukanuba',
+  'pds': 'Pedigree', 'pedigree': 'Pedigree',
+  'csr': 'Cesar', 'cesar': 'Cesar',
   'mpf': 'Monster Pet Food',
+  'vit': 'Vital Essentials', 'vital': 'Vital Essentials',
+  'adams': 'Adams',
+  'advantage': 'Advantage',
+  'tomlyn': 'Tomlyn',
+  'zymox': 'Zymox',
+  'furminator': 'Furminator',
+  'earthbath': 'Earthbath',
 };
+
+// Context-based brand detection using product keywords
+// These are VERIFIED patterns - don't add guesses here!
+const CONTEXT_BRAND_RULES = [
+  // NaturVet products (distributed by Garmon Corp with GAR prefix)
+  { keywords: ['cranberry relief', 'crnbrry relief'], brand: 'NaturVet', confidence: 'high' },
+  { keywords: ['quiet moment', 'grasssaver', 'coprophagia'], brand: 'NaturVet', confidence: 'high' },
+  { keywords: ['all-in-one', 'hip joint', 'digestive enzymes'], brand: 'NaturVet', confidence: 'medium' },
+  
+  // Lafebers products
+  { keywords: ['nutri berries', 'nutriberries', 'el paso'], brand: 'Lafebers', confidence: 'high' },
+  
+  // Blue Buffalo products
+  { keywords: ['wilderness', 'life protection', 'blue basics'], brand: 'Blue Buffalo', confidence: 'high' },
+  
+  // Taste of the Wild products
+  { keywords: ['ancient stream', 'ancient wetland', 'ancient prairie', 'ancient mountain'], brand: 'Taste of the Wild', confidence: 'high' },
+  
+  // Zoo Med products
+  { keywords: ['creature soil', 'repti bark', 'eco earth', 'naturalistic'], brand: 'Zoo Med', confidence: 'high' },
+  
+  // Flukers products  
+  { keywords: ['repta leash', 'cricket quencher', 'hermit crab'], brand: 'Flukers', confidence: 'high' },
+];
+
+// Track unverified prefix patterns for manual review (don't auto-promote!)
+let unverifiedPrefixes = {};
 
 const ABBREVIATIONS = {
   // Product types
@@ -287,33 +325,52 @@ function expandText(text) {
 
 function detectBrand(text) {
   const lower = text.toLowerCase();
-  const firstWord = lower.split(/\s+/)[0];
+  const words = lower.split(/\s+/);
+  const firstWord = words[0];
   
-  // Check brand prefixes
+  // STEP 1: Check verified brand prefixes (highest priority)
   if (BRAND_PREFIXES[firstWord]) {
-    return BRAND_PREFIXES[firstWord];
+    return { brand: BRAND_PREFIXES[firstWord], method: 'prefix', confidence: 'verified' };
   }
   
-  // Check if brand name appears at start
-  const brandPatterns = Object.values(BRAND_PREFIXES);
+  // STEP 2: Check if brand name appears at start
+  const brandPatterns = [...new Set(Object.values(BRAND_PREFIXES))];
   for (const brand of brandPatterns) {
     if (lower.startsWith(brand.toLowerCase())) {
-      return brand;
+      return { brand, method: 'name_match', confidence: 'verified' };
     }
   }
   
-  // Track unknown first words as potential brand prefixes
-  if (firstWord.length >= 2 && firstWord.length <= 4 && /^[a-z]+$/i.test(firstWord)) {
+  // STEP 3: Check context-based rules
+  for (const rule of CONTEXT_BRAND_RULES) {
+    for (const keyword of rule.keywords) {
+      if (lower.includes(keyword.toLowerCase())) {
+        return { brand: rule.brand, method: 'context', confidence: rule.confidence, keyword };
+      }
+    }
+  }
+  
+  // STEP 4: Track unknown first words for MANUAL REVIEW (never auto-promote!)
+  if (firstWord.length >= 2 && firstWord.length <= 5 && /^[a-z]+$/i.test(firstWord)) {
+    if (!unverifiedPrefixes[firstWord]) {
+      unverifiedPrefixes[firstWord] = { count: 0, examples: [], status: 'needs_review' };
+    }
+    unverifiedPrefixes[firstWord].count++;
+    if (unverifiedPrefixes[firstWord].examples.length < 5) {
+      unverifiedPrefixes[firstWord].examples.push(text.substring(0, 80));
+    }
+    
+    // Also track in log for learning
     if (!log.brandPrefixesFound[firstWord]) {
-      log.brandPrefixesFound[firstWord] = { count: 0, examples: [] };
+      log.brandPrefixesFound[firstWord] = { count: 0, examples: [], status: 'NEEDS_VERIFICATION' };
     }
     log.brandPrefixesFound[firstWord].count++;
-    if (log.brandPrefixesFound[firstWord].examples.length < 3) {
-      log.brandPrefixesFound[firstWord].examples.push(text.substring(0, 60));
+    if (log.brandPrefixesFound[firstWord].examples.length < 5) {
+      log.brandPrefixesFound[firstWord].examples.push(text.substring(0, 80));
     }
   }
   
-  return 'UNKNOWN';
+  return { brand: 'UNKNOWN', method: 'none', confidence: 'none' };
 }
 
 // ===== MAIN EXTRACTION =====
@@ -435,32 +492,46 @@ async function main() {
   let brandCounts = {};
   let sourceCounts = {};
   
+  let methodCounts = { prefix: 0, name_match: 0, context: 0, none: 0 };
+  let confidenceCounts = { verified: 0, high: 0, medium: 0, none: 0 };
+  
   for (const [upc, data] of allUpcs) {
     const expanded = expandText(data.name);
-    const brand = detectBrand(data.name);
+    const brandResult = detectBrand(data.name);
     
     result.push({
       upc,
       name_original: data.name,
       name_expanded: expanded,
-      brand,
+      brand: brandResult.brand,
+      brand_method: brandResult.method,
+      brand_confidence: brandResult.confidence,
+      brand_keyword: brandResult.keyword || null,
       source: data.source
     });
     
-    brandCounts[brand] = (brandCounts[brand] || 0) + 1;
+    brandCounts[brandResult.brand] = (brandCounts[brandResult.brand] || 0) + 1;
     sourceCounts[data.source] = (sourceCounts[data.source] || 0) + 1;
+    methodCounts[brandResult.method] = (methodCounts[brandResult.method] || 0) + 1;
+    confidenceCounts[brandResult.confidence] = (confidenceCounts[brandResult.confidence] || 0) + 1;
   }
   
   log.stats = {
     total_upcs: result.length,
     by_source: sourceCounts,
     by_brand: brandCounts,
+    by_detection_method: methodCounts,
+    by_confidence: confidenceCounts,
     unknown_brand_count: brandCounts['UNKNOWN'] || 0
   };
   
+  // Add unverified prefixes to log for review
+  log.unverifiedPrefixes = unverifiedPrefixes;
+  
   logStep('Processing complete', {
     total: result.length,
-    known_brands: result.length - (brandCounts['UNKNOWN'] || 0),
+    verified_brands: confidenceCounts.verified || 0,
+    context_detected: methodCounts.context || 0,
     unknown_brands: brandCounts['UNKNOWN'] || 0
   });
   
@@ -475,8 +546,16 @@ async function main() {
   result.slice(0, 15).forEach(u => {
     console.log(`\nOriginal: ${u.name_original}`);
     console.log(`Expanded: ${u.name_expanded}`);
-    console.log(`Brand: ${u.brand} | Source: ${u.source}`);
+    console.log(`Brand: ${u.brand} (${u.brand_method}/${u.brand_confidence}) | Source: ${u.source}`);
+    if (u.brand_keyword) console.log(`  Matched keyword: "${u.brand_keyword}"`);
   });
+  
+  // Show detection method breakdown
+  console.log('\n========== DETECTION METHODS ==========');
+  console.log(`Prefix match (verified): ${methodCounts.prefix}`);
+  console.log(`Name match (verified): ${methodCounts.name_match}`);
+  console.log(`Context rules: ${methodCounts.context}`);
+  console.log(`Unknown (needs review): ${methodCounts.none}`);
   
   // STEP 8: Show unknown abbreviations for learning
   console.log('\n========== UNKNOWN ABBREVIATIONS (HELP NEEDED) ==========');
