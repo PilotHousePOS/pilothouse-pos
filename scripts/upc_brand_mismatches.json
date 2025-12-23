@@ -1,6 +1,6 @@
 {
-  "auditDate": "2025-12-23T17:49:12.847Z",
-  "totalMismatches": 1788,
+  "auditDate": "2025-12-23T18:08:40.228Z",
+  "totalMismatches": 1623,
   "mismatches": [
     {
       "id": 7263,
@@ -92,17 +92,6 @@
       ]
     },
     {
-      "id": 5039,
-      "name": "Aqualife 28\" Bubble Wall",
-      "supplyBrand": "Aqualife",
-      "upc": "097612621501",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 5044,
       "name": "Aqualife 35.5\" Bend Bubble Wall",
       "supplyBrand": "Aqualife",
@@ -146,17 +135,6 @@
       "upcPrefix": "618940",
       "expectedBrands": [
         "jw pet"
-      ]
-    },
-    {
-      "id": 5064,
-      "name": "Aqualife Superflex Airtube Pink 8ft",
-      "supplyBrand": "Aqualife",
-      "upc": "097612200812",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -334,16 +312,6 @@
       ]
     },
     {
-      "id": 5510,
-      "name": "Aqueon Phosphate Remove 20-75",
-      "supplyBrand": "Aqueon",
-      "upc": "071859426419",
-      "upcPrefix": "071859",
-      "expectedBrands": [
-        "kaytee"
-      ]
-    },
-    {
       "id": 4993,
       "name": "Aqueon Proscraper 3.0 Short",
       "supplyBrand": "Aqueon",
@@ -356,28 +324,6 @@
       ]
     },
     {
-      "id": 5088,
-      "name": "Aqueon Quitflow Air Pump40",
-      "supplyBrand": "Aqueon",
-      "upc": "097612009101",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 5617,
-      "name": "Aqueon T8 Fullspec 36\"l",
-      "supplyBrand": "Aqueon",
-      "upc": "097612326307",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 5005,
       "name": "Aqueon Twist & Click Steel Blade 3pk",
       "supplyBrand": "Aqueon",
@@ -387,50 +333,6 @@
         "fluval",
         "marina",
         "hagen"
-      ]
-    },
-    {
-      "id": 4439,
-      "name": "10\" Collagen Sticks Chicken",
-      "supplyBrand": "Barkworthies",
-      "upc": "097612325126",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4440,
-      "name": "10\" Collagen Stiks Bacon",
-      "supplyBrand": "Barkworthies",
-      "upc": "097612092080",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4609,
-      "name": "Benebone Large Wishbone Bacon",
-      "supplyBrand": "Benebone",
-      "upc": "097612104011",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4616,
-      "name": "Benebone Large Wishbone Chicken",
-      "supplyBrand": "Benebone",
-      "upc": "097612104011",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -453,28 +355,6 @@
       "upcPrefix": "096316",
       "expectedBrands": [
         "zilla"
-      ]
-    },
-    {
-      "id": 4818,
-      "name": "Bionic Bone Medium",
-      "supplyBrand": "Bionic",
-      "upc": "097612923612",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4819,
-      "name": "Bionic Bone Small",
-      "supplyBrand": "Bionic",
-      "upc": "097612923629",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -2090,28 +1970,6 @@
       "expectedBrands": [
         "instinct",
         "nature's variety"
-      ]
-    },
-    {
-      "id": 5097,
-      "name": "Caribsea Cichlid 20lb Sand",
-      "supplyBrand": "CaribSea",
-      "upc": "097612930108",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 5099,
-      "name": "Ecoplanted Red 20lb",
-      "supplyBrand": "CaribSea",
-      "upc": "097612091557",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -5971,17 +5829,6 @@
       ]
     },
     {
-      "id": 2584,
-      "name": "Coastal Large Dinosaurs26 Collar",
-      "supplyBrand": "Coastal",
-      "upc": "097612210224",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 2592,
       "name": "Coastal Large Llamas26 Collar",
       "supplyBrand": "Coastal",
@@ -5989,28 +5836,6 @@
       "upcPrefix": "076484",
       "expectedBrands": [
         "kong"
-      ]
-    },
-    {
-      "id": 2594,
-      "name": "Coastal Large Pineapples26 Collar",
-      "supplyBrand": "Coastal",
-      "upc": "097612210224",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 2590,
-      "name": "Coastal Large Unicorns26 Collar",
-      "supplyBrand": "Coastal",
-      "upc": "097612210224",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -6051,39 +5876,6 @@
       "upcPrefix": "076484",
       "expectedBrands": [
         "kong"
-      ]
-    },
-    {
-      "id": 3322,
-      "name": "Coastal Leash Bmb06\" 46436",
-      "supplyBrand": "Coastal",
-      "upc": "0976120088007",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 3312,
-      "name": "Coastal Leash Bmb06' 46336",
-      "supplyBrand": "Coastal",
-      "upc": "097612610208",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 3321,
-      "name": "Coastal Leash Bmb06' 46936",
-      "supplyBrand": "Coastal",
-      "upc": "097612752045",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -6227,17 +6019,6 @@
       ]
     },
     {
-      "id": 3276,
-      "name": "Coastal Leash Nbp6' 61476",
-      "supplyBrand": "Coastal",
-      "upc": "097612008708",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 3275,
       "name": "Coastal Leash Nbp6' 61976",
       "supplyBrand": "Coastal",
@@ -6358,17 +6139,6 @@
       ]
     },
     {
-      "id": 3280,
-      "name": "Coastal Leash Rwp6' 61476",
-      "supplyBrand": "Coastal",
-      "upc": "097612008708",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 3279,
       "name": "Coastal Leash Rwp6' 61976",
       "supplyBrand": "Coastal",
@@ -6426,17 +6196,6 @@
       "upcPrefix": "076484",
       "expectedBrands": [
         "kong"
-      ]
-    },
-    {
-      "id": 3274,
-      "name": "Coastal Leash Tsa6' 61476",
-      "supplyBrand": "Coastal",
-      "upc": "097612008708",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -6627,17 +6386,6 @@
       "upcPrefix": "076484",
       "expectedBrands": [
         "kong"
-      ]
-    },
-    {
-      "id": 3701,
-      "name": "Coastal Lime 6' 306 Leash",
-      "supplyBrand": "Coastal",
-      "upc": "097612008708",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -7929,17 +7677,6 @@
       ]
     },
     {
-      "id": 3842,
-      "name": "Coastal Purple12\" Buck Collar",
-      "supplyBrand": "Coastal",
-      "upc": "097612180367",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 3847,
       "name": "Coastal Purple14\" 401 Collar",
       "supplyBrand": "Coastal",
@@ -8020,17 +7757,6 @@
       ]
     },
     {
-      "id": 3837,
-      "name": "Coastal Purple20\" 61601 Buc Collar",
-      "supplyBrand": "Coastal",
-      "upc": "097612180367",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 3836,
       "name": "Coastal Purple20\" 61601 Mbuc Collar",
       "supplyBrand": "Coastal",
@@ -8048,17 +7774,6 @@
       "upcPrefix": "076484",
       "expectedBrands": [
         "kong"
-      ]
-    },
-    {
-      "id": 3833,
-      "name": "Coastal Purple20\" Buck Collar",
-      "supplyBrand": "Coastal",
-      "upc": "097612180367",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -8109,17 +7824,6 @@
       "upcPrefix": "076484",
       "expectedBrands": [
         "kong"
-      ]
-    },
-    {
-      "id": 3827,
-      "name": "Coastal Purple26\" Buck Collar",
-      "supplyBrand": "Coastal",
-      "upc": "097612180367",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -9165,17 +8869,6 @@
       ]
     },
     {
-      "id": 3380,
-      "name": "Coastal Ww206 Leash",
-      "supplyBrand": "Coastal",
-      "upc": "097612008708",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 3400,
       "name": "Coastal Ww214 Collar",
       "supplyBrand": "Coastal",
@@ -9213,17 +8906,6 @@
       "upcPrefix": "076484",
       "expectedBrands": [
         "kong"
-      ]
-    },
-    {
-      "id": 3390,
-      "name": "Coastal Ww226\" Leash",
-      "supplyBrand": "Coastal",
-      "upc": "097612008708",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -9317,17 +8999,6 @@
       ]
     },
     {
-      "id": 4650,
-      "name": "Dingo Munchy Stix 10pk",
-      "supplyBrand": "Dingo",
-      "upc": "097612343182",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 1733,
       "name": "Cat/Doglife Filter Cartridge Replace",
       "supplyBrand": "Dog Life",
@@ -9401,50 +9072,6 @@
         "fluval",
         "marina",
         "hagen"
-      ]
-    },
-    {
-      "id": 5104,
-      "name": "Stoney River Java Sand 5lb",
-      "supplyBrand": "Estes",
-      "upc": "097612090512",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 5126,
-      "name": "Stoneyriver Beach 5lb",
-      "supplyBrand": "Estes",
-      "upc": "097612091069",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 5124,
-      "name": "Stoneyriver Cherokee",
-      "supplyBrand": "Estes",
-      "upc": "097612091014",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 5123,
-      "name": "Stoneyriver Jumbo Neautral 5lb",
-      "supplyBrand": "Estes",
-      "upc": "097612091267",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -9603,17 +9230,6 @@
       ]
     },
     {
-      "id": 421,
-      "name": "Exoterra Reptile Dome Nano",
-      "supplyBrand": "Exo Terra",
-      "upc": "097612200843",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 5836,
       "name": "Harness Hoodie Large Red",
       "supplyBrand": "Fashion Pet",
@@ -9634,39 +9250,6 @@
         "coastal",
         "li'l pals",
         "lil pals"
-      ]
-    },
-    {
-      "id": 4838,
-      "name": "Nothin' to Hide 10\" Large Roll Beef 2pk",
-      "supplyBrand": "Fieldcrest Farms",
-      "upc": "097612660203",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4841,
-      "name": "Nothin' to Hide 10\" Large Roll Peanut Butter",
-      "supplyBrand": "Fieldcrest Farms",
-      "upc": "097612660050",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4837,
-      "name": "Nothin' to Hide 5\" Small Roll Beef 2pk",
-      "supplyBrand": "Fieldcrest Farms",
-      "upc": "097612660104",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -9738,17 +9321,6 @@
       ]
     },
     {
-      "id": 5101,
-      "name": "Fluval Biothane-stratum 4.4lb",
-      "supplyBrand": "Fluval",
-      "upc": "097612091045",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 6969,
       "name": "Fluval Bug Bite Color Enh 4.4oz",
       "supplyBrand": "Fluval",
@@ -9813,16 +9385,6 @@
       ]
     },
     {
-      "id": 5514,
-      "name": "Fluval Flt Insert Bag Ac20",
-      "supplyBrand": "Fluval",
-      "upc": "071859426440",
-      "upcPrefix": "071859",
-      "expectedBrands": [
-        "kaytee"
-      ]
-    },
-    {
       "id": 7188,
       "name": "Fluval Forceps",
       "supplyBrand": "Fluval",
@@ -9854,17 +9416,6 @@
         "fluker's",
         "flukers",
         "fluker"
-      ]
-    },
-    {
-      "id": 5758,
-      "name": "Fluval Suction Cups",
-      "supplyBrand": "Fluval",
-      "upc": "097612661040",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -9930,17 +9481,6 @@
       ]
     },
     {
-      "id": 5850,
-      "name": "Basic Hoodie Natural Blue Small",
-      "supplyBrand": "Frisco",
-      "upc": "859610005789",
-      "upcPrefix": "859610",
-      "expectedBrands": [
-        "blue buffalo",
-        "blue"
-      ]
-    },
-    {
       "id": 4759,
       "name": "Fromm Baked Chicken",
       "supplyBrand": "Fromm",
@@ -9950,17 +9490,6 @@
         "fluval",
         "marina",
         "hagen"
-      ]
-    },
-    {
-      "id": 4758,
-      "name": "Fromm Baked Lamb",
-      "supplyBrand": "Fromm",
-      "upc": "097612151244",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -10215,182 +9744,6 @@
       ]
     },
     {
-      "id": 4692,
-      "name": "Good 'n' Fun 3 Flavor Wing",
-      "supplyBrand": "Good'n'Fun",
-      "upc": "097612910261",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4956,
-      "name": "Greenies Blueberry Large 12oz",
-      "supplyBrand": "Greenies",
-      "upc": "097612300062",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4952,
-      "name": "Greenies Blueberry Teenie 12oz",
-      "supplyBrand": "Greenies",
-      "upc": "097612300086",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4951,
-      "name": "Greenies Frsh Large 12oz",
-      "supplyBrand": "Greenies",
-      "upc": "097612500257",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4937,
-      "name": "Greenies Orange Regular 12oz",
-      "supplyBrand": "Greenies",
-      "upc": "097612520019",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4955,
-      "name": "Greenies Petite Puppy 12oz",
-      "supplyBrand": "Greenies",
-      "upc": "097612376005",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4964,
-      "name": "Greenies Plllpcktche Cap 15.8oz",
-      "supplyBrand": "Greenies",
-      "upc": "097612300246",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4963,
-      "name": "Greenies Pllpckt Cheese Cap 7.9oz",
-      "supplyBrand": "Greenies",
-      "upc": "097612300109",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4967,
-      "name": "Greenies Pllpckt Chicken Cap 15.8oz",
-      "supplyBrand": "Greenies",
-      "upc": "097612300314",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4966,
-      "name": "Greenies Pllpckt Chicken Cap 7.9oz",
-      "supplyBrand": "Greenies",
-      "upc": "097612327113",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4962,
-      "name": "Greenies Pllpckt Peanut Butter Cap 15.8oz",
-      "supplyBrand": "Greenies",
-      "upc": "097612120110",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4961,
-      "name": "Greenies Pllpckt Peanut Butter Cap 7.9oz",
-      "supplyBrand": "Greenies",
-      "upc": "097612327120",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4960,
-      "name": "Greenies Pllpckt Peanut Butter Tab 3.2oz",
-      "supplyBrand": "Greenies",
-      "upc": "097612008302",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4969,
-      "name": "Greenies Pllpckt Smk Cap 7.9oz",
-      "supplyBrand": "Greenies",
-      "upc": "097612322811",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4968,
-      "name": "Greenies Pllpckt Smk Tab 3.2oz",
-      "supplyBrand": "Greenies",
-      "upc": "097612322804",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 6537,
-      "name": "Greenies Small Top Beef 2oz",
-      "supplyBrand": "Greenies",
-      "upc": "859610007905",
-      "upcPrefix": "859610",
-      "expectedBrands": [
-        "blue buffalo",
-        "blue"
-      ]
-    },
-    {
       "id": 6540,
       "name": "Greenies Small Top Chicken & Green Bean 2oz",
       "supplyBrand": "Greenies",
@@ -10409,27 +9762,6 @@
       "upcPrefix": "096316",
       "expectedBrands": [
         "zilla"
-      ]
-    },
-    {
-      "id": 1133,
-      "name": "Exact Hand Feeding Formula",
-      "supplyBrand": "Hagen",
-      "upc": "071859475110",
-      "upcPrefix": "071859",
-      "expectedBrands": [
-        "kaytee"
-      ]
-    },
-    {
-      "id": 4902,
-      "name": "PetOdor Happy Days Wax",
-      "supplyBrand": "Happy",
-      "upc": "097612180190",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -10684,61 +10016,6 @@
       "upcPrefix": "618940",
       "expectedBrands": [
         "jw pet"
-      ]
-    },
-    {
-      "id": 4216,
-      "name": "Kaytee Aspen 19.7l",
-      "supplyBrand": "Kaytee",
-      "upc": "097612751246",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4161,
-      "name": "Kaytee Chewbular Medium",
-      "supplyBrand": "Kaytee",
-      "upc": "097612762150",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4411,
-      "name": "Kaytee Comfort Harness Rat Small",
-      "supplyBrand": "Kaytee",
-      "upc": "097612790207",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4405,
-      "name": "Kaytee Crinkle Tunnel",
-      "supplyBrand": "Kaytee",
-      "upc": "097612790115",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4239,
-      "name": "Kaytee Water Bottle Holder Large",
-      "supplyBrand": "Kaytee",
-      "upc": "097612790207",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -12274,28 +11551,6 @@
       ]
     },
     {
-      "id": 4809,
-      "name": "4\" Pressed Bone",
-      "supplyBrand": "Loving Pets",
-      "upc": "097612923407",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4810,
-      "name": "4.5\" Pressed Bone Natural",
-      "supplyBrand": "Loving Pets",
-      "upc": "097612923308",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 1695,
       "name": "Crisscross Steel Non Skid Dish",
       "supplyBrand": "Loving Pets",
@@ -12327,17 +11582,6 @@
       ]
     },
     {
-      "id": 3324,
-      "name": "Lupine Dapp 10\"-16\" 1/2 in Collar",
-      "supplyBrand": "Lupine",
-      "upc": "097612008210",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 3326,
       "name": "Lupine Dapp 13\"-22\" 3/4in Collar",
       "supplyBrand": "Lupine",
@@ -12345,28 +11589,6 @@
       "upcPrefix": "096316",
       "expectedBrands": [
         "zilla"
-      ]
-    },
-    {
-      "id": 3325,
-      "name": "Lupine Dapp 8\"-12\" 1/2in Collar",
-      "supplyBrand": "Lupine",
-      "upc": "097612762358",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 3331,
-      "name": "Lupine Turt 12\"-20\" 1in Collar",
-      "supplyBrand": "Lupine",
-      "upc": "097612752243",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -12387,17 +11609,6 @@
       "upcPrefix": "096316",
       "expectedBrands": [
         "zilla"
-      ]
-    },
-    {
-      "id": 3323,
-      "name": "Lupine Turtrf 10'-16' 1/2 Incollar",
-      "supplyBrand": "Lupine",
-      "upc": "097612008715",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -12461,17 +11672,6 @@
       ]
     },
     {
-      "id": 5091,
-      "name": "Marina Air Pump 50",
-      "supplyBrand": "Marineland",
-      "upc": "097612009309",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 5093,
       "name": "Marina Air Pump A100",
       "supplyBrand": "Marineland",
@@ -12484,17 +11684,6 @@
       ]
     },
     {
-      "id": 5094,
-      "name": "Marina Air Pump A200",
-      "supplyBrand": "Marineland",
-      "upc": "097612009538",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 5095,
       "name": "Marina Air Pump A300",
       "supplyBrand": "Marineland",
@@ -12504,17 +11693,6 @@
         "penn-plax",
         "pennplax",
         "penn plax"
-      ]
-    },
-    {
-      "id": 5092,
-      "name": "Marina Air Pump A75",
-      "supplyBrand": "Marineland",
-      "upc": "097612009378",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -12537,28 +11715,6 @@
         "fluval",
         "marina",
         "hagen"
-      ]
-    },
-    {
-      "id": 5029,
-      "name": "Marina Digit Thermometer",
-      "supplyBrand": "Marineland",
-      "upc": "097612300246",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 5021,
-      "name": "Marina Digital Thermometer",
-      "supplyBrand": "Marineland",
-      "upc": "097612300246",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -12622,49 +11778,6 @@
       ]
     },
     {
-      "id": 5829,
-      "name": "Marineland 56gal Tank & Stand",
-      "supplyBrand": "Marineland",
-      "upc": "097612091014",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 5828,
-      "name": "Marineland 60gal Tank & Stand",
-      "supplyBrand": "Marineland",
-      "upc": "097612091014",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 5830,
-      "name": "Marineland 75 Tank & Stand",
-      "supplyBrand": "Marineland",
-      "upc": "097612091014",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 5515,
-      "name": "Marineland Floss Sleeve Mag200",
-      "supplyBrand": "Marineland",
-      "upc": "071859426464",
-      "upcPrefix": "071859",
-      "expectedBrands": [
-        "kaytee"
-      ]
-    },
-    {
       "id": 5639,
       "name": "Marineland Led Pod Color Enhnce",
       "supplyBrand": "Marineland",
@@ -12672,83 +11785,6 @@
       "upcPrefix": "645095",
       "expectedBrands": [
         "tropiclean"
-      ]
-    },
-    {
-      "id": 4419,
-      "name": "Marshall Ferret Bell Collar",
-      "supplyBrand": "Marshall",
-      "upc": "097612750041",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4418,
-      "name": "Marshall Ferret Harness & Lead",
-      "supplyBrand": "Marshall",
-      "upc": "097612751048",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4663,
-      "name": "Fresh Kisses Large Double-Brush Box",
-      "supplyBrand": "Merrick",
-      "upc": "097612340020",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4670,
-      "name": "Fresh Kisses Large Mint Box",
-      "supplyBrand": "Merrick",
-      "upc": "097612326109",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4669,
-      "name": "Fresh Kisses Medium Mint Box",
-      "supplyBrand": "Merrick",
-      "upc": "097612326109",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4668,
-      "name": "Fresh Kisses Small Mint Box",
-      "supplyBrand": "Merrick",
-      "upc": "097612326109",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4665,
-      "name": "Fresh Kisses Small Mint Brush",
-      "supplyBrand": "Merrick",
-      "upc": "097612310405",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -12795,72 +11831,6 @@
         "coastal",
         "li'l pals",
         "lil pals"
-      ]
-    },
-    {
-      "id": 4655,
-      "name": "N-bone Teething Plus Rings 3pk",
-      "supplyBrand": "N-Bone",
-      "upc": "097612340112",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4654,
-      "name": "N-bone Teething Sticks",
-      "supplyBrand": "N-Bone",
-      "upc": "097612340068",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4406,
-      "name": "Nation Cozy Cube",
-      "supplyBrand": "Nation",
-      "upc": "097612790511",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4404,
-      "name": "Nation Ramp Covers 3pk",
-      "supplyBrand": "Nation",
-      "upc": "097612740202",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4684,
-      "name": "Rewards Crunch Bison Small Breed Duck 8oz",
-      "supplyBrand": "Natural Balance",
-      "upc": "097612950175",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4685,
-      "name": "Rewards Crunch Bison Small Breed Salmon 8oz",
-      "supplyBrand": "Natural Balance",
-      "upc": "097612950151",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -13171,50 +12141,6 @@
       ]
     },
     {
-      "id": 4812,
-      "name": "Nutrichomps Pork Knot",
-      "supplyBrand": "Nutri-Vet",
-      "upc": "097612921502",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4788,
-      "name": "Nutrisource Chicken Big Bites",
-      "supplyBrand": "Nutrisource",
-      "upc": "097612008364",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4794,
-      "name": "Nutrisource Chompy Chompers Rabbit & Venison",
-      "supplyBrand": "Nutrisource",
-      "upc": "097612322316",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4792,
-      "name": "Nutrisource Chompy Chompers Salmon & Trout",
-      "supplyBrand": "Nutrisource",
-      "upc": "097612322255",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 6516,
       "name": "Nutrisource Come-Pooch-A Beef Bone Broth Recipe",
       "supplyBrand": "Nutrisource",
@@ -13223,28 +12149,6 @@
       "expectedBrands": [
         "ethical pet",
         "spot"
-      ]
-    },
-    {
-      "id": 4786,
-      "name": "Nutrisource Crispy Crispers Lamb & Beef",
-      "supplyBrand": "Nutrisource",
-      "upc": "097612322361",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4785,
-      "name": "Nutrisource Crispy Crispers Turkey & Venison",
-      "supplyBrand": "Nutrisource",
-      "upc": "097612322354",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -13260,17 +12164,6 @@
       ]
     },
     {
-      "id": 4784,
-      "name": "Nutrisource Nutty Butter Bites Apple",
-      "supplyBrand": "Nutrisource",
-      "upc": "097612322309",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 6520,
       "name": "Nutrisource PureVita Beef Entree 12.5oz",
       "supplyBrand": "Nutrisource",
@@ -13279,17 +12172,6 @@
       "expectedBrands": [
         "ethical pet",
         "spot"
-      ]
-    },
-    {
-      "id": 6519,
-      "name": "Nutrisource PureVita Turkey Stew 12.5oz",
-      "supplyBrand": "Nutrisource",
-      "upc": "859610007943",
-      "upcPrefix": "859610",
-      "expectedBrands": [
-        "blue buffalo",
-        "blue"
       ]
     },
     {
@@ -14086,28 +12968,6 @@
       ]
     },
     {
-      "id": 4044,
-      "name": "Oxbow Hay Blend 90oz",
-      "supplyBrand": "Oxbow",
-      "upc": "097612009118",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 713,
-      "name": "Galapagos Hermit Crab Sub",
-      "supplyBrand": "Pangea",
-      "upc": "097612009507",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 3472,
       "name": "Paw Patrol Small Harness",
       "supplyBrand": "Paw Patrol",
@@ -14127,50 +12987,6 @@
       "upcPrefix": "096316",
       "expectedBrands": [
         "zilla"
-      ]
-    },
-    {
-      "id": 5075,
-      "name": "Act-air Action Split Shipwreck",
-      "supplyBrand": "Penn-Plax",
-      "upc": "097612009507",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 5068,
-      "name": "Act-air Diver W Hose",
-      "supplyBrand": "Penn-Plax",
-      "upc": "097612091397",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 5077,
-      "name": "Act-air Half Shipwreck",
-      "supplyBrand": "Penn-Plax",
-      "upc": "097612009408",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 5076,
-      "name": "Act-air Rocking Shipwreck",
-      "supplyBrand": "Penn-Plax",
-      "upc": "097612009415",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -14201,57 +13017,6 @@
       "upcPrefix": "076484",
       "expectedBrands": [
         "kong"
-      ]
-    },
-    {
-      "id": 5150,
-      "name": "Aquaplt 4\" Plant Green",
-      "supplyBrand": "Penn-Plax",
-      "upc": "097612090611",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 5282,
-      "name": "Aquascapes Glow Bunch",
-      "supplyBrand": "Penn-Plax",
-      "upc": "071859949260",
-      "upcPrefix": "071859",
-      "expectedBrands": [
-        "kaytee"
-      ]
-    },
-    {
-      "id": 5281,
-      "name": "Aquascapes Large Red Bunch",
-      "supplyBrand": "Penn-Plax",
-      "upc": "071859949260",
-      "upcPrefix": "071859",
-      "expectedBrands": [
-        "kaytee"
-      ]
-    },
-    {
-      "id": 5277,
-      "name": "Aquascapes Small Purpl Bunch",
-      "supplyBrand": "Penn-Plax",
-      "upc": "071859949260",
-      "upcPrefix": "071859",
-      "expectedBrands": [
-        "kaytee"
-      ]
-    },
-    {
-      "id": 5278,
-      "name": "Aquascapes Small Yell Bunch",
-      "supplyBrand": "Penn-Plax",
-      "upc": "071859949260",
-      "upcPrefix": "071859",
-      "expectedBrands": [
-        "kaytee"
       ]
     },
     {
@@ -14344,16 +13109,6 @@
       ]
     },
     {
-      "id": 5254,
-      "name": "Foregrounder Fan Palm Red",
-      "supplyBrand": "Penn-Plax",
-      "upc": "071859942384",
-      "upcPrefix": "071859",
-      "expectedBrands": [
-        "kaytee"
-      ]
-    },
-    {
       "id": 108,
       "name": "Gourmet Bearded Dragon Food",
       "supplyBrand": "Penn-Plax",
@@ -14361,17 +13116,6 @@
       "upcPrefix": "042055",
       "expectedBrands": [
         "hikari"
-      ]
-    },
-    {
-      "id": 106,
-      "name": "Gourmet Iguana Food",
-      "supplyBrand": "Penn-Plax",
-      "upc": "097612401066",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -14432,17 +13176,6 @@
       ]
     },
     {
-      "id": 19,
-      "name": "Lizard Ladder",
-      "supplyBrand": "Penn-Plax",
-      "upc": "097612610109",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 5024,
       "name": "Lok-tite 3gang Vlv",
       "supplyBrand": "Penn-Plax",
@@ -14484,27 +13217,6 @@
       "upcPrefix": "660048",
       "expectedBrands": [
         "chuckit"
-      ]
-    },
-    {
-      "id": 5272,
-      "name": "Minireplica Treasure Chest",
-      "supplyBrand": "Penn-Plax",
-      "upc": "071859002583",
-      "upcPrefix": "071859",
-      "expectedBrands": [
-        "kaytee"
-      ]
-    },
-    {
-      "id": 5082,
-      "name": "Nano Air Pump",
-      "supplyBrand": "Penn-Plax",
-      "upc": "097612009613",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -14563,17 +13275,6 @@
       ]
     },
     {
-      "id": 5342,
-      "name": "Roundstone Hideaway Large 4\"",
-      "supplyBrand": "Penn-Plax",
-      "upc": "097612210224",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 5401,
       "name": "Sea Anemone Pink Medium",
       "supplyBrand": "Penn-Plax",
@@ -14617,17 +13318,6 @@
         "fluval",
         "marina",
         "hagen"
-      ]
-    },
-    {
-      "id": 5081,
-      "name": "The Bubbler Bottm Filter",
-      "supplyBrand": "Penn-Plax",
-      "upc": "097612410112",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -14686,16 +13376,6 @@
       "upcPrefix": "076484",
       "expectedBrands": [
         "kong"
-      ]
-    },
-    {
-      "id": 4063,
-      "name": "Pretty Pets Hedgehog Food",
-      "supplyBrand": "Pretty Pets",
-      "upc": "071859008653",
-      "upcPrefix": "071859",
-      "expectedBrands": [
-        "kaytee"
       ]
     },
     {
@@ -14888,17 +13568,6 @@
       "upcPrefix": "076484",
       "expectedBrands": [
         "kong"
-      ]
-    },
-    {
-      "id": 6527,
-      "name": "Pro Plan Large Breed Salmon 34lb",
-      "supplyBrand": "Pro Plan",
-      "upc": "859610008315",
-      "upcPrefix": "859610",
-      "expectedBrands": [
-        "blue buffalo",
-        "blue"
       ]
     },
     {
@@ -15398,28 +14067,6 @@
       ]
     },
     {
-      "id": 4463,
-      "name": "Redbarn Bully Barbell",
-      "supplyBrand": "RedBarn",
-      "upc": "097612401042",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4470,
-      "name": "Redbarn Bully Ring",
-      "supplyBrand": "RedBarn",
-      "upc": "097612400724",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 4453,
       "name": "Redbarn Duo Large Fill Bone Pbj",
       "supplyBrand": "RedBarn",
@@ -15430,39 +14077,6 @@
       ]
     },
     {
-      "id": 4485,
-      "name": "Redbarn Glaze Cheek Roll Beef Peanut Butter",
-      "supplyBrand": "RedBarn",
-      "upc": "097612400410",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4469,
-      "name": "Redbarn Large 1/2 Deer Antler",
-      "supplyBrand": "RedBarn",
-      "upc": "097612400656",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4488,
-      "name": "Redbarn Large Collagen Stick",
-      "supplyBrand": "RedBarn",
-      "upc": "097612403091",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 4454,
       "name": "Redbarn Large Fill Bone Lamb",
       "supplyBrand": "RedBarn",
@@ -15470,28 +14084,6 @@
       "upcPrefix": "096316",
       "expectedBrands": [
         "zilla"
-      ]
-    },
-    {
-      "id": 4472,
-      "name": "Redbarn Medium Pork Pizzle Braid",
-      "supplyBrand": "RedBarn",
-      "upc": "097612401806",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4468,
-      "name": "Redbarn Small/Medium Deer Antler",
-      "supplyBrand": "RedBarn",
-      "upc": "097612400809",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -15732,38 +14324,6 @@
         "penn-plax",
         "pennplax",
         "penn plax"
-      ]
-    },
-    {
-      "id": 4032,
-      "name": "Rndlake Timothy Hay 18oz",
-      "supplyBrand": "Round Lake Farm",
-      "upc": "097612009118",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4031,
-      "name": "Rndlake Timothy Hay 48 oz",
-      "supplyBrand": "Round Lake Farm",
-      "upc": "097612009361",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 6004,
-      "name": "Royal Canin Small Adult Adult Adult Adult 4lb",
-      "supplyBrand": "Royal Canin",
-      "upc": "071859000022",
-      "upcPrefix": "071859",
-      "expectedBrands": [
-        "kaytee"
       ]
     },
     {
@@ -16307,39 +14867,6 @@
       ]
     },
     {
-      "id": 4691,
-      "name": "Beggar Bones Mini 3 in 1",
-      "supplyBrand": "Savory Prime",
-      "upc": "097612910247",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4686,
-      "name": "Beggar Bones Mix Large 1pk",
-      "supplyBrand": "Savory Prime",
-      "upc": "097612950106",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4682,
-      "name": "Beggar Bones Pork Skin Twist 11pk",
-      "supplyBrand": "Savory Prime",
-      "upc": "097612910506",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 6792,
       "name": "Science Diet Cat 11+ 7lb",
       "supplyBrand": "Science Diet",
@@ -16581,17 +15108,6 @@
       ]
     },
     {
-      "id": 4671,
-      "name": "Shepherd Boy Freeze Chicken Hearts",
-      "supplyBrand": "Shepherd Boy",
-      "upc": "097612326307",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 4640,
       "name": "SmartBones 3 Large Chicken",
       "supplyBrand": "SmartBones",
@@ -16662,28 +15178,6 @@
       ]
     },
     {
-      "id": 4975,
-      "name": "Smokehouse Bully Bites 6oz",
-      "supplyBrand": "Smokehouse",
-      "upc": "097612300321",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4695,
-      "name": "Smokehouse Chicken Sweet Potato Combo",
-      "supplyBrand": "Smokehouse",
-      "upc": "097612322002",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 4981,
       "name": "Smokehouse Cow Ears 5 Ears",
       "supplyBrand": "Smokehouse",
@@ -16703,50 +15197,6 @@
         "penn-plax",
         "pennplax",
         "penn plax"
-      ]
-    },
-    {
-      "id": 4903,
-      "name": "PetOdor Cream Vanilla Wax",
-      "supplyBrand": "Specialty Pet Products",
-      "upc": "097612180268",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4885,
-      "name": "PetOdor Creamy Vanilla",
-      "supplyBrand": "Specialty Pet Products",
-      "upc": "097612180268",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4898,
-      "name": "PetOdor Creamy Vanilla Car",
-      "supplyBrand": "Specialty Pet Products",
-      "upc": "097612180268",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4875,
-      "name": "PetOdor Gummies",
-      "supplyBrand": "Specialty Pet Products",
-      "upc": "097612110524",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -16771,17 +15221,6 @@
         "fluker's",
         "flukers",
         "fluker"
-      ]
-    },
-    {
-      "id": 4904,
-      "name": "PetOdor Pineapple Coconut Wax",
-      "supplyBrand": "Specialty Pet Products",
-      "upc": "097612180213",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -16829,28 +15268,6 @@
       ]
     },
     {
-      "id": 5117,
-      "name": "Spectrastone Blue Special 5lb",
-      "supplyBrand": "Spectrastone",
-      "upc": "097612091359",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 5110,
-      "name": "Spectrastone Green Special 5lb",
-      "supplyBrand": "Spectrastone",
-      "upc": "097612091359",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 5119,
       "name": "Spectrastone Lake Green 5lb",
       "supplyBrand": "Spectrastone",
@@ -16858,17 +15275,6 @@
       "upcPrefix": "096316",
       "expectedBrands": [
         "zilla"
-      ]
-    },
-    {
-      "id": 5118,
-      "name": "Spectrastone Lte Blue Special 5lb",
-      "supplyBrand": "Spectrastone",
-      "upc": "097612091359",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -16889,17 +15295,6 @@
       "upcPrefix": "096316",
       "expectedBrands": [
         "zilla"
-      ]
-    },
-    {
-      "id": 5111,
-      "name": "Spectrastone Red 5lb",
-      "supplyBrand": "Spectrastone",
-      "upc": "097612090413",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -17055,16 +15450,6 @@
       ]
     },
     {
-      "id": 4095,
-      "name": "Sunburst Ham & Gerbil 2.5 lb",
-      "supplyBrand": "Sunburst",
-      "upc": "071859000213",
-      "upcPrefix": "071859",
-      "expectedBrands": [
-        "kaytee"
-      ]
-    },
-    {
       "id": 3686,
       "name": "Sunburst Red10\" Collar",
       "supplyBrand": "Sunburst",
@@ -17075,28 +15460,6 @@
       ]
     },
     {
-      "id": 4286,
-      "name": "Sunburst Veggie Garden",
-      "supplyBrand": "Sunburst",
-      "upc": "071859998527",
-      "upcPrefix": "071859",
-      "expectedBrands": [
-        "kaytee"
-      ]
-    },
-    {
-      "id": 5246,
-      "name": "Suzie's CBD Original 6oz",
-      "supplyBrand": "Suzie's CBD",
-      "upc": "064992724184",
-      "upcPrefix": "064992",
-      "expectedBrands": [
-        "orijen",
-        "acana",
-        "champion petfoods"
-      ]
-    },
-    {
       "id": 6050,
       "name": "Taste of the Wild Ancient Stream 14lb",
       "supplyBrand": "Taste of the Wild",
@@ -17104,17 +15467,6 @@
       "upcPrefix": "618940",
       "expectedBrands": [
         "jw pet"
-      ]
-    },
-    {
-      "id": 499,
-      "name": "Reptisticks Turtle",
-      "supplyBrand": "Tetra",
-      "upc": "097612400311",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -17223,17 +15575,6 @@
         "fluval",
         "marina",
         "hagen"
-      ]
-    },
-    {
-      "id": 4672,
-      "name": "Milk-Bone Trail Mix",
-      "supplyBrand": "The J.M. Smucker Company",
-      "upc": "097612320787",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -17689,17 +16030,6 @@
       ]
     },
     {
-      "id": 4856,
-      "name": "Tuesdays 10\" Beef Cheek Peanut Butter",
-      "supplyBrand": "Tuesday's Natural Dog Company",
-      "upc": "097612410211",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 4855,
       "name": "Tuesdays 10\" Beef Cheek Roll Dusted",
       "supplyBrand": "Tuesday's Natural Dog Company",
@@ -17707,17 +16037,6 @@
       "upcPrefix": "046798",
       "expectedBrands": [
         "tetra"
-      ]
-    },
-    {
-      "id": 4854,
-      "name": "Tuesdays 10-12\" Beef Basted Chkrll",
-      "supplyBrand": "Tuesday's Natural Dog Company",
-      "upc": "097612410501",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -17748,17 +16067,6 @@
       "upcPrefix": "046798",
       "expectedBrands": [
         "tetra"
-      ]
-    },
-    {
-      "id": 4853,
-      "name": "Tuesdays Chicken Basted Cheek Roll",
-      "supplyBrand": "Tuesday's Natural Dog Company",
-      "upc": "097612400564",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {
@@ -17994,39 +16302,6 @@
       ]
     },
     {
-      "id": 3474,
-      "name": "Valhoma 16 Large Collar",
-      "supplyBrand": "Valhoma",
-      "upc": "097612210224",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 3476,
-      "name": "Valhoma 18 Large Collar",
-      "supplyBrand": "Valhoma",
-      "upc": "097612210224",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 3478,
-      "name": "Valhoma 20 Large Collar",
-      "supplyBrand": "Valhoma",
-      "upc": "097612210224",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 3480,
       "name": "Valhoma 20 Red Collar",
       "supplyBrand": "Valhoma",
@@ -18074,16 +16349,6 @@
       "upcPrefix": "642863",
       "expectedBrands": [
         "greenies"
-      ]
-    },
-    {
-      "id": 4108,
-      "name": "Vitagarden Gpig 4lb",
-      "supplyBrand": "Vitakraft",
-      "upc": "071859999906",
-      "upcPrefix": "071859",
-      "expectedBrands": [
-        "kaytee"
       ]
     },
     {
@@ -18165,18 +16430,6 @@
       "upcPrefix": "076484",
       "expectedBrands": [
         "kong"
-      ]
-    },
-    {
-      "id": 6682,
-      "name": "Vital Essentials Duck Patties 8oz",
-      "supplyBrand": "Vital Essentials",
-      "upc": "064992715625",
-      "upcPrefix": "064992",
-      "expectedBrands": [
-        "orijen",
-        "acana",
-        "champion petfoods"
       ]
     },
     {
@@ -18661,17 +16914,6 @@
       ]
     },
     {
-      "id": 4859,
-      "name": "Wholesome Rewards Medium Variety",
-      "supplyBrand": "Wholesome",
-      "upc": "097612401301",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
       "id": 4862,
       "name": "Wholesome Rewards Puppy Vareity",
       "supplyBrand": "Wholesome",
@@ -18699,50 +16941,6 @@
       "upcPrefix": "076484",
       "expectedBrands": [
         "kong"
-      ]
-    },
-    {
-      "id": 4808,
-      "name": "Zignature Soft Duck Bites",
-      "supplyBrand": "Zignature",
-      "upc": "097612920109",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4807,
-      "name": "Zignature Soft Lamb Bites",
-      "supplyBrand": "Zignature",
-      "upc": "097612920208",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4802,
-      "name": "Zignature Treats Duck 12oz",
-      "supplyBrand": "Zignature",
-      "upc": "097612925203",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
-      ]
-    },
-    {
-      "id": 4804,
-      "name": "Zignature Treats Lamb 12oz",
-      "supplyBrand": "Zignature",
-      "upc": "097612924114",
-      "upcPrefix": "097612",
-      "expectedBrands": [
-        "zoo med",
-        "zoomed"
       ]
     },
     {

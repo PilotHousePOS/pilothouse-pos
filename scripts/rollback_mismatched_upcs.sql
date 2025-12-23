@@ -1,5 +1,5 @@
 -- Rollback mismatched UPCs
--- Generated: 2025-12-23T17:49:12.854Z
+-- Generated: 2025-12-23T18:08:40.232Z
 
 UPDATE supplies SET upc = NULL WHERE id = 7263; -- Api Betta Conditioner
 UPDATE supplies SET upc = NULL WHERE id = 7117; -- Api Melafix 4oz
@@ -9,12 +9,10 @@ UPDATE supplies SET upc = NULL WHERE id = 6420; -- Acana Freeze Dried Duck 14oz
 UPDATE supplies SET upc = NULL WHERE id = 6421; -- Acana Freeze Dried Turkey 14oz
 UPDATE supplies SET upc = NULL WHERE id = 5496; -- Ammonia Remover Pad
 UPDATE supplies SET upc = NULL WHERE id = 5045; -- Aqualife 23.5" Bend Bubble Wall
-UPDATE supplies SET upc = NULL WHERE id = 5039; -- Aqualife 28" Bubble Wall
 UPDATE supplies SET upc = NULL WHERE id = 5044; -- Aqualife 35.5" Bend Bubble Wall
 UPDATE supplies SET upc = NULL WHERE id = 5043; -- Aqualife 48" Bend Bubble Wall
 UPDATE supplies SET upc = NULL WHERE id = 5048; -- Aqualife Delux Airline Tube 20ft
 UPDATE supplies SET upc = NULL WHERE id = 5224; -- Aqualife Plant Scapes 10"
-UPDATE supplies SET upc = NULL WHERE id = 5064; -- Aqualife Superflex Airtube Pink 8ft
 UPDATE supplies SET upc = NULL WHERE id = 5020; -- Aqualife Thermal-temp
 UPDATE supplies SET upc = NULL WHERE id = 5174; -- Aquatop Vibrant Gar Blue Plant 10"
 UPDATE supplies SET upc = NULL WHERE id = 5197; -- Aquatop Vibrant Gar Blue Plant 6"
@@ -31,19 +29,10 @@ UPDATE supplies SET upc = NULL WHERE id = 7271; -- Aqueon Betta Beads Pack
 UPDATE supplies SET upc = NULL WHERE id = 6971; -- Aqueon Chiclid Pellet Medium 7.5oz
 UPDATE supplies SET upc = NULL WHERE id = 6972; -- Aqueon Cichlid Pellet Mini 4.5oz
 UPDATE supplies SET upc = NULL WHERE id = 4998; -- Aqueon Fomcln Pad 1pk
-UPDATE supplies SET upc = NULL WHERE id = 5510; -- Aqueon Phosphate Remove 20-75
 UPDATE supplies SET upc = NULL WHERE id = 4993; -- Aqueon Proscraper 3.0 Short
-UPDATE supplies SET upc = NULL WHERE id = 5088; -- Aqueon Quitflow Air Pump40
-UPDATE supplies SET upc = NULL WHERE id = 5617; -- Aqueon T8 Fullspec 36"l
 UPDATE supplies SET upc = NULL WHERE id = 5005; -- Aqueon Twist & Click Steel Blade 3pk
-UPDATE supplies SET upc = NULL WHERE id = 4439; -- 10" Collagen Sticks Chicken
-UPDATE supplies SET upc = NULL WHERE id = 4440; -- 10" Collagen Stiks Bacon
-UPDATE supplies SET upc = NULL WHERE id = 4609; -- Benebone Large Wishbone Bacon
-UPDATE supplies SET upc = NULL WHERE id = 4616; -- Benebone Large Wishbone Chicken
 UPDATE supplies SET upc = NULL WHERE id = 4535; -- Benebone Medium Puppy Wishbone Bacon
 UPDATE supplies SET upc = NULL WHERE id = 4823; -- Bionic Ball Medium
-UPDATE supplies SET upc = NULL WHERE id = 4818; -- Bionic Bone Medium
-UPDATE supplies SET upc = NULL WHERE id = 4819; -- Bionic Bone Small
 UPDATE supplies SET upc = NULL WHERE id = 4815; -- Bionic Urban Stick Medium
 UPDATE supplies SET upc = NULL WHERE id = 858; -- Birdlif Mineral Block 2pk
 UPDATE supplies SET upc = NULL WHERE id = 984; -- Birdlife 11" Wooden Perches
@@ -184,8 +173,6 @@ UPDATE supplies SET upc = NULL WHERE id = 6601; -- Blue Buffalo Wilderness Turke
 UPDATE supplies SET upc = NULL WHERE id = 2193; -- Blue Wilderness Chick & Turkey Treat
 UPDATE supplies SET upc = NULL WHERE id = 2183; -- Blue Wilderness Chicken & Duck Cat Treats
 UPDATE supplies SET upc = NULL WHERE id = 2175; -- Blue Wilderness Chunk & Salmon Treats
-UPDATE supplies SET upc = NULL WHERE id = 5097; -- Caribsea Cichlid 20lb Sand
-UPDATE supplies SET upc = NULL WHERE id = 5099; -- Ecoplanted Red 20lb
 UPDATE supplies SET upc = NULL WHERE id = 5035; -- Cascade Air Charger I
 UPDATE supplies SET upc = NULL WHERE id = 5036; -- Cascade Air Charger Ii
 UPDATE supplies SET upc = NULL WHERE id = 5256; -- Cascade Baby Hideout
@@ -567,17 +554,11 @@ UPDATE supplies SET upc = NULL WHERE id = 3449; -- Coastal Lak06' Leash
 UPDATE supplies SET upc = NULL WHERE id = 3596; -- Coastal Lak24" Harness
 UPDATE supplies SET upc = NULL WHERE id = 3632; -- Coastal Lak38" Harness
 UPDATE supplies SET upc = NULL WHERE id = 2586; -- Coastal Large Aliens26 Collar
-UPDATE supplies SET upc = NULL WHERE id = 2584; -- Coastal Large Dinosaurs26 Collar
 UPDATE supplies SET upc = NULL WHERE id = 2592; -- Coastal Large Llamas26 Collar
-UPDATE supplies SET upc = NULL WHERE id = 2594; -- Coastal Large Pineapples26 Collar
-UPDATE supplies SET upc = NULL WHERE id = 2590; -- Coastal Large Unicorns26 Collar
 UPDATE supplies SET upc = NULL WHERE id = 3234; -- Coastal Leash Black Bones 06"' 466
 UPDATE supplies SET upc = NULL WHERE id = 3262; -- Coastal Leash Black Bones 6"' 666
 UPDATE supplies SET upc = NULL WHERE id = 3261; -- Coastal Leash Black Bones 6"' 966
 UPDATE supplies SET upc = NULL WHERE id = 3255; -- Coastal Leash Black Skulls 06"' 966
-UPDATE supplies SET upc = NULL WHERE id = 3322; -- Coastal Leash Bmb06" 46436
-UPDATE supplies SET upc = NULL WHERE id = 3312; -- Coastal Leash Bmb06' 46336
-UPDATE supplies SET upc = NULL WHERE id = 3321; -- Coastal Leash Bmb06' 46936
 UPDATE supplies SET upc = NULL WHERE id = 3241; -- Coastal Leash Btd06' 366
 UPDATE supplies SET upc = NULL WHERE id = 3268; -- Coastal Leash Btd6' 666
 UPDATE supplies SET upc = NULL WHERE id = 3267; -- Coastal Leash Btd6' 966
@@ -592,7 +573,6 @@ UPDATE supplies SET upc = NULL WHERE id = 3320; -- Coastal Leash Hrw06' 46436
 UPDATE supplies SET upc = NULL WHERE id = 3314; -- Coastal Leash Lsk06"' 46436
 UPDATE supplies SET upc = NULL WHERE id = 3304; -- Coastal Leash Lsk06"46336
 UPDATE supplies SET upc = NULL WHERE id = 3313; -- Coastal Leash Lsk06' 46936
-UPDATE supplies SET upc = NULL WHERE id = 3276; -- Coastal Leash Nbp6' 61476
 UPDATE supplies SET upc = NULL WHERE id = 3275; -- Coastal Leash Nbp6' 61976
 UPDATE supplies SET upc = NULL WHERE id = 3227; -- Coastal Leash Pbo06' 366
 UPDATE supplies SET upc = NULL WHERE id = 3226; -- Coastal Leash Pbo06' 466
@@ -605,14 +585,12 @@ UPDATE supplies SET upc = NULL WHERE id = 3278; -- Coastal Leash Ppa6' 61476
 UPDATE supplies SET upc = NULL WHERE id = 3277; -- Coastal Leash Ppa6' 61976
 UPDATE supplies SET upc = NULL WHERE id = 3260; -- Coastal Leash Red Bones 06"' 666
 UPDATE supplies SET upc = NULL WHERE id = 3259; -- Coastal Leash Red Bones 06"' 966
-UPDATE supplies SET upc = NULL WHERE id = 3280; -- Coastal Leash Rwp6' 61476
 UPDATE supplies SET upc = NULL WHERE id = 3279; -- Coastal Leash Rwp6' 61976
 UPDATE supplies SET upc = NULL WHERE id = 3229; -- Coastal Leash Skx06' 366
 UPDATE supplies SET upc = NULL WHERE id = 3228; -- Coastal Leash Skx06' 466
 UPDATE supplies SET upc = NULL WHERE id = 3236; -- Coastal Leash Tdp06' 466
 UPDATE supplies SET upc = NULL WHERE id = 3264; -- Coastal Leash Tpd6' 666
 UPDATE supplies SET upc = NULL WHERE id = 3263; -- Coastal Leash Tpd6' 966
-UPDATE supplies SET upc = NULL WHERE id = 3274; -- Coastal Leash Tsa6' 61476
 UPDATE supplies SET upc = NULL WHERE id = 3273; -- Coastal Leash Tsa6' 61976
 UPDATE supplies SET upc = NULL WHERE id = 3239; -- Coastal Leash Wdf06 366
 UPDATE supplies SET upc = NULL WHERE id = 3238; -- Coastal Leash Wdf06' 466
@@ -632,7 +610,6 @@ UPDATE supplies SET upc = NULL WHERE id = 3762; -- Coastal Lime 30 Harness
 UPDATE supplies SET upc = NULL WHERE id = 3768; -- Coastal Lime 38 Harness
 UPDATE supplies SET upc = NULL WHERE id = 3568; -- Coastal Lime 3xs Harness
 UPDATE supplies SET upc = NULL WHERE id = 3698; -- Coastal Lime 6' 2906 Leash
-UPDATE supplies SET upc = NULL WHERE id = 3701; -- Coastal Lime 6' 306 Leash
 UPDATE supplies SET upc = NULL WHERE id = 3700; -- Coastal Lime 6' 404 Leash
 UPDATE supplies SET upc = NULL WHERE id = 3699; -- Coastal Lime 6' 906 Leash
 UPDATE supplies SET upc = NULL WHERE id = 3574; -- Coastal Lime Extra Small Harness
@@ -760,7 +737,6 @@ UPDATE supplies SET upc = NULL WHERE id = 3822; -- Coastal Purple06' 606 Leash
 UPDATE supplies SET upc = NULL WHERE id = 3820; -- Coastal Purple06' 906 Leash
 UPDATE supplies SET upc = NULL WHERE id = 3843; -- Coastal Purple12" 301 Collar
 UPDATE supplies SET upc = NULL WHERE id = 3845; -- Coastal Purple12" 401 Collar
-UPDATE supplies SET upc = NULL WHERE id = 3842; -- Coastal Purple12" Buck Collar
 UPDATE supplies SET upc = NULL WHERE id = 3847; -- Coastal Purple14" 401 Collar
 UPDATE supplies SET upc = NULL WHERE id = 3841; -- Coastal Purple14" Buck Collar
 UPDATE supplies SET upc = NULL WHERE id = 3840; -- Coastal Purple14" Martingale Collar
@@ -769,16 +745,13 @@ UPDATE supplies SET upc = NULL WHERE id = 3838; -- Coastal Purple16" 601 Collar
 UPDATE supplies SET upc = NULL WHERE id = 3839; -- Coastal Purple18" 601 Collar
 UPDATE supplies SET upc = NULL WHERE id = 3835; -- Coastal Purple18" 901 Collar
 UPDATE supplies SET upc = NULL WHERE id = 3828; -- Coastal Purple20" 2901 Collar
-UPDATE supplies SET upc = NULL WHERE id = 3837; -- Coastal Purple20" 61601 Buc Collar
 UPDATE supplies SET upc = NULL WHERE id = 3836; -- Coastal Purple20" 61601 Mbuc Collar
 UPDATE supplies SET upc = NULL WHERE id = 3834; -- Coastal Purple20" 901 Collar
-UPDATE supplies SET upc = NULL WHERE id = 3833; -- Coastal Purple20" Buck Collar
 UPDATE supplies SET upc = NULL WHERE id = 3832; -- Coastal Purple20" Martingale Collar
 UPDATE supplies SET upc = NULL WHERE id = 3829; -- Coastal Purple22" 2901 Collar
 UPDATE supplies SET upc = NULL WHERE id = 3751; -- Coastal Purple24 Harness
 UPDATE supplies SET upc = NULL WHERE id = 3830; -- Coastal Purple24" 2901 Collar
 UPDATE supplies SET upc = NULL WHERE id = 3831; -- Coastal Purple26" 2901 Collar
-UPDATE supplies SET upc = NULL WHERE id = 3827; -- Coastal Purple26" Buck Collar
 UPDATE supplies SET upc = NULL WHERE id = 3826; -- Coastal Purple26" Martingale Collar
 UPDATE supplies SET upc = NULL WHERE id = 3757; -- Coastal Purple30 Harness
 UPDATE supplies SET upc = NULL WHERE id = 3770; -- Coastal Purple38 Harness
@@ -882,12 +855,10 @@ UPDATE supplies SET upc = NULL WHERE id = 3739; -- Coastal Tel18 Harness
 UPDATE supplies SET upc = NULL WHERE id = 3752; -- Coastal Tel24 Harness
 UPDATE supplies SET upc = NULL WHERE id = 3761; -- Coastal Tel30 Harness
 UPDATE supplies SET upc = NULL WHERE id = 3772; -- Coastal Tel38 Harness
-UPDATE supplies SET upc = NULL WHERE id = 3380; -- Coastal Ww206 Leash
 UPDATE supplies SET upc = NULL WHERE id = 3400; -- Coastal Ww214 Collar
 UPDATE supplies SET upc = NULL WHERE id = 3396; -- Coastal Ww220 Collar
 UPDATE supplies SET upc = NULL WHERE id = 3397; -- Coastal Ww224 Collar
 UPDATE supplies SET upc = NULL WHERE id = 3389; -- Coastal Ww226 Collar
-UPDATE supplies SET upc = NULL WHERE id = 3390; -- Coastal Ww226" Leash
 UPDATE supplies SET upc = NULL WHERE id = 3379; -- Coastal Ww406 Leash
 UPDATE supplies SET upc = NULL WHERE id = 3399; -- Coastal Ww414 Collar
 UPDATE supplies SET upc = NULL WHERE id = 3398; -- Coastal Ww514 Collar
@@ -897,7 +868,6 @@ UPDATE supplies SET upc = NULL WHERE id = 3374; -- Coastal Wwl06 Leash
 UPDATE supplies SET upc = NULL WHERE id = 3375; -- Coastal Wwo06 Leash
 UPDATE supplies SET upc = NULL WHERE id = 4713; -- Crazy Dog Mini Bacon
 UPDATE supplies SET upc = NULL WHERE id = 4715; -- Crazy Dog Mini Beef
-UPDATE supplies SET upc = NULL WHERE id = 4650; -- Dingo Munchy Stix 10pk
 UPDATE supplies SET upc = NULL WHERE id = 1733; -- Cat/Doglife Filter Cartridge Replace
 UPDATE supplies SET upc = NULL WHERE id = 2837; -- Dogslife Fleece Slipper
 UPDATE supplies SET upc = NULL WHERE id = 5233; -- Durvet Worm Ease Liquid 8oz
@@ -905,10 +875,6 @@ UPDATE supplies SET upc = NULL WHERE id = 6330; -- Earthborn Coastal Catch 12.5l
 UPDATE supplies SET upc = NULL WHERE id = 6331; -- Earthborn Coastal Catch 25lb
 UPDATE supplies SET upc = NULL WHERE id = 6329; -- Earthborn Meadow 25lb
 UPDATE supplies SET upc = NULL WHERE id = 5103; -- Stoney River Carribean Sand 5lb
-UPDATE supplies SET upc = NULL WHERE id = 5104; -- Stoney River Java Sand 5lb
-UPDATE supplies SET upc = NULL WHERE id = 5126; -- Stoneyriver Beach 5lb
-UPDATE supplies SET upc = NULL WHERE id = 5124; -- Stoneyriver Cherokee
-UPDATE supplies SET upc = NULL WHERE id = 5123; -- Stoneyriver Jumbo Neautral 5lb
 UPDATE supplies SET upc = NULL WHERE id = 1698; -- 4.75" Stoneware Crock Dog Dish
 UPDATE supplies SET upc = NULL WHERE id = 1716; -- 7.50" Stoneware Crock Dog Dish
 UPDATE supplies SET upc = NULL WHERE id = 1717; -- 9.50" Stoneware Crock Dog Dish
@@ -923,39 +889,30 @@ UPDATE supplies SET upc = NULL WHERE id = 6326; -- Eukanuba Medium Br 16lb
 UPDATE supplies SET upc = NULL WHERE id = 6324; -- Eukanuba Small Breed Puppy 15lb
 UPDATE supplies SET upc = NULL WHERE id = 6323; -- Eukanuba Small Breed Puppy 4.5lb
 UPDATE supplies SET upc = NULL WHERE id = 5301; -- Breeding Cone
-UPDATE supplies SET upc = NULL WHERE id = 421; -- Exoterra Reptile Dome Nano
 UPDATE supplies SET upc = NULL WHERE id = 5836; -- Harness Hoodie Large Red
 UPDATE supplies SET upc = NULL WHERE id = 5838; -- Polar Harness Coat Extra Small Blue
-UPDATE supplies SET upc = NULL WHERE id = 4838; -- Nothin' to Hide 10" Large Roll Beef 2pk
-UPDATE supplies SET upc = NULL WHERE id = 4841; -- Nothin' to Hide 10" Large Roll Peanut Butter
-UPDATE supplies SET upc = NULL WHERE id = 4837; -- Nothin' to Hide 5" Small Roll Beef 2pk
 UPDATE supplies SET upc = NULL WHERE id = 4830; -- Nothin' to Hide 5" Small Rolls Chicken
 UPDATE supplies SET upc = NULL WHERE id = 4844; -- Nothin' to Hide Small Twist Stix Beef
 UPDATE supplies SET upc = NULL WHERE id = 4836; -- Nothin' to Hide Small Twist Stix Salmon
 UPDATE supplies SET upc = NULL WHERE id = 5755; -- Fluval 106 Impellar Cover
 UPDATE supplies SET upc = NULL WHERE id = 5668; -- Fluval Ac50 Amremove
 UPDATE supplies SET upc = NULL WHERE id = 5657; -- Fluval Ac70 Ac110 Clear Carb 2pk
-UPDATE supplies SET upc = NULL WHERE id = 5101; -- Fluval Biothane-stratum 4.4lb
 UPDATE supplies SET upc = NULL WHERE id = 6969; -- Fluval Bug Bite Color Enh 4.4oz
 UPDATE supplies SET upc = NULL WHERE id = 5654; -- Fluval Carbon Ac70 Ac110
 UPDATE supplies SET upc = NULL WHERE id = 6970; -- Fluval Chiclid Medium to Large 3.5 oz
 UPDATE supplies SET upc = NULL WHERE id = 7019; -- Fluval Cichlid Small to Medium 1.6oz
 UPDATE supplies SET upc = NULL WHERE id = 7022; -- Fluval Color Enhancing 1.6oz
 UPDATE supplies SET upc = NULL WHERE id = 5396; -- Fluval Decor Medium
-UPDATE supplies SET upc = NULL WHERE id = 5514; -- Fluval Flt Insert Bag Ac20
 UPDATE supplies SET upc = NULL WHERE id = 7188; -- Fluval Forceps
 UPDATE supplies SET upc = NULL WHERE id = 6976; -- Fluval Moss Ball
 UPDATE supplies SET upc = NULL WHERE id = 5640; -- Fluval Prism 2.0
-UPDATE supplies SET upc = NULL WHERE id = 5758; -- Fluval Suction Cups
 UPDATE supplies SET upc = NULL WHERE id = 7021; -- Fluval Tropical Small 1.6oz
 UPDATE supplies SET upc = NULL WHERE id = 6876; -- Freshpet Beef,Bison 2lb
 UPDATE supplies SET upc = NULL WHERE id = 6880; -- Freshpet Small Breed Chicken,Turkey,Lamb 1lb
 UPDATE supplies SET upc = NULL WHERE id = 6877; -- Freshpet Small Breed Multi Protein 1lb
 UPDATE supplies SET upc = NULL WHERE id = 6874; -- Freshpet Turky 2lb
 UPDATE supplies SET upc = NULL WHERE id = 6889; -- Freshpet Vital Grain Free Chicken,Beef,Salmon 1.75
-UPDATE supplies SET upc = NULL WHERE id = 5850; -- Basic Hoodie Natural Blue Small
 UPDATE supplies SET upc = NULL WHERE id = 4759; -- Fromm Baked Chicken
-UPDATE supplies SET upc = NULL WHERE id = 4758; -- Fromm Baked Lamb
 UPDATE supplies SET upc = NULL WHERE id = 4760; -- Fromm Baked Salmon
 UPDATE supplies SET upc = NULL WHERE id = 6169; -- Fromm Beef Frittata Veg 12lb
 UPDATE supplies SET upc = NULL WHERE id = 6170; -- Fromm Beef Frittata Veg 26lb
@@ -979,26 +936,8 @@ UPDATE supplies SET upc = NULL WHERE id = 6834; -- Fussie Cat Tuna, Smoked Tuna 
 UPDATE supplies SET upc = NULL WHERE id = 5258; -- Glo-Plant 4" Aquaplnt
 UPDATE supplies SET upc = NULL WHERE id = 5259; -- Glo-Plant Small Glow Pad
 UPDATE supplies SET upc = NULL WHERE id = 5820; -- Glofish Trilogy
-UPDATE supplies SET upc = NULL WHERE id = 4692; -- Good 'n' Fun 3 Flavor Wing
-UPDATE supplies SET upc = NULL WHERE id = 4956; -- Greenies Blueberry Large 12oz
-UPDATE supplies SET upc = NULL WHERE id = 4952; -- Greenies Blueberry Teenie 12oz
-UPDATE supplies SET upc = NULL WHERE id = 4951; -- Greenies Frsh Large 12oz
-UPDATE supplies SET upc = NULL WHERE id = 4937; -- Greenies Orange Regular 12oz
-UPDATE supplies SET upc = NULL WHERE id = 4955; -- Greenies Petite Puppy 12oz
-UPDATE supplies SET upc = NULL WHERE id = 4964; -- Greenies Plllpcktche Cap 15.8oz
-UPDATE supplies SET upc = NULL WHERE id = 4963; -- Greenies Pllpckt Cheese Cap 7.9oz
-UPDATE supplies SET upc = NULL WHERE id = 4967; -- Greenies Pllpckt Chicken Cap 15.8oz
-UPDATE supplies SET upc = NULL WHERE id = 4966; -- Greenies Pllpckt Chicken Cap 7.9oz
-UPDATE supplies SET upc = NULL WHERE id = 4962; -- Greenies Pllpckt Peanut Butter Cap 15.8oz
-UPDATE supplies SET upc = NULL WHERE id = 4961; -- Greenies Pllpckt Peanut Butter Cap 7.9oz
-UPDATE supplies SET upc = NULL WHERE id = 4960; -- Greenies Pllpckt Peanut Butter Tab 3.2oz
-UPDATE supplies SET upc = NULL WHERE id = 4969; -- Greenies Pllpckt Smk Cap 7.9oz
-UPDATE supplies SET upc = NULL WHERE id = 4968; -- Greenies Pllpckt Smk Tab 3.2oz
-UPDATE supplies SET upc = NULL WHERE id = 6537; -- Greenies Small Top Beef 2oz
 UPDATE supplies SET upc = NULL WHERE id = 6540; -- Greenies Small Top Chicken & Green Bean 2oz
 UPDATE supplies SET upc = NULL WHERE id = 4948; -- Greenies Teenie Orange 36oz
-UPDATE supplies SET upc = NULL WHERE id = 1133; -- Exact Hand Feeding Formula
-UPDATE supplies SET upc = NULL WHERE id = 4902; -- PetOdor Happy Days Wax
 UPDATE supplies SET upc = NULL WHERE id = 6548; -- Health Extension Vitality 3.5 oz
 UPDATE supplies SET upc = NULL WHERE id = 4090; -- Sunburst Rat & Mouse 2.5 lb
 UPDATE supplies SET upc = NULL WHERE id = 6960; -- Hikari First Bites .35oz
@@ -1024,11 +963,6 @@ UPDATE supplies SET upc = NULL WHERE id = 6338; -- IAMS Mini Chunks 30lb
 UPDATE supplies SET upc = NULL WHERE id = 6336; -- IAMS Mini Chunks 7lb
 UPDATE supplies SET upc = NULL WHERE id = 6559; -- IAMS Puppy 13oz
 UPDATE supplies SET upc = NULL WHERE id = 951; -- Insight Sand Perch T-perch
-UPDATE supplies SET upc = NULL WHERE id = 4216; -- Kaytee Aspen 19.7l
-UPDATE supplies SET upc = NULL WHERE id = 4161; -- Kaytee Chewbular Medium
-UPDATE supplies SET upc = NULL WHERE id = 4411; -- Kaytee Comfort Harness Rat Small
-UPDATE supplies SET upc = NULL WHERE id = 4405; -- Kaytee Crinkle Tunnel
-UPDATE supplies SET upc = NULL WHERE id = 4239; -- Kaytee Water Bottle Holder Large
 UPDATE supplies SET upc = NULL WHERE id = 5564; -- Undergravel Filter 40/55g
 UPDATE supplies SET upc = NULL WHERE id = 1576; -- Li'l Pals Combo Brush
 UPDATE supplies SET upc = NULL WHERE id = 1629; -- Li'l Pals Double Sided Comb
@@ -1182,59 +1116,31 @@ UPDATE supplies SET upc = NULL WHERE id = 2500; -- Lilpals Small Harness Ryppsm
 UPDATE supplies SET upc = NULL WHERE id = 2502; -- Lilpals Small Harness Tgdpsm
 UPDATE supplies SET upc = NULL WHERE id = 2498; -- Lilpals Small Harness Tyspsm
 UPDATE supplies SET upc = NULL WHERE id = 2730; -- Lilpals Soccerball Rop
-UPDATE supplies SET upc = NULL WHERE id = 4809; -- 4" Pressed Bone
-UPDATE supplies SET upc = NULL WHERE id = 4810; -- 4.5" Pressed Bone Natural
 UPDATE supplies SET upc = NULL WHERE id = 1695; -- Crisscross Steel Non Skid Dish
 UPDATE supplies SET upc = NULL WHERE id = 4716; -- Flvrfullz Cheese
 UPDATE supplies SET upc = NULL WHERE id = 4717; -- Flvrfullz Chicken
-UPDATE supplies SET upc = NULL WHERE id = 3324; -- Lupine Dapp 10"-16" 1/2 in Collar
 UPDATE supplies SET upc = NULL WHERE id = 3326; -- Lupine Dapp 13"-22" 3/4in Collar
-UPDATE supplies SET upc = NULL WHERE id = 3325; -- Lupine Dapp 8"-12" 1/2in Collar
-UPDATE supplies SET upc = NULL WHERE id = 3331; -- Lupine Turt 12"-20" 1in Collar
 UPDATE supplies SET upc = NULL WHERE id = 3330; -- Lupine Turt 13"-22" 3/4in Collar
 UPDATE supplies SET upc = NULL WHERE id = 3343; -- Lupine Turt 6ft 1in Leash
-UPDATE supplies SET upc = NULL WHERE id = 3323; -- Lupine Turtrf 10'-16' 1/2 Incollar
 UPDATE supplies SET upc = NULL WHERE id = 7071; -- Marina 150w Heater
 UPDATE supplies SET upc = NULL WHERE id = 7072; -- Marina 200w Heater
 UPDATE supplies SET upc = NULL WHERE id = 7073; -- Marina 300w Heater
 UPDATE supplies SET upc = NULL WHERE id = 7070; -- Marina 50w Heater
 UPDATE supplies SET upc = NULL WHERE id = 7260; -- Marina Accent Gravel Black
-UPDATE supplies SET upc = NULL WHERE id = 5091; -- Marina Air Pump 50
 UPDATE supplies SET upc = NULL WHERE id = 5093; -- Marina Air Pump A100
-UPDATE supplies SET upc = NULL WHERE id = 5094; -- Marina Air Pump A200
 UPDATE supplies SET upc = NULL WHERE id = 5095; -- Marina Air Pump A300
-UPDATE supplies SET upc = NULL WHERE id = 5092; -- Marina Air Pump A75
 UPDATE supplies SET upc = NULL WHERE id = 5037; -- Marina Battery Air Pump
 UPDATE supplies SET upc = NULL WHERE id = 5813; -- Marina Betta Kit
-UPDATE supplies SET upc = NULL WHERE id = 5029; -- Marina Digit Thermometer
-UPDATE supplies SET upc = NULL WHERE id = 5021; -- Marina Digital Thermometer
 UPDATE supplies SET upc = NULL WHERE id = 7244; -- Marina Fire Grass Plant
 UPDATE supplies SET upc = NULL WHERE id = 5016; -- Marina Floating Thermometer W Suction
 UPDATE supplies SET upc = NULL WHERE id = 7294; -- Marina Gravel Black
 UPDATE supplies SET upc = NULL WHERE id = 7257; -- Marina Marble
 UPDATE supplies SET upc = NULL WHERE id = 7243; -- Marina Pack Orchid Plant
-UPDATE supplies SET upc = NULL WHERE id = 5829; -- Marineland 56gal Tank & Stand
-UPDATE supplies SET upc = NULL WHERE id = 5828; -- Marineland 60gal Tank & Stand
-UPDATE supplies SET upc = NULL WHERE id = 5830; -- Marineland 75 Tank & Stand
-UPDATE supplies SET upc = NULL WHERE id = 5515; -- Marineland Floss Sleeve Mag200
 UPDATE supplies SET upc = NULL WHERE id = 5639; -- Marineland Led Pod Color Enhnce
-UPDATE supplies SET upc = NULL WHERE id = 4419; -- Marshall Ferret Bell Collar
-UPDATE supplies SET upc = NULL WHERE id = 4418; -- Marshall Ferret Harness & Lead
-UPDATE supplies SET upc = NULL WHERE id = 4663; -- Fresh Kisses Large Double-Brush Box
-UPDATE supplies SET upc = NULL WHERE id = 4670; -- Fresh Kisses Large Mint Box
-UPDATE supplies SET upc = NULL WHERE id = 4669; -- Fresh Kisses Medium Mint Box
-UPDATE supplies SET upc = NULL WHERE id = 4668; -- Fresh Kisses Small Mint Box
-UPDATE supplies SET upc = NULL WHERE id = 4665; -- Fresh Kisses Small Mint Brush
 UPDATE supplies SET upc = NULL WHERE id = 4769; -- Merrick Power Bites Chicken
 UPDATE supplies SET upc = NULL WHERE id = 4290; -- N-Bone Frrt Chew Salmon
 UPDATE supplies SET upc = NULL WHERE id = 4639; -- N-Bone Puppy Teething Ring
 UPDATE supplies SET upc = NULL WHERE id = 4289; -- N-bone Frrt Chew Chick
-UPDATE supplies SET upc = NULL WHERE id = 4655; -- N-bone Teething Plus Rings 3pk
-UPDATE supplies SET upc = NULL WHERE id = 4654; -- N-bone Teething Sticks
-UPDATE supplies SET upc = NULL WHERE id = 4406; -- Nation Cozy Cube
-UPDATE supplies SET upc = NULL WHERE id = 4404; -- Nation Ramp Covers 3pk
-UPDATE supplies SET upc = NULL WHERE id = 4684; -- Rewards Crunch Bison Small Breed Duck 8oz
-UPDATE supplies SET upc = NULL WHERE id = 4685; -- Rewards Crunch Bison Small Breed Salmon 8oz
 UPDATE supplies SET upc = NULL WHERE id = 4688; -- Rewards Jumpin Stix Duck 4oz
 UPDATE supplies SET upc = NULL WHERE id = 1988; -- Nature's Miracle Advance No Spray
 UPDATE supplies SET upc = NULL WHERE id = 1366; -- Nature's Miracle Advanced Stain & Odor
@@ -1265,17 +1171,9 @@ UPDATE supplies SET upc = NULL WHERE id = 5122; -- Purewater Pebbles Rainbow Gem
 UPDATE supplies SET upc = NULL WHERE id = 5120; -- Purewater Pebbles Snow White 5lb
 UPDATE supplies SET upc = NULL WHERE id = 6410; -- Next Level Hi Pro 30 50lb
 UPDATE supplies SET upc = NULL WHERE id = 4324; -- Nibbles Barnyard
-UPDATE supplies SET upc = NULL WHERE id = 4812; -- Nutrichomps Pork Knot
-UPDATE supplies SET upc = NULL WHERE id = 4788; -- Nutrisource Chicken Big Bites
-UPDATE supplies SET upc = NULL WHERE id = 4794; -- Nutrisource Chompy Chompers Rabbit & Venison
-UPDATE supplies SET upc = NULL WHERE id = 4792; -- Nutrisource Chompy Chompers Salmon & Trout
 UPDATE supplies SET upc = NULL WHERE id = 6516; -- Nutrisource Come-Pooch-A Beef Bone Broth Recipe
-UPDATE supplies SET upc = NULL WHERE id = 4786; -- Nutrisource Crispy Crispers Lamb & Beef
-UPDATE supplies SET upc = NULL WHERE id = 4785; -- Nutrisource Crispy Crispers Turkey & Venison
 UPDATE supplies SET upc = NULL WHERE id = 4783; -- Nutrisource Duck Little Bites
-UPDATE supplies SET upc = NULL WHERE id = 4784; -- Nutrisource Nutty Butter Bites Apple
 UPDATE supplies SET upc = NULL WHERE id = 6520; -- Nutrisource PureVita Beef Entree 12.5oz
-UPDATE supplies SET upc = NULL WHERE id = 6519; -- Nutrisource PureVita Turkey Stew 12.5oz
 UPDATE supplies SET upc = NULL WHERE id = 6299; -- Nutrisource Seafood Select 15lb
 UPDATE supplies SET upc = NULL WHERE id = 6280; -- Nutrisource Weight Management Chicken & Chicken Me
 UPDATE supplies SET upc = NULL WHERE id = 2891; -- Nylabone Alt Elk Bone
@@ -1343,22 +1241,11 @@ UPDATE supplies SET upc = NULL WHERE id = 7001; -- Omega One Cichlid Pellets Sup
 UPDATE supplies SET upc = NULL WHERE id = 7002; -- Omega One Cichlid Pellets Super Color 4.2oz
 UPDATE supplies SET upc = NULL WHERE id = 6706; -- Orijen Cat Duck & Chicken 3oz
 UPDATE supplies SET upc = NULL WHERE id = 1781; -- Red Cross Extra Large Life Jacket
-UPDATE supplies SET upc = NULL WHERE id = 4044; -- Oxbow Hay Blend 90oz
-UPDATE supplies SET upc = NULL WHERE id = 713; -- Galapagos Hermit Crab Sub
 UPDATE supplies SET upc = NULL WHERE id = 3472; -- Paw Patrol Small Harness
 UPDATE supplies SET upc = NULL WHERE id = 5067; -- Act-air Action Skeleton
-UPDATE supplies SET upc = NULL WHERE id = 5075; -- Act-air Action Split Shipwreck
-UPDATE supplies SET upc = NULL WHERE id = 5068; -- Act-air Diver W Hose
-UPDATE supplies SET upc = NULL WHERE id = 5077; -- Act-air Half Shipwreck
-UPDATE supplies SET upc = NULL WHERE id = 5076; -- Act-air Rocking Shipwreck
 UPDATE supplies SET upc = NULL WHERE id = 5136; -- Aquaplants 12" Various 6pk
 UPDATE supplies SET upc = NULL WHERE id = 5204; -- Aquaplnt 12" Rckplnt Color
 UPDATE supplies SET upc = NULL WHERE id = 5203; -- Aquaplnt 2.5/3.5" Rckplnt Assorted
-UPDATE supplies SET upc = NULL WHERE id = 5150; -- Aquaplt 4" Plant Green
-UPDATE supplies SET upc = NULL WHERE id = 5282; -- Aquascapes Glow Bunch
-UPDATE supplies SET upc = NULL WHERE id = 5281; -- Aquascapes Large Red Bunch
-UPDATE supplies SET upc = NULL WHERE id = 5277; -- Aquascapes Small Purpl Bunch
-UPDATE supplies SET upc = NULL WHERE id = 5278; -- Aquascapes Small Yell Bunch
 UPDATE supplies SET upc = NULL WHERE id = 490; -- Basking Platform Filter
 UPDATE supplies SET upc = NULL WHERE id = 5431; -- Bonsai Tree Small
 UPDATE supplies SET upc = NULL WHERE id = 1697; -- Cat/Reptile 5.25" Bowl
@@ -1367,38 +1254,30 @@ UPDATE supplies SET upc = NULL WHERE id = 1628; -- Dry Ears Bowl
 UPDATE supplies SET upc = NULL WHERE id = 5416; -- Extra Large Red Rock
 UPDATE supplies SET upc = NULL WHERE id = 4225; -- Feeding Dish Large
 UPDATE supplies SET upc = NULL WHERE id = 4224; -- Feeding Dish Small
-UPDATE supplies SET upc = NULL WHERE id = 5254; -- Foregrounder Fan Palm Red
 UPDATE supplies SET upc = NULL WHERE id = 108; -- Gourmet Bearded Dragon Food
-UPDATE supplies SET upc = NULL WHERE id = 106; -- Gourmet Iguana Food
 UPDATE supplies SET upc = NULL WHERE id = 717; -- Hermit Beach
 UPDATE supplies SET upc = NULL WHERE id = 1626; -- I Love Cats Fish
 UPDATE supplies SET upc = NULL WHERE id = 5206; -- Jungle Pds Large Stle 6
 UPDATE supplies SET upc = NULL WHERE id = 5212; -- Junglepd Small Style 2
 UPDATE supplies SET upc = NULL WHERE id = 5388; -- Large Rock Cave
-UPDATE supplies SET upc = NULL WHERE id = 19; -- Lizard Ladder
 UPDATE supplies SET upc = NULL WHERE id = 5024; -- Lok-tite 3gang Vlv
 UPDATE supplies SET upc = NULL WHERE id = 5459; -- Magical Castle Medium
 UPDATE supplies SET upc = NULL WHERE id = 5267; -- Mickey Merminnie Mini
 UPDATE supplies SET upc = NULL WHERE id = 5468; -- Mini Undersea Mini Cannon
-UPDATE supplies SET upc = NULL WHERE id = 5272; -- Minireplica Treasure Chest
-UPDATE supplies SET upc = NULL WHERE id = 5082; -- Nano Air Pump
 UPDATE supplies SET upc = NULL WHERE id = 5317; -- Nemo
 UPDATE supplies SET upc = NULL WHERE id = 7256; -- Penn Plax Dazzle Stone Multi
 UPDATE supplies SET upc = NULL WHERE id = 7178; -- Penn Plax Feeder 7 Day
 UPDATE supplies SET upc = NULL WHERE id = 7047; -- Penn Plax Quick Net 3 in
 UPDATE supplies SET upc = NULL WHERE id = 4991; -- Penn-plax Wizard
-UPDATE supplies SET upc = NULL WHERE id = 5342; -- Roundstone Hideaway Large 4"
 UPDATE supplies SET upc = NULL WHERE id = 5401; -- Sea Anemone Pink Medium
 UPDATE supplies SET upc = NULL WHERE id = 5139; -- Sinkers Water Lily White Medium
 UPDATE supplies SET upc = NULL WHERE id = 5386; -- Small Rock Cave
 UPDATE supplies SET upc = NULL WHERE id = 5128; -- Supernatural Jelly Beans 20lb
-UPDATE supplies SET upc = NULL WHERE id = 5081; -- The Bubbler Bottm Filter
 UPDATE supplies SET upc = NULL WHERE id = 5776; -- Wonder Shell
 UPDATE supplies SET upc = NULL WHERE id = 4923; -- Pet House Reed Diffuser Citrus
 UPDATE supplies SET upc = NULL WHERE id = 4927; -- Pet House Vanilla Sandalwood
 UPDATE supplies SET upc = NULL WHERE id = 4907; -- Pet House Vanilla Sandalwood Car
 UPDATE supplies SET upc = NULL WHERE id = 6017; -- Collapsible Crate
-UPDATE supplies SET upc = NULL WHERE id = 4063; -- Pretty Pets Hedgehog Food
 UPDATE supplies SET upc = NULL WHERE id = 1186; -- Assorted Medium & Small Cage
 UPDATE supplies SET upc = NULL WHERE id = 5366; -- Naturals Log Medium
 UPDATE supplies SET upc = NULL WHERE id = 6910; -- Primal Broth Pork
@@ -1418,7 +1297,6 @@ UPDATE supplies SET upc = NULL WHERE id = 6375; -- Pro Plan Large Breed 18lb
 UPDATE supplies SET upc = NULL WHERE id = 6376; -- Pro Plan Large Breed 34lb
 UPDATE supplies SET upc = NULL WHERE id = 6377; -- Pro Plan Large Breed Puppy 18lb
 UPDATE supplies SET upc = NULL WHERE id = 6378; -- Pro Plan Large Breed Puppy 34lb
-UPDATE supplies SET upc = NULL WHERE id = 6527; -- Pro Plan Large Breed Salmon 34lb
 UPDATE supplies SET upc = NULL WHERE id = 6384; -- Pro Plan Puppy 34lb
 UPDATE supplies SET upc = NULL WHERE id = 6382; -- Pro Plan Puppy 6lb
 UPDATE supplies SET upc = NULL WHERE id = 6353; -- Pro Plan Sensitive Lamb 24lb
@@ -1468,15 +1346,8 @@ UPDATE supplies SET upc = NULL WHERE id = 2710; -- Rascals Latex Cow
 UPDATE supplies SET upc = NULL WHERE id = 2667; -- Rascals Sheep Toy
 UPDATE supplies SET upc = NULL WHERE id = 6525; -- Red Barn Chicken Stew 12oz
 UPDATE supplies SET upc = NULL WHERE id = 6524; -- Red Barn Turky Stew 12oz
-UPDATE supplies SET upc = NULL WHERE id = 4463; -- Redbarn Bully Barbell
-UPDATE supplies SET upc = NULL WHERE id = 4470; -- Redbarn Bully Ring
 UPDATE supplies SET upc = NULL WHERE id = 4453; -- Redbarn Duo Large Fill Bone Pbj
-UPDATE supplies SET upc = NULL WHERE id = 4485; -- Redbarn Glaze Cheek Roll Beef Peanut Butter
-UPDATE supplies SET upc = NULL WHERE id = 4469; -- Redbarn Large 1/2 Deer Antler
-UPDATE supplies SET upc = NULL WHERE id = 4488; -- Redbarn Large Collagen Stick
 UPDATE supplies SET upc = NULL WHERE id = 4454; -- Redbarn Large Fill Bone Lamb
-UPDATE supplies SET upc = NULL WHERE id = 4472; -- Redbarn Medium Pork Pizzle Braid
-UPDATE supplies SET upc = NULL WHERE id = 4468; -- Redbarn Small/Medium Deer Antler
 UPDATE supplies SET upc = NULL WHERE id = 4486; -- Redbarn Smmd Beef Cheek Rl Chicken
 UPDATE supplies SET upc = NULL WHERE id = 571; -- Reptile Climber Vines with Leaves 5'
 UPDATE supplies SET upc = NULL WHERE id = 545; -- Repto Green Hanging Vines 12'
@@ -1497,9 +1368,6 @@ UPDATE supplies SET upc = NULL WHERE id = 540; -- Reptology Orange Hanging Vines
 UPDATE supplies SET upc = NULL WHERE id = 656; -- Reptology Rock Scape
 UPDATE supplies SET upc = NULL WHERE id = 614; -- Reptology Thermo
 UPDATE supplies SET upc = NULL WHERE id = 526; -- Reptology Turtle Platform
-UPDATE supplies SET upc = NULL WHERE id = 4032; -- Rndlake Timothy Hay 18oz
-UPDATE supplies SET upc = NULL WHERE id = 4031; -- Rndlake Timothy Hay 48 oz
-UPDATE supplies SET upc = NULL WHERE id = 6004; -- Royal Canin Small Adult Adult Adult Adult 4lb
 UPDATE supplies SET upc = NULL WHERE id = 1532; -- Safari Bristle Brush Large
 UPDATE supplies SET upc = NULL WHERE id = 1939; -- Safari Cat Bristle Brush
 UPDATE supplies SET upc = NULL WHERE id = 1937; -- Safari Cat Nail Trimmer
@@ -1554,9 +1422,6 @@ UPDATE supplies SET upc = NULL WHERE id = 1534; -- Safari Wire Pin Brush Small &
 UPDATE supplies SET upc = NULL WHERE id = 1949; -- Safari the Complete Cat Brush
 UPDATE supplies SET upc = NULL WHERE id = 1514; -- Safari the Complete Dog Brush
 UPDATE supplies SET upc = NULL WHERE id = 1528; -- Safarin Self Cleaning Slicker Medium
-UPDATE supplies SET upc = NULL WHERE id = 4691; -- Beggar Bones Mini 3 in 1
-UPDATE supplies SET upc = NULL WHERE id = 4686; -- Beggar Bones Mix Large 1pk
-UPDATE supplies SET upc = NULL WHERE id = 4682; -- Beggar Bones Pork Skin Twist 11pk
 UPDATE supplies SET upc = NULL WHERE id = 6792; -- Science Diet Cat 11+ 7lb
 UPDATE supplies SET upc = NULL WHERE id = 6805; -- Science Diet Cat Indoor 15.5lb
 UPDATE supplies SET upc = NULL WHERE id = 6779; -- Science Diet Cat Indoor 3.5lb
@@ -1580,7 +1445,6 @@ UPDATE supplies SET upc = NULL WHERE id = 7107; -- Seachem Florish Iron 8.5oz
 UPDATE supplies SET upc = NULL WHERE id = 7163; -- Seachem Sulfaplex
 UPDATE supplies SET upc = NULL WHERE id = 5242; -- Seresto Large Dog Collar
 UPDATE supplies SET upc = NULL WHERE id = 6400; -- Shep Boy Chicken Fdr 14oz
-UPDATE supplies SET upc = NULL WHERE id = 4671; -- Shepherd Boy Freeze Chicken Hearts
 UPDATE supplies SET upc = NULL WHERE id = 4640; -- SmartBones 3 Large Chicken
 UPDATE supplies SET upc = NULL WHERE id = 4652; -- SmartBones 4lg Churro
 UPDATE supplies SET upc = NULL WHERE id = 4638; -- SmartBones 6 Stuff Twist Pork
@@ -1588,28 +1452,17 @@ UPDATE supplies SET upc = NULL WHERE id = 4629; -- SmartBones Stuffed Twistz 6pk
 UPDATE supplies SET upc = NULL WHERE id = 4631; -- SmartBones Twists 30pk Sirloin
 UPDATE supplies SET upc = NULL WHERE id = 4630; -- SmartBones Twists 50pk Peanut Butter
 UPDATE supplies SET upc = NULL WHERE id = 4622; -- Smartsticks 16 Count Chamomile & Lavender
-UPDATE supplies SET upc = NULL WHERE id = 4975; -- Smokehouse Bully Bites 6oz
-UPDATE supplies SET upc = NULL WHERE id = 4695; -- Smokehouse Chicken Sweet Potato Combo
 UPDATE supplies SET upc = NULL WHERE id = 4981; -- Smokehouse Cow Ears 5 Ears
 UPDATE supplies SET upc = NULL WHERE id = 4876; -- PetOdor Bamboo Breeze
-UPDATE supplies SET upc = NULL WHERE id = 4903; -- PetOdor Cream Vanilla Wax
-UPDATE supplies SET upc = NULL WHERE id = 4885; -- PetOdor Creamy Vanilla
-UPDATE supplies SET upc = NULL WHERE id = 4898; -- PetOdor Creamy Vanilla Car
-UPDATE supplies SET upc = NULL WHERE id = 4875; -- PetOdor Gummies
 UPDATE supplies SET upc = NULL WHERE id = 4897; -- PetOdor Lavender & Chamomile Car
 UPDATE supplies SET upc = NULL WHERE id = 4889; -- PetOdor Pawtopia
-UPDATE supplies SET upc = NULL WHERE id = 4904; -- PetOdor Pineapple Coconut Wax
 UPDATE supplies SET upc = NULL WHERE id = 4888; -- PetOdor Woofstock Spray
 UPDATE supplies SET upc = NULL WHERE id = 5113; -- Spectrastone Berry Lk 5lb
 UPDATE supplies SET upc = NULL WHERE id = 5131; -- Spectrastone Blue Jean 25lb
 UPDATE supplies SET upc = NULL WHERE id = 5132; -- Spectrastone Blue Spec 25lb
-UPDATE supplies SET upc = NULL WHERE id = 5117; -- Spectrastone Blue Special 5lb
-UPDATE supplies SET upc = NULL WHERE id = 5110; -- Spectrastone Green Special 5lb
 UPDATE supplies SET upc = NULL WHERE id = 5119; -- Spectrastone Lake Green 5lb
-UPDATE supplies SET upc = NULL WHERE id = 5118; -- Spectrastone Lte Blue Special 5lb
 UPDATE supplies SET upc = NULL WHERE id = 5107; -- Spectrastone Mini Rainbow 5lb
 UPDATE supplies SET upc = NULL WHERE id = 5109; -- Spectrastone Pgl Lavender 5lb
-UPDATE supplies SET upc = NULL WHERE id = 5111; -- Spectrastone Red 5lb
 UPDATE supplies SET upc = NULL WHERE id = 5134; -- Spectrastone lb Black 25lb
 UPDATE supplies SET upc = NULL WHERE id = 5133; -- Spectrastone lb White Spe 25lb
 UPDATE supplies SET upc = NULL WHERE id = 6108; -- Sportmix Bite Size 40lb
@@ -1624,12 +1477,8 @@ UPDATE supplies SET upc = NULL WHERE id = 4762; -- Starmark Medium Cookie Cup Ch
 UPDATE supplies SET upc = NULL WHERE id = 4765; -- Starmark Medium Cup Jar
 UPDATE supplies SET upc = NULL WHERE id = 4761; -- Starmark Small Cookie Cups Chicken
 UPDATE supplies SET upc = NULL WHERE id = 3685; -- Sunburst Blu10" Collar
-UPDATE supplies SET upc = NULL WHERE id = 4095; -- Sunburst Ham & Gerbil 2.5 lb
 UPDATE supplies SET upc = NULL WHERE id = 3686; -- Sunburst Red10" Collar
-UPDATE supplies SET upc = NULL WHERE id = 4286; -- Sunburst Veggie Garden
-UPDATE supplies SET upc = NULL WHERE id = 5246; -- Suzie's CBD Original 6oz
 UPDATE supplies SET upc = NULL WHERE id = 6050; -- Taste of the Wild Ancient Stream 14lb
-UPDATE supplies SET upc = NULL WHERE id = 499; -- Reptisticks Turtle
 UPDATE supplies SET upc = NULL WHERE id = 6997; -- Tetra Crisp Select a Food 2.4oz
 UPDATE supplies SET upc = NULL WHERE id = 7236; -- Tetra Glo Extra Large Gr/Black Plant
 UPDATE supplies SET upc = NULL WHERE id = 7237; -- Tetra Glo Extra Large Purple/Pack Plant
@@ -1640,7 +1489,6 @@ UPDATE supplies SET upc = NULL WHERE id = 6974; -- Tetra Pleco Wafer 2.12oz
 UPDATE supplies SET upc = NULL WHERE id = 6975; -- Tetra Shrimp Wafer 3oz
 UPDATE supplies SET upc = NULL WHERE id = 6978; -- Tetramin Granule 3.52oz
 UPDATE supplies SET upc = NULL WHERE id = 4745; -- Milk-Bone Marosnacks
-UPDATE supplies SET upc = NULL WHERE id = 4672; -- Milk-Bone Trail Mix
 UPDATE supplies SET upc = NULL WHERE id = 1776; -- Titan Aerial Dog Run
 UPDATE supplies SET upc = NULL WHERE id = 2665; -- Titan Comfort Tips Fine
 UPDATE supplies SET upc = NULL WHERE id = 2663; -- Titan Comfort Tips Heavy
@@ -1686,13 +1534,10 @@ UPDATE supplies SET upc = NULL WHERE id = 2647; -- Titan Traincllr Xhvy 30" 5540
 UPDATE supplies SET upc = NULL WHERE id = 2637; -- Titan Trincollar Heavy 18" 5530
 UPDATE supplies SET upc = NULL WHERE id = 4973; -- Etta Says Buffalo Chew
 UPDATE supplies SET upc = NULL WHERE id = 4848; -- Tuesday Beef Bladder
-UPDATE supplies SET upc = NULL WHERE id = 4856; -- Tuesdays 10" Beef Cheek Peanut Butter
 UPDATE supplies SET upc = NULL WHERE id = 4855; -- Tuesdays 10" Beef Cheek Roll Dusted
-UPDATE supplies SET upc = NULL WHERE id = 4854; -- Tuesdays 10-12" Beef Basted Chkrll
 UPDATE supplies SET upc = NULL WHERE id = 4850; -- Tuesdays 10-12" Stuff Pork Gullets
 UPDATE supplies SET upc = NULL WHERE id = 4852; -- Tuesdays 12" Cllgen Peanut Butter
 UPDATE supplies SET upc = NULL WHERE id = 4851; -- Tuesdays 5" Beef Cheek Roll
-UPDATE supplies SET upc = NULL WHERE id = 4853; -- Tuesdays Chicken Basted Cheek Roll
 UPDATE supplies SET upc = NULL WHERE id = 4456; -- Tuesdays Filled Hoof Peanut Butter
 UPDATE supplies SET upc = NULL WHERE id = 4845; -- Tuesdays Small Beef Tail
 UPDATE supplies SET upc = NULL WHERE id = 843; -- Turbo Animal Prints
@@ -1716,15 +1561,11 @@ UPDATE supplies SET upc = NULL WHERE id = 6428; -- VICTOR Hi Pro 30lb
 UPDATE supplies SET upc = NULL WHERE id = 6426; -- VICTOR Hi Pro 50lb
 UPDATE supplies SET upc = NULL WHERE id = 6427; -- VICTOR Prof 30lb
 UPDATE supplies SET upc = NULL WHERE id = 6422; -- VICTOR Senior 40lb
-UPDATE supplies SET upc = NULL WHERE id = 3474; -- Valhoma 16 Large Collar
-UPDATE supplies SET upc = NULL WHERE id = 3476; -- Valhoma 18 Large Collar
-UPDATE supplies SET upc = NULL WHERE id = 3478; -- Valhoma 20 Large Collar
 UPDATE supplies SET upc = NULL WHERE id = 3480; -- Valhoma 20 Red Collar
 UPDATE supplies SET upc = NULL WHERE id = 3484; -- Valhoma 22 Red Collar
 UPDATE supplies SET upc = NULL WHERE id = 3486; -- Valhoma 24 Red Collar
 UPDATE supplies SET upc = NULL WHERE id = 3499; -- Valhoma Spike 18 Red Collar
 UPDATE supplies SET upc = NULL WHERE id = 4255; -- Smakers Nut
-UPDATE supplies SET upc = NULL WHERE id = 4108; -- Vitagarden Gpig 4lb
 UPDATE supplies SET upc = NULL WHERE id = 4089; -- Vitagarden Rat & Mouse 2.5 lb
 UPDATE supplies SET upc = NULL WHERE id = 6399; -- Vital Essentials Beef Ground Top 6oz
 UPDATE supplies SET upc = NULL WHERE id = 6394; -- Vital Essentials Beef Mini Nibbles 14oz
@@ -1733,7 +1574,6 @@ UPDATE supplies SET upc = NULL WHERE id = 6396; -- Vital Essentials Chicken Mini
 UPDATE supplies SET upc = NULL WHERE id = 6395; -- Vital Essentials Chicken Mini Pate 14oz
 UPDATE supplies SET upc = NULL WHERE id = 6392; -- Vital Essentials Duck Mini Nibbles 14oz
 UPDATE supplies SET upc = NULL WHERE id = 6391; -- Vital Essentials Duck Mini Pate 14oz
-UPDATE supplies SET upc = NULL WHERE id = 6682; -- Vital Essentials Duck Patties 8oz
 UPDATE supplies SET upc = NULL WHERE id = 6397; -- Vital Essentials Turkey Ground Top 6oz
 UPDATE supplies SET upc = NULL WHERE id = 6390; -- Vital Essentials Turkey Mini Nibbles 14oz
 UPDATE supplies SET upc = NULL WHERE id = 6389; -- Vital Essentials Turkey Mini Pate 14oz
@@ -1778,14 +1618,9 @@ UPDATE supplies SET upc = NULL WHERE id = 1852; -- Weewee Washable Pad 3pk
 UPDATE supplies SET upc = NULL WHERE id = 6550; -- Welln Beef Stew 12.5oz
 UPDATE supplies SET upc = NULL WHERE id = 6544; -- Wellness Petite Entree Beef 3oz
 UPDATE supplies SET upc = NULL WHERE id = 4860; -- Wholesome Rewards Lite Bites
-UPDATE supplies SET upc = NULL WHERE id = 4859; -- Wholesome Rewards Medium Variety
 UPDATE supplies SET upc = NULL WHERE id = 4862; -- Wholesome Rewards Puppy Vareity
 UPDATE supplies SET upc = NULL WHERE id = 6447; -- Wholesome Sensitive 30lb
 UPDATE supplies SET upc = NULL WHERE id = 4944; -- YummyCombs Extra Large 12oz
-UPDATE supplies SET upc = NULL WHERE id = 4808; -- Zignature Soft Duck Bites
-UPDATE supplies SET upc = NULL WHERE id = 4807; -- Zignature Soft Lamb Bites
-UPDATE supplies SET upc = NULL WHERE id = 4802; -- Zignature Treats Duck 12oz
-UPDATE supplies SET upc = NULL WHERE id = 4804; -- Zignature Treats Lamb 12oz
 UPDATE supplies SET upc = NULL WHERE id = 514; -- Turtle Pier Extender Clips
 UPDATE supplies SET upc = NULL WHERE id = 605; -- Zoo Med Terraium Controller
 UPDATE supplies SET upc = NULL WHERE id = 1173; -- Zupreem Fruitblend Medium Bird
