@@ -12418,6 +12418,7 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
     stockQuantity: '',
     weight: '',
     size: '',
+    sku: '',
     isActive: true,
   });
 
@@ -12493,6 +12494,16 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
             required
           />
         </div>
+      </div>
+      <div>
+        <Label htmlFor="sku">SKU/UPC</Label>
+        <Input
+          id="sku"
+          value={formData.sku}
+          onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+          placeholder="Product SKU or UPC code"
+          data-testid="input-add-supply-sku"
+        />
       </div>
       <div>
         <Label htmlFor="description">Description</Label>
