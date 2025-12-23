@@ -1,0 +1,8448 @@
+{
+  "unknown_abbreviations": [
+    {
+      "abbr": "pound",
+      "count": 678,
+      "examples": [
+        "WWI GRVL RAINBOW 5#",
+        "SLI SBSTRT FLOURITE BK 7.7#",
+        "TET GRVL GLOFSH WH 5#"
+      ]
+    },
+    {
+      "abbr": "cat",
+      "count": 229,
+      "examples": [
+        "ETH CROCK CAT RTL CERAMIC 5IN",
+        "ETH TEASR CAT PRANCER 44IN",
+        "Advantage Shampoo Cat"
+      ]
+    },
+    {
+      "abbr": "and",
+      "count": 217,
+      "examples": [
+        "KMP FOOD GPIG & MORE 4#",
+        "ETH TEASR CT BFLY & MYLAR ASST",
+        "A&E HOLDER CUTBNE/TRT 2PK"
+      ]
+    },
+    {
+      "abbr": "zoomed",
+      "count": 179,
+      "examples": [
+        "ZooMed River Pebbles",
+        "ZooMed Hyrdo Balls",
+        "ZooMed Creature Soil 1 QT"
+      ]
+    },
+    {
+      "abbr": "food",
+      "count": 138,
+      "examples": [
+        "AQE FOOD BETTA FOOD .95OZ",
+        "AQE FOOD BETTA FOOD .95OZ",
+        "AQE FOOD CCHLD PLLT MINI 4.5OZ"
+      ]
+    },
+    {
+      "abbr": "collar",
+      "count": 137,
+      "examples": [
+        "Adams Dog Large Flea Collar",
+        "Adams Dog Small Flea Collar",
+        "Adams Cat Flea Collar"
+      ]
+    },
+    {
+      "abbr": "kong",
+      "count": 120,
+      "examples": [
+        "KON TOY XTRM KONG BK LG",
+        "KON TOY KONG PUP SM",
+        "KON TOY XTRM KONG BK XL"
+      ]
+    },
+    {
+      "abbr": "fromm",
+      "count": 119,
+      "examples": [
+        "FROMM classic 30#",
+        "FROMM classic puppy 30#",
+        "FROMM classic puppy 5#"
+      ]
+    },
+    {
+      "abbr": "spot",
+      "count": 89,
+      "examples": [
+        "ZIL BULB SPOT DAY WH 50W BOX",
+        "ZML BULB BASKING SPOT NANO 25W",
+        "ZIL BULB SPOT DAY WH 150W BOX"
+      ]
+    },
+    {
+      "abbr": "blue",
+      "count": 89,
+      "examples": [
+        "Flukers Cricket Quencher Blue",
+        "Zilla Mini Halogen Bulb 50W Blue",
+        "Zilla Mini Halogen Bulb 25w Blue"
+      ]
+    },
+    {
+      "abbr": "puppy",
+      "count": 88,
+      "examples": [
+        "MagicCoat Prof Series oats  Puppy",
+        "PetCrest Lucky Puppy",
+        "Tomlyn High Calorie Gel Puppy"
+      ]
+    },
+    {
+      "abbr": "zilla",
+      "count": 84,
+      "examples": [
+        "Zilla Jungle Mix 4QT",
+        "Zilla Green Liner 15/20H G",
+        "Zilla Green liner 40/50g"
+      ]
+    },
+    {
+      "abbr": "beef",
+      "count": 78,
+      "examples": [
+        "SD mini jerky beef",
+        "SD jerky beef",
+        "SD soft beef"
+      ]
+    },
+    {
+      "abbr": "plan",
+      "count": 77,
+      "examples": [
+        "PRO PLAN sm br sensit 4#",
+        "PRO PLAN sensit puppy salm 15#",
+        "PRO PLAN sensi sm br 15#"
+      ]
+    },
+    {
+      "abbr": "nutri",
+      "count": 75,
+      "examples": [
+        "Lafebers el paso Nutri berries parrot",
+        "NUTRI SOU sm puppy 1.5#",
+        "NUTRI SOU sm puppy 4#"
+      ]
+    },
+    {
+      "abbr": "leash",
+      "count": 66,
+      "examples": [
+        "Flukers xsmall Repta Leash",
+        "Flukers xxsmall Repta Leash",
+        "Flukers Med. Repta Leash"
+      ]
+    },
+    {
+      "abbr": "catit",
+      "count": 57,
+      "examples": [
+        "Catit Pixi Feeder",
+        "Catit Fountain Filter Mini 3pck",
+        "Catit CatNip Roll On"
+      ]
+    },
+    {
+      "abbr": "tetra",
+      "count": 56,
+      "examples": [
+        "Tetra Hermit Crab Cakes",
+        "Tetra Fauna 10G Reptohab",
+        "TETRA glofish wafer 1.58oz"
+      ]
+    },
+    {
+      "abbr": "safari",
+      "count": 53,
+      "examples": [
+        "COA GRMG CT SAFARI NAIL TRMR",
+        "Safari Mat Remover",
+        "Safari Double Row Rake Rotating pins"
+      ]
+    },
+    {
+      "abbr": "gr",
+      "count": 51,
+      "examples": [
+        "FAS SWTR TXTRD CABLE GR SM",
+        "FAS SWTR TXTRD CABLE GR XS",
+        "FAS SWTR TXTRD CABLE GR MD"
+      ]
+    },
+    {
+      "abbr": "ball",
+      "count": 50,
+      "examples": [
+        "KON TOY CRUNCHAIR BALL MD 3PK",
+        "PTS BALL RUN ABOUT GIANT CLR",
+        "KON TUG JAXX BRIGHT W/BALL MD"
+      ]
+    },
+    {
+      "abbr": "bed",
+      "count": 50,
+      "examples": [
+        "PTS BED CUDDLE CUP",
+        "ZML LEAF BETTA BED HAMMOCK REG",
+        "ASP BED CT PUFFY ROUND 18IN"
+      ]
+    },
+    {
+      "abbr": "spray",
+      "count": 47,
+      "examples": [
+        "Zilla Tropical Mist Humidity Spray",
+        "Troiclean Ntrl Flea&Tik Soothing Spray",
+        "TropiClean Natrl Flea&Tik Home spray"
+      ]
+    },
+    {
+      "abbr": "cc",
+      "count": 47,
+      "examples": [
+        "LilPals CC FWR08",
+        "LilPals CC DMC07",
+        "LilPals CC GND08"
+      ]
+    },
+    {
+      "abbr": "buf",
+      "count": 47,
+      "examples": [
+        "BL BUF ck stew 12.5oz",
+        "BL BUF hunters stew 12.5oz",
+        "BL BUF beef stew"
+      ]
+    },
+    {
+      "abbr": "large",
+      "count": 45,
+      "examples": [
+        "PTS CHEW KABOB ECONOMY LARGE",
+        "Flukers Large Repta Leash",
+        "Flukers X Large Repta Leash"
+      ]
+    },
+    {
+      "abbr": "circle",
+      "count": 45,
+      "examples": [
+        "HappyBeaks rotating Circle",
+        "CIRCLE 14\"TCR1786S COLLAR",
+        "CIRCLE 16\"TCR1786S COLLAR"
+      ]
+    },
+    {
+      "abbr": "lamb",
+      "count": 45,
+      "examples": [
+        "DIAM sm br lamb 18#",
+        "DIAM lg br lamb 40#",
+        "DIAM lamb 6#"
+      ]
+    },
+    {
+      "abbr": "small",
+      "count": 44,
+      "examples": [
+        "ExoTerr Small Sand Mat",
+        "Flukers Dubia Roaches Small",
+        "Small Jelly Pots"
+      ]
+    },
+    {
+      "abbr": "sou",
+      "count": 44,
+      "examples": [
+        "NUTRI SOU sm puppy 1.5#",
+        "NUTRI SOU sm puppy 4#",
+        "NUTRI SOU sm puppy 12#"
+      ]
+    },
+    {
+      "abbr": "bite",
+      "count": 43,
+      "examples": [
+        "KAY FOOD BIG BITE PRRT 4#",
+        "SPOT SKNZ BIG BITE JACKAL",
+        "SPOT SKNZ BIG BITE BEAR"
+      ]
+    },
+    {
+      "abbr": "bulb",
+      "count": 42,
+      "examples": [
+        "AQE BULB T8 COLORMAX 18IN 15W",
+        "AQE CLNR GRVL VAC W/BULB 10IN",
+        "ZIL BULB DAY WH INC 100W BOX"
+      ]
+    },
+    {
+      "abbr": "litter",
+      "count": 41,
+      "examples": [
+        "PTS LTTR CRITTER LITTER 8#",
+        "PTS LTTR CRITTER LITTER 4#",
+        "Arm&Hammer Litter Fragrence Booster"
+      ]
+    },
+    {
+      "abbr": "duck",
+      "count": 40,
+      "examples": [
+        "KON TOY SNUZZLE DUCK XS",
+        "GRE TUB S/T CHKN/DUCK 2OZ/8PK",
+        "NBP TRT REWARDS STIX DUCK 4OZ"
+      ]
+    },
+    {
+      "abbr": "red",
+      "count": 39,
+      "examples": [
+        "Zilla Mini Halogen Bulb 25W Red",
+        "Zilla Mini Halogen Bulb 50W Red",
+        "Zilla Night Red Heat 150W"
+      ]
+    },
+    {
+      "abbr": "titan",
+      "count": 39,
+      "examples": [
+        "Titan Spiral Stake&TieOut Combo",
+        "Titan Tie Out Chain 15Ft",
+        "Titan ShockSpring With Snap"
+      ]
+    },
+    {
+      "abbr": "tow",
+      "count": 39,
+      "examples": [
+        "TOW anc wetland 5#",
+        "TOW anc stream 5#",
+        "TOW anc mount 5#"
+      ]
+    },
+    {
+      "abbr": "bowl",
+      "count": 38,
+      "examples": [
+        "ZIL BOWL DURABLE GY MD",
+        "ZML BOWL REPRIROCK COMBO MD",
+        "ZML BOWL REPTI RAMP MD"
+      ]
+    },
+    {
+      "abbr": "fluval",
+      "count": 38,
+      "examples": [
+        "FLUVAL bug bite pleco waf 4.6oz",
+        "FLUVAL bug bite col enh 4.4oz",
+        "FLUVAL chiclid md to lg 3.5oz"
+      ]
+    },
+    {
+      "abbr": "penn",
+      "count": 37,
+      "examples": [
+        "penn plax rockscapes",
+        "PENN PLAX divider 20 gallon",
+        "PENN PLAX divider 15-20"
+      ]
+    },
+    {
+      "abbr": "plax",
+      "count": 37,
+      "examples": [
+        "penn plax rockscapes",
+        "PENN PLAX divider 20 gallon",
+        "PENN PLAX divider 15-20"
+      ]
+    },
+    {
+      "abbr": "diam",
+      "count": 37,
+      "examples": [
+        "DIAM sm br ck 6#",
+        "DIAM sm br ck 18#",
+        "DIAM sm br lamb 18#"
+      ]
+    },
+    {
+      "abbr": "mat",
+      "count": 36,
+      "examples": [
+        "OXB TRT TMTHY MAT LG",
+        "LOV MAT BELLA SPILL PROOF BKLG",
+        "LOV MAT BELLA SPILL PROOF BKSM"
+      ]
+    },
+    {
+      "abbr": "dish",
+      "count": 36,
+      "examples": [
+        "Buffalo Worm Dish",
+        "ExoTerra Canopy Worm Dish",
+        "Komodo Smart Dish"
+      ]
+    },
+    {
+      "abbr": "glo",
+      "count": 35,
+      "examples": [
+        "ExoTerra Solar Glo 80W",
+        "ExoTerra Solar Glo 125W",
+        "ExoTerra Solar Glo 160W"
+      ]
+    },
+    {
+      "abbr": "bird",
+      "count": 34,
+      "examples": [
+        "JWP WATERER BIRD SILO LG",
+        "KAY TRT SPRFD STC BIRD BLBRY5Z",
+        "JWP FRD WTR BIRD CUP SM"
+      ]
+    },
+    {
+      "abbr": "stew",
+      "count": 34,
+      "examples": [
+        "RBP CAN STEW TRKY/CRRT 12OZ",
+        "RBP CAN STEW CHKN/PMPKN 12OZ",
+        "NUTRI SOUR pv ck stew 12.5oz"
+      ]
+    },
+    {
+      "abbr": "tuna",
+      "count": 34,
+      "examples": [
+        "purebites cat freeze tuna",
+        "Vital Cat Ahi Tuna Bites",
+        "FlavorFullz Tuna"
+      ]
+    },
+    {
+      "abbr": "salm",
+      "count": 34,
+      "examples": [
+        "Blue Wilderness Chnk&Salm Treats",
+        "PURE VITA gr fr salm & pea 5#",
+        "PURE VITA gr fr salm & pea 12#"
+      ]
+    },
+    {
+      "abbr": "fr",
+      "count": 34,
+      "examples": [
+        "SD sensi gr fr 24#",
+        "SD gr fr crunch",
+        "DIAM gr fr 28#"
+      ]
+    },
+    {
+      "abbr": "plant",
+      "count": 33,
+      "examples": [
+        "Zilla Mini Led plant Bulb",
+        "ZooMed Palubarium UVB &Plant",
+        "Reptology Lava rock Plant"
+      ]
+    },
+    {
+      "abbr": "ph",
+      "count": 33,
+      "examples": [
+        "PH Cage Saver",
+        "PH Sm Seed Catcher",
+        "PH Med Seed Catcher"
+      ]
+    },
+    {
+      "abbr": "weight",
+      "count": 33,
+      "examples": [
+        "Heavy Weight 11.5oz bowl",
+        "FourPaws 50' Hvy weight tie out cable",
+        "SD sm min perf weight 12.5#"
+      ]
+    },
+    {
+      "abbr": "sour",
+      "count": 33,
+      "examples": [
+        "NUTRI SOUR seaf 15#",
+        "NUTRI SOUR gr fr weight 4#",
+        "NUTRI SOUR heartland 13oz"
+      ]
+    },
+    {
+      "abbr": "bedng",
+      "count": 32,
+      "examples": [
+        "ZIL BEDNG JUNGLE MIX 24QT",
+        "ZIL BEDNG DESERT BLEND 10QT",
+        "ZML BEDNG CREATURES SOIL 1QT"
+      ]
+    },
+    {
+      "abbr": "heat",
+      "count": 32,
+      "examples": [
+        "ZML LGHT KIT TRPCL HEAT UVB",
+        "ZML BULB HEAT INFRARED NANO25W",
+        "ExoTerra Night Heat 150w"
+      ]
+    },
+    {
+      "abbr": "turtle",
+      "count": 32,
+      "examples": [
+        "ZML MED EYE DROPS TURTLE",
+        "ExoTerra Turtle Pebbles",
+        "ExoTerra Turtle bank"
+      ]
+    },
+    {
+      "abbr": "marina",
+      "count": 32,
+      "examples": [
+        "MARINA 50w heater",
+        "MARINA 150w heater",
+        "MARINA 200w heater"
+      ]
+    },
+    {
+      "abbr": "rbp",
+      "count": 30,
+      "examples": [
+        "RBP DRY W/G LAND 4#",
+        "RBP TRT BNE KNUCKLE SMOKED",
+        "RBP TRT CLLGN STC SM 5CT"
+      ]
+    },
+    {
+      "abbr": "box",
+      "count": 30,
+      "examples": [
+        "ZIL BULB DAY WH INC 100W BOX",
+        "ZIL BULB NGHT BK INC 75W BOX",
+        "ZIL BULB NIGHT INC RD 75W BOX"
+      ]
+    },
+    {
+      "abbr": "combo",
+      "count": 30,
+      "examples": [
+        "ZML BOWL REPRIROCK COMBO MD",
+        "ZML FXTR DEEP DOME MINI COMBO",
+        "SLI MONITOR ALERTS COMBO PK6MO"
+      ]
+    },
+    {
+      "abbr": "kitten",
+      "count": 30,
+      "examples": [
+        "KeepOff Cat & Kitten",
+        "VetRx Cat &Kitten Aid",
+        "Tomlyn High Calorie Gel kitten"
+      ]
+    },
+    {
+      "abbr": "dog",
+      "count": 29,
+      "examples": [
+        "COA BRUSH RBBR CURRY DOG",
+        "TRO F/T NAT DOG & BED SPRY 16Z",
+        "Advantage Spray Dog"
+      ]
+    },
+    {
+      "abbr": "gold",
+      "count": 29,
+      "examples": [
+        "Safflower Gold Conure &Cockatiel",
+        "Safflower Gold Conure&tiel 25lbs",
+        "Safflower Gold Parrot 25lbs"
+      ]
+    },
+    {
+      "abbr": "vict",
+      "count": 29,
+      "examples": [
+        "VICT seniior 40#",
+        "VICT hi energy 40#",
+        "VICT perfor 40#"
+      ]
+    },
+    {
+      "abbr": "fish",
+      "count": 28,
+      "examples": [
+        "ATP FDR AUTO FISH PROGRAMMABLE",
+        "Turbo Fish",
+        "BellaBowl Xsmall Fish Blue"
+      ]
+    },
+    {
+      "abbr": "weewee",
+      "count": 28,
+      "examples": [
+        "WeeWee Patch Indoor Potty sm",
+        "WeeWee Spring Action Scoop Sm",
+        "WeeWee SpringActionGrss Scp  Med"
+      ]
+    },
+    {
+      "abbr": "turk",
+      "count": 28,
+      "examples": [
+        "WELLN sm br turk 4#",
+        "VIT ESS turk min pat 14oz",
+        "VIT ESS turk min nib 14oz"
+      ]
+    },
+    {
+      "abbr": "gre",
+      "count": 27,
+      "examples": [
+        "GRE TRT DNTL ORIG LG 6OZ",
+        "GRE TRT PILLP CAPSL CHS 15.8OZ",
+        "GRE TRT PILLP CAPSL PB 15.8Z"
+      ]
+    },
+    {
+      "abbr": "bone",
+      "count": 27,
+      "examples": [
+        "ZML SPLMT TRTL BONE",
+        "ExoTerra DinoSaur Bone",
+        "BirdLife Cuttle bone"
+      ]
+    },
+    {
+      "abbr": "light",
+      "count": 27,
+      "examples": [
+        "Zilla Light&Heat Halogen Mini Dome",
+        "Exoterr Large Light Bracket",
+        "Zilla Day Blue Light 150W"
+      ]
+    },
+    {
+      "abbr": "day",
+      "count": 26,
+      "examples": [
+        "ZIL BULB DAY WH INC 100W BOX",
+        "ZIL BULB SPOT DAY WH 50W BOX",
+        "ZIL BULB DAY BL INC 75W BOX"
+      ]
+    },
+    {
+      "abbr": "brush",
+      "count": 26,
+      "examples": [
+        "COA BRUSH RBBR CURRY DOG",
+        "COA BRUSH SLKR FIRM SM",
+        "COA BRUSH SLKR FIRM MD"
+      ]
+    },
+    {
+      "abbr": "pet",
+      "count": 26,
+      "examples": [
+        "TopPerformance Fresh Pet",
+        "SkoutsHonor Prebiotic Pet Balm",
+        "Tropiclean BbyPwder Pet Spray"
+      ]
+    },
+    {
+      "abbr": "sensi",
+      "count": 26,
+      "examples": [
+        "SD puppy sensi 4#",
+        "SD puppy sensi 13#",
+        "SD sensi pollock 12#"
+      ]
+    },
+    {
+      "abbr": "sand",
+      "count": 25,
+      "examples": [
+        "JWP PERCH SAND T SM",
+        "JWP PERCH SAND T REG",
+        "GAL SAND TRPCL MIX HC 4QT"
+      ]
+    },
+    {
+      "abbr": "dry",
+      "count": 25,
+      "examples": [
+        "IAM DRY PAH MINI CHK 15#",
+        "IAM DRY PAH MINICHUNKS 30#",
+        "RBP DRY W/G LAND 4#"
+      ]
+    },
+    {
+      "abbr": "flea",
+      "count": 25,
+      "examples": [
+        "COA COMB W6162 FLEA PLSTC 100",
+        "Tropiclean Natural Flea &Tic Yard",
+        "Tropicalen Ntrl Flea&Tick Soothing Sham"
+      ]
+    },
+    {
+      "abbr": "zoo",
+      "count": 25,
+      "examples": [
+        "VIP TOY TUFF ZOO ELPHNT JR",
+        "ZooMed Zoo Menu Iguana Food",
+        "KONG WUB ZOO ZEBRA LG"
+      ]
+    },
+    {
+      "abbr": "feeder",
+      "count": 25,
+      "examples": [
+        "ZooMed Mealworm Feeder",
+        "Reptology Feeder dish sm",
+        "Reptology Feeder Dish Lg."
+      ]
+    },
+    {
+      "abbr": "gravel",
+      "count": 25,
+      "examples": [
+        "Living World Gravel paper",
+        "BirdLife Gravel Paper11x17",
+        "BirdLife Gravel Paper 15.5x15.5"
+      ]
+    },
+    {
+      "abbr": "swtr",
+      "count": 24,
+      "examples": [
+        "FAS SWTR CLASSIC CABLE PK XS",
+        "FAS SWTR CLASSIC CABLE PK SM",
+        "FAS SWTR CLASSIC CABLE PK MD"
+      ]
+    },
+    {
+      "abbr": "salmon",
+      "count": 24,
+      "examples": [
+        "Brilliant Salmon Oil",
+        "NaturVet Salmon Oil",
+        "Grizzly Omega Salmon 8oz"
+      ]
+    },
+    {
+      "abbr": "primal",
+      "count": 24,
+      "examples": [
+        "PRIMAL fro beef nug 3#",
+        "PRIMAL fr rab nug 3#",
+        "PRIMAL fro nug pork 3#"
+      ]
+    },
+    {
+      "abbr": "crab",
+      "count": 23,
+      "examples": [
+        "ZML FOOD HRMT CRAB FRUIT SALAD",
+        "ZML COND WTR HRMT CRAB",
+        "ZML COND S/W HRMT CRAB"
+      ]
+    },
+    {
+      "abbr": "safe",
+      "count": 23,
+      "examples": [
+        "COA CLLR CT SAFE FSHN SKP 12",
+        "COA CLLR CT SAFE FSHN SKZ 12",
+        "COA CLLR CT SAFE FSHN WDF 12"
+      ]
+    },
+    {
+      "abbr": "happy",
+      "count": 23,
+      "examples": [
+        "Happy Beaks Two Sided Mirror",
+        "Happy Beaks Snuggle Sack MD",
+        "Happy Beaks Snuggle SackLG"
+      ]
+    },
+    {
+      "abbr": "zign",
+      "count": 23,
+      "examples": [
+        "ZIGN zssen 13oz",
+        "ZIGN pork 13oz",
+        "ZIGN wh fish 13oz"
+      ]
+    },
+    {
+      "abbr": "lttr",
+      "count": 22,
+      "examples": [
+        "EPC LTTR GENIE RFILL 1PK",
+        "OXB LTTR PAN RECT W/SHIELD",
+        "PTS LTTR CRITTER LITTER 8#"
+      ]
+    },
+    {
+      "abbr": "heater",
+      "count": 22,
+      "examples": [
+        "AQE HEATER FLAT 5W UP TO 2G",
+        "ZML HEATER BETTA THERM 7.5W",
+        "AQE HEATER FLAT 7.5W"
+      ]
+    },
+    {
+      "abbr": "min",
+      "count": 22,
+      "examples": [
+        "ZooMed Min Des. UVB Combo",
+        "ExoTerra Min/Max Thermo",
+        "ZooMed Min/Max Thermo"
+      ]
+    },
+    {
+      "abbr": "turbo",
+      "count": 22,
+      "examples": [
+        "Turbo Cat ball",
+        "Turbo Yarn Ball",
+        "Turbo Octopus"
+      ]
+    },
+    {
+      "abbr": "pb",
+      "count": 21,
+      "examples": [
+        "KON TRT MARATHON PB SM 2CT",
+        "GRE TRT PILLP CAPSL PB 15.8Z",
+        "IMS BNE STFD PB LG 5-6IN"
+      ]
+    },
+    {
+      "abbr": "tro",
+      "count": 21,
+      "examples": [
+        "TRO SHMP/COND 2IN1 WTRMLN 20OZ",
+        "TRO SHMP CT WTRLSS DEEP CLN7.4",
+        "TRO DNTL WTR ADD-P H/J 33.8OZ"
+      ]
+    },
+    {
+      "abbr": "flu",
+      "count": 21,
+      "examples": [
+        "FLU CLAMP LAMP CERM 5.5IN",
+        "FLU FOOD HI-CAL CRICKET 11.5OZ",
+        "FLU CRICKET QUENCHER CALC 16OZ"
+      ]
+    },
+    {
+      "abbr": "liner",
+      "count": 21,
+      "examples": [
+        "ZIL LINER TERRARIUM BR 20/29",
+        "KOM LINER CCNUT TERRM 12X30",
+        "ZIL LINER TERRARIUM BR 40/50G"
+      ]
+    },
+    {
+      "abbr": "cup",
+      "count": 21,
+      "examples": [
+        "PTS BED CUDDLE CUP",
+        "JWP FRD WTR BIRD CUP SM",
+        "ZML FDR CUP ARBOREAL"
+      ]
+    },
+    {
+      "abbr": "cable",
+      "count": 20,
+      "examples": [
+        "COA T/O 89080 CABLE GNT 10FT",
+        "COA T/O 89081 CABLE GNT 15FT",
+        "COA T/O 89083 CABLE GNT 30FT"
+      ]
+    },
+    {
+      "abbr": "rock",
+      "count": 20,
+      "examples": [
+        "CRS ROCK DRGN STONE SM 25#",
+        "ExoTerra HeatWave Rock Small",
+        "ExoTerra HeatWave Rock Med."
+      ]
+    },
+    {
+      "abbr": "soft",
+      "count": 20,
+      "examples": [
+        "KON E-CLLR CLOUD SOFT SM",
+        "KON E-CLLR CLOUD SOFT MD",
+        "KON E-CLLR CLOUD SOFT LG"
+      ]
+    },
+    {
+      "abbr": "adams",
+      "count": 20,
+      "examples": [
+        "FAR F/T SHMP ADAMS FOAMING 10Z",
+        "FAR SHMP F/T ADAMS 12OZ",
+        "FAR F/T ADAMS HOME SPRY 24OZ"
+      ]
+    },
+    {
+      "abbr": "tuffy",
+      "count": 20,
+      "examples": [
+        "VIP TUG TUFFY DRBL 3 WAY JR",
+        "TUFFY T-MG-GR-TG",
+        "TUFFY T-OC-SM-OCTOPUS"
+      ]
+    },
+    {
+      "abbr": "water",
+      "count": 20,
+      "examples": [
+        "Nature Zone Water Bites",
+        "Zilla Water Pillow",
+        "ExoTerra Water Dish x-sm"
+      ]
+    },
+    {
+      "abbr": "shred",
+      "count": 20,
+      "examples": [
+        "PRO PLAN weight shred 6#",
+        "PRO PLAN weight shred 18#",
+        "PRO PLAN weight shred 34#"
+      ]
+    },
+    {
+      "abbr": "dntl",
+      "count": 19,
+      "examples": [
+        "GRE TRT DNTL ORIG LG 6OZ",
+        "GRE TRT DNTL PUP XS 6OZ",
+        "GRE TRT DNTL ORIG XS 12OZ"
+      ]
+    },
+    {
+      "abbr": "top",
+      "count": 19,
+      "examples": [
+        "KAY TRT HLTHY TOP PAPAYA BIRD",
+        "DOS LTTR TOP ENTRY PAN SLVR/WH",
+        "DOS LTTR LINER TOP ENTRY PAN"
+      ]
+    },
+    {
+      "abbr": "dome",
+      "count": 18,
+      "examples": [
+        "ZIL DOME REFL CERM BK 8.5IN",
+        "ZML FXTR NANO DOME LAMP",
+        "ZML FXTR DEEP DOME MINI COMBO"
+      ]
+    },
+    {
+      "abbr": "scoop",
+      "count": 18,
+      "examples": [
+        "DOS LTTR SCOOP WH LG",
+        "DOS LTTR SCOOP WH JMB",
+        "DOS LTTR SCOOP WH GNT"
+      ]
+    },
+    {
+      "abbr": "quiet",
+      "count": 18,
+      "examples": [
+        "GAR QUIET MOMENT MELATONIN70CT",
+        "GAR QUIET MOMENTS HEMP 60CT",
+        "GAR SPLMT HEMP QUIET LIQ 1OZ"
+      ]
+    },
+    {
+      "abbr": "vita",
+      "count": 18,
+      "examples": [
+        "ZML SAND VITA GOBI GLD 10#",
+        "NOV SPLMT VITA PURE C GPIG 2OZ",
+        "ZooMed Vita Sand White"
+      ]
+    },
+    {
+      "abbr": "green",
+      "count": 18,
+      "examples": [
+        "WWI GRVL NEON GREEN 5#",
+        "Zilla Green Liner 15/20H G",
+        "Zilla Green liner 40/50g"
+      ]
+    },
+    {
+      "abbr": "high",
+      "count": 18,
+      "examples": [
+        "Flukers High -Calcium Dubia diet",
+        "Flukers High Calcium Cricket Diet",
+        "Flukers High Calcium Mealworm Diet"
+      ]
+    },
+    {
+      "abbr": "orijen",
+      "count": 18,
+      "examples": [
+        "ORIJEN fit & trim 4.5#",
+        "ORIJEN fit &  trim 23.5#",
+        "ORIJEN region 4.5#"
+      ]
+    },
+    {
+      "abbr": "or",
+      "count": 17,
+      "examples": [
+        "N/M S/O OR OXY JFC TRGGR 24OZ",
+        "FLU FOOD OR CB CRICKET 12OZ",
+        "FAS SWTR BNE ACCENT OR XS"
+      ]
+    },
+    {
+      "abbr": "pan",
+      "count": 17,
+      "examples": [
+        "OXB LTTR PAN RECT W/SHIELD",
+        "DOS LTTR TOP ENTRY PAN SLVR/WH",
+        "DOS LTTR LINER TOP ENTRY PAN"
+      ]
+    },
+    {
+      "abbr": "comb",
+      "count": 17,
+      "examples": [
+        "COA COMB W6162 FLEA PLSTC 100",
+        "KON GRMG CONNECTS KITTY COMB",
+        "FURminator Deshed Foam Comb"
+      ]
+    },
+    {
+      "abbr": "gecko",
+      "count": 17,
+      "examples": [
+        "ZML FOOD CRSTD GECKO TRPCL 2OZ",
+        "ZML FOOD CRSTD GECKO TRPCL 4OZ",
+        "ZML FOOD CRSTD GECKO VARPK"
+      ]
+    },
+    {
+      "abbr": "double",
+      "count": 17,
+      "examples": [
+        "Safari Double Row Rake Rotating pins",
+        "Safari Double Row Rake",
+        "Safari Double Sided Flea Comb"
+      ]
+    },
+    {
+      "abbr": "pur",
+      "count": 17,
+      "examples": [
+        "FussieCat Tuna&Chkn Pur 4pk",
+        "FROM pur sni du stew 3oz",
+        "FROM pur sni du liv 3oz"
+      ]
+    },
+    {
+      "abbr": "perf",
+      "count": 17,
+      "examples": [
+        "SD perf digest sm bite 3.5#",
+        "SD perf digest ck 3.5#",
+        "SD perf digest ck 12#"
+      ]
+    },
+    {
+      "abbr": "led",
+      "count": 16,
+      "examples": [
+        "AQE FXTR LED STRIPLIGHT BK 24",
+        "ATP FXTR SKYAQUA LED PRO 18W",
+        "ZML HOOD REPTISUN LED SUNR22.5"
+      ]
+    },
+    {
+      "abbr": "tug",
+      "count": 16,
+      "examples": [
+        "MAM TOY COLR 3KNOT ROPE TUG LG",
+        "NYL TOY TUG PUP BL",
+        "KON TUG JAXX BRIGHT W/BALL MD"
+      ]
+    },
+    {
+      "abbr": "wee",
+      "count": 16,
+      "examples": [
+        "FOU DIAPER WEE WEE DSPL SM 12C",
+        "FOU DIAPER WEE WEE DSPL SM 12C",
+        "FOU PADS WEE WEE XL 40CT"
+      ]
+    },
+    {
+      "abbr": "pure",
+      "count": 16,
+      "examples": [
+        "OXB BEDNG PURE CMFT 36L",
+        "OXB BEDNG PURE CMFT 72L",
+        "OXB BEDNG PURE CMFT WH 36L"
+      ]
+    },
+    {
+      "abbr": "zone",
+      "count": 16,
+      "examples": [
+        "FAR RMDY CLLR COMFT ZONE",
+        "Nature Zone bites and bits gecko",
+        "Nature Zone Water Bites"
+      ]
+    },
+    {
+      "abbr": "door",
+      "count": 16,
+      "examples": [
+        "ZML TERRM DBL DOOR 30X12X16",
+        "Dirty Dog Door Mat",
+        "PetSafe Plastic Pet door Sm"
+      ]
+    },
+    {
+      "abbr": "pink",
+      "count": 16,
+      "examples": [
+        "Repto Pink Hanging Vines 24\"",
+        "Repto Pink Hanging Vines 12'",
+        "Doggy Bahama Pink"
+      ]
+    },
+    {
+      "abbr": "parrot",
+      "count": 16,
+      "examples": [
+        "VitaKraft Sticks apricot&Cherry Parrot",
+        "VitaKraft Sticks Apple&Honey Parrot",
+        "Lafebers el paso Nutri berries parrot"
+      ]
+    },
+    {
+      "abbr": "health",
+      "count": 16,
+      "examples": [
+        "FreshBreathe Support Skin Health 33.8 oz",
+        "PetHonesty Allergy Skin Health",
+        "PetHonesty Hip+Joint Health Max"
+      ]
+    },
+    {
+      "abbr": "essen",
+      "count": 16,
+      "examples": [
+        "VIT ESSen duck min nib 14oz",
+        "VIT ESSEN beef min pat 14oz",
+        "VIT ESSEN beef min nib 14oz"
+      ]
+    },
+    {
+      "abbr": "hikari",
+      "count": 16,
+      "examples": [
+        "HIKARI froz krill 16oz",
+        "HIKARI froz krill 3.5oz",
+        "HIKARI froz tubifex worm 3.5oz"
+      ]
+    },
+    {
+      "abbr": "aqueon",
+      "count": 16,
+      "examples": [
+        "AQUEON trop granules 6.5oz",
+        "AQUEON goldfish granules 3oz",
+        "AQUEON water changer 25ft"
+      ]
+    },
+    {
+      "abbr": "essntl",
+      "count": 15,
+      "examples": [
+        "OXB FOOD ESSNTL HAM/GERB 1#",
+        "OXB FOOD ESSNTL CHINCH 3#",
+        "OXB FOOD ESSNTL YOUNG GPIG 10#"
+      ]
+    },
+    {
+      "abbr": "mouse",
+      "count": 15,
+      "examples": [
+        "AEC WHEEL HAM/MOUSE 4IN",
+        "KAY FOOD FDPH MOUSE/RAT 3#",
+        "ETH TOY BERTHA MOUSE CTNP 7IN"
+      ]
+    },
+    {
+      "abbr": "kttn",
+      "count": 15,
+      "examples": [
+        "COA CLLR KTTN LP BRKW PSC 8",
+        "COA CLLR KTTN LP BRKW DMC 8",
+        "COA CLLR KTTN LP BRKW WDF 8"
+      ]
+    },
+    {
+      "abbr": "gar",
+      "count": 15,
+      "examples": [
+        "GAR RMDY CRNBRRY RELIEF 50G",
+        "GAR SPLMT ALL-IN-ONE SFT 60CT",
+        "GAR QUIET MOMENT MELATONIN70CT"
+      ]
+    },
+    {
+      "abbr": "plus",
+      "count": 15,
+      "examples": [
+        "TET FOOD TETRAMIN PLUS 2.2OZ",
+        "TET FOOD TETCLR PLUS 2.2OZ",
+        "ETH TOY SKIN PLUS PENQUIN 15IN"
+      ]
+    },
+    {
+      "abbr": "wood",
+      "count": 15,
+      "examples": [
+        "ZML ORNMT AFR MOPANI WOOD SM",
+        "ZML ORNMT AFR MOPANI WOOD MD",
+        "Naturals 9\" Java Wood Perch"
+      ]
+    },
+    {
+      "abbr": "cave",
+      "count": 15,
+      "examples": [
+        "Zilla Spring Cave",
+        "Reptology Ledge and cave hideout",
+        "Reptology ledge and cave hideout sm"
+      ]
+    },
+    {
+      "abbr": "dental",
+      "count": 15,
+      "examples": [
+        "NylaBone Oral Care Dental Spray",
+        "NylaBone Senior Dental Kit",
+        "NylaBone Dental Kit ultra Clean"
+      ]
+    },
+    {
+      "abbr": "senior",
+      "count": 15,
+      "examples": [
+        "NylaBone Senior Dental Kit",
+        "DIAM senior 35#",
+        "FROMM gold senior 5#"
+      ]
+    },
+    {
+      "abbr": "fussie",
+      "count": 15,
+      "examples": [
+        "FUSSIE cat salm 10#",
+        "Fussie cat salm 3.5#",
+        "\"FUSSIE CAT tuna"
+      ]
+    },
+    {
+      "abbr": "odor",
+      "count": 14,
+      "examples": [
+        "FOU SHMP MC REDUCES ODOR 16OZ",
+        "SkoutsHonor Skunk Odor Elminator",
+        "WeeAway Odor Fogger CM"
+      ]
+    },
+    {
+      "abbr": "rope",
+      "count": 14,
+      "examples": [
+        "MAM TOY COLR 3KNOT ROPE TUG LG",
+        "MUL TOY LOOFA ROPE BODY 11IN",
+        "BirdLIfe Rope Perch 21in"
+      ]
+    },
+    {
+      "abbr": "mix",
+      "count": 14,
+      "examples": [
+        "FLU FOOD GRMT INSCT MIX 2.75OZ",
+        "GAL SAND TRPCL MIX HC 4QT",
+        "ZIL BEDNG JUNGLE MIX 24QT"
+      ]
+    },
+    {
+      "abbr": "night",
+      "count": 14,
+      "examples": [
+        "ZIL BULB NIGHT INC RD 75W BOX",
+        "ZIL BULB SPOT NIGHT BK 150WBOX",
+        "ZIL BULB NIGHT INC RD 50W BOX"
+      ]
+    },
+    {
+      "abbr": "lp",
+      "count": 14,
+      "examples": [
+        "COA CLLR KTTN LP BRKW PSC 8",
+        "COA CLLR KTTN LP BRKW DMC 8",
+        "COA CLLR KTTN LP BRKW WDF 8"
+      ]
+    },
+    {
+      "abbr": "wild",
+      "count": 14,
+      "examples": [
+        "KON TOY WILD SHIELDZ PERCH MD",
+        "Kaytee Food For the wild Bird",
+        "Wild Bird 20 lbs"
+      ]
+    },
+    {
+      "abbr": "pangea",
+      "count": 14,
+      "examples": [
+        "Pangea Humitidy Hide Sponge",
+        "Pangea EcoDish Mossy Pine",
+        "Pangea EcoDish Gray Marble"
+      ]
+    },
+    {
+      "abbr": "corner",
+      "count": 14,
+      "examples": [
+        "ExoTerra Corner Water dish Med",
+        "ExoTerra Corner Water Dish Lg",
+        "ExoTerra Corner Water Dish X-lg"
+      ]
+    },
+    {
+      "abbr": "sham",
+      "count": 14,
+      "examples": [
+        "Tropicalen Ntrl Flea&Tick Soothing Sham",
+        "Tropiclean Ntrl Flea&Tik MAX sham",
+        "Skouts Honor Flea Sham"
+      ]
+    },
+    {
+      "abbr": "hair",
+      "count": 14,
+      "examples": [
+        "Safari Long Hair Slicker Med",
+        "Safari Long Hair Slicker Lg",
+        "Safari Shed Magic Long Hair Med"
+      ]
+    },
+    {
+      "abbr": "muzzle",
+      "count": 14,
+      "examples": [
+        "Coastal Soft Basket Muzzle Size 1",
+        "Coastal Soft basket Muzzle Size 2",
+        "Coastal Soft basket muzzle Size 3"
+      ]
+    },
+    {
+      "abbr": "size",
+      "count": 14,
+      "examples": [
+        "Coastal Soft Basket Muzzle Size 1",
+        "Coastal Soft basket Muzzle Size 2",
+        "Coastal Soft basket muzzle Size 3"
+      ]
+    },
+    {
+      "abbr": "time",
+      "count": 14,
+      "examples": [
+        "Quiet Time Pet bed Blue 18\"",
+        "Quiet time pet bed Pink 18\"",
+        "Quiet Time Reverseible Bed 18\""
+      ]
+    },
+    {
+      "abbr": "sen",
+      "count": 14,
+      "examples": [
+        "PRO PLAN sen lg br pup sal 24#",
+        "PRO PLAN sen turk 16#",
+        "BL BUF wild sen 12.5oz"
+      ]
+    },
+    {
+      "abbr": "mam",
+      "count": 13,
+      "examples": [
+        "MAM TOY COLR 3KNOT ROPE TUG LG",
+        "MAM TOY 3KNT/2BALL RP MINI",
+        "MAM TOY TRBTR 2 6IN"
+      ]
+    },
+    {
+      "abbr": "repta",
+      "count": 13,
+      "examples": [
+        "FLU SPLMT REPTA VIT 4OZ",
+        "FLU DECOR REPTA VINES IVY 6FT",
+        "FLU DECOR REPTA VINE POTHOS 6F"
+      ]
+    },
+    {
+      "abbr": "kabob",
+      "count": 13,
+      "examples": [
+        "PTS CHEW KABOB ECONOMY LARGE",
+        "BirdLife Casino Kabob",
+        "BirdLife Kabob Toy"
+      ]
+    },
+    {
+      "abbr": "coat",
+      "count": 13,
+      "examples": [
+        "FAS COAT RAINY DAY YL LG",
+        "TRO SHMP SPA WH COAT 16OZ",
+        "FAS COAT RAINY DAY YL SM"
+      ]
+    },
+    {
+      "abbr": "care",
+      "count": 13,
+      "examples": [
+        "TRO DNTL KIT ORAL CARE SM 3PC",
+        "TRO DNTL SPRY ORAL CARE PB 4OZ",
+        "FOU WIPES DG/CT EYE CARE 35CT"
+      ]
+    },
+    {
+      "abbr": "pad",
+      "count": 13,
+      "examples": [
+        "FOU PAD WEE WEE GRASS SCT 10CT",
+        "Happy Jack Pad Kote",
+        "DryTech Puppy Pad 7pk"
+      ]
+    },
+    {
+      "abbr": "mesh",
+      "count": 13,
+      "examples": [
+        "ZML TERRM MESH 18X18",
+        "ZML TERRM MESH 12X12",
+        "Coastal Mesh Muzzle Size 1"
+      ]
+    },
+    {
+      "abbr": "black",
+      "count": 13,
+      "examples": [
+        "Zilla Black Heat Bulb 150W",
+        "Zilla Black Heat Spot 100W",
+        "Zilla Black Heat Spot 75W"
+      ]
+    },
+    {
+      "abbr": "filter",
+      "count": 13,
+      "examples": [
+        "Basking Platform Filter",
+        "Reptology Filter Cart. 70",
+        "ZooMed Paludarium Filter 20 Cart"
+      ]
+    },
+    {
+      "abbr": "sticks",
+      "count": 13,
+      "examples": [
+        "ReptoMin Floating turtle sticks JUMBO",
+        "Zilla Aquatic Turtle Sticks",
+        "Galopagos 24in mossy sticks"
+      ]
+    },
+    {
+      "abbr": "bug",
+      "count": 13,
+      "examples": [
+        "Bug Blaster",
+        "FLUVAL bug bite pleco waf 4.6oz",
+        "FLUVAL bug bite col enh 4.4oz"
+      ]
+    },
+    {
+      "abbr": "clean",
+      "count": 13,
+      "examples": [
+        "JW Clean Cup MED",
+        "JW Clean Cup Lg.",
+        "WashAway Simply Clean Shamp"
+      ]
+    },
+    {
+      "abbr": "kaytee",
+      "count": 13,
+      "examples": [
+        "Kaytee Mixed nuts & Cherries",
+        "Kaytee Garden Veggie Treat",
+        "Kaytee Yo Dips"
+      ]
+    },
+    {
+      "abbr": "kennel",
+      "count": 13,
+      "examples": [
+        "Happy Jack Kennel Dip II",
+        "Small Kennel Cup",
+        "PetMate Kennel Cup DBL"
+      ]
+    },
+    {
+      "abbr": "grey",
+      "count": 13,
+      "examples": [
+        "PetMate Replendish 4gal Water Grey",
+        "Replendish0.5GWTRw/Micro Grey",
+        "Replendish 1GWTRWMicro Grey"
+      ]
+    },
+    {
+      "abbr": "tieout",
+      "count": 13,
+      "examples": [
+        "Titan Spiral Stake&TieOut Combo",
+        "FourPaws WalkAbout 21\" hvy tieout stake",
+        "PH Tieout spiralstake 24\""
+      ]
+    },
+    {
+      "abbr": "hvy",
+      "count": 13,
+      "examples": [
+        "FourPaws WalkAbout 21\" hvy tieout stake",
+        "PH TieOut Chain 20' Hvy Duty",
+        "PH TieOut Chain 30' Hvy Duty"
+      ]
+    },
+    {
+      "abbr": "creamy",
+      "count": 13,
+      "examples": [
+        "Catit Creamy Dish",
+        "Catit Creamy Feeding Mat",
+        "Catit Creamy Spoon"
+      ]
+    },
+    {
+      "abbr": "royal",
+      "count": 13,
+      "examples": [
+        "royal can sm 4#",
+        "royal can sm 14#",
+        "royal can poodle"
+      ]
+    },
+    {
+      "abbr": "prim",
+      "count": 13,
+      "examples": [
+        "PRIM kitr puppy 1.5#",
+        "PRIM kitr puppy 9#",
+        "PRIM kitr beef 1.5#"
+      ]
+    },
+    {
+      "abbr": "fro",
+      "count": 13,
+      "examples": [
+        "PRIMAL fro beef nug 3#",
+        "PRIMAL fro nug pork 3#",
+        "\"PRIMAL fro nug tuk"
+      ]
+    },
+    {
+      "abbr": "fou",
+      "count": 12,
+      "examples": [
+        "FOU SHMP MC REDUCES ODOR 16OZ",
+        "FOU DIAPER WEE WEE DSPL SM 12C",
+        "FOU SHMP MC PUP TEARLESS 16OZ"
+      ]
+    },
+    {
+      "abbr": "dos",
+      "count": 12,
+      "examples": [
+        "DOS LTTR SCOOP WH LG",
+        "DOS LTTR LNR CLEANSTEP JMB 8PK",
+        "DOS LTTR TOP ENTRY PAN SLVR/WH"
+      ]
+    },
+    {
+      "abbr": "earth",
+      "count": 12,
+      "examples": [
+        "ZML BEDNG ECO EARTH LOOSE 8QT",
+        "ZML BEDNG ECO EARTH CNUT 3PK",
+        "ZML BEDNG ECO EARTH LOOSE 24QT"
+      ]
+    },
+    {
+      "abbr": "ring",
+      "count": 12,
+      "examples": [
+        "NPI USA TTHING PUP RING CHKN",
+        "NPI USA TTHING PUP RING PMPK3C",
+        "NPI USA TTHING PUP RING CHKN3C"
+      ]
+    },
+    {
+      "abbr": "quick",
+      "count": 12,
+      "examples": [
+        "API COND QUICK START 8OZ",
+        "API COND QUICK START 1OZ",
+        "API COND QUICK START 4OZ"
+      ]
+    },
+    {
+      "abbr": "pads",
+      "count": 12,
+      "examples": [
+        "FOU PADS WEE WEE XL 40CT",
+        "FOU PADS WEE WEE XL 14CT",
+        "Zeus Fountain Filter pads"
+      ]
+    },
+    {
+      "abbr": "max",
+      "count": 12,
+      "examples": [
+        "CAN TOY MAX GLW BLL MD",
+        "CAN TOY MAX GLW BLL LG",
+        "ExoTerra Min/Max Thermo"
+      ]
+    },
+    {
+      "abbr": "wubba",
+      "count": 12,
+      "examples": [
+        "KON TOY WUBBA TUGGA LG",
+        "KON TOY WUBBA BALLSTC FRND SM",
+        "KON TOY WUBBA PUP"
+      ]
+    },
+    {
+      "abbr": "jumbo",
+      "count": 12,
+      "examples": [
+        "ZooMed Coconut Chips JUMBO",
+        "ReptoMin Floating turtle sticks JUMBO",
+        "Komodo Guiniana Plant Jumbo"
+      ]
+    },
+    {
+      "abbr": "flower",
+      "count": 12,
+      "examples": [
+        "ZooMed Lizard flower topper",
+        "ZooMed TorToise Flower food topper",
+        "BirdLife Flower Mirror w Bell"
+      ]
+    },
+    {
+      "abbr": "ladder",
+      "count": 12,
+      "examples": [
+        "BirdLife Cement Ladder",
+        "Carpenter Creations Bendable Ladder",
+        "Carpenter Creations 15-Rung Ladder"
+      ]
+    },
+    {
+      "abbr": "beaks",
+      "count": 12,
+      "examples": [
+        "Happy Beaks Two Sided Mirror",
+        "Happy Beaks Snuggle Sack MD",
+        "Happy Beaks Snuggle SackLG"
+      ]
+    },
+    {
+      "abbr": "sni",
+      "count": 12,
+      "examples": [
+        "FROM pur sni du stew 3oz",
+        "FROM pur sni du liv 3oz",
+        "FROM pur sni shred ck"
+      ]
+    },
+    {
+      "abbr": "test",
+      "count": 11,
+      "examples": [
+        "API TEST KIT NITRITE FW",
+        "API TEST STRP 5-IN-1 4CT",
+        "API TEST STRP 5-IN-1 25CT"
+      ]
+    },
+    {
+      "abbr": "mul",
+      "count": 11,
+      "examples": [
+        "MUL TOY DAZZLE FLYING DUCK13IN",
+        "MUL TOY WOODY WOODPECKER 11IN",
+        "MUL TOY LMB CHOP 6IN"
+      ]
+    },
+    {
+      "abbr": "skin",
+      "count": 11,
+      "examples": [
+        "FMN COND SENS SKIN 16OZ",
+        "FMN SHMP SENS SKIN 16OZ",
+        "ETH TOY PLSH SKIN RCCN"
+      ]
+    },
+    {
+      "abbr": "kom",
+      "count": 11,
+      "examples": [
+        "KOM FOOD TORTOISE HAY 24OZ",
+        "KOM PLNT WDLAND CANOPY 42CM",
+        "KOM PLNT RAINFORST CANOPY 10IN"
+      ]
+    },
+    {
+      "abbr": "jungle",
+      "count": 11,
+      "examples": [
+        "ZIL BEDNG JUNGLE MIX 24QT",
+        "ZIL BEDNG JUNGLE MIX 8QT",
+        "Zilla Jungle Mix 4QT"
+      ]
+    },
+    {
+      "abbr": "aid",
+      "count": 11,
+      "examples": [
+        "ZML RMDY SHEDDING AID 2.25OZ",
+        "GAR TRNG AID POTTY HERE SPRY8Z",
+        "GAR SPLMT 24/7 CALM AID 120CT"
+      ]
+    },
+    {
+      "abbr": "brkw",
+      "count": 11,
+      "examples": [
+        "COA CLLR KTTN LP BRKW PSC 8",
+        "COA CLLR KTTN LP BRKW DMC 8",
+        "COA CLLR KTTN LP BRKW WDF 8"
+      ]
+    },
+    {
+      "abbr": "deep",
+      "count": 11,
+      "examples": [
+        "TRO SHMP CT WTRLSS DEEP CLN7.4",
+        "ZML FXTR DEEP DOME MINI COMBO",
+        "TRO WIPES DEEP CLN 100CT"
+      ]
+    },
+    {
+      "abbr": "bcn",
+      "count": 11,
+      "examples": [
+        "NTN TRT FRTBL APL/BCN 12OZ",
+        "RBP TRT BNE FLLD CHS/BCN SM",
+        "KON TRT EASY PASTE BCN CHS 80Z"
+      ]
+    },
+    {
+      "abbr": "vip",
+      "count": 11,
+      "examples": [
+        "VIP TOU TUFF SPRT TUG-O-WAR YL",
+        "VIP TOY ULT 3WAY TUG BL",
+        "VIP TOY TUFF JR'S TUFF RING RD"
+      ]
+    },
+    {
+      "abbr": "tuff",
+      "count": 11,
+      "examples": [
+        "VIP TOU TUFF SPRT TUG-O-WAR YL",
+        "VIP TOY TUFF JR'S TUFF RING RD",
+        "VIP TOY TUFF JR'S TUFF RING RD"
+      ]
+    },
+    {
+      "abbr": "catnip",
+      "count": 11,
+      "examples": [
+        "ETH TOY STRINGY MICE/CATNIP 4P",
+        "ETH TOY SHMMR GLMR TRTL CATNIP",
+        "Kong Naturals Catnip Spray"
+      ]
+    },
+    {
+      "abbr": "diet",
+      "count": 11,
+      "examples": [
+        "MFP FOOD FRRT PREM DIET 22OZ",
+        "Flukers High -Calcium Dubia diet",
+        "Flukers High Calcium Cricket Diet"
+      ]
+    },
+    {
+      "abbr": "bites",
+      "count": 11,
+      "examples": [
+        "HIK FOOD VIBRA BITES 2.57OZ",
+        "Nature Zone bites and bits gecko",
+        "Nature Zone Water Bites"
+      ]
+    },
+    {
+      "abbr": "long",
+      "count": 11,
+      "examples": [
+        "AQA PLNT BAMBOO 3FT LONG",
+        "ExoTerra Screen Cover 20 Gal. Long",
+        "Safari Long Hair Slicker Med"
+      ]
+    },
+    {
+      "abbr": "on",
+      "count": 11,
+      "examples": [
+        "FAR F/T ADAMS-P C SPT ON <5#3M",
+        "FAR F/T ADAMS-P SPT ON XL 3M",
+        "AQE FXTR CLIP ON PLNTED LED"
+      ]
+    },
+    {
+      "abbr": "moss",
+      "count": 11,
+      "examples": [
+        "ZML PLNT MOSS SPHAGNUM",
+        "ExoTerra Forest Moss 2 pack",
+        "ExoTerra Mini Moss Mat"
+      ]
+    },
+    {
+      "abbr": "white",
+      "count": 11,
+      "examples": [
+        "ZooMed Vita Sand White",
+        "Zilla Mini Halogen Bulb 25W White",
+        "Zilla Mini Halogen Bulb 50W White"
+      ]
+    },
+    {
+      "abbr": "color",
+      "count": 11,
+      "examples": [
+        "Nature Zone bearded Color",
+        "MAMMOTH SM COLOR 3 KNOT TUG",
+        "MAMMOTH MED COLOR BONE"
+      ]
+    },
+    {
+      "abbr": "mossy",
+      "count": 11,
+      "examples": [
+        "Pangea EcoDish Mossy Pine",
+        "Galopagos 24in mossy sticks",
+        "Galopagoos 18in Mossy Sticks"
+      ]
+    },
+    {
+      "abbr": "powder",
+      "count": 11,
+      "examples": [
+        "Zodiac Flea and tick Powder",
+        "Adams Carpet Powder",
+        "BioGroom EarFresh Ear Powder"
+      ]
+    },
+    {
+      "abbr": "mirror",
+      "count": 11,
+      "examples": [
+        "Happy Beaks Two Sided Mirror",
+        "Birdie basics 2-sided mirror w bell",
+        "Birdie basics 2-sided mirror"
+      ]
+    },
+    {
+      "abbr": "petag",
+      "count": 11,
+      "examples": [
+        "PETAG Dyne 16 oz",
+        "PetAG Dyne 32oz",
+        "PetAg Goats Milk Esbilac milk"
+      ]
+    },
+    {
+      "abbr": "pot",
+      "count": 11,
+      "examples": [
+        "SodaPup Lg Blue Flower Pot",
+        "SodaPup Lg Green Flower Pot",
+        "SodaPup Lg Orange Flower Pot"
+      ]
+    },
+    {
+      "abbr": "tan",
+      "count": 11,
+      "examples": [
+        "Small Tan Bone Place Mat",
+        "CIRCLE 18\"TAN 1106 COLLAR",
+        "CIRCLE 10\" TAN 1103 COLLAR"
+      ]
+    },
+    {
+      "abbr": "knots",
+      "count": 11,
+      "examples": [
+        "KONG KNOTS CHICKEN MD/LRG",
+        "KONG KNOTS SNAKE ASS MD/LG",
+        "KONG KNOTS TEDDY SM"
+      ]
+    },
+    {
+      "abbr": "anc",
+      "count": 11,
+      "examples": [
+        "TOW anc wetland 5#",
+        "TOW anc stream 5#",
+        "TOW anc mount 5#"
+      ]
+    },
+    {
+      "abbr": "acana",
+      "count": 11,
+      "examples": [
+        "ACANA wh gr sea 4#",
+        "ACANA butch ck 17#",
+        "ACANA butch ck 4#"
+      ]
+    },
+    {
+      "abbr": "exten",
+      "count": 11,
+      "examples": [
+        "HEALTH EXTEN gen cook duck 9oz",
+        "HEALTH EXTEN gen cook beef 9oz",
+        "HEALTH EXTEN gen cook ck 9oz"
+      ]
+    },
+    {
+      "abbr": "glofsh",
+      "count": 10,
+      "examples": [
+        "TET ORNMT GLOFSH CLAM SM",
+        "TET GRVL GLOFSH WH 5#",
+        "TET FOOD GLOFSH FLK 1.59OZ"
+      ]
+    },
+    {
+      "abbr": "pillp",
+      "count": 10,
+      "examples": [
+        "GRE TRT PILLP CAPSL CHS 15.8OZ",
+        "GRE TRT PILLP CAPSL PB 15.8Z",
+        "GRE TRT PILLP TAB HCKRY 3.2OZ"
+      ]
+    },
+    {
+      "abbr": "lamp",
+      "count": 10,
+      "examples": [
+        "FLU CLAMP LAMP CERM 5.5IN",
+        "ZML FXTR NANO DOME LAMP",
+        "FLU CLAMP LAMP CERM 8.5IN"
+      ]
+    },
+    {
+      "abbr": "fruit",
+      "count": 10,
+      "examples": [
+        "ZML FOOD HRMT CRAB FRUIT SALAD",
+        "ZIL REPT MUNCHIES FRUIT 2.5OZ",
+        "AEC TOY LOOFAH BUNCH OF FRUIT"
+      ]
+    },
+    {
+      "abbr": "cork",
+      "count": 10,
+      "examples": [
+        "ZML ORNMT CORK BRK ROUND SM",
+        "ZML ORNMT CORK BRK ROUND MD",
+        "ZML ORNMT CORK BRK ROUND JMB"
+      ]
+    },
+    {
+      "abbr": "hood",
+      "count": 10,
+      "examples": [
+        "ZML HOOD REPTISUN LED SUNR22.5",
+        "ZML HOOD REPTISUN LED CMB 24IN",
+        "ZML HOOD REPTISUN LED CMB 30IN"
+      ]
+    },
+    {
+      "abbr": "snake",
+      "count": 10,
+      "examples": [
+        "ZML BEDNG ASPEN SNAKE 24QT",
+        "ExoTerra Snake Bedding",
+        "ExoTerra Snake Bowl"
+      ]
+    },
+    {
+      "abbr": "hlp",
+      "count": 10,
+      "examples": [
+        "HLP BEDNG CF COLRS PR 23L",
+        "HLP BEDNG CF COLRS BL 50L",
+        "HLP BEDNG CF SPEC SEA GLASS23L"
+      ]
+    },
+    {
+      "abbr": "cf",
+      "count": 10,
+      "examples": [
+        "HLP BEDNG CF COLRS PR 23L",
+        "HLP BEDNG CF COLRS BL 50L",
+        "HLP BEDNG CF SPEC SEA GLASS23L"
+      ]
+    },
+    {
+      "abbr": "bottle",
+      "count": 10,
+      "examples": [
+        "PTS CLEARWATER BOTTLE 8OZ",
+        "PTS CLEARWATER BOTTLE 32OZ",
+        "PTS CLEARWATER BOTTLE 4OZ"
+      ]
+    },
+    {
+      "abbr": "flo",
+      "count": 10,
+      "examples": [
+        "ZIL BULB FLO COIL TRPCL 20W",
+        "ZIL BULB FLO COIL DSRT 20W",
+        "ZIL BULB FLO DSRT T8 18IN 15W"
+      ]
+    },
+    {
+      "abbr": "sprt",
+      "count": 10,
+      "examples": [
+        "VIP TOU TUFF SPRT TUG-O-WAR YL",
+        "KNG SPRT SOFT MD BLK",
+        "KNG SPRT SFT BLL SM"
+      ]
+    },
+    {
+      "abbr": "nail",
+      "count": 10,
+      "examples": [
+        "COA GRMG CT SAFARI NAIL TRMR",
+        "Safari Nail Trimmer Sm Dogs",
+        "PennPlax Nail Grinder"
+      ]
+    },
+    {
+      "abbr": "the",
+      "count": 10,
+      "examples": [
+        "ZooMed Glow In the Dark Tong",
+        "ZooMed Crab Glow in the dark scoop",
+        "Kaytee Food For the wild Bird"
+      ]
+    },
+    {
+      "abbr": "komodo",
+      "count": 10,
+      "examples": [
+        "Komodo Smart Dish",
+        "Komodo Dandelion Kit",
+        "Komodo Tortoise Hay"
+      ]
+    },
+    {
+      "abbr": "hermit",
+      "count": 10,
+      "examples": [
+        "ZooMed Hermit Crab Habitat kit",
+        "ZooMed hermit Crab starter kit",
+        "ZooMed Blue Hermit Crab Sand"
+      ]
+    },
+    {
+      "abbr": "basic",
+      "count": 10,
+      "examples": [
+        "Zilla Basic Trop. KIt",
+        "Petmate Sm Basic Open Litter box",
+        "Petmate Med Basic Open Litter Box"
+      ]
+    },
+    {
+      "abbr": "shamp",
+      "count": 10,
+      "examples": [
+        "Adams Plus Shamp W Precor",
+        "SkoutsHonor ProItchRelief Shamp",
+        "WashAway Green Tea Shamp"
+      ]
+    },
+    {
+      "abbr": "wooden",
+      "count": 10,
+      "examples": [
+        "BirdLife 11\" Wooden Perches",
+        "BirdLIfe 12\" Wooden Perches",
+        "BirdLIfe 14\" Wooden Perches"
+      ]
+    },
+    {
+      "abbr": "swing",
+      "count": 10,
+      "examples": [
+        "Wacky Wood Large Swing",
+        "BirdLife Cement &Acrylic Swing LG",
+        "BirdLife Cement&Acrylic Swing Sm"
+      ]
+    },
+    {
+      "abbr": "prevue",
+      "count": 10,
+      "examples": [
+        "Prevue Econo Keet Cage",
+        "Prevue Keet Cage",
+        "Prevue keet/tiel cage"
+      ]
+    },
+    {
+      "abbr": "cotton",
+      "count": 10,
+      "examples": [
+        "Cozy Cotton Nesting Material",
+        "Coastal RD 10' Cotton training leash",
+        "Coastal BLK 10' Cotton train Leash"
+      ]
+    },
+    {
+      "abbr": "durvet",
+      "count": 10,
+      "examples": [
+        "Durvet Chlorhexidine Solution",
+        "Durvet Medicated itch Spray",
+        "Durvet Remedies Iodine Shampoo"
+      ]
+    },
+    {
+      "abbr": "vital",
+      "count": 10,
+      "examples": [
+        "Vital Cat Salmon Bites",
+        "Vital Cat Minnows",
+        "Vital Cat chicken hearts"
+      ]
+    },
+    {
+      "abbr": "nyla",
+      "count": 10,
+      "examples": [
+        "NYLA SNEAKY SNACKER WOLF",
+        "NYLA PUP TACTILE STICK",
+        "NYLA PUP TEETHING RINGS"
+      ]
+    },
+    {
+      "abbr": "airdog",
+      "count": 10,
+      "examples": [
+        "KNG AIRDOG DUMBBELL SM",
+        "KNG AIRDOG DUMBBELL MD",
+        "KNG AIRDOG DUMBBELL LG"
+      ]
+    },
+    {
+      "abbr": "la",
+      "count": 10,
+      "examples": [
+        "FROMM ck a la veg 4#",
+        "FROMM ck a la veg 12#",
+        "FROMM ck a la veg 26#"
+      ]
+    },
+    {
+      "abbr": "pork",
+      "count": 10,
+      "examples": [
+        "FROMM pork & apple 4#",
+        "FROMM pork & apple 12#",
+        "FROMM pork & apple 26#"
+      ]
+    },
+    {
+      "abbr": "big",
+      "count": 9,
+      "examples": [
+        "KAY FOOD BIG BITE PRRT 4#",
+        "Big Jelly Pots",
+        "ZooMed Big dripper"
+      ]
+    },
+    {
+      "abbr": "nbp",
+      "count": 9,
+      "examples": [
+        "NBP DRY LID VENISN/SWPOT 22#",
+        "NBP TRT LIT VENISN/SWPOT S/B8Z",
+        "NBP DRY LID SLMN/SWPOT 4#"
+      ]
+    },
+    {
+      "abbr": "swpot",
+      "count": 9,
+      "examples": [
+        "NBP DRY LID VENISN/SWPOT 22#",
+        "NBP TRT LIT VENISN/SWPOT S/B8Z",
+        "NBP DRY LID SLMN/SWPOT 4#"
+      ]
+    },
+    {
+      "abbr": "inc",
+      "count": 9,
+      "examples": [
+        "ZIL BULB DAY WH INC 100W BOX",
+        "ZIL BULB NGHT BK INC 75W BOX",
+        "ZIL BULB NIGHT INC RD 75W BOX"
+      ]
+    },
+    {
+      "abbr": "gel",
+      "count": 9,
+      "examples": [
+        "INV MED-P ANTIMIC EYE GEL 3OZ",
+        "Vetericyn AntiMicro Dressing Gel",
+        "Veterricyn AntiMicro Hot Spot Gel"
+      ]
+    },
+    {
+      "abbr": "zippy",
+      "count": 9,
+      "examples": [
+        "ZIP TOY SQKY CAN ZIPPY COLA",
+        "Zippy Paws XS Life Jacket",
+        "Zippy Paws Sm Life Jacket"
+      ]
+    },
+    {
+      "abbr": "no",
+      "count": 9,
+      "examples": [
+        "TRO SHMP F/T CT NO RINSE 7.4OZ",
+        "SweetHarvest Cockatiel No Sunflower",
+        "SweetHarvest Parrot No sunflower"
+      ]
+    },
+    {
+      "abbr": "vines",
+      "count": 9,
+      "examples": [
+        "FLU DECOR REPTA VINES IVY 6FT",
+        "Reptology Climber vines w leaves",
+        "Repto. Orange Hanging Vines 24\""
+      ]
+    },
+    {
+      "abbr": "vine",
+      "count": 9,
+      "examples": [
+        "FLU DECOR REPTA VINE POTHOS 6F",
+        "Lizard Lounger Vine Backdrop",
+        "galap. moss vine"
+      ]
+    },
+    {
+      "abbr": "life",
+      "count": 9,
+      "examples": [
+        "KAY TOY TREE OF LIFE 3IN1 LG",
+        "Playfuls Slice of life",
+        "SodaPup EMAT Tree Of Life"
+      ]
+    },
+    {
+      "abbr": "kitty",
+      "count": 9,
+      "examples": [
+        "KON GRMG CONNECTS KITTY COMB",
+        "PPR LEAD CWM KITTY KTN SM BK",
+        "Hello Kitty Pet Bed Lg Pink"
+      ]
+    },
+    {
+      "abbr": "hide",
+      "count": 9,
+      "examples": [
+        "IMS TRT BULLY HIDE STC SM 9CT",
+        "IMS TRT BULLY HIDE STC SM 12CT",
+        "Pangea Humitidy Hide Sponge"
+      ]
+    },
+    {
+      "abbr": "latex",
+      "count": 9,
+      "examples": [
+        "MUL TOY LATEX ANIMALS MINI 3IN",
+        "SPOT LATEX FOOD 8\" ASST.",
+        "RASCALS LATEX COW"
+      ]
+    },
+    {
+      "abbr": "lizard",
+      "count": 9,
+      "examples": [
+        "VIP TOY DSRT LIZZY LIZARD",
+        "Lizard Lounger",
+        "Lizard Lounger Bridge"
+      ]
+    },
+    {
+      "abbr": "seed",
+      "count": 9,
+      "examples": [
+        "AEC SEED CATCHER LG",
+        "KMP TRT SWTHRVST PMPKN SEED 5Z",
+        "BirdLife Large Seed/Water Fountain"
+      ]
+    },
+    {
+      "abbr": "fox",
+      "count": 9,
+      "examples": [
+        "OWH TOY SF FOX OR MD",
+        "KON TOY KNTS FLOPPY FOX S/M",
+        "SPOT SKNZ EX QUILTED MINI FOX"
+      ]
+    },
+    {
+      "abbr": "ear",
+      "count": 9,
+      "examples": [
+        "TRO CLNR EAR DUAL ACTN 4OZ",
+        "RBP TRT LMB EAR",
+        "TRO GRMG WIPES EAR 50CT"
+      ]
+    },
+    {
+      "abbr": "home",
+      "count": 9,
+      "examples": [
+        "FAR F/T ADAMS HOME SPRY 24OZ",
+        "TropiClean Natrl Flea&Tik Home spray",
+        "Skouts Honor Flea Home Spray"
+      ]
+    },
+    {
+      "abbr": "dragon",
+      "count": 9,
+      "examples": [
+        "ZooMed Juv. Dragon Food",
+        "ZooMed Adult Dragon Food",
+        "Gourment Bearded Dragon Food"
+      ]
+    },
+    {
+      "abbr": "adult",
+      "count": 9,
+      "examples": [
+        "ZooMed Adult Dragon Food",
+        "ZooMed Adult Iguana Food",
+        "Flukers Buffet Blend Adult Bearded"
+      ]
+    },
+    {
+      "abbr": "nature",
+      "count": 9,
+      "examples": [
+        "Nature Zone bites and bits gecko",
+        "Nature Zone Water Bites",
+        "Nature Zone Mite Guard"
+      ]
+    },
+    {
+      "abbr": "with",
+      "count": 9,
+      "examples": [
+        "Zilla Cricket Drink with Calcium",
+        "Flukers Repta Calcium with D3 StrB",
+        "rept. Climber vines with leaves 5'"
+      ]
+    },
+    {
+      "abbr": "in",
+      "count": 9,
+      "examples": [
+        "ZooMed Glow In the Dark Tong",
+        "ZooMed Crab Glow in the dark scoop",
+        "PetCrest Two In One"
+      ]
+    },
+    {
+      "abbr": "steel",
+      "count": 9,
+      "examples": [
+        "ZooMed 10\" Stainless Steel",
+        "Mediterranean Stainless Steel Dbbl 1 pint",
+        "Snappy Fit Stainless Steel Bowls 4C"
+      ]
+    },
+    {
+      "abbr": "screen",
+      "count": 9,
+      "examples": [
+        "PetCrest Screen Clips 5-25g",
+        "ExoTerra Screen Clips Small",
+        "ExoTerra Screen Clips Large"
+      ]
+    },
+    {
+      "abbr": "multi",
+      "count": 9,
+      "examples": [
+        "ExoTerra Monsoon Multi",
+        "WorldsBestCatLitter Multi 8lb",
+        "WorldsBestCatLitter Multi 28lb"
+      ]
+    },
+    {
+      "abbr": "skull",
+      "count": 9,
+      "examples": [
+        "Komodo Raptor Skull",
+        "ExoTerra Crocodile Skull",
+        "ExoTerra Trex Skull"
+      ]
+    },
+    {
+      "abbr": "world",
+      "count": 9,
+      "examples": [
+        "Small world Habitat 2.3 Gal",
+        "Small world Habitat 4Gal",
+        "Small world Habitat 2.2 Gal"
+      ]
+    },
+    {
+      "abbr": "stick",
+      "count": 9,
+      "examples": [
+        "Turbo Stick and ball",
+        "CatLife Tickle Stick Wand",
+        "NYLA PUP TACTILE STICK"
+      ]
+    },
+    {
+      "abbr": "milk",
+      "count": 9,
+      "examples": [
+        "PetAg Goats Milk Esbilac milk",
+        "PetAg Goats Milk Esbilac milk",
+        "PetAg Esbilac 2nd Step Powder Milk"
+      ]
+    },
+    {
+      "abbr": "single",
+      "count": 9,
+      "examples": [
+        "Safari Single Row Rake",
+        "VanNess Single 44oz",
+        "Lg Blue Single Bowl Trvl"
+      ]
+    },
+    {
+      "abbr": "magic",
+      "count": 9,
+      "examples": [
+        "Safari Shed Magic Large",
+        "Safari Shed Magic Med",
+        "Safari Shed Magic Cat"
+      ]
+    },
+    {
+      "abbr": "paws",
+      "count": 9,
+      "examples": [
+        "Spot Clean Paws mat",
+        "Zippy Paws XS Life Jacket",
+        "Zippy Paws Sm Life Jacket"
+      ]
+    },
+    {
+      "abbr": "train",
+      "count": 9,
+      "examples": [
+        "Coastal BLK 10' Cotton train Leash",
+        "Coastal BLK 15' Cotton Train Leash",
+        "Coastal RD 15' Cotton Train leash"
+      ]
+    },
+    {
+      "abbr": "feline",
+      "count": 9,
+      "examples": [
+        "Feline Greenies Chkn Skin&Fur Health",
+        "Feline Greenies Tuna Clean Breath",
+        "Feline Greenies Salmon Clean Breath"
+      ]
+    },
+    {
+      "abbr": "turkey",
+      "count": 9,
+      "examples": [
+        "Blue Wilderness Chick&Turkey Treat",
+        "KNG SHAK HONK TURKEY LG",
+        "BLUE B basic turkey 4#"
+      ]
+    },
+    {
+      "abbr": "mw",
+      "count": 9,
+      "examples": [
+        "\"MW 18\"\" single door\"",
+        "\"MW 24\"\" single door\"",
+        "\"MW 30\"\" single door\""
+      ]
+    },
+    {
+      "abbr": "sw",
+      "count": 9,
+      "examples": [
+        "VICT lam & sw pot 5#",
+        "VICT lam & sw pot 15#",
+        "VICT lam & sw pot 30#"
+      ]
+    },
+    {
+      "abbr": "urin",
+      "count": 9,
+      "examples": [
+        "PRO PLAN cat urin beef 3oz",
+        "PRO PLAN cat urin sal 3oz",
+        "P{RO PLAN cat urin turk 3oz"
+      ]
+    },
+    {
+      "abbr": "indo",
+      "count": 9,
+      "examples": [
+        "SD indo kitten 3.5#",
+        "SD cat indo 3.5#",
+        "SD cat indo 7#"
+      ]
+    },
+    {
+      "abbr": "zup",
+      "count": 8,
+      "examples": [
+        "ZUP FOOD SELECTS TIEL/LVBR2.5#",
+        "ZUP FOOD FRT BLND TIEL 2#",
+        "ZUP FOOD PRRT FRT BREEDER 40#"
+      ]
+    },
+    {
+      "abbr": "den",
+      "count": 8,
+      "examples": [
+        "KON TOY CT ZEN DEN",
+        "ZIL DEN DURABLE GY SM",
+        "ZIL DEN DURABLE GY MD"
+      ]
+    },
+    {
+      "abbr": "trpcl",
+      "count": 8,
+      "examples": [
+        "GAL SAND TRPCL MIX HC 4QT",
+        "ZML BEDNG BIOBLEND TRPCL 8QT",
+        "ZIL BULB FLO COIL TRPCL 20W"
+      ]
+    },
+    {
+      "abbr": "blend",
+      "count": 8,
+      "examples": [
+        "ZIL BEDNG DESERT BLEND 10QT",
+        "ZUP FOOD NUT BLEND MD/LG 3.25#",
+        "ZIL BEDNG DESERT BLEND 25QT"
+      ]
+    },
+    {
+      "abbr": "repti",
+      "count": 8,
+      "examples": [
+        "ZML BOWL REPTI RAMP MD",
+        "ZML SPLMT REPTI CAL W/D3 3OZ",
+        "Repti Hammock Sm"
+      ]
+    },
+    {
+      "abbr": "giant",
+      "count": 8,
+      "examples": [
+        "PTS BALL RUN ABOUT GIANT CLR",
+        "Repti Hammock Giant",
+        "ZooMed Habba Hut Giant"
+      ]
+    },
+    {
+      "abbr": "fshn",
+      "count": 8,
+      "examples": [
+        "COA CLLR CT SAFE FSHN SKP 12",
+        "COA CLLR CT SAFE FSHN SKZ 12",
+        "COA CLLR CT SAFE FSHN WDF 12"
+      ]
+    },
+    {
+      "abbr": "comft",
+      "count": 8,
+      "examples": [
+        "BLI CARRIER COMFT SM BK/BR",
+        "BLI CARRIER COMFT SM TP",
+        "BLI CARRIER COMFT SM BERMUDA"
+      ]
+    },
+    {
+      "abbr": "lov",
+      "count": 8,
+      "examples": [
+        "LOV BOWL DOLCE WOOF SM",
+        "LOV BOWL BELLA CLSC PK MD",
+        "LOV BOWL BELLA CLSC BL MD"
+      ]
+    },
+    {
+      "abbr": "fun",
+      "count": 8,
+      "examples": [
+        "ETH TOY FUN FOOD DOGRITOS 14IN",
+        "Spot kitty fun tubes",
+        "SPOT Springy Fun w Pom-Pom"
+      ]
+    },
+    {
+      "abbr": "easy",
+      "count": 8,
+      "examples": [
+        "KON TRT EASY PASTE BCN CHS 80Z",
+        "KON TRT EASY PASTE PUP CHKN",
+        "KON TRT EASY PASTE PEPPERONI8Z"
+      ]
+    },
+    {
+      "abbr": "frog",
+      "count": 8,
+      "examples": [
+        "KON TOY SNUZZLE FROG XS",
+        "ZML FOOD AQ FROG/TADPOLE 2OZ",
+        "ZML KIT NATURALISTIC FROG 10G"
+      ]
+    },
+    {
+      "abbr": "air",
+      "count": 8,
+      "examples": [
+        "KON TOY AIR SQKR BALL SM 3CT",
+        "KON TOY AIR SQKR TENN BALL LG",
+        "ATP PART VLVE AIR CHECK/FLTR"
+      ]
+    },
+    {
+      "abbr": "plush",
+      "count": 8,
+      "examples": [
+        "ETH TOY PLUSH SKINNEEEZ RABBIT",
+        "MUL TOY WRINKLEEZ PLUSH",
+        "LILPALS PLUSH RABBIT"
+      ]
+    },
+    {
+      "abbr": "accent",
+      "count": 8,
+      "examples": [
+        "FAS SWTR BNE ACCENT OR XS",
+        "FAS SWTR BNE ACCENT OR SM",
+        "FAS SWTR BNE ACCENT OR MD"
+      ]
+    },
+    {
+      "abbr": "to",
+      "count": 8,
+      "examples": [
+        "AQE HEATER FLAT 5W UP TO 2G",
+        "SunBurst Fruit To Nuts",
+        "Happy Ride Booster Seat up to 12"
+      ]
+    },
+    {
+      "abbr": "foam",
+      "count": 8,
+      "examples": [
+        "HIK FLTR BACTO-SURGE FOAM 40G",
+        "HIK FLTR BACTO-SURGE FOAM 75G",
+        "TRO DNTL FOAM ORAL CARE 4OZ"
+      ]
+    },
+    {
+      "abbr": "ultra",
+      "count": 8,
+      "examples": [
+        "CND LTTR A/H ULTRA LAST 20#",
+        "Natures Miracle Ultra Disenfect",
+        "NylaBone Toothpaste ultra clean"
+      ]
+    },
+    {
+      "abbr": "low",
+      "count": 8,
+      "examples": [
+        "KON TOY LOW STUFF STRP PIG MD",
+        "KON TOY LOW STUFF STRP DNKY MD",
+        "Zilla Dual Low Profile Fixture"
+      ]
+    },
+    {
+      "abbr": "balls",
+      "count": 8,
+      "examples": [
+        "ZooMed Hyrdo Balls",
+        "SPOT Slotted Balls 4pk",
+        "SPOT Colored Burlap Balls 3pk"
+      ]
+    },
+    {
+      "abbr": "orange",
+      "count": 8,
+      "examples": [
+        "Flukers Orange Cube",
+        "Flukers Cricket Quencher Orange",
+        "Repto. Orange Hanging Vines 24\""
+      ]
+    },
+    {
+      "abbr": "glow",
+      "count": 8,
+      "examples": [
+        "ZooMed Glow In the Dark Tong",
+        "ExoTerra Glow Light Large",
+        "ExoTerra Glow Light Small"
+      ]
+    },
+    {
+      "abbr": "clips",
+      "count": 8,
+      "examples": [
+        "PetCrest Screen Clips 5-25g",
+        "ExoTerra Screen Clips Small",
+        "ExoTerra Screen Clips Large"
+      ]
+    },
+    {
+      "abbr": "pen",
+      "count": 8,
+      "examples": [
+        "Cricket pen Replacement Foam",
+        "ZooMed tortoise play pen",
+        "ExoTerra Cricket Pen Small"
+      ]
+    },
+    {
+      "abbr": "block",
+      "count": 8,
+      "examples": [
+        "Creatures Feeding Block",
+        "ZooMed Cricket Block",
+        "BirdLife Mineral Block Bannan Flavr"
+      ]
+    },
+    {
+      "abbr": "brown",
+      "count": 8,
+      "examples": [
+        "Pangea Brown reptile vine",
+        "Quiet Time Large brown bed",
+        "Quiet Time XL brown bed"
+      ]
+    },
+    {
+      "abbr": "lbs",
+      "count": 8,
+      "examples": [
+        "Harris Diatomaceous Earth 2 lbs",
+        "Adams Dog Spot on 15-30 LBs",
+        "SweetHarvest Parrot 20 lbs"
+      ]
+    },
+    {
+      "abbr": "finch",
+      "count": 8,
+      "examples": [
+        "Finch Fries",
+        "PH Finch Tiki Hut",
+        "SweetHarvest Finch"
+      ]
+    },
+    {
+      "abbr": "nest",
+      "count": 8,
+      "examples": [
+        "HappyBeaks Bird Nest",
+        "Living World Finch Nest",
+        "Living World Canary Nest"
+      ]
+    },
+    {
+      "abbr": "basket",
+      "count": 8,
+      "examples": [
+        "Oval Basket Nest Med",
+        "Oval Basket Nest LG",
+        "Coastal Soft Basket Muzzle Size 1"
+      ]
+    },
+    {
+      "abbr": "shed",
+      "count": 8,
+      "examples": [
+        "MagicCoat Prof Series Oats Shed con",
+        "PetCrest Shed Control",
+        "TropiClean Shed Control"
+      ]
+    },
+    {
+      "abbr": "stain",
+      "count": 8,
+      "examples": [
+        "NaturVet Tear Stain Remover",
+        "NaturesMiracle Advanced Stain&Odor",
+        "NaturesMiracle Oxy Set in Stain"
+      ]
+    },
+    {
+      "abbr": "omega",
+      "count": 8,
+      "examples": [
+        "Grizzly Omega Plant based 8oz",
+        "Grizzly Omega Salmon 8oz",
+        "Grizzly Omega Salmon 16oz"
+      ]
+    },
+    {
+      "abbr": "sport",
+      "count": 8,
+      "examples": [
+        "Thunder Shirt Sport XXS",
+        "Thunder Shirt Sport XS",
+        "Thunder Shirt Sport Sm"
+      ]
+    },
+    {
+      "abbr": "nola",
+      "count": 8,
+      "examples": [
+        "SM NOLA SAINTS COLLAR",
+        "MED NOLA SAINTS COLLAR",
+        "LG NOLA SAINTS COLLAR"
+      ]
+    },
+    {
+      "abbr": "saints",
+      "count": 8,
+      "examples": [
+        "SM NOLA SAINTS COLLAR",
+        "MED NOLA SAINTS COLLAR",
+        "LG NOLA SAINTS COLLAR"
+      ]
+    },
+    {
+      "abbr": "xhvy",
+      "count": 8,
+      "examples": [
+        "TITAN TRAINCLLR XHVY 20\" 5540",
+        "TITAN TRAINCLLR XHVY 22' 5540",
+        "TITAN TRAINCLLR XHVY 24\" 5540"
+      ]
+    },
+    {
+      "abbr": "sqk",
+      "count": 8,
+      "examples": [
+        "SPOT SKINZ EXT TRPL SQK SHARK",
+        "SPOT SKINZ EXT TRPL SQK CROC",
+        "SPOT SKNZ EX TRPL SQK SNAKE"
+      ]
+    },
+    {
+      "abbr": "mamm",
+      "count": 8,
+      "examples": [
+        "MAMM SM TPR BONEW CLOTH ROPE",
+        "MAMM XLRG COLOR BONE",
+        "MAMM MED XTR MONKEY FIST"
+      ]
+    },
+    {
+      "abbr": "game",
+      "count": 8,
+      "examples": [
+        "FROMM game bird 4#",
+        "FROMM game bird 12#",
+        "FROMM game bird 26#"
+      ]
+    },
+    {
+      "abbr": "hairba",
+      "count": 8,
+      "examples": [
+        "SD cat hairba 3.5#",
+        "SD cat hairba 7#",
+        "SD cat hairba 15.5#"
+      ]
+    },
+    {
+      "abbr": "net",
+      "count": 8,
+      "examples": [
+        "PENN PLAX quick net 5 in",
+        "PENN PLAX quick net 5l in",
+        "PENN PLAX quick net 6 in"
+      ]
+    },
+    {
+      "abbr": "bsct",
+      "count": 7,
+      "examples": [
+        "MPF BSCT WHSM GRMT SMKY 3#",
+        "MPF BSCT WHSM GRMT ORIG LG 3#",
+        "MPF BSCT WHSM ORIG PUP 2#"
+      ]
+    },
+    {
+      "abbr": "grmt",
+      "count": 7,
+      "examples": [
+        "MPF BSCT WHSM GRMT SMKY 3#",
+        "MPF BSCT WHSM GRMT ORIG LG 3#",
+        "FLU FOOD GRMT INSCT MIX 2.75OZ"
+      ]
+    },
+    {
+      "abbr": "capsl",
+      "count": 7,
+      "examples": [
+        "GRE TRT PILLP CAPSL CHS 15.8OZ",
+        "GRE TRT PILLP CAPSL PB 15.8Z",
+        "GRE TRT PILLP CAPSL PB 7.9OZ"
+      ]
+    },
+    {
+      "abbr": "chs",
+      "count": 7,
+      "examples": [
+        "GRE TRT PILLP CAPSL CHS 15.8OZ",
+        "RBP TRT BNE FLLD CHS/BCN SM",
+        "KON TRT EASY PASTE BCN CHS 80Z"
+      ]
+    },
+    {
+      "abbr": "edbl",
+      "count": 7,
+      "examples": [
+        "NYL HLTHY EDBL ROAST BF SOUPER",
+        "NYL HLTHY EDBL MEATY REG 4CT",
+        "NYL HLTHY EDBL PUP VARPK PETT"
+      ]
+    },
+    {
+      "abbr": "rmdy",
+      "count": 7,
+      "examples": [
+        "NZP RMDY MITE GRD LQ 8OZ",
+        "ZML RMDY SHEDDING AID 2.25OZ",
+        "GAR RMDY CRNBRRY RELIEF 50G"
+      ]
+    },
+    {
+      "abbr": "gy",
+      "count": 7,
+      "examples": [
+        "ZIL BOWL DURABLE GY MD",
+        "ZIL DEN DURABLE GY SM",
+        "ZIL DEN DURABLE GY MD"
+      ]
+    },
+    {
+      "abbr": "desert",
+      "count": 7,
+      "examples": [
+        "ZIL BEDNG DESERT BLEND 10QT",
+        "GAL BKGD CLING DESERT 15X36",
+        "ZIL BEDNG DESERT BLEND 25QT"
+      ]
+    },
+    {
+      "abbr": "round",
+      "count": 7,
+      "examples": [
+        "ZML ORNMT CORK BRK ROUND SM",
+        "ZML ORNMT CORK BRK ROUND MD",
+        "ZML ORNMT CORK BRK ROUND JMB"
+      ]
+    },
+    {
+      "abbr": "terrm",
+      "count": 7,
+      "examples": [
+        "ZML THERMOMETER DIGITAL TERRM",
+        "KOM LINER CCNUT TERRM 12X30",
+        "KOM LINER CCNUT TERRM 18X36"
+      ]
+    },
+    {
+      "abbr": "sea",
+      "count": 7,
+      "examples": [
+        "HLP BEDNG CF SPEC SEA GLASS23L",
+        "VIP TOY TUFF SEA CRTRS LOBSTER",
+        "ZooMed Hermit Sea Sponge"
+      ]
+    },
+    {
+      "abbr": "hut",
+      "count": 7,
+      "examples": [
+        "OXB HUT TMTHY SA MD",
+        "ZML HUT COCO NUT HOUSE",
+        "ZooMed Habba Hut Giant"
+      ]
+    },
+    {
+      "abbr": "chew",
+      "count": 7,
+      "examples": [
+        "PTS CHEW KABOB ECONOMY LARGE",
+        "PTS BTTL CHEW PROOF LG 26OZ",
+        "PTS BTTL CHEW PROOF SM 6OZ"
+      ]
+    },
+    {
+      "abbr": "strp",
+      "count": 7,
+      "examples": [
+        "COA CLLR CT SAFE RND FSHN STRP",
+        "API TEST STRP 5-IN-1 4CT",
+        "FAS SWTR STRP GY XS"
+      ]
+    },
+    {
+      "abbr": "bli",
+      "count": 7,
+      "examples": [
+        "BLI CARRIER COMFT SM BK/BR",
+        "BLI CARRIER COMFT SM TP",
+        "BLI CARRIER COMFT SM BERMUDA"
+      ]
+    },
+    {
+      "abbr": "ela",
+      "count": 7,
+      "examples": [
+        "ELA MED TAPE WORM 5CT",
+        "ELA F/T CLLR CT SERESTO",
+        "ELA F/T CLLR SERESTO LG"
+      ]
+    },
+    {
+      "abbr": "bag",
+      "count": 7,
+      "examples": [
+        "FLU TRT GRUB BAG BRD DRGN 4OZ",
+        "FLU TRT GRUB BAG MLWORM 3.75Z",
+        "FLU TRT GRUB BAG TRTL SHRMP6OZ"
+      ]
+    },
+    {
+      "abbr": "repto",
+      "count": 7,
+      "examples": [
+        "TET CRTRDG REPTO FLTR 3PK",
+        "Repto Treat Turtle",
+        "Repto Orange Hanging Vines 12\""
+      ]
+    },
+    {
+      "abbr": "of",
+      "count": 7,
+      "examples": [
+        "KAY TOY TREE OF LIFE 3IN1 LG",
+        "AEC TOY LOOFAH BUNCH OF FRUIT",
+        "JW Hall Of Mirrors"
+      ]
+    },
+    {
+      "abbr": "tie",
+      "count": 7,
+      "examples": [
+        "FAS PJS TIE DYE YL SM",
+        "PetCrest Tie Out Stake",
+        "Titan Tie Out Chain 15Ft"
+      ]
+    },
+    {
+      "abbr": "yl",
+      "count": 7,
+      "examples": [
+        "FAS PJS TIE DYE YL SM",
+        "VIP TOU TUFF SPRT TUG-O-WAR YL",
+        "FAS COAT RAINY DAY YL LG"
+      ]
+    },
+    {
+      "abbr": "far",
+      "count": 7,
+      "examples": [
+        "FAR RMDY CLLR COMFT ZONE",
+        "FAR F/T SHMP C ADAMS-P FOAM10Z",
+        "FAR F/T ADAMS-P C SPT ON <5#3M"
+      ]
+    },
+    {
+      "abbr": "prem",
+      "count": 7,
+      "examples": [
+        "FMN SHMP DESHDDNG ULT PREM 16Z",
+        "MFP FOOD FRRT PREM DIET 22OZ",
+        "KON CTNP PREM 1OZ"
+      ]
+    },
+    {
+      "abbr": "hi",
+      "count": 7,
+      "examples": [
+        "FLU FOOD DUBIA ROACH HI CAL7OZ",
+        "NEXT LEVEL hi pro 30 50#",
+        "VICT hi energy 40#"
+      ]
+    },
+    {
+      "abbr": "iguana",
+      "count": 7,
+      "examples": [
+        "REP FOOD ADLT IGUANA 2#",
+        "REP FOOD JUV IGUANA 6OZ",
+        "Gourmet Iguana Food"
+      ]
+    },
+    {
+      "abbr": "flat",
+      "count": 7,
+      "examples": [
+        "AQE HEATER FLAT 5W UP TO 2G",
+        "AQE HEATER FLAT 7.5W",
+        "ZML ORNMT NAT CORK BRK FLAT MD"
+      ]
+    },
+    {
+      "abbr": "algae",
+      "count": 7,
+      "examples": [
+        "API CLNR ALGAE SCRPR W/HNDL",
+        "HIK FOOD ALGAE WFR MINI .77Z",
+        "AQE CLNR ALGAE PROSCRPR16-25IN"
+      ]
+    },
+    {
+      "abbr": "duty",
+      "count": 7,
+      "examples": [
+        "CND LTTR A/H DEOD DBL DUTY 30Z",
+        "PH TieOut Chain 20' Hvy Duty",
+        "PH TieOut Chain 10' Med Duty"
+      ]
+    },
+    {
+      "abbr": "wipes",
+      "count": 7,
+      "examples": [
+        "TRO WIPES HYPO 100CT",
+        "FOU WIPES DG/CT EYE CARE 35CT",
+        "TRO WIPES DEEP CLN 100CT"
+      ]
+    },
+    {
+      "abbr": "tool",
+      "count": 7,
+      "examples": [
+        "SLI TOOL AV SS CURVED FRCPS",
+        "Furminator Large Dog Short hair Tool",
+        "Furminator Large Dog Long Hair Tool"
+      ]
+    },
+    {
+      "abbr": "maxx",
+      "count": 7,
+      "examples": [
+        "KON TOY MAXX STC S/M",
+        "KON TOY MAXX BNE S/M",
+        "KNG MAXX RHINO LRG"
+      ]
+    },
+    {
+      "abbr": "pig",
+      "count": 7,
+      "examples": [
+        "MUL TOY GLOBLET PIG LTX MINI",
+        "KON TOY LOW STUFF STRP PIG MD",
+        "RASCALS 6.25\" PIG"
+      ]
+    },
+    {
+      "abbr": "branch",
+      "count": 7,
+      "examples": [
+        "HIK ORNMT CRL BRANCH 5.1IN",
+        "Flukers bend a branch",
+        "ExoTerra Forest Branch Med"
+      ]
+    },
+    {
+      "abbr": "vari",
+      "count": 7,
+      "examples": [
+        "DOS KNNL VARI TP/BK 28IN",
+        "vari kennel 70-90#",
+        "vari kennel giant"
+      ]
+    },
+    {
+      "abbr": "forest",
+      "count": 7,
+      "examples": [
+        "ExoTerra Forest Moss 2 pack",
+        "galap. Forest enviroment Cling",
+        "ExoTerra Small forest Branchh"
+      ]
+    },
+    {
+      "abbr": "treats",
+      "count": 7,
+      "examples": [
+        "Flukers Bearded Dragon Treats",
+        "Flukers Calcium Tortoie Treats",
+        "Nacho Duck Liver Cat treats"
+      ]
+    },
+    {
+      "abbr": "cover",
+      "count": 7,
+      "examples": [
+        "ExoTerra Screen Cover 10 Gal.",
+        "ExoTerra Screen Cover 15/20 Gal.",
+        "ExoTerra Screen Cover 20 Gal. Long"
+      ]
+    },
+    {
+      "abbr": "purple",
+      "count": 7,
+      "examples": [
+        "Pangea Hanging Orchid purple",
+        "Flukers Purple Coleus",
+        "FunFeeder Slo Bowl Purple"
+      ]
+    },
+    {
+      "abbr": "tall",
+      "count": 7,
+      "examples": [
+        "ZooMed 18x18x24 Tall",
+        "ExoTerra Nano Tall",
+        "ExoTerra Mini Tall"
+      ]
+    },
+    {
+      "abbr": "super",
+      "count": 7,
+      "examples": [
+        "Vitapol Vitaline Smakers Super Foods",
+        "Fast Acting Super Clot",
+        "FourPaws TieoutCabble20FT SUPER"
+      ]
+    },
+    {
+      "abbr": "birdie",
+      "count": 7,
+      "examples": [
+        "Perch Birdie Basics Y-Shaped",
+        "Birdie Basics perch Sm7/16x10",
+        "Birdie Basics Perch Sm -Med 7/16x16"
+      ]
+    },
+    {
+      "abbr": "basics",
+      "count": 7,
+      "examples": [
+        "Perch Birdie Basics Y-Shaped",
+        "Birdie Basics perch Sm7/16x10",
+        "Birdie Basics Perch Sm -Med 7/16x16"
+      ]
+    },
+    {
+      "abbr": "chain",
+      "count": 7,
+      "examples": [
+        "JW Lattice Chain",
+        "Titan Tie Out Chain 15Ft",
+        "PH TieOut Chain 20' Hvy Duty"
+      ]
+    },
+    {
+      "abbr": "sound",
+      "count": 7,
+      "examples": [
+        "PlayFuls Sound&Move\"Partytime\"",
+        "PlayFuls Sound&Move\"Summer Breeze\"",
+        "PlayFuls Sound&Move \"Monsoon\""
+      ]
+    },
+    {
+      "abbr": "barn",
+      "count": 7,
+      "examples": [
+        "Playfuls barn Dance",
+        "barn home xsm",
+        "barn home 25-50#"
+      ]
+    },
+    {
+      "abbr": "cream",
+      "count": 7,
+      "examples": [
+        "Bannixx Wound Care Cream 4oz",
+        "Banixx Wound Care Cream 8oz",
+        "Zymox Topical Cream"
+      ]
+    },
+    {
+      "abbr": "emat",
+      "count": 7,
+      "examples": [
+        "SodaPup EMAT Whale",
+        "SodaPup EMAT Duckies",
+        "SodaPup EMAT Tree Of Life"
+      ]
+    },
+    {
+      "abbr": "cwmk",
+      "count": 7,
+      "examples": [
+        "CWMK SM RED",
+        "CWMK SM BLU",
+        "CWMK SM PURP"
+      ]
+    },
+    {
+      "abbr": "shrimp",
+      "count": 7,
+      "examples": [
+        "Purebites cat freeze shrimp",
+        "Catit Nibbly Shrimp Grills",
+        "Catit Creamy Chkn&Shrimp 5pk"
+      ]
+    },
+    {
+      "abbr": "arm",
+      "count": 7,
+      "examples": [
+        "Arm&Hammer Litter Fragrence Booster",
+        "Arm&Hammer Litter Mat",
+        "Arm&Hammer Rimmed Pan"
+      ]
+    },
+    {
+      "abbr": "lsu",
+      "count": 7,
+      "examples": [
+        "SM LSU COLLAR",
+        "MED LSU COLLAR",
+        "LG LSU COLLAR"
+      ]
+    },
+    {
+      "abbr": "ext",
+      "count": 7,
+      "examples": [
+        "SPOT SKINZ EXT TRPL SQK SHARK",
+        "SPOT SKINZ EXT TRPL SQK CROC",
+        "MAMM MD TB E/EXT LOOP"
+      ]
+    },
+    {
+      "abbr": "sknz",
+      "count": 7,
+      "examples": [
+        "SPOT SKNZ CRINKLERS LG BIRD",
+        "SPOT SKNZ BIG BITE JACKAL",
+        "SPOT SKNZ BIG BITE BEAR"
+      ]
+    },
+    {
+      "abbr": "ftbll",
+      "count": 7,
+      "examples": [
+        "KNG AIRDOG FTBLL SM",
+        "KNG SQUEEZ GOOMZ FTBLL LG",
+        "KNG AIRDOG FTBLL MD"
+      ]
+    },
+    {
+      "abbr": "stream",
+      "count": 7,
+      "examples": [
+        "TOW anc stream 5#",
+        "TOW anc stream 14#",
+        "TOW anc stream 28#"
+      ]
+    },
+    {
+      "abbr": "mount",
+      "count": 7,
+      "examples": [
+        "TOW anc mount 5#",
+        "TOW anc mount 14#",
+        "TOW sierra mount 5#"
+      ]
+    },
+    {
+      "abbr": "welln",
+      "count": 7,
+      "examples": [
+        "WELLN sm br weight 4#",
+        "WELLN sm br turk 4#",
+        "WELLN sm br core 12#"
+      ]
+    },
+    {
+      "abbr": "nib",
+      "count": 7,
+      "examples": [
+        "VIT ESS turk min nib 14oz",
+        "VIT ESSen duck min nib 14oz",
+        "VIT ESSEN beef min nib 14oz"
+      ]
+    },
+    {
+      "abbr": "nug",
+      "count": 7,
+      "examples": [
+        "PRIM fd nug 14oz",
+        "PRIMAL fro beef nug 3#",
+        "PRIMAL fr rab nug 3#"
+      ]
+    },
+    {
+      "abbr": "ri",
+      "count": 7,
+      "examples": [
+        "FROMM ck & ri 12.2oz",
+        "NUTRI SOUR beef & ri 1203oz",
+        "PRO PLAN ck & ri 13oz"
+      ]
+    },
+    {
+      "abbr": "dig",
+      "count": 7,
+      "examples": [
+        "HEALTH EXTEN dig sup 9oz",
+        "SD perf dig ck 5.8oz",
+        "SD perf dig ck 12.8oz"
+      ]
+    },
+    {
+      "abbr": "heal",
+      "count": 7,
+      "examples": [
+        "SD heal cuis ck 12.5oz",
+        "SD heal cuis 7+ ck 12.5oz",
+        "SD heal cuis beef 12.5oz"
+      ]
+    },
+    {
+      "abbr": "aqua",
+      "count": 6,
+      "examples": [
+        "API COND AQUA ESNTL 4OZ",
+        "GeoBone Aqua Fashion Mat",
+        "KNG AQUA LG"
+      ]
+    },
+    {
+      "abbr": "whsm",
+      "count": 6,
+      "examples": [
+        "MPF BSCT WHSM GRMT SMKY 3#",
+        "MPF BSCT WHSM GRMT ORIG LG 3#",
+        "MPF BSCT WHSM ORIG PUP 2#"
+      ]
+    },
+    {
+      "abbr": "dspnsr",
+      "count": 6,
+      "examples": [
+        "KON DSPNSR BAMBOO DUMBBELL MD",
+        "KON DSPNSR TRT GOODIEZ RNG MD",
+        "KON DSPNSR TRT TNNS BALL LG"
+      ]
+    },
+    {
+      "abbr": "bamboo",
+      "count": 6,
+      "examples": [
+        "KON DSPNSR BAMBOO DUMBBELL MD",
+        "AQA PLNT BAMBOO 3FT LONG",
+        "KON DSPNSR BAMBOO BALL MD"
+      ]
+    },
+    {
+      "abbr": "lid",
+      "count": 6,
+      "examples": [
+        "NBP DRY LID VENISN/SWPOT 22#",
+        "NBP DRY LID SLMN/SWPOT 4#",
+        "NBP DRY LID SLMN/SWPOT S/B 4#"
+      ]
+    },
+    {
+      "abbr": "cuddle",
+      "count": 6,
+      "examples": [
+        "ETH TOY CUDDLE BUNNIES 13IN",
+        "PTS BED CUDDLE CUP",
+        "QuietTime Cuddle bed Blue Med"
+      ]
+    },
+    {
+      "abbr": "hay",
+      "count": 6,
+      "examples": [
+        "KOM FOOD TORTOISE HAY 24OZ",
+        "OXB TRT TMTHY ORC HAY 90Z",
+        "PTS FDR HAY BUFFET W/LID"
+      ]
+    },
+    {
+      "abbr": "canopy",
+      "count": 6,
+      "examples": [
+        "KOM PLNT WDLAND CANOPY 42CM",
+        "KOM PLNT RAINFORST CANOPY 10IN",
+        "ExoTerra Canopy Worm Dish"
+      ]
+    },
+    {
+      "abbr": "brk",
+      "count": 6,
+      "examples": [
+        "ZML ORNMT CORK BRK ROUND SM",
+        "ZML ORNMT CORK BRK ROUND MD",
+        "RAD CLLR RCHRGB LITE BRK CNTRL"
+      ]
+    },
+    {
+      "abbr": "ramp",
+      "count": 6,
+      "examples": [
+        "ZML BOWL REPTI RAMP MD",
+        "Zilla Basking Platform w Ramp sm",
+        "Zilla Basking Platform W ramp Lg"
+      ]
+    },
+    {
+      "abbr": "wheel",
+      "count": 6,
+      "examples": [
+        "AEC WHEEL HAM/MOUSE 4IN",
+        "PTS WHEEL COMFORT LG",
+        "PTS WHEEL SILENT SPINNER MD"
+      ]
+    },
+    {
+      "abbr": "ledge",
+      "count": 6,
+      "examples": [
+        "PTS TOY LAVA LEDGE",
+        "Reptology Ledge and cave hideout",
+        "Reptology ledge and cave hideout sm"
+      ]
+    },
+    {
+      "abbr": "frzn",
+      "count": 6,
+      "examples": [
+        "HIK FOOD FRZN SPIR MYSIS 3.5Z",
+        "HIK FOOD FRZN BLDWRM JMBCB 3.5",
+        "SFB FOOD FRZN BF HEART-P 3.5OZ"
+      ]
+    },
+    {
+      "abbr": "eye",
+      "count": 6,
+      "examples": [
+        "INV MED-P ANTIMIC EYE GEL 3OZ",
+        "FOU WIPES DG/CT EYE CARE 35CT",
+        "NTN MED EYE CLEANSE 4OZ"
+      ]
+    },
+    {
+      "abbr": "spry",
+      "count": 6,
+      "examples": [
+        "GAR RMDY ALLER-911 SPRY 8OZ",
+        "GAR SPRY BITTER YUCK 8OZ",
+        "TRO DNTL SPRY ORAL CARE PB 4OZ"
+      ]
+    },
+    {
+      "abbr": "diaper",
+      "count": 6,
+      "examples": [
+        "FOU DIAPER WEE WEE DSPL SM 12C",
+        "BRM DIAPER WASHBL MD",
+        "FOU DIAPER WEE WEE LINER 24CT"
+      ]
+    },
+    {
+      "abbr": "worm",
+      "count": 6,
+      "examples": [
+        "ELA MED TAPE WORM 5CT",
+        "ELA MED CT TAPE WORM 3CT",
+        "Buffalo Worm Dish"
+      ]
+    },
+    {
+      "abbr": "roll",
+      "count": 6,
+      "examples": [
+        "FCF TRT NTH ROLL CHKN LG2P",
+        "LEN RWHD ROLL PB 9-10IN",
+        "FCF TRT NTH ROLL BF SM 2CT"
+      ]
+    },
+    {
+      "abbr": "house",
+      "count": 6,
+      "examples": [
+        "ZML HUT COCO NUT HOUSE",
+        "Ass. keet house cage",
+        "Prevue House Style Tiel Cage"
+      ]
+    },
+    {
+      "abbr": "eco",
+      "count": 6,
+      "examples": [
+        "ZML BEDNG ECO EARTH LOOSE 8QT",
+        "ZML BEDNG ECO EARTH CNUT 3PK",
+        "ZML BEDNG ECO EARTH LOOSE 24QT"
+      ]
+    },
+    {
+      "abbr": "cmft",
+      "count": 6,
+      "examples": [
+        "OXB BEDNG PURE CMFT 36L",
+        "OXB BEDNG PURE CMFT 72L",
+        "OXB BEDNG PURE CMFT WH 36L"
+      ]
+    },
+    {
+      "abbr": "tree",
+      "count": 6,
+      "examples": [
+        "KAY TOY TREE OF LIFE 3IN1 LG",
+        "TRO SHMP OAT & TEA TREE 20OZ",
+        "ExoTerra Small Jungle Tree"
+      ]
+    },
+    {
+      "abbr": "pjs",
+      "count": 6,
+      "examples": [
+        "FAS PJS MOON/STARS BL XS",
+        "FAS PJS TIE DYE YL SM",
+        "FAS PJS UNICORN PK SM"
+      ]
+    },
+    {
+      "abbr": "stone",
+      "count": 6,
+      "examples": [
+        "CRS ROCK DRGN STONE SM 25#",
+        "ExoTerra Stone Desert",
+        "Reptology Granite Stone hideaway Lg"
+      ]
+    },
+    {
+      "abbr": "papaya",
+      "count": 6,
+      "examples": [
+        "KAY TRT HLTHY TOP PAPAYA BIRD",
+        "KAY TRT HLTHY TOP PAPAYA SA",
+        "SweetHarvest Papaya"
+      ]
+    },
+    {
+      "abbr": "patch",
+      "count": 6,
+      "examples": [
+        "FOU WEE WEE PATCH MD 20X30IN",
+        "WeeWee Patch Indoor Potty sm",
+        "WeeWee premium patch pet potty"
+      ]
+    },
+    {
+      "abbr": "oral",
+      "count": 6,
+      "examples": [
+        "TRO DNTL KIT ORAL CARE SM 3PC",
+        "TRO DNTL SPRY ORAL CARE PB 4OZ",
+        "TRO DNTL FOAM ORAL CARE 4OZ"
+      ]
+    },
+    {
+      "abbr": "up",
+      "count": 6,
+      "examples": [
+        "MUL TOY TRP LGHT UP BALL 2.5IN",
+        "AQE HEATER FLAT 5W UP TO 2G",
+        "AniMed Muscle Up"
+      ]
+    },
+    {
+      "abbr": "skinz",
+      "count": 6,
+      "examples": [
+        "ETH TOY SKINZ XTRM OCTOPUS 16",
+        "ETH TOY SKINZ STRETCHEEZ 22IN",
+        "SPOT SKINZ EXT TRPL SQK SHARK"
+      ]
+    },
+    {
+      "abbr": "pett",
+      "count": 6,
+      "examples": [
+        "NYL HLTHY EDBL PUP VARPK PETT",
+        "GRE TRT DNTL ORIG PETT 6OZ",
+        "NYL TOY TTHNG CHW PUP BL PETT"
+      ]
+    },
+    {
+      "abbr": "rat",
+      "count": 6,
+      "examples": [
+        "SPF FOOD REGGIE RAT/M MOUSE2#",
+        "KAY FOOD FDPH MOUSE/RAT 3#",
+        "OXB FOOD GRDN MSE/RAT 2#"
+      ]
+    },
+    {
+      "abbr": "pine",
+      "count": 6,
+      "examples": [
+        "KAY BEDNG PINE 3200CI",
+        "Pangea EcoDish Mossy Pine",
+        "Pine Swing Med"
+      ]
+    },
+    {
+      "abbr": "nuts",
+      "count": 6,
+      "examples": [
+        "KAY TRT SPRFD STC BIRD NUTS 5Z",
+        "Kaytee Mixed nuts & Cherries",
+        "Vitapol Smakers Nuts Cockatiel"
+      ]
+    },
+    {
+      "abbr": "sponge",
+      "count": 6,
+      "examples": [
+        "ETH TOY SPONGE SCCR BALL 4PK",
+        "Pangea Humitidy Hide Sponge",
+        "Reptology Bio Sponge 70 replace"
+      ]
+    },
+    {
+      "abbr": "stuff",
+      "count": 6,
+      "examples": [
+        "KON TRT STUFF N SWPOT 5OZ",
+        "KON TOY LOW STUFF STRP PIG MD",
+        "KON TOY LOW STUFF STRP DNKY MD"
+      ]
+    },
+    {
+      "abbr": "knts",
+      "count": 6,
+      "examples": [
+        "KON TOY KNTS FLOPPY FOX S/M",
+        "KON TOY KNTS FLOPPY HIPPO S/M",
+        "KON TOY KNTS FLOPPY BUNNY M/L"
+      ]
+    },
+    {
+      "abbr": "floppy",
+      "count": 6,
+      "examples": [
+        "KON TOY KNTS FLOPPY FOX S/M",
+        "KON TOY KNTS FLOPPY HIPPO S/M",
+        "KON TOY KNTS FLOPPY BUNNY M/L"
+      ]
+    },
+    {
+      "abbr": "fiesta",
+      "count": 6,
+      "examples": [
+        "KAY FOOD FIESTA GPIG 2.5#",
+        "KAY FOOD FIESTA RBBT 6.5#",
+        "Kaytee Fiesta Cockatiel"
+      ]
+    },
+    {
+      "abbr": "pack",
+      "count": 6,
+      "examples": [
+        "ExoTerra Forest Moss 2 pack",
+        "Crested Gecko Variety pack ZooMed",
+        "ZooMed Leo gecko Value pack"
+      ]
+    },
+    {
+      "abbr": "guard",
+      "count": 6,
+      "examples": [
+        "Nature Zone Mite Guard",
+        "Nature Zone Coccidia Guard",
+        "Nature Zone Rot Guard"
+      ]
+    },
+    {
+      "abbr": "micro",
+      "count": 6,
+      "examples": [
+        "Pangea XS Micro Dish",
+        "Pangea L Micro Dish",
+        "Zilla Micro Arboreal Habitat"
+      ]
+    },
+    {
+      "abbr": "garden",
+      "count": 6,
+      "examples": [
+        "Flukers Garden Blend",
+        "Suculate Garden",
+        "Kaytee Garden Veggie Treat"
+      ]
+    },
+    {
+      "abbr": "treat",
+      "count": 6,
+      "examples": [
+        "Repto Treat Turtle",
+        "Kaytee Garden Veggie Treat",
+        "Blue Wilderness Chick&Turkey Treat"
+      ]
+    },
+    {
+      "abbr": "thermo",
+      "count": 6,
+      "examples": [
+        "ZooMed Reptitemp Digital Thermo",
+        "Reptology Digtial Thermo",
+        "Reptology thermo"
+      ]
+    },
+    {
+      "abbr": "shells",
+      "count": 6,
+      "examples": [
+        "ZooMed Neon Crab Shells",
+        "ZooMed Mixed Fancy Shells",
+        "ZooMed Growth Shells Lg"
+      ]
+    },
+    {
+      "abbr": "wide",
+      "count": 6,
+      "examples": [
+        "ExoTerra Mini Wide",
+        "ZooMed Small and wide",
+        "ExoTerra Large Wide"
+      ]
+    },
+    {
+      "abbr": "birds",
+      "count": 6,
+      "examples": [
+        "Turbo Birds",
+        "BirdLife Calcium Perch Small birds",
+        "Oasis Vita Drops Large Birds"
+      ]
+    },
+    {
+      "abbr": "fleece",
+      "count": 6,
+      "examples": [
+        "Turbo Fleece Mouse",
+        "PetCrest  Fleece BolsterBed Sm",
+        "PetCrest Fleece bed white XL"
+      ]
+    },
+    {
+      "abbr": "apple",
+      "count": 6,
+      "examples": [
+        "VitaKraft Sticks Apple&Honey Parrot",
+        "Grannicks Bitter Apple",
+        "SD apple"
+      ]
+    },
+    {
+      "abbr": "honey",
+      "count": 6,
+      "examples": [
+        "VitaKraft Sticks Apple&Honey Parrot",
+        "Vitacraft Sticks Egg and honey keets",
+        "SodaPup Ebowl Honey Comb"
+      ]
+    },
+    {
+      "abbr": "crunch",
+      "count": 6,
+      "examples": [
+        "Pacific Perch 6\" Cosmic Crunch",
+        "Pacific Perch 9\" Cosmic Crunch",
+        "SPOT CRUNCH AND SQK"
+      ]
+    },
+    {
+      "abbr": "cozy",
+      "count": 6,
+      "examples": [
+        "PH Cozy Corner Med",
+        "Happy Beaks Cozy Corner Sm",
+        "Happy Beaks Cozy Corner LG"
+      ]
+    },
+    {
+      "abbr": "move",
+      "count": 6,
+      "examples": [
+        "PlayFuls Sound&Move\"Partytime\"",
+        "PlayFuls Sound&Move\"Summer Breeze\"",
+        "PlayFuls Sound&Move \"Monsoon\""
+      ]
+    },
+    {
+      "abbr": "breeze",
+      "count": 6,
+      "examples": [
+        "PlayFuls Sound&Move\"Summer Breeze\"",
+        "TropiClean Berry Breeze Spray",
+        "WeeAway Odor Fogger Hawain Breeze"
+      ]
+    },
+    {
+      "abbr": "blocks",
+      "count": 6,
+      "examples": [
+        "HappyBeaks Big Cirlce and Blocks",
+        "HappyBeaks Stacked Blocks",
+        "HappyBeaks ABC Hanging Blocks"
+      ]
+    },
+    {
+      "abbr": "zymox",
+      "count": 6,
+      "examples": [
+        "Zymox Avain Care",
+        "Zymox Shampoo",
+        "Zymox Leave on Conditioner"
+      ]
+    },
+    {
+      "abbr": "skunk",
+      "count": 6,
+      "examples": [
+        "SkoutsHonor Skunk Odor Elminator",
+        "TropiClean Skunk",
+        "NaturesMiracle Skunk Lavender"
+      ]
+    },
+    {
+      "abbr": "one",
+      "count": 6,
+      "examples": [
+        "PetCrest Two In One",
+        "NaturVet All in One",
+        "OMEGA ONE froz blo worm 4oz"
+      ]
+    },
+    {
+      "abbr": "jack",
+      "count": 6,
+      "examples": [
+        "Happy Jack Mange Medicine",
+        "Happy Jack Kennel Dip II",
+        "Happy Jack Xylecide"
+      ]
+    },
+    {
+      "abbr": "knot",
+      "count": 6,
+      "examples": [
+        "Magic Coat Total Knot Destroyer",
+        "SPT DBL KNOT TUG STRNG FLEX",
+        "MAMMOTH TB BLL W EX 2 KNOT BNE"
+      ]
+    },
+    {
+      "abbr": "surf",
+      "count": 6,
+      "examples": [
+        "SodaPup Mini Surf Emat",
+        "Surf Kitty Kitty Treats",
+        "FROMM surf & turf 4#"
+      ]
+    },
+    {
+      "abbr": "clear",
+      "count": 6,
+      "examples": [
+        "LIFE Clear Spring Pet Fountain",
+        "Catit Fresh &Clear Foam Repl. 3pk",
+        "PRO PLAN live clear 5.5#"
+      ]
+    },
+    {
+      "abbr": "out",
+      "count": 6,
+      "examples": [
+        "PetCrest Tie Out Stake",
+        "Titan Tie Out Chain 15Ft",
+        "PetCrest Tie out cable Sm 10FT"
+      ]
+    },
+    {
+      "abbr": "shirt",
+      "count": 6,
+      "examples": [
+        "Thunder Shirt xxs",
+        "Thunder Shirt Sport XXS",
+        "Thunder Shirt Sport XS"
+      ]
+    },
+    {
+      "abbr": "catch",
+      "count": 6,
+      "examples": [
+        "CatLife Catch&Scratch Sm",
+        "CatLife Catch&Scratch Lg",
+        "SPOT Catch & Release Cat Toy"
+      ]
+    },
+    {
+      "abbr": "wand",
+      "count": 6,
+      "examples": [
+        "SPOT Dolphin Laser Wand",
+        "SPOT FantFish Teaser Wand",
+        "CATLIFE Wiggle Wand"
+      ]
+    },
+    {
+      "abbr": "fine",
+      "count": 6,
+      "examples": [
+        "TITAN TRAINCLLR FINE 12\" 5520",
+        "TITAN TRAINCLLR FINE 14\" 5520",
+        "TITAN TRAINCLLR FINE 16\" 5520"
+      ]
+    },
+    {
+      "abbr": "ex",
+      "count": 6,
+      "examples": [
+        "SPOT SKNZ EX QUILTED MINI FOX",
+        "SPOT SKNZ EX TRPL SQK SNAKE",
+        "SPOT SKNZ EX QUILTED SQUIRELL"
+      ]
+    },
+    {
+      "abbr": "wub",
+      "count": 6,
+      "examples": [
+        "KONG WUB FRIEND BALLISTIC LRG",
+        "KONG WUB ZOO ZEBRA LG",
+        "KONG WUB BALLIS HIGHVIZ LRG"
+      ]
+    },
+    {
+      "abbr": "rice",
+      "count": 6,
+      "examples": [
+        "NB ck & br rice 24#",
+        "PURE VITA ck & br rice 5#",
+        "VICT lam & br rice 5#"
+      ]
+    },
+    {
+      "abbr": "trout",
+      "count": 6,
+      "examples": [
+        "FROMM trout 4#",
+        "FROMM trout 12#",
+        "ZIGN trout & salm 4#"
+      ]
+    },
+    {
+      "abbr": "ocean",
+      "count": 6,
+      "examples": [
+        "RED B ocean gr fr 4#",
+        "FUSSIE CAT tuna ocean 2.82oz",
+        "\"BLUE BUF cat ocean"
+      ]
+    },
+    {
+      "abbr": "pat",
+      "count": 6,
+      "examples": [
+        "VIT ESS turk min pat 14oz",
+        "VIT ESS duck min pat 14oz",
+        "VIT ESSEN beef min pat 14oz"
+      ]
+    },
+    {
+      "abbr": "kitr",
+      "count": 6,
+      "examples": [
+        "PRIM kitr puppy 1.5#",
+        "PRIM kitr puppy 9#",
+        "PRIM kitr beef 1.5#"
+      ]
+    },
+    {
+      "abbr": "cuis",
+      "count": 6,
+      "examples": [
+        "SD heal cuis ck 12.5oz",
+        "SD heal cuis 7+ ck 12.5oz",
+        "SD heal cuis beef 12.5oz"
+      ]
+    },
+    {
+      "abbr": "chow",
+      "count": 6,
+      "examples": [
+        "CAT CHOW ind 3.15#",
+        "CAT CHOW 3.15#",
+        "KITTEN CHOW 3.15#"
+      ]
+    },
+    {
+      "abbr": "from",
+      "count": 6,
+      "examples": [
+        "FROM kitten 3oz",
+        "FROM cat adult 3oz",
+        "FROM cat sal&tun 3oz"
+      ]
+    },
+    {
+      "abbr": "pron",
+      "count": 6,
+      "examples": [
+        "PRIMAL fro pron ck 4#",
+        "PRIMAL fro pron lamb 4#",
+        "\"PRIMAL fro pron turk"
+      ]
+    },
+    {
+      "abbr": "froz",
+      "count": 6,
+      "examples": [
+        "HIKARI froz krill 16oz",
+        "HIKARI froz krill 3.5oz",
+        "HIKARI froz tubifex worm 3.5oz"
+      ]
+    },
+    {
+      "abbr": "fritz",
+      "count": 6,
+      "examples": [
+        "FRITZ maracyn oxy 4oz",
+        "FRITZ maracyn oxy 16oz",
+        "FRITZ coppersafe 4oz"
+      ]
+    },
+    {
+      "abbr": "cozie",
+      "count": 5,
+      "examples": [
+        "KON TOY COZIE ELMER ELPHNT MD",
+        "KON TOY COZIE ALI ALIGATOR MD",
+        "KNG COZIE TUGGZ CHEET MD/LG"
+      ]
+    },
+    {
+      "abbr": "pah",
+      "count": 5,
+      "examples": [
+        "IAM DRY PAH MINI CHK 15#",
+        "IAM DRY PAH MINICHUNKS 30#",
+        "IAM DRY CT PAH ORIG CHKN 7#"
+      ]
+    },
+    {
+      "abbr": "bambne",
+      "count": 5,
+      "examples": [
+        "ETH TOY BAMBNE BNE CHKN 5.75IN",
+        "ETH TOY BAMBNE BNE CHKN 7.25IN",
+        "ETH TOY BAMBNE DNTL BNE PB 6IN"
+      ]
+    },
+    {
+      "abbr": "clamp",
+      "count": 5,
+      "examples": [
+        "FLU CLAMP LAMP CERM 5.5IN",
+        "FLU CLAMP LAMP CERM 8.5IN",
+        "Flukers 10 in . Clamp Lamp"
+      ]
+    },
+    {
+      "abbr": "jelly",
+      "count": 5,
+      "examples": [
+        "ZML FOOD CREATURE JELLY CUP3PK",
+        "Small Jelly Pots",
+        "Big Jelly Pots"
+      ]
+    },
+    {
+      "abbr": "crnr",
+      "count": 5,
+      "examples": [
+        "ZML BOWL REPTIROCK CRNR WTR SM",
+        "ZML BOWL REPTIROCK CRNR WTR XL",
+        "AEC CAGE SHELF CRNR LG"
+      ]
+    },
+    {
+      "abbr": "colrs",
+      "count": 5,
+      "examples": [
+        "HLP BEDNG CF COLRS PR 23L",
+        "HLP BEDNG CF COLRS BL 50L",
+        "HLP BEDNG CF COLRS BL 23L"
+      ]
+    },
+    {
+      "abbr": "spf",
+      "count": 5,
+      "examples": [
+        "SPF SAND CHINCH BATH 52.8OZ",
+        "SPF TRT HAZEL LOVELIES 4.2OZ",
+        "SPF FOOD REGGIE RAT/M MOUSE2#"
+      ]
+    },
+    {
+      "abbr": "bttl",
+      "count": 5,
+      "examples": [
+        "OXB BTTL DRIPLESS 15OZ",
+        "PTS BTTL CHEW PROOF LG 26OZ",
+        "LIX BTTL GPIG BEST BUY W/R16OZ"
+      ]
+    },
+    {
+      "abbr": "rnd",
+      "count": 5,
+      "examples": [
+        "COA CLLR CT SAFE RND FSHN CAMO",
+        "COA CLLR CT SAFE RND FSHN STRP",
+        "COA CLLR KTTN LP RND NDT 8IN"
+      ]
+    },
+    {
+      "abbr": "ims",
+      "count": 5,
+      "examples": [
+        "IMS BNE STFD PB LG 5-6IN",
+        "IMS BNE STERILZR STFD BF 5-6IN",
+        "IMS TRT SWPOT STEAK FRY 1#"
+      ]
+    },
+    {
+      "abbr": "trbtr",
+      "count": 5,
+      "examples": [
+        "MAM TOY TRBTR 2 6IN",
+        "MAM TOY TRBTR 2 W/RPE 3.75",
+        "MAM TOY TRBTR 2 5in"
+      ]
+    },
+    {
+      "abbr": "rinse",
+      "count": 5,
+      "examples": [
+        "TRO SHMP F/T CT NO RINSE 7.4OZ",
+        "Flukers Repta Rinse Eye Rinse",
+        "Flukers Repta Rinse Eye Rinse"
+      ]
+    },
+    {
+      "abbr": "for",
+      "count": 5,
+      "examples": [
+        "TRO CLGN SPA FOR HIM 16OZ",
+        "Kaytee Food For the wild Bird",
+        "Spa Lavish For Him Shamp"
+      ]
+    },
+    {
+      "abbr": "wshbn",
+      "count": 5,
+      "examples": [
+        "NYL TOY CHW WSHBN PUP BL",
+        "BEN CHW WSHBN PB MD",
+        "BEN CHW WSHBN PB LG"
+      ]
+    },
+    {
+      "abbr": "bella",
+      "count": 5,
+      "examples": [
+        "LOV BOWL BELLA CLSC PK MD",
+        "LOV BOWL BELLA CLSC BL MD",
+        "LOV MAT BELLA SPILL PROOF BKLG"
+      ]
+    },
+    {
+      "abbr": "van",
+      "count": 5,
+      "examples": [
+        "VAN BOWL LTWT SM",
+        "VAN LTTR LINERS LG 12CT",
+        "VAN LTTR SIFT PAN LINER 10PK"
+      ]
+    },
+    {
+      "abbr": "decor",
+      "count": 5,
+      "examples": [
+        "FLU DECOR REPTA VINES IVY 6FT",
+        "FLU DECOR REPTA VINE POTHOS 6F",
+        "MARINA circus ring decor"
+      ]
+    },
+    {
+      "abbr": "drgn",
+      "count": 5,
+      "examples": [
+        "FLU TRT GRUB BAG BRD DRGN 4OZ",
+        "NZP FOOD BNB JUV DRGN 2.76OZ",
+        "ZML FOOD GRMT BRD DRGN 8.25Z"
+      ]
+    },
+    {
+      "abbr": "cal",
+      "count": 5,
+      "examples": [
+        "FLU SPLMT REPTA CAL 4OZ",
+        "FLU SPLMT CAL D3 STRWBRY/BAN4Z",
+        "ZIL FOOD MUNCHIE VEG CAL 4OZ"
+      ]
+    },
+    {
+      "abbr": "ss",
+      "count": 5,
+      "examples": [
+        "ZML FEEDING TONGS SS ANGLED",
+        "LOV BOWL SS R-N-T DMD 3QT",
+        "SLI TOOL AV SS CURVED FRCPS"
+      ]
+    },
+    {
+      "abbr": "pld",
+      "count": 5,
+      "examples": [
+        "FAS SWTR UNTUCKED PLD LG",
+        "FAS SWTR UNTUCKED PLD SM",
+        "FAS SWTR UNTUCKED PLD MD"
+      ]
+    },
+    {
+      "abbr": "start",
+      "count": 5,
+      "examples": [
+        "API COND QUICK START 8OZ",
+        "API COND QUICK START 1OZ",
+        "API COND QUICK START 4OZ"
+      ]
+    },
+    {
+      "abbr": "cnd",
+      "count": 5,
+      "examples": [
+        "CND LTTR A/H MULTICAT 20#",
+        "CND LTTR A/H DEOD 20OZ",
+        "CND LTTR A/H DEOD DBL DUTY 30Z"
+      ]
+    },
+    {
+      "abbr": "cloud",
+      "count": 5,
+      "examples": [
+        "KON E-CLLR CLOUD SOFT SM",
+        "KON E-CLLR CLOUD SOFT MD",
+        "KON E-CLLR CLOUD SOFT LG"
+      ]
+    },
+    {
+      "abbr": "flyer",
+      "count": 5,
+      "examples": [
+        "KON TOY FLYER RD SM",
+        "JOLLY PET FLYER 7.5\" BLUE",
+        "CHUCKIT RUGGED FLYER MED"
+      ]
+    },
+    {
+      "abbr": "lmb",
+      "count": 5,
+      "examples": [
+        "MUL TOY LMB CHOP 6IN",
+        "MUL TOY LMB CHOP 10IN",
+        "ETH TOY STHRS TABBIE LMB 8IN"
+      ]
+    },
+    {
+      "abbr": "plsh",
+      "count": 5,
+      "examples": [
+        "ETH TOY PLSH SKIN RCCN",
+        "ETH TOY GIGGLER PLSH CHKN 12IN",
+        "ETH TOY LUNA-CORN PLSH 10IN"
+      ]
+    },
+    {
+      "abbr": "mfp",
+      "count": 5,
+      "examples": [
+        "MFP FOOD FRRT PREM DIET 22OZ",
+        "MFP RMDY FRRT LAX 3OZ",
+        "MFP SPLMT FERRET FURO-TONE 6OZ"
+      ]
+    },
+    {
+      "abbr": "txtrd",
+      "count": 5,
+      "examples": [
+        "FAS SWTR TXTRD CABLE GR SM",
+        "FAS SWTR TXTRD CABLE GR XS",
+        "FAS SWTR TXTRD CABLE GR MD"
+      ]
+    },
+    {
+      "abbr": "holder",
+      "count": 5,
+      "examples": [
+        "JWP HOLDER CUTTLEBONE",
+        "A&E HOLDER CUTBNE/TRT 2PK",
+        "ExoTerra Food Cup Holder"
+      ]
+    },
+    {
+      "abbr": "dbl",
+      "count": 5,
+      "examples": [
+        "CND LTTR A/H DEOD DBL DUTY 30Z",
+        "JWP TOY BIRD DBL AXIS",
+        "ZML TERRM DBL DOOR 30X12X16"
+      ]
+    },
+    {
+      "abbr": "grass",
+      "count": 5,
+      "examples": [
+        "FOU PAD WEE WEE GRASS SCT 10CT",
+        "WeeWee Patch Replace Grass Sm",
+        "WeeWee Patch Replace Grass Med"
+      ]
+    },
+    {
+      "abbr": "neon",
+      "count": 5,
+      "examples": [
+        "WWI GRVL NEON GREEN 5#",
+        "WWI BIO ACTIV BETTA NEON PK 1#",
+        "WWI GRVL NEON RNBW 2#"
+      ]
+    },
+    {
+      "abbr": "log",
+      "count": 5,
+      "examples": [
+        "ZML BETTA CERAMIC LOG SM",
+        "ExoTerra Med wet Log",
+        "ExoTerra Sm Wet Log"
+      ]
+    },
+    {
+      "abbr": "hippo",
+      "count": 5,
+      "examples": [
+        "KON TOY KNTS FLOPPY HIPPO S/M",
+        "KON TOY KNTS FLOPPY HIPPO M/L",
+        "ExoTerra Hippo Island"
+      ]
+    },
+    {
+      "abbr": "bunny",
+      "count": 5,
+      "examples": [
+        "KON TOY KNTS FLOPPY BUNNY M/L",
+        "SPT SOOTH HEARTBEAT BUNNY 12\"",
+        "ZIPPYPAWS DONUTZ BUDDIES BUNNY"
+      ]
+    },
+    {
+      "abbr": "yard",
+      "count": 5,
+      "examples": [
+        "OXB CAGE HABITAT W/PLY YARD XL",
+        "Tropiclean Natural Flea &Tic Yard",
+        "Skouts Honor Flea Yard spray"
+      ]
+    },
+    {
+      "abbr": "bridge",
+      "count": 5,
+      "examples": [
+        "Lizard Lounger Bridge",
+        "Galap. Flexible Bridge 2x3",
+        "Galap. Flexible Bridge 3x3"
+      ]
+    },
+    {
+      "abbr": "living",
+      "count": 5,
+      "examples": [
+        "Living Natural Coco Mat 10x20",
+        "Living World Mineral Block",
+        "Living World Finch Nest"
+      ]
+    },
+    {
+      "abbr": "mist",
+      "count": 5,
+      "examples": [
+        "Zilla Tropical Mist Humidity Spray",
+        "Tropiclean Ntrl Flea&Tik Easy Mist",
+        "TropiClean Papaya Mist Spray"
+      ]
+    },
+    {
+      "abbr": "free",
+      "count": 5,
+      "examples": [
+        "Flukers Repti Calcium D3 & Phos Free",
+        "SPT AXOLOTL STUFFING FREE",
+        "SPT LVTHEEARTH STUFF FREE CROC"
+      ]
+    },
+    {
+      "abbr": "lees",
+      "count": 5,
+      "examples": [
+        "Lees Mealworm Dish",
+        "LEE'S fauget adapter",
+        "LEE'S super pump"
+      ]
+    },
+    {
+      "abbr": "series",
+      "count": 5,
+      "examples": [
+        "Zilla Canopy Series Trop. 13W",
+        "Zilla Canopy Series Des. 20W",
+        "Zilla Des. Series 50 T8 24\" 17W"
+      ]
+    },
+    {
+      "abbr": "fogger",
+      "count": 5,
+      "examples": [
+        "ZooMed Multiport Fogger Attachment",
+        "Adams Indoor Fogger",
+        "WeeAway Odor Fogger CM"
+      ]
+    },
+    {
+      "abbr": "spring",
+      "count": 5,
+      "examples": [
+        "Zilla Spring Cave",
+        "LIFE Clear Spring Pet Fountain",
+        "WeeWee Spring Action Scoop Sm"
+      ]
+    },
+    {
+      "abbr": "cups",
+      "count": 5,
+      "examples": [
+        "Turtle Dock Suction Cups",
+        "A&E 5oz Jungle Cups",
+        "A&E 10oz Jungle Cups"
+      ]
+    },
+    {
+      "abbr": "center",
+      "count": 5,
+      "examples": [
+        "ZooMed Enviromental Control Center",
+        "BirdLife Activity Center XS",
+        "BirdLIfe Activity Center S"
+      ]
+    },
+    {
+      "abbr": "wet",
+      "count": 5,
+      "examples": [
+        "ExoTerra Wet Rock lg",
+        "ExoTerra Wet Rock Med",
+        "ExoTerra Wet Rock Sm"
+      ]
+    },
+    {
+      "abbr": "cactus",
+      "count": 5,
+      "examples": [
+        "ExoTerra barrel Cactus Med",
+        "ExoTerra Barrel Cactus Sm",
+        "ExoTerra Finger Cactus"
+      ]
+    },
+    {
+      "abbr": "beach",
+      "count": 5,
+      "examples": [
+        "Hermit Beach",
+        "Pacific Perch Beach Walk sm 4\"",
+        "Pacific Perch Beach Walk Sm 5\""
+      ]
+    },
+    {
+      "abbr": "shell",
+      "count": 5,
+      "examples": [
+        "ZooMed Growth Shell XL",
+        "ZooMed Growth Shell Med",
+        "Playfuls Preen&Paci \"Shell&Sticks\""
+      ]
+    },
+    {
+      "abbr": "play",
+      "count": 5,
+      "examples": [
+        "ZooMed tortoise play pen",
+        "BirdLife Small Bird play",
+        "Smart Play Tower"
+      ]
+    },
+    {
+      "abbr": "conure",
+      "count": 5,
+      "examples": [
+        "Higgins Duets Conure&Lovebird",
+        "Safflower Gold Conure &Cockatiel",
+        "Kaytee Fiesta Conure Food"
+      ]
+    },
+    {
+      "abbr": "millet",
+      "count": 5,
+      "examples": [
+        "SunBurst Millet Bits",
+        "Higgins Spray Millet",
+        "Kaytee Spray Millet lg"
+      ]
+    },
+    {
+      "abbr": "walk",
+      "count": 5,
+      "examples": [
+        "Pacific Perch Beach Walk sm 4\"",
+        "Pacific Perch Beach Walk Sm 5\"",
+        "PH Wonder Walk Med"
+      ]
+    },
+    {
+      "abbr": "cement",
+      "count": 5,
+      "examples": [
+        "BirdLife Cement Ladder",
+        "BirdLIfe 16\" Cement Perches",
+        "BirdLife 19\" Cement Perches"
+      ]
+    },
+    {
+      "abbr": "beads",
+      "count": 5,
+      "examples": [
+        "BirdLife Twin Rings with turning beads",
+        "BirdLife Perch w Mirror and Beads",
+        "BirdLife Mirror With Beads"
+      ]
+    },
+    {
+      "abbr": "sack",
+      "count": 5,
+      "examples": [
+        "PH Snuggle Sack Med",
+        "PH Snuggle Sack XL",
+        "PH Snuggle Sack SM"
+      ]
+    },
+    {
+      "abbr": "oasis",
+      "count": 5,
+      "examples": [
+        "Oasis Alive&Well Probiotics",
+        "Oasis Vita E-Z-MIST",
+        "Oasis Vita Drops Large Birds"
+      ]
+    },
+    {
+      "abbr": "paper",
+      "count": 5,
+      "examples": [
+        "Living World Gravel paper",
+        "BirdLife Gravel Paper 15.5x15.5",
+        "BirdLife Gravel Paper 9x12"
+      ]
+    },
+    {
+      "abbr": "fresh",
+      "count": 5,
+      "examples": [
+        "TopPerformance Fresh Pet",
+        "Catit Fresh &Clear Foam Repl. 3pk",
+        "Naturally Fresh Pellets 10lb"
+      ]
+    },
+    {
+      "abbr": "paw",
+      "count": 5,
+      "examples": [
+        "Banixx Paw Wipes",
+        "PennPlex Paw Cleaner",
+        "NutriVet Uri-Ease Cat paw Gel"
+      ]
+    },
+    {
+      "abbr": "pill",
+      "count": 5,
+      "examples": [
+        "Pill Crusher",
+        "Healthy Promise Pill Disenser",
+        "Pill Popper"
+      ]
+    },
+    {
+      "abbr": "rake",
+      "count": 5,
+      "examples": [
+        "Safari Double Row Rake Rotating pins",
+        "Safari Double Row Rake",
+        "Safari Single Row Rake"
+      ]
+    },
+    {
+      "abbr": "short",
+      "count": 5,
+      "examples": [
+        "Safari Shedding Comb Short Hair",
+        "Safari Flea Comb Short/Med hair",
+        "Furminator Large Dog Short hair Tool"
+      ]
+    },
+    {
+      "abbr": "tips",
+      "count": 5,
+      "examples": [
+        "Furminator Replacement Grinding tips",
+        "TITAN COMFORT TIPS XHVY",
+        "TITAN COMFORT TIPS HVY"
+      ]
+    },
+    {
+      "abbr": "dogit",
+      "count": 5,
+      "examples": [
+        "DOGIT Go Slow Xs Blue",
+        "DOGIT Go Slow Xs Pink",
+        "DOGIT Go Slow M Black"
+      ]
+    },
+    {
+      "abbr": "go",
+      "count": 5,
+      "examples": [
+        "DOGIT Go Slow Xs Blue",
+        "DOGIT Go Slow Xs Pink",
+        "DOGIT Go Slow M Black"
+      ]
+    },
+    {
+      "abbr": "slow",
+      "count": 5,
+      "examples": [
+        "DOGIT Go Slow Xs Blue",
+        "DOGIT Go Slow Xs Pink",
+        "DOGIT Go Slow M Black"
+      ]
+    },
+    {
+      "abbr": "retro",
+      "count": 5,
+      "examples": [
+        "Retro Small Blue Bowl",
+        "Retro Med Blue Bowl",
+        "Retro Lg Blue Bowl"
+      ]
+    },
+    {
+      "abbr": "jacket",
+      "count": 5,
+      "examples": [
+        "Zippy Paws XS Life Jacket",
+        "Zippy Paws Sm Life Jacket",
+        "Zippy Paws Med Life Jacket"
+      ]
+    },
+    {
+      "abbr": "churo",
+      "count": 5,
+      "examples": [
+        "Churo Tuna w Salmon 4pk",
+        "Churo Skin & Coat chicken 4pk",
+        "Churo Skin&Coat Tuna 4pk"
+      ]
+    },
+    {
+      "abbr": "puree",
+      "count": 5,
+      "examples": [
+        "FussieCat Tuna&Anchovies Puree 4pk",
+        "FussieCat Tuna Puree 4pk",
+        "FussieCat Sardine Puree 4pk"
+      ]
+    },
+    {
+      "abbr": "monkey",
+      "count": 5,
+      "examples": [
+        "RASCALS 6\" MONKEY",
+        "LILPALS 4\" MONKEY",
+        "MAMM MED XTR MONKEY FIST"
+      ]
+    },
+    {
+      "abbr": "sloth",
+      "count": 5,
+      "examples": [
+        "SPOT FUN SLOTH 7\"",
+        "SPOT FUN SLOTH 13\"",
+        "KONG TUGGZ SLOTH XL"
+      ]
+    },
+    {
+      "abbr": "wolf",
+      "count": 5,
+      "examples": [
+        "NYLABONE RHINO CONE WOLF",
+        "NYLABONE CHEESE BONE WOLF",
+        "NYLA SNEAKY SNACKER WOLF"
+      ]
+    },
+    {
+      "abbr": "comfrt",
+      "count": 5,
+      "examples": [
+        "KONG COMFRT PUPS PEANUT SM",
+        "KONG COMFRT PUPS BOSS SM",
+        "KONG COMFRT PUPS FRTIZ MD"
+      ]
+    },
+    {
+      "abbr": "snuzz",
+      "count": 5,
+      "examples": [
+        "KONG SNUZZ KID ELEPHANT SM",
+        "KONG SNUZZ KID SLOTH SM",
+        "KNG SNUZZ MINI PIG XS"
+      ]
+    },
+    {
+      "abbr": "eleph",
+      "count": 5,
+      "examples": [
+        "KONG SHAKERS LUVS ELEPH LG",
+        "KONG RINGAROOS ELEPH MD",
+        "KNG SHAK CRUMP ELEPH XL"
+      ]
+    },
+    {
+      "abbr": "wld",
+      "count": 5,
+      "examples": [
+        "KONG WLD KNOTS FOX SM/MD",
+        "KONG WLD KNOTS GIRAFFE SM/MD",
+        "KONG WLD KNTS BEAR ASS. MD/LG"
+      ]
+    },
+    {
+      "abbr": "shak",
+      "count": 5,
+      "examples": [
+        "KNG SHAK CRUMP SLOTH XL",
+        "KNG SHAK CRUMP ELEPH XL",
+        "KNG SHAK HONK DUCK LG"
+      ]
+    },
+    {
+      "abbr": "jerky",
+      "count": 5,
+      "examples": [
+        "KNG JERKY CHKN SM/MD",
+        "KNG JERKY CHKN MD/LG",
+        "SD mini jerky beef"
+      ]
+    },
+    {
+      "abbr": "goodie",
+      "count": 5,
+      "examples": [
+        "KNG GOODIE RIBBON SM",
+        "KNG GOODIE RIBBON MD",
+        "KNG EXT GOODIE BONE LG"
+      ]
+    },
+    {
+      "abbr": "digest",
+      "count": 5,
+      "examples": [
+        "SD perf digest sm bite 3.5#",
+        "SD perf digest ck 3.5#",
+        "SD perf digest ck 12#"
+      ]
+    },
+    {
+      "abbr": "spree",
+      "count": 5,
+      "examples": [
+        "spree carrier blue 19 in",
+        "\" MW spree kennel red 19\"\"\"",
+        "\"MW spree kennel green 19\"\"\""
+      ]
+    },
+    {
+      "abbr": "iams",
+      "count": 5,
+      "examples": [
+        "IAMS mini chu 7#",
+        "IAMS lg br puppy 15#",
+        "IAMS pup 13oz"
+      ]
+    },
+    {
+      "abbr": "per",
+      "count": 5,
+      "examples": [
+        "SD cat per weig 2.9oz",
+        "SD cat per dig ck 2.9oz",
+        "SD cat per dig ck3.5#"
+      ]
+    },
+    {
+      "abbr": "silo",
+      "count": 4,
+      "examples": [
+        "JWP WATERER BIRD SILO LG",
+        "JW Tall Silo Waterer",
+        "JW Silo Bird Feeder"
+      ]
+    },
+    {
+      "abbr": "oxy",
+      "count": 4,
+      "examples": [
+        "N/M S/O OR OXY JFC TRGGR 24OZ",
+        "NaturesMiracle Oxy Set in Stain",
+        "FRITZ maracyn oxy 4oz"
+      ]
+    },
+    {
+      "abbr": "mc",
+      "count": 4,
+      "examples": [
+        "FOU SHMP MC REDUCES ODOR 16OZ",
+        "FOU SHMP MC PUP TEARLESS 16OZ",
+        "FOU GRMG MC 3-IN-1 SCISSORS"
+      ]
+    },
+    {
+      "abbr": "colr",
+      "count": 4,
+      "examples": [
+        "MAM TOY COLR 3KNOT ROPE TUG LG",
+        "MAM TUG COLR 3KNT/4IN BALL LG",
+        "MAM TOY COLR 3KNT RP TUG MD"
+      ]
+    },
+    {
+      "abbr": "rp",
+      "count": 4,
+      "examples": [
+        "MAM TOY 3KNT/2BALL RP MINI",
+        "KON TOY RP RALLY BNE MD",
+        "MAM TOY CLOTH RP 3KNT W/SQKR10"
+      ]
+    },
+    {
+      "abbr": "land",
+      "count": 4,
+      "examples": [
+        "RBP DRY W/G LAND 4#",
+        "RBP DRY W/G LAND 22#",
+        "RBP DRY G/F LAND 22#"
+      ]
+    },
+    {
+      "abbr": "cerm",
+      "count": 4,
+      "examples": [
+        "FLU CLAMP LAMP CERM 5.5IN",
+        "ZIL DOME REFL CERM BK 8.5IN",
+        "FLU CLAMP LAMP CERM 8.5IN"
+      ]
+    },
+    {
+      "abbr": "mite",
+      "count": 4,
+      "examples": [
+        "NZP RMDY MITE GRD LQ 8OZ",
+        "Nature Zone Mite Guard",
+        "Jurassi Mite"
+      ]
+    },
+    {
+      "abbr": "leaf",
+      "count": 4,
+      "examples": [
+        "KOM PLNT MONSTERA LEAF 18IN",
+        "ZML LEAF BETTA BED HAMMOCK REG",
+        "PENN PLAX betta leaf"
+      ]
+    },
+    {
+      "abbr": "hrmt",
+      "count": 4,
+      "examples": [
+        "ZML FOOD HRMT CRAB FRUIT SALAD",
+        "ZML COND WTR HRMT CRAB",
+        "ZML COND S/W HRMT CRAB"
+      ]
+    },
+    {
+      "abbr": "salad",
+      "count": 4,
+      "examples": [
+        "ZML FOOD HRMT CRAB FRUIT SALAD",
+        "Tortoise Salad dressing",
+        "iguana Salad dressing"
+      ]
+    },
+    {
+      "abbr": "bath",
+      "count": 4,
+      "examples": [
+        "SPF SAND CHINCH BATH 52.8OZ",
+        "BirdLIfe Bird Bath w Mirror",
+        "PenPlax Bird Bath"
+      ]
+    },
+    {
+      "abbr": "westrn",
+      "count": 4,
+      "examples": [
+        "OXB TRT WESTRN TMTHY 90OZ",
+        "OXB TRT WESTRN TMTHY/ORC 15Z",
+        "OXB TRT WESTRN TMTHY 40OZ"
+      ]
+    },
+    {
+      "abbr": "young",
+      "count": 4,
+      "examples": [
+        "OXB FOOD ESSNTL YOUNG GPIG 10#",
+        "OXB FOOD ESSNTL YOUNG RBBT5#",
+        "OXB FOOD ESSNTL YOUNG RBBT 10#"
+      ]
+    },
+    {
+      "abbr": "baked",
+      "count": 4,
+      "examples": [
+        "OXB TRT BAKED CRRT/DILL 3OZ",
+        "OXB TRT BAKED APPL/BAN 3OZ",
+        "DMF BSCT MB BAKED PB 12OZ"
+      ]
+    },
+    {
+      "abbr": "ice",
+      "count": 4,
+      "examples": [
+        "AEC TOY NIBBLE ICE CR CHW",
+        "DOGO'S ice cream pumkin",
+        "DOGO'S ice cream ched bac"
+      ]
+    },
+    {
+      "abbr": "buffet",
+      "count": 4,
+      "examples": [
+        "PTS FDR HAY BUFFET W/LID",
+        "Flukers Buffet Blend Juv, Bearded",
+        "Flukers Buffet Blend Adult Bearded"
+      ]
+    },
+    {
+      "abbr": "rainy",
+      "count": 4,
+      "examples": [
+        "COA CLLR CT SAFE RAINY DAY8-12",
+        "FAS COAT RAINY DAY YL LG",
+        "FAS COAT RAINY DAY YL SM"
+      ]
+    },
+    {
+      "abbr": "lav",
+      "count": 4,
+      "examples": [
+        "INS LTTR ODORLOCK LAV 25#",
+        "N/M SHMP/COND LAV 16OZ",
+        "EAP CLNG CALM LAV/CHMML 4OZ"
+      ]
+    },
+    {
+      "abbr": "ntn",
+      "count": 4,
+      "examples": [
+        "NTN TRT FRTBL APL/BCN 12OZ",
+        "NTN MED BITTER BANDAGE 3IN",
+        "NTN MED EYE CLEANSE 4OZ"
+      ]
+    },
+    {
+      "abbr": "relief",
+      "count": 4,
+      "examples": [
+        "GAR RMDY CRNBRRY RELIEF 50G",
+        "TropiClean Flea&Tick Relief",
+        "Sentry HairBall Relief Cat"
+      ]
+    },
+    {
+      "abbr": "hemp",
+      "count": 4,
+      "examples": [
+        "GAR QUIET MOMENTS HEMP 60CT",
+        "GAR SPLMT HEMP QUIET LIQ 1OZ",
+        "PetHonesty Hemp Calming"
+      ]
+    },
+    {
+      "abbr": "spa",
+      "count": 4,
+      "examples": [
+        "TRO CLGN SPA FOR HIM 16OZ",
+        "TRO SHMP SPA WH COAT 16OZ",
+        "Spa Lavish For Him Shamp"
+      ]
+    },
+    {
+      "abbr": "bitter",
+      "count": 4,
+      "examples": [
+        "NTN MED BITTER BANDAGE 3IN",
+        "GAR SPRY BITTER YUCK 8OZ",
+        "Grannicks Bitter Apple"
+      ]
+    },
+    {
+      "abbr": "sky",
+      "count": 4,
+      "examples": [
+        "RBP DRY G/F SKY 22#",
+        "RBP DRY W/G SKY 4#",
+        "RBP DRY W/G SKY 22#"
+      ]
+    },
+    {
+      "abbr": "flld",
+      "count": 4,
+      "examples": [
+        "RBP TRT BNE FLLD PB SM",
+        "RBP TRT BNE FLLD CHS/BCN SM",
+        "RBP TRT BNE FLLD CHKN SM"
+      ]
+    },
+    {
+      "abbr": "fcf",
+      "count": 4,
+      "examples": [
+        "FCF TRT NTH ROLL CHKN LG2P",
+        "FCF TRT NTH TWST CHKN SM10",
+        "FCF TRT NTH ROLL BF SM 2CT"
+      ]
+    },
+    {
+      "abbr": "nth",
+      "count": 4,
+      "examples": [
+        "FCF TRT NTH ROLL CHKN LG2P",
+        "FCF TRT NTH TWST CHKN SM10",
+        "FCF TRT NTH ROLL BF SM 2CT"
+      ]
+    },
+    {
+      "abbr": "clsc",
+      "count": 4,
+      "examples": [
+        "LOV BOWL BELLA CLSC PK MD",
+        "LOV BOWL BELLA CLSC BL MD",
+        "KON TOY CLSC KONG RD MD"
+      ]
+    },
+    {
+      "abbr": "mlworm",
+      "count": 4,
+      "examples": [
+        "FLU TRT GRUB BAG MLWORM 3.75Z",
+        "ZIL FOOD MUNCHIE MLWORM 3.75Z",
+        "LEE BOWL MLWORM CURVED SIDES"
+      ]
+    },
+    {
+      "abbr": "dsrt",
+      "count": 4,
+      "examples": [
+        "ZIL BULB FLO COIL DSRT 20W",
+        "ZIL BULB FLO DSRT T8 18IN 15W",
+        "VIP TOY DSRT LIZZY LIZARD"
+      ]
+    },
+    {
+      "abbr": "gn",
+      "count": 4,
+      "examples": [
+        "ZIL LINER TERRARIUM GN 10G",
+        "ZIL LINER TERRARIUM GN 20/29",
+        "TET GRVL GLOFSH PK/GN/BL 5#"
+      ]
+    },
+    {
+      "abbr": "coco",
+      "count": 4,
+      "examples": [
+        "ZML HUT COCO NUT HOUSE",
+        "ExoTerra Coco Husk",
+        "Living Natural Coco Mat 10x20"
+      ]
+    },
+    {
+      "abbr": "more",
+      "count": 4,
+      "examples": [
+        "KMP FOOD GPIG & MORE 4#",
+        "KMP FOOD HAM & MORE 2#",
+        "Happy Jack Itch No more Shampoo"
+      ]
+    },
+    {
+      "abbr": "proof",
+      "count": 4,
+      "examples": [
+        "PTS BTTL CHEW PROOF LG 26OZ",
+        "LOV MAT BELLA SPILL PROOF BKLG",
+        "LOV MAT BELLA SPILL PROOF BKSM"
+      ]
+    },
+    {
+      "abbr": "cosmic",
+      "count": 4,
+      "examples": [
+        "FAS HOODIE COSMIC NVY XS",
+        "FAS HOODIE COSMIC NVY SM",
+        "Pacific Perch 6\" Cosmic Crunch"
+      ]
+    },
+    {
+      "abbr": "all",
+      "count": 4,
+      "examples": [
+        "FAS BOOT ALL WTHR RD LG",
+        "FAS BOOT ALL WTHR RD XXXS",
+        "FAS BOOT ALL WRTH RD XXS"
+      ]
+    },
+    {
+      "abbr": "npi",
+      "count": 4,
+      "examples": [
+        "NPI TRT FRRT STC SLMN 1.87OZ",
+        "NPI USA TTHING PUP RING CHKN",
+        "NPI USA TTHING PUP RING PMPK3C"
+      ]
+    },
+    {
+      "abbr": "yarn",
+      "count": 4,
+      "examples": [
+        "ETH TOY CT YARN BLLS 3.5IN",
+        "ETH TOY CT YARN BLLS 2.5IN 2PK",
+        "Turbo Yarn Ball"
+      ]
+    },
+    {
+      "abbr": "sthrs",
+      "count": 4,
+      "examples": [
+        "ETH TOY STHRS WARM HUG PAL10IN",
+        "ETH TOY STHRS WARM HUG BNE 9IN",
+        "ETH TOY STHRS TABBIE LMB 8IN"
+      ]
+    },
+    {
+      "abbr": "hug",
+      "count": 4,
+      "examples": [
+        "ETH TOY STHRS WARM HUG PAL10IN",
+        "ETH TOY STHRS WARM HUG BNE 9IN",
+        "FurHaven Calming Hug Bed SM"
+      ]
+    },
+    {
+      "abbr": "shrmp",
+      "count": 4,
+      "examples": [
+        "AQE FOOD SHRMP PLLTS 3.25OZ",
+        "TET FOOD SHRMP WFR 3OZ",
+        "AQE FOOD SHRMP PLLTS 6.5OZ"
+      ]
+    },
+    {
+      "abbr": "liners",
+      "count": 4,
+      "examples": [
+        "VAN LTTR LINERS LG 12CT",
+        "PureNess Giant 8 Cat Pan Liners",
+        "PureNess Large 12 Cat pan Liners"
+      ]
+    },
+    {
+      "abbr": "bully",
+      "count": 4,
+      "examples": [
+        "IMS TRT BULLY HIDE STC SM 9CT",
+        "IMS TRT BULLY HIDE STC SM 12CT",
+        "MAX BULLY 5#"
+      ]
+    },
+    {
+      "abbr": "paste",
+      "count": 4,
+      "examples": [
+        "KON TRT EASY PASTE BCN CHS 80Z",
+        "KON TRT EASY PASTE PUP CHKN",
+        "KON TRT EASY PASTE PEPPERONI8Z"
+      ]
+    },
+    {
+      "abbr": "luvs",
+      "count": 4,
+      "examples": [
+        "KON TOY SHAKERS LUVS GIRAFFELG",
+        "KON TOY SHAKERS LUVS GIRAFFESM",
+        "KONG cat Luvs lizard"
+      ]
+    },
+    {
+      "abbr": "gator",
+      "count": 4,
+      "examples": [
+        "KON TOY BALLSTC GATOR MD/LG",
+        "LILPALS PLUSH GATOR",
+        "LILPALS 8\" SPIKY GATOR"
+      ]
+    },
+    {
+      "abbr": "sqkr",
+      "count": 4,
+      "examples": [
+        "KON TOY AIR SQKR BALL SM 3CT",
+        "KON TOY AIR SQKR TENN BALL LG",
+        "KON TOY AIR SQKR BNE MD"
+      ]
+    },
+    {
+      "abbr": "dubia",
+      "count": 4,
+      "examples": [
+        "FLU FOOD DUBIA ROACH HI CAL7OZ",
+        "FLU FOOD CAN GRMT DUBIA 1.2OZ",
+        "Flukers Dubia Roaches Small"
+      ]
+    },
+    {
+      "abbr": "trpl",
+      "count": 4,
+      "examples": [
+        "ETH TOY BAMBNE TRPL BISON 4IN",
+        "SPOT SKINZ EXT TRPL SQK SHARK",
+        "SPOT SKINZ EXT TRPL SQK CROC"
+      ]
+    },
+    {
+      "abbr": "jrs",
+      "count": 4,
+      "examples": [
+        "VIP TOY TUFF JR'S TUFF RING RD",
+        "VIP TOY TUFF JR'S TUFF RING BL",
+        "VIP TOY TUFF JR'S TUFF RING PK"
+      ]
+    },
+    {
+      "abbr": "fist",
+      "count": 4,
+      "examples": [
+        "MAM TOY XTRA MNKY FIST 3.5IN",
+        "MAMM MED XTR MONKEY FIST",
+        "MAMM LRG XTR MONKEY FIST"
+      ]
+    },
+    {
+      "abbr": "grow",
+      "count": 4,
+      "examples": [
+        "KOM TRT GROW DANDELIONS 6.5IN",
+        "KOM TRT GROW TORTOISE GRASS6.5",
+        "Rep-Cal Grow Juv. Bearded D."
+      ]
+    },
+    {
+      "abbr": "leaves",
+      "count": 4,
+      "examples": [
+        "GAL OAK LEAVES LIVE NAT 4QT",
+        "Magnolia Leaves",
+        "Reptology Climber vines w leaves"
+      ]
+    },
+    {
+      "abbr": "hdghog",
+      "count": 4,
+      "examples": [
+        "PTT FOOD HDGHOG MAINT 3#",
+        "ETH TOY CT JITTERY HDGHOG 3IN",
+        "RASCALS 3\" HDGHOG"
+      ]
+    },
+    {
+      "abbr": "maint",
+      "count": 4,
+      "examples": [
+        "PTT FOOD HDGHOG MAINT 3#",
+        "REP FOOD MAINT BOX TRTL 12OZ",
+        "DIAM cat maint 6#"
+      ]
+    },
+    {
+      "abbr": "castle",
+      "count": 4,
+      "examples": [
+        "TET ORNMT GLOFSH CASTLE LG",
+        "MARINA glo castle",
+        "MARINA glo skull castle"
+      ]
+    },
+    {
+      "abbr": "potty",
+      "count": 4,
+      "examples": [
+        "GAR TRNG AID POTTY HERE SPRY8Z",
+        "WeeWee Patch Indoor Potty sm",
+        "WeeWee premium patch pet potty"
+      ]
+    },
+    {
+      "abbr": "freeze",
+      "count": 4,
+      "examples": [
+        "KON ACESS FILL OR FREEZE TRAY",
+        "purebites cat freeze tuna",
+        "Purebites cat freeze shrimp"
+      ]
+    },
+    {
+      "abbr": "tank",
+      "count": 4,
+      "examples": [
+        "TET TANK REPTOHABITAT 75G",
+        "ZooMed Under tank Heater 10-20Gal",
+        "ZooMed Under tank Heater 30-40Gal"
+      ]
+    },
+    {
+      "abbr": "shark",
+      "count": 4,
+      "examples": [
+        "KON TOY CUTESEAS SHARK MD/LG",
+        "SPOT SKINZ EXT TRPL SQK SHARK",
+        "MAMMOTH MED SQK SHARK 15\""
+      ]
+    },
+    {
+      "abbr": "rhino",
+      "count": 4,
+      "examples": [
+        "KON TOY BALLSTC RHINO MD/LG",
+        "RASCAL6.5\" PURPLE RHINO",
+        "NYLABONE RHINO CONE WOLF"
+      ]
+    },
+    {
+      "abbr": "stix",
+      "count": 4,
+      "examples": [
+        "NBP TRT REWARDS STIX DUCK 4OZ",
+        "KNG SQUEAK STIX MD",
+        "SD flexi stix beef"
+      ]
+    },
+    {
+      "abbr": "bear",
+      "count": 4,
+      "examples": [
+        "DRN TOY TEDDY BEAR XS",
+        "SPOT SKNZ BIG BITE BEAR",
+        "KONG SNUZZLES BEAR MD"
+      ]
+    },
+    {
+      "abbr": "oval",
+      "count": 4,
+      "examples": [
+        "FUR BED LNGR OVAL PLSH CR SM",
+        "Lagoon 11\" oval",
+        "Oval Basket Nest Med"
+      ]
+    },
+    {
+      "abbr": "dock",
+      "count": 4,
+      "examples": [
+        "ZML FLOATING DOCK MINI",
+        "ZooMed Turltle Dock Sm",
+        "ZooMed Turltle Dock Med"
+      ]
+    },
+    {
+      "abbr": "xsmall",
+      "count": 4,
+      "examples": [
+        "Flukers xsmall Repta Leash",
+        "BellaBowl Xsmall Fish Blue",
+        "BellaBown xsmall Fish Purple"
+      ]
+    },
+    {
+      "abbr": "lock",
+      "count": 4,
+      "examples": [
+        "ExoTerra Terrarium lock",
+        "InterSand Odor Lock Unsc 13lb",
+        "API ammo lock 8oz"
+      ]
+    },
+    {
+      "abbr": "wire",
+      "count": 4,
+      "examples": [
+        "ExoTerra Wire Light",
+        "ZooMed Wire Cage Clamp Lamp",
+        "Safari Wire pin Brush Large"
+      ]
+    },
+    {
+      "abbr": "bowls",
+      "count": 4,
+      "examples": [
+        "ZooMed Glow Bowls Combo M",
+        "ZooMed Glow Bowls Combo Lg.",
+        "ZooMed Bright Bowls"
+      ]
+    },
+    {
+      "abbr": "lagoon",
+      "count": 4,
+      "examples": [
+        "Lagoon 11\" oval",
+        "Lagoon Kidney",
+        "TETRA glo gravel black lagoon"
+      ]
+    },
+    {
+      "abbr": "pier",
+      "count": 4,
+      "examples": [
+        "Floating Turtle Pier Sm",
+        "Floating Turtle Pier Med.",
+        "Floating Turtle Pier Lg."
+      ]
+    },
+    {
+      "abbr": "silk",
+      "count": 4,
+      "examples": [
+        "ExoTerra Abutilon Silk Small",
+        "ExoTerra Abutilon Silk Med",
+        "ExoTerra Abutilon Silk Large"
+      ]
+    },
+    {
+      "abbr": "bush",
+      "count": 4,
+      "examples": [
+        "Pangea Hanging Caladium Bush Lg",
+        "Komodo Anthurium Bush",
+        "ExoTerra Anthurium Bush"
+      ]
+    },
+    {
+      "abbr": "growth",
+      "count": 4,
+      "examples": [
+        "ZooMed Growth Shells Lg",
+        "ZooMed Growth Shells Sm",
+        "ZooMed Growth Shell XL"
+      ]
+    },
+    {
+      "abbr": "harris",
+      "count": 4,
+      "examples": [
+        "Harris Diatomaceous Earth 10.5 lbs.",
+        "Harris Diatomaceous Earth 4Lbs",
+        "Harris Diatomaceous Earth 2 lbs"
+      ]
+    },
+    {
+      "abbr": "tik",
+      "count": 4,
+      "examples": [
+        "Tropiclean Ntrl Flea&Tik MAX sham",
+        "Troiclean Ntrl Flea&Tik Soothing Spray",
+        "Tropiclean Ntrl Flea&Tik Easy Mist"
+      ]
+    },
+    {
+      "abbr": "skouts",
+      "count": 4,
+      "examples": [
+        "Skouts Honor Flea Sham",
+        "Skouts Honor Flea Home Spray",
+        "Skouts Honor Flea Yard spray"
+      ]
+    },
+    {
+      "abbr": "honor",
+      "count": 4,
+      "examples": [
+        "Skouts Honor Flea Sham",
+        "Skouts Honor Flea Home Spray",
+        "Skouts Honor Flea Yard spray"
+      ]
+    },
+    {
+      "abbr": "groom",
+      "count": 4,
+      "examples": [
+        "BIo Groom Flea Shampoo",
+        "Comfy Groom",
+        "Magic Coat Gentle Groom Glove"
+      ]
+    },
+    {
+      "abbr": "carpet",
+      "count": 4,
+      "examples": [
+        "Adams Carpet Spray",
+        "Adams Carpet Powder",
+        "WeeAway Carpet Shampoo"
+      ]
+    },
+    {
+      "abbr": "feed",
+      "count": 4,
+      "examples": [
+        "E-Z Feed 6oz",
+        "E-Z Feed 2oz",
+        "E-Z Feed 4oz"
+      ]
+    },
+    {
+      "abbr": "cuttle",
+      "count": 4,
+      "examples": [
+        "BirdLife Cuttle Bones 2pk",
+        "BirdLife Cuttle bone",
+        "BirdLife Fruit Dipped Cuttle Bone 2pk"
+      ]
+    },
+    {
+      "abbr": "kiwi",
+      "count": 4,
+      "examples": [
+        "Vitapol Smakers Snack Kiwi Cocktiel",
+        "TropiClean Kiwi Blossom Spray",
+        "TropiClean Deep Cleansing mango&Kiwi"
+      ]
+    },
+    {
+      "abbr": "fruits",
+      "count": 4,
+      "examples": [
+        "SunBurst Fruits and Veggies",
+        "SunBurts Sticks lil fruits",
+        "SunBurst Sticks Island Fruits"
+      ]
+    },
+    {
+      "abbr": "lil",
+      "count": 4,
+      "examples": [
+        "SunBurts Sticks lil fruits",
+        "lil pals combo brush",
+        "Lil pals Double Sided Comb"
+      ]
+    },
+    {
+      "abbr": "hari",
+      "count": 4,
+      "examples": [
+        "Hari Spray Millet",
+        "Hari Oyster Shells",
+        "Hari Clay-Cal"
+      ]
+    },
+    {
+      "abbr": "wacky",
+      "count": 4,
+      "examples": [
+        "Wacky Wood 14\"",
+        "Wacky Wood 24\"",
+        "Wacky Wood 36\""
+      ]
+    },
+    {
+      "abbr": "step",
+      "count": 4,
+      "examples": [
+        "BirdLife Wood Ladder 5 Step",
+        "BirdLIfe Wood Ladder 7 Step",
+        "PetAg Esbilac 2nd Step Powder Milk"
+      ]
+    },
+    {
+      "abbr": "bell",
+      "count": 4,
+      "examples": [
+        "Birdie basics 2-sided mirror w bell",
+        "BirdLIfe Hanging Pacifier with bell",
+        "BirdLife Flower Mirror w Bell"
+      ]
+    },
+    {
+      "abbr": "forage",
+      "count": 4,
+      "examples": [
+        "PlayFul Forage&Eng \"Raincatcher\"",
+        "PlayFuls Forage&Eng \"Fireball\"",
+        "PH Forage &Engage"
+      ]
+    },
+    {
+      "abbr": "cirlce",
+      "count": 4,
+      "examples": [
+        "HappyBeaks Big Cirlce and Blocks",
+        "CIRLCE 20\"TCR 1786S COLLAR",
+        "CIRLCE 16\"TNV 1786S COLLAR"
+      ]
+    },
+    {
+      "abbr": "canary",
+      "count": 4,
+      "examples": [
+        "Higgins VitaSeed Canary",
+        "Higgins Sunburst Canary&Finch",
+        "Sunseed vitaprima Canary&Finch"
+      ]
+    },
+    {
+      "abbr": "stress",
+      "count": 4,
+      "examples": [
+        "EarthBath Stress Release Spritz Euc&Pep",
+        "API stress zyme",
+        "API stress zyme 8oz"
+      ]
+    },
+    {
+      "abbr": "banixx",
+      "count": 4,
+      "examples": [
+        "Banixx Wound Care Cream 8oz",
+        "Banixx Spray 8oz",
+        "Banixx Spray 32 oz"
+      ]
+    },
+    {
+      "abbr": "tomlyn",
+      "count": 4,
+      "examples": [
+        "Tomlyn High Calorie Gel Puppy",
+        "Tomlyn Hairball Relief Gel for cats",
+        "Tomlyn High Calorie Gel kitten"
+      ]
+    },
+    {
+      "abbr": "joint",
+      "count": 4,
+      "examples": [
+        "FreshBreathe Hip&Joint 16oz",
+        "PetHonesty Hip+Joint Health Max",
+        "PetHonesty Hip+Joint Health"
+      ]
+    },
+    {
+      "abbr": "peanut",
+      "count": 4,
+      "examples": [
+        "NylaBone Dental Kit Peanut Butter",
+        "NYLABONE PEANUT WLF",
+        "KONG COMFRT PUPS PEANUT SM"
+      ]
+    },
+    {
+      "abbr": "self",
+      "count": 4,
+      "examples": [
+        "Safari Self Cleaning Slicker Lg",
+        "Safarin Self Cleaning Slicker Med",
+        "Safari Self Cleaning Slicker Sm"
+      ]
+    },
+    {
+      "abbr": "pals",
+      "count": 4,
+      "examples": [
+        "lil pals combo brush",
+        "Lil pals Double Sided Comb",
+        "KONG Tropics Pals 2pk"
+      ]
+    },
+    {
+      "abbr": "love",
+      "count": 4,
+      "examples": [
+        "SodaPup Mini Groovy Love Emat",
+        "I love Cats Fish",
+        "SPOT Love the earth butterfly"
+      ]
+    },
+    {
+      "abbr": "pixi",
+      "count": 4,
+      "examples": [
+        "Catit Pixi Feeder",
+        "Catit pixi",
+        "Pixi FlowFoun Filter 3X"
+      ]
+    },
+    {
+      "abbr": "cafe",
+      "count": 4,
+      "examples": [
+        "PetMate Cafe Watr .25g",
+        "Petmate cafe WTR 1.5 G",
+        "Petmate cafe feeder 12Lb"
+      ]
+    },
+    {
+      "abbr": "heavy",
+      "count": 4,
+      "examples": [
+        "Heavy Weight 11.5oz bowl",
+        "Titan TieOut 15' Heavy",
+        "Titan TieOut 20' Heavy"
+      ]
+    },
+    {
+      "abbr": "stake",
+      "count": 4,
+      "examples": [
+        "PetCrest Tie Out Stake",
+        "Titan Spiral Stake&TieOut Combo",
+        "FourPaws WalkAbout 21\" hvy tieout stake"
+      ]
+    },
+    {
+      "abbr": "kmr",
+      "count": 4,
+      "examples": [
+        "PetAg KMR 2nd Step Powder",
+        "PetAg KMR Powder",
+        "KMR Ready to use"
+      ]
+    },
+    {
+      "abbr": "breath",
+      "count": 4,
+      "examples": [
+        "Feline Greenies Tuna Clean Breath",
+        "Feline Greenies Salmon Clean Breath",
+        "Feline Greenies Chkn Cleans breath"
+      ]
+    },
+    {
+      "abbr": "kfc",
+      "count": 4,
+      "examples": [
+        "KFC Sauce&DrumStick",
+        "KFC FAMOUS BOWL",
+        "KFC CHICKEN BOX"
+      ]
+    },
+    {
+      "abbr": "get",
+      "count": 4,
+      "examples": [
+        "Meowijuana Get Cheesy Toy",
+        "Meowijuana Get smoked Toy",
+        "Meowijuana Get Buzzed Toy"
+      ]
+    },
+    {
+      "abbr": "roller",
+      "count": 4,
+      "examples": [
+        "CK roller cat toy",
+        "JW PUPPY HOL-EE ROLLER",
+        "JW HOL-EE ROLLER MED"
+      ]
+    },
+    {
+      "abbr": "post",
+      "count": 4,
+      "examples": [
+        "Petcrest scratching post",
+        "Prevue Scartching post GREY",
+        "CATLIFE Activity&Scratch post"
+      ]
+    },
+    {
+      "abbr": "open",
+      "count": 4,
+      "examples": [
+        "Petmate Sm Basic Open Litter box",
+        "Petmate Med Basic Open Litter Box",
+        "PetMate Jum Basic Open Litter Box"
+      ]
+    },
+    {
+      "abbr": "jolly",
+      "count": 4,
+      "examples": [
+        "JOLLY PETS 4\"JOLLY SCCRBALL",
+        "JOLLY PETS 4\"JOLLY SCCRBALL",
+        "JOLLY TUG"
+      ]
+    },
+    {
+      "abbr": "wlf",
+      "count": 4,
+      "examples": [
+        "NYLABONE FREEZE BONE WLF",
+        "NYLABONE PEANUT WLF",
+        "NYLABONE DURACHEW BACON WLF"
+      ]
+    },
+    {
+      "abbr": "pups",
+      "count": 4,
+      "examples": [
+        "KONG COMFRT. PUPS GOLDIE MD",
+        "KONG COMFRT PUPS PEANUT SM",
+        "KONG COMFRT PUPS BOSS SM"
+      ]
+    },
+    {
+      "abbr": "butch",
+      "count": 4,
+      "examples": [
+        "ACANA butch ck 17#",
+        "ACANA butch ck 4#",
+        "ACANA butch beef 4#"
+      ]
+    },
+    {
+      "abbr": "seaf",
+      "count": 4,
+      "examples": [
+        "NUTRI SOU sm bite seaf 4#",
+        "NUTRI SOU sm bite seaf 15#",
+        "NUTRI SOU seaf 4#"
+      ]
+    },
+    {
+      "abbr": "kanga",
+      "count": 4,
+      "examples": [
+        "ZIGN kanga 13oz",
+        "ZIGN kanga 4#",
+        "ZIGN kanga 12.5#"
+      ]
+    },
+    {
+      "abbr": "pv",
+      "count": 4,
+      "examples": [
+        "NUTRI SOUR pv ck stew 12.5oz",
+        "NUTRI SOUR pv beef stew 12.5oz",
+        "NUTRI SOUR pv turkey stew 12.5oz"
+      ]
+    },
+    {
+      "abbr": "gen",
+      "count": 4,
+      "examples": [
+        "HEALTH EXTEN gen cook duck 9oz",
+        "HEALTH EXTEN gen cook beef 9oz",
+        "HEALTH EXTEN gen cook ck 9oz"
+      ]
+    },
+    {
+      "abbr": "cook",
+      "count": 4,
+      "examples": [
+        "HEALTH EXTEN gen cook duck 9oz",
+        "HEALTH EXTEN gen cook beef 9oz",
+        "HEALTH EXTEN gen cook ck 9oz"
+      ]
+    },
+    {
+      "abbr": "sto",
+      "count": 4,
+      "examples": [
+        "SD sen sto 3.5#",
+        "SD kitten sen sto 3.5#",
+        "SD cat sen sto 7#"
+      ]
+    },
+    {
+      "abbr": "dashi",
+      "count": 4,
+      "examples": [
+        "\"DASHI cat ck",
+        "\"DASHI cat ck",
+        "\"DASHI cat ck"
+      ]
+    },
+    {
+      "abbr": "broth",
+      "count": 4,
+      "examples": [
+        "PRIMAL broth beef",
+        "PRIMAL broth pork",
+        "PRIMAL broth ck"
+      ]
+    },
+    {
+      "abbr": "pleco",
+      "count": 4,
+      "examples": [
+        "FLUVAL bug bite pleco waf 4.6oz",
+        "TETRA pleco wafer 2.12oz",
+        "ZOO MED feeder pleco"
+      ]
+    },
+    {
+      "abbr": "buffer",
+      "count": 4,
+      "examples": [
+        "SEACHEM alkaline buffer 10.5oz",
+        "SEACHEM acid buffer 10.5oz",
+        "SEACHEM discus buffer 8.8oz"
+      ]
+    },
+    {
+      "abbr": "aquar",
+      "count": 4,
+      "examples": [
+        "AQUAR SOLUT herbal betta revive",
+        "AQUAR SOLUT betta revive",
+        "AQUAR SOLUT betta ultimate"
+      ]
+    },
+    {
+      "abbr": "hny",
+      "count": 3,
+      "examples": [
+        "KAY TRT FDPH HNY KEET 7OZ",
+        "KAY TRT FDPH HNY PRRT 7OZ",
+        "KAY TRT FDPH HNY STC TIEL 8OZ"
+      ]
+    },
+    {
+      "abbr": "genie",
+      "count": 3,
+      "examples": [
+        "EPC LTTR GENIE RFILL 1PK",
+        "EPC LTTR GENIE RFILL JMB 2PK",
+        "Litter Genie Plus"
+      ]
+    },
+    {
+      "abbr": "dazzle",
+      "count": 3,
+      "examples": [
+        "MUL TOY DAZZLE FLYING DUCK13IN",
+        "PENN PLAX dazzle stone bl",
+        "PENN PLAX dazzle stone multi"
+      ]
+    },
+    {
+      "abbr": "venisn",
+      "count": 3,
+      "examples": [
+        "NBP DRY LID VENISN/SWPOT 22#",
+        "NBP TRT LIT VENISN/SWPOT S/B8Z",
+        "NYL HLTHY EDBL BNE VENISN LG"
+      ]
+    },
+    {
+      "abbr": "lit",
+      "count": 3,
+      "examples": [
+        "NBP TRT LIT VENISN/SWPOT S/B8Z",
+        "NBP TRT LIT FSH/SWPOT S/B 8OZ",
+        "TidyCats 24/7 Preformance Lit 20"
+      ]
+    },
+    {
+      "abbr": "dmf",
+      "count": 3,
+      "examples": [
+        "DMF TRT PUP-PERONI MIG/BCN5.6Z",
+        "DMF BSCT MB BAKED PB 12OZ",
+        "DMF BSCT MB FLVR SNACK MINI15Z"
+      ]
+    },
+    {
+      "abbr": "fmn",
+      "count": 3,
+      "examples": [
+        "FMN COND SENS SKIN 16OZ",
+        "FMN SHMP SENS SKIN 16OZ",
+        "FMN SHMP DESHDDNG ULT PREM 16Z"
+      ]
+    },
+    {
+      "abbr": "flexi",
+      "count": 3,
+      "examples": [
+        "NYL FLEXI CHW VARPK REG",
+        "SD flexi stix beef",
+        "SD flexi stix turk"
+      ]
+    },
+    {
+      "abbr": "varpk",
+      "count": 3,
+      "examples": [
+        "NYL FLEXI CHW VARPK REG",
+        "NYL HLTHY EDBL PUP VARPK PETT",
+        "ZML FOOD CRSTD GECKO VARPK"
+      ]
+    },
+    {
+      "abbr": "nzp",
+      "count": 3,
+      "examples": [
+        "NZP RMDY MITE GRD LQ 8OZ",
+        "NZP FOOD BNB JUV DRGN 2.76OZ",
+        "NZP RMDY SHLL SAVER TRTL 2OZ"
+      ]
+    },
+    {
+      "abbr": "nght",
+      "count": 3,
+      "examples": [
+        "ZIL BULB NGHT BK INC 75W BOX",
+        "ZIL BULB NGHT BK INC 50W BOX",
+        "ZIL BULB NGHT BK INC 100W BOX"
+      ]
+    },
+    {
+      "abbr": "soil",
+      "count": 3,
+      "examples": [
+        "ZML BEDNG CREATURES SOIL 1QT",
+        "ZooMed Creature Soil 1 QT",
+        "ZooMed Hermit Soil"
+      ]
+    },
+    {
+      "abbr": "therm",
+      "count": 3,
+      "examples": [
+        "ZML GAUGE THERM HUMDTY DIGITAL",
+        "ZML HEATER BETTA THERM 7.5W",
+        "Zoomed High range Reptile Therm"
+      ]
+    },
+    {
+      "abbr": "aspen",
+      "count": 3,
+      "examples": [
+        "ZML BEDNG ASPEN SNAKE 24QT",
+        "Zoomed Aspen 8 QT",
+        "Zoomed Aspen 4Qt"
+      ]
+    },
+    {
+      "abbr": "chinch",
+      "count": 3,
+      "examples": [
+        "SPF SAND CHINCH BATH 52.8OZ",
+        "OXB FOOD ESSNTL CHINCH 3#",
+        "OXB FOOD ESSNTL CHINCH 10#"
+      ]
+    },
+    {
+      "abbr": "orc",
+      "count": 3,
+      "examples": [
+        "OXB TRT TMTHY ORC HAY 90Z",
+        "OXB TRT ORC GRSS 40OZ",
+        "OXB TRT WESTRN TMTHY/ORC 15Z"
+      ]
+    },
+    {
+      "abbr": "sa",
+      "count": 3,
+      "examples": [
+        "OXB HUT TMTHY SA MD",
+        "KAY TRT HLTHY TOP MXD FRT SA",
+        "KAY TRT HLTHY TOP PAPAYA SA"
+      ]
+    },
+    {
+      "abbr": "nibble",
+      "count": 3,
+      "examples": [
+        "AEC TOY NIBBLE ICE CR CHW",
+        "AEC TOY NIBBLE STRW BLL CHW",
+        "AEC TOY NIBBLE PALM STAR CHW"
+      ]
+    },
+    {
+      "abbr": "about",
+      "count": 3,
+      "examples": [
+        "PTS BALL RUN ABOUT GIANT CLR",
+        "FourPaws Walk About 19\" SprlStake",
+        "FourPaws Walk About QuickFit Muzzle"
+      ]
+    },
+    {
+      "abbr": "gid",
+      "count": 3,
+      "examples": [
+        "COA CLLR CT SAFE GID GBF 12",
+        "COA CLLR CT SAFE GID GOF 12",
+        "COA CLLR CT SAFE GID GBG 12"
+      ]
+    },
+    {
+      "abbr": "emb",
+      "count": 3,
+      "examples": [
+        "COA CLLR CT SAFE EMB FHSN PK12",
+        "COA CLLR CT SAFE EMB FHSN RD12",
+        "COA CLLR CT SAFE EMB FHSN OR12"
+      ]
+    },
+    {
+      "abbr": "fhsn",
+      "count": 3,
+      "examples": [
+        "COA CLLR CT SAFE EMB FHSN PK12",
+        "COA CLLR CT SAFE EMB FHSN RD12",
+        "COA CLLR CT SAFE EMB FHSN OR12"
+      ]
+    },
+    {
+      "abbr": "bfly",
+      "count": 3,
+      "examples": [
+        "COA CLLR CT SAFE BFLY 8-12IN",
+        "KON TEASR CT PURRSUIT BFLY",
+        "ETH TEASR CT BFLY & MYLAR ASST"
+      ]
+    },
+    {
+      "abbr": "tp",
+      "count": 3,
+      "examples": [
+        "BLI CARRIER COMFT SM TP",
+        "BLI CARRIER COMFT LG TP",
+        "DOS KNNL VARI TP/BK 28IN"
+      ]
+    },
+    {
+      "abbr": "bry",
+      "count": 3,
+      "examples": [
+        "BLI CARRIER COMFT SM BRY",
+        "BLI CARRIER COMFT LG BRY",
+        "TRO SHMP CT BRY/CCNUT 12OZ"
+      ]
+    },
+    {
+      "abbr": "curry",
+      "count": 3,
+      "examples": [
+        "COA BRUSH RBBR CURRY DOG",
+        "Safari Comfort Grip Curry Brush",
+        "LeSalon Essentials Curry Brush"
+      ]
+    },
+    {
+      "abbr": "slkr",
+      "count": 3,
+      "examples": [
+        "COA BRUSH SLKR FIRM SM",
+        "COA BRUSH SLKR FIRM MD",
+        "COA BRUSH SLKR FIRM LG"
+      ]
+    },
+    {
+      "abbr": "firm",
+      "count": 3,
+      "examples": [
+        "COA BRUSH SLKR FIRM SM",
+        "COA BRUSH SLKR FIRM MD",
+        "COA BRUSH SLKR FIRM LG"
+      ]
+    },
+    {
+      "abbr": "ve",
+      "count": 3,
+      "examples": [
+        "KMP FOOD SWTHRVST KEET VE 20#",
+        "KMP FOOD SWTHRVST KEET VE 2#",
+        "KMP FOOD SWTHRVST KEET VE 4#"
+      ]
+    },
+    {
+      "abbr": "wtrlss",
+      "count": 3,
+      "examples": [
+        "TRO SHMP CT WTRLSS DEEP CLN7.4",
+        "TRO SHMP WTRLSS HYPO 7.4OZ",
+        "TRO SHMP WTRLSS DEEP CLN 7.4OZ"
+      ]
+    },
+    {
+      "abbr": "zip",
+      "count": 3,
+      "examples": [
+        "ZIP TOY SQKY CAN ZIPPY COLA",
+        "ZIP TOY NOMNOMZ FRIES MD",
+        "ZIP TOY PLSH CATERPLLR LG"
+      ]
+    },
+    {
+      "abbr": "sft",
+      "count": 3,
+      "examples": [
+        "GAR SPLMT ALL-IN-ONE SFT 60CT",
+        "GRE SPLMT SFT CHW H/J 30CT",
+        "KNG SPRT SFT BLL SM"
+      ]
+    },
+    {
+      "abbr": "bright",
+      "count": 3,
+      "examples": [
+        "KON TUG JAXX BRIGHT W/BALL MD",
+        "FOU SHMP MC BRIGHT WH 16OZ",
+        "ZooMed Bright Bowls"
+      ]
+    },
+    {
+      "abbr": "tab",
+      "count": 3,
+      "examples": [
+        "GRE TRT PILLP TAB HCKRY 3.2OZ",
+        "GRE TRT PILLP TAB CHKN 3.2Z",
+        "GRE TRT PILLP TAB CHS 3.2OZ."
+      ]
+    },
+    {
+      "abbr": "hckry",
+      "count": 3,
+      "examples": [
+        "GRE TRT PILLP TAB HCKRY 3.2OZ",
+        "GRE TRT PILLP CAPSL HCKRY 15.8",
+        "GRE TRT PILLP CAPSL HCKRY 7.9Z"
+      ]
+    },
+    {
+      "abbr": "ocn",
+      "count": 3,
+      "examples": [
+        "RBP DRY W/G OCN 4#",
+        "RBP DRY G/F OCN 22#",
+        "RBP DRY W/G OCN 22#"
+      ]
+    },
+    {
+      "abbr": "tthng",
+      "count": 3,
+      "examples": [
+        "NYL TOY TTHNG KEYS PUP SM",
+        "NYL TOY TTHNG PACIFIER XS",
+        "NYL TOY TTHNG CHW PUP BL PETT"
+      ]
+    },
+    {
+      "abbr": "dolce",
+      "count": 3,
+      "examples": [
+        "LOV BOWL DOLCE WOOF SM",
+        "Dolce Food & Water Bowl",
+        "Dolce Puppy Forever Bowl"
+      ]
+    },
+    {
+      "abbr": "eap",
+      "count": 3,
+      "examples": [
+        "EAP CLNG PUP/KTTN BABY PWD 4OZ",
+        "EAP CLNG CALM LAV/CHMML 4OZ",
+        "EAP SHMP 2IN1 SHMP & COND 20OZ"
+      ]
+    },
+    {
+      "abbr": "baby",
+      "count": 3,
+      "examples": [
+        "EAP CLNG PUP/KTTN BABY PWD 4OZ",
+        "HIK FOOD FRZN BABY BRINE 1.75Z",
+        "ReptoMin Floating Turtle BABY"
+      ]
+    },
+    {
+      "abbr": "grub",
+      "count": 3,
+      "examples": [
+        "FLU TRT GRUB BAG BRD DRGN 4OZ",
+        "FLU TRT GRUB BAG MLWORM 3.75Z",
+        "FLU TRT GRUB BAG TRTL SHRMP6OZ"
+      ]
+    },
+    {
+      "abbr": "juv",
+      "count": 3,
+      "examples": [
+        "NZP FOOD BNB JUV DRGN 2.76OZ",
+        "REP FOOD JUV IGUANA 6OZ",
+        "Flukers Buffet Blend Juv, Bearded"
+      ]
+    },
+    {
+      "abbr": "ccnut",
+      "count": 3,
+      "examples": [
+        "KOM LINER CCNUT TERRM 12X30",
+        "KOM LINER CCNUT TERRM 18X36",
+        "TRO SHMP CT BRY/CCNUT 12OZ"
+      ]
+    },
+    {
+      "abbr": "coil",
+      "count": 3,
+      "examples": [
+        "ZIL BULB FLO COIL TRPCL 20W",
+        "ZIL BULB FLO COIL DSRT 20W",
+        "Flukers SunGlow Coil Bulb"
+      ]
+    },
+    {
+      "abbr": "crstd",
+      "count": 3,
+      "examples": [
+        "ZML FOOD CRSTD GECKO TRPCL 2OZ",
+        "ZML FOOD CRSTD GECKO TRPCL 4OZ",
+        "ZML FOOD CRSTD GECKO VARPK"
+      ]
+    },
+    {
+      "abbr": "moon",
+      "count": 3,
+      "examples": [
+        "FAS PJS MOON/STARS BL XS",
+        "FAS PJS MOON/STARS BL LG",
+        "TETRA led half moon"
+      ]
+    },
+    {
+      "abbr": "grdn",
+      "count": 3,
+      "examples": [
+        "FAS PJS GRDN GNOMES PK SM",
+        "FAS PJS GRDN GNOMES PK LG",
+        "OXB FOOD GRDN MSE/RAT 2#"
+      ]
+    },
+    {
+      "abbr": "boot",
+      "count": 3,
+      "examples": [
+        "FAS BOOT ALL WTHR RD LG",
+        "FAS BOOT ALL WTHR RD XXXS",
+        "FAS BOOT ALL WRTH RD XXS"
+      ]
+    },
+    {
+      "abbr": "usa",
+      "count": 3,
+      "examples": [
+        "NPI USA TTHING PUP RING CHKN",
+        "NPI USA TTHING PUP RING PMPK3C",
+        "NPI USA TTHING PUP RING CHKN3C"
+      ]
+    },
+    {
+      "abbr": "tthing",
+      "count": 3,
+      "examples": [
+        "NPI USA TTHING PUP RING CHKN",
+        "NPI USA TTHING PUP RING PMPK3C",
+        "NPI USA TTHING PUP RING CHKN3C"
+      ]
+    },
+    {
+      "abbr": "gf",
+      "count": 3,
+      "examples": [
+        "AQE FOOD GF GRNLRS 5.8OZ",
+        "TET FOOD PRO GF CRISPS 3.04OZ",
+        "TET FOOD PRO GF CRISPS 7.9OZ"
+      ]
+    },
+    {
+      "abbr": "pllts",
+      "count": 3,
+      "examples": [
+        "AQE FOOD SHRMP PLLTS 3.25OZ",
+        "AQE FOOD SHRMP PLLTS 6.5OZ",
+        "TET FOOD BETTA PLLTS 1.02OZ"
+      ]
+    },
+    {
+      "abbr": "crs",
+      "count": 3,
+      "examples": [
+        "CRS ROCK DRGN STONE SM 25#",
+        "CRS SAND ECO CMPLT CCHLD 20#",
+        "CRS SAND SN MOONLIGHT 20#"
+      ]
+    },
+    {
+      "abbr": "frsh",
+      "count": 3,
+      "examples": [
+        "GRE TRT DNTL FRSH REG 12OZ",
+        "CND LTTR A/H 4EVER FRSH LAV20#",
+        "MAMM SM EX FRSH 3 KNOT TUG"
+      ]
+    },
+    {
+      "abbr": "tub",
+      "count": 3,
+      "examples": [
+        "GRE TUB S/T CHKN/BF 2OZ",
+        "GRE TUB S/T CHKN/DUCK 2OZ/8PK",
+        "GRE TUB S/T CHKN/BF 2OZ/8PK"
+      ]
+    },
+    {
+      "abbr": "twists",
+      "count": 3,
+      "examples": [
+        "PMX TRT SMBN SMRT TWISTS 50PK",
+        "KONG KNOTS TWISTS ASS. SM/MD",
+        "KONG KNOTS TWISTS ASS MD/LG"
+      ]
+    },
+    {
+      "abbr": "pmpkn",
+      "count": 3,
+      "examples": [
+        "RBP CAN STEW CHKN/PMPKN 12OZ",
+        "KMP TRT SWTHRVST PMPKN SEED 5Z",
+        "NTN TRT FRTBL PMPKN/CRN 7OZ"
+      ]
+    },
+    {
+      "abbr": "rabbit",
+      "count": 3,
+      "examples": [
+        "ETH TOY PLUSH SKINNEEEZ RABBIT",
+        "Vital cat Rabbit Bites",
+        "LILPALS PLUSH RABBIT"
+      ]
+    },
+    {
+      "abbr": "rep",
+      "count": 3,
+      "examples": [
+        "REP FOOD ADLT IGUANA 2#",
+        "REP FOOD JUV IGUANA 6OZ",
+        "REP FOOD MAINT BOX TRTL 12OZ"
+      ]
+    },
+    {
+      "abbr": "smart",
+      "count": 3,
+      "examples": [
+        "KOM BOWL SMART 5IN",
+        "Komodo Smart Dish",
+        "Smart Play Tower"
+      ]
+    },
+    {
+      "abbr": "floor",
+      "count": 3,
+      "examples": [
+        "ZML BEDNG FRST FLOOR 24QT",
+        "ZooMed Creature Floor",
+        "NaturesMiracle Hard floor Cleaner"
+      ]
+    },
+    {
+      "abbr": "lix",
+      "count": 3,
+      "examples": [
+        "LIX FEEDING DROPPER SYRINGE",
+        "LIX BTTL GPIG BEST BUY W/R16OZ",
+        "LIX BTTL RBBT BEST BUY W/R32OZ"
+      ]
+    },
+    {
+      "abbr": "part",
+      "count": 3,
+      "examples": [
+        "AQA PART B/W ASSM 200B/350B",
+        "ATP PART VLVE AIR CHECK/FLTR",
+        "PYTHON 13 c switch part"
+      ]
+    },
+    {
+      "abbr": "rad",
+      "count": 3,
+      "examples": [
+        "RAD CLLR RCHRGB LITE BRK CNTRL",
+        "RAD CLLR NANOBARK SM",
+        "RAD CLLR TRNR REMOTE 300 YRD"
+      ]
+    },
+    {
+      "abbr": "rpe",
+      "count": 3,
+      "examples": [
+        "MAM TOY TRBTR 2 W/RPE 3.75",
+        "MAM TOY TRBTR 2 W/RPE 5IN",
+        "MAM TOY TRBTR 2 W/RPE 6IN"
+      ]
+    },
+    {
+      "abbr": "flvr",
+      "count": 3,
+      "examples": [
+        "DMF BSCT MB FLVR SNACK MINI15Z",
+        "Meowee Savory Spoonables 3 flvr",
+        "Meowijuana Chicken Flvr Treats"
+      ]
+    },
+    {
+      "abbr": "snack",
+      "count": 3,
+      "examples": [
+        "DMF BSCT MB FLVR SNACK MINI15Z",
+        "Vitapol Smakers Snack Kiwi Cocktiel",
+        "Vitapol smakers Snack Fruit Cocktiel"
+      ]
+    },
+    {
+      "abbr": "jr",
+      "count": 3,
+      "examples": [
+        "VIP TOY TUFF ZOO ELPHNT JR",
+        "VIP TUG TUFFY DRBL 3 WAY JR",
+        "CHUCKIT LAUNCHER JR 18M"
+      ]
+    },
+    {
+      "abbr": "cln",
+      "count": 3,
+      "examples": [
+        "ZML FLTR INTRNL CLN BETTA 10G",
+        "TRO WIPES DEEP CLN 100CT",
+        "TRO SHMP WTRLSS DEEP CLN 7.4OZ"
+      ]
+    },
+    {
+      "abbr": "fries",
+      "count": 3,
+      "examples": [
+        "ZIP TOY NOMNOMZ FRIES MD",
+        "Finch Fries",
+        "KFC FRIES&DRUMMETTE 2PK"
+      ]
+    },
+    {
+      "abbr": "fetch",
+      "count": 3,
+      "examples": [
+        "CAN TOY AIR FETCH BLL SM 2CT",
+        "CHUCKIT FETCH&FOLD 25M LAUNCH",
+        "CHUCKIT FETCH IMM 3PK MED"
+      ]
+    },
+    {
+      "abbr": "knt",
+      "count": 3,
+      "examples": [
+        "KON TOY KNT FROG LG/XL",
+        "SMP SUPR BNE KNT BF 4-5IN",
+        "MAM TUG COLR 3 KNT/2 BALL MD"
+      ]
+    },
+    {
+      "abbr": "fill",
+      "count": 3,
+      "examples": [
+        "KON ACESS FILL OR FREEZE TRAY",
+        "NYLABONE SNR FILL&TREAT",
+        "PYTHON clean fill"
+      ]
+    },
+    {
+      "abbr": "dual",
+      "count": 3,
+      "examples": [
+        "TRO CLNR EAR DUAL ACTN 4OZ",
+        "Zilla Dual Low Profile Fixture",
+        "ZooMed Crab GITD Dual Meter"
+      ]
+    },
+    {
+      "abbr": "loofa",
+      "count": 3,
+      "examples": [
+        "MUL TOY LOOFA ROPE BODY 11IN",
+        "MUL TOY LOOFA FLOPPY 18IN ASST",
+        "MUKTIPET LOOFA SQK MAT"
+      ]
+    },
+    {
+      "abbr": "ii",
+      "count": 3,
+      "examples": [
+        "ELA F/T K9 ADVANTIX II LG 6PK",
+        "Happy Jack Kennel Dip II",
+        "Happy Jack Sardex II"
+      ]
+    },
+    {
+      "abbr": "best",
+      "count": 3,
+      "examples": [
+        "LIX BTTL GPIG BEST BUY W/R16OZ",
+        "LIX BTTL RBBT BEST BUY W/R32OZ",
+        "Best Friends Cat 6\" Dish"
+      ]
+    },
+    {
+      "abbr": "als",
+      "count": 3,
+      "examples": [
+        "CDA DRY ALS MULTI-PRO 40#",
+        "DIAM als ck 40#",
+        "CANIDAE als salm 5#"
+      ]
+    },
+    {
+      "abbr": "sfb",
+      "count": 3,
+      "examples": [
+        "SFB FOOD FRZN BF HEART-P 3.5OZ",
+        "SFB FOOD FRZN NA BRINE SHRMP3Z",
+        "SFB FOOD FRZN NA BLDWRM 3.5Z"
+      ]
+    },
+    {
+      "abbr": "teddy",
+      "count": 3,
+      "examples": [
+        "DRN TOY TEDDY BEAR XS",
+        "KONG KNOTS TEDDY SM",
+        "KONG KNOTS TEDDY MD ASS."
+      ]
+    },
+    {
+      "abbr": "fur",
+      "count": 3,
+      "examples": [
+        "FUR BED LNGR OVAL PLSH CR SM",
+        "TropiClean Perfect Fur Tangle Remover",
+        "Feline Greenies Chkn Skin&Fur Health"
+      ]
+    },
+    {
+      "abbr": "humid",
+      "count": 3,
+      "examples": [
+        "GAL KIT STARTER F/HUMID ENVIR",
+        "Pangea Med. Humid Hide",
+        "Pangea Sm Humid Hide"
+      ]
+    },
+    {
+      "abbr": "pillow",
+      "count": 3,
+      "examples": [
+        "ZIL WTR PILLOW CRICKET 6PK",
+        "Zilla Water Pillow",
+        "PetCrest Grey Pillow Bed"
+      ]
+    },
+    {
+      "abbr": "brine",
+      "count": 3,
+      "examples": [
+        "HIK FOOD FRZN BABY BRINE 1.75Z",
+        "SFB FOOD FRZN NA BRINE SHRMP3Z",
+        "HIKARI brine shrimp .42oz"
+      ]
+    },
+    {
+      "abbr": "crisps",
+      "count": 3,
+      "examples": [
+        "TET FOOD PRO GF CRISPS 3.04OZ",
+        "TET FOOD PRO GF CRISPS 7.9OZ",
+        "TETRA color crisps 7.41oz"
+      ]
+    },
+    {
+      "abbr": "oxymed",
+      "count": 3,
+      "examples": [
+        "TRO SHMP OXYMED MEDICATED 20OZ",
+        "TropiClean OXYMED HypoAllergenic Spray",
+        "Tropiclean OxyMed Hairball Foam Sham"
+      ]
+    },
+    {
+      "abbr": "drops",
+      "count": 3,
+      "examples": [
+        "ZML MED EYE DROPS TURTLE",
+        "Oasis Vita Drops Large Birds",
+        "Oasis Vita Drops Small Birds"
+      ]
+    },
+    {
+      "abbr": "loofah",
+      "count": 3,
+      "examples": [
+        "AEC TOY LOOFAH HEARTS",
+        "AEC TOY LOOFAH BUNCH OF FRUIT",
+        "AEC TOY LOOFAH BON BONS"
+      ]
+    },
+    {
+      "abbr": "stump",
+      "count": 3,
+      "examples": [
+        "PTS HIDEOUT STUMP NAT SM",
+        "PTS HIDEOUT STUMP NAT LG",
+        "MARINA mini stump"
+      ]
+    },
+    {
+      "abbr": "liquid",
+      "count": 3,
+      "examples": [
+        "ExoTerra Calcium liquid",
+        "Nutri-Vet Liquid Bandage",
+        "Dogswell Liquid Bandage"
+      ]
+    },
+    {
+      "abbr": "non",
+      "count": 3,
+      "examples": [
+        "Zilla non locking clips 29 or smaller",
+        "Zilla Non Locking Clips 30g",
+        "CrissCross Steel non Skid Dish"
+      ]
+    },
+    {
+      "abbr": "stand",
+      "count": 3,
+      "examples": [
+        "ZooMed Lamp Stand Lg",
+        "ZooMed Lamp Stand SM",
+        "PetMate Scoop&Stand"
+      ]
+    },
+    {
+      "abbr": "solar",
+      "count": 3,
+      "examples": [
+        "ExoTerra Solar Glo 80W",
+        "ExoTerra Solar Glo 125W",
+        "ExoTerra Solar Glo 160W"
+      ]
+    },
+    {
+      "abbr": "carbon",
+      "count": 3,
+      "examples": [
+        "Reptology Carbon Cartridge 175",
+        "Catit Clean Carbon Filter",
+        "Catit Carbon Pads"
+      ]
+    },
+    {
+      "abbr": "island",
+      "count": 3,
+      "examples": [
+        "ExoTerra Turtle Island",
+        "ExoTerra Hippo Island",
+        "SunBurst Sticks Island Fruits"
+      ]
+    },
+    {
+      "abbr": "orchid",
+      "count": 3,
+      "examples": [
+        "Pangea Hanging Orchid purple",
+        "ExoTerra Spider Orchid",
+        "MARINA pk orchid plant"
+      ]
+    },
+    {
+      "abbr": "under",
+      "count": 3,
+      "examples": [
+        "ZooMed Under tank Heater 10-20Gal",
+        "ZooMed Under tank Heater 30-40Gal",
+        "ZooMed Under tank Heater 50-60 Gal"
+      ]
+    },
+    {
+      "abbr": "down",
+      "count": 3,
+      "examples": [
+        "ZooMed Nano Hold down kit",
+        "ZooMed Nano Combo Hold down kit",
+        "API ph down"
+      ]
+    },
+    {
+      "abbr": "finger",
+      "count": 3,
+      "examples": [
+        "ExoTerra Finger Cactus",
+        "NylaBone Finger Brushes",
+        "FreshBreath Finger Brushes"
+      ]
+    },
+    {
+      "abbr": "fern",
+      "count": 3,
+      "examples": [
+        "ExoTerra Boston Fern",
+        "TETRA glo green fern",
+        "TETRA yellow fern"
+      ]
+    },
+    {
+      "abbr": "habba",
+      "count": 3,
+      "examples": [
+        "ZooMed Habba Hut Giant",
+        "ZooMed Habba Hut Large",
+        "ZooMed Habba Hut Sm"
+      ]
+    },
+    {
+      "abbr": "animed",
+      "count": 3,
+      "examples": [
+        "AniMed Dia Earth",
+        "AniMed Muscle Up",
+        "AniMed Shed Med"
+      ]
+    },
+    {
+      "abbr": "tick",
+      "count": 3,
+      "examples": [
+        "Tropicalen Ntrl Flea&Tick Soothing Sham",
+        "Zodiac Flea and tick Powder",
+        "TropiClean Flea&Tick Relief"
+      ]
+    },
+    {
+      "abbr": "dogs",
+      "count": 3,
+      "examples": [
+        "Advantage Shampoo Dogs",
+        "Safari Nail Trimmer Sm Dogs",
+        "Safari Nail Trimmer Sm Dogs"
+      ]
+    },
+    {
+      "abbr": "indoor",
+      "count": 3,
+      "examples": [
+        "Adams Indoor Fogger",
+        "WeeWee Patch Indoor Potty sm",
+        "DIAM indoor 6#"
+      ]
+    },
+    {
+      "abbr": "animal",
+      "count": 3,
+      "examples": [
+        "Turbo Animal Prints",
+        "SPOT animal Print Rattles",
+        "SPOT LATEX ANIMAL"
+      ]
+    },
+    {
+      "abbr": "berry",
+      "count": 3,
+      "examples": [
+        "Birdlife Mineral Berry Flavor",
+        "TropiClean Deep Cleansing berry",
+        "TropiClean Berry Breeze Spray"
+      ]
+    },
+    {
+      "abbr": "coop",
+      "count": 3,
+      "examples": [
+        "10oz Coop Cups",
+        "20oz Coop Cup",
+        "30oz Coop Cup"
+      ]
+    },
+    {
+      "abbr": "egg",
+      "count": 3,
+      "examples": [
+        "Vitacraft Sticks Egg and honey keets",
+        "Quiko Red Egg Food",
+        "Quiko Classic Egg Food"
+      ]
+    },
+    {
+      "abbr": "tuscan",
+      "count": 3,
+      "examples": [
+        "Higgins Tuscan Dream",
+        "BioGroom NatuScen Tuscan olive Sham",
+        "BioGroom NatuScen Tuscan Olive Spray"
+      ]
+    },
+    {
+      "abbr": "bells",
+      "count": 3,
+      "examples": [
+        "BirdLife milletholder w bells",
+        "BirdLife Hanging Pacifer w Bells",
+        "LILPALS POTTY BELLS"
+      ]
+    },
+    {
+      "abbr": "vision",
+      "count": 3,
+      "examples": [
+        "Vision Perch Green",
+        "Vision Daylight LED",
+        "Vision Compact Cage Lamp"
+      ]
+    },
+    {
+      "abbr": "sided",
+      "count": 3,
+      "examples": [
+        "Happy Beaks Two Sided Mirror",
+        "Safari Double Sided Flea Comb",
+        "Lil pals Double Sided Comb"
+      ]
+    },
+    {
+      "abbr": "rings",
+      "count": 3,
+      "examples": [
+        "BirdLife Twin Rings with turning beads",
+        "SmartPlay Hanging Rings",
+        "NYLA PUP TEETHING RINGS"
+      ]
+    },
+    {
+      "abbr": "preen",
+      "count": 3,
+      "examples": [
+        "PlayFuls Preen&paci\"Straw Stacker\"",
+        "Playfuls Preen&Paci \"Shell&Sticks\"",
+        "Playfuls Preen&Paci \"Mineral"
+      ]
+    },
+    {
+      "abbr": "paci",
+      "count": 3,
+      "examples": [
+        "PlayFuls Preen&paci\"Straw Stacker\"",
+        "Playfuls Preen&Paci \"Shell&Sticks\"",
+        "Playfuls Preen&Paci \"Mineral"
+      ]
+    },
+    {
+      "abbr": "weave",
+      "count": 3,
+      "examples": [
+        "BirdLife Natural Weave Playground",
+        "BirdLife Weave Kabob",
+        "BirdLife Natur weave kabob lg"
+      ]
+    },
+    {
+      "abbr": "trop",
+      "count": 3,
+      "examples": [
+        "Hagan Trop HandFeeding 4lb",
+        "KONG SHEILD TROP FROG MED",
+        "AQUEON trop granules 6.5oz"
+      ]
+    },
+    {
+      "abbr": "flight",
+      "count": 3,
+      "examples": [
+        "Prevue Flight Cage",
+        "Tall Flight Cage",
+        "CHUCKIT WHISTLE FLIGHT"
+      ]
+    },
+    {
+      "abbr": "citrus",
+      "count": 3,
+      "examples": [
+        "Salon Scents Citrus&Pom",
+        "Bark2Basics Citrus Plus",
+        "NaturesMiracle Skunk Citrus"
+      ]
+    },
+    {
+      "abbr": "prof",
+      "count": 3,
+      "examples": [
+        "MagicCoat Prof Series oats  Puppy",
+        "MagicCoat Prof Series Oats Shed con",
+        "VICT prof 30#"
+      ]
+    },
+    {
+      "abbr": "itch",
+      "count": 3,
+      "examples": [
+        "TropiClean 4in1 Itch",
+        "Durvet Medicated itch Spray",
+        "Happy Jack Itch No more Shampoo"
+      ]
+    },
+    {
+      "abbr": "wound",
+      "count": 3,
+      "examples": [
+        "Vetericyn AntiMicro Wound Care",
+        "Bannixx Wound Care Cream 4oz",
+        "Banixx Wound Care Cream 8oz"
+      ]
+    },
+    {
+      "abbr": "hot",
+      "count": 3,
+      "examples": [
+        "Veterricyn AntiMicro Hot Spot Gel",
+        "NaturVet Aller-911 Hot Spot Foam",
+        "Durvet Remedis Hot Spot Mist"
+      ]
+    },
+    {
+      "abbr": "oil",
+      "count": 3,
+      "examples": [
+        "Brilliant Salmon Oil",
+        "UltraJoint For Join Pain oil",
+        "NaturVet Salmon Oil"
+      ]
+    },
+    {
+      "abbr": "hip",
+      "count": 3,
+      "examples": [
+        "FreshBreathe Hip&Joint 16oz",
+        "PetHonesty Hip+Joint Health Max",
+        "PetHonesty Hip+Joint Health"
+      ]
+    },
+    {
+      "abbr": "off",
+      "count": 3,
+      "examples": [
+        "Flys Off Spray",
+        "Skouts Honor Stay Off Training Aid",
+        "NaturVet Off Limits Training Spray"
+      ]
+    },
+    {
+      "abbr": "zenpet",
+      "count": 3,
+      "examples": [
+        "ZenPet Wrap",
+        "Zenpet BuddyLift",
+        "ZenPet Buddy Lift L/XL"
+      ]
+    },
+    {
+      "abbr": "row",
+      "count": 3,
+      "examples": [
+        "Safari Double Row Rake Rotating pins",
+        "Safari Double Row Rake",
+        "Safari Single Row Rake"
+      ]
+    },
+    {
+      "abbr": "blade",
+      "count": 3,
+      "examples": [
+        "Safari Shedding Blade",
+        "PetCrest Shedding Blade",
+        "Safari Cat Shedding Blade"
+      ]
+    },
+    {
+      "abbr": "pin",
+      "count": 3,
+      "examples": [
+        "Safari Wire pin Brush Large",
+        "Safari Wire Pin Brush Sm&Med",
+        "PetCrest Pin Brush"
+      ]
+    },
+    {
+      "abbr": "ebowl",
+      "count": 3,
+      "examples": [
+        "Sodapup Wave Ebowl",
+        "SodaPup EBowl Great outdoors",
+        "SodaPup Ebowl Honey Comb"
+      ]
+    },
+    {
+      "abbr": "groovy",
+      "count": 3,
+      "examples": [
+        "SodaPup Mini Groovy Love Emat",
+        "CATIT Groovy Gecko",
+        "CATIT Groovy Fish"
+      ]
+    },
+    {
+      "abbr": "dinner",
+      "count": 3,
+      "examples": [
+        "Small Dinner Mat",
+        "Dinner Mat",
+        "PM Easy Reach Dinner XL"
+      ]
+    },
+    {
+      "abbr": "diner",
+      "count": 3,
+      "examples": [
+        "Mediterranin Steal Double Diner 1 Qt",
+        "RuffnTuff double diner",
+        "Sm Blue Double Diner Trvl"
+      ]
+    },
+    {
+      "abbr": "vault",
+      "count": 3,
+      "examples": [
+        "Vittles Vault 40lbs",
+        "Vittles Vault Elevated Feeder 50 lbs",
+        "Vittles Vault 30 lbs storage"
+      ]
+    },
+    {
+      "abbr": "fit",
+      "count": 3,
+      "examples": [
+        "Snappy Fit Stainless Steel Bowls 4C",
+        "ORIJEN fit & trim 4.5#",
+        "ORIJEN fit &  trim 23.5#"
+      ]
+    },
+    {
+      "abbr": "ride",
+      "count": 3,
+      "examples": [
+        "Happy Ride Booster Seat up to 12",
+        "Happy Ride Safty Harness 45-75",
+        "Happy Ride Safty Harness 25-50"
+      ]
+    },
+    {
+      "abbr": "ez",
+      "count": 3,
+      "examples": [
+        "Kong Ez Cone Collar Sm",
+        "Kong Ez Cone Collar Med",
+        "Kong EZ Soft Collar Sm"
+      ]
+    },
+    {
+      "abbr": "cone",
+      "count": 3,
+      "examples": [
+        "Kong Ez Cone Collar Sm",
+        "Kong Ez Cone Collar Med",
+        "NYLABONE RHINO CONE WOLF"
+      ]
+    },
+    {
+      "abbr": "waste",
+      "count": 3,
+      "examples": [
+        "Spot In the bag waste bags",
+        "Catit Clean Waste Bags",
+        "FLUVAL waste remover"
+      ]
+    },
+    {
+      "abbr": "bags",
+      "count": 3,
+      "examples": [
+        "Spot In the bag waste bags",
+        "PetCrest Poop Bags",
+        "Catit Clean Waste Bags"
+      ]
+    },
+    {
+      "abbr": "cow",
+      "count": 3,
+      "examples": [
+        "Territory Cow Pet Bd",
+        "RASCALS LATEX COW",
+        "LILPALS 8.5\" COW ROPE"
+      ]
+    },
+    {
+      "abbr": "level",
+      "count": 3,
+      "examples": [
+        "PetPals Charcoal 4 Level Pet Stairs",
+        "PetPals Zoso 4 Level Pet stairs",
+        "NEXT LEVEL hi pro 30 50#"
+      ]
+    },
+    {
+      "abbr": "gate",
+      "count": 3,
+      "examples": [
+        "FourPaws Wood Gate 26\"-42\"",
+        "MyPet Universal Pet Gate 26\"x26\"",
+        "MidWest PetGate Steel Pet Gate"
+      ]
+    },
+    {
+      "abbr": "liver",
+      "count": 3,
+      "examples": [
+        "Nacho Duck Liver Cat treats",
+        "Vital Cat Duck Liver",
+        "Catit Chicken & Liver 50pk"
+      ]
+    },
+    {
+      "abbr": "laser",
+      "count": 3,
+      "examples": [
+        "SPOT Dolphin Laser Wand",
+        "KONG Laser Chirp Bird",
+        "SPOT SpinAbout Electronic Laser"
+      ]
+    },
+    {
+      "abbr": "teaser",
+      "count": 3,
+      "examples": [
+        "SPOT FantFish Teaser Wand",
+        "KONG Butterfly Teaser",
+        "KONG Jellyfish teaser"
+      ]
+    },
+    {
+      "abbr": "active",
+      "count": 3,
+      "examples": [
+        "KONG Active Scrunchie",
+        "KONG Cat Active Jacks 3pk",
+        "KONG Cat Active Caps 2pk"
+      ]
+    },
+    {
+      "abbr": "cheese",
+      "count": 3,
+      "examples": [
+        "KONG rewards rocker cheese",
+        "NYLABONE CHEESE BONE WOLF",
+        "KNG SNCKS BCN&CHEESE LG"
+      ]
+    },
+    {
+      "abbr": "hammer",
+      "count": 3,
+      "examples": [
+        "Arm&Hammer Litter Fragrence Booster",
+        "Arm&Hammer Litter Mat",
+        "Arm&Hammer Rimmed Pan"
+      ]
+    },
+    {
+      "abbr": "blkpsm",
+      "count": 3,
+      "examples": [
+        "LILPALS SM HARNESS BLKPSM",
+        "LILPALS SM HARNESS BLKPSM",
+        "LILPALS HARNESS COMBO BLKPSM"
+      ]
+    },
+    {
+      "abbr": "btl",
+      "count": 3,
+      "examples": [
+        "CIRCLE 20\"BTL 1788S COLLAR",
+        "CIRCLE 14\"BTL 1786S COLLAR",
+        "CIRCLE 16\" BTL 1786S COLLAR"
+      ]
+    },
+    {
+      "abbr": "bro",
+      "count": 3,
+      "examples": [
+        "CIRCLE 16\"BRO 1786S COLLAR",
+        "CIRCLE 14\" BRO 1786S COLLAR",
+        "CIRCLE 20\" BRO 1788S COLLAR"
+      ]
+    },
+    {
+      "abbr": "burger",
+      "count": 3,
+      "examples": [
+        "NOLA SAINTS BURGER TOY",
+        "RASCALS JUMBO BURGER",
+        "LILPALS BURGER COMBO"
+      ]
+    },
+    {
+      "abbr": "rascal",
+      "count": 3,
+      "examples": [
+        "RASCAL SHEEP TOY",
+        "RASCAL 4\" BASKETBALL",
+        "RASCAL 5\" FOOT"
+      ]
+    },
+    {
+      "abbr": "toys",
+      "count": 3,
+      "examples": [
+        "LILPALS HONEY BEE TOYS",
+        "LILPALS SECRET GARDEN TOYS",
+        "LILPALS FIESTA TOYS"
+      ]
+    },
+    {
+      "abbr": "donutz",
+      "count": 3,
+      "examples": [
+        "ZIPPYPAWS DONUTZ RAINBOW",
+        "ZIPPYPAWS DONUTZ BUDDIES FRG",
+        "ZIPPYPAWS DONUTZ BUDDIES BUNNY"
+      ]
+    },
+    {
+      "abbr": "xtr",
+      "count": 3,
+      "examples": [
+        "MAMM MED XTR MONKEY FIST",
+        "MAMM LRG XTR MONKEY FIST",
+        "MAMM SM XTR MONKEY FIST"
+      ]
+    },
+    {
+      "abbr": "tennis",
+      "count": 3,
+      "examples": [
+        "CHUCKIT TENNIS BALL LRG",
+        "CHUCKIT TENNIS BALL 2PK MED",
+        "KNG SQUEEEZZ TENNIS LG 2PK"
+      ]
+    },
+    {
+      "abbr": "lion",
+      "count": 3,
+      "examples": [
+        "KONG SCAMP LION MED",
+        "KNG COZIE KING LION MD",
+        "KNG ZOOLOOZ LION MD"
+      ]
+    },
+    {
+      "abbr": "lwstff",
+      "count": 3,
+      "examples": [
+        "KONG LWSTFF STRIPES LLAMA MED",
+        "KONG LWSTFF FOX MD",
+        "KONG LWSTFF MALLARD MD"
+      ]
+    },
+    {
+      "abbr": "koala",
+      "count": 3,
+      "examples": [
+        "KONG WUB ZOO KOALA LG",
+        "KONG SCRUMP KOALA MD",
+        "KNG COZIE BUSTER KOALA MED"
+      ]
+    },
+    {
+      "abbr": "kid",
+      "count": 3,
+      "examples": [
+        "KONG SNUZZ KID ELEPHANT SM",
+        "KONG SNUZZ KID SLOTH SM",
+        "KNG CMFRT KID ELEPH XS"
+      ]
+    },
+    {
+      "abbr": "belly",
+      "count": 3,
+      "examples": [
+        "KONG KNOTS BELLY GORILLA MD/LG",
+        "KONG KNOTS BELLY HIPPO MD/LG",
+        "HEALTH EXTEN healthy belly 3.5oz"
+      ]
+    },
+    {
+      "abbr": "sign",
+      "count": 3,
+      "examples": [
+        "KNG SIGN STICK XL",
+        "KNG SIGN SPRT BALLS 3PK XS",
+        "KNG SIGN SPRT BLL 2PK LRG"
+      ]
+    },
+    {
+      "abbr": "squeak",
+      "count": 3,
+      "examples": [
+        "KNG SQUEAK KNOB BALL MD",
+        "KNG AIRDOG SQUEAK KNOB BALL MD/LG",
+        "KNG SQUEAK STIX MD"
+      ]
+    },
+    {
+      "abbr": "squeez",
+      "count": 3,
+      "examples": [
+        "KNG SQUEEZ GOOMZ FTBLL LG",
+        "KNG SQUEEZ DENTAL STICK XS",
+        "KNG SQUEEZ FLEX BNE MD"
+      ]
+    },
+    {
+      "abbr": "twitz",
+      "count": 3,
+      "examples": [
+        "KNG TWITZ HIGHVIZ BALL LG",
+        "KNG TWITZ BALL MED",
+        "KNG TWITZ RING LG"
+      ]
+    },
+    {
+      "abbr": "skudo",
+      "count": 3,
+      "examples": [
+        "skudo xsm",
+        "skudo cat",
+        "skudo 40#"
+      ]
+    },
+    {
+      "abbr": "south",
+      "count": 3,
+      "examples": [
+        "TOW south can 14#",
+        "Tow south can 5#",
+        "TOW south can 13.2oz"
+      ]
+    },
+    {
+      "abbr": "sierra",
+      "count": 3,
+      "examples": [
+        "TOW sierra mount 5#",
+        "TOW sierra mount 14#",
+        "TOW sierra mount 28#"
+      ]
+    },
+    {
+      "abbr": "energy",
+      "count": 3,
+      "examples": [
+        "SPORTMIX energy plus 50#",
+        "SPORTMIX high energy 50#",
+        "VICT hi energy 40#"
+      ]
+    },
+    {
+      "abbr": "be",
+      "count": 3,
+      "examples": [
+        "FROMM gold sm be 15#",
+        "EUK be & veg 12.5oz",
+        "EUK ck & be 12.5 oz"
+      ]
+    },
+    {
+      "abbr": "lentil",
+      "count": 3,
+      "examples": [
+        "FROMM lamb & lentil 4#",
+        "FROMM lamb & lentil 26#",
+        "FROMM wh fish & lentil 12.2oz"
+      ]
+    },
+    {
+      "abbr": "turf",
+      "count": 3,
+      "examples": [
+        "FROMM surf & turf 4#",
+        "FROMM surf & turf 12#",
+        "FROMM surf & turf 26#"
+      ]
+    },
+    {
+      "abbr": "wilder",
+      "count": 3,
+      "examples": [
+        "BLUE B wilder sm br 4.5#",
+        "BLUE B wilder sm br 13#",
+        "BLUE B wilder lg br ck 24#"
+      ]
+    },
+    {
+      "abbr": "six",
+      "count": 3,
+      "examples": [
+        "ORIJEN six fish 13#",
+        "ORIJEN six fish 23.5#",
+        "ORIJEN cat six 4#"
+      ]
+    },
+    {
+      "abbr": "nutr",
+      "count": 3,
+      "examples": [
+        "NUTR SOU senior 4#",
+        "NUTR SOU beef 4#",
+        "NUTR SOUR seafood 26#"
+      ]
+    },
+    {
+      "abbr": "pea",
+      "count": 3,
+      "examples": [
+        "PURE VITA gr fr salm & pea 5#",
+        "PURE VITA gr fr salm & pea 12#",
+        "PURE VITA gr fr salm & pea 25#"
+      ]
+    },
+    {
+      "abbr": "ess",
+      "count": 3,
+      "examples": [
+        "VIT ESS turk min pat 14oz",
+        "VIT ESS turk min nib 14oz",
+        "VIT ESS duck min pat 14oz"
+      ]
+    },
+    {
+      "abbr": "ground",
+      "count": 3,
+      "examples": [
+        "VIT ESSEN turk ground top 6oz",
+        "VIT ESSEN ck ground top 6oz",
+        "VIT ESSEN beef ground top 6oz"
+      ]
+    },
+    {
+      "abbr": "orij",
+      "count": 3,
+      "examples": [
+        "ORIJ orig fd 8oz",
+        "ORIJ tundra fd 8oz",
+        "ORIJ orig bites 6oz"
+      ]
+    },
+    {
+      "abbr": "valu",
+      "count": 3,
+      "examples": [
+        "VALU PAK 30/20 purpl 50#",
+        "VALU PAK 28/20 bla 50#",
+        "VALU PAK 24/20 rd 50#"
+      ]
+    },
+    {
+      "abbr": "pak",
+      "count": 3,
+      "examples": [
+        "VALU PAK 30/20 purpl 50#",
+        "VALU PAK 28/20 bla 50#",
+        "VALU PAK 24/20 rd 50#"
+      ]
+    },
+    {
+      "abbr": "clasic",
+      "count": 3,
+      "examples": [
+        "FROMM clasic puppy 12.5oz",
+        "FROMM clasic ck 12.5oz",
+        "FROMM clasic rurk 12.5oz"
+      ]
+    },
+    {
+      "abbr": "tur",
+      "count": 3,
+      "examples": [
+        "FROMM tur duc & sw pot 12.2oz",
+        "FROMM tur & pumpk 12.2oz",
+        "VITAL ESSEN cat fro tur 28oz"
+      ]
+    },
+    {
+      "abbr": "pooch",
+      "count": 3,
+      "examples": [
+        "NUTRI SOUR pooch turky",
+        "NUTRI SOUR pooch ck",
+        "NUTRI SOUR pooch beef"
+      ]
+    },
+    {
+      "abbr": "sup",
+      "count": 3,
+      "examples": [
+        "HEALTH EXTEN dig sup 9oz",
+        "OMEGA ONE cich pel sup colo 9oz",
+        "OMEGA ONE cich pel sup col 4.2oz"
+      ]
+    },
+    {
+      "abbr": "pt",
+      "count": 3,
+      "examples": [
+        "\"WELLNESS pt ent ck",
+        "WELLNESS pt ent roast ck 3oz",
+        "WELLNESS pt en beef 3oz"
+      ]
+    },
+    {
+      "abbr": "sele",
+      "count": 3,
+      "examples": [
+        "ZIGN sele trout & salm 12.5#",
+        "NUTRI SOUR cat count sele 5.5oz",
+        "NUTRI SOUR cat turk sele 5.5oz"
+      ]
+    },
+    {
+      "abbr": "ind",
+      "count": 3,
+      "examples": [
+        "CAT CHOW ind 3.15#",
+        "CAT CHOW ind 15#",
+        "ACANA cat ind herring 4#"
+      ]
+    },
+    {
+      "abbr": "riv",
+      "count": 3,
+      "examples": [
+        "TOW can riv 5.5oz",
+        "TOW cat can riv 14#",
+        "TOW cat can riv 5#"
+      ]
+    },
+    {
+      "abbr": "roc",
+      "count": 3,
+      "examples": [
+        "TOW roc mount 5.5oz",
+        "TOW roc moun 14#",
+        "TOW roc moun 5#"
+      ]
+    },
+    {
+      "abbr": "tun",
+      "count": 3,
+      "examples": [
+        "TUFFY'S cat ck&tun 5.5oz",
+        "PRO PLAN cat tun & shri 3oz",
+        "FROM cat sal&tun 3oz"
+      ]
+    },
+    {
+      "abbr": "count",
+      "count": 3,
+      "examples": [
+        "NUTRI SOUR cat count sele 5.5oz",
+        "TETRA ammonia strip 25 count",
+        "TETRA 6in1 test strip 25 count"
+      ]
+    },
+    {
+      "abbr": "du",
+      "count": 3,
+      "examples": [
+        "ORIJEN cat du&ck 3oz",
+        "FROM pur sni du stew 3oz",
+        "FROM pur sni du liv 3oz"
+      ]
+    },
+    {
+      "abbr": "liv",
+      "count": 3,
+      "examples": [
+        "FROM pur sni du liv 3oz",
+        "SD kitten liv & ck 5.5oz",
+        "SD kitten liv & ck 2.9oz"
+      ]
+    },
+    {
+      "abbr": "bff",
+      "count": 3,
+      "examples": [
+        "BFF cat tuna.tilapia 3oz",
+        "\"BFF tuna",
+        "\"BFF tuna"
+      ]
+    },
+    {
+      "abbr": "grav",
+      "count": 3,
+      "examples": [
+        "BLUE BUF ck grav 3oz",
+        "BLUE BUF tuna grav 5.5oz",
+        "BLUE BUF cat ck grav 5.5oz"
+      ]
+    },
+    {
+      "abbr": "goat",
+      "count": 3,
+      "examples": [
+        "PRIMAL goat milk 16oz",
+        "PRIMAL goat milk 32oz",
+        "PRIMAL goat milk cran 32oz"
+      ]
+    },
+    {
+      "abbr": "dogos",
+      "count": 3,
+      "examples": [
+        "DOGO'S ice cream pumkin",
+        "DOGO'S ice cream ched bac",
+        "DOGO'S ice cream vanilla"
+      ]
+    },
+    {
+      "abbr": "flake",
+      "count": 3,
+      "examples": [
+        "TETRA cichil flake 5.65oz",
+        "TETRA cichlid flake 2.82oz",
+        "TETRA cichlid flake 1.58oz"
+      ]
+    },
+    {
+      "abbr": "enhan",
+      "count": 3,
+      "examples": [
+        "FLUVAL bug bite color enhan .63",
+        "FLUVAL bug bite color enhan 1.58oz",
+        "FLUVAL bug bite color enhan 3.17oz"
+      ]
+    },
+    {
+      "abbr": "python",
+      "count": 3,
+      "examples": [
+        "PYTHON clean fill",
+        "PYTHON 13 c switch part",
+        "PYTHON squeeze"
+      ]
+    },
+    {
+      "abbr": "strip",
+      "count": 3,
+      "examples": [
+        "API ammonia test strip",
+        "TETRA ammonia strip 25 count",
+        "TETRA 6in1 test strip 25 count"
+      ]
+    },
+    {
+      "abbr": "alert",
+      "count": 3,
+      "examples": [
+        "SEACHEM ammonia alert",
+        "SEACHEM ph alert",
+        "SEACHEM alert combo"
+      ]
+    },
+    {
+      "abbr": "yel",
+      "count": 3,
+      "examples": [
+        "TETRA sm gr/yel plant",
+        "TETRA glo lg or/yel plant",
+        "TETRA glo sm or/yel plant"
+      ]
+    },
+    {
+      "abbr": "solut",
+      "count": 3,
+      "examples": [
+        "AQUAR SOLUT herbal betta revive",
+        "AQUAR SOLUT betta revive",
+        "AQUAR SOLUT betta ultimate"
+      ]
+    }
+  ],
+  "potential_brand_prefixes": [
+    {
+      "prefix": "blue",
+      "count": 51,
+      "examples": [
+        "Blue Wilderness Chnk&Salm Treats",
+        "Blue Wilderness Chnk&Duck Cat Treats",
+        "Blue Wilderness Chick&Turkey Treat"
+      ]
+    },
+    {
+      "prefix": "tow",
+      "count": 39,
+      "examples": [
+        "TOW anc wetland 5#",
+        "TOW anc stream 5#",
+        "TOW anc mount 5#"
+      ]
+    },
+    {
+      "prefix": "penn",
+      "count": 37,
+      "examples": [
+        "penn plax rockscapes",
+        "PENN PLAX divider 20 gallon",
+        "PENN PLAX divider 15-20"
+      ]
+    },
+    {
+      "prefix": "diam",
+      "count": 37,
+      "examples": [
+        "DIAM sm br ck 6#",
+        "DIAM sm br ck 18#",
+        "DIAM sm br lamb 18#"
+      ]
+    },
+    {
+      "prefix": "rbp",
+      "count": 30,
+      "examples": [
+        "RBP DRY W/G LAND 4#",
+        "RBP TRT BNE KNUCKLE SMOKED",
+        "RBP TRT CLLGN STC SM 5CT"
+      ]
+    },
+    {
+      "prefix": "ph",
+      "count": 30,
+      "examples": [
+        "PH Cage Saver",
+        "PH Sm Seed Catcher",
+        "PH Med Seed Catcher"
+      ]
+    },
+    {
+      "prefix": "vict",
+      "count": 29,
+      "examples": [
+        "VICT seniior 40#",
+        "VICT hi energy 40#",
+        "VICT perfor 40#"
+      ]
+    },
+    {
+      "prefix": "gre",
+      "count": 26,
+      "examples": [
+        "GRE TRT DNTL ORIG LG 6OZ",
+        "GRE TRT PILLP CAPSL CHS 15.8OZ",
+        "GRE TRT PILLP CAPSL PB 15.8Z"
+      ]
+    },
+    {
+      "prefix": "bl",
+      "count": 26,
+      "examples": [
+        "BL BUF ck stew 12.5oz",
+        "BL BUF hunters stew 12.5oz",
+        "BL BUF beef stew"
+      ]
+    },
+    {
+      "prefix": "zign",
+      "count": 23,
+      "examples": [
+        "ZIGN zssen 13oz",
+        "ZIGN pork 13oz",
+        "ZIGN wh fish 13oz"
+      ]
+    },
+    {
+      "prefix": "tro",
+      "count": 21,
+      "examples": [
+        "TRO SHMP/COND 2IN1 WTRMLN 20OZ",
+        "TRO SHMP CT WTRLSS DEEP CLN7.4",
+        "TRO DNTL WTR ADD-P H/J 33.8OZ"
+      ]
+    },
+    {
+      "prefix": "flu",
+      "count": 21,
+      "examples": [
+        "FLU CLAMP LAMP CERM 5.5IN",
+        "FLU FOOD HI-CAL CRICKET 11.5OZ",
+        "FLU CRICKET QUENCHER CALC 16OZ"
+      ]
+    },
+    {
+      "prefix": "vit",
+      "count": 17,
+      "examples": [
+        "VIT ESS turk min pat 14oz",
+        "VIT ESS turk min nib 14oz",
+        "VIT ESS duck min pat 14oz"
+      ]
+    },
+    {
+      "prefix": "gar",
+      "count": 15,
+      "examples": [
+        "GAR RMDY CRNBRRY RELIEF 50G",
+        "GAR SPLMT ALL-IN-ONE SFT 60CT",
+        "GAR QUIET MOMENT MELATONIN70CT"
+      ]
+    },
+    {
+      "prefix": "mam",
+      "count": 13,
+      "examples": [
+        "MAM TOY COLR 3KNOT ROPE TUG LG",
+        "MAM TOY 3KNT/2BALL RP MINI",
+        "MAM TOY TRBTR 2 6IN"
+      ]
+    },
+    {
+      "prefix": "prim",
+      "count": 13,
+      "examples": [
+        "PRIM kitr puppy 1.5#",
+        "PRIM kitr puppy 9#",
+        "PRIM kitr beef 1.5#"
+      ]
+    },
+    {
+      "prefix": "fou",
+      "count": 12,
+      "examples": [
+        "FOU SHMP MC REDUCES ODOR 16OZ",
+        "FOU DIAPER WEE WEE DSPL SM 12C",
+        "FOU SHMP MC PUP TEARLESS 16OZ"
+      ]
+    },
+    {
+      "prefix": "dos",
+      "count": 12,
+      "examples": [
+        "DOS LTTR SCOOP WH LG",
+        "DOS LTTR LNR CLEANSTEP JMB 8PK",
+        "DOS LTTR TOP ENTRY PAN SLVR/WH"
+      ]
+    },
+    {
+      "prefix": "mul",
+      "count": 11,
+      "examples": [
+        "MUL TOY DAZZLE FLYING DUCK13IN",
+        "MUL TOY WOODY WOODPECKER 11IN",
+        "MUL TOY LMB CHOP 6IN"
+      ]
+    },
+    {
+      "prefix": "kom",
+      "count": 11,
+      "examples": [
+        "KOM FOOD TORTOISE HAY 24OZ",
+        "KOM PLNT WDLAND CANOPY 42CM",
+        "KOM PLNT RAINFORST CANOPY 10IN"
+      ]
+    },
+    {
+      "prefix": "vip",
+      "count": 11,
+      "examples": [
+        "VIP TOU TUFF SPRT TUG-O-WAR YL",
+        "VIP TOY ULT 3WAY TUG BL",
+        "VIP TOY TUFF JR'S TUFF RING RD"
+      ]
+    },
+    {
+      "prefix": "red",
+      "count": 11,
+      "examples": [
+        "Red Cross XL Life jacket",
+        "RED B land gr fr 4#",
+        "RED B ocean gr fr 4#"
+      ]
+    },
+    {
+      "prefix": "hlp",
+      "count": 10,
+      "examples": [
+        "HLP BEDNG CF COLRS PR 23L",
+        "HLP BEDNG CF COLRS BL 50L",
+        "HLP BEDNG CF SPEC SEA GLASS23L"
+      ]
+    },
+    {
+      "prefix": "nyla",
+      "count": 10,
+      "examples": [
+        "NYLA SNEAKY SNACKER WOLF",
+        "NYLA PUP TACTILE STICK",
+        "NYLA PUP TEETHING RINGS"
+      ]
+    },
+    {
+      "prefix": "pure",
+      "count": 10,
+      "examples": [
+        "PURE VITA gr fr salm & pea 5#",
+        "PURE VITA gr fr salm & pea 12#",
+        "PURE VITA gr fr salm & pea 25#"
+      ]
+    },
+    {
+      "prefix": "nbp",
+      "count": 9,
+      "examples": [
+        "NBP DRY LID VENISN/SWPOT 22#",
+        "NBP TRT LIT VENISN/SWPOT S/B8Z",
+        "NBP DRY LID SLMN/SWPOT 4#"
+      ]
+    },
+    {
+      "prefix": "zup",
+      "count": 8,
+      "examples": [
+        "ZUP FOOD SELECTS TIEL/LVBR2.5#",
+        "ZUP FOOD FRT BLND TIEL 2#",
+        "ZUP FOOD PRRT FRT BREEDER 40#"
+      ]
+    },
+    {
+      "prefix": "lov",
+      "count": 8,
+      "examples": [
+        "LOV BOWL DOLCE WOOF SM",
+        "LOV BOWL BELLA CLSC PK MD",
+        "LOV BOWL BELLA CLSC BL MD"
+      ]
+    },
+    {
+      "prefix": "mamm",
+      "count": 8,
+      "examples": [
+        "MAMM SM TPR BONEW CLOTH ROPE",
+        "MAMM XLRG COLOR BONE",
+        "MAMM MED XTR MONKEY FIST"
+      ]
+    },
+    {
+      "prefix": "bli",
+      "count": 7,
+      "examples": [
+        "BLI CARRIER COMFT SM BK/BR",
+        "BLI CARRIER COMFT SM TP",
+        "BLI CARRIER COMFT SM BERMUDA"
+      ]
+    },
+    {
+      "prefix": "ela",
+      "count": 7,
+      "examples": [
+        "ELA MED TAPE WORM 5CT",
+        "ELA F/T CLLR CT SERESTO",
+        "ELA F/T CLLR SERESTO LG"
+      ]
+    },
+    {
+      "prefix": "far",
+      "count": 7,
+      "examples": [
+        "FAR RMDY CLLR COMFT ZONE",
+        "FAR F/T SHMP C ADAMS-P FOAM10Z",
+        "FAR F/T ADAMS-P C SPT ON <5#3M"
+      ]
+    },
+    {
+      "prefix": "sm",
+      "count": 7,
+      "examples": [
+        "Sm Food Scoop",
+        "Sm Blue Double Diner Trvl",
+        "Sm Furhaven  cozy cave"
+      ]
+    },
+    {
+      "prefix": "cwmk",
+      "count": 7,
+      "examples": [
+        "CWMK SM RED",
+        "CWMK SM BLU",
+        "CWMK SM PURP"
+      ]
+    },
+    {
+      "prefix": "from",
+      "count": 6,
+      "examples": [
+        "FROM kitten 3oz",
+        "FROM cat adult 3oz",
+        "FROM cat sal&tun 3oz"
+      ]
+    },
+    {
+      "prefix": "gal",
+      "count": 5,
+      "examples": [
+        "GAL SAND TRPCL MIX HC 4QT",
+        "GAL BKGD CLING DESERT 15X36",
+        "GAL OAK LEAVES LIVE NAT 4QT"
+      ]
+    },
+    {
+      "prefix": "spf",
+      "count": 5,
+      "examples": [
+        "SPF SAND CHINCH BATH 52.8OZ",
+        "SPF TRT HAZEL LOVELIES 4.2OZ",
+        "SPF FOOD REGGIE RAT/M MOUSE2#"
+      ]
+    },
+    {
+      "prefix": "ims",
+      "count": 5,
+      "examples": [
+        "IMS BNE STFD PB LG 5-6IN",
+        "IMS BNE STERILZR STFD BF 5-6IN",
+        "IMS TRT SWPOT STEAK FRY 1#"
+      ]
+    },
+    {
+      "prefix": "cnd",
+      "count": 5,
+      "examples": [
+        "CND LTTR A/H MULTICAT 20#",
+        "CND LTTR A/H DEOD 20OZ",
+        "CND LTTR A/H DEOD DBL DUTY 30Z"
+      ]
+    },
+    {
+      "prefix": "mfp",
+      "count": 5,
+      "examples": [
+        "MFP FOOD FRRT PREM DIET 22OZ",
+        "MFP RMDY FRRT LAX 3OZ",
+        "MFP SPLMT FERRET FURO-TONE 6OZ"
+      ]
+    },
+    {
+      "prefix": "med",
+      "count": 5,
+      "examples": [
+        "Med Blue Solo Bowl Tvrl",
+        "MED NOLA SAINTS COLLAR",
+        "MED NOLA SAINTS LEASH"
+      ]
+    },
+    {
+      "prefix": "lg",
+      "count": 5,
+      "examples": [
+        "Lg Blue Single Bowl Trvl",
+        "LG NOLA SAINTS COLLAR",
+        "LG NOLA SAINTS LEASH"
+      ]
+    },
+    {
+      "prefix": "cat",
+      "count": 5,
+      "examples": [
+        "Cat Scratcher Replacement Pad",
+        "CAT CHOW ind 3.15#",
+        "CAT CHOW 3.15#"
+      ]
+    }
+  ]
+}
