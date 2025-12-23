@@ -43,7 +43,7 @@ export const BRAND_UPC_PREFIXES = {
   '023100': ['pedigree', 'iams', 'eukanuba'],
   
   // Dog/cat accessory brands
-  '076484': ['kong'],
+  '076484': ['kong', 'coastal'],  // Coastal also uses 076484 prefix (7648... when truncated)
   '018214': ['nylabone', 'coastal', "li'l pals", 'lil pals', 'lazer brite', 'easy rider'],  // Nylabone uses 018214 prefix!
   '018065': ['nylabone', "nature's miracle", 'natures miracle'],  // Nylabone also uses 018065
   '810833': ['benebone'],
