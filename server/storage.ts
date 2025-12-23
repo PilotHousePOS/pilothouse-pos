@@ -1049,7 +1049,7 @@ export class DatabaseStorage implements IStorage {
       const filteredItems = fuzzySearchFilter(
         allItems,
         trimmedSearch,
-        (item) => [item.name || '', item.brand || '', item.description || '', item.sku || ''],
+        (item) => [item.name || '', item.brand || '', item.description || '', item.sku || '', item.upc || ''],
         70 // 70% similarity threshold for typo tolerance
       );
       
