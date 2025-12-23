@@ -1,0 +1,2279 @@
+[
+  {
+    "supplyId": 1861,
+    "supplyName": "Simplesolution Large Washmale Wrap",
+    "brand": "Simple Solution",
+    "upc": "010279112427",
+    "upcName": "SimpleSolution Lg WashMale Wrap",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6014,
+    "supplyName": "Vari-Kennel-Kennel-Kennel-Kennel Kennel 70-90lb",
+    "brand": "Petmate",
+    "upc": "029695219504",
+    "upcName": "vari kennel 70-90#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6175,
+    "supplyName": "Fromm Chicken Frommage 12lb",
+    "brand": "Fromm",
+    "upc": "072705114726",
+    "upcName": "FROMM ck frommage 12#",
+    "upcBrand": "Fromm",
+    "score": 1
+  },
+  {
+    "supplyId": 6015,
+    "supplyName": "Vari-Kennel-Kennel-Kennel-Kennel Kennel Giant",
+    "brand": "Petmate",
+    "upc": "029695217005",
+    "upcName": "vari kennel giant",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6072,
+    "supplyName": "Pacific Stream Puppy 5lb",
+    "brand": "Taste of the Wild",
+    "upc": "074198611157",
+    "upcName": "pacific stream puppy 5#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6011,
+    "supplyName": "Barn Home 25-50lb",
+    "brand": "Petmate",
+    "upc": "029695251139",
+    "upcName": "barn home 25-50#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 2603,
+    "supplyName": "Large LSU Collar",
+    "brand": "Pets First",
+    "upc": "849790155329",
+    "upcName": "LG LSU COLLAR",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 1666,
+    "supplyName": "Bellabowl Red Large",
+    "brand": "Bellabowl",
+    "upc": "842982074149",
+    "upcName": "BellaBowl Red Lg",
+    "upcBrand": "Loving Pets",
+    "score": 1
+  },
+  {
+    "supplyId": 6449,
+    "supplyName": "Valu-Pak 28/20 Bla 50lb",
+    "brand": "Valu-Pak",
+    "upc": "071898431962",
+    "upcName": "VALU PAK 28/20 bla 50#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 2806,
+    "supplyName": "Zippypaws Birthday Cake -Blue",
+    "brand": "ZippyPaws",
+    "upc": "818786018610",
+    "upcName": "ZIPPYPAWS BIRTHDAY CAKE -BLU",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6110,
+    "supplyName": "Sportmix High Energy 50lb",
+    "brand": "SportMix",
+    "upc": "034846700435",
+    "upcName": "SPORTMIX high energy 50#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6329,
+    "supplyName": "Earthborn Meadow 25lb",
+    "brand": "Earthborn",
+    "upc": "034846540307",
+    "upcName": "EARTHBORN meadow 25#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 1039,
+    "supplyName": "Happy Beaks Cozy Corner Small",
+    "brand": "Happy",
+    "upc": "44472002034",
+    "upcName": "Happy Beaks Cozy Corner Sm",
+    "upcBrand": "Happy Beaks",
+    "score": 1
+  },
+  {
+    "supplyId": 1916,
+    "supplyName": "Hello Kitty Pet Bed Small White",
+    "brand": "Jazwares",
+    "upc": "191726749301",
+    "upcName": "Hello Kitty Pet Bed Sm White",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 1655,
+    "supplyName": "Bellabowl Pink Large",
+    "brand": "Bellabowl",
+    "upc": "842982074026",
+    "upcName": "BellaBowl Pink Lg",
+    "upcBrand": "Loving Pets",
+    "score": 1
+  },
+  {
+    "supplyId": 2606,
+    "supplyName": "Large LSU Leash",
+    "brand": "Pets First",
+    "upc": "849790158887",
+    "upcName": "LG LSU LEASH",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 1613,
+    "supplyName": "Small Food Scoop",
+    "brand": "Penn-Plax",
+    "upc": "079441006216",
+    "upcName": "Sm Food Scoop",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 7257,
+    "supplyName": "Marina Marble",
+    "brand": "Marineland",
+    "upc": "015561127097",
+    "upcName": "MARINA marble",
+    "upcBrand": "Marina",
+    "score": 1
+  },
+  {
+    "supplyId": 6176,
+    "supplyName": "Fromm Chicken Frommage 26lb",
+    "brand": "Fromm",
+    "upc": "072705114702",
+    "upcName": "FROMM ck frommage 26#",
+    "upcBrand": "Fromm",
+    "score": 1
+  },
+  {
+    "supplyId": 1143,
+    "supplyName": "Sunseed Dove & Pigeon Diet",
+    "brand": "Sunseed",
+    "upc": "087535361516",
+    "upcName": "SunSeed Dove&Pigeon Diet",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 987,
+    "supplyName": "A & E 14\" Wooden Perches",
+    "brand": "A&E Cage Co",
+    "upc": "644472008388",
+    "upcName": "A&E 14\" Wooden Perches",
+    "upcBrand": "A&E Cage",
+    "score": 1
+  },
+  {
+    "supplyId": 885,
+    "supplyName": "A & E 10oz Jungle Cups",
+    "brand": "A&E Cage Co",
+    "upc": "644472015034",
+    "upcName": "A&E 10oz Jungle Cups",
+    "upcBrand": "A&E Cage",
+    "score": 1
+  },
+  {
+    "supplyId": 6448,
+    "supplyName": "Valu-Pak 30/20 Purpl 50lb",
+    "brand": "Valu-Pak",
+    "upc": "071898122426",
+    "upcName": "VALU PAK 30/20 purpl 50#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 1922,
+    "supplyName": "Furhaven Small Bed",
+    "brand": "FurHaven",
+    "upc": "842229130522",
+    "upcName": "FurHaven Sm Bed",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 1245,
+    "supplyName": "Chicken-9 Cologne",
+    "brand": "Ethical Pet",
+    "upc": "653373000728",
+    "upcName": "CK-9 Cologne",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6054,
+    "supplyName": "Toe Anc Prairie 28lb",
+    "brand": "Toe Anchor",
+    "upc": "074198614479",
+    "upcName": "TOE anc prairie 28#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 7073,
+    "supplyName": "Marina 300w Heater",
+    "brand": "Marineland",
+    "upc": "015561112369",
+    "upcName": "MARINA 300w heater",
+    "upcBrand": "Marina",
+    "score": 1
+  },
+  {
+    "supplyId": 6330,
+    "supplyName": "Earthborn Coastal Catch 12.5lb",
+    "brand": "Earthborn",
+    "upc": "034846540215",
+    "upcName": "EARTHBORN coastal catch 12.5#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6109,
+    "supplyName": "Sportmix Energy Plus 50lb",
+    "brand": "SportMix",
+    "upc": "034846700916",
+    "upcName": "SPORTMIX energy plus 50#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 7072,
+    "supplyName": "Marina 200w Heater",
+    "brand": "Marineland",
+    "upc": "015561112352",
+    "upcName": "MARINA 200w heater",
+    "upcBrand": "Marina",
+    "score": 1
+  },
+  {
+    "supplyId": 1915,
+    "supplyName": "Hello Kitty Pet Bed Large Pink",
+    "brand": "Jazwares",
+    "upc": "191726749288",
+    "upcName": "Hello Kitty Pet Bed Lg Pink",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6321,
+    "supplyName": "Max Bully 5lb",
+    "brand": "Max",
+    "upc": "030626101058",
+    "upcName": "MAX BULLY 5#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 1945,
+    "supplyName": "Comfortzone Cat Spray & Scratch",
+    "brand": "Comfort Zone",
+    "upc": "039079002141",
+    "upcName": "ComFortZone Cat Spray&Scratch",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 1921,
+    "supplyName": "Furhaven Calming Hug Bed Small",
+    "brand": "FurHaven",
+    "upc": "842229122220",
+    "upcName": "FurHaven Calming Hug Bed SM",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 1136,
+    "supplyName": "Oasis Alive & Well Probiotics",
+    "brand": "Kordon",
+    "upc": "048054800702",
+    "upcName": "Oasis Alive&Well Probiotics",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 7071,
+    "supplyName": "Marina 150w Heater",
+    "brand": "Marineland",
+    "upc": "015561112345",
+    "upcName": "MARINA 150w heater",
+    "upcBrand": "Marina",
+    "score": 1
+  },
+  {
+    "supplyId": 489,
+    "supplyName": "Floating Turtle Pier Large",
+    "brand": "Penn-Plax",
+    "upc": "030172065224",
+    "upcName": "Floating Turtle Pier Lg.",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 990,
+    "supplyName": "A & E 18\" Wooden Perches",
+    "brand": "A&E Cage Co",
+    "upc": "644472008401",
+    "upcName": "A&E 18\" Wooden Perches",
+    "upcBrand": "A&E Cage",
+    "score": 1
+  },
+  {
+    "supplyId": 2283,
+    "supplyName": "Chicken Roller Cat Toy",
+    "brand": "Pet Elite",
+    "upc": "034202499959",
+    "upcName": "CK roller cat toy",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6142,
+    "supplyName": "Fromm Chicken À La Veg 26lb",
+    "brand": "Fromm",
+    "upc": "072705116119",
+    "upcName": "FROMM ck a la veg 26#",
+    "upcBrand": "Fromm",
+    "score": 1
+  },
+  {
+    "supplyId": 2289,
+    "supplyName": "Catlife Activity & Scratch Post",
+    "brand": "Penn-Plax",
+    "upc": "030172067334",
+    "upcName": "CATLIFE Activity&Scratch post",
+    "upcBrand": "Cat Life",
+    "score": 1
+  },
+  {
+    "supplyId": 1572,
+    "supplyName": "Furminator Small Dog, Short Hair Tool",
+    "brand": "FURminator",
+    "upc": "811794929152",
+    "upcName": "Furminator Sm Dog, Short Hair Tool",
+    "upcBrand": "Furminator",
+    "score": 1
+  },
+  {
+    "supplyId": 1171,
+    "supplyName": "Sunseed Vitaprima Canary & Finch",
+    "brand": "Sunseed",
+    "upc": "087535597649",
+    "upcName": "Sunseed vitaprima Canary&Finch",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 698,
+    "supplyName": "Galapogoas Mossy Cave Large",
+    "brand": "Galapagos",
+    "upc": "759834053446",
+    "upcName": "Galapogoas Mossy Cave lg",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6937,
+    "supplyName": "Puppy Cup Bacon 13oz",
+    "brand": "Puppy-peroni",
+    "upc": "860008024114",
+    "upcName": "PUP CUP bacon 13oz",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6022,
+    "supplyName": "Vari-Kennel-Kennel-Kennel-Kennel Kennel 19\"",
+    "brand": "Petmate",
+    "upc": "029695218590",
+    "upcName": "\"vari kennel 19\"\"\"",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 982,
+    "supplyName": "A & E 18\" Sand Perches",
+    "brand": "A&E Cage Co",
+    "upc": "644472008418",
+    "upcName": "A&E 18\" Sand Perches",
+    "upcBrand": "A&E Cage",
+    "score": 1
+  },
+  {
+    "supplyId": 886,
+    "supplyName": "A & E 20oz Jungle Cups",
+    "brand": "A&E Cage Co",
+    "upc": "44472015058",
+    "upcName": "A&E 20oz Jungle Cups",
+    "upcBrand": "A&E Cage",
+    "score": 1
+  },
+  {
+    "supplyId": 1681,
+    "supplyName": "Replendish Steel Small Water 1g",
+    "brand": "Replendish",
+    "upc": "029695243455",
+    "upcName": "Replendish Steel Sm Wtr 1g",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6021,
+    "supplyName": "Vari-Kennel-Kennel-Kennel-Kennel Kennel 24\"",
+    "brand": "Petmate",
+    "upc": "029695218637",
+    "upcName": "\"vari kennel 24\"\"\"",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 702,
+    "supplyName": "Galap Mossy Dome Hide Small",
+    "brand": "Pangea",
+    "upc": "756144053668",
+    "upcName": "Galap Mossy Dome Hide Sm",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 7244,
+    "supplyName": "Marina Fire Grass Plant",
+    "brand": "Marineland",
+    "upc": "015561120944",
+    "upcName": "MARINA fire grass plant",
+    "upcBrand": "Marina",
+    "score": 1
+  },
+  {
+    "supplyId": 1035,
+    "supplyName": "Happy Beaks Snuggle Sack Medium",
+    "brand": "Happy",
+    "upc": "644472001853",
+    "upcName": "Happy Beaks Snuggle Sack MD",
+    "upcBrand": "Happy Beaks",
+    "score": 1
+  },
+  {
+    "supplyId": 6073,
+    "supplyName": "Pacific Stream Puppy 14lb",
+    "brand": "Taste of the Wild",
+    "upc": "074198614004",
+    "upcName": "pacific stream puppy 14#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 1573,
+    "supplyName": "Furminator Small Dog, Long Hair Tool",
+    "brand": "FURminator",
+    "upc": "811794929244",
+    "upcName": "Furminator Sm dog, Long hair tool",
+    "upcBrand": "Furminator",
+    "score": 1
+  },
+  {
+    "supplyId": 1780,
+    "supplyName": "Zippy Paws Large Life Jacket",
+    "brand": "ZippyPaws",
+    "upc": "818786015008",
+    "upcName": "Zippy Paws Lg Life Jacket",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6012,
+    "supplyName": "Barn Home 50-90lb",
+    "brand": "Petmate",
+    "upc": "029695251146",
+    "upcName": "barn home 50-90#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 1729,
+    "supplyName": "Large Blue Single Bowl Trvl",
+    "brand": "Lixit",
+    "upc": "842982079878",
+    "upcName": "Lg Blue Single Bowl Trvl",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 786,
+    "supplyName": "Reptile Ranch Small",
+    "brand": "Exo Terra",
+    "upc": "010838200503",
+    "upcName": "Reptile ranch Sm",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 1644,
+    "supplyName": "Funfeeder Wave Mint Small",
+    "brand": "Outward Hound",
+    "upc": "700603678292",
+    "upcName": "FunFeeder Wave Mint Sm",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6675,
+    "supplyName": "Cat Chow 15lb",
+    "brand": "Purina",
+    "upc": "017800184953",
+    "upcName": "CAT CHOW 15#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 2899,
+    "supplyName": "Chuckit Max Glow Small",
+    "brand": "Chuckit!",
+    "upc": "029695323126",
+    "upcName": "CHUCKIT MAX GLOW SM",
+    "upcBrand": "Chuckit",
+    "score": 1
+  },
+  {
+    "supplyId": 6883,
+    "supplyName": "Freshpet Chicken 1lb",
+    "brand": "Freshpet",
+    "upc": "851893001366",
+    "upcName": "FRESHPET ck 1#",
+    "upcBrand": "Freshpet",
+    "score": 1
+  },
+  {
+    "supplyId": 2288,
+    "supplyName": "Small Furhaven Cozy Cave",
+    "brand": "FurHaven",
+    "upc": "842229129571",
+    "upcName": "Sm Furhaven  cozy cave",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6108,
+    "supplyName": "Sportmix Bite Size 40lb",
+    "brand": "SportMix",
+    "upc": "034846600520",
+    "upcName": "SPORTMIX bite size 40#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 2130,
+    "supplyName": "Fussiecat Tuna & Anchovies Puree 4pk",
+    "brand": "Fussie Cat",
+    "upc": "810138350942",
+    "upcName": "FussieCat Tuna&Anchovies Puree 4pk",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 487,
+    "supplyName": "Floating Turtle Pier Small",
+    "brand": "Penn-Plax",
+    "upc": "030172061059",
+    "upcName": "Floating Turtle Pier Sm",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 7070,
+    "supplyName": "Marina 50w Heater",
+    "brand": "Marineland",
+    "upc": "015561112321",
+    "upcName": "MARINA 50w heater",
+    "upcBrand": "Marina",
+    "score": 1
+  },
+  {
+    "supplyId": 1645,
+    "supplyName": "Funfeeder Notch Blue Medium",
+    "brand": "Outward Hound",
+    "upc": "700603678308",
+    "upcName": "FunFeeder Notch Blu MD",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6322,
+    "supplyName": "Max Bully 30lb",
+    "brand": "Max",
+    "upc": "030626101300",
+    "upcName": "MAX BULLY 30#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6673,
+    "supplyName": "Kitten Chow 14lb",
+    "brand": "Purina",
+    "upc": "017800106252",
+    "upcName": "KITTEN CHOW 14#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6450,
+    "supplyName": "Valu-Pak 24/20 Red 50lb",
+    "brand": "Valu-Pak",
+    "upc": "071898431863",
+    "upcName": "VALU PAK 24/20 rd 50#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 884,
+    "supplyName": "A & E 5oz Jungle Cups",
+    "brand": "A&E Cage Co",
+    "upc": "644472015010",
+    "upcName": "A&E 5oz Jungle Cups",
+    "upcBrand": "A&E Cage",
+    "score": 1
+  },
+  {
+    "supplyId": 2126,
+    "supplyName": "Surf Kitty Treats",
+    "brand": "Treat Planet",
+    "upc": "854913005757",
+    "upcName": "Surf Kitty Kitty Treats",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 6665,
+    "supplyName": "Kitten Chow 3.15lb",
+    "brand": "Purina",
+    "upc": "017800150200",
+    "upcName": "KITTEN CHOW 3.15#",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 1114,
+    "supplyName": "Happybeaks Hanging Blocks Large",
+    "brand": "A&E Cage Co",
+    "upc": "644472990621",
+    "upcName": "HappyBeaks Hanging Blocks LG",
+    "upcBrand": "Happy Beaks",
+    "score": 1
+  },
+  {
+    "supplyId": 919,
+    "supplyName": "Sunburst Sticks Nuts & Berries",
+    "brand": "Sunburst",
+    "upc": "046706002641",
+    "upcName": "SunBurst Sticks Nuts&Berries",
+    "upcBrand": "UNKNOWN",
+    "score": 1
+  },
+  {
+    "supplyId": 1040,
+    "supplyName": "Happy Beaks Cozy Corner Large",
+    "brand": "Happy",
+    "upc": "644472001990",
+    "upcName": "Happy Beaks Cozy Corner LG",
+    "upcBrand": "Happy Beaks",
+    "score": 1
+  },
+  {
+    "supplyId": 6703,
+    "supplyName": "P{ro Plan Cat Urin Turkey 3oz",
+    "brand": "Purina",
+    "upc": "038100173379",
+    "upcName": "P{RO PLAN cat urin turk 3oz",
+    "upcBrand": "UNKNOWN",
+    "score": 0.9833333333333334
+  },
+  {
+    "supplyId": 971,
+    "supplyName": "Birdie Basics Perch Small -Medium 7/16x16",
+    "brand": "Prevue",
+    "upc": "048081003732",
+    "upcName": "Birdie Basics Perch Sm -Med 7/16x16",
+    "upcBrand": "UNKNOWN",
+    "score": 0.9833333333333334
+  },
+  {
+    "supplyId": 1777,
+    "supplyName": "Zippy Paws Extra Small Life Jacket",
+    "brand": "ZippyPaws",
+    "upc": "818786014988",
+    "upcName": "Zippy Paws Sm Life Jacket",
+    "upcBrand": "UNKNOWN",
+    "score": 0.9833333333333334
+  },
+  {
+    "supplyId": 1799,
+    "supplyName": "Thunder Shirt Sport Extra Small",
+    "brand": "Thunder Shirt",
+    "upc": "819505013213",
+    "upcName": "Thunder Shirt Sport Sm",
+    "upcBrand": "UNKNOWN",
+    "score": 0.9500000000000001
+  },
+  {
+    "supplyId": 1779,
+    "supplyName": "Zippy Paws Medium Life Jacket",
+    "brand": "ZippyPaws",
+    "upc": "818786014995",
+    "upcName": "Zippy Paws Med Life Jacket",
+    "upcBrand": "UNKNOWN",
+    "score": 0.9500000000000001
+  },
+  {
+    "supplyId": 972,
+    "supplyName": "Birdie Basics Perch Medium 3/4x15",
+    "brand": "Prevue",
+    "upc": "048081003763",
+    "upcName": "Birdie Basics Perch Med 3/4x15",
+    "upcBrand": "UNKNOWN",
+    "score": 0.9500000000000001
+  },
+  {
+    "supplyId": 6469,
+    "supplyName": "Fromm Chicken Fromm Bites 12.5oz",
+    "brand": "Fromm",
+    "upc": "072705130047",
+    "upcName": "FROMM clasic ck 12.5oz",
+    "upcBrand": "Fromm",
+    "score": 0.9500000000000001
+  },
+  {
+    "supplyId": 1505,
+    "supplyName": "Freshbreath Toothbrush Small & Medium",
+    "brand": "TropiClean",
+    "upc": "645095002173",
+    "upcName": "FreshBreath ToothBrush sm&med",
+    "upcBrand": "UNKNOWN",
+    "score": 0.9500000000000001
+  },
+  {
+    "supplyId": 1727,
+    "supplyName": "Medium Blue Solo Bowl Tvrl",
+    "brand": "Lixit",
+    "upc": "842982079861",
+    "upcName": "Med Blue Solo Bowl Tvrl",
+    "upcBrand": "UNKNOWN",
+    "score": 0.9500000000000001
+  },
+  {
+    "supplyId": 2910,
+    "supplyName": "Chuckit Tennis Ball 2pk Medium",
+    "brand": "Chuckit!",
+    "upc": "660048074021",
+    "upcName": "CHUCKIT TENNIS BALL 2PK MED",
+    "upcBrand": "Chuckit",
+    "score": 0.9500000000000001
+  },
+  {
+    "supplyId": 2911,
+    "supplyName": "Chuckit Fetch Imm 3pk Medium",
+    "brand": "Chuckit!",
+    "upc": "029695330728",
+    "upcName": "CHUCKIT FETCH IMM 3PK MED",
+    "upcBrand": "Chuckit",
+    "score": 0.9500000000000001
+  },
+  {
+    "supplyId": 703,
+    "supplyName": "Galapagos Mossy Dome Hide Large",
+    "brand": "Pangea",
+    "upc": "759834053682",
+    "upcName": "Galap. Mossy Dome Hide Lg",
+    "upcBrand": "UNKNOWN",
+    "score": 0.9500000000000001
+  },
+  {
+    "supplyId": 4422,
+    "supplyName": "Medium Oval Basket Nest",
+    "brand": "Penn-Plax",
+    "upc": "048081010716",
+    "upcName": "Oval Basket Nest Med",
+    "upcBrand": "UNKNOWN",
+    "score": 0.9
+  },
+  {
+    "supplyId": 1120,
+    "supplyName": "Happybeaks Hanging Blocks Medium",
+    "brand": "A&E Cage Co",
+    "upc": "644472991208",
+    "upcName": "HappyBeaks Hanging Blocks Med",
+    "upcBrand": "Happy Beaks",
+    "score": 0.9
+  },
+  {
+    "supplyId": 6688,
+    "supplyName": "Diamond Cat Chicken 5.5oz",
+    "brand": "Diamond",
+    "upc": "074198612765",
+    "upcName": "DIAM cat ck 5.5oz",
+    "upcBrand": "Diamond",
+    "score": 0.9
+  },
+  {
+    "supplyId": 2908,
+    "supplyName": "Chuckit Rugged Flyer Medium",
+    "brand": "Chuckit!",
+    "upc": "029695313424",
+    "upcName": "CHUCKIT RUGGED FLYER MED",
+    "upcBrand": "Chuckit",
+    "score": 0.9
+  },
+  {
+    "supplyId": 1860,
+    "supplyName": "Simplesolution Medium Washmale Warp",
+    "brand": "Simple Solution",
+    "upc": "010279112410",
+    "upcName": "SimpleSolution Med WashMale Warp",
+    "upcBrand": "UNKNOWN",
+    "score": 0.9
+  },
+  {
+    "supplyId": 2906,
+    "supplyName": "Chuckit Ultra Ball Medium",
+    "brand": "Chuckit!",
+    "upc": "660048001683",
+    "upcName": "CHUCKIT ULTRA BALL MED",
+    "upcBrand": "Chuckit",
+    "score": 0.9
+  },
+  {
+    "supplyId": 1598,
+    "supplyName": "Outwardhound Ffeedslbwl or Medium",
+    "brand": "Outward Hound",
+    "upc": "700603510042",
+    "upcName": "OutwardHound FFeedSlBwl Or Med",
+    "upcBrand": "UNKNOWN",
+    "score": 0.9
+  },
+  {
+    "supplyId": 1597,
+    "supplyName": "Outward Hound Funfeederslobwl Medium",
+    "brand": "Outward Hound",
+    "upc": "700603510066",
+    "upcName": "Outward Hound FunFeederSloBwl med",
+    "upcBrand": "UNKNOWN",
+    "score": 0.9
+  },
+  {
+    "supplyId": 1135,
+    "supplyName": "Hagan Tropical Handfeeding 4lb",
+    "brand": "Hagen",
+    "upc": "015561822633",
+    "upcName": "Hagan Trop HandFeeding 4lb",
+    "upcBrand": "UNKNOWN",
+    "score": 0.9
+  },
+  {
+    "supplyId": 2904,
+    "supplyName": "Chuckit Ultra Squekball Medium",
+    "brand": "Chuckit!",
+    "upc": "029695520686",
+    "upcName": "CHUCKIT ULTRA SQUEKBALL MED",
+    "upcBrand": "Chuckit",
+    "score": 0.9
+  },
+  {
+    "supplyId": 6202,
+    "supplyName": "Blue Buffalo Wilder Large Breed Chicken 24lb",
+    "brand": "Blue Buffalo",
+    "upc": "840243148615",
+    "upcName": "BLUE B wilder lg br ck 24#",
+    "upcBrand": "Blue Buffalo",
+    "score": 0.8642857142857143
+  },
+  {
+    "supplyId": 384,
+    "supplyName": "Reptile System T5 Zone 3 Unit 39w 35\"",
+    "brand": "Reptile Systems",
+    "upc": "3443981210285",
+    "upcName": "Reptile Sys. T5 Zone 3 Unit 39W 35\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8571428571428571
+  },
+  {
+    "supplyId": 6668,
+    "supplyName": "Pro Plan Cat Chicken & Rice 16lb",
+    "brand": "Pro Plan",
+    "upc": "038100131546",
+    "upcName": "PRO PLAN cat ck & ri 16#",
+    "upcBrand": "Pro Plan",
+    "score": 0.8571428571428571
+  },
+  {
+    "supplyId": 166,
+    "supplyName": "Flukers Repti Calcium D3 & Phosphate Free",
+    "brand": "Fluker's",
+    "upc": "9119773005",
+    "upcName": "Flukers Repti Calcium D3 & Phos Free",
+    "upcBrand": "Flukers",
+    "score": 0.8571428571428571
+  },
+  {
+    "supplyId": 6314,
+    "supplyName": "Pure Vita Chicken & Brown Rice 5lb",
+    "brand": "Pure Vita",
+    "upc": "073893170020",
+    "upcName": "PURE VITA ck & br rice 5#",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8571428571428571
+  },
+  {
+    "supplyId": 2791,
+    "supplyName": "Spot Sooth Wrm Hug Bone 12\"",
+    "brand": "Ethical Pet",
+    "upc": "077234548523",
+    "upcName": "SPT SOOTH WRM HUG BONE 12\"",
+    "upcBrand": "Spot",
+    "score": 0.8333333333333334
+  },
+  {
+    "supplyId": 1222,
+    "supplyName": "Safflower Gold Conure & Cockatiel 25lbs",
+    "brand": "Safflower Gold",
+    "upc": "046706251254",
+    "upcName": "Safflower Gold Conure&tiel 25lbs",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8333333333333334
+  },
+  {
+    "supplyId": 2384,
+    "supplyName": "Arm & Hammer Cloud Control Litter",
+    "brand": "Arm & Hammer",
+    "upc": "033200001836",
+    "upcName": "Arm&Ham Cloud Control Litter",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8333333333333334
+  },
+  {
+    "supplyId": 2385,
+    "supplyName": "Arm & Hammer Clump & Seal Litter",
+    "brand": "Arm & Hammer",
+    "upc": "033200021438",
+    "upcName": "Arm&Hamm Clump&Seal Litter",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8333333333333334
+  },
+  {
+    "supplyId": 2386,
+    "supplyName": "Arm & Hammer Double Duty Litter",
+    "brand": "Arm & Hammer",
+    "upc": "033200022084",
+    "upcName": "Arm&Hamm Double Duty litter",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8333333333333334
+  },
+  {
+    "supplyId": 2387,
+    "supplyName": "Arm & Hammer Super Scoop Litter",
+    "brand": "Arm & Hammer",
+    "upc": "033200021407",
+    "upcName": "Arm&Ham Super Scoop Litter",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8333333333333334
+  },
+  {
+    "supplyId": 2605,
+    "supplyName": "Medium LSU Leash",
+    "brand": "Pets First",
+    "upc": "849790151666",
+    "upcName": "MED LSU LEASH",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 6626,
+    "supplyName": "Canidae Multi 13oz",
+    "brand": "Canidae",
+    "upc": "640461010134",
+    "upcName": "CAND multi 13oz",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 6709,
+    "supplyName": "From Cat Salmon & Tuna 3oz",
+    "brand": "Fromm",
+    "upc": "072705112722",
+    "upcName": "FROM cat sal&tun 3oz",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 1653,
+    "supplyName": "Bellabowl Pink Small",
+    "brand": "Bellabowl",
+    "upc": "842982074668",
+    "upcName": "BellaBowl Green Sm",
+    "upcBrand": "Loving Pets",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 1656,
+    "supplyName": "Bellabowl Green Small",
+    "brand": "Bellabowl",
+    "upc": "842982074040",
+    "upcName": "BellaBowl Black Sm",
+    "upcBrand": "Loving Pets",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 6034,
+    "supplyName": "Catiit Blue Medium",
+    "brand": "Catit",
+    "upc": "022517766095",
+    "upcName": "catiit blue med",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 1709,
+    "supplyName": "Crock Heavyweight 106oz",
+    "brand": "Ethical Pet",
+    "upc": "079441003055",
+    "upcName": "Crock HvyWeight 106OZ",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 6458,
+    "supplyName": "VICTOR Beef & Vegetable 13.2oz",
+    "brand": "VICTOR",
+    "upc": "854524005450",
+    "upcName": "VICT beef & veg 13.2oz",
+    "upcBrand": "Victor",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 1659,
+    "supplyName": "Bellabowl Black Medium",
+    "brand": "Bellabowl",
+    "upc": "842982074057",
+    "upcName": "BellaBowl Black Med",
+    "upcBrand": "Loving Pets",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 6457,
+    "supplyName": "VICTOR Chicken & Vegetable 13.2oz",
+    "brand": "VICTOR",
+    "upc": "854524005429",
+    "upcName": "VICT ck & rice 13.2oz",
+    "upcBrand": "Victor",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 2818,
+    "supplyName": "Lambchop Small",
+    "brand": "Multipet",
+    "upc": "784369207750",
+    "upcName": "LambChop Cat Sm",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 1405,
+    "supplyName": "Animed Shed Medium",
+    "brand": "AniMed",
+    "upc": "694244951701",
+    "upcName": "AniMed Shed Med",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 6865,
+    "supplyName": "Blue Buffalo Cat Turkey, Chicken 5.5oz",
+    "brand": "Blue Buffalo",
+    "upc": "840243140633",
+    "upcName": "BLUE BUF cat ck grav 5.5oz",
+    "upcBrand": "Blue Buffalo",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 6543,
+    "supplyName": "Wellness Petite Entree Roast Chicken 3oz",
+    "brand": "Wellness",
+    "upc": "076344090335",
+    "upcName": "WELLNESS pt ent roast ck 3oz",
+    "upcBrand": "Wellness",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 6623,
+    "supplyName": "Eukanuba Chicken & Beef 12.5 oz",
+    "brand": "Eukanuba",
+    "upc": "751486000717",
+    "upcName": "EUK ck & be 12.5 oz",
+    "upcBrand": "Eukanuba",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 2729,
+    "supplyName": "Multipet Small Loofadog",
+    "brand": "Multipet",
+    "upc": "784369610352",
+    "upcName": "MULITPET SM LOOFADOG",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 1657,
+    "supplyName": "Bellabowl Green Medium",
+    "brand": "Bellabowl",
+    "upc": "842982074675",
+    "upcName": "BellaBowl Green Med",
+    "upcBrand": "Loving Pets",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 6456,
+    "supplyName": "VICTOR Lamb & Rice 13.2oz",
+    "brand": "VICTOR",
+    "upc": "854524005443",
+    "upcName": "VICT lam & rice 13.2oz",
+    "upcBrand": "Victor",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 6111,
+    "supplyName": "Sportmix Puppy Small Bite 16.5lb",
+    "brand": "SportMix",
+    "upc": "034846600131",
+    "upcName": "SPORTMIX puppy sm bite 1605#",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 6455,
+    "supplyName": "VICTOR Chicken & Rice 13.2oz",
+    "brand": "VICTOR",
+    "upc": "854524005412",
+    "upcName": "VICT ck & veg 13.2oz",
+    "upcBrand": "Victor",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 1707,
+    "supplyName": "Crock Heavyweight 20oz",
+    "brand": "Ethical Pet",
+    "upc": "079441003031",
+    "upcName": "Crock HvyWeight 20oz",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 5857,
+    "supplyName": "LSU Teeshirt Small",
+    "brand": "Pets First",
+    "upc": "849790155343",
+    "upcName": "SM LSU COLLAR",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 6627,
+    "supplyName": "Canidae Chicken 13oz",
+    "brand": "Canidae",
+    "upc": "052742703701",
+    "upcName": "SD ck 13oz",
+    "upcBrand": "Science Diet",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 6398,
+    "supplyName": "Vital Essentials Chicken Ground Top 6oz",
+    "brand": "Vital Essentials",
+    "upc": "840199682041",
+    "upcName": "VIT ESSEN ck ground top 6oz",
+    "upcBrand": "Vital Essentials",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 2601,
+    "supplyName": "Small LSU Collar",
+    "brand": "Pets First",
+    "upc": "849790158894",
+    "upcName": "SM LSU LEASH",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 2602,
+    "supplyName": "Medium LSU Collar",
+    "brand": "Pets First",
+    "upc": "849790155336",
+    "upcName": "MED LSU COLLAR",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 6517,
+    "supplyName": "Nutrisource PureVita Chicken Stew 12.5oz",
+    "brand": "Nutrisource",
+    "upc": "052742068534",
+    "upcName": "SD ck stew 12.5oz",
+    "upcBrand": "Science Diet",
+    "score": 0.8166666666666667
+  },
+  {
+    "supplyId": 6529,
+    "supplyName": "Pro Plan Shred Salmon 15lb",
+    "brand": "Pro Plan",
+    "upc": "038100101334",
+    "upcName": "PRO PLAN beef shred 15#",
+    "upcBrand": "Pro Plan",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6168,
+    "supplyName": "Fromm Beef Frittata Veg 4lb",
+    "brand": "Fromm",
+    "upc": "072705114146",
+    "upcName": "FROMM beef frittata 4#",
+    "upcBrand": "Fromm",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6197,
+    "supplyName": "MidWest Spree Kennel Red 24\"",
+    "brand": "MidWest Homes For Pets",
+    "upc": "027773019602",
+    "upcName": "\"MW spree kennel red 24\"\"\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6198,
+    "supplyName": "MidWest Spree Kennel Green 24\"",
+    "brand": "MidWest Homes For Pets",
+    "upc": "02777301958",
+    "upcName": "\"MW spree kennel green 24\"\"\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8
+  },
+  {
+    "supplyId": 143,
+    "supplyName": "Flukers High Calcium Cricket Diet",
+    "brand": "Fluker's",
+    "upc": "9119771013",
+    "upcName": "Flukers High -Calcium Dubia diet",
+    "upcBrand": "Flukers",
+    "score": 0.8
+  },
+  {
+    "supplyId": 2291,
+    "supplyName": "Catlife Purple Activiy & Scratch",
+    "brand": "Penn-Plax",
+    "upc": "030172067327",
+    "upcName": "CATLIFE Purple Activiy&Scartch",
+    "upcBrand": "Cat Life",
+    "score": 0.8
+  },
+  {
+    "supplyId": 112,
+    "supplyName": "Rep-cal Grow Juvenile Bearded D",
+    "brand": "Rep-Cal",
+    "upc": "788286008124",
+    "upcName": "Rep-Cal Grow Juv. Bearded D.",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6762,
+    "supplyName": "Acana Cat Indoor Herring 4lb",
+    "brand": "Acana",
+    "upc": "064992723941",
+    "upcName": "ACANA cat ind herring 4#",
+    "upcBrand": "Acana",
+    "score": 0.8
+  },
+  {
+    "supplyId": 795,
+    "supplyName": "Harris Diatomaceous Earth 10.5lb",
+    "brand": "Harris",
+    "upc": "072725004182",
+    "upcName": "Harris Diatomaceous Earth 10.5 lbs.",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8
+  },
+  {
+    "supplyId": 1233,
+    "supplyName": "Salon Scents Citrus & Pomegranate",
+    "brand": "Salon Scents",
+    "upc": "745855817013",
+    "upcName": "Salon Scents Citrus&Pom",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6196,
+    "supplyName": "MidWest Spree Kennel Green 19\"",
+    "brand": "MidWest Homes For Pets",
+    "upc": "027773019558",
+    "upcName": "\"MW spree kennel green 19\"\"\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8
+  },
+  {
+    "supplyId": 1633,
+    "supplyName": "Mediterranean Stainless Steel Double 1 Pint",
+    "brand": "Ethical Pet",
+    "upc": "077234058497",
+    "upcName": "Mediterranean Stainless Steel Dbbl 1 pint",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6149,
+    "supplyName": "Fromm Salmon À La Veg 4lb",
+    "brand": "Fromm",
+    "upc": "072705116164",
+    "upcName": "FROMM ck a la veg 4#",
+    "upcBrand": "Fromm",
+    "score": 0.8
+  },
+  {
+    "supplyId": 1412,
+    "supplyName": "Vetrx Dog & Puppy Aid",
+    "brand": "Goodwinol",
+    "upc": "046938070012",
+    "upcName": "VETRX Dog&Pupy Aid",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6195,
+    "supplyName": "MidWest Spree Kennel Red 19\"",
+    "brand": "MidWest Homes For Pets",
+    "upc": "027773019572",
+    "upcName": "\" MW spree kennel red 19\"\"\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8
+  },
+  {
+    "supplyId": 105,
+    "supplyName": "Rep-cal Adult Iguana Food",
+    "brand": "Rep-Cal",
+    "upc": "788286004058",
+    "upcName": "REP FOOD ADLT IGUANA 2#",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8
+  },
+  {
+    "supplyId": 2804,
+    "supplyName": "Zippy Paws Nomnom Cupcake Pink",
+    "brand": "ZippyPaws",
+    "upc": "818786019129",
+    "upcName": "ZIPPY PAWS NOMNOM CUPCAKE PNK",
+    "upcBrand": "UNKNOWN",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6528,
+    "supplyName": "Pro Plan Senior Turkey 16lb",
+    "brand": "Pro Plan",
+    "upc": "038100189745",
+    "upcName": "PRO PLAN sen turk 16#",
+    "upcBrand": "Pro Plan",
+    "score": 0.8
+  },
+  {
+    "supplyId": 7255,
+    "supplyName": "Penn Plax Dazzle Stone Blue",
+    "brand": "Penn-Plax",
+    "upc": "030172010354",
+    "upcName": "PENN PLAX dazzle stone bl",
+    "upcBrand": "Penn-Plax",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6815,
+    "supplyName": "Victor Cat High Pro 5lb",
+    "brand": "VICTOR",
+    "upc": "854524005832",
+    "upcName": "VICTOR cat hi pro 5#",
+    "upcBrand": "Victor",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6005,
+    "supplyName": "Royal Canin Small Adult Adult Adult Adult 14lb",
+    "brand": "Royal Canin",
+    "upc": "030111512512",
+    "upcName": "royal can sm 14#",
+    "upcBrand": "Royal Canin",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6191,
+    "supplyName": "MidWest Exercise Pen 24\"",
+    "brand": "MidWest Homes For Pets",
+    "upc": "027773024811",
+    "upcName": "\"MW exercise pen 24\"\"\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6181,
+    "supplyName": "PetCrest 48\" Single Door",
+    "brand": "PetCrest",
+    "upc": "784099025051",
+    "upcName": "\"PC 48\"\" single door\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6229,
+    "supplyName": "Blue Buffalo Puppy 5lb",
+    "brand": "Blue Buffalo",
+    "upc": "840243144082",
+    "upcName": "BLUE B puppy 5#",
+    "upcBrand": "Blue Buffalo",
+    "score": 0.75
+  },
+  {
+    "supplyId": 7056,
+    "supplyName": "Aqueon Siphon Vac 5\"",
+    "brand": "Aqueon",
+    "upc": "015905062305",
+    "upcName": "\"AQUEON siphon vac 10\"\"\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 918,
+    "supplyName": "Sunburst Sticks Lil Fruits",
+    "brand": "Higgins",
+    "upc": "046706002702",
+    "upcName": "SunBurts Sticks lil fruits",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6226,
+    "supplyName": "Blue Buffalo Chicken 30lb",
+    "brand": "Blue Buffalo",
+    "upc": "859610000111",
+    "upcName": "BLUE B ck 30#",
+    "upcBrand": "Blue Buffalo",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6418,
+    "supplyName": "Acana Freeze Dried Beef 14oz",
+    "brand": "Acana",
+    "upc": "064992715670",
+    "upcName": "ACANA fd beef 14oz",
+    "upcBrand": "Acana",
+    "score": 0.75
+  },
+  {
+    "supplyId": 701,
+    "supplyName": "Galapagos Mossy Corner Hide",
+    "brand": "Pangea",
+    "upc": "759834053705",
+    "upcName": "Galap. Mossy Corner Hide",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6328,
+    "supplyName": "Eukanuba Large Breed Lamb 30lb",
+    "brand": "Eukanuba",
+    "upc": "030111310019",
+    "upcName": "EUK lg br lamb 30#",
+    "upcBrand": "Eukanuba",
+    "score": 0.75
+  },
+  {
+    "supplyId": 2684,
+    "supplyName": "NatureFlex Tinytots T-rex 4.5\"",
+    "brand": "Penn-Plax",
+    "upc": "713080180240",
+    "upcName": "NATURFLEX TINYTOTS T-REX 4.5\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6076,
+    "supplyName": "Diamond Small Breed Lamb 18lb",
+    "brand": "Diamond",
+    "upc": "074198608300",
+    "upcName": "DIAM sm br lamb 18#",
+    "upcBrand": "Diamond",
+    "score": 0.75
+  },
+  {
+    "supplyId": 2600,
+    "supplyName": "Large New Orleans Saints Saints Leash",
+    "brand": "Pets First",
+    "upc": "849790159266",
+    "upcName": "LG NOLA SAINTS LEASH",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 1185,
+    "supplyName": "A & E Variety Bird Cage",
+    "brand": "A&E Cage Co",
+    "upc": "644472014600",
+    "upcName": "AE Variety Bird Cage",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6187,
+    "supplyName": "PetCrest 24\" Double Door",
+    "brand": "PetCrest",
+    "upc": "784099025105",
+    "upcName": "\"PC 24\"\" double door\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 1050,
+    "supplyName": "Birdlife Activity Center Small",
+    "brand": "Birdlife",
+    "upc": "030172023675",
+    "upcName": "BirdLIfe Activity Center S",
+    "upcBrand": "Birdlife",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6807,
+    "supplyName": "Sportmix Cat Original 15lb",
+    "brand": "SportMix",
+    "upc": "034846600803",
+    "upcName": "SPORTMIX cat  orig 15#",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 812,
+    "supplyName": "Biothane-groom Repel 35",
+    "brand": "Bio Groom",
+    "upc": "021653080164",
+    "upcName": "Bio-Groom Repel 35",
+    "upcBrand": "Bio-Groom",
+    "score": 0.75
+  },
+  {
+    "supplyId": 1876,
+    "supplyName": "Drytech 100 Pack Pads",
+    "brand": "Penn-Plax",
+    "upc": "030172041150",
+    "upcName": "DryTech 100 pk Pads",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6209,
+    "supplyName": "Blue Buffalo Large Breed 15lb",
+    "brand": "Blue Buffalo",
+    "upc": "859610000364",
+    "upcName": "BLUE B lg br 15#",
+    "upcBrand": "Blue Buffalo",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6230,
+    "supplyName": "Blue Buffalo Puppy 15lb",
+    "brand": "Blue Buffalo",
+    "upc": "859610000036",
+    "upcName": "BLUE B puppy 15#",
+    "upcBrand": "Blue Buffalo",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6222,
+    "supplyName": "Blue Buffalo Lamb 15lb",
+    "brand": "Blue Buffalo",
+    "upc": "859610000357",
+    "upcName": "BLUE B lamb 15#",
+    "upcBrand": "Blue Buffalo",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6440,
+    "supplyName": "VICTOR Nutra Pro 40lb",
+    "brand": "VICTOR",
+    "upc": "854524005085",
+    "upcName": "VICT nutra pro 40#",
+    "upcBrand": "Victor",
+    "score": 0.75
+  },
+  {
+    "supplyId": 1250,
+    "supplyName": "Skoutshonor Propuppy Sham+Conditioner",
+    "brand": "Skout's Honor",
+    "upc": "810053870617",
+    "upcName": "SkoutsHonor ProPuppy Sham+Con",
+    "upcBrand": "Skout's Honor",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6189,
+    "supplyName": "PetCrest 36\" Double Door",
+    "brand": "PetCrest",
+    "upc": "784099025129",
+    "upcName": "\"PC 36\"\" double door\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6246,
+    "supplyName": "Orijen Original 23.5lb",
+    "brand": "Orijen",
+    "upc": "064992103255",
+    "upcName": "ORIJEN orig 23.5#",
+    "upcBrand": "Orijen",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6324,
+    "supplyName": "Eukanuba Small Breed Puppy 15lb",
+    "brand": "Eukanuba",
+    "upc": "030111150066",
+    "upcName": "EUK sm br puppy 15#",
+    "upcBrand": "Eukanuba",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6333,
+    "supplyName": "Welln Small Breed Turkey 4lb",
+    "brand": "Wellness",
+    "upc": "076344891109",
+    "upcName": "WELLN sm br turk 4#",
+    "upcBrand": "Wellness",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6738,
+    "supplyName": "Fromm Cat Weight 10lb",
+    "brand": "Fromm",
+    "upc": "072705117031",
+    "upcName": "FROMM cat game 10#",
+    "upcBrand": "Fromm",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6182,
+    "supplyName": "MidWest 18\" Single Door",
+    "brand": "MidWest Homes For Pets",
+    "upc": "027773021964",
+    "upcName": "\"MW 18\"\" single door\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 2595,
+    "supplyName": "Small New Orleans Saints Saints Collar",
+    "brand": "Pets First",
+    "upc": "849790039940",
+    "upcName": "SM NOLA SAINTS COLLAR",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6077,
+    "supplyName": "Diamond Small Breed Puppy 6lb",
+    "brand": "Diamond",
+    "upc": "074198608232",
+    "upcName": "DIAM sm br puppy 6#",
+    "upcBrand": "Diamond",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6213,
+    "supplyName": "Blue Buffalo Senior 30lb",
+    "brand": "Blue Buffalo",
+    "upc": "859610000173",
+    "upcName": "BLUE B senior 30#",
+    "upcBrand": "Blue Buffalo",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6212,
+    "supplyName": "Blue Buffalo Senior 15lb",
+    "brand": "Blue Buffalo",
+    "upc": "859610000159",
+    "upcName": "BLUE B senior 15#",
+    "upcBrand": "Blue Buffalo",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6223,
+    "supplyName": "Blue Buffalo Lamb 30lb",
+    "brand": "Blue Buffalo",
+    "upc": "859610000371",
+    "upcName": "BLUE B lamb 30#",
+    "upcBrand": "Blue Buffalo",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6084,
+    "supplyName": "Diamond Large Breed Lamb 40lb",
+    "brand": "Diamond",
+    "upc": "074198610693",
+    "upcName": "DIAM lg br lamb 40#",
+    "upcBrand": "Diamond",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6079,
+    "supplyName": "Diamond Als Chicken 40lb",
+    "brand": "Diamond",
+    "upc": "074198608201",
+    "upcName": "DIAM als ck 40#",
+    "upcBrand": "Diamond",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6671,
+    "supplyName": "Diamond Cat Maint 6lb",
+    "brand": "Diamond",
+    "upc": "074198004065",
+    "upcName": "DIAM cat maint 6#",
+    "upcBrand": "Diamond",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6672,
+    "supplyName": "Diamond Cat Maint 20lb",
+    "brand": "Diamond",
+    "upc": "074198004201",
+    "upcName": "DIAM cat maint 20#",
+    "upcBrand": "Diamond",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6208,
+    "supplyName": "Blue Buffalo Large Breed 30lb",
+    "brand": "Blue Buffalo",
+    "upc": "859610000388",
+    "upcName": "BLUE B lg br 30#",
+    "upcBrand": "Blue Buffalo",
+    "score": 0.75
+  },
+  {
+    "supplyId": 7243,
+    "supplyName": "Marina Pack Orchid Plant",
+    "brand": "Marineland",
+    "upc": "015561120814",
+    "upcName": "MARINA pk orchid plant",
+    "upcBrand": "Marina",
+    "score": 0.75
+  },
+  {
+    "supplyId": 1950,
+    "supplyName": "Safari Cat Shedding Blade",
+    "brand": "Safari",
+    "upc": "076484513022",
+    "upcName": "Safari Shedding Blade",
+    "upcBrand": "Safari",
+    "score": 0.75
+  },
+  {
+    "supplyId": 521,
+    "supplyName": "Reptology Filter Cartridge 70",
+    "brand": "Reptology",
+    "upc": "030172060847",
+    "upcName": "Reptology Filter Cart. 70",
+    "upcBrand": "Reptology",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6096,
+    "supplyName": "Diamond Puppy Large Breed 40lb",
+    "brand": "Diamond",
+    "upc": "074198608379",
+    "upcName": "DIAM puppy lg br 40#",
+    "upcBrand": "Diamond",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6186,
+    "supplyName": "PetCrest 42\" Double Door",
+    "brand": "PetCrest",
+    "upc": "784099025136",
+    "upcName": "\"PC 42\"\" double door\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 700,
+    "supplyName": "Galapagos Flexible Bridge 3x3",
+    "brand": "Pangea",
+    "upc": "759834053095",
+    "upcName": "Galap. Flexible Bridge 3x3",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6631,
+    "supplyName": "Pro Plan Puppy Turkey 13oz",
+    "brand": "Pro Plan",
+    "upc": "038100196156",
+    "upcName": "PRO PLAN sensi 13oz",
+    "upcBrand": "Pro Plan",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6234,
+    "supplyName": "Acana Butcher's Chicken 4lb",
+    "brand": "Acana",
+    "upc": "064992723385",
+    "upcName": "ACANA butch ck 4#",
+    "upcBrand": "Acana",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6236,
+    "supplyName": "Acana Butcher's Salmon 4lb",
+    "brand": "Acana",
+    "upc": "064992723422",
+    "upcName": "ACANA butch salmon 4#",
+    "upcBrand": "Acana",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6759,
+    "supplyName": "Orijen Cat Guardian 8 4lb",
+    "brand": "Orijen",
+    "upc": "064992718527",
+    "upcName": "ORIJEN cat guard 4#",
+    "upcBrand": "Orijen",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6219,
+    "supplyName": "Blue Buffalo Small Breed 5lb",
+    "brand": "Blue Buffalo",
+    "upc": "840243144112",
+    "upcName": "BLUE B sm br 5#",
+    "upcBrand": "Blue Buffalo",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6235,
+    "supplyName": "Acana Butcher's Beef 4lb",
+    "brand": "Acana",
+    "upc": "064992723408",
+    "upcName": "ACANA butch beef 4#",
+    "upcBrand": "Acana",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6233,
+    "supplyName": "Acana Butcher's Chicken 17lb",
+    "brand": "Acana",
+    "upc": "064992723392",
+    "upcName": "ACANA butch ck 17#",
+    "upcBrand": "Acana",
+    "score": 0.75
+  },
+  {
+    "supplyId": 2809,
+    "supplyName": "Spot Axolotl Mermaid 10\"",
+    "brand": "Ethical Pet",
+    "upc": "077234549650",
+    "upcName": "SPT AXOLOTL MERMAID 10\"",
+    "upcBrand": "Spot",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6185,
+    "supplyName": "MidWest 36\" Single Door",
+    "brand": "MidWest Homes For Pets",
+    "upc": "027773021995",
+    "upcName": "\"MW 36\"\" single door\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6938,
+    "supplyName": "Dogo's Ice Cream Pumpkin",
+    "brand": "Dog-O's",
+    "upc": "850529003897",
+    "upcName": "DOGO'S ice cream pumkin",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6220,
+    "supplyName": "Blue Buffalo Small Breed 15lb",
+    "brand": "Blue Buffalo",
+    "upc": "840243104888",
+    "upcName": "BLUE B sm br 15#",
+    "upcBrand": "Blue Buffalo",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6078,
+    "supplyName": "Diamond Small Breed Puppy 18lb",
+    "brand": "Diamond",
+    "upc": "074198608249",
+    "upcName": "DIAM sm br puppy 18#",
+    "upcBrand": "Diamond",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6095,
+    "supplyName": "Diamond Puppy Large Breed 6lb",
+    "brand": "Diamond",
+    "upc": "074198608355",
+    "upcName": "DIAM puppy lg br 6#",
+    "upcBrand": "Diamond",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6075,
+    "supplyName": "Diamond Small Breed Chicken 18lb",
+    "brand": "Diamond",
+    "upc": "074198608287",
+    "upcName": "DIAM sm br ck 18#",
+    "upcBrand": "Diamond",
+    "score": 0.75
+  },
+  {
+    "supplyId": 1284,
+    "supplyName": "Magiccoat Tangles & Mats",
+    "brand": "Four Paws",
+    "upc": "045663976484",
+    "upcName": "MagicCoat Tangles&Matts",
+    "upcBrand": "Four Paws",
+    "score": 0.75
+  },
+  {
+    "supplyId": 7112,
+    "supplyName": "Weco Nox-ich 4oz",
+    "brand": "Weco",
+    "upc": "028023200047",
+    "upcName": "WECO nox-ich",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 7149,
+    "supplyName": "Api Copper Test Kit",
+    "brand": "API",
+    "upc": "317163001288",
+    "upcName": "API ph test kit",
+    "upcBrand": "API",
+    "score": 0.75
+  },
+  {
+    "supplyId": 7224,
+    "supplyName": "Tetra Small Green/Yellow Plant",
+    "brand": "Tetra",
+    "upc": "046798780274",
+    "upcName": "TETRA sm gr/yel plant",
+    "upcBrand": "Tetra",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6836,
+    "supplyName": "Fussie Cat Tuna 2.82oz",
+    "brand": "Fussie Cat",
+    "upc": "888641133918",
+    "upcName": "\"FUSSIE CAT tuna",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6188,
+    "supplyName": "PetCrest 30\" Double Door",
+    "brand": "PetCrest",
+    "upc": "784099025112",
+    "upcName": "\"PC 30\"\" double door\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 7260,
+    "supplyName": "Marina Accent Gravel Black",
+    "brand": "Marineland",
+    "upc": "015561123747",
+    "upcName": "MARINA accent gravel bl",
+    "upcBrand": "Marina",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6190,
+    "supplyName": "PetCrest 48\" Double Door",
+    "brand": "PetCrest",
+    "upc": "784099025143",
+    "upcName": "\"PC 48\"\" double door\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6183,
+    "supplyName": "MidWest 24\" Single Door",
+    "brand": "MidWest Homes For Pets",
+    "upc": "027773021971",
+    "upcName": "\"MW 24\"\" single door\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6674,
+    "supplyName": "Cat Chow Indoor 15lb",
+    "brand": "Purina",
+    "upc": "017800150187",
+    "upcName": "CAT CHOW ind 3.15#",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 2598,
+    "supplyName": "Small New Orleans Saints Saints Leash",
+    "brand": "Pets First",
+    "upc": "849790045798",
+    "upcName": "SM NOLA SAINTS LEASH",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6180,
+    "supplyName": "PetCrest 42\" Single Door",
+    "brand": "PetCrest",
+    "upc": "784099025044",
+    "upcName": "\"PC 42\"\" single door\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6663,
+    "supplyName": "Cat Chow Indoor 3.15lb",
+    "brand": "Purina",
+    "upc": "017800184991",
+    "upcName": "CAT CHOW ind 15#",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6184,
+    "supplyName": "MidWest 30\" Single Door",
+    "brand": "MidWest Homes For Pets",
+    "upc": "027773021988",
+    "upcName": "\"MW 30\"\" single door\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6193,
+    "supplyName": "PetCrest Exercise Pen 36\"",
+    "brand": "PetCrest",
+    "upc": "784099025327",
+    "upcName": "\"PC exercise pen 36\"\"\"",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 2810,
+    "supplyName": "Spot Axolotl Butterball 7\"",
+    "brand": "Ethical Pet",
+    "upc": "077234549643",
+    "upcName": "SPT AXOLOTL BUTTERBALL 7\"",
+    "upcBrand": "Spot",
+    "score": 0.75
+  },
+  {
+    "supplyId": 2808,
+    "supplyName": "Spot Axolotl W Duck Tube",
+    "brand": "Ethical Pet",
+    "upc": "077234549674",
+    "upcName": "SPT AXOLOTL W DUCK TUBE",
+    "upcBrand": "Spot",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6503,
+    "supplyName": "Nutrisource Prairie Select 12.3oz",
+    "brand": "Nutrisource",
+    "upc": "073893021216",
+    "upcName": "NUTRI SOUR prairie 12.3oz",
+    "upcBrand": "Nutrisource",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6429,
+    "supplyName": "VICTOR Hi Pro 15lb",
+    "brand": "VICTOR",
+    "upc": "854524005139",
+    "upcName": "VICT hi pro 15#",
+    "upcBrand": "Victor",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6074,
+    "supplyName": "Diamond Small Breed Chicken 6lb",
+    "brand": "Diamond",
+    "upc": "074198608270",
+    "upcName": "DIAM sm br ck 6#",
+    "upcBrand": "Diamond",
+    "score": 0.75
+  },
+  {
+    "supplyId": 2798,
+    "supplyName": "Spot Axolotl Stuffing Free",
+    "brand": "Ethical Pet",
+    "upc": "077234549681",
+    "upcName": "SPT AXOLOTL STUFFING FREE",
+    "upcBrand": "Spot",
+    "score": 0.75
+  },
+  {
+    "supplyId": 1027,
+    "supplyName": "Birdlife 3\" Wooden Swing",
+    "brand": "Birdlife",
+    "upc": "030172902185",
+    "upcName": "BirdLife 4\" Wooden Swing",
+    "upcBrand": "Birdlife",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6925,
+    "supplyName": "Hikari Frozen Tubifex Worm 3.5 oz",
+    "brand": "Hikari",
+    "upc": "042055329200",
+    "upcName": "HIKARI froz tubifex worm 3.5oz",
+    "upcBrand": "Hikari",
+    "score": 0.75
+  },
+  {
+    "supplyId": 7169,
+    "supplyName": "Fritz Expel-f 10 Pack",
+    "brand": "Fritz Aquatics",
+    "upc": "080531900130",
+    "upcName": "FRITZ expel-f 10 pk",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 7168,
+    "supplyName": "Fritz Maracyn 10 Pack",
+    "brand": "Fritz Aquatics",
+    "upc": "080531460016",
+    "upcName": "FRITZ maracyn 10 pk",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6323,
+    "supplyName": "Eukanuba Small Breed Puppy 4.5lb",
+    "brand": "Eukanuba",
+    "upc": "073893263050",
+    "upcName": "NUTRI SOU sm puppy 1.5#",
+    "upcBrand": "Nutrisource",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6746,
+    "supplyName": "Fromm Cat Salmon 4lb",
+    "brand": "Fromm",
+    "upc": "072705115600",
+    "upcName": "FROMM cat adult 4#",
+    "upcBrand": "Fromm",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6419,
+    "supplyName": "Acana Freeze Dried Chicken 14oz",
+    "brand": "Acana",
+    "upc": "064992715557",
+    "upcName": "ACANA fd ck 14oz",
+    "upcBrand": "Acana",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6677,
+    "supplyName": "Health Extension Healthy Belly 3.5 oz",
+    "brand": "Health Extension",
+    "upc": "810120991016",
+    "upcName": "HEALTH EXTEN healthy belly 3.5oz",
+    "upcBrand": "Health Extensions",
+    "score": 0.75
+  },
+  {
+    "supplyId": 2203,
+    "supplyName": "Meowijuana Chicken Flavor Treats",
+    "brand": "SmarterPaw",
+    "upc": "859442005469",
+    "upcName": "Meowijuana Chicken Flvr Treats",
+    "upcBrand": "Meowijuana",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6486,
+    "supplyName": "Fromm Lamb & Sweet Potato 12.2oz",
+    "brand": "Fromm",
+    "upc": "072705118687",
+    "upcName": "FROMM lamb 12.2oz",
+    "upcBrand": "Fromm",
+    "score": 0.7214285714285714
+  },
+  {
+    "supplyId": 6472,
+    "supplyName": "Fromm Chicken & Sweet Potato 12.2oz",
+    "brand": "Fromm",
+    "upc": "072705119202",
+    "upcName": "FROMM tur & pumpk 12.2oz",
+    "upcBrand": "Fromm",
+    "score": 0.7214285714285714
+  },
+  {
+    "supplyId": 1976,
+    "supplyName": "PetAg KMR Goat's Milk Ready to Use",
+    "brand": "PetAg",
+    "upc": "020279994824",
+    "upcName": "KMR Goats Milk Ready To Use",
+    "upcBrand": "UNKNOWN",
+    "score": 0.7142857142857143
+  },
+  {
+    "supplyId": 802,
+    "supplyName": "TropiClean Ntrl Flea & Tickk Soothing Sham",
+    "brand": "TropiClean",
+    "upc": "45095202542",
+    "upcName": "Tropicalen Ntrl Flea&Tick Soothing Sham",
+    "upcBrand": "UNKNOWN",
+    "score": 0.7142857142857143
+  },
+  {
+    "supplyId": 6315,
+    "supplyName": "Pure Vita Small Bite Grain Free Frozen Turkey 4lb",
+    "brand": "Pure Vita",
+    "upc": "073893175117",
+    "upcName": "PURE VITA sm bi gr fr turkey 4#",
+    "upcBrand": "UNKNOWN",
+    "score": 0.7055555555555556
+  }
+]

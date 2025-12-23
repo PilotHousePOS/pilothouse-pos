@@ -1,0 +1,272 @@
+[
+  {
+    "supplyId": 6016,
+    "supplyName": "Pop Up Playpen",
+    "brand": "Penn-Plax",
+    "upc": "791611020807",
+    "upcName": "pop up playpen",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 6017,
+    "supplyName": "Collapsible Crate",
+    "brand": "Petmate",
+    "upc": "076484889516",
+    "upcName": "collapsible crate",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 6018,
+    "supplyName": "Spree Carrier Blue 19 in",
+    "brand": "Prevue",
+    "upc": "027773019565",
+    "upcName": "spree carrier blue 19 in",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 6025,
+    "supplyName": "Skudo Cat",
+    "brand": "MidWest Homes For Pets",
+    "upc": "027773027454",
+    "upcName": "skudo cat",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 6028,
+    "supplyName": "Voyager Blue 26.6",
+    "brand": "Best Pet Supplies",
+    "upc": "022517766101",
+    "upcName": "voyager blue 26.6",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 6036,
+    "supplyName": "Voyager Blue 24\"",
+    "brand": "Best Pet Supplies",
+    "upc": "022517766002",
+    "upcName": "\"voyager blue 24\"\"\"",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 6037,
+    "supplyName": "Voyager Grey 24\"",
+    "brand": "Best Pet Supplies",
+    "upc": "022517766064",
+    "upcName": "\"voyager grey 24\"\"\"",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 6192,
+    "supplyName": "Exercise Pen 30\"",
+    "brand": "Penn-Plax",
+    "upc": "029695550126",
+    "upcName": "\"exercise pen 30\"\"\"",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 6194,
+    "supplyName": "Exercise Pen 48\"",
+    "brand": "Dockstel",
+    "upc": "029695550157",
+    "upcName": "\"exercise pen 48\"\"\"",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 6625,
+    "supplyName": "Canid Lamb 13oz",
+    "brand": "Canidae",
+    "upc": "640461012138",
+    "upcName": "CANID lamb 13oz",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 6707,
+    "supplyName": "From Kitten 3oz",
+    "brand": "Fromm",
+    "upc": "072705133420",
+    "upcName": "FROM kitten 3oz",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 6708,
+    "supplyName": "From Cat Adult 3oz",
+    "brand": "Fromm",
+    "upc": "072705133307",
+    "upcName": "FROM cat adult 3oz",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 6939,
+    "supplyName": "Dogo's Ice Cream Ched Bac",
+    "brand": "Dog-O's",
+    "upc": "850529003927",
+    "upcName": "DOGO'S ice cream ched bac",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 6940,
+    "supplyName": "Dogo's Ice Cream Vanilla",
+    "brand": "Dog-O's",
+    "upc": "850529003903",
+    "upcName": "DOGO'S ice cream vanilla",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7037,
+    "supplyName": "Lee's Fauget Adapter",
+    "brand": "Lee's",
+    "upc": "010838115852",
+    "upcName": "LEE'S fauget adapter",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7039,
+    "supplyName": "Python Squeeze",
+    "brand": "Python",
+    "upc": "094036013196",
+    "upcName": "PYTHON squeeze",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7040,
+    "supplyName": "Lee's Super Pump",
+    "brand": "Lee's",
+    "upc": "010838115807",
+    "upcName": "LEE'S super pump",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7060,
+    "supplyName": "Fluval Easy Vac 10\"",
+    "brand": "Fluval",
+    "upc": "015561110617",
+    "upcName": "\"FLUVAL easy vac 10\"\"\"",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7061,
+    "supplyName": "Fluval Easy Vac 24\"",
+    "brand": "Fluval",
+    "upc": "015561110631",
+    "upcName": "\"FLUVAL easy vac 24\"\"\"",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7062,
+    "supplyName": "Lee's Gravel Vac 50ft",
+    "brand": "Lee's",
+    "upc": "010838115715",
+    "upcName": "LEE'S gravel vac 50ft",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7063,
+    "supplyName": "Lee's Gravel Vac 25ft",
+    "brand": "Lee's",
+    "upc": "010838115708",
+    "upcName": "LEE'S gravel vac 25ft",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7090,
+    "supplyName": "Aquavitro Phosfiltrum 5.6oz",
+    "brand": "SeaChem",
+    "upc": "000116772105",
+    "upcName": "AQUAVITRO phosfiltrum 5.6oz",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7096,
+    "supplyName": "Aquavitro Seed 11.8oz",
+    "brand": "SeaChem",
+    "upc": "000116770101",
+    "upcName": "AQUAVITRO seed 11.8oz",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7111,
+    "supplyName": "Aquarium Solutions Prazipro 16oz",
+    "brand": "Hikari",
+    "upc": "042055732567",
+    "upcName": "AQUARIUM SOLUTIONS prazipro 16oz",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7113,
+    "supplyName": "Kordon Ich Attack 4oz",
+    "brand": "Kordon",
+    "upc": "048054394447",
+    "upcName": "KORDON ich attack 4oz",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7114,
+    "supplyName": "Fritz Maracyn Oxy 4oz",
+    "brand": "Fritz Aquatics",
+    "upc": "080531440001",
+    "upcName": "FRITZ maracyn oxy 4oz",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7115,
+    "supplyName": "Fritz Maracyn Oxy 16oz",
+    "brand": "Fritz Aquatics",
+    "upc": "080531440605",
+    "upcName": "FRITZ maracyn oxy 16oz",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7116,
+    "supplyName": "Fritz Coppersafe 4oz",
+    "brand": "Fritz Aquatics",
+    "upc": "080531420201",
+    "upcName": "FRITZ coppersafe 4oz",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7125,
+    "supplyName": "Fritz Glass Cleaner",
+    "brand": "Fritz Aquatics",
+    "upc": "080531540084",
+    "upcName": "FRITZ glass cleaner",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  },
+  {
+    "supplyId": 7193,
+    "supplyName": "Instant Ocean Hydrometer",
+    "brand": "Instant Ocean",
+    "upc": "051378025034",
+    "upcName": "INSTANT OCEAN hydrometer",
+    "score": 1,
+    "matchType": "unknown_brand_exact"
+  }
+]
