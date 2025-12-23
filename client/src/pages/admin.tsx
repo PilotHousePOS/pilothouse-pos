@@ -695,7 +695,7 @@ function ContactsManager() {
     phoneNumber: '',
     petNames: [] as string[],
     notes: '',
-    animalType: '',
+    animalType: 'dog',
     breed: '',
   });
   const [petNamesInput, setPetNamesInput] = useState('');
@@ -743,7 +743,7 @@ function ContactsManager() {
         description: "Contact has been added successfully.",
       });
       setIsAddContactOpen(false);
-      setContactFormData({ name: '', email: '', phoneNumber: '', petNames: [], notes: '', animalType: '', breed: '' });
+      setContactFormData({ name: '', email: '', phoneNumber: '', petNames: [], notes: '', animalType: 'dog', breed: '' });
       setPetNamesInput('');
       queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
     },
@@ -766,7 +766,7 @@ function ContactsManager() {
         description: "Contact has been updated successfully.",
       });
       setEditingContact(null);
-      setContactFormData({ name: '', email: '', phoneNumber: '', petNames: [], notes: '', animalType: '', breed: '' });
+      setContactFormData({ name: '', email: '', phoneNumber: '', petNames: [], notes: '', animalType: 'dog', breed: '' });
       setPetNamesInput('');
       await queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
       await queryClient.invalidateQueries({ predicate: (query) => 
