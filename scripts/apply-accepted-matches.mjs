@@ -2,6 +2,7 @@ import fs from 'fs';
 import { db } from '../server/db.js';
 import { supplies } from '../shared/schema.js';
 import { eq } from 'drizzle-orm';
+import { validateBrandUpcMatch } from './brand-upc-prefixes.mjs';
 
 const QUEUE_FILE = 'scripts/match_queue.json';
 const APPLY_LOG = 'scripts/match_apply_log.json';
@@ -24,15 +25,38 @@ async function main() {
   
   let applied = 0;
   let failed = 0;
+  let brandConflicts = 0;
   const runLog = {
     timestamp: new Date().toISOString(),
     attempted: accepted.length,
     applied: 0,
     failed: 0,
+    brandConflicts: 0,
     details: []
   };
   
   for (const match of accepted) {
+    // BRAND-UPC PREFIX VALIDATION: Prevent cross-brand UPC assignments
+    const validation = validateBrandUpcMatch(match.supplyBrand, match.upc);
+    if (!validation.valid) {
+      brandConflicts++;
+      console.log(`\n!!! BRAND CONFLICT BLOCKED !!!\n  Supply: "${match.supplyName}" (${match.supplyBrand})\n  UPC: ${match.upc}\n  Reason: ${validation.reason}`);
+      
+      // Mark as rejected with reason
+      queue.matches[match.matchId].status = 'rejected';
+      queue.matches[match.matchId].rejectedAt = new Date().toISOString();
+      queue.matches[match.matchId].rejectionReason = `Brand conflict: ${validation.reason}`;
+      
+      runLog.details.push({
+        matchId: match.matchId,
+        status: 'brand_conflict',
+        reason: validation.reason,
+        supplyBrand: match.supplyBrand,
+        upc: match.upc
+      });
+      continue;
+    }
+    
     try {
       await db.update(supplies)
         .set({ upc: match.upc })
@@ -60,6 +84,7 @@ async function main() {
   
   runLog.applied = applied;
   runLog.failed = failed;
+  runLog.brandConflicts = brandConflicts;
   
   // Update stats
   queue.stats.pending = Object.values(queue.matches).filter(m => m.status === 'pending').length;
@@ -84,6 +109,7 @@ async function main() {
   
   console.log(`\n=== APPLY COMPLETE ===`);
   console.log(`Applied: ${applied}`);
+  console.log(`Brand conflicts blocked: ${brandConflicts}`);
   console.log(`Failed: ${failed}`);
   console.log(`\nQueue stats:`);
   console.log(`  Pending: ${queue.stats.pending}`);
