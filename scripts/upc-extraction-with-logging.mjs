@@ -56,7 +56,7 @@ const BRAND_PREFIXES = {
   'exo': 'Exo Terra',
   'zil': 'Zilla', 'zilla': 'Zilla',
   'flk': 'Flukers', 'fsk': 'Flukers', 'flu': 'Flukers', 'flukers': 'Flukers',
-  'kmd': 'Komodo',
+  'kmd': 'Komodo', 'kom': 'Komodo', 'komodo': 'Komodo',
   'pge': 'Pangea',
   
   // Dog/Cat brands
@@ -80,7 +80,7 @@ const BRAND_PREFIXES = {
   // NOTE: 'gar' is Garmon Corp (distributor), NOT a brand - use context detection instead
   'fas': 'Fashion Pet',
   'pts': 'Petmate', 'petmate': 'Petmate',
-  'mps': 'Multipet', 'mrp': 'Multipet', 'multipet': 'Multipet',
+  'mps': 'Multipet', 'mrp': 'Multipet', 'mul': 'Multipet', 'multipet': 'Multipet',
   'mam': 'Mammoth', 'mammoth': 'Mammoth',
   'tit': 'Titan',
   'prv': 'Prevue', 'prevue': 'Prevue',
@@ -134,8 +134,12 @@ const BRAND_PREFIXES = {
 // These are VERIFIED patterns - don't add guesses here!
 const CONTEXT_BRAND_RULES = [
   // NaturVet products (distributed by Garmon Corp with GAR prefix)
+  // GAR is Garmon Corp distributor code - verified 2024-12
+  { keywords: ['gar rmdy', 'gar splmt'], brand: 'NaturVet', confidence: 'high' },
+  { keywords: ['aller-911', 'aller 911'], brand: 'NaturVet', confidence: 'high' },
   { keywords: ['cranberry relief', 'crnbrry relief'], brand: 'NaturVet', confidence: 'high' },
   { keywords: ['quiet moment', 'grasssaver', 'coprophagia'], brand: 'NaturVet', confidence: 'high' },
+  { keywords: ['bladder support', 'bladder-pcrn', 'probio/enz'], brand: 'NaturVet', confidence: 'high' },
   { keywords: ['all-in-one', 'hip joint', 'digestive enzymes'], brand: 'NaturVet', confidence: 'medium' },
   
   // Lafebers products

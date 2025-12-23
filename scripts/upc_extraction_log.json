@@ -1,10 +1,10 @@
 {
-  "timestamp": "2025-12-23T02:13:13.487Z",
+  "timestamp": "2025-12-23T02:20:43.709Z",
   "steps": [
     {
       "step": "Loading invoice UPCs",
       "details": "Checking available files...",
-      "time": "2025-12-23T02:13:13.489Z"
+      "time": "2025-12-23T02:20:43.712Z"
     },
     {
       "step": "Invoice UPCs loaded",
@@ -12,12 +12,12 @@
         "file": "invoice_extracted_upcs.json",
         "count": 1065
       },
-      "time": "2025-12-23T02:13:13.616Z"
+      "time": "2025-12-23T02:20:43.713Z"
     },
     {
       "step": "Loading maybe inventory UPCs",
       "details": "Checking available files...",
-      "time": "2025-12-23T02:13:13.618Z"
+      "time": "2025-12-23T02:20:43.714Z"
     },
     {
       "step": "Maybe UPCs loaded",
@@ -25,12 +25,12 @@
         "file": "scripts/maybe_upcs_clean_3171.json",
         "count": 3150
       },
-      "time": "2025-12-23T02:13:13.629Z"
+      "time": "2025-12-23T02:20:43.718Z"
     },
     {
       "step": "Loading Google sheet UPCs",
       "details": "Checking available files...",
-      "time": "2025-12-23T02:13:13.630Z"
+      "time": "2025-12-23T02:20:43.719Z"
     },
     {
       "step": "Sheet UPCs loaded",
@@ -38,7 +38,7 @@
         "file": "scripts/google_sheet_upcs.csv",
         "count": 1414
       },
-      "time": "2025-12-23T02:13:13.643Z"
+      "time": "2025-12-23T02:20:43.723Z"
     },
     {
       "step": "Combining all sources",
@@ -48,34 +48,34 @@
         "sheet": 1414,
         "total_before_dedup": 5629
       },
-      "time": "2025-12-23T02:13:13.644Z"
+      "time": "2025-12-23T02:20:43.723Z"
     },
     {
       "step": "After deduplication",
       "details": {
         "unique_upcs": 5083
       },
-      "time": "2025-12-23T02:13:13.654Z"
+      "time": "2025-12-23T02:20:43.726Z"
     },
     {
       "step": "Expanding abbreviations and detecting brands",
       "details": "Processing all UPCs...",
-      "time": "2025-12-23T02:13:13.654Z"
+      "time": "2025-12-23T02:20:43.726Z"
     },
     {
       "step": "Processing complete",
       "details": {
         "total": 5083,
-        "verified_brands": 2851,
-        "context_detected": 4,
-        "unknown_brands": 2228
+        "verified_brands": 2873,
+        "context_detected": 12,
+        "unknown_brands": 2198
       },
-      "time": "2025-12-23T02:13:14.558Z"
+      "time": "2025-12-23T02:20:44.474Z"
     },
     {
       "step": "Saving results",
       "details": "Writing to files...",
-      "time": "2025-12-23T02:13:14.558Z"
+      "time": "2025-12-23T02:20:44.475Z"
     }
   ],
   "stats": {
@@ -88,7 +88,7 @@
     "by_brand": {
       "Aqueon": 44,
       "API": 43,
-      "UNKNOWN": 2228,
+      "UNKNOWN": 2198,
       "Hikari": 30,
       "Aquatop": 4,
       "World Wide Imports": 8,
@@ -102,8 +102,10 @@
       "Iams": 10,
       "Mammoth": 21,
       "TropiClean": 60,
+      "Multipet": 18,
       "Nylabone": 37,
       "Flukers": 57,
+      "Komodo": 21,
       "Zilla": 128,
       "Zoo Med": 279,
       "Oxbow": 44,
@@ -111,13 +113,12 @@
       "Petmate": 51,
       "Coastal": 169,
       "Instinct": 1,
-      "NaturVet": 29,
+      "NaturVet": 37,
       "Fashion Pet": 38,
       "Benebone": 5,
       "Nutrisource": 72,
       "Canidae": 5,
       "Exo Terra": 2,
-      "Komodo": 10,
       "Pangea": 14,
       "Penn-Plax": 37,
       "Advantage": 3,
@@ -137,7 +138,6 @@
       "Four Paws": 12,
       "Vital Essentials": 26,
       "Blue Buffalo": 51,
-      "Multipet": 7,
       "Tuffy": 21,
       "Chuckit": 14,
       "Science Diet": 202,
@@ -155,18 +155,18 @@
       "Fluval": 36
     },
     "by_detection_method": {
-      "prefix": 2412,
-      "name_match": 439,
-      "context": 4,
-      "none": 2228
+      "prefix": 2444,
+      "name_match": 429,
+      "context": 12,
+      "none": 2198
     },
     "by_confidence": {
-      "verified": 2851,
-      "high": 3,
-      "medium": 1,
-      "none": 2228
+      "verified": 2873,
+      "high": 12,
+      "medium": 0,
+      "none": 2198
     },
-    "unknown_brand_count": 2228
+    "unknown_brand_count": 2198
   },
   "unknownAbbreviations": {
     "bulb": {
@@ -637,14 +637,6 @@
         "TRO SHMP/COND 2IN1 WTRMLN 20OZ"
       ]
     },
-    "mul": {
-      "count": 11,
-      "contexts": [
-        "MUL TOY DAZZLE FLYING DUCK13IN",
-        "MUL TOY WOODY WOODPECKER 11IN",
-        "MUL TOY LMB CHOP 6IN"
-      ]
-    },
     "dazzle": {
       "count": 3,
       "contexts": [
@@ -907,14 +899,6 @@
       "count": 1,
       "contexts": [
         "NZP RMDY MITE GRD LQ 8OZ"
-      ]
-    },
-    "kom": {
-      "count": 11,
-      "contexts": [
-        "KOM FOOD TORTOISE HAY 24OZ",
-        "KOM PLNT WDLAND CANOPY 42CM",
-        "KOM PLNT RAINFORST CANOPY 10IN"
       ]
     },
     "hay": {
@@ -6326,14 +6310,6 @@
         "ZooMed 10\" Stainless Steel",
         "Mediterranean Stainless Steel Dbbl 1 pint",
         "Snappy Fit Stainless Steel Bowls 4C"
-      ]
-    },
-    "komodo": {
-      "count": 10,
-      "contexts": [
-        "Komodo Smart Dish",
-        "Komodo Dandelion Kit",
-        "Komodo Tortoise Hay"
       ]
     },
     "screen": {
@@ -14630,17 +14606,6 @@
       ],
       "status": "NEEDS_VERIFICATION"
     },
-    "mul": {
-      "count": 11,
-      "examples": [
-        "MUL TOY DAZZLE FLYING DUCK13IN",
-        "MUL TOY WOODY WOODPECKER 11IN",
-        "MUL TOY LMB CHOP 6IN",
-        "MUL TOY LMB CHOP 10IN",
-        "MUL TOY TRP LGHT UP BALL 2.5IN"
-      ],
-      "status": "NEEDS_VERIFICATION"
-    },
     "rbp": {
       "count": 30,
       "examples": [
@@ -14687,17 +14652,6 @@
         "NZP RMDY MITE GRD LQ 8OZ",
         "NZP FOOD BNB JUV DRGN 2.76OZ",
         "NZP RMDY SHLL SAVER TRTL 2OZ"
-      ],
-      "status": "NEEDS_VERIFICATION"
-    },
-    "kom": {
-      "count": 11,
-      "examples": [
-        "KOM FOOD TORTOISE HAY 24OZ",
-        "KOM PLNT WDLAND CANOPY 42CM",
-        "KOM PLNT RAINFORST CANOPY 10IN",
-        "KOM PLNT SPOTTED BEGONIA 18IN",
-        "KOM PLNT MONSTERA LEAF 18IN"
       ],
       "status": "NEEDS_VERIFICATION"
     },
@@ -14793,17 +14747,6 @@
         "ZIP TOY SQKY CAN ZIPPY COLA",
         "ZIP TOY NOMNOMZ FRIES MD",
         "ZIP TOY PLSH CATERPLLR LG"
-      ],
-      "status": "NEEDS_VERIFICATION"
-    },
-    "gar": {
-      "count": 11,
-      "examples": [
-        "GAR RMDY ALLER-911 SPRY 8OZ",
-        "GAR SPLMT CT DGST PROBIO/ENZ60",
-        "GAR SPLMT CT L-LYSINE CHW 60CT",
-        "GAR SPLMT BLADDER-PCRN SFT60CT",
-        "GAR SPLMT ADV PROBIO/ENZ PWD4Z"
       ],
       "status": "NEEDS_VERIFICATION"
     },
@@ -14925,6 +14868,15 @@
         "CND LTTR A/H DEOD DBL DUTY 30Z",
         "CND LTTR A/H ULTRA LAST 20#",
         "CND LTTR A/H 4EVER FRSH LAV20#"
+      ],
+      "status": "NEEDS_VERIFICATION"
+    },
+    "gar": {
+      "count": 3,
+      "examples": [
+        "GAR SPRY BITTER YUCK 8OZ",
+        "GAR STOOL EATING DETERRENT 70C",
+        "GAR TRNG AID POTTY HERE SPRY8Z"
       ],
       "status": "NEEDS_VERIFICATION"
     },
@@ -16217,17 +16169,6 @@
       ],
       "status": "needs_review"
     },
-    "mul": {
-      "count": 11,
-      "examples": [
-        "MUL TOY DAZZLE FLYING DUCK13IN",
-        "MUL TOY WOODY WOODPECKER 11IN",
-        "MUL TOY LMB CHOP 6IN",
-        "MUL TOY LMB CHOP 10IN",
-        "MUL TOY TRP LGHT UP BALL 2.5IN"
-      ],
-      "status": "needs_review"
-    },
     "rbp": {
       "count": 30,
       "examples": [
@@ -16274,17 +16215,6 @@
         "NZP RMDY MITE GRD LQ 8OZ",
         "NZP FOOD BNB JUV DRGN 2.76OZ",
         "NZP RMDY SHLL SAVER TRTL 2OZ"
-      ],
-      "status": "needs_review"
-    },
-    "kom": {
-      "count": 11,
-      "examples": [
-        "KOM FOOD TORTOISE HAY 24OZ",
-        "KOM PLNT WDLAND CANOPY 42CM",
-        "KOM PLNT RAINFORST CANOPY 10IN",
-        "KOM PLNT SPOTTED BEGONIA 18IN",
-        "KOM PLNT MONSTERA LEAF 18IN"
       ],
       "status": "needs_review"
     },
@@ -16380,17 +16310,6 @@
         "ZIP TOY SQKY CAN ZIPPY COLA",
         "ZIP TOY NOMNOMZ FRIES MD",
         "ZIP TOY PLSH CATERPLLR LG"
-      ],
-      "status": "needs_review"
-    },
-    "gar": {
-      "count": 11,
-      "examples": [
-        "GAR RMDY ALLER-911 SPRY 8OZ",
-        "GAR SPLMT CT DGST PROBIO/ENZ60",
-        "GAR SPLMT CT L-LYSINE CHW 60CT",
-        "GAR SPLMT BLADDER-PCRN SFT60CT",
-        "GAR SPLMT ADV PROBIO/ENZ PWD4Z"
       ],
       "status": "needs_review"
     },
@@ -16512,6 +16431,15 @@
         "CND LTTR A/H DEOD DBL DUTY 30Z",
         "CND LTTR A/H ULTRA LAST 20#",
         "CND LTTR A/H 4EVER FRSH LAV20#"
+      ],
+      "status": "needs_review"
+    },
+    "gar": {
+      "count": 3,
+      "examples": [
+        "GAR SPRY BITTER YUCK 8OZ",
+        "GAR STOOL EATING DETERRENT 70C",
+        "GAR TRNG AID POTTY HERE SPRY8Z"
       ],
       "status": "needs_review"
     },

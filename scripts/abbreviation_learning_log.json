@@ -1531,30 +1531,12 @@
       ]
     },
     {
-      "abbr": "mul",
-      "count": 11,
-      "examples": [
-        "MUL TOY DAZZLE FLYING DUCK13IN",
-        "MUL TOY WOODY WOODPECKER 11IN",
-        "MUL TOY LMB CHOP 6IN"
-      ]
-    },
-    {
       "abbr": "skin",
       "count": 11,
       "examples": [
         "FMN COND SENS SKIN 16OZ",
         "FMN SHMP SENS SKIN 16OZ",
         "ETH TOY PLSH SKIN RCCN"
-      ]
-    },
-    {
-      "abbr": "kom",
-      "count": 11,
-      "examples": [
-        "KOM FOOD TORTOISE HAY 24OZ",
-        "KOM PLNT WDLAND CANOPY 42CM",
-        "KOM PLNT RAINFORST CANOPY 10IN"
       ]
     },
     {
@@ -1897,15 +1879,6 @@
         "ZooMed Glow In the Dark Tong",
         "ZooMed Crab Glow in the dark scoop",
         "Kaytee Food For the wild Bird"
-      ]
-    },
-    {
-      "abbr": "komodo",
-      "count": 10,
-      "examples": [
-        "Komodo Smart Dish",
-        "Komodo Dandelion Kit",
-        "Komodo Tortoise Hay"
       ]
     },
     {
@@ -7944,39 +7917,6 @@
         "DOS LTTR TOP ENTRY PAN SLVR/WH",
         "DOS LTTR LINER TOP ENTRY PAN",
         "DOS LTTR SCOOP WH JMB"
-      ]
-    },
-    {
-      "prefix": "mul",
-      "count": 11,
-      "examples": [
-        "MUL TOY DAZZLE FLYING DUCK13IN",
-        "MUL TOY WOODY WOODPECKER 11IN",
-        "MUL TOY LMB CHOP 6IN",
-        "MUL TOY LMB CHOP 10IN",
-        "MUL TOY TRP LGHT UP BALL 2.5IN"
-      ]
-    },
-    {
-      "prefix": "kom",
-      "count": 11,
-      "examples": [
-        "KOM FOOD TORTOISE HAY 24OZ",
-        "KOM PLNT WDLAND CANOPY 42CM",
-        "KOM PLNT RAINFORST CANOPY 10IN",
-        "KOM PLNT SPOTTED BEGONIA 18IN",
-        "KOM PLNT MONSTERA LEAF 18IN"
-      ]
-    },
-    {
-      "prefix": "gar",
-      "count": 11,
-      "examples": [
-        "GAR RMDY ALLER-911 SPRY 8OZ",
-        "GAR SPLMT CT DGST PROBIO/ENZ60",
-        "GAR SPLMT CT L-LYSINE CHW 60CT",
-        "GAR SPLMT BLADDER-PCRN SFT60CT",
-        "GAR SPLMT ADV PROBIO/ENZ PWD4Z"
       ]
     },
     {
