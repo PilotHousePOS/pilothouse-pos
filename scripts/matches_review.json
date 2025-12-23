@@ -1,0 +1,514 @@
+[
+  {
+    "supplyId": 2390,
+    "supplyName": "Dr. Elsey's Kitten Attract",
+    "upc": "000338007207",
+    "upcName": "Dr.Elseys Kitten Attract",
+    "score": 0.75,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 394,
+    "supplyName": "Reptile System T5 Zone 2 24w 6\"",
+    "upc": "443983200086",
+    "upcName": "Reptile Sys. T5 Zone 1 24W 2.4%",
+    "score": 0.8,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 2532,
+    "supplyName": "Lilpals Harness Combo Blackpsm",
+    "upc": "076484062049",
+    "upcName": "LILPALS HARNESS COMBO PKBPSM",
+    "score": 0.75,
+    "brand": "Li'l Pals"
+  },
+  {
+    "supplyId": 2811,
+    "supplyName": "Spot Axolotl in Swimwear",
+    "upc": "077234549667",
+    "upcName": "SPT AXOLOTL IN SWIMWEAR",
+    "score": 0.75,
+    "brand": "Spot"
+  },
+  {
+    "supplyId": 5114,
+    "supplyName": "Purewater Pebble Neon Raibow",
+    "upc": "096316002593",
+    "upcName": "PUREWATER PEBBLE NEON PINK",
+    "score": 0.75,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 868,
+    "supplyName": "JW Pet Pet Pet Pet Clean Cup Large",
+    "upc": "618940313113",
+    "upcName": "JW Clean Cup Lg.",
+    "score": 0.8,
+    "brand": "JW Pet"
+  },
+  {
+    "supplyId": 390,
+    "supplyName": "Reptile System T5 Zone 3 12% 39w",
+    "upc": "3443981170077",
+    "upcName": "Reptile Sys. T5 Zone 3 12% 39W",
+    "score": 0.8333333333333334,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 2391,
+    "supplyName": "Dr. Elsey's Cat Attract Litter",
+    "upc": "000338007771",
+    "upcName": "Dr.Elseys Cat Attract Litter",
+    "score": 0.8,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 2928,
+    "supplyName": "Nylabone Power Chew Pretzel Regular",
+    "upc": "018214850724",
+    "upcName": "NYLA PWR CHW PRETZEL REG",
+    "score": 0.8,
+    "brand": "Nylabone"
+  },
+  {
+    "supplyId": 4224,
+    "supplyName": "Feeding Dish Small",
+    "upc": "015561228114",
+    "upcName": "ExoTerra Feeding Dish sm",
+    "score": 0.75,
+    "brand": "Exo Terra"
+  },
+  {
+    "supplyId": 1184,
+    "supplyName": "A & E Assorted Bird Cage",
+    "upc": "644472013351",
+    "upcName": "AE Asst Bird Cage",
+    "score": 0.75,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 2533,
+    "supplyName": "Circle 14\"tcr1786s Collar",
+    "upc": "076484178627",
+    "upcName": "CIRCLE 14\"TCR1786S COLLAR",
+    "score": 0.75,
+    "brand": "Circle T"
+  },
+  {
+    "supplyId": 3939,
+    "supplyName": "Coastal Blue04' 904 Leash",
+    "upc": "015561224666",
+    "upcName": "COASTAL HUN04' 904 LEASH",
+    "score": 0.75,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 1968,
+    "supplyName": "Naturvet Digestive Enzymes Cat",
+    "upc": "797801036603",
+    "upcName": "NaturVet Digestive Enzymes Powder",
+    "score": 0.75,
+    "brand": "NaturVet"
+  },
+  {
+    "supplyId": 7108,
+    "supplyName": "Seachem Flourish Excel 8.5oz",
+    "upc": "000116051606",
+    "upcName": "SEACHEM flourish 8.5oz",
+    "score": 0.75,
+    "brand": "SeaChem"
+  },
+  {
+    "supplyId": 1965,
+    "supplyName": "Nutri-Vet Uri-ease Cat Paw Gel",
+    "upc": "669125998533",
+    "upcName": "NutriVet Uri-Ease Cat paw Gel",
+    "score": 0.7142857142857143,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 6349,
+    "supplyName": "Pro Plan Sensitive Salmon 4lb",
+    "upc": "038100100757",
+    "upcName": "PRO PLAN sensi salm 4#",
+    "score": 0.8,
+    "brand": "Pro Plan"
+  },
+  {
+    "supplyId": 6642,
+    "supplyName": "Pro Plan Turkey & Vegetable 13oz",
+    "upc": "038100026767",
+    "upcName": "PRO PLAN turk & veg 13oz",
+    "score": 0.8333333333333334,
+    "brand": "Pro Plan"
+  },
+  {
+    "supplyId": 2657,
+    "supplyName": "Titan Traincllr Medium 20\" 5525",
+    "upc": "076484093210",
+    "upcName": "TITAN TRAINCLLR MED 16\" 5525",
+    "score": 0.8,
+    "brand": "Titan"
+  },
+  {
+    "supplyId": 2871,
+    "supplyName": "Mammoth TireBiter Ball With Extra 2 Knot Bone",
+    "upc": "746772352045",
+    "upcName": "MAMMOTH TB BLL W EX 2 KNOT BNE",
+    "score": 0.7142857142857143,
+    "brand": "Mammoth"
+  },
+  {
+    "supplyId": 2162,
+    "supplyName": "Catit Chicken & Shrimp 50pk",
+    "upc": "022517444399",
+    "upcName": "Catit Chkn & Shrimp 50pk",
+    "score": 0.8,
+    "brand": "Catit"
+  },
+  {
+    "supplyId": 1730,
+    "supplyName": "Petmate Kennel Cup Double",
+    "upc": "029695231742",
+    "upcName": "Petmate Double cup Sm",
+    "score": 0.75,
+    "brand": "Petmate"
+  },
+  {
+    "supplyId": 1170,
+    "supplyName": "Higgins Sunburst Canary & Finch",
+    "upc": "046706302253",
+    "upcName": "Higgins Sunburst Canary&Finch",
+    "score": 0.8,
+    "brand": "Higgins"
+  },
+  {
+    "supplyId": 6641,
+    "supplyName": "Pro Plan Lamb & Vegetable 13oz",
+    "upc": "038100026750",
+    "upcName": "PRO PLAN lam & veg 13oz",
+    "score": 0.8333333333333334,
+    "brand": "Pro Plan"
+  },
+  {
+    "supplyId": 862,
+    "supplyName": "Birdlife Fruit Dipped Cuttle Bone 2pk",
+    "upc": "030172096853",
+    "upcName": "BirdLife Fruit Dipped Cuttle Bone 2pk",
+    "score": 0.8333333333333334,
+    "brand": "Birdlife"
+  },
+  {
+    "supplyId": 2628,
+    "supplyName": "Coastal Small Aliens14 Collar",
+    "upc": "076484996450",
+    "upcName": "COASTAL SM DNS14 COLLAR",
+    "score": 0.75,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 2594,
+    "supplyName": "Coastal Large Pineapples26 Collar",
+    "upc": "076484693816",
+    "upcName": "COASTAL LG DNS26 COLLAR",
+    "score": 0.75,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 3586,
+    "supplyName": "Coastal Gray Pink Small Harness",
+    "upc": "76484163272",
+    "upcName": "COASTAL HARN/LEASH GRY SML",
+    "score": 0.8,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 7248,
+    "supplyName": "Penn Plax Pink/White Small Plant",
+    "upc": "030172093104",
+    "upcName": "PENN PLAX pk/wh sm plant",
+    "score": 0.8333333333333334,
+    "brand": "Penn-Plax"
+  },
+  {
+    "supplyId": 5277,
+    "supplyName": "Aquascapes Small Purpl Bunch",
+    "upc": "071859949260",
+    "upcName": "AQUASCAPES SM YELL BUNCH",
+    "score": 0.75,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 6698,
+    "supplyName": "Pro Plan Cat Salmon 3oz",
+    "upc": "079441004052",
+    "upcName": "PRO PLAN cat sal & shri 3oz",
+    "score": 0.8333333333333334,
+    "brand": "Pro Plan"
+  },
+  {
+    "supplyId": 2531,
+    "supplyName": "Lilpals Harness Combo Pkbpsm",
+    "upc": "076484638381",
+    "upcName": "LILPALS SM HARNESS PKBPSM",
+    "score": 0.75,
+    "brand": "Li'l Pals"
+  },
+  {
+    "supplyId": 2543,
+    "supplyName": "Circle 18\" Tan 1106 Collar",
+    "upc": "076484104343",
+    "upcName": "CIRCLE 18\"TAN 1106 COLLAR",
+    "score": 0.8,
+    "brand": "Circle T"
+  },
+  {
+    "supplyId": 4573,
+    "supplyName": "Nylabone DuraChew Wolf Bacon",
+    "upc": "018214823285",
+    "upcName": "NYLABONE DURACHEW BACON WLF",
+    "score": 0.75,
+    "brand": "Nylabone"
+  },
+  {
+    "supplyId": 6489,
+    "supplyName": "Zignature White Fish 13oz",
+    "upc": "888641131402",
+    "upcName": "ZIGN wh fish 13oz",
+    "score": 0.75,
+    "brand": "Zignature"
+  },
+  {
+    "supplyId": 2924,
+    "supplyName": "Nylabone Power Chew Twist Giant",
+    "upc": "018214855910",
+    "upcName": "NYLA PWR CHW TWIST GIANT",
+    "score": 0.8,
+    "brand": "Nylabone"
+  },
+  {
+    "supplyId": 818,
+    "supplyName": "Adams Plus Shampoo With Precor",
+    "upc": "039079090025",
+    "upcName": "Adams Plus Shamp W Precor",
+    "score": 0.8,
+    "brand": "Adams"
+  },
+  {
+    "supplyId": 5056,
+    "supplyName": "Aqualife Stand Airline Tube 25ft",
+    "upc": "059834053088",
+    "upcName": "AQUALIFE STAND AIRLINE TUBE 8FT",
+    "score": 0.8,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 6637,
+    "supplyName": "Pro Plan Chicken & Carrot 13oz",
+    "upc": "038100153364",
+    "upcName": "PRO PLAN ck & car 13oz",
+    "score": 0.8333333333333334,
+    "brand": "Pro Plan"
+  },
+  {
+    "supplyId": 386,
+    "supplyName": "Reptile System T5 Zone 1 Unit 24w 23\"",
+    "upc": "3443981210230",
+    "upcName": "Reptile Sys. T5 Zone 1 Unit 24W 23\"",
+    "score": 0.7142857142857143,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 5731,
+    "supplyName": "Fluval C2 Zeo-carb 3pk",
+    "upc": "097227002333",
+    "upcName": "FLUVAL C3 ZEO-CARB 3PK",
+    "score": 0.8,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 4192,
+    "supplyName": "Kaytee Large Comfort Wheel",
+    "upc": "045125613841",
+    "upcName": "PTS WHEEL COMFORT LG",
+    "score": 0.75,
+    "brand": "Petmate"
+  },
+  {
+    "supplyId": 5110,
+    "supplyName": "Spectrastone Green Special 5lb",
+    "upc": "097612091359",
+    "upcName": "SPECTRASTONE BLU SPECIAL 5LB",
+    "score": 0.75,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 6835,
+    "supplyName": "Fussie Cat Tuna, Mussel 2.82oz",
+    "upc": "888641133116",
+    "upcName": "FUSSIE CAT tuna 2.82oz",
+    "score": 0.8,
+    "brand": "Fussie Cat"
+  },
+  {
+    "supplyId": 4225,
+    "supplyName": "Feeding Dish Large",
+    "upc": "015561228138",
+    "upcName": "ExoTerra Feeding Dish X-lg.",
+    "score": 0.75,
+    "brand": "Exo Terra"
+  },
+  {
+    "supplyId": 393,
+    "supplyName": "Reptile System T5 Zone 3 24w 12%",
+    "upc": "3443981170060",
+    "upcName": "Reptile Sys. T5 Zone 3 24W 12%",
+    "score": 0.8333333333333334,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 6644,
+    "supplyName": "Pro Plan Chicken & Vegetable 13oz",
+    "upc": "038100107978",
+    "upcName": "PRO PLAN ck & veg 13oz",
+    "score": 0.8333333333333334,
+    "brand": "Pro Plan"
+  },
+  {
+    "supplyId": 4529,
+    "supplyName": "Benebone Small Beef Tripe Bone",
+    "upc": "008317859331",
+    "upcName": "BENEBONE SM BEEF TRIPE BNE",
+    "score": 0.8,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 2536,
+    "supplyName": "Cirlce 16\"tnv 1786s Collar",
+    "upc": "076484178672",
+    "upcName": "CIRLCE 16\"TNV 1786S COLLAR",
+    "score": 0.8,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 5794,
+    "supplyName": "Tetra Pond Sticks",
+    "upc": "069125024416",
+    "upcName": "TETRA POND STICKS 1LB",
+    "score": 0.75,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 1055,
+    "supplyName": "Playfuls Sound & Move\"partytime\"",
+    "upc": "048081625071",
+    "upcName": "PlayFuls Sound&Move\"Partytime\"",
+    "score": 0.8,
+    "brand": "Playfuls"
+  },
+  {
+    "supplyId": 1182,
+    "supplyName": "Prevue Econo Keet Cage",
+    "upc": "048081220061",
+    "upcName": "Prevue Econo Keet Cage",
+    "score": 0.75,
+    "brand": "Prevue"
+  },
+  {
+    "supplyId": 2252,
+    "supplyName": "Kong Cat Active Caps 2pk",
+    "upc": "035585459332",
+    "upcName": "KONG Cat Active Caps 2pk",
+    "score": 0.8,
+    "brand": "Kong"
+  },
+  {
+    "supplyId": 6474,
+    "supplyName": "Fromm Turkey Duck & Sweet Potato 12.2oz",
+    "upc": "072705119141",
+    "upcName": "FROMM bef & sw pot 12.2oz",
+    "score": 0.7142857142857143,
+    "brand": "Fromm"
+  },
+  {
+    "supplyId": 2089,
+    "supplyName": "Coastal Cat Soft Mesh Harness Red",
+    "upc": "076484630330",
+    "upcName": "COASTAL CAT SOFT MESH HARN PINK",
+    "score": 0.8333333333333334,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 6580,
+    "supplyName": "Science Diet Sensitive Puppy Salmon 12.5oz",
+    "upc": "052742069487",
+    "upcName": "SD sensi pup sal 12.5oz",
+    "score": 0.7142857142857143,
+    "brand": "Science Diet"
+  },
+  {
+    "supplyId": 6617,
+    "supplyName": "Blue Buffalo Chicken 12.5 oz",
+    "upc": "840243104932",
+    "upcName": "BL BUF ck 12.5 oz",
+    "score": 0.8,
+    "brand": "Blue Buffalo"
+  },
+  {
+    "supplyId": 2636,
+    "supplyName": "Coastal Small Pineapples14 Collar",
+    "upc": "076484996443",
+    "upcName": "COASTAL SM ALN14 COLLAR",
+    "score": 0.75,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 3911,
+    "supplyName": "Coastal Hunter04' 604 Leash",
+    "upc": "015561224789",
+    "upcName": "COASTAL PUR06' 604 LEASH",
+    "score": 0.75,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 2590,
+    "supplyName": "Coastal Large Unicorns26 Collar",
+    "upc": "076484693809",
+    "upcName": "COASTAL LG ALN26 COLLAR",
+    "score": 0.75,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 4190,
+    "supplyName": "Kaytee Large High Crnr Litter Pan",
+    "upc": "044472002393",
+    "upcName": "KAYTEE HIGH CRNR LITTER PAN",
+    "score": 0.8333333333333334,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 1201,
+    "supplyName": "Finch Tiki Hut",
+    "upc": "048081011560",
+    "upcName": "PH Finch Tiki Hut",
+    "score": 0.75,
+    "brand": "Prevue"
+  },
+  {
+    "supplyId": 2584,
+    "supplyName": "Coastal Large Dinosaurs26 Collar",
+    "upc": "076484065620",
+    "upcName": "COASTAL LG FDN26 COLLAR",
+    "score": 0.75,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 2593,
+    "supplyName": "Coastal Medium Pineapples20 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.75,
+    "brand": "Coastal"
+  }
+]

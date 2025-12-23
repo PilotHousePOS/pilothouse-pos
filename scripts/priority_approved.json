@@ -1,0 +1,236 @@
+[
+  {
+    "supplyId": 6871,
+    "supplyName": "Blue Buffalo Cat Wilderness Chicken 3oz",
+    "supplyExpanded": "blue buffalo cat wilderness chicken 3oz",
+    "upc": "840243104987",
+    "upcName": "BLUE BUF cat wild ck 3oz",
+    "upcExpanded": "blue buf cat wilderness chicken 3oz",
+    "score": 0.8333333333333334
+  },
+  {
+    "supplyId": 6225,
+    "supplyName": "Blue Buffalo Chicken 15lb",
+    "supplyExpanded": "blue buffalo chicken 15lb",
+    "upc": "859610000098",
+    "upcName": "BLUE B ck 15#",
+    "upcExpanded": "blue buffalo chicken 15",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6619,
+    "supplyName": "Blue Buffalo Delight Grain Free Chicken 3.5 oz",
+    "supplyExpanded": "blue buffalo delight grain free chicken 3 5 oz",
+    "upc": "840243120475",
+    "upcName": "BL BUF delight gr ck 3.5oz",
+    "upcExpanded": "blue buffalo delight grain chicken 3 5oz",
+    "score": 0.7142857142857143
+  },
+  {
+    "supplyId": 6221,
+    "supplyName": "Blue Buffalo Lamb 5lb",
+    "supplyExpanded": "blue buffalo lamb 5lb",
+    "upc": "840243144099",
+    "upcName": "BLUE B lamb 5#",
+    "upcExpanded": "blue buffalo lamb 5",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6216,
+    "supplyName": "Blue Buffalo Senior 5lb",
+    "supplyExpanded": "blue buffalo senior 5lb",
+    "upc": "840243144143",
+    "upcName": "BLUE B senior 5#",
+    "upcExpanded": "blue buffalo senior 5",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6739,
+    "supplyName": "Fromm Cat Hasen Duckenpfeffer 4lb",
+    "supplyExpanded": "fromm cat hasen duckenpfeffer 4lb",
+    "upc": "072705117307",
+    "upcName": "FROMM cat has duck 4#",
+    "upcExpanded": "fromm cat hasen duckenpfeffer 4",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6586,
+    "supplyName": "Science Diet 7+ Chicken 13oz",
+    "supplyExpanded": "science diet 7 chicken 13oz",
+    "upc": "052742705507",
+    "upcName": "SD 7+ ck 13oz",
+    "upcExpanded": "science diet 7 chicken 13oz",
+    "score": 1
+  },
+  {
+    "supplyId": 6584,
+    "supplyName": "Science Diet 7+ Turkey 13oz",
+    "supplyExpanded": "science diet 7 turkey 13oz",
+    "upc": "052742705705",
+    "upcName": "SD 7+ turk 13oz",
+    "upcExpanded": "science diet 7 turkey 13oz",
+    "score": 1
+  },
+  {
+    "supplyId": 6715,
+    "supplyName": "Science Diet Cat Chicken 5.5oz",
+    "supplyExpanded": "science diet cat chicken 5 5oz",
+    "upc": "052742453408",
+    "upcName": "SD cat ck 5.5oz",
+    "upcExpanded": "science diet cat chicken 5 5oz",
+    "score": 1
+  },
+  {
+    "supplyId": 6789,
+    "supplyName": "Science Diet Cat Hairball Control 15.5lb",
+    "supplyExpanded": "science diet cat hairball control 15 5lb",
+    "upc": "052742887609",
+    "upcName": "SD cat hairba light 15.5#",
+    "upcExpanded": "science diet cat hairball light 15 5",
+    "score": 0.7142857142857143
+  },
+  {
+    "supplyId": 6718,
+    "supplyName": "Science Diet Cat Senior Chicken 2.9oz",
+    "supplyExpanded": "science diet cat senior chicken 2 9oz",
+    "upc": "052742010243",
+    "upcName": "SD cat sen ck 2.9oz",
+    "upcExpanded": "science diet cat sensitive chicken 2 9oz",
+    "score": 0.8333333333333334
+  },
+  {
+    "supplyId": 6716,
+    "supplyName": "Science Diet Cat Turkey 5.5oz",
+    "supplyExpanded": "science diet cat turkey 5 5oz",
+    "upc": "052742453804",
+    "upcName": "SD cat turk 5.5oz",
+    "upcExpanded": "science diet cat turkey 5 5oz",
+    "score": 1
+  },
+  {
+    "supplyId": 6846,
+    "supplyName": "Science Diet Cat Urinary & Hairball Control Chicken Stew 2.9oz",
+    "supplyExpanded": "science diet cat urinary hairball control chicken stew 2 9oz",
+    "upc": "052742075556",
+    "upcName": "SD cat urin ck stew 2.9oz",
+    "upcExpanded": "science diet cat urinary chicken stew 2 9oz",
+    "score": 0.7777777777777778
+  },
+  {
+    "supplyId": 6848,
+    "supplyName": "Science Diet Cat Urinary & Hairball Control Salmon Stew 2.9oz",
+    "supplyExpanded": "science diet cat urinary hairball control salmon stew 2 9oz",
+    "upc": "052742075891",
+    "upcName": "SD cat urin salm stew 2.9oz",
+    "upcExpanded": "science diet cat urinary salmon stew 2 9oz",
+    "score": 0.7777777777777778
+  },
+  {
+    "supplyId": 6847,
+    "supplyName": "Science Diet Cat Urinary & Hairball Control Tuna Stew",
+    "supplyExpanded": "science diet cat urinary hairball control tuna stew",
+    "upc": "052742075853",
+    "upcName": "SD cat urin tuna stew",
+    "upcExpanded": "science diet cat urinary tuna stew",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6593,
+    "supplyName": "Science Diet Chicken 13oz",
+    "supplyExpanded": "science diet chicken 13oz",
+    "upc": "052742020419",
+    "upcName": "SD ck 15#",
+    "upcExpanded": "science diet chicken 15",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6561,
+    "supplyName": "Science Diet Chicken Stew 3.5 oz",
+    "supplyExpanded": "science diet chicken stew 3 5 oz",
+    "upc": "052742018140",
+    "upcName": "SD ck stew 3.5oz",
+    "upcExpanded": "science diet chicken stew 3 5oz",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6575,
+    "supplyName": "Science Diet Healthy Cuisine 7+ Chicken 12.5oz",
+    "supplyExpanded": "science diet healthy cuisine 7 chicken 12 5oz",
+    "upc": "052742007236",
+    "upcName": "SD heal cuis ck 12.5oz",
+    "upcExpanded": "science diet healthy cuisine chicken 12 5oz",
+    "score": 1
+  },
+  {
+    "supplyId": 5947,
+    "supplyName": "Science Diet Lamb 15.5lb",
+    "supplyExpanded": "science diet lamb 15 5lb",
+    "upc": "052742855608",
+    "upcName": "SD lam 15.5#",
+    "upcExpanded": "science diet lamb 15 5",
+    "score": 0.8
+  },
+  {
+    "supplyId": 5948,
+    "supplyName": "Science Diet Lamb 33lb",
+    "supplyExpanded": "science diet lamb 33lb",
+    "upc": "052742203607",
+    "upcName": "SD lam 33#",
+    "upcExpanded": "science diet lamb 33",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6589,
+    "supplyName": "Science Diet Perfect Weight Chicken Stew 12.5oz",
+    "supplyExpanded": "science diet perfect weight chicken stew 12 5oz",
+    "upc": "052742002019",
+    "upcName": "SD perf weight ck stew 12.5oz",
+    "upcExpanded": "science diet perfect weight chicken stew 12 5oz",
+    "score": 1
+  },
+  {
+    "supplyId": 6587,
+    "supplyName": "Science Diet Perfect Weight Salmon Stew 12.5oz",
+    "supplyExpanded": "science diet perfect weight salmon stew 12 5oz",
+    "upc": "052742069814",
+    "upcName": "SD perf weight sal stew 12.5oz",
+    "upcExpanded": "science diet perfect weight salmon stew 12 5oz",
+    "score": 1
+  },
+  {
+    "supplyId": 5987,
+    "supplyName": "Science Diet Sensitive 15.5lb",
+    "supplyExpanded": "science diet sensitive 15 5lb",
+    "upc": "052742886008",
+    "upcName": "SD sensi 15.5#",
+    "upcExpanded": "science diet sensitive 15 5",
+    "score": 0.8
+  },
+  {
+    "supplyId": 5990,
+    "supplyName": "Science Diet Sensitive Grain Free Frozen 24lb",
+    "supplyExpanded": "science diet sensitive grain free frozen 24lb",
+    "upc": "052742022109",
+    "upcName": "SD sensi gr fr 24#",
+    "upcExpanded": "science diet sensitive grain free 24",
+    "score": 0.7142857142857143
+  },
+  {
+    "supplyId": 6580,
+    "supplyName": "Science Diet Sensitive Puppy Salmon 12.5oz",
+    "supplyExpanded": "science diet sensitive puppy salmon 12 5oz",
+    "upc": "052742069487",
+    "upcName": "SD sensi pup sal 12.5oz",
+    "upcExpanded": "science diet sensitive puppy salmon 12 5oz",
+    "score": 1
+  },
+  {
+    "supplyId": 5920,
+    "supplyName": "Science Diet Small Breed Lamb 4.5",
+    "supplyExpanded": "science diet small breed lamb 4 5",
+    "upc": "052742289601",
+    "upcName": "sd sm br lam 4.5",
+    "upcExpanded": "science diet small breed lamb 4 5",
+    "score": 1
+  }
+]

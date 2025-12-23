@@ -1,0 +1,56 @@
+[
+  {
+    "supplyId": 2657,
+    "supplyName": "Titan Traincllr Medium 20\" 5525",
+    "upc": "076484093210",
+    "upcName": "TITAN TRAINCLLR MED 16\" 5525",
+    "score": 0.8,
+    "brand": "Titan",
+    "issue": "size: 20\" vs 16\""
+  },
+  {
+    "supplyId": 5056,
+    "supplyName": "Aqualife Stand Airline Tube 25ft",
+    "upc": "059834053088",
+    "upcName": "AQUALIFE STAND AIRLINE TUBE 8FT",
+    "score": 0.8,
+    "brand": "UNKNOWN",
+    "issue": "length: 25ft vs 8ft"
+  },
+  {
+    "supplyId": 5731,
+    "supplyName": "Fluval C2 Zeo-carb 3pk",
+    "upc": "097227002333",
+    "upcName": "FLUVAL C3 ZEO-CARB 3PK",
+    "score": 0.8,
+    "brand": "UNKNOWN",
+    "issue": "product: C2 vs C3"
+  },
+  {
+    "supplyId": 6835,
+    "supplyName": "Fussie Cat Tuna, Mussel 2.82oz",
+    "upc": "888641133116",
+    "upcName": "FUSSIE CAT tuna 2.82oz",
+    "score": 0.8,
+    "brand": "Fussie Cat",
+    "issue": "ingredient: mussel missing"
+  },
+  {
+    "supplyId": 2089,
+    "supplyName": "Coastal Cat Soft Mesh Harness Red",
+    "upc": "076484630330",
+    "upcName": "COASTAL CAT SOFT MESH HARN PINK",
+    "score": 0.8333333333333334,
+    "brand": "Coastal",
+    "issue": "color: red vs pink"
+  },
+  {
+    "supplyId": 4190,
+    "supplyName": "Kaytee Large High Crnr Litter Pan",
+    "upc": "044472002393",
+    "upcName": "KAYTEE HIGH CRNR LITTER PAN",
+    "score": 0.8333333333333334,
+    "brand": "UNKNOWN",
+    "issue": "size: large missing in UPC"
+  }
+]

@@ -1,0 +1,234 @@
+[
+  {
+    "supplyId": 2390,
+    "supplyName": "Dr. Elsey's Kitten Attract",
+    "upc": "000338007207",
+    "upcName": "Dr.Elseys Kitten Attract",
+    "score": 0.75,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 2811,
+    "supplyName": "Spot Axolotl in Swimwear",
+    "upc": "077234549667",
+    "upcName": "SPT AXOLOTL IN SWIMWEAR",
+    "score": 0.75,
+    "brand": "Spot"
+  },
+  {
+    "supplyId": 5114,
+    "supplyName": "Purewater Pebble Neon Raibow",
+    "upc": "096316002593",
+    "upcName": "PUREWATER PEBBLE NEON PINK",
+    "score": 0.75,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 4224,
+    "supplyName": "Feeding Dish Small",
+    "upc": "015561228114",
+    "upcName": "ExoTerra Feeding Dish sm",
+    "score": 0.75,
+    "brand": "Exo Terra"
+  },
+  {
+    "supplyId": 1184,
+    "supplyName": "A & E Assorted Bird Cage",
+    "upc": "644472013351",
+    "upcName": "AE Asst Bird Cage",
+    "score": 0.75,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 2533,
+    "supplyName": "Circle 14\"tcr1786s Collar",
+    "upc": "076484178627",
+    "upcName": "CIRCLE 14\"TCR1786S COLLAR",
+    "score": 0.75,
+    "brand": "Circle T"
+  },
+  {
+    "supplyId": 1965,
+    "supplyName": "Nutri-Vet Uri-ease Cat Paw Gel",
+    "upc": "669125998533",
+    "upcName": "NutriVet Uri-Ease Cat paw Gel",
+    "score": 0.7142857142857143,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 2871,
+    "supplyName": "Mammoth TireBiter Ball With Extra 2 Knot Bone",
+    "upc": "746772352045",
+    "upcName": "MAMMOTH TB BLL W EX 2 KNOT BNE",
+    "score": 0.7142857142857143,
+    "brand": "Mammoth"
+  },
+  {
+    "supplyId": 1730,
+    "supplyName": "Petmate Kennel Cup Double",
+    "upc": "029695231742",
+    "upcName": "Petmate Double cup Sm",
+    "score": 0.75,
+    "brand": "Petmate"
+  },
+  {
+    "supplyId": 2628,
+    "supplyName": "Coastal Small Aliens14 Collar",
+    "upc": "076484996450",
+    "upcName": "COASTAL SM DNS14 COLLAR",
+    "score": 0.75,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 2594,
+    "supplyName": "Coastal Large Pineapples26 Collar",
+    "upc": "076484693816",
+    "upcName": "COASTAL LG DNS26 COLLAR",
+    "score": 0.75,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 5277,
+    "supplyName": "Aquascapes Small Purpl Bunch",
+    "upc": "071859949260",
+    "upcName": "AQUASCAPES SM YELL BUNCH",
+    "score": 0.75,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 2531,
+    "supplyName": "Lilpals Harness Combo Pkbpsm",
+    "upc": "076484638381",
+    "upcName": "LILPALS SM HARNESS PKBPSM",
+    "score": 0.75,
+    "brand": "Li'l Pals"
+  },
+  {
+    "supplyId": 4573,
+    "supplyName": "Nylabone DuraChew Wolf Bacon",
+    "upc": "018214823285",
+    "upcName": "NYLABONE DURACHEW BACON WLF",
+    "score": 0.75,
+    "brand": "Nylabone"
+  },
+  {
+    "supplyId": 6489,
+    "supplyName": "Zignature White Fish 13oz",
+    "upc": "888641131402",
+    "upcName": "ZIGN wh fish 13oz",
+    "score": 0.75,
+    "brand": "Zignature"
+  },
+  {
+    "supplyId": 386,
+    "supplyName": "Reptile System T5 Zone 1 Unit 24w 23\"",
+    "upc": "3443981210230",
+    "upcName": "Reptile Sys. T5 Zone 1 Unit 24W 23\"",
+    "score": 0.7142857142857143,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 4192,
+    "supplyName": "Kaytee Large Comfort Wheel",
+    "upc": "045125613841",
+    "upcName": "PTS WHEEL COMFORT LG",
+    "score": 0.75,
+    "brand": "Petmate"
+  },
+  {
+    "supplyId": 5110,
+    "supplyName": "Spectrastone Green Special 5lb",
+    "upc": "097612091359",
+    "upcName": "SPECTRASTONE BLU SPECIAL 5LB",
+    "score": 0.75,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 4225,
+    "supplyName": "Feeding Dish Large",
+    "upc": "015561228138",
+    "upcName": "ExoTerra Feeding Dish X-lg.",
+    "score": 0.75,
+    "brand": "Exo Terra"
+  },
+  {
+    "supplyId": 5794,
+    "supplyName": "Tetra Pond Sticks",
+    "upc": "069125024416",
+    "upcName": "TETRA POND STICKS 1LB",
+    "score": 0.75,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 1182,
+    "supplyName": "Prevue Econo Keet Cage",
+    "upc": "048081220061",
+    "upcName": "Prevue Econo Keet Cage",
+    "score": 0.75,
+    "brand": "Prevue"
+  },
+  {
+    "supplyId": 6474,
+    "supplyName": "Fromm Turkey Duck & Sweet Potato 12.2oz",
+    "upc": "072705119141",
+    "upcName": "FROMM bef & sw pot 12.2oz",
+    "score": 0.7142857142857143,
+    "brand": "Fromm"
+  },
+  {
+    "supplyId": 6580,
+    "supplyName": "Science Diet Sensitive Puppy Salmon 12.5oz",
+    "upc": "052742069487",
+    "upcName": "SD sensi pup sal 12.5oz",
+    "score": 0.7142857142857143,
+    "brand": "Science Diet"
+  },
+  {
+    "supplyId": 2636,
+    "supplyName": "Coastal Small Pineapples14 Collar",
+    "upc": "076484996443",
+    "upcName": "COASTAL SM ALN14 COLLAR",
+    "score": 0.75,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 3911,
+    "supplyName": "Coastal Hunter04' 604 Leash",
+    "upc": "015561224789",
+    "upcName": "COASTAL PUR06' 604 LEASH",
+    "score": 0.75,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 2590,
+    "supplyName": "Coastal Large Unicorns26 Collar",
+    "upc": "076484693809",
+    "upcName": "COASTAL LG ALN26 COLLAR",
+    "score": 0.75,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 1201,
+    "supplyName": "Finch Tiki Hut",
+    "upc": "048081011560",
+    "upcName": "PH Finch Tiki Hut",
+    "score": 0.75,
+    "brand": "Prevue"
+  },
+  {
+    "supplyId": 2584,
+    "supplyName": "Coastal Large Dinosaurs26 Collar",
+    "upc": "076484065620",
+    "upcName": "COASTAL LG FDN26 COLLAR",
+    "score": 0.75,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 2593,
+    "supplyName": "Coastal Medium Pineapples20 Collar",
+    "upc": "076484693526",
+    "upcName": "COASTAL MD  DNS20 COLLAR",
+    "score": 0.75,
+    "brand": "Coastal"
+  }
+]

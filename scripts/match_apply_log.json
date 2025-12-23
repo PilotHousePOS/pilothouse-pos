@@ -8532,5 +8532,791 @@
         "upc": "072705116461"
       }
     ]
+  },
+  {
+    "timestamp": "2025-12-23T03:56:33.594Z",
+    "attempted": 56,
+    "applied": 56,
+    "failed": 0,
+    "details": [
+      {
+        "matchId": "1030-048081132043",
+        "status": "success",
+        "supplyId": 1030,
+        "upc": "048081132043"
+      },
+      {
+        "matchId": "1428-018214828075",
+        "status": "success",
+        "supplyId": 1428,
+        "upc": "018214828075"
+      },
+      {
+        "matchId": "1579-045663975531",
+        "status": "success",
+        "supplyId": 1579,
+        "upc": "045663975531"
+      },
+      {
+        "matchId": "228-9631609626",
+        "status": "success",
+        "supplyId": 228,
+        "upc": "9631609626"
+      },
+      {
+        "matchId": "1458-020279998013",
+        "status": "success",
+        "supplyId": 1458,
+        "upc": "020279998013"
+      },
+      {
+        "matchId": "459-096316116603",
+        "status": "success",
+        "supplyId": 459,
+        "upc": "096316116603"
+      },
+      {
+        "matchId": "407-015561220620",
+        "status": "success",
+        "supplyId": 407,
+        "upc": "015561220620"
+      },
+      {
+        "matchId": "2240-035585459349",
+        "status": "success",
+        "supplyId": 2240,
+        "upc": "035585459349"
+      },
+      {
+        "matchId": "1739-026716800000",
+        "status": "success",
+        "supplyId": 1739,
+        "upc": "026716800000"
+      },
+      {
+        "matchId": "2266-035585534008",
+        "status": "success",
+        "supplyId": 2266,
+        "upc": "035585534008"
+      },
+      {
+        "matchId": "6485-072705118700",
+        "status": "success",
+        "supplyId": 6485,
+        "upc": "072705118700"
+      },
+      {
+        "matchId": "2912-018214855729",
+        "status": "success",
+        "supplyId": 2912,
+        "upc": "018214855729"
+      },
+      {
+        "matchId": "660-15561228565",
+        "status": "success",
+        "supplyId": 660,
+        "upc": "15561228565"
+      },
+      {
+        "matchId": "1345-645095000124",
+        "status": "success",
+        "supplyId": 1345,
+        "upc": "645095000124"
+      },
+      {
+        "matchId": "2612-076484560033",
+        "status": "success",
+        "supplyId": 2612,
+        "upc": "076484560033"
+      },
+      {
+        "matchId": "213-9119770062",
+        "status": "success",
+        "supplyId": 213,
+        "upc": "9119770062"
+      },
+      {
+        "matchId": "1294-645095202146",
+        "status": "success",
+        "supplyId": 1294,
+        "upc": "645095202146"
+      },
+      {
+        "matchId": "488-030172060885",
+        "status": "success",
+        "supplyId": 488,
+        "upc": "030172060885"
+      },
+      {
+        "matchId": "2611-076484560026",
+        "status": "success",
+        "supplyId": 2611,
+        "upc": "076484560026"
+      },
+      {
+        "matchId": "2204-077234521915",
+        "status": "success",
+        "supplyId": 2204,
+        "upc": "077234521915"
+      },
+      {
+        "matchId": "1947-076484959509",
+        "status": "success",
+        "supplyId": 1947,
+        "upc": "076484959509"
+      },
+      {
+        "matchId": "4353-048081605059",
+        "status": "success",
+        "supplyId": 4353,
+        "upc": "048081605059"
+      },
+      {
+        "matchId": "1290-645095861329",
+        "status": "success",
+        "supplyId": 1290,
+        "upc": "645095861329"
+      },
+      {
+        "matchId": "1301-645095202184",
+        "status": "success",
+        "supplyId": 1301,
+        "upc": "645095202184"
+      },
+      {
+        "matchId": "461-096316116580",
+        "status": "success",
+        "supplyId": 461,
+        "upc": "096316116580"
+      },
+      {
+        "matchId": "101-096316700611",
+        "status": "success",
+        "supplyId": 101,
+        "upc": "096316700611"
+      },
+      {
+        "matchId": "2217-077234521175",
+        "status": "success",
+        "supplyId": 2217,
+        "upc": "077234521175"
+      },
+      {
+        "matchId": "567-091197510175",
+        "status": "success",
+        "supplyId": 567,
+        "upc": "091197510175"
+      },
+      {
+        "matchId": "4516-001556121852",
+        "status": "success",
+        "supplyId": 4516,
+        "upc": "001556121852"
+      },
+      {
+        "matchId": "5538-030172016271",
+        "status": "success",
+        "supplyId": 5538,
+        "upc": "030172016271"
+      },
+      {
+        "matchId": "2465-076484662287",
+        "status": "success",
+        "supplyId": 2465,
+        "upc": "076484662287"
+      },
+      {
+        "matchId": "2496-076484322273",
+        "status": "success",
+        "supplyId": 2496,
+        "upc": "076484322273"
+      },
+      {
+        "matchId": "2261-035585457048",
+        "status": "success",
+        "supplyId": 2261,
+        "upc": "035585457048"
+      },
+      {
+        "matchId": "2493-076484001253",
+        "status": "success",
+        "supplyId": 2493,
+        "upc": "076484001253"
+      },
+      {
+        "matchId": "2467-076484662638",
+        "status": "success",
+        "supplyId": 2467,
+        "upc": "076484662638"
+      },
+      {
+        "matchId": "1956-645095007420",
+        "status": "success",
+        "supplyId": 1956,
+        "upc": "645095007420"
+      },
+      {
+        "matchId": "6696-038100026965",
+        "status": "success",
+        "supplyId": 6696,
+        "upc": "038100026965"
+      },
+      {
+        "matchId": "1829-076484075995",
+        "status": "success",
+        "supplyId": 1829,
+        "upc": "076484075995"
+      },
+      {
+        "matchId": "2296-079441009019",
+        "status": "success",
+        "supplyId": 2296,
+        "upc": "079441009019"
+      },
+      {
+        "matchId": "2420-076484622601",
+        "status": "success",
+        "supplyId": 2420,
+        "upc": "076484622601"
+      },
+      {
+        "matchId": "506-317163034422",
+        "status": "success",
+        "supplyId": 506,
+        "upc": "317163034422"
+      },
+      {
+        "matchId": "2456-076484066375",
+        "status": "success",
+        "supplyId": 2456,
+        "upc": "076484066375"
+      },
+      {
+        "matchId": "1569-045663975609",
+        "status": "success",
+        "supplyId": 1569,
+        "upc": "045663975609"
+      },
+      {
+        "matchId": "380-015561224253",
+        "status": "success",
+        "supplyId": 380,
+        "upc": "015561224253"
+      },
+      {
+        "matchId": "2776-077234541852",
+        "status": "success",
+        "supplyId": 2776,
+        "upc": "077234541852"
+      },
+      {
+        "matchId": "6705-064992719340",
+        "status": "success",
+        "supplyId": 6705,
+        "upc": "064992719340"
+      },
+      {
+        "matchId": "1118-030172013478",
+        "status": "success",
+        "supplyId": 1118,
+        "upc": "030172013478"
+      },
+      {
+        "matchId": "668-015561229227",
+        "status": "success",
+        "supplyId": 668,
+        "upc": "015561229227"
+      },
+      {
+        "matchId": "2504-076484624926",
+        "status": "success",
+        "supplyId": 2504,
+        "upc": "076484624926"
+      },
+      {
+        "matchId": "120-091197780080",
+        "status": "success",
+        "supplyId": 120,
+        "upc": "091197780080"
+      },
+      {
+        "matchId": "2518-076484029769",
+        "status": "success",
+        "supplyId": 2518,
+        "upc": "076484029769"
+      },
+      {
+        "matchId": "2434-076484410185",
+        "status": "success",
+        "supplyId": 2434,
+        "upc": "076484410185"
+      },
+      {
+        "matchId": "689-015561229944",
+        "status": "success",
+        "supplyId": 689,
+        "upc": "015561229944"
+      },
+      {
+        "matchId": "2516-076484029776",
+        "status": "success",
+        "supplyId": 2516,
+        "upc": "076484029776"
+      },
+      {
+        "matchId": "750-096316001541",
+        "status": "success",
+        "supplyId": 750,
+        "upc": "096316001541"
+      },
+      {
+        "matchId": "1828-076484076053",
+        "status": "success",
+        "supplyId": 1828,
+        "upc": "076484076053"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-12-23T03:58:10.003Z",
+    "attempted": 22,
+    "applied": 22,
+    "failed": 0,
+    "details": [
+      {
+        "matchId": "868-618940313113",
+        "status": "success",
+        "supplyId": 868,
+        "upc": "618940313113"
+      },
+      {
+        "matchId": "390-3443981170077",
+        "status": "success",
+        "supplyId": 390,
+        "upc": "3443981170077"
+      },
+      {
+        "matchId": "2391-000338007771",
+        "status": "success",
+        "supplyId": 2391,
+        "upc": "000338007771"
+      },
+      {
+        "matchId": "2928-018214850724",
+        "status": "success",
+        "supplyId": 2928,
+        "upc": "018214850724"
+      },
+      {
+        "matchId": "6349-038100100757",
+        "status": "success",
+        "supplyId": 6349,
+        "upc": "038100100757"
+      },
+      {
+        "matchId": "6642-038100026767",
+        "status": "success",
+        "supplyId": 6642,
+        "upc": "038100026767"
+      },
+      {
+        "matchId": "2162-022517444399",
+        "status": "success",
+        "supplyId": 2162,
+        "upc": "022517444399"
+      },
+      {
+        "matchId": "1170-046706302253",
+        "status": "success",
+        "supplyId": 1170,
+        "upc": "046706302253"
+      },
+      {
+        "matchId": "6641-038100026750",
+        "status": "success",
+        "supplyId": 6641,
+        "upc": "038100026750"
+      },
+      {
+        "matchId": "862-030172096853",
+        "status": "success",
+        "supplyId": 862,
+        "upc": "030172096853"
+      },
+      {
+        "matchId": "7248-030172093104",
+        "status": "success",
+        "supplyId": 7248,
+        "upc": "030172093104"
+      },
+      {
+        "matchId": "2543-076484104343",
+        "status": "success",
+        "supplyId": 2543,
+        "upc": "076484104343"
+      },
+      {
+        "matchId": "2924-018214855910",
+        "status": "success",
+        "supplyId": 2924,
+        "upc": "018214855910"
+      },
+      {
+        "matchId": "818-039079090025",
+        "status": "success",
+        "supplyId": 818,
+        "upc": "039079090025"
+      },
+      {
+        "matchId": "6637-038100153364",
+        "status": "success",
+        "supplyId": 6637,
+        "upc": "038100153364"
+      },
+      {
+        "matchId": "393-3443981170060",
+        "status": "success",
+        "supplyId": 393,
+        "upc": "3443981170060"
+      },
+      {
+        "matchId": "6644-038100107978",
+        "status": "success",
+        "supplyId": 6644,
+        "upc": "038100107978"
+      },
+      {
+        "matchId": "4529-008317859331",
+        "status": "success",
+        "supplyId": 4529,
+        "upc": "008317859331"
+      },
+      {
+        "matchId": "2536-076484178672",
+        "status": "success",
+        "supplyId": 2536,
+        "upc": "076484178672"
+      },
+      {
+        "matchId": "1055-048081625071",
+        "status": "success",
+        "supplyId": 1055,
+        "upc": "048081625071"
+      },
+      {
+        "matchId": "2252-035585459332",
+        "status": "success",
+        "supplyId": 2252,
+        "upc": "035585459332"
+      },
+      {
+        "matchId": "6617-840243104932",
+        "status": "success",
+        "supplyId": 6617,
+        "upc": "840243104932"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-12-23T04:00:40.310Z",
+    "attempted": 23,
+    "applied": 23,
+    "failed": 0,
+    "details": [
+      {
+        "matchId": "6871-840243104987",
+        "status": "success",
+        "supplyId": 6871,
+        "upc": "840243104987"
+      },
+      {
+        "matchId": "6225-859610000098",
+        "status": "success",
+        "supplyId": 6225,
+        "upc": "859610000098"
+      },
+      {
+        "matchId": "6619-840243120475",
+        "status": "success",
+        "supplyId": 6619,
+        "upc": "840243120475"
+      },
+      {
+        "matchId": "6221-840243144099",
+        "status": "success",
+        "supplyId": 6221,
+        "upc": "840243144099"
+      },
+      {
+        "matchId": "6216-840243144143",
+        "status": "success",
+        "supplyId": 6216,
+        "upc": "840243144143"
+      },
+      {
+        "matchId": "6739-072705117307",
+        "status": "success",
+        "supplyId": 6739,
+        "upc": "072705117307"
+      },
+      {
+        "matchId": "6586-052742705507",
+        "status": "success",
+        "supplyId": 6586,
+        "upc": "052742705507"
+      },
+      {
+        "matchId": "6584-052742705705",
+        "status": "success",
+        "supplyId": 6584,
+        "upc": "052742705705"
+      },
+      {
+        "matchId": "6715-052742453408",
+        "status": "success",
+        "supplyId": 6715,
+        "upc": "052742453408"
+      },
+      {
+        "matchId": "6716-052742453804",
+        "status": "success",
+        "supplyId": 6716,
+        "upc": "052742453804"
+      },
+      {
+        "matchId": "6846-052742075556",
+        "status": "success",
+        "supplyId": 6846,
+        "upc": "052742075556"
+      },
+      {
+        "matchId": "6848-052742075891",
+        "status": "success",
+        "supplyId": 6848,
+        "upc": "052742075891"
+      },
+      {
+        "matchId": "6847-052742075853",
+        "status": "success",
+        "supplyId": 6847,
+        "upc": "052742075853"
+      },
+      {
+        "matchId": "6561-052742018140",
+        "status": "success",
+        "supplyId": 6561,
+        "upc": "052742018140"
+      },
+      {
+        "matchId": "6575-052742007236",
+        "status": "success",
+        "supplyId": 6575,
+        "upc": "052742007236"
+      },
+      {
+        "matchId": "5947-052742855608",
+        "status": "success",
+        "supplyId": 5947,
+        "upc": "052742855608"
+      },
+      {
+        "matchId": "5948-052742203607",
+        "status": "success",
+        "supplyId": 5948,
+        "upc": "052742203607"
+      },
+      {
+        "matchId": "6589-052742002019",
+        "status": "success",
+        "supplyId": 6589,
+        "upc": "052742002019"
+      },
+      {
+        "matchId": "6587-052742069814",
+        "status": "success",
+        "supplyId": 6587,
+        "upc": "052742069814"
+      },
+      {
+        "matchId": "5987-052742886008",
+        "status": "success",
+        "supplyId": 5987,
+        "upc": "052742886008"
+      },
+      {
+        "matchId": "5990-052742022109",
+        "status": "success",
+        "supplyId": 5990,
+        "upc": "052742022109"
+      },
+      {
+        "matchId": "6580-052742069487",
+        "status": "success",
+        "supplyId": 6580,
+        "upc": "052742069487"
+      },
+      {
+        "matchId": "5920-052742289601",
+        "status": "success",
+        "supplyId": 5920,
+        "upc": "052742289601"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-12-23T04:01:39.555Z",
+    "attempted": 9,
+    "applied": 9,
+    "failed": 0,
+    "details": [
+      {
+        "matchId": "6780-052742715605",
+        "status": "success",
+        "supplyId": 6780,
+        "upc": "052742715605"
+      },
+      {
+        "matchId": "6797-052742753300",
+        "status": "success",
+        "supplyId": 6797,
+        "upc": "052742753300"
+      },
+      {
+        "matchId": "5942-052742020419",
+        "status": "success",
+        "supplyId": 5942,
+        "upc": "052742020419"
+      },
+      {
+        "matchId": "5943-052742016016",
+        "status": "success",
+        "supplyId": 5943,
+        "upc": "052742016016"
+      },
+      {
+        "matchId": "5986-052742001821",
+        "status": "success",
+        "supplyId": 5986,
+        "upc": "052742001821"
+      },
+      {
+        "matchId": "5988-052742883908",
+        "status": "success",
+        "supplyId": 5988,
+        "upc": "052742883908"
+      },
+      {
+        "matchId": "6718-052742010243",
+        "status": "success",
+        "supplyId": 6718,
+        "upc": "052742010243"
+      },
+      {
+        "matchId": "6199-840243105359",
+        "status": "success",
+        "supplyId": 6199,
+        "upc": "840243105359"
+      },
+      {
+        "matchId": "6747-072705116638",
+        "status": "success",
+        "supplyId": 6747,
+        "upc": "072705116638"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-12-23T04:02:29.943Z",
+    "attempted": 9,
+    "applied": 9,
+    "failed": 0,
+    "details": [
+      {
+        "matchId": "6620-840243120352",
+        "status": "success",
+        "supplyId": 6620,
+        "upc": "840243120352"
+      },
+      {
+        "matchId": "6741-072705117208",
+        "status": "success",
+        "supplyId": 6741,
+        "upc": "072705117208"
+      },
+      {
+        "matchId": "6742-072705117239",
+        "status": "success",
+        "supplyId": 6742,
+        "upc": "072705117239"
+      },
+      {
+        "matchId": "6743-072705117000",
+        "status": "success",
+        "supplyId": 6743,
+        "upc": "072705117000"
+      },
+      {
+        "matchId": "6745-072705116904",
+        "status": "success",
+        "supplyId": 6745,
+        "upc": "072705116904"
+      },
+      {
+        "matchId": "6748-072705137459",
+        "status": "success",
+        "supplyId": 6748,
+        "upc": "072705137459"
+      },
+      {
+        "matchId": "6755-072705137404",
+        "status": "success",
+        "supplyId": 6755,
+        "upc": "072705137404"
+      },
+      {
+        "matchId": "6752-072705137039",
+        "status": "success",
+        "supplyId": 6752,
+        "upc": "072705137039"
+      },
+      {
+        "matchId": "6574-052742007236",
+        "status": "success",
+        "supplyId": 6574,
+        "upc": "052742007236"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-12-23T04:03:18.198Z",
+    "attempted": 4,
+    "applied": 4,
+    "failed": 0,
+    "details": [
+      {
+        "matchId": "6802-052742887609",
+        "status": "success",
+        "supplyId": 6802,
+        "upc": "052742887609"
+      },
+      {
+        "matchId": "6782-052742002156",
+        "status": "success",
+        "supplyId": 6782,
+        "upc": "052742002156"
+      },
+      {
+        "matchId": "6788-052742002170",
+        "status": "success",
+        "supplyId": 6788,
+        "upc": "052742002170"
+      },
+      {
+        "matchId": "6172-072705114429",
+        "status": "success",
+        "supplyId": 6172,
+        "upc": "072705114429"
+      }
+    ]
   }
 ]

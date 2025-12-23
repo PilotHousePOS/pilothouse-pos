@@ -1,0 +1,450 @@
+[
+  {
+    "supplyId": 1030,
+    "supplyName": "Pine Swing Medium",
+    "upc": "048081132043",
+    "upcName": "Pine Swing Med",
+    "score": 1,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 1428,
+    "supplyName": "Nylabone Oral Care Dental Spray",
+    "upc": "018214828075",
+    "upcName": "NylaBone Oral Care Dental Spray",
+    "score": 1,
+    "brand": "Nylabone"
+  },
+  {
+    "supplyId": 1579,
+    "supplyName": "Magic Coat Reduces Shedding",
+    "upc": "045663975531",
+    "upcName": "Magic Coat Reduces Shedding",
+    "score": 1,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 228,
+    "supplyName": "Zilla Vegtable Mix",
+    "upc": "9631609626",
+    "upcName": "Zilla Vegtable Mix",
+    "score": 1,
+    "brand": "Zilla"
+  },
+  {
+    "supplyId": 1458,
+    "supplyName": "Petag Nurser Bottle 2oz",
+    "upc": "020279998013",
+    "upcName": "PetAg Nurser Bottle 2oz",
+    "score": 1,
+    "brand": "PetAg"
+  },
+  {
+    "supplyId": 459,
+    "supplyName": "Zilla Durable Dish L",
+    "upc": "096316116603",
+    "upcName": "Zilla Durable Dish L",
+    "score": 1,
+    "brand": "Zilla"
+  },
+  {
+    "supplyId": 407,
+    "supplyName": "Exoterra Wire Light",
+    "upc": "015561220620",
+    "upcName": "ExoTerra Wire Light",
+    "score": 1,
+    "brand": "Exo Terra"
+  },
+  {
+    "supplyId": 2240,
+    "supplyName": "Kong Gumball Infuseer",
+    "upc": "035585459349",
+    "upcName": "KONG Gumball Infuseer",
+    "score": 1,
+    "brand": "Kong"
+  },
+  {
+    "supplyId": 1739,
+    "supplyName": "Petcrestspiralstake",
+    "upc": "026716800000",
+    "upcName": "PetCrestSpiralStake",
+    "score": 1,
+    "brand": "PetCrest"
+  },
+  {
+    "supplyId": 2266,
+    "supplyName": "Kong Playspaces Pawcorn",
+    "upc": "035585534008",
+    "upcName": "KONG playspaces Pawcorn",
+    "score": 1,
+    "brand": "Kong"
+  },
+  {
+    "supplyId": 6485,
+    "supplyName": "Fromm Turkey 12.2oz",
+    "upc": "072705118700",
+    "upcName": "FROMM turk 12.2oz",
+    "score": 1,
+    "brand": "Fromm"
+  },
+  {
+    "supplyId": 2912,
+    "supplyName": "Nylabone Freeze Bone Wlf",
+    "upc": "018214855729",
+    "upcName": "NYLABONE FREEZE BONE WLF",
+    "score": 1,
+    "brand": "Nylabone"
+  },
+  {
+    "supplyId": 660,
+    "supplyName": "Exoterra Crocodile Skull",
+    "upc": "15561228565",
+    "upcName": "ExoTerra Crocodile Skull",
+    "score": 1,
+    "brand": "Exo Terra"
+  },
+  {
+    "supplyId": 1345,
+    "supplyName": "Tropiclean Perfect Fur Tangle Remover",
+    "upc": "645095000124",
+    "upcName": "TropiClean Perfect Fur Tangle Remover",
+    "score": 1,
+    "brand": "TropiClean"
+  },
+  {
+    "supplyId": 2612,
+    "supplyName": "Titan G3320 Traincollarprg",
+    "upc": "076484560033",
+    "upcName": "TITAN G3320 TRAINCOLLARPRG",
+    "score": 1,
+    "brand": "Titan"
+  },
+  {
+    "supplyId": 213,
+    "supplyName": "Flukers Garden Blend",
+    "upc": "9119770062",
+    "upcName": "Flukers Garden Blend",
+    "score": 1,
+    "brand": "Flukers"
+  },
+  {
+    "supplyId": 1294,
+    "supplyName": "Tropiclean Deoderizing Shamp",
+    "upc": "645095202146",
+    "upcName": "TropiClean Deoderizing Shamp",
+    "score": 1,
+    "brand": "TropiClean"
+  },
+  {
+    "supplyId": 488,
+    "supplyName": "Floating Turtle Pier Medium",
+    "upc": "030172060885",
+    "upcName": "Floating Turtle Pier Med.",
+    "score": 1,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 2611,
+    "supplyName": "Titan G3018 Traincollarprg",
+    "upc": "076484560026",
+    "upcName": "TITAN G3018 TRAINCOLLARPRG",
+    "score": 1,
+    "brand": "Titan"
+  },
+  {
+    "supplyId": 2204,
+    "supplyName": "Spot Buzzing Insects",
+    "upc": "077234521915",
+    "upcName": "SPOT Buzzing Insects",
+    "score": 1,
+    "brand": "Spot"
+  },
+  {
+    "supplyId": 1947,
+    "supplyName": "Safari Shedding Comb",
+    "upc": "076484959509",
+    "upcName": "Safari Shedding Comb",
+    "score": 1,
+    "brand": "Safari"
+  },
+  {
+    "supplyId": 4353,
+    "supplyName": "Oxbow Critical Care Herb 36g",
+    "upc": "048081605059",
+    "upcName": "OXBOW CRITICAL CARE HERB 36G",
+    "score": 1,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 1290,
+    "supplyName": "Tropiclean Bbypwder Pet Spray",
+    "upc": "645095861329",
+    "upcName": "Tropiclean BbyPwder Pet Spray",
+    "score": 1,
+    "brand": "TropiClean"
+  },
+  {
+    "supplyId": 1301,
+    "supplyName": "Tropiclean Luxury 2in1",
+    "upc": "645095202184",
+    "upcName": "TropiClean Luxury 2in1",
+    "score": 1,
+    "brand": "TropiClean"
+  },
+  {
+    "supplyId": 461,
+    "supplyName": "Zilla Durable Dish S",
+    "upc": "096316116580",
+    "upcName": "Zilla Durable DIsh s",
+    "score": 1,
+    "brand": "Zilla"
+  },
+  {
+    "supplyId": 101,
+    "supplyName": "Zilla Green Liner 55g",
+    "upc": "096316700611",
+    "upcName": "Zilla Green Liner 55g",
+    "score": 1,
+    "brand": "Zilla"
+  },
+  {
+    "supplyId": 2217,
+    "supplyName": "Spot Hugnkiick Fantastic Fish",
+    "upc": "077234521175",
+    "upcName": "SPOT HugnKIick Fantastic Fish",
+    "score": 1,
+    "brand": "Spot"
+  },
+  {
+    "supplyId": 567,
+    "supplyName": "Flukers Red Coleus",
+    "upc": "091197510175",
+    "upcName": "Flukers Red Coleus",
+    "score": 1,
+    "brand": "Flukers"
+  },
+  {
+    "supplyId": 4516,
+    "supplyName": "Happydog Jumbo Elk Antler",
+    "upc": "001556121852",
+    "upcName": "HAPPYDOG JUMBO ELK ANTLER",
+    "score": 1,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 5538,
+    "supplyName": "Cascade Filtapack 2pk",
+    "upc": "030172016271",
+    "upcName": "CASCADE FILTAPACK 2PK",
+    "score": 1,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 2465,
+    "supplyName": "Lilpals Small Collar Gnd12",
+    "upc": "076484662287",
+    "upcName": "LILPALS SM COLLAR GND12",
+    "score": 1,
+    "brand": "Li'l Pals"
+  },
+  {
+    "supplyId": 2496,
+    "supplyName": "Lilpals Small Collar Red10",
+    "upc": "076484322273",
+    "upcName": "LILPALS SM COLLAR RED10",
+    "score": 1,
+    "brand": "Li'l Pals"
+  },
+  {
+    "supplyId": 2261,
+    "supplyName": "Kong Play Spacer Camper",
+    "upc": "035585457048",
+    "upcName": "KONG Play Spacer Camper",
+    "score": 1,
+    "brand": "Kong"
+  },
+  {
+    "supplyId": 2493,
+    "supplyName": "Lilpals Small Collar 2bl12",
+    "upc": "076484001253",
+    "upcName": "LILPALS SM COLLAR 2BL12",
+    "score": 1,
+    "brand": "Li'l Pals"
+  },
+  {
+    "supplyId": 2467,
+    "supplyName": "Lilpals Small Collar Ptv12",
+    "upc": "076484662638",
+    "upcName": "LILPALS SM COLLAR PTV12",
+    "score": 1,
+    "brand": "Li'l Pals"
+  },
+  {
+    "supplyId": 1956,
+    "supplyName": "Tropiclean Natural Flea Cat Mist",
+    "upc": "645095007420",
+    "upcName": "TropiClean Natural Flea CAT mist",
+    "score": 1,
+    "brand": "TropiClean"
+  },
+  {
+    "supplyId": 6696,
+    "supplyName": "Pro Plan Cat Chicken 3oz",
+    "upc": "038100026965",
+    "upcName": "PRO PLAN cat ck 3oz",
+    "score": 1,
+    "brand": "Pro Plan"
+  },
+  {
+    "supplyId": 1829,
+    "supplyName": "Coastal Mesh Muzzle Size 4",
+    "upc": "076484075995",
+    "upcName": "Coastal Mesh Muzzle Size 1",
+    "score": 1,
+    "brand": "Coastal"
+  },
+  {
+    "supplyId": 2296,
+    "supplyName": "5lbs Pet Food Container",
+    "upc": "079441009019",
+    "upcName": "5lbs Pet Food Container",
+    "score": 1,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 2420,
+    "supplyName": "Lilpals Leash Dmc06",
+    "upc": "076484622601",
+    "upcName": "LILPALS LEASH DMC06",
+    "score": 1,
+    "brand": "Li'l Pals"
+  },
+  {
+    "supplyId": 506,
+    "supplyName": "Api Turtle Turtle Fix",
+    "upc": "317163034422",
+    "upcName": "API Turtle Turtle Fix",
+    "score": 1,
+    "brand": "API"
+  },
+  {
+    "supplyId": 2456,
+    "supplyName": "Lilpals Small Collar Btd12",
+    "upc": "076484066375",
+    "upcName": "LILPALS SM COLLAR BTD12",
+    "score": 1,
+    "brand": "Li'l Pals"
+  },
+  {
+    "supplyId": 1569,
+    "supplyName": "Magic Coat Saftey Sciccors",
+    "upc": "045663975609",
+    "upcName": "Magic Coat Saftey Sciccors",
+    "score": 1,
+    "brand": "UNKNOWN"
+  },
+  {
+    "supplyId": 380,
+    "supplyName": "Exoterra Terraskyuv 9w",
+    "upc": "015561224253",
+    "upcName": "ExoTerra TerraSkyUV 9W",
+    "score": 1,
+    "brand": "Exo Terra"
+  },
+  {
+    "supplyId": 2776,
+    "supplyName": "Spot Sknz Ex Quilted Fox",
+    "upc": "077234541852",
+    "upcName": "SPOT SKNZ EX QUILTED FOX",
+    "score": 1,
+    "brand": "Spot"
+  },
+  {
+    "supplyId": 6705,
+    "supplyName": "Orijen Cat Original 3oz",
+    "upc": "064992719340",
+    "upcName": "ORIJEN cat orig 3oz",
+    "score": 1,
+    "brand": "Orijen"
+  },
+  {
+    "supplyId": 1118,
+    "supplyName": "Birdlife Kabob Toy Large",
+    "upc": "030172013478",
+    "upcName": "BirdLIfe Kabob toy Lg",
+    "score": 1,
+    "brand": "Birdlife"
+  },
+  {
+    "supplyId": 668,
+    "supplyName": "Exoterra Tortoie Cave",
+    "upc": "015561229227",
+    "upcName": "ExoTerra Tortoie Cave",
+    "score": 1,
+    "brand": "Exo Terra"
+  },
+  {
+    "supplyId": 2504,
+    "supplyName": "Lilpals Small Harness Ryppsm",
+    "upc": "076484624926",
+    "upcName": "LILPALS SM HARNESS RYPPSM",
+    "score": 1,
+    "brand": "Li'l Pals"
+  },
+  {
+    "supplyId": 120,
+    "supplyName": "Flukers Omnivore Mix",
+    "upc": "091197780080",
+    "upcName": "Flukers Omnivore Mix",
+    "score": 1,
+    "brand": "Flukers"
+  },
+  {
+    "supplyId": 2518,
+    "supplyName": "Lilpals Small Harness Blupsm",
+    "upc": "076484029769",
+    "upcName": "LILPALS SM HARNESS BLUPSM",
+    "score": 1,
+    "brand": "Li'l Pals"
+  },
+  {
+    "supplyId": 2434,
+    "supplyName": "Lilpals Leash Npk06",
+    "upc": "076484410185",
+    "upcName": "LILPALS LEASH NPK06",
+    "score": 1,
+    "brand": "Li'l Pals"
+  },
+  {
+    "supplyId": 689,
+    "supplyName": "Exoterra Boxwood Bush",
+    "upc": "015561229944",
+    "upcName": "ExoTerra BoxWood Bush",
+    "score": 1,
+    "brand": "Exo Terra"
+  },
+  {
+    "supplyId": 2516,
+    "supplyName": "Lilpals Small Harness Pnkpsm",
+    "upc": "076484029776",
+    "upcName": "LILPALS SM HARNESS PNKPSM",
+    "score": 1,
+    "brand": "Li'l Pals"
+  },
+  {
+    "supplyId": 750,
+    "supplyName": "Zilla Micro Terrestial Habitat",
+    "upc": "096316001541",
+    "upcName": "Zilla Micro Terrestial Habitat",
+    "score": 1,
+    "brand": "Zilla"
+  },
+  {
+    "supplyId": 1828,
+    "supplyName": "Coastal Mesh Muzzle Size 3",
+    "upc": "076484076053",
+    "upcName": "Coastal Mesh Muzzle Size 2",
+    "score": 1,
+    "brand": "Coastal"
+  }
+]

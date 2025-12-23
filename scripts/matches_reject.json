@@ -1,0 +1,56 @@
+[
+  {
+    "supplyId": 394,
+    "supplyName": "Reptile System T5 Zone 2 24w 6\"",
+    "upc": "443983200086",
+    "upcName": "Reptile Sys. T5 Zone 1 24W 2.4%",
+    "score": 0.8,
+    "brand": "UNKNOWN",
+    "issue": "zone mismatch"
+  },
+  {
+    "supplyId": 2532,
+    "supplyName": "Lilpals Harness Combo Blackpsm",
+    "upc": "076484062049",
+    "upcName": "LILPALS HARNESS COMBO PKBPSM",
+    "score": 0.75,
+    "brand": "Li'l Pals",
+    "issue": "color mismatch"
+  },
+  {
+    "supplyId": 3939,
+    "supplyName": "Coastal Blue04' 904 Leash",
+    "upc": "015561224666",
+    "upcName": "COASTAL HUN04' 904 LEASH",
+    "score": 0.75,
+    "brand": "Coastal",
+    "issue": "color mismatch"
+  },
+  {
+    "supplyId": 1968,
+    "supplyName": "Naturvet Digestive Enzymes Cat",
+    "upc": "797801036603",
+    "upcName": "NaturVet Digestive Enzymes Powder",
+    "score": 0.75,
+    "brand": "NaturVet",
+    "issue": "product mismatch (cat vs powder)"
+  },
+  {
+    "supplyId": 7108,
+    "supplyName": "Seachem Flourish Excel 8.5oz",
+    "upc": "000116051606",
+    "upcName": "SEACHEM flourish 8.5oz",
+    "score": 0.75,
+    "brand": "SeaChem",
+    "issue": "product mismatch (flourish vs flourish excel)"
+  },
+  {
+    "supplyId": 3586,
+    "supplyName": "Coastal Gray Pink Small Harness",
+    "upc": "76484163272",
+    "upcName": "COASTAL HARN/LEASH GRY SML",
+    "score": 0.8,
+    "brand": "Coastal",
+    "issue": "color mismatch"
+  }
+]

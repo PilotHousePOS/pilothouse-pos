@@ -1,0 +1,155 @@
+[
+  {
+    "supplyId": 2883,
+    "supplyName": "Mammoth XLarge Color Bone",
+    "upc": "746772200049",
+    "upcName": "MAMMOTH MED COLOR BONE",
+    "score": 0.75,
+    "brand": "Mammoth",
+    "issue": "size mismatch: large vs med"
+  },
+  {
+    "supplyId": 1800,
+    "supplyName": "Thunder Shirt Sport Small",
+    "upc": "819505013190",
+    "upcName": "Thunder Shirt Sport XXS",
+    "score": 0.75,
+    "brand": "UNKNOWN",
+    "issue": "size mismatch: small vs xs"
+  },
+  {
+    "supplyId": 2755,
+    "supplyName": "Spot Fun Sloth 13\"",
+    "upc": "077234544945",
+    "upcName": "SPOT FUN SLOTH 7\"",
+    "score": 0.75,
+    "brand": "Spot",
+    "issue": "size mismatch: 13 vs 7"
+  },
+  {
+    "supplyId": 3433,
+    "supplyName": "Coastal Fsa24\" Soy Harness",
+    "upc": "008436993111",
+    "upcName": "COASTAL ONY30\" SOY HARNESS",
+    "score": 0.75,
+    "brand": "Coastal",
+    "issue": "size mismatch: 24 vs 30"
+  },
+  {
+    "supplyId": 2653,
+    "supplyName": "Titan Traincllr Fine 18\" 5520",
+    "upc": "076484093128",
+    "upcName": "TITAN TRAINCLLR FINE 16\" 5520",
+    "score": 0.8,
+    "brand": "Titan",
+    "issue": "size mismatch: 18 vs 16"
+  },
+  {
+    "supplyId": 3434,
+    "supplyName": "Coastal Fsa18\" Soy Harness",
+    "upc": "001556121973",
+    "upcName": "COASTAL SLA38\" SOY HARNESS",
+    "score": 0.75,
+    "brand": "Coastal",
+    "issue": "size mismatch: 18 vs 38"
+  },
+  {
+    "supplyId": 3431,
+    "supplyName": "Coastal Sla24\" Soy Harness",
+    "upc": "009119773030",
+    "upcName": "COASTAL SLA30\" SOY HARNESS",
+    "score": 0.75,
+    "brand": "Coastal",
+    "issue": "size mismatch: 24 vs 30"
+  },
+  {
+    "supplyId": 2550,
+    "supplyName": "Circle 20\" Red 1106 Collar",
+    "upc": "076484104312",
+    "upcName": "CIRCLE 18\" RED 1106 COLLAR",
+    "score": 0.8,
+    "brand": "Circle T",
+    "issue": "size mismatch: 20 vs 18"
+  },
+  {
+    "supplyId": 2647,
+    "supplyName": "Titan Traincllr Xhvy 30\" 5540",
+    "upc": "076484093418",
+    "upcName": "TITAN TRAINCLLR XHVY 20\" 5540",
+    "score": 0.8,
+    "brand": "Titan",
+    "issue": "size mismatch: 30 vs 20"
+  },
+  {
+    "supplyId": 4423,
+    "supplyName": "Small Oval Basket Nest",
+    "upc": "048081010723",
+    "upcName": "Oval Basket Nest LG",
+    "score": 0.75,
+    "brand": "UNKNOWN",
+    "issue": "size mismatch: small vs lg"
+  },
+  {
+    "supplyId": 1520,
+    "supplyName": "Safari Soft Slicker Medium",
+    "upc": "076484004063",
+    "upcName": "Safari Soft Slicker lg",
+    "score": 0.75,
+    "brand": "Safari",
+    "issue": "size mismatch: medium vs lg"
+  },
+  {
+    "supplyId": 4668,
+    "supplyName": "Fresh Kisses Small Mint Box",
+    "upc": "097612326109",
+    "upcName": "FRESH KISSES LG MINT BOX",
+    "score": 0.8,
+    "brand": "UNKNOWN",
+    "issue": "size mismatch: small vs lg"
+  },
+  {
+    "supplyId": 4520,
+    "supplyName": "Happydog Large Sliced Elk Ant",
+    "upc": "009761213303",
+    "upcName": "HAPPYDOG JUMBO SLICED ELK ANT",
+    "score": 0.8,
+    "brand": "UNKNOWN",
+    "issue": "size mismatch: large vs jumbo"
+  },
+  {
+    "supplyId": 4493,
+    "supplyName": "Redbarn Small Collagen Stick",
+    "upc": "001556121979",
+    "upcName": "REDBARN XL COLLAGEN STICK",
+    "score": 0.75,
+    "brand": "RedBarn",
+    "issue": "size mismatch: small vs xl"
+  },
+  {
+    "supplyId": 4545,
+    "supplyName": "Bam-bones + Stck 9.5\" Chick",
+    "upc": "009631667110",
+    "upcName": "BAM-BONES + STICK 5.25\" CHICK",
+    "score": 0.8,
+    "brand": "UNKNOWN",
+    "issue": "size mismatch: 5 vs 25"
+  },
+  {
+    "supplyId": 1858,
+    "supplyName": "Simplesolution Medium Washable Diaper",
+    "upc": "010279105955",
+    "upcName": "SimpleSolution XL Washable Diaper",
+    "score": 0.75,
+    "brand": "UNKNOWN",
+    "issue": "size mismatch: medium vs xl"
+  },
+  {
+    "supplyId": 1778,
+    "supplyName": "Zippy Paws Small Life Jacket",
+    "upc": "818786014971",
+    "upcName": "Zippy Paws XS Life Jacket",
+    "score": 0.8,
+    "brand": "UNKNOWN",
+    "issue": "size mismatch: small vs xs"
+  }
+]

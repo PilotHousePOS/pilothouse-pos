@@ -1,0 +1,212 @@
+[
+  {
+    "supplyId": 4727,
+    "supplyName": "Blue Buffalo Bits Beef",
+    "supplyExpanded": "blue buffalo bits beef",
+    "upc": "840243105212",
+    "upcName": "BL BUF beef stew",
+    "upcExpanded": "blue buffalo beef stew",
+    "score": 0.75,
+    "issue": "product: bits vs not bits"
+  },
+  {
+    "supplyId": 4728,
+    "supplyName": "Blue Buffalo Bits Chicken",
+    "supplyExpanded": "blue buffalo bits chicken",
+    "upc": "840243144075",
+    "upcName": "BLUE B ck 5#",
+    "upcExpanded": "blue buffalo chicken 5",
+    "score": 0.75,
+    "issue": "product: bits vs not bits"
+  },
+  {
+    "supplyId": 4729,
+    "supplyName": "Blue Buffalo Bits Salmon",
+    "supplyExpanded": "blue buffalo bits salmon",
+    "upc": "840243105359",
+    "upcName": "BLUE B wilderness salmon 4.5#",
+    "upcExpanded": "blue buffalo wilderness salmon 4 5",
+    "score": 0.75,
+    "issue": "product: bits vs not bits"
+  },
+  {
+    "supplyId": 4726,
+    "supplyName": "Blue Buffalo Bits Turkey",
+    "supplyExpanded": "blue buffalo bits turkey",
+    "upc": "859610007509",
+    "upcName": "BLUE B basic turkey 4#",
+    "upcExpanded": "blue buffalo basic turkey 4",
+    "score": 0.75,
+    "issue": "product: bits vs not bits"
+  },
+  {
+    "supplyId": 6603,
+    "supplyName": "Blue Buffalo Wilderness Beef & Chicken 12.5oz",
+    "supplyExpanded": "blue buffalo wilderness beef chicken 12 5oz",
+    "upc": "840243105199",
+    "upcName": "BL BUF ck stew 12.5oz",
+    "upcExpanded": "blue buffalo chicken stew 12 5oz",
+    "score": 0.7142857142857143,
+    "issue": "product: wilderness missing"
+  },
+  {
+    "supplyId": 4759,
+    "supplyName": "Fromm Baked Chicken",
+    "supplyExpanded": "fromm baked chicken",
+    "upc": "072705114740",
+    "upcName": "FROMM ck frommage 4#",
+    "upcExpanded": "fromm chicken frommage 4",
+    "score": 0.6666666666666666,
+    "issue": "product: baked missing"
+  },
+  {
+    "supplyId": 4760,
+    "supplyName": "Fromm Baked Salmon",
+    "supplyExpanded": "fromm baked salmon",
+    "upc": "072705116706",
+    "upcName": "FROMM cat saslm 4#",
+    "upcExpanded": "fromm cat salmon 4",
+    "score": 0.6666666666666666,
+    "issue": "product: baked missing"
+  },
+  {
+    "supplyId": 6747,
+    "supplyName": "Fromm Cat Duck À La Vegetable 10lb",
+    "supplyExpanded": "fromm cat duckenpfeffer la vegetable 10lb",
+    "upc": "072705116638",
+    "upcName": "FROMM cat duck veg 10#",
+    "upcExpanded": "fromm cat duckenpfeffer vegetable 10",
+    "score": 0.6666666666666666,
+    "issue": "score too low: 67%"
+  },
+  {
+    "supplyId": 6744,
+    "supplyName": "Fromm Cat Game Bird Recipe 10lb",
+    "supplyExpanded": "fromm cat game bird bird recipe 10lb",
+    "upc": "072705117000",
+    "upcName": "FROMM cat game 4#",
+    "upcExpanded": "fromm cat game bird 4",
+    "score": 0.6666666666666666,
+    "issue": "size: 10lb missing"
+  },
+  {
+    "supplyId": 6474,
+    "supplyName": "Fromm Turkey Duck & Sweet Potato 12.2oz",
+    "supplyExpanded": "fromm turkey duckenpfeffer sweet potato 12 2oz",
+    "upc": "072705119141",
+    "upcName": "FROMM bef & sw pot 12.2oz",
+    "upcExpanded": "fromm beef sweet potato 12 2oz",
+    "score": 0.7142857142857143,
+    "issue": "protein: turkey+duck vs beef"
+  },
+  {
+    "supplyId": 6780,
+    "supplyName": "Science Diet Cat Hairball Control 3.5lb",
+    "supplyExpanded": "science diet cat hairball control 3 5lb",
+    "upc": "052742715605",
+    "upcName": "SD cat hairba 3.5#",
+    "upcExpanded": "science diet cat hairball 3 5",
+    "score": 0.6666666666666666,
+    "issue": "score too low: 67%"
+  },
+  {
+    "supplyId": 6797,
+    "supplyName": "Science Diet Cat Hairball Control 7+ 3.5lb",
+    "supplyExpanded": "science diet cat hairball control 7 3 5lb",
+    "upc": "052742753300",
+    "upcName": "SD cat hairba 7+ 3.5#",
+    "upcExpanded": "science diet cat hairball 7 3 5",
+    "score": 0.6666666666666666,
+    "issue": "score too low: 67%"
+  },
+  {
+    "supplyId": 6781,
+    "supplyName": "Science Diet Cat Hairball Control 7lb",
+    "supplyExpanded": "science diet cat hairball control 7lb",
+    "upc": "052742888309",
+    "upcName": "SD cat hairba 7+ 7#",
+    "upcExpanded": "science diet cat hairball 7 7",
+    "score": 0.6666666666666666,
+    "issue": "age: regular vs 7+"
+  },
+  {
+    "supplyId": 5942,
+    "supplyName": "Science Diet Chicken 15lb",
+    "supplyExpanded": "science diet chicken 15lb",
+    "upc": "052742016016",
+    "upcName": "SD ck 35#",
+    "upcExpanded": "science diet chicken 35",
+    "score": 0.75,
+    "issue": "size: 15lb vs 35#"
+  },
+  {
+    "supplyId": 5943,
+    "supplyName": "Science Diet Chicken 35lb",
+    "supplyExpanded": "science diet chicken 35lb",
+    "upc": "052742018188",
+    "upcName": "SD 7+ ck stew",
+    "upcExpanded": "science diet 7 chicken stew",
+    "score": 0.75,
+    "issue": "age: 7+ in wrong product"
+  },
+  {
+    "supplyId": 6574,
+    "supplyName": "Science Diet Healthy Cuisine Chicken 12.5oz",
+    "supplyExpanded": "science diet healthy cuisine chicken 12 5oz",
+    "upc": "052742007212",
+    "upcName": "SD heal cuis 7+ ck 12.5oz",
+    "upcExpanded": "science diet healthy cuisine 7 chicken 12 5oz",
+    "score": 1,
+    "issue": "age: 7+ in wrong product"
+  },
+  {
+    "supplyId": 5930,
+    "supplyName": "Science Diet Large Breed Light 30lb",
+    "supplyExpanded": "science diet large breed light 30lb",
+    "upc": "052742910109",
+    "upcName": "sd sm br light 15.5#",
+    "upcExpanded": "science diet small breed light 15 5",
+    "score": 0.6666666666666666,
+    "issue": "size: large vs small"
+  },
+  {
+    "supplyId": 6569,
+    "supplyName": "Science Diet Puppy Stew Chicken 12.5oz",
+    "supplyExpanded": "science diet puppy stew chicken 12 5oz",
+    "upc": "052742936604",
+    "upcName": "SD puppy ck 12.5#",
+    "upcExpanded": "science diet puppy chicken 12 5",
+    "score": 0.7142857142857143,
+    "issue": "product: stew missing"
+  },
+  {
+    "supplyId": 5988,
+    "supplyName": "Science Diet Sensitive 30lb",
+    "supplyExpanded": "science diet sensitive 30lb",
+    "upc": "052742001821",
+    "upcName": "SD sensi 4#",
+    "upcExpanded": "science diet sensitive 4",
+    "score": 0.75,
+    "issue": "size: 30lb vs 4#"
+  },
+  {
+    "supplyId": 5986,
+    "supplyName": "Science Diet Sensitive 4lb",
+    "supplyExpanded": "science diet sensitive 4lb",
+    "upc": "052742883908",
+    "upcName": "SD sensi 30#",
+    "upcExpanded": "science diet sensitive 30",
+    "score": 0.75,
+    "issue": "size: 4lb vs 30#"
+  },
+  {
+    "supplyId": 5918,
+    "supplyName": "Science Diet Small Breed Chicken 15.5lb",
+    "supplyExpanded": "science diet small breed chicken 15 5lb",
+    "upc": "052742289700",
+    "upcName": "sd sm br lam 15.5#",
+    "upcExpanded": "science diet small breed lamb 15 5",
+    "score": 0.7142857142857143,
+    "issue": "protein: chicken vs lamb"
+  }
+]
