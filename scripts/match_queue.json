@@ -1,12 +1,12 @@
 {
   "version": 3,
-  "lastUpdated": "2025-12-23T04:14:50.528Z",
+  "lastUpdated": "2025-12-23T04:22:35.059Z",
   "totalDiscovered": 859,
   "stats": {
     "pending": 0,
     "accepted": 0,
-    "rejected": 35,
-    "applied": 1354
+    "rejected": 39,
+    "applied": 1357
   },
   "matches": {
     "7018-015561165839": {
@@ -1953,11 +1953,13 @@
       "upc": "029695230783",
       "upcName": "PetMate 2 Cup Bowl",
       "score": 0.7,
-      "status": "applied",
+      "status": "rejected",
       "discoveredAt": "2025-12-23T03:01:18.465Z",
       "reviewedAt": "2025-12-23T03:10:12.506Z",
       "appliedAt": "2025-12-23T03:10:23.838Z",
-      "notes": "Bulk accepted for application"
+      "notes": "Bulk accepted for application",
+      "rejectReason": "SIZE MISMATCH: 1 Cup vs 2 Cup",
+      "rolledBackAt": "2025-12-23T04:20:31.883Z"
     },
     "1263-045663976392": {
       "matchId": "1263-045663976392",
@@ -4230,8 +4232,9 @@
       "appliedAt": "2025-12-23T03:45:21.349Z",
       "notes": "Re-accepted after validation",
       "rejectedAt": "2025-12-23T03:22:14.319Z",
-      "rejectReason": "PROTEIN: tuna vs salmon",
-      "reAcceptedAt": "2025-12-23T03:45:10.788Z"
+      "rejectReason": "PROTEIN MISMATCH: tuna vs salmon",
+      "reAcceptedAt": "2025-12-23T03:45:10.788Z",
+      "rolledBackAt": "2025-12-23T04:18:57.109Z"
     },
     "6666-037424191366": {
       "matchId": "6666-037424191366",
@@ -15343,12 +15346,14 @@
       "upcName": "BellaBowl Green Sm",
       "upcBrand": "Loving Pets",
       "score": 0.8166666666666667,
-      "status": "applied",
+      "status": "rejected",
       "matchType": "aggressive_cross_brand",
       "discoveredAt": "2025-12-23T03:15:51.844Z",
       "reviewedAt": "2025-12-23T03:15:51.844Z",
       "notes": "Auto-accepted: cross-brand match >= 70%",
-      "appliedAt": "2025-12-23T03:15:59.330Z"
+      "appliedAt": "2025-12-23T03:15:59.330Z",
+      "rejectReason": "COLOR MISMATCH: Pink vs Green",
+      "rolledBackAt": "2025-12-23T04:20:31.892Z"
     },
     "1656-842982074040": {
       "matchId": "1656-842982074040",
@@ -15359,12 +15364,14 @@
       "upcName": "BellaBowl Black Sm",
       "upcBrand": "Loving Pets",
       "score": 0.8166666666666667,
-      "status": "applied",
+      "status": "rejected",
       "matchType": "aggressive_cross_brand",
       "discoveredAt": "2025-12-23T03:15:51.844Z",
       "reviewedAt": "2025-12-23T03:15:51.844Z",
       "notes": "Auto-accepted: cross-brand match >= 70%",
-      "appliedAt": "2025-12-23T03:15:59.354Z"
+      "appliedAt": "2025-12-23T03:15:59.354Z",
+      "rejectReason": "COLOR MISMATCH: Green vs Black",
+      "rolledBackAt": "2025-12-23T04:20:31.893Z"
     },
     "6034-022517766095": {
       "matchId": "6034-022517766095",
@@ -15578,18 +15585,14 @@
       "matchId": "6111-034846600131",
       "supplyId": 6111,
       "supplyName": "Sportmix Puppy Small Bite 16.5lb",
-      "brand": "SportMix",
       "upc": "034846600131",
-      "upcName": "SPORTMIX puppy sm bite 1605#",
-      "upcBrand": "UNKNOWN",
-      "score": 0.8166666666666667,
-      "status": "rejected",
-      "matchType": "aggressive_cross_brand",
-      "discoveredAt": "2025-12-23T03:15:51.844Z",
-      "reviewedAt": "2025-12-23T03:15:51.844Z",
-      "notes": "Auto-accepted: cross-brand match >= 70%",
-      "appliedAt": "2025-12-23T03:15:59.679Z",
-      "rejectReason": "SIZE: 16.5lb vs 1605#"
+      "upcName": "SPORTMIX puppy sm bite 16.5#",
+      "score": 1,
+      "status": "applied",
+      "matchType": "corrected_match",
+      "discoveredAt": "2025-12-23T04:21:54.813Z",
+      "reviewedAt": "2025-12-23T04:21:54.813Z",
+      "appliedAt": "2025-12-23T04:21:59.404Z"
     },
     "6455-854524005412": {
       "matchId": "6455-854524005412",
@@ -15648,12 +15651,14 @@
       "upcName": "SD ck 13oz",
       "upcBrand": "Science Diet",
       "score": 0.8166666666666667,
-      "status": "applied",
+      "status": "rejected",
       "matchType": "aggressive_cross_brand",
       "discoveredAt": "2025-12-23T03:15:51.844Z",
       "reviewedAt": "2025-12-23T03:15:51.844Z",
       "notes": "Auto-accepted: cross-brand match >= 70%",
-      "appliedAt": "2025-12-23T03:15:59.772Z"
+      "appliedAt": "2025-12-23T03:15:59.772Z",
+      "rejectReason": "BRAND MISMATCH: Canidae vs Science Diet",
+      "rolledBackAt": "2025-12-23T04:20:31.894Z"
     },
     "6398-840199682041": {
       "matchId": "6398-840199682041",
@@ -15712,12 +15717,14 @@
       "upcName": "SD ck stew 12.5oz",
       "upcBrand": "Science Diet",
       "score": 0.8166666666666667,
-      "status": "applied",
+      "status": "rejected",
       "matchType": "aggressive_cross_brand",
       "discoveredAt": "2025-12-23T03:15:51.844Z",
       "reviewedAt": "2025-12-23T03:15:51.844Z",
       "notes": "Auto-accepted: cross-brand match >= 70%",
-      "appliedAt": "2025-12-23T03:15:59.864Z"
+      "appliedAt": "2025-12-23T03:15:59.864Z",
+      "rejectReason": "BRAND MISMATCH: Nutrisource vs Science Diet",
+      "rolledBackAt": "2025-12-23T04:20:31.895Z"
     },
     "6529-038100101334": {
       "matchId": "6529-038100101334",
@@ -17162,7 +17169,8 @@
       "reviewedAt": "2025-12-23T03:15:51.844Z",
       "notes": "Auto-accepted: cross-brand match >= 70%",
       "appliedAt": "2025-12-23T03:16:01.974Z",
-      "rejectReason": "SIZE: 15lb vs 3.15#"
+      "rejectReason": "SIZE MISMATCH: 15lb vs 3.15#",
+      "rolledBackAt": "2025-12-23T04:18:57.124Z"
     },
     "2598-849790045798": {
       "matchId": "2598-849790045798",
@@ -17211,7 +17219,8 @@
       "reviewedAt": "2025-12-23T03:15:51.844Z",
       "notes": "Auto-accepted: cross-brand match >= 70%",
       "appliedAt": "2025-12-23T03:16:02.042Z",
-      "rejectReason": "SIZE: 3.15lb vs 15#"
+      "rejectReason": "SIZE MISMATCH: 3.15lb vs 15#",
+      "rolledBackAt": "2025-12-23T04:18:57.124Z"
     },
     "6184-027773021988": {
       "matchId": "6184-027773021988",
@@ -17420,7 +17429,8 @@
       "reviewedAt": "2025-12-23T03:15:51.844Z",
       "notes": "Auto-accepted: cross-brand match >= 70%",
       "appliedAt": "2025-12-23T03:16:02.343Z",
-      "rejectReason": "SIZE: 4.5lb vs 1.5#"
+      "rejectReason": "BRAND+SIZE MISMATCH: Eukanuba vs NutriSource, 4.5lb vs 1.5#",
+      "rolledBackAt": "2025-12-23T04:18:57.124Z"
     },
     "6746-072705115600": {
       "matchId": "6746-072705115600",
@@ -20916,6 +20926,97 @@
       "discoveredAt": "2025-12-23T04:14:48.154Z",
       "reviewedAt": "2025-12-23T04:14:48.154Z",
       "appliedAt": "2025-12-23T04:14:50.526Z"
+    },
+    "1651-029695230776": {
+      "matchId": "1651-029695230776",
+      "supplyId": 1651,
+      "supplyName": "Petmate 1 Cup Bowl",
+      "upc": "029695230776",
+      "upcName": "PetMate 1 Cup Bowl",
+      "score": 1,
+      "status": "applied",
+      "matchType": "corrected_match",
+      "discoveredAt": "2025-12-23T04:21:54.812Z",
+      "reviewedAt": "2025-12-23T04:21:54.813Z",
+      "appliedAt": "2025-12-23T04:21:59.427Z"
+    },
+    "1653-842982074002": {
+      "matchId": "1653-842982074002",
+      "supplyId": 1653,
+      "supplyName": "Bellabowl Pink Small",
+      "upc": "842982074002",
+      "upcName": "BellaBowl Pink Sm",
+      "score": 1,
+      "status": "applied",
+      "matchType": "corrected_match",
+      "discoveredAt": "2025-12-23T04:21:54.813Z",
+      "reviewedAt": "2025-12-23T04:21:54.813Z",
+      "appliedAt": "2025-12-23T04:21:59.451Z"
+    },
+    "1656-842982074668": {
+      "matchId": "1656-842982074668",
+      "supplyId": 1656,
+      "supplyName": "Bellabowl Green Small",
+      "upc": "842982074668",
+      "upcName": "BellaBowl Green Sm",
+      "score": 1,
+      "status": "applied",
+      "matchType": "corrected_match",
+      "discoveredAt": "2025-12-23T04:21:54.813Z",
+      "reviewedAt": "2025-12-23T04:21:54.813Z",
+      "appliedAt": "2025-12-23T04:21:59.475Z"
+    },
+    "6697-038100111975": {
+      "matchId": "6697-038100111975",
+      "supplyId": 6697,
+      "supplyName": "Pro Plan Cat Tuna 3oz",
+      "upc": "038100111975",
+      "upcName": "PRO PLAN cat tuna 3oz",
+      "score": 1,
+      "status": "applied",
+      "matchType": "corrected_match",
+      "discoveredAt": "2025-12-23T04:21:54.813Z",
+      "reviewedAt": "2025-12-23T04:21:54.813Z",
+      "appliedAt": "2025-12-23T04:21:59.500Z"
+    },
+    "6674-017800184991": {
+      "matchId": "6674-017800184991",
+      "supplyId": 6674,
+      "supplyName": "Cat Chow Indoor 15lb",
+      "upc": "017800184991",
+      "upcName": "CAT CHOW ind 15#",
+      "score": 1,
+      "status": "applied",
+      "matchType": "corrected_match",
+      "discoveredAt": "2025-12-23T04:22:32.847Z",
+      "reviewedAt": "2025-12-23T04:22:32.847Z",
+      "appliedAt": "2025-12-23T04:22:35.004Z"
+    },
+    "6663-017800150187": {
+      "matchId": "6663-017800150187",
+      "supplyId": 6663,
+      "supplyName": "Cat Chow Indoor 3.15lb",
+      "upc": "017800150187",
+      "upcName": "CAT CHOW ind 3.15#",
+      "score": 1,
+      "status": "applied",
+      "matchType": "corrected_match",
+      "discoveredAt": "2025-12-23T04:22:32.848Z",
+      "reviewedAt": "2025-12-23T04:22:32.848Z",
+      "appliedAt": "2025-12-23T04:22:35.031Z"
+    },
+    "6323-030111208903": {
+      "matchId": "6323-030111208903",
+      "supplyId": 6323,
+      "supplyName": "Eukanuba Small Breed Puppy 4.5lb",
+      "upc": "030111208903",
+      "upcName": "EUK sm br puppy 4.5#",
+      "score": 1,
+      "status": "applied",
+      "matchType": "corrected_match",
+      "discoveredAt": "2025-12-23T04:22:32.848Z",
+      "reviewedAt": "2025-12-23T04:22:32.848Z",
+      "appliedAt": "2025-12-23T04:22:35.056Z"
     }
   }
 }
