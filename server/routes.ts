@@ -1033,7 +1033,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
-  // Export unmatched supplies (no UPC) to Excel
+  // Export unmatched supplies (no UPC) to CSV
   app.get("/api/export/unmatched-supplies", authMiddleware, async (req: any, res) => {
     try {
       const userId = (req as any).user?.id;
@@ -1049,31 +1049,6 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const allSupplies = await storage.getAllSupplies();
       const unmatchedSupplies = allSupplies.filter(s => !s.upc || s.upc.trim() === '');
 
-      // Create workbook
-      const workbook = new ExcelJS.Workbook();
-      workbook.creator = 'Animal House Pet Store';
-      workbook.created = new Date();
-
-      const sheet = workbook.addWorksheet('Unmatched Supplies');
-      sheet.columns = [
-        { header: 'ID', key: 'id', width: 8 },
-        { header: 'Name', key: 'name', width: 50 },
-        { header: 'Brand', key: 'brand', width: 20 },
-        { header: 'Category', key: 'category', width: 15 },
-        { header: 'Price', key: 'price', width: 10 },
-        { header: 'UPC (Enter Here)', key: 'upc', width: 20 },
-        { header: 'Description', key: 'description', width: 60 },
-      ];
-
-      // Style header row
-      sheet.getRow(1).font = { bold: true };
-      sheet.getRow(1).fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFFF6B00' }
-      };
-      sheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
-
       // Sort by brand, then name
       unmatchedSupplies.sort((a, b) => {
         const brandA = (a.brand || '').toLowerCase();
@@ -1082,30 +1057,36 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return (a.name || '').localeCompare(b.name || '');
       });
 
-      // Add data
-      unmatchedSupplies.forEach(supply => {
-        sheet.addRow({
-          id: supply.id,
-          name: supply.name,
-          brand: supply.brand || '',
-          category: supply.category || '',
-          price: supply.price ? `$${supply.price}` : '',
-          upc: '',
-          description: supply.description || '',
-        });
-      });
+      // Create CSV content
+      const escapeCSV = (str: string) => {
+        if (!str) return '';
+        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+          return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+      };
+
+      const headers = ['ID', 'Name', 'Brand', 'Category', 'Price', 'UPC_Enter_Here', 'Description'];
+      const rows = unmatchedSupplies.map(supply => [
+        supply.id.toString(),
+        escapeCSV(supply.name || ''),
+        escapeCSV(supply.brand || ''),
+        escapeCSV(supply.category || ''),
+        supply.price ? `$${supply.price}` : '',
+        '',
+        escapeCSV(supply.description || ''),
+      ].join(','));
+
+      const csvContent = [headers.join(','), ...rows].join('\n');
 
       // Generate filename with date
       const dateStr = new Date().toISOString().split('T')[0];
-      const filename = `Unmatched_Supplies_Need_UPC_${dateStr}.xlsx`;
+      const filename = `Unmatched_Supplies_Need_UPC_${dateStr}.csv`;
 
-      // Set response headers
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      // Set response headers for CSV download
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-
-      // Write to response
-      await workbook.xlsx.write(res);
-      res.end();
+      res.send(csvContent);
 
     } catch (error) {
       console.error("Error exporting unmatched supplies:", error);
