@@ -1,42 +1,109 @@
 [
   {
-    "supplyId": 6704,
-    "supplyName": "Pro Plan Cat Urin Chicken 3oz",
-    "upc": "038100173409",
-    "upcName": "PRO PLAN cat urin beef 3oz",
-    "score": 0.7,
-    "issues": [
-      "PROTEIN: chicken vs beef"
-    ]
+    "match": {
+      "matchId": "6697-038100026972",
+      "supplyId": 6697,
+      "supplyName": "Pro Plan Cat Tuna 3oz",
+      "brand": "Pro Plan",
+      "upc": "038100026972",
+      "upcName": "PRO PLAN cat salm 3oz",
+      "score": 0.6799999999999999,
+      "status": "applied",
+      "discoveredAt": "2025-12-23T03:01:18.465Z",
+      "reviewedAt": "2025-12-23T03:10:12.506Z",
+      "appliedAt": "2025-12-23T03:45:21.349Z",
+      "notes": "Re-accepted after validation",
+      "rejectedAt": "2025-12-23T03:22:14.319Z",
+      "rejectReason": "Score below 70% threshold: 68%",
+      "reAcceptedAt": "2025-12-23T03:45:10.788Z"
+    },
+    "issue": "PROTEIN: tuna vs salmon"
   },
   {
-    "supplyId": 6701,
-    "supplyName": "Pro Plan Cat Urin Beef 3oz",
-    "upc": "038100027030",
-    "upcName": "PRO PLAN cat urin ck 3oz",
-    "score": 0.7,
-    "issues": [
-      "PROTEIN: beef vs chicken"
-    ]
+    "match": {
+      "matchId": "6111-034846600131",
+      "supplyId": 6111,
+      "supplyName": "Sportmix Puppy Small Bite 16.5lb",
+      "brand": "SportMix",
+      "upc": "034846600131",
+      "upcName": "SPORTMIX puppy sm bite 1605#",
+      "upcBrand": "UNKNOWN",
+      "score": 0.8166666666666667,
+      "status": "applied",
+      "matchType": "aggressive_cross_brand",
+      "discoveredAt": "2025-12-23T03:15:51.844Z",
+      "reviewedAt": "2025-12-23T03:15:51.844Z",
+      "notes": "Auto-accepted: cross-brand match >= 70%",
+      "appliedAt": "2025-12-23T03:15:59.679Z"
+    },
+    "issue": "SIZE: 16.5lb vs 1605#"
   },
   {
-    "supplyId": 6529,
-    "supplyName": "Pro Plan Shred Salmon 15lb",
-    "upc": "038100101334",
-    "upcName": "PRO PLAN beef shred 15#",
-    "score": 0.8,
-    "issues": [
-      "PROTEIN: salmon vs beef"
-    ]
+    "match": {
+      "matchId": "6674-017800150187",
+      "supplyId": 6674,
+      "supplyName": "Cat Chow Indoor 15lb",
+      "brand": "Purina",
+      "upc": "017800150187",
+      "upcName": "CAT CHOW ind 3.15#",
+      "upcBrand": "UNKNOWN",
+      "score": 0.75,
+      "status": "applied",
+      "matchType": "aggressive_cross_brand",
+      "discoveredAt": "2025-12-23T03:15:51.844Z",
+      "reviewedAt": "2025-12-23T03:15:51.844Z",
+      "notes": "Auto-accepted: cross-brand match >= 70%",
+      "appliedAt": "2025-12-23T03:16:01.974Z"
+    },
+    "issue": "SIZE: 15lb vs 3.15#"
   },
   {
-    "supplyId": 6149,
-    "supplyName": "Fromm Salmon À La Veg 4lb",
-    "upc": "072705116164",
-    "upcName": "FROMM ck a la veg 4#",
-    "score": 0.8,
-    "issues": [
-      "PROTEIN: salmon vs chicken"
-    ]
+    "match": {
+      "matchId": "6663-017800184991",
+      "supplyId": 6663,
+      "supplyName": "Cat Chow Indoor 3.15lb",
+      "brand": "Purina",
+      "upc": "017800184991",
+      "upcName": "CAT CHOW ind 15#",
+      "upcBrand": "UNKNOWN",
+      "score": 0.75,
+      "status": "applied",
+      "matchType": "aggressive_cross_brand",
+      "discoveredAt": "2025-12-23T03:15:51.844Z",
+      "reviewedAt": "2025-12-23T03:15:51.844Z",
+      "notes": "Auto-accepted: cross-brand match >= 70%",
+      "appliedAt": "2025-12-23T03:16:02.042Z"
+    },
+    "issue": "SIZE: 3.15lb vs 15#"
+  },
+  {
+    "match": {
+      "matchId": "6323-073893263050",
+      "supplyId": 6323,
+      "supplyName": "Eukanuba Small Breed Puppy 4.5lb",
+      "brand": "Eukanuba",
+      "upc": "073893263050",
+      "upcName": "NUTRI SOU sm puppy 1.5#",
+      "upcBrand": "Nutrisource",
+      "score": 0.75,
+      "status": "applied",
+      "matchType": "aggressive_cross_brand",
+      "discoveredAt": "2025-12-23T03:15:51.844Z",
+      "reviewedAt": "2025-12-23T03:15:51.844Z",
+      "notes": "Auto-accepted: cross-brand match >= 70%",
+      "appliedAt": "2025-12-23T03:16:02.343Z"
+    },
+    "issue": "SIZE: 4.5lb vs 1.5#"
+  },
+  {
+    "timestamp": "2025-12-23T04:14:48.167Z",
+    "errorType": "wrong_product_match",
+    "supplyId": 6088,
+    "supplyName": "Science Diet 7+ 33lb",
+    "wrongUpc": "052742203805",
+    "wrongUpcName": "SD lg br lam 33#",
+    "correctUpc": "052742204208",
+    "correctUpcName": "SD 7+ 33#",
+    "action": "Swapped UPCs - applied correct matches"
   }
 ]
