@@ -1,13 +1,24 @@
 {
-  "generatedAt": "2025-12-23T03:22:46.472Z",
+  "generatedAt": "2025-12-23T03:35:12.676Z",
   "summary": {
-    "totalApplied": 950,
+    "totalApplied": 1017,
     "totalRejected": 198,
+    "dbCoverage": "68.6% (4,956 / 7,225)",
+    "upcUsage": "4,521 / 7,300 available UPCs used (62%)",
     "byScoreRange": {
-      "100%": 511,
-      "90-99%": 23,
-      "80-89%": 69,
-      "70-79%": 347
+      "100%": 531,
+      "90-99%": 33,
+      "80-89%": 75,
+      "70-79%": 378
+    },
+    "byMatchType": {
+      "standard": 264,
+      "direct_exact": 403,
+      "unknown_brand_exact": 30,
+      "aggressive_cross_brand": 253,
+      "new_source_match": 49,
+      "final_sweep": 15,
+      "brand_specific": 3
     }
   },
   "appliedMatches": [
@@ -8296,6 +8307,609 @@
       "score": 0.7055555555555556,
       "brand": "Pure Vita",
       "matchType": "aggressive_cross_brand"
+    },
+    {
+      "supplyId": 6157,
+      "supplyName": "Fromm Trout 26lb",
+      "upc": "072705108015",
+      "upcName": "FROMM trout 26#",
+      "score": 1,
+      "brand": "Fromm",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 4208,
+      "supplyName": "Kaytee 13\" Runabout Ball Rainbow",
+      "upc": "046706322503",
+      "upcName": "KAYTEE 13\" RUNABOUT BALL RAINBOW",
+      "score": 1,
+      "brand": "Kaytee",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 140,
+      "supplyName": "Flukers Cricket Quencher Orange",
+      "upc": "009119771201",
+      "upcName": "Flukers Cricket Quencher Orange",
+      "score": 1,
+      "brand": "Fluker's",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 3495,
+      "supplyName": "Valhoma Spike 16 Hp Collar",
+      "upc": "009761211850",
+      "upcName": "VALHOMA SPIKE 16 HP CLLR",
+      "score": 1,
+      "brand": "Valhoma",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 522,
+      "supplyName": "Zilla Turtle Mircale Ball",
+      "upc": "096316003286",
+      "upcName": "Zilla Turtle Mircale Ball",
+      "score": 1,
+      "brand": "Zilla",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 3441,
+      "supplyName": "Coastal Fsa38\" Soy Harness",
+      "upc": "008317859341",
+      "upcName": "COASTAL FSA38\" SOY HARNESS",
+      "score": 1,
+      "brand": "Coastal",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 4491,
+      "supplyName": "Redbarn Puffed Collagen Spring",
+      "upc": "008317854371",
+      "upcName": "REDBARN PUFFED COLLAGEN SPRING",
+      "score": 1,
+      "brand": "RedBarn",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 3512,
+      "supplyName": "Valhoma Spike 24 Hw Collar",
+      "upc": "009761211060",
+      "upcName": "VALHOMA SPIKE 24 HW CLLR",
+      "score": 1,
+      "brand": "Valhoma",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 4177,
+      "supplyName": "Kaytee Critter Loopdloop",
+      "upc": "044472015058",
+      "upcName": "KAYTEE CRITTER LOOPDLOOP",
+      "score": 1,
+      "brand": "Kaytee",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 4515,
+      "supplyName": "Happydog Large Moose Antler",
+      "upc": "001556121855",
+      "upcName": "HAPPYDOG LG MOOSE ANTLER",
+      "score": 1,
+      "brand": "Happy Dog of Cape Cod",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 4031,
+      "supplyName": "Rndlake Timothy Hay 48 oz",
+      "upc": "097612009361",
+      "upcName": "RNDLAKE TIMOTHY HAY 48 OZ",
+      "score": 1,
+      "brand": "Round Lake Farm",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 155,
+      "supplyName": "Zilla Tropical Mist Humidity Spray",
+      "upc": "009631670005",
+      "upcName": "Zilla Tropical Mist Humidity Spray",
+      "score": 1,
+      "brand": "Zilla",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 3721,
+      "supplyName": "Coastal Lim14\" Buck Collar",
+      "upc": "015561221931",
+      "upcName": "COASTAL LIM14\" BUCK CLLR",
+      "score": 1,
+      "brand": "",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 3440,
+      "supplyName": "Coastal Sla30\" Soy Harness",
+      "upc": "001556121993",
+      "upcName": "COASTAL SLA30\" SOY HARNESS",
+      "score": 1,
+      "brand": "",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 7032,
+      "supplyName": "Penn Plax Divider 29-55",
+      "upc": "030172014277",
+      "upcName": "PENN PLAX divider 29-55",
+      "score": 1,
+      "brand": "Penn-Plax",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 468,
+      "supplyName": "Zilla Terraced Dish Medium",
+      "upc": "096316117617",
+      "upcName": "Zilla Terraced Dish Med.",
+      "score": 0.9,
+      "brand": "Zilla",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5328,
+      "supplyName": "Jaws Swim-thru Small",
+      "upc": "030172103292",
+      "upcName": "JAWS™ Swim-Through - Small",
+      "score": 0.9,
+      "brand": "Penn-Plax",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5332,
+      "supplyName": "Medium Sea Patrol Skye",
+      "upc": "030172080005",
+      "upcName": "Paw Patrol - Skye - Medium",
+      "score": 0.9,
+      "brand": "Penn-Plax",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5241,
+      "supplyName": "Seresto Small Dog Collar",
+      "upc": "724089579447",
+      "upcName": "ELA F/T CLLR SERESTO SM",
+      "score": 0.9,
+      "brand": "Seresto",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 4608,
+      "supplyName": "Benebone Small Zaggler Bacon",
+      "upc": "001556122130",
+      "upcName": "BENEBONE SM ZAGGLER BCN",
+      "score": 0.9,
+      "brand": "Benebone",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5368,
+      "supplyName": "Frozen Anna Medium",
+      "upc": "030172092084",
+      "upcName": "Disney® Frozen Anna - Medium",
+      "score": 0.9,
+      "brand": "Penn-Plax",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5264,
+      "supplyName": "Frozen Anna Mini",
+      "upc": "030172092114",
+      "upcName": "Disney® Frozen Anna - Mini",
+      "score": 0.9,
+      "brand": "Penn-Plax",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 337,
+      "supplyName": "Zoo Med Reptirapid Skul Medium Watrfl",
+      "upc": "097612910278",
+      "upcName": "ZooMed ReptiRapid Skul Md. Watrfl",
+      "score": 0.8166666666666667,
+      "brand": "Zoo Med",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5464,
+      "supplyName": "Sunken Treasure Ship Small",
+      "upc": "030172048272",
+      "upcName": "Tide & Treasure™ Sunken Treasure Ship - Small",
+      "score": 0.8166666666666667,
+      "brand": "Penn-Plax",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5418,
+      "supplyName": "Rialto Bridge Small",
+      "upc": "048081110546",
+      "upcName": "Bendy Bridge / small",
+      "score": 0.8166666666666667,
+      "brand": "Penn-Plax",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 3498,
+      "supplyName": "Valhoma Spike 26 Large Collar",
+      "upc": "009119770062",
+      "upcName": "VALHOMA SPIKE 26 BL CLLR",
+      "score": 0.8,
+      "brand": "Valhoma",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 4199,
+      "supplyName": "Kaytee 7\" Runabout Ball Clear",
+      "upc": "044472002126",
+      "upcName": "KAYTEE 7\" RUNABOUT BALL CLR",
+      "score": 0.8,
+      "brand": "Kaytee",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 3481,
+      "supplyName": "Valhoma 22 Large Collar",
+      "upc": "001556122620",
+      "upcName": "VALHOMA SPIKE 18 LG CLLR",
+      "score": 0.75,
+      "brand": "Valhoma",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 3490,
+      "supplyName": "Valhoma 26 Red Collar",
+      "upc": "001083820165",
+      "upcName": "VALHOMA 26 PR COLLAR",
+      "score": 0.75,
+      "brand": "Valhoma",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 3494,
+      "supplyName": "Valhoma 28 Pr Collar",
+      "upc": "009631670022",
+      "upcName": "VALHOMA 28 RO COLLAR",
+      "score": 0.75,
+      "brand": "Valhoma",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 3844,
+      "supplyName": "Coastal Purple10\" 301 Collar",
+      "upc": "050005832560",
+      "upcName": "COASTAL HUN10\" 301 CLLR",
+      "score": 0.75,
+      "brand": "Coastal",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 3983,
+      "supplyName": "Coastal Red14\" 401 Collar",
+      "upc": "084369931709",
+      "upcName": "COASTAL BLL14\" 401 CLLR",
+      "score": 0.75,
+      "brand": "Coastal",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 3955,
+      "supplyName": "Coastal Blue12\" 301 Collar",
+      "upc": "015561230681",
+      "upcName": "COASTAL PKB12\" 301 CLLR",
+      "score": 0.75,
+      "brand": "Coastal",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5471,
+      "supplyName": "Treasure Chest Small",
+      "upc": "030172019401",
+      "upcName": "Tide & Treasure™ Treasure Chest - Small",
+      "score": 0.75,
+      "brand": "Penn-Plax",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 728,
+      "supplyName": "Zoo Med Crab Glow in the Dark Scoop",
+      "upc": "097612009262",
+      "upcName": "ZooMed Crab Glow in the dark scoop",
+      "score": 0.75,
+      "brand": "Zoo Med",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5379,
+      "supplyName": "Twin Mill Hotwheel Small",
+      "upc": "030172105203",
+      "upcName": "Hot Wheels™ Twin Mill - Small",
+      "score": 0.75,
+      "brand": "Penn-Plax",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5470,
+      "supplyName": "Mini Undersea Treasure Chest",
+      "upc": "030172010644",
+      "upcName": "Action-Air™ Treasure Chest - Mini",
+      "score": 0.75,
+      "brand": "Penn-Plax",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5242,
+      "supplyName": "Seresto Large Dog Collar",
+      "upc": "030172096310",
+      "upcName": "Dog's Life™ Bungee Collar - Large",
+      "score": 0.75,
+      "brand": "Seresto",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5016,
+      "supplyName": "Marina Floating Thermometer W Suction",
+      "upc": "015561228565",
+      "upcName": "MARINA FLOATING THERM W SUCTION",
+      "score": 0.75,
+      "brand": "Marineland",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 4617,
+      "supplyName": "Benebone Medium Wishbone Chicken",
+      "upc": "009119731005",
+      "upcName": "BENEBONE MD PUP WISHBONE BCN",
+      "score": 0.75,
+      "brand": "Benebone",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 4379,
+      "supplyName": "Playfuls Flower Chew Sticks",
+      "upc": "048081110768",
+      "upcName": "Natural Flower Chew Sticks",
+      "score": 0.75,
+      "brand": "Playfuls",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5090,
+      "supplyName": "Led Air Stone",
+      "upc": "030172085758",
+      "upcName": "shorefins™ LED Air Stone",
+      "score": 0.75,
+      "brand": "Penn-Plax",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 3435,
+      "supplyName": "Coastal Ony38\" Soy Harness",
+      "upc": "008436993140",
+      "upcName": "COASTAL CRN38\" SOY HARNESS",
+      "score": 0.75,
+      "brand": "Coastal",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5817,
+      "supplyName": "1-3 Betta Tank Kit",
+      "upc": "030172015373",
+      "upcName": "Betta Tank Kit - Small",
+      "score": 0.75,
+      "brand": "Penn-Plax",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5380,
+      "supplyName": "Night Shifter Hotwheel Small",
+      "upc": "030172105197",
+      "upcName": "Hot Wheels™ Night Shifter - Small",
+      "score": 0.75,
+      "brand": "Penn-Plax",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 5378,
+      "supplyName": "Rodger Dodger Hotwheel Small",
+      "upc": "030172105180",
+      "upcName": "Hot Wheels™ Rodger Dodger - Small",
+      "score": 0.75,
+      "brand": "Penn-Plax",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 4685,
+      "supplyName": "Rewards Crunch Bison Small Breed Salmon 8oz",
+      "upc": "097612950151",
+      "upcName": "RWRDS CRUNCH BIS SM BR SAL 8OZ",
+      "score": 0.7285714285714285,
+      "brand": "Natural Balance",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 804,
+      "supplyName": "TropiClean Ntrl Flea & Tick Soothing Spray",
+      "upc": "045095202542",
+      "upcName": "Tropicalen Ntrl Flea&Tick Soothing Sham",
+      "score": 0.7142857142857143,
+      "brand": "TropiClean",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 594,
+      "supplyName": "Zoo Med Under Tank Heater 10-20gal",
+      "upc": "097612300055",
+      "upcName": "ZooMed Under tank Heater 10-20Gal",
+      "score": 0.7142857142857143,
+      "brand": "Zoo Med",
+      "matchType": "new_source_match"
+    },
+    {
+      "supplyId": 6132,
+      "supplyName": "Fromm Gold lb Br Weight 15lb",
+      "upc": "072705105830",
+      "upcName": "FROMM gold lb br weight 15#",
+      "score": 1,
+      "brand": "Fromm",
+      "matchType": "final_sweep"
+    },
+    {
+      "supplyId": 7104,
+      "supplyName": "Seachem Gartlic Guard 8.5oz",
+      "upc": "000116017602",
+      "upcName": "SEACHEM gartlic guard 8.5oz",
+      "score": 1,
+      "brand": "SeaChem",
+      "matchType": "final_sweep"
+    },
+    {
+      "supplyId": 7093,
+      "supplyName": "Seachem Amguarad 8.5oz",
+      "upc": "000116077606",
+      "upcName": "SEACHEM amguarad 8.5oz",
+      "score": 1,
+      "brand": "SeaChem",
+      "matchType": "final_sweep"
+    },
+    {
+      "supplyId": 7100,
+      "supplyName": "Seachem Clarity 3.4oz",
+      "upc": "000116014502",
+      "upcName": "SEACHEM clarity 3.4oz",
+      "score": 1,
+      "brand": "SeaChem",
+      "matchType": "final_sweep"
+    },
+    {
+      "supplyId": 7091,
+      "supplyName": "Seachem Cupramine 1.7oz",
+      "upc": "000116056403",
+      "upcName": "SEACHEM cupramine 1.7oz",
+      "score": 1,
+      "brand": "SeaChem",
+      "matchType": "final_sweep"
+    },
+    {
+      "supplyId": 6837,
+      "supplyName": "Fussie Cat Tuna, Salmon 2.82oz",
+      "upc": "888641130535",
+      "upcName": "FUSSIE CAT tuna ocean 2.82oz",
+      "score": 0.9500000000000001,
+      "brand": "Fussie Cat",
+      "matchType": "final_sweep"
+    },
+    {
+      "supplyId": 6326,
+      "supplyName": "Eukanuba Medium Br 16lb",
+      "upc": "030111160027",
+      "upcName": "EUK med br 16#",
+      "score": 0.9,
+      "brand": "Eukanuba",
+      "matchType": "final_sweep"
+    },
+    {
+      "supplyId": 4607,
+      "supplyName": "Benebone Medium Zaggler Bacon",
+      "upc": "001556122124",
+      "upcName": "BENEBONE MED WISHBNE BCN",
+      "score": 0.9,
+      "brand": "Benebone",
+      "matchType": "final_sweep"
+    },
+    {
+      "supplyId": 5967,
+      "supplyName": "Science Diet Perf Digest Small Bite 3.5lb",
+      "upc": "052742041285",
+      "upcName": "SD perf digest sm bite 3.5#",
+      "score": 0.8642857142857143,
+      "brand": "Science Diet",
+      "matchType": "final_sweep"
+    },
+    {
+      "supplyId": 5915,
+      "supplyName": "Science Diet Puppy Large Breed Chicken 27.5lb",
+      "upc": "052742060194",
+      "upcName": "sd puppy lg br ck 27.5#",
+      "score": 0.775,
+      "brand": "Science Diet",
+      "matchType": "final_sweep"
+    },
+    {
+      "supplyId": 1174,
+      "supplyName": "Zupreem Smart Select Medium Bird",
+      "upc": "762177360201",
+      "upcName": "ZuPreem PureFun Med Bird",
+      "score": 0.75,
+      "brand": "ZuPreem",
+      "matchType": "final_sweep"
+    },
+    {
+      "supplyId": 5850,
+      "supplyName": "Basic Hoodie Natural Blue Small",
+      "upc": "859610005789",
+      "upcName": "BLUE B basic sm br 4#",
+      "score": 0.75,
+      "brand": "Frisco",
+      "matchType": "final_sweep"
+    },
+    {
+      "supplyId": 2599,
+      "supplyName": "Medium New Orleans Saints Saints Leash",
+      "upc": "849790159273",
+      "upcName": "MED NOLA SAINTS LEASH",
+      "score": 0.75,
+      "brand": "Pets First",
+      "matchType": "final_sweep"
+    },
+    {
+      "supplyId": 2596,
+      "supplyName": "Medium New Orleans Saints Saints Collar",
+      "upc": "849790155817",
+      "upcName": "MED NOLA SAINTS COLLAR",
+      "score": 0.75,
+      "brand": "Pets First",
+      "matchType": "final_sweep"
+    },
+    {
+      "supplyId": 4542,
+      "supplyName": "Benebone Small Ring Bacon",
+      "upc": "001556122730",
+      "upcName": "BENEBONE SM PUP WISHBONE BCN",
+      "score": 0.75,
+      "brand": "Benebone",
+      "matchType": "final_sweep"
+    },
+    {
+      "supplyId": 3237,
+      "supplyName": "Coastal Leash Tdp06' 366",
+      "upc": "000011685460",
+      "upcName": "COASTAL MTN06' LEASH",
+      "score": 0.7,
+      "brand": "Coastal",
+      "matchType": "brand_specific"
+    },
+    {
+      "supplyId": 3253,
+      "supplyName": "Coastal Leash Pbo06' 966",
+      "upc": "009631670009",
+      "upcName": "COASTAL MDW06' LEASH",
+      "score": 0.7,
+      "brand": "Coastal",
+      "matchType": "brand_specific"
+    },
+    {
+      "supplyId": 3316,
+      "supplyName": "Coastal Leash Pmf06' 46336",
+      "upc": "009631609625",
+      "upcName": "COASTAL SUF06' LEASH",
+      "score": 0.7,
+      "brand": "Coastal",
+      "matchType": "brand_specific"
     }
   ],
   "rejectedMatches": [

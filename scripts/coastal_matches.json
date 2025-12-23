@@ -1,0 +1,26 @@
+[
+  {
+    "supplyId": 3237,
+    "supplyName": "Coastal Leash Tdp06' 366",
+    "brand": "Coastal",
+    "upc": "000011685460",
+    "upcName": "COASTAL MTN06' LEASH",
+    "score": 0.7
+  },
+  {
+    "supplyId": 3253,
+    "supplyName": "Coastal Leash Pbo06' 966",
+    "brand": "Coastal",
+    "upc": "009631670009",
+    "upcName": "COASTAL MDW06' LEASH",
+    "score": 0.7
+  },
+  {
+    "supplyId": 3316,
+    "supplyName": "Coastal Leash Pmf06' 46336",
+    "brand": "Coastal",
+    "upc": "009631609625",
+    "upcName": "COASTAL SUF06' LEASH",
+    "score": 0.7
+  }
+]

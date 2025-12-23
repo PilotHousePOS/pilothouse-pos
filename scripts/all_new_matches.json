@@ -1,0 +1,137 @@
+[
+  {
+    "supplyId": 6132,
+    "supplyName": "Fromm Gold lb Br Weight 15lb",
+    "brand": "Fromm",
+    "upc": "072705105830",
+    "upcName": "FROMM gold lb br weight 15#",
+    "upcBrand": "Fromm",
+    "score": 1
+  },
+  {
+    "supplyId": 7104,
+    "supplyName": "Seachem Gartlic Guard 8.5oz",
+    "brand": "SeaChem",
+    "upc": "000116017602",
+    "upcName": "SEACHEM gartlic guard 8.5oz",
+    "upcBrand": "SeaChem",
+    "score": 1
+  },
+  {
+    "supplyId": 7093,
+    "supplyName": "Seachem Amguarad 8.5oz",
+    "brand": "SeaChem",
+    "upc": "000116077606",
+    "upcName": "SEACHEM amguarad 8.5oz",
+    "upcBrand": "SeaChem",
+    "score": 1
+  },
+  {
+    "supplyId": 7100,
+    "supplyName": "Seachem Clarity 3.4oz",
+    "brand": "SeaChem",
+    "upc": "000116014502",
+    "upcName": "SEACHEM clarity 3.4oz",
+    "upcBrand": "SeaChem",
+    "score": 1
+  },
+  {
+    "supplyId": 7091,
+    "supplyName": "Seachem Cupramine 1.7oz",
+    "brand": "SeaChem",
+    "upc": "000116056403",
+    "upcName": "SEACHEM cupramine 1.7oz",
+    "upcBrand": "SeaChem",
+    "score": 1
+  },
+  {
+    "supplyId": 6837,
+    "supplyName": "Fussie Cat Tuna, Salmon 2.82oz",
+    "brand": "Fussie Cat",
+    "upc": "888641130535",
+    "upcName": "FUSSIE CAT tuna ocean 2.82oz",
+    "upcBrand": "Fussie Cat",
+    "score": 0.9500000000000001
+  },
+  {
+    "supplyId": 6326,
+    "supplyName": "Eukanuba Medium Br 16lb",
+    "brand": "Eukanuba",
+    "upc": "030111160027",
+    "upcName": "EUK med br 16#",
+    "upcBrand": "Eukanuba",
+    "score": 0.9
+  },
+  {
+    "supplyId": 4607,
+    "supplyName": "Benebone Medium Zaggler Bacon",
+    "brand": "Benebone",
+    "upc": "001556122124",
+    "upcName": "BENEBONE MED WISHBNE BCN",
+    "upcBrand": "UNKNOWN",
+    "score": 0.9
+  },
+  {
+    "supplyId": 5967,
+    "supplyName": "Science Diet Perf Digest Small Bite 3.5lb",
+    "brand": "Science Diet",
+    "upc": "052742041285",
+    "upcName": "SD perf digest sm bite 3.5#",
+    "upcBrand": "Science Diet",
+    "score": 0.8642857142857143
+  },
+  {
+    "supplyId": 5915,
+    "supplyName": "Science Diet Puppy Large Breed Chicken 27.5lb",
+    "brand": "Science Diet",
+    "upc": "052742060194",
+    "upcName": "sd puppy lg br ck 27.5#",
+    "upcBrand": "Science Diet",
+    "score": 0.775
+  },
+  {
+    "supplyId": 1174,
+    "supplyName": "Zupreem Smart Select Medium Bird",
+    "brand": "ZuPreem",
+    "upc": "762177360201",
+    "upcName": "ZuPreem PureFun Med Bird",
+    "upcBrand": "ZuPreem",
+    "score": 0.75
+  },
+  {
+    "supplyId": 5850,
+    "supplyName": "Basic Hoodie Natural Blue Small",
+    "brand": "Frisco",
+    "upc": "859610005789",
+    "upcName": "BLUE B basic sm br 4#",
+    "upcBrand": "Blue Buffalo",
+    "score": 0.75
+  },
+  {
+    "supplyId": 2599,
+    "supplyName": "Medium New Orleans Saints Saints Leash",
+    "brand": "Pets First",
+    "upc": "849790159273",
+    "upcName": "MED NOLA SAINTS LEASH",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 2596,
+    "supplyName": "Medium New Orleans Saints Saints Collar",
+    "brand": "Pets First",
+    "upc": "849790155817",
+    "upcName": "MED NOLA SAINTS COLLAR",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  },
+  {
+    "supplyId": 4542,
+    "supplyName": "Benebone Small Ring Bacon",
+    "brand": "Benebone",
+    "upc": "001556122730",
+    "upcName": "BENEBONE SM PUP WISHBONE BCN",
+    "upcBrand": "UNKNOWN",
+    "score": 0.75
+  }
+]

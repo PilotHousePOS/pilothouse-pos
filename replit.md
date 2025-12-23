@@ -80,11 +80,11 @@ The application is a full-stack web application featuring a React frontend (Vite
 ### Overview
 - **Target**: 90% coverage with 100% accuracy (zero errors tolerated)
 - **Total supplies**: 7,225
-- **Total UPCs available**: 5,083 (deduplicated from 3 sources: invoice 1,065 + maybe 2,738 + spreadsheet 1,280)
-- **Current progress**: 67.7% matched (4,889 products)
-- **Applied through queue**: 950 verified matches (after rollback of 198 errors below 70%)
+- **Total UPCs available**: 7,300 (expanded from 3+ sources)
+- **Current progress**: 68.6% matched (4,956 products)
+- **Applied through queue**: 1,017 verified matches (after rollback of 198 errors below 70%)
 - **Brand detection**: 4,089 with brands (80%), 994 unknown (20%)
-- **Remaining unmatched**: 2,336 supplies (limited by available UPC data)
+- **Remaining unmatched**: 2,269 supplies (limited by available UPC data - 4,521/7,300 UPCs used)
 - **Philosophy**: NO matches below 70% threshold - improvements come from better abbreviation expansion, text normalization, and VERIFIED brand mappings only
 
 ### Matching Pipeline (Stateful - Never Loses Progress)
