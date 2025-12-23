@@ -1,0 +1,130 @@
+[
+  {
+    "supplyId": 6776,
+    "supplyName": "Science Diet Cat Light 16lb",
+    "brand": "Science Diet",
+    "upc": "052742006444",
+    "upcName": "SD cat light 16#",
+    "score": 1
+  },
+  {
+    "supplyId": 6787,
+    "supplyName": "Science Diet Cat hairball 7+ 7lb",
+    "brand": "Science Diet",
+    "upc": "052742204802",
+    "upcName": "SD cat 7+ 7#",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6795,
+    "supplyName": "Science Diet Cat Indoor 7+ 3.5lb",
+    "brand": "Science Diet",
+    "upc": "052742644608",
+    "upcName": "SD cat indo 7+ 3.5#",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6796,
+    "supplyName": "Science Diet Cat Indoor 7+ 7lb",
+    "brand": "Science Diet",
+    "upc": "052742888002",
+    "upcName": "SD cat indo 7+ 7#",
+    "score": 0.8
+  },
+  {
+    "supplyId": 6791,
+    "supplyName": "Science Diet Kitten Indoor 7lb",
+    "brand": "Science Diet",
+    "upc": "052742939100",
+    "upcName": "SD kitten 7#",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6775,
+    "supplyName": "Science Diet Cat Salmon 15lb",
+    "brand": "Science Diet",
+    "upc": "052742146409",
+    "upcName": "SD cat 11+ 15#",
+    "score": 0.75
+  },
+  {
+    "supplyId": 5976,
+    "supplyName": "Science Diet Perfect Weight 12lb",
+    "brand": "Science Diet",
+    "upc": "052742060538",
+    "upcName": "SD perf weight 12#",
+    "score": 0.75
+  },
+  {
+    "supplyId": 5975,
+    "supplyName": "Science Diet Perfect Weight 4lb",
+    "brand": "Science Diet",
+    "upc": "052742297200",
+    "upcName": "SD perf weight 4#",
+    "score": 0.75
+  },
+  {
+    "supplyId": 5980,
+    "supplyName": "Science Diet Perfect Weight 25lb",
+    "brand": "Science Diet",
+    "upc": "052742060545",
+    "upcName": "SD perf weight 25#",
+    "score": 0.75
+  },
+  {
+    "supplyId": 5933,
+    "supplyName": "Science Diet Puppy Lamb 4lb",
+    "brand": "Science Diet",
+    "upc": "052742059815",
+    "upcName": "SD puppy lam 4#",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6454,
+    "supplyName": "Science Diet Flexi Stix Turkey",
+    "brand": "Science Diet",
+    "upc": "052742368009",
+    "upcName": "SD flexi stix turk",
+    "score": 0.75
+  },
+  {
+    "supplyId": 6766,
+    "supplyName": "Science Diet Cat Salmon 3.5lb",
+    "brand": "Science Diet",
+    "upc": "052742068633",
+    "upcName": "SD cat salm 3.5#",
+    "score": 0.75
+  },
+  {
+    "supplyId": 5936,
+    "supplyName": "Science Diet Puppy Chicken 4.5lb",
+    "brand": "Science Diet",
+    "upc": "052742713304",
+    "upcName": "SD puppy ck 4.5#",
+    "score": 0.75
+  },
+  {
+    "supplyId": 5935,
+    "supplyName": "Science Diet Puppy Lamb 25lb",
+    "brand": "Science Diet",
+    "upc": "052742059396",
+    "upcName": "SD puppy lam 25#",
+    "score": 0.75
+  },
+  {
+    "supplyId": 5979,
+    "supplyName": "Science Diet Sensitive Pollock 12lb",
+    "brand": "Science Diet",
+    "upc": "052742059136",
+    "upcName": "SD sensi pollock 12#",
+    "score": 0.75
+  },
+  {
+    "supplyId": 5977,
+    "supplyName": "Science Diet Puppy Sensitive 4lb",
+    "brand": "Science Diet",
+    "upc": "052742068688",
+    "upcName": "SD puppy sensi 4#",
+    "score": 0.75
+  }
+]
