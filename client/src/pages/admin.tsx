@@ -8230,8 +8230,16 @@ export default function Admin() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => deleteSupplyMutation.mutate(supply.id)}
+                            onClick={() => {
+                              showDeleteConfirmation(
+                                'Delete Supply',
+                                'Are you sure you want to delete this supply item? This action cannot be undone.',
+                                supply.name,
+                                () => deleteSupplyMutation.mutate(supply.id)
+                              );
+                            }}
                             disabled={deleteSupplyMutation.isPending}
+                            data-testid={`button-delete-supply-${supply.id}`}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
