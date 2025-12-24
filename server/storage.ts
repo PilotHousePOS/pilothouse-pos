@@ -146,7 +146,7 @@ export interface IStorage {
     healthcareType?: string;
   }): Promise<{ items: Supply[]; total: number }>;
   getSupply(id: number): Promise<Supply | undefined>;
-  getRelatedSupplies(excludeId: number, category: string, brand: string | null, limit?: number): Promise<Supply[]>;
+  getRelatedSupplies(excludeId: number, category: string, brand: string | null, limit?: number, productName?: string): Promise<Supply[]>;
   createSupply(supply: InsertSupply): Promise<Supply>;
   updateSupply(id: number, supply: Partial<InsertSupply>): Promise<Supply>;
   deleteSupply(id: number): Promise<void>;
@@ -1125,47 +1125,121 @@ export class DatabaseStorage implements IStorage {
     return supply;
   }
 
-  async getRelatedSupplies(excludeId: number, category: string, brand: string | null, limit: number = 6): Promise<Supply[]> {
-    // Get related products - prioritize same brand, then same category
+  async getRelatedSupplies(excludeId: number, category: string, brand: string | null, limit: number = 6, productName?: string): Promise<Supply[]> {
+    // Smart product recommendations based on category-specific pairings
     const conditions = [
       ne(supplies.id, excludeId),
       eq(supplies.isActive, true),
     ];
     
-    // First try to get products from same brand
-    if (brand) {
-      const brandMatches = await db
-        .select()
-        .from(supplies)
-        .where(and(...conditions, eq(supplies.brand, brand)))
-        .limit(limit);
+    // Define smart product pairings based on keywords in product name
+    const smartPairings: Record<string, string[]> = {
+      // Reptile products - tanks/terrariums need heat, lighting, bedding, decorations
+      'tank': ['heat lamp', 'heating', 'thermometer', 'bedding', 'substrate', 'decoration', 'plant', 'hide', 'light'],
+      'terrarium': ['heat lamp', 'heating', 'thermometer', 'bedding', 'substrate', 'decoration', 'plant', 'hide', 'light'],
+      'habitat': ['heat lamp', 'heating', 'thermometer', 'bedding', 'substrate', 'decoration', 'plant', 'hide'],
+      'heat lamp': ['thermometer', 'thermostat', 'dome', 'fixture', 'bulb', 'lamp stand'],
+      'heating': ['thermometer', 'thermostat', 'temperature'],
+      'bulb': ['dome', 'fixture', 'lamp', 'clamp'],
+      'fixture': ['bulb', 'lamp'],
+      'gecko': ['calcium', 'vitamin', 'mealworm', 'cricket', 'gecko food', 'hide', 'humid hide', 'heat'],
+      'bearded dragon': ['calcium', 'vitamin', 'greens', 'pellet', 'basking', 'heat', 'uvb'],
+      'snake': ['mouse', 'rat', 'frozen', 'hide', 'water bowl', 'bedding', 'aspen'],
       
-      if (brandMatches.length >= limit) {
-        return brandMatches;
+      // Aquatic products - tanks need filters, heaters, decorations, food
+      'aquarium': ['filter', 'heater', 'thermometer', 'gravel', 'decoration', 'plant', 'air pump', 'light'],
+      'filter': ['filter media', 'cartridge', 'carbon', 'sponge'],
+      'fish food': ['fish food', 'flakes', 'pellets'],
+      'frog': ['frog food', 'tadpole', 'aquatic', 'water conditioner'],
+      'tadpole': ['frog food', 'aquatic plant', 'water conditioner'],
+      
+      // Dog/Cat food - pair with same protein type and brand
+      'dog food': ['dog treat', 'dog chew'],
+      'cat food': ['cat treat'],
+      'puppy': ['puppy food', 'puppy treat', 'training'],
+      'kitten': ['kitten food', 'kitten'],
+    };
+    
+    const nameLower = (productName || '').toLowerCase();
+    let smartKeywords: string[] = [];
+    
+    // Find matching keywords for smart pairing
+    for (const [trigger, pairings] of Object.entries(smartPairings)) {
+      if (nameLower.includes(trigger)) {
+        smartKeywords = [...smartKeywords, ...pairings];
       }
-      
-      // Fill remaining slots with same category
-      const remaining = limit - brandMatches.length;
-      const brandIds = brandMatches.map(s => s.id);
-      const categoryMatches = await db
-        .select()
-        .from(supplies)
-        .where(and(
-          ...conditions,
-          eq(supplies.category, category),
-          notInArray(supplies.id, brandIds.length > 0 ? brandIds : [0])
-        ))
-        .limit(remaining);
-      
-      return [...brandMatches, ...categoryMatches];
     }
     
-    // No brand - just get same category
-    return db
-      .select()
-      .from(supplies)
-      .where(and(...conditions, eq(supplies.category, category)))
-      .limit(limit);
+    let results: Supply[] = [];
+    
+    // Try smart keyword matching first
+    if (smartKeywords.length > 0) {
+      const uniqueKeywords = [...new Set(smartKeywords)];
+      const allSupplies = await db.select().from(supplies).where(and(...conditions));
+      
+      // Score each supply by how many keywords match
+      const scored = allSupplies.map(s => {
+        const sName = (s.name || '').toLowerCase();
+        const sDesc = (s.description || '').toLowerCase();
+        let score = 0;
+        for (const kw of uniqueKeywords) {
+          if (sName.includes(kw) || sDesc.includes(kw)) {
+            score += 1;
+          }
+        }
+        // Bonus for same category
+        if (s.category === category) score += 0.5;
+        // Bonus for same brand
+        if (brand && s.brand === brand) score += 0.3;
+        return { supply: s, score };
+      });
+      
+      // Get top scoring matches
+      results = scored
+        .filter(s => s.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, limit)
+        .map(s => s.supply);
+    }
+    
+    // If not enough smart matches, fall back to brand/category matching
+    if (results.length < limit) {
+      const remaining = limit - results.length;
+      const excludeIds = [excludeId, ...results.map(r => r.id)];
+      
+      if (brand) {
+        const brandMatches = await db
+          .select()
+          .from(supplies)
+          .where(and(
+            ...conditions,
+            eq(supplies.brand, brand),
+            notInArray(supplies.id, excludeIds)
+          ))
+          .limit(remaining);
+        
+        results = [...results, ...brandMatches];
+      }
+      
+      // Still need more? Get same category
+      if (results.length < limit) {
+        const stillRemaining = limit - results.length;
+        const allExcludeIds = [excludeId, ...results.map(r => r.id)];
+        const categoryMatches = await db
+          .select()
+          .from(supplies)
+          .where(and(
+            ...conditions,
+            eq(supplies.category, category),
+            notInArray(supplies.id, allExcludeIds)
+          ))
+          .limit(stillRemaining);
+        
+        results = [...results, ...categoryMatches];
+      }
+    }
+    
+    return results;
   }
 
   async getSuppliesWithoutImages(

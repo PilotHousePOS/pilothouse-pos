@@ -1413,7 +1413,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       // Get related products (same category/brand, excluding current item)
       let relatedProducts: any[] = [];
       try {
-        relatedProducts = await storage.getRelatedSupplies(id, supply.category, supply.brand, 6);
+        relatedProducts = await storage.getRelatedSupplies(id, supply.category, supply.brand, 6, supply.name);
       } catch (e) {
         console.error("Error fetching related products:", e);
       }
