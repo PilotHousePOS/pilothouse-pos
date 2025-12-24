@@ -1133,25 +1133,37 @@ export class DatabaseStorage implements IStorage {
     ];
     
     // Define smart product pairings - prioritize CROSS-CATEGORY complementary items
+    // IMPORTANT: Avoid generic keywords that match unrelated products (e.g., 'filter' matches undergravel filters)
     const smartPairings: Record<string, string[]> = {
-      // AQUATIC FOOD products → recommend decorations, plants, accessories (NOT more food)
-      'turtle food': ['decoration', 'plant', 'gravel', 'filter', 'heater', 'thermometer', 'water conditioner', 'basking', 'dock', 'turtle'],
-      'frog food': ['decoration', 'plant', 'gravel', 'water conditioner', 'aquatic', 'moss', 'driftwood'],
-      'tadpole': ['decoration', 'plant', 'gravel', 'water conditioner', 'aquatic', 'moss'],
-      'fish food': ['decoration', 'plant', 'gravel', 'filter', 'air pump', 'thermometer', 'aquarium', 'ornament'],
-      'aquatic': ['decoration', 'plant', 'gravel', 'filter', 'water conditioner', 'ornament', 'driftwood'],
+      // AQUATIC AMPHIBIAN FOOD (frog, tadpole, newt) → decorations, docks, calcium, lighting
+      'frog food': ['turtle dock', 'turtle island', 'basking dock', 'floating dock', 'decoration', 'plant', 'driftwood', 'moss ball', 'calcium', 'repti calcium', 'water conditioner', 'reptisafe'],
+      'frog & tadpole': ['turtle dock', 'turtle island', 'basking dock', 'floating dock', 'decoration', 'plant', 'driftwood', 'moss ball', 'calcium', 'repti calcium', 'water conditioner', 'reptisafe'],
+      'tadpole': ['turtle dock', 'turtle island', 'basking dock', 'floating dock', 'decoration', 'plant', 'driftwood', 'moss ball', 'water conditioner', 'reptisafe'],
+      'newt': ['turtle dock', 'turtle island', 'basking dock', 'floating dock', 'decoration', 'plant', 'driftwood', 'moss ball', 'calcium', 'water conditioner'],
       
-      // REPTILE FOOD products → recommend decorations, hides, heating, bedding (NOT more food)
-      'reptile food': ['decoration', 'hide', 'bedding', 'substrate', 'heat lamp', 'thermometer', 'terrarium'],
-      'gecko food': ['hide', 'humid hide', 'decoration', 'bedding', 'heat', 'thermometer', 'calcium', 'vitamin'],
-      'bearded dragon': ['basking', 'decoration', 'hammock', 'hide', 'bedding', 'heat', 'uvb', 'calcium'],
-      'snake food': ['hide', 'bedding', 'aspen', 'water bowl', 'decoration', 'heat', 'thermometer'],
-      'cricket': ['calcium', 'vitamin', 'keeper', 'container', 'gut load'],
-      'mealworm': ['calcium', 'vitamin', 'keeper', 'dish'],
+      // AQUATIC TURTLE FOOD → docks, basking platforms, calcium, UVB, decorations
+      'turtle food': ['turtle dock', 'turtle island', 'basking dock', 'floating dock', 'decoration', 'plant', 'calcium', 'repti calcium', 'uvb', 'basking bulb', 'heat lamp', 'thermometer', 'water conditioner', 'reptisafe'],
+      'aquatic turtle': ['turtle dock', 'turtle island', 'basking dock', 'floating dock', 'decoration', 'plant', 'calcium', 'uvb', 'basking bulb', 'heat lamp', 'thermometer', 'water conditioner'],
+      
+      // FISH FOOD → decorations, plants, ornaments (NOT filters - that's equipment)
+      'fish food': ['decoration', 'plant', 'gravel', 'ornament', 'driftwood', 'air stone', 'thermometer', 'background'],
+      'betta': ['betta plant', 'betta leaf', 'decoration', 'plant', 'gravel', 'thermometer', 'water conditioner'],
+      'goldfish': ['decoration', 'plant', 'gravel', 'ornament', 'air stone', 'thermometer'],
+      'tropical flakes': ['decoration', 'plant', 'gravel', 'ornament', 'thermometer', 'air stone'],
+      'cichlid': ['decoration', 'rock', 'cave', 'gravel', 'sand', 'background'],
+      
+      // REPTILE FOOD products → decorations, hides, heating, bedding, calcium (NOT more food)
+      'reptile food': ['decoration', 'hide', 'bedding', 'substrate', 'heat lamp', 'thermometer', 'calcium', 'vitamin', 'uvb'],
+      'gecko food': ['hide', 'humid hide', 'decoration', 'bedding', 'heat', 'thermometer', 'calcium', 'vitamin', 'uvb', 'coconut'],
+      'crested gecko': ['hide', 'humid hide', 'decoration', 'vine', 'plant', 'coconut', 'calcium', 'vitamin', 'misting'],
+      'bearded dragon': ['basking bulb', 'decoration', 'hammock', 'hide', 'bedding', 'heat lamp', 'uvb', 'calcium', 'vitamin', 'reptile carpet'],
+      'snake food': ['hide', 'bedding', 'aspen', 'water bowl', 'decoration', 'heat mat', 'thermometer'],
+      'cricket': ['calcium', 'vitamin', 'cricket keeper', 'gut load', 'water gel'],
+      'mealworm': ['calcium', 'vitamin', 'mealworm keeper', 'dish'],
       
       // Reptile equipment → recommend complementary items
-      'tank': ['heat lamp', 'heating', 'thermometer', 'bedding', 'substrate', 'decoration', 'plant', 'hide', 'light'],
-      'terrarium': ['heat lamp', 'heating', 'thermometer', 'bedding', 'substrate', 'decoration', 'plant', 'hide', 'light'],
+      'tank': ['heat lamp', 'heating', 'thermometer', 'bedding', 'substrate', 'decoration', 'plant', 'hide', 'light', 'screen'],
+      'terrarium': ['heat lamp', 'heating', 'thermometer', 'bedding', 'substrate', 'decoration', 'plant', 'hide', 'light', 'screen'],
       'habitat': ['heat lamp', 'heating', 'thermometer', 'bedding', 'substrate', 'decoration', 'plant', 'hide'],
       'heat lamp': ['thermometer', 'thermostat', 'dome', 'fixture', 'bulb', 'lamp stand', 'clamp'],
       'heating': ['thermometer', 'thermostat', 'temperature', 'heat mat'],
@@ -1161,9 +1173,9 @@ export class DatabaseStorage implements IStorage {
       'bedding': ['hide', 'decoration', 'water bowl', 'substrate'],
       
       // Aquarium equipment → recommend complementary items
-      'aquarium': ['filter', 'heater', 'thermometer', 'gravel', 'decoration', 'plant', 'air pump', 'light'],
+      'aquarium': ['heater', 'thermometer', 'gravel', 'decoration', 'plant', 'air pump', 'light', 'background'],
       'filter': ['filter media', 'cartridge', 'carbon', 'sponge', 'air pump'],
-      'decoration': ['plant', 'gravel', 'ornament', 'driftwood', 'moss'],
+      'decoration': ['plant', 'gravel', 'ornament', 'driftwood', 'moss', 'background'],
       
       // Dog/Cat food - pair with treats and accessories
       'dog food': ['dog treat', 'dog chew', 'bowl', 'container'],
@@ -1191,12 +1203,16 @@ export class DatabaseStorage implements IStorage {
       
       // Detect if this is a food product (we want cross-category for food)
       const isFoodProduct = nameLower.includes('food') || category === 'food';
+      const isAquaticFood = isFoodProduct && (nameLower.includes('frog') || nameLower.includes('tadpole') || 
+                            nameLower.includes('turtle') || nameLower.includes('fish') || nameLower.includes('betta') ||
+                            nameLower.includes('goldfish') || nameLower.includes('newt') || nameLower.includes('aquatic'));
       
       // Score each supply by how many keywords match
       const scored = allSupplies.map(s => {
         const sName = (s.name || '').toLowerCase();
         const sDesc = (s.description || '').toLowerCase();
         let score = 0;
+        
         for (const kw of uniqueKeywords) {
           if (sName.includes(kw) || sDesc.includes(kw)) {
             score += 1;
@@ -1205,19 +1221,36 @@ export class DatabaseStorage implements IStorage {
         
         // For food products: PENALIZE same-category food items, prefer accessories/decorations
         if (isFoodProduct) {
+          // Heavily penalize recommending more food items
           if (s.category === 'food' || sName.includes('food')) {
-            score -= 2; // Penalize recommending more food
+            score -= 5;
           }
-          if (sName.includes('decoration') || sName.includes('plant') || sName.includes('hide') || 
-              sName.includes('gravel') || sName.includes('filter') || sName.includes('ornament')) {
-            score += 1; // Bonus for decorations/accessories
+          
+          // For aquatic food: STRONGLY PENALIZE filters, pumps, and equipment
+          if (isAquaticFood) {
+            if (sName.includes('filter') || sName.includes('undergravel') || sName.includes('cartridge') || 
+                sName.includes('carbon') || sName.includes('pump') || sName.includes('powerhead')) {
+              score -= 10; // Strong penalty for filter equipment
+            }
+            // Bonus for relevant aquatic accessories
+            if (sName.includes('dock') || sName.includes('island') || sName.includes('basking') || 
+                sName.includes('platform') || sName.includes('calcium') || sName.includes('reptisafe') ||
+                sName.includes('water conditioner') || sName.includes('decoration') || sName.includes('plant')) {
+              score += 3;
+            }
+          }
+          
+          // General decorations/accessories bonus
+          if (sName.includes('decoration') || sName.includes('ornament') || sName.includes('hide') || 
+              sName.includes('gravel') || sName.includes('driftwood') || sName.includes('moss')) {
+            score += 1;
           }
         } else {
           // For non-food: small bonus for same category
           if (s.category === category) score += 0.3;
         }
         
-        // Small bonus for same brand (good for upselling)
+        // Small bonus for same brand (good for upselling complementary items)
         if (brand && s.brand === brand) score += 0.2;
         return { supply: s, score };
       });

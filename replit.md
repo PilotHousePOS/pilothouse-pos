@@ -30,6 +30,17 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Aquatic Subcategorization (server/aquaticCategoryEvidence.ts): Evidence-based system with verified product terminology from official product lines. Priority system: Decoration exclusion → Brand-based categorization → Keyword scoring → Default to accessories.
   - Cat/dog food exclusion: Products containing cat/dog keywords excluded from aquatic filterType.
   - Shampoo categorization: Medicated/therapeutic shampoos (Zymox, Adams, Advantage, flea/tick) go to healthcare; grooming shampoos (Furminator, Freshnclean, carpet shampoo) go to accessories per Excel file.
+- Product Recommendations ("You May Also Like"): Smart cross-category recommendations based on product type.
+  - Food products: Recommend complementary accessories, NOT more food. For aquatic food (frog, turtle, fish), recommend docks, decorations, calcium, water conditioners. For reptile food, recommend hides, bedding, calcium, heating.
+  - Strong penalty for filter/pump equipment when recommending for food products (-10 score).
+  - Bonus for relevant accessories like docks, islands, basking platforms, calcium, reptisafe (+3 score).
+  - smartPairings triggers: 'frog food', 'frog & tadpole', 'tadpole', 'turtle food', 'aquatic turtle', 'fish food', 'betta', 'goldfish', 'bearded dragon', 'gecko food', 'crested gecko', 'snake food', 'cricket', 'mealworm'.
+- Extended Product Information: Sourced from reliable retailers (Chewy, Amazon, manufacturer websites).
+  - Ingredients: Full ingredient list from product packaging.
+  - Guaranteed Analysis: Stored as pipe-separated values for table display (e.g., "Crude Protein (min)|12%|Crude Fat (min)|5%").
+  - Feeding Instructions: Usage directions from product labels.
+  - Features: JSON with highlights array for bullet point display.
+  - Currently 61+ products have complete extended information.
 
 ## System Architecture
 The application is a full-stack web application featuring a React frontend (Vite, TypeScript, Tailwind CSS, shadcn/ui) and an Express.js backend (TypeScript) connected to a PostgreSQL database via Drizzle ORM.
