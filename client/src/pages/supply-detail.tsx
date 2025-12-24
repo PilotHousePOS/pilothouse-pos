@@ -394,7 +394,7 @@ export default function SupplyDetail() {
         {supply.relatedProducts && supply.relatedProducts.length > 0 && (
           <div className="mt-8">
             <h2 className="text-lg font-bold mb-4" data-testid="related-products-title">
-              Frequently Bought Together
+              You May Also Like
             </h2>
             <div className="overflow-x-auto pb-4">
               <div className="flex gap-4" style={{ width: 'max-content' }}>
