@@ -36,6 +36,7 @@ export const BRAND_UPC_PREFIXES = {
   '052742': ["hill's", 'hills', 'science diet', 'healthy advantage'],
   '859610': ['blue buffalo', 'blue wilderness', 'blue freedom'],
   '072705': ['fromm'],
+  '727051': ['fromm'],  // Secondary Fromm prefix
   '030111': ['royal canin', 'royalcanin'],
   '019014': ['nutro'],
   '769949': ['taste of the wild'],
@@ -57,6 +58,8 @@ export const BRAND_UPC_PREFIXES = {
   '029695': ['petmate', 'chuckit', 'chuck it'],  // Petmate owns Chuckit
   '022517': ['catit'],
   '073893': ['nutrisource'],
+  '738933': ['nutrisource'],  // Secondary NutriSource prefix
+  '738938': ['nutrisource'],  // Secondary NutriSource prefix
   '077234': ['ethical pet', 'spot', 'colorful springs'],
   '618940': ['jw pet', 'jw'],
   '045663': ['safari', 'four paws', '4 paws'],
