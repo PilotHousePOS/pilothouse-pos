@@ -3122,6 +3122,11 @@ export class DatabaseStorage implements IStorage {
                 weight: sql`EXCLUDED.weight`,
                 size: sql`EXCLUDED.size`,
                 sku: sql`EXCLUDED.sku`,
+                // Extended product info - preserve existing values if import has null
+                ingredients: sql`COALESCE(EXCLUDED.ingredients, supplies.ingredients)`,
+                guaranteedAnalysis: sql`COALESCE(EXCLUDED.guaranteed_analysis, supplies.guaranteed_analysis)`,
+                instructions: sql`COALESCE(EXCLUDED.instructions, supplies.instructions)`,
+                features: sql`COALESCE(EXCLUDED.features, supplies.features)`,
                 updatedAt: sql`EXCLUDED.updated_at`,
               },
             });
