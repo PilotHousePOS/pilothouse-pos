@@ -13,7 +13,7 @@
 export const BRAND_UPC_PREFIXES = {
   // Reptile brands
   '097612': ['zoo med', 'zoomed', 'zoo-med'],
-  '015561': ['exo terra', 'exoterra', 'hagen', 'fluval', 'marina', 'nutrafin', 'living world'],
+  '015561': ['exo terra', 'exoterra', 'hagen', 'fluval', 'marina', 'nutrafin', 'living world', 'carefresh', 'sunburst'],  // Hagen family
   '091197': ["fluker's", 'flukers', 'fluker'],
   '096316': ['zilla'],
   
@@ -46,7 +46,7 @@ export const BRAND_UPC_PREFIXES = {
   '023100': ['pedigree', 'iams', 'eukanuba'],
   
   // Dog/cat accessory brands
-  '076484': ['kong', 'coastal', "li'l pals", 'lil pals', 'safari', 'titan', 'lazer brite', 'easy rider'],  // Coastal family brands
+  '076484': ['kong', 'coastal', "li'l pals", 'lil pals', 'safari', 'titan', 'lazer brite', 'easy rider', 'circle t', 'bionic'],  // Coastal family brands
   '018214': ['nylabone', 'coastal', "li'l pals", 'lil pals', 'lazer brite', 'easy rider'],  // Nylabone uses 018214 prefix!
   '018065': ['nylabone', "nature's miracle", 'natures miracle'],  // Nylabone also uses 018065
   '854111': ['benebone'],  // Corrected from 810833
@@ -70,6 +70,10 @@ export const BRAND_UPC_PREFIXES = {
   // Additional small animal prefixes  
   '045125': ['kaytee'],  // Kaytee also uses this prefix
   '730582': ['living world', 'friendsfarm', 'hagen'],
+  
+  // Sub-brand relationships
+  '046798': ['tetra', 'glofish'],  // GloFish is Tetra subsidiary
+  '074198': ['diamond', 'diamond naturals', 'taste of the wild', 'totw'],  // TOTW is Diamond
   
   // New prefixes from 2024-12 export sync
   '021653': ['bio groom', 'bio-groom', 'biogroom'],  // Bio Groom
