@@ -115,6 +115,11 @@ export const supplies = pgTable("supplies", {
   posProductId: varchar("pos_product_id", { length: 255 }), // External POS system product ID
   posLastSyncedAt: timestamp("pos_last_synced_at"), // Last time POS data was synced
   nonRestockable: boolean("non_restockable").default(false), // Flag for items that won't be restocked
+  // Product detail fields for expanded view
+  features: jsonb("features"), // Additional product features { grossWeight, netWeight, height, length, width, flavor, etc. }
+  ingredients: text("ingredients"), // Raw ingredients list
+  instructions: text("instructions"), // Usage/feeding instructions
+  guaranteedAnalysis: text("guaranteed_analysis"), // Nutritional analysis for food products
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

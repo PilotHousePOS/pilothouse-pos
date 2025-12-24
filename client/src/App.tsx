@@ -11,6 +11,7 @@ import ResetPassword from "@/pages/reset-password";
 import Home from "@/pages/home";
 import Pets from "@/pages/pets";
 import Supplies from "@/pages/supplies";
+import SupplyDetail from "@/pages/supply-detail";
 import Aquatics from "@/pages/aquatics";
 import Reptiles from "@/pages/reptiles";
 import Booking from "@/pages/booking";
@@ -53,6 +54,7 @@ function Router() {
             <Route path="/" component={Home} />
             <Route path="/pets" component={Pets} />
             <Route path="/supplies" component={Supplies} />
+            <Route path="/supplies/:id" component={SupplyDetail} />
             <Route path="/aquatics" component={Aquatics} />
             <Route path="/reptiles" component={Reptiles} />
             <Route path="/booking" component={Booking} />

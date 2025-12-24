@@ -1409,7 +1409,16 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (!supply) {
         return res.status(404).json({ message: "Supply not found" });
       }
-      res.json(supply);
+      
+      // Get related products (same category/brand, excluding current item)
+      let relatedProducts: any[] = [];
+      try {
+        relatedProducts = await storage.getRelatedSupplies(id, supply.category, supply.brand, 6);
+      } catch (e) {
+        console.error("Error fetching related products:", e);
+      }
+      
+      res.json({ ...supply, relatedProducts });
     } catch (error) {
       console.error("Error fetching supply:", error);
       res.status(500).json({ message: "Failed to fetch supply" });

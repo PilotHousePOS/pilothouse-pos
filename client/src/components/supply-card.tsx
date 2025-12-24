@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -132,7 +133,8 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
 
   return (
     <>
-    <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => setShowDetails(true)}>
+    <Link href={`/supplies/${supply.id}`}>
+    <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer" data-testid={`supply-card-${supply.id}`}>
       <CardContent className="p-0">
         <div className="flex">
           <div className="relative w-20 h-20 overflow-hidden">
@@ -184,8 +186,9 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
         </div>
       </CardContent>
     </Card>
+    </Link>
 
-    {/* Supply Details Modal */}
+    {/* Supply Details Modal - kept for backwards compatibility */}
     <Dialog open={showDetails} onOpenChange={(open) => {
       setShowDetails(open);
       if (!open) {

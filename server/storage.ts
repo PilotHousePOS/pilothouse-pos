@@ -90,7 +90,7 @@ import {
   type InsertAstroPurchaseSyncLog,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, and, or, not, ilike, lt, isNull, count, sql, inArray } from "drizzle-orm";
+import { eq, desc, asc, and, or, not, ilike, lt, isNull, count, sql, inArray, ne, notInArray } from "drizzle-orm";
 import { phoneNumbersMatch } from "./phoneUtils";
 import { SUPPLY_FILTERS, type FilterType } from "./filterConfig";
 import { 
@@ -146,6 +146,7 @@ export interface IStorage {
     healthcareType?: string;
   }): Promise<{ items: Supply[]; total: number }>;
   getSupply(id: number): Promise<Supply | undefined>;
+  getRelatedSupplies(excludeId: number, category: string, brand: string | null, limit?: number): Promise<Supply[]>;
   createSupply(supply: InsertSupply): Promise<Supply>;
   updateSupply(id: number, supply: Partial<InsertSupply>): Promise<Supply>;
   deleteSupply(id: number): Promise<void>;
@@ -1122,6 +1123,49 @@ export class DatabaseStorage implements IStorage {
   async getSupply(id: number): Promise<Supply | undefined> {
     const [supply] = await db.select().from(supplies).where(eq(supplies.id, id));
     return supply;
+  }
+
+  async getRelatedSupplies(excludeId: number, category: string, brand: string | null, limit: number = 6): Promise<Supply[]> {
+    // Get related products - prioritize same brand, then same category
+    const conditions = [
+      ne(supplies.id, excludeId),
+      eq(supplies.isActive, true),
+    ];
+    
+    // First try to get products from same brand
+    if (brand) {
+      const brandMatches = await db
+        .select()
+        .from(supplies)
+        .where(and(...conditions, eq(supplies.brand, brand)))
+        .limit(limit);
+      
+      if (brandMatches.length >= limit) {
+        return brandMatches;
+      }
+      
+      // Fill remaining slots with same category
+      const remaining = limit - brandMatches.length;
+      const brandIds = brandMatches.map(s => s.id);
+      const categoryMatches = await db
+        .select()
+        .from(supplies)
+        .where(and(
+          ...conditions,
+          eq(supplies.category, category),
+          notInArray(supplies.id, brandIds.length > 0 ? brandIds : [0])
+        ))
+        .limit(remaining);
+      
+      return [...brandMatches, ...categoryMatches];
+    }
+    
+    // No brand - just get same category
+    return db
+      .select()
+      .from(supplies)
+      .where(and(...conditions, eq(supplies.category, category)))
+      .limit(limit);
   }
 
   async getSuppliesWithoutImages(
