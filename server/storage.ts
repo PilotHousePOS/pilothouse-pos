@@ -1132,32 +1132,44 @@ export class DatabaseStorage implements IStorage {
       eq(supplies.isActive, true),
     ];
     
-    // Define smart product pairings based on keywords in product name
+    // Define smart product pairings - prioritize CROSS-CATEGORY complementary items
     const smartPairings: Record<string, string[]> = {
-      // Reptile products - tanks/terrariums need heat, lighting, bedding, decorations
+      // AQUATIC FOOD products → recommend decorations, plants, accessories (NOT more food)
+      'turtle food': ['decoration', 'plant', 'gravel', 'filter', 'heater', 'thermometer', 'water conditioner', 'basking', 'dock', 'turtle'],
+      'frog food': ['decoration', 'plant', 'gravel', 'water conditioner', 'aquatic', 'moss', 'driftwood'],
+      'tadpole': ['decoration', 'plant', 'gravel', 'water conditioner', 'aquatic', 'moss'],
+      'fish food': ['decoration', 'plant', 'gravel', 'filter', 'air pump', 'thermometer', 'aquarium', 'ornament'],
+      'aquatic': ['decoration', 'plant', 'gravel', 'filter', 'water conditioner', 'ornament', 'driftwood'],
+      
+      // REPTILE FOOD products → recommend decorations, hides, heating, bedding (NOT more food)
+      'reptile food': ['decoration', 'hide', 'bedding', 'substrate', 'heat lamp', 'thermometer', 'terrarium'],
+      'gecko food': ['hide', 'humid hide', 'decoration', 'bedding', 'heat', 'thermometer', 'calcium', 'vitamin'],
+      'bearded dragon': ['basking', 'decoration', 'hammock', 'hide', 'bedding', 'heat', 'uvb', 'calcium'],
+      'snake food': ['hide', 'bedding', 'aspen', 'water bowl', 'decoration', 'heat', 'thermometer'],
+      'cricket': ['calcium', 'vitamin', 'keeper', 'container', 'gut load'],
+      'mealworm': ['calcium', 'vitamin', 'keeper', 'dish'],
+      
+      // Reptile equipment → recommend complementary items
       'tank': ['heat lamp', 'heating', 'thermometer', 'bedding', 'substrate', 'decoration', 'plant', 'hide', 'light'],
       'terrarium': ['heat lamp', 'heating', 'thermometer', 'bedding', 'substrate', 'decoration', 'plant', 'hide', 'light'],
       'habitat': ['heat lamp', 'heating', 'thermometer', 'bedding', 'substrate', 'decoration', 'plant', 'hide'],
-      'heat lamp': ['thermometer', 'thermostat', 'dome', 'fixture', 'bulb', 'lamp stand'],
-      'heating': ['thermometer', 'thermostat', 'temperature'],
-      'bulb': ['dome', 'fixture', 'lamp', 'clamp'],
-      'fixture': ['bulb', 'lamp'],
-      'gecko': ['calcium', 'vitamin', 'mealworm', 'cricket', 'gecko food', 'hide', 'humid hide', 'heat'],
-      'bearded dragon': ['calcium', 'vitamin', 'greens', 'pellet', 'basking', 'heat', 'uvb'],
-      'snake': ['mouse', 'rat', 'frozen', 'hide', 'water bowl', 'bedding', 'aspen'],
+      'heat lamp': ['thermometer', 'thermostat', 'dome', 'fixture', 'bulb', 'lamp stand', 'clamp'],
+      'heating': ['thermometer', 'thermostat', 'temperature', 'heat mat'],
+      'bulb': ['dome', 'fixture', 'lamp', 'clamp', 'thermometer'],
+      'fixture': ['bulb', 'lamp', 'thermometer'],
+      'hide': ['bedding', 'substrate', 'decoration', 'plant', 'water bowl'],
+      'bedding': ['hide', 'decoration', 'water bowl', 'substrate'],
       
-      // Aquatic products - tanks need filters, heaters, decorations, food
+      // Aquarium equipment → recommend complementary items
       'aquarium': ['filter', 'heater', 'thermometer', 'gravel', 'decoration', 'plant', 'air pump', 'light'],
-      'filter': ['filter media', 'cartridge', 'carbon', 'sponge'],
-      'fish food': ['fish food', 'flakes', 'pellets'],
-      'frog': ['frog food', 'tadpole', 'aquatic', 'water conditioner'],
-      'tadpole': ['frog food', 'aquatic plant', 'water conditioner'],
+      'filter': ['filter media', 'cartridge', 'carbon', 'sponge', 'air pump'],
+      'decoration': ['plant', 'gravel', 'ornament', 'driftwood', 'moss'],
       
-      // Dog/Cat food - pair with same protein type and brand
-      'dog food': ['dog treat', 'dog chew'],
-      'cat food': ['cat treat'],
-      'puppy': ['puppy food', 'puppy treat', 'training'],
-      'kitten': ['kitten food', 'kitten'],
+      // Dog/Cat food - pair with treats and accessories
+      'dog food': ['dog treat', 'dog chew', 'bowl', 'container'],
+      'cat food': ['cat treat', 'bowl', 'container'],
+      'puppy': ['puppy treat', 'training', 'bowl', 'crate'],
+      'kitten': ['kitten treat', 'bowl', 'toy'],
     };
     
     const nameLower = (productName || '').toLowerCase();
@@ -1177,6 +1189,9 @@ export class DatabaseStorage implements IStorage {
       const uniqueKeywords = [...new Set(smartKeywords)];
       const allSupplies = await db.select().from(supplies).where(and(...conditions));
       
+      // Detect if this is a food product (we want cross-category for food)
+      const isFoodProduct = nameLower.includes('food') || category === 'food';
+      
       // Score each supply by how many keywords match
       const scored = allSupplies.map(s => {
         const sName = (s.name || '').toLowerCase();
@@ -1187,10 +1202,23 @@ export class DatabaseStorage implements IStorage {
             score += 1;
           }
         }
-        // Bonus for same category
-        if (s.category === category) score += 0.5;
-        // Bonus for same brand
-        if (brand && s.brand === brand) score += 0.3;
+        
+        // For food products: PENALIZE same-category food items, prefer accessories/decorations
+        if (isFoodProduct) {
+          if (s.category === 'food' || sName.includes('food')) {
+            score -= 2; // Penalize recommending more food
+          }
+          if (sName.includes('decoration') || sName.includes('plant') || sName.includes('hide') || 
+              sName.includes('gravel') || sName.includes('filter') || sName.includes('ornament')) {
+            score += 1; // Bonus for decorations/accessories
+          }
+        } else {
+          // For non-food: small bonus for same category
+          if (s.category === category) score += 0.3;
+        }
+        
+        // Small bonus for same brand (good for upselling)
+        if (brand && s.brand === brand) score += 0.2;
         return { supply: s, score };
       });
       
