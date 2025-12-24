@@ -9,6 +9,14 @@
   </head>
   <body>
     <div id="root"></div>
+    <script type="module">
+      // Auto-reload on Vite HMR reconnection to fix blank screen after updates
+      if (import.meta.hot) {
+        let disconnected = false;
+        import.meta.hot.on('vite:ws:disconnect', () => { disconnected = true; });
+        import.meta.hot.on('vite:ws:connect', () => { if (disconnected) location.reload(); });
+      }
+    </script>
     <script type="module" src="/src/main.tsx?v=20251023164100"></script>
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
