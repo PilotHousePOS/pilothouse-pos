@@ -8210,7 +8210,7 @@ export default function Admin() {
                       {/* Name gets full remaining width */}
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm leading-snug" title={supply.name}>{supply.name}</h3>
-                        <p className="text-xs text-gray-600 mt-0.5">{supply.brand} • ${supply.price} • Stock: {supply.stockQuantity}</p>
+                        <p className="text-xs text-gray-600 mt-0.5">{supply.brand} • ${supply.price} • Stock: {supply.stockQuantity}{supply.sku ? ` • SKU: ${supply.sku}` : ''}{supply.upc ? ` • UPC: ${supply.upc}` : ''}</p>
                       </div>
                     </div>
                     {/* Actions on separate row */}

@@ -290,23 +290,6 @@ export default function SupplyDetail() {
             {inStock ? 'In Stock' : 'Out of Stock'}
           </Badge>
 
-          <div className="mt-4 space-y-1 text-sm text-gray-400">
-            {supply.sku && (
-              <div data-testid="product-sku">
-                <span className="text-gray-500">SKU:</span> {supply.sku}
-              </div>
-            )}
-            {supply.upc && (
-              <div data-testid="product-upc">
-                <span className="text-gray-500">UPC:</span> {supply.upc}
-              </div>
-            )}
-            {(supply.stockQuantity ?? 0) > 0 && (
-              <div data-testid="product-qty">
-                <span className="text-gray-500">Qty Available:</span> {supply.stockQuantity}
-              </div>
-            )}
-          </div>
         </div>
 
         <div className="flex items-center gap-3 mb-6">
@@ -456,12 +439,6 @@ function RelatedProductCard({ product }: { product: Supply }) {
           <div className="text-green-400 font-bold text-sm">
             ${Number(product.price).toFixed(2)}
           </div>
-          {product.sku && (
-            <div className="text-gray-500 text-xs mt-1">SKU: {product.sku}</div>
-          )}
-          {product.upc && (
-            <div className="text-gray-500 text-xs">UPC: {product.upc}</div>
-          )}
         </CardContent>
       </Card>
     </Link>
