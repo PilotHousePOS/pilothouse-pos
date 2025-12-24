@@ -388,18 +388,19 @@ export default function SupplyDetail() {
               <AccordionContent className="text-gray-300">
                 <table className="w-full text-sm" data-testid="guaranteed-analysis-table">
                   <tbody>
-                    {supply.guaranteedAnalysis.split('|').map((item, idx) => {
-                      const parts = item.trim().split(':');
-                      if (parts.length === 2) {
-                        return (
-                          <tr key={idx} className="border-b border-gray-700">
-                            <td className="py-2 font-semibold text-white">{parts[0].trim()}</td>
-                            <td className="py-2 text-right">{parts[1].trim()}</td>
+                    {(() => {
+                      const parts = supply.guaranteedAnalysis.split('|');
+                      const rows = [];
+                      for (let i = 0; i < parts.length - 1; i += 2) {
+                        rows.push(
+                          <tr key={i} className="border-b border-gray-700">
+                            <td className="py-2 font-semibold text-white">{parts[i].trim()}</td>
+                            <td className="py-2 text-right">{parts[i + 1].trim()}</td>
                           </tr>
                         );
                       }
-                      return null;
-                    })}
+                      return rows;
+                    })()}
                   </tbody>
                 </table>
               </AccordionContent>
