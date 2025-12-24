@@ -63,7 +63,7 @@ export default function SupplyDetail() {
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   const { data: supply, isLoading, error } = useQuery<SupplyWithRelated>({
-    queryKey: ["/api/supplies", id],
+    queryKey: [`/api/supplies/${id}`],
     enabled: !!id,
   });
 
