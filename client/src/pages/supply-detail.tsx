@@ -338,21 +338,32 @@ export default function SupplyDetail() {
           </div>
         )}
 
-        <Accordion type="multiple" className="w-full">
-          {features && Object.keys(features).length > 0 && (
-            <AccordionItem value="features" className="border-gray-700">
+        <Accordion type="multiple" className="w-full" defaultValue={["details"]}>
+          {features && (features.highlights || Object.keys(features).length > 0) && (
+            <AccordionItem value="details" className="border-gray-700">
               <AccordionTrigger className="text-green-500 hover:text-green-400" data-testid="accordion-features">
-                ADDITIONAL FEATURES
+                Details
               </AccordionTrigger>
               <AccordionContent className="text-gray-300">
-                <div className="space-y-2">
-                  {Object.entries(features).map(([key, value]) => (
-                    <div key={key} className="flex justify-between">
-                      <span className="text-gray-500 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
-                      <span>{String(value)}</span>
-                    </div>
-                  ))}
-                </div>
+                {features.highlights && Array.isArray(features.highlights) ? (
+                  <ul className="space-y-2 text-sm">
+                    {features.highlights.map((highlight: string, idx: number) => (
+                      <li key={idx} className="flex items-start">
+                        <span className="text-green-500 mr-2">•</span>
+                        <span>{highlight}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="space-y-2 text-sm">
+                    {Object.entries(features).map(([key, value]) => (
+                      <div key={key} className="flex justify-between">
+                        <span className="text-gray-500 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
+                        <span>{String(value)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </AccordionContent>
             </AccordionItem>
           )}
@@ -360,21 +371,11 @@ export default function SupplyDetail() {
           {supply.ingredients && (
             <AccordionItem value="ingredients" className="border-gray-700">
               <AccordionTrigger className="text-green-500 hover:text-green-400" data-testid="accordion-ingredients">
-                INGREDIENTS
+                Ingredient Information
               </AccordionTrigger>
-              <AccordionContent className="text-gray-300 text-sm">
-                {supply.ingredients}
-              </AccordionContent>
-            </AccordionItem>
-          )}
-
-          {supply.instructions && (
-            <AccordionItem value="instructions" className="border-gray-700">
-              <AccordionTrigger className="text-green-500 hover:text-green-400" data-testid="accordion-instructions">
-                INSTRUCTIONS
-              </AccordionTrigger>
-              <AccordionContent className="text-gray-300 text-sm">
-                {supply.instructions}
+              <AccordionContent className="text-gray-300">
+                <p className="font-semibold text-white mb-2">Ingredients</p>
+                <p className="text-sm leading-relaxed">{supply.ingredients}</p>
               </AccordionContent>
             </AccordionItem>
           )}
@@ -382,10 +383,36 @@ export default function SupplyDetail() {
           {supply.guaranteedAnalysis && (
             <AccordionItem value="analysis" className="border-gray-700">
               <AccordionTrigger className="text-green-500 hover:text-green-400" data-testid="accordion-analysis">
-                GUARANTEED ANALYSIS
+                Guaranteed Analysis
               </AccordionTrigger>
-              <AccordionContent className="text-gray-300 text-sm">
-                {supply.guaranteedAnalysis}
+              <AccordionContent className="text-gray-300">
+                <table className="w-full text-sm" data-testid="guaranteed-analysis-table">
+                  <tbody>
+                    {supply.guaranteedAnalysis.split('|').map((item, idx) => {
+                      const parts = item.trim().split(':');
+                      if (parts.length === 2) {
+                        return (
+                          <tr key={idx} className="border-b border-gray-700">
+                            <td className="py-2 font-semibold text-white">{parts[0].trim()}</td>
+                            <td className="py-2 text-right">{parts[1].trim()}</td>
+                          </tr>
+                        );
+                      }
+                      return null;
+                    })}
+                  </tbody>
+                </table>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+
+          {supply.instructions && (
+            <AccordionItem value="instructions" className="border-gray-700">
+              <AccordionTrigger className="text-green-500 hover:text-green-400" data-testid="accordion-instructions">
+                Feeding Instructions
+              </AccordionTrigger>
+              <AccordionContent className="text-gray-300 text-sm leading-relaxed">
+                {supply.instructions}
               </AccordionContent>
             </AccordionItem>
           )}
