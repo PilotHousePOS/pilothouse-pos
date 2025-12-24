@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application designed to enhance the store's online presence, service accessibility, and product sales. It supports pet browsing, grooming appointment booking, and pet supply purchasing, including exotic reptiles. The application aims to provide a comprehensive online platform that boosts sales, streamlines operations, and integrates inventory management, customer accounts, and administrative functionalities.
+The Animal House Pet Store project is a mobile-friendly web application designed to enhance the store's online presence, service accessibility, and product sales. It supports pet browsing, grooming appointment booking, and pet supply purchasing, including exotic reptiles. The application aims to provide a comprehensive online platform that boosts sales, streamlines operations, and integrates inventory management, customer accounts, and administrative functionalities. The business vision is to provide a comprehensive online platform that boosts sales, streamlines operations, and integrates inventory management, customer accounts, and administrative functionalities.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -59,7 +59,9 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Advanced Management**: Pet Boarding/Babysitting, Database Sync Tools (staging import, supplies-only sync, full sync), Auto-Categorization System (brand/keyword analysis, Live Animal Detection, category cleanup), Smart Abbreviation Expansion, Brand Extraction & Assignment.
 - **Admin Tools**: Product Image Management (dashboard, batch search/preview), Employee & Grooming Schedule Management.
 - **AI & Integrations**: AI-Powered Order Photo Upload (GPT-5 Vision for item extraction, auto-categorization, custom pricing), Astro Loyalty Integration, POS Integration (real-time sync, webhooks).
-- **UPC Matching System**: A strict system for matching UPCs to products with 90% coverage and 100% accuracy, employing abbreviation expansion, text normalization, and verified brand mappings. Strict validation rules apply to size, wattage, weight/volume, dimensions, cup/capacity, and length. Includes critical product type exclusions and a comprehensive brand prefix expansion dictionary.
+- **UPC Matching System**: Strict system for matching UPCs to products with 90% coverage and 100% accuracy, employing abbreviation expansion, text normalization, and verified brand mappings. Strict validation rules apply to size, wattage, weight/volume, dimensions, cup/capacity, and length. Includes critical product type exclusions and a comprehensive brand prefix expansion dictionary.
+    - **Validation Rules**: Size, Wattage, Weight/Volume, Dimension, Cup/Capacity, and Length must match exactly.
+    - **Brand-UPC Prefix Validation**: UPC prefix must match product's brand using GS1 manufacturer prefixes.
 
 **System Design Choices:**
 - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
@@ -86,77 +88,28 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Query Library**: TanStack Query
 - **Client-Side Router**: Wouter
 
-## UPC Matching System
+## UPC/SKU Matching System
 
-### Overview
-- **Target**: 90% coverage with 100% accuracy (zero errors tolerated)
-- **Total supplies**: 7,225
-- **Total UPCs available**: 7,300 (expanded from 3+ sources)
-- **Current progress**: 82.2% matched (5,939 products) - after cleanup of 175 incorrect UPCs
-- **Applied through queue**: 2,177 verified matches (after protein/product validation)
-- **Rejected**: 56 matches (protein/size/color/brand mismatches)
-- **Brand detection**: 4,089 with brands (80%), 994 unknown (20%)
-- **Remaining unmatched**: 1,286 supplies (limited by available UPC data)
-- **Philosophy**: Matches validated for protein/product type accuracy AND brand-UPC prefix validation
+### Key Principles
+- **SKU = UPC**: In this system, SKU and UPC are identical - always copy SKU to UPC where UPC is empty
+- **Current Coverage**: 84.8% (6,150 of 7,252 products have UPCs)
+- **Photo Coverage**: 97.7% (7,088 products have proper photos)
+- **Data Sync**: When exporting from production, all UPC/SKU corrections are preserved via ID-based updates
 
-**Known Data Source Notes:**
-- Science Diet: 202 UPCs in Google spreadsheet (all ingested), matches validated with protein checking
-
-### Matching Pipeline (Stateful - Never Loses Progress)
-1. **Discovery**: `batch-match-all.mjs` finds matches → saves to `all_pending_matches.json`
-2. **Queue**: `merge-matches-to-queue.mjs` merges into `match_queue.json` (deduplicates)
-3. **Review**: Accept matches manually or via `accept-all-high-score.mjs [minScore]`
-4. **Apply**: `apply-accepted-matches.mjs` applies accepted matches to database
-
-### Key Files
-- `scripts/ALL_UPCS_EXPANDED.json` - Master UPC database with 5,083 UPCs, brand-detected
-- `scripts/match_queue.json` - **STATEFUL** queue with status: pending/accepted/rejected/applied
-- `scripts/match_decisions_log.json` - Append-only audit trail of all decisions
-- `scripts/match_apply_log.json` - Log of all apply runs
-- `scripts/upc-extraction-with-logging.mjs` - Extraction script with 160+ brand prefixes
-- `scripts/batch-match-all.mjs` - Batch matching across all brands
-- `scripts/smart-match-v2.mjs` - Single-brand matching with detailed output
-
-### Validation Rules (STRICT - All Must Pass)
-1. **Size Matching**: xxsmall, xsmall, small, mini, medium, large, xlarge, xxlarge, jumbo, giant
-2. **Wattage Matching**: Must match exactly (25W ≠ 50W)
-3. **Weight/Volume Matching**: Value AND unit must match exactly
-4. **Dimension Matching**: Normalized (5" = 5in = 5inch), must match exactly
-5. **Cup/Capacity Matching**: 1 cup ≠ 7 cup
-6. **Length Matching**: Foot measurements must match (15' ≠ 10')
-7. **Brand-UPC Prefix Validation**: UPC prefix must match product's brand (see below)
-
-### Brand-UPC Prefix Validation (CRITICAL)
+### Brand-UPC Prefix Validation
 Prevents cross-brand UPC assignments using GS1 manufacturer prefixes. Implemented in `scripts/brand-upc-prefixes.mjs`.
 
-**Known Brand Prefixes:**
-- **Reptile**: Zoo Med=097612, Exo Terra/Hagen=015561, Fluker's=091197, Zilla=096316
-- **Aquatic**: Tetra=046798, Aqueon=015905, Hikari=042055, API=317163, Marineland=047431, Penn-Plax=030172
-- **Small Animal**: Kaytee=071859, Oxbow=034846, Vitakraft=071354
-- **Pet Food**: Orijen/Acana=064992, Hill's=052742, Blue Buffalo=859610, Fromm=072705, Royal Canin=030111
-- **Accessories**: Kong=076484, Coastal=018214, Nylabone=018065, Greenies=642863, RedBarn=785184
+**Known Prefixes (2024-12 update):**
+- **Reptile**: Zoo Med=097612, Exo Terra=015561, Fluker's=091197, Zilla=096316
+- **Aquatic**: Tetra=046798, Aqueon=015905, Hikari=042055, API=317163, Marineland=047431
+- **Small Animal**: Kaytee=071859/045125, Oxbow=744845, Vitakraft=071354
+- **Pet Food**: Orijen=064992, Blue Buffalo=859610/840243, Fromm=072705/727051, NutriSource=073893/738933/738938
+- **Accessories**: Kong=035585/076484/611932, Coastal=018214, Nylabone=018214/018065, Greenies=642863
+- **Grooming**: Bio Groom=021653, Earthbath=602644, FURminator=811794, Vet's Best=031658, Zymox=667334, TropiClean=645095, Skout's Honor=810053/856713/850004, NaturVet=797801, PetAg=071860, Dogswell=693804
 
-**How it works:**
-1. When applying a UPC match, the system checks if the UPC prefix matches the product's brand
-2. If mismatch detected, the match is automatically rejected with reason
-3. Audit script `scripts/audit-upc-brand-prefixes.mjs` finds existing mismatches in database
-
-### Brand Prefix Expansion (80+ verified mappings)
-Never auto-promote unverified prefixes - all mappings must be user-confirmed!
-- **Aquarium**: AQE/AQA→Aqueon, TET→Tetra, HIK/HKR→Hikari, ATP→Aquatop, WWI→World Wide Imports, SLI/SCM→SeaChem, FLV→Fluval, API→API, GLF→GloFish, PENN→Penn-Plax
-- **Reptile**: ZMD/ZM/ZML→Zoo Med, EXO→Exo Terra, ZIL→Zilla, FLK/FSK/FLU→Flukers, KMD/KOM→Komodo, PGE→Pangea
-- **Dog/Cat**: KON/KNG→Kong, CST/COA→Coastal, NYL→Nylabone, BEN→Benebone, SMB/SMBN→SmartBones, RDB/RED→RedBarn, GRN→Greenies, WHI→Whimzees, CHT→Chuckit, ETH→Ethical Pet, SPT→Spot, JWP/JW→JW Pet, SAF→Safari, TRC/TRP/TRO→TropiClean, FRP/FOU→Four Paws, NVT→NaturVet, FAS→Fashion Pet, PTS/DOS→Petmate, MPS/MRP/MUL→Multipet, MAM→Mammoth, TUF/VIP→Tuffy, CATIT→Catit, PETAG→PetAg
-- **Small Animal/Bird**: KAY/KMP→Kaytee, OXB→Oxbow, VTK→Vitakraft, LAF→Lafebers, AEC→A&E Cage
-- **Food**: SD/HSD→Science Diet, BB/BLU/BLUE→Blue Buffalo, RC→Royal Canin, NUT/NBS/SOU→Nutrisource, FRM/FROMM→Fromm, DIA/DIAM→Diamond, TOW/TAS→Taste of the Wild, PRIM→Primal, INS→Instinct, PP/PRO→Pro Plan, VIT→Vital Essentials
-
-**Distributor codes (NOT brands)**: GAR=Garmon Corp distributes NaturVet - use context detection instead
-
-### Progress Notes
-- 2024-12: Created comprehensive logging system that tracks unknown abbreviations and brand prefixes
-- 2024-12: Added verified brand prefixes: MUL→Multipet, KOM→Komodo, FOU→Four Paws, DOS→Petmate, VIP→Tuffy, PETAG→PetAg, RED→RedBarn, PRIM→Primal
-- 2024-12: Added context-based detection for GAR (Garmon Corp distributor) → NaturVet products via keywords
-- 2024-12: Established verification workflow: Never auto-promote prefixes - all mappings must be user-confirmed
-- 2024-12: Created stateful matching pipeline with match_queue.json tracking all matches
-- 2024-12: Ingested 3,150 maybe inventory UPCs - 2,206 already applied, 403 new direct matches in queue
-- 2024-12: Added 50+ new brand prefixes: ExoTerra, LILPALS, CIRCLE, MARINA, VICT, ZUP, LOV, ELA, FAR, BL, etc.
-- Remaining gap: 994 UPCs still have unknown brands - check abbreviation_learning_log.json for candidates
+### Abbreviation Patterns Learned
+- Yng→Young, Gpig→Guinea Pig, Grden→Garden, Grdnsel→Garden Select
+- Ham→Hamster, Snr→Senior, Chinch→Chinchilla, Clmbree→Calming Breeze
+- Foritdiet→Forti-Diet, Turky→Turkey, Frg→Frog
+- Color codes: Blu→Blue, Pnk→Pink, Prpl→Purple, Grn→Green, Blk→Black
+- Biogroom→Bio-Groom, Exoterra→Exo Terra, Lilpals→Li'l Pals

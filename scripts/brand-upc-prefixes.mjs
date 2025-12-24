@@ -70,6 +70,22 @@ export const BRAND_UPC_PREFIXES = {
   // Additional small animal prefixes  
   '045125': ['kaytee'],  // Kaytee also uses this prefix
   '730582': ['living world', 'friendsfarm', 'hagen'],
+  
+  // New prefixes from 2024-12 export sync
+  '021653': ['bio groom', 'bio-groom', 'biogroom'],  // Bio Groom
+  '602644': ['earthbath', 'earth bath'],  // Earthbath
+  '811794': ['furminator', 'furminator'],  // FURminator
+  '035585': ['kong'],  // Kong main prefix
+  '797801': ['naturvet', 'natur vet'],  // NaturVet
+  '071860': ['petag', 'pet-ag', 'pet ag'],  // PetAg
+  '810053': ["skout's honor", 'skouts honor', 'skout'],  // Skout's Honor primary
+  '856713': ["skout's honor", 'skouts honor', 'skout'],  // Skout's Honor secondary
+  '850004': ["skout's honor", 'skouts honor', 'skout'],  // Skout's Honor tertiary
+  '714929': ['smarterpaw', 'smarter paw'],  // SmarterPaw
+  '039079': ['sulfodene'],  // Sulfodene
+  '031658': ["vet's best", 'vets best', 'vetsbest'],  // Vet's Best
+  '667334': ['zymox'],  // Zymox
+  '611932': ['kong'],  // Kong secondary
 };
 
 /**
