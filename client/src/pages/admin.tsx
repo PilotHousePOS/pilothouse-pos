@@ -11914,12 +11914,13 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium mb-1">Name</label>
-        <input
-          type="text"
+        <textarea
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full p-2 border rounded"
+          className="w-full p-2 border rounded resize-none"
+          rows={2}
           required
+          data-testid="input-supply-name"
         />
       </div>
       <div>
