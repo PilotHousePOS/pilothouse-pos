@@ -101,6 +101,7 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Inventory Saves**: Excel/CSV inventory exports contain photos AND SKU/UPC data for products
 - Photos and UPC data should be extracted from these inventory saves during import
 - User's manual UPC assignments must be preserved and never overwritten
+- **"Manual UPC assignments" = SKU values the user has entered in production** - these are in the SKU field of inventory exports and MUST be preserved during any sync or import operation
 
 ### Key Metrics
 - **Current Coverage**: 84.8% (6,150 of 7,252 products have UPCs)
