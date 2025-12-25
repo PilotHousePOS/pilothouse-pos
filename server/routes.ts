@@ -1344,7 +1344,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   // Supply routes with pagination
   app.get("/api/supplies", async (req, res) => {
     try {
-      const { category, search, page = '0', limit = '24', animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType, filterType: filterTypeParam } = req.query;
+      const { category, search, page = '0', limit = '24', animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType, petFoodAnimalType, treatAnimalType, filterType: filterTypeParam } = req.query;
       
       // Parse pagination parameters with defaults
       const pageNum = Math.max(0, parseInt(page as string) || 0);
@@ -1378,7 +1378,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         aquaticType: aquaticType as string | undefined,
         reptileType: reptileType as string | undefined,
         birdType: birdType as string | undefined,
-        smallAnimalProductType: smallAnimalProductType as string | undefined
+        smallAnimalProductType: smallAnimalProductType as string | undefined,
+        petFoodAnimalType: petFoodAnimalType as string | undefined,
+        treatAnimalType: treatAnimalType as string | undefined
       });
 
       // Return paginated response with metadata

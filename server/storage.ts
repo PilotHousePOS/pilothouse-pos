@@ -140,6 +140,8 @@ export interface IStorage {
     category?: string; 
     search?: string; 
     filterType?: FilterType;
+    petFoodAnimalType?: string;
+    treatAnimalType?: string;
     animalType?: string;
     foodType?: string;
     toyType?: string;
@@ -756,8 +758,10 @@ export class DatabaseStorage implements IStorage {
     reptileType?: string;
     birdType?: string;
     smallAnimalProductType?: string;
+    petFoodAnimalType?: string;
+    treatAnimalType?: string;
   }): Promise<{ items: Supply[]; total: number }> {
-    const { limit, offset, category, search, filterType, animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType } = params;
+    const { limit, offset, category, search, filterType, animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType, petFoodAnimalType, treatAnimalType } = params;
 
     // Build WHERE conditions based on filters
     let whereConditions: any[] = [eq(supplies.isActive, true)];
@@ -772,8 +776,38 @@ export class DatabaseStorage implements IStorage {
     }
     
     // Apply category filter whenever category is provided
+    // Handle consolidated categories (petFood → dogFood + catFood, treats → dogTreats + catTreats)
     if (category) {
-      whereConditions.push(eq(supplies.category, category));
+      if (category === 'petFood') {
+        // Consolidated Pet Food category - query both dog and cat food
+        if (petFoodAnimalType === 'dog') {
+          whereConditions.push(eq(supplies.category, 'dogFood'));
+        } else if (petFoodAnimalType === 'cat') {
+          whereConditions.push(eq(supplies.category, 'catFood'));
+        } else {
+          // No animal type filter - show both dog and cat food
+          whereConditions.push(or(
+            eq(supplies.category, 'dogFood'),
+            eq(supplies.category, 'catFood')
+          ));
+        }
+      } else if (category === 'treats') {
+        // Consolidated Treats category - query both dog and cat treats
+        if (treatAnimalType === 'dog') {
+          whereConditions.push(eq(supplies.category, 'dogTreats'));
+        } else if (treatAnimalType === 'cat') {
+          whereConditions.push(eq(supplies.category, 'catTreats'));
+        } else {
+          // No animal type filter - show both dog and cat treats
+          whereConditions.push(or(
+            eq(supplies.category, 'dogTreats'),
+            eq(supplies.category, 'catTreats')
+          ));
+        }
+      } else {
+        // Standard category filter
+        whereConditions.push(eq(supplies.category, category));
+      }
     }
 
     // Define animal type keywords for filtering
