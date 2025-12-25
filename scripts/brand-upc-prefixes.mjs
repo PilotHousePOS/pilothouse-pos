@@ -13,6 +13,8 @@
 export const BRAND_UPC_PREFIXES = {
   // Reptile brands
   '097612': ['zoo med', 'zoomed', 'zoo-med'],
+  '099761': ['zoo med', 'zoomed', 'zoo-med'],  // Zoo Med alternate prefix
+  '009761': ['zoo med', 'zoomed', 'zoo-med'],  // Zoo Med alternate prefix (short)
   '015561': ['exo terra', 'exoterra', 'hagen', 'fluval', 'marina', 'nutrafin', 'living world', 'carefresh', 'sunburst'],  // Hagen family
   '091197': ["fluker's", 'flukers', 'fluker'],
   '096316': ['zilla'],
@@ -23,7 +25,7 @@ export const BRAND_UPC_PREFIXES = {
   '042055': ['hikari'],
   '317163': ['api'],
   '047431': ['marineland'],
-  '030172': ['penn-plax', 'pennplax', 'penn plax'],
+  '030172': ['penn-plax', 'pennplax', 'penn plax', 'birdlife', 'bird life', 'reptology', 'cascade', 'aqualife', 'aqua life', 'tweet eats', 'shorefins'],  // Penn-Plax family brands
   
   // Small animal/bird brands
   '071859': ['kaytee'],
@@ -46,7 +48,7 @@ export const BRAND_UPC_PREFIXES = {
   '023100': ['pedigree', 'iams', 'eukanuba'],
   
   // Dog/cat accessory brands
-  '076484': ['kong', 'coastal', "li'l pals", 'lil pals', 'safari', 'titan', 'lazer brite', 'easy rider', 'circle t', 'bionic'],  // Coastal family brands
+  '076484': ['kong', 'coastal', "li'l pals", 'lil pals', 'safari', 'titan', 'lazer brite', 'easy rider', 'circle t', 'bionic', 'rascals', 'turbo'],  // Coastal family brands
   '018214': ['nylabone', 'coastal', "li'l pals", 'lil pals', 'lazer brite', 'easy rider'],  // Nylabone uses 018214 prefix!
   '018065': ['nylabone', "nature's miracle", 'natures miracle'],  // Nylabone also uses 018065
   '854111': ['benebone'],  // Corrected from 810833
