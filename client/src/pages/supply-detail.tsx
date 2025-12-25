@@ -410,7 +410,7 @@ export default function SupplyDetail() {
           {supply.instructions && (
             <AccordionItem value="instructions" className="border-gray-700">
               <AccordionTrigger className="text-green-500 hover:text-green-400" data-testid="accordion-instructions">
-                Feeding Instructions
+                {(supply as any).instructionLabel || 'Usage Instructions'}
               </AccordionTrigger>
               <AccordionContent className="text-gray-300 text-sm leading-relaxed">
                 {supply.instructions}

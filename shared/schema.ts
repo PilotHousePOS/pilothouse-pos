@@ -119,6 +119,8 @@ export const supplies = pgTable("supplies", {
   features: jsonb("features"), // Additional product features { grossWeight, netWeight, height, length, width, flavor, etc. }
   ingredients: text("ingredients"), // Raw ingredients list
   instructions: text("instructions"), // Usage/feeding instructions
+  instructionLabel: varchar("instruction_label", { length: 50 }), // "Feeding Instructions", "Application Instructions", "Usage Instructions", etc.
+  contentSource: varchar("content_source", { length: 20 }), // "manual", "brand_template", "auto" - prevents overwrites of manual entries
   guaranteedAnalysis: text("guaranteed_analysis"), // Nutritional analysis for food products
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
