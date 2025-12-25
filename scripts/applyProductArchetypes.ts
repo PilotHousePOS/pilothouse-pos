@@ -49,6 +49,26 @@ async function applyArchetypes() {
     'Trusted by trainers and pet owners',
     'Safe and reliable',
     'Built to last',
+    // AI-sounding bed patterns to replace
+    'pet bed for restful sleep',
+    'Soft, comfortable filling',
+    'Size-appropriate for your pet',
+    'Durable cover material',
+    'Supports joints and provides insulation',
+    // AI-sounding clothing patterns
+    'fashionable pet apparel',
+    'Cozy knit fabric for warmth',
+    'Multiple sizes available',
+    'Easy on/off design',
+    // AI-sounding toy patterns
+    'engaging chew toy',
+    'Satisfies natural chewing instincts',
+    'Size-appropriate for safe play',
+    'Helps clean teeth during play',
+    'high-visibility fetch toy',
+    'Perfect for outdoor play and exercise',
+    'Easy to throw for long distances',
+    'Engages natural chase instincts',
   ];
   
   let updated = 0;

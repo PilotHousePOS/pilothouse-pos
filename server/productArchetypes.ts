@@ -19,6 +19,53 @@ export interface ProductInfo {
   description: string | null;
 }
 
+// Helper to extract bed-specific attributes
+function extractBedAttributes(name: string): {
+  material?: string;
+  filling?: string;
+  shape?: string;
+  feature?: string;
+} {
+  const nameLower = name.toLowerCase();
+  
+  // Materials
+  const materialMatch = nameLower.match(/(canvas|fleece|plush|velvet|faux fur|microfiber|cotton|polyester|suede|chenille|corduroy|denim|nylon|sherpa|linen|orthopedic|memory foam)/);
+  const material = materialMatch ? materialMatch[1] : undefined;
+  
+  // Filling types
+  const fillingMatch = nameLower.match(/(memory foam|cedar|poly-?fill|fiberfill|gel|orthopedic|egg crate|recycled)/);
+  const filling = fillingMatch ? fillingMatch[1] : undefined;
+  
+  // Shapes
+  const shapeMatch = nameLower.match(/(bolster|donut|cave|tent|crate|mat|pad|nest|couch|sofa|cuddler|round|oval|rectangle|square)/);
+  const shape = shapeMatch ? shapeMatch[1] : undefined;
+  
+  // Special features
+  const featureMatch = nameLower.match(/(waterproof|washable|removable cover|reversible|heated|cooling|elevated|outdoor|travel|portable|anti-?anxiety|calming)/);
+  const feature = featureMatch ? featureMatch[1] : undefined;
+  
+  return { material, filling, shape, feature };
+}
+
+// Helper to extract clothing attributes
+function extractClothingAttributes(name: string): {
+  style?: string;
+  material?: string;
+  closure?: string;
+} {
+  const nameLower = name.toLowerCase();
+  
+  const styleMatch = nameLower.match(/(sweater|hoodie|jacket|coat|vest|dress|polo|tank|pj|pajama|bandana|costume|raincoat)/);
+  const materialMatch = nameLower.match(/(fleece|cotton|wool|knit|cable knit|polyester|nylon|denim|flannel)/);
+  const closureMatch = nameLower.match(/(velcro|snap|button|zipper|pullover)/);
+  
+  return {
+    style: styleMatch ? styleMatch[1] : undefined,
+    material: materialMatch ? materialMatch[1] : undefined,
+    closure: closureMatch ? closureMatch[1] : undefined,
+  };
+}
+
 // Helper to extract product attributes from name
 function extractAttributes(name: string): {
   size?: string;
@@ -519,20 +566,37 @@ const archetypes: Record<string, ProductArchetype> = {
     id: 'bed',
     instructionLabel: 'Care Instructions',
     getFeatures: (p) => {
+      const bedAttrs = extractBedAttributes(p.name);
       const attrs = extractAttributes(p.name);
-      const brand = p.brand || 'Comfortable';
-      return {
-        highlights: [
-          `${brand} pet bed for restful sleep`,
-          'Soft, comfortable filling',
-          attrs.size ? `${attrs.size} size` : 'Size-appropriate for your pet',
-          'Durable cover material',
-          'Supports joints and provides insulation from floor',
-        ],
-      };
+      const highlights: string[] = [];
+      
+      // Build factual, specific bullets based on detected attributes
+      if (bedAttrs.shape) {
+        highlights.push(`${bedAttrs.shape.charAt(0).toUpperCase() + bedAttrs.shape.slice(1)} style bed`);
+      }
+      if (bedAttrs.material) {
+        highlights.push(`${bedAttrs.material.charAt(0).toUpperCase() + bedAttrs.material.slice(1)} fabric`);
+      }
+      if (bedAttrs.filling) {
+        highlights.push(`${bedAttrs.filling} filling`);
+      }
+      if (bedAttrs.feature) {
+        highlights.push(`${bedAttrs.feature.charAt(0).toUpperCase() + bedAttrs.feature.slice(1)}`);
+      }
+      if (attrs.size) {
+        highlights.push(attrs.size);
+      }
+      
+      // If no specific attributes found, use minimal factual description
+      if (highlights.length === 0) {
+        highlights.push('Indoor pet bed');
+        highlights.push('Machine washable');
+      }
+      
+      return { highlights };
     },
     getInstructions: (p) => {
-      return `Place in a quiet, draft-free area. Fluff regularly to maintain loft. Spot clean as needed. Machine wash cover on gentle cycle if removable. Air dry or tumble dry low.`;
+      return `Spot clean or machine wash on gentle. Air dry or tumble dry low. Fluff to restore shape.`;
     },
   },
   
@@ -542,19 +606,25 @@ const archetypes: Record<string, ProductArchetype> = {
     instructionLabel: 'Play & Safety Instructions',
     getFeatures: (p) => {
       const attrs = extractAttributes(p.name);
-      const brand = p.brand || 'Durable';
-      return {
-        highlights: [
-          `${brand} ${attrs.color || 'engaging'} chew toy`,
-          'Durable material for enthusiastic chewers',
-          'Satisfies natural chewing instincts',
-          attrs.size ? `${attrs.size} size` : 'Size-appropriate for safe play',
-          'Helps clean teeth during play',
-        ],
-      };
+      const nameLower = p.name.toLowerCase();
+      const highlights: string[] = [];
+      
+      // Detect material from name
+      if (nameLower.includes('rubber')) highlights.push('Rubber');
+      else if (nameLower.includes('nylon')) highlights.push('Nylon');
+      else if (nameLower.includes('rope')) highlights.push('Rope');
+      else if (nameLower.includes('plush')) highlights.push('Plush');
+      
+      if (attrs.size) highlights.push(attrs.size);
+      if (attrs.color) highlights.push(attrs.color.charAt(0).toUpperCase() + attrs.color.slice(1));
+      if (p.brand) highlights.push(`By ${p.brand}`);
+      
+      if (highlights.length === 0) highlights.push('Chew toy');
+      
+      return { highlights };
     },
     getInstructions: (p) => {
-      return `Choose appropriate size for your pet - toy should be too large to swallow. Supervise play sessions. Inspect regularly for damage and replace when worn. Not suitable for aggressive chewers who break off pieces.`;
+      return `Supervise play. Inspect for damage and replace when worn.`;
     },
   },
   
@@ -563,19 +633,21 @@ const archetypes: Record<string, ProductArchetype> = {
     instructionLabel: 'Play Instructions',
     getFeatures: (p) => {
       const attrs = extractAttributes(p.name);
-      const brand = p.brand || 'Fun';
-      return {
-        highlights: [
-          `${brand} ${attrs.color || 'high-visibility'} fetch toy`,
-          'Perfect for outdoor play and exercise',
-          'Easy to throw for long distances',
-          'Floats in water for water play',
-          'Engages natural chase instincts',
-        ],
-      };
+      const nameLower = p.name.toLowerCase();
+      const highlights: string[] = [];
+      
+      if (nameLower.includes('ball')) highlights.push('Ball');
+      else if (nameLower.includes('frisbee') || nameLower.includes('disc')) highlights.push('Disc/Frisbee');
+      else highlights.push('Fetch toy');
+      
+      if (nameLower.includes('float')) highlights.push('Floats in water');
+      if (attrs.color) highlights.push(attrs.color.charAt(0).toUpperCase() + attrs.color.slice(1));
+      if (p.brand) highlights.push(`By ${p.brand}`);
+      
+      return { highlights };
     },
     getInstructions: (p) => {
-      return `Throw toy and encourage your pet to retrieve. Reward successful retrieval with praise. Allow rest between throws. Clean with mild soap after use. Inspect for damage before each play session.`;
+      return `Supervise play. Rinse after outdoor use.`;
     },
   },
   
@@ -845,24 +917,37 @@ const archetypes: Record<string, ProductArchetype> = {
     id: 'clothing',
     instructionLabel: 'Care & Sizing Instructions',
     getFeatures: (p) => {
+      const clothingAttrs = extractClothingAttributes(p.name);
       const attrs = extractAttributes(p.name);
-      const brand = p.brand || 'Stylish';
-      const nameLower = p.name.toLowerCase();
-      const isSweater = nameLower.includes('sweater');
-      const isCoat = nameLower.includes('coat') || nameLower.includes('jacket');
-      const isPolo = nameLower.includes('polo');
-      const isTank = nameLower.includes('tank');
-      const highlights = [`${brand} ${attrs.color || 'fashionable'} pet apparel`];
-      if (isSweater) highlights.push('Cozy knit fabric for warmth');
-      if (isCoat) highlights.push('Weather-resistant outer layer');
-      if (isPolo || isTank) highlights.push('Lightweight, breathable fabric');
-      highlights.push(attrs.size ? `${attrs.size} sizing` : 'Multiple sizes available');
-      highlights.push('Easy on/off design');
-      highlights.push('Machine washable');
+      const highlights: string[] = [];
+      
+      // Build factual bullets from detected attributes
+      if (clothingAttrs.style) {
+        highlights.push(`${clothingAttrs.style.charAt(0).toUpperCase() + clothingAttrs.style.slice(1)}`);
+      }
+      if (clothingAttrs.material) {
+        highlights.push(`${clothingAttrs.material.charAt(0).toUpperCase() + clothingAttrs.material.slice(1)} fabric`);
+      }
+      if (clothingAttrs.closure) {
+        highlights.push(`${clothingAttrs.closure.charAt(0).toUpperCase() + clothingAttrs.closure.slice(1)} closure`);
+      }
+      if (attrs.color) {
+        highlights.push(attrs.color.charAt(0).toUpperCase() + attrs.color.slice(1));
+      }
+      if (attrs.size) {
+        highlights.push(attrs.size);
+      }
+      
+      // Minimal fallback
+      if (highlights.length === 0) {
+        highlights.push('Dog apparel');
+        highlights.push('Machine washable');
+      }
+      
       return { highlights };
     },
     getInstructions: (p) => {
-      return `Measure your pet before ordering - check chest girth and back length. Slip over head or use closures as designed. Ensure pet can move freely. Machine wash cold, tumble dry low or lay flat.`;
+      return `Measure chest and back length before ordering. Machine wash cold, lay flat to dry.`;
     },
   },
   
@@ -1116,18 +1201,23 @@ const archetypes: Record<string, ProductArchetype> = {
     id: 'generic',
     instructionLabel: 'Usage Instructions',
     getFeatures: (p) => {
-      const brand = p.brand || 'Quality';
-      return {
-        highlights: [
-          `${brand} pet product`,
-          'Quality materials and construction',
-          'Designed for pet safety and comfort',
-          'Easy to use and maintain',
-        ],
-      };
+      const attrs = extractAttributes(p.name);
+      const highlights: string[] = [];
+      
+      // Just state what we can detect from the name, nothing more
+      if (p.brand) highlights.push(`By ${p.brand}`);
+      if (attrs.size) highlights.push(attrs.size);
+      if (attrs.color) highlights.push(attrs.color.charAt(0).toUpperCase() + attrs.color.slice(1));
+      
+      // Minimal fallback - just the category
+      if (highlights.length === 0) {
+        highlights.push('Pet accessory');
+      }
+      
+      return { highlights };
     },
     getInstructions: (p) => {
-      return `Follow any included product instructions. Inspect regularly for wear. Use as intended for your pet's size and species.`;
+      return `Follow included instructions. Check regularly for wear.`;
     },
   },
 };
