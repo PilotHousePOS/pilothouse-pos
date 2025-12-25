@@ -129,19 +129,20 @@ const archetypes: Record<string, ProductArchetype> = {
     instructionLabel: 'Feeding Instructions',
     getFeatures: (p) => {
       const attrs = extractAttributes(p.name);
-      const brand = p.brand || 'Premium';
-      const highlights = [
-        `${brand} dry ${attrs.flavor || 'protein'} formula`,
-        attrs.species ? `Formulated specifically for ${attrs.species}s` : 'Complete and balanced nutrition',
-        'High-quality protein sources',
-        'Essential vitamins and minerals included',
-      ];
-      if (attrs.size) highlights.push(`Convenient ${attrs.size} size`);
+      const highlights: string[] = [];
+      
+      // Just factual info from product name
+      if (p.brand) highlights.push(`By ${p.brand}`);
+      if (attrs.flavor) highlights.push(`${attrs.flavor.charAt(0).toUpperCase() + attrs.flavor.slice(1)} flavor`);
+      if (attrs.species) highlights.push(`For ${attrs.species}s`);
+      if (attrs.size) highlights.push(attrs.size);
+      
+      if (highlights.length === 0) highlights.push('Dry pet food');
+      
       return { highlights };
     },
     getInstructions: (p) => {
-      const attrs = extractAttributes(p.name);
-      return `Feed according to your ${attrs.species || 'pet'}'s weight and activity level. Transition gradually over 7-10 days when switching foods. Provide fresh water at all times. Store in a cool, dry place.`;
+      return `Feed according to weight guidelines on package. Transition gradually when switching foods.`;
     },
   },
   
@@ -150,20 +151,19 @@ const archetypes: Record<string, ProductArchetype> = {
     instructionLabel: 'Feeding Instructions',
     getFeatures: (p) => {
       const attrs = extractAttributes(p.name);
-      const brand = p.brand || 'Premium';
-      return {
-        highlights: [
-          `${brand} wet ${attrs.flavor || 'protein'} recipe`,
-          'High moisture content for hydration',
-          attrs.species ? `Made for ${attrs.species}s` : 'Palatable texture pets love',
-          'No artificial preservatives',
-          attrs.size ? `${attrs.size} can/pouch` : 'Convenient serving size',
-        ],
-      };
+      const highlights: string[] = [];
+      
+      if (p.brand) highlights.push(`By ${p.brand}`);
+      if (attrs.flavor) highlights.push(`${attrs.flavor.charAt(0).toUpperCase() + attrs.flavor.slice(1)} flavor`);
+      if (attrs.species) highlights.push(`For ${attrs.species}s`);
+      if (attrs.size) highlights.push(attrs.size);
+      
+      if (highlights.length === 0) highlights.push('Wet pet food');
+      
+      return { highlights };
     },
     getInstructions: (p) => {
-      const attrs = extractAttributes(p.name);
-      return `Serve at room temperature for best palatability. Refrigerate unused portion and use within 3 days. Feed according to ${attrs.species || 'pet'} size and weight guidelines.`;
+      return `Refrigerate unused portion. Use within 3 days of opening.`;
     },
   },
   
@@ -719,20 +719,21 @@ const archetypes: Record<string, ProductArchetype> = {
     id: 'filter',
     instructionLabel: 'Setup & Maintenance Instructions',
     getFeatures: (p) => {
+      const nameLower = p.name.toLowerCase();
       const attrs = extractAttributes(p.name);
-      const brand = p.brand || 'Quality';
-      return {
-        highlights: [
-          `${brand} aquarium filtration system`,
-          'Multi-stage filtration for clean, healthy water',
-          'Quiet operation',
-          attrs.size ? `Rated for ${attrs.size} tanks` : 'Appropriate flow rate for tank size',
-          'Easy cartridge replacement',
-        ],
-      };
+      const highlights: string[] = [];
+      
+      if (p.brand) highlights.push(`By ${p.brand}`);
+      if (nameLower.includes('canister') || nameLower.includes('cannister')) highlights.push('Canister filter');
+      else if (nameLower.includes('hang') || nameLower.includes('hob')) highlights.push('Hang-on-back filter');
+      else if (nameLower.includes('sponge')) highlights.push('Sponge filter');
+      else highlights.push('Aquarium filter');
+      if (attrs.size) highlights.push(attrs.size);
+      
+      return { highlights };
     },
     getInstructions: (p) => {
-      return `Install according to included directions. Prime filter before starting. Replace cartridge monthly or as needed. Rinse biological media in tank water only. Clean impeller quarterly for optimal performance.`;
+      return `Install per included directions. Replace media as needed.`;
     },
   },
   
@@ -787,19 +788,48 @@ const archetypes: Record<string, ProductArchetype> = {
     instructionLabel: 'Setup & Care Instructions',
     getFeatures: (p) => {
       const attrs = extractAttributes(p.name);
-      const brand = p.brand || 'Quality';
-      return {
-        highlights: [
-          `${brand} reptile terrarium ${attrs.size ? `(${attrs.size})` : ''}`,
-          'Front-opening doors for easy access',
-          'Ventilation system for proper air flow',
-          'Escape-proof design',
-          'Accommodates heating and lighting fixtures',
-        ],
-      };
+      const nameLower = p.name.toLowerCase();
+      const highlights: string[] = [];
+      
+      // Extract actual attributes from name
+      if (p.brand) highlights.push(`By ${p.brand}`);
+      if (attrs.size) highlights.push(attrs.size);
+      if (nameLower.includes('glass')) highlights.push('Glass construction');
+      if (nameLower.includes('screen')) highlights.push('Screen top');
+      if (nameLower.includes('front') && nameLower.includes('open')) highlights.push('Front-opening');
+      if (nameLower.includes('starter') || nameLower.includes('kit')) highlights.push('Starter kit');
+      
+      if (highlights.length === 0) highlights.push('Reptile enclosure');
+      
+      return { highlights };
     },
     getInstructions: (p) => {
-      return `Assemble on sturdy, level surface. Install lighting and heating equipment before adding substrate. Create temperature gradient with basking and cool zones. Add hides, climbing surfaces, and water dish. Mist as needed for humidity-loving species.`;
+      return `Assemble on level surface. Install heating and lighting before adding substrate.`;
+    },
+  },
+  
+  reptileAccessory: {
+    id: 'reptileAccessory',
+    instructionLabel: 'Usage Instructions',
+    getFeatures: (p) => {
+      const nameLower = p.name.toLowerCase();
+      const highlights: string[] = [];
+      
+      // Just state what the product is based on name
+      if (nameLower.includes('cover')) highlights.push('Terrarium cover');
+      else if (nameLower.includes('lid')) highlights.push('Tank lid');
+      else if (nameLower.includes('cleaner')) highlights.push('Terrarium cleaner');
+      else if (nameLower.includes('thermometer')) highlights.push('Temperature monitor');
+      else if (nameLower.includes('hygrometer')) highlights.push('Humidity monitor');
+      else if (nameLower.includes('background') || nameLower.includes('backdrop')) highlights.push('Terrarium background');
+      else highlights.push('Terrarium accessory');
+      
+      if (p.brand) highlights.push(`By ${p.brand}`);
+      
+      return { highlights };
+    },
+    getInstructions: (p) => {
+      return `Follow included instructions for installation.`;
     },
   },
   
@@ -1054,19 +1084,18 @@ const archetypes: Record<string, ProductArchetype> = {
     id: 'pump',
     instructionLabel: 'Setup & Maintenance',
     getFeatures: (p) => {
-      const brand = p.brand || 'Quality';
-      return {
-        highlights: [
-          `${brand} aquarium pump`,
-          'Reliable water circulation or aeration',
-          'Quiet operation',
-          'Energy efficient',
-          'Easy to install and maintain',
-        ],
-      };
+      const nameLower = p.name.toLowerCase();
+      const highlights: string[] = [];
+      
+      if (p.brand) highlights.push(`By ${p.brand}`);
+      if (nameLower.includes('air')) highlights.push('Air pump');
+      else if (nameLower.includes('water') || nameLower.includes('circulation')) highlights.push('Water pump');
+      else highlights.push('Aquarium pump');
+      
+      return { highlights };
     },
     getInstructions: (p) => {
-      return `Install according to included directions. Place air pump above water level or use check valve. Replace air stones and tubing as needed. Clean intake regularly.`;
+      return `Install per directions. Use check valve if placing below water level.`;
     },
   },
   
@@ -1377,8 +1406,18 @@ export function classifyProduct(product: ProductInfo): ProductArchetype {
   }
   
   if (category.includes('reptile') || filterType === 'reptile') {
-    if (name.includes('terrarium') || name.includes('vivarium') || name.includes('tank')) {
+    // Terrarium accessories - NOT actual terrariums
+    const isAccessory = name.includes('cover') || name.includes('lid') || name.includes('cleaner') || 
+                        name.includes('spray') || name.includes('thermometer') || name.includes('hygrometer') ||
+                        name.includes('backdrop') || name.includes('background') || name.includes('liner') ||
+                        name.includes('lock') || name.includes('latch');
+    
+    if ((name.includes('terrarium') || name.includes('vivarium') || name.includes('tank')) && !isAccessory) {
       return archetypes.terrarium;
+    }
+    // Terrarium accessories go to generic reptile accessory
+    if (isAccessory) {
+      return archetypes.reptileAccessory;
     }
     if (name.includes('heat') || name.includes('heater') || name.includes('heating')) {
       return archetypes.heater;

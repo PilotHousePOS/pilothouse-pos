@@ -69,6 +69,44 @@ async function applyArchetypes() {
     'Perfect for outdoor play and exercise',
     'Easy to throw for long distances',
     'Engages natural chase instincts',
+    // AI-sounding terrarium patterns (incorrectly applied to covers/cleaners)
+    'Front-opening doors for easy access',
+    'Ventilation system for proper air flow',
+    'Escape-proof design',
+    'Accommodates heating and lighting fixtures',
+    'Quality reptile terrarium',
+    'reptile terrarium',
+    // Other AI patterns
+    'Reliable water circulation or aeration',
+    'Quiet operation',
+    'Energy efficient',
+    'Easy to install and maintain',
+    'Safe for reptile habitats',
+    // Food AI patterns
+    'High-quality protein sources',
+    'Essential vitamins and minerals included',
+    'Complete and balanced nutrition',
+    'Palatable texture pets love',
+    'No artificial preservatives',
+    'Convenient serving size',
+    'High moisture content for hydration',
+    // Filter/pump AI patterns
+    'Multi-stage filtration for clean',
+    'Easy cartridge replacement',
+    'Appropriate flow rate',
+    'Premium aquarium supplies',
+    'Designed for optimal fish health',
+    // Zoo Med patterns
+    'Trusted reptile care brand',
+    'Research-backed products',
+    'Promotes natural reptile behaviors',
+    'Professional quality',
+    // Hermit crab patterns
+    'Various products',
+    'For hermit crab care',
+    'Quality design',
+    // Incorrectly applied patterns from SQL fix
+    '"Pet food"',
   ];
   
   let updated = 0;
