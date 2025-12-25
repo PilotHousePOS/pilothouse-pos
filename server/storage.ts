@@ -776,32 +776,38 @@ export class DatabaseStorage implements IStorage {
     }
     
     // Apply category filter whenever category is provided
-    // Handle consolidated categories (petFood → dogFood + catFood, treats → dogTreats + catTreats)
+    // Handle consolidated categories (petFood → dogFood + catFood + smallAnimalFood, treats → dogTreats + catTreats + smallAnimalTreats)
     if (category) {
       if (category === 'petFood') {
-        // Consolidated Pet Food category - query both dog and cat food
+        // Consolidated Pet Food category - query dog, cat, and small animal food
         if (petFoodAnimalType === 'dog') {
           whereConditions.push(eq(supplies.category, 'dogFood'));
         } else if (petFoodAnimalType === 'cat') {
           whereConditions.push(eq(supplies.category, 'catFood'));
+        } else if (petFoodAnimalType === 'smallAnimal') {
+          whereConditions.push(eq(supplies.category, 'smallAnimalFood'));
         } else {
-          // No animal type filter - show both dog and cat food
+          // No animal type filter - show all pet food (dog, cat, and small animal)
           whereConditions.push(or(
             eq(supplies.category, 'dogFood'),
-            eq(supplies.category, 'catFood')
+            eq(supplies.category, 'catFood'),
+            eq(supplies.category, 'smallAnimalFood')
           ));
         }
       } else if (category === 'treats') {
-        // Consolidated Treats category - query both dog and cat treats
+        // Consolidated Treats category - query dog, cat, and small animal treats
         if (treatAnimalType === 'dog') {
           whereConditions.push(eq(supplies.category, 'dogTreats'));
         } else if (treatAnimalType === 'cat') {
           whereConditions.push(eq(supplies.category, 'catTreats'));
+        } else if (treatAnimalType === 'smallAnimal') {
+          whereConditions.push(eq(supplies.category, 'smallAnimalTreats'));
         } else {
-          // No animal type filter - show both dog and cat treats
+          // No animal type filter - show all treats (dog, cat, and small animal)
           whereConditions.push(or(
             eq(supplies.category, 'dogTreats'),
-            eq(supplies.category, 'catTreats')
+            eq(supplies.category, 'catTreats'),
+            eq(supplies.category, 'smallAnimalTreats')
           ));
         }
       } else {

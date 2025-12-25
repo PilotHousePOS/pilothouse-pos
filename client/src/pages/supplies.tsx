@@ -90,11 +90,13 @@ const SMALL_ANIMAL_PRODUCT_TYPES = [
 const PET_FOOD_ANIMAL_TYPES = [
   { id: 'dog', label: 'Dog Food', emoji: '🐕' },
   { id: 'cat', label: 'Cat Food', emoji: '🐱' },
+  { id: 'smallAnimal', label: 'Small Animal Food', emoji: '🐹' },
 ];
 
 const TREAT_ANIMAL_TYPES = [
   { id: 'dog', label: 'Dog Treats', emoji: '🐕' },
   { id: 'cat', label: 'Cat Treats', emoji: '🐱' },
+  { id: 'smallAnimal', label: 'Small Animal Treats', emoji: '🐹' },
 ];
 
 export default function Supplies() {
