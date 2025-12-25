@@ -90,6 +90,11 @@ export const BRAND_UPC_PREFIXES = {
   '031658': ["vet's best", 'vets best', 'vetsbest'],  // Vet's Best
   '667334': ['zymox'],  // Zymox
   '611932': ['kong'],  // Kong secondary
+  '355853': ['kong'],  // Kong truncated prefix (missing leading 0)
+  
+  // Additional learned prefixes from 2024-12 user corrections
+  '064992': ['orijen', 'acana'],  // Orijen/Acana
+  '0 0649': ['orijen', 'acana'],  // Orijen with space prefix error
 };
 
 /**
