@@ -90,8 +90,19 @@ The application is a full-stack web application featuring a React frontend (Vite
 
 ## UPC/SKU Matching System
 
-### Key Principles
-- **SKU = UPC**: In this system, SKU and UPC are identical - always copy SKU to UPC where UPC is empty
+### ⚠️ CRITICAL: SKU = UPC
+**In this system, the SKU field IS the UPC field. They are identical.**
+- When inputting UPC codes, they go into the SKU field
+- Always copy SKU to UPC where UPC is empty
+- There is no separate UPC input field - SKU is the UPC
+- **NEVER FORGET THIS** - this has been flagged multiple times as forgotten information
+
+### Data Sources
+- **Inventory Saves**: Excel/CSV inventory exports contain photos AND SKU/UPC data for products
+- Photos and UPC data should be extracted from these inventory saves during import
+- User's manual UPC assignments must be preserved and never overwritten
+
+### Key Metrics
 - **Current Coverage**: 84.8% (6,150 of 7,252 products have UPCs)
 - **Photo Coverage**: 97.7% (7,088 products have proper photos)
 - **Data Sync**: When exporting from production, all UPC/SKU corrections are preserved via ID-based updates
