@@ -105,7 +105,7 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **"Manual UPC assignments" = SKU values the user has entered in production** - these are in the SKU field of inventory exports and MUST be preserved during any sync or import operation
 
 ### Key Metrics
-- **Current Coverage**: 96.4% (6,949 of 7,210 products have UPCs)
+- **Current Coverage**: 96.0% (6,919 of 7,210 products have UPCs)
 - **Photo Coverage**: 97.7% (7,088 products have proper photos)
 - **Data Sync**: When exporting from production, all UPC/SKU corrections are preserved via ID-based updates
 
@@ -128,10 +128,11 @@ Prevents cross-brand UPC assignments using GS1 manufacturer prefixes. Implemente
 - Never assign reptile brand UPCs to dog/cat products
 
 **Known Prefixes (2024-12 update):**
-- **Reptile**: Zoo Med=097612, Exo Terra=015561, Fluker's=091197, Zilla=096316
+- **Reptile**: Zoo Med=097612, Exo Terra=015561, Fluker's=091197, Zilla=096316, Nature Zone=783178
 - **Aquatic**: Tetra=046798, Aqueon=015905, Hikari=042055, API=317163, Marineland=047431
 - **Small Animal**: Kaytee=071859/045125, Oxbow=744845, Vitakraft=071354
 - **Pet Food**: Orijen=064992, Blue Buffalo=859610/840243, Fromm=072705/727051, NutriSource=073893/738933/738938
+- **Dog Treats**: RedBarn=785184
 - **Accessories**: Kong=035585/076484/611932, Coastal=018214, Nylabone=018214/018065, Greenies=642863
 - **Grooming**: Bio Groom=021653, Earthbath=602644, FURminator=811794, Vet's Best=031658, Zymox=667334, TropiClean=645095, Skout's Honor=810053/856713/850004, NaturVet=797801, PetAg=071860, Dogswell=693804
 
