@@ -1087,11 +1087,12 @@ export class DatabaseStorage implements IStorage {
       }
       
       // Then apply fuzzy search filtering with typo tolerance
+      // Name is first in array - gets highest priority for sorting
       const filteredItems = fuzzySearchFilter(
         allItems,
         trimmedSearch,
         (item) => [item.name || '', item.brand || '', item.description || '', item.sku || '', item.upc || ''],
-        70 // 70% similarity threshold for typo tolerance
+        75 // 75% similarity threshold to filter out false positives like "Eliminator" matching "Furminator"
       );
       
       // Get total count

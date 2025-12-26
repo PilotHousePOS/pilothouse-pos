@@ -149,17 +149,23 @@ export function fuzzyMatch(
  * Example: searching "Diamond" will also match products with "Diam" in the name
  * Example: searching "Blue Buffalo" will also match products with "Blue B"
  * 
+ * PRIORITY ORDER:
+ * 1. Exact name matches (score 200+) - query appears exactly in product name
+ * 2. Name contains query (score 150+) - product name contains query substring
+ * 3. Fuzzy name matches (score 100+) - typo-tolerant name matching
+ * 4. Brand-only matches (score 50+) - query matches brand but not name
+ * 
  * @param items - Array of items to search
  * @param query - Search query
- * @param getSearchableText - Function to extract searchable text from each item
- * @param threshold - Minimum similarity score (default: 70)
+ * @param getSearchableText - Function to extract searchable text from each item (first element should be name)
+ * @param threshold - Minimum similarity score (default: 75)
  * @returns Filtered and sorted array of items with relevance scores
  */
 export function fuzzySearchFilter<T>(
   items: T[],
   query: string,
   getSearchableText: (item: T) => string[],
-  threshold: number = 70
+  threshold: number = 75  // Raised from 70 to filter out false positives
 ): Array<T & { _relevance?: number }> {
   if (!query || !query.trim()) {
     return items;
@@ -167,6 +173,7 @@ export function fuzzySearchFilter<T>(
   
   // Expand brand names to include variations (e.g., "Diamond" → ["Diamond", "Diam"])
   const brandVariations = expandBrandNames(query);
+  const lowerQuery = query.toLowerCase().trim();
   
   const resultsMap = new Map<any, number>(); // Track best score for each item
   
@@ -176,10 +183,29 @@ export function fuzzySearchFilter<T>(
       const searchableTexts = getSearchableText(item);
       let bestScore = resultsMap.get(item) || 0;
       
-      // Check all searchable fields and take the best match
-      for (const text of searchableTexts) {
+      // First field is NAME - give it highest priority
+      const name = searchableTexts[0] || '';
+      const lowerName = name.toLowerCase();
+      
+      // Check for exact/substring name match first (highest priority)
+      if (lowerName.includes(lowerQuery)) {
+        // Name contains query - boost by 100 points
+        bestScore = Math.max(bestScore, 200);
+      } else {
+        // Check fuzzy name match
+        const nameMatch = fuzzyMatch(name, searchQuery, threshold);
+        if (nameMatch.matches) {
+          // Fuzzy name match - boost by 50 points
+          bestScore = Math.max(bestScore, 100 + nameMatch.score);
+        }
+      }
+      
+      // Check other fields (brand, description) with lower priority
+      for (let i = 1; i < searchableTexts.length; i++) {
+        const text = searchableTexts[i];
         const { matches, score } = fuzzyMatch(text, searchQuery, threshold);
         if (matches) {
+          // Brand/description matches get base score (no boost)
           bestScore = Math.max(bestScore, score);
         }
       }
