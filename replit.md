@@ -89,3 +89,9 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Server-Side Framework**: Express.js
 - **Query Library**: TanStack Query
 - **Client-Side Router**: Wouter
+## Rollback Inventory
+- **File**: `backups/rollback-inventory-2025-12-26.json`
+- **Products**: 7,289
+- **UPC Coverage**: 95.8% (6,985 products with verified UPCs)
+- **Date**: December 26, 2025
+- Use this file to restore inventory to a known good state with all manual UPC corrections preserved
