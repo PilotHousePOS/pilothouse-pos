@@ -105,9 +105,10 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **"Manual UPC assignments" = SKU values the user has entered in production** - these are in the SKU field of inventory exports and MUST be preserved during any sync or import operation
 
 ### Key Metrics
-- **Current Coverage**: 96.0% (6,919 of 7,210 products have UPCs)
+- **Current Coverage**: 96.2% (6,936 of 7,210 products have UPCs)
 - **Photo Coverage**: 97.7% (7,088 products have proper photos)
 - **Data Sync**: When exporting from production, all UPC/SKU corrections are preserved via ID-based updates
+- **Learning System**: Brand-prefix mappings stored in `scripts/brand-upc-prefixes.json` (74 brands verified)
 
 ### UPC Format Validation
 - **Leading Zero Issue**: Many UPCs imported from Excel/CSV lose leading zeros. Always validate and restore:
@@ -127,14 +128,21 @@ Prevents cross-brand UPC assignments using GS1 manufacturer prefixes. Implemente
 - Kong products MUST have 035585 prefix
 - Never assign reptile brand UPCs to dog/cat products
 
-**Known Prefixes (2024-12 update):**
-- **Reptile**: Zoo Med=097612, Exo Terra=015561, Fluker's=091197, Zilla=096316, Nature Zone=783178
-- **Aquatic**: Tetra=046798, Aqueon=015905, Hikari=042055, API=317163, Marineland=047431
-- **Small Animal**: Kaytee=071859/045125, Oxbow=744845, Vitakraft=071354
-- **Pet Food**: Orijen=064992, Blue Buffalo=859610/840243, Fromm=072705/727051, NutriSource=073893/738933/738938
-- **Dog Treats**: RedBarn=785184
-- **Accessories**: Kong=035585/076484/611932, Coastal=018214, Nylabone=018214/018065, Greenies=642863
-- **Grooming**: Bio Groom=021653, Earthbath=602644, FURminator=811794, Vet's Best=031658, Zymox=667334, TropiClean=645095, Skout's Honor=810053/856713/850004, NaturVet=797801, PetAg=071860, Dogswell=693804
+**Known Prefixes (2025-12 update - 74 brands verified):**
+- **Reptile**: Zoo Med=097612, Exo Terra=015561, Fluker's=091197/911977, Zilla=096316, Nature Zone=783178, Galapagos=759834, Lees=010838
+- **Aquatic**: Tetra=046798, Aqueon=015905, Hikari=042055, API=317163, Marineland=015561, Fluval=015561, SeaChem=000116
+- **Small Animal**: Kaytee=071859/045125, Oxbow=744845, Prevue=048081, Playfuls=048081
+- **Pet Food**: Orijen=064992, Blue Buffalo=859610/840243, Fromm=072705, NutriSource=073893, Science Diet=052742, Taste of the Wild=074198, Diamond=074198, VICTOR=854524, Zignature=888641, Royal Canin=030111
+- **Dog Treats**: RedBarn=785184, Primal=850334, Vital Essentials=840199, Benebone=854111
+- **Accessories**: Kong=035585, Coastal=076484, Nylabone=018214, Greenies=642863, Petmate=029695, JW Pet=618940, Mammoth=746772
+- **Parent Company Groups** (share prefixes):
+  - 076484: Coastal, Li'l Pals, Safari, Circle T, Titan, Rascals, Turbo, Pro Plan (some)
+  - 030172: Penn-Plax, Birdlife, Reptology
+  - 045663: Four Paws, Wee-Wee
+  - 027773: Quiet Time, MidWest Homes For Pets
+  - 015561: Exo Terra, Fluval, Marineland (Hagen family)
+- **Grooming**: Bio Groom=021653, Earthbath=602644, FURminator=811794, Vet's Best=031658, TropiClean=645095, NaturVet=797801, Nature's Miracle=018065
+- **Other**: Catit=022517, Spot=077234, PetCrest=784099, Multipet=784369, SodaPup=810216, Bellabowl=842982, Higgins=046706, PetAg=020279, A&E Cage Co=644472, Tuffy=180181, Van Ness=079441, Pets First=849790
 
 ### Abbreviation Patterns Learned
 - Yng→Young, Gpig→Guinea Pig, Grden→Garden, Grdnsel→Garden Select
