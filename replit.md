@@ -120,6 +120,13 @@ The application is a full-stack web application featuring a React frontend (Vite
 ### Brand-UPC Prefix Validation
 Prevents cross-brand UPC assignments using GS1 manufacturer prefixes. Implemented in `scripts/brand-upc-prefixes.mjs`.
 
+**CRITICAL:** If a product's UPC prefix doesn't match its brand's known prefix, the UPC is WRONG and should be cleared.
+- Zoo Med products MUST have 097612 prefix
+- Exo Terra products MUST have 015561 prefix
+- Zilla products MUST have 096316 prefix
+- Kong products MUST have 035585 prefix
+- Never assign reptile brand UPCs to dog/cat products
+
 **Known Prefixes (2024-12 update):**
 - **Reptile**: Zoo Med=097612, Exo Terra=015561, Fluker's=091197, Zilla=096316
 - **Aquatic**: Tetra=046798, Aqueon=015905, Hikari=042055, API=317163, Marineland=047431
