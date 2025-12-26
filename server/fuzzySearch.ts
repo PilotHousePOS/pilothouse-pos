@@ -52,12 +52,23 @@ function similarityScore(str1: string, str2: string): number {
   // Exact match = 100
   if (lower1 === lower2) return 100;
   
-  // Contains exact substring = 90
-  if (lower1.includes(lower2) || lower2.includes(lower1)) return 90;
+  // Substring match - only give high score if the shorter string is at least 60% of the longer
+  // This prevents "mint" matching "furmintor" (mint is only 44% of furmintor)
+  const minLen = Math.min(lower1.length, lower2.length);
+  const maxLen = Math.max(lower1.length, lower2.length);
+  const lengthRatio = minLen / maxLen;
+  
+  if (lower1.includes(lower2) || lower2.includes(lower1)) {
+    // Only give high substring score if the words are similar in length
+    if (lengthRatio >= 0.6) {
+      return 90;
+    }
+    // For short substrings, score based on length ratio
+    return Math.max(40, lengthRatio * 70);
+  }
   
   // Calculate based on edit distance
   const distance = levenshteinDistance(lower1, lower2);
-  const maxLen = Math.max(lower1.length, lower2.length);
   
   // Convert distance to similarity percentage
   const similarity = ((maxLen - distance) / maxLen) * 100;
