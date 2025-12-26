@@ -380,6 +380,18 @@ export default function SupplyDetail() {
             </AccordionItem>
           )}
 
+          {(supply as any).materials && (
+            <AccordionItem value="materials" className="border-gray-700">
+              <AccordionTrigger className="text-green-500 hover:text-green-400" data-testid="accordion-materials">
+                Product Materials
+              </AccordionTrigger>
+              <AccordionContent className="text-gray-300">
+                <p className="font-semibold text-white mb-2">Materials</p>
+                <p className="text-sm leading-relaxed">{(supply as any).materials}</p>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+
           {supply.guaranteedAnalysis && (
             <AccordionItem value="analysis" className="border-gray-700">
               <AccordionTrigger className="text-green-500 hover:text-green-400" data-testid="accordion-analysis">

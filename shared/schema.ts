@@ -117,7 +117,8 @@ export const supplies = pgTable("supplies", {
   nonRestockable: boolean("non_restockable").default(false), // Flag for items that won't be restocked
   // Product detail fields for expanded view
   features: jsonb("features"), // Additional product features { grossWeight, netWeight, height, length, width, flavor, etc. }
-  ingredients: text("ingredients"), // Raw ingredients list
+  ingredients: text("ingredients"), // Raw ingredients list for consumables (food, treats, shampoo)
+  materials: text("materials"), // Materials/composition for physical products (decorations, toys, equipment)
   instructions: text("instructions"), // Usage/feeding instructions
   instructionLabel: varchar("instruction_label", { length: 50 }), // "Feeding Instructions", "Application Instructions", "Usage Instructions", etc.
   contentSource: varchar("content_source", { length: 20 }), // "manual", "brand_template", "auto" - prevents overwrites of manual entries
