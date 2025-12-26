@@ -75,7 +75,7 @@ function similarityScore(str1: string, str2: string): number {
 export function fuzzyMatch(
   text: string | null | undefined,
   query: string,
-  threshold: number = 70
+  threshold: number = 75  // Raised from 70 to filter out false positives like "Eliminator" matching "Furminator"
 ): { matches: boolean; score: number } {
   if (!text || !query) {
     return { matches: false, score: 0 };
