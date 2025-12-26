@@ -30,6 +30,7 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Aquatic Subcategorization (server/aquaticCategoryEvidence.ts): Evidence-based system with verified product terminology from official product lines. Priority system: Decoration exclusion → Brand-based categorization → Keyword scoring → Default to accessories.
   - Cat/dog food exclusion: Products containing cat/dog keywords excluded from aquatic filterType.
   - Shampoo categorization: Medicated/therapeutic shampoos (Zymox, Adams, Advantage, flea/tick) go to healthcare; grooming shampoos (Furminator, Freshnclean, carpet shampoo) go to accessories per Excel file.
+- **Food vs Treat Categorization by Size**: For freeze-dried products (Vital Essentials, etc.), products >3oz are categorized as food (dogFood/catFood), products ≤3oz are categorized as treats (dogTreats/catTreats). Patties, nibbles, and mini pate in larger sizes are food; bites and small portions are treats.
 - Product Recommendations ("You May Also Like"): Smart cross-category recommendations based on product type.
   - Food products: Recommend complementary accessories, NOT more food. For aquatic food (frog, turtle, fish), recommend docks, decorations, calcium, water conditioners. For reptile food, recommend hides, bedding, calcium, heating.
   - Strong penalty for filter/pump equipment when recommending for food products (-10 score).
