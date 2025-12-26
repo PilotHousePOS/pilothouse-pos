@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application designed to enhance the store's online presence, service accessibility, and product sales. It supports pet browsing, grooming appointment booking, and pet supply purchasing, including exotic reptiles. The application aims to provide a comprehensive online platform that boosts sales, streamlines operations, and integrates inventory management, customer accounts, and administrative functionalities. The business vision is to provide a comprehensive online platform that boosts sales, streamlines operations, and integrates inventory management, customer accounts, and administrative functionalities.
+The Animal House Pet Store project is a mobile-friendly web application designed to enhance the store's online presence, service accessibility, and product sales. It supports pet browsing, grooming appointment booking, and pet supply purchasing, including exotic reptiles. The business vision is to provide a comprehensive online platform that boosts sales, streamlines operations, and integrates inventory management, customer accounts, and administrative functionalities.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -30,7 +30,7 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Aquatic Subcategorization (server/aquaticCategoryEvidence.ts): Evidence-based system with verified product terminology from official product lines. Priority system: Decoration exclusion → Brand-based categorization → Keyword scoring → Default to accessories.
   - Cat/dog food exclusion: Products containing cat/dog keywords excluded from aquatic filterType.
   - Shampoo categorization: Medicated/therapeutic shampoos (Zymox, Adams, Advantage, flea/tick) go to healthcare; grooming shampoos (Furminator, Freshnclean, carpet shampoo) go to accessories per Excel file.
-- **Food vs Treat Categorization by Size**: For freeze-dried products (Vital Essentials, etc.), products >3oz are categorized as food (dogFood/catFood), products ≤3oz are categorized as treats (dogTreats/catTreats). Patties, nibbles, and mini pate in larger sizes are food; bites and small portions are treats.
+- Food vs Treat Categorization by Size: For freeze-dried products (Vital Essentials, etc.), products >3oz are categorized as food (dogFood/catFood), products ≤3oz are categorized as treats (dogTreats/catTreats). Patties, nibbles, and mini pate in larger sizes are food; bites and small portions are treats.
 - Product Recommendations ("You May Also Like"): Smart cross-category recommendations based on product type.
   - Food products: Recommend complementary accessories, NOT more food. For aquatic food (frog, turtle, fish), recommend docks, decorations, calcium, water conditioners. For reptile food, recommend hides, bedding, calcium, heating.
   - Strong penalty for filter/pump equipment when recommending for food products (-10 score).
@@ -72,6 +72,7 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **State Management**: TanStack Query.
 - **Routing**: Wouter.
 - **Development Practices**: Strict TypeScript, proper HTTP status codes, environment-aware configurations.
+- **SKU = UPC**: The SKU field is used for UPC codes. All UPC data is stored in the SKU field. Manual UPC assignments (SKU values in production) must be preserved during sync/import. UPCs must be validated for leading zeros and standard 12-digit length. UPC prefix must match brand's known prefix. Attribute-based matching (size, wattage, weight, dimension, count) is critical for exact product identification.
 
 ## External Dependencies
 - **Database**: PostgreSQL
@@ -88,65 +89,3 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Server-Side Framework**: Express.js
 - **Query Library**: TanStack Query
 - **Client-Side Router**: Wouter
-
-## UPC/SKU Matching System
-
-### ⚠️ CRITICAL: SKU = UPC
-**In this system, the SKU field IS the UPC field. They are identical.**
-- When inputting UPC codes, they go into the SKU field
-- Always copy SKU to UPC where UPC is empty
-- There is no separate UPC input field - SKU is the UPC
-- **NEVER FORGET THIS** - this has been flagged multiple times as forgotten information
-
-### Data Sources
-- **Inventory Saves**: Excel/CSV inventory exports contain photos AND SKU/UPC data for products
-- Photos and UPC data should be extracted from these inventory saves during import
-- User's manual UPC assignments must be preserved and never overwritten
-- **"Manual UPC assignments" = SKU values the user has entered in production** - these are in the SKU field of inventory exports and MUST be preserved during any sync or import operation
-
-### Key Metrics
-- **Current Coverage**: 96.2% (6,936 of 7,210 products have UPCs)
-- **Photo Coverage**: 97.7% (7,088 products have proper photos)
-- **Data Sync**: When exporting from production, all UPC/SKU corrections are preserved via ID-based updates
-- **Learning System**: Brand-prefix mappings stored in `scripts/brand-upc-prefixes.json` (74 brands verified)
-
-### UPC Format Validation
-- **Leading Zero Issue**: Many UPCs imported from Excel/CSV lose leading zeros. Always validate and restore:
-  - Exo Terra UPCs should be `015561xxxxxx` not `1556121xxxx`
-  - Zilla UPCs should be `096316xxxxxx` not `9631609xxx`
-  - Zoo Med UPCs should be `097612xxxxxx` not `9761209xxx`
-- **Standard UPC Length**: Most retail UPCs are 12 digits (UPC-A format)
-- **Auto-fix pattern**: If SKU starts with brand prefix minus leading zero and is 10-11 digits, prepend "0"
-
-### Brand-UPC Prefix Validation
-Prevents cross-brand UPC assignments using GS1 manufacturer prefixes. Implemented in `scripts/brand-upc-prefixes.mjs`.
-
-**CRITICAL:** If a product's UPC prefix doesn't match its brand's known prefix, the UPC is WRONG and should be cleared.
-- Zoo Med products MUST have 097612 prefix
-- Exo Terra products MUST have 015561 prefix
-- Zilla products MUST have 096316 prefix
-- Kong products MUST have 035585 prefix
-- Never assign reptile brand UPCs to dog/cat products
-
-**Known Prefixes (2025-12 update - 74 brands verified):**
-- **Reptile**: Zoo Med=097612, Exo Terra=015561, Fluker's=091197/911977, Zilla=096316, Nature Zone=783178, Galapagos=759834, Lees=010838
-- **Aquatic**: Tetra=046798, Aqueon=015905, Hikari=042055, API=317163, Marineland=015561, Fluval=015561, SeaChem=000116
-- **Small Animal**: Kaytee=071859/045125, Oxbow=744845, Prevue=048081, Playfuls=048081
-- **Pet Food**: Orijen=064992, Blue Buffalo=859610/840243, Fromm=072705, NutriSource=073893, Science Diet=052742, Taste of the Wild=074198, Diamond=074198, VICTOR=854524, Zignature=888641, Royal Canin=030111
-- **Dog Treats**: RedBarn=785184, Primal=850334, Vital Essentials=840199, Benebone=854111
-- **Accessories**: Kong=035585, Coastal=076484, Nylabone=018214, Greenies=642863, Petmate=029695, JW Pet=618940, Mammoth=746772
-- **Parent Company Groups** (share prefixes):
-  - 076484: Coastal, Li'l Pals, Safari, Circle T, Titan, Rascals, Turbo, Pro Plan (some)
-  - 030172: Penn-Plax, Birdlife, Reptology
-  - 045663: Four Paws, Wee-Wee
-  - 027773: Quiet Time, MidWest Homes For Pets
-  - 015561: Exo Terra, Fluval, Marineland (Hagen family)
-- **Grooming**: Bio Groom=021653, Earthbath=602644, FURminator=811794, Vet's Best=031658, TropiClean=645095, NaturVet=797801, Nature's Miracle=018065
-- **Other**: Catit=022517, Spot=077234, PetCrest=784099, Multipet=784369, SodaPup=810216, Bellabowl=842982, Higgins=046706, PetAg=020279, A&E Cage Co=644472, Tuffy=180181, Van Ness=079441, Pets First=849790
-
-### Abbreviation Patterns Learned
-- Yng→Young, Gpig→Guinea Pig, Grden→Garden, Grdnsel→Garden Select
-- Ham→Hamster, Snr→Senior, Chinch→Chinchilla, Clmbree→Calming Breeze
-- Foritdiet→Forti-Diet, Turky→Turkey, Frg→Frog
-- Color codes: Blu→Blue, Pnk→Pink, Prpl→Purple, Grn→Green, Blk→Black
-- Biogroom→Bio-Groom, Exoterra→Exo Terra, Lilpals→Li'l Pals

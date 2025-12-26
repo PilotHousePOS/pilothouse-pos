@@ -1,0 +1,87 @@
+{
+  "version": "2025-12-26",
+  "description": "UPC validation rules learned from production corrections",
+  "criticalRules": [
+    {
+      "name": "brand_prefix_match",
+      "description": "UPC prefix must match product brand",
+      "severity": "critical",
+      "action": "reject"
+    },
+    {
+      "name": "size_exact_match",
+      "description": "Size attributes (small/medium/large/xl) must match exactly",
+      "severity": "critical",
+      "action": "reject"
+    },
+    {
+      "name": "wattage_exact_match", 
+      "description": "Wattage values must match exactly (100w != 75w)",
+      "severity": "critical",
+      "action": "reject"
+    },
+    {
+      "name": "weight_tolerance",
+      "description": "Weight must be within 5% or 0.5oz (whichever is larger)",
+      "severity": "critical",
+      "action": "reject"
+    },
+    {
+      "name": "dimension_exact_match",
+      "description": "Dimensions (12\", 24\") must match exactly",
+      "severity": "critical",
+      "action": "reject"
+    }
+  ],
+  "warningRules": [
+    {
+      "name": "color_mismatch",
+      "description": "Colors should match but can be variant products",
+      "severity": "warning",
+      "action": "flag"
+    },
+    {
+      "name": "count_mismatch",
+      "description": "Pack counts (2pk, 3pk) should match",
+      "severity": "warning", 
+      "action": "flag"
+    }
+  ],
+  "commonMistakes": {
+    "same_brand_different_product": {
+      "description": "Products from same brand assigned same UPC",
+      "examples": [
+        "Zoo Med Calcium 3.2oz vs Zoo Med Calcium + D3 3.2oz",
+        "Exo Terra Ceramic 100w vs Exo Terra Ceramic 150w",
+        "Coastal Harness Small vs Coastal Harness Medium"
+      ],
+      "prevention": "Always match weight/size/wattage/dimension attributes"
+    },
+    "species_category_mismatch": {
+      "description": "Dog/cat product UPC assigned to reptile/fish product",
+      "examples": [
+        "Fieldcrest Farms dog chew with Lees turtle lagoon UPC",
+        "Tuesday's dog treats with Tetra reptile food UPC"
+      ],
+      "prevention": "Check species keywords in product names"
+    },
+    "leading_zero_stripped": {
+      "description": "Excel import strips leading zeros from UPCs",
+      "examples": [
+        "097612 becomes 97612",
+        "015561 becomes 15561 or 155612"
+      ],
+      "prevention": "Always validate 12-digit format, prepend 0 if needed"
+    }
+  },
+  "duplicateStats": {
+    "totalDuplicates": 1179,
+    "productsToClear": 716,
+    "topIssues": [
+      { "pattern": "Same brand, different size", "count": 200 },
+      { "pattern": "Same brand, different weight", "count": 150 },
+      { "pattern": "Cross-category (dog/cat vs reptile)", "count": 100 },
+      { "pattern": "Same prefix, different brand", "count": 80 }
+    ]
+  }
+}
