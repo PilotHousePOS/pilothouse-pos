@@ -105,9 +105,17 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **"Manual UPC assignments" = SKU values the user has entered in production** - these are in the SKU field of inventory exports and MUST be preserved during any sync or import operation
 
 ### Key Metrics
-- **Current Coverage**: 84.8% (6,150 of 7,252 products have UPCs)
+- **Current Coverage**: 96.4% (6,949 of 7,210 products have UPCs)
 - **Photo Coverage**: 97.7% (7,088 products have proper photos)
 - **Data Sync**: When exporting from production, all UPC/SKU corrections are preserved via ID-based updates
+
+### UPC Format Validation
+- **Leading Zero Issue**: Many UPCs imported from Excel/CSV lose leading zeros. Always validate and restore:
+  - Exo Terra UPCs should be `015561xxxxxx` not `1556121xxxx`
+  - Zilla UPCs should be `096316xxxxxx` not `9631609xxx`
+  - Zoo Med UPCs should be `097612xxxxxx` not `9761209xxx`
+- **Standard UPC Length**: Most retail UPCs are 12 digits (UPC-A format)
+- **Auto-fix pattern**: If SKU starts with brand prefix minus leading zero and is 10-11 digits, prepend "0"
 
 ### Brand-UPC Prefix Validation
 Prevents cross-brand UPC assignments using GS1 manufacturer prefixes. Implemented in `scripts/brand-upc-prefixes.mjs`.
