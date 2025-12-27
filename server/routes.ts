@@ -1462,17 +1462,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       }
 
       const id = parseInt(req.params.id);
-      let supplyData = insertSupplySchema.partial().parse(req.body);
+      const supplyData = insertSupplySchema.partial().parse(req.body);
       
-      // Apply abbreviation expansion to name and description if provided
-      if (supplyData.name || supplyData.description) {
-        const expanded = expandProductAbbreviations(
-          supplyData.name || undefined,
-          supplyData.description || undefined
-        );
-        if (supplyData.name) supplyData.name = expanded.name;
-        if (supplyData.description) supplyData.description = expanded.description;
-      }
+      // Note: Abbreviation expansion removed from regular edits
+      // Only run expansion during bulk import/invoice processing
+      // to prevent unwanted autocorrection of manually entered names
       
       const supply = await storage.updateSupply(id, supplyData);
       res.json(supply);
