@@ -161,8 +161,8 @@ export function fuzzyMatch(
  * Example: searching "Blue Buffalo" will also match products with "Blue B"
  * 
  * PRIORITY ORDER:
- * 1. Exact name matches (score 200+) - query appears exactly in product name
- * 2. Name contains query (score 150+) - product name contains query substring
+ * 1. Word boundary matches (score 250) - query matches as complete word in name ("Sour" in "Sour Apple")
+ * 2. Substring matches (score 200) - query embedded in another word ("sour" in "NutriSource")
  * 3. Fuzzy name matches (score 100+) - typo-tolerant name matching
  * 4. Brand-only matches (score 50+) - query matches brand but not name
  * 
@@ -200,8 +200,17 @@ export function fuzzySearchFilter<T>(
       
       // Check for exact/substring name match first (highest priority)
       if (lowerName.includes(lowerQuery)) {
-        // Name contains query - boost by 100 points
-        bestScore = Math.max(bestScore, 200);
+        // Check if query matches as a complete word (word boundary match)
+        // "sour" in "Sour Apple" = word match (score 250)
+        // "sour" in "NutriSource" = substring only (score 200)
+        const wordBoundaryRegex = new RegExp(`\\b${lowerQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+        if (wordBoundaryRegex.test(lowerName)) {
+          // Query matches as a complete word - highest priority
+          bestScore = Math.max(bestScore, 250);
+        } else {
+          // Query is just a substring within another word - lower priority
+          bestScore = Math.max(bestScore, 200);
+        }
       } else {
         // Check fuzzy name match
         const nameMatch = fuzzyMatch(name, searchQuery, threshold);
