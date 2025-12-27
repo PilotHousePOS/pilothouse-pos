@@ -12214,11 +12214,43 @@ function SupplyImageUpload({ supplyId, currentImageUrl, onImageUploaded }: {
   );
 }
 
-// Image Upload Component
+// Image Upload Component with paste URL support
 function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageChange: (url: string) => void }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropZoneRef = useRef<HTMLDivElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const [pasteActive, setPasteActive] = useState(false);
+  const [urlInput, setUrlInput] = useState('');
   const { toast } = useToast();
+
+  // Handle clipboard paste (Ctrl+V / Cmd+V)
+  const handlePaste = useCallback(async (e: ClipboardEvent) => {
+    if (!pasteActive) return;
+    
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.startsWith('image/')) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (file) {
+          handleFileUpload(file);
+          return;
+        }
+      }
+    }
+  }, [pasteActive]);
+
+  // Register paste event listener when component is focused
+  useEffect(() => {
+    if (pasteActive) {
+      document.addEventListener('paste', handlePaste);
+      return () => document.removeEventListener('paste', handlePaste);
+    }
+  }, [pasteActive, handlePaste]);
 
   const handleFileUpload = async (file: File) => {
     if (!file) return;
@@ -12275,10 +12307,76 @@ function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageCha
     }
   };
 
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFileUpload(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+  };
+
+  const handleUrlSubmit = () => {
+    if (urlInput.trim()) {
+      onImageChange(urlInput.trim());
+      setUrlInput('');
+      toast({
+        title: "Image URL Added",
+        description: "Image URL has been set successfully.",
+      });
+    }
+  };
+
   return (
     <div className="space-y-3">
       <Label>Image</Label>
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+      
+      {/* URL Input for pasting image URLs */}
+      <div className="flex gap-2">
+        <Input
+          placeholder="Paste image URL here..."
+          value={urlInput}
+          onChange={(e) => setUrlInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleUrlSubmit())}
+          className="flex-1"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleUrlSubmit}
+          disabled={!urlInput.trim()}
+        >
+          Use URL
+        </Button>
+      </div>
+      
+      <div 
+        ref={dropZoneRef}
+        tabIndex={0}
+        className={`border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer ${
+          dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 
+          pasteActive ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-300'
+        }`}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onFocus={() => setPasteActive(true)}
+        onBlur={() => setPasteActive(false)}
+        onClick={() => dropZoneRef.current?.focus()}
+      >
+        {pasteActive && (
+          <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-sm p-2 rounded mb-2 text-center">
+            Ready to paste! Press Ctrl+V (or Cmd+V on Mac) to paste an image
+          </div>
+        )}
         {imageUrl ? (
           <div className="relative">
             <img src={imageUrl} alt="Preview" className="w-full sm:h-40 h-24 object-cover rounded" />
@@ -12295,7 +12393,7 @@ function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageCha
         ) : (
           <div className="text-center sm:py-8 py-4">
             <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-            <p className="text-sm text-gray-500">Click to upload an image</p>
+            <p className="text-sm text-gray-500">Drag & drop, paste (Ctrl+V), or click to upload</p>
           </div>
         )}
         <input
