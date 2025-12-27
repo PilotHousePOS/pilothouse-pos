@@ -12589,6 +12589,7 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="food">Food</SelectItem>
+              <SelectItem value="treats">Treats</SelectItem>
               <SelectItem value="toys">Toys</SelectItem>
               <SelectItem value="beds">Beds</SelectItem>
               <SelectItem value="leashesAndCollars">Leashes & Collars</SelectItem>
