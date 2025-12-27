@@ -11945,13 +11945,30 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
       </div>
       <div>
         <label className="block text-sm font-medium mb-1">Category</label>
-        <input
-          type="text"
-          value={formData.category}
-          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-          className="w-full p-2 border rounded"
-          required
-        />
+        <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="food">Food</SelectItem>
+            <SelectItem value="treats">Treats</SelectItem>
+            <SelectItem value="toys">Toys</SelectItem>
+            <SelectItem value="beds">Beds</SelectItem>
+            <SelectItem value="leashesAndCollars">Leashes & Collars</SelectItem>
+            <SelectItem value="healthcare">Healthcare</SelectItem>
+            <SelectItem value="accessories">Accessories</SelectItem>
+            <SelectItem value="aquatics">Aquatics</SelectItem>
+            <SelectItem value="reptiles">Reptiles</SelectItem>
+            <SelectItem value="birdSupplies">Bird Supplies</SelectItem>
+            <SelectItem value="dogCages">Dog Cages/Houses</SelectItem>
+            <SelectItem value="smallAnimalSupplies">Small Animal Supplies</SelectItem>
+            <SelectItem value="catFood">Cat Food</SelectItem>
+            <SelectItem value="catTreats">Cat Treats</SelectItem>
+            <SelectItem value="catToys">Cat Toys</SelectItem>
+            <SelectItem value="dogFood">Dog Food</SelectItem>
+            <SelectItem value="dogTreats">Dog Treats</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       <div>
         <label className="block text-sm font-medium mb-1">Price ($)</label>
