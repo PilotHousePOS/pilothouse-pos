@@ -11,7 +11,6 @@ const ABBR_MAP: Record<string, string> = {
   'royal can': 'royal canin',
   'rc': 'royal canin',
   'bb': 'blue buffalo',
-  'blue': 'blue buffalo',
   'ns': 'nutrisource',
   'nutri sou': 'nutrisource',
   'pp': 'pro plan',

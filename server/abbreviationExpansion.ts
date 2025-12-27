@@ -89,7 +89,6 @@ const ABBREVIATION_MAPPINGS: Record<string, string> = {
   'API': 'API',
   'SPOT': 'Spot',
   'SAFE': 'Safe',
-  'BLUE': 'Blue Buffalo',
   'KONG': 'Kong',
   'HIKARI': 'Hikari',
   'FROMM': 'Fromm',
