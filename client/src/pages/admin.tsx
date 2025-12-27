@@ -12726,9 +12726,12 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
           <Label htmlFor="stockQuantity">Stock Quantity</Label>
           <Input
             id="stockQuantity"
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             value={formData.stockQuantity}
-            onChange={(e) => setFormData({ ...formData, stockQuantity: e.target.value })}
+            onChange={(e) => setFormData({ ...formData, stockQuantity: e.target.value.replace(/\D/g, '') })}
+            placeholder="0"
             required
           />
         </div>
