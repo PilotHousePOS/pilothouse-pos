@@ -6400,16 +6400,18 @@ export default function Admin() {
     
     if (blockedList.includes(dateString)) return false;
     
-    const advanceBookingDays = parseInt(settings.find(s => s.setting === 'advance_booking_days')?.value || '30');
-    const maxDate = new Date();
-    maxDate.setDate(maxDate.getDate() + advanceBookingDays);
-    
-    if (date > maxDate) return false;
-    
-    // Admins and groomers can book same-day and next-day appointments (exempt from minimum notice)
+    // Admins and groomers have no booking restrictions (can book any future date, same-day, etc.)
     const isAdminOrGroomer = typedUser?.isAdmin || typedUser?.isGroomer;
     
     if (!isAdminOrGroomer) {
+      // Non-admin users have advance booking limit
+      const advanceBookingDays = parseInt(settings.find(s => s.setting === 'advance_booking_days')?.value || '30');
+      const maxDate = new Date();
+      maxDate.setDate(maxDate.getDate() + advanceBookingDays);
+      
+      if (date > maxDate) return false;
+      
+      // Non-admin users have minimum notice requirement
       const minimumNoticeHours = parseInt(settings.find(s => s.setting === 'minimum_notice_hours')?.value || '24');
       const minDate = new Date();
       minDate.setHours(minDate.getHours() + minimumNoticeHours);
