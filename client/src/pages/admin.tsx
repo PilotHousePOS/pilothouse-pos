@@ -7172,7 +7172,8 @@ export default function Admin() {
     } else {
       // Multiple appointments - create them sequentially
       let successCount = 0;
-      let failCount = 0;
+      let failedDates: string[] = [];
+      let capacityFailedDates: string[] = [];
       
       for (const date of appointmentDates) {
         try {
@@ -7181,25 +7182,59 @@ export default function Admin() {
             appointmentDate: date,
           });
           successCount++;
-        } catch (err) {
-          failCount++;
+        } catch (err: any) {
           console.error(`Failed to create appointment for ${date}:`, err);
+          
+          // Check for capacity error
+          let errorText = '';
+          if (err?.message) {
+            const parts = err.message.split(': ', 2);
+            if (parts.length === 2) {
+              try {
+                const jsonData = JSON.parse(parts[1]);
+                errorText = jsonData.message || '';
+              } catch {
+                errorText = parts[1];
+              }
+            } else {
+              errorText = err.message;
+            }
+          }
+          
+          if (errorText.includes('capacity is fully booked') || errorText.includes('capacity would be exceeded')) {
+            capacityFailedDates.push(date);
+          } else {
+            failedDates.push(date);
+          }
         }
       }
       
-      // Invalidate cache and show results
+      // Invalidate cache
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments-all"] });
       
-      if (failCount === 0) {
+      // Show results
+      const totalFailed = failedDates.length + capacityFailedDates.length;
+      if (totalFailed === 0) {
         toast({
           title: "Recurring Appointments Created",
           description: `Successfully created ${successCount} appointments.`,
         });
+      } else if (capacityFailedDates.length > 0 && successCount === 0) {
+        // All failures are capacity-related - show capacity dialog
+        setShowAdminCapacityDialog(true);
+        return;
       } else {
+        let failureMsg = `Created ${successCount} appointments.`;
+        if (capacityFailedDates.length > 0) {
+          failureMsg += ` ${capacityFailedDates.length} date(s) fully booked.`;
+        }
+        if (failedDates.length > 0) {
+          failureMsg += ` ${failedDates.length} failed.`;
+        }
         toast({
           title: "Partial Success",
-          description: `Created ${successCount} appointments. ${failCount} failed (may be fully booked).`,
+          description: failureMsg,
           variant: "destructive",
         });
       }

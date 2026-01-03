@@ -301,6 +301,10 @@ export default function Booking() {
       setSelectedGroomer('');
       setPets([{ name: '', type: 'dog', serviceType: '', notes: '', groomerId: '' }]);
       setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
+      setContactSearch('');
+      setIsRecurring(false);
+      setRecurringType('monthly');
+      setCustomRecurringDates([]);
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
     },
     onError: (error: any) => {
@@ -349,7 +353,7 @@ export default function Booking() {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate all pets have required fields
@@ -370,14 +374,48 @@ export default function Booking() {
       return sum + (serviceData?.price || 0);
     }, 0);
 
-    createAppointmentMutation.mutate({
-      appointmentDate: selectedDate.toISOString().split('T')[0],
+    // Build list of dates to create appointments for
+    const appointmentDates: string[] = [];
+    const formatDate = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
+    // Always include the primary selected date
+    appointmentDates.push(formatDate(selectedDate));
+    
+    if (isRecurring) {
+      if (recurringType === 'monthly') {
+        // Generate dates for the next 6 months on the same day
+        for (let i = 1; i <= 6; i++) {
+          const futureDate = new Date(selectedDate);
+          futureDate.setMonth(futureDate.getMonth() + i);
+          // Handle edge case where day doesn't exist in future month (e.g., Jan 31 -> Feb 28)
+          if (futureDate.getDate() !== selectedDate.getDate()) {
+            // Set to last day of previous month
+            futureDate.setDate(0);
+          }
+          appointmentDates.push(formatDate(futureDate));
+        }
+      } else if (recurringType === 'custom' && customRecurringDates.length > 0) {
+        // Add custom selected dates
+        customRecurringDates.forEach(date => {
+          appointmentDates.push(formatDate(date));
+        });
+      }
+    }
+
+    const baseAppointmentData = {
       appointmentTime: selectedTime,
       ...(selectedGroomer && { groomerId: parseInt(selectedGroomer) }),
       ownerFirstName: ownerInfo.firstName,
       ownerLastName: ownerInfo.lastName,
       ownerPhoneNumber: ownerInfo.phoneNumber,
       price: totalPrice.toString(),
+      isRecurring: isRecurring,
+      recurringType: isRecurring ? recurringType : undefined,
       pets: pets.map(pet => ({
         petName: pet.name,
         petType: pet.type,
@@ -385,7 +423,116 @@ export default function Booking() {
         specialNotes: pet.notes,
         groomerId: pet.groomerId ? parseInt(pet.groomerId) : undefined,
       })),
-    });
+    };
+
+    // Create appointments for all dates
+    if (appointmentDates.length === 1) {
+      // Single appointment
+      createAppointmentMutation.mutate({
+        ...baseAppointmentData,
+        appointmentDate: appointmentDates[0],
+      });
+    } else {
+      // Multiple appointments - create them sequentially
+      let successCount = 0;
+      let failedDates: string[] = [];
+      let capacityFailedDates: string[] = [];
+      let unauthorizedError = false;
+      
+      for (const date of appointmentDates) {
+        try {
+          await apiRequest("POST", "/api/appointments", {
+            ...baseAppointmentData,
+            appointmentDate: date,
+          });
+          successCount++;
+        } catch (err: any) {
+          console.error(`Failed to create appointment for ${date}:`, err);
+          
+          // Check for unauthorized error
+          if (isUnauthorizedError(err)) {
+            unauthorizedError = true;
+            break; // Stop processing - need to re-authenticate
+          }
+          
+          // Check for capacity error
+          let errorText = '';
+          if (err?.message) {
+            const parts = err.message.split(': ', 2);
+            if (parts.length === 2) {
+              try {
+                const jsonData = JSON.parse(parts[1]);
+                errorText = jsonData.message || '';
+              } catch {
+                errorText = parts[1];
+              }
+            } else {
+              errorText = err.message;
+            }
+          }
+          
+          if (errorText.includes('capacity is fully booked') || errorText.includes('capacity would be exceeded')) {
+            capacityFailedDates.push(date);
+          } else {
+            failedDates.push(date);
+          }
+        }
+      }
+      
+      // Handle unauthorized error
+      if (unauthorizedError) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      
+      // Invalidate cache
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      
+      // Show results
+      const totalFailed = failedDates.length + capacityFailedDates.length;
+      if (totalFailed === 0) {
+        toast({
+          title: "Recurring Appointments Created",
+          description: `Successfully created ${successCount} appointments.`,
+        });
+      } else if (capacityFailedDates.length > 0 && successCount === 0) {
+        // All failures are capacity-related - show capacity dialog
+        setShowCapacityDialog(true);
+        return;
+      } else {
+        let failureMsg = `Created ${successCount} appointments.`;
+        if (capacityFailedDates.length > 0) {
+          failureMsg += ` ${capacityFailedDates.length} date(s) fully booked.`;
+        }
+        if (failedDates.length > 0) {
+          failureMsg += ` ${failedDates.length} failed.`;
+        }
+        toast({
+          title: "Partial Success",
+          description: failureMsg,
+          variant: "destructive",
+        });
+      }
+      
+      // Reset form
+      setSelectedDate(new Date());
+      setSelectedTime('');
+      setSelectedGroomer('');
+      setPets([{ name: '', type: 'dog', serviceType: '', notes: '', groomerId: '' }]);
+      setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
+      setContactSearch('');
+      setIsRecurring(false);
+      setRecurringType('monthly');
+      setCustomRecurringDates([]);
+      return;
+    }
   };
 
   const addPet = () => {
