@@ -1377,16 +1377,16 @@ function ContactsManager() {
               return (
                 <div 
                   key={uniqueKey} 
-                  className={`border rounded-lg p-4 transition-all cursor-pointer hover:bg-gray-50 ${isExpanded ? 'ring-2 ring-blue-400' : ''}`}
+                  className={`border rounded-lg p-4 transition-all cursor-pointer hover:bg-gray-50 min-w-0 overflow-hidden ${isExpanded ? 'ring-2 ring-blue-400' : ''}`}
                   onClick={() => {
                     // Toggle expand/collapse for contacts
                     setExpandedContactId(isExpanded ? null : (contact.id || contact.resourceName || contact.email));
                   }}
                   data-testid={`contact-card-${index}`}
                 >
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 min-w-0">
                     {/* Name */}
-                    <p className="font-semibold text-base break-words">
+                    <p className="font-semibold text-base break-words truncate">
                       {contact.displayName || contact.name}
                     </p>
                     
