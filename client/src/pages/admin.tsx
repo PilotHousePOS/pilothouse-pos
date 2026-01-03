@@ -7045,8 +7045,12 @@ export default function Admin() {
       setBookingSelectedTime('');
       setBookingPets([{ name: '', type: 'Dog', serviceType: '', notes: '', groomerId: '' }]);
       setBookingOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
+      setIsRecurring(false);
+      setRecurringType('monthly');
+      setCustomRecurringDates([]);
       // Refresh appointments
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments-all"] });
     },
     onError: (error: any) => {
       // Extract error message from apiRequest error format: "400: {json}"
@@ -7108,13 +7112,47 @@ export default function Admin() {
       return sum + (serviceData?.price || 0);
     }, 0);
 
-    const appointmentData = {
-      appointmentDate: bookingSelectedDate.toISOString().split('T')[0],
+    // Build list of dates to create appointments for
+    const appointmentDates: string[] = [];
+    const formatDate = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
+    // Always include the primary selected date
+    appointmentDates.push(formatDate(bookingSelectedDate));
+    
+    if (isRecurring) {
+      if (recurringType === 'monthly') {
+        // Generate dates for the next 6 months on the same day
+        for (let i = 1; i <= 6; i++) {
+          const futureDate = new Date(bookingSelectedDate);
+          futureDate.setMonth(futureDate.getMonth() + i);
+          // Handle edge case where day doesn't exist in future month (e.g., Jan 31 -> Feb 28)
+          if (futureDate.getDate() !== bookingSelectedDate.getDate()) {
+            // Set to last day of previous month
+            futureDate.setDate(0);
+          }
+          appointmentDates.push(formatDate(futureDate));
+        }
+      } else if (recurringType === 'custom' && customRecurringDates.length > 0) {
+        // Add custom selected dates
+        customRecurringDates.forEach(date => {
+          appointmentDates.push(formatDate(date));
+        });
+      }
+    }
+
+    const baseAppointmentData = {
       appointmentTime: bookingSelectedTime,
       ownerFirstName: bookingOwnerInfo.firstName,
       ownerLastName: bookingOwnerInfo.lastName,
       ownerPhoneNumber: bookingOwnerInfo.phoneNumber,
       price: totalPrice.toString(),
+      isRecurring: isRecurring,
+      recurringType: isRecurring ? recurringType : undefined,
       pets: bookingPets.map(pet => ({
         petName: pet.name,
         petType: pet.type,
@@ -7124,7 +7162,60 @@ export default function Admin() {
       })),
     };
 
-    createAppointmentMutation.mutate(appointmentData);
+    // Create appointments for all dates
+    if (appointmentDates.length === 1) {
+      // Single appointment
+      createAppointmentMutation.mutate({
+        ...baseAppointmentData,
+        appointmentDate: appointmentDates[0],
+      });
+    } else {
+      // Multiple appointments - create them sequentially
+      let successCount = 0;
+      let failCount = 0;
+      
+      for (const date of appointmentDates) {
+        try {
+          await apiRequest("POST", "/api/appointments", {
+            ...baseAppointmentData,
+            appointmentDate: date,
+          });
+          successCount++;
+        } catch (err) {
+          failCount++;
+          console.error(`Failed to create appointment for ${date}:`, err);
+        }
+      }
+      
+      // Invalidate cache and show results
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments-all"] });
+      
+      if (failCount === 0) {
+        toast({
+          title: "Recurring Appointments Created",
+          description: `Successfully created ${successCount} appointments.`,
+        });
+      } else {
+        toast({
+          title: "Partial Success",
+          description: `Created ${successCount} appointments. ${failCount} failed (may be fully booked).`,
+          variant: "destructive",
+        });
+      }
+      
+      // Reset form
+      setBookingContactSearch('');
+      setBookingSelectedDate(new Date());
+      setBookingSelectedTime('');
+      setBookingPets([{ name: '', type: 'Dog', serviceType: '', notes: '', groomerId: '' }]);
+      setBookingOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
+      setIsRecurring(false);
+      setRecurringType('monthly');
+      setCustomRecurringDates([]);
+      setIsBookAppointmentOpen(false);
+      return;
+    }
   };
 
   // Admin User Management Mutation
