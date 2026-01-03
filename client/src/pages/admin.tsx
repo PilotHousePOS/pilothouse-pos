@@ -539,7 +539,7 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
 
 // Contacts Manager Component with Search and Event Creation
 // Helper component to display appointment history for a contact
-function ContactAppointmentHistory({ contactId }: { contactId: number }) {
+function ContactAppointmentHistory({ contactId, onViewFullHistory }: { contactId: number; onViewFullHistory?: () => void }) {
   // Fetch active appointments
   const { data: appointments = [], isLoading: isLoadingAppointments } = useQuery<any[]>({
     queryKey: ["/api/contacts", contactId, "appointments"],
@@ -595,10 +595,22 @@ function ContactAppointmentHistory({ contactId }: { contactId: number }) {
   };
 
   return (
-    <div className="space-y-2">
-      <p className="text-sm font-medium text-gray-700">Recent Grooming History ({completedAppointments.length})</p>
+    <div 
+      className={`space-y-2 ${onViewFullHistory ? 'cursor-pointer hover:bg-gray-50 rounded -m-1 p-1' : ''}`}
+      onClick={(e) => {
+        if (onViewFullHistory) {
+          e.stopPropagation();
+          onViewFullHistory();
+        }
+      }}
+      data-testid="contact-history-preview"
+    >
+      <p className="text-sm font-medium text-gray-700">
+        Recent Grooming History ({completedAppointments.length})
+        {onViewFullHistory && <span className="text-blue-600 ml-1 text-xs">View All</span>}
+      </p>
       <div className="space-y-2 max-h-48 overflow-y-auto">
-        {completedAppointments.map((apt: any) => (
+        {completedAppointments.slice(0, 3).map((apt: any) => (
           <div key={apt.id} className="bg-gray-50 rounded p-2 text-xs" data-testid={`appointment-history-${apt.id}`}>
             <div className="flex justify-between items-start">
               <div>
@@ -615,6 +627,9 @@ function ContactAppointmentHistory({ contactId }: { contactId: number }) {
             )}
           </div>
         ))}
+        {completedAppointments.length > 3 && (
+          <p className="text-xs text-blue-600 text-center">+{completedAppointments.length - 3} more</p>
+        )}
       </div>
     </div>
   );
@@ -1442,7 +1457,10 @@ function ContactsManager() {
                     {/* Appointment History - visible when expanded */}
                     {contact.isDatabaseContact && isExpanded && contact.phoneNumber && (
                       <div className="pt-2 mt-1 border-t border-gray-200">
-                        <ContactAppointmentHistory contactId={contact.id} />
+                        <ContactAppointmentHistory 
+                          contactId={contact.id} 
+                          onViewFullHistory={() => setHistoryDialogContact({ id: contact.id, name: contact.displayName || contact.name })}
+                        />
                       </div>
                     )}
                     
