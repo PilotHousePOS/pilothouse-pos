@@ -181,6 +181,9 @@ export const appointments = pgTable("appointments", {
   source: varchar("source", { length: 50 }).default("manual"), // manual or google_calendar
   googleEventId: varchar("google_event_id", { length: 255 }), // Google Calendar event ID
   groomerTag: varchar("groomer_tag", { length: 100 }), // Groomer name/tag from calendar event
+  isRecurring: boolean("is_recurring").default(false), // Whether this is a recurring appointment
+  recurringType: varchar("recurring_type", { length: 20 }), // "monthly" or "custom"
+  recurringParentId: integer("recurring_parent_id"), // Links child appointments to original parent
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
