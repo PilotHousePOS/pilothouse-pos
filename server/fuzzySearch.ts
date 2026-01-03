@@ -182,9 +182,33 @@ export function fuzzySearchFilter<T>(
     return items;
   }
   
+  const lowerQuery = query.toLowerCase().trim();
+  
+  // For full UPC/SKU searches (10+ digits), require EXACT match only
+  // This prevents fuzzy matching between similar UPCs like 096316671461 vs 096316671478
+  const digitsOnly = lowerQuery.replace(/\D/g, '');
+  const isUpcSearch = digitsOnly.length >= 10 && digitsOnly === lowerQuery;
+  
+  if (isUpcSearch) {
+    // Exact UPC/SKU matching only
+    return items.filter(item => {
+      const searchableTexts = getSearchableText(item);
+      // Check SKU field (index 3) and UPC field (index 4) for exact match
+      for (const text of searchableTexts) {
+        if (text && text.toLowerCase() === lowerQuery) {
+          return true;
+        }
+        // Also allow partial match if the query is the full UPC and text starts with it
+        if (text && text.toLowerCase().includes(lowerQuery)) {
+          return true;
+        }
+      }
+      return false;
+    }).map(item => ({ ...item, _relevance: 100 }));
+  }
+  
   // Expand brand names to include variations (e.g., "Diamond" → ["Diamond", "Diam"])
   const brandVariations = expandBrandNames(query);
-  const lowerQuery = query.toLowerCase().trim();
   
   const resultsMap = new Map<any, number>(); // Track best score for each item
   
