@@ -47,6 +47,9 @@ export default function Booking() {
   const [contactSearch, setContactSearch] = useState('');
   const [showContactDropdown, setShowContactDropdown] = useState(false);
   const [showCapacityDialog, setShowCapacityDialog] = useState(false);
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurringType, setRecurringType] = useState<'monthly' | 'custom'>('monthly');
+  const [customRecurringDates, setCustomRecurringDates] = useState<Date[]>([]);
 
   // Fetch current user data to check if admin/groomer
   const { data: currentUser, isLoading: isUserLoading } = useQuery({
@@ -504,6 +507,102 @@ export default function Booking() {
             ))}
           </div>
         </div>
+
+        {/* Recurring Appointment Options */}
+        <Card>
+          <CardContent className="p-4 space-y-4">
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                id="recurring-checkbox"
+                checked={isRecurring}
+                onChange={(e) => {
+                  setIsRecurring(e.target.checked);
+                  if (!e.target.checked) {
+                    setCustomRecurringDates([]);
+                  }
+                }}
+                className="h-5 w-5 rounded border-gray-300"
+                data-testid="checkbox-recurring"
+              />
+              <Label htmlFor="recurring-checkbox" className="text-base font-semibold text-gray-900 cursor-pointer">
+                Make this a recurring appointment
+              </Label>
+            </div>
+
+            {isRecurring && (
+              <div className="space-y-4 pl-8">
+                <div className="flex flex-col space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      id="recurring-monthly"
+                      name="recurringType"
+                      checked={recurringType === 'monthly'}
+                      onChange={() => {
+                        setRecurringType('monthly');
+                        setCustomRecurringDates([]);
+                      }}
+                      className="h-4 w-4"
+                      data-testid="radio-recurring-monthly"
+                    />
+                    <Label htmlFor="recurring-monthly" className="text-gray-700 cursor-pointer">
+                      Monthly (same day each month)
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      id="recurring-custom"
+                      name="recurringType"
+                      checked={recurringType === 'custom'}
+                      onChange={() => setRecurringType('custom')}
+                      className="h-4 w-4"
+                      data-testid="radio-recurring-custom"
+                    />
+                    <Label htmlFor="recurring-custom" className="text-gray-700 cursor-pointer">
+                      Custom dates
+                    </Label>
+                  </div>
+                </div>
+
+                {recurringType === 'monthly' && selectedDate && (
+                  <p className="text-sm text-gray-600">
+                    Appointments will be created on the {selectedDate.getDate()}th of each month for the next 6 months.
+                  </p>
+                )}
+
+                {recurringType === 'custom' && (
+                  <div className="space-y-3">
+                    <Label className="text-sm text-gray-700">Select additional dates:</Label>
+                    <Calendar
+                      mode="multiple"
+                      selected={customRecurringDates}
+                      onSelect={(dates) => setCustomRecurringDates(dates || [])}
+                      disabled={(date) => {
+                        if (selectedDate && date.toDateString() === selectedDate.toDateString()) {
+                          return true;
+                        }
+                        return !isDateAvailable(date);
+                      }}
+                      className="rounded-md border"
+                    />
+                    {customRecurringDates.length > 0 && (
+                      <div className="text-sm text-gray-600">
+                        <strong>Additional dates selected:</strong>
+                        <ul className="list-disc pl-5 mt-1">
+                          {customRecurringDates.map((date, idx) => (
+                            <li key={idx}>{date.toLocaleDateString()}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Groomer Selection */}
         <div>
