@@ -540,7 +540,8 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
 // Contacts Manager Component with Search and Event Creation
 // Helper component to display appointment history for a contact
 function ContactAppointmentHistory({ contactId }: { contactId: number }) {
-  const { data: appointments = [], isLoading } = useQuery<any[]>({
+  // Fetch active appointments
+  const { data: appointments = [], isLoading: isLoadingAppointments } = useQuery<any[]>({
     queryKey: ["/api/contacts", contactId, "appointments"],
     queryFn: async () => {
       const response = await fetch(`/api/contacts/${contactId}/appointments`, {
@@ -552,8 +553,28 @@ function ContactAppointmentHistory({ contactId }: { contactId: number }) {
     enabled: !!contactId,
   });
 
-  // Filter for completed and confirmed appointments only
-  const completedAppointments = appointments.filter(apt => 
+  // Also fetch archived history
+  const { data: history = [], isLoading: isLoadingHistory } = useQuery<any[]>({
+    queryKey: ["/api/contacts", contactId, "history"],
+    queryFn: async () => {
+      const response = await fetch(`/api/contacts/${contactId}/history`, {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch contact history');
+      return response.json();
+    },
+    enabled: !!contactId,
+  });
+
+  const isLoading = isLoadingAppointments || isLoadingHistory;
+
+  // Combine active appointments and archived history, filter for completed and confirmed
+  const allAppointments = [...appointments, ...history];
+  // Remove duplicates by id
+  const uniqueAppointments = allAppointments.filter((apt, index, self) => 
+    index === self.findIndex(a => a.id === apt.id)
+  );
+  const completedAppointments = uniqueAppointments.filter(apt => 
     apt.status === 'confirmed' || apt.status === 'completed'
   );
 
