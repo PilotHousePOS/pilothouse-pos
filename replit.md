@@ -90,11 +90,12 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Query Library**: TanStack Query
 - **Client-Side Router**: Wouter
 ## Rollback Inventory
-- **File**: `backups/rollback-inventory-2025-12-29.json`
-- **Products**: 7,305
-- **UPC Coverage**: 96.1% (7,023 products with verified UPCs)
-- **Images**: 7,289 products with photos
-- **Features**: 7,279 products with extended info
-- **Ingredients**: 6,261 products with ingredient lists
-- **Date**: December 29, 2025
+- **File**: `backups/rollback-inventory-2025-01-05.json`
+- **Products**: 7,680
+- **UPC Coverage**: 95.3% (7,318 products with verified UPCs)
+- **Images**: 7,576 products with photos
+- **Features**: 7,202 products with extended info
+- **Ingredients**: 6,178 products with ingredient lists
+- **Date**: January 5, 2025
 - Use this file to restore inventory to a known good state with all manual UPC corrections, photos, and descriptions preserved
+- Brand consistency: "Zoo Med" standardized (15 "Zoomed" entries corrected)
