@@ -91,9 +91,9 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Client-Side Router**: Wouter
 ## Rollback Inventory
 - **File**: `backups/rollback-inventory-2025-01-05.json`
-- **Products**: 7,680
-- **UPC Coverage**: 95.3% (7,318 products with verified UPCs)
-- **Images**: 7,576 products with photos
+- **Products**: 7,686
+- **UPC Coverage**: 95.3% (7,323 products with verified UPCs)
+- **Images**: 7,582 products with photos
 - **Features**: 7,202 products with extended info
 - **Ingredients**: 6,178 products with ingredient lists
 - **Date**: January 5, 2025
