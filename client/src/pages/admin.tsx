@@ -73,6 +73,7 @@ import {
   Save,
   CheckCircle2,
   Home,
+  Star,
   Type,
   Image,
   Camera,
@@ -12285,10 +12286,12 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
         </div>
       </div>
       
-      <SupplyImageUpload 
+      <SupplyMultiImageUpload 
         supplyId={supply.id}
-        currentImageUrl={formData.imageUrl}
-        onImageUploaded={(newUrl) => setFormData({ ...formData, imageUrl: newUrl })}
+        mainImageUrl={formData.imageUrl}
+        additionalImageUrls={formData.imageUrls}
+        onMainImageChange={(newUrl) => setFormData({ ...formData, imageUrl: newUrl })}
+        onAdditionalImagesChange={(urls) => setFormData({ ...formData, imageUrls: urls })}
       />
       <Button type="submit" className="w-full bg-brand-blue hover:bg-blue-600">
         Update Supply
@@ -12490,6 +12493,226 @@ function SupplyImageUpload({ supplyId, currentImageUrl, onImageUploaded }: {
       </div>
       <p className="text-xs text-gray-500">
         Drag & drop, paste (Ctrl+V), or browse to upload. Images are permanently stored.
+      </p>
+    </div>
+  );
+}
+
+// Multi-Image Upload Component for Supplies - supports carousel/swipe on customer view
+function SupplyMultiImageUpload({ 
+  supplyId, 
+  mainImageUrl, 
+  additionalImageUrls, 
+  onMainImageChange,
+  onAdditionalImagesChange 
+}: { 
+  supplyId: number; 
+  mainImageUrl: string;
+  additionalImageUrls: string[];
+  onMainImageChange: (url: string) => void;
+  onAdditionalImagesChange: (urls: string[]) => void;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const { toast } = useToast();
+
+  const allImages = [mainImageUrl, ...additionalImageUrls].filter(url => url && url.trim() !== '');
+
+  const handleFileUpload = async (file: File) => {
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid File",
+        description: "Please select an image file (JPG, PNG, GIF, or WebP).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please select an image under 10MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch(`/api/admin/supplies/${supplyId}/upload-image`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Upload failed');
+      }
+
+      const data = await response.json();
+      
+      if (!mainImageUrl) {
+        onMainImageChange(data.storedPath);
+      } else {
+        onAdditionalImagesChange([...additionalImageUrls, data.storedPath]);
+      }
+      
+      toast({
+        title: "Image Uploaded",
+        description: `Image ${allImages.length + 1} has been uploaded successfully.`,
+      });
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Upload Failed",
+        description: error.message || "Failed to upload image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFileUpload(file);
+  };
+
+  const removeImage = (index: number) => {
+    if (index === 0) {
+      if (additionalImageUrls.length > 0) {
+        onMainImageChange(additionalImageUrls[0]);
+        onAdditionalImagesChange(additionalImageUrls.slice(1));
+      } else {
+        onMainImageChange('');
+      }
+    } else {
+      const newAdditional = additionalImageUrls.filter((_, i) => i !== index - 1);
+      onAdditionalImagesChange(newAdditional);
+    }
+  };
+
+  const setAsPrimary = (index: number) => {
+    if (index === 0) return;
+    const newPrimary = additionalImageUrls[index - 1];
+    const newAdditional = [mainImageUrl, ...additionalImageUrls.filter((_, i) => i !== index - 1)];
+    onMainImageChange(newPrimary);
+    onAdditionalImagesChange(newAdditional);
+    toast({
+      title: "Primary Image Changed",
+      description: "This image is now the main product image.",
+    });
+  };
+
+  return (
+    <div className="space-y-3">
+      <Label>Product Images ({allImages.length}) - Customers can swipe through these</Label>
+      
+      {allImages.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {allImages.map((url, index) => (
+            <div 
+              key={index} 
+              className={`relative border-2 rounded-lg overflow-hidden ${
+                index === 0 ? 'border-blue-500' : 'border-gray-300'
+              }`}
+            >
+              <img 
+                src={url} 
+                alt={`Product ${index + 1}`} 
+                className="w-full h-28 object-contain bg-gray-100 dark:bg-gray-800" 
+              />
+              <div className="absolute top-1 left-1 flex gap-1">
+                {index === 0 && (
+                  <span className="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded">
+                    Main
+                  </span>
+                )}
+                {url?.startsWith('/public-objects/') && (
+                  <span className="bg-green-500 text-white text-xs px-1.5 py-0.5 rounded">
+                    Stored
+                  </span>
+                )}
+              </div>
+              <div className="absolute top-1 right-1 flex gap-1">
+                {index !== 0 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-6 w-6 p-0 bg-white hover:bg-blue-100"
+                    onClick={() => setAsPrimary(index)}
+                    title="Set as main image"
+                  >
+                    <Star className="w-3 h-3" />
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-6 w-6 p-0 bg-white hover:bg-red-100"
+                  onClick={() => removeImage(index)}
+                  title="Remove image"
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
+              <div className="absolute bottom-1 left-1 bg-black/60 text-white px-1.5 py-0.5 rounded text-xs">
+                {index + 1}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div 
+        className={`border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer ${
+          dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300'
+        }`}
+        onDrop={handleDrop}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
+        onClick={() => fileInputRef.current?.click()}
+      >
+        <div className="text-center py-2">
+          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+          <p className="text-sm text-gray-500">
+            {allImages.length === 0 ? 'Add main product image' : 'Add another image'}
+          </p>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleFileUpload(file);
+            e.target.value = '';
+          }}
+          className="hidden"
+          data-testid="input-multi-image-upload"
+        />
+      </div>
+      
+      {uploading && (
+        <div className="flex items-center justify-center gap-2 text-sm text-blue-600">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Uploading to Object Storage...
+        </div>
+      )}
+      
+      <p className="text-xs text-gray-500">
+        Upload multiple images. Customers can swipe through them like on Amazon. First image is the main display.
       </p>
     </div>
   );

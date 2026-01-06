@@ -156,9 +156,9 @@ export default function SupplyDetail() {
   }
 
   const isValidImageUrl = (url: string) => url && (url.startsWith('http') || url.startsWith('/public-objects/'));
-  const filteredImageUrls = supply.imageUrls?.filter((url: string) => isValidImageUrl(url)) || [];
-  const singleImageUrl = supply.imageUrl && isValidImageUrl(supply.imageUrl) ? [supply.imageUrl] : [];
-  const images = filteredImageUrls.length > 0 ? filteredImageUrls : singleImageUrl;
+  const mainImageUrl = supply.imageUrl && isValidImageUrl(supply.imageUrl) ? supply.imageUrl : null;
+  const additionalImageUrls = supply.imageUrls?.filter((url: string) => isValidImageUrl(url) && url !== mainImageUrl) || [];
+  const images = mainImageUrl ? [mainImageUrl, ...additionalImageUrls] : additionalImageUrls;
   const hasMultipleImages = images.length > 1;
   const fallbackImage = defaultImages[supply.category] || defaultImages.default;
   const currentImage = imageError || images.length === 0 ? fallbackImage : (images[currentImageIndex] || fallbackImage);
