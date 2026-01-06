@@ -79,7 +79,8 @@ import {
   Camera,
   BookOpen,
   Zap,
-  CalendarX2
+  CalendarX2,
+  ClipboardPaste
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -12513,14 +12514,16 @@ function SupplyMultiImageUpload({
   onAdditionalImagesChange: (urls: string[]) => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [pasteReady, setPasteReady] = useState(false);
   const { toast } = useToast();
 
   const allImages = [mainImageUrl, ...additionalImageUrls].filter(url => url && url.trim() !== '');
 
   useEffect(() => {
+    if (!pasteReady) return;
+    
     const handlePaste = (e: ClipboardEvent) => {
       const items = e.clipboardData?.items;
       if (!items) return;
@@ -12537,11 +12540,22 @@ function SupplyMultiImageUpload({
       }
     };
 
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setPasteReady(false);
+      }
+    };
+
     document.addEventListener('paste', handlePaste);
-    return () => document.removeEventListener('paste', handlePaste);
-  }, [mainImageUrl, additionalImageUrls]);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('paste', handlePaste);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [pasteReady, mainImageUrl, additionalImageUrls]);
 
   const handleFileUpload = async (file: File) => {
+    setPasteReady(false);
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
@@ -12697,34 +12711,61 @@ function SupplyMultiImageUpload({
         </div>
       )}
 
-      <div 
-        className={`border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer ${
-          dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300'
-        }`}
-        onDrop={handleDrop}
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-        onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
-        onClick={() => fileInputRef.current?.click()}
-      >
-        <div className="text-center py-2">
-          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-500">
-            {allImages.length === 0 ? 'Add main product image' : 'Add another image'}
-          </p>
+      {pasteReady ? (
+        <div 
+          className="border-2 border-dashed rounded-lg p-4 transition-colors border-green-500 bg-green-50 dark:bg-green-900/20"
+          onDrop={handleDrop}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
+        >
+          <div className="text-center py-2">
+            <ClipboardPaste className="w-8 h-8 text-green-600 mx-auto mb-2 animate-pulse" />
+            <p className="text-sm text-green-700 font-medium">Ready for image - Paste (Ctrl+V) or drop here</p>
+            <p className="text-xs text-green-600 mt-1">Press Escape to cancel</p>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFileUpload(file);
+              e.target.value = '';
+            }}
+            className="hidden"
+            data-testid="input-multi-image-upload"
+          />
         </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) handleFileUpload(file);
-            e.target.value = '';
-          }}
-          className="hidden"
-          data-testid="input-multi-image-upload"
-        />
-      </div>
+      ) : (
+        <div 
+          className={`border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer ${
+            dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300'
+          }`}
+          onDrop={handleDrop}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
+          onClick={() => setPasteReady(true)}
+        >
+          <div className="text-center py-2">
+            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+            <p className="text-sm text-gray-500">
+              {allImages.length === 0 ? 'Add main product image' : 'Add another image'}
+            </p>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFileUpload(file);
+              e.target.value = '';
+            }}
+            className="hidden"
+            data-testid="input-multi-image-upload"
+          />
+        </div>
+      )}
       
       {uploading && (
         <div className="flex items-center justify-center gap-2 text-sm text-blue-600">
@@ -12734,7 +12775,7 @@ function SupplyMultiImageUpload({
       )}
       
       <p className="text-xs text-gray-500">
-        Drag & drop, paste (Ctrl+V), or click to upload. Customers can swipe through images like Amazon. First image is the main display.
+        Click the area above, then paste (Ctrl+V) or drop an image. Customers can swipe through images like Amazon. First image is the main display.
       </p>
     </div>
   );
