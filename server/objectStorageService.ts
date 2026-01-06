@@ -300,7 +300,9 @@ export class ObjectStorageService {
 
       const sanitizedBrand = (brand || 'unknown').toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
       const sanitizedName = productName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').substring(0, 50);
-      const fileName = `products/${sanitizedBrand}/${sanitizedName}-${productId}.${extension}`;
+      // Add unique timestamp suffix to prevent overwriting when uploading multiple images
+      const uniqueSuffix = Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
+      const fileName = `products/${sanitizedBrand}/${sanitizedName}-${productId}-${uniqueSuffix}.${extension}`;
 
       const publicPaths = this.getPublicObjectSearchPaths();
       if (publicPaths.length === 0) {
