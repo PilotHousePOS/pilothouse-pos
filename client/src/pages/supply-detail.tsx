@@ -67,6 +67,14 @@ export default function SupplyDetail() {
     enabled: !!id,
   });
 
+  // Fetch wishlist to check if item is already in it
+  const { data: wishlistItems } = useQuery<any[]>({
+    queryKey: ["/api/wishlist"],
+  });
+  
+  const wishlistItem = wishlistItems?.find((item: any) => item.supplyId === parseInt(id!));
+  const isInWishlist = !!wishlistItem;
+
   const addToCartMutation = useMutation({
     mutationFn: async () => {
       await apiRequest("POST", "/api/cart", {
@@ -127,6 +135,35 @@ export default function SupplyDetail() {
       });
     },
   });
+
+  const removeFromWishlistMutation = useMutation({
+    mutationFn: async () => {
+      if (!wishlistItem) return;
+      await apiRequest("DELETE", `/api/wishlist/${wishlistItem.id}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Removed from Wishlist",
+        description: `${supply?.name} has been removed from your wishlist.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/wishlist"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to remove item from wishlist.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleWishlistToggle = () => {
+    if (isInWishlist) {
+      removeFromWishlistMutation.mutate();
+    } else {
+      addToWishlistMutation.mutate();
+    }
+  };
 
   if (isLoading) {
     return (
@@ -222,11 +259,13 @@ export default function SupplyDetail() {
           />
           
           <button 
-            onClick={() => addToWishlistMutation.mutate()}
+            onClick={handleWishlistToggle}
             className="absolute top-3 right-3 p-2 bg-black/50 rounded-full"
             data-testid="wishlist-button"
           >
-            <Heart className="w-5 h-5 text-white" />
+            <Heart 
+              className={`w-5 h-5 ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-white'}`} 
+            />
           </button>
 
           {hasMultipleImages && (
