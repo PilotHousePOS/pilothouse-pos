@@ -12594,16 +12594,20 @@ function SupplyMultiImageUpload({
 
       const data = await response.json();
       
-      // Backend always updates imageUrl to the new image, so we must match that behavior
-      // Move old main image to additional images, set new upload as main
-      if (mainImageUrl) {
-        onAdditionalImagesChange([...additionalImageUrls, mainImageUrl]);
+      // Backend sets first image as main, subsequent images append to imageUrls
+      if (data.isMainImage) {
+        // This was the first image - it's now the main image
+        onMainImageChange(data.storedPath);
+      } else {
+        // This was an additional image - append to the list
+        onAdditionalImagesChange([...additionalImageUrls, data.storedPath]);
       }
-      onMainImageChange(data.storedPath);
       
       toast({
         title: "Image Uploaded",
-        description: `Image uploaded successfully. It is now the main product image.`,
+        description: data.isMainImage 
+          ? "Main product image set successfully." 
+          : `Additional image added (${additionalImageUrls.length + 2} total).`,
       });
     } catch (error: any) {
       console.error('Upload error:', error);

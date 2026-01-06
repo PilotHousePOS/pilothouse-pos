@@ -6489,17 +6489,32 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const correctedName = nameResult.expanded;
       const nameWasCorrected = correctedName !== supply.name;
 
-      // Update both image and corrected name
-      await storage.updateSupply(supply.id, { 
-        imageUrl: result.storedPath!,
+      // Determine where to place the new image:
+      // - If no main image exists, new image becomes main
+      // - If main image exists, append new image to imageUrls array
+      const hasMainImage = supply.imageUrl && supply.imageUrl.trim() !== '';
+      
+      let updateData: any = {
         ...(nameWasCorrected ? { name: correctedName } : {})
-      });
+      };
+      
+      if (!hasMainImage) {
+        // First image: set as main
+        updateData.imageUrl = result.storedPath!;
+      } else {
+        // Additional image: append to imageUrls array
+        const existingUrls = supply.imageUrls || [];
+        updateData.imageUrls = [...existingUrls, result.storedPath!];
+      }
+      
+      await storage.updateSupply(supply.id, updateData);
 
       res.json({
         success: true,
         productId: supply.id,
         productName: nameWasCorrected ? correctedName : supply.name,
         storedPath: result.storedPath,
+        isMainImage: !hasMainImage,
         nameCorrected: nameWasCorrected,
         originalName: nameWasCorrected ? supply.name : undefined
       });
