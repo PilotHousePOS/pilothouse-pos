@@ -12513,11 +12513,33 @@ function SupplyMultiImageUpload({
   onAdditionalImagesChange: (urls: string[]) => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const { toast } = useToast();
 
   const allImages = [mainImageUrl, ...additionalImageUrls].filter(url => url && url.trim() !== '');
+
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith('image/')) {
+          const file = items[i].getAsFile();
+          if (file) {
+            e.preventDefault();
+            handleFileUpload(file);
+            break;
+          }
+        }
+      }
+    };
+
+    document.addEventListener('paste', handlePaste);
+    return () => document.removeEventListener('paste', handlePaste);
+  }, [mainImageUrl, additionalImageUrls]);
 
   const handleFileUpload = async (file: File) => {
     if (!file) return;
@@ -12712,7 +12734,7 @@ function SupplyMultiImageUpload({
       )}
       
       <p className="text-xs text-gray-500">
-        Upload multiple images. Customers can swipe through them like on Amazon. First image is the main display.
+        Drag & drop, paste (Ctrl+V), or click to upload. Customers can swipe through images like Amazon. First image is the main display.
       </p>
     </div>
   );
