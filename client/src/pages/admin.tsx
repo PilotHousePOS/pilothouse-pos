@@ -12594,15 +12594,16 @@ function SupplyMultiImageUpload({
 
       const data = await response.json();
       
-      if (!mainImageUrl) {
-        onMainImageChange(data.storedPath);
-      } else {
-        onAdditionalImagesChange([...additionalImageUrls, data.storedPath]);
+      // Backend always updates imageUrl to the new image, so we must match that behavior
+      // Move old main image to additional images, set new upload as main
+      if (mainImageUrl) {
+        onAdditionalImagesChange([...additionalImageUrls, mainImageUrl]);
       }
+      onMainImageChange(data.storedPath);
       
       toast({
         title: "Image Uploaded",
-        description: `Image ${allImages.length + 1} has been uploaded successfully.`,
+        description: `Image uploaded successfully. It is now the main product image.`,
       });
     } catch (error: any) {
       console.error('Upload error:', error);
