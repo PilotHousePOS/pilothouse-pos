@@ -8360,11 +8360,11 @@ export default function Admin() {
                 {(supplies as any[]).map((supply: any) => (
                   <div key={supply.id} className="p-3 border rounded-lg">
                     <div className="flex gap-3">
-                      {/* Supply Thumbnail */}
+                      {/* Supply Thumbnail - use imageUrl or first imageUrls entry */}
                       <div className="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
-                        {supply.imageUrl ? (
+                        {(supply.imageUrl || supply.imageUrls?.[0]) ? (
                           <img 
-                            src={supply.imageUrl} 
+                            src={supply.imageUrl || supply.imageUrls?.[0]} 
                             alt={supply.name}
                             className="w-full h-full object-cover"
                             loading="lazy"
@@ -8375,7 +8375,7 @@ export default function Admin() {
                             data-testid={`img-supply-thumbnail-${supply.id}`}
                           />
                         ) : null}
-                        <div className={`w-full h-full flex items-center justify-center ${supply.imageUrl ? 'hidden' : ''}`}>
+                        <div className={`w-full h-full flex items-center justify-center ${(supply.imageUrl || supply.imageUrls?.[0]) ? 'hidden' : ''}`}>
                           <Package className="w-5 h-5 text-gray-400" />
                         </div>
                       </div>
