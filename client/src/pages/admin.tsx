@@ -12603,9 +12603,6 @@ function SupplyMultiImageUpload({
         onAdditionalImagesChange([...additionalImageUrls, data.storedPath]);
       }
       
-      // Invalidate supplies cache so the list updates with new image
-      queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
-      
       toast({
         title: "Image Uploaded",
         description: data.isMainImage 
