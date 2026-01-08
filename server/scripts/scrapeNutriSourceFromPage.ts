@@ -271,12 +271,16 @@ async function main() {
       }
     }
     
-    // Build update object
+    // Build update object - first image becomes main, rest go in imageUrls
+    const mainImage = storedUrls[0] || null;
+    const additionalImages = storedUrls.slice(1);
+    
     const updates: any = {
-      imageUrls: storedUrls,
-      category: 'dogTreats',    // Little Bites are treats
-      filterType: 'dogTreats',  // Little Bites are treats
-      color: 'Purple',          // NutriSource Little Bites bags are purple
+      imageUrl: mainImage,       // First image = main image
+      imageUrls: additionalImages, // Rest = carousel images
+      category: 'dogTreats',     // Little Bites are treats
+      filterType: 'dogTreats',   // Little Bites are treats
+      color: 'Purple',           // NutriSource Little Bites bags are purple
     };
     
     // Only update fields if we have better data
