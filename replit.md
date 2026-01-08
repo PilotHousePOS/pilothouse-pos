@@ -116,6 +116,11 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Routing**: Wouter.
 - **Development Practices**: Strict TypeScript, proper HTTP status codes, environment-aware configurations.
 - **SKU = UPC**: The SKU field is used for UPC codes. All UPC data is stored in the SKU field. Manual UPC assignments (SKU values in production) must be preserved during sync/import. UPCs must be validated for leading zeros and standard 12-digit length. UPC prefix must match brand's known prefix. Attribute-based matching (size, wattage, weight, dimension, count) is critical for exact product identification.
+- **PROTECTED FIELDS (NEVER modify via scripts)**: 
+  - `sku` (UPC codes) - Manually curated, must always persist
+  - `name` (Product titles) - Manually curated, must always persist
+  - All scrapers/automation must explicitly exclude these fields from updates
+  - Scripts should log confirmation that protected fields were preserved
 
 ## External Dependencies
 - **Database**: PostgreSQL

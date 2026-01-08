@@ -230,6 +230,10 @@ async function detectColorWithAI(imagePath: string): Promise<string> {
 
 async function main() {
   console.log('\n=== NutriSource Treats Comprehensive Scraper ===\n');
+  console.log('⚠️  PROTECTED FIELDS (never modified): SKU (UPC), name\n');
+  
+  // CRITICAL: These fields are manually curated and must NEVER be overwritten
+  const PROTECTED_FIELDS = ['sku', 'name'];
   
   const treatKeywords = ['little bites', 'big bites', 'soft & tender', 'nutty butter', 
     'crispers', 'grillin', 'chompy', 'chompers'];
@@ -321,11 +325,20 @@ async function main() {
       console.log(`  ⚠ No valid image, defaulting to Purple`);
     }
     
+    // SAFETY: Remove any protected fields that might have been accidentally added
+    for (const field of PROTECTED_FIELDS) {
+      if (field in updates) {
+        console.log(`  ⚠️ BLOCKED: Attempted to modify protected field '${field}'`);
+        delete updates[field];
+      }
+    }
+    
     await db.update(supplies)
       .set(updates)
       .where(eq(supplies.id, product.id));
     
     console.log(`  ✓ Updated: color=${updates.color || product.color}, size=${updates.size || product.size || 'N/A'}`);
+    console.log(`  (SKU/UPC preserved: ${product.sku || 'none'})`);
     processed++;
   }
   
