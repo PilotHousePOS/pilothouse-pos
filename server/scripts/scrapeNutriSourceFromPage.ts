@@ -276,6 +276,7 @@ async function main() {
       imageUrls: storedUrls,
       category: 'dogTreats',    // Little Bites are treats
       filterType: 'dogTreats',  // Little Bites are treats
+      color: 'Purple',          // NutriSource Little Bites bags are purple
     };
     
     // Only update fields if we have better data
