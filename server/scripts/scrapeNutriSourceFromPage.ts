@@ -274,6 +274,7 @@ async function main() {
     // Build update object
     const updates: any = {
       imageUrls: storedUrls,
+      category: 'dogTreats',    // Little Bites are treats
       filterType: 'dogTreats',  // Little Bites are treats
     };
     
