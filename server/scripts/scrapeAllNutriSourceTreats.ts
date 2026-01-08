@@ -24,41 +24,42 @@ interface ProductData {
   feedingInstructions: string;
 }
 
-const SLUG_MAPPINGS: Record<string, { slug: string; color: string }> = {
-  'little bites chicken': { slug: 'chicken-little-bites', color: 'Purple' },
-  'little bites duck': { slug: 'duck-little-bites', color: 'Purple' },
-  'little bites peanut butter': { slug: 'grain-free-peanut-butter-little-bites', color: 'Purple' },
-  'little bites beef': { slug: 'grain-free-beef-little-bites', color: 'Purple' },
-  'little bites turkey': { slug: 'grain-free-turkey-little-bites', color: 'Purple' },
-  'little bites trout': { slug: 'grain-free-trout-little-bites', color: 'Purple' },
-  'little bites salmon': { slug: 'salmon-little-bites', color: 'Purple' },
-  'big bites chicken': { slug: 'chicken-big-bites', color: 'Orange' },
-  'big bites beef': { slug: 'beef-big-bites', color: 'Orange' },
-  'grillin grillers chicken': { slug: 'chicken-grillin-grillers', color: 'Brown' },
-  'grillin grillers beef': { slug: 'beef-grillin-grillers', color: 'Brown' },
-  'grillin grillers turkey': { slug: 'turkey-grillin-grillers', color: 'Brown' },
-  'grillin grillers whitefish': { slug: 'whitefish-grillin-grillers', color: 'Brown' },
-  'crispy crispers chicken duck': { slug: 'chicken-duck-crispy-crispers', color: 'Green' },
-  'crispy crispers lamb beef': { slug: 'lamb-beef-crispy-crispers', color: 'Green' },
-  'crispy crispers turkey venison': { slug: 'turkey-venison-crispy-crispers', color: 'Green' },
-  'crispers chicken duck': { slug: 'chicken-duck-crispy-crispers', color: 'Green' },
-  'chompy chompers beef boar': { slug: 'beef-wild-boar-chompy-chompers', color: 'Red' },
-  'chompy chompers salmon trout': { slug: 'salmon-trout-chompy-chompers', color: 'Red' },
-  'chompy chompers turkey duck': { slug: 'turkey-duck-chompy-chompers', color: 'Red' },
-  'chompy chompers rabbit venison': { slug: 'rabbit-venison-chompy-chompers', color: 'Red' },
-  'nutty butter apple': { slug: 'almond-butter-apple-nutty-butter-bites', color: 'Tan' },
-  'nutty butter blueberry': { slug: 'almond-butter-blueberry-nutty-butter-bites', color: 'Tan' },
-  'nutty butter cranberry': { slug: 'almond-butter-cranberry-nutty-butter-bites', color: 'Tan' },
-  'soft tender chicken': { slug: 'chicken-soft-tender-bites', color: 'Blue' },
+// Slug mappings - colors removed, will be detected via AI vision
+const SLUG_MAPPINGS: Record<string, string> = {
+  'little bites chicken': 'chicken-little-bites',
+  'little bites duck': 'duck-little-bites',
+  'little bites peanut butter': 'grain-free-peanut-butter-little-bites',
+  'little bites beef': 'grain-free-beef-little-bites',
+  'little bites turkey': 'grain-free-turkey-little-bites',
+  'little bites trout': 'grain-free-trout-little-bites',
+  'little bites salmon': 'salmon-little-bites',
+  'big bites chicken': 'chicken-big-bites',
+  'big bites beef': 'beef-big-bites',
+  'grillin grillers chicken': 'chicken-grillin-grillers',
+  'grillin grillers beef': 'beef-grillin-grillers',
+  'grillin grillers turkey': 'turkey-grillin-grillers',
+  'grillin grillers whitefish': 'whitefish-grillin-grillers',
+  'crispy crispers chicken duck': 'chicken-duck-crispy-crispers',
+  'crispy crispers lamb beef': 'lamb-beef-crispy-crispers',
+  'crispy crispers turkey venison': 'turkey-venison-crispy-crispers',
+  'crispers chicken duck': 'chicken-duck-crispy-crispers',
+  'chompy chompers beef boar': 'beef-wild-boar-chompy-chompers',
+  'chompy chompers salmon trout': 'salmon-trout-chompy-chompers',
+  'chompy chompers turkey duck': 'turkey-duck-chompy-chompers',
+  'chompy chompers rabbit venison': 'rabbit-venison-chompy-chompers',
+  'nutty butter apple': 'almond-butter-apple-nutty-butter-bites',
+  'nutty butter blueberry': 'almond-butter-blueberry-nutty-butter-bites',
+  'nutty butter cranberry': 'almond-butter-cranberry-nutty-butter-bites',
+  'soft tender chicken': 'chicken-soft-tender-bites',
 };
 
-function findSlugMapping(productName: string): { slug: string; color: string } | null {
+function findSlug(productName: string): string | null {
   const name = productName.toLowerCase();
   
-  for (const [key, value] of Object.entries(SLUG_MAPPINGS)) {
+  for (const [key, slug] of Object.entries(SLUG_MAPPINGS)) {
     const keywords = key.split(' ');
     if (keywords.every(k => name.includes(k))) {
-      return value;
+      return slug;
     }
   }
   
@@ -213,7 +214,7 @@ async function detectColorWithAI(imagePath: string): Promise<string> {
       messages: [{
         role: 'user',
         content: [
-          { type: 'text', text: 'What is the main/dominant color of this product packaging? Reply with just one word - the color name (e.g., Purple, Blue, Red, Green, Orange, Brown, Tan, Yellow, Pink, Black, White).' },
+          { type: 'text', text: 'Look at the main product PACKAGING BAG color (not the contents, not accent colors, not small graphics). This is a pet treat bag. What is the dominant color of the BAG itself? NutriSource treats typically use purple bags. Reply with just one word - the packaging bag color (Purple, Blue, Red, Green, Orange, Brown, Tan, Yellow, Pink, Black, White).' },
           { type: 'image_url', image_url: { url: `data:image/png;base64,${base64}` } }
         ]
       }],
@@ -251,76 +252,80 @@ async function main() {
     console.log(`\n${'='.repeat(60)}`);
     console.log(`[${processed + skipped + 1}/${treats.length}] ${product.name} (ID: ${product.id})`);
     
-    const mapping = findSlugMapping(product.name);
+    const slug = findSlug(product.name);
     
-    if (!mapping) {
-      console.log(`  No slug mapping - will use AI for color detection only`);
-      
-      if (product.imageUrl && !product.color) {
-        console.log(`  Detecting color with AI...`);
-        const color = await detectColorWithAI(product.imageUrl);
-        if (color) {
-          await db.update(supplies)
-            .set({ color, category: 'dogTreats', filterType: 'dogTreats' })
-            .where(eq(supplies.id, product.id));
-          console.log(`  ✓ Color set to: ${color}`);
-        }
-      }
-      
-      skipped++;
-      continue;
-    }
-    
-    console.log(`  Slug: ${mapping.slug}, Color: ${mapping.color}`);
-    
-    const data = await fetchProductData(mapping.slug);
-    if (!data || data.imageUrls.length === 0) {
-      console.log(`  Failed to fetch - skipping`);
-      skipped++;
-      continue;
-    }
-    
-    const storedUrls: string[] = [];
-    const downloadedHashes = new Set<string>();
-    
-    console.log(`  Downloading ${data.imageUrls.length} images...`);
-    for (let i = 0; i < data.imageUrls.length; i++) {
-      const buffer = await downloadImage(data.imageUrls[i]);
-      if (!buffer) continue;
-      
-      const hash = computeHash(buffer);
-      if (downloadedHashes.has(hash)) continue;
-      downloadedHashes.add(hash);
-      
-      const storedUrl = await storeImage(buffer, product.id, product.name, storedUrls.length + 1);
-      if (storedUrl) storedUrls.push(storedUrl);
-    }
-    
-    console.log(`  Stored ${storedUrls.length} unique images`);
-    
-    const mainImage = storedUrls[0] || product.imageUrl;
-    const additionalImages = storedUrls.slice(1);
-    
+    // Always set category/filterType for treats
     const updates: any = {
-      imageUrl: mainImage,
-      imageUrls: additionalImages,
       category: 'dogTreats',
       filterType: 'dogTreats',
-      color: mapping.color,
     };
     
-    if (data.size) updates.size = data.size;
-    if (data.style) updates.style = data.style;
-    if (data.description) updates.description = data.description;
-    if (data.ingredients) updates.ingredients = data.ingredients;
-    if (data.guaranteedAnalysis) updates.guaranteedAnalysis = data.guaranteedAnalysis;
-    if (data.feedingInstructions) updates.feedingInstructions = data.feedingInstructions;
+    // Try to fetch data from website if slug exists
+    if (slug) {
+      console.log(`  Slug: ${slug}`);
+      const data = await fetchProductData(slug);
+      
+      if (data && data.imageUrls.length > 0) {
+        const storedUrls: string[] = [];
+        const downloadedHashes = new Set<string>();
+        
+        console.log(`  Downloading ${data.imageUrls.length} images...`);
+        for (let i = 0; i < data.imageUrls.length; i++) {
+          const buffer = await downloadImage(data.imageUrls[i]);
+          if (!buffer) continue;
+          
+          const hash = computeHash(buffer);
+          if (downloadedHashes.has(hash)) continue;
+          downloadedHashes.add(hash);
+          
+          const storedUrl = await storeImage(buffer, product.id, product.name, storedUrls.length + 1);
+          if (storedUrl) storedUrls.push(storedUrl);
+        }
+        
+        console.log(`  Stored ${storedUrls.length} unique images`);
+        
+        if (storedUrls.length > 0) {
+          updates.imageUrl = storedUrls[0];
+          updates.imageUrls = storedUrls.slice(1);
+        }
+        
+        if (data.size) updates.size = data.size;
+        if (data.style) updates.style = data.style;
+        if (data.description) updates.description = data.description;
+        if (data.ingredients) updates.ingredients = data.ingredients;
+        if (data.guaranteedAnalysis) updates.guaranteedAnalysis = data.guaranteedAnalysis;
+        if (data.feedingInstructions) updates.feedingInstructions = data.feedingInstructions;
+      } else {
+        console.log(`  Website fetch failed`);
+      }
+    } else {
+      console.log(`  No slug mapping for website`);
+    }
+    
+    // Always detect color with AI vision from main image
+    const imageToAnalyze = updates.imageUrl || product.imageUrl;
+    if (imageToAnalyze && imageToAnalyze.startsWith('/public-objects/')) {
+      console.log(`  Detecting color with AI vision...`);
+      const detectedColor = await detectColorWithAI(imageToAnalyze);
+      if (detectedColor) {
+        updates.color = detectedColor;
+        console.log(`  ✓ AI detected color: ${detectedColor}`);
+      } else {
+        // Fallback to Purple for NutriSource treats
+        updates.color = 'Purple';
+        console.log(`  ⚠ AI failed, defaulting to Purple`);
+      }
+    } else if (!product.color) {
+      // No valid image, use default
+      updates.color = 'Purple';
+      console.log(`  ⚠ No valid image, defaulting to Purple`);
+    }
     
     await db.update(supplies)
       .set(updates)
       .where(eq(supplies.id, product.id));
     
-    console.log(`  ✓ Updated: ${storedUrls.length} images, color=${mapping.color}, size=${data.size || 'N/A'}`);
+    console.log(`  ✓ Updated: color=${updates.color || product.color}, size=${updates.size || product.size || 'N/A'}`);
     processed++;
   }
   
