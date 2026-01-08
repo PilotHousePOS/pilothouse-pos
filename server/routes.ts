@@ -4940,6 +4940,56 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Create backup file on server (Admin only)
+  app.post("/api/admin/supplies/backup", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const fs = await import('fs');
+      const path = await import('path');
+      
+      console.log("Creating supplies backup...");
+      const allSupplies = await storage.getAllSupplies();
+
+      const backupData = {
+        version: "1.0",
+        type: "supplies-only",
+        exportDate: new Date().toISOString(),
+        environment: process.env.NODE_ENV || "development",
+        totalProducts: allSupplies.length,
+        data: {
+          supplies: allSupplies
+        }
+      };
+
+      const backupDir = path.join(process.cwd(), 'backups');
+      if (!fs.existsSync(backupDir)) {
+        fs.mkdirSync(backupDir, { recursive: true });
+      }
+
+      const dateStr = new Date().toISOString().split('T')[0];
+      const filename = `rollback-inventory-${dateStr}.json`;
+      const filepath = path.join(backupDir, filename);
+      
+      fs.writeFileSync(filepath, JSON.stringify(backupData, null, 2));
+      
+      console.log(`Backup created: ${filename} with ${allSupplies.length} products`);
+
+      res.json({ 
+        message: "Backup created successfully",
+        filename,
+        totalProducts: allSupplies.length,
+        path: filepath
+      });
+    } catch (error) {
+      console.error('Error creating backup:', error);
+      res.status(500).json({ message: "Failed to create backup" });
+    }
+  });
+
   // Import ONLY supplies from JSON (Admin only - SAFE FOR PRODUCTION)
   app.post("/api/admin/supplies/import", authMiddleware, async (req: any, res) => {
     try {

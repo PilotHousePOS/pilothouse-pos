@@ -12211,6 +12211,10 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
     stockQuantity: supply.stockQuantity || 0,
     nonRestockable: supply.nonRestockable || false,
     sku: supply.sku || "",
+    size: supply.size || "",
+    color: supply.color || "",
+    style: supply.style || "",
+    mfgPart: supply.mfgPart || "",
   });
   
   const handleNonRestockableChange = (checked: boolean) => {
@@ -12272,6 +12276,58 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
           data-testid="input-supply-sku"
         />
       </div>
+      
+      {/* ExaTouch POS Fields - Optional */}
+      <div className="grid grid-cols-2 gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+        <div className="col-span-2">
+          <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-2">ExaTouch POS Fields (Optional)</p>
+        </div>
+        <div>
+          <label className="block text-xs font-medium mb-1">Size</label>
+          <input
+            type="text"
+            value={formData.size}
+            onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+            className="w-full p-2 border rounded text-sm"
+            placeholder="e.g., 4lb, 12lb, Large"
+            data-testid="input-supply-size"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium mb-1">Color</label>
+          <input
+            type="text"
+            value={formData.color}
+            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+            className="w-full p-2 border rounded text-sm"
+            placeholder="e.g., Red, Blue, Natural"
+            data-testid="input-supply-color"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium mb-1">Style</label>
+          <input
+            type="text"
+            value={formData.style}
+            onChange={(e) => setFormData({ ...formData, style: e.target.value })}
+            className="w-full p-2 border rounded text-sm"
+            placeholder="e.g., Grain-Free, Chicken"
+            data-testid="input-supply-style"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium mb-1">Mfg Part #</label>
+          <input
+            type="text"
+            value={formData.mfgPart}
+            onChange={(e) => setFormData({ ...formData, mfgPart: e.target.value })}
+            className="w-full p-2 border rounded text-sm"
+            placeholder="Manufacturer part number"
+            data-testid="input-supply-mfgpart"
+          />
+        </div>
+      </div>
+      
       <div>
         <label className="block text-sm font-medium mb-1">Category</label>
         <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
