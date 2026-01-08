@@ -98,9 +98,6 @@ function getProductKeywords(productName: string): string[] {
 }
 
 async function scrapeCarouselImages(url: string, productName: string): Promise<string[]> {
-  const keywords = getProductKeywords(productName);
-  console.log(`  Product keywords: ${keywords.join(', ')}`);
-  
   // Use system Chromium installed via Nix
   const browser = await chromium.launch({ 
     headless: true,
@@ -118,51 +115,93 @@ async function scrapeCarouselImages(url: string, productName: string): Promise<s
     // Click through carousel to ensure all images load
     const nextButton = await page.$('.et-pb-arrow-next, .et_pb_slider_arrow_next');
     if (nextButton) {
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 6; i++) {
         await nextButton.click();
-        await page.waitForTimeout(500);
+        await page.waitForTimeout(600);
       }
     }
     
-    // Get all carousel/gallery images - inline all logic to avoid function reference issues
-    const allImageUrls = await page.evaluate(`
+    // Get images specifically from the carousel/slider container
+    // Target the et_pb_slider or gallery container, not the whole page
+    const carouselImages = await page.evaluate(`
       (function() {
         var images = [];
+        var seen = {};
         
-        // Get all img elements
-        var allImages = document.querySelectorAll('img');
-        for (var i = 0; i < allImages.length; i++) {
-          var img = allImages[i];
-          var src = img.src || img.getAttribute('data-src') || '';
+        // Helper to check if URL is a valid product image (not nav/logo)
+        function isValidProductImage(src) {
+          if (!src) return false;
           var lower = src.toLowerCase();
           var filename = lower.split('/').pop() || '';
           
-          // Check if valid product image
-          if (src && lower.indexOf('/uploads/') !== -1) {
-            if (filename.indexOf('ns_') === 0 || filename.indexOf('nsgf_') === 0) {
-              if (lower.indexOf('-150x') === -1 && lower.indexOf('-300x') === -1 && lower.indexOf('-480x') === -1) {
-                if (filename.indexOf('logo') === -1 && filename.indexOf('nav') === -1 && filename.indexOf('sidenav') === -1) {
-                  if (images.indexOf(src) === -1) {
-                    images.push(src);
-                  }
-                }
+          // Must be from uploads directory
+          if (lower.indexOf('/uploads/') === -1) return false;
+          
+          // Exclude thumbnails
+          if (lower.indexOf('-150x') !== -1 || lower.indexOf('-300x') !== -1 || lower.indexOf('-480x') !== -1) return false;
+          
+          // Exclude navigation and logo images
+          if (filename.indexOf('logo') !== -1 || filename.indexOf('nav') !== -1 || 
+              filename.indexOf('sidenav') !== -1 || filename.indexOf('button') !== -1 ||
+              filename.indexOf('find-store') !== -1 || filename.indexOf('fcf_') !== -1 ||
+              filename.indexOf('social') !== -1 || filename.indexOf('icon') !== -1) return false;
+          
+          return true;
+        }
+        
+        // Strategy 1: Look for images inside the main slider container
+        var sliderContainers = document.querySelectorAll('.et_pb_slider, .et_pb_gallery, .et_pb_fullwidth_slider, [class*="slider"], [class*="gallery"], [class*="carousel"]');
+        for (var c = 0; c < sliderContainers.length; c++) {
+          var container = sliderContainers[c];
+          
+          // Get images from slides
+          var slideImages = container.querySelectorAll('.et_pb_slide img, .et_pb_gallery_item img, [class*="slide"] img');
+          for (var i = 0; i < slideImages.length; i++) {
+            var img = slideImages[i];
+            var src = img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src') || '';
+            if (isValidProductImage(src) && !seen[src]) {
+              seen[src] = true;
+              images.push(src);
+            }
+          }
+          
+          // Get background images from slides
+          var slides = container.querySelectorAll('.et_pb_slide, .et_pb_gallery_item, [class*="slide"]');
+          for (var j = 0; j < slides.length; j++) {
+            var slide = slides[j];
+            // Check data attributes for full-size images
+            var dataSrc = slide.getAttribute('data-image') || slide.getAttribute('data-full') || 
+                          slide.getAttribute('data-src') || slide.getAttribute('data-background');
+            if (isValidProductImage(dataSrc) && !seen[dataSrc]) {
+              seen[dataSrc] = true;
+              images.push(dataSrc);
+            }
+            
+            // Check computed background-image
+            var style = window.getComputedStyle(slide);
+            var bgImage = style.backgroundImage;
+            if (bgImage && bgImage !== 'none') {
+              var match = bgImage.match(/url\\(["']?([^"')]+)["']?\\)/);
+              if (match && isValidProductImage(match[1]) && !seen[match[1]]) {
+                seen[match[1]] = true;
+                images.push(match[1]);
               }
             }
           }
         }
         
-        // Also check data-full attributes
-        var dataFullElements = document.querySelectorAll('[data-full]');
-        for (var j = 0; j < dataFullElements.length; j++) {
-          var dataFull = dataFullElements[j].getAttribute('data-full') || '';
-          var dataLower = dataFull.toLowerCase();
-          var dataFilename = dataLower.split('/').pop() || '';
-          
-          if (dataFull && dataLower.indexOf('/uploads/') !== -1) {
-            if (dataFilename.indexOf('ns_') === 0 || dataFilename.indexOf('nsgf_') === 0) {
-              if (images.indexOf(dataFull) === -1) {
-                images.push(dataFull);
-              }
+        // Strategy 2: If no slider found, look for product-specific images (NS_ prefix)
+        if (images.length === 0) {
+          var allImages = document.querySelectorAll('img');
+          for (var k = 0; k < allImages.length; k++) {
+            var img2 = allImages[k];
+            var src2 = img2.src || img2.getAttribute('data-src') || '';
+            var filename = src2.toLowerCase().split('/').pop() || '';
+            // Only accept NS_ or NSGF_ prefixed images (product images)
+            if ((filename.indexOf('ns_') === 0 || filename.indexOf('nsgf_') === 0) && 
+                isValidProductImage(src2) && !seen[src2]) {
+              seen[src2] = true;
+              images.push(src2);
             }
           }
         }
@@ -171,19 +210,8 @@ async function scrapeCarouselImages(url: string, productName: string): Promise<s
       })()
     `) as string[];
     
-    // Filter images to only include those matching product keywords
-    const filteredImages = allImageUrls.filter(imgUrl => {
-      const filename = imgUrl.toLowerCase().split('/').pop() || '';
-      // Must match at least one product-specific keyword (flavor)
-      const flavorKeywords = keywords.filter(k => ['peanutbutter', 'chicken', 'beef', 'turkey', 'salmon', 'trout', 'duck', 'rabbit', 'lamb'].includes(k));
-      if (flavorKeywords.length > 0) {
-        return flavorKeywords.some(kw => filename.includes(kw));
-      }
-      return true; // If no flavor keywords, accept all
-    });
-    
-    console.log(`  Found ${allImageUrls.length} total images, ${filteredImages.length} match product`);
-    return filteredImages;
+    console.log(`  Found ${carouselImages.length} carousel images`);
+    return carouselImages;
   } catch (error) {
     console.log(`  Playwright error: ${error}`);
     return [];
