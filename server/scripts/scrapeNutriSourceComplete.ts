@@ -147,22 +147,73 @@ async function downloadImage(url: string): Promise<Buffer | null> {
   });
 }
 
-function extractImages(html: string): string[] {
+function extractImages(html: string, productName: string): string[] {
   const images: string[] = [];
-  const imgRegex = /<img[^>]+src=["']([^"']+nutrisourcepetfoods\.com[^"']+\.(png|jpg|jpeg|webp))["'][^>]*>/gi;
-  const srcRegex = /src=["']([^"']+)["']/i;
+  
+  // Extract product identifier from name (e.g., "Peanut Butter" -> "peanutbutter")
+  const productKey = productName.toLowerCase()
+    .replace(/nutrisource/gi, '')
+    .replace(/grain free/gi, 'gf')
+    .replace(/\d+\s*(lb|oz|lbs)/gi, '')
+    .replace(/soft\s*&?\s*tender/gi, '')
+    .replace(/bites?/gi, '')
+    .replace(/recipe/gi, '')
+    .replace(/\s+/g, '')
+    .trim();
   
   const wpContentRegex = /https:\/\/nutrisourcepetfoods\.com\/wp-content\/uploads\/[^"'\s<>]+\.(png|jpg|jpeg|webp)/gi;
   let match;
   while ((match = wpContentRegex.exec(html)) !== null) {
     const url = match[0];
-    if (!images.includes(url) && 
-        !url.includes('logo') && 
-        !url.includes('icon') && 
-        !url.includes('sidenav') &&
-        !url.includes('footer') &&
-        !url.includes('FCF_Logo') &&
-        !url.includes('kln-logo')) {
+    const urlLower = url.toLowerCase();
+    
+    // Exclude non-product images
+    const isExcluded = 
+      urlLower.includes('logo') ||
+      urlLower.includes('icon') ||
+      urlLower.includes('sidenav') ||
+      urlLower.includes('footer') ||
+      urlLower.includes('fcf_') ||
+      urlLower.includes('kln-') ||
+      urlLower.includes('flag') ||
+      urlLower.includes('instagram') ||
+      urlLower.includes('facebook') ||
+      urlLower.includes('twitter') ||
+      urlLower.includes('social') ||
+      urlLower.includes('translatepress') ||
+      urlLower.includes('plugins') ||
+      urlLower.includes('smush-webp') ||
+      urlLower.includes('-150x150') ||
+      urlLower.includes('-480x') ||
+      urlLower.includes('_359w') ||
+      urlLower.includes('amplifull') ||
+      urlLower.includes('hero-') ||
+      urlLower.includes('bg-tab') ||
+      urlLower.includes('background');
+    
+    if (isExcluded) continue;
+    
+    // Must be a NutriSource product image
+    const isNSProduct = urlLower.includes('ns_') || urlLower.includes('nsgf_');
+    if (!isNSProduct) continue;
+    
+    // Only include images that match THIS product specifically
+    const urlNoPath = urlLower.split('/').pop() || '';
+    const matchesThisProduct = 
+      urlNoPath.includes(productKey) ||
+      (productName.toLowerCase().includes('chicken') && urlNoPath.includes('chicken')) ||
+      (productName.toLowerCase().includes('beef') && urlNoPath.includes('beef')) ||
+      (productName.toLowerCase().includes('turkey') && urlNoPath.includes('turkey')) ||
+      (productName.toLowerCase().includes('salmon') && urlNoPath.includes('salmon')) ||
+      (productName.toLowerCase().includes('trout') && urlNoPath.includes('trout')) ||
+      (productName.toLowerCase().includes('duck') && urlNoPath.includes('duck')) ||
+      (productName.toLowerCase().includes('rabbit') && urlNoPath.includes('rabbit')) ||
+      (productName.toLowerCase().includes('peanut') && urlNoPath.includes('peanut')) ||
+      (productName.toLowerCase().includes('lamb') && urlNoPath.includes('lamb')) ||
+      (productName.toLowerCase().includes('whitefish') && urlNoPath.includes('whitefish')) ||
+      (productName.toLowerCase().includes('liver') && urlNoPath.includes('liver'));
+    
+    if (matchesThisProduct && !images.includes(url)) {
       images.push(url);
     }
   }
@@ -299,13 +350,13 @@ function extractCalorieContent(html: string): string {
   return '';
 }
 
-async function scrapeProductPage(url: string): Promise<ProductPageData | null> {
+async function scrapeProductPage(url: string, productName: string): Promise<ProductPageData | null> {
   try {
     console.log(`  Fetching: ${url}`);
     const html = await fetchPage(url);
     
     return {
-      images: extractImages(html),
+      images: extractImages(html, productName),
       description: extractDescription(html),
       features: extractFeatures(html),
       ingredients: extractIngredients(html),
@@ -410,7 +461,7 @@ async function processNutriSourceProducts(limit: number = 5, dryRun: boolean = f
       continue;
     }
     
-    const pageData = await scrapeProductPage(mapping.pageUrl);
+    const pageData = await scrapeProductPage(mapping.pageUrl, product.name);
     if (!pageData) {
       console.log(`  Failed to scrape page`);
       errors++;
