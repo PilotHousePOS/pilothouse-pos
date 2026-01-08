@@ -73,7 +73,34 @@ async function storeImage(imageBuffer: Buffer, productId: number, productName: s
   }
 }
 
-async function scrapeCarouselImages(url: string): Promise<string[]> {
+// Extract product variant keywords from product name for filtering
+function getProductKeywords(productName: string): string[] {
+  const name = productName.toLowerCase();
+  const keywords: string[] = [];
+  
+  // Extract flavor/variant
+  if (name.includes('peanut butter')) keywords.push('peanutbutter');
+  if (name.includes('chicken')) keywords.push('chicken');
+  if (name.includes('beef')) keywords.push('beef');
+  if (name.includes('turkey')) keywords.push('turkey');
+  if (name.includes('salmon')) keywords.push('salmon');
+  if (name.includes('trout')) keywords.push('trout');
+  if (name.includes('duck')) keywords.push('duck');
+  if (name.includes('rabbit')) keywords.push('rabbit');
+  if (name.includes('lamb')) keywords.push('lamb');
+  
+  // Extract product line
+  if (name.includes('little bites')) keywords.push('littlebites');
+  if (name.includes('big bites')) keywords.push('bigbites');
+  if (name.includes('grain free') || name.includes('gf')) keywords.push('gf');
+  
+  return keywords;
+}
+
+async function scrapeCarouselImages(url: string, productName: string): Promise<string[]> {
+  const keywords = getProductKeywords(productName);
+  console.log(`  Product keywords: ${keywords.join(', ')}`);
+  
   // Use system Chromium installed via Nix
   const browser = await chromium.launch({ 
     headless: true,
@@ -98,7 +125,7 @@ async function scrapeCarouselImages(url: string): Promise<string[]> {
     }
     
     // Get all carousel/gallery images - inline all logic to avoid function reference issues
-    const imageUrls = await page.evaluate(`
+    const allImageUrls = await page.evaluate(`
       (function() {
         var images = [];
         
@@ -142,10 +169,21 @@ async function scrapeCarouselImages(url: string): Promise<string[]> {
         
         return images;
       })()
-    `);
+    `) as string[];
     
-    console.log(`  Found ${imageUrls.length} carousel images via Playwright`);
-    return imageUrls;
+    // Filter images to only include those matching product keywords
+    const filteredImages = allImageUrls.filter(imgUrl => {
+      const filename = imgUrl.toLowerCase().split('/').pop() || '';
+      // Must match at least one product-specific keyword (flavor)
+      const flavorKeywords = keywords.filter(k => ['peanutbutter', 'chicken', 'beef', 'turkey', 'salmon', 'trout', 'duck', 'rabbit', 'lamb'].includes(k));
+      if (flavorKeywords.length > 0) {
+        return flavorKeywords.some(kw => filename.includes(kw));
+      }
+      return true; // If no flavor keywords, accept all
+    });
+    
+    console.log(`  Found ${allImageUrls.length} total images, ${filteredImages.length} match product`);
+    return filteredImages;
   } catch (error) {
     console.log(`  Playwright error: ${error}`);
     return [];
@@ -188,7 +226,7 @@ async function main() {
     }
     
     console.log(`  URL: ${url}`);
-    const carouselImages = await scrapeCarouselImages(url);
+    const carouselImages = await scrapeCarouselImages(url, product.name);
     
     if (carouselImages.length === 0) {
       console.log(`  No carousel images found`);
