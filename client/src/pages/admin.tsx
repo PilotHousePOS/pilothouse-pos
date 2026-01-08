@@ -34,6 +34,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Calendar } from "@/components/ui/calendar";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
 import { 
   Plus,
@@ -12215,6 +12216,9 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
     color: supply.color || "",
     style: supply.style || "",
     mfgPart: supply.mfgPart || "",
+    ingredients: supply.ingredients || "",
+    instructions: supply.instructions || "",
+    guaranteedAnalysis: supply.guaranteedAnalysis || "",
   });
   
   const handleNonRestockableChange = (checked: boolean) => {
@@ -12383,8 +12387,59 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           className="w-full p-2 border rounded"
           rows={3}
+          data-testid="input-supply-description"
         />
       </div>
+      
+      <Accordion type="multiple" className="w-full border rounded-lg">
+        <AccordionItem value="ingredients" className="border-b-0">
+          <AccordionTrigger className="px-3 py-2 text-sm font-medium text-green-600 dark:text-green-400 hover:no-underline">
+            Ingredient Information
+          </AccordionTrigger>
+          <AccordionContent className="px-3 pb-3">
+            <textarea
+              value={formData.ingredients}
+              onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
+              className="w-full p-2 border rounded text-sm"
+              rows={4}
+              placeholder="Enter ingredient list..."
+              data-testid="input-supply-ingredients"
+            />
+          </AccordionContent>
+        </AccordionItem>
+        
+        <AccordionItem value="analysis" className="border-b-0">
+          <AccordionTrigger className="px-3 py-2 text-sm font-medium text-green-600 dark:text-green-400 hover:no-underline">
+            Guaranteed Analysis
+          </AccordionTrigger>
+          <AccordionContent className="px-3 pb-3">
+            <textarea
+              value={formData.guaranteedAnalysis}
+              onChange={(e) => setFormData({ ...formData, guaranteedAnalysis: e.target.value })}
+              className="w-full p-2 border rounded text-sm"
+              rows={4}
+              placeholder="Enter guaranteed analysis (use pipe separator for table format, e.g., Crude Protein|12%|Crude Fat|5%)..."
+              data-testid="input-supply-analysis"
+            />
+          </AccordionContent>
+        </AccordionItem>
+        
+        <AccordionItem value="instructions" className="border-b-0">
+          <AccordionTrigger className="px-3 py-2 text-sm font-medium text-green-600 dark:text-green-400 hover:no-underline">
+            Usage Instructions
+          </AccordionTrigger>
+          <AccordionContent className="px-3 pb-3">
+            <textarea
+              value={formData.instructions}
+              onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
+              className="w-full p-2 border rounded text-sm"
+              rows={4}
+              placeholder="Enter feeding/usage instructions..."
+              data-testid="input-supply-instructions"
+            />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
       
       <div className="flex items-center space-x-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
         <Checkbox
