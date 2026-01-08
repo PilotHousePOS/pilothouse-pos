@@ -104,6 +104,9 @@ export const supplies = pgTable("supplies", {
   isActive: boolean("is_active").default(true),
   weight: varchar("weight", { length: 50 }),
   size: varchar("size", { length: 50 }),
+  color: varchar("color", { length: 100 }), // Product color for ExaTouch POS
+  style: varchar("style", { length: 100 }), // Product style/variant for ExaTouch POS
+  mfgPart: varchar("mfg_part", { length: 100 }), // Manufacturer part number for ExaTouch POS
   sku: varchar("sku", { length: 100 }), // Product SKU from original supply list
   upc: varchar("upc", { length: 20 }), // Universal Product Code (barcode)
   filterType: varchar("filter_type", { length: 20 }), // 'aquatic', 'reptile', or null for general

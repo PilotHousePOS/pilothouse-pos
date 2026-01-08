@@ -41,7 +41,49 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Guaranteed Analysis: Stored as pipe-separated values for table display (e.g., "Crude Protein (min)|12%|Crude Fat (min)|5%").
   - Feeding Instructions: Usage directions from product labels.
   - Features: JSON with highlights array for bullet point display.
-  - Currently 61+ products have complete extended information.
+  - Currently 6,177 products with ingredients, 5,475 with detailed descriptions.
+
+## Comprehensive Product Data Enhancement (ExaTouch POS Preparation)
+User is systematically enhancing ALL product data for ExaTouch POS import. Key requirements:
+
+**Multi-Image Collection Strategy:**
+- Pull ALL available product photos from Amazon, Chewy, or manufacturer websites
+- Image order matters: First image = main display, subsequent images append in carousel order
+- Photo types to collect for each product:
+  1. **Main product image** - Package front/hero shot
+  2. **Brand marketing graphics** - "Good 4 Life System", "Why [Brand]" infographics
+  3. **Quality/ingredients graphics** - Visual ingredient breakdowns
+  4. **Size comparison photos** - Kibble/product size with coin for scale
+  5. **Feeding guidelines/charts** - Visual feeding instructions
+  6. **Guaranteed analysis images** - Nutritional info graphics
+  7. **Back of package** - Ingredients list, instructions
+- Example: NutriSource products have 6-8 images each covering all these categories
+
+**Item-Specific Descriptions (NOT Generic):**
+- Descriptions must be product-specific, pulled directly from Chewy/Amazon product pages
+- NOT generic catch-all descriptions that apply to multiple products
+- Include key features, benefits, and specifications unique to that exact item
+- Example: Zilla Waterfall description includes specific features like "enclosed design prevents insects", "corner design reduces space"
+
+**ExaTouch POS Fields to Populate:**
+- **MfgPart**: Manufacturer part number (new column added)
+- **Color**: Product color variant (new column added)
+- **Size**: Product size (existing but needs population)
+- **Style**: Product style/variant (new column added)
+- These columns are currently empty and need data from product sources
+
+**Data Sources Priority:**
+1. Official manufacturer websites (most accurate)
+2. Chewy.com product pages (detailed, verified)
+3. Amazon product listings (comprehensive)
+4. Product packaging (for ingredients/analysis)
+
+**Current Enhancement Status:**
+- 7,724 total products in inventory
+- 6,177 products with ingredients (80%)
+- 5,475 products with detailed descriptions (71%)
+- 4 products with multiple images (just starting)
+- 0 products with size/color/style populated (needs work)
 
 ## System Architecture
 The application is a full-stack web application featuring a React frontend (Vite, TypeScript, Tailwind CSS, shadcn/ui) and an Express.js backend (TypeScript) connected to a PostgreSQL database via Drizzle ORM.
