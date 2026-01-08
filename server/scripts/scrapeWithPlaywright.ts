@@ -3,9 +3,10 @@ import { db } from '../db';
 import { supplies } from '@shared/schema';
 import { ilike, or, sql } from 'drizzle-orm';
 import https from 'https';
-import { objectStorageClient } from '../objectStorageService';
+import { ObjectStorageService, objectStorageClient } from '../objectStorageService';
 import { setObjectAclPolicy } from '../objectAcl';
-import * as objectStorageService from '../objectStorageService';
+
+const objectStorageService = new ObjectStorageService();
 
 const productUrlMappings: { [key: string]: string } = {
   'peanut butter little bites': 'https://nutrisourcepetfoods.com/our-food/grain-free-peanut-butter-little-bites/',
@@ -73,7 +74,11 @@ async function storeImage(imageBuffer: Buffer, productId: number, productName: s
 }
 
 async function scrapeCarouselImages(url: string): Promise<string[]> {
-  const browser = await chromium.launch({ headless: true });
+  // Use system Chromium installed via Nix
+  const browser = await chromium.launch({ 
+    headless: true,
+    executablePath: '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium'
+  });
   const page = await browser.newPage();
   
   try {
@@ -81,52 +86,63 @@ async function scrapeCarouselImages(url: string): Promise<string[]> {
     await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
     
     // Wait for slider/carousel to load
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000);
     
-    // Get all images in the slider/carousel area
-    const imageUrls = await page.evaluate(() => {
-      const images: string[] = [];
-      
-      // Try different selector patterns for Divi sliders
-      const selectors = [
-        '.et_pb_slider img',
-        '.et_pb_slide img',
-        '.et_pb_gallery_image img',
-        '.et_pb_image img',
-        'img[src*="uploads"]',
-        'img[data-src*="uploads"]'
-      ];
-      
-      for (const selector of selectors) {
-        document.querySelectorAll(selector).forEach((img: any) => {
-          const src = img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src');
-          if (src && src.includes('uploads') && !src.includes('logo') && !src.includes('icon')) {
-            // Filter to only get full-size images, not thumbnails
-            if (!src.includes('-150x150') && !src.includes('-300x') && !src.includes('-480x')) {
-              if (!images.includes(src)) {
-                images.push(src);
+    // Click through carousel to ensure all images load
+    const nextButton = await page.$('.et-pb-arrow-next, .et_pb_slider_arrow_next');
+    if (nextButton) {
+      for (let i = 0; i < 5; i++) {
+        await nextButton.click();
+        await page.waitForTimeout(500);
+      }
+    }
+    
+    // Get all carousel/gallery images - inline all logic to avoid function reference issues
+    const imageUrls = await page.evaluate(`
+      (function() {
+        var images = [];
+        
+        // Get all img elements
+        var allImages = document.querySelectorAll('img');
+        for (var i = 0; i < allImages.length; i++) {
+          var img = allImages[i];
+          var src = img.src || img.getAttribute('data-src') || '';
+          var lower = src.toLowerCase();
+          var filename = lower.split('/').pop() || '';
+          
+          // Check if valid product image
+          if (src && lower.indexOf('/uploads/') !== -1) {
+            if (filename.indexOf('ns_') === 0 || filename.indexOf('nsgf_') === 0) {
+              if (lower.indexOf('-150x') === -1 && lower.indexOf('-300x') === -1 && lower.indexOf('-480x') === -1) {
+                if (filename.indexOf('logo') === -1 && filename.indexOf('nav') === -1 && filename.indexOf('sidenav') === -1) {
+                  if (images.indexOf(src) === -1) {
+                    images.push(src);
+                  }
+                }
               }
             }
           }
-        });
-      }
-      
-      // Also check for background images in slides
-      document.querySelectorAll('.et_pb_slide, .et_pb_gallery_item').forEach((el: any) => {
-        const style = window.getComputedStyle(el);
-        const bgImage = style.backgroundImage;
-        if (bgImage && bgImage !== 'none') {
-          const match = bgImage.match(/url\(["']?([^"')]+)["']?\)/);
-          if (match && match[1].includes('uploads') && !match[1].includes('logo')) {
-            if (!images.includes(match[1])) {
-              images.push(match[1]);
+        }
+        
+        // Also check data-full attributes
+        var dataFullElements = document.querySelectorAll('[data-full]');
+        for (var j = 0; j < dataFullElements.length; j++) {
+          var dataFull = dataFullElements[j].getAttribute('data-full') || '';
+          var dataLower = dataFull.toLowerCase();
+          var dataFilename = dataLower.split('/').pop() || '';
+          
+          if (dataFull && dataLower.indexOf('/uploads/') !== -1) {
+            if (dataFilename.indexOf('ns_') === 0 || dataFilename.indexOf('nsgf_') === 0) {
+              if (images.indexOf(dataFull) === -1) {
+                images.push(dataFull);
+              }
             }
           }
         }
-      });
-      
-      return images;
-    });
+        
+        return images;
+      })()
+    `);
     
     console.log(`  Found ${imageUrls.length} carousel images via Playwright`);
     return imageUrls;
