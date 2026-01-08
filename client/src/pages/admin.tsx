@@ -3711,32 +3711,35 @@ function ProductImageManager() {
 function ScheduleManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [scheduleData, setScheduleData] = useState<Record<string, any[]>>({ A: [], B: [], C: [] });
+  const [sections, setSections] = useState<string[]>(['A', 'B']);
+  const [scheduleData, setScheduleData] = useState<Record<string, any[]>>({ A: [], B: [] });
   const [isSaving, setIsSaving] = useState(false);
   
-  const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  const SECTIONS = ['A', 'B', 'C'];
+  // Pay period: Wednesday through Tuesday
+  const DAYS = ['Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Monday', 'Tuesday'];
   
-  // Calculate dates for each section
+  // Calculate dates for each section (week starts on Wednesday)
   const getDatesForSection = (section: string) => {
     const now = new Date();
-    const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, ... 3 = Wednesday
     
-    // Calculate days to subtract to get to Monday of current week
-    const daysToMonday = currentDay === 0 ? 6 : currentDay - 1;
-    const currentWeekMonday = new Date(now);
-    currentWeekMonday.setDate(now.getDate() - daysToMonday);
-    currentWeekMonday.setHours(0, 0, 0, 0);
+    // Calculate days to subtract to get to Wednesday of current week
+    // Wednesday = 3, so we need: (currentDay - 3 + 7) % 7 days ago was Wednesday
+    const daysToWednesday = (currentDay - 3 + 7) % 7;
+    const currentWeekWednesday = new Date(now);
+    currentWeekWednesday.setDate(now.getDate() - daysToWednesday);
+    currentWeekWednesday.setHours(0, 0, 0, 0);
     
-    // Section A = previous week, B = current week, C = next week
-    const weekOffset = section === 'A' ? -7 : section === 'B' ? 0 : 7;
-    const sectionMonday = new Date(currentWeekMonday);
-    sectionMonday.setDate(currentWeekMonday.getDate() + weekOffset);
+    // Section index determines week offset (A = current week, B = next week, etc.)
+    const sectionIndex = sections.indexOf(section);
+    const weekOffset = sectionIndex * 7;
+    const sectionWednesday = new Date(currentWeekWednesday);
+    sectionWednesday.setDate(currentWeekWednesday.getDate() + weekOffset);
     
-    // Generate dates for all days of the week
+    // Generate dates for all days of the week (Wed-Tue)
     return DAYS.map((_, index) => {
-      const date = new Date(sectionMonday);
-      date.setDate(sectionMonday.getDate() + index);
+      const date = new Date(sectionWednesday);
+      date.setDate(sectionWednesday.getDate() + index);
       return date;
     });
   };
@@ -3749,11 +3752,23 @@ function ScheduleManagement() {
   // Organize schedule data by section and employee
   useEffect(() => {
     if (scheduleQuery.data) {
-      const organized: Record<string, any[]> = { A: [], B: [], C: [] };
       const entries = scheduleQuery.data as any[];
       
+      // Find all unique sections from data
+      const existingSections = [...new Set(entries.map((e: any) => e.section))].filter(Boolean).sort();
+      if (existingSections.length > 0) {
+        setSections(existingSections);
+      }
+      
+      const organized: Record<string, any[]> = {};
+      
+      // Initialize all sections
+      (existingSections.length > 0 ? existingSections : sections).forEach(section => {
+        organized[section] = [];
+      });
+      
       // Group by section and employee
-      SECTIONS.forEach(section => {
+      (existingSections.length > 0 ? existingSections : sections).forEach(section => {
         const sectionEntries = entries.filter((e: any) => e.section === section);
         const employees = [...new Set(sectionEntries.map((e: any) => e.employeeName))];
         
@@ -3797,9 +3812,10 @@ function ScheduleManagement() {
   };
   
   const addEmployee = (section: string) => {
+    const currentSectionData = scheduleData[section] || [];
     const newEmployee: any = {
       employeeName: 'New Employee',
-      displayOrder: scheduleData[section].length,
+      displayOrder: currentSectionData.length,
     };
     
     DAYS.forEach(day => {
@@ -3808,15 +3824,35 @@ function ScheduleManagement() {
     
     setScheduleData(prev => ({
       ...prev,
-      [section]: [...prev[section], newEmployee]
+      [section]: [...(prev[section] || []), newEmployee]
     }));
   };
   
   const removeEmployee = (section: string, employeeIndex: number) => {
     setScheduleData(prev => ({
       ...prev,
-      [section]: prev[section].filter((_, idx) => idx !== employeeIndex)
+      [section]: (prev[section] || []).filter((_, idx) => idx !== employeeIndex)
     }));
+  };
+  
+  const addSection = () => {
+    // Get next section letter (A, B, C, D, ...)
+    const nextLetter = String.fromCharCode(65 + sections.length); // 65 = 'A'
+    setSections(prev => [...prev, nextLetter]);
+    setScheduleData(prev => ({ ...prev, [nextLetter]: [] }));
+  };
+  
+  const removeSection = (sectionToRemove: string) => {
+    if (sections.length <= 1) {
+      toast({ title: 'Cannot remove last section', variant: 'destructive' });
+      return;
+    }
+    setSections(prev => prev.filter(s => s !== sectionToRemove));
+    setScheduleData(prev => {
+      const newData = { ...prev };
+      delete newData[sectionToRemove];
+      return newData;
+    });
   };
   
   const saveSchedule = async () => {
@@ -3824,8 +3860,8 @@ function ScheduleManagement() {
     try {
       const entries: any[] = [];
       
-      SECTIONS.forEach(section => {
-        scheduleData[section].forEach((employee, idx) => {
+      sections.forEach(section => {
+        (scheduleData[section] || []).forEach((employee, idx) => {
           DAYS.forEach(day => {
             entries.push({
               section,
@@ -3882,12 +3918,39 @@ function ScheduleManagement() {
         </div>
       </CardHeader>
       <CardContent className="space-y-8">
-        {SECTIONS.map(section => (
+        <div className="flex items-center gap-2 pb-2 border-b">
+          <span className="text-sm text-gray-600">Manage Sections:</span>
+          <Button 
+            size="sm"
+            variant="outline"
+            onClick={addSection}
+            data-testid="button-add-section"
+          >
+            <Plus className="w-3 h-3 mr-1" />
+            Add Section
+          </Button>
+          <span className="text-xs text-gray-500 ml-2">(Pay period: Wed - Tue)</span>
+        </div>
+        
+        {sections.map(section => (
           <div key={section} className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-gray-900 bg-green-200 px-3 py-1 rounded">
-                Section {section}
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-bold text-gray-900 bg-green-200 px-3 py-1 rounded">
+                  Section {section}
+                </h3>
+                {sections.length > 1 && (
+                  <Button 
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => removeSection(section)}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                    data-testid={`button-remove-section-${section}`}
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                )}
+              </div>
               <Button 
                 size="sm"
                 variant="outline"
@@ -3919,7 +3982,7 @@ function ScheduleManagement() {
                   </tr>
                 </thead>
                 <tbody>
-                  {scheduleData[section].map((employee, empIdx) => (
+                  {(scheduleData[section] || []).map((employee, empIdx) => (
                     <tr key={empIdx} className="hover:bg-gray-50">
                       <td className="border border-gray-300 px-2 py-1">
                         <input
@@ -3954,7 +4017,7 @@ function ScheduleManagement() {
                       </td>
                     </tr>
                   ))}
-                  {scheduleData[section].length === 0 && (
+                  {(scheduleData[section] || []).length === 0 && (
                     <tr>
                       <td colSpan={DAYS.length + 2} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
                         No employees in this section. Click "Add Employee" to get started.
