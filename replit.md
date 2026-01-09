@@ -90,9 +90,35 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Include key features, benefits, and specifications unique to that exact item
 - ExaTouch POS Fields to Populate:
   - MfgPart: Manufacturer part number
-  - Color: Product color variant
+  - Color: Product color variant (based on packaging band color)
   - Size: Product size
   - Style: Product style/variant
+- **POS Color Assignment Rules by Brand:**
+  - **Science Diet Color Rules (based on packaging band):**
+    - Puppy & Kitten = Green band
+    - Small & Mini / Little Bites = Pink band
+    - Specialty (Hairball, Sensitive, Urinary, Vitality, Perfect Digestion) = Silver band
+    - Light products = Red band (NOT specialty)
+    - Regular Adult & Senior (7+, 11+) = Red band
+    - Treats = Red band (EXCEPT Flexi-Stix, Soft-Baked, Grain Free Crunchy)
+    - Flexi-Stix = Burgundy/Purple band
+    - Soft-Baked treats (Soft Beef, Soft Chicken, Soft Duck) = Green/Lime band
+    - Grain Free Crunchy Naturals = Green/Lime band
+  - **NutriSource Color Rules (use AI Vision for packaging detection):**
+    - Chicken & Rice (dry bags) = Blue
+    - Beef products = Burgundy
+    - Lamb products = Tan (orange-brown)
+    - Senior products = Brown
+    - Weight Management = Green
+    - Seafood/Salmon = Red
+    - Classic Catch / Country Select = Teal
+    - Elements Crispy Crispers = Purple (ALL flavors)
+    - Chompy Chompers = Purple
+    - Grillin' Grillers = Purple
+    - Little Bites (most) = Purple
+    - Chicken Lamb & Fish 13oz can = Burgundy (red can)
+    - Large Breed Puppy = Purple
+  - Scripts available: `server/scripts/applyPOSFieldsRuleBased.ts` (Science Diet), `server/scripts/nutriSourceAIVision.ts` (NutriSource)
 - **CRITICAL DATA SOURCING RULES - NEVER GUESS:**
   - **ALWAYS use manufacturer websites FIRST** for ALL product information including:
     - Descriptions (copy EXACT text, never paraphrase)
