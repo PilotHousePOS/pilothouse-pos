@@ -27,39 +27,38 @@ export default function Landing() {
         {/* Logo with Bold Design */}
         <div className="mb-8 relative">
           <div className="relative mb-6">
-            <div className="w-28 h-28 bg-white rounded-3xl flex items-center justify-center mx-auto mb-4 border-2 border-gray-700">
+            <div className="w-28 h-28 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 border-4 border-gray-800">
               <img 
                 src={mascotLogoPath} 
                 alt="Animal House Mascot" 
-                className="w-20 h-20 rounded-2xl object-cover"
+                className="w-24 h-24 rounded-xl object-contain"
               />
             </div>
-            <div className="absolute -top-3 -right-3 w-8 h-8 bg-green-500 rounded-full border-2 border-gray-900"></div>
+            <div className="absolute -top-2 -right-2 w-7 h-7 bg-green-500 rounded-full"></div>
           </div>
-          <img 
-            src={animalHouseLogoPath} 
-            alt="Animal House Logo" 
-            className="w-48 h-28 object-contain mx-auto"
-          />
+          <div className="bg-white rounded-lg px-2 py-1 border-4 border-blue-700 inline-block">
+            <img 
+              src={animalHouseLogoPath} 
+              alt="Animal House Logo" 
+              className="w-44 h-24 object-contain"
+            />
+          </div>
         </div>
 
         {/* Hero Text with Bold Typography */}
         <div className="mb-10">
           <div className="flex items-center justify-center mb-4">
-            <Sparkles className="w-8 h-8 text-gray-400 mr-3" />
+            <Sparkles className="w-6 h-6 text-gray-400 mr-4" />
             <h1 
-              className="text-5xl font-black"
+              className="text-5xl font-black text-red-600 leading-tight"
               style={{
-                backgroundImage: 'linear-gradient(90deg, #DC2626 0%, #DC2626 30%, #FFFFFF 45%, #FFFFFF 55%, #2563EB 70%, #2563EB 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                color: 'transparent',
-                WebkitTextStroke: '0.5px rgba(0,0,0,0.2)'
+                WebkitTextStroke: '2px #1e40af',
+                textShadow: '2px 2px 0px #1e40af'
               }}
             >
               ANIMAL<br/>HOUSE
             </h1>
-            <Sparkles className="w-8 h-8 text-gray-400 ml-3" />
+            <Sparkles className="w-6 h-6 text-gray-400 ml-4" />
           </div>
           <p className="text-3xl font-bold text-white mb-4 drop-shadow-lg">WHERE PETS FIND FAMILIES</p>
           <p className="text-xl font-semibold text-gray-200 max-w-sm mx-auto leading-relaxed">
