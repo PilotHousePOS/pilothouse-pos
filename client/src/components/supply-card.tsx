@@ -86,9 +86,9 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
   };
 
   const isValidImageUrl = (url: string) => url && (url.startsWith('http') || url.startsWith('/public-objects/')) && !url.includes('placeholder');
-  const filteredImageUrls = supply.imageUrls?.filter((url: string) => isValidImageUrl(url)) || [];
-  const singleImageUrl = supply.imageUrl && isValidImageUrl(supply.imageUrl) ? [supply.imageUrl] : [];
-  const images = filteredImageUrls.length > 0 ? filteredImageUrls : singleImageUrl;
+  const mainImage = supply.imageUrl && isValidImageUrl(supply.imageUrl) ? supply.imageUrl : null;
+  const additionalImages = supply.imageUrls?.filter((url: string) => isValidImageUrl(url) && url !== mainImage) || [];
+  const images = mainImage ? [mainImage, ...additionalImages] : additionalImages;
   const hasMultipleImages = images.length > 1;
   const fallbackImage = defaultImages[supply.category] || defaultImages.default;
   const imageUrl = imageError || images.length === 0 ? fallbackImage : (images[currentImageIndex] || fallbackImage);
