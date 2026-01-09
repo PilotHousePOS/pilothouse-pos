@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application designed to enhance the store's online presence, service accessibility, and product sales. It supports pet browsing, grooming appointment booking, and pet supply purchasing, including exotic reptiles. The business vision is to provide a comprehensive online platform that boosts sales, streamlines operations, and integrates inventory management, customer accounts, and administrative functionalities to expand market reach and improve efficiency.
+The Animal House Pet Store project is a mobile-friendly web application designed to expand the store's online presence, improve service accessibility, and increase product sales. It provides features for pet browsing, grooming appointment booking, and purchasing pet supplies, including exotic reptiles. The platform aims to boost sales, streamline operations, and integrate inventory management, customer accounts, and administrative functions to broaden market reach and enhance efficiency.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -62,6 +62,16 @@ The Animal House Pet Store project is a mobile-friendly web application designed
     - Bone broth products with grains (brown rice, barley, oatmeal)
     - Canned food with moisture <70% in guaranteed analysis
   - **Verification Process**: Always search official manufacturer website for exact product page, confirm ingredients match product size and format before updating.
+- **Brand Ingredient Audit Process** (use for Science Diet, Royal Canin, etc.):
+  1. **Query all brand products with wrong patterns**: `SELECT id, name, ingredients FROM supplies WHERE name ILIKE '%brand%' AND ingredients LIKE '%Meal%'`
+  2. **Identify wet foods with dry ingredients**: Check for "Chicken Meal", "Beef Meal", "Brown Rice, Barley" in products with oz sizes
+  3. **Search manufacturer website for each product**: Use format-specific URLs (e.g., `/wet-dog-food/`, `/canned-cat-food/`)
+  4. **Update with correct ingredients**: Include guaranteed analysis with proper moisture (78%+ for wet)
+  5. **Verify protein matching**: First ingredients must match product name protein
+  6. **SQL audit queries to run**:
+     - `WHERE ingredients LIKE 'Chicken, Chicken Meal%'` - dry kibble pattern in wrong products
+     - `WHERE (name LIKE '%oz%' OR name LIKE '%Broth%') AND ingredients LIKE '%Meal%'` - wet foods with dry ingredients
+     - `WHERE name LIKE '%fish%' AND ingredients NOT ILIKE '%fish%'` - protein mismatch
 - **Multi-Image Collection Strategy:**
   - Pull ALL available product photos from Amazon, Chewy, or manufacturer websites
   - Image order matters: First image = main display, subsequent images append in carousel order
@@ -93,7 +103,7 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Login Flow: Navigate to main page (/), click "Start Now", enter credentials. Do NOT bypass the main page.
 
 ## System Architecture
-The application is a full-stack web application featuring a React frontend (Vite, TypeScript, Tailwind CSS, shadcn/ui) and an Express.js backend (TypeScript) connected to a PostgreSQL database via Drizzle ORM.
+The application is a full-stack web application featuring a React frontend (Vite, TypeScript, Tailwind CSS, shadcn/ui) and an Express.js backend (TypeScript), all connected to a PostgreSQL database via Drizzle ORM.
 
 **UI/UX Decisions:**
 - Dark, bold design with strong contrast and mobile responsiveness.
