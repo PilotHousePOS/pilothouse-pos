@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application designed to expand the store's online presence, improve service accessibility, and increase product sales. It enables pet browsing, grooming appointment booking, and purchasing pet supplies, including exotic reptiles. The platform aims to boost sales, streamline operations, and integrate inventory management, customer accounts, and administrative functions to broaden market reach and enhance efficiency.
+The Animal House Pet Store project is a mobile-friendly web application designed to expand the store's online presence, improve service accessibility, and increase product sales. It enables pet browsing, grooming appointment bookings, and the purchase of pet supplies, including exotic reptiles. The platform aims to streamline operations, integrate inventory management, customer accounts, and administrative functions to broaden market reach and enhance efficiency. The project's ambition is to become a leading online destination for pet owners, offering a seamless and comprehensive service experience.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -123,7 +123,7 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Login Flow: Navigate to main page (/), click "Start Now", enter credentials. Do NOT bypass the main page.
 
 ## System Architecture
-The application is a full-stack web application featuring a React frontend and an Express.js backend, all connected to a PostgreSQL database via Drizzle ORM.
+The application is a full-stack web application with a React frontend, an Express.js backend, and a PostgreSQL database utilizing Drizzle ORM.
 
 **UI/UX Decisions:**
 - Dark, bold design with strong contrast and mobile responsiveness.
@@ -140,8 +140,6 @@ The application is a full-stack web application featuring a React frontend and a
 - **Admin Tools**: Product Image Management (dashboard, batch search/preview), Employee & Grooming Schedule Management.
 - **AI & Integrations**: AI-Powered Order Photo Upload (GPT-5 Vision for item extraction, auto-categorization, custom pricing), Astro Loyalty Integration, POS Integration (real-time sync, webhooks).
 - **UPC Matching System**: Strict system for matching UPCs to products with 90% coverage and 100% accuracy, employing abbreviation expansion, text normalization, and verified brand mappings. Strict validation rules apply to size, wattage, weight/volume, dimension, cup/capacity, and length. Includes critical product type exclusions and a comprehensive brand prefix expansion dictionary.
-    - **Validation Rules**: Size, Wattage, Weight/Volume, Dimension, Cup/Capacity, and Length must match exactly.
-    - **Brand-UPC Prefix Validation**: UPC prefix must match product's brand using GS1 manufacturer prefixes.
 
 **System Design Choices:**
 - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
@@ -159,7 +157,7 @@ The application is a full-stack web application featuring a React frontend and a
 - **SMS Service**: Twilio
 - **Calendar Integration**: Google Calendar
 - **Loyalty Program**: Astro Loyalty
-- **AI Vision**: OpenAI (for GPT-5 Vision)
+- **AI Vision**: OpenAI
 - **Frontend Framework**: React
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS
