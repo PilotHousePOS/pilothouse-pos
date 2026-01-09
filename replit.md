@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application designed to expand the store's online presence, enhance service accessibility, and boost product sales. It enables customers to browse pets, book grooming appointments, and purchase pet supplies, including exotic reptiles. The platform integrates inventory, customer accounts, and administration to streamline operations, broaden market reach, and improve efficiency, aiming to become a leading online destination for pet owners.
+The Animal House Pet Store project is a mobile-friendly web application designed to expand the store's online presence, boost sales, and streamline operations. It allows customers to purchase pets (including specialty exotic reptiles), book grooming appointments, and buy pet supplies. The platform integrates inventory, customer accounts, and administrative functions, aspiring to become a premier online destination for pet owners.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -15,46 +15,18 @@ The Animal House Pet Store project is a mobile-friendly web application designed
 - Mobile authentication consistency: Same account should show identical admin access across devices
 - Inventory Management: Full product names and descriptions preserved from Excel imports (no abbreviations)
 - Search Functionality: All searches (supplies, pets) with intelligent typo tolerance and brand expansion
-  - Fuzzy Search: Auto-corrects typos and finds closest matches (70% similarity threshold), searches across name, brand, and description fields, results sorted by relevance. Works across all supply pages, combines with category and filterType filters (AND logic), whitespace-only searches treated as empty searches, and search bars integrated into specialty pages with pagination support.
-  - Animal Search on Specialty Pages: Independent search bars for animals on Aquatics and Exotic Reptiles pages with debounced input (500ms delay). Searches fish/reptiles by name, breed, or description.
-  - Brand Name Expansion: Automatically maps abbreviated brand names to full names for better search results (server/brandNameExpansion.ts).
 - Supply Filtering: Centralized, research-based filtering system with proper brand/keyword separation (server/filterConfig.ts).
-  - Reptile supplies: ZooMed, Exo Terra, Zilla, Fluker's, ReptiCare brands + reptile keywords.
-  - Aquatic supplies: Hikari, Tetra, Aqueon, Marineland, API, Fluval, SeaChem, GloFish, Omega One, Ocean Nutrition brands + aquatic keywords.
-  - Cross-category brands (ZooMed): Make both aquatic AND reptile products - not excluded from either category, keywords determine final categorization. Zoo Med aquatic products (Aqualog, Aqua Thermometer) properly categorized via aquatic keywords.
-  - Keyword priority system: Species-specific keywords (60pts) override brand scoring (40pts) for accurate categorization.
-  - Exclusion logic: Brand exclusions prevent brand scoring only; keyword exclusions prevent keyword scoring only.
-  - Pattern name exclusions: "snake print", "lizard print", "turtle print", "frog print" excluded from reptile category (these are dog/cat accessory patterns, not reptile products).
-  - Dog/cat accessory brands (Coastal, Li'l Pals, Comfort Soft) excluded from reptile category.
-  - Toy brands hard-excluded from both categories via brand AND keyword exclusions.
-  - Aquatic Subcategorization (server/aquaticCategoryEvidence.ts): Evidence-based system with verified product terminology from official product lines. Priority system: Decoration exclusion → Brand-based categorization → Keyword scoring → Default to accessories.
-  - Cat/dog food exclusion: Products containing cat/dog keywords excluded from aquatic filterType.
-  - Shampoo categorization: Medicated/therapeutic shampoos (Zymox, Adams, Advantage, flea/tick) go to healthcare; grooming shampoos (Furminator, Freshnclean, carpet shampoo) go to accessories per Excel file.
 - Food vs Treat Categorization by Size: For freeze-dried products (Vital Essentials, etc.), products >3oz are categorized as food (dogFood/catFood), products ≤3oz are categorized as treats (dogTreats/catTreats). Patties, nibbles, and mini pate in larger sizes are food; bites and small portions are treats.
 - Product Recommendations ("You May Also Like"): Smart cross-category recommendations based on product type.
-  - Food products: Recommend complementary accessories, NOT more food. For aquatic food (frog, turtle, fish), recommend docks, decorations, calcium, water conditioners. For reptile food, recommend hides, bedding, calcium, heating.
-  - Strong penalty for filter/pump equipment when recommending for food products (-10 score).
-  - Bonus for relevant accessories like docks, islands, basking platforms, calcium, reptisafe (+3 score).
-  - smartPairings triggers: 'frog food', 'frog & tadpole', 'tadpole', 'turtle food', 'aquatic turtle', 'fish food', 'betta', 'goldfish', 'bearded dragon', 'gecko food', 'crested gecko', 'snake food', 'cricket', 'mealworm'.
 - Extended Product Information: Sourced from reliable retailers (Chewy, Amazon, manufacturer websites).
-  - Ingredients: Full ingredient list from product packaging.
-  - Guaranteed Analysis: Stored as pipe-separated values for table display (e.g., "Crude Protein (min)|12%|Crude Fat (min)|5%").
-  - Feeding Instructions: Usage directions from product labels.
-  - Features: JSON with highlights array for bullet point display.
 - Data Quality Validation Rules:
   - Wet vs Dry Food Ingredients: Wet food (cans, stews, broths, entrees) ingredients differ significantly from dry food (kibble, bags). Never copy dry food ingredients to wet food products.
-    - Wet food indicators: Starts with meat broth/water, named fresh meats (chicken, beef, turkey), high moisture (70-96%), sizes like oz cans/pouches
-    - Dry food indicators: Starts with meat meals (chicken meal, beef meal), grains (brown rice, barley), low moisture (10%), moisture (10%), sizes like lb bags
-    - Common mistake pattern: "Chicken, Chicken Meal, Brown Rice, Barley" is DRY kibble formula - NEVER use for canned/wet products
   - Product Format Detection Rules:
     - Bone broth toppers (Come-Pooch-A): Must start with "[protein] bone broth" (e.g., "Turkey bone broth, liquid Lactobacillus...")
     - Canned wet food (13oz, 5.5oz cans): Must start with "[protein], [protein] broth" (e.g., "Chicken, chicken broth, chicken liver...")
     - Stews/Entrees: Must start with fresh meat + broth (e.g., "Beef, beef broth, beef liver, tapioca starch...")
     - Dry kibble (4lb, 26lb, 30lb bags): Can start with meat meals (e.g., "Chicken meal, whole grain sorghum...")
   - Protein Source Matching: Ingredients must match the product's advertised protein. Cross-check first 3-5 ingredients against product name.
-    - "Classic Catch" (fish) → Must have fish ingredients (haddock, trout, cod)
-    - "Turkey Bone Broth" → Must start with "Turkey bone broth"
-    - "Beef Stew" → Must start with "Beef, beef broth"
   - Format-Specific Data: Each product variant (5.5oz can vs 4lb bag) needs format-specific ingredients from manufacturer website.
   - Red Flag Patterns (indicates wrong ingredients copied):
     - Wet food with "Chicken Meal" or "Beef Meal" in first 3 ingredients
@@ -74,13 +46,7 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Photo types to collect for each product: Main product image, Brand marketing graphics, Quality/ingredients graphics, Size comparison photos, Feeding guidelines/charts, Guaranteed analysis images, Back of package.
 - Image Validation Rules (CRITICAL - Product Type Matching):
   - Species Matching: Cat products MUST show cat food images, dog products MUST show dog food images. Never mix species.
-    - Cat/kitten products: Image URL should contain "cat" or show cat on packaging
-    - Dog/puppy products: Image URL should contain "dog" or show dog on packaging
-    - Common error: Cat wet food showing dog food bag images
   - Format Matching: Wet food products MUST show can/pouch images, dry food MUST show bag images.
-    - Wet food sizes: 2.8oz, 2.9oz, 5.5oz, 12.5oz, 12.8oz, 13oz cans/pouches/stews
-    - Dry food sizes: 3.5lb, 4lb, 7lb, 15lb, 15.5lb, 16lb, 30lb bags
-    - Common error: Wet food (e.g., "Chicken Stew 2.8oz") showing dry food bag (15.5lb bag)
   - Red Flag Image URL Patterns:
     - Cat product with "dog-food" in URL path = WRONG
     - Wet food (oz size) with "bag" or "lb" size in URL = WRONG
@@ -119,7 +85,7 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Login Flow: Navigate to main page (/), click "Start Now", enter credentials. Do NOT bypass the main page.
 
 ## System Architecture
-The application is a full-stack web application with a React frontend, an Express.js backend, and a PostgreSQL database utilizing Drizzle ORM.
+The application is a full-stack web application built with a React frontend, an Express.js backend, and a PostgreSQL database leveraging Drizzle ORM.
 
 **UI/UX Decisions:**
 - Dark, bold design with strong contrast and mobile responsiveness.
