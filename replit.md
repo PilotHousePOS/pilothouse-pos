@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application designed to expand the store's online presence, boost sales, and streamline operations. It allows customers to purchase pets (including specialty exotic reptiles), book grooming appointments, and buy pet supplies. The platform integrates inventory, customer accounts, and administrative functions, aspiring to become a premier online destination for pet owners.
+The Animal House Pet Store project is a mobile-friendly web application designed to expand the store's online presence, increase sales, and optimize operations. It enables customers to purchase pets (including specialty exotic reptiles), book grooming appointments, and buy pet supplies. The platform integrates inventory, customer accounts, and administrative functions, aiming to become a leading online destination for pet owners.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -70,14 +70,22 @@ The Animal House Pet Store project is a mobile-friendly web application designed
     - Product is "Beef" but image shows "Chicken" = WRONG
     - Product is single can but image shows "VARIETY PACK" or "12 POUCHES" = WRONG
     - Product is "13oz" but can label shows "5.8 oz" = WRONG
+  - **DESCRIPTION FORMAT MUST MATCH SIZE (CRITICAL):**
+    - oz sizes MUST have descriptions saying "wet", "canned", or "can" - NEVER "dry" or "kibble"
+    - lb sizes MUST have descriptions saying "dry", "kibble", or "bag" - NEVER "wet" or "canned"
+    - AUDIT RULE: Run validation query after any bulk updates to catch mismatches
   - Validation Query for Mismatches:
     ```sql
     -- Find cat products with dog images
     SELECT id, name FROM supplies WHERE LOWER(name) LIKE '%cat%' AND image_urls[1] LIKE '%dog%';
     -- Find wet food with dry food images
     SELECT id, name FROM supplies WHERE (LOWER(name) LIKE '%stew%' OR LOWER(name) LIKE '%2.9oz%') AND image_urls[1] LIKE '%bag%';
+    -- Find oz products with DRY descriptions (WRONG - oz = cans)
+    SELECT id, name FROM supplies WHERE name ~* '\d+\.?\d*\s*oz' AND (description ILIKE '%dry%' OR description ILIKE '%kibble%');
+    -- Find lb products with WET descriptions (WRONG - lb = bags)
+    SELECT id, name FROM supplies WHERE name ~* '\d+\s*lb' AND (description ILIKE '%wet%' OR description ILIKE '%canned%');
     ```
-  - Fix Process: 
+  - Fix Process:
     1. Extract EXACT weight from product name (5.8oz, 13oz, 7lb, etc.)
     2. Extract EXACT flavor from product name (Chicken, Beef, Salmon, etc.)
     3. Search manufacturer website for that EXACT size + flavor combination
@@ -155,7 +163,7 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Login Flow: Navigate to main page (/), click "Start Now", enter credentials. Do NOT bypass the main page.
 
 ## System Architecture
-The application is a full-stack web application built with a React frontend, an Express.js backend, and a PostgreSQL database leveraging Drizzle ORM.
+The application is a full-stack web application with a React frontend, an Express.js backend, and a PostgreSQL database utilizing Drizzle ORM.
 
 **UI/UX Decisions:**
 - Dark, bold design with strong contrast and mobile responsiveness.

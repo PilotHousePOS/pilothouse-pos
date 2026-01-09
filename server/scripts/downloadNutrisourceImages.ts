@@ -10,16 +10,16 @@ async function downloadImages() {
 
   const updates = [
     {
-      id: 6310,
-      name: "Nutrisource Element Series Open Waters Recipe 4lb",
+      id: 6513,
+      name: "Nutrisource Small & Medium Breed Puppy Chicken & Rice Recipe 5.5oz",
       brand: "Nutrisource",
-      imageUrl: "https://nutrisourcepetfoods.com/wp-content/uploads/2021/02/Element_OpenWaters.png"
+      imageUrl: "https://nutrisourcepetfoods.com/wp-content/uploads/2020/03/5_5ozNS_SmlMedPuppyCan.png"
     },
     {
-      id: 4784,
-      name: "Nutrisource Nutty Butter Bites with Apple",
+      id: 6690,
+      name: "Nutrisource Classic Catch Cat 5.5oz",
       brand: "Nutrisource",
-      imageUrl: "https://nutrisourcepetfoods.com/wp-content/uploads/2024/09/NS_NuttyButterBites_PB_Apple_Front.png"
+      imageUrl: "https://nutrisourcepetfoods.com/wp-content/uploads/2023/11/5_5ozES_ClassicCatch_CatCan.png"
     }
   ];
 
