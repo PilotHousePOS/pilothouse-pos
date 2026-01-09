@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application designed to expand the store's online presence, enhance service accessibility, and boost product sales. It enables customers to browse pets, book grooming appointments, and purchase pet supplies, including exotic reptiles. The platform integrates inventory, customer accounts, and administration to streamline operations, broaden market reach, and improve efficiency. The project aims to become a leading online destination for pet owners, offering a seamless and comprehensive service experience.
+The Animal House Pet Store project is a mobile-friendly web application designed to expand the store's online presence, enhance service accessibility, and boost product sales. It enables customers to browse pets, book grooming appointments, and purchase pet supplies, including exotic reptiles. The platform integrates inventory, customer accounts, and administration to streamline operations, broaden market reach, and improve efficiency, aiming to become a leading online destination for pet owners.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -62,16 +62,6 @@ The Animal House Pet Store project is a mobile-friendly web application designed
     - Bone broth products with grains (brown rice, barley, oatmeal)
     - Canned food with moisture <70% in guaranteed analysis
   - Verification Process: Always search official manufacturer website for exact product page, confirm ingredients match product size and format before updating.
-- Brand Ingredient Audit Process (use for Science Diet, Royal Canin, etc.):
-  1. Query all brand products with wrong patterns: `SELECT id, name, ingredients FROM supplies WHERE name ILIKE '%brand%' AND ingredients LIKE '%Meal%'`
-  2. Identify wet foods with dry ingredients: Check for "Chicken Meal", "Beef Meal", "Brown Rice, Barley" in products with oz sizes
-  3. Search manufacturer website for each product: Use format-specific URLs (e.g., `/wet-dog-food/`, `/canned-cat-food/`)
-  4. Update with correct ingredients: Include guaranteed analysis with proper moisture (78%+ for wet)
-  5. Verify protein matching: First ingredients must match product name protein
-  6. SQL audit queries to run:
-     - `WHERE ingredients LIKE 'Chicken, Chicken Meal%'` - dry kibble pattern in wrong products
-     - `WHERE (name LIKE '%oz%' OR name LIKE '%Broth%') AND ingredients LIKE '%Meal%'` - wet foods with dry ingredients
-     - `WHERE name LIKE '%fish%' AND ingredients NOT ILIKE '%fish%'` - protein mismatch
 - MANDATORY Manufacturer Website Verification Process (NEVER skip this):
   - DO NOT assume existing data is correct - Always verify against actual manufacturer website
   - DO NOT copy ingredients from other products - Each product needs its own verified data
@@ -158,10 +148,3 @@ The application is a full-stack web application with a React frontend, an Expres
 - **Calendar Integration**: Google Calendar
 - **Loyalty Program**: Astro Loyalty
 - **AI Vision**: OpenAI
-- **Frontend Framework**: React
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **UI Component Library**: shadcn/ui
-- **Server-Side Framework**: Express.js
-- **Query Library**: TanStack Query
-- **Client-Side Router**: Wouter
