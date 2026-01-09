@@ -27,30 +27,30 @@ export default function Landing() {
         {/* Logo with Bold Design */}
         <div className="mb-8 relative">
           <div className="relative mb-6">
-            <div className="w-28 h-28 bg-gradient-to-br from-brand-red to-brand-blue rounded-3xl flex items-center justify-center shadow-2xl mx-auto mb-4 border-2 border-white">
+            <div className="w-28 h-28 bg-gray-800 rounded-3xl flex items-center justify-center mx-auto mb-4 border-2 border-gray-600">
               <img 
                 src={mascotLogoPath} 
                 alt="Animal House Mascot" 
                 className="w-20 h-20 rounded-2xl object-cover"
               />
             </div>
-            <div className="absolute -top-3 -right-3 w-8 h-8 bg-green-500 rounded-full border-3 border-white animate-pulse shadow-lg"></div>
+            <div className="absolute -top-3 -right-3 w-8 h-8 bg-green-500 rounded-full border-2 border-gray-800"></div>
           </div>
           <img 
             src={animalHouseLogoPath} 
             alt="Animal House Logo" 
-            className="w-48 h-28 object-contain mx-auto drop-shadow-2xl"
+            className="w-48 h-28 object-contain mx-auto"
           />
         </div>
 
         {/* Hero Text with Bold Typography */}
         <div className="mb-10">
           <div className="flex items-center justify-center mb-4">
-            <Sparkles className="w-8 h-8 text-brand-orange mr-3 animate-pulse" />
-            <h1 className="text-6xl font-black text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 30px rgba(255,255,255,0.5)'}}>
+            <Sparkles className="w-8 h-8 text-brand-orange mr-3" />
+            <h1 className="text-6xl font-black bg-gradient-to-r from-brand-red via-brand-orange to-brand-blue bg-clip-text text-transparent" style={{WebkitTextStroke: '1px rgba(0,0,0,0.3)'}}>
               ANIMAL HOUSE
             </h1>
-            <Sparkles className="w-8 h-8 text-brand-orange ml-3 animate-pulse" />
+            <Sparkles className="w-8 h-8 text-brand-orange ml-3" />
           </div>
           <p className="text-3xl font-bold text-white mb-4 drop-shadow-lg">WHERE PETS FIND FAMILIES</p>
           <p className="text-xl font-semibold text-gray-200 max-w-sm mx-auto leading-relaxed">
