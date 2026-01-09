@@ -45,12 +45,31 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Image order matters: First image = main display, subsequent images append in carousel order
   - Photo types to collect for each product: Main product image, Brand marketing graphics, Quality/ingredients graphics, Size comparison photos, Feeding guidelines/charts, Guaranteed analysis images, Back of package.
 - Image Validation Rules (CRITICAL - Product Type Matching):
+  - **SIZE = FORMAT (MANDATORY):**
+    - oz sizes (2.8oz, 2.9oz, 5.5oz, 5.8oz, 12.8oz, 13oz) = CAN/WET FOOD - Must show can image
+    - lb sizes (3.5lb, 7lb, 15.5lb, 22lb, 30lb) = BAG/DRY FOOD - Must show bag image
+    - NEVER show a bag image for an oz-sized product (e.g., 5.8oz is a CAN, not a bag!)
+    - NEVER show a can image for a lb-sized product (e.g., 7lb is a BAG, not a can!)
+  - **EXACT SIZE MATCHING:**
+    - 5.8oz can ≠ 13oz can - Different can sizes have different images
+    - Search for exact weight match on manufacturer website
+    - Verify the weight shown on the can/bag image matches the product weight
+  - **FLAVOR MATCHING:**
+    - Chicken product = Chicken image (never Salmon, Beef, Tuna)
+    - Salmon product = Salmon image (never Chicken, Turkey, Beef)
+    - Tuna product = Tuna image (never Chicken, Salmon)
+    - Check the flavor text on the can/bag matches the product name
+  - **SINGLE vs VARIETY PACK:**
+    - Single can/bag products MUST show single can/bag image
+    - NEVER use variety pack images (showing "12 POUCHES", "VARIETY PACK") for individual items
+    - Variety pack images show multiple flavors - these are WRONG for single products
   - Species Matching: Cat products MUST show cat food images, dog products MUST show dog food images. Never mix species.
-  - Format Matching: Wet food products MUST show can/pouch images, dry food MUST show bag images.
-  - Red Flag Image URL Patterns:
-    - Cat product with "dog-food" in URL path = WRONG
-    - Wet food (oz size) with "bag" or "lb" size in URL = WRONG
-    - Kitten product with adult dog image = WRONG
+  - Red Flag Image Patterns to AVOID:
+    - Product is "5.8oz" but image shows a bag = WRONG
+    - Product is "7lb" but image shows a can = WRONG
+    - Product is "Beef" but image shows "Chicken" = WRONG
+    - Product is single can but image shows "VARIETY PACK" or "12 POUCHES" = WRONG
+    - Product is "13oz" but can label shows "5.8 oz" = WRONG
   - Validation Query for Mismatches:
     ```sql
     -- Find cat products with dog images
@@ -58,7 +77,13 @@ The Animal House Pet Store project is a mobile-friendly web application designed
     -- Find wet food with dry food images
     SELECT id, name FROM supplies WHERE (LOWER(name) LIKE '%stew%' OR LOWER(name) LIKE '%2.9oz%') AND image_urls[1] LIKE '%bag%';
     ```
-  - Fix Process: Search Chewy for exact product → fetch correct carousel images → update image_urls array
+  - Fix Process: 
+    1. Extract EXACT weight from product name (5.8oz, 13oz, 7lb, etc.)
+    2. Extract EXACT flavor from product name (Chicken, Beef, Salmon, etc.)
+    3. Search manufacturer website for that EXACT size + flavor combination
+    4. Verify image shows correct weight on label before using
+    5. Verify image shows correct flavor on label before using
+    6. Verify image is single product (not variety pack) before using
 - Item-Specific Descriptions (NOT Generic):
   - Descriptions must be product-specific, pulled directly from Chewy/Amazon product pages
   - NOT generic catch-all descriptions that apply to multiple products
