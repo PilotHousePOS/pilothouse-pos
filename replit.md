@@ -68,10 +68,28 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Color: Product color variant
   - Size: Product size
   - Style: Product style/variant
+- **CRITICAL DATA SOURCING RULES - NEVER GUESS:**
+  - **ALWAYS use manufacturer websites FIRST** for ALL product information including:
+    - Descriptions (copy EXACT text, never paraphrase)
+    - Ingredients (copy EXACTLY as shown, including order and spelling)
+    - Guaranteed analysis (exact percentages)
+    - Photos/images (all available product images)
+    - Sizing, features, benefits
+  - **EXHAUST ALL RESOURCES before stopping:**
+    1. Official manufacturer website (MANDATORY first stop)
+    2. Chewy.com product pages
+    3. Amazon product listings
+    4. Other verified retailer sites
+  - **IF information is too complex to port over:** Summarize key points but note the source
+  - **ONLY stop trying and ask user for help** when all resources are exhausted
+  - **IF UNSURE about anything - ASK FIRST, never guess**
+  - **NEVER create, paraphrase, or assume product information**
+  - Use `web_fetch` tool to load actual manufacturer product pages
+  - Copy text EXACTLY as displayed - do not reword or interpret
 - Data Sources Priority:
-  1. Official manufacturer websites (most accurate)
+  1. Official manufacturer websites (MANDATORY - most accurate)
   2. Chewy.com product pages (detailed, verified)
-  3. Amazon product listings (comprehesive)
+  3. Amazon product listings (comprehensive)
   4. Product packaging (for ingredients/analysis)
 - SKU = UPC: The SKU field is used for UPC codes. All UPC data is stored in the SKU field. Manual UPC assignments (SKU values in production) must be preserved during sync/import. UPCs must be validated for leading zeros and standard 12-digit length. UPC prefix must match brand's known prefix. Attribute-based matching (size, wattage, weight, dimension, count) is critical for exact product identification.
 - PROTECTED FIELDS (NEVER modify via scripts):
