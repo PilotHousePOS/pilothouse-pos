@@ -27,19 +27,19 @@ export default function Landing() {
         {/* Logo with Bold Design */}
         <div className="mb-8 relative">
           <div className="relative mb-6">
-            <div className="w-28 h-28 flex items-center justify-center mx-auto mb-4">
+            <div className="w-24 h-24 bg-black rounded-2xl flex items-center justify-center mx-auto mb-4 border border-gray-700 p-1">
               <img 
                 src={mascotLogoPath} 
                 alt="Animal House Mascot" 
-                className="w-28 h-28 object-contain"
+                className="w-full h-full object-contain rounded-xl"
               />
             </div>
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full"></div>
+            <div className="absolute top-0 right-0 w-5 h-5 bg-green-500 rounded-full"></div>
           </div>
           <img 
             src={animalHouseLogoPath} 
             alt="Animal House Logo" 
-            className="w-48 h-auto object-contain mx-auto"
+            className="w-52 h-auto object-contain mx-auto"
           />
         </div>
 
