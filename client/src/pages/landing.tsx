@@ -47,7 +47,7 @@ export default function Landing() {
         <div className="mb-10">
           <div className="flex items-center justify-center mb-4">
             <Sparkles className="w-8 h-8 text-brand-orange mr-3 animate-pulse" />
-            <h1 className="text-6xl font-black bg-gradient-to-r from-brand-red via-white to-brand-blue bg-clip-text text-transparent drop-shadow-2xl">
+            <h1 className="text-6xl font-black text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 30px rgba(255,255,255,0.5)'}}>
               ANIMAL HOUSE
             </h1>
             <Sparkles className="w-8 h-8 text-brand-orange ml-3 animate-pulse" />
