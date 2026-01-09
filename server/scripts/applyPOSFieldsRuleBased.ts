@@ -30,8 +30,8 @@ function getScienceDietColor(name: string): string {
   }
   
   // Specialty/Prescription products = Silver
-  // These include: Light, Sensitive, Urinary, Prescription, Vitality, Perfect, etc.
-  if (/light|sensitive|urinary|prescription|digestive|metabolic|mobility|brain|oral|perfect|derm|vitality|i\/d|z\/d|k\/d|w\/d|c\/d|l\/d|j\/d|d\/d|h\/d|t\/d|m\/d|a\/d|b\/d|r\/d|s\/d/i.test(lowerName)) {
+  // These include: Hairball, Light, Sensitive, Urinary, Prescription, Vitality, Perfect, etc.
+  if (/hairball|light|sensitive|urinary|prescription|digestive|metabolic|mobility|brain|oral|perfect|derm|vitality|i\/d|z\/d|k\/d|w\/d|c\/d|l\/d|j\/d|d\/d|h\/d|t\/d|m\/d|a\/d|b\/d|r\/d|s\/d/i.test(lowerName)) {
     return "Silver";
   }
   
