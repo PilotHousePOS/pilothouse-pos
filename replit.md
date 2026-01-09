@@ -41,11 +41,10 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Guaranteed Analysis: Stored as pipe-separated values for table display (e.g., "Crude Protein (min)|12%|Crude Fat (min)|5%").
   - Feeding Instructions: Usage directions from product labels.
   - Features: JSON with highlights array for bullet point display.
-  - Currently 6,177 products with ingredients, 5,475 with detailed descriptions.
 - Data Quality Validation Rules:
   - Wet vs Dry Food Ingredients: Wet food (cans, stews, broths, entrees) ingredients differ significantly from dry food (kibble, bags). Never copy dry food ingredients to wet food products.
     - Wet food indicators: Starts with meat broth/water, named fresh meats (chicken, beef, turkey), high moisture (70-96%), sizes like oz cans/pouches
-    - Dry food indicators: Starts with meat meals (chicken meal, beef meal), grains (brown rice, barley), low moisture (10%), sizes like lb bags
+    - Dry food indicators: Starts with meat meals (chicken meal, beef meal), grains (brown rice, barley), low moisture (10%), moisture (10%), sizes like lb bags
     - Common mistake pattern: "Chicken, Chicken Meal, Brown Rice, Barley" is DRY kibble formula - NEVER use for canned/wet products
   - Product Format Detection Rules:
     - Bone broth toppers (Come-Pooch-A): Must start with "[protein] bone broth" (e.g., "Turkey bone broth, liquid Lactobacillus...")
@@ -69,24 +68,31 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Step 2: Copy ingredients EXACTLY as shown on manufacturer website (including order and spelling)
   - Step 3: Copy guaranteed analysis table with exact percentages from manufacturer
   - Step 4: Only then run UPDATE query with verified data
-  - NutriSource URLs: `https://discovernutrisource.com/products/[product-slug]/`
-    - Example: `discovernutrisource.com/products/chicken-bone-broth-recipe-come-pooch-a`
-    - Alternative info site: `nutrisourcepetfoods.com/our-food/[product-slug]/` (has ingredient details)
-  - Science Diet URLs: `https://www.hillspet.com/dog-food/` or `/cat-food/`
-  - Royal Canin URLs: `https://www.royalcanin.com/us/dogs/products/` or `/cats/products/`
-  - Verification Example:
-    ```
-    1. web_fetch("https://nutrisourcepetfoods.com/our-food/lamb/")
-    2. Find "Ingredients" section on page
-    3. Copy: "Lamb, turkey, lamb broth, lamb liver, chickpeas..."
-    4. Find "Guaranteed Analysis" table
-    5. Copy: "Crude Protein (Min.) 9.0%, Crude Fat (Min.) 8.5%..."
-    6. UPDATE supplies SET ingredients = '[verified]', guaranteed_analysis = '[verified]' WHERE id = X;
-    ```
 - Multi-Image Collection Strategy:
   - Pull ALL available product photos from Amazon, Chewy, or manufacturer websites
   - Image order matters: First image = main display, subsequent images append in carousel order
   - Photo types to collect for each product: Main product image, Brand marketing graphics, Quality/ingredients graphics, Size comparison photos, Feeding guidelines/charts, Guaranteed analysis images, Back of package.
+- **Image Validation Rules (CRITICAL - Product Type Matching)**:
+  - **Species Matching**: Cat products MUST show cat food images, dog products MUST show dog food images. Never mix species.
+    - Cat/kitten products: Image URL should contain "cat" or show cat on packaging
+    - Dog/puppy products: Image URL should contain "dog" or show dog on packaging
+    - Common error: Cat wet food showing dog food bag images
+  - **Format Matching**: Wet food products MUST show can/pouch images, dry food MUST show bag images.
+    - Wet food sizes: 2.8oz, 2.9oz, 5.5oz, 12.5oz, 12.8oz, 13oz cans/pouches/stews
+    - Dry food sizes: 3.5lb, 4lb, 7lb, 15lb, 15.5lb, 16lb, 30lb bags
+    - Common error: Wet food (e.g., "Chicken Stew 2.8oz") showing dry food bag (15.5lb bag)
+  - **Red Flag Image URL Patterns**:
+    - Cat product with "dog-food" in URL path = WRONG
+    - Wet food (oz size) with "bag" or "lb" size in URL = WRONG
+    - Kitten product with adult dog image = WRONG
+  - **Validation Query for Mismatches**:
+    ```sql
+    -- Find cat products with dog images
+    SELECT id, name FROM supplies WHERE LOWER(name) LIKE '%cat%' AND image_urls[1] LIKE '%dog%';
+    -- Find wet food with dry food images
+    SELECT id, name FROM supplies WHERE (LOWER(name) LIKE '%stew%' OR LOWER(name) LIKE '%2.9oz%') AND image_urls[1] LIKE '%bag%';
+    ```
+  - **Fix Process**: Search Chewy for exact product → fetch correct carousel images → update image_urls array
 - Item-Specific Descriptions (NOT Generic):
   - Descriptions must be product-specific, pulled directly from Chewy/Amazon product pages
   - NOT generic catch-all descriptions that apply to multiple products
