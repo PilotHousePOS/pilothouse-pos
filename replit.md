@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application designed to enhance the store's online presence, service accessibility, and product sales. It supports pet browsing, grooming appointment booking, and pet supply purchasing, including exotic reptiles. The business vision is to provide a comprehensive online platform that boosts sales, streamlines operations, and integrates inventory management, customer accounts, and administrative functionalities.
+The Animal House Pet Store project is a mobile-friendly web application designed to enhance the store's online presence, service accessibility, and product sales. It supports pet browsing, grooming appointment booking, and pet supply purchasing, including exotic reptiles. The business vision is to provide a comprehensive online platform that boosts sales, streamlines operations, and integrates inventory management, customer accounts, and administrative functionalities to expand market reach and improve efficiency.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -42,49 +42,41 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Feeding Instructions: Usage directions from product labels.
   - Features: JSON with highlights array for bullet point display.
   - Currently 6,177 products with ingredients, 5,475 with detailed descriptions.
-
-## Comprehensive Product Data Enhancement (ExaTouch POS Preparation)
-User is systematically enhancing ALL product data for ExaTouch POS import. Key requirements:
-
-**Multi-Image Collection Strategy:**
-- Pull ALL available product photos from Amazon, Chewy, or manufacturer websites
-- Image order matters: First image = main display, subsequent images append in carousel order
-- Photo types to collect for each product:
-  1. **Main product image** - Package front/hero shot
-  2. **Brand marketing graphics** - "Good 4 Life System", "Why [Brand]" infographics
-  3. **Quality/ingredients graphics** - Visual ingredient breakdowns
-  4. **Size comparison photos** - Kibble/product size with coin for scale
-  5. **Feeding guidelines/charts** - Visual feeding instructions
-  6. **Guaranteed analysis images** - Nutritional info graphics
-  7. **Back of package** - Ingredients list, instructions
-- Example: NutriSource products have 6-8 images each covering all these categories
-
-**Item-Specific Descriptions (NOT Generic):**
-- Descriptions must be product-specific, pulled directly from Chewy/Amazon product pages
-- NOT generic catch-all descriptions that apply to multiple products
-- Include key features, benefits, and specifications unique to that exact item
-- Example: Zilla Waterfall description includes specific features like "enclosed design prevents insects", "corner design reduces space"
-
-**ExaTouch POS Fields to Populate:**
-- **MfgPart**: Manufacturer part number (new column added)
-- **Color**: Product color variant (new column added)
-- **Size**: Product size (existing but needs population)
-- **Style**: Product style/variant (new column added)
-- These columns are currently empty and need data from product sources
-
-**Data Sources Priority:**
-1. Official manufacturer websites (most accurate)
-2. Chewy.com product pages (detailed, verified)
-3. Amazon product listings (comprehensive)
-4. Product packaging (for ingredients/analysis)
-
-**Current Enhancement Status:**
-- 7,732 total products in inventory
-- 6,177 products with ingredients (80%)
-- 5,475 products with detailed descriptions (71%)
-- **NutriSource: 102 products - 100% have official manufacturer images**
-- Size auto-extraction from product names using regex patterns
-- ExaTouch POS fields (mfgPart, color, style) ready for population
+- **Data Quality Validation Rules:**
+  - **Wet vs Dry Food Ingredients**: Wet food (cans) ingredients differ significantly from dry food (kibble). Never copy dry food ingredients to wet food products. Wet food typically starts with meat broth/water and named meats; dry food starts with meat meals and grains.
+  - **Protein Source Matching**: Ingredients must match the product's advertised protein (e.g., "Trout & Haddock" must have fish as primary ingredients, NOT chicken). Cross-check first 3-5 ingredients against product name.
+  - **Format-Specific Data**: Each product variant (5.5oz can vs 4lb bag) needs format-specific ingredients and guaranteed analysis from manufacturer website.
+  - **Primary Ingredient Validation**: If product name mentions specific proteins (salmon, beef, chicken, fish), those must appear in first 3 ingredients.
+  - **Example Catch**: NutriSource Classic Catch Cat 5.5oz (wet) was incorrectly using dry food ingredients (chicken-based) instead of correct wet food ingredients (fish broth, trout, haddock, cod).
+- **Multi-Image Collection Strategy:**
+  - Pull ALL available product photos from Amazon, Chewy, or manufacturer websites
+  - Image order matters: First image = main display, subsequent images append in carousel order
+  - Photo types to collect for each product: Main product image, Brand marketing graphics, Quality/ingredients graphics, Size comparison photos, Feeding guidelines/charts, Guaranteed analysis images, Back of package.
+- **Item-Specific Descriptions (NOT Generic):**
+  - Descriptions must be product-specific, pulled directly from Chewy/Amazon product pages
+  - NOT generic catch-all descriptions that apply to multiple products
+  - Include key features, benefits, and specifications unique to that exact item
+- **ExaTouch POS Fields to Populate:**
+  - **MfgPart**: Manufacturer part number
+  - **Color**: Product color variant
+  - **Size**: Product size
+  - **Style**: Product style/variant
+- **Data Sources Priority:**
+  1. Official manufacturer websites (most accurate)
+  2. Chewy.com product pages (detailed, verified)
+  3. Amazon product listings (comprehensive)
+  4. Product packaging (for ingredients/analysis)
+- **SKU = UPC**: The SKU field is used for UPC codes. All UPC data is stored in the SKU field. Manual UPC assignments (SKU values in production) must be preserved during sync/import. UPCs must be validated for leading zeros and standard 12-digit length. UPC prefix must match brand's known prefix. Attribute-based matching (size, wattage, weight, dimension, count) is critical for exact product identification.
+- **PROTECTED FIELDS (NEVER modify via scripts)**:
+  - `sku` (UPC codes) - Manually curated, must always persist
+  - `name` (Product titles) - Manually curated, must always persist
+  - All scrapers/automation must explicitly exclude these fields from updates
+  - Scripts should log confirmation that protected fields were preserved
+- **Testing Credentials**:
+  - Email: theanimalhouse@comcast.net
+  - Password: password
+  - Role: Admin
+  - Login Flow: Navigate to main page (/), click "Start Now", enter credentials. Do NOT bypass the main page.
 
 ## System Architecture
 The application is a full-stack web application featuring a React frontend (Vite, TypeScript, Tailwind CSS, shadcn/ui) and an Express.js backend (TypeScript) connected to a PostgreSQL database via Drizzle ORM.
@@ -115,12 +107,6 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **State Management**: TanStack Query.
 - **Routing**: Wouter.
 - **Development Practices**: Strict TypeScript, proper HTTP status codes, environment-aware configurations.
-- **SKU = UPC**: The SKU field is used for UPC codes. All UPC data is stored in the SKU field. Manual UPC assignments (SKU values in production) must be preserved during sync/import. UPCs must be validated for leading zeros and standard 12-digit length. UPC prefix must match brand's known prefix. Attribute-based matching (size, wattage, weight, dimension, count) is critical for exact product identification.
-- **PROTECTED FIELDS (NEVER modify via scripts)**: 
-  - `sku` (UPC codes) - Manually curated, must always persist
-  - `name` (Product titles) - Manually curated, must always persist
-  - All scrapers/automation must explicitly exclude these fields from updates
-  - Scripts should log confirmation that protected fields were preserved
 
 ## External Dependencies
 - **Database**: PostgreSQL
@@ -137,30 +123,3 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Server-Side Framework**: Express.js
 - **Query Library**: TanStack Query
 - **Client-Side Router**: Wouter
-## Testing & Authentication
-**Permanent Test Account:**
-- Email: theanimalhouse@comcast.net
-- Password: password
-- Role: Admin (full access)
-
-**Login Flow for Automated Testing:**
-1. Navigate to the main page (/)
-2. Click the "Start Now" button to initiate login
-3. Enter credentials on the login page
-4. After successful login, admin features are accessible
-
-**Critical Testing Notes:**
-- Tests MUST click "Start Now" on the main page before attempting login
-- Do NOT bypass the main page - the login flow starts there
-- This account has persistent admin access for all testing scenarios
-
-## Rollback Inventory
-- **File**: `backups/rollback-inventory-2025-01-05.json`
-- **Products**: 7,686
-- **UPC Coverage**: 95.3% (7,323 products with verified UPCs)
-- **Images**: 7,582 products with photos
-- **Features**: 7,202 products with extended info
-- **Ingredients**: 6,178 products with ingredient lists
-- **Date**: January 5, 2025
-- Use this file to restore inventory to a known good state with all manual UPC corrections, photos, and descriptions preserved
-- Brand consistency: "Zoo Med" standardized (15 "Zoomed" entries corrected)
