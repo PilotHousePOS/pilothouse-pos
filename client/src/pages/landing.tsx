@@ -36,11 +36,13 @@ export default function Landing() {
             </div>
             <div className="absolute top-0 right-0 w-5 h-5 bg-green-500 rounded-full"></div>
           </div>
-          <img 
-            src={animalHouseLogoPath} 
-            alt="Animal House Logo" 
-            className="w-52 h-auto object-contain mx-auto"
-          />
+          <div className="bg-white rounded-lg inline-block">
+            <img 
+              src={animalHouseLogoPath} 
+              alt="Animal House Logo" 
+              className="w-52 h-auto object-contain"
+            />
+          </div>
         </div>
 
         {/* Hero Text with Bold Typography */}
