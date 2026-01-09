@@ -24,14 +24,14 @@ function getScienceDietColor(name: string): string {
     return "Green";
   }
   
-  // Kitten products = Teal/Turquoise
+  // Kitten products = Green band (same as puppy)
   if (/kitten/i.test(lowerName)) {
-    return "Teal";
+    return "Green";
   }
   
   // Specialty/Prescription products = Silver
-  // These typically include: Sensitive, Urinary, Prescription, i/d, z/d, k/d, etc.
-  if (/sensitive|urinary|prescription|digestive|metabolic|mobility|brain|oral|perfect|derm|i\/d|z\/d|k\/d|w\/d|c\/d|l\/d|j\/d|d\/d|h\/d|t\/d|m\/d|a\/d|b\/d|r\/d|s\/d/i.test(lowerName)) {
+  // These typically include: Sensitive, Urinary, Prescription, Vitality, i/d, z/d, k/d, etc.
+  if (/sensitive|urinary|prescription|digestive|metabolic|mobility|brain|oral|perfect|derm|vitality|i\/d|z\/d|k\/d|w\/d|c\/d|l\/d|j\/d|d\/d|h\/d|t\/d|m\/d|a\/d|b\/d|r\/d|s\/d/i.test(lowerName)) {
     return "Silver";
   }
   
