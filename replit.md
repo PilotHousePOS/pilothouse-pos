@@ -137,6 +137,23 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Server-Side Framework**: Express.js
 - **Query Library**: TanStack Query
 - **Client-Side Router**: Wouter
+## Testing & Authentication
+**Permanent Test Account:**
+- Email: theanimalhouse@comcast.net
+- Password: password
+- Role: Admin (full access)
+
+**Login Flow for Automated Testing:**
+1. Navigate to the main page (/)
+2. Click the "Start Now" button to initiate login
+3. Enter credentials on the login page
+4. After successful login, admin features are accessible
+
+**Critical Testing Notes:**
+- Tests MUST click "Start Now" on the main page before attempting login
+- Do NOT bypass the main page - the login flow starts there
+- This account has persistent admin access for all testing scenarios
+
 ## Rollback Inventory
 - **File**: `backups/rollback-inventory-2025-01-05.json`
 - **Products**: 7,686
