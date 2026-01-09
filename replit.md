@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application designed to expand the store's online presence, improve service accessibility, and increase product sales. It provides features for pet browsing, grooming appointment booking, and purchasing pet supplies, including exotic reptiles. The platform aims to boost sales, streamline operations, and integrate inventory management, customer accounts, and administrative functions to broaden market reach and enhance efficiency.
+The Animal House Pet Store project is a mobile-friendly web application designed to expand the store's online presence, improve service accessibility, and increase product sales. It offers features for pet browsing, grooming appointment booking, and purchasing pet supplies, including exotic reptiles. The platform aims to boost sales, streamline operations, and integrate inventory management, customer accounts, and administrative functions to broaden market reach and enhance efficiency.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -72,6 +72,28 @@ The Animal House Pet Store project is a mobile-friendly web application designed
      - `WHERE ingredients LIKE 'Chicken, Chicken Meal%'` - dry kibble pattern in wrong products
      - `WHERE (name LIKE '%oz%' OR name LIKE '%Broth%') AND ingredients LIKE '%Meal%'` - wet foods with dry ingredients
      - `WHERE name LIKE '%fish%' AND ingredients NOT ILIKE '%fish%'` - protein mismatch
+- **MANDATORY Manufacturer Website Verification Process** (NEVER skip this):
+  - **DO NOT assume existing data is correct** - Always verify against actual manufacturer website
+  - **DO NOT copy ingredients from other products** - Each product needs its own verified data
+  - **Step 1**: Use `web_fetch` to load the actual manufacturer product page URL
+  - **Step 2**: Copy ingredients EXACTLY as shown on manufacturer website (including order and spelling)
+  - **Step 3**: Copy guaranteed analysis table with exact percentages from manufacturer
+  - **Step 4**: Only then run UPDATE query with verified data
+  - **NutriSource URLs**: `https://nutrisourcepetfoods.com/our-food/[product-slug]/`
+    - Grain Free Lamb: `/our-food/lamb/`
+    - Chicken & Rice Cat: `/our-food/chicken-rice/`
+    - Dog wet foods: `/our-food/nutrisource/nutrisource-dogs/nutrisource-grain-inclusive-dogs-wet/[recipe]/`
+  - **Science Diet URLs**: `https://www.hillspet.com/dog-food/` or `/cat-food/`
+  - **Royal Canin URLs**: `https://www.royalcanin.com/us/dogs/products/` or `/cats/products/`
+  - **Verification Example**:
+    ```
+    1. web_fetch("https://nutrisourcepetfoods.com/our-food/lamb/")
+    2. Find "Ingredients" section on page
+    3. Copy: "Lamb, turkey, lamb broth, lamb liver, chickpeas..."
+    4. Find "Guaranteed Analysis" table
+    5. Copy: "Crude Protein (Min.) 9.0%, Crude Fat (Min.) 8.5%..."
+    6. UPDATE supplies SET ingredients = '[verified]', guaranteed_analysis = '[verified]' WHERE id = X;
+    ```
 - **Multi-Image Collection Strategy:**
   - Pull ALL available product photos from Amazon, Chewy, or manufacturer websites
   - Image order matters: First image = main display, subsequent images append in carousel order
@@ -88,7 +110,7 @@ The Animal House Pet Store project is a mobile-friendly web application designed
 - **Data Sources Priority:**
   1. Official manufacturer websites (most accurate)
   2. Chewy.com product pages (detailed, verified)
-  3. Amazon product listings (comprehensive)
+  3. Amazon product listings (comprehesive)
   4. Product packaging (for ingredients/analysis)
 - **SKU = UPC**: The SKU field is used for UPC codes. All UPC data is stored in the SKU field. Manual UPC assignments (SKU values in production) must be preserved during sync/import. UPCs must be validated for leading zeros and standard 12-digit length. UPC prefix must match brand's known prefix. Attribute-based matching (size, wattage, weight, dimension, count) is critical for exact product identification.
 - **PROTECTED FIELDS (NEVER modify via scripts)**:
@@ -116,7 +138,7 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Core Management**: Pet & Supply Management (multi-image, extensive inventory, automated brand extraction), Appointment System (15-min intervals, admin approval, email notifications, Google Calendar sync), Order & Notification System.
 - **Authentication & Authorization**: JWT tokens, password reset, user settings, admin user management, three-tier role system (Customer, Groomer, Admin).
 - **Specialized Systems**: Wishlist, Google Calendar & Contact Management, Groomer Management, Content Management (Aquatics/Exotic Reptiles pages with subcategory filters), Admin Order Management, Orders & Appointments Search.
-- **Advanced Management**: Pet Boarding/Babysitting, Database Sync Tools (staging import, supplies-only sync, full sync), Auto-Categorization System (brand/keyword analysis, Live Animal Detection, category cleanup), Smart Abbreviation Expansion, Brand Extraction & Assignment.
+- **Advanced Management**: Pet Boarding/Babysitting, Database Sync Tools, Auto-Categorization System (brand/keyword analysis, Live Animal Detection, category cleanup), Smart Abbreviation Expansion, Brand Extraction & Assignment.
 - **Admin Tools**: Product Image Management (dashboard, batch search/preview), Employee & Grooming Schedule Management.
 - **AI & Integrations**: AI-Powered Order Photo Upload (GPT-5 Vision for item extraction, auto-categorization, custom pricing), Astro Loyalty Integration, POS Integration (real-time sync, webhooks).
 - **UPC Matching System**: Strict system for matching UPCs to products with 90% coverage and 100% accuracy, employing abbreviation expansion, text normalization, and verified brand mappings. Strict validation rules apply to size, wattage, weight/volume, dimensions, cup/capacity, and length. Includes critical product type exclusions and a comprehensive brand prefix expansion dictionary.
