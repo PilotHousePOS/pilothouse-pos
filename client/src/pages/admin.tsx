@@ -12554,10 +12554,7 @@ function SupplyImageUpload({ supplyId, currentImageUrl, onImageUploaded }: {
 
       const data = await response.json();
       onImageUploaded(data.storedPath);
-      toast({
-        title: "Image Uploaded",
-        description: "Image has been uploaded and stored permanently.",
-      });
+      // Success toast removed to speed up workflow
     } catch (error: any) {
       console.error('Upload error:', error);
       toast({
@@ -12776,13 +12773,7 @@ function SupplyMultiImageUpload({
         // This was an additional image - append to the list
         onAdditionalImagesChange([...additionalImageUrls, data.storedPath]);
       }
-      
-      toast({
-        title: "Image Uploaded",
-        description: data.isMainImage 
-          ? "Main product image set successfully." 
-          : `Additional image added (${additionalImageUrls.length + 2} total).`,
-      });
+      // Success toast removed to speed up workflow
     } catch (error: any) {
       console.error('Upload error:', error);
       toast({
@@ -12822,10 +12813,7 @@ function SupplyMultiImageUpload({
     const newAdditional = [mainImageUrl, ...additionalImageUrls.filter((_, i) => i !== index - 1)];
     onMainImageChange(newPrimary);
     onAdditionalImagesChange(newAdditional);
-    toast({
-      title: "Primary Image Changed",
-      description: "This image is now the main product image.",
-    });
+    // Success toast removed to speed up workflow
   };
 
   return (
@@ -13037,10 +13025,7 @@ function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageCha
 
       const data = await response.json();
       onImageChange(data.imageUrl);
-      toast({
-        title: "Image Uploaded",
-        description: "Image has been uploaded successfully.",
-      });
+      // Success toast removed to speed up workflow
     } catch (error) {
       console.error('Upload error:', error);
       toast({
@@ -13074,10 +13059,7 @@ function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageCha
     if (urlInput.trim()) {
       onImageChange(urlInput.trim());
       setUrlInput('');
-      toast({
-        title: "Image URL Added",
-        description: "Image URL has been set successfully.",
-      });
+      // Success toast removed to speed up workflow
     }
   };
 
@@ -13213,10 +13195,7 @@ function MultiImageUpload({ imageUrls, onImagesChange }: { imageUrls: string[]; 
       const data = await response.json();
       // Add new image to the array
       onImagesChange([...imageUrls, data.imageUrl]);
-      toast({
-        title: "Image Uploaded",
-        description: "Image has been uploaded successfully.",
-      });
+      // Success toast removed to speed up workflow
     } catch (error) {
       console.error('Upload error:', error);
       toast({
@@ -13401,6 +13380,9 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
     stockQuantity: '',
     weight: '',
     size: '',
+    color: '',
+    style: '',
+    mfgPart: '',
     sku: '',
     isActive: true,
   });
@@ -13492,6 +13474,58 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
           data-testid="input-add-supply-sku"
         />
       </div>
+      
+      {/* ExaTouch POS Fields - Optional */}
+      <div className="grid grid-cols-2 gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+        <div className="col-span-2">
+          <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-2">ExaTouch POS Fields (Optional)</p>
+        </div>
+        <div>
+          <Label htmlFor="size" className="text-xs">Size</Label>
+          <Input
+            id="size"
+            value={formData.size}
+            onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+            placeholder="e.g., 4lb, 12lb, Large"
+            className="text-sm"
+            data-testid="input-add-supply-size"
+          />
+        </div>
+        <div>
+          <Label htmlFor="color" className="text-xs">Color</Label>
+          <Input
+            id="color"
+            value={formData.color}
+            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+            placeholder="e.g., Red, Blue, Natural"
+            className="text-sm"
+            data-testid="input-add-supply-color"
+          />
+        </div>
+        <div>
+          <Label htmlFor="style" className="text-xs">Style</Label>
+          <Input
+            id="style"
+            value={formData.style}
+            onChange={(e) => setFormData({ ...formData, style: e.target.value })}
+            placeholder="e.g., Grain-Free, Chicken"
+            className="text-sm"
+            data-testid="input-add-supply-style"
+          />
+        </div>
+        <div>
+          <Label htmlFor="mfgPart" className="text-xs">Mfg Part #</Label>
+          <Input
+            id="mfgPart"
+            value={formData.mfgPart}
+            onChange={(e) => setFormData({ ...formData, mfgPart: e.target.value })}
+            placeholder="Manufacturer part number"
+            className="text-sm"
+            data-testid="input-add-supply-mfgpart"
+          />
+        </div>
+      </div>
+      
       <div>
         <Label htmlFor="description">Description</Label>
         <Textarea
