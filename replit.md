@@ -72,27 +72,27 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Pull ALL available product photos from Amazon, Chewy, or manufacturer websites
   - Image order matters: First image = main display, subsequent images append in carousel order
   - Photo types to collect for each product: Main product image, Brand marketing graphics, Quality/ingredients graphics, Size comparison photos, Feeding guidelines/charts, Guaranteed analysis images, Back of package.
-- **Image Validation Rules (CRITICAL - Product Type Matching)**:
-  - **Species Matching**: Cat products MUST show cat food images, dog products MUST show dog food images. Never mix species.
+- Image Validation Rules (CRITICAL - Product Type Matching):
+  - Species Matching: Cat products MUST show cat food images, dog products MUST show dog food images. Never mix species.
     - Cat/kitten products: Image URL should contain "cat" or show cat on packaging
     - Dog/puppy products: Image URL should contain "dog" or show dog on packaging
     - Common error: Cat wet food showing dog food bag images
-  - **Format Matching**: Wet food products MUST show can/pouch images, dry food MUST show bag images.
+  - Format Matching: Wet food products MUST show can/pouch images, dry food MUST show bag images.
     - Wet food sizes: 2.8oz, 2.9oz, 5.5oz, 12.5oz, 12.8oz, 13oz cans/pouches/stews
     - Dry food sizes: 3.5lb, 4lb, 7lb, 15lb, 15.5lb, 16lb, 30lb bags
     - Common error: Wet food (e.g., "Chicken Stew 2.8oz") showing dry food bag (15.5lb bag)
-  - **Red Flag Image URL Patterns**:
+  - Red Flag Image URL Patterns:
     - Cat product with "dog-food" in URL path = WRONG
     - Wet food (oz size) with "bag" or "lb" size in URL = WRONG
     - Kitten product with adult dog image = WRONG
-  - **Validation Query for Mismatches**:
+  - Validation Query for Mismatches:
     ```sql
     -- Find cat products with dog images
     SELECT id, name FROM supplies WHERE LOWER(name) LIKE '%cat%' AND image_urls[1] LIKE '%dog%';
     -- Find wet food with dry food images
     SELECT id, name FROM supplies WHERE (LOWER(name) LIKE '%stew%' OR LOWER(name) LIKE '%2.9oz%') AND image_urls[1] LIKE '%bag%';
     ```
-  - **Fix Process**: Search Chewy for exact product → fetch correct carousel images → update image_urls array
+  - Fix Process: Search Chewy for exact product → fetch correct carousel images → update image_urls array
 - Item-Specific Descriptions (NOT Generic):
   - Descriptions must be product-specific, pulled directly from Chewy/Amazon product pages
   - NOT generic catch-all descriptions that apply to multiple products
