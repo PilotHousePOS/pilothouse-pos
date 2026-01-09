@@ -43,11 +43,25 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Features: JSON with highlights array for bullet point display.
   - Currently 6,177 products with ingredients, 5,475 with detailed descriptions.
 - **Data Quality Validation Rules:**
-  - **Wet vs Dry Food Ingredients**: Wet food (cans) ingredients differ significantly from dry food (kibble). Never copy dry food ingredients to wet food products. Wet food typically starts with meat broth/water and named meats; dry food starts with meat meals and grains.
-  - **Protein Source Matching**: Ingredients must match the product's advertised protein (e.g., "Trout & Haddock" must have fish as primary ingredients, NOT chicken). Cross-check first 3-5 ingredients against product name.
-  - **Format-Specific Data**: Each product variant (5.5oz can vs 4lb bag) needs format-specific ingredients and guaranteed analysis from manufacturer website.
-  - **Primary Ingredient Validation**: If product name mentions specific proteins (salmon, beef, chicken, fish), those must appear in first 3 ingredients.
-  - **Example Catch**: NutriSource Classic Catch Cat 5.5oz (wet) was incorrectly using dry food ingredients (chicken-based) instead of correct wet food ingredients (fish broth, trout, haddock, cod).
+  - **Wet vs Dry Food Ingredients**: Wet food (cans, stews, broths, entrees) ingredients differ significantly from dry food (kibble, bags). Never copy dry food ingredients to wet food products.
+    - **Wet food indicators**: Starts with meat broth/water, named fresh meats (chicken, beef, turkey), high moisture (70-96%), sizes like oz cans/pouches
+    - **Dry food indicators**: Starts with meat meals (chicken meal, beef meal), grains (brown rice, barley), low moisture (10%), sizes like lb bags
+    - **Common mistake pattern**: "Chicken, Chicken Meal, Brown Rice, Barley" is DRY kibble formula - NEVER use for canned/wet products
+  - **Product Format Detection Rules:**
+    - **Bone broth toppers** (Come-Pooch-A): Must start with "[protein] bone broth" (e.g., "Turkey bone broth, liquid Lactobacillus...")
+    - **Canned wet food** (13oz, 5.5oz cans): Must start with "[protein], [protein] broth" (e.g., "Chicken, chicken broth, chicken liver...")
+    - **Stews/Entrees**: Must start with fresh meat + broth (e.g., "Beef, beef broth, beef liver, tapioca starch...")
+    - **Dry kibble** (4lb, 26lb, 30lb bags): Can start with meat meals (e.g., "Chicken meal, whole grain sorghum...")
+  - **Protein Source Matching**: Ingredients must match the product's advertised protein. Cross-check first 3-5 ingredients against product name.
+    - "Classic Catch" (fish) → Must have fish ingredients (haddock, trout, cod)
+    - "Turkey Bone Broth" → Must start with "Turkey bone broth"
+    - "Beef Stew" → Must start with "Beef, beef broth"
+  - **Format-Specific Data**: Each product variant (5.5oz can vs 4lb bag) needs format-specific ingredients from manufacturer website.
+  - **Red Flag Patterns** (indicates wrong ingredients copied):
+    - Wet food with "Chicken Meal" or "Beef Meal" in first 3 ingredients
+    - Bone broth products with grains (brown rice, barley, oatmeal)
+    - Canned food with moisture <70% in guaranteed analysis
+  - **Verification Process**: Always search official manufacturer website for exact product page, confirm ingredients match product size and format before updating.
 - **Multi-Image Collection Strategy:**
   - Pull ALL available product photos from Amazon, Chewy, or manufacturer websites
   - Image order matters: First image = main display, subsequent images append in carousel order
