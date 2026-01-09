@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application designed to expand the store's online presence, improve service accessibility, and increase product sales. It offers features for pet browsing, grooming appointment booking, and purchasing pet supplies, including exotic reptiles. The platform aims to boost sales, streamline operations, and integrate inventory management, customer accounts, and administrative functions to broaden market reach and enhance efficiency.
+The Animal House Pet Store project is a mobile-friendly web application designed to expand the store's online presence, improve service accessibility, and increase product sales. It enables pet browsing, grooming appointment booking, and purchasing pet supplies, including exotic reptiles. The platform aims to boost sales, streamline operations, and integrate inventory management, customer accounts, and administrative functions to broaden market reach and enhance efficiency.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -42,50 +42,49 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Feeding Instructions: Usage directions from product labels.
   - Features: JSON with highlights array for bullet point display.
   - Currently 6,177 products with ingredients, 5,475 with detailed descriptions.
-- **Data Quality Validation Rules:**
-  - **Wet vs Dry Food Ingredients**: Wet food (cans, stews, broths, entrees) ingredients differ significantly from dry food (kibble, bags). Never copy dry food ingredients to wet food products.
-    - **Wet food indicators**: Starts with meat broth/water, named fresh meats (chicken, beef, turkey), high moisture (70-96%), sizes like oz cans/pouches
-    - **Dry food indicators**: Starts with meat meals (chicken meal, beef meal), grains (brown rice, barley), low moisture (10%), sizes like lb bags
-    - **Common mistake pattern**: "Chicken, Chicken Meal, Brown Rice, Barley" is DRY kibble formula - NEVER use for canned/wet products
-  - **Product Format Detection Rules:**
-    - **Bone broth toppers** (Come-Pooch-A): Must start with "[protein] bone broth" (e.g., "Turkey bone broth, liquid Lactobacillus...")
-    - **Canned wet food** (13oz, 5.5oz cans): Must start with "[protein], [protein] broth" (e.g., "Chicken, chicken broth, chicken liver...")
-    - **Stews/Entrees**: Must start with fresh meat + broth (e.g., "Beef, beef broth, beef liver, tapioca starch...")
-    - **Dry kibble** (4lb, 26lb, 30lb bags): Can start with meat meals (e.g., "Chicken meal, whole grain sorghum...")
-  - **Protein Source Matching**: Ingredients must match the product's advertised protein. Cross-check first 3-5 ingredients against product name.
+- Data Quality Validation Rules:
+  - Wet vs Dry Food Ingredients: Wet food (cans, stews, broths, entrees) ingredients differ significantly from dry food (kibble, bags). Never copy dry food ingredients to wet food products.
+    - Wet food indicators: Starts with meat broth/water, named fresh meats (chicken, beef, turkey), high moisture (70-96%), sizes like oz cans/pouches
+    - Dry food indicators: Starts with meat meals (chicken meal, beef meal), grains (brown rice, barley), low moisture (10%), sizes like lb bags
+    - Common mistake pattern: "Chicken, Chicken Meal, Brown Rice, Barley" is DRY kibble formula - NEVER use for canned/wet products
+  - Product Format Detection Rules:
+    - Bone broth toppers (Come-Pooch-A): Must start with "[protein] bone broth" (e.g., "Turkey bone broth, liquid Lactobacillus...")
+    - Canned wet food (13oz, 5.5oz cans): Must start with "[protein], [protein] broth" (e.g., "Chicken, chicken broth, chicken liver...")
+    - Stews/Entrees: Must start with fresh meat + broth (e.g., "Beef, beef broth, beef liver, tapioca starch...")
+    - Dry kibble (4lb, 26lb, 30lb bags): Can start with meat meals (e.g., "Chicken meal, whole grain sorghum...")
+  - Protein Source Matching: Ingredients must match the product's advertised protein. Cross-check first 3-5 ingredients against product name.
     - "Classic Catch" (fish) → Must have fish ingredients (haddock, trout, cod)
     - "Turkey Bone Broth" → Must start with "Turkey bone broth"
     - "Beef Stew" → Must start with "Beef, beef broth"
-  - **Format-Specific Data**: Each product variant (5.5oz can vs 4lb bag) needs format-specific ingredients from manufacturer website.
-  - **Red Flag Patterns** (indicates wrong ingredients copied):
+  - Format-Specific Data: Each product variant (5.5oz can vs 4lb bag) needs format-specific ingredients from manufacturer website.
+  - Red Flag Patterns (indicates wrong ingredients copied):
     - Wet food with "Chicken Meal" or "Beef Meal" in first 3 ingredients
     - Bone broth products with grains (brown rice, barley, oatmeal)
     - Canned food with moisture <70% in guaranteed analysis
-  - **Verification Process**: Always search official manufacturer website for exact product page, confirm ingredients match product size and format before updating.
-- **Brand Ingredient Audit Process** (use for Science Diet, Royal Canin, etc.):
-  1. **Query all brand products with wrong patterns**: `SELECT id, name, ingredients FROM supplies WHERE name ILIKE '%brand%' AND ingredients LIKE '%Meal%'`
-  2. **Identify wet foods with dry ingredients**: Check for "Chicken Meal", "Beef Meal", "Brown Rice, Barley" in products with oz sizes
-  3. **Search manufacturer website for each product**: Use format-specific URLs (e.g., `/wet-dog-food/`, `/canned-cat-food/`)
-  4. **Update with correct ingredients**: Include guaranteed analysis with proper moisture (78%+ for wet)
-  5. **Verify protein matching**: First ingredients must match product name protein
-  6. **SQL audit queries to run**:
+  - Verification Process: Always search official manufacturer website for exact product page, confirm ingredients match product size and format before updating.
+- Brand Ingredient Audit Process (use for Science Diet, Royal Canin, etc.):
+  1. Query all brand products with wrong patterns: `SELECT id, name, ingredients FROM supplies WHERE name ILIKE '%brand%' AND ingredients LIKE '%Meal%'`
+  2. Identify wet foods with dry ingredients: Check for "Chicken Meal", "Beef Meal", "Brown Rice, Barley" in products with oz sizes
+  3. Search manufacturer website for each product: Use format-specific URLs (e.g., `/wet-dog-food/`, `/canned-cat-food/`)
+  4. Update with correct ingredients: Include guaranteed analysis with proper moisture (78%+ for wet)
+  5. Verify protein matching: First ingredients must match product name protein
+  6. SQL audit queries to run:
      - `WHERE ingredients LIKE 'Chicken, Chicken Meal%'` - dry kibble pattern in wrong products
      - `WHERE (name LIKE '%oz%' OR name LIKE '%Broth%') AND ingredients LIKE '%Meal%'` - wet foods with dry ingredients
      - `WHERE name LIKE '%fish%' AND ingredients NOT ILIKE '%fish%'` - protein mismatch
-- **MANDATORY Manufacturer Website Verification Process** (NEVER skip this):
-  - **DO NOT assume existing data is correct** - Always verify against actual manufacturer website
-  - **DO NOT copy ingredients from other products** - Each product needs its own verified data
-  - **Step 1**: Use `web_fetch` to load the actual manufacturer product page URL
-  - **Step 2**: Copy ingredients EXACTLY as shown on manufacturer website (including order and spelling)
-  - **Step 3**: Copy guaranteed analysis table with exact percentages from manufacturer
-  - **Step 4**: Only then run UPDATE query with verified data
-  - **NutriSource URLs**: `https://nutrisourcepetfoods.com/our-food/[product-slug]/`
-    - Grain Free Lamb: `/our-food/lamb/`
-    - Chicken & Rice Cat: `/our-food/chicken-rice/`
-    - Dog wet foods: `/our-food/nutrisource/nutrisource-dogs/nutrisource-grain-inclusive-dogs-wet/[recipe]/`
-  - **Science Diet URLs**: `https://www.hillspet.com/dog-food/` or `/cat-food/`
-  - **Royal Canin URLs**: `https://www.royalcanin.com/us/dogs/products/` or `/cats/products/`
-  - **Verification Example**:
+- MANDATORY Manufacturer Website Verification Process (NEVER skip this):
+  - DO NOT assume existing data is correct - Always verify against actual manufacturer website
+  - DO NOT copy ingredients from other products - Each product needs its own verified data
+  - Step 1: Use `web_fetch` to load the actual manufacturer product page URL
+  - Step 2: Copy ingredients EXACTLY as shown on manufacturer website (including order and spelling)
+  - Step 3: Copy guaranteed analysis table with exact percentages from manufacturer
+  - Step 4: Only then run UPDATE query with verified data
+  - NutriSource URLs: `https://discovernutrisource.com/products/[product-slug]/`
+    - Example: `discovernutrisource.com/products/chicken-bone-broth-recipe-come-pooch-a`
+    - Alternative info site: `nutrisourcepetfoods.com/our-food/[product-slug]/` (has ingredient details)
+  - Science Diet URLs: `https://www.hillspet.com/dog-food/` or `/cat-food/`
+  - Royal Canin URLs: `https://www.royalcanin.com/us/dogs/products/` or `/cats/products/`
+  - Verification Example:
     ```
     1. web_fetch("https://nutrisourcepetfoods.com/our-food/lamb/")
     2. Find "Ingredients" section on page
@@ -94,31 +93,31 @@ The Animal House Pet Store project is a mobile-friendly web application designed
     5. Copy: "Crude Protein (Min.) 9.0%, Crude Fat (Min.) 8.5%..."
     6. UPDATE supplies SET ingredients = '[verified]', guaranteed_analysis = '[verified]' WHERE id = X;
     ```
-- **Multi-Image Collection Strategy:**
+- Multi-Image Collection Strategy:
   - Pull ALL available product photos from Amazon, Chewy, or manufacturer websites
   - Image order matters: First image = main display, subsequent images append in carousel order
   - Photo types to collect for each product: Main product image, Brand marketing graphics, Quality/ingredients graphics, Size comparison photos, Feeding guidelines/charts, Guaranteed analysis images, Back of package.
-- **Item-Specific Descriptions (NOT Generic):**
+- Item-Specific Descriptions (NOT Generic):
   - Descriptions must be product-specific, pulled directly from Chewy/Amazon product pages
   - NOT generic catch-all descriptions that apply to multiple products
   - Include key features, benefits, and specifications unique to that exact item
-- **ExaTouch POS Fields to Populate:**
-  - **MfgPart**: Manufacturer part number
-  - **Color**: Product color variant
-  - **Size**: Product size
-  - **Style**: Product style/variant
-- **Data Sources Priority:**
+- ExaTouch POS Fields to Populate:
+  - MfgPart: Manufacturer part number
+  - Color: Product color variant
+  - Size: Product size
+  - Style: Product style/variant
+- Data Sources Priority:
   1. Official manufacturer websites (most accurate)
   2. Chewy.com product pages (detailed, verified)
   3. Amazon product listings (comprehesive)
   4. Product packaging (for ingredients/analysis)
-- **SKU = UPC**: The SKU field is used for UPC codes. All UPC data is stored in the SKU field. Manual UPC assignments (SKU values in production) must be preserved during sync/import. UPCs must be validated for leading zeros and standard 12-digit length. UPC prefix must match brand's known prefix. Attribute-based matching (size, wattage, weight, dimension, count) is critical for exact product identification.
-- **PROTECTED FIELDS (NEVER modify via scripts)**:
+- SKU = UPC: The SKU field is used for UPC codes. All UPC data is stored in the SKU field. Manual UPC assignments (SKU values in production) must be preserved during sync/import. UPCs must be validated for leading zeros and standard 12-digit length. UPC prefix must match brand's known prefix. Attribute-based matching (size, wattage, weight, dimension, count) is critical for exact product identification.
+- PROTECTED FIELDS (NEVER modify via scripts):
   - `sku` (UPC codes) - Manually curated, must always persist
   - `name` (Product titles) - Manually curated, must always persist
   - All scrapers/automation must explicitly exclude these fields from updates
   - Scripts should log confirmation that protected fields were preserved
-- **Testing Credentials**:
+- Testing Credentials:
   - Email: theanimalhouse@comcast.net
   - Password: password
   - Role: Admin
