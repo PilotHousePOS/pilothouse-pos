@@ -35,9 +35,9 @@ function getScienceDietColor(name: string): string {
     return "Silver";
   }
   
-  // Light/Weight Management products may have light blue or different shade
-  if (/light|weight|perfect weight|healthy weight/i.test(lowerName)) {
-    return "Red"; // Still red band for adult weight management
+  // Light/Weight Management products = Silver band (specialty)
+  if (/light/i.test(lowerName)) {
+    return "Silver";
   }
   
   // Senior 7+, 11+ Adult products = Red band (same as regular adult)
