@@ -112,7 +112,8 @@ The Animal House Pet Store project is a mobile-friendly web application designed
     - Weight Management = Green
     - Seafood/Salmon = Red
     - Classic Catch / Country Select = Teal
-    - Elements Crispy Crispers (treats only) = Purple (ALL flavors)
+    - Elements dry food bags = Black
+    - Elements Crispy Crispers (treats only) = Purple
     - Chompy Chompers = Purple
     - Grillin' Grillers = Purple
     - Little Bites (most) = Purple
