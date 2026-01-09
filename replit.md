@@ -116,7 +116,6 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - `sku` (UPC codes) - Manually curated, must always persist
   - `name` (Product titles) - Manually curated, must always persist
   - All scrapers/automation must explicitly exclude these fields from updates
-  - Scripts should log confirmation that protected fields were preserved
 - Testing Credentials:
   - Email: theanimalhouse@comcast.net
   - Password: password
@@ -124,7 +123,7 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Login Flow: Navigate to main page (/), click "Start Now", enter credentials. Do NOT bypass the main page.
 
 ## System Architecture
-The application is a full-stack web application featuring a React frontend (Vite, TypeScript, Tailwind CSS, shadcn/ui) and an Express.js backend (TypeScript), all connected to a PostgreSQL database via Drizzle ORM.
+The application is a full-stack web application featuring a React frontend and an Express.js backend, all connected to a PostgreSQL database via Drizzle ORM.
 
 **UI/UX Decisions:**
 - Dark, bold design with strong contrast and mobile responsiveness.
@@ -140,7 +139,7 @@ The application is a full-stack web application featuring a React frontend (Vite
 - **Advanced Management**: Pet Boarding/Babysitting, Database Sync Tools, Auto-Categorization System (brand/keyword analysis, Live Animal Detection, category cleanup), Smart Abbreviation Expansion, Brand Extraction & Assignment.
 - **Admin Tools**: Product Image Management (dashboard, batch search/preview), Employee & Grooming Schedule Management.
 - **AI & Integrations**: AI-Powered Order Photo Upload (GPT-5 Vision for item extraction, auto-categorization, custom pricing), Astro Loyalty Integration, POS Integration (real-time sync, webhooks).
-- **UPC Matching System**: Strict system for matching UPCs to products with 90% coverage and 100% accuracy, employing abbreviation expansion, text normalization, and verified brand mappings. Strict validation rules apply to size, wattage, weight/volume, dimensions, cup/capacity, and length. Includes critical product type exclusions and a comprehensive brand prefix expansion dictionary.
+- **UPC Matching System**: Strict system for matching UPCs to products with 90% coverage and 100% accuracy, employing abbreviation expansion, text normalization, and verified brand mappings. Strict validation rules apply to size, wattage, weight/volume, dimension, cup/capacity, and length. Includes critical product type exclusions and a comprehensive brand prefix expansion dictionary.
     - **Validation Rules**: Size, Wattage, Weight/Volume, Dimension, Cup/Capacity, and Length must match exactly.
     - **Brand-UPC Prefix Validation**: UPC prefix must match product's brand using GS1 manufacturer prefixes.
 
