@@ -1,10 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, ChevronLeft, ChevronRight, X } from "lucide-react";
 import SupplyCard from "@/components/supply-card";
 import CartSidebar from "@/components/cart-sidebar";
+
+function getUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    search: params.get('search') || '',
+    category: params.get('category') || '',
+    page: parseInt(params.get('page') || '0', 10),
+    animalType: params.get('animalType') || '',
+    toyType: params.get('toyType') || '',
+    healthcareType: params.get('healthcareType') || '',
+    aquaticType: params.get('aquaticType') || '',
+    reptileType: params.get('reptileType') || '',
+    birdType: params.get('birdType') || '',
+    smallAnimalProductType: params.get('smallAnimalProductType') || '',
+    petFoodAnimalType: params.get('petFoodAnimalType') || '',
+    treatAnimalType: params.get('treatAnimalType') || '',
+  };
+}
 
 const SUPPLY_CATEGORIES = [
   { id: 'petFood', label: 'Pet Food', emoji: '🍖' },
@@ -100,38 +119,77 @@ const TREAT_ANIMAL_TYPES = [
 ];
 
 export default function Supplies() {
-  const [searchInput, setSearchInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedAnimalType, setSelectedAnimalType] = useState('');
-  const [selectedToyType, setSelectedToyType] = useState('');
-  const [selectedHealthcareType, setSelectedHealthcareType] = useState('');
-  const [selectedAquaticType, setSelectedAquaticType] = useState('');
-  const [selectedReptileType, setSelectedReptileType] = useState('');
-  const [selectedBirdType, setSelectedBirdType] = useState('');
-  const [selectedSmallAnimalProductType, setSelectedSmallAnimalProductType] = useState('');
-  const [selectedPetFoodAnimalType, setSelectedPetFoodAnimalType] = useState('');
-  const [selectedTreatAnimalType, setSelectedTreatAnimalType] = useState('');
+  const [location, setLocation] = useLocation();
+  const urlParams = getUrlParams();
+  
+  const [searchInput, setSearchInput] = useState(urlParams.search);
+  const [searchQuery, setSearchQuery] = useState(urlParams.search);
+  const [selectedCategory, setSelectedCategory] = useState(urlParams.category);
+  const [selectedAnimalType, setSelectedAnimalType] = useState(urlParams.animalType);
+  const [selectedToyType, setSelectedToyType] = useState(urlParams.toyType);
+  const [selectedHealthcareType, setSelectedHealthcareType] = useState(urlParams.healthcareType);
+  const [selectedAquaticType, setSelectedAquaticType] = useState(urlParams.aquaticType);
+  const [selectedReptileType, setSelectedReptileType] = useState(urlParams.reptileType);
+  const [selectedBirdType, setSelectedBirdType] = useState(urlParams.birdType);
+  const [selectedSmallAnimalProductType, setSelectedSmallAnimalProductType] = useState(urlParams.smallAnimalProductType);
+  const [selectedPetFoodAnimalType, setSelectedPetFoodAnimalType] = useState(urlParams.petFoodAnimalType);
+  const [selectedTreatAnimalType, setSelectedTreatAnimalType] = useState(urlParams.treatAnimalType);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(urlParams.page);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+
+  const updateUrl = useCallback((updates: Record<string, string | number>) => {
+    const params = new URLSearchParams(window.location.search);
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === '' || value === 0) {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
+    });
+    const newSearch = params.toString();
+    const newUrl = newSearch ? `/supplies?${newSearch}` : '/supplies';
+    window.history.replaceState({}, '', newUrl);
+  }, []);
 
   // Handle search submit
   const handleSearch = (e?: React.FormEvent) => {
     e?.preventDefault();
-    setSearchQuery(searchInput.trim());
+    const trimmedSearch = searchInput.trim();
+    setSearchQuery(trimmedSearch);
+    setCurrentPage(0);
+    updateUrl({ search: trimmedSearch, page: 0 });
   };
 
   // Auto-reset search when input is cleared (backspace or X button)
   useEffect(() => {
     if (searchInput === '' && searchQuery !== '') {
       setSearchQuery('');
+      updateUrl({ search: '' });
     }
-  }, [searchInput, searchQuery]);
+  }, [searchInput, searchQuery, updateUrl]);
 
-  // Reset page and filters when category changes
+  // Update URL when page changes
   useEffect(() => {
+    updateUrl({ page: currentPage });
+  }, [currentPage, updateUrl]);
+
+  // Update URL when category changes
+  useEffect(() => {
+    updateUrl({ 
+      category: selectedCategory, 
+      page: 0,
+      animalType: '',
+      toyType: '',
+      healthcareType: '',
+      aquaticType: '',
+      reptileType: '',
+      birdType: '',
+      smallAnimalProductType: '',
+      petFoodAnimalType: '',
+      treatAnimalType: ''
+    });
     setCurrentPage(0);
     // Clear animal type when not in small animal category
     if (selectedCategory !== 'smallanimal') {
@@ -166,12 +224,24 @@ export default function Supplies() {
     if (selectedCategory !== 'treats') {
       setSelectedTreatAnimalType('');
     }
-  }, [searchQuery, selectedCategory]);
+  }, [selectedCategory, updateUrl]);
 
-  // Reset page when any sub-filter changes
+  // Update URL when sub-filters change
   useEffect(() => {
+    updateUrl({ 
+      animalType: selectedAnimalType,
+      toyType: selectedToyType,
+      healthcareType: selectedHealthcareType,
+      aquaticType: selectedAquaticType,
+      reptileType: selectedReptileType,
+      birdType: selectedBirdType,
+      smallAnimalProductType: selectedSmallAnimalProductType,
+      petFoodAnimalType: selectedPetFoodAnimalType,
+      treatAnimalType: selectedTreatAnimalType,
+      page: 0
+    });
     setCurrentPage(0);
-  }, [selectedAnimalType, selectedToyType, selectedHealthcareType, selectedAquaticType, selectedReptileType, selectedBirdType, selectedSmallAnimalProductType, selectedPetFoodAnimalType, selectedTreatAnimalType]);
+  }, [selectedAnimalType, selectedToyType, selectedHealthcareType, selectedAquaticType, selectedReptileType, selectedBirdType, selectedSmallAnimalProductType, selectedPetFoodAnimalType, selectedTreatAnimalType, updateUrl]);
 
   const { data, isLoading } = useQuery<{
     items: any[];
