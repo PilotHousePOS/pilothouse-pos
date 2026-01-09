@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
@@ -122,6 +122,9 @@ export default function Supplies() {
   const [location, setLocation] = useLocation();
   const urlParams = getUrlParams();
   
+  // Ref to track if this is the initial mount - skip page reset on mount
+  const isInitialMount = useRef(true);
+  
   const [searchInput, setSearchInput] = useState(urlParams.search);
   const [searchQuery, setSearchQuery] = useState(urlParams.search);
   const [selectedCategory, setSelectedCategory] = useState(urlParams.category);
@@ -138,6 +141,36 @@ export default function Supplies() {
   const [currentPage, setCurrentPage] = useState(urlParams.page);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+  
+  // Sync state from URL on browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = getUrlParams();
+      setSearchInput(params.search);
+      setSearchQuery(params.search);
+      setSelectedCategory(params.category);
+      setSelectedAnimalType(params.animalType);
+      setSelectedToyType(params.toyType);
+      setSelectedHealthcareType(params.healthcareType);
+      setSelectedAquaticType(params.aquaticType);
+      setSelectedReptileType(params.reptileType);
+      setSelectedBirdType(params.birdType);
+      setSelectedSmallAnimalProductType(params.smallAnimalProductType);
+      setSelectedPetFoodAnimalType(params.petFoodAnimalType);
+      setSelectedTreatAnimalType(params.treatAnimalType);
+      setCurrentPage(params.page);
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+  
+  // Mark initial mount complete after first render
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+    }
+  }, []);
 
   const updateUrl = useCallback((updates: Record<string, string | number>) => {
     const params = new URLSearchParams(window.location.search);
@@ -175,8 +208,19 @@ export default function Supplies() {
     updateUrl({ page: currentPage });
   }, [currentPage, updateUrl]);
 
+  // Track if category effect has run once (to skip page reset on initial mount)
+  const categoryEffectRan = useRef(false);
+  
   // Update URL when category changes
   useEffect(() => {
+    // Skip page reset on initial mount - preserve URL page state
+    if (!categoryEffectRan.current) {
+      categoryEffectRan.current = true;
+      // Still update URL with current values but don't reset page
+      updateUrl({ category: selectedCategory });
+      return;
+    }
+    
     updateUrl({ 
       category: selectedCategory, 
       page: 0,
@@ -226,8 +270,17 @@ export default function Supplies() {
     }
   }, [selectedCategory, updateUrl]);
 
+  // Track if subfilter effect has run once (to skip page reset on initial mount)
+  const subfilterEffectRan = useRef(false);
+  
   // Update URL when sub-filters change
   useEffect(() => {
+    // Skip page reset on initial mount - preserve URL page state
+    if (!subfilterEffectRan.current) {
+      subfilterEffectRan.current = true;
+      return;
+    }
+    
     updateUrl({ 
       animalType: selectedAnimalType,
       toyType: selectedToyType,
