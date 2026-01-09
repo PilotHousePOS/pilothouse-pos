@@ -10,16 +10,10 @@ async function downloadImages() {
 
   const updates = [
     {
-      id: 6513,
-      name: "Nutrisource Small & Medium Breed Puppy Chicken & Rice Recipe 5.5oz",
+      id: 6295,
+      name: "Nutrisource Grain Free Lamb 26lb",
       brand: "Nutrisource",
-      imageUrl: "https://nutrisourcepetfoods.com/wp-content/uploads/2020/03/5_5ozNS_SmlMedPuppyCan.png"
-    },
-    {
-      id: 6690,
-      name: "Nutrisource Classic Catch Cat 5.5oz",
-      brand: "Nutrisource",
-      imageUrl: "https://nutrisourcepetfoods.com/wp-content/uploads/2023/11/5_5ozES_ClassicCatch_CatCan.png"
+      imageUrl: "https://nutrisourcepetfoods.com/wp-content/uploads/2020/02/NSGF_LambPeas.png"
     }
   ];
 

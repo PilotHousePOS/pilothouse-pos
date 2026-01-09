@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application designed to expand the store's online presence, boost sales, and streamline operations. It enables customers to purchase pets (including specialty exotic reptiles), book grooming appointments, and buy pet supplies. The platform integrates inventory, customer accounts, and administrative functions, aiming to become a premier online destination for pet owners.
+The Animal House Pet Store project is a mobile-friendly web application for an exotic reptile pet store. It aims to expand online presence, increase sales, and streamline operations by enabling customers to purchase pets and supplies, book grooming appointments, and providing comprehensive inventory, customer account, and administrative functionalities. The project's vision is to establish the store as a premier online destination for pet owners.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -163,7 +163,7 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Login Flow: Navigate to main page (/), click "Start Now", enter credentials. Do NOT bypass the main page.
 
 ## System Architecture
-The application is a full-stack web application with a React frontend, an Express.js backend, and a PostgreSQL database utilizing Drizzle ORM.
+The application is a full-stack web application built with a React frontend, an Express.js backend, and a PostgreSQL database utilizing Drizzle ORM.
 
 **UI/UX Decisions:**
 - Dark, bold design with strong contrast and mobile responsiveness.
