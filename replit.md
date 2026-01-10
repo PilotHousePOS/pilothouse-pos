@@ -1,20 +1,20 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application for an exotic reptile pet store. It aims to expand online presence and streamline operations, allowing customers to purchase pets and supplies, and book grooming appointments. The application provides comprehensive inventory, customer account, and administrative functionalities, positioning the store as a premier online destination for exotic pet owners.
+The Animal House Pet Store project is a mobile-friendly web application designed for an exotic reptile pet store. Its primary goal is to establish a robust online presence, streamline business operations, and provide customers with an intuitive platform to purchase pets and supplies, and book grooming appointments. The application features comprehensive inventory, customer account management, and administrative functionalities, aiming to position the store as a leading online destination for exotic pet owners and expand its market share.
 
 ## User Preferences
-- Dark, bold design aesthetic with strong contrast
-- No free services - but don't display prices in booking appointments
-- Remove vet care and training services completely - only grooming services offered
-- Add exotic reptiles as specialty instead of training
-- Customer login should redirect to full-access customer homepage, not welcome page
-- Authentication must work reliably without session persistence issues
-- Booking restrictions: No appointments on Sundays, no appointments after 1:30 PM
-- Grooming services: Only "Bath Only" and "Full Grooming" options
-- Mobile authentication consistency: Same account should show identical admin access across devices
-- Inventory Management: Full product names and descriptions preserved from Excel imports (no abbreviations)
-- Search Functionality: All searches (supplies, pets) with intelligent typo tolerance and brand expansion
+- Dark, bold design aesthetic with strong contrast.
+- No free services - but don't display prices in booking appointments.
+- Remove vet care and training services completely - only grooming services offered.
+- Add exotic reptiles as specialty instead of training.
+- Customer login should redirect to full-access customer homepage, not welcome page.
+- Authentication must work reliably without session persistence issues.
+- Booking restrictions: No appointments on Sundays, no appointments after 1:30 PM.
+- Grooming services: Only "Bath Only" and "Full Grooming" options.
+- Mobile authentication consistency: Same account should show identical admin access across devices.
+- Inventory Management: Full product names and descriptions preserved from Excel imports (no abbreviations).
+- Search Functionality: All searches (supplies, pets) with intelligent typo tolerance and brand expansion.
 - Supply Filtering: Centralized, research-based filtering system with proper brand/keyword separation (server/filterConfig.ts).
 - Food vs Treat Categorization by Size: For freeze-dried products (Vital Essentials, etc.), products >3oz are categorized as food (dogFood/catFood), products ≤3oz are categorized as treats (dogTreats/catTreats). Patties, nibbles, and mini pate in larger sizes are food; bites and small portions are treats.
 - Product Recommendations ("You May Also Like"): Smart cross-category recommendations based on product type.
@@ -150,7 +150,6 @@ The Animal House Pet Store project is a mobile-friendly web application for an e
   - Login Flow: Navigate to main page (/), click "Start Now", enter credentials. Do NOT bypass the main page.
 - MANDATORY Product Data Checklist (CRITICAL - Never Skip)
 **EVERY product added or updated MUST have ALL of these fields populated:**
-
 ### Required Fields for ALL Products:
 1. **image_urls** (array) - Minimum 6 carousel images from manufacturer website
 2. **guaranteed_analysis** - Protein %, Fat %, Fiber %, Moisture % (exact from manufacturer)
@@ -161,7 +160,6 @@ The Animal House Pet Store project is a mobile-friendly web application for an e
 7. **color** - POS color based on brand rules (see Color Assignment Rules above)
 8. **style** - Product line and format (e.g., "Frommbalaya - Can", "Four-Star - Dry")
 9. **description** - Product-specific description from manufacturer (NOT generic)
-
 ### Common Mistakes to NEVER Make Again:
 1. **Adding products without carousel images** - ALWAYS fetch 6+ images from manufacturer page
 2. **Missing guaranteed analysis** - ALWAYS copy protein/fat/fiber/moisture percentages
@@ -169,7 +167,6 @@ The Animal House Pet Store project is a mobile-friendly web application for an e
 4. **Missing feeding instructions** - ALWAYS include daily feeding amounts and calorie info
 5. **Missing size/color/style** - ALWAYS populate POS fields for inventory management
 6. **Using INSERT without complete data** - NEVER insert a product row without ALL fields
-
 ### Mandatory Workflow for Adding Products:
 ```
 Step 1: web_fetch manufacturer product page
@@ -178,7 +175,6 @@ Step 3: Prepare UPDATE/INSERT with ALL required fields populated
 Step 4: Run verification query after update to confirm data saved
 Step 5: NEVER mark task complete until verification passes
 ```
-
 ### Post-Update Verification Query:
 ```sql
 SELECT name,
@@ -190,14 +186,12 @@ SELECT name,
   CASE WHEN color IS NULL THEN 'MISSING' ELSE 'OK' END as color
 FROM supplies WHERE id = [product_id];
 ```
-
 ### Brand-Specific Manufacturer URLs:
 - **Fromm**: https://frommfamily.com/products/dog/ or /cat/
 - **NutriSource**: https://nutrisourcepetfoods.com/products/
 - **Science Diet**: https://www.hillspet.com/dog-food or /cat-food
 - **Blue Buffalo**: https://bluebuffalo.com/
 - **Pro Plan**: https://www.purina.com/pro-plan/
-
 ### Audit Query (Run Periodically):
 ```sql
 SELECT id, name, brand,
@@ -211,32 +205,32 @@ AND (image_urls IS NULL OR guaranteed_analysis IS NULL OR instructions IS NULL);
 ```
 
 ## System Architecture
-The application is a full-stack web application with a React frontend, an Express.js backend, and a PostgreSQL database using Drizzle ORM.
+The application is a full-stack web application built with a React frontend, an Express.js backend, and a PostgreSQL database utilizing Drizzle ORM.
 
 **UI/UX Decisions:**
-- Dark, bold design with strong contrast and mobile responsiveness.
-- Themed headers for Aquatics (blue) and Exotic Reptiles (green) pages.
-- Amazon-style image enlargement with carousels and swipe gestures.
-- Full-screen modals for mobile forms and prominent warning banners for breed restrictions.
-- Universal back button and force refresh button in admin dashboard.
+- Employs a dark, bold design with strong contrast and is fully mobile-responsive.
+- Features themed headers for Aquatics (blue) and Exotic Reptiles (green) pages.
+- Incorporates Amazon-style image enlargement with carousels and swipe gestures.
+- Uses full-screen modals for mobile forms and prominent warning banners for breed restrictions.
+- Includes universal back and force refresh buttons in the admin dashboard.
 
 **Technical Implementations & Feature Specifications:**
-- **Core Management**: Pet & Supply Management (multi-image, extensive inventory, automated brand extraction), Appointment System (15-min intervals, admin approval, email notifications, Google Calendar sync), Order & Notification System.
-- **Authentication & Authorization**: JWT tokens, password reset, user settings, admin user management, three-tier role system (Customer, Groomer, Admin).
-- **Specialized Systems**: Wishlist, Google Calendar & Contact Management, Groomer Management, Content Management (Aquatics/Exotic Reptiles pages with subcategory filters), Admin Order Management, Orders & Appointments Search.
-- **Advanced Management**: Pet Boarding/Babysitting, Database Sync Tools, Auto-Categorization System (brand/keyword analysis, Live Animal Detection, category cleanup), Smart Abbreviation Expansion, Brand Extraction & Assignment.
-- **Admin Tools**: Product Image Management (dashboard, batch search/preview), Employee & Grooming Schedule Management.
-- **AI & Integrations**: AI-Powered Order Photo Upload (GPT-5 Vision for item extraction, auto-categorization, custom pricing), Astro Loyalty Integration, POS Integration (real-time sync, webhooks).
-- **UPC Matching System**: Strict system for matching UPCs to products with 90% coverage and 100% accuracy, employing abbreviation expansion, text normalization, and verified brand mappings. Strict validation rules apply to size, wattage, weight/volume, dimension, cup/capacity, and length. Includes critical product type exclusions and a comprehensive brand prefix expansion dictionary.
+- **Core Management**: Comprehensive Pet & Supply Management supporting multi-image uploads, extensive inventory fields, and automated brand extraction. An advanced Appointment System with 15-minute intervals, admin approval, email notifications, and Google Calendar synchronization. An integrated Order & Notification System.
+- **Authentication & Authorization**: Implemented with JWT tokens, password reset, user settings, admin user management, and a three-tier role system (Customer, Groomer, Admin).
+- **Specialized Systems**: Includes a Wishlist, Google Calendar & Contact Management, Groomer Management, Content Management for Aquatics/Exotic Reptiles pages with subcategory filters, Admin Order Management, and dedicated search for Orders & Appointments.
+- **Advanced Management**: Features for Pet Boarding/Babysitting, Database Synchronization Tools, an Auto-Categorization System (using brand/keyword analysis, Live Animal Detection, and category cleanup), Smart Abbreviation Expansion, and Brand Extraction & Assignment.
+- **Admin Tools**: Provides a Product Image Management dashboard with batch search/preview capabilities and Employee & Grooming Schedule Management.
+- **AI & Integrations**: Utilizes AI-Powered Order Photo Upload (GPT-5 Vision for item extraction, auto-categorization, and custom pricing), Astro Loyalty Integration, and POS Integration with real-time sync and webhooks.
+- **UPC Matching System**: A strict system for matching UPCs to products with high accuracy, using abbreviation expansion, text normalization, and verified brand mappings. Includes validation rules for size, wattage, weight/volume, dimension, cup/capacity, length, critical product type exclusions, and a comprehensive brand prefix expansion dictionary.
 
 **System Design Choices:**
-- **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
-- **Backend**: Express.js, TypeScript.
+- **Frontend**: Developed using React, Vite, TypeScript, Tailwind CSS, and shadcn/ui.
+- **Backend**: Built with Express.js and TypeScript.
 - **Database**: PostgreSQL with Drizzle ORM.
-- **Authentication**: JWT tokens stored in secure cookies.
-- **State Management**: TanStack Query.
-- **Routing**: Wouter.
-- **Development Practices**: Strict TypeScript, proper HTTP status codes, environment-aware configurations.
+- **Authentication**: Handled via JWT tokens stored in secure cookies.
+- **State Management**: Managed using TanStack Query.
+- **Routing**: Implemented with Wouter.
+- **Development Practices**: Adheres to strict TypeScript, proper HTTP status codes, and environment-aware configurations.
 
 ## External Dependencies
 - PostgreSQL
