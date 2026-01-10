@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application designed for an exotic reptile pet store. Its primary goal is to establish a robust online presence, streamline business operations, and provide customers with an intuitive platform to purchase pets and supplies, and book grooming appointments. The application features comprehensive inventory, customer account management, and administrative functionalities, aiming to position the store as a leading online destination for exotic pet owners and expand its market share.
+The Animal House Pet Store project is a mobile-friendly web application for an exotic reptile pet store. Its primary purpose is to establish an online presence, streamline operations, and provide an intuitive platform for purchasing pets and supplies, and booking grooming services. The project aims to expand market reach and position the store as a premier online destination for exotic pet owners through comprehensive inventory management, customer accounts, and administrative tools.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -199,44 +199,44 @@ SELECT id, name, brand,
   CASE WHEN guaranteed_analysis IS NULL THEN 'MISSING' ELSE 'OK' END,
   CASE WHEN ingredients IS NULL OR length(ingredients) < 100 THEN 'MISSING' ELSE 'OK' END,
   CASE WHEN instructions IS NULL THEN 'MISSING' ELSE 'OK' END
-FROM supplies 
+FROM supplies
 WHERE brand IN ('Fromm', 'Nutrisource', 'Science Diet')
 AND (image_urls IS NULL OR guaranteed_analysis IS NULL OR instructions IS NULL);
 ```
 
 ## System Architecture
-The application is a full-stack web application built with a React frontend, an Express.js backend, and a PostgreSQL database utilizing Drizzle ORM.
+The application uses a full-stack architecture with a React frontend, an Express.js backend, and a PostgreSQL database managed by Drizzle ORM.
 
 **UI/UX Decisions:**
-- Employs a dark, bold design with strong contrast and is fully mobile-responsive.
-- Features themed headers for Aquatics (blue) and Exotic Reptiles (green) pages.
-- Incorporates Amazon-style image enlargement with carousels and swipe gestures.
-- Uses full-screen modals for mobile forms and prominent warning banners for breed restrictions.
-- Includes universal back and force refresh buttons in the admin dashboard.
+- Dark, bold aesthetic with high contrast and mobile responsiveness.
+- Themed headers (blue for Aquatics, green for Exotic Reptiles).
+- Amazon-style image enlargement with carousels and swipe gestures.
+- Full-screen modals for mobile forms and prominent warning banners for breed restrictions.
+- Admin dashboard includes universal back and force refresh buttons.
 
 **Technical Implementations & Feature Specifications:**
-- **Core Management**: Comprehensive Pet & Supply Management supporting multi-image uploads, extensive inventory fields, and automated brand extraction. An advanced Appointment System with 15-minute intervals, admin approval, email notifications, and Google Calendar synchronization. An integrated Order & Notification System.
-- **Authentication & Authorization**: Implemented with JWT tokens, password reset, user settings, admin user management, and a three-tier role system (Customer, Groomer, Admin).
-- **Specialized Systems**: Includes a Wishlist, Google Calendar & Contact Management, Groomer Management, Content Management for Aquatics/Exotic Reptiles pages with subcategory filters, Admin Order Management, and dedicated search for Orders & Appointments.
-- **Advanced Management**: Features for Pet Boarding/Babysitting, Database Synchronization Tools, an Auto-Categorization System (using brand/keyword analysis, Live Animal Detection, and category cleanup), Smart Abbreviation Expansion, and Brand Extraction & Assignment.
-- **Admin Tools**: Provides a Product Image Management dashboard with batch search/preview capabilities and Employee & Grooming Schedule Management.
-- **AI & Integrations**: Utilizes AI-Powered Order Photo Upload (GPT-5 Vision for item extraction, auto-categorization, and custom pricing), Astro Loyalty Integration, and POS Integration with real-time sync and webhooks.
-- **UPC Matching System**: A strict system for matching UPCs to products with high accuracy, using abbreviation expansion, text normalization, and verified brand mappings. Includes validation rules for size, wattage, weight/volume, dimension, cup/capacity, length, critical product type exclusions, and a comprehensive brand prefix expansion dictionary.
+- **Core Management**: Pet and Supply Management with multi-image uploads and detailed inventory; Appointment System with 15-minute intervals, admin approval, email notifications, and Google Calendar synchronization; Order and Notification System.
+- **Authentication & Authorization**: JWT tokens, password reset, user settings, admin user management, and three-tier role system (Customer, Groomer, Admin).
+- **Specialized Systems**: Wishlist, Google Calendar & Contact Management, Groomer Management, Content Management for Aquatics/Exotic Reptiles pages with subcategory filters, Admin Order Management, and dedicated search for Orders & Appointments.
+- **Advanced Management**: Pet Boarding/Babysitting, Database Synchronization Tools, Auto-Categorization, Live Animal Detection, category cleanup, Smart Abbreviation Expansion, and Brand Extraction & Assignment.
+- **Admin Tools**: Product Image Management dashboard for batch searching and previewing, Employee & Grooming Schedule Management.
+- **AI & Integrations**: AI-Powered Order Photo Upload using OpenAI's GPT-5 Vision for item extraction, auto-categorization, and custom pricing. Integration with Astro Loyalty and POS for real-time synchronization and webhooks.
+- **UPC Matching System**: Strict UPC matching with abbreviation expansion, text normalization, brand mappings, validation rules, and brand prefix expansion dictionary.
 
 **System Design Choices:**
-- **Frontend**: Developed using React, Vite, TypeScript, Tailwind CSS, and shadcn/ui.
-- **Backend**: Built with Express.js and TypeScript.
+- **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
+- **Backend**: Express.js, TypeScript.
 - **Database**: PostgreSQL with Drizzle ORM.
-- **Authentication**: Handled via JWT tokens stored in secure cookies.
-- **State Management**: Managed using TanStack Query.
-- **Routing**: Implemented with Wouter.
-- **Development Practices**: Adheres to strict TypeScript, proper HTTP status codes, and environment-aware configurations.
+- **Authentication**: JWT tokens stored in secure cookies.
+- **State Management**: TanStack Query.
+- **Routing**: Wouter.
+- **Development Practices**: Strict TypeScript, proper HTTP status codes, environment-aware configurations.
 
 ## External Dependencies
 - PostgreSQL
 - Drizzle ORM
-- SendGrid (Email Service)
-- Twilio (SMS Service)
+- SendGrid
+- Twilio
 - Google Calendar
 - Astro Loyalty
 - OpenAI (AI Vision)
