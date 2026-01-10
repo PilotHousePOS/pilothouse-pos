@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application designed to expand the online presence and streamline operations for an exotic reptile pet store. It enables customers to purchase pets and supplies, book grooming appointments, and provides comprehensive inventory, customer account, and administrative functionalities. The project's vision is to establish the store as a premier online destination for pet owners, focusing on exotic reptiles and offering a robust online experience.
+The Animal House Pet Store project is a mobile-friendly web application for an exotic reptile pet store. It aims to expand online presence and streamline operations, allowing customers to purchase pets and supplies, and book grooming appointments. The application provides comprehensive inventory, customer account, and administrative functionalities, positioning the store as a premier online destination for exotic pet owners.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast
@@ -148,9 +148,70 @@ The Animal House Pet Store project is a mobile-friendly web application designed
   - Password: password
   - Role: Admin
   - Login Flow: Navigate to main page (/), click "Start Now", enter credentials. Do NOT bypass the main page.
+- MANDATORY Product Data Checklist (CRITICAL - Never Skip)
+**EVERY product added or updated MUST have ALL of these fields populated:**
+
+### Required Fields for ALL Products:
+1. **image_urls** (array) - Minimum 6 carousel images from manufacturer website
+2. **guaranteed_analysis** - Protein %, Fat %, Fiber %, Moisture % (exact from manufacturer)
+3. **ingredients** - Complete ingredient list (100+ characters, copied EXACTLY from manufacturer)
+4. **instructions** - Feeding guidelines with calorie info
+5. **instruction_label** - Label for instructions (e.g., "Feeding Guidelines")
+6. **size** - Product size (e.g., "12.5oz", "4lb", "30lb")
+7. **color** - POS color based on brand rules (see Color Assignment Rules above)
+8. **style** - Product line and format (e.g., "Frommbalaya - Can", "Four-Star - Dry")
+9. **description** - Product-specific description from manufacturer (NOT generic)
+
+### Common Mistakes to NEVER Make Again:
+1. **Adding products without carousel images** - ALWAYS fetch 6+ images from manufacturer page
+2. **Missing guaranteed analysis** - ALWAYS copy protein/fat/fiber/moisture percentages
+3. **Short/missing ingredients** - ALWAYS copy FULL ingredient list (100+ chars minimum)
+4. **Missing feeding instructions** - ALWAYS include daily feeding amounts and calorie info
+5. **Missing size/color/style** - ALWAYS populate POS fields for inventory management
+6. **Using INSERT without complete data** - NEVER insert a product row without ALL fields
+
+### Mandatory Workflow for Adding Products:
+```
+Step 1: web_fetch manufacturer product page
+Step 2: Extract ALL data fields (images, analysis, ingredients, feeding, etc.)
+Step 3: Prepare UPDATE/INSERT with ALL required fields populated
+Step 4: Run verification query after update to confirm data saved
+Step 5: NEVER mark task complete until verification passes
+```
+
+### Post-Update Verification Query:
+```sql
+SELECT name,
+  CASE WHEN image_urls IS NULL OR array_length(image_urls, 1) < 2 THEN 'MISSING' ELSE 'OK' END as carousel,
+  CASE WHEN guaranteed_analysis IS NULL THEN 'MISSING' ELSE 'OK' END as analysis,
+  CASE WHEN ingredients IS NULL OR length(ingredients) < 100 THEN 'MISSING' ELSE 'OK' END as ingredients,
+  CASE WHEN instructions IS NULL THEN 'MISSING' ELSE 'OK' END as feeding,
+  CASE WHEN size IS NULL THEN 'MISSING' ELSE 'OK' END as size,
+  CASE WHEN color IS NULL THEN 'MISSING' ELSE 'OK' END as color
+FROM supplies WHERE id = [product_id];
+```
+
+### Brand-Specific Manufacturer URLs:
+- **Fromm**: https://frommfamily.com/products/dog/ or /cat/
+- **NutriSource**: https://nutrisourcepetfoods.com/products/
+- **Science Diet**: https://www.hillspet.com/dog-food or /cat-food
+- **Blue Buffalo**: https://bluebuffalo.com/
+- **Pro Plan**: https://www.purina.com/pro-plan/
+
+### Audit Query (Run Periodically):
+```sql
+SELECT id, name, brand,
+  CASE WHEN image_urls IS NULL OR array_length(image_urls, 1) < 2 THEN 'MISSING' ELSE 'OK' END,
+  CASE WHEN guaranteed_analysis IS NULL THEN 'MISSING' ELSE 'OK' END,
+  CASE WHEN ingredients IS NULL OR length(ingredients) < 100 THEN 'MISSING' ELSE 'OK' END,
+  CASE WHEN instructions IS NULL THEN 'MISSING' ELSE 'OK' END
+FROM supplies 
+WHERE brand IN ('Fromm', 'Nutrisource', 'Science Diet')
+AND (image_urls IS NULL OR guaranteed_analysis IS NULL OR instructions IS NULL);
+```
 
 ## System Architecture
-The application is a full-stack web application built with a React frontend, an Express.js backend, and a PostgreSQL database utilizing Drizzle ORM.
+The application is a full-stack web application with a React frontend, an Express.js backend, and a PostgreSQL database using Drizzle ORM.
 
 **UI/UX Decisions:**
 - Dark, bold design with strong contrast and mobile responsiveness.
@@ -178,10 +239,10 @@ The application is a full-stack web application built with a React frontend, an 
 - **Development Practices**: Strict TypeScript, proper HTTP status codes, environment-aware configurations.
 
 ## External Dependencies
-- **Database**: PostgreSQL
-- **ORM**: Drizzle ORM
-- **Email Service**: SendGrid
-- **SMS Service**: Twilio
-- **Calendar Integration**: Google Calendar
-- **Loyalty Program**: Astro Loyalty
-- **AI Vision**: OpenAI
+- PostgreSQL
+- Drizzle ORM
+- SendGrid (Email Service)
+- Twilio (SMS Service)
+- Google Calendar
+- Astro Loyalty
+- OpenAI (AI Vision)
