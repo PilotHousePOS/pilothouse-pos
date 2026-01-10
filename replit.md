@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application for an exotic reptile pet store. Its main purpose is to create an online presence, improve operations, and offer an easy-to-use platform for buying pets and supplies, and booking grooming services. The project aims to expand market reach and establish the store as a top online destination for exotic pet owners, with the business vision of becoming the leading online retailer for exotic reptile pets and supplies.
+The Animal House Pet Store project is a mobile-friendly web application for an exotic reptile pet store. Its main purpose is to establish an online presence, streamline operations, and provide an intuitive platform for purchasing pets and supplies, and booking grooming services. The project aims to broaden market reach and position the store as a premier online destination for exotic pet owners, with the business vision of becoming the leading online retailer for exotic reptile pets and supplies.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -83,7 +83,7 @@ The Animal House Pet Store project is a mobile-friendly web application for an e
 - Item-Specific Descriptions (NOT Generic):
   - Descriptions must be product-specific, pulled directly from Chewy/Amazon product pages
   - NOT generic catch-all descriptions that apply to multiple products
-  - Include key features, benefits, and specifications unique to that exact item
+  - Include key features, benefits, and specifications unique to that exact item.
 - ExaTouch POS Fields to Populate:
   - MfgPart: Manufacturer part number
   - Color: Product color variant (based on packaging band color)
@@ -149,7 +149,6 @@ The Animal House Pet Store project is a mobile-friendly web application for an e
   - Role: Admin
   - Login Flow: Navigate to main page (/), click "Start Now", enter credentials. Do NOT bypass the main page.
 - MANDATORY Product Data Checklist (CRITICAL - Never Skip)
-**EVERY product added or updated MUST have ALL of these fields populated:**
 ### Required Fields for ALL Products:
 1. **image_urls** (array) - Minimum 6 carousel images from manufacturer website
 2. **guaranteed_analysis** - Protein %, Fat %, Fiber %, Moisture % (exact from manufacturer)
@@ -174,17 +173,6 @@ Step 2: Extract ALL data fields (images, analysis, ingredients, feeding, etc.)
 Step 3: Prepare UPDATE/INSERT with ALL required fields populated
 Step 4: Run verification query after update to confirm data saved
 Step 5: NEVER mark task complete until verification passes
-```
-### Post-Update Verification Query:
-```sql
-SELECT name,
-  CASE WHEN image_urls IS NULL OR array_length(image_urls, 1) < 2 THEN 'MISSING' ELSE 'OK' END as carousel,
-  CASE WHEN guaranteed_analysis IS NULL THEN 'MISSING' ELSE 'OK' END as analysis,
-  CASE WHEN ingredients IS NULL OR length(ingredients) < 100 THEN 'MISSING' ELSE 'OK' END as ingredients,
-  CASE WHEN instructions IS NULL THEN 'MISSING' ELSE 'OK' END as feeding,
-  CASE WHEN size IS NULL THEN 'MISSING' ELSE 'OK' END as size,
-  CASE WHEN color IS NULL THEN 'MISSING' ELSE 'OK' END as color
-FROM supplies WHERE id = [product_id];
 ```
 ### Brand-Specific Manufacturer URLs:
 - **Fromm**: https://frommfamily.com/products/dog/ or /cat/
