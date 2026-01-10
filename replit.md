@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application for an exotic reptile pet store. Its primary purpose is to establish an online presence, streamline operations, and provide an intuitive platform for purchasing pets and supplies, and booking grooming services. The project aims to expand market reach and position the store as a premier online destination for exotic pet owners through comprehensive inventory management, customer accounts, and administrative tools.
+The Animal House Pet Store project is a mobile-friendly web application for an exotic reptile pet store. It aims to establish an online presence, enhance operational efficiency, and provide an intuitive platform for customers to purchase pets and supplies, and book grooming services. The project's goal is to broaden market reach and position the store as a premier online destination for exotic pet owners through comprehensive inventory management, customer accounts, and administrative functionalities.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -205,7 +205,7 @@ AND (image_urls IS NULL OR guaranteed_analysis IS NULL OR instructions IS NULL);
 ```
 
 ## System Architecture
-The application uses a full-stack architecture with a React frontend, an Express.js backend, and a PostgreSQL database managed by Drizzle ORM.
+The application employs a full-stack architecture comprising a React frontend, an Express.js backend, and a PostgreSQL database managed by Drizzle ORM.
 
 **UI/UX Decisions:**
 - Dark, bold aesthetic with high contrast and mobile responsiveness.
@@ -215,7 +215,7 @@ The application uses a full-stack architecture with a React frontend, an Express
 - Admin dashboard includes universal back and force refresh buttons.
 
 **Technical Implementations & Feature Specifications:**
-- **Core Management**: Pet and Supply Management with multi-image uploads and detailed inventory; Appointment System with 15-minute intervals, admin approval, email notifications, and Google Calendar synchronization; Order and Notification System.
+- **Core Management**: Pet and Supply Management with multi-image uploads; Appointment System with 15-minute intervals, admin approval, email notifications, and Google Calendar synchronization; Order and Notification System.
 - **Authentication & Authorization**: JWT tokens, password reset, user settings, admin user management, and three-tier role system (Customer, Groomer, Admin).
 - **Specialized Systems**: Wishlist, Google Calendar & Contact Management, Groomer Management, Content Management for Aquatics/Exotic Reptiles pages with subcategory filters, Admin Order Management, and dedicated search for Orders & Appointments.
 - **Advanced Management**: Pet Boarding/Babysitting, Database Synchronization Tools, Auto-Categorization, Live Animal Detection, category cleanup, Smart Abbreviation Expansion, and Brand Extraction & Assignment.
