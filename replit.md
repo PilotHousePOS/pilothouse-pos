@@ -180,17 +180,6 @@ Step 5: NEVER mark task complete until verification passes
 - **Science Diet**: https://www.hillspet.com/dog-food or /cat-food
 - **Blue Buffalo**: https://bluebuffalo.com/
 - **Pro Plan**: https://www.purina.com/pro-plan/
-### Audit Query (Run Periodically):
-```sql
-SELECT id, name, brand,
-  CASE WHEN image_urls IS NULL OR array_length(image_urls, 1) < 2 THEN 'MISSING' ELSE 'OK' END,
-  CASE WHEN guaranteed_analysis IS NULL THEN 'MISSING' ELSE 'OK' END,
-  CASE WHEN ingredients IS NULL OR length(ingredients) < 100 THEN 'MISSING' ELSE 'OK' END,
-  CASE WHEN instructions IS NULL THEN 'MISSING' ELSE 'OK' END
-FROM supplies
-WHERE brand IN ('Fromm', 'Nutrisource', 'Science Diet')
-AND (image_urls IS NULL OR guaranteed_analysis IS NULL OR instructions IS NULL);
-```
 
 ## System Architecture
 The application uses a full-stack architecture with a React frontend, an Express.js backend, and a PostgreSQL database managed by Drizzle ORM.
