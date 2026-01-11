@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application for an exotic reptile pet store. Its primary goal is to establish a strong online presence, optimize operational efficiency, and provide an intuitive platform for customers to purchase exotic pets and supplies, and book grooming services. The project aims to become a leader in the online exotic reptile market, significantly expand its customer base, and enhance brand recognition through a superior online experience.
+The Animal House Pet Store project is a mobile-friendly web application for an exotic reptile pet store. It aims to establish a robust online presence, streamline operations, and offer an intuitive platform for customers to purchase exotic pets and supplies, and book grooming services. The project seeks to lead the online exotic reptile market, expand its customer base, and enhance brand recognition through an outstanding online user experience.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -193,18 +193,18 @@ The application is a full-stack, mobile-first web solution for comprehensive pet
 - **Core Management**: Handles inventory for pets and supplies, supports multi-image uploads, manages appointment scheduling (with 15-minute intervals, admin approval, notifications, and Google Calendar sync), and processes orders.
 - **Authentication & Authorization**: Implements JWT tokens, password reset, user settings, admin user management, and a three-tier role system (Customer, Groomer, Admin).
 - **Specialized Systems**: Includes a wishlist, Google Calendar integration, content management for animal categories with subcategory filters, admin order management, and dedicated search functionalities.
-- **Advanced Management**: Supports pet boarding/babysitting, database synchronization, auto-categorization, live animal detection, category cleanup, smart abbreviation expansion, and brand extraction/assignment.
+- **Advanced Management**: Supports database synchronization, auto-categorization, live animal detection, category cleanup, smart abbreviation expansion, and brand extraction/assignment.
 - **Admin Tools**: Provides a product image management dashboard and tools for employee and grooming schedule management.
-- **AI & Integrations**: Features AI-Powered Order Photo Upload using OpenAI's GPT-5 Vision for item extraction, auto-categorization, and custom pricing. Integrates with Astro Loyalty and POS for real-time synchronization and webhooks.
+- **AI & Integrations**: Features AI-Powered Order Photo Upload using OpenAI's GPT-5 Vision for item extraction, auto-categorization, and custom pricing.
 - **UPC Matching System**: Employs strict UPC matching with abbreviation expansion, text normalization, brand mappings, validation rules, and a brand prefix expansion dictionary.
 
 **System Design Choices:**
-- **Frontend**: Built with React, Vite, TypeScript, Tailwind CSS, and shadcn/ui.
-- **Backend**: Developed using Express.js and TypeScript.
+- **Frontend**: React, Vite, TypeScript, Tailwind CSS, and shadcn/ui.
+- **Backend**: Express.js and TypeScript.
 - **Database**: PostgreSQL with Drizzle ORM.
-- **Authentication**: Utilizes JWT tokens stored in secure cookies.
-- **State Management**: Implemented with TanStack Query.
-- **Routing**: Handled by Wouter.
+- **Authentication**: JWT tokens stored in secure cookies.
+- **State Management**: TanStack Query.
+- **Routing**: Wouter.
 - **Development Practices**: Adheres to strict TypeScript, proper HTTP status codes, and environment-aware configurations.
 
 ## External Dependencies

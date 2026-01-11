@@ -12688,9 +12688,54 @@ function SupplyMultiImageUpload({
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [pasteReady, setPasteReady] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const { toast } = useToast();
 
   const allImages = [mainImageUrl, ...additionalImageUrls].filter(url => url && url.trim() !== '');
+
+  // Drag and drop reordering
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index.toString());
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragOverImage = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (draggedIndex !== null && draggedIndex !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleDropOnImage = (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (draggedIndex === null || draggedIndex === targetIndex) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    // Reorder the images
+    const newAllImages = [...allImages];
+    const [draggedImage] = newAllImages.splice(draggedIndex, 1);
+    newAllImages.splice(targetIndex, 0, draggedImage);
+
+    // Update main image and additional images
+    onMainImageChange(newAllImages[0] || '');
+    onAdditionalImagesChange(newAllImages.slice(1));
+
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
 
   useEffect(() => {
     if (!pasteReady) return;
@@ -12831,21 +12876,28 @@ function SupplyMultiImageUpload({
 
   return (
     <div className="space-y-3">
-      <Label>Product Images ({allImages.length}) - Customers can swipe through these</Label>
+      <Label>Product Images ({allImages.length}) - Drag to reorder, customers see in this order</Label>
       
       {allImages.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {allImages.map((url, index) => (
             <div 
-              key={`${url}-${index}`} 
-              className={`relative border-2 rounded-lg overflow-hidden ${
+              key={`${url}-${index}`}
+              draggable
+              onDragStart={(e) => handleDragStart(e, index)}
+              onDragEnd={handleDragEnd}
+              onDragOver={(e) => handleDragOverImage(e, index)}
+              onDrop={(e) => handleDropOnImage(e, index)}
+              className={`relative border-2 rounded-lg overflow-hidden cursor-grab active:cursor-grabbing transition-all ${
                 index === 0 ? 'border-blue-500' : 'border-gray-300'
+              } ${draggedIndex === index ? 'opacity-50 scale-95' : ''} ${
+                dragOverIndex === index ? 'border-dashed border-orange-500 bg-orange-50' : ''
               }`}
             >
               <img 
                 src={url} 
                 alt={`Product ${index + 1}`} 
-                className="w-full h-28 object-contain bg-gray-100 dark:bg-gray-800" 
+                className="w-full h-28 object-contain bg-gray-100 dark:bg-gray-800 pointer-events-none" 
               />
               <div className="absolute top-1 left-1 flex gap-1">
                 {index === 0 && (
