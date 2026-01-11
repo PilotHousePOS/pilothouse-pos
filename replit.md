@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project aims to develop a mobile-friendly web application for an exotic reptile pet store. Its primary goal is to establish a strong online presence, streamline operational tasks, and provide an intuitive platform for customers to purchase pets and supplies, as well as book grooming services. The project envisions becoming the leading online retailer for exotic reptile pets and supplies, significantly expanding market reach and solidifying the store's reputation as a top destination for exotic pet owners.
+The Animal House Pet Store project is a mobile-friendly web application for an exotic reptile pet store. Its core purpose is to establish a strong online presence, streamline operations, and provide an intuitive platform for customers to purchase pets and supplies, and book grooming services. The project aims to become the leading online retailer for exotic reptile pets and supplies, significantly expanding market reach and solidifying the store's reputation.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -182,21 +182,21 @@ Step 5: NEVER mark task complete until verification passes
 - **Pro Plan**: https://www.purina.com/pro-plan/
 
 ## System Architecture
-The application employs a full-stack architecture.
+The application features a full-stack architecture with a focus on mobile-first design and comprehensive pet store management.
 
 **UI/UX Decisions:**
-- Dark, bold, high-contrast aesthetic optimized for mobile.
-- Themed headers (blue for Aquatics, green for Exotic Reptiles).
-- Amazon-style image enlargement with carousels and swipe gestures.
+- Dark, bold, high-contrast aesthetic optimized for mobile devices.
+- Themed headers for different animal categories (e.g., blue for Aquatics, green for Exotic Reptiles).
+- Amazon-style image carousels with swipe gestures and enlargement capabilities.
 - Full-screen modals for mobile forms and prominent warning banners for breed restrictions.
-- Admin dashboard includes universal back and force refresh buttons.
+- Admin dashboard includes universal navigation buttons (back, force refresh).
 
 **Technical Implementations & Feature Specifications:**
-- **Core Management**: Pet and Supply Management with multi-image uploads; Appointment System with 15-minute intervals, admin approval, email notifications, and Google Calendar synchronization; Order and Notification System.
+- **Core Management**: Pet and supply inventory, multi-image uploads, appointment scheduling (15-minute intervals, admin approval, notifications, Google Calendar sync), order processing, and notification system.
 - **Authentication & Authorization**: JWT tokens, password reset, user settings, admin user management, and a three-tier role system (Customer, Groomer, Admin).
-- **Specialized Systems**: Wishlist, Google Calendar & Contact Management, Groomer Management, Content Management for Aquatics/Exotic Reptiles pages with subcategory filters, Admin Order Management, and dedicated search for Orders & Appointments.
-- **Advanced Management**: Pet Boarding/Babysitting, Database Synchronization Tools, Auto-Categorization, Live Animal Detection, category cleanup, Smart Abbreviation Expansion, and Brand Extraction & Assignment.
-- **Admin Tools**: Product Image Management dashboard for batch searching and previewing, Employee & Grooming Schedule Management.
+- **Specialized Systems**: Wishlist functionality, Google Calendar integration for contact management, groomer scheduling, content management for animal categories with subcategory filters, admin order management, and dedicated search for orders and appointments.
+- **Advanced Management**: Pet boarding/babysitting, database synchronization, auto-categorization of products, live animal detection, category cleanup, smart abbreviation expansion, and brand extraction/assignment.
+- **Admin Tools**: Product image management dashboard for batch operations and previews, employee and grooming schedule management.
 - **AI & Integrations**: AI-Powered Order Photo Upload using OpenAI's GPT-5 Vision for item extraction, auto-categorization, and custom pricing. Integration with Astro Loyalty and POS for real-time synchronization and webhooks.
 - **UPC Matching System**: Strict UPC matching with abbreviation expansion, text normalization, brand mappings, validation rules, and brand prefix expansion dictionary.
 
