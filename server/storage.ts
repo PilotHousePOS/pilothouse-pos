@@ -1048,17 +1048,46 @@ export class DatabaseStorage implements IStorage {
       return filterByKeywords(items, animalType, animalKeywords);
     };
 
-    // If we have a search query, use fuzzy search for typo tolerance
+    // If we have a search query, use full-text search + fuzzy search for typo tolerance
     if (trimmedSearch) {
       // Import fuzzy search at runtime to avoid circular dependencies
       const { fuzzySearchFilter } = await import('./fuzzySearch');
       
-      // Fetch all matching items from database (without search filter to get broader set)
-      let allItems = await db
-        .select()
-        .from(supplies)
-        .where(and(...whereConditions))
-        .orderBy(desc(supplies.createdAt));
+      // Use PostgreSQL full-text search for initial filtering (uses GIN index)
+      // This dramatically reduces the dataset before JavaScript fuzzy search
+      const searchTerms = trimmedSearch.split(/\s+/).filter(t => t.length > 0);
+      const tsQuery = searchTerms.map(term => term + ':*').join(' & ');
+      
+      // Use full-text search with the GIN index for faster searching
+      let allItems: Supply[];
+      if (searchTerms.length > 0 && searchTerms.some(t => t.length >= 2)) {
+        // Use full-text search for better performance
+        // Combine full-text search with ILIKE fallback for partial matches
+        const likePattern = `%${trimmedSearch}%`;
+        
+        // Add full-text search condition to the existing where conditions
+        const ftsCondition = sql`(
+          search_vector @@ to_tsquery('english', ${tsQuery})
+          OR name ILIKE ${likePattern}
+          OR brand ILIKE ${likePattern}
+          OR sku ILIKE ${likePattern}
+        )`;
+        
+        whereConditions.push(ftsCondition);
+        
+        allItems = await db
+          .select()
+          .from(supplies)
+          .where(and(...whereConditions))
+          .orderBy(desc(supplies.createdAt));
+      } else {
+        // Fall back to standard query for very short searches
+        allItems = await db
+          .select()
+          .from(supplies)
+          .where(and(...whereConditions))
+          .orderBy(desc(supplies.createdAt));
+      }
       
       // Apply specialty filters FIRST, before fuzzy search
       if (animalType) {
