@@ -12794,23 +12794,36 @@ function SupplyMultiImageUpload({
   };
 
   const removeImage = (index: number) => {
+    // Get the actual URL being removed for clarity
+    const urlToRemove = allImages[index];
+    console.log(`Removing image at index ${index}: ${urlToRemove?.substring(0, 50)}...`);
+    
     if (index === 0) {
+      // Removing main image
       if (additionalImageUrls.length > 0) {
+        // Promote first additional to main
         onMainImageChange(additionalImageUrls[0]);
         onAdditionalImagesChange(additionalImageUrls.slice(1));
       } else {
         onMainImageChange('');
       }
     } else {
-      const newAdditional = additionalImageUrls.filter((_, i) => i !== index - 1);
+      // Removing from additional images array
+      // index in allImages = index - 1 in additionalImageUrls (since allImages[0] = mainImageUrl)
+      const additionalIndex = index - 1;
+      const newAdditional = additionalImageUrls.filter((_, i) => i !== additionalIndex);
+      console.log(`Removed additional image at additionalIndex ${additionalIndex}, new count: ${newAdditional.length}`);
       onAdditionalImagesChange(newAdditional);
     }
   };
 
   const setAsPrimary = (index: number) => {
     if (index === 0) return;
-    const newPrimary = additionalImageUrls[index - 1];
-    const newAdditional = [mainImageUrl, ...additionalImageUrls.filter((_, i) => i !== index - 1)];
+    // index in allImages = index - 1 in additionalImageUrls
+    const additionalIndex = index - 1;
+    const newPrimary = additionalImageUrls[additionalIndex];
+    // Keep current main as first additional, then all others except the promoted one
+    const newAdditional = [mainImageUrl, ...additionalImageUrls.filter((_, i) => i !== additionalIndex)];
     onMainImageChange(newPrimary);
     onAdditionalImagesChange(newAdditional);
     // Success toast removed to speed up workflow
@@ -12824,7 +12837,7 @@ function SupplyMultiImageUpload({
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {allImages.map((url, index) => (
             <div 
-              key={index} 
+              key={`${url}-${index}`} 
               className={`relative border-2 rounded-lg overflow-hidden ${
                 index === 0 ? 'border-blue-500' : 'border-gray-300'
               }`}
