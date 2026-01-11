@@ -48,7 +48,7 @@ The Animal House Pet Store project is a mobile-friendly web application for an e
   - **SIZE = FORMAT (MANDATORY):**
     - oz sizes (2.8oz, 2.9oz, 5.5oz, 5.8oz, 12.8oz, 13oz) = CAN/WET FOOD - Must show can image
     - lb sizes (3.5lb, 7lb, 15.5lb, 22lb, 30lb) = BAG/DRY FOOD - Must show bag image
-    - NEVER show a bag image for an oz-sized product (e.8., 5.8oz is a CAN, not a bag!)
+    - NEVER show a bag image for an oz-sized product (e.g., 5.8oz is a CAN, not a bag!)
     - NEVER show a can image for a lb-sized product (e.g., 7lb is a BAG, not a can!)
   - **EXACT SIZE MATCHING:**
     - 5.8oz can ≠ 13oz can - Different can sizes have different images
