@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-friendly web application for an exotic reptile pet store. Its core purpose is to establish a strong online presence, streamline operations, and provide an intuitive platform for customers to purchase pets and supplies, and book grooming services. The project aims to become the leading online retailer for exotic reptile pets and supplies, significantly expanding market reach and solidifying the store's reputation.
+The Animal House Pet Store project is a mobile-friendly web application for an exotic reptile pet store. Its core purpose is to establish a strong online presence, streamline operations, and provide an intuitive platform for customers to purchase exotic pets and supplies, and book grooming services. The project aims to become a leader in the online exotic reptile market, expanding its reach and enhancing its brand.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -182,19 +182,19 @@ Step 5: NEVER mark task complete until verification passes
 - **Pro Plan**: https://www.purina.com/pro-plan/
 
 ## System Architecture
-The application features a full-stack architecture with a focus on mobile-first design and comprehensive pet store management.
+The application is designed as a full-stack, mobile-first web solution for comprehensive pet store management.
 
 **UI/UX Decisions:**
-- Dark, bold, high-contrast aesthetic optimized for mobile devices.
-- Themed headers for different animal categories (e.g., blue for Aquatics, green for Exotic Reptiles).
-- Amazon-style image carousels with swipe gestures and enlargement capabilities.
+- Dark, bold, high-contrast aesthetic.
+- Themed headers for different animal categories.
+- Amazon-style image carousels with swipe and enlargement.
 - Full-screen modals for mobile forms and prominent warning banners for breed restrictions.
-- Admin dashboard includes universal navigation buttons (back, force refresh).
+- Admin dashboard includes universal navigation buttons.
 
 **Technical Implementations & Feature Specifications:**
-- **Core Management**: Pet and supply inventory, multi-image uploads, appointment scheduling (15-minute intervals, admin approval, notifications, Google Calendar sync), order processing, and notification system.
+- **Core Management**: Inventory for pets and supplies, multi-image uploads, appointment scheduling (15-minute intervals, admin approval, notifications, Google Calendar sync), order processing, and a notification system.
 - **Authentication & Authorization**: JWT tokens, password reset, user settings, admin user management, and a three-tier role system (Customer, Groomer, Admin).
-- **Specialized Systems**: Wishlist functionality, Google Calendar integration for contact management, groomer scheduling, content management for animal categories with subcategory filters, admin order management, and dedicated search for orders and appointments.
+- **Specialized Systems**: Wishlist, Google Calendar integration for contact and groomer scheduling, content management for animal categories with subcategory filters, admin order management, and dedicated search for orders and appointments.
 - **Advanced Management**: Pet boarding/babysitting, database synchronization, auto-categorization of products, live animal detection, category cleanup, smart abbreviation expansion, and brand extraction/assignment.
 - **Admin Tools**: Product image management dashboard for batch operations and previews, employee and grooming schedule management.
 - **AI & Integrations**: AI-Powered Order Photo Upload using OpenAI's GPT-5 Vision for item extraction, auto-categorization, and custom pricing. Integration with Astro Loyalty and POS for real-time synchronization and webhooks.
