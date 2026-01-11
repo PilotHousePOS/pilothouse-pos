@@ -16,7 +16,7 @@ The Animal House Pet Store project is a mobile-friendly web application for an e
 - Inventory Management: Full product names and descriptions preserved from Excel imports (no abbreviations).
 - Search Functionality: All searches (supplies, pets) with intelligent typo tolerance and brand expansion.
 - Supply Filtering: Centralized, research-based filtering system with proper brand/keyword separation (server/filterConfig.ts).
-- Food vs Treat Categorization by Size: For freeze-dried products (Vital Essentials, etc.), products >3oz are categorized as food (dogFood/catFood), products ≤3oz are categorized as treats (dogTreats/catTreats). Patties, nibbles, and mini pate in larger sizes are food; bites and small portions are treats.
+- Food vs Treat Categorization by Size: For freeze-dried products (Vital Essentials, etc.), products >3oz are categorized as food (dogFood/catFood), products ≤3oz as treats (dogTreats/catTreats). Patties, nibbles, and mini pate in larger sizes are food; bites and small portions are treats.
 - Product Recommendations ("You May Also Like"): Smart cross-category recommendations based on product type.
 - Extended Product Information: Sourced from reliable retailers (Chewy, Amazon, manufacturer websites).
 - Data Quality Validation Rules:
