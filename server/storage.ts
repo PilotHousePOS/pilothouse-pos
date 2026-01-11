@@ -1055,7 +1055,9 @@ export class DatabaseStorage implements IStorage {
       
       // Use PostgreSQL full-text search for initial filtering (uses GIN index)
       // This dramatically reduces the dataset before JavaScript fuzzy search
-      const searchTerms = trimmedSearch.split(/\s+/).filter(t => t.length > 0);
+      // Remove special characters that break tsquery (& | ! ( ) : * etc.)
+      const sanitizedSearch = trimmedSearch.replace(/[&|!():*'"<>\\]/g, ' ').trim();
+      const searchTerms = sanitizedSearch.split(/\s+/).filter(t => t.length > 0);
       const tsQuery = searchTerms.map(term => term + ':*').join(' & ');
       
       // Use full-text search with the GIN index for faster searching
