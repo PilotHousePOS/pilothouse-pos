@@ -1064,15 +1064,17 @@ export class DatabaseStorage implements IStorage {
       let allItems: Supply[];
       if (searchTerms.length > 0 && searchTerms.some(t => t.length >= 2)) {
         // Use full-text search for better performance
-        // Combine full-text search with ILIKE fallback for partial matches
-        const likePattern = `%${trimmedSearch}%`;
+        // Build ILIKE conditions for each search term (matches if ALL terms found anywhere)
+        // This works even when search_vector is empty (e.g., fresh production deploy)
+        const termConditions = searchTerms.map(term => {
+          const termPattern = `%${term}%`;
+          return sql`(name ILIKE ${termPattern} OR brand ILIKE ${termPattern} OR description ILIKE ${termPattern} OR sku ILIKE ${termPattern})`;
+        });
         
-        // Add full-text search condition to the existing where conditions
+        // Add full-text search OR term-by-term ILIKE fallback
         const ftsCondition = sql`(
           search_vector @@ to_tsquery('english', ${tsQuery})
-          OR name ILIKE ${likePattern}
-          OR brand ILIKE ${likePattern}
-          OR sku ILIKE ${likePattern}
+          OR (${sql.join(termConditions, sql` AND `)})
         )`;
         
         whereConditions.push(ftsCondition);

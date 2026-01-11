@@ -117,6 +117,35 @@ async function initializeApp() {
       initializeScheduledTasks();
     });
     
+    // Auto-populate search_vector for products that don't have it (e.g., after publish to production)
+    setImmediate(async () => {
+      try {
+        const { db } = await import('./db');
+        const { sql } = await import('drizzle-orm');
+        
+        // Check if there are rows with null search_vector
+        const result = await db.execute(sql`
+          SELECT COUNT(*) as count FROM supplies WHERE search_vector IS NULL
+        `);
+        const nullCount = parseInt((result.rows[0] as any)?.count || '0');
+        
+        if (nullCount > 0) {
+          console.log(`[search] Populating search_vector for ${nullCount} products...`);
+          await db.execute(sql`
+            UPDATE supplies SET search_vector = 
+              setweight(to_tsvector('english', COALESCE(name, '')), 'A') ||
+              setweight(to_tsvector('english', COALESCE(brand, '')), 'B') ||
+              setweight(to_tsvector('english', COALESCE(sku, '')), 'A') ||
+              setweight(to_tsvector('english', COALESCE(description, '')), 'C')
+            WHERE search_vector IS NULL
+          `);
+          console.log(`[search] Search vector populated for ${nullCount} products`);
+        }
+      } catch (error) {
+        console.error('[search] Failed to populate search_vector:', error);
+      }
+    });
+    
     // Error handler
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
