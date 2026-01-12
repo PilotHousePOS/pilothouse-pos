@@ -12791,6 +12791,16 @@ function SupplyMultiImageUpload({
   const handleFileUpload = async (file: File) => {
     setPasteReady(false);
     if (!file) return;
+    
+    // Cannot upload files without a supplyId
+    if (!supplyId) {
+      toast({
+        title: "Save Product First",
+        description: "Please create the product first, then you can upload images in the edit form.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     if (!file.type.startsWith('image/')) {
       toast({
