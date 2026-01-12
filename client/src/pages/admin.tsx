@@ -12723,23 +12723,34 @@ function SupplyMultiImageUpload({
     e.preventDefault();
     e.stopPropagation();
     
-    if (draggedIndex === null || draggedIndex === targetIndex) {
-      setDraggedIndex(null);
-      setDragOverIndex(null);
+    const sourceIndex = draggedIndex;
+    
+    // Clear drag state immediately
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+    
+    if (sourceIndex === null || sourceIndex === targetIndex) {
       return;
     }
 
-    // Reorder the images
-    const newAllImages = [...allImages];
-    const [draggedImage] = newAllImages.splice(draggedIndex, 1);
-    newAllImages.splice(targetIndex, 0, draggedImage);
+    // Get current images as a fresh copy
+    const currentMain = mainImageUrl;
+    const currentAdditional = [...additionalImageUrls];
+    const currentAll = [currentMain, ...currentAdditional].filter(url => url && url.trim() !== '');
+    
+    // Validate indices
+    if (sourceIndex < 0 || sourceIndex >= currentAll.length || targetIndex < 0 || targetIndex >= currentAll.length) {
+      return;
+    }
 
-    // Update main image and additional images
-    onMainImageChange(newAllImages[0] || '');
-    onAdditionalImagesChange(newAllImages.slice(1));
+    // Reorder: remove from source, insert at target
+    const reordered = [...currentAll];
+    const [movedImage] = reordered.splice(sourceIndex, 1);
+    reordered.splice(targetIndex, 0, movedImage);
 
-    setDraggedIndex(null);
-    setDragOverIndex(null);
+    // Update state with reordered images
+    onMainImageChange(reordered[0] || '');
+    onAdditionalImagesChange(reordered.slice(1));
   };
 
   useEffect(() => {
@@ -12887,12 +12898,30 @@ function SupplyMultiImageUpload({
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {allImages.map((url, index) => (
             <div 
-              key={`${url}-${index}`}
+              key={`img-${index}-${url.slice(-20)}`}
               draggable
-              onDragStart={(e) => handleDragStart(e, index)}
-              onDragEnd={handleDragEnd}
-              onDragOver={(e) => handleDragOverImage(e, index)}
-              onDrop={(e) => handleDropOnImage(e, index)}
+              onDragStart={(e) => {
+                e.stopPropagation();
+                handleDragStart(e, index);
+              }}
+              onDragEnd={(e) => {
+                e.stopPropagation();
+                handleDragEnd();
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleDragOverImage(e, index);
+              }}
+              onDragLeave={(e) => {
+                e.stopPropagation();
+                setDragOverIndex(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleDropOnImage(e, index);
+              }}
               className={`relative border-2 rounded-lg overflow-hidden cursor-grab active:cursor-grabbing transition-all ${
                 index === 0 ? 'border-blue-500' : 'border-gray-300'
               } ${draggedIndex === index ? 'opacity-50 scale-95' : ''} ${
