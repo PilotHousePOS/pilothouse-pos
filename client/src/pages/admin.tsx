@@ -12676,6 +12676,7 @@ function SupplyImageUpload({ supplyId, currentImageUrl, onImageUploaded }: {
 }
 
 // Multi-Image Upload Component for Supplies - supports carousel/swipe on customer view
+// supplyId is optional - when null, works in URL-only mode for new products
 function SupplyMultiImageUpload({ 
   supplyId, 
   mainImageUrl, 
@@ -12683,12 +12684,13 @@ function SupplyMultiImageUpload({
   onMainImageChange,
   onAdditionalImagesChange 
 }: { 
-  supplyId: number; 
+  supplyId?: number | null; 
   mainImageUrl: string;
   additionalImageUrls: string[];
   onMainImageChange: (url: string) => void;
   onAdditionalImagesChange: (urls: string[]) => void;
 }) {
+  const [urlInput, setUrlInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -12854,6 +12856,20 @@ function SupplyMultiImageUpload({
     if (file) handleFileUpload(file);
   };
 
+  // Add image via URL (works without supplyId)
+  const addImageUrl = (url: string) => {
+    if (!url || !url.trim()) return;
+    const trimmedUrl = url.trim();
+    
+    // Add as main if no images, otherwise add to additional
+    if (!mainImageUrl || mainImageUrl.trim() === '') {
+      onMainImageChange(trimmedUrl);
+    } else {
+      onAdditionalImagesChange([...additionalImageUrls, trimmedUrl]);
+    }
+    setUrlInput('');
+  };
+
   const removeImage = (index: number) => {
     // Get the actual URL being removed for clarity
     const urlToRemove = allImages[index];
@@ -12977,60 +12993,63 @@ function SupplyMultiImageUpload({
         </div>
       )}
 
-      {pasteReady ? (
-        <div 
-          className="border-2 border-dashed rounded-lg p-4 transition-colors border-green-500 bg-green-50 dark:bg-green-900/20"
-          onDrop={handleDrop}
-          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-          onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
-        >
-          <div className="text-center py-2">
-            <ClipboardPaste className="w-8 h-8 text-green-600 mx-auto mb-2 animate-pulse" />
-            <p className="text-sm text-green-700 font-medium">Ready for image - Paste (Ctrl+V) or drop here</p>
-            <p className="text-xs text-green-600 mt-1">Press Escape to cancel</p>
+      {/* File upload drop zone - only show when we have a supplyId */}
+      {supplyId && (
+        pasteReady ? (
+          <div 
+            className="border-2 border-dashed rounded-lg p-4 transition-colors border-green-500 bg-green-50 dark:bg-green-900/20"
+            onDrop={handleDrop}
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
+          >
+            <div className="text-center py-2">
+              <ClipboardPaste className="w-8 h-8 text-green-600 mx-auto mb-2 animate-pulse" />
+              <p className="text-sm text-green-700 font-medium">Ready for image - Paste (Ctrl+V) or drop here</p>
+              <p className="text-xs text-green-600 mt-1">Press Escape to cancel</p>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFileUpload(file);
+                e.target.value = '';
+              }}
+              className="hidden"
+              data-testid="input-multi-image-upload"
+            />
           </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleFileUpload(file);
-              e.target.value = '';
-            }}
-            className="hidden"
-            data-testid="input-multi-image-upload"
-          />
-        </div>
-      ) : (
-        <div 
-          className={`border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer ${
-            dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300'
-          }`}
-          onDrop={handleDrop}
-          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-          onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
-          onClick={() => setPasteReady(true)}
-        >
-          <div className="text-center py-2">
-            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-            <p className="text-sm text-gray-500">
-              {allImages.length === 0 ? 'Add main product image' : 'Add another image'}
-            </p>
+        ) : (
+          <div 
+            className={`border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer ${
+              dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300'
+            }`}
+            onDrop={handleDrop}
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
+            onClick={() => setPasteReady(true)}
+          >
+            <div className="text-center py-2">
+              <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+              <p className="text-sm text-gray-500">
+                {allImages.length === 0 ? 'Add main product image' : 'Add another image'}
+              </p>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFileUpload(file);
+                e.target.value = '';
+              }}
+              className="hidden"
+              data-testid="input-multi-image-upload"
+            />
           </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleFileUpload(file);
-              e.target.value = '';
-            }}
-            className="hidden"
-            data-testid="input-multi-image-upload"
-          />
-        </div>
+        )
       )}
       
       {uploading && (
@@ -13040,8 +13059,35 @@ function SupplyMultiImageUpload({
         </div>
       )}
       
+      {/* URL Input for adding images via URL */}
+      <div className="flex gap-2">
+        <Input
+          placeholder="Paste image URL here..."
+          value={urlInput}
+          onChange={(e) => setUrlInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              addImageUrl(urlInput);
+            }
+          }}
+          className="flex-1"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => addImageUrl(urlInput)}
+          disabled={!urlInput.trim()}
+        >
+          Add URL
+        </Button>
+      </div>
+      
       <p className="text-xs text-gray-500">
-        Click the area above, then paste (Ctrl+V) or drop an image. Customers can swipe through images like Amazon. First image is the main display.
+        {supplyId 
+          ? 'Click the area above, then paste (Ctrl+V) or drop an image. Customers can swipe through images like Amazon. First image is the main display.'
+          : 'Paste image URLs to add product images. First image is the main display. Customers can swipe through images like Amazon.'
+        }
       </p>
     </div>
   );
@@ -13491,6 +13537,9 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
     nonRestockable: false,
   });
   
+  // Additional images for carousel
+  const [additionalImageUrls, setAdditionalImageUrls] = useState<string[]>([]);
+  
   // Collapsible sections state
   const [showIngredients, setShowIngredients] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
@@ -13501,6 +13550,7 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
     onSubmit({
       ...formData,
       stockQuantity: parseInt(formData.stockQuantity) || 0,
+      imageUrls: additionalImageUrls,
     });
   };
 
@@ -13740,13 +13790,13 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
         </div>
       </div>
       
-      <ImageUpload 
-        imageUrl={formData.imageUrl} 
-        onImageChange={(url) => setFormData({ ...formData, imageUrl: url })} 
+      <SupplyMultiImageUpload
+        supplyId={null}
+        mainImageUrl={formData.imageUrl}
+        additionalImageUrls={additionalImageUrls}
+        onMainImageChange={(url) => setFormData({ ...formData, imageUrl: url })}
+        onAdditionalImagesChange={setAdditionalImageUrls}
       />
-      <p className="text-xs text-gray-500 text-center">
-        After creating the product, you can add multiple images with drag-and-drop
-      </p>
       <Button type="submit" className="w-full">Add Supply</Button>
     </form>
   );
