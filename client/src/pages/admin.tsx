@@ -12993,20 +12993,22 @@ function SupplyMultiImageUpload({
         </div>
       )}
 
-      {/* File upload drop zone - only show when we have a supplyId */}
-      {supplyId && (
-        pasteReady ? (
-          <div 
-            className="border-2 border-dashed rounded-lg p-4 transition-colors border-green-500 bg-green-50 dark:bg-green-900/20"
-            onDrop={handleDrop}
-            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-            onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
-          >
-            <div className="text-center py-2">
-              <ClipboardPaste className="w-8 h-8 text-green-600 mx-auto mb-2 animate-pulse" />
-              <p className="text-sm text-green-700 font-medium">Ready for image - Paste (Ctrl+V) or drop here</p>
-              <p className="text-xs text-green-600 mt-1">Press Escape to cancel</p>
-            </div>
+      {/* File upload drop zone - with or without supplyId */}
+      {pasteReady ? (
+        <div 
+          className="border-2 border-dashed rounded-lg p-4 transition-colors border-green-500 bg-green-50 dark:bg-green-900/20"
+          onDrop={supplyId ? handleDrop : undefined}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
+        >
+          <div className="text-center py-2">
+            <ClipboardPaste className="w-8 h-8 text-green-600 mx-auto mb-2 animate-pulse" />
+            <p className="text-sm text-green-700 font-medium">
+              {supplyId ? 'Ready for image - Paste (Ctrl+V) or drop here' : 'Paste image URL below'}
+            </p>
+            <p className="text-xs text-green-600 mt-1">Press Escape to cancel</p>
+          </div>
+          {supplyId && (
             <input
               ref={fileInputRef}
               type="file"
@@ -13019,23 +13021,25 @@ function SupplyMultiImageUpload({
               className="hidden"
               data-testid="input-multi-image-upload"
             />
+          )}
+        </div>
+      ) : (
+        <div 
+          className={`border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer ${
+            dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300'
+          }`}
+          onDrop={supplyId ? handleDrop : undefined}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
+          onClick={() => setPasteReady(true)}
+        >
+          <div className="text-center py-2">
+            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+            <p className="text-sm text-gray-500">
+              {allImages.length === 0 ? 'Add main product image' : 'Add another image'}
+            </p>
           </div>
-        ) : (
-          <div 
-            className={`border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer ${
-              dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300'
-            }`}
-            onDrop={handleDrop}
-            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-            onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
-            onClick={() => setPasteReady(true)}
-          >
-            <div className="text-center py-2">
-              <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm text-gray-500">
-                {allImages.length === 0 ? 'Add main product image' : 'Add another image'}
-              </p>
-            </div>
+          {supplyId && (
             <input
               ref={fileInputRef}
               type="file"
@@ -13048,8 +13052,8 @@ function SupplyMultiImageUpload({
               className="hidden"
               data-testid="input-multi-image-upload"
             />
-          </div>
-        )
+          )}
+        </div>
       )}
       
       {uploading && (
