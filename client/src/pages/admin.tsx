@@ -6596,15 +6596,20 @@ export default function Admin() {
   // Create Supply Mutation
   const createSupplyMutation = useMutation({
     mutationFn: async (supplyData: any) => {
-      await apiRequest("POST", "/api/supplies", supplyData);
+      const response = await apiRequest("POST", "/api/supplies", supplyData);
+      return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (createdSupply) => {
       toast({
         title: "Supply Added",
-        description: "Supply has been added successfully.",
+        description: "Supply created! You can now add images.",
       });
       setIsAddSupplyOpen(false);
       queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
+      // Auto-open edit dialog so user can add images
+      if (createdSupply && createdSupply.id) {
+        setTimeout(() => setEditingSupply(createdSupply), 300);
+      }
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
@@ -13450,7 +13455,17 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
     mfgPart: '',
     sku: '',
     isActive: true,
+    ingredients: '',
+    guaranteedAnalysis: '',
+    instructions: '',
+    instructionLabel: '',
+    nonRestockable: false,
   });
+  
+  // Collapsible sections state
+  const [showIngredients, setShowIngredients] = useState(false);
+  const [showAnalysis, setShowAnalysis] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -13599,10 +13614,110 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         />
       </div>
+      
+      {/* Collapsible Sections - Match Edit Form */}
+      <div className="space-y-2">
+        {/* Ingredient Information */}
+        <div className="border rounded-lg overflow-hidden">
+          <button
+            type="button"
+            className="w-full flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/30"
+            onClick={() => setShowIngredients(!showIngredients)}
+          >
+            <span className="font-medium">Ingredient Information</span>
+            <ChevronDown className={`w-5 h-5 transition-transform ${showIngredients ? 'rotate-180' : ''}`} />
+          </button>
+          {showIngredients && (
+            <div className="p-3 border-t">
+              <Textarea
+                placeholder="Enter full ingredient list from manufacturer..."
+                value={formData.ingredients}
+                onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
+                rows={4}
+              />
+            </div>
+          )}
+        </div>
+        
+        {/* Guaranteed Analysis */}
+        <div className="border rounded-lg overflow-hidden">
+          <button
+            type="button"
+            className="w-full flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/30"
+            onClick={() => setShowAnalysis(!showAnalysis)}
+          >
+            <span className="font-medium">Guaranteed Analysis</span>
+            <ChevronDown className={`w-5 h-5 transition-transform ${showAnalysis ? 'rotate-180' : ''}`} />
+          </button>
+          {showAnalysis && (
+            <div className="p-3 border-t">
+              <Textarea
+                placeholder="Crude Protein (min): 10%&#10;Crude Fat (min): 5%&#10;Crude Fiber (max): 2%&#10;Moisture (max): 78%"
+                value={formData.guaranteedAnalysis}
+                onChange={(e) => setFormData({ ...formData, guaranteedAnalysis: e.target.value })}
+                rows={4}
+              />
+            </div>
+          )}
+        </div>
+        
+        {/* Usage Instructions */}
+        <div className="border rounded-lg overflow-hidden">
+          <button
+            type="button"
+            className="w-full flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/30"
+            onClick={() => setShowInstructions(!showInstructions)}
+          >
+            <span className="font-medium">Usage Instructions</span>
+            <ChevronDown className={`w-5 h-5 transition-transform ${showInstructions ? 'rotate-180' : ''}`} />
+          </button>
+          {showInstructions && (
+            <div className="p-3 border-t space-y-3">
+              <div>
+                <Label className="text-xs">Label (e.g., "Feeding Guidelines")</Label>
+                <Input
+                  placeholder="Feeding Guidelines"
+                  value={formData.instructionLabel}
+                  onChange={(e) => setFormData({ ...formData, instructionLabel: e.target.value })}
+                />
+              </div>
+              <Textarea
+                placeholder="Enter feeding/usage instructions..."
+                value={formData.instructions}
+                onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
+                rows={4}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* Non-Restockable Checkbox */}
+      <div className="p-3 border-2 border-orange-200 dark:border-orange-700 rounded-lg bg-orange-50 dark:bg-orange-900/20">
+        <div className="flex items-start gap-3">
+          <Checkbox
+            id="nonRestockable"
+            checked={formData.nonRestockable}
+            onCheckedChange={(checked) => setFormData({ ...formData, nonRestockable: checked as boolean })}
+          />
+          <div>
+            <Label htmlFor="nonRestockable" className="text-orange-700 dark:text-orange-400 font-medium cursor-pointer">
+              Non-Restockable Item
+            </Label>
+            <p className="text-xs text-orange-600 dark:text-orange-500">
+              Mark this item as not being restocked once sold out
+            </p>
+          </div>
+        </div>
+      </div>
+      
       <ImageUpload 
         imageUrl={formData.imageUrl} 
         onImageChange={(url) => setFormData({ ...formData, imageUrl: url })} 
       />
+      <p className="text-xs text-gray-500 text-center">
+        After creating the product, you can add multiple images with drag-and-drop
+      </p>
       <Button type="submit" className="w-full">Add Supply</Button>
     </form>
   );
