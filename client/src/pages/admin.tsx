@@ -13003,68 +13003,75 @@ function SupplyMultiImageUpload({
         </div>
       )}
 
-      {/* File upload drop zone - with or without supplyId */}
-      {pasteReady ? (
-        <div 
-          className="border-2 border-dashed rounded-lg p-4 transition-colors border-green-500 bg-green-50 dark:bg-green-900/20"
-          onDrop={supplyId ? handleDrop : undefined}
-          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-          onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
-        >
-          <div className="text-center py-2">
-            <ClipboardPaste className="w-8 h-8 text-green-600 mx-auto mb-2 animate-pulse" />
-            <p className="text-sm text-green-700 font-medium">
-              {supplyId ? 'Ready for image - Paste (Ctrl+V) or drop here' : 'Paste image URL below'}
-            </p>
-            <p className="text-xs text-green-600 mt-1">Press Escape to cancel</p>
-          </div>
-          {supplyId && (
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleFileUpload(file);
-                e.target.value = '';
-              }}
-              className="hidden"
-              data-testid="input-multi-image-upload"
-            />
+      {/* File upload drop zone */}
+      <div 
+        className={`border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer ${
+          pasteReady 
+            ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
+            : dragOver 
+              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+              : 'border-gray-300'
+        }`}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          const file = e.dataTransfer.files?.[0];
+          if (file) {
+            if (supplyId) {
+              handleFileUpload(file);
+            } else {
+              toast({
+                title: "Save Product First",
+                description: "Create the product first, then upload images via file drop.",
+                variant: "destructive",
+              });
+            }
+          }
+        }}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
+        onClick={() => {
+          if (supplyId) {
+            fileInputRef.current?.click();
+          } else {
+            setPasteReady(true);
+          }
+        }}
+      >
+        <div className="text-center py-2">
+          {pasteReady ? (
+            <>
+              <ClipboardPaste className="w-8 h-8 text-green-600 mx-auto mb-2 animate-pulse" />
+              <p className="text-sm text-green-700 font-medium">
+                {supplyId ? 'Ready - Paste (Ctrl+V), drop, or click to browse' : 'Paste image URL below'}
+              </p>
+              <p className="text-xs text-green-600 mt-1">Press Escape to cancel</p>
+            </>
+          ) : (
+            <>
+              <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+              <p className="text-sm text-gray-500">
+                {allImages.length === 0 ? 'Add main product image' : 'Add another image'}
+              </p>
+              {supplyId && (
+                <p className="text-xs text-gray-400 mt-1">Click to browse, drag & drop, or paste</p>
+              )}
+            </>
           )}
         </div>
-      ) : (
-        <div 
-          className={`border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer ${
-            dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300'
-          }`}
-          onDrop={supplyId ? handleDrop : undefined}
-          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-          onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
-          onClick={() => setPasteReady(true)}
-        >
-          <div className="text-center py-2">
-            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-            <p className="text-sm text-gray-500">
-              {allImages.length === 0 ? 'Add main product image' : 'Add another image'}
-            </p>
-          </div>
-          {supplyId && (
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleFileUpload(file);
-                e.target.value = '';
-              }}
-              className="hidden"
-              data-testid="input-multi-image-upload"
-            />
-          )}
-        </div>
-      )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleFileUpload(file);
+            e.target.value = '';
+          }}
+          className="hidden"
+          data-testid="input-multi-image-upload"
+        />
+      </div>
       
       {uploading && (
         <div className="flex items-center justify-center gap-2 text-sm text-blue-600">
