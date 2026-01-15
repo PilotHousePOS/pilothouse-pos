@@ -1106,9 +1106,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      // Get all supplies and pets
+      // Get all supplies (live animals handled separately in POS)
       const allSupplies = await storage.getAllSupplies();
-      const allPets = await storage.getAllPets();
 
       // Create workbook with Exatouch format
       const workbook = new ExcelJS.Workbook();
@@ -1255,73 +1254,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         });
       });
 
-      // Add pets
-      allPets.forEach(pet => {
-        const priceNum = pet.price ? parseFloat(pet.price.toString()) : '';
-        
-        itemsSheet.addRow({
-          active: pet.isAvailable ? 'True' : 'False',
-          description: pet.name || '',
-          descLong: pet.description || pet.name || '',
-          descButton: (pet.name || '').substring(0, 20),
-          descReceipt: pet.name || '',
-          descRemote: pet.name || '',
-          descSticky: pet.name || '',
-          price: priceNum,
-          pricePrompt: '',
-          priceSuggest: '',
-          costIndex: 0,
-          costAvg: '',
-          costRecent: '',
-          costLow: '',
-          costEntered: '',
-          stockType: 2,
-          qtyOnHand: 1,
-          minQty: 0,
-          qtyReorder: 0,
-          limitQty: '',
-          dynamicEnabled: 'False',
-          dynamicQty: '',
-          orderMin: '',
-          sku: 'PET-' + pet.id.toString(),
-          altSku: '',
-          category: 'Live Animals',
-          subCategory: pet.species || '',
-          mfg: '',
-          mfgPart: '',
-          color: '',
-          size: '',
-          style: pet.breed || '',
-          packSize: '',
-          packUnit: '',
-          sbf: '',
-          unit: 'ea',
-          chargeUnit: 'ea',
-          customField1: '',
-          customField2: '',
-          customField3: '',
-          customField4: '',
-          ebtFood: 'False',
-          ebtCash: 'False',
-          checkAge: '',
-          refundable: 'False',
-          taxableA: 'True',
-          taxableB: 'False',
-          taxableC: 'False',
-          taxableD: 'False',
-          taxIncluded: 'False',
-          overridePrice: 'False',
-          overrideQty: 'False',
-          excludeDisc: 'False',
-          excludePromo: 'False',
-          vendor: '',
-          vendorBuyQty: '',
-          vendorSrp: '',
-          vendorCost: '',
-          vendorPart: '',
-          vendorLeadTime: '',
-        });
-      });
+      // Note: Live animals excluded from ExaTouch export - handled separately in POS
 
       // Generate filename with date
       const dateStr = new Date().toISOString().split('T')[0];

@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-first web application designed for online sales of exotic reptiles and pet supplies, and for streamlining grooming service bookings. Its primary goal is to provide a seamless and engaging shopping experience focused on specialized pet products and services, expanding the customer base within the exotic reptile enthusiast market. The project aims to offer robust inventory management, secure transactions, and efficient service scheduling, establishing Animal House as a leading online destination for exotic pet enthusiasts.
+The Animal House Pet Store project is a mobile-first web application designed for online sales of exotic reptiles and pet supplies, and for streamlining grooming service bookings. Its primary goal is to offer a seamless and engaging shopping experience focused on specialized pet products and services, expanding its customer base within the exotic reptile enthusiast market. The project emphasizes robust inventory management, secure transactions, and efficient service scheduling to position Animal House as a leading online destination for exotic pet enthusiasts.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -182,13 +182,13 @@ Step 5: NEVER mark task complete until verification passes
 - **Pro Plan**: https://www.purina.com/pro-plan/
 
 ## System Architecture
-The application is a full-stack, mobile-first web solution designed for pet store management, sales, and grooming services.
+The application is a full-stack, mobile-first web solution for pet store management, sales, and grooming services.
 
 **UI/UX Decisions:**
 - Dark, bold aesthetic with high contrast and themed headers.
 - Amazon-style image carousels for product displays.
 - Mobile forms implemented as full-screen modals with warning banners.
-- Admin dashboard providing universal navigation.
+- Admin dashboard for universal navigation.
 
 **Technical Implementations & Feature Specifications:**
 - **Core Management**: Inventory tracking, multi-image upload, advanced appointment scheduling (15-min intervals, admin approval, notifications, Google Calendar sync), robust order processing with AI photo uploads and custom pricing.
