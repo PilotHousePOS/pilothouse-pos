@@ -1186,6 +1186,18 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       };
       itemsSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
 
+      // Helper function to format category names (camelCase to Title Case)
+      const formatCategory = (category: string): string => {
+        if (!category) return '';
+        // Split camelCase into words and capitalize first letter of each
+        return category
+          .replace(/([a-z])([A-Z])/g, '$1 $2') // Add space before capitals
+          .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+      };
+
       // Add supplies
       allSupplies.forEach(supply => {
         const priceNum = supply.price ? parseFloat(supply.price.replace(/[^\d.]/g, '')) : '';
@@ -1216,8 +1228,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           orderMin: '',
           sku: supply.sku || supply.id.toString(),
           altSku: supply.sku ? supply.id.toString() : '',
-          category: supply.category || '',
-          subCategory: supply.productType || '',
+          category: formatCategory(supply.category || ''),
+          subCategory: formatCategory(supply.productType || ''),
           mfg: supply.brand || '',
           mfgPart: '',
           color: '',

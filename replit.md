@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is an online platform for exotic reptiles and pet supplies, including grooming service bookings. This mobile-first web application aims to create an engaging e-commerce experience with comprehensive inventory management, secure transaction processing, and efficient service scheduling to capture a significant share of the exotic pet market.
+The Animal House Pet Store project is an online platform specializing in exotic reptiles and pet supplies, including grooming service bookings. This mobile-first web application aims to provide an engaging e-commerce experience with robust inventory management, secure transaction processing, and efficient service scheduling. The project seeks to capture a significant share of the exotic pet market through its comprehensive offerings and user-friendly design.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -87,8 +87,8 @@ The Animal House Pet Store project is an online platform for exotic reptiles and
 - ExaTouch POS Fields to Populate:
   - MfgPart: Manufacturer part number
   - Color: Product color variant (based on packaging band color)
-  - Size: Product size
-  - Style: Product style/variant
+  2. Size: Product size
+  3. Style: Product style/variant
 - **POS Color Assignment Rules by Brand:**
   - **Science Diet Color Rules (based on packaging band):**
     - Puppy & Kitten = Green band
@@ -182,7 +182,7 @@ Step 5: NEVER mark task complete until verification passes
 - **Pro Plan**: https://www.purina.com/pro-plan/
 
 ## System Architecture
-The application is a full-stack, mobile-first web solution for pet store management, sales, and grooming services.
+The application is a full-stack, mobile-first web solution designed for pet store management, sales, and grooming services.
 
 **UI/UX Decisions:**
 - Dark, bold aesthetic with high contrast and themed headers.
