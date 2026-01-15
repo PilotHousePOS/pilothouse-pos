@@ -1246,7 +1246,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           overrideQty: 'False',
           excludeDisc: 'False',
           excludePromo: 'False',
-          vendor: '',
+          vendor: supply.vendor || '',
           vendorBuyQty: '',
           vendorSrp: '',
           vendorCost: '',

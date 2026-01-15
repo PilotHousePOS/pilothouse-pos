@@ -118,6 +118,7 @@ export const supplies = pgTable("supplies", {
   posProductId: varchar("pos_product_id", { length: 255 }), // External POS system product ID
   posLastSyncedAt: timestamp("pos_last_synced_at"), // Last time POS data was synced
   nonRestockable: boolean("non_restockable").default(false), // Flag for items that won't be restocked
+  vendor: varchar("vendor", { length: 100 }), // Vendor/distributor (Central, Phillips, Nelsons, Penn-Plax, Coastal, etc.)
   // Product detail fields for expanded view
   features: jsonb("features"), // Additional product features { grossWeight, netWeight, height, length, width, flavor, etc. }
   ingredients: text("ingredients"), // Raw ingredients list for consumables (food, treats, shampoo)
