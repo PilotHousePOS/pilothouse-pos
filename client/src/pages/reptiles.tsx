@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useState, useEffect } from "react";
 import { safeGoBack } from "@/lib/navigation";
 import { useDebounce } from "@/hooks/use-debounce";
+import { formatCategory } from "@/lib/formatCategory";
 
 const ITEMS_PER_PAGE = 24;
 
@@ -329,7 +330,7 @@ export default function ReptilesPage() {
                     </div>
                     <CardContent className="p-4 pb-6 flex flex-col flex-grow">
                       <h3 className="font-bold text-lg mb-2">{supply.name}</h3>
-                      <p className="text-sm text-gray-600 mb-2">{supply.category}</p>
+                      <p className="text-sm text-gray-600 mb-2">{formatCategory(supply.category)}</p>
                       {supply.description && (
                         <p className="text-sm text-gray-500 mb-3 line-clamp-2">
                           {supply.description}
@@ -510,7 +511,7 @@ export default function ReptilesPage() {
                 )}
                 {selectedType === "supply" && selectedItem.category && (
                   <div>
-                    <span className="font-semibold">Category:</span> {selectedItem.category}
+                    <span className="font-semibold">Category:</span> {formatCategory(selectedItem.category)}
                   </div>
                 )}
                 {selectedItem.description && (

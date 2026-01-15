@@ -3014,7 +3014,7 @@ function ProductImageManager() {
                 <div className="space-y-2 max-h-60 overflow-y-auto">
                   {((imageStats as any).byCategory || []).slice(0, 10).map((cat: any) => (
                     <div key={cat.category} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded">
-                      <span className="font-medium capitalize">{cat.category}</span>
+                      <span className="font-medium">{formatCategory(cat.category)}</span>
                       <div className="flex items-center gap-4 text-sm">
                         <span className="text-gray-600">Total: {cat.total}</span>
                         <span className="text-red-600">Missing: {cat.withoutImages}</span>
@@ -5863,7 +5863,7 @@ function BrandCatalogManager() {
                       )}
                       {entry.category && (
                         <Badge variant="default" className="text-xs bg-blue-100 text-blue-800">
-                          {entry.category}
+                          {formatCategory(entry.category)}
                         </Badge>
                       )}
                     </div>

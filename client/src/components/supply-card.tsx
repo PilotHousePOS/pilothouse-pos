@@ -293,7 +293,7 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
             <div className="flex gap-6">
               <div>
                 <span className="font-semibold">Category: </span>
-                <span className="capitalize">{supply.category}</span>
+                <span>{formatCategory(supply.category)}</span>
               </div>
               <div>
                 <span className="font-semibold">Price: </span>
