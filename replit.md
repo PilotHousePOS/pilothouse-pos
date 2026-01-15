@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-first web application for the online sale of exotic reptiles and pet supplies, and streamlining grooming service bookings. Its primary objective is to establish an engaging e-commerce platform, positioning Animal House as a leading online destination for exotic reptile enthusiasts. Key capabilities include comprehensive inventory management, secure transaction processing, and efficient service scheduling, aiming to capture a significant share of the exotic pet market.
+The Animal House Pet Store project is an online platform for exotic reptiles and pet supplies, including grooming service bookings. This mobile-first web application aims to create an engaging e-commerce experience with comprehensive inventory management, secure transaction processing, and efficient service scheduling to capture a significant share of the exotic pet market.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
