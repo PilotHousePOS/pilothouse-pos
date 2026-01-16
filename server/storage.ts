@@ -3196,6 +3196,11 @@ export class DatabaseStorage implements IStorage {
                 weight: sql`EXCLUDED.weight`,
                 size: sql`EXCLUDED.size`,
                 sku: sql`EXCLUDED.sku`,
+                // ExaTouch POS fields
+                color: sql`EXCLUDED.color`,
+                style: sql`EXCLUDED.style`,
+                mfgPart: sql`EXCLUDED.mfg_part`,
+                vendor: sql`EXCLUDED.vendor`,
                 // Extended product info - preserve existing values if import has null
                 ingredients: sql`COALESCE(EXCLUDED.ingredients, supplies.ingredients)`,
                 guaranteedAnalysis: sql`COALESCE(EXCLUDED.guaranteed_analysis, supplies.guaranteed_analysis)`,
