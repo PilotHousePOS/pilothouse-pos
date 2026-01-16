@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first web application specializing in exotic reptiles and pet supplies, including grooming services. It aims to be a leading online retailer by offering a comprehensive product range, robust inventory management, secure transactions, and efficient service scheduling, capturing a significant share of the exotic pet market.
+The Animal House Pet Store is a mobile-first web application specializing in exotic reptiles and pet supplies, including grooming services. It aims to be a leading online retailer with a comprehensive product range, robust inventory management, secure transactions, and efficient service scheduling, capturing a significant share of the exotic pet market.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -87,8 +87,8 @@ The Animal House Pet Store is a mobile-first web application specializing in exo
 - ExaTouch POS Fields to Populate:
   - MfgPart: Manufacturer part number
   - Color: Product color variant (based on packaging band color)
-  2. Size: Product size
-  3. Style: Product style/variant
+  - Size: Product size
+  - Style: Product style/variant
 - **POS Color Assignment Rules by Brand:**
   - **Science Diet Color Rules (based on packaging band):**
     - Puppy & Kitten = Green band

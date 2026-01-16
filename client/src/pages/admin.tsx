@@ -12221,6 +12221,7 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
     color: supply.color || "",
     style: supply.style || "",
     mfgPart: supply.mfgPart || "",
+    vendor: supply.vendor || "",
     ingredients: supply.ingredients || "",
     instructions: supply.instructions || "",
     guaranteedAnalysis: supply.guaranteedAnalysis || "",
@@ -12334,6 +12335,31 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
             placeholder="Manufacturer part number"
             data-testid="input-supply-mfgpart"
           />
+        </div>
+        <div className="col-span-2">
+          <label className="block text-xs font-medium mb-1">Vendor</label>
+          <Select value={formData.vendor} onValueChange={(value) => setFormData({ ...formData, vendor: value })}>
+            <SelectTrigger className="w-full text-sm" data-testid="select-supply-vendor">
+              <SelectValue placeholder="Select vendor" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">None</SelectItem>
+              <SelectItem value="Central">Central</SelectItem>
+              <SelectItem value="Coastal">Coastal</SelectItem>
+              <SelectItem value="Phillips">Phillips</SelectItem>
+              <SelectItem value="Penn-Plax">Penn-Plax</SelectItem>
+              <SelectItem value="Nelsons">Nelsons</SelectItem>
+              <SelectItem value="Science Diet">Science Diet</SelectItem>
+              <SelectItem value="Supreme">Supreme</SelectItem>
+              <SelectItem value="Prevue">Prevue</SelectItem>
+              <SelectItem value="Specialty Pet Products">Specialty Pet Products</SelectItem>
+              <SelectItem value="Valhoma">Valhoma</SelectItem>
+              <SelectItem value="Pets First">Pets First</SelectItem>
+              <SelectItem value="MidWest">MidWest</SelectItem>
+              <SelectItem value="Tuesday's Natural Dog Company">Tuesday's Natural Dog Company</SelectItem>
+              <SelectItem value="SodaPup">SodaPup</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
       
@@ -13549,6 +13575,7 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
     color: '',
     style: '',
     mfgPart: '',
+    vendor: '',
     sku: '',
     isActive: true,
     ingredients: '',
@@ -13703,6 +13730,31 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
             className="text-sm"
             data-testid="input-add-supply-mfgpart"
           />
+        </div>
+        <div className="col-span-2">
+          <Label htmlFor="vendor" className="text-xs">Vendor</Label>
+          <Select value={formData.vendor} onValueChange={(value) => setFormData({ ...formData, vendor: value })}>
+            <SelectTrigger className="w-full text-sm" data-testid="select-add-supply-vendor">
+              <SelectValue placeholder="Select vendor" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">None</SelectItem>
+              <SelectItem value="Central">Central</SelectItem>
+              <SelectItem value="Coastal">Coastal</SelectItem>
+              <SelectItem value="Phillips">Phillips</SelectItem>
+              <SelectItem value="Penn-Plax">Penn-Plax</SelectItem>
+              <SelectItem value="Nelsons">Nelsons</SelectItem>
+              <SelectItem value="Science Diet">Science Diet</SelectItem>
+              <SelectItem value="Supreme">Supreme</SelectItem>
+              <SelectItem value="Prevue">Prevue</SelectItem>
+              <SelectItem value="Specialty Pet Products">Specialty Pet Products</SelectItem>
+              <SelectItem value="Valhoma">Valhoma</SelectItem>
+              <SelectItem value="Pets First">Pets First</SelectItem>
+              <SelectItem value="MidWest">MidWest</SelectItem>
+              <SelectItem value="Tuesday's Natural Dog Company">Tuesday's Natural Dog Company</SelectItem>
+              <SelectItem value="SodaPup">SodaPup</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
       
