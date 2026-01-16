@@ -12338,12 +12338,12 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
         </div>
         <div className="col-span-2">
           <label className="block text-xs font-medium mb-1">Vendor</label>
-          <Select value={formData.vendor} onValueChange={(value) => setFormData({ ...formData, vendor: value })}>
+          <Select value={formData.vendor || "none"} onValueChange={(value) => setFormData({ ...formData, vendor: value === "none" ? "" : value })}>
             <SelectTrigger className="w-full text-sm" data-testid="select-supply-vendor">
               <SelectValue placeholder="Select vendor" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">None</SelectItem>
+              <SelectItem value="none">None</SelectItem>
               <SelectItem value="Central">Central</SelectItem>
               <SelectItem value="Coastal">Coastal</SelectItem>
               <SelectItem value="Phillips">Phillips</SelectItem>
@@ -13733,12 +13733,12 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
         </div>
         <div className="col-span-2">
           <Label htmlFor="vendor" className="text-xs">Vendor</Label>
-          <Select value={formData.vendor} onValueChange={(value) => setFormData({ ...formData, vendor: value })}>
+          <Select value={formData.vendor || "none"} onValueChange={(value) => setFormData({ ...formData, vendor: value === "none" ? "" : value })}>
             <SelectTrigger className="w-full text-sm" data-testid="select-add-supply-vendor">
               <SelectValue placeholder="Select vendor" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">None</SelectItem>
+              <SelectItem value="none">None</SelectItem>
               <SelectItem value="Central">Central</SelectItem>
               <SelectItem value="Coastal">Coastal</SelectItem>
               <SelectItem value="Phillips">Phillips</SelectItem>
