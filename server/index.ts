@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import path from "path";
 import http from "http";
+import * as fs from "fs";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -45,14 +46,31 @@ app.use(cookieParser());
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/stock-images', express.static(path.join(process.cwd(), 'attached_assets/stock_images')));
 
-// Serve PWA files (manifest, service worker, icons)
-app.use('/icons', express.static(path.join(process.cwd(), 'client/public/icons')));
-app.get('/manifest.json', (_req, res) => {
-  res.sendFile(path.join(process.cwd(), 'client/public/manifest.json'));
+// Serve PWA files (manifest, service worker, icons) - works in both dev and production
+const pwaDevPath = path.join(process.cwd(), 'client/public');
+const pwaProdPath = path.join(process.cwd(), 'dist/public');
+
+// Try dev path first, fall back to prod path
+const getPwaFilePath = (filename: string) => {
+  const devFile = path.join(pwaDevPath, filename);
+  const prodFile = path.join(pwaProdPath, filename);
+  return fs.existsSync(devFile) ? devFile : prodFile;
+};
+
+app.use('/icons', (req, res, next) => {
+  const devIconsPath = path.join(pwaDevPath, 'icons');
+  const prodIconsPath = path.join(pwaProdPath, 'icons');
+  const iconsPath = fs.existsSync(devIconsPath) ? devIconsPath : prodIconsPath;
+  express.static(iconsPath)(req, res, next);
 });
+
+app.get('/manifest.json', (_req, res) => {
+  res.sendFile(getPwaFilePath('manifest.json'));
+});
+
 app.get('/sw.js', (_req, res) => {
   res.setHeader('Content-Type', 'application/javascript');
-  res.sendFile(path.join(process.cwd(), 'client/public/sw.js'));
+  res.sendFile(getPwaFilePath('sw.js'));
 });
 
 // Cache headers
