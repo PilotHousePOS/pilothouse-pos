@@ -5313,14 +5313,15 @@ function EmailCenter() {
     }
   };
 
-  const toggleRecipient = (id: string) => {
+  const toggleRecipient = (id: number | string) => {
+    const idStr = String(id);
     setSelectedRecipients(prev =>
-      prev.includes(id) ? prev.filter(r => r !== id) : [...prev, id]
+      prev.includes(idStr) ? prev.filter(r => r !== idStr) : [...prev, idStr]
     );
   };
 
   const selectAll = () => {
-    setSelectedRecipients(filteredRecipients.map((r: any) => r.id));
+    setSelectedRecipients(filteredRecipients.map((r: any) => String(r.id)));
   };
 
   const clearAll = () => {
@@ -5455,12 +5456,12 @@ function EmailCenter() {
                         <div
                           key={recipient.id}
                           className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-accent ${
-                            selectedRecipients.includes(recipient.id) ? 'bg-accent' : ''
+                            selectedRecipients.includes(String(recipient.id)) ? 'bg-accent' : ''
                           }`}
                           onClick={() => toggleRecipient(recipient.id)}
                         >
                           <Checkbox
-                            checked={selectedRecipients.includes(recipient.id)}
+                            checked={selectedRecipients.includes(String(recipient.id))}
                             onCheckedChange={() => toggleRecipient(recipient.id)}
                           />
                           <div className="flex-1 min-w-0">
