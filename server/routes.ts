@@ -2647,20 +2647,23 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           });
         }
         
-        // LIMIT: Only 1 active appointment per customer account
+        // LIMIT: Only 1 appointment per customer per day
         const userAppointments = await storage.getAppointments();
-        const activeAppointments = userAppointments.filter((apt: any) => 
-          apt.userId === userId && 
-          apt.status !== 'cancelled' && 
-          apt.status !== 'rejected' &&
-          apt.status !== 'completed' &&
-          new Date(apt.appointmentDate) >= today
-        );
+        const requestedDateStr = req.body.appointmentDate; // "YYYY-MM-DD" format
+        const sameDayAppointments = userAppointments.filter((apt: any) => {
+          if (apt.userId !== userId) return false;
+          if (apt.status === 'cancelled' || apt.status === 'rejected') return false;
+          
+          // Compare date strings directly (both in YYYY-MM-DD format)
+          const aptDateStr = typeof apt.appointmentDate === 'string' 
+            ? apt.appointmentDate.split('T')[0] 
+            : new Date(apt.appointmentDate).toISOString().split('T')[0];
+          return aptDateStr === requestedDateStr;
+        });
         
-        if (activeAppointments.length > 0) {
-          const existingDate = new Date(activeAppointments[0].appointmentDate).toLocaleDateString();
+        if (sameDayAppointments.length > 0) {
           return res.status(400).json({ 
-            message: `You already have an active appointment on ${existingDate}. Only one appointment per account is allowed. Please cancel your existing appointment first or call the store.` 
+            message: `You already have an appointment booked for this date. Only one appointment per day is allowed.` 
           });
         }
       }
