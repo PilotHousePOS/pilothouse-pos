@@ -12,6 +12,7 @@
   "orientation": "portrait-primary",
   "lang": "en",
   "dir": "ltr",
+  "iarc_rating_id": "",
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
@@ -93,6 +94,21 @@
   ],
   "categories": ["shopping", "lifestyle", "business"],
   "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.animalhousepetstore.app",
+      "id": "com.animalhousepetstore.app"
+    },
+    {
+      "platform": "itunes",
+      "url": "https://apps.apple.com/app/animal-house-pet-store/id000000000"
+    },
+    {
+      "platform": "windows",
+      "url": "https://www.microsoft.com/store/apps/9XXXXXX"
+    }
+  ],
   "launch_handler": {
     "client_mode": "navigate-existing"
   },
@@ -114,5 +130,27 @@
       "url": "/?action=%s"
     }
   ],
-  "handle_links": "preferred"
+  "handle_links": "preferred",
+  "scope_extensions": [
+    {
+      "origin": "https://*.animalhousepetstore.com"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "text/csv": [".csv"],
+        "application/json": [".json"]
+      },
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ],
+      "launch_type": "single-client"
+    }
+  ]
 }
