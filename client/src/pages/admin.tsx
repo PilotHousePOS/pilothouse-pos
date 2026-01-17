@@ -6478,7 +6478,7 @@ export default function Admin() {
   const [isAddBlockedDayOpen, setIsAddBlockedDayOpen] = useState(false);
   const [blockedDayFormData, setBlockedDayFormData] = useState({
     groomerId: '',
-    date: '',
+    dates: [] as Date[],
     reason: 'sick',
     notes: ''
   });
@@ -8167,22 +8167,29 @@ export default function Admin() {
 
   // Groomer blocked days mutations
   const createBlockedDayMutation = useMutation({
-    mutationFn: async (blockedDayData: { groomerId: number; date: string; reason: string; notes?: string }) => {
-      await apiRequest("POST", "/api/admin/groomer-blocked-days", blockedDayData);
+    mutationFn: async (blockedDayData: { groomerId: number; dates: string[]; reason: string; notes?: string }) => {
+      for (const date of blockedDayData.dates) {
+        await apiRequest("POST", "/api/admin/groomer-blocked-days", {
+          groomerId: blockedDayData.groomerId,
+          date,
+          reason: blockedDayData.reason,
+          notes: blockedDayData.notes
+        });
+      }
     },
     onSuccess: () => {
       toast({
-        title: "Blocked Day Added",
-        description: "Groomer blocked day has been added successfully.",
+        title: "Blocked Days Added",
+        description: `${blockedDayFormData.dates.length} blocked day(s) added successfully.`,
       });
       setIsAddBlockedDayOpen(false);
-      setBlockedDayFormData({ groomerId: '', date: '', reason: 'sick', notes: '' });
+      setBlockedDayFormData({ groomerId: '', dates: [], reason: 'sick', notes: '' });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/groomer-blocked-days"] });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to add blocked day.",
+        description: "Failed to add blocked days.",
         variant: "destructive",
       });
     },
@@ -12095,9 +12102,9 @@ export default function Admin() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CalendarX2 className="w-5 h-5" />
-              Add Blocked Day
+              Add Blocked Days
             </DialogTitle>
-            <DialogDescription>Block a groomer from being assigned on a specific date (sick day, vacation, etc.)</DialogDescription>
+            <DialogDescription>Block a groomer from being assigned on specific dates (sick days, vacation, etc.). Click multiple dates to select them.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -12119,14 +12126,36 @@ export default function Admin() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="blocked-date">Date *</Label>
-              <Input
-                id="blocked-date"
-                type="date"
-                value={blockedDayFormData.date}
-                onChange={(e) => setBlockedDayFormData({ ...blockedDayFormData, date: e.target.value })}
-                data-testid="input-blocked-date"
-              />
+              <Label>Dates * <span className="text-sm text-gray-500">({blockedDayFormData.dates.length} selected)</span></Label>
+              <div className="border rounded-md p-2 bg-white dark:bg-gray-950">
+                <Calendar
+                  mode="multiple"
+                  selected={blockedDayFormData.dates}
+                  onSelect={(dates) => setBlockedDayFormData({ ...blockedDayFormData, dates: dates || [] })}
+                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                  className="rounded-md"
+                  data-testid="calendar-blocked-dates"
+                />
+              </div>
+              {blockedDayFormData.dates.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {blockedDayFormData.dates.sort((a, b) => a.getTime() - b.getTime()).map((date, idx) => (
+                    <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded">
+                      {date.toLocaleDateString()}
+                      <button
+                        type="button"
+                        onClick={() => setBlockedDayFormData({
+                          ...blockedDayFormData,
+                          dates: blockedDayFormData.dates.filter((d) => d.getTime() !== date.getTime())
+                        })}
+                        className="hover:text-orange-600"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
               <Label htmlFor="blocked-reason">Reason *</Label>
@@ -12160,7 +12189,7 @@ export default function Admin() {
                 variant="outline"
                 onClick={() => {
                   setIsAddBlockedDayOpen(false);
-                  setBlockedDayFormData({ groomerId: '', date: '', reason: 'sick', notes: '' });
+                  setBlockedDayFormData({ groomerId: '', dates: [], reason: 'sick', notes: '' });
                 }}
                 data-testid="button-cancel-blocked-day"
               >
@@ -12169,17 +12198,22 @@ export default function Admin() {
               <Button
                 className="bg-orange-600 hover:bg-orange-700"
                 onClick={() => {
-                  if (!blockedDayFormData.groomerId || !blockedDayFormData.date) {
+                  if (!blockedDayFormData.groomerId || blockedDayFormData.dates.length === 0) {
                     toast({
                       title: "Missing Information",
-                      description: "Please select a groomer and date.",
+                      description: "Please select a groomer and at least one date.",
                       variant: "destructive",
                     });
                     return;
                   }
                   createBlockedDayMutation.mutate({
                     groomerId: parseInt(blockedDayFormData.groomerId),
-                    date: blockedDayFormData.date,
+                    dates: blockedDayFormData.dates.map(d => {
+                      const year = d.getFullYear();
+                      const month = String(d.getMonth() + 1).padStart(2, '0');
+                      const day = String(d.getDate()).padStart(2, '0');
+                      return `${year}-${month}-${day}`;
+                    }),
                     reason: blockedDayFormData.reason,
                     notes: blockedDayFormData.notes || undefined
                   });
@@ -12187,7 +12221,7 @@ export default function Admin() {
                 disabled={createBlockedDayMutation.isPending}
                 data-testid="button-save-blocked-day"
               >
-                {createBlockedDayMutation.isPending ? "Adding..." : "Add Blocked Day"}
+                {createBlockedDayMutation.isPending ? "Adding..." : `Add ${blockedDayFormData.dates.length || ''} Blocked Day${blockedDayFormData.dates.length !== 1 ? 's' : ''}`}
               </Button>
             </div>
           </div>
