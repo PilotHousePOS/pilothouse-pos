@@ -182,9 +182,10 @@ Step 5: NEVER mark task complete until verification passes
 - **Pro Plan**: https://www.purina.com/pro-plan/
 
 ## System Architecture
-The Animal House Pet Store application is a full-stack, mobile-first web solution with a dark, bold, and high-contrast UI.
+The Animal House Pet Store application is a full-stack, mobile-first web solution.
 
 **UI/UX Decisions:**
+- Dark, bold, and high-contrast UI.
 - Product displays use Amazon-style image carousels.
 - Mobile interactions are managed with full-screen modal forms and warning banners.
 - A universal admin dashboard ensures consistent navigation.
