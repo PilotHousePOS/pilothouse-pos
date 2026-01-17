@@ -156,28 +156,28 @@
   "screenshots": [
     {
       "src": "/screenshots/home-narrow.jpg",
-      "sizes": "1080x2340",
+      "sizes": "1080x2254",
       "type": "image/jpeg",
       "form_factor": "narrow",
       "label": "Featured Pets - Exotic Reptiles"
     },
     {
       "src": "/screenshots/services-narrow.jpg",
-      "sizes": "1080x2340",
+      "sizes": "1080x2256",
       "type": "image/jpeg",
       "form_factor": "narrow",
       "label": "Complete Pet Care Services"
     },
     {
       "src": "/screenshots/supplies-narrow.jpg",
-      "sizes": "1080x2340",
+      "sizes": "1080x2255",
       "type": "image/jpeg",
       "form_factor": "narrow",
       "label": "Pet Supplies Shop"
     },
     {
       "src": "/screenshots/profile-narrow.jpg",
-      "sizes": "1080x2340",
+      "sizes": "1080x2259",
       "type": "image/jpeg",
       "form_factor": "narrow",
       "label": "Customer Profile & Quick Actions"
