@@ -5230,12 +5230,14 @@ function EditAppointmentDialog({
   );
 }
 
-// Email Center Component for sending emails to users
+// Email & Text Center Component for sending emails and SMS to users
 function EmailCenter() {
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<'email' | 'sms'>('email');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [sendToAll, setSendToAll] = useState(true);
+  const [roleFilter, setRoleFilter] = useState<'all' | 'customers' | 'groomers' | 'admins'>('all');
   const [selectedRecipients, setSelectedRecipients] = useState<string[]>([]);
   const [isSending, setIsSending] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -5245,11 +5247,28 @@ function EmailCenter() {
     queryKey: ['/api/admin/email/recipients'],
   });
 
-  // Filter recipients based on search
-  const filteredRecipients = (recipients as any[]).filter((r: any) =>
-    r.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    r.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter recipients based on search and role
+  const filteredRecipients = (recipients as any[]).filter((r: any) => {
+    const matchesSearch = r.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (r.phoneNumber && r.phoneNumber.includes(searchTerm));
+    
+    if (!matchesSearch) return false;
+    
+    switch (roleFilter) {
+      case 'customers':
+        return !r.isAdmin && !r.isGroomer;
+      case 'groomers':
+        return r.isGroomer;
+      case 'admins':
+        return r.isAdmin;
+      default:
+        return true;
+    }
+  });
+
+  // Recipients with phone numbers for SMS
+  const recipientsWithPhones = filteredRecipients.filter((r: any) => r.phoneNumber);
 
   const handleSendEmail = async () => {
     if (!subject.trim() || !message.trim()) {
@@ -5280,6 +5299,7 @@ function EmailCenter() {
           subject,
           message,
           sendToAll,
+          roleFilter: sendToAll ? roleFilter : undefined,
           recipients: sendToAll ? undefined : selectedRecipients
         })
       });
@@ -5291,7 +5311,6 @@ function EmailCenter() {
           title: "Emails Sent",
           description: result.message
         });
-        // Reset form
         setSubject('');
         setMessage('');
         setSelectedRecipients([]);
@@ -5313,6 +5332,66 @@ function EmailCenter() {
     }
   };
 
+  const handleSendSMS = async () => {
+    if (!message.trim()) {
+      toast({
+        title: "Missing Message",
+        description: "Please enter a message to send",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!sendToAll && selectedRecipients.length === 0) {
+      toast({
+        title: "No Recipients Selected",
+        description: "Please select at least one recipient with a phone number",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      const response = await fetch('/api/admin/sms/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          message,
+          sendToAll,
+          roleFilter: sendToAll ? roleFilter : undefined,
+          recipients: sendToAll ? undefined : selectedRecipients
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Text Messages Sent",
+          description: result.message
+        });
+        setMessage('');
+        setSelectedRecipients([]);
+      } else {
+        toast({
+          title: "Failed to Send",
+          description: result.message || "Something went wrong",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send text messages. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   const toggleRecipient = (id: number | string) => {
     const idStr = String(id);
     setSelectedRecipients(prev =>
@@ -5321,96 +5400,206 @@ function EmailCenter() {
   };
 
   const selectAll = () => {
-    setSelectedRecipients(filteredRecipients.map((r: any) => String(r.id)));
+    const recipientsList = activeTab === 'sms' ? recipientsWithPhones : filteredRecipients;
+    setSelectedRecipients(recipientsList.map((r: any) => String(r.id)));
   };
 
   const clearAll = () => {
     setSelectedRecipients([]);
   };
 
+  const getRoleCount = (role: string) => {
+    switch (role) {
+      case 'customers':
+        return (recipients as any[]).filter((r: any) => !r.isAdmin && !r.isGroomer).length;
+      case 'groomers':
+        return (recipients as any[]).filter((r: any) => r.isGroomer).length;
+      case 'admins':
+        return (recipients as any[]).filter((r: any) => r.isAdmin).length;
+      default:
+        return recipients.length;
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {/* Compose Email Card */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Mail className="w-5 h-5" />
-            Email Center
+            Communication Center
           </CardTitle>
           <CardDescription>
-            Send promotional emails, announcements, and maintenance notices to your customers
+            Send emails and text messages to customers, groomers, and admins
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Quick Templates */}
+          {/* Tab Selection */}
+          <div className="flex gap-2 border-b pb-2">
+            <Button
+              variant={activeTab === 'email' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => { setActiveTab('email'); setSelectedRecipients([]); }}
+            >
+              <Mail className="w-4 h-4 mr-2" />
+              Email
+            </Button>
+            <Button
+              variant={activeTab === 'sms' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => { setActiveTab('sms'); setSelectedRecipients([]); }}
+            >
+              <Phone className="w-4 h-4 mr-2" />
+              Text Message
+            </Button>
+          </div>
+
+          {/* Role Filter */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Quick Templates</Label>
+            <Label className="text-sm font-medium">Target Audience</Label>
             <div className="flex flex-wrap gap-2">
               <Button
-                variant="outline"
+                variant={roleFilter === 'all' ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => {
-                  setSubject('Important Notice from Animal House Pet Store');
-                  setMessage('Dear Valued Customer,\n\nWe have an important update to share with you.\n\n[Your message here]\n\nThank you for being a loyal customer!\n\nBest regards,\nAnimal House Pet Store');
-                }}
+                onClick={() => setRoleFilter('all')}
               >
-                General Announcement
+                All ({getRoleCount('all')})
               </Button>
               <Button
-                variant="outline"
+                variant={roleFilter === 'customers' ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => {
-                  setSubject('Scheduled Maintenance Notice');
-                  setMessage('Dear Valued Customer,\n\nWe want to inform you about scheduled maintenance:\n\n• Date: [DATE]\n• Time: [TIME]\n• Expected Duration: [DURATION]\n\nDuring this time, our online services may be temporarily unavailable.\n\nWe apologize for any inconvenience.\n\nBest regards,\nAnimal House Pet Store');
-                }}
+                onClick={() => setRoleFilter('customers')}
               >
-                Maintenance Notice
+                Customers ({getRoleCount('customers')})
               </Button>
               <Button
-                variant="outline"
+                variant={roleFilter === 'groomers' ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => {
-                  setSubject('Special Promotion at Animal House Pet Store!');
-                  setMessage('Dear Valued Customer,\n\nWe have an exciting promotion just for you!\n\n[Promotion details here]\n\nDon\'t miss out on these amazing deals!\n\nVisit us in store or online.\n\nBest regards,\nAnimal House Pet Store');
-                }}
+                onClick={() => setRoleFilter('groomers')}
               >
-                Promotion
+                Groomers ({getRoleCount('groomers')})
               </Button>
               <Button
-                variant="outline"
+                variant={roleFilter === 'admins' ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => {
-                  setSubject('New Password Requirements - Action Required');
-                  setMessage('Dear Valued Customer,\n\nStarting January 23rd, 2026, we are implementing stronger password requirements to better protect your account.\n\nNew passwords must now contain:\n• At least 6 characters\n• At least one capital letter\n• At least one number\n\nPlease log in and update your password within the next 24 hours.\n\nTo reset your password, visit our website and click "Forgot Password" on the login page.\n\nThank you for helping us keep your account secure!\n\nBest regards,\nAnimal House Pet Store');
-                }}
+                onClick={() => setRoleFilter('admins')}
               >
-                Password Update Notice
+                Admins ({getRoleCount('admins')})
               </Button>
             </div>
           </div>
 
-          {/* Email Form */}
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="email-subject">Subject</Label>
-              <Input
-                id="email-subject"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                placeholder="Enter email subject..."
-                className="mt-1"
-              />
+          {/* Quick Templates */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Quick Templates</Label>
+            <div className="flex flex-wrap gap-2">
+              {activeTab === 'email' ? (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSubject('Important Notice from Animal House Pet Store');
+                      setMessage('Dear Valued Customer,\n\nWe have an important update to share with you.\n\n[Your message here]\n\nThank you for being a loyal customer!\n\nBest regards,\nAnimal House Pet Store');
+                    }}
+                  >
+                    General Announcement
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSubject('Scheduled Maintenance Notice');
+                      setMessage('Dear Valued Customer,\n\nWe want to inform you about scheduled maintenance:\n\n• Date: [DATE]\n• Time: [TIME]\n• Expected Duration: [DURATION]\n\nDuring this time, our online services may be temporarily unavailable.\n\nWe apologize for any inconvenience.\n\nBest regards,\nAnimal House Pet Store');
+                    }}
+                  >
+                    Maintenance Notice
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSubject('Special Promotion at Animal House Pet Store!');
+                      setMessage('Dear Valued Customer,\n\nWe have an exciting promotion just for you!\n\n[Promotion details here]\n\nDon\'t miss out on these amazing deals!\n\nVisit us in store or online.\n\nBest regards,\nAnimal House Pet Store');
+                    }}
+                  >
+                    Promotion
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSubject('New Password Requirements - Action Required');
+                      setMessage('Dear Valued Customer,\n\nStarting January 23rd, 2026, we are implementing stronger password requirements to better protect your account.\n\nNew passwords must now contain:\n• At least 6 characters\n• At least one capital letter\n• At least one number\n\nPlease log in and update your password within the next 24 hours.\n\nTo reset your password, visit our website and click "Forgot Password" on the login page.\n\nThank you for helping us keep your account secure!\n\nBest regards,\nAnimal House Pet Store');
+                    }}
+                  >
+                    Password Update Notice
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setMessage('Your pet is ready for pickup at Animal House! Please come by during business hours.')}
+                  >
+                    Pet Ready
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setMessage('Your order is ready for pickup at Animal House Pet Store!')}
+                  >
+                    Order Ready
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setMessage('Reminder: Your grooming appointment is tomorrow at Animal House. See you then!')}
+                  >
+                    Appointment Reminder
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setMessage('Animal House Pet Store: [Your message here]')}
+                  >
+                    Custom Message
+                  </Button>
+                </>
+              )}
             </div>
+          </div>
+
+          {/* Message Form */}
+          <div className="space-y-4">
+            {activeTab === 'email' && (
+              <div>
+                <Label htmlFor="email-subject">Subject</Label>
+                <Input
+                  id="email-subject"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  placeholder="Enter email subject..."
+                  className="mt-1"
+                />
+              </div>
+            )}
             <div>
-              <Label htmlFor="email-message">Message</Label>
+              <Label htmlFor="message-body">{activeTab === 'email' ? 'Message' : 'Text Message'}</Label>
               <Textarea
-                id="email-message"
+                id="message-body"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Enter your message..."
-                rows={8}
+                placeholder={activeTab === 'email' ? "Enter your message..." : "Enter text message (160 chars recommended)..."}
+                rows={activeTab === 'email' ? 8 : 4}
                 className="mt-1"
               />
+              {activeTab === 'sms' && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {message.length} characters {message.length > 160 && '(may be split into multiple messages)'}
+                </p>
+              )}
             </div>
           </div>
 
@@ -5424,7 +5613,9 @@ function EmailCenter() {
                   checked={sendToAll}
                   onCheckedChange={setSendToAll}
                 />
-                <Label htmlFor="send-to-all" className="text-sm">Send to All Customers</Label>
+                <Label htmlFor="send-to-all" className="text-sm">
+                  Send to All {roleFilter === 'all' ? '' : roleFilter.charAt(0).toUpperCase() + roleFilter.slice(1)}
+                </Label>
               </div>
             </div>
 
@@ -5432,7 +5623,7 @@ function EmailCenter() {
               <div className="border rounded-lg p-4 space-y-3">
                 <div className="flex items-center gap-2">
                   <Input
-                    placeholder="Search by name or email..."
+                    placeholder={activeTab === 'sms' ? "Search by name or phone..." : "Search by name or email..."}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="flex-1"
@@ -5443,16 +5634,19 @@ function EmailCenter() {
                 
                 <div className="text-sm text-muted-foreground">
                   {selectedRecipients.length} recipient(s) selected
+                  {activeTab === 'sms' && ` (${recipientsWithPhones.length} have phone numbers)`}
                 </div>
 
                 <ScrollArea className="h-48 border rounded">
                   {loadingRecipients ? (
                     <div className="p-4 text-center text-muted-foreground">Loading recipients...</div>
-                  ) : filteredRecipients.length === 0 ? (
-                    <div className="p-4 text-center text-muted-foreground">No recipients found</div>
+                  ) : (activeTab === 'sms' ? recipientsWithPhones : filteredRecipients).length === 0 ? (
+                    <div className="p-4 text-center text-muted-foreground">
+                      {activeTab === 'sms' ? 'No recipients with phone numbers found' : 'No recipients found'}
+                    </div>
                   ) : (
                     <div className="p-2 space-y-1">
-                      {filteredRecipients.map((recipient: any) => (
+                      {(activeTab === 'sms' ? recipientsWithPhones : filteredRecipients).map((recipient: any) => (
                         <div
                           key={recipient.id}
                           className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-accent ${
@@ -5465,8 +5659,14 @@ function EmailCenter() {
                             onCheckedChange={() => toggleRecipient(recipient.id)}
                           />
                           <div className="flex-1 min-w-0">
-                            <div className="font-medium truncate">{recipient.fullName}</div>
-                            <div className="text-xs text-muted-foreground truncate">{recipient.email}</div>
+                            <div className="font-medium truncate flex items-center gap-2">
+                              {recipient.fullName}
+                              {recipient.isAdmin && <Badge variant="secondary" className="text-xs">Admin</Badge>}
+                              {recipient.isGroomer && <Badge variant="outline" className="text-xs">Groomer</Badge>}
+                            </div>
+                            <div className="text-xs text-muted-foreground truncate">
+                              {activeTab === 'sms' ? recipient.phoneNumber : recipient.email}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -5480,7 +5680,20 @@ function EmailCenter() {
               <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 text-sm">
                 <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300">
                   <AlertCircle className="w-4 h-4" />
-                  <span>This will send to all {recipients.length} customers with valid email addresses</span>
+                  <span>
+                    {activeTab === 'email' 
+                      ? `This will send to ${getRoleCount(roleFilter)} ${roleFilter === 'all' ? 'users' : roleFilter} with valid email addresses`
+                      : `This will send to ${(recipients as any[]).filter((r: any) => {
+                          if (!r.phoneNumber) return false;
+                          switch (roleFilter) {
+                            case 'customers': return !r.isAdmin && !r.isGroomer;
+                            case 'groomers': return r.isGroomer;
+                            case 'admins': return r.isAdmin;
+                            default: return true;
+                          }
+                        }).length} ${roleFilter === 'all' ? 'users' : roleFilter} with phone numbers`
+                    }
+                  </span>
                 </div>
               </div>
             )}
@@ -5488,19 +5701,22 @@ function EmailCenter() {
 
           {/* Send Button */}
           <Button
-            onClick={handleSendEmail}
-            disabled={isSending || !subject.trim() || !message.trim()}
+            onClick={activeTab === 'email' ? handleSendEmail : handleSendSMS}
+            disabled={isSending || !message.trim() || (activeTab === 'email' && !subject.trim())}
             className="w-full bg-brand-blue hover:bg-blue-600"
           >
             {isSending ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Sending Emails...
+                {activeTab === 'email' ? 'Sending Emails...' : 'Sending Text Messages...'}
               </>
             ) : (
               <>
                 <Send className="w-4 h-4 mr-2" />
-                {sendToAll ? `Send to All (${recipients.length})` : `Send to ${selectedRecipients.length} Recipient(s)`}
+                {activeTab === 'email' 
+                  ? (sendToAll ? `Send Email to ${getRoleCount(roleFilter)}` : `Send Email to ${selectedRecipients.length} Recipient(s)`)
+                  : (sendToAll ? `Send Text to ${(recipients as any[]).filter((r: any) => r.phoneNumber).length}` : `Send Text to ${selectedRecipients.length} Recipient(s)`)
+                }
               </>
             )}
           </Button>

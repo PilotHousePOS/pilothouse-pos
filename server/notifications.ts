@@ -313,6 +313,56 @@ class SMSService {
       return false;
     }
   }
+
+  async sendPetReadySMS(phoneNumber: string, firstName: string, petName: string): Promise<boolean> {
+    if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE_NUMBER) {
+      console.log('Twilio not configured, SMS notification skipped');
+      return false;
+    }
+
+    try {
+      const twilio = await import('twilio');
+      const client = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+      const message = `Hi ${firstName}! ${petName} is all done and looking great! 🐾 Come pick up your fur baby at Animal House Pet Store. Thank you!`;
+
+      await client.messages.create({
+        body: message,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: phoneNumber,
+      });
+
+      console.log(`Pet ready SMS sent to ${phoneNumber} for pet: ${petName}`);
+      return true;
+    } catch (error) {
+      console.error('Pet ready SMS notification error:', error);
+      return false;
+    }
+  }
+
+  async sendGenericSMS(phoneNumber: string, message: string): Promise<boolean> {
+    if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE_NUMBER) {
+      console.log('Twilio not configured, SMS notification skipped');
+      return false;
+    }
+
+    try {
+      const twilio = await import('twilio');
+      const client = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+      await client.messages.create({
+        body: message,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: phoneNumber,
+      });
+
+      console.log(`SMS sent to ${phoneNumber}`);
+      return true;
+    } catch (error) {
+      console.error('SMS notification error:', error);
+      return false;
+    }
+  }
 }
 
 // Main notification service that coordinates all notification types
@@ -437,6 +487,23 @@ export class NotificationService {
       appointmentDate, 
       appointmentTime
     );
+  }
+
+  async sendPetReadyNotification(
+    phoneNumber: string,
+    firstName: string,
+    petName: string
+  ): Promise<boolean> {
+    console.log(`Sending pet ready SMS notification for ${petName} to ${phoneNumber}`);
+    return await this.smsService.sendPetReadySMS(phoneNumber, firstName, petName);
+  }
+
+  async sendGenericSMS(
+    phoneNumber: string,
+    message: string
+  ): Promise<boolean> {
+    console.log(`Sending generic SMS to ${phoneNumber}`);
+    return await this.smsService.sendGenericSMS(phoneNumber, message);
   }
 }
 

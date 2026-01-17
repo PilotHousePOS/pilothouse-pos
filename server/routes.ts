@@ -2571,6 +2571,60 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Send "Pet Ready" SMS notification for grooming appointment
+  app.post("/api/appointments/:id/notify-ready", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin && !user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const appointment = await storage.getAppointment(id);
+      
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+
+      // Get the phone number from the appointment
+      const phoneNumber = appointment.ownerPhoneNumber;
+      if (!phoneNumber) {
+        return res.status(400).json({ message: "No phone number found for this appointment" });
+      }
+
+      // Get customer first name
+      const firstName = appointment.ownerFirstName || 'Customer';
+      
+      // Get pet name(s)
+      const appointmentPets = await storage.getAppointmentPets(id);
+      let petNames: string;
+      if (appointmentPets && appointmentPets.length > 0) {
+        petNames = appointmentPets.map(p => p.petName).join(' and ');
+      } else {
+        petNames = appointment.petName || 'your pet';
+      }
+
+      // Send the SMS notification
+      const success = await notificationService.sendPetReadyNotification(
+        phoneNumber,
+        firstName,
+        petNames
+      );
+
+      if (success) {
+        res.json({ message: `Pet ready notification sent to ${phoneNumber}` });
+      } else {
+        res.status(400).json({ 
+          message: "SMS service not configured. Please set up Twilio credentials.",
+          setupRequired: true
+        });
+      }
+    } catch (error) {
+      console.error("Error sending pet ready notification:", error);
+      res.status(500).json({ message: "Failed to send pet ready notification" });
+    }
+  });
+
   app.post("/api/appointments", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;
@@ -3190,7 +3244,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      const { recipients, subject, message, sendToAll } = req.body;
+      const { recipients, subject, message, sendToAll, roleFilter } = req.body;
 
       if (!subject || !message) {
         return res.status(400).json({ message: "Subject and message are required" });
@@ -3205,7 +3259,24 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (sendToAll) {
         // Get all users with email addresses
         targetUsers = await storage.getAllUsers();
-        targetUsers = targetUsers.filter((u: any) => u.email && !u.email.startsWith('temp_'));
+        targetUsers = targetUsers.filter((u: any) => {
+          if (!u.email || u.email.startsWith('temp_')) return false;
+          
+          // Apply role filter if specified
+          if (roleFilter && roleFilter !== 'all') {
+            switch (roleFilter) {
+              case 'customers':
+                return !u.isAdmin && !u.isGroomer;
+              case 'groomers':
+                return u.isGroomer;
+              case 'admins':
+                return u.isAdmin;
+              default:
+                return true;
+            }
+          }
+          return true;
+        });
       } else if (recipients && Array.isArray(recipients) && recipients.length > 0) {
         // Get specific users by ID
         for (const userId of recipients) {
@@ -3274,7 +3345,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
-  // Get all users for email recipient selection
+  // Get all users for email/SMS recipient selection
   app.get("/api/admin/email/recipients", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) {
@@ -3283,21 +3354,122 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
       const allUsers = await storage.getAllUsers();
       
-      // Filter out users without valid emails and return minimal data
+      // Filter out users without valid emails and return data with role info
       const recipients = allUsers
         .filter((u: any) => u.email && !u.email.startsWith('temp_'))
         .map((u: any) => ({
           id: u.id,
           email: u.email,
+          phoneNumber: u.phoneNumber || null,
           firstName: u.firstName,
           lastName: u.lastName,
-          fullName: `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email
+          fullName: `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email,
+          isAdmin: u.isAdmin || false,
+          isGroomer: u.isGroomer || false
         }));
 
       res.json(recipients);
     } catch (error) {
       console.error("Error fetching email recipients:", error);
       res.status(500).json({ message: "Failed to fetch recipients" });
+    }
+  });
+
+  // Admin SMS Center - Send text messages to users
+  app.post("/api/admin/sms/send", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { recipients, message, sendToAll, roleFilter } = req.body;
+
+      if (!message) {
+        return res.status(400).json({ message: "Message is required" });
+      }
+
+      // Check Twilio configuration
+      if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE_NUMBER) {
+        return res.status(400).json({ 
+          message: "SMS service not configured. Please set up Twilio credentials.",
+          setupRequired: true
+        });
+      }
+
+      let targetUsers: any[] = [];
+
+      if (sendToAll) {
+        // Get all users with phone numbers
+        targetUsers = await storage.getAllUsers();
+        targetUsers = targetUsers.filter((u: any) => {
+          if (!u.phoneNumber) return false;
+          
+          // Apply role filter if specified
+          if (roleFilter && roleFilter !== 'all') {
+            switch (roleFilter) {
+              case 'customers':
+                return !u.isAdmin && !u.isGroomer;
+              case 'groomers':
+                return u.isGroomer;
+              case 'admins':
+                return u.isAdmin;
+              default:
+                return true;
+            }
+          }
+          return true;
+        });
+      } else if (recipients && Array.isArray(recipients) && recipients.length > 0) {
+        // Get specific users by ID
+        for (const userId of recipients) {
+          const user = await storage.getUser(userId);
+          if (user && user.phoneNumber) {
+            targetUsers.push(user);
+          }
+        }
+      } else {
+        return res.status(400).json({ message: "No recipients specified" });
+      }
+
+      if (targetUsers.length === 0) {
+        return res.status(400).json({ message: "No valid recipients with phone numbers found" });
+      }
+
+      // Send SMS messages
+      const twilio = await import('twilio');
+      const client = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+      
+      let successCount = 0;
+      let failedCount = 0;
+      const errors: string[] = [];
+
+      for (const user of targetUsers) {
+        try {
+          await client.messages.create({
+            body: message,
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: user.phoneNumber,
+          });
+          successCount++;
+        } catch (smsError: any) {
+          failedCount++;
+          errors.push(`Failed to send to ${user.phoneNumber}: ${smsError.message}`);
+          console.error(`Failed to send SMS to ${user.phoneNumber}:`, smsError);
+        }
+      }
+
+      res.json({
+        message: `Text messages sent: ${successCount} successful, ${failedCount} failed`,
+        stats: {
+          total: targetUsers.length,
+          success: successCount,
+          failed: failedCount,
+          errors: errors.slice(0, 5)
+        }
+      });
+    } catch (error: any) {
+      console.error("Error sending bulk SMS:", error);
+      res.status(500).json({ message: error.message || "Failed to send text messages" });
     }
   });
 
