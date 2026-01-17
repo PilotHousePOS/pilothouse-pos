@@ -25,6 +25,7 @@ import { normalizePhoneNumber } from './phoneUtils';
 import { db, resetPool } from './db';
 import { eq } from 'drizzle-orm';
 import { expandProductAbbreviations } from './abbreviationExpansion';
+import { hashPassword, verifyPassword, isPasswordComplexEnough, getPasswordRequirementsMessage } from './passwordUtils';
 
 // Retry helper for transient database errors
 async function withRetry<T>(operation: () => Promise<T>, maxRetries = 3, delayMs = 1000): Promise<T> {
@@ -120,16 +121,28 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(400).json({ message: "All fields including phone number are required" });
       }
 
+      // Validate password complexity
+      const passwordValidation = isPasswordComplexEnough(password);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({ 
+          message: passwordValidation.errors.join('. '),
+          requirements: getPasswordRequirementsMessage()
+        });
+      }
+
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
         return res.status(400).json({ message: "User already exists" });
       }
 
-      // Create new user
+      // Hash password before storing
+      const hashedPassword = await hashPassword(password);
+
+      // Create new user with hashed password
       const newUser = await storage.createUser({
         email,
-        password, // In production, hash this password
+        password: hashedPassword,
         firstName,
         lastName,
       });
@@ -225,8 +238,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      // In production, verify hashed password
-      if (user.password !== password) {
+      // Verify password using bcrypt (handles both hashed and legacy plain text)
+      const passwordValid = await verifyPassword(password, user.password);
+      if (!passwordValid) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
@@ -372,9 +386,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(400).json({ message: "Current password and new password are required" });
       }
 
-      // Validate new password length
-      if (newPassword.length < 6) {
-        return res.status(400).json({ message: "New password must be at least 6 characters" });
+      // Validate new password complexity
+      const passwordValidation = isPasswordComplexEnough(newPassword);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({ 
+          message: passwordValidation.errors.join('. '),
+          requirements: getPasswordRequirementsMessage()
+        });
       }
 
       // Get current user data
@@ -383,15 +401,17 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Verify current password (In production, use bcrypt.compare)
-      if (currentUser.password !== currentPassword) {
+      // Verify current password using bcrypt
+      const currentPasswordValid = await verifyPassword(currentPassword, currentUser.password);
+      if (!currentPasswordValid) {
         return res.status(401).json({ message: "Current password is incorrect" });
       }
 
-      // Update user with new password (In production, hash the password with bcrypt)
+      // Hash new password and update user
+      const hashedNewPassword = await hashPassword(newPassword);
       const updatedUser = await storage.upsertUser({
         ...currentUser,
-        password: newPassword,
+        password: hashedNewPassword,
         updatedAt: new Date(),
       });
 
@@ -516,9 +536,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(400).json({ message: "Token and new password are required" });
       }
 
-      // Validate new password length
-      if (newPassword.length < 6) {
-        return res.status(400).json({ message: "New password must be at least 6 characters" });
+      // Validate new password complexity
+      const passwordValidation = isPasswordComplexEnough(newPassword);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({ 
+          message: passwordValidation.errors.join('. '),
+          requirements: getPasswordRequirementsMessage()
+        });
       }
 
       // Get token from database
@@ -544,10 +568,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Update password (In production, hash the password with bcrypt)
+      // Hash and update password
+      const hashedPassword = await hashPassword(newPassword);
       await storage.upsertUser({
         ...user,
-        password: newPassword,
+        password: hashedPassword,
         updatedAt: new Date(),
       });
 
@@ -3155,6 +3180,124 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(404).json({ message: "User not found" });
       }
       res.status(500).json({ message: "Failed to delete user" });
+    }
+  });
+
+  // Admin Email Center - Send emails to users
+  app.post("/api/admin/email/send", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { recipients, subject, message, sendToAll } = req.body;
+
+      if (!subject || !message) {
+        return res.status(400).json({ message: "Subject and message are required" });
+      }
+
+      // Get SendGrid client
+      const { getUncachableSendGridClient } = await import('./sendgridIntegration');
+      const { client: sgMail, fromEmail } = await getUncachableSendGridClient();
+
+      let targetUsers: any[] = [];
+
+      if (sendToAll) {
+        // Get all users with email addresses
+        targetUsers = await storage.getAllUsers();
+        targetUsers = targetUsers.filter((u: any) => u.email && !u.email.startsWith('temp_'));
+      } else if (recipients && Array.isArray(recipients) && recipients.length > 0) {
+        // Get specific users by ID
+        for (const userId of recipients) {
+          const user = await storage.getUser(userId);
+          if (user && user.email && !user.email.startsWith('temp_')) {
+            targetUsers.push(user);
+          }
+        }
+      } else {
+        return res.status(400).json({ message: "No recipients specified" });
+      }
+
+      if (targetUsers.length === 0) {
+        return res.status(400).json({ message: "No valid recipients found" });
+      }
+
+      // Send emails
+      let successCount = 0;
+      let failedCount = 0;
+      const errors: string[] = [];
+
+      for (const user of targetUsers) {
+        try {
+          await sgMail.send({
+            to: user.email,
+            from: fromEmail,
+            subject: subject,
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 20px; text-align: center;">
+                  <h1 style="color: #f59e0b; margin: 0;">Animal House Pet Store</h1>
+                </div>
+                <div style="padding: 30px; background: #ffffff;">
+                  <p style="color: #374151;">Hello ${user.firstName || 'Valued Customer'},</p>
+                  <div style="color: #374151; line-height: 1.6;">
+                    ${message.replace(/\n/g, '<br>')}
+                  </div>
+                </div>
+                <div style="background: #f3f4f6; padding: 20px; text-align: center; color: #6b7280; font-size: 12px;">
+                  <p>Animal House Pet Store</p>
+                  <p>If you have any questions, please contact us.</p>
+                </div>
+              </div>
+            `,
+          });
+          successCount++;
+        } catch (emailError: any) {
+          failedCount++;
+          errors.push(`Failed to send to ${user.email}: ${emailError.message}`);
+          console.error(`Failed to send email to ${user.email}:`, emailError);
+        }
+      }
+
+      res.json({
+        message: `Emails sent: ${successCount} successful, ${failedCount} failed`,
+        stats: {
+          total: targetUsers.length,
+          success: successCount,
+          failed: failedCount,
+          errors: errors.slice(0, 5) // Return first 5 errors
+        }
+      });
+    } catch (error: any) {
+      console.error("Error sending bulk emails:", error);
+      res.status(500).json({ message: error.message || "Failed to send emails" });
+    }
+  });
+
+  // Get all users for email recipient selection
+  app.get("/api/admin/email/recipients", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const allUsers = await storage.getAllUsers();
+      
+      // Filter out users without valid emails and return minimal data
+      const recipients = allUsers
+        .filter((u: any) => u.email && !u.email.startsWith('temp_'))
+        .map((u: any) => ({
+          id: u.id,
+          email: u.email,
+          firstName: u.firstName,
+          lastName: u.lastName,
+          fullName: `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email
+        }));
+
+      res.json(recipients);
+    } catch (error) {
+      console.error("Error fetching email recipients:", error);
+      res.status(500).json({ message: "Failed to fetch recipients" });
     }
   });
 

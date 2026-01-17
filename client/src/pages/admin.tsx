@@ -36,6 +36,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Calendar } from "@/components/ui/calendar";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   Plus,
   Edit,
@@ -81,7 +82,8 @@ import {
   BookOpen,
   Zap,
   CalendarX2,
-  ClipboardPaste
+  ClipboardPaste,
+  Send
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -5228,6 +5230,285 @@ function EditAppointmentDialog({
   );
 }
 
+// Email Center Component for sending emails to users
+function EmailCenter() {
+  const { toast } = useToast();
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [sendToAll, setSendToAll] = useState(true);
+  const [selectedRecipients, setSelectedRecipients] = useState<string[]>([]);
+  const [isSending, setIsSending] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Fetch all recipients for selection
+  const { data: recipients = [], isLoading: loadingRecipients } = useQuery<any[]>({
+    queryKey: ['/api/admin/email/recipients'],
+  });
+
+  // Filter recipients based on search
+  const filteredRecipients = (recipients as any[]).filter((r: any) =>
+    r.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    r.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleSendEmail = async () => {
+    if (!subject.trim() || !message.trim()) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter both subject and message",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!sendToAll && selectedRecipients.length === 0) {
+      toast({
+        title: "No Recipients Selected",
+        description: "Please select at least one recipient or choose 'Send to All'",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      const response = await fetch('/api/admin/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          subject,
+          message,
+          sendToAll,
+          recipients: sendToAll ? undefined : selectedRecipients
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Emails Sent",
+          description: result.message
+        });
+        // Reset form
+        setSubject('');
+        setMessage('');
+        setSelectedRecipients([]);
+      } else {
+        toast({
+          title: "Failed to Send",
+          description: result.message || "Something went wrong",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send emails. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const toggleRecipient = (id: string) => {
+    setSelectedRecipients(prev =>
+      prev.includes(id) ? prev.filter(r => r !== id) : [...prev, id]
+    );
+  };
+
+  const selectAll = () => {
+    setSelectedRecipients(filteredRecipients.map((r: any) => r.id));
+  };
+
+  const clearAll = () => {
+    setSelectedRecipients([]);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Compose Email Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Mail className="w-5 h-5" />
+            Email Center
+          </CardTitle>
+          <CardDescription>
+            Send promotional emails, announcements, and maintenance notices to your customers
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Quick Templates */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Quick Templates</Label>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSubject('Important Notice from Animal House Pet Store');
+                  setMessage('Dear Valued Customer,\n\nWe have an important update to share with you.\n\n[Your message here]\n\nThank you for being a loyal customer!\n\nBest regards,\nAnimal House Pet Store');
+                }}
+              >
+                General Announcement
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSubject('Scheduled Maintenance Notice');
+                  setMessage('Dear Valued Customer,\n\nWe want to inform you about scheduled maintenance:\n\n• Date: [DATE]\n• Time: [TIME]\n• Expected Duration: [DURATION]\n\nDuring this time, our online services may be temporarily unavailable.\n\nWe apologize for any inconvenience.\n\nBest regards,\nAnimal House Pet Store');
+                }}
+              >
+                Maintenance Notice
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSubject('Special Promotion at Animal House Pet Store!');
+                  setMessage('Dear Valued Customer,\n\nWe have an exciting promotion just for you!\n\n[Promotion details here]\n\nDon\'t miss out on these amazing deals!\n\nVisit us in store or online.\n\nBest regards,\nAnimal House Pet Store');
+                }}
+              >
+                Promotion
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSubject('New Password Requirements - Action Required');
+                  setMessage('Dear Valued Customer,\n\nStarting January 23rd, 2026, we are implementing stronger password requirements to better protect your account.\n\nNew passwords must now contain:\n• At least 6 characters\n• At least one capital letter\n• At least one number\n\nPlease log in and update your password within the next 24 hours.\n\nTo reset your password, visit our website and click "Forgot Password" on the login page.\n\nThank you for helping us keep your account secure!\n\nBest regards,\nAnimal House Pet Store');
+                }}
+              >
+                Password Update Notice
+              </Button>
+            </div>
+          </div>
+
+          {/* Email Form */}
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="email-subject">Subject</Label>
+              <Input
+                id="email-subject"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="Enter email subject..."
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="email-message">Message</Label>
+              <Textarea
+                id="email-message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Enter your message..."
+                rows={8}
+                className="mt-1"
+              />
+            </div>
+          </div>
+
+          {/* Recipient Selection */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">Recipients</Label>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="send-to-all"
+                  checked={sendToAll}
+                  onCheckedChange={setSendToAll}
+                />
+                <Label htmlFor="send-to-all" className="text-sm">Send to All Customers</Label>
+              </div>
+            </div>
+
+            {!sendToAll && (
+              <div className="border rounded-lg p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Input
+                    placeholder="Search by name or email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button variant="outline" size="sm" onClick={selectAll}>Select All</Button>
+                  <Button variant="outline" size="sm" onClick={clearAll}>Clear</Button>
+                </div>
+                
+                <div className="text-sm text-muted-foreground">
+                  {selectedRecipients.length} recipient(s) selected
+                </div>
+
+                <ScrollArea className="h-48 border rounded">
+                  {loadingRecipients ? (
+                    <div className="p-4 text-center text-muted-foreground">Loading recipients...</div>
+                  ) : filteredRecipients.length === 0 ? (
+                    <div className="p-4 text-center text-muted-foreground">No recipients found</div>
+                  ) : (
+                    <div className="p-2 space-y-1">
+                      {filteredRecipients.map((recipient: any) => (
+                        <div
+                          key={recipient.id}
+                          className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-accent ${
+                            selectedRecipients.includes(recipient.id) ? 'bg-accent' : ''
+                          }`}
+                          onClick={() => toggleRecipient(recipient.id)}
+                        >
+                          <Checkbox
+                            checked={selectedRecipients.includes(recipient.id)}
+                            onCheckedChange={() => toggleRecipient(recipient.id)}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium truncate">{recipient.fullName}</div>
+                            <div className="text-xs text-muted-foreground truncate">{recipient.email}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </div>
+            )}
+
+            {sendToAll && (
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 text-sm">
+                <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>This will send to all {recipients.length} customers with valid email addresses</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Send Button */}
+          <Button
+            onClick={handleSendEmail}
+            disabled={isSending || !subject.trim() || !message.trim()}
+            className="w-full bg-brand-blue hover:bg-blue-600"
+          >
+            {isSending ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Sending Emails...
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4 mr-2" />
+                {sendToAll ? `Send to All (${recipients.length})` : `Send to ${selectedRecipients.length} Recipient(s)`}
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 // Astro Loyalty Manager Component
 function AstroLoyaltyManager() {
   const { toast } = useToast();
@@ -8149,6 +8430,12 @@ export default function Admin() {
               <TabsTrigger value="astro" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 <span className="hidden lg:inline">Astro Loyalty</span>
                 <span className="lg:hidden">Astro</span>
+              </TabsTrigger>
+            )}
+            {typedUser?.isAdmin && (
+              <TabsTrigger value="email-center" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                <span className="hidden lg:inline">Email Center</span>
+                <span className="lg:hidden">Email</span>
               </TabsTrigger>
             )}
           </TabsList>
@@ -11301,6 +11588,10 @@ export default function Admin() {
 
         <TabsContent value="astro" className="space-y-6">
           <AstroLoyaltyManager />
+        </TabsContent>
+
+        <TabsContent value="email-center" className="space-y-6">
+          <EmailCenter />
         </TabsContent>
       </Tabs>
 
