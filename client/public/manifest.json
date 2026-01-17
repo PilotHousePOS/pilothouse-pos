@@ -6,7 +6,7 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "background_color": "#1a1a1a",
   "theme_color": "#2563eb",
   "orientation": "portrait-primary",
@@ -151,6 +151,36 @@
         }
       ],
       "launch_type": "single-client"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home-narrow.jpg",
+      "sizes": "1080x2340",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Featured Pets - Exotic Reptiles"
+    },
+    {
+      "src": "/screenshots/services-narrow.jpg",
+      "sizes": "1080x2340",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Complete Pet Care Services"
+    },
+    {
+      "src": "/screenshots/supplies-narrow.jpg",
+      "sizes": "1080x2340",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Pet Supplies Shop"
+    },
+    {
+      "src": "/screenshots/profile-narrow.jpg",
+      "sizes": "1080x2340",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Customer Profile & Quick Actions"
     }
   ]
 }
