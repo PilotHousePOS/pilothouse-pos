@@ -1,4 +1,63 @@
-// Service Worker for Push Notifications
+const CACHE_NAME = 'animal-house-v1';
+const urlsToCache = [
+  '/',
+  '/manifest.json',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png'
+];
+
+self.addEventListener('install', function(event) {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        console.log('Opened cache');
+        return cache.addAll(urlsToCache);
+      })
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', function(event) {
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.filter(function(cacheName) {
+          return cacheName !== CACHE_NAME;
+        }).map(function(cacheName) {
+          return caches.delete(cacheName);
+        })
+      );
+    })
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', function(event) {
+  if (event.request.method !== 'GET') return;
+  
+  if (event.request.url.includes('/api/')) {
+    return;
+  }
+  
+  event.respondWith(
+    fetch(event.request)
+      .then(function(response) {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          return response;
+        }
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME)
+          .then(function(cache) {
+            cache.put(event.request, responseToCache);
+          });
+        return response;
+      })
+      .catch(function() {
+        return caches.match(event.request);
+      })
+  );
+});
+
 self.addEventListener('push', function(event) {
   console.log('Push notification received:', event);
   
@@ -7,20 +66,19 @@ self.addEventListener('push', function(event) {
     
     const options = {
       body: data.body,
-      icon: data.icon || '/icon-192x192.png',
-      badge: data.badge || '/badge-72x72.png',
+      icon: data.icon || '/icons/icon-192x192.png',
+      badge: data.badge || '/icons/icon-72x72.png',
       tag: data.tag,
       data: data.data,
       actions: [
         {
           action: 'view',
-          title: 'View Order',
-          icon: '/view-icon.png'
+          title: 'View',
+          icon: '/icons/icon-72x72.png'
         },
         {
           action: 'close',
-          title: 'Close',
-          icon: '/close-icon.png'
+          title: 'Close'
         }
       ],
       requireInteraction: true,
@@ -35,13 +93,11 @@ self.addEventListener('push', function(event) {
 
 self.addEventListener('notificationclick', function(event) {
   console.log('Notification clicked:', event);
-  
   event.notification.close();
   
   if (event.action === 'view') {
-    // Open the app to the orders/profile page
     event.waitUntil(
-      clients.openWindow(event.notification.data.url || '/profile')
+      clients.openWindow(event.notification.data?.url || '/')
     );
   }
 });
