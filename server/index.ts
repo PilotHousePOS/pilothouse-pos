@@ -45,6 +45,16 @@ app.use(cookieParser());
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/stock-images', express.static(path.join(process.cwd(), 'attached_assets/stock_images')));
 
+// Serve PWA files (manifest, service worker, icons)
+app.use('/icons', express.static(path.join(process.cwd(), 'client/public/icons')));
+app.get('/manifest.json', (_req, res) => {
+  res.sendFile(path.join(process.cwd(), 'client/public/manifest.json'));
+});
+app.get('/sw.js', (_req, res) => {
+  res.setHeader('Content-Type', 'application/javascript');
+  res.sendFile(path.join(process.cwd(), 'client/public/sw.js'));
+});
+
 // Cache headers
 app.use((_req, res, next) => {
   res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
