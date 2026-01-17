@@ -12,7 +12,6 @@
   "orientation": "portrait-primary",
   "lang": "en",
   "dir": "ltr",
-  "iarc_rating_id": "",
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
@@ -75,19 +74,45 @@
       "short_name": "Book",
       "description": "Book a grooming appointment",
       "url": "/booking",
-      "icons": [{"src": "/icons/icon-96x96.png", "sizes": "96x96"}]
+      "icons": [{"src": "/icons/icon-96x96.png", "sizes": "96x96", "type": "image/png"}]
     },
     {
       "name": "Shop Supplies",
       "short_name": "Shop",
       "description": "Browse pet supplies",
       "url": "/supplies",
-      "icons": [{"src": "/icons/icon-96x96.png", "sizes": "96x96"}]
+      "icons": [{"src": "/icons/icon-96x96.png", "sizes": "96x96", "type": "image/png"}]
+    },
+    {
+      "name": "View Exotic Pets",
+      "short_name": "Pets",
+      "description": "Browse exotic reptiles",
+      "url": "/pets",
+      "icons": [{"src": "/icons/icon-96x96.png", "sizes": "96x96", "type": "image/png"}]
     }
   ],
   "categories": ["shopping", "lifestyle", "business"],
   "prefer_related_applications": false,
   "launch_handler": {
     "client_mode": "navigate-existing"
-  }
+  },
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+animalhouse",
+      "url": "/?action=%s"
+    }
+  ],
+  "handle_links": "preferred"
 }
