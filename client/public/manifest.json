@@ -1,63 +1,93 @@
 {
+  "id": "/",
   "name": "Animal House Pet Store",
   "short_name": "Animal House",
-  "description": "Exotic reptiles, pet supplies, and professional grooming services",
+  "description": "Exotic reptiles, pet supplies, and professional grooming services. Book grooming appointments, shop for pet supplies, and discover exotic pets.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#1a1a1a",
-  "theme_color": "#ea580c",
+  "theme_color": "#2563eb",
   "orientation": "portrait-primary",
+  "lang": "en",
+  "dir": "ltr",
+  "iarc_rating_id": "",
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-96x96.png",
       "sizes": "96x96",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-152x152.png",
       "sizes": "152x152",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Book Grooming",
+      "short_name": "Book",
+      "description": "Book a grooming appointment",
+      "url": "/booking",
+      "icons": [{"src": "/icons/icon-96x96.png", "sizes": "96x96"}]
+    },
+    {
+      "name": "Shop Supplies",
+      "short_name": "Shop",
+      "description": "Browse pet supplies",
+      "url": "/supplies",
+      "icons": [{"src": "/icons/icon-96x96.png", "sizes": "96x96"}]
     }
   ],
   "categories": ["shopping", "lifestyle", "business"],
-  "screenshots": [],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }
