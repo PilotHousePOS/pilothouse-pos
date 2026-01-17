@@ -259,8 +259,8 @@ export default function Booking() {
     // Otherwise, generate regular time slots
     const settings = groomingSettings as any[];
     const startTime = settings.find(s => s.setting === 'start_time')?.value || '09:00';
-    // Enforce 1:30 PM cutoff as per user requirements
-    const endTime = '13:30'; // Hard-coded 1:30 PM limit
+    // Enforce 12:00 PM (noon) cutoff as per user requirements
+    const endTime = '12:00'; // Hard-coded 12:00 PM (noon) limit
     
     const slots = [];
     const [startHour, startMin] = startTime.split(':').map(Number);

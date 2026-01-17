@@ -2646,6 +2646,23 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
             message: "Same-day appointments are not allowed. Please book for tomorrow or later." 
           });
         }
+        
+        // LIMIT: Only 1 active appointment per customer account
+        const userAppointments = await storage.getAppointments();
+        const activeAppointments = userAppointments.filter((apt: any) => 
+          apt.userId === userId && 
+          apt.status !== 'cancelled' && 
+          apt.status !== 'rejected' &&
+          apt.status !== 'completed' &&
+          new Date(apt.appointmentDate) >= today
+        );
+        
+        if (activeAppointments.length > 0) {
+          const existingDate = new Date(activeAppointments[0].appointmentDate).toLocaleDateString();
+          return res.status(400).json({ 
+            message: `You already have an active appointment on ${existingDate}. Only one appointment per account is allowed. Please cancel your existing appointment first or call the store.` 
+          });
+        }
       }
 
       // Use timezone-aware date functions to prevent UTC/CST mismatch bugs
@@ -2835,7 +2852,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       
       console.log(`[FINAL CAPACITY CHECK] PASSED - proceeding with appointment creation`);
       
-      // Admin-created appointments bypass approval, others require approval
+      // All appointments are auto-approved with capacity safeguards in place
       const appointmentData = insertAppointmentSchema.parse({ 
         ...req.body,
         // Use first pet's data for backward compatibility
@@ -2844,8 +2861,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         serviceType: firstPet.serviceType,
         specialNotes: firstPet.specialNotes,
         userId,
-        isApproved: isAdmin ? true : false,
-        status: isAdmin ? 'confirmed' : 'scheduled'
+        isApproved: true,
+        status: 'confirmed'
       });
       const appointment = await storage.createAppointment(appointmentData);
       

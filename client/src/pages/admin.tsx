@@ -6940,7 +6940,7 @@ export default function Admin() {
   const bookingAvailableTimeSlots = useMemo(() => {
     const settings = groomingSettings as any[];
     const startTime = settings.find(s => s.setting === 'start_time')?.value || '09:00';
-    const endTime = '13:30'; // Hard-coded 1:30 PM limit
+    const endTime = '12:00'; // Hard-coded 12:00 PM (noon) limit
     
     const slots = [];
     const [startHour, startMin] = startTime.split(':').map(Number);
