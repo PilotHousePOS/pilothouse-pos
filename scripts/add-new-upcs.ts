@@ -104,9 +104,9 @@ async function main() {
   
   // Apply matches
   if (matches.length > 0) {
-    const ids = matches.map(m => m.productId);
-    const caseWhen = matches.map(m => `WHEN id = ${m.productId} THEN '${m.upc}'`).join(' ');
-    await db.execute(sql.raw(`UPDATE supplies SET sku = CASE ${caseWhen} END WHERE id IN (${ids.join(',')})`));
+    for (const m of matches) {
+      await db.update(supplies).set({ sku: m.upc }).where(eq(supplies.id, m.productId));
+    }
     console.log('Applied matches');
     
     // Show samples
