@@ -11743,7 +11743,15 @@ export default function Admin() {
                       <div className="text-center py-8 text-gray-500">
                         <CalendarX2 className="w-12 h-12 mx-auto mb-3 opacity-30" />
                         <p>No blocked days scheduled{blockedDaysGroomerFilter !== 'all' ? ' for this groomer' : ''}</p>
-                        <p className="text-sm mt-1">Click "Add Blocked Day" to block a groomer from being assigned on specific dates</p>
+                        <p className="text-sm mt-1 mb-4">Block a groomer from being assigned on specific dates</p>
+                        <Button 
+                          onClick={() => setIsAddBlockedDayOpen(true)}
+                          className="bg-orange-600 hover:bg-orange-700"
+                          data-testid="button-add-blocked-day-empty"
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add Blocked Day
+                        </Button>
                       </div>
                     );
                   }
