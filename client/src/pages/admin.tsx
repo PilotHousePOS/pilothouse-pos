@@ -11939,6 +11939,15 @@ export default function Admin() {
                     </>
                   )}
                 </div>
+                {/* Total Price Section */}
+                {selectedAppointment.price && (
+                  <div className="border-t pt-3">
+                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                      <Label className="text-sm font-semibold text-green-800">Total Price</Label>
+                      <p className="text-xl font-bold text-green-700">${selectedAppointment.price}</p>
+                    </div>
+                  </div>
+                )}
                 <div className="border-t pt-3">
                   <h4 className="font-semibold text-gray-900 mb-2">Owner Information</h4>
                   <div className="space-y-2">
