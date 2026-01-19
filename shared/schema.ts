@@ -862,11 +862,11 @@ export type InsertAutomatedMessage = z.infer<typeof insertAutomatedMessageSchema
 // Automated Message Logs - Track sent messages (depends on automatedMessages table)
 export const automatedMessageLogs = pgTable("automated_message_logs", {
   id: serial("id").primaryKey(),
-  automatedMessageId: integer("automated_message_id").notNull().references(() => automatedMessages.id, { onDelete: "cascade" }),
+  automatedMessageId: integer("automated_message_id").notNull(),
   recipientId: varchar("recipient_id"),
   recipientEmail: varchar("recipient_email", { length: 255 }),
   recipientPhone: varchar("recipient_phone", { length: 20 }),
-  appointmentId: integer("appointment_id").references(() => appointments.id, { onDelete: "set null" }),
+  appointmentId: integer("appointment_id"),
   status: varchar("status", { length: 20 }).notNull().default('sent'),
   errorMessage: text("error_message"),
   sentAt: timestamp("sent_at").defaultNow(),
