@@ -1075,11 +1075,8 @@ export class DatabaseStorage implements IStorage {
           return sql`(name ILIKE ${termPattern} OR brand ILIKE ${termPattern} OR description ILIKE ${termPattern} OR sku ILIKE ${termPattern})`;
         });
         
-        // Add full-text search OR term-by-term ILIKE fallback
-        const ftsCondition = sql`(
-          search_vector @@ to_tsquery('english', ${tsQuery})
-          OR (${sql.join(termConditions, sql` AND `)})
-        )`;
+        // Use ILIKE conditions for search (search_vector column was removed)
+        const ftsCondition = sql`(${sql.join(termConditions, sql` AND `)})`;
         
         whereConditions.push(ftsCondition);
         
