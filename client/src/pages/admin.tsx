@@ -5233,7 +5233,8 @@ function EditAppointmentDialog({
 // Email & Text Center Component for sending emails and SMS to users
 function EmailCenter() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<'email' | 'sms'>('email');
+  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<'email' | 'sms' | 'automated'>('email');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [sendToAll, setSendToAll] = useState(true);
@@ -5241,6 +5242,26 @@ function EmailCenter() {
   const [selectedRecipients, setSelectedRecipients] = useState<string[]>([]);
   const [isSending, setIsSending] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Automated message form state
+  const [showAutoMessageForm, setShowAutoMessageForm] = useState(false);
+  const [editingAutoMessage, setEditingAutoMessage] = useState<any>(null);
+  const [autoMessageForm, setAutoMessageForm] = useState({
+    name: '',
+    triggerType: 'appointment_reminder' as string,
+    triggerValue: '24',
+    targetAudience: 'appointment_customers' as string,
+    channel: 'email' as string,
+    emailSubject: '',
+    emailBody: '',
+    smsBody: '',
+    isActive: true
+  });
+
+  // Fetch automated messages
+  const { data: automatedMessages = [], isLoading: loadingAutoMessages } = useQuery<any[]>({
+    queryKey: ['/api/admin/automated-messages'],
+  });
 
   // Fetch all recipients for selection
   const { data: recipients = [], isLoading: loadingRecipients } = useQuery<any[]>({
@@ -5408,6 +5429,126 @@ function EmailCenter() {
     setSelectedRecipients([]);
   };
 
+  const resetAutoMessageForm = () => {
+    setAutoMessageForm({
+      name: '',
+      triggerType: 'appointment_reminder',
+      triggerValue: '24',
+      targetAudience: 'appointment_customers',
+      channel: 'email',
+      emailSubject: '',
+      emailBody: '',
+      smsBody: '',
+      isActive: true
+    });
+    setEditingAutoMessage(null);
+    setShowAutoMessageForm(false);
+  };
+
+  const handleSaveAutoMessage = async () => {
+    if (!autoMessageForm.name.trim()) {
+      toast({ title: "Name required", variant: "destructive" });
+      return;
+    }
+    if (autoMessageForm.channel === 'email' && (!autoMessageForm.emailSubject.trim() || !autoMessageForm.emailBody.trim())) {
+      toast({ title: "Email subject and body required", variant: "destructive" });
+      return;
+    }
+    if (autoMessageForm.channel === 'sms' && !autoMessageForm.smsBody.trim()) {
+      toast({ title: "SMS body required", variant: "destructive" });
+      return;
+    }
+
+    try {
+      const url = editingAutoMessage
+        ? `/api/admin/automated-messages/${editingAutoMessage.id}`
+        : '/api/admin/automated-messages';
+      const method = editingAutoMessage ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(autoMessageForm)
+      });
+
+      if (response.ok) {
+        toast({ title: editingAutoMessage ? "Message updated" : "Message created" });
+        queryClient.invalidateQueries({ queryKey: ['/api/admin/automated-messages'] });
+        resetAutoMessageForm();
+      } else {
+        const result = await response.json();
+        toast({ title: result.message || "Failed to save", variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Error saving message", variant: "destructive" });
+    }
+  };
+
+  const handleDeleteAutoMessage = async (id: number) => {
+    if (!confirm('Delete this automated message?')) return;
+    try {
+      await fetch(`/api/admin/automated-messages/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/automated-messages'] });
+      toast({ title: "Message deleted" });
+    } catch (error) {
+      toast({ title: "Failed to delete", variant: "destructive" });
+    }
+  };
+
+  const handleToggleAutoMessage = async (id: number, isActive: boolean) => {
+    try {
+      await fetch(`/api/admin/automated-messages/${id}/toggle`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ isActive })
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/automated-messages'] });
+    } catch (error) {
+      toast({ title: "Failed to toggle", variant: "destructive" });
+    }
+  };
+
+  const editAutoMessage = (msg: any) => {
+    setAutoMessageForm({
+      name: msg.name,
+      triggerType: msg.triggerType,
+      triggerValue: msg.triggerValue || '24',
+      targetAudience: msg.targetAudience,
+      channel: msg.channel,
+      emailSubject: msg.emailSubject || '',
+      emailBody: msg.emailBody || '',
+      smsBody: msg.smsBody || '',
+      isActive: msg.isActive
+    });
+    setEditingAutoMessage(msg);
+    setShowAutoMessageForm(true);
+  };
+
+  const getTriggerLabel = (type: string, value: string) => {
+    switch (type) {
+      case 'appointment_reminder': return `${value} hours before appointment`;
+      case 'daily': return `Daily at ${value}`;
+      case 'weekly': return `Weekly on ${value}`;
+      default: return type;
+    }
+  };
+
+  const getAudienceLabel = (audience: string) => {
+    const labels: Record<string, string> = {
+      all: 'All Users',
+      customers: 'Customers Only',
+      groomers: 'Groomers Only',
+      admins: 'Admins Only',
+      appointment_customers: 'Appointment Customers'
+    };
+    return labels[audience] || audience;
+  };
+
   const getRoleCount = (role: string) => {
     switch (role) {
       case 'customers':
@@ -5452,8 +5593,216 @@ function EmailCenter() {
               <Phone className="w-4 h-4 mr-2" />
               Text Message
             </Button>
+            <Button
+              variant={activeTab === 'automated' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => { setActiveTab('automated'); setSelectedRecipients([]); }}
+            >
+              <Clock className="w-4 h-4 mr-2" />
+              Automated
+            </Button>
           </div>
 
+          {/* Automated Messages Tab */}
+          {activeTab === 'automated' && (
+            <div className="space-y-4">
+              {!showAutoMessageForm ? (
+                <>
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-muted-foreground">
+                      Create scheduled messages that send automatically based on triggers.
+                    </p>
+                    <Button onClick={() => setShowAutoMessageForm(true)} className="bg-brand-blue hover:bg-blue-600">
+                      <Plus className="w-4 h-4 mr-2" /> New Message
+                    </Button>
+                  </div>
+
+                  {loadingAutoMessages ? (
+                    <div className="text-center py-8 text-muted-foreground">Loading...</div>
+                  ) : (automatedMessages as any[]).length === 0 ? (
+                    <div className="text-center py-8 border rounded-lg">
+                      <Clock className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+                      <p className="text-muted-foreground">No automated messages yet</p>
+                      <Button onClick={() => setShowAutoMessageForm(true)} variant="outline" className="mt-3">
+                        <Plus className="w-4 h-4 mr-2" /> Create Your First
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {(automatedMessages as any[]).map((msg: any) => (
+                        <div key={msg.id} className="border rounded-lg p-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-medium">{msg.name}</h4>
+                                <Badge variant={msg.isActive ? 'default' : 'secondary'}>
+                                  {msg.isActive ? 'Active' : 'Paused'}
+                                </Badge>
+                                <Badge variant="outline">{msg.channel.toUpperCase()}</Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {getTriggerLabel(msg.triggerType, msg.triggerValue)} • {getAudienceLabel(msg.targetAudience)}
+                              </p>
+                              {msg.channel === 'email' && (
+                                <p className="text-sm mt-2 truncate">Subject: {msg.emailSubject}</p>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={msg.isActive}
+                                onCheckedChange={(checked) => handleToggleAutoMessage(msg.id, checked)}
+                              />
+                              <Button size="icon" variant="ghost" onClick={() => editAutoMessage(msg)}>
+                                <Pencil className="w-4 h-4" />
+                              </Button>
+                              <Button size="icon" variant="ghost" onClick={() => handleDeleteAutoMessage(msg.id)}>
+                                <Trash2 className="w-4 h-4 text-red-500" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="space-y-4 border rounded-lg p-4">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-semibold">{editingAutoMessage ? 'Edit' : 'New'} Automated Message</h4>
+                    <Button variant="ghost" size="sm" onClick={resetAutoMessageForm}>
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  <div>
+                    <Label>Name</Label>
+                    <Input
+                      value={autoMessageForm.name}
+                      onChange={(e) => setAutoMessageForm({ ...autoMessageForm, name: e.target.value })}
+                      placeholder="e.g., Appointment Reminder"
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Trigger Type</Label>
+                      <Select
+                        value={autoMessageForm.triggerType}
+                        onValueChange={(v) => setAutoMessageForm({ ...autoMessageForm, triggerType: v })}
+                      >
+                        <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="appointment_reminder">Appointment Reminder</SelectItem>
+                          <SelectItem value="daily">Daily Schedule</SelectItem>
+                          <SelectItem value="weekly">Weekly Schedule</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>
+                        {autoMessageForm.triggerType === 'appointment_reminder' ? 'Hours Before' : 
+                         autoMessageForm.triggerType === 'daily' ? 'Time (HH:MM)' : 'Day'}
+                      </Label>
+                      <Input
+                        value={autoMessageForm.triggerValue}
+                        onChange={(e) => setAutoMessageForm({ ...autoMessageForm, triggerValue: e.target.value })}
+                        placeholder={autoMessageForm.triggerType === 'appointment_reminder' ? '24' : '09:00'}
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Target Audience</Label>
+                      <Select
+                        value={autoMessageForm.targetAudience}
+                        onValueChange={(v) => setAutoMessageForm({ ...autoMessageForm, targetAudience: v })}
+                      >
+                        <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="appointment_customers">Appointment Customers</SelectItem>
+                          <SelectItem value="all">All Users</SelectItem>
+                          <SelectItem value="customers">Customers Only</SelectItem>
+                          <SelectItem value="groomers">Groomers Only</SelectItem>
+                          <SelectItem value="admins">Admins Only</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Channel</Label>
+                      <Select
+                        value={autoMessageForm.channel}
+                        onValueChange={(v) => setAutoMessageForm({ ...autoMessageForm, channel: v })}
+                      >
+                        <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="email">Email</SelectItem>
+                          <SelectItem value="sms">SMS</SelectItem>
+                          <SelectItem value="both">Both</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {(autoMessageForm.channel === 'email' || autoMessageForm.channel === 'both') && (
+                    <>
+                      <div>
+                        <Label>Email Subject</Label>
+                        <Input
+                          value={autoMessageForm.emailSubject}
+                          onChange={(e) => setAutoMessageForm({ ...autoMessageForm, emailSubject: e.target.value })}
+                          placeholder="Reminder: Your Appointment Tomorrow"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label>Email Body</Label>
+                        <Textarea
+                          value={autoMessageForm.emailBody}
+                          onChange={(e) => setAutoMessageForm({ ...autoMessageForm, emailBody: e.target.value })}
+                          placeholder="Dear {{customerName}}, your appointment is scheduled for {{appointmentTime}}..."
+                          rows={4}
+                          className="mt-1"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Available placeholders: {'{{customerName}}'}, {'{{petName}}'}, {'{{appointmentTime}}'}, {'{{appointmentDate}}'}
+                        </p>
+                      </div>
+                    </>
+                  )}
+
+                  {(autoMessageForm.channel === 'sms' || autoMessageForm.channel === 'both') && (
+                    <div>
+                      <Label>SMS Message</Label>
+                      <Textarea
+                        value={autoMessageForm.smsBody}
+                        onChange={(e) => setAutoMessageForm({ ...autoMessageForm, smsBody: e.target.value })}
+                        placeholder="Reminder: {{petName}}'s appointment is tomorrow at {{appointmentTime}}. See you then!"
+                        rows={3}
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {autoMessageForm.smsBody.length}/160 characters
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 pt-2">
+                    <Button onClick={handleSaveAutoMessage} className="flex-1 bg-brand-blue hover:bg-blue-600">
+                      {editingAutoMessage ? 'Update Message' : 'Create Message'}
+                    </Button>
+                    <Button variant="outline" onClick={resetAutoMessageForm}>Cancel</Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Email/SMS Content */}
+          {activeTab !== 'automated' && (
+            <>
           {/* Role Filter */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">Target Audience</Label>
@@ -5720,6 +6069,8 @@ function EmailCenter() {
               </>
             )}
           </Button>
+          </>
+          )}
         </CardContent>
       </Card>
     </div>
