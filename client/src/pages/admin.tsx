@@ -11808,6 +11808,16 @@ export default function Admin() {
                           })}
                         </tbody>
                       </table>
+                      <div className="mt-4 text-center">
+                        <Button 
+                          onClick={() => setIsAddBlockedDayOpen(true)}
+                          className="bg-orange-600 hover:bg-orange-700"
+                          data-testid="button-add-blocked-day-table"
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add Blocked Day
+                        </Button>
+                      </div>
                     </div>
                   );
                 })()}
