@@ -827,3 +827,53 @@ export const insertAstroPurchaseSyncLogSchema = createInsertSchema(astroPurchase
 
 export type AstroPurchaseSyncLog = typeof astroPurchaseSyncLog.$inferSelect;
 export type InsertAstroPurchaseSyncLog = z.infer<typeof insertAstroPurchaseSyncLogSchema>;
+
+// Automated Messages - Scheduled emails/SMS for appointments and notifications
+export const automatedMessages = pgTable("automated_messages", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(), // "Appointment Reminder 1 Hour Before"
+  type: varchar("type", { length: 20 }).notNull(), // 'email' or 'sms'
+  triggerType: varchar("trigger_type", { length: 50 }).notNull(), // 'appointment_reminder', 'daily', 'weekly'
+  // Timing settings
+  timingValue: integer("timing_value").notNull(), // e.g., 1, 24, 48
+  timingUnit: varchar("timing_unit", { length: 20 }).notNull(), // 'minutes', 'hours', 'days'
+  timingDirection: varchar("timing_direction", { length: 10 }).notNull().default('before'), // 'before' or 'after'
+  // For scheduled (non-appointment) messages
+  scheduledTime: varchar("scheduled_time", { length: 10 }), // "09:00" for daily/weekly
+  scheduledDays: text("scheduled_days").array(), // ['monday', 'wednesday'] for weekly
+  // Message content
+  subject: varchar("subject", { length: 255 }), // For emails only
+  message: text("message").notNull(), // Supports placeholders like {{petName}}, {{appointmentTime}}
+  // Target audience
+  targetAudience: varchar("target_audience", { length: 50 }).notNull().default('all'), // 'all', 'customers', 'groomers', 'admins', 'appointment_customers'
+  // Status
+  isActive: boolean("is_active").default(true),
+  lastRunAt: timestamp("last_run_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAutomatedMessageSchema = createInsertSchema(automatedMessages).omit({
+  id: true,
+  lastRunAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type AutomatedMessage = typeof automatedMessages.$inferSelect;
+export type InsertAutomatedMessage = z.infer<typeof insertAutomatedMessageSchema>;
+
+// Automated Message Logs - Track sent messages
+export const automatedMessageLogs = pgTable("automated_message_logs", {
+  id: serial("id").primaryKey(),
+  automatedMessageId: integer("automated_message_id").notNull().references(() => automatedMessages.id, { onDelete: "cascade" }),
+  recipientId: varchar("recipient_id"), // User ID if applicable
+  recipientEmail: varchar("recipient_email", { length: 255 }),
+  recipientPhone: varchar("recipient_phone", { length: 20 }),
+  appointmentId: integer("appointment_id").references(() => appointments.id, { onDelete: "set null" }),
+  status: varchar("status", { length: 20 }).notNull().default('sent'), // 'sent', 'failed', 'pending'
+  errorMessage: text("error_message"),
+  sentAt: timestamp("sent_at").defaultNow(),
+});
+
+export type AutomatedMessageLog = typeof automatedMessageLogs.$inferSelect;
