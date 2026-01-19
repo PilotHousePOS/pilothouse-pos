@@ -828,48 +828,37 @@ export const insertAstroPurchaseSyncLogSchema = createInsertSchema(astroPurchase
 export type AstroPurchaseSyncLog = typeof astroPurchaseSyncLog.$inferSelect;
 export type InsertAstroPurchaseSyncLog = z.infer<typeof insertAstroPurchaseSyncLogSchema>;
 
-// Automated Messages - Scheduled emails/SMS for appointments and notifications
-// NOTE: This table MUST be defined before automatedMessageLogs due to foreign key dependency
-export const automatedMessages = pgTable("automated_messages", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  type: varchar("type", { length: 20 }).notNull(),
-  triggerType: varchar("trigger_type", { length: 50 }).notNull(),
-  timingValue: integer("timing_value").notNull(),
-  timingUnit: varchar("timing_unit", { length: 20 }).notNull(),
-  timingDirection: varchar("timing_direction", { length: 10 }).notNull().default('before'),
-  scheduledTime: varchar("scheduled_time", { length: 10 }),
-  scheduledDays: text("scheduled_days").array(),
-  subject: varchar("subject", { length: 255 }),
-  message: text("message").notNull(),
-  targetAudience: varchar("target_audience", { length: 50 }).notNull().default('all'),
-  isActive: boolean("is_active").default(true),
-  lastRunAt: timestamp("last_run_at"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+// Automated Messages - TEMPORARILY DISABLED for publishing test
+// Will be re-enabled after confirming publishing works
 
-export const insertAutomatedMessageSchema = createInsertSchema(automatedMessages).omit({
-  id: true,
-  lastRunAt: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export type AutomatedMessage = typeof automatedMessages.$inferSelect;
-export type InsertAutomatedMessage = z.infer<typeof insertAutomatedMessageSchema>;
-
-// Automated Message Logs - Track sent messages (depends on automatedMessages table)
-export const automatedMessageLogs = pgTable("automated_message_logs", {
-  id: serial("id").primaryKey(),
-  automatedMessageId: integer("automated_message_id").notNull(),
-  recipientId: varchar("recipient_id"),
-  recipientEmail: varchar("recipient_email", { length: 255 }),
-  recipientPhone: varchar("recipient_phone", { length: 20 }),
-  appointmentId: integer("appointment_id"),
-  status: varchar("status", { length: 20 }).notNull().default('sent'),
-  errorMessage: text("error_message"),
-  sentAt: timestamp("sent_at").defaultNow(),
-});
-
-export type AutomatedMessageLog = typeof automatedMessageLogs.$inferSelect;
+// Placeholder types for compilation
+export type AutomatedMessage = {
+  id: number;
+  name: string;
+  type: string;
+  triggerType: string;
+  timingValue: number;
+  timingUnit: string;
+  timingDirection: string;
+  scheduledTime: string | null;
+  scheduledDays: string[] | null;
+  subject: string | null;
+  message: string;
+  targetAudience: string;
+  isActive: boolean | null;
+  lastRunAt: Date | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+};
+export type InsertAutomatedMessage = Omit<AutomatedMessage, 'id' | 'lastRunAt' | 'createdAt' | 'updatedAt'>;
+export type AutomatedMessageLog = {
+  id: number;
+  automatedMessageId: number;
+  recipientId: string | null;
+  recipientEmail: string | null;
+  recipientPhone: string | null;
+  appointmentId: number | null;
+  status: string;
+  errorMessage: string | null;
+  sentAt: Date | null;
+};

@@ -82,8 +82,6 @@ import {
   astroCustomers,
   astroFrequentBuyerProgress,
   astroPurchaseSyncLog,
-  automatedMessages,
-  automatedMessageLogs,
   type AstroCustomer,
   type AutomatedMessage,
   type InsertAutomatedMessage,
@@ -3819,44 +3817,33 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  // Automated Messages operations
+  // Automated Messages operations - TEMPORARILY DISABLED FOR PUBLISHING TEST
   async getAllAutomatedMessages(): Promise<AutomatedMessage[]> {
-    return await db.select().from(automatedMessages).orderBy(desc(automatedMessages.createdAt));
+    return []; // Disabled - tables removed for publishing test
   }
 
   async getActiveAutomatedMessages(): Promise<AutomatedMessage[]> {
-    return await db.select().from(automatedMessages)
-      .where(eq(automatedMessages.isActive, true))
-      .orderBy(asc(automatedMessages.name));
+    return []; // Disabled
   }
 
   async getAutomatedMessageById(id: number): Promise<AutomatedMessage | undefined> {
-    const [message] = await db.select().from(automatedMessages).where(eq(automatedMessages.id, id));
-    return message;
+    return undefined; // Disabled
   }
 
   async createAutomatedMessage(message: InsertAutomatedMessage): Promise<AutomatedMessage> {
-    const [created] = await db.insert(automatedMessages).values(message).returning();
-    return created;
+    throw new Error("Automated messaging temporarily disabled");
   }
 
   async updateAutomatedMessage(id: number, message: Partial<InsertAutomatedMessage>): Promise<AutomatedMessage> {
-    const [updated] = await db
-      .update(automatedMessages)
-      .set({ ...message, updatedAt: new Date() })
-      .where(eq(automatedMessages.id, id))
-      .returning();
-    return updated;
+    throw new Error("Automated messaging temporarily disabled");
   }
 
   async deleteAutomatedMessage(id: number): Promise<void> {
-    await db.delete(automatedMessages).where(eq(automatedMessages.id, id));
+    // Disabled
   }
 
   async updateAutomatedMessageLastRun(id: number): Promise<void> {
-    await db.update(automatedMessages)
-      .set({ lastRunAt: new Date() })
-      .where(eq(automatedMessages.id, id));
+    // Disabled
   }
 
   async createAutomatedMessageLog(log: { 
@@ -3868,14 +3855,11 @@ export class DatabaseStorage implements IStorage {
     status: string;
     errorMessage?: string;
   }): Promise<AutomatedMessageLog> {
-    const [created] = await db.insert(automatedMessageLogs).values(log).returning();
-    return created;
+    throw new Error("Automated messaging temporarily disabled");
   }
 
   async getAutomatedMessageLogs(messageId: number): Promise<AutomatedMessageLog[]> {
-    return await db.select().from(automatedMessageLogs)
-      .where(eq(automatedMessageLogs.automatedMessageId, messageId))
-      .orderBy(desc(automatedMessageLogs.sentAt));
+    return []; // Disabled
   }
 }
 
