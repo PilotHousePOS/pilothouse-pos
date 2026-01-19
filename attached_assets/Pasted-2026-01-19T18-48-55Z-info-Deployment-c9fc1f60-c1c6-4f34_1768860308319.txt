@@ -1,0 +1,144 @@
+2026-01-19T18:48:55Z info: Deployment: c9fc1f60-c1c6-4f34-b93b-33bad5bc92e8
+2026-01-19T18:48:55Z info: Build: a123275a-77b1-4a99-af62-0f988010f156
+2026-01-19T18:48:55Z info: Running Security Scan
+2026-01-19T18:50:44Z info: Security Scan Complete
+2026-01-19T18:50:44Z info: Connecting to builder
+2026-01-19T18:50:45Z info: Builder connected
+2026-01-19T18:50:45Z info: Installing packages
+2026-01-19T18:50:45Z info: Starting Build
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+
+vite v7.2.4 building client environment for production...
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+
+transforming...
+
+✓ 2615 modules transformed.
+
+rendering chunks...
+
+computing gzip size...
+
+../dist/public/index.html                                                    2.18 kB │ gzip:   0.82 kB
+
+../dist/public/assets/Circle Mascot Logo_1750438195696-oSGw530S.jpg      2,011.27 kB
+../dist/public/assets/animal house logo full_1750438187184-DHb9WgNI.jpg  3,199.50 kB
+
+../dist/public/assets/index-m7-pV0tX.css                                    96.08 kB │ gzip:  15.61 kB
+
+../dist/public/assets/index-CDfgbg7P.js                                    987.16 kB │ gzip: 260.47 kB
+
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+✓ built in 7.54s
+
+▲ [WARNING] Duplicate key "Galap." in object literal [duplicate-object-key]
+
+    server/abbreviationExpansion.ts:188:2:
+      188 │   'Galap.': 'Galapagos',
+          ╵   ~~~~~~~~
+
+  The original key "Galap." is here:
+
+    server/abbreviationExpansion.ts:142:2:
+      142 │   'Galap.': 'Galapagos',
+          ╵   ~~~~~~~~
+
+▲ [WARNING] Duplicate key "Sys." in object literal [duplicate-object-key]
+
+    server/abbreviationExpansion.ts:220:2:
+      220 │   'Sys.': 'Systems',
+          ╵   ~~~~~~
+
+  The original key "Sys." is here:
+
+    server/abbreviationExpansion.ts:148:2:
+      148 │   'Sys.': 'Systems',
+          ╵   ~~~~~~
+
+▲ [WARNING] Duplicate key "Trop." in object literal [duplicate-object-key]
+
+    server/abbreviationExpansion.ts:221:2:
+      221 │   'Trop.': 'Tropical',
+          ╵   ~~~~~~~
+
+  The original key "Trop." is here:
+
+    server/abbreviationExpansion.ts:138:2:
+      138 │   'Trop.': 'Tropical',
+          ╵   ~~~~~~~
+
+
+▲ [WARNING] Duplicate key "Fl." in object literal [duplicate-object-key]
+
+    server/abbreviationExpansion.ts:222:2:
+      222 │   'Fl.': 'Fluorescent',
+          ╵   ~~~~~
+
+  The original key "Fl." is here:
+
+    server/abbreviationExpansion.ts:150:2:
+      150 │   'Fl.': 'Fluorescent',
+          ╵   ~~~~~
+
+▲ [WARNING] Duplicate key "REPT." in object literal [duplicate-object-key]
+
+    server/abbreviationExpansion.ts:223:2:
+      223 │   'REPT.': 'Reptile',
+          ╵   ~~~~~~~
+
+  The original key "REPT." is here:
+
+    server/abbreviationExpansion.ts:146:2:
+      146 │   'REPT.': 'Reptile',
+          ╵   ~~~~~~~
+
+▲ [WARNING] Duplicate key "diam." in object literal [duplicate-object-key]
+
+    server/abbreviationExpansion.ts:225:2:
+      225 │   'diam.': 'diameter',
+          ╵   ~~~~~~~
+
+  The original key "diam." is here:
+
+    server/abbreviationExpansion.ts:154:2:
+      154 │   'diam.': 'Diameter',
+          ╵   ~~~~~~~
+
+6 of 37 warnings shown (disable the message limit with --log-limit=0)
+
+
+  dist/index.js  709.9kb
+
+⚡ Done in 552ms
+
+npm notice
+npm notice New major version of npm available! 10.8.2 -> 11.7.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.7.0
+npm notice To update run: npm install -g npm@11.7.0
+npm notice
+
+2026-01-19T18:51:00Z info: Pushing pid1 binary layer...
+2026-01-19T18:51:01Z info: Created pid1 binary layer
+2026-01-19T18:51:04Z info: Pushing Repl layer...
+2026-01-19T18:51:04Z info: Pushing hosting layer...
+2026-01-19T18:51:04Z info: Retrieved cached nix layer
+2026-01-19T18:51:04Z info: Created hosting layer
+2026-01-19T18:53:11Z info: Created Repl layer
+2026-01-19T18:53:14Z info: Pushed image manifest
+2026-01-19T18:53:16Z info: Pushed soci index manifest
+2026-01-19T18:53:20Z info: Creating virtual machine
+2026-01-19T18:53:35Z info: Virtual machine created
+2026-01-19T18:53:35Z info: Waiting for deployment to be ready
+starting up user application
+forwarding local port 5000 to external port 80 (mapped as 1104)
+metasidecar: loaded enterprise status from environment is_enterprise=false
+2026-01-19T18:54:25Z info: Deployment successful
