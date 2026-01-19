@@ -13,13 +13,13 @@ async function main() {
   
   for (let i = 0; i < matches.length; i += CHUNK_SIZE) {
     const chunk = matches.slice(i, i + CHUNK_SIZE);
-    const ids = chunk.map((m: any) => m.productId);
     
-    // Build CASE statement
-    const caseWhen = chunk.map((m: any) => `WHEN id = ${m.productId} THEN '${m.upc}'`).join(' ');
-    const query = `UPDATE supplies SET sku = CASE ${caseWhen} END WHERE id IN (${ids.join(',')})`;
+    for (const match of chunk) {
+      await db.update(supplies)
+        .set({ sku: match.upc })
+        .where(eq(supplies.id, match.productId));
+    }
     
-    await db.execute(sql.raw(query));
     applied += chunk.length;
     console.log(`Applied ${applied}/${matches.length}...`);
   }
