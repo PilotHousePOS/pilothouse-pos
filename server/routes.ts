@@ -3501,6 +3501,76 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Automated Messages routes
+  app.get("/api/admin/automated-messages", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const messages = await storage.getAllAutomatedMessages();
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching automated messages:", error);
+      res.status(500).json({ message: "Failed to fetch automated messages" });
+    }
+  });
+
+  app.post("/api/admin/automated-messages", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const message = await storage.createAutomatedMessage(req.body);
+      res.status(201).json(message);
+    } catch (error) {
+      console.error("Error creating automated message:", error);
+      res.status(500).json({ message: "Failed to create automated message" });
+    }
+  });
+
+  app.put("/api/admin/automated-messages/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const id = parseInt(req.params.id);
+      const message = await storage.updateAutomatedMessage(id, req.body);
+      res.json(message);
+    } catch (error) {
+      console.error("Error updating automated message:", error);
+      res.status(500).json({ message: "Failed to update automated message" });
+    }
+  });
+
+  app.delete("/api/admin/automated-messages/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const id = parseInt(req.params.id);
+      await storage.deleteAutomatedMessage(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting automated message:", error);
+      res.status(500).json({ message: "Failed to delete automated message" });
+    }
+  });
+
+  app.patch("/api/admin/automated-messages/:id/toggle", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const id = parseInt(req.params.id);
+      const { isActive } = req.body;
+      const message = await storage.updateAutomatedMessage(id, { isActive });
+      res.json(message);
+    } catch (error) {
+      console.error("Error toggling automated message:", error);
+      res.status(500).json({ message: "Failed to toggle automated message" });
+    }
+  });
+
   // Grooming settings routes
   app.get("/api/admin/grooming-settings", authMiddleware, async (req: any, res) => {
     try {

@@ -82,7 +82,12 @@ import {
   astroCustomers,
   astroFrequentBuyerProgress,
   astroPurchaseSyncLog,
+  automatedMessages,
+  automatedMessageLogs,
   type AstroCustomer,
+  type AutomatedMessage,
+  type InsertAutomatedMessage,
+  type AutomatedMessageLog,
   type InsertAstroCustomer,
   type AstroFrequentBuyerProgress,
   type InsertAstroFrequentBuyerProgress,
@@ -3812,6 +3817,65 @@ export class DatabaseStorage implements IStorage {
   async createPurchaseSyncLog(log: InsertAstroPurchaseSyncLog): Promise<AstroPurchaseSyncLog> {
     const [created] = await db.insert(astroPurchaseSyncLog).values(log).returning();
     return created;
+  }
+
+  // Automated Messages operations
+  async getAllAutomatedMessages(): Promise<AutomatedMessage[]> {
+    return await db.select().from(automatedMessages).orderBy(desc(automatedMessages.createdAt));
+  }
+
+  async getActiveAutomatedMessages(): Promise<AutomatedMessage[]> {
+    return await db.select().from(automatedMessages)
+      .where(eq(automatedMessages.isActive, true))
+      .orderBy(asc(automatedMessages.name));
+  }
+
+  async getAutomatedMessageById(id: number): Promise<AutomatedMessage | undefined> {
+    const [message] = await db.select().from(automatedMessages).where(eq(automatedMessages.id, id));
+    return message;
+  }
+
+  async createAutomatedMessage(message: InsertAutomatedMessage): Promise<AutomatedMessage> {
+    const [created] = await db.insert(automatedMessages).values(message).returning();
+    return created;
+  }
+
+  async updateAutomatedMessage(id: number, message: Partial<InsertAutomatedMessage>): Promise<AutomatedMessage> {
+    const [updated] = await db
+      .update(automatedMessages)
+      .set({ ...message, updatedAt: new Date() })
+      .where(eq(automatedMessages.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteAutomatedMessage(id: number): Promise<void> {
+    await db.delete(automatedMessages).where(eq(automatedMessages.id, id));
+  }
+
+  async updateAutomatedMessageLastRun(id: number): Promise<void> {
+    await db.update(automatedMessages)
+      .set({ lastRunAt: new Date() })
+      .where(eq(automatedMessages.id, id));
+  }
+
+  async createAutomatedMessageLog(log: { 
+    automatedMessageId: number; 
+    recipientId?: string; 
+    recipientEmail?: string; 
+    recipientPhone?: string; 
+    appointmentId?: number;
+    status: string;
+    errorMessage?: string;
+  }): Promise<AutomatedMessageLog> {
+    const [created] = await db.insert(automatedMessageLogs).values(log).returning();
+    return created;
+  }
+
+  async getAutomatedMessageLogs(messageId: number): Promise<AutomatedMessageLog[]> {
+    return await db.select().from(automatedMessageLogs)
+      .where(eq(automatedMessageLogs.automatedMessageId, messageId))
+      .orderBy(desc(automatedMessageLogs.sentAt));
   }
 }
 
