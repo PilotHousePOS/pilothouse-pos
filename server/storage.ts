@@ -280,6 +280,7 @@ export interface IStorage {
   // Groomer availability operations
   getGroomerAvailability(groomerId: number): Promise<GroomerAvailability[]>;
   getAvailableGroomersForDay(dayOfWeek: number): Promise<Groomer[]>;
+  getAvailableGroomersForDate(date: string): Promise<Groomer[]>;
   setGroomerAvailability(availability: InsertGroomerAvailability): Promise<GroomerAvailability>;
   updateGroomerAvailability(id: number, availability: Partial<InsertGroomerAvailability>): Promise<GroomerAvailability>;
   deleteGroomerAvailability(id: number): Promise<void>;
@@ -2724,6 +2725,36 @@ export class DatabaseStorage implements IStorage {
         eq(groomerAvailability.isAvailable, true)
       ))
       .orderBy(groomers.name);
+  }
+
+  async getAvailableGroomersForDate(date: string): Promise<Groomer[]> {
+    const dateObj = new Date(date + 'T00:00:00');
+    const dayOfWeek = dateObj.getDay();
+    
+    const availableGroomers = await db
+      .select({
+        id: groomers.id,
+        name: groomers.name,
+        email: groomers.email,
+        phone: groomers.phone,
+        specialties: groomers.specialties,
+        isActive: groomers.isActive,
+        createdAt: groomers.createdAt,
+        updatedAt: groomers.updatedAt,
+      })
+      .from(groomers)
+      .innerJoin(groomerAvailability, eq(groomers.id, groomerAvailability.groomerId))
+      .where(and(
+        eq(groomers.isActive, true),
+        eq(groomerAvailability.dayOfWeek, dayOfWeek),
+        eq(groomerAvailability.isAvailable, true)
+      ))
+      .orderBy(groomers.name);
+    
+    const blockedDays = await this.getGroomerBlockedDaysForDate(date);
+    const blockedGroomerIds = new Set(blockedDays.map(bd => bd.groomerId));
+    
+    return availableGroomers.filter(g => !blockedGroomerIds.has(g.id));
   }
 
   async setGroomerAvailability(availabilityData: InsertGroomerAvailability): Promise<GroomerAvailability> {

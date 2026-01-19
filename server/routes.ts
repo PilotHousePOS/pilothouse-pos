@@ -3699,6 +3699,21 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  app.get("/api/groomers/available-for-date/:date", async (req, res) => {
+    try {
+      const date = req.params.date;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD" });
+      }
+      
+      const groomers = await storage.getAvailableGroomersForDate(date);
+      res.json(groomers);
+    } catch (error) {
+      console.error("Error fetching available groomers for date:", error);
+      res.status(500).json({ message: "Failed to fetch available groomers" });
+    }
+  });
+
   // Admin groomer management routes
   app.get("/api/admin/groomers", authMiddleware, async (req: any, res) => {
     try {

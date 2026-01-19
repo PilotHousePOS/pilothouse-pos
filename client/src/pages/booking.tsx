@@ -63,12 +63,6 @@ export default function Booking() {
     retry: false,
   });
 
-  // Fetch active groomers
-  const { data: availableGroomers = [] } = useQuery({
-    queryKey: ["/api/groomers"],
-    retry: false,
-  });
-
   // Fetch contacts for search
   const { data: allContacts = [] } = useQuery({
     queryKey: ["/api/contacts"],
@@ -81,11 +75,25 @@ export default function Booking() {
     retry: false,
   });
 
-  // Fetch special date settings for selected date
   // Use local date string to avoid timezone issues (e.g., UTC+5 would shift dates)
   const selectedDateStr = selectedDate 
     ? `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
     : '';
+
+  // Fetch groomers available for the selected date (checks blocked days)
+  const { data: availableGroomers = [] } = useQuery({
+    queryKey: ["/api/groomers/available-for-date", selectedDateStr],
+    queryFn: async () => {
+      if (!selectedDateStr) return [];
+      const response = await fetch(`/api/groomers/available-for-date/${selectedDateStr}`);
+      if (!response.ok) return [];
+      return response.json();
+    },
+    enabled: !!selectedDateStr,
+    retry: false,
+  });
+
+  // Fetch special date settings for selected date
   const { data: specialDate } = useQuery({
     queryKey: ["/api/special-dates", selectedDateStr],
     queryFn: async () => {

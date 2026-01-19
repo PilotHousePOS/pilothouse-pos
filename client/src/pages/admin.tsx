@@ -6482,6 +6482,7 @@ export default function Admin() {
     reason: 'sick',
     notes: ''
   });
+  const [blockedDaysGroomerFilter, setBlockedDaysGroomerFilter] = useState<string>('all');
   const [isAddBoardingOpen, setIsAddBoardingOpen] = useState(false);
   const [showApprovedAppointments, setShowApprovedAppointments] = useState(false);
   const [showDeniedAppointments, setShowDeniedAppointments] = useState(false);
@@ -11703,77 +11704,105 @@ export default function Admin() {
                     <CalendarX2 className="w-5 h-5" />
                     Blocked Days (Sick/Vacation)
                   </CardTitle>
-                  <Button 
-                    onClick={() => setIsAddBlockedDayOpen(true)}
-                    className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700"
-                    data-testid="button-add-blocked-day"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Blocked Day
-                  </Button>
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <Select
+                      value={blockedDaysGroomerFilter}
+                      onValueChange={setBlockedDaysGroomerFilter}
+                    >
+                      <SelectTrigger className="w-full sm:w-[200px]">
+                        <SelectValue placeholder="Filter by groomer" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Groomers</SelectItem>
+                        {groomersQuery.data?.filter((g: any) => g.isActive).map((groomer: any) => (
+                          <SelectItem key={groomer.id} value={groomer.id.toString()}>
+                            {groomer.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button 
+                      onClick={() => setIsAddBlockedDayOpen(true)}
+                      className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700"
+                      data-testid="button-add-blocked-day"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Blocked Day
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
-                {groomerBlockedDays.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <CalendarX2 className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                    <p>No blocked days scheduled</p>
-                    <p className="text-sm mt-1">Click "Add Blocked Day" to block a groomer from being assigned on specific dates</p>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse border border-gray-300">
-                      <thead>
-                        <tr className="bg-orange-100">
-                          <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold">Groomer</th>
-                          <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold">Date</th>
-                          <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold">Reason</th>
-                          <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold">Notes</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold w-[80px]">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {groomerBlockedDays.map((blockedDay: any) => {
-                          const groomer = groomersQuery.data?.find((g: any) => g.id === blockedDay.groomerId);
-                          return (
-                            <tr key={blockedDay.id} className="hover:bg-gray-50">
-                              <td className="border border-gray-300 px-3 py-2 text-sm">{groomer?.name || 'Unknown'}</td>
-                              <td className="border border-gray-300 px-3 py-2 text-sm">
-                                {new Date(blockedDay.date + 'T00:00:00').toLocaleDateString('en-US', { 
-                                  weekday: 'short', 
-                                  month: 'short', 
-                                  day: 'numeric',
-                                  year: 'numeric'
-                                })}
-                              </td>
-                              <td className="border border-gray-300 px-3 py-2 text-sm capitalize">
-                                <Badge variant={
-                                  blockedDay.reason === 'sick' ? 'destructive' : 
-                                  blockedDay.reason === 'vacation' ? 'default' : 
-                                  'secondary'
-                                }>
-                                  {blockedDay.reason}
-                                </Badge>
-                              </td>
-                              <td className="border border-gray-300 px-3 py-2 text-sm text-gray-600">{blockedDay.notes || '-'}</td>
-                              <td className="border border-gray-300 px-3 py-2 text-center">
-                                <Button
-                                  variant="destructive"
-                                  size="sm"
-                                  onClick={() => deleteBlockedDayMutation.mutate(blockedDay.id)}
-                                  disabled={deleteBlockedDayMutation.isPending}
-                                  data-testid={`button-delete-blocked-day-${blockedDay.id}`}
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                </Button>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                {(() => {
+                  const filteredBlockedDays = blockedDaysGroomerFilter === 'all' 
+                    ? groomerBlockedDays 
+                    : groomerBlockedDays.filter((bd: any) => bd.groomerId === parseInt(blockedDaysGroomerFilter));
+                  
+                  if (filteredBlockedDays.length === 0) {
+                    return (
+                      <div className="text-center py-8 text-gray-500">
+                        <CalendarX2 className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                        <p>No blocked days scheduled{blockedDaysGroomerFilter !== 'all' ? ' for this groomer' : ''}</p>
+                        <p className="text-sm mt-1">Click "Add Blocked Day" to block a groomer from being assigned on specific dates</p>
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse border border-gray-300">
+                        <thead>
+                          <tr className="bg-orange-100">
+                            <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold">Groomer</th>
+                            <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold">Date</th>
+                            <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold">Reason</th>
+                            <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold">Notes</th>
+                            <th className="border border-gray-300 px-3 py-2 text-center text-sm font-semibold w-[80px]">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredBlockedDays.map((blockedDay: any) => {
+                            const groomer = groomersQuery.data?.find((g: any) => g.id === blockedDay.groomerId);
+                            return (
+                              <tr key={blockedDay.id} className="hover:bg-gray-50">
+                                <td className="border border-gray-300 px-3 py-2 text-sm">{groomer?.name || 'Unknown'}</td>
+                                <td className="border border-gray-300 px-3 py-2 text-sm">
+                                  {new Date(blockedDay.date + 'T00:00:00').toLocaleDateString('en-US', { 
+                                    weekday: 'short', 
+                                    month: 'short', 
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                  })}
+                                </td>
+                                <td className="border border-gray-300 px-3 py-2 text-sm capitalize">
+                                  <Badge variant={
+                                    blockedDay.reason === 'sick' ? 'destructive' : 
+                                    blockedDay.reason === 'vacation' ? 'default' : 
+                                    'secondary'
+                                  }>
+                                    {blockedDay.reason}
+                                  </Badge>
+                                </td>
+                                <td className="border border-gray-300 px-3 py-2 text-sm text-gray-600">{blockedDay.notes || '-'}</td>
+                                <td className="border border-gray-300 px-3 py-2 text-center">
+                                  <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => deleteBlockedDayMutation.mutate(blockedDay.id)}
+                                    disabled={deleteBlockedDayMutation.isPending}
+                                    data-testid={`button-delete-blocked-day-${blockedDay.id}`}
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </Button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  );
+                })()}
               </CardContent>
             </Card>
           )}
