@@ -418,8 +418,8 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                               : 'bg-blue-50 border-blue-500'
                           }`}
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
+                          <div className="flex items-start gap-3">
+                            <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-2">
                                 <p className="text-sm text-gray-600">
                                   Owner: {capitalizeWords(appointment.ownerFirstName)} {capitalizeWords(appointment.ownerLastName)}
@@ -470,9 +470,21 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                                 ))}
                               </div>
                             </div>
-                            <Badge variant="default" className="bg-green-600">
-                              Grooming
-                            </Badge>
+                            
+                            {/* Right side - Contact Notes and Badge */}
+                            <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                              <Badge variant="default" className="bg-green-600">
+                                Grooming
+                              </Badge>
+                              {appointment.contactNotes && (
+                                <div className="w-32 sm:w-40 bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2 border border-amber-200 dark:border-amber-800">
+                                  <p className="text-xs font-medium text-amber-800 dark:text-amber-300 mb-1">Notes</p>
+                                  <p className="text-xs text-amber-700 dark:text-amber-400 break-words line-clamp-4">
+                                    {appointment.contactNotes}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
@@ -1425,39 +1437,55 @@ function ContactsManager() {
                   }}
                   data-testid={`contact-card-${index}`}
                 >
-                  <div className="flex flex-col gap-2 min-w-0">
-                    {/* Name */}
-                    <p className="font-semibold text-base break-words truncate">
-                      {contact.displayName || contact.name}
-                    </p>
+                  <div className="flex gap-3 min-w-0">
+                    {/* Left side - Contact Info */}
+                    <div className="flex flex-col gap-2 min-w-0 flex-1">
+                      {/* Name */}
+                      <p className="font-semibold text-base break-words truncate">
+                        {contact.displayName || contact.name}
+                      </p>
+                      
+                      {/* Phone Number */}
+                      {contact.phoneNumber && (
+                        <div className="flex items-start gap-2 text-sm text-gray-600">
+                          <span className="text-base flex-shrink-0">📱</span>
+                          <PhoneNumberDisplay phoneNumber={contact.phoneNumber} />
+                        </div>
+                      )}
+                      
+                      {/* Pet Names */}
+                      {contact.petNames && contact.petNames.length > 0 && (
+                        <div className="flex items-start gap-2 text-sm text-gray-600">
+                          <span className="text-base flex-shrink-0">🐕</span>
+                          <span className="break-words">
+                            {contact.petNames.join(', ')}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* Animal Type/Breed */}
+                      {contact.animalType && (
+                        <div className="flex items-start gap-2 text-sm text-gray-600">
+                          <span className="text-base flex-shrink-0">🐾</span>
+                          <span className="capitalize break-words">
+                            {contact.animalType.replace('_', ' ')}{contact.breed && contact.animalType === 'dog' ? ` - ${contact.breed}` : ''}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                     
-                    {/* Phone Number */}
-                    {contact.phoneNumber && (
-                      <div className="flex items-start gap-2 text-sm text-gray-600">
-                        <span className="text-base flex-shrink-0">📱</span>
-                        <PhoneNumberDisplay phoneNumber={contact.phoneNumber} />
+                    {/* Right side - Permanent Notes */}
+                    {contact.notes && (
+                      <div className="flex-shrink-0 w-32 sm:w-40 bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2 border border-amber-200 dark:border-amber-800">
+                        <p className="text-xs font-medium text-amber-800 dark:text-amber-300 mb-1">Notes</p>
+                        <p className="text-xs text-amber-700 dark:text-amber-400 break-words line-clamp-4">
+                          {contact.notes}
+                        </p>
                       </div>
                     )}
-                    
-                    {/* Pet Names */}
-                    {contact.petNames && contact.petNames.length > 0 && (
-                      <div className="flex items-start gap-2 text-sm text-gray-600">
-                        <span className="text-base flex-shrink-0">🐕</span>
-                        <span className="break-words">
-                          {contact.petNames.join(', ')}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {/* Animal Type/Breed */}
-                    {contact.animalType && (
-                      <div className="flex items-start gap-2 text-sm text-gray-600">
-                        <span className="text-base flex-shrink-0">🐾</span>
-                        <span className="capitalize break-words">
-                          {contact.animalType.replace('_', ' ')}{contact.breed && contact.animalType === 'dog' ? ` - ${contact.breed}` : ''}
-                        </span>
-                      </div>
-                    )}
+                  </div>
+                  
+                  <div className="flex flex-col gap-2 min-w-0 mt-2">
                     
                     {/* Appointment History - visible when expanded */}
                     {contact.isDatabaseContact && isExpanded && contact.phoneNumber && (

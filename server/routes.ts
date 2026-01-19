@@ -1773,6 +1773,16 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const appointmentIds = filteredAppointments.map((apt: any) => apt.id);
       const petsByAppointmentId = await storage.getAppointmentPetsByAppointmentIds(appointmentIds);
       
+      // Get all contacts for looking up notes by phone number
+      const allContacts = await storage.getContacts();
+      const contactsByPhone = new Map<string, any>();
+      for (const contact of allContacts) {
+        if (contact.phoneNumber) {
+          const normalizedPhone = contact.phoneNumber.replace(/\D/g, '');
+          contactsByPhone.set(normalizedPhone, contact);
+        }
+      }
+      
       const appointmentsWithPets = filteredAppointments.map((apt: any) => {
         let pets = petsByAppointmentId.get(apt.id);
         
@@ -1792,9 +1802,20 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           }
         }
         
+        // Look up contact notes by phone number
+        let contactNotes = null;
+        if (apt.ownerPhoneNumber) {
+          const normalizedPhone = apt.ownerPhoneNumber.replace(/\D/g, '');
+          const contact = contactsByPhone.get(normalizedPhone);
+          if (contact?.notes) {
+            contactNotes = contact.notes;
+          }
+        }
+        
         return {
           ...apt,
-          pets
+          pets,
+          contactNotes
         };
       });
       
