@@ -112,6 +112,14 @@ const excelUpload = multer({
 
 export async function registerRoutes(app: Express, server?: Server): Promise<void> {
 
+  // Prevent browser caching of API responses to avoid stale data
+  app.use('/api', (req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    next();
+  });
+
   // Customer signup
   app.post('/api/auth/signup', async (req, res) => {
     try {
