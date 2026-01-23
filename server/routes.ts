@@ -1774,7 +1774,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const petsByAppointmentId = await storage.getAppointmentPetsByAppointmentIds(appointmentIds);
       
       // Get all contacts for looking up notes by phone number
-      const allContacts = await storage.getContacts();
+      const allContacts = await storage.getAllContacts();
       const contactsByPhone = new Map<string, any>();
       for (const contact of allContacts) {
         if (contact.phoneNumber) {
