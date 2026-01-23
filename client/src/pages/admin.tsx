@@ -41,6 +41,7 @@ import {
   Plus,
   Edit,
   Trash2,
+  User,
   Users,
   Calendar as CalendarIcon,
   ShoppingBag,
