@@ -41,7 +41,7 @@ import {
   Plus,
   Edit,
   Trash2,
-  User,
+  User as UserIcon,
   Users,
   Calendar as CalendarIcon,
   ShoppingBag,
@@ -12101,7 +12101,7 @@ export default function Admin() {
                           <AccordionTrigger className="hover:no-underline">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                                <User className="w-5 h-5 text-orange-600" />
+                                <UserIcon className="w-5 h-5 text-orange-600" />
                               </div>
                               <div className="text-left">
                                 <p className="font-medium">{groomer.name}</p>
