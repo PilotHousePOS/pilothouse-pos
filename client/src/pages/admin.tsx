@@ -84,7 +84,8 @@ import {
   Zap,
   CalendarX2,
   ClipboardPaste,
-  Send
+  Send,
+  Clock
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
