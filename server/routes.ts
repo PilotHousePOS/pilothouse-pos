@@ -3592,6 +3592,72 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Daily Sales Report Settings routes
+  app.get("/api/admin/daily-report-settings", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const settings = await storage.getGroomingSettings();
+      const enabledSetting = settings.find((s: any) => s.setting === 'daily_report_enabled');
+      const emailsSetting = settings.find((s: any) => s.setting === 'daily_report_emails');
+      const timeSetting = settings.find((s: any) => s.setting === 'daily_report_time');
+
+      res.json({
+        enabled: enabledSetting?.value === 'true',
+        emails: emailsSetting?.value || '',
+        time: timeSetting?.value || '21:00'
+      });
+    } catch (error) {
+      console.error("Error fetching daily report settings:", error);
+      res.status(500).json({ message: "Failed to fetch daily report settings" });
+    }
+  });
+
+  app.post("/api/admin/daily-report-settings", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { enabled, emails, time } = req.body;
+
+      // Save settings using grooming_settings table
+      await storage.upsertGroomingSetting({ setting: 'daily_report_enabled', value: enabled ? 'true' : 'false' });
+      await storage.upsertGroomingSetting({ setting: 'daily_report_emails', value: emails || '' });
+      await storage.upsertGroomingSetting({ setting: 'daily_report_time', value: time || '21:00' });
+
+      res.json({ success: true, message: "Daily report settings saved" });
+    } catch (error) {
+      console.error("Error saving daily report settings:", error);
+      res.status(500).json({ message: "Failed to save daily report settings" });
+    }
+  });
+
+  app.post("/api/admin/daily-report-settings/test", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { emails } = req.body;
+      
+      if (!emails || !emails.trim()) {
+        return res.status(400).json({ message: "Email address is required" });
+      }
+
+      // Import and call the sendDailySalesReport function
+      const { sendDailySalesReport } = await import('./dailySalesReport');
+      await sendDailySalesReport(emails.split(',').map((e: string) => e.trim()).filter((e: string) => e));
+
+      res.json({ success: true, message: "Test report sent successfully" });
+    } catch (error: any) {
+      console.error("Error sending test daily report:", error);
+      res.status(500).json({ message: error.message || "Failed to send test report" });
+    }
+  });
+
   // Grooming settings routes
   app.get("/api/admin/grooming-settings", authMiddleware, async (req: any, res) => {
     try {

@@ -166,6 +166,48 @@ export function initializeScheduledTasks() {
 
   // Google Calendar sync has been removed - transition period complete
 
+  // Daily Sales Report - runs every hour to check if it's time to send
+  cron.schedule('0 * * * *', async () => {
+    try {
+      const settings = await storage.getGroomingSettings();
+      const enabledSetting = settings.find((s: any) => s.setting === 'daily_report_enabled');
+      const emailsSetting = settings.find((s: any) => s.setting === 'daily_report_emails');
+      const timeSetting = settings.find((s: any) => s.setting === 'daily_report_time');
+
+      if (enabledSetting?.value !== 'true' || !emailsSetting?.value) {
+        return; // Report not enabled or no emails configured
+      }
+
+      const configuredTime = timeSetting?.value || '21:00';
+      const [configHour] = configuredTime.split(':').map(Number);
+      
+      // Get current hour in America/Chicago timezone
+      const now = new Date();
+      const currentHour = parseInt(now.toLocaleTimeString('en-US', { 
+        timeZone: 'America/Chicago', 
+        hour: '2-digit', 
+        hour12: false 
+      }));
+
+      if (currentHour === configHour) {
+        console.log(`Running scheduled Daily Sales Report at ${configuredTime} CST`);
+        
+        const { sendDailySalesReport } = await import('./dailySalesReport');
+        const emails = emailsSetting.value.split(',').map((e: string) => e.trim()).filter((e: string) => e);
+        
+        if (emails.length > 0) {
+          await sendDailySalesReport(emails);
+          console.log('Daily sales report sent successfully');
+        }
+      }
+    } catch (error) {
+      console.error('Error running daily sales report:', error);
+    }
+  }, {
+    timezone: "America/Chicago"
+  });
+
   console.log('Scheduled tasks initialized:');
   console.log('- Clear approved appointments and reset "Here"/"Paid" flags: Daily at 12:00 AM (CST)');
+  console.log('- Daily Sales Report: Hourly check (sends at configured time if enabled)');
 }

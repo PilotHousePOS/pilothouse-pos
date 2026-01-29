@@ -5264,7 +5264,7 @@ function EditAppointmentDialog({
 function EmailCenter() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'email' | 'sms' | 'automated'>('email');
+  const [activeTab, setActiveTab] = useState<'email' | 'sms' | 'automated' | 'daily-reports'>('email');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [sendToAll, setSendToAll] = useState(true);
@@ -5288,10 +5288,34 @@ function EmailCenter() {
     isActive: true
   });
 
+  // Daily report settings state
+  const [dailyReportSettings, setDailyReportSettings] = useState({
+    enabled: false,
+    emails: '',
+    time: '21:00'
+  });
+  const [isSavingDailyReport, setIsSavingDailyReport] = useState(false);
+
   // Fetch automated messages
   const { data: automatedMessages = [], isLoading: loadingAutoMessages } = useQuery<any[]>({
     queryKey: ['/api/admin/automated-messages'],
   });
+
+  // Fetch daily report settings
+  const { data: dailyReportData, isLoading: loadingDailyReport } = useQuery<any>({
+    queryKey: ['/api/admin/daily-report-settings'],
+  });
+
+  // Update local state when data is fetched
+  useEffect(() => {
+    if (dailyReportData) {
+      setDailyReportSettings({
+        enabled: dailyReportData.enabled || false,
+        emails: dailyReportData.emails || '',
+        time: dailyReportData.time || '21:00'
+      });
+    }
+  }, [dailyReportData]);
 
   // Fetch all recipients for selection
   const { data: recipients = [], isLoading: loadingRecipients } = useQuery<any[]>({
@@ -5457,6 +5481,93 @@ function EmailCenter() {
 
   const clearAll = () => {
     setSelectedRecipients([]);
+  };
+
+  const handleSaveDailyReportSettings = async () => {
+    if (dailyReportSettings.enabled && !dailyReportSettings.emails.trim()) {
+      toast({
+        title: "Missing Email",
+        description: "Please enter at least one email address for the daily report",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSavingDailyReport(true);
+    try {
+      const response = await fetch('/api/admin/daily-report-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(dailyReportSettings)
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Settings Saved",
+          description: "Daily sales report settings have been updated"
+        });
+        queryClient.invalidateQueries({ queryKey: ['/api/admin/daily-report-settings'] });
+      } else {
+        const result = await response.json();
+        toast({
+          title: "Failed to Save",
+          description: result.message || "Something went wrong",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save settings. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSavingDailyReport(false);
+    }
+  };
+
+  const handleSendTestReport = async () => {
+    if (!dailyReportSettings.emails.trim()) {
+      toast({
+        title: "Missing Email",
+        description: "Please enter an email address first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSavingDailyReport(true);
+    try {
+      const response = await fetch('/api/admin/daily-report-settings/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ emails: dailyReportSettings.emails })
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        toast({
+          title: "Test Report Sent",
+          description: result.message || "Check your email for the test report"
+        });
+      } else {
+        toast({
+          title: "Failed to Send",
+          description: result.message || "Something went wrong",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send test report. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSavingDailyReport(false);
+    }
   };
 
   const resetAutoMessageForm = () => {
@@ -5630,6 +5741,14 @@ function EmailCenter() {
             >
               <Clock className="w-4 h-4 mr-2" />
               Automated
+            </Button>
+            <Button
+              variant={activeTab === 'daily-reports' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => { setActiveTab('daily-reports'); setSelectedRecipients([]); }}
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              Daily Reports
             </Button>
           </div>
 
@@ -5830,8 +5949,106 @@ function EmailCenter() {
             </div>
           )}
 
+          {/* Daily Reports Tab */}
+          {activeTab === 'daily-reports' && (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Configure automatic daily sales reports to be emailed at the end of each day. 
+                This helps you track sales made through the app and update your POS inventory.
+              </p>
+
+              {loadingDailyReport ? (
+                <div className="text-center py-8 text-muted-foreground">Loading...</div>
+              ) : (
+                <div className="space-y-4 border rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base font-medium">Enable Daily Sales Report</Label>
+                      <p className="text-sm text-muted-foreground">Send a summary of all orders placed today</p>
+                    </div>
+                    <Switch
+                      checked={dailyReportSettings.enabled}
+                      onCheckedChange={(checked) => setDailyReportSettings({ ...dailyReportSettings, enabled: checked })}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="report-emails">Recipient Email(s) *</Label>
+                    <Input
+                      id="report-emails"
+                      type="text"
+                      placeholder="email1@example.com, email2@example.com"
+                      value={dailyReportSettings.emails}
+                      onChange={(e) => setDailyReportSettings({ ...dailyReportSettings, emails: e.target.value })}
+                      className="mt-1"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Separate multiple email addresses with commas
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="report-time">Send Time (CST)</Label>
+                    <Select
+                      value={dailyReportSettings.time}
+                      onValueChange={(value) => setDailyReportSettings({ ...dailyReportSettings, time: value })}
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Select time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="18:00">6:00 PM</SelectItem>
+                        <SelectItem value="19:00">7:00 PM</SelectItem>
+                        <SelectItem value="20:00">8:00 PM</SelectItem>
+                        <SelectItem value="21:00">9:00 PM</SelectItem>
+                        <SelectItem value="22:00">10:00 PM</SelectItem>
+                        <SelectItem value="23:00">11:00 PM</SelectItem>
+                        <SelectItem value="23:59">11:59 PM</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-sm">
+                    <p className="text-blue-800 dark:text-blue-300">
+                      <strong>Report includes:</strong> All orders placed today with item names, quantities, prices, and customer information. 
+                      Use this to update your Exatouch POS inventory.
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <Button 
+                      onClick={handleSaveDailyReportSettings} 
+                      disabled={isSavingDailyReport}
+                      className="flex-1 bg-brand-blue hover:bg-blue-600"
+                    >
+                      {isSavingDailyReport ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4 mr-2" />
+                          Save Settings
+                        </>
+                      )}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={handleSendTestReport}
+                      disabled={isSavingDailyReport || !dailyReportSettings.emails.trim()}
+                    >
+                      <Send className="w-4 h-4 mr-2" />
+                      Send Test Report
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Email/SMS Content */}
-          {activeTab !== 'automated' && (
+          {(activeTab === 'email' || activeTab === 'sms') && (
             <>
           {/* Role Filter */}
           <div className="space-y-2">
