@@ -5717,11 +5717,12 @@ function EmailCenter() {
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Tab Selection */}
-          <div className="flex gap-2 border-b pb-2">
+          <div className="flex gap-2 border-b pb-2 overflow-x-auto">
             <Button
               variant={activeTab === 'email' ? 'default' : 'outline'}
               size="sm"
               onClick={() => { setActiveTab('email'); setSelectedRecipients([]); }}
+              className="flex-shrink-0"
             >
               <Mail className="w-4 h-4 mr-2" />
               Email
@@ -5730,6 +5731,7 @@ function EmailCenter() {
               variant={activeTab === 'sms' ? 'default' : 'outline'}
               size="sm"
               onClick={() => { setActiveTab('sms'); setSelectedRecipients([]); }}
+              className="flex-shrink-0"
             >
               <Phone className="w-4 h-4 mr-2" />
               Text Message
@@ -5738,6 +5740,7 @@ function EmailCenter() {
               variant={activeTab === 'automated' ? 'default' : 'outline'}
               size="sm"
               onClick={() => { setActiveTab('automated'); setSelectedRecipients([]); }}
+              className="flex-shrink-0"
             >
               <Clock className="w-4 h-4 mr-2" />
               Automated
@@ -5746,6 +5749,7 @@ function EmailCenter() {
               variant={activeTab === 'daily-reports' ? 'default' : 'outline'}
               size="sm"
               onClick={() => { setActiveTab('daily-reports'); setSelectedRecipients([]); }}
+              className="flex-shrink-0"
             >
               <FileText className="w-4 h-4 mr-2" />
               Daily Reports
