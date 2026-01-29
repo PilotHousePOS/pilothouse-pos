@@ -34,6 +34,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -362,7 +363,22 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
             <Button variant="outline" size="sm" onClick={() => changeDate(-1)}>
               ← Previous Day
             </Button>
-            <h3 className="text-lg font-semibold whitespace-nowrap">{formatDate(selectedDate)}</h3>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="text-lg font-semibold whitespace-nowrap">
+                  {formatDate(selectedDate)}
+                  <CalendarIcon className="w-4 h-4 ml-2" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => date && setSelectedDate(date)}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
             <Button variant="outline" size="sm" onClick={() => changeDate(1)}>
               Next Day →
             </Button>
