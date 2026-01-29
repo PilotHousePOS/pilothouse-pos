@@ -13,34 +13,43 @@ export async function sendPasswordResetEmail(toEmail: string, resetToken: string
     
     const msg = {
       to: toEmail,
-      from: fromEmail,
-      subject: 'Animal House - Password Reset Request',
-      text: `You requested a password reset. Click this link to reset your password: ${resetLink}\n\nThis link will expire in 1 hour.\n\nIf you didn't request this, please ignore this email.`,
+      from: {
+        email: fromEmail,
+        name: 'Animal House Pet Store'
+      },
+      subject: 'Your Animal House Account - Action Required',
+      text: `Animal House Pet Store - Account Security\n\nHello,\n\nWe received a request to update your account credentials. To complete this process, please visit:\n\n${resetLink}\n\nThis link expires in 1 hour.\n\nIf you did not make this request, no action is needed - your account remains secure.\n\nThank you,\nAnimal House Pet Store\n318-323-6090`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background-color: #1e40af; color: white; padding: 20px; text-align: center;">
+          <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
             <h1 style="margin: 0;">Animal House Pet Store</h1>
           </div>
-          <div style="padding: 30px; background-color: #f9fafb;">
-            <h2 style="color: #1f2937;">Password Reset Request</h2>
-            <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">
-              You requested to reset your password. Click the button below to create a new password:
+          <div style="padding: 30px; background-color: #f9f9f9;">
+            <h2 style="color: #333; margin-bottom: 20px;">🔐 Account Security Update</h2>
+            <p style="font-size: 16px; line-height: 1.5;">
+              We received a request to update your account credentials. Click below to continue:
             </p>
             <div style="text-align: center; margin: 30px 0;">
               <a href="${resetLink}" 
-                 style="background-color: #1e40af; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
-                Reset Password
+                 style="background-color: #dc2626; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+                Update Account
               </a>
             </div>
-            <p style="color: #6b7280; font-size: 14px;">
-              This link will expire in 1 hour for security purposes.
+            <div style="background-color: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p style="margin: 0; color: #92400e; font-size: 14px;">
+                <strong>Security Notice:</strong> This link expires in 1 hour. If you didn't request this, no action is needed.
+              </p>
+            </div>
+            <p style="font-size: 14px; color: #666;">
+              If the button doesn't work, copy and paste this link into your browser:
             </p>
-            <p style="color: #6b7280; font-size: 14px;">
-              If you didn't request this password reset, please ignore this email. Your password will remain unchanged.
+            <p style="font-size: 12px; color: #999; word-break: break-all;">
+              ${resetLink}
             </p>
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
             <p style="color: #9ca3af; font-size: 12px; text-align: center;">
-              Animal House Pet Store - Your trusted pet care partner
+              Animal House Pet Store | 318-323-6090<br>
+              Your trusted pet care partner
             </p>
           </div>
         </div>
