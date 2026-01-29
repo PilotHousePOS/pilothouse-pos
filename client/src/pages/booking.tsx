@@ -391,11 +391,16 @@ export default function Booking() {
       return `${year}-${month}-${day}`;
     };
     
-    // Always include the primary selected date
-    appointmentDates.push(formatDate(selectedDate));
-    
-    if (isRecurring) {
-      if (recurringType === 'monthly') {
+    if (isRecurring && recurringType === 'custom' && customRecurringDates.length > 0) {
+      // For custom recurring, use ONLY the custom dates (they already include all selected dates)
+      customRecurringDates.forEach(date => {
+        appointmentDates.push(formatDate(date));
+      });
+    } else {
+      // For single appointment or monthly recurring, start with the primary selected date
+      appointmentDates.push(formatDate(selectedDate));
+      
+      if (isRecurring && recurringType === 'monthly') {
         // Generate dates for the next 6 months on the same day
         for (let i = 1; i <= 6; i++) {
           const futureDate = new Date(selectedDate);
@@ -407,13 +412,11 @@ export default function Booking() {
           }
           appointmentDates.push(formatDate(futureDate));
         }
-      } else if (recurringType === 'custom' && customRecurringDates.length > 0) {
-        // Add custom selected dates
-        customRecurringDates.forEach(date => {
-          appointmentDates.push(formatDate(date));
-        });
       }
     }
+    
+    // Remove any duplicate dates (safety check)
+    const uniqueAppointmentDates = [...new Set(appointmentDates)];
 
     const baseAppointmentData = {
       appointmentTime: selectedTime,
@@ -434,11 +437,11 @@ export default function Booking() {
     };
 
     // Create appointments for all dates
-    if (appointmentDates.length === 1) {
+    if (uniqueAppointmentDates.length === 1) {
       // Single appointment
       createAppointmentMutation.mutate({
         ...baseAppointmentData,
-        appointmentDate: appointmentDates[0],
+        appointmentDate: uniqueAppointmentDates[0],
       });
     } else {
       // Multiple appointments - create them sequentially
@@ -447,7 +450,7 @@ export default function Booking() {
       let capacityFailedDates: string[] = [];
       let unauthorizedError = false;
       
-      for (const date of appointmentDates) {
+      for (const date of uniqueAppointmentDates) {
         try {
           await apiRequest("POST", "/api/appointments", {
             ...baseAppointmentData,
