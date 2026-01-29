@@ -8158,7 +8158,7 @@ export default function Admin() {
     if (!appointments) return;
     
     const approvedAppointments = (appointments as any[]).filter(
-      (a: any) => a.status === 'confirmed' || a.status === 'completed'
+      (a: any) => a.status === 'confirmed'
     );
     const totalPages = Math.ceil(approvedAppointments.length / APPOINTMENTS_PER_PAGE);
     
@@ -8992,7 +8992,8 @@ export default function Admin() {
     
     const approvedAppts = ((search.trim() ? filteredAppointments : appointments) as any[])
       .filter((a: any) => {
-        if (a.status !== 'confirmed' && a.status !== 'completed') return false;
+        // Only show confirmed appointments (completed should be removed from this list)
+        if (a.status !== 'confirmed') return false;
         
         // When filtering by "Here", only show appointments marked as here
         // EXCEPTION: Always show paid appointments regardless of "Here" filter
