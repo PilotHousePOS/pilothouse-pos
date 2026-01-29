@@ -383,7 +383,6 @@ export default function Booking() {
     }, 0);
 
     // Build list of dates to create appointments for
-    const appointmentDates: string[] = [];
     const formatDate = (d: Date) => {
       const year = d.getFullYear();
       const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -391,16 +390,14 @@ export default function Booking() {
       return `${year}-${month}-${day}`;
     };
     
-    if (isRecurring && recurringType === 'custom' && customRecurringDates.length > 0) {
-      // For custom recurring, use ONLY the custom dates (they already include all selected dates)
-      customRecurringDates.forEach(date => {
-        appointmentDates.push(formatDate(date));
-      });
-    } else {
-      // For single appointment or monthly recurring, start with the primary selected date
-      appointmentDates.push(formatDate(selectedDate));
-      
-      if (isRecurring && recurringType === 'monthly') {
+    // Use a Set to automatically prevent duplicates
+    const appointmentDateSet = new Set<string>();
+    
+    // Always include the primary selected date
+    appointmentDateSet.add(formatDate(selectedDate));
+    
+    if (isRecurring) {
+      if (recurringType === 'monthly') {
         // Generate dates for the next 6 months on the same day
         for (let i = 1; i <= 6; i++) {
           const futureDate = new Date(selectedDate);
@@ -410,13 +407,17 @@ export default function Booking() {
             // Set to last day of previous month
             futureDate.setDate(0);
           }
-          appointmentDates.push(formatDate(futureDate));
+          appointmentDateSet.add(formatDate(futureDate));
         }
+      } else if (recurringType === 'custom' && customRecurringDates.length > 0) {
+        // Add custom selected dates (Set prevents duplicates automatically)
+        customRecurringDates.forEach(date => {
+          appointmentDateSet.add(formatDate(date));
+        });
       }
     }
     
-    // Remove any duplicate dates (safety check)
-    const uniqueAppointmentDates = [...new Set(appointmentDates)];
+    const uniqueAppointmentDates = [...appointmentDateSet];
 
     const baseAppointmentData = {
       appointmentTime: selectedTime,
