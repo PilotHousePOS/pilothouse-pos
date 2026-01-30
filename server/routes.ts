@@ -3874,6 +3874,19 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Tax rate endpoint (public for cart checkout)
+  app.get("/api/settings/tax-rate", async (_req, res) => {
+    try {
+      const settings = await storage.getGroomingSettings();
+      const taxSetting = settings.find(s => s.setting === 'tax_rate');
+      const taxRate = taxSetting ? parseFloat(taxSetting.value) : 0;
+      res.json({ taxRate });
+    } catch (error) {
+      console.error("Error fetching tax rate:", error);
+      res.json({ taxRate: 0 });
+    }
+  });
+
   // Daily appointment limit routes
   app.get("/api/admin/daily-limits", authMiddleware, async (req: any, res) => {
     try {

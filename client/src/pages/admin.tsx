@@ -7104,7 +7104,7 @@ export default function Admin() {
   const [isAddBoardingOpen, setIsAddBoardingOpen] = useState(false);
   const [showApprovedAppointments, setShowApprovedAppointments] = useState(false);
   const [showDeniedAppointments, setShowDeniedAppointments] = useState(false);
-  const [showPendingOrders, setShowPendingOrders] = useState(true);
+  const [showPendingOrders, setShowPendingOrders] = useState(false);
   const [filterByHere, setFilterByHere] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<any>(null);
   const [isCategorizing, setIsCategorizing] = useState(false);
