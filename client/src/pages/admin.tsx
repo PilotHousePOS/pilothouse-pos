@@ -8904,7 +8904,7 @@ export default function Admin() {
   });
 
   const pendingAppointments = (appointments as any[]).filter((a: any) => a.status === 'scheduled').length;
-  const pendingOrders = (orders as any[]).filter((o: any) => o.status === 'pending').length;
+  const pendingOrdersCount = (orders as any[]).filter((o: any) => o.status === 'pending').length;
   
   // Calculate customers here - filter appointments with isHere = true from today onwards
   const today = new Date();
@@ -9199,7 +9199,7 @@ export default function Admin() {
         <Card className="min-h-[120px]">
           <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
             <ShoppingBag className="w-8 h-8 mb-3 text-brand-red" />
-            <div className="text-2xl font-bold mb-1">{pendingOrders}</div>
+            <div className="text-2xl font-bold mb-1">{pendingOrdersCount}</div>
             <div className="text-sm text-gray-500">Pending Orders</div>
           </CardContent>
         </Card>
