@@ -177,9 +177,9 @@ Step 5: NEVER mark task complete until verification passes
 ### Brand-Specific Manufacturer URLs:
 - **Fromm**: https://frommfamily.com/products/dog/ or /cat/
 - **NutriSource**: https://nutrisourcepetfoods.com/products/
-- **Science Diet**: https://www.hillspet.com/dog-food or /cat-food
+- **Science Diet**: https://hillspet.com/dog-food or /cat-food
 - **Blue Buffalo**: https://bluebuffalo.com/
-- **Pro Plan**: https://www.purina.com/pro-plan/
+- **Pro Plan**: https://purina.com/pro-plan/
 
 ## System Architecture
 The Animal House Pet Store application is a full-stack, mobile-first web solution designed for robust e-commerce and service management.
