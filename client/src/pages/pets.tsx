@@ -160,21 +160,7 @@ export default function Pets() {
         </div>
       ) : (
         <>
-          <div 
-            className="grid grid-cols-2 gap-4"
-            onTouchStart={(e) => setTouchStart(e.targetTouches[0].clientX)}
-            onTouchMove={(e) => setTouchEnd(e.targetTouches[0].clientX)}
-            onTouchEnd={() => {
-              if (touchStart - touchEnd > 75 && currentPage < totalPages - 1) {
-                setCurrentPage(currentPage + 1);
-              }
-              if (touchStart - touchEnd < -75 && currentPage > 0) {
-                setCurrentPage(currentPage - 1);
-              }
-              setTouchStart(0);
-              setTouchEnd(0);
-            }}
-          >
+          <div className="grid grid-cols-2 gap-4">
             {pets.map((pet: any) => (
               <PetCard key={pet.id} pet={pet} />
             ))}

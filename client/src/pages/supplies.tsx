@@ -659,19 +659,7 @@ export default function Supplies() {
         </div>
       ) : (
         <>
-          <div 
-            className="space-y-4"
-            onTouchStart={(e) => setTouchStart(e.targetTouches[0].clientX)}
-            onTouchMove={(e) => setTouchEnd(e.targetTouches[0].clientX)}
-            onTouchEnd={() => {
-              if (touchStart - touchEnd > 75 && currentPage < totalPages - 1) {
-                setCurrentPage(currentPage + 1);
-              }
-              if (touchStart - touchEnd < -75 && currentPage > 0) {
-                setCurrentPage(currentPage - 1);
-              }
-            }}
-          >
+          <div className="space-y-4">
             {supplies.map((supply) => (
               <SupplyCard key={supply.id} supply={supply} />
             ))}
