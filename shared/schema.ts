@@ -148,6 +148,7 @@ export const orders = pgTable("orders", {
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
   status: varchar("status", { length: 50 }).default("pending"), // pending, confirmed, shipped, delivered, cancelled
   approvalStatus: varchar("approval_status", { length: 50 }).default("pending_approval"), // pending_approval, approved, ready_for_pickup, picked_up
+  outOfStockPreference: varchar("out_of_stock_preference", { length: 50 }).default("contact_me"), // substitute, no_replace, contact_me
   customerEmail: varchar("customer_email", { length: 255 }),
   customerPhone: varchar("customer_phone", { length: 20 }),
   customerName: varchar("customer_name", { length: 255 }),

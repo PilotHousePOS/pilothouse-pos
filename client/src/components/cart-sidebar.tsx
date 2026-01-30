@@ -33,6 +33,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [outOfStockPreference, setOutOfStockPreference] = useState("contact_me");
 
   const { data: cartItems = [], isLoading } = useQuery({
     queryKey: ["/api/cart"],
@@ -214,6 +215,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
       orderData: {
         totalAmount: totalAmount.toFixed(2),
         shippingAddress: "In-Store Pickup - Animal House Pet Store",
+        outOfStockPreference,
       },
       items: orderItems,
     });
@@ -376,6 +378,56 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                   <span>Total:</span>
                   <span className="text-brand-red">${totalAmount.toFixed(2)}</span>
                 </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                If an item is out of stock:
+              </label>
+              <div className="space-y-2">
+                <label className="flex items-start space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                  <input
+                    type="radio"
+                    name="outOfStock"
+                    value="contact_me"
+                    checked={outOfStockPreference === "contact_me"}
+                    onChange={(e) => setOutOfStockPreference(e.target.value)}
+                    className="mt-0.5"
+                  />
+                  <div>
+                    <span className="font-medium">Contact me</span>
+                    <p className="text-sm text-gray-600">We'll call you to discuss alternatives</p>
+                  </div>
+                </label>
+                <label className="flex items-start space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                  <input
+                    type="radio"
+                    name="outOfStock"
+                    value="substitute"
+                    checked={outOfStockPreference === "substitute"}
+                    onChange={(e) => setOutOfStockPreference(e.target.value)}
+                    className="mt-0.5"
+                  />
+                  <div>
+                    <span className="font-medium">Replace with closest substitute</span>
+                    <p className="text-sm text-gray-600">We'll pick a similar product for you</p>
+                  </div>
+                </label>
+                <label className="flex items-start space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                  <input
+                    type="radio"
+                    name="outOfStock"
+                    value="no_replace"
+                    checked={outOfStockPreference === "no_replace"}
+                    onChange={(e) => setOutOfStockPreference(e.target.value)}
+                    className="mt-0.5"
+                  />
+                  <div>
+                    <span className="font-medium">Don't replace</span>
+                    <p className="text-sm text-gray-600">Just remove the item from my order</p>
+                  </div>
+                </label>
               </div>
             </div>
 

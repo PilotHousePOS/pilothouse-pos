@@ -9909,6 +9909,17 @@ export default function Admin() {
                                 Total: ${order.totalAmount}
                               </p>
                               
+                              {order.outOfStockPreference && (
+                                <div className="mt-2 p-2 bg-gray-100 rounded text-sm">
+                                  <span className="font-medium">If out of stock: </span>
+                                  <span className="text-gray-700">
+                                    {order.outOfStockPreference === 'contact_me' && 'Contact customer'}
+                                    {order.outOfStockPreference === 'substitute' && 'Replace with substitute'}
+                                    {order.outOfStockPreference === 'no_replace' && "Don't replace - remove item"}
+                                  </span>
+                                </div>
+                              )}
+                              
                               <p className="text-xs text-gray-500 mt-1">
                                 Ordered: {new Date(order.orderDate).toLocaleDateString()}
                               </p>
