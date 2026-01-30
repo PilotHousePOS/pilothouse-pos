@@ -3887,6 +3887,27 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Set tax rate (Admin only)
+  app.put("/api/admin/settings/tax-rate", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { taxRate } = req.body;
+      if (typeof taxRate !== 'number' || taxRate < 0 || taxRate > 100) {
+        return res.status(400).json({ message: "Tax rate must be a number between 0 and 100" });
+      }
+
+      await storage.setGroomingSetting('tax_rate', taxRate.toString());
+      res.json({ success: true, taxRate });
+    } catch (error) {
+      console.error("Error setting tax rate:", error);
+      res.status(500).json({ message: "Failed to set tax rate" });
+    }
+  });
+
   // Daily appointment limit routes
   app.get("/api/admin/daily-limits", authMiddleware, async (req: any, res) => {
     try {

@@ -4064,6 +4064,97 @@ function EditAppointmentDialog({
 
 // EmailCenter component moved to client/src/components/admin/EmailCenter.tsx
 
+// Settings Panel Component
+function SettingsPanel() {
+  const { toast } = useToast();
+  const [taxRate, setTaxRate] = useState<number>(0);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const { data: taxData, isLoading } = useQuery({
+    queryKey: ['/api/settings/tax-rate'],
+  });
+
+  useEffect(() => {
+    if (taxData && typeof (taxData as any).taxRate === 'number') {
+      setTaxRate((taxData as any).taxRate);
+    }
+  }, [taxData]);
+
+  const handleSaveTaxRate = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/admin/settings/tax-rate', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ taxRate }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to save tax rate');
+      }
+      
+      toast({
+        title: "Settings saved",
+        description: `Tax rate set to ${taxRate}%`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save tax rate",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Settings className="w-5 h-5" />
+          Store Settings
+        </CardTitle>
+        <CardDescription>Configure store-wide settings</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Tax Settings</h3>
+          <div className="flex items-center gap-4">
+            <div className="flex-1 max-w-xs">
+              <Label htmlFor="tax-rate">Sales Tax Rate (%)</Label>
+              <div className="flex items-center gap-2 mt-2">
+                <Input
+                  id="tax-rate"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  value={taxRate}
+                  onChange={(e) => setTaxRate(parseFloat(e.target.value) || 0)}
+                  className="w-32"
+                  disabled={isLoading}
+                />
+                <span className="text-gray-500">%</span>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                This tax rate will be applied to all orders at checkout
+              </p>
+            </div>
+          </div>
+          <Button 
+            onClick={handleSaveTaxRate} 
+            disabled={isSaving || isLoading}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            {isSaving ? 'Saving...' : 'Save Tax Settings'}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 // Astro Loyalty Manager Component
 function AstroLoyaltyManager() {
@@ -6570,6 +6661,11 @@ export default function Admin() {
               <TabsTrigger value="email-center" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 <span className="hidden lg:inline">Email Center</span>
                 <span className="lg:hidden">Email</span>
+              </TabsTrigger>
+            )}
+            {typedUser?.isAdmin && (
+              <TabsTrigger value="settings" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                Settings
               </TabsTrigger>
             )}
           </TabsList>
@@ -9865,6 +9961,10 @@ export default function Admin() {
 
         <TabsContent value="email-center" className="space-y-6">
           <EmailCenter groomingSettings={groomingSettings as any[]} />
+        </TabsContent>
+
+        <TabsContent value="settings" className="space-y-6">
+          <SettingsPanel />
         </TabsContent>
       </Tabs>
 
