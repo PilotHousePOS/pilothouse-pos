@@ -39,15 +39,17 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     enabled: isOpen,
   });
 
-  const { data: supplies = [] } = useQuery({
+  const { data: suppliesData } = useQuery({
     queryKey: ["/api/supplies"],
     enabled: isOpen && cartItems.length > 0,
   });
+  const supplies = suppliesData?.items || [];
 
-  const { data: pets = [] } = useQuery({
+  const { data: petsData } = useQuery({
     queryKey: ["/api/pets"],
     enabled: isOpen && cartItems.length > 0,
   });
+  const pets = petsData?.pets || [];
 
   const updateQuantityMutation = useMutation({
     mutationFn: async ({ id, quantity }: { id: number; quantity: number }) => {
