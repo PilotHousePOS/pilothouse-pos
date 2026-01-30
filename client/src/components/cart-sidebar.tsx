@@ -51,14 +51,12 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   });
   const pets = petsData?.pets || [];
 
-  // Fetch tax rate from grooming settings
-  const { data: groomingSettings = [] } = useQuery<any[]>({
-    queryKey: ["/api/admin/grooming-settings"],
+  // Fetch tax rate from public endpoint
+  const { data: taxData } = useQuery<{ taxRate: number }>({
+    queryKey: ["/api/settings/tax-rate"],
     enabled: isOpen,
   });
-  
-  const taxRateSetting = (groomingSettings as any[])?.find(s => s.setting === 'tax_rate');
-  const taxRate = parseFloat(taxRateSetting?.value || '0');
+  const taxRate = taxData?.taxRate || 0;
 
   const updateQuantityMutation = useMutation({
     mutationFn: async ({ id, quantity }: { id: number; quantity: number }) => {
