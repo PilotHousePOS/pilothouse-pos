@@ -51,6 +51,15 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   });
   const pets = petsData?.pets || [];
 
+  // Fetch tax rate from grooming settings
+  const { data: groomingSettings = [] } = useQuery<any[]>({
+    queryKey: ["/api/admin/grooming-settings"],
+    enabled: isOpen,
+  });
+  
+  const taxRateSetting = (groomingSettings as any[])?.find(s => s.setting === 'tax_rate');
+  const taxRate = parseFloat(taxRateSetting?.value || '0');
+
   const updateQuantityMutation = useMutation({
     mutationFn: async ({ id, quantity }: { id: number; quantity: number }) => {
       await apiRequest("PUT", `/api/cart/${id}`, { quantity });
@@ -176,9 +185,12 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     details: getItemDetails(item)
   }));
 
-  const totalAmount = cartItemsWithDetails.reduce((total, item) => {
+  const subtotal = cartItemsWithDetails.reduce((total, item) => {
     return total + (parseFloat(item.details.price) * item.quantity);
   }, 0);
+  
+  const taxAmount = subtotal * (taxRate / 100);
+  const totalAmount = subtotal + taxAmount;
 
   const handleCheckout = () => {
     if (cartItems.length === 0) {
@@ -305,9 +317,21 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
           {cartItems.length > 0 && (
             <div className="border-t p-6 space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold">Total:</span>
-                <span className="text-lg font-bold text-brand-red">${totalAmount.toFixed(2)}</span>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-sm">
+                  <span>Subtotal:</span>
+                  <span>${subtotal.toFixed(2)}</span>
+                </div>
+                {taxRate > 0 && (
+                  <div className="flex justify-between items-center text-sm text-muted-foreground">
+                    <span>Tax ({taxRate}%):</span>
+                    <span>${taxAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-semibold">Total:</span>
+                  <span className="text-lg font-bold text-brand-red">${totalAmount.toFixed(2)}</span>
+                </div>
               </div>
               <Button 
                 onClick={handleCheckout}
@@ -339,9 +363,21 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                 ))}
               </div>
               <Separator className="my-2" />
-              <div className="flex justify-between font-semibold">
-                <span>Total:</span>
-                <span className="text-brand-red">${totalAmount.toFixed(2)}</span>
+              <div className="space-y-1">
+                <div className="flex justify-between text-sm">
+                  <span>Subtotal:</span>
+                  <span>${subtotal.toFixed(2)}</span>
+                </div>
+                {taxRate > 0 && (
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>Tax ({taxRate}%):</span>
+                    <span>${taxAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between font-semibold">
+                  <span>Total:</span>
+                  <span className="text-brand-red">${totalAmount.toFixed(2)}</span>
+                </div>
               </div>
             </div>
 

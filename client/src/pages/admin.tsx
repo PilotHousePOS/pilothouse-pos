@@ -5312,6 +5312,10 @@ function EmailCenter() {
   });
   const [isSavingDailyReport, setIsSavingDailyReport] = useState(false);
 
+  // Tax settings state
+  const [taxRate, setTaxRate] = useState('0');
+  const [isSavingTax, setIsSavingTax] = useState(false);
+
   // Fetch automated messages
   const { data: automatedMessages = [], isLoading: loadingAutoMessages } = useQuery<any[]>({
     queryKey: ['/api/admin/automated-messages'],
@@ -5332,6 +5336,40 @@ function EmailCenter() {
       });
     }
   }, [dailyReportData]);
+
+  // Fetch tax rate from grooming settings
+  useEffect(() => {
+    const taxSetting = (groomingSettings as any[])?.find(s => s.setting === 'tax_rate');
+    if (taxSetting) {
+      setTaxRate(taxSetting.value || '0');
+    }
+  }, [groomingSettings]);
+
+  // Save tax rate handler
+  const handleSaveTaxRate = async () => {
+    setIsSavingTax(true);
+    try {
+      await fetch('/api/admin/grooming-settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ setting: 'tax_rate', value: taxRate })
+      });
+      toast({
+        title: "Tax Rate Saved",
+        description: `Tax rate set to ${taxRate}%`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/grooming-settings'] });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save tax rate",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSavingTax(false);
+    }
+  };
 
   // Fetch all recipients for selection
   const { data: recipients = [], isLoading: loadingRecipients } = useQuery<any[]>({
@@ -6064,6 +6102,53 @@ function EmailCenter() {
                   </div>
                 </div>
               )}
+
+              {/* Tax Settings */}
+              <div className="mt-6 border-t pt-6">
+                <h4 className="text-lg font-semibold mb-2">Tax Settings</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Set a blanket tax rate to apply to all orders at checkout.
+                </p>
+                <div className="space-y-4 border rounded-lg p-4">
+                  <div>
+                    <Label htmlFor="tax-rate">Tax Rate (%)</Label>
+                    <div className="flex gap-2 mt-1">
+                      <Input
+                        id="tax-rate"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        max="100"
+                        placeholder="10.99"
+                        value={taxRate}
+                        onChange={(e) => setTaxRate(e.target.value)}
+                        className="max-w-32"
+                      />
+                      <span className="flex items-center text-muted-foreground">%</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Enter the tax percentage (e.g., 10.99 for 10.99% tax)
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={handleSaveTaxRate}
+                    disabled={isSavingTax}
+                    className="bg-brand-blue hover:bg-blue-600"
+                  >
+                    {isSavingTax ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4 mr-2" />
+                        Save Tax Rate
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
 

@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store project is a mobile-first web application for online retail of exotic reptiles, pet supplies, and professional grooming services. Its purpose is to provide an intuitive user experience, streamline product and service management, ensure secure transactions, and cultivate customer loyalty. The project aims to be a leader in the exotic pet retail and service industry through specialized inventory, robust e-commerce capabilities, and a seamless user experience, with a focus on exotic reptiles as a specialty.
+The Animal House Pet Store project is a mobile-first web application for online retail of exotic reptiles, pet supplies, and professional grooming services. Its purpose is to provide an intuitive user experience, streamline product and service management, ensure secure transactions, and cultivate customer loyalty. The project aims to be a leader in the exotic pet retail and service industry through specialized inventory, robust e-commerce capabilities, and a seamless user experience.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -98,7 +98,7 @@ The Animal House Pet Store project is a mobile-first web application for online 
     - Regular Adult & Senior (7+, 11+) = Red band
     - Treats = Red band (EXCEPT Flexi-Stix, Soft-Baked, Grain Free Crunchy)
     - Flexi-Stix = Burgundy/Purple band
-    - Soft-Baked treats (Soft Beef, Soft Chicken, Soft Duck) = Green/Lime band
+    - Soft-Baked treats (Soft Chicken, Soft Beef, Soft Duck) = Green/Lime band
     - Grain Free Crunchy Naturals = Green/Lime band
   - **NutriSource Color Rules (use AI Vision for packaging detection):**
     - Chicken & Rice (dry bags) = Blue
@@ -200,13 +200,13 @@ The Animal House Pet Store application is a full-stack, mobile-first web solutio
 - **UPC Matching System**: A robust system handles UPC matching, including abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
 
 **System Design Choices:**
-- **Frontend**: Utilizes React, Vite, TypeScript, Tailwind CSS, and shadcn/ui for a modern, responsive user interface.
-- **Backend**: Developed with Express.js and TypeScript, providing a scalable and maintainable server-side.
-- **Database**: PostgreSQL is used as the primary database, managed through Drizzle ORM for efficient data interaction.
-- **Authentication**: JWT tokens are employed for secure authentication, with tokens stored in cookies.
-- **State Management**: TanStack Query is used for effective data fetching, caching, and state synchronization.
-- **Routing**: Wouter is used for client-side routing.
-- **Development Practices**: Adheres to strict TypeScript for type safety, uses proper HTTP status codes, and implements environment-aware configurations.
+- **Frontend**: Utilizes React, Vite, TypeScript, Tailwind CSS, and shadcn/ui.
+- **Backend**: Developed with Express.js and TypeScript.
+- **Database**: PostgreSQL with Drizzle ORM.
+- **Authentication**: JWT tokens stored in cookies.
+- **State Management**: TanStack Query.
+- **Routing**: Wouter.
+- **Development Practices**: Strict TypeScript, proper HTTP status codes, environment-aware configurations.
 
 ## External Dependencies
 - PostgreSQL
