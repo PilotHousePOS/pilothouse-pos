@@ -212,7 +212,7 @@ The Animal House Pet Store application is a full-stack, mobile-first web solutio
 - PostgreSQL
 - Drizzle ORM
 - SendGrid
-- Twilio (not yet configured - for future SMS notifications)
+- Twilio
 - Google Calendar
 - Astro Loyalty
 - OpenAI (AI Vision)
