@@ -7104,6 +7104,7 @@ export default function Admin() {
   const [isAddBoardingOpen, setIsAddBoardingOpen] = useState(false);
   const [showApprovedAppointments, setShowApprovedAppointments] = useState(false);
   const [showDeniedAppointments, setShowDeniedAppointments] = useState(false);
+  const [showPendingOrders, setShowPendingOrders] = useState(true);
   const [filterByHere, setFilterByHere] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<any>(null);
   const [isCategorizing, setIsCategorizing] = useState(false);
@@ -7280,6 +7281,11 @@ export default function Admin() {
   const { data: orders = [] } = useQuery({
     queryKey: ["/api/orders"],
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
+  });
+  
+  const { data: pendingOrders = [], refetch: refetchPendingOrders } = useQuery<any[]>({
+    queryKey: ["/api/admin/pending-orders"],
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
   const { data: appointments = [] } = useQuery<any[]>({
@@ -8121,6 +8127,69 @@ export default function Admin() {
       toast({
         title: "Cleanup Failed",
         description: "Failed to cleanup past appointments.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const approveOrderMutation = useMutation({
+    mutationFn: async (orderId: number) => {
+      return await apiRequest("POST", `/api/admin/orders/${orderId}/approve`, {});
+    },
+    onSuccess: () => {
+      toast({
+        title: "Order Approved",
+        description: "Customer has been notified via email.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pending-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to approve order.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const orderReadyMutation = useMutation({
+    mutationFn: async (orderId: number) => {
+      return await apiRequest("POST", `/api/admin/orders/${orderId}/ready`, {});
+    },
+    onSuccess: () => {
+      toast({
+        title: "Order Ready",
+        description: "Customer has been notified their order is ready for pickup.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pending-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to mark order as ready.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const orderPickedUpMutation = useMutation({
+    mutationFn: async (orderId: number) => {
+      return await apiRequest("POST", `/api/admin/orders/${orderId}/picked-up`, {});
+    },
+    onSuccess: () => {
+      toast({
+        title: "Order Complete",
+        description: "Order has been marked as picked up.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pending-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to mark order as picked up.",
         variant: "destructive",
       });
     },
@@ -9692,6 +9761,117 @@ export default function Admin() {
               </button>
             )}
           </div>
+
+          {/* Pending Orders Section */}
+          {typedUser?.isAdmin && pendingOrders.length > 0 && (
+            <div className="space-y-2">
+              <Button
+                variant="outline"
+                className="w-full justify-between border-2 border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700"
+                onClick={() => setShowPendingOrders(!showPendingOrders)}
+              >
+                <span className="flex items-center gap-2">
+                  <ShoppingBag className="w-5 h-5" />
+                  Pending Orders ({pendingOrders.length})
+                </span>
+                {showPendingOrders ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+              </Button>
+              
+              {showPendingOrders && (
+                <div className="space-y-3">
+                  {pendingOrders.map((orderData: any) => {
+                    const order = orderData?.order;
+                    const items = orderData?.items || [];
+                    if (!order) return null;
+                    
+                    const isPendingApproval = order.approvalStatus === 'pending_approval';
+                    const isApproved = order.approvalStatus === 'approved';
+                    
+                    return (
+                      <Card 
+                        key={order.id} 
+                        className={`border-2 ${isPendingApproval ? 'border-amber-300 bg-amber-50' : 'border-blue-300 bg-blue-50'}`}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex flex-col sm:flex-row justify-between gap-3">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge className={isPendingApproval ? 'bg-amber-500' : 'bg-blue-500'}>
+                                  {isPendingApproval ? 'Pending Approval' : 'Approved - Preparing'}
+                                </Badge>
+                                <span className="text-sm text-gray-500">Order #{order.id}</span>
+                              </div>
+                              
+                              <p className="font-semibold">{order.customerName || 'Customer'}</p>
+                              {order.customerEmail && (
+                                <p className="text-sm text-gray-600">{order.customerEmail}</p>
+                              )}
+                              {order.customerPhone && (
+                                <p className="text-sm text-gray-600">{order.customerPhone}</p>
+                              )}
+                              
+                              <div className="mt-2 space-y-1">
+                                <p className="text-sm font-medium">Items:</p>
+                                {items.map((item: any, idx: number) => (
+                                  <p key={idx} className="text-sm text-gray-700">
+                                    • {item.supply?.name || item.pet?.name || 'Item'} x{item.quantity} - ${item.price}
+                                  </p>
+                                ))}
+                              </div>
+                              
+                              <p className="text-lg font-bold text-green-700 mt-2">
+                                Total: ${order.totalAmount}
+                              </p>
+                              
+                              <p className="text-xs text-gray-500 mt-1">
+                                Ordered: {new Date(order.orderDate).toLocaleDateString()}
+                              </p>
+                            </div>
+                            
+                            <div className="flex flex-col gap-2 sm:w-40">
+                              {isPendingApproval && (
+                                <Button
+                                  onClick={() => approveOrderMutation.mutate(order.id)}
+                                  disabled={approveOrderMutation.isPending}
+                                  className="bg-green-600 hover:bg-green-700 text-white"
+                                >
+                                  <Check className="w-4 h-4 mr-2" />
+                                  {approveOrderMutation.isPending ? 'Approving...' : 'Approve Order'}
+                                </Button>
+                              )}
+                              
+                              {isApproved && (
+                                <Button
+                                  onClick={() => orderReadyMutation.mutate(order.id)}
+                                  disabled={orderReadyMutation.isPending}
+                                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                                >
+                                  <Package className="w-4 h-4 mr-2" />
+                                  {orderReadyMutation.isPending ? 'Notifying...' : 'Order Ready'}
+                                </Button>
+                              )}
+                              
+                              {isApproved && (
+                                <Button
+                                  variant="outline"
+                                  onClick={() => orderPickedUpMutation.mutate(order.id)}
+                                  disabled={orderPickedUpMutation.isPending}
+                                  className="border-green-300 text-green-700 hover:bg-green-50"
+                                >
+                                  <Check className="w-4 h-4 mr-2" />
+                                  {orderPickedUpMutation.isPending ? 'Completing...' : 'Picked Up'}
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Approved Appointments - Collapsible Button */}
           <div className="space-y-2">

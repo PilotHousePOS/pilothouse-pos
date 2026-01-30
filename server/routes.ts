@@ -1691,6 +1691,187 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Order Approval Management Routes (Admin)
+  app.get("/api/admin/pending-orders", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const allOrders = await storage.getOrders();
+      const pendingOrders = allOrders.filter(o => 
+        o.approvalStatus === 'pending_approval' || 
+        o.approvalStatus === 'approved'
+      );
+      
+      // Get order items for each order
+      const ordersWithItems = await Promise.all(
+        pendingOrders.map(async (order) => {
+          const orderWithItems = await storage.getOrderWithItems(order.id);
+          return orderWithItems;
+        })
+      );
+      
+      res.json(ordersWithItems.filter(Boolean));
+    } catch (error) {
+      console.error("Error fetching pending orders:", error);
+      res.status(500).json({ message: "Failed to fetch pending orders" });
+    }
+  });
+  
+  app.post("/api/admin/orders/:id/approve", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const orderId = parseInt(req.params.id);
+      const orderWithItems = await storage.getOrderWithItems(orderId);
+      
+      if (!orderWithItems) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      
+      // Update order approval status
+      await storage.updateOrderApprovalStatus(orderId, 'approved');
+      
+      // Send email notification
+      const order = orderWithItems.order;
+      if (order.customerEmail) {
+        try {
+          const { sendEmail } = await import('./sendgridIntegration');
+          const itemsList = orderWithItems.items.map((item: any) => 
+            `• ${item.supply?.name || item.pet?.name || 'Item'} x${item.quantity} - $${item.price}`
+          ).join('\n');
+          
+          await sendEmail({
+            to: order.customerEmail,
+            subject: 'Your Animal House Order Has Been Approved!',
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
+                  <h1 style="margin: 0;">🐾 Animal House Pet Store</h1>
+                </div>
+                <div style="padding: 20px; background-color: #f9fafb;">
+                  <h2 style="color: #16a34a;">Order Approved! ✓</h2>
+                  <p>Hi ${order.customerName || 'Valued Customer'},</p>
+                  <p>Great news! Your order <strong>#${order.id}</strong> has been approved and is now being prepared.</p>
+                  
+                  <div style="background: white; border-radius: 8px; padding: 15px; margin: 15px 0;">
+                    <h3 style="margin-top: 0;">Order Details:</h3>
+                    <pre style="white-space: pre-wrap; font-family: Arial;">${itemsList}</pre>
+                    <p style="font-weight: bold; font-size: 18px; color: #dc2626;">Total: $${order.totalAmount}</p>
+                  </div>
+                  
+                  <p>We'll notify you when your order is ready for pickup!</p>
+                  <p>Thank you for shopping with us!</p>
+                </div>
+                <div style="background-color: #1f2937; color: white; padding: 15px; text-align: center; font-size: 12px;">
+                  <p>Animal House Pet Store</p>
+                </div>
+              </div>
+            `
+          });
+        } catch (emailError) {
+          console.error("Failed to send approval email:", emailError);
+        }
+      }
+      
+      res.json({ success: true, message: "Order approved and customer notified" });
+    } catch (error) {
+      console.error("Error approving order:", error);
+      res.status(500).json({ message: "Failed to approve order" });
+    }
+  });
+  
+  app.post("/api/admin/orders/:id/ready", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const orderId = parseInt(req.params.id);
+      const orderWithItems = await storage.getOrderWithItems(orderId);
+      
+      if (!orderWithItems) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      
+      // Update order status to ready
+      await storage.updateOrderApprovalStatus(orderId, 'ready_for_pickup');
+      
+      // Send email notification
+      const order = orderWithItems.order;
+      if (order.customerEmail) {
+        try {
+          const { sendEmail } = await import('./sendgridIntegration');
+          
+          await sendEmail({
+            to: order.customerEmail,
+            subject: 'Your Animal House Order Is Ready for Pickup! 🎉',
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
+                  <h1 style="margin: 0;">🐾 Animal House Pet Store</h1>
+                </div>
+                <div style="padding: 20px; background-color: #f9fafb;">
+                  <h2 style="color: #16a34a;">Your Order is Ready! 📦</h2>
+                  <p>Hi ${order.customerName || 'Valued Customer'},</p>
+                  <p>Your order <strong>#${order.id}</strong> is now ready for pickup!</p>
+                  
+                  <div style="background: #16a34a; color: white; border-radius: 8px; padding: 20px; margin: 15px 0; text-align: center;">
+                    <h3 style="margin: 0;">Come pick up your order anytime during store hours</h3>
+                    <p style="font-size: 24px; font-weight: bold; margin: 10px 0;">Order Total: $${order.totalAmount}</p>
+                  </div>
+                  
+                  <p>Thank you for shopping with Animal House Pet Store!</p>
+                </div>
+                <div style="background-color: #1f2937; color: white; padding: 15px; text-align: center; font-size: 12px;">
+                  <p>Animal House Pet Store</p>
+                </div>
+              </div>
+            `
+          });
+        } catch (emailError) {
+          console.error("Failed to send ready email:", emailError);
+        }
+      }
+      
+      res.json({ success: true, message: "Order marked ready and customer notified" });
+    } catch (error) {
+      console.error("Error marking order ready:", error);
+      res.status(500).json({ message: "Failed to mark order ready" });
+    }
+  });
+  
+  app.post("/api/admin/orders/:id/picked-up", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const orderId = parseInt(req.params.id);
+      await storage.updateOrderApprovalStatus(orderId, 'picked_up');
+      
+      res.json({ success: true, message: "Order marked as picked up" });
+    } catch (error) {
+      console.error("Error marking order picked up:", error);
+      res.status(500).json({ message: "Failed to mark order picked up" });
+    }
+  });
+
   // Wishlist routes
   app.get("/api/wishlist", authMiddleware, async (req: any, res) => {
     try {

@@ -227,6 +227,7 @@ export interface IStorage {
   getOrder(id: number): Promise<Order | undefined>;
   getOrderWithItems(id: number): Promise<{ order: Order; items: OrderItem[] } | undefined>;
   updateOrderStatus(id: number, status: string): Promise<Order>;
+  updateOrderApprovalStatus(id: number, approvalStatus: string): Promise<Order>;
   deleteOrder(id: number): Promise<void>;
 
   // Appointment operations
@@ -2266,6 +2267,26 @@ export class DatabaseStorage implements IStorage {
     const [updated] = await db
       .update(orders)
       .set({ status, updatedAt: new Date() })
+      .where(eq(orders.id, id))
+      .returning();
+    return updated;
+  }
+  
+  async updateOrderApprovalStatus(id: number, approvalStatus: string): Promise<Order> {
+    const updateData: any = { approvalStatus, updatedAt: new Date() };
+    
+    // Set timestamps based on approval status
+    if (approvalStatus === 'approved') {
+      updateData.approvedAt = new Date();
+    } else if (approvalStatus === 'ready_for_pickup') {
+      updateData.readyAt = new Date();
+    } else if (approvalStatus === 'picked_up') {
+      updateData.pickedUpAt = new Date();
+    }
+    
+    const [updated] = await db
+      .update(orders)
+      .set(updateData)
       .where(eq(orders.id, id))
       .returning();
     return updated;
