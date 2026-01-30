@@ -9782,6 +9782,7 @@ export default function Admin() {
                   {pendingOrders.map((orderData: any) => {
                     const order = orderData?.order;
                     const items = orderData?.items || [];
+                    const customerName = orderData?.customerName || 'Customer';
                     if (!order) return null;
                     
                     const isPendingApproval = order.approvalStatus === 'pending_approval';
@@ -9802,7 +9803,7 @@ export default function Admin() {
                                 <span className="text-sm text-gray-500">Order #{order.id}</span>
                               </div>
                               
-                              <p className="font-semibold">{order.customerName || 'Customer'}</p>
+                              <p className="font-semibold">{customerName}</p>
                               {order.customerEmail && (
                                 <p className="text-sm text-gray-600">{order.customerEmail}</p>
                               )}
@@ -9814,7 +9815,7 @@ export default function Admin() {
                                 <p className="text-sm font-medium">Items:</p>
                                 {items.map((item: any, idx: number) => (
                                   <p key={idx} className="text-sm text-gray-700">
-                                    • {item.supply?.name || item.pet?.name || 'Item'} x{item.quantity} - ${item.price}
+                                    • {item.itemName || 'Item'} x{item.quantity} - ${item.price}
                                   </p>
                                 ))}
                               </div>
