@@ -1,4 +1,5 @@
 import { getUncachableSendGridClient } from './sendgridIntegration';
+import { storage } from './storage';
 
 // Email notification service
 class EmailService {
@@ -279,42 +280,85 @@ class PushNotificationService {
   }
 }
 
-// SMS notification service
+// SMS notification service with logging and opt-out checking
 class SMSService {
+  // Helper to check if contact has opted out
+  private async isOptedOut(phoneNumber: string): Promise<{ optedOut: boolean; contactId?: number }> {
+    try {
+      const { normalizePhoneNumber } = await import('./phoneUtils');
+      const normalizedPhone = normalizePhoneNumber(phoneNumber);
+      const contact = await storage.getContactByPhoneNumber(normalizedPhone);
+      if (contact) {
+        return { optedOut: contact.smsOptOut === true, contactId: contact.id };
+      }
+      return { optedOut: false };
+    } catch (error) {
+      console.error('Error checking opt-out status:', error);
+      return { optedOut: false };
+    }
+  }
+
+  // Helper to log SMS attempts
+  private async logSms(params: { contactId?: number; phoneNumber: string; message: string; status: string; errorMessage?: string; twilioSid?: string; appointmentId?: number }): Promise<void> {
+    try {
+      await storage.createSmsLog(params);
+    } catch (error) {
+      console.error('Error logging SMS:', error);
+    }
+  }
+
   async sendOrderStatusSMS(phoneNumber: string, firstName: string, orderId: number, status: string): Promise<boolean> {
+    const messages = {
+      'in_progress': `Hi ${firstName}! Your Animal House order #${orderId} is being prepared. We'll text you when it's ready for pickup!`,
+      'ready': `${firstName}, your order #${orderId} is ready for pickup at Animal House Pet Store! 🐾`
+    };
+    const message = messages[status as keyof typeof messages];
+    if (!message) return false;
+
+    // Check opt-out status
+    const { optedOut, contactId } = await this.isOptedOut(phoneNumber);
+    if (optedOut) {
+      console.log(`SMS skipped for ${phoneNumber} - contact opted out`);
+      await this.logSms({ contactId, phoneNumber, message, status: 'skipped', errorMessage: 'Contact opted out of SMS' });
+      return false;
+    }
+
     if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE_NUMBER) {
       console.log('Twilio not configured, SMS notification skipped');
       return false;
     }
 
     try {
-      // Import Twilio dynamically to avoid errors if not installed
       const twilio = await import('twilio');
       const client = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
-      const messages = {
-        'in_progress': `Hi ${firstName}! Your Animal House order #${orderId} is being prepared. We'll text you when it's ready for pickup!`,
-        'ready': `${firstName}, your order #${orderId} is ready for pickup at Animal House Pet Store! 🐾`
-      };
-
-      const message = messages[status as keyof typeof messages];
-      if (!message) return false;
-
-      await client.messages.create({
+      const result = await client.messages.create({
         body: message,
         from: process.env.TWILIO_PHONE_NUMBER,
         to: phoneNumber,
       });
 
       console.log(`SMS sent to ${phoneNumber} for order ${orderId} status: ${status}`);
+      await this.logSms({ contactId, phoneNumber, message, status: 'sent', twilioSid: result.sid });
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('SMS notification error:', error);
+      await this.logSms({ contactId, phoneNumber, message, status: 'failed', errorMessage: error.message || 'Unknown error' });
       return false;
     }
   }
 
-  async sendPetReadySMS(phoneNumber: string, firstName: string, petName: string): Promise<boolean> {
+  async sendPetReadySMS(phoneNumber: string, firstName: string, petName: string, appointmentId?: number): Promise<boolean> {
+    const message = `Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way. The Animal House 318-323-6090.`;
+
+    // Check opt-out status
+    const { optedOut, contactId } = await this.isOptedOut(phoneNumber);
+    if (optedOut) {
+      console.log(`SMS skipped for ${phoneNumber} - contact opted out`);
+      await this.logSms({ contactId, phoneNumber, message, status: 'skipped', errorMessage: 'Contact opted out of SMS', appointmentId });
+      return false;
+    }
+
     if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE_NUMBER) {
       console.log('Twilio not configured, SMS notification skipped');
       return false;
@@ -324,23 +368,31 @@ class SMSService {
       const twilio = await import('twilio');
       const client = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
-      const message = `Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way. The Animal House 318-323-6090.`;
-
-      await client.messages.create({
+      const result = await client.messages.create({
         body: message,
         from: process.env.TWILIO_PHONE_NUMBER,
         to: phoneNumber,
       });
 
       console.log(`Pet ready SMS sent to ${phoneNumber} for pet: ${petName}`);
+      await this.logSms({ contactId, phoneNumber, message, status: 'sent', twilioSid: result.sid, appointmentId });
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Pet ready SMS notification error:', error);
+      await this.logSms({ contactId, phoneNumber, message, status: 'failed', errorMessage: error.message || 'Unknown error', appointmentId });
       return false;
     }
   }
 
-  async sendGenericSMS(phoneNumber: string, message: string): Promise<boolean> {
+  async sendGenericSMS(phoneNumber: string, message: string, appointmentId?: number): Promise<boolean> {
+    // Check opt-out status
+    const { optedOut, contactId } = await this.isOptedOut(phoneNumber);
+    if (optedOut) {
+      console.log(`SMS skipped for ${phoneNumber} - contact opted out`);
+      await this.logSms({ contactId, phoneNumber, message, status: 'skipped', errorMessage: 'Contact opted out of SMS', appointmentId });
+      return false;
+    }
+
     if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE_NUMBER) {
       console.log('Twilio not configured, SMS notification skipped');
       return false;
@@ -350,16 +402,18 @@ class SMSService {
       const twilio = await import('twilio');
       const client = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
-      await client.messages.create({
+      const result = await client.messages.create({
         body: message,
         from: process.env.TWILIO_PHONE_NUMBER,
         to: phoneNumber,
       });
 
       console.log(`SMS sent to ${phoneNumber}`);
+      await this.logSms({ contactId, phoneNumber, message, status: 'sent', twilioSid: result.sid, appointmentId });
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('SMS notification error:', error);
+      await this.logSms({ contactId, phoneNumber, message, status: 'failed', errorMessage: error.message || 'Unknown error', appointmentId });
       return false;
     }
   }
