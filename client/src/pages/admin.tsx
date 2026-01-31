@@ -5792,7 +5792,7 @@ export default function Admin() {
     onSuccess: () => {
       toast({
         title: "Refund Recorded",
-        description: "Refund has been recorded for inventory tracking. Process the actual refund through ExaTouch POS.",
+        description: "Refund has been recorded. When electronic payments are connected, this will process automatically.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/orders-with-items"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/refunds"] });
@@ -7581,7 +7581,7 @@ export default function Admin() {
                       Order History & Refunds
                     </CardTitle>
                     <p className="text-sm text-gray-600">
-                      Refunds are recorded here for inventory tracking. Process actual card refunds through ExaTouch POS.
+                      Refunds are recorded here. When electronic payments are connected, refunds will process automatically.
                     </p>
                   </CardHeader>
                   <CardContent>
@@ -7923,10 +7923,9 @@ export default function Admin() {
               
               {selectedOrderForRefund && (
                 <div className="space-y-4">
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                    <p className="text-sm text-yellow-800">
-                      <strong>Important:</strong> This records the refund for inventory tracking only. 
-                      Process the actual card refund through ExaTouch POS.
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p className="text-sm text-blue-800">
+                      <strong>Note:</strong> When electronic payments are connected, this will automatically process a refund to the customer's payment method.
                     </p>
                   </div>
                   
@@ -8024,9 +8023,21 @@ export default function Admin() {
                   
                   <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="font-medium">Refund Summary</p>
-                    <p className="text-2xl font-bold text-red-600">
-                      ${Object.values(selectedRefundItems).reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)}
-                    </p>
+                    {(() => {
+                      const subtotal = Object.values(selectedRefundItems).reduce((sum, item) => sum + parseFloat(item.amount), 0);
+                      const taxRate = 10.99; // Same tax rate as checkout
+                      const taxAmount = subtotal * (taxRate / 100);
+                      const totalRefund = subtotal + taxAmount;
+                      return (
+                        <>
+                          <p className="text-sm text-gray-600">Subtotal: ${subtotal.toFixed(2)}</p>
+                          <p className="text-sm text-gray-600">Tax ({taxRate}%): ${taxAmount.toFixed(2)}</p>
+                          <p className="text-2xl font-bold text-red-600">
+                            Total: ${totalRefund.toFixed(2)}
+                          </p>
+                        </>
+                      );
+                    })()}
                     <p className="text-xs text-gray-500">
                       {Object.keys(selectedRefundItems).length} item(s) selected
                     </p>
@@ -8042,7 +8053,10 @@ export default function Admin() {
                     </Button>
                     <Button
                       onClick={() => {
-                        const totalAmount = Object.values(selectedRefundItems).reduce((sum, item) => sum + parseFloat(item.amount), 0);
+                        const subtotal = Object.values(selectedRefundItems).reduce((sum, item) => sum + parseFloat(item.amount), 0);
+                        const taxRate = 10.99;
+                        const taxAmount = subtotal * (taxRate / 100);
+                        const totalWithTax = subtotal + taxAmount;
                         const itemIds = Object.keys(selectedRefundItems);
                         
                         if (itemIds.length === 0) {
@@ -8050,14 +8064,18 @@ export default function Admin() {
                           return;
                         }
                         
-                        // Create refund for each selected item
+                        // Create refund for each selected item (with proportional tax)
                         itemIds.forEach(itemId => {
                           const refundItem = selectedRefundItems[parseInt(itemId)];
+                          const itemSubtotal = parseFloat(refundItem.amount);
+                          const itemTax = itemSubtotal * (taxRate / 100);
+                          const itemTotalWithTax = itemSubtotal + itemTax;
+                          
                           createRefundMutation.mutate({
                             orderId: selectedOrderForRefund.id,
                             orderItemId: parseInt(itemId),
                             quantity: refundItem.quantity,
-                            amount: refundItem.amount,
+                            amount: itemTotalWithTax.toFixed(2),
                             reason: refundReason || 'Customer request',
                             notes: refundNotes,
                             refundType: 'partial'
