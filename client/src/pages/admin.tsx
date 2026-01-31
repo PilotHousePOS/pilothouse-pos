@@ -5791,8 +5791,8 @@ export default function Admin() {
     },
     onSuccess: () => {
       toast({
-        title: "Refund Recorded",
-        description: "Refund has been recorded. When electronic payments are connected, this will process automatically.",
+        title: "Refund Processed",
+        description: "Refund has been processed. When electronic payments are connected, this will refund to the customer's payment method automatically.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/orders-with-items"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/refunds"] });
@@ -8087,7 +8087,7 @@ export default function Admin() {
                       disabled={Object.keys(selectedRefundItems).length === 0 || createRefundMutation.isPending}
                       className="flex-1 bg-red-600 hover:bg-red-700 text-white"
                     >
-                      {createRefundMutation.isPending ? 'Processing...' : 'Record Refund'}
+                      {createRefundMutation.isPending ? 'Processing...' : 'Process Refund'}
                     </Button>
                   </div>
                 </div>
