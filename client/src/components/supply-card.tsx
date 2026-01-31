@@ -153,33 +153,21 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
                   {supply.weight && `${supply.weight} • `}
                   {supply.size && supply.size}
                 </p>
-                {supply.stockQuantity !== null && supply.stockQuantity <= 5 && supply.stockQuantity > 0 && (
-                  <Badge variant="destructive" className="text-xs mt-1">
-                    Low Stock
-                  </Badge>
-                )}
-                {supply.stockQuantity !== null && supply.stockQuantity === 0 && (
-                  <Badge variant="secondary" className="text-xs mt-1">
-                    Out of Stock
-                  </Badge>
-                )}
               </div>
               <div className="text-right">
                 <p className="text-sm font-bold text-brand-red">${supply.price}</p>
-                {supply.stockQuantity !== 0 && (
-                  <Button 
-                    className="bg-brand-blue hover:bg-blue-600 text-white px-3 py-1 rounded-full text-xs mt-1"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      addToCartMutation.mutate();
-                    }}
-                    disabled={addToCartMutation.isPending}
-                    data-testid="button-add-to-cart"
-                  >
-                    {addToCartMutation.isPending ? "Adding..." : "Add to Cart"}
-                  </Button>
-                )}
+                <Button 
+                  className="bg-brand-blue hover:bg-blue-600 text-white px-3 py-1 rounded-full text-xs mt-1"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    addToCartMutation.mutate();
+                  }}
+                  disabled={addToCartMutation.isPending}
+                  data-testid="button-add-to-cart"
+                >
+                  {addToCartMutation.isPending ? "Adding..." : "Add to Cart"}
+                </Button>
               </div>
             </div>
           </div>
@@ -318,12 +306,6 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
                 <p className="text-gray-600 mt-1">{supply.description}</p>
               </div>
             )}
-            <div className="flex items-center gap-2">
-              <span className="font-semibold">Stock:</span>
-              <Badge variant={supply.stockQuantity && supply.stockQuantity > 0 ? "default" : "destructive"}>
-                {supply.stockQuantity && supply.stockQuantity > 0 ? `${supply.stockQuantity} in stock` : "Out of Stock"}
-              </Badge>
-            </div>
           </div>
 
           {/* Add to Cart in Modal */}
@@ -333,10 +315,10 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
               addToCartMutation.mutate();
               setShowDetails(false);
             }}
-            disabled={supply.stockQuantity === 0 || addToCartMutation.isPending}
+            disabled={addToCartMutation.isPending}
             data-testid="button-modal-add-to-cart"
           >
-            {addToCartMutation.isPending ? "Adding..." : supply.stockQuantity === 0 ? "Out of Stock" : "Add to Cart"}
+            {addToCartMutation.isPending ? "Adding..." : "Add to Cart"}
           </Button>
         </div>
       </DialogContent>

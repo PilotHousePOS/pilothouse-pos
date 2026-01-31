@@ -321,14 +321,6 @@ export default function SupplyDetail() {
             </span>
           </div>
 
-          <Badge 
-            variant={inStock ? "default" : "destructive"} 
-            className={`mt-2 ${inStock ? 'bg-green-600' : ''}`}
-            data-testid="stock-status"
-          >
-            {inStock ? 'In Stock' : 'Out of Stock'}
-          </Badge>
-
         </div>
 
         <div className="flex items-center gap-3 mb-6">
@@ -500,11 +492,6 @@ function RelatedProductCard({ product }: { product: Supply }) {
       <Card className="w-40 bg-gray-900 border-gray-700 cursor-pointer hover:border-green-500 transition-colors" data-testid={`related-product-${product.id}`}>
         <CardContent className="p-2">
           <div className="relative aspect-square mb-2 rounded overflow-hidden">
-            {inStock && (
-              <Badge className="absolute top-1 left-1 bg-green-600 text-xs z-10">
-                Back In Stock
-              </Badge>
-            )}
             <button className="absolute top-1 right-1 p-1 bg-black/50 rounded-full z-10">
               <Heart className="w-3 h-3 text-white" />
             </button>
