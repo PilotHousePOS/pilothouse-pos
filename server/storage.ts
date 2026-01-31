@@ -2255,7 +2255,7 @@ export class DatabaseStorage implements IStorage {
     const [customer] = await db.select().from(users).where(eq(users.id, order.userId));
     const customerName = customer ? `${customer.firstName} ${customer.lastName}` : 'Unknown Customer';
     const customerEmail = order.customerEmail || customer?.email || '';
-    const customerPhone = order.customerPhone || customer?.phone || '';
+    const customerPhone = order.customerPhone || customer?.phoneNumber || '';
     
     const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
     

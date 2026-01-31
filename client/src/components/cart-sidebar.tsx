@@ -233,6 +233,8 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
     createOrderMutation.mutate({
       orderData: {
+        subtotal: subtotal.toFixed(2),
+        taxAmount: taxAmount.toFixed(2),
         totalAmount: totalAmount.toFixed(2),
         shippingAddress: "In-Store Pickup - Animal House Pet Store",
         outOfStockPreference,
