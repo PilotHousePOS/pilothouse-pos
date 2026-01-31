@@ -1761,7 +1761,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const allOrders = await storage.getOrders();
       const pendingOrders = allOrders.filter(o => 
         o.approvalStatus === 'pending_approval' || 
-        o.approvalStatus === 'approved'
+        o.approvalStatus === 'approved' ||
+        o.approvalStatus === 'ready_for_pickup'
       );
       
       // Get order items for each order

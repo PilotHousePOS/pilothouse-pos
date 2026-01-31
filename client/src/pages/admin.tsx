@@ -7559,7 +7559,7 @@ export default function Admin() {
                                   </div>
                                 </div>
                                 
-                                <div className="flex flex-col gap-2 sm:w-32">
+                                <div className="flex flex-col gap-2 min-w-[100px]">
                                   <Button
                                     variant="outline"
                                     size="sm"
@@ -7570,7 +7570,7 @@ export default function Admin() {
                                       setRefundNotes('');
                                       setRefundModalOpen(true);
                                     }}
-                                    className="border-red-300 text-red-700 hover:bg-red-50"
+                                    className="border-red-300 text-red-700 hover:bg-red-50 w-full"
                                   >
                                     <RotateCcw className="w-4 h-4 mr-1" />
                                     Refund
@@ -7590,7 +7590,7 @@ export default function Admin() {
                                           }
                                         }
                                       }}
-                                      className="border-gray-300 text-gray-600 hover:bg-gray-50"
+                                      className="border-gray-300 text-gray-600 hover:bg-gray-50 w-full"
                                     >
                                       <Trash2 className="w-4 h-4 mr-1" />
                                       Remove

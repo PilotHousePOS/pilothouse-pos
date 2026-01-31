@@ -370,7 +370,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
       {/* Checkout Dialog */}
       <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Checkout</DialogTitle>
           </DialogHeader>
