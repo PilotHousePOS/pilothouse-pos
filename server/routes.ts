@@ -4022,6 +4022,99 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Send refund report email
+  app.post("/api/admin/send-refund-report", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { email, startDate, endDate } = req.body;
+      
+      if (!email || !email.trim()) {
+        return res.status(400).json({ message: "Email address is required" });
+      }
+
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "Date range is required" });
+      }
+
+      // Fetch refunds from database - never trust client-provided refund data
+      const refunds = await storage.getRefundsByDateRange(startDate, endDate);
+
+      if (!refunds || refunds.length === 0) {
+        return res.status(400).json({ message: "No refunds found for the selected date range" });
+      }
+
+      // Calculate totals from database data
+      const totalRefunded = refunds.reduce((sum: number, r: any) => sum + parseFloat(r.refundAmount || 0), 0);
+
+      // Build email content
+      const refundRows = refunds.map((r: any) => 
+        `<tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee;">#${r.orderId}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee;">${new Date(r.refundDate).toLocaleDateString()}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee;">${r.reason || 'N/A'}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #d97706;">-$${parseFloat(r.refundAmount).toFixed(2)}</td>
+        </tr>`
+      ).join('');
+
+      const emailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #1e3a8a;">Animal House Pet Store - Refund Report</h2>
+          <p style="color: #666;">Date Range: ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}</p>
+          
+          <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 0; font-size: 18px; color: #92400e;">
+              <strong>Total Refunded: -$${totalRefunded.toFixed(2)}</strong>
+            </p>
+            <p style="margin: 5px 0 0; color: #78350f; font-size: 14px;">
+              ${refunds.length} refund${refunds.length !== 1 ? 's' : ''} processed
+            </p>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background-color: #f3f4f6;">
+                <th style="padding: 10px; text-align: left;">Order</th>
+                <th style="padding: 10px; text-align: left;">Date</th>
+                <th style="padding: 10px; text-align: left;">Reason</th>
+                <th style="padding: 10px; text-align: right;">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${refundRows}
+            </tbody>
+            <tfoot>
+              <tr style="background-color: #fef3c7;">
+                <td colspan="3" style="padding: 10px; font-weight: bold;">Total Refunded</td>
+                <td style="padding: 10px; text-align: right; font-weight: bold; color: #d97706;">-$${totalRefunded.toFixed(2)}</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <p style="color: #666; font-size: 12px; margin-top: 20px;">
+            This report is for ExaTouch POS reconciliation purposes.<br>
+            Generated on ${new Date().toLocaleString()}
+          </p>
+        </div>
+      `;
+
+      // Send email using sendGrid
+      const { sendEmail } = await import('./notifications');
+      await sendEmail({
+        to: email,
+        subject: `Refund Report: ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}`,
+        html: emailHtml
+      });
+
+      res.json({ success: true, message: "Refund report sent successfully" });
+    } catch (error: any) {
+      console.error("Error sending refund report:", error);
+      res.status(500).json({ message: error.message || "Failed to send refund report" });
+    }
+  });
+
   // Grooming settings routes
   app.get("/api/admin/grooming-settings", authMiddleware, async (req: any, res) => {
     try {

@@ -55,14 +55,10 @@ export default function OrderHistory() {
     try {
       const [orderResponse, refundsResponse] = await Promise.all([
         fetch(`/api/orders/${order.id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
+          credentials: 'include',
         }),
         fetch(`/api/refunds?orderId=${order.id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
+          credentials: 'include',
         }),
       ]);
 
