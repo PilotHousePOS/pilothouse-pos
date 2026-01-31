@@ -505,6 +505,14 @@ export class NotificationService {
     console.log(`Sending generic SMS to ${phoneNumber}`);
     return await this.smsService.sendGenericSMS(phoneNumber, message);
   }
+
+  async sendCustomSMS(
+    phoneNumber: string,
+    message: string
+  ): Promise<boolean> {
+    console.log(`Sending custom SMS to ${phoneNumber}: ${message.substring(0, 50)}...`);
+    return await this.smsService.sendGenericSMS(phoneNumber, message);
+  }
 }
 
 export const notificationService = new NotificationService();

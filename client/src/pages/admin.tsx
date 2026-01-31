@@ -4531,6 +4531,67 @@ export default function Admin() {
     setDeleteConfirmation(prev => ({ ...prev, isOpen: false }));
   };
   
+  // SMS Confirmation Dialog State
+  const [smsConfirmDialog, setSmsConfirmDialog] = useState<{
+    isOpen: boolean;
+    appointmentId: number | null;
+    customerName: string;
+    customerPhone: string;
+    message: string;
+  }>({
+    isOpen: false,
+    appointmentId: null,
+    customerName: '',
+    customerPhone: '',
+    message: "Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way. The Animal House 318-323-6090."
+  });
+  
+  const defaultSmsMessage = "Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way. The Animal House 318-323-6090.";
+  
+  const openSmsConfirmDialog = (appointmentId: number, customerName: string, customerPhone: string) => {
+    setSmsConfirmDialog({
+      isOpen: true,
+      appointmentId,
+      customerName,
+      customerPhone: customerPhone || '',
+      message: defaultSmsMessage
+    });
+  };
+  
+  const closeSmsConfirmDialog = () => {
+    setSmsConfirmDialog(prev => ({ ...prev, isOpen: false, appointmentId: null }));
+  };
+  
+  const confirmSmsAndMarkDone = async () => {
+    if (!smsConfirmDialog.appointmentId) return;
+    
+    // Update grooming completed status with custom message
+    try {
+      await apiRequest("PATCH", `/api/appointments/${smsConfirmDialog.appointmentId}/grooming-completed`, { 
+        groomingCompleted: true,
+        customMessage: smsConfirmDialog.message
+      });
+      
+      toast({
+        title: "Grooming Completed",
+        description: smsConfirmDialog.customerPhone 
+          ? "Marked as done - SMS notification sent" 
+          : "Marked as done - No phone number on file",
+      });
+      
+      await queryClient.refetchQueries({ queryKey: ["/api/appointments"] });
+    } catch (error) {
+      console.error('Error updating grooming status:', error);
+      toast({
+        title: "Update Failed",
+        description: "Failed to update grooming status. Please try again.",
+        variant: "destructive",
+      });
+    }
+    
+    closeSmsConfirmDialog();
+  };
+  
   const [specialDateForm, setSpecialDateForm] = useState<{
     id?: number;
     date: string;
@@ -7833,10 +7894,21 @@ export default function Admin() {
                                 id={`grooming-completed-${currentAppointment.id}`}
                                 checked={currentAppointment.groomingCompleted || false}
                                 onCheckedChange={(checked) => {
-                                  updateAppointmentGroomingCompletedMutation.mutate({ 
-                                    id: currentAppointment.id, 
-                                    groomingCompleted: checked as boolean 
-                                  });
+                                  if (checked) {
+                                    // Open SMS confirmation dialog when checking Done
+                                    const contact = contacts?.find((c: any) => c.id === currentAppointment.contactId);
+                                    openSmsConfirmDialog(
+                                      currentAppointment.id,
+                                      currentAppointment.customerName || 'Customer',
+                                      contact?.phoneNumber || ''
+                                    );
+                                  } else {
+                                    // Allow unchecking without dialog
+                                    updateAppointmentGroomingCompletedMutation.mutate({ 
+                                      id: currentAppointment.id, 
+                                      groomingCompleted: false 
+                                    });
+                                  }
                                 }}
                                 data-testid={`checkbox-grooming-completed-${currentAppointment.id}`}
                               />
@@ -10368,6 +10440,54 @@ export default function Admin() {
           <SettingsPanel />
         </TabsContent>
       </Tabs>
+
+      {/* SMS Confirmation Dialog for Grooming Completed */}
+      <Dialog open={smsConfirmDialog.isOpen} onOpenChange={(open) => !open && closeSmsConfirmDialog()}>
+        <DialogContent className="max-w-md mx-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Send className="w-5 h-5 text-green-600" />
+              Send SMS Notification
+            </DialogTitle>
+            <DialogDescription>
+              {smsConfirmDialog.customerPhone ? (
+                <>Sending to <strong>{smsConfirmDialog.customerName}</strong> at <strong>{smsConfirmDialog.customerPhone}</strong></>
+              ) : (
+                <span className="text-amber-600">No phone number on file for {smsConfirmDialog.customerName}. Message will not be sent.</span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="sms-message">Message (editable - add price, notes, etc.)</Label>
+              <Textarea
+                id="sms-message"
+                value={smsConfirmDialog.message}
+                onChange={(e) => setSmsConfirmDialog(prev => ({ ...prev, message: e.target.value }))}
+                className="min-h-[120px] text-sm"
+                placeholder="Enter SMS message..."
+              />
+              <p className="text-xs text-muted-foreground">
+                {smsConfirmDialog.message.length} characters
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={closeSmsConfirmDialog}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={confirmSmsAndMarkDone}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Check className="w-4 h-4 mr-2" />
+              {smsConfirmDialog.customerPhone ? "Send & Mark Done" : "Mark Done"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Appointment Details Dialog */}
       {selectedAppointment && (

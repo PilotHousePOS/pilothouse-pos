@@ -3030,7 +3030,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       }
 
       const id = parseInt(req.params.id);
-      const { groomingCompleted } = req.body;
+      const { groomingCompleted, customMessage } = req.body;
       
       if (typeof groomingCompleted !== 'boolean') {
         return res.status(400).json({ message: "groomingCompleted must be a boolean" });
@@ -3044,18 +3044,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       // Send SMS notification when grooming is marked as completed
       if (groomingCompleted && appointment.ownerPhoneNumber) {
         try {
-          const appointmentPets = await storage.getAppointmentPets(id);
-          let petNames: string;
-          if (appointmentPets && appointmentPets.length > 0) {
-            petNames = appointmentPets.map(p => p.petName).join(' and ');
-          } else {
-            petNames = appointment.petName || 'your pet';
-          }
-
-          const smsSent = await notificationService.sendPetReadyNotification(
+          // Use custom message if provided, otherwise use default
+          const smsMessage = customMessage || "Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way. The Animal House 318-323-6090.";
+          
+          const smsSent = await notificationService.sendCustomSMS(
             appointment.ownerPhoneNumber,
-            appointment.ownerFirstName || 'Customer',
-            petNames
+            smsMessage
           );
           
           if (smsSent) {
