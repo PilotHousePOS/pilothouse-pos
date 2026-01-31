@@ -7400,6 +7400,8 @@ export default function Admin() {
                     const order = orderData?.order;
                     const items = orderData?.items || [];
                     const customerName = orderData?.customerName || 'Customer';
+                    const customerEmail = orderData?.customerEmail || order?.customerEmail || '';
+                    const customerPhone = orderData?.customerPhone || order?.customerPhone || '';
                     if (!order) return null;
                     
                     const isPendingApproval = order.approvalStatus === 'pending_approval';
@@ -7430,11 +7432,17 @@ export default function Admin() {
                               </div>
                               
                               <p className="font-semibold">{customerName}</p>
-                              {order.customerEmail && (
-                                <p className="text-sm text-gray-600">{order.customerEmail}</p>
+                              {customerEmail && (
+                                <p className="text-sm text-gray-600 flex items-center gap-1">
+                                  <Mail className="w-3 h-3" />
+                                  <a href={`mailto:${customerEmail}`} className="text-blue-600 hover:underline">{customerEmail}</a>
+                                </p>
                               )}
-                              {order.customerPhone && (
-                                <p className="text-sm text-gray-600">{order.customerPhone}</p>
+                              {customerPhone && (
+                                <p className="text-sm text-gray-600 flex items-center gap-1">
+                                  <Phone className="w-3 h-3" />
+                                  <a href={`tel:${customerPhone}`} className="text-blue-600 hover:underline">{customerPhone}</a>
+                                </p>
                               )}
                               
                               <div className="mt-2 space-y-1">
@@ -7446,9 +7454,17 @@ export default function Admin() {
                                 ))}
                               </div>
                               
-                              <p className="text-lg font-bold text-green-700 mt-2">
-                                Total: ${order.totalAmount}
-                              </p>
+                              <div className="mt-2">
+                                {order.subtotal && (
+                                  <p className="text-sm text-gray-600">Subtotal: ${order.subtotal}</p>
+                                )}
+                                {order.taxAmount && parseFloat(order.taxAmount) > 0 && (
+                                  <p className="text-sm text-gray-600">Tax: ${order.taxAmount}</p>
+                                )}
+                                <p className="text-lg font-bold text-green-700">
+                                  Total: ${order.totalAmount}
+                                </p>
+                              </div>
                               
                               {order.outOfStockPreference && (
                                 <div className="mt-2 p-2 bg-gray-100 rounded text-sm">
@@ -7801,7 +7817,7 @@ export default function Admin() {
                             try {
                               const res = await fetch(`/api/supplies?search=${encodeURIComponent(query)}&limit=5`);
                               const data = await res.json();
-                              setEditOrderSearchResults(data.supplies || []);
+                              setEditOrderSearchResults(data.items || []);
                             } catch (err) {
                               console.error('Search error:', err);
                             } finally {
