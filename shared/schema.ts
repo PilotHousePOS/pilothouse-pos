@@ -145,6 +145,9 @@ export const cartItems = pgTable("cart_items", {
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").notNull().references(() => users.id),
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }), // Base price before tax
+  taxRate: decimal("tax_rate", { precision: 5, scale: 3 }), // Tax rate applied (e.g., 8.250)
+  taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }), // Tax amount
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
   status: varchar("status", { length: 50 }).default("pending"), // pending, confirmed, shipped, delivered, cancelled
   approvalStatus: varchar("approval_status", { length: 50 }).default("pending_approval"), // pending_approval, approved, ready_for_pickup, picked_up
@@ -168,6 +171,34 @@ export const orderItems = pgTable("order_items", {
   petId: integer("pet_id").references(() => pets.id),
   quantity: integer("quantity").default(1),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  category: varchar("category", { length: 100 }), // Product category for reporting
+  productName: varchar("product_name", { length: 255 }), // Snapshot of product name at time of purchase
+  refundedQuantity: integer("refunded_quantity").default(0), // How many units refunded
+  refundedAmount: decimal("refunded_amount", { precision: 10, scale: 2 }).default("0"), // Total refund for this item
+});
+
+// Refunds tracking
+export const refunds = pgTable("refunds", {
+  id: serial("id").primaryKey(),
+  orderId: integer("order_id").notNull().references(() => orders.id),
+  orderItemId: integer("order_item_id").references(() => orderItems.id), // Null if full order refund
+  refundType: varchar("refund_type", { length: 20 }).notNull(), // "full_order" or "partial_item"
+  quantity: integer("quantity").default(1), // Number of items refunded
+  subtotalRefunded: decimal("subtotal_refunded", { precision: 10, scale: 2 }).notNull(), // Base price refunded
+  taxRefunded: decimal("tax_refunded", { precision: 10, scale: 2 }).default("0"), // Tax portion refunded
+  totalRefunded: decimal("total_refunded", { precision: 10, scale: 2 }).notNull(), // Total including tax
+  reason: text("reason"), // Reason for refund
+  processedBy: varchar("processed_by").references(() => users.id), // Admin who processed refund
+  posTransactionId: varchar("pos_transaction_id", { length: 255 }), // ExaTouch transaction reference
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Refund report settings (email recipients)
+export const refundReportSettings = pgTable("refund_report_settings", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Appointments
@@ -452,6 +483,16 @@ export const insertOrderItemSchema = createInsertSchema(orderItems).omit({
   id: true,
 });
 
+export const insertRefundSchema = createInsertSchema(refunds).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertRefundReportSettingSchema = createInsertSchema(refundReportSettings).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertAppointmentSchema = createInsertSchema(appointments).omit({
   id: true,
   createdAt: true,
@@ -554,6 +595,10 @@ export type Order = typeof orders.$inferSelect;
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export type OrderItem = typeof orderItems.$inferSelect;
 export type InsertOrderItem = z.infer<typeof insertOrderItemSchema>;
+export type Refund = typeof refunds.$inferSelect;
+export type InsertRefund = z.infer<typeof insertRefundSchema>;
+export type RefundReportSetting = typeof refundReportSettings.$inferSelect;
+export type InsertRefundReportSetting = z.infer<typeof insertRefundReportSettingSchema>;
 export type Appointment = typeof appointments.$inferSelect;
 export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
 export type AppointmentPet = typeof appointmentPets.$inferSelect;

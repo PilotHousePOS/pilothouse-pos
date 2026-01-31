@@ -182,7 +182,7 @@ Step 5: NEVER mark task complete until verification passes
 - **Pro Plan**: https://purina.com/pro-plan/
 
 ## System Architecture
-The Animal House Pet Store application is a full-stack, mobile-first web solution designed for robust e-commerce and service management.
+The Animal House Pet Store application is a full-stack, mobile-first web solution.
 
 **UI/UX Decisions:**
 - Employs a dark, bold, and high-contrast aesthetic.
@@ -191,7 +191,7 @@ The Animal House Pet Store application is a full-stack, mobile-first web solutio
 - Implements a consistent universal admin dashboard for unified navigation and management.
 
 **Technical Implementations & Feature Specifications:**
-- **Core Management**: Includes comprehensive inventory tracking, multi-image upload capabilities, and advanced appointment scheduling with 15-minute intervals, admin approval, notifications, and Google Calendar synchronization. Custom pricing and AI-powered photo uploads for order processing are also integrated.
+- **Core Management**: Includes comprehensive inventory tracking, multi-image upload capabilities, and advanced appointment scheduling with 15-minute intervals, admin approval, notifications, and Google Calendar synchronization.
 - **Authentication & Authorization**: Built with JWT tokens for secure authentication, supporting password resets and user settings. Features a three-tier role-based access control system (Customer, Groomer, Admin).
 - **Specialized Systems**: Incorporates customer wishlists, deep Google Calendar integration, a CMS for animal categories and subcategory filtering, extensive admin order management, and sophisticated search functionalities.
 - **Advanced Management**: Features database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, and automated brand extraction.
