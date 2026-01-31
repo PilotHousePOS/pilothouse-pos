@@ -142,17 +142,18 @@ export default function OrderHistory() {
 
       if (orderResponse.ok) {
         const orderDetails = await orderResponse.json();
-        console.log('Order details response:', orderDetails);
-        console.log('Items from response:', orderDetails.items);
         // API already returns items with itemName enriched
         items = orderDetails.items || [];
-        console.log('Items after assignment:', items);
-      } else {
-        console.log('Order response not ok:', orderResponse.status);
       }
 
-      if (refundsResponse.ok) {
-        refunds = await refundsResponse.json();
+      // Fetch refunds separately so errors don't affect items
+      try {
+        if (refundsResponse.ok) {
+          refunds = await refundsResponse.json();
+        }
+      } catch (refundError) {
+        console.error("Error parsing refunds:", refundError);
+        // Continue with empty refunds
       }
 
       // Update with full details
