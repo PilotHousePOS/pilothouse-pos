@@ -4554,6 +4554,9 @@ export default function Admin() {
   const [editingOrder, setEditingOrder] = useState<any>(null);
   const [editOrderModalOpen, setEditOrderModalOpen] = useState(false);
   const [editOrderItems, setEditOrderItems] = useState<any[]>([]);
+  const [editOrderSearchQuery, setEditOrderSearchQuery] = useState('');
+  const [editOrderSearchResults, setEditOrderSearchResults] = useState<any[]>([]);
+  const [isSearchingProducts, setIsSearchingProducts] = useState(false);
   const [filterByHere, setFilterByHere] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<any>(null);
   const [isCategorizing, setIsCategorizing] = useState(false);
@@ -7477,7 +7480,10 @@ export default function Admin() {
                                   <Button
                                     variant="outline"
                                     onClick={() => {
-                                      setEditingOrder({ order, items });
+                                      setEditingOrder({ order, items, customerName, customerEmail: order.customerEmail, customerPhone: order.customerPhone });
+                                      setEditOrderItems(items.map((item: any) => ({ ...item })));
+                                      setEditOrderSearchQuery('');
+                                      setEditOrderSearchResults([]);
                                       setEditOrderModalOpen(true);
                                     }}
                                     className="border-blue-300 text-blue-700 hover:bg-blue-50"
@@ -7665,78 +7671,172 @@ export default function Admin() {
           )}
           
           {/* Edit Order Modal */}
-          <Dialog open={editOrderModalOpen} onOpenChange={(open) => {
-            setEditOrderModalOpen(open);
-            if (open && editingOrder) {
-              setEditOrderItems(editingOrder.items.map((item: any) => ({ ...item })));
-            }
-          }}>
-            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <Dialog open={editOrderModalOpen} onOpenChange={setEditOrderModalOpen}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Edit Order #{editingOrder?.order?.id}</DialogTitle>
               </DialogHeader>
               
               {editingOrder && (
                 <div className="space-y-4">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <p className="text-sm text-blue-800">
-                      <strong>Edit Items:</strong> Adjust quantities or remove items before approving.
-                      Set quantity to 0 to remove an item.
-                    </p>
+                  {/* Customer Contact Info */}
+                  <div className="bg-gray-50 border rounded-lg p-3">
+                    <p className="font-semibold text-lg">{editingOrder.customerName || 'Customer'}</p>
+                    {editingOrder.customerEmail && (
+                      <p className="text-sm text-gray-600 flex items-center gap-2">
+                        <Mail className="w-4 h-4" />
+                        <a href={`mailto:${editingOrder.customerEmail}`} className="text-blue-600 hover:underline">
+                          {editingOrder.customerEmail}
+                        </a>
+                      </p>
+                    )}
+                    {editingOrder.customerPhone && (
+                      <p className="text-sm text-gray-600 flex items-center gap-2">
+                        <Phone className="w-4 h-4" />
+                        <a href={`tel:${editingOrder.customerPhone}`} className="text-blue-600 hover:underline">
+                          {editingOrder.customerPhone}
+                        </a>
+                      </p>
+                    )}
                   </div>
-                  
-                  <div className="space-y-3">
-                    {editOrderItems.map((item: any, idx: number) => (
-                      <div key={item.id || idx} className="flex items-center justify-between gap-3 p-3 border rounded">
-                        <div className="flex-1">
-                          <p className="font-medium text-sm">{item.itemName || item.productName || 'Item'}</p>
-                          <p className="text-xs text-gray-500">${item.price} each</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setEditOrderItems(prev => prev.map((it, i) => 
-                                i === idx ? { ...it, quantity: Math.max(0, it.quantity - 1) } : it
-                              ));
-                            }}
-                          >
-                            <Minus className="w-4 h-4" />
-                          </Button>
-                          <span className="w-8 text-center font-medium">{item.quantity}</span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setEditOrderItems(prev => prev.map((it, i) => 
-                                i === idx ? { ...it, quantity: it.quantity + 1 } : it
-                              ));
-                            }}
-                          >
-                            <Plus className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => {
-                              setEditOrderItems(prev => prev.map((it, i) => 
-                                i === idx ? { ...it, quantity: 0 } : it
-                              ));
-                            }}
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
+
+                  {/* Current Items */}
+                  <div>
+                    <p className="font-medium mb-2">Order Items:</p>
+                    {editOrderItems.filter(it => it.quantity > 0).length === 0 ? (
+                      <p className="text-sm text-gray-500 italic">No items in order</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {editOrderItems.filter(it => it.quantity > 0).map((item: any, idx: number) => {
+                          const actualIdx = editOrderItems.findIndex(it => it === item);
+                          return (
+                            <div key={item.id || idx} className="flex items-center justify-between gap-3 p-3 border rounded bg-white">
+                              <div className="flex-1">
+                                <p className="font-medium text-sm">{item.itemName || item.productName || 'Item'}</p>
+                                <p className="text-xs text-gray-500">${item.price} each</p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    setEditOrderItems(prev => prev.map((it, i) => 
+                                      i === actualIdx ? { ...it, quantity: Math.max(0, it.quantity - 1) } : it
+                                    ));
+                                  }}
+                                >
+                                  <Minus className="w-4 h-4" />
+                                </Button>
+                                <span className="w-8 text-center font-medium">{item.quantity}</span>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    setEditOrderItems(prev => prev.map((it, i) => 
+                                      i === actualIdx ? { ...it, quantity: it.quantity + 1 } : it
+                                    ));
+                                  }}
+                                >
+                                  <Plus className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => {
+                                    setEditOrderItems(prev => prev.filter((_, i) => i !== actualIdx));
+                                  }}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                    ))}
+                    )}
+                  </div>
+
+                  {/* Add Items from Inventory */}
+                  <div className="border-t pt-3">
+                    <p className="font-medium mb-2">Add Items from Inventory:</p>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        placeholder="Search products..."
+                        value={editOrderSearchQuery}
+                        onChange={async (e) => {
+                          const query = e.target.value;
+                          setEditOrderSearchQuery(query);
+                          if (query.length >= 2) {
+                            setIsSearchingProducts(true);
+                            try {
+                              const res = await fetch(`/api/supplies?search=${encodeURIComponent(query)}&limit=5`);
+                              const data = await res.json();
+                              setEditOrderSearchResults(data.supplies || []);
+                            } catch (err) {
+                              console.error('Search error:', err);
+                            } finally {
+                              setIsSearchingProducts(false);
+                            }
+                          } else {
+                            setEditOrderSearchResults([]);
+                          }
+                        }}
+                        className="pl-10"
+                      />
+                    </div>
+                    
+                    {isSearchingProducts && (
+                      <p className="text-sm text-gray-500 mt-2">Searching...</p>
+                    )}
+                    
+                    {editOrderSearchResults.length > 0 && (
+                      <div className="mt-2 border rounded max-h-48 overflow-y-auto">
+                        {editOrderSearchResults.map((product: any) => (
+                          <div 
+                            key={product.id} 
+                            className="flex items-center justify-between p-2 hover:bg-gray-50 border-b last:border-b-0 cursor-pointer"
+                            onClick={() => {
+                              // Check if item already exists in order
+                              const existingIdx = editOrderItems.findIndex(it => it.supplyId === product.id);
+                              if (existingIdx >= 0) {
+                                // Increase quantity
+                                setEditOrderItems(prev => prev.map((it, i) => 
+                                  i === existingIdx ? { ...it, quantity: it.quantity + 1 } : it
+                                ));
+                              } else {
+                                // Add new item
+                                setEditOrderItems(prev => [...prev, {
+                                  supplyId: product.id,
+                                  itemName: product.name,
+                                  productName: product.name,
+                                  price: product.price,
+                                  quantity: 1,
+                                  category: product.category || 'uncategorized'
+                                }]);
+                              }
+                              setEditOrderSearchQuery('');
+                              setEditOrderSearchResults([]);
+                            }}
+                          >
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">{product.name}</p>
+                              <p className="text-xs text-gray-500">${product.price}</p>
+                            </div>
+                            <Button size="sm" variant="ghost">
+                              <Plus className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   
                   <div className="border-t pt-3">
                     <div className="flex justify-between font-semibold">
                       <span>New Subtotal:</span>
                       <span>
-                        ${editOrderItems.reduce((sum: number, item: any) => 
+                        ${editOrderItems.filter(it => it.quantity > 0).reduce((sum: number, item: any) => 
                           sum + (parseFloat(item.price) * item.quantity), 0
                         ).toFixed(2)}
                       </span>
@@ -7756,7 +7856,7 @@ export default function Admin() {
                       onClick={() => {
                         updateOrderItemsMutation.mutate({
                           orderId: editingOrder.order.id,
-                          items: editOrderItems
+                          items: editOrderItems.filter(it => it.quantity > 0)
                         });
                       }}
                       disabled={updateOrderItemsMutation.isPending}
