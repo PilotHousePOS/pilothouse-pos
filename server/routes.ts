@@ -5125,6 +5125,62 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // SMS Opt-Out Management
+  app.patch("/api/contacts/:id/sms-opt-out", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const contactId = parseInt(req.params.id);
+      const { optOut } = req.body;
+      
+      if (typeof optOut !== 'boolean') {
+        return res.status(400).json({ message: "optOut must be a boolean" });
+      }
+
+      const contact = await storage.updateContactSmsOptOut(contactId, optOut);
+      res.json(contact);
+    } catch (error) {
+      console.error("Error updating SMS opt-out:", error);
+      res.status(500).json({ message: "Failed to update SMS opt-out status" });
+    }
+  });
+
+  // Get SMS logs
+  app.get("/api/admin/sms-logs", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const limit = parseInt(req.query.limit as string) || 100;
+      const logs = await storage.getSmsLogs(limit);
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching SMS logs:", error);
+      res.status(500).json({ message: "Failed to fetch SMS logs" });
+    }
+  });
+
+  // Get failed SMS logs only
+  app.get("/api/admin/sms-logs/failed", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const logs = await storage.getFailedSmsLogs();
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching failed SMS logs:", error);
+      res.status(500).json({ message: "Failed to fetch failed SMS logs" });
+    }
+  });
+
   // Manual cleanup of past appointments (with optional status filter)
   app.post("/api/admin/appointments/cleanup-past", authMiddleware, async (req: any, res) => {
     try {

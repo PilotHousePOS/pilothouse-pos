@@ -18,6 +18,7 @@ import {
   passwordResetTokens,
   wishlistItems,
   contacts,
+  smsLogs,
   appointmentHistory,
   dailyAppointmentLimits,
   weeklyAppointmentLimits,
@@ -323,6 +324,12 @@ export interface IStorage {
   deleteContact(id: number): Promise<void>;
   linkContactToUser(contactId: number, userId: string): Promise<void>;
   findUnlinkedContactsByPhoneNumber(phoneNumber: string): Promise<Contact[]>;
+  updateContactSmsOptOut(contactId: number, optOut: boolean): Promise<Contact>;
+
+  // SMS log operations
+  createSmsLog(log: { contactId?: number; phoneNumber: string; message: string; status: string; errorMessage?: string; twilioSid?: string; appointmentId?: number }): Promise<any>;
+  getSmsLogs(limit?: number): Promise<any[]>;
+  getFailedSmsLogs(): Promise<any[]>;
 
   // Daily appointment limit operations (deprecated, use weekly limits)
   getDailyAppointmentLimit(date: string): Promise<DailyAppointmentLimit | undefined>;
@@ -3058,6 +3065,37 @@ export class DatabaseStorage implements IStorage {
     return unlinkedContacts.filter(c =>
       c.phoneNumber && normalizePhoneNumber(c.phoneNumber) === normalizedSearch
     );
+  }
+
+  async updateContactSmsOptOut(contactId: number, optOut: boolean): Promise<Contact> {
+    const [updated] = await db
+      .update(contacts)
+      .set({ smsOptOut: optOut, updatedAt: new Date() })
+      .where(eq(contacts.id, contactId))
+      .returning();
+    return updated;
+  }
+
+  // SMS log operations
+  async createSmsLog(log: { contactId?: number; phoneNumber: string; message: string; status: string; errorMessage?: string; twilioSid?: string; appointmentId?: number }): Promise<any> {
+    const [newLog] = await db.insert(smsLogs).values({
+      contactId: log.contactId || null,
+      phoneNumber: log.phoneNumber,
+      message: log.message,
+      status: log.status,
+      errorMessage: log.errorMessage || null,
+      twilioSid: log.twilioSid || null,
+      appointmentId: log.appointmentId || null,
+    }).returning();
+    return newLog;
+  }
+
+  async getSmsLogs(limit: number = 100): Promise<any[]> {
+    return await db.select().from(smsLogs).orderBy(desc(smsLogs.sentAt)).limit(limit);
+  }
+
+  async getFailedSmsLogs(): Promise<any[]> {
+    return await db.select().from(smsLogs).where(eq(smsLogs.status, 'failed')).orderBy(desc(smsLogs.sentAt));
   }
 
   // Daily appointment limit operations
