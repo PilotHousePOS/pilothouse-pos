@@ -29,183 +29,6 @@ import {
   Search
 } from "lucide-react";
 
-function RefundReportSection() {
-  const { toast } = useToast();
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [recipientEmail, setRecipientEmail] = useState('');
-  const [isSending, setIsSending] = useState(false);
-  const [refunds, setRefunds] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const fetchRefunds = async () => {
-    if (!startDate || !endDate) {
-      toast({
-        title: "Date Range Required",
-        description: "Please select both start and end dates.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/refunds?startDate=${startDate}&endDate=${endDate}`, {
-        credentials: 'include'
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setRefunds(data);
-      }
-    } catch (error) {
-      console.error("Error fetching refunds:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSendRefundReport = async () => {
-    if (!recipientEmail) {
-      toast({
-        title: "Email Required",
-        description: "Please enter an email address to send the report.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!startDate || !endDate) {
-      toast({
-        title: "Date Range Required",
-        description: "Please select a date range first.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsSending(true);
-    try {
-      const response = await fetch('/api/admin/send-refund-report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          email: recipientEmail,
-          startDate,
-          endDate
-        })
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Report Sent",
-          description: `Refund report sent to ${recipientEmail}`,
-        });
-      } else {
-        throw new Error("Failed to send report");
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to send refund report",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSending(false);
-    }
-  };
-
-  const totalRefunded = refunds.reduce((sum, r) => sum + parseFloat(r.refundAmount || 0), 0);
-
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label>Start Date</Label>
-          <Input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-        </div>
-        <div>
-          <Label>End Date</Label>
-          <Input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <Button
-        onClick={fetchRefunds}
-        disabled={isLoading || !startDate || !endDate}
-        variant="outline"
-        className="w-full"
-      >
-        {isLoading ? 'Loading...' : 'Load Refunds'}
-      </Button>
-
-      {refunds.length > 0 && (
-        <div className="space-y-4">
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-medium text-orange-800">
-                {refunds.length} Refund{refunds.length !== 1 ? 's' : ''} Found
-              </span>
-              <span className="font-bold text-orange-600">
-                Total: ${totalRefunded.toFixed(2)}
-              </span>
-            </div>
-            <div className="max-h-40 overflow-y-auto space-y-2">
-              {refunds.map((refund, idx) => (
-                <div key={refund.id || idx} className="text-sm flex justify-between items-center p-2 bg-white rounded">
-                  <div>
-                    <span className="font-medium">Order #{refund.orderId}</span>
-                    <span className="text-gray-500 ml-2">
-                      {new Date(refund.refundDate).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <span className="font-semibold text-orange-600">
-                    -${refund.refundAmount}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <Label>Send Report To</Label>
-            <Input
-              type="email"
-              value={recipientEmail}
-              onChange={(e) => setRecipientEmail(e.target.value)}
-              placeholder="owner@example.com"
-            />
-          </div>
-
-          <Button
-            onClick={handleSendRefundReport}
-            disabled={isSending || !recipientEmail}
-            className="w-full bg-brand-blue hover:bg-blue-600"
-          >
-            <Send className="w-4 h-4 mr-2" />
-            {isSending ? 'Sending...' : 'Send Refund Report'}
-          </Button>
-        </div>
-      )}
-
-      {refunds.length === 0 && startDate && endDate && !isLoading && (
-        <div className="text-center py-4 text-gray-500">
-          <RotateCcw className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-          <p>No refunds found for the selected date range.</p>
-        </div>
-      )}
-    </div>
-  );
-}
-
 interface EmailCenterProps {
   groomingSettings: any[];
 }
@@ -243,9 +66,6 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
   });
   const [isSavingDailyReport, setIsSavingDailyReport] = useState(false);
 
-  const [taxRate, setTaxRate] = useState('0');
-  const [isSavingTax, setIsSavingTax] = useState(false);
-
   // SMS Management state
   const [smsContactSearch, setSmsContactSearch] = useState('');
   const [smsLogFilter, setSmsLogFilter] = useState<'all' | 'failed' | 'skipped'>('all');
@@ -277,38 +97,6 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
       });
     }
   }, [dailyReportData]);
-
-  useEffect(() => {
-    const taxSetting = (groomingSettings as any[])?.find(s => s.setting === 'tax_rate');
-    if (taxSetting) {
-      setTaxRate(taxSetting.value || '0');
-    }
-  }, [groomingSettings]);
-
-  const handleSaveTaxRate = async () => {
-    setIsSavingTax(true);
-    try {
-      await fetch('/api/admin/grooming-settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ setting: 'tax_rate', value: taxRate })
-      });
-      toast({
-        title: "Tax Rate Saved",
-        description: `Tax rate set to ${taxRate}%`,
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/grooming-settings'] });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to save tax rate",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSavingTax(false);
-    }
-  };
 
   const { data: recipients = [], isLoading: loadingRecipients } = useQuery<any[]>({
     queryKey: ['/api/admin/email/recipients'],
@@ -1002,41 +790,6 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
                 </div>
               </div>
 
-              <div className="border-t pt-6">
-                <h4 className="font-medium mb-4">Tax Settings</h4>
-                <div className="flex items-end gap-4">
-                  <div className="flex-1 max-w-xs">
-                    <Label>Sales Tax Rate (%)</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      max="100"
-                      value={taxRate}
-                      onChange={(e) => setTaxRate(e.target.value)}
-                      placeholder="8.25"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Applied to all orders at checkout
-                    </p>
-                  </div>
-                  <Button
-                    onClick={handleSaveTaxRate}
-                    disabled={isSavingTax}
-                    className="bg-brand-blue hover:bg-blue-600"
-                  >
-                    {isSavingTax ? 'Saving...' : 'Save Tax Rate'}
-                  </Button>
-                </div>
-              </div>
-
-              <div className="border-t pt-6">
-                <h4 className="font-medium mb-2">Refund Report</h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Send a report of all refunds processed during a selected date range for ExaTouch POS reconciliation.
-                </p>
-                <RefundReportSection />
-              </div>
             </div>
           )}
 
