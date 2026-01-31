@@ -1801,15 +1801,16 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       
       // Send email notification
       const order = orderWithItems.order;
-      if (order.customerEmail) {
+      const customerEmail = orderWithItems.customerEmail || order.customerEmail;
+      if (customerEmail) {
         try {
           const { sendEmail } = await import('./sendgridIntegration');
           const itemsList = orderWithItems.items.map((item: any) => 
-            `• ${item.supply?.name || item.pet?.name || 'Item'} x${item.quantity} - $${item.price}`
+            `• ${item.itemName || 'Item'} x${item.quantity} - $${item.price}`
           ).join('\n');
           
           await sendEmail({
-            to: order.customerEmail,
+            to: customerEmail,
             subject: 'Your Animal House Order Has Been Approved!',
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -1817,8 +1818,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                   <h1 style="margin: 0;">🐾 Animal House Pet Store</h1>
                 </div>
                 <div style="padding: 20px; background-color: #f9fafb;">
-                  <h2 style="color: #16a34a;">Order Approved! ✓</h2>
-                  <p>Hi ${order.customerName || 'Valued Customer'},</p>
+                  <h2 style="color: #16a34a;">Order Approved!</h2>
+                  <p>Hi ${orderWithItems.customerName || 'Valued Customer'},</p>
                   <p>Great news! Your order <strong>#${order.id}</strong> has been approved and is now being prepared.</p>
                   
                   <div style="background: white; border-radius: 8px; padding: 15px; margin: 15px 0;">
@@ -1869,21 +1870,22 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       
       // Send email notification
       const order = orderWithItems.order;
-      if (order.customerEmail) {
+      const customerEmail = orderWithItems.customerEmail || order.customerEmail;
+      if (customerEmail) {
         try {
           const { sendEmail } = await import('./sendgridIntegration');
           
           await sendEmail({
-            to: order.customerEmail,
-            subject: 'Your Animal House Order Is Ready for Pickup! 🎉',
+            to: customerEmail,
+            subject: 'Your Animal House Order Is Ready for Pickup!',
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
                   <h1 style="margin: 0;">🐾 Animal House Pet Store</h1>
                 </div>
                 <div style="padding: 20px; background-color: #f9fafb;">
-                  <h2 style="color: #16a34a;">Your Order is Ready! 📦</h2>
-                  <p>Hi ${order.customerName || 'Valued Customer'},</p>
+                  <h2 style="color: #16a34a;">Your Order is Ready!</h2>
+                  <p>Hi ${orderWithItems.customerName || 'Valued Customer'},</p>
                   <p>Your order <strong>#${order.id}</strong> is now ready for pickup!</p>
                   
                   <div style="background: #16a34a; color: white; border-radius: 8px; padding: 20px; margin: 15px 0; text-align: center;">
