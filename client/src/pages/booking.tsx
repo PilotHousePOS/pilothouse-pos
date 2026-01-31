@@ -630,41 +630,48 @@ export default function Booking() {
         {/* Date Selection */}
         <div>
           <Label className="text-sm font-semibold text-gray-900 mb-3 block">Select Date</Label>
-          <Card>
-            <CardContent className="p-4">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                disabled={(date) => !isDateAvailable(date)}
-                className="rounded-md border-none"
-                components={{
-                  DayContent: ({ date }) => {
-                    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-                    const slots = (availableSlots as any)[dateStr];
-                    const isAvailable = isDateAvailable(date);
-                    const totalSlots = slots ? slots.totalAvailable : 0;
-                    
-                    return (
-                      <div className="flex flex-col items-center">
-                        <span>{date.getDate()}</span>
-                        {isAvailable && totalSlots > 0 && (
-                          <span className="text-[10px] text-green-600 font-medium leading-none">
-                            {totalSlots} left
-                          </span>
-                        )}
-                        {isAvailable && totalSlots === 0 && slots && (
-                          <span className="text-[10px] text-red-500 font-medium leading-none">
-                            Full
-                          </span>
-                        )}
-                      </div>
-                    );
-                  }
-                }}
-              />
-            </CardContent>
-          </Card>
+          <div className="flex flex-col md:flex-row gap-4">
+            <Card className="flex-shrink-0">
+              <CardContent className="p-4">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={setSelectedDate}
+                  disabled={(date) => !isDateAvailable(date)}
+                  className="rounded-md border-none"
+                  components={{
+                    DayContent: ({ date }) => {
+                      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                      const slots = (availableSlots as any)[dateStr];
+                      const isAvailable = isDateAvailable(date);
+                      const totalSlots = slots ? slots.totalAvailable : 0;
+                      
+                      return (
+                        <div className="flex flex-col items-center">
+                          <span>{date.getDate()}</span>
+                          {isAvailable && totalSlots > 0 && (
+                            <span className="text-[10px] text-green-600 font-medium leading-none">
+                              {totalSlots} left
+                            </span>
+                          )}
+                          {isAvailable && totalSlots === 0 && slots && (
+                            <span className="text-[10px] text-red-500 font-medium leading-none">
+                              Full
+                            </span>
+                          )}
+                        </div>
+                      );
+                    }
+                  }}
+                />
+              </CardContent>
+            </Card>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex-1">
+              <p className="text-sm text-blue-700">
+                <strong>Note:</strong> The slots shown left open include baths and grooms. It may say 10 left and the slots open are baths not grooms or vice versa.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Important Notice */}

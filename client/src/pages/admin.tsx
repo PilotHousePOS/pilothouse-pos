@@ -11290,37 +11290,44 @@ export default function Admin() {
             {/* Date Selection */}
             <div>
               <Label>Select Date *</Label>
-              <Calendar
-                mode="single"
-                selected={bookingSelectedDate}
-                onSelect={setBookingSelectedDate}
-                disabled={(date) => !isBookingDateAvailable(date)}
-                className="rounded-md border"
-                components={{
-                  DayContent: ({ date }) => {
-                    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-                    const slots = (availableSlots as any)[dateStr];
-                    const isAvailable = isBookingDateAvailable(date);
-                    const totalSlots = slots ? slots.totalAvailable : 0;
-                    
-                    return (
-                      <div className="flex flex-col items-center">
-                        <span>{date.getDate()}</span>
-                        {isAvailable && totalSlots > 0 && (
-                          <span className="text-[10px] text-green-600 font-medium leading-none">
-                            {totalSlots} left
-                          </span>
-                        )}
-                        {isAvailable && totalSlots === 0 && slots && (
-                          <span className="text-[10px] text-red-500 font-medium leading-none">
-                            Full
-                          </span>
-                        )}
-                      </div>
-                    );
-                  }
-                }}
-              />
+              <div className="flex flex-col md:flex-row gap-4">
+                <Calendar
+                  mode="single"
+                  selected={bookingSelectedDate}
+                  onSelect={setBookingSelectedDate}
+                  disabled={(date) => !isBookingDateAvailable(date)}
+                  className="rounded-md border flex-shrink-0"
+                  components={{
+                    DayContent: ({ date }) => {
+                      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                      const slots = (availableSlots as any)[dateStr];
+                      const isAvailable = isBookingDateAvailable(date);
+                      const totalSlots = slots ? slots.totalAvailable : 0;
+                      
+                      return (
+                        <div className="flex flex-col items-center">
+                          <span>{date.getDate()}</span>
+                          {isAvailable && totalSlots > 0 && (
+                            <span className="text-[10px] text-green-600 font-medium leading-none">
+                              {totalSlots} left
+                            </span>
+                          )}
+                          {isAvailable && totalSlots === 0 && slots && (
+                            <span className="text-[10px] text-red-500 font-medium leading-none">
+                              Full
+                            </span>
+                          )}
+                        </div>
+                      );
+                    }
+                  }}
+                />
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex-1">
+                  <p className="text-sm text-blue-700">
+                    <strong>Note:</strong> The slots shown left open include baths and grooms. It may say 10 left and the slots open are baths not grooms or vice versa.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Time Selection */}
