@@ -4404,20 +4404,38 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
-  // Tax rate endpoint (public for cart checkout)
+  // Tax rate endpoint (public for cart checkout) - ExaTouch POS format
   app.get("/api/settings/tax-rate", async (_req, res) => {
     try {
       const settings = await storage.getGroomingSettings();
-      const taxSetting = settings.find(s => s.setting === 'tax_rate');
-      const taxRate = taxSetting ? parseFloat(taxSetting.value) : 0;
-      res.json({ taxRate });
+      const cityTax = settings.find(s => s.setting === 'tax_city')?.value || '0';
+      const countyTax = settings.find(s => s.setting === 'tax_county')?.value || '0';
+      const stateTax = settings.find(s => s.setting === 'tax_state')?.value || '5.0000';
+      const federalTax = settings.find(s => s.setting === 'tax_federal')?.value || '5.9900';
+      const showOnReceipt = settings.find(s => s.setting === 'tax_show_on_receipt')?.value !== 'false';
+      const defaultForItems = settings.find(s => s.setting === 'tax_default_for_items')?.value !== 'false';
+      const defaultForServices = settings.find(s => s.setting === 'tax_default_for_services')?.value !== 'false';
+      
+      // Calculate combined tax rate
+      const taxRate = parseFloat(cityTax) + parseFloat(countyTax) + parseFloat(stateTax) + parseFloat(federalTax);
+      
+      res.json({ 
+        taxRate,
+        cityTax: parseFloat(cityTax),
+        countyTax: parseFloat(countyTax),
+        stateTax: parseFloat(stateTax),
+        federalTax: parseFloat(federalTax),
+        showOnReceipt,
+        defaultForItems,
+        defaultForServices
+      });
     } catch (error) {
       console.error("Error fetching tax rate:", error);
-      res.json({ taxRate: 0 });
+      res.json({ taxRate: 10.99, cityTax: 0, countyTax: 0, stateTax: 5.0, federalTax: 5.99, showOnReceipt: true, defaultForItems: true, defaultForServices: true });
     }
   });
 
-  // Set tax rate (Admin only)
+  // Set tax rate (Admin only) - ExaTouch POS format
   app.put("/api/admin/settings/tax-rate", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
@@ -4425,13 +4443,30 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      const { taxRate } = req.body;
-      if (typeof taxRate !== 'number' || taxRate < 0 || taxRate > 100) {
-        return res.status(400).json({ message: "Tax rate must be a number between 0 and 100" });
+      const { cityTax, countyTax, stateTax, federalTax, showOnReceipt, defaultForItems, defaultForServices } = req.body;
+      
+      // Validate tax values
+      const taxes = [cityTax, countyTax, stateTax, federalTax];
+      for (const tax of taxes) {
+        if (typeof tax !== 'number' || tax < 0 || tax > 100) {
+          return res.status(400).json({ message: "Tax rates must be numbers between 0 and 100" });
+        }
       }
 
-      await storage.setGroomingSetting('tax_rate', taxRate.toString());
-      res.json({ success: true, taxRate });
+      // Save individual tax rates
+      await storage.upsertGroomingSetting({ setting: 'tax_city', value: cityTax.toFixed(4) });
+      await storage.upsertGroomingSetting({ setting: 'tax_county', value: countyTax.toFixed(4) });
+      await storage.upsertGroomingSetting({ setting: 'tax_state', value: stateTax.toFixed(4) });
+      await storage.upsertGroomingSetting({ setting: 'tax_federal', value: federalTax.toFixed(4) });
+      await storage.upsertGroomingSetting({ setting: 'tax_show_on_receipt', value: showOnReceipt ? 'true' : 'false' });
+      await storage.upsertGroomingSetting({ setting: 'tax_default_for_items', value: defaultForItems ? 'true' : 'false' });
+      await storage.upsertGroomingSetting({ setting: 'tax_default_for_services', value: defaultForServices ? 'true' : 'false' });
+      
+      // Calculate combined rate for backwards compatibility
+      const taxRate = cityTax + countyTax + stateTax + federalTax;
+      await storage.upsertGroomingSetting({ setting: 'tax_rate', value: taxRate.toString() });
+      
+      res.json({ success: true, taxRate, cityTax, countyTax, stateTax, federalTax, showOnReceipt, defaultForItems, defaultForServices });
     } catch (error) {
       console.error("Error setting tax rate:", error);
       res.status(500).json({ message: "Failed to set tax rate" });

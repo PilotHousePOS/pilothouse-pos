@@ -4067,10 +4067,16 @@ function EditAppointmentDialog({
 
 // EmailCenter component moved to client/src/components/admin/EmailCenter.tsx
 
-// Settings Panel Component
+// Settings Panel Component - ExaTouch POS Tax Format
 function SettingsPanel() {
   const { toast } = useToast();
-  const [taxRate, setTaxRate] = useState<number>(0);
+  const [cityTax, setCityTax] = useState<number>(0);
+  const [countyTax, setCountyTax] = useState<number>(0);
+  const [stateTax, setStateTax] = useState<number>(5.0);
+  const [federalTax, setFederalTax] = useState<number>(5.99);
+  const [showOnReceipt, setShowOnReceipt] = useState<boolean>(true);
+  const [defaultForItems, setDefaultForItems] = useState<boolean>(true);
+  const [defaultForServices, setDefaultForServices] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState(false);
 
   const { data: taxData, isLoading } = useQuery({
@@ -4078,10 +4084,19 @@ function SettingsPanel() {
   });
 
   useEffect(() => {
-    if (taxData && typeof (taxData as any).taxRate === 'number') {
-      setTaxRate((taxData as any).taxRate);
+    if (taxData) {
+      const data = taxData as any;
+      if (typeof data.cityTax === 'number') setCityTax(data.cityTax);
+      if (typeof data.countyTax === 'number') setCountyTax(data.countyTax);
+      if (typeof data.stateTax === 'number') setStateTax(data.stateTax);
+      if (typeof data.federalTax === 'number') setFederalTax(data.federalTax);
+      if (typeof data.showOnReceipt === 'boolean') setShowOnReceipt(data.showOnReceipt);
+      if (typeof data.defaultForItems === 'boolean') setDefaultForItems(data.defaultForItems);
+      if (typeof data.defaultForServices === 'boolean') setDefaultForServices(data.defaultForServices);
     }
   }, [taxData]);
+
+  const totalTaxRate = cityTax + countyTax + stateTax + federalTax;
 
   const handleSaveTaxRate = async () => {
     setIsSaving(true);
@@ -4090,7 +4105,15 @@ function SettingsPanel() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ taxRate }),
+        body: JSON.stringify({ 
+          cityTax, 
+          countyTax, 
+          stateTax, 
+          federalTax,
+          showOnReceipt,
+          defaultForItems,
+          defaultForServices
+        }),
       });
       
       if (!response.ok) {
@@ -4099,7 +4122,7 @@ function SettingsPanel() {
       
       toast({
         title: "Settings saved",
-        description: `Tax rate set to ${taxRate}%`,
+        description: `Total tax rate set to ${totalTaxRate.toFixed(4)}%`,
       });
     } catch (error) {
       toast({
@@ -4119,33 +4142,129 @@ function SettingsPanel() {
           <Settings className="w-5 h-5" />
           Store Settings
         </CardTitle>
-        <CardDescription>Configure store-wide settings</CardDescription>
+        <CardDescription>Configure store-wide settings (ExaTouch POS format)</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Tax Settings</h3>
-          <div className="flex items-center gap-4">
-            <div className="flex-1 max-w-xs">
-              <Label htmlFor="tax-rate">Sales Tax Rate (%)</Label>
-              <div className="flex items-center gap-2 mt-2">
-                <Input
-                  id="tax-rate"
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.01"
-                  value={taxRate}
-                  onChange={(e) => setTaxRate(parseFloat(e.target.value) || 0)}
-                  className="w-32"
-                  disabled={isLoading}
-                />
-                <span className="text-gray-500">%</span>
-              </div>
-              <p className="text-sm text-gray-500 mt-1">
-                This tax rate will be applied to all orders at checkout
-              </p>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Group A - Sales Tax</h3>
+            <div className="text-right">
+              <span className="text-sm text-gray-500">Total: </span>
+              <span className="font-bold text-lg">{totalTaxRate.toFixed(4)}%</span>
             </div>
           </div>
+          
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-3">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="city-tax" className="text-right w-24">City Tax</Label>
+                <div className="flex items-center gap-1">
+                  <Input
+                    id="city-tax"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.0001"
+                    value={cityTax}
+                    onChange={(e) => setCityTax(parseFloat(e.target.value) || 0)}
+                    className="w-28 text-right"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <Label htmlFor="county-tax" className="text-right w-24">County Tax</Label>
+                <div className="flex items-center gap-1">
+                  <Input
+                    id="county-tax"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.0001"
+                    value={countyTax}
+                    onChange={(e) => setCountyTax(parseFloat(e.target.value) || 0)}
+                    className="w-28 text-right"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <Label htmlFor="state-tax" className="text-right w-24">State Tax</Label>
+                <div className="flex items-center gap-1">
+                  <Input
+                    id="state-tax"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.0001"
+                    value={stateTax}
+                    onChange={(e) => setStateTax(parseFloat(e.target.value) || 0)}
+                    className="w-28 text-right"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <Label htmlFor="federal-tax" className="text-right w-24">Federal Tax</Label>
+                <div className="flex items-center gap-1">
+                  <Input
+                    id="federal-tax"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.0001"
+                    value={federalTax}
+                    onChange={(e) => setFederalTax(parseFloat(e.target.value) || 0)}
+                    className="w-28 text-right"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3 space-y-2">
+              <div className="flex items-center space-x-2">
+                <input 
+                  type="checkbox" 
+                  id="show-on-receipt" 
+                  checked={showOnReceipt}
+                  onChange={(e) => setShowOnReceipt(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300"
+                />
+                <Label htmlFor="show-on-receipt" className="text-sm cursor-pointer">Show On Receipt</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <input 
+                  type="checkbox" 
+                  id="default-for-items" 
+                  checked={defaultForItems}
+                  onChange={(e) => setDefaultForItems(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300"
+                />
+                <Label htmlFor="default-for-items" className="text-sm cursor-pointer">Default For Items</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <input 
+                  type="checkbox" 
+                  id="default-for-services" 
+                  checked={defaultForServices}
+                  onChange={(e) => setDefaultForServices(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300"
+                />
+                <Label htmlFor="default-for-services" className="text-sm cursor-pointer">Default For Services</Label>
+              </div>
+            </div>
+          </div>
+          
+          <p className="text-sm text-gray-500">
+            Tax rates match ExaTouch POS format. Total rate ({totalTaxRate.toFixed(4)}%) is applied to all orders at checkout.
+          </p>
+          
           <Button 
             onClick={handleSaveTaxRate} 
             disabled={isSaving || isLoading}
