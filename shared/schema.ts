@@ -161,6 +161,10 @@ export const orders = pgTable("orders", {
   pickedUpAt: timestamp("picked_up_at"),
   orderDate: timestamp("order_date").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  isRecurring: boolean("is_recurring").default(false), // Customer wants to repeat this order
+  recurringFrequency: varchar("recurring_frequency", { length: 20 }), // weekly, biweekly, monthly
+  nextRecurringDate: timestamp("next_recurring_date"), // When to remind/place next order
+  recurringParentId: integer("recurring_parent_id"), // Links to original order if this is a recurring copy
 });
 
 // Order items

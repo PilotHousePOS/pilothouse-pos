@@ -34,6 +34,8 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const queryClient = useQueryClient();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [outOfStockPreference, setOutOfStockPreference] = useState("contact_me");
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurringFrequency, setRecurringFrequency] = useState("monthly");
 
   const { data: cartItems = [], isLoading } = useQuery({
     queryKey: ["/api/cart"],
@@ -211,11 +213,32 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
       price: item.details.price,
     }));
 
+    // Calculate next recurring date if recurring order
+    let nextRecurringDate = null;
+    if (isRecurring) {
+      const now = new Date();
+      switch (recurringFrequency) {
+        case 'weekly':
+          nextRecurringDate = new Date(now.setDate(now.getDate() + 7));
+          break;
+        case 'biweekly':
+          nextRecurringDate = new Date(now.setDate(now.getDate() + 14));
+          break;
+        case 'monthly':
+        default:
+          nextRecurringDate = new Date(now.setMonth(now.getMonth() + 1));
+          break;
+      }
+    }
+
     createOrderMutation.mutate({
       orderData: {
         totalAmount: totalAmount.toFixed(2),
         shippingAddress: "In-Store Pickup - Animal House Pet Store",
         outOfStockPreference,
+        isRecurring,
+        recurringFrequency: isRecurring ? recurringFrequency : null,
+        nextRecurringDate: nextRecurringDate?.toISOString() || null,
       },
       items: orderItems,
     });
@@ -428,6 +451,71 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     <p className="text-sm text-gray-600">Just remove the item from my order</p>
                   </div>
                 </label>
+              </div>
+            </div>
+
+            {/* Recurring Purchase Option */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Make this a recurring order?
+              </label>
+              <div className="space-y-3">
+                <label className="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                  <input
+                    type="checkbox"
+                    checked={isRecurring}
+                    onChange={(e) => setIsRecurring(e.target.checked)}
+                    className="w-4 h-4 text-brand-red"
+                  />
+                  <div>
+                    <span className="font-medium">Yes, set up recurring order</span>
+                    <p className="text-sm text-gray-600">We'll remind you when it's time to reorder</p>
+                  </div>
+                </label>
+                
+                {isRecurring && (
+                  <div className="ml-7 space-y-2">
+                    <p className="text-sm font-medium">How often?</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      <label className={`flex items-center justify-center p-2 border rounded-lg cursor-pointer text-sm ${recurringFrequency === 'weekly' ? 'border-brand-red bg-red-50' : 'hover:bg-gray-50'}`}>
+                        <input
+                          type="radio"
+                          name="frequency"
+                          value="weekly"
+                          checked={recurringFrequency === "weekly"}
+                          onChange={(e) => setRecurringFrequency(e.target.value)}
+                          className="sr-only"
+                        />
+                        <span>Weekly</span>
+                      </label>
+                      <label className={`flex items-center justify-center p-2 border rounded-lg cursor-pointer text-sm ${recurringFrequency === 'biweekly' ? 'border-brand-red bg-red-50' : 'hover:bg-gray-50'}`}>
+                        <input
+                          type="radio"
+                          name="frequency"
+                          value="biweekly"
+                          checked={recurringFrequency === "biweekly"}
+                          onChange={(e) => setRecurringFrequency(e.target.value)}
+                          className="sr-only"
+                        />
+                        <span>Biweekly</span>
+                      </label>
+                      <label className={`flex items-center justify-center p-2 border rounded-lg cursor-pointer text-sm ${recurringFrequency === 'monthly' ? 'border-brand-red bg-red-50' : 'hover:bg-gray-50'}`}>
+                        <input
+                          type="radio"
+                          name="frequency"
+                          value="monthly"
+                          checked={recurringFrequency === "monthly"}
+                          onChange={(e) => setRecurringFrequency(e.target.value)}
+                          className="sr-only"
+                        />
+                        <span>Monthly</span>
+                      </label>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      We'll send you a reminder when it's time to place your next order.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
