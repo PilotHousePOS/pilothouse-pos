@@ -122,6 +122,12 @@ export default function OrderHistory() {
   };
 
   const handleOrderClick = async (order: Order) => {
+    console.log("Order clicked:", order.id);
+    
+    // Set order immediately to show modal, then load details
+    setSelectedItems(new Set());
+    setSelectedOrder({ ...order, items: [], refunds: [] });
+    
     try {
       const [orderResponse, refundsResponse] = await Promise.all([
         fetch(`/api/orders/${order.id}`, {
@@ -183,7 +189,7 @@ export default function OrderHistory() {
         refunds = await refundsResponse.json();
       }
 
-      setSelectedItems(new Set());
+      // Update with full details
       setSelectedOrder({ ...order, items, refunds });
     } catch (error) {
       console.error("Error fetching order details:", error);
