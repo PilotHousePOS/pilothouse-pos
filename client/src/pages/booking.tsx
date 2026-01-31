@@ -314,12 +314,22 @@ export default function Booking() {
 
   const createAppointmentMutation = useMutation({
     mutationFn: async (appointmentData: any) => {
-      await apiRequest("POST", "/api/appointments", appointmentData);
+      const response = await apiRequest("POST", "/api/appointments", appointmentData);
+      return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
+      let description = "Your appointment has been successfully scheduled.";
+      if (data?.remainingSlots) {
+        const total = data.remainingSlots.totalAvailable;
+        if (total > 0) {
+          description = `Your appointment is scheduled! ${total} slot${total !== 1 ? 's' : ''} remaining for this date.`;
+        } else {
+          description = "Your appointment is scheduled! This date is now fully booked.";
+        }
+      }
       toast({
         title: "Appointment Booked!",
-        description: "Your appointment has been successfully scheduled.",
+        description,
       });
       // Reset form
       setSelectedDate(new Date());
@@ -332,6 +342,7 @@ export default function Booking() {
       setRecurringType('monthly');
       setCustomRecurringDates([]);
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments/available-slots"] });
     },
     onError: (error: any) => {
       if (isUnauthorizedError(error)) {

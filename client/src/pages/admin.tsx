@@ -5792,12 +5792,22 @@ export default function Admin() {
   // Create Appointment from Admin Booking Modal
   const createAppointmentMutation = useMutation({
     mutationFn: async (appointmentData: any) => {
-      await apiRequest("POST", "/api/appointments", appointmentData);
+      const response = await apiRequest("POST", "/api/appointments", appointmentData);
+      return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
+      let description = "The appointment has been created successfully.";
+      if (data?.remainingSlots) {
+        const total = data.remainingSlots.totalAvailable;
+        if (total > 0) {
+          description = `Appointment created! ${total} slot${total !== 1 ? 's' : ''} remaining for this date.`;
+        } else {
+          description = "Appointment created! This date is now fully booked.";
+        }
+      }
       toast({
         title: "Appointment Created",
-        description: "The appointment has been created successfully.",
+        description,
       });
       setIsBookAppointmentOpen(false);
       // Reset form
@@ -5812,6 +5822,7 @@ export default function Admin() {
       // Refresh appointments
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments-all"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments/available-slots"] });
     },
     onError: (error: any) => {
       // Extract error message from apiRequest error format: "400: {json}"

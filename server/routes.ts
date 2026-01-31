@@ -2273,17 +2273,21 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         });
       }
       
-      // Get all confirmed appointments in the date range
+      // Get all appointments that consume capacity (not cancelled or rejected)
       const allAppointments = await storage.getAppointments();
-      const confirmedAppointments = allAppointments.filter((apt: any) => 
-        apt.status === 'confirmed' && apt.appointmentDate
+      const activeAppointments = allAppointments.filter((apt: any) => 
+        apt.status !== 'cancelled' && apt.status !== 'rejected' && apt.appointmentDate
       );
       
       // Count booked slots per date
       const bookedByDate = new Map<string, { bathCount: number; groomCount: number }>();
       
-      for (const apt of confirmedAppointments) {
-        const dateStr = apt.appointmentDate.split('T')[0];
+      for (const apt of activeAppointments) {
+        // Handle both string and Date types for appointmentDate
+        const aptDateRaw = apt.appointmentDate;
+        const dateStr = typeof aptDateRaw === 'string' 
+          ? aptDateRaw.split('T')[0] 
+          : aptDateRaw.toISOString().split('T')[0];
         const aptDate = new Date(dateStr);
         
         if (aptDate >= start && aptDate <= end) {
@@ -2293,9 +2297,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           let groomCount = 0;
           
           for (const pet of pets) {
-            if (pet.serviceType === 'bath' || pet.serviceType === 'Bath Only') {
+            // Use substring matching like the rest of the capacity logic
+            const serviceType = (pet.serviceType || '').toLowerCase();
+            if (serviceType.includes('bath')) {
               bathCount++;
-            } else if (pet.serviceType === 'groom' || pet.serviceType === 'Full Grooming') {
+            } else if (serviceType.includes('full') || (serviceType.includes('groom') && !serviceType.includes('bath'))) {
               groomCount++;
             }
           }
@@ -3519,7 +3525,49 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         // Don't fail the appointment if notifications fail
       }
       
-      res.json(appointment);
+      // Calculate remaining slots after booking
+      let remainingSlots = null;
+      try {
+        const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
+        if (weeklyLimit) {
+          // Re-count existing appointments after this booking (all non-cancelled/rejected consume capacity)
+          const updatedAppointments = await storage.getAppointments();
+          const activeForDate = updatedAppointments.filter((apt: any) => {
+            if (!apt.appointmentDate) return false;
+            if (apt.status === 'cancelled' || apt.status === 'rejected') return false;
+            // Handle both string and Date types
+            const aptDateStr = typeof apt.appointmentDate === 'string' 
+              ? apt.appointmentDate.split('T')[0] 
+              : apt.appointmentDate.toISOString().split('T')[0];
+            return aptDateStr === rawDateStr;
+          });
+          
+          let bathCount = 0;
+          let groomCount = 0;
+          for (const apt of activeForDate) {
+            const pets = await storage.getAppointmentPets(apt.id);
+            for (const pet of pets) {
+              // Use substring matching like the rest of the capacity logic
+              const serviceType = (pet.serviceType || '').toLowerCase();
+              if (serviceType.includes('bath')) {
+                bathCount++;
+              } else if (serviceType.includes('full') || (serviceType.includes('groom') && !serviceType.includes('bath'))) {
+                groomCount++;
+              }
+            }
+          }
+          
+          remainingSlots = {
+            bathAvailable: Math.max(0, weeklyLimit.maxBathAppointments - bathCount),
+            groomAvailable: Math.max(0, weeklyLimit.maxGroomAppointments - groomCount),
+            totalAvailable: Math.max(0, weeklyLimit.maxBathAppointments - bathCount) + Math.max(0, weeklyLimit.maxGroomAppointments - groomCount)
+          };
+        }
+      } catch (slotsError) {
+        console.error('Failed to calculate remaining slots:', slotsError);
+      }
+      
+      res.json({ ...appointment, remainingSlots });
     } catch (error) {
       console.error("Error creating appointment:", error);
       if (error instanceof z.ZodError) {
