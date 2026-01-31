@@ -7928,7 +7928,7 @@ export default function Admin() {
                                 onCheckedChange={(checked) => {
                                   if (checked) {
                                     // Open SMS confirmation dialog when checking Done
-                                    const contact = contacts?.find((c: any) => c.id === currentAppointment.contactId);
+                                    const contact = allBookingContacts?.find((c: any) => c.id === currentAppointment.contactId);
                                     openSmsConfirmDialog(
                                       currentAppointment.id,
                                       currentAppointment.customerName || 'Customer',
