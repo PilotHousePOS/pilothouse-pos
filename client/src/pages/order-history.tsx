@@ -26,6 +26,7 @@ export default function OrderHistory() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case "completed":
       case "delivered":
         return "bg-green-500";
       case "shipped":

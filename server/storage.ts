@@ -2305,6 +2305,8 @@ export class DatabaseStorage implements IStorage {
       updateData.readyAt = new Date();
     } else if (approvalStatus === 'picked_up') {
       updateData.pickedUpAt = new Date();
+      // Also mark the main status as completed for customer-facing display
+      updateData.status = 'completed';
     }
     
     const [updated] = await db
