@@ -101,8 +101,6 @@ export async function setupAuth(app: Express) {
 
   app.get("/api/login", (req, res, next) => {
     const strategy = `replitauth:${req.hostname}`;
-    console.log('Login attempt with strategy:', strategy);
-    console.log('Available strategies:', Object.keys(passport._strategies || {}));
     
     passport.authenticate(strategy, {
       prompt: "login consent",

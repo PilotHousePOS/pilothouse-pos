@@ -51,7 +51,6 @@ class NotificationWebSocketServer {
       if (user && user.isAdmin) {
         ws.user = user;
         this.adminClients.add(ws);
-        console.log(`Admin user ${user.email} connected to WebSocket`);
       }
     }
 
@@ -61,9 +60,6 @@ class NotificationWebSocketServer {
 
     ws.on('close', () => {
       this.adminClients.delete(ws);
-      if (ws.user) {
-        console.log(`Admin user ${ws.user.email} disconnected from WebSocket`);
-      }
     });
 
     ws.on('error', (error) => {
@@ -96,7 +92,6 @@ class NotificationWebSocketServer {
       }
     });
 
-    console.log(`Broadcast notification to ${this.adminClients.size} admin clients:`, notification.title);
   }
 }
 

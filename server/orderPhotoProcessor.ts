@@ -67,7 +67,6 @@ export async function extractOrderFromPhoto(
     
     // If it's a PDF, convert first page to PNG image
     if (mimeType === 'application/pdf') {
-      console.log("Converting PDF to image...");
       const document = await pdf(imagePath, { scale: 3 }); // Higher scale for better quality
       let firstPage: Buffer | null = null;
       
@@ -82,7 +81,6 @@ export async function extractOrderFromPhoto(
       
       imageBuffer = firstPage;
       mimeType = 'image/png';
-      console.log("PDF converted to PNG successfully");
     } else {
       // Read the image file directly
       imageBuffer = fs.readFileSync(imagePath);
@@ -134,10 +132,7 @@ Return ONLY valid JSON in this EXACT format:
     // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
     const openai = getOpenAIClient();
     
-    console.log(`Processing image: ${imagePath}`);
-    console.log(`Image size: ${imageBuffer.length} bytes`);
-    console.log(`MIME type: ${mimeType}`);
-    console.log(`Base64 length: ${base64Image.length} characters`);
+    // Processing order photo with AI Vision
     
     const response = await openai.chat.completions.create({
       model: "gpt-5",
@@ -162,13 +157,9 @@ Return ONLY valid JSON in this EXACT format:
       max_completion_tokens: 16000,
     });
 
-    console.log("=== OpenAI Vision Response ===");
-    console.log("Full response:", JSON.stringify(response, null, 2));
     const content = response.choices[0]?.message?.content;
-    console.log("Raw content:", content);
     
     if (!content) {
-      console.log("ERROR: No content in response");
       return {
         success: false,
         items: [],
@@ -180,7 +171,6 @@ Return ONLY valid JSON in this EXACT format:
     let parsedData;
     try {
       parsedData = JSON.parse(content);
-      console.log("Parsed data:", JSON.stringify(parsedData, null, 2));
     } catch (parseError) {
       console.error("JSON parse error:", parseError);
       return {
@@ -191,7 +181,6 @@ Return ONLY valid JSON in this EXACT format:
     }
     
     const items: ExtractedItem[] = parsedData.items || [];
-    console.log(`Extracted ${items.length} items from AI response`);
 
     // Apply price multiplier to create marked-up prices
     const processedItems = items.map(item => ({
