@@ -16,6 +16,7 @@ interface OrderItemWithDetails extends OrderItem {
   supplyName?: string;
   petName?: string;
   imageUrl?: string;
+  itemName?: string;
 }
 
 interface OrderWithDetails extends Order {
@@ -122,11 +123,9 @@ export default function OrderHistory() {
   };
 
   const handleOrderClick = async (order: Order) => {
-    console.log("Order clicked:", order.id);
-    
-    // Set order immediately to show modal, then load details
+    // Set order immediately to show modal
     setSelectedItems(new Set());
-    setSelectedOrder({ ...order, items: [], refunds: [] });
+    setSelectedOrder({ ...order, items: undefined, refunds: [] });
     
     try {
       const [orderResponse, refundsResponse] = await Promise.all([
@@ -143,46 +142,8 @@ export default function OrderHistory() {
 
       if (orderResponse.ok) {
         const orderDetails = await orderResponse.json();
-        const rawItems = orderDetails.items || [];
-        
-        // Fetch supply/pet details for each item
-        const itemsWithDetails = await Promise.all(
-          rawItems.map(async (item: OrderItem) => {
-            let supplyName = '';
-            let petName = '';
-            let imageUrl = '';
-            
-            if (item.supplyId) {
-              try {
-                const supplyRes = await fetch(`/api/supplies/${item.supplyId}`, { credentials: 'include' });
-                if (supplyRes.ok) {
-                  const supply = await supplyRes.json();
-                  supplyName = supply.name || `Supply #${item.supplyId}`;
-                  imageUrl = supply.imageUrl || '';
-                }
-              } catch { 
-                supplyName = `Supply #${item.supplyId}`;
-              }
-            }
-            
-            if (item.petId) {
-              try {
-                const petRes = await fetch(`/api/pets/${item.petId}`, { credentials: 'include' });
-                if (petRes.ok) {
-                  const pet = await petRes.json();
-                  petName = pet.name || `Pet #${item.petId}`;
-                  imageUrl = pet.imageUrl || '';
-                }
-              } catch {
-                petName = `Pet #${item.petId}`;
-              }
-            }
-            
-            return { ...item, supplyName, petName, imageUrl };
-          })
-        );
-        
-        items = itemsWithDetails;
+        // API already returns items with itemName enriched
+        items = orderDetails.items || [];
       }
 
       if (refundsResponse.ok) {
@@ -193,6 +154,8 @@ export default function OrderHistory() {
       setSelectedOrder({ ...order, items, refunds });
     } catch (error) {
       console.error("Error fetching order details:", error);
+      // Still show the order even if details fail
+      setSelectedOrder({ ...order, items: [], refunds: [] });
     }
   };
 
@@ -324,6 +287,14 @@ export default function OrderHistory() {
                 </div>
               )}
 
+              {/* Loading state for items */}
+              {selectedOrder.items === undefined && (
+                <div className="text-center py-4">
+                  <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-brand-blue"></div>
+                  <p className="text-sm text-gray-500 mt-2">Loading items...</p>
+                </div>
+              )}
+
               {selectedOrder.items && selectedOrder.items.length > 0 && (
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -366,7 +337,7 @@ export default function OrderHistory() {
                         )}
                         <div className="flex-1">
                           <p className="font-medium">
-                            {item.supplyName || item.petName || (item.supplyId ? `Supply #${item.supplyId}` : `Pet #${item.petId}`)}
+                            {item.itemName || item.supplyName || item.petName || (item.supplyId ? `Supply #${item.supplyId}` : `Pet #${item.petId}`)}
                           </p>
                           <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
                         </div>
