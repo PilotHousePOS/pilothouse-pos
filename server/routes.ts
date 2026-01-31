@@ -1804,13 +1804,15 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const customerEmail = orderWithItems.customerEmail || order.customerEmail;
       if (customerEmail) {
         try {
-          const { sendEmail } = await import('./sendgridIntegration');
+          const { getUncachableSendGridClient } = await import('./sendgridIntegration');
+          const { client, fromEmail } = await getUncachableSendGridClient();
           const itemsList = orderWithItems.items.map((item: any) => 
             `• ${item.itemName || 'Item'} x${item.quantity} - $${item.price}`
           ).join('\n');
           
-          await sendEmail({
+          await client.send({
             to: customerEmail,
+            from: fromEmail,
             subject: 'Your Animal House Order Has Been Approved!',
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -1873,10 +1875,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const customerEmail = orderWithItems.customerEmail || order.customerEmail;
       if (customerEmail) {
         try {
-          const { sendEmail } = await import('./sendgridIntegration');
+          const { getUncachableSendGridClient } = await import('./sendgridIntegration');
+          const { client, fromEmail } = await getUncachableSendGridClient();
           
-          await sendEmail({
+          await client.send({
             to: customerEmail,
+            from: fromEmail,
             subject: 'Your Animal House Order Is Ready for Pickup!',
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
