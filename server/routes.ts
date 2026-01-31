@@ -16,6 +16,8 @@ import {
   insertCustomerPetSchema,
   users,
   extractedOrderItems,
+  orderItems,
+  orders,
 } from "@shared/schema";
 import { z } from "zod";
 import { notificationService } from './notifications';
