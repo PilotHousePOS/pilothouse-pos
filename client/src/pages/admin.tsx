@@ -86,7 +86,9 @@ import {
   CalendarX2,
   ClipboardPaste,
   Send,
-  Clock
+  Clock,
+  RotateCcw,
+  Check
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -4423,6 +4425,11 @@ export default function Admin() {
   const [showApprovedAppointments, setShowApprovedAppointments] = useState(false);
   const [showDeniedAppointments, setShowDeniedAppointments] = useState(false);
   const [showPendingOrders, setShowPendingOrders] = useState(false);
+  const [selectedOrderForRefund, setSelectedOrderForRefund] = useState<any>(null);
+  const [refundModalOpen, setRefundModalOpen] = useState(false);
+  const [selectedRefundItems, setSelectedRefundItems] = useState<{[key: number]: { quantity: number; amount: string }}>({}); 
+  const [refundReason, setRefundReason] = useState('');
+  const [refundNotes, setRefundNotes] = useState('');
   const [filterByHere, setFilterByHere] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<any>(null);
   const [isCategorizing, setIsCategorizing] = useState(false);
@@ -4603,6 +4610,16 @@ export default function Admin() {
   
   const { data: pendingOrders = [], refetch: refetchPendingOrders } = useQuery<any[]>({
     queryKey: ["/api/admin/pending-orders"],
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+  });
+
+  const { data: allOrdersWithItems = [], refetch: refetchAllOrders } = useQuery<any[]>({
+    queryKey: ["/api/admin/orders-with-items"],
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+  });
+
+  const { data: refunds = [], refetch: refetchRefunds } = useQuery<any[]>({
+    queryKey: ["/api/admin/refunds"],
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
@@ -5508,6 +5525,28 @@ export default function Admin() {
       toast({
         title: "Error",
         description: "Failed to mark order as picked up.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const createRefundMutation = useMutation({
+    mutationFn: async (refundData: { orderId: number; orderItemId?: number; quantity?: number; amount: string; reason?: string; notes?: string; refundType?: string }) => {
+      return await apiRequest("POST", "/api/admin/refunds", refundData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Refund Recorded",
+        description: "Refund has been recorded for inventory tracking. Process the actual refund through ExaTouch POS.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/orders-with-items"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/refunds"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to record refund.",
         variant: "destructive",
       });
     },
@@ -7199,25 +7238,288 @@ export default function Admin() {
 
           {/* All Orders Section with Refund Management */}
           {typedUser?.isAdmin && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <div className="space-y-4">
+              <Button
+                variant="outline"
+                className="w-full justify-between border-2 border-gray-200 bg-gray-50 hover:bg-gray-100"
+                onClick={() => setShowCompletedOrders(!showCompletedOrders)}
+              >
+                <span className="flex items-center gap-2">
                   <ShoppingBag className="w-5 h-5" />
-                  Order History & Refunds
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-600 mb-4">
-                  View all orders, process refunds, and track order status. Refunds are recorded here for inventory tracking - actual card refunds are processed through ExaTouch POS.
-                </p>
-                <div className="text-center py-8 text-gray-500">
-                  <ShoppingBag className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>Order management with refund tracking coming soon</p>
-                  <p className="text-sm mt-2">Search for orders above to view details</p>
-                </div>
-              </CardContent>
-            </Card>
+                  Completed Orders ({allOrdersWithItems.filter((o: any) => o.approvalStatus === 'picked_up' || o.status === 'completed').length})
+                </span>
+                {showCompletedOrders ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+              </Button>
+              
+              {showCompletedOrders && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <ShoppingBag className="w-5 h-5" />
+                      Order History & Refunds
+                    </CardTitle>
+                    <p className="text-sm text-gray-600">
+                      Refunds are recorded here for inventory tracking. Process actual card refunds through ExaTouch POS.
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {allOrdersWithItems
+                        .filter((order: any) => {
+                          if (search) {
+                            const searchLower = search.toLowerCase();
+                            return (order.customerName || '').toLowerCase().includes(searchLower) ||
+                                   (order.customerEmail || '').toLowerCase().includes(searchLower);
+                          }
+                          return order.approvalStatus === 'picked_up' || order.status === 'completed';
+                        })
+                        .slice(0, 20)
+                        .map((order: any) => (
+                          <Card key={order.id} className="border">
+                            <CardContent className="p-4">
+                              <div className="flex flex-col sm:flex-row justify-between gap-3">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                    <Badge variant={order.approvalStatus === 'picked_up' ? 'default' : 'secondary'}>
+                                      {order.approvalStatus === 'picked_up' ? 'Completed' : order.approvalStatus || order.status}
+                                    </Badge>
+                                    <span className="text-sm text-gray-500">Order #{order.id}</span>
+                                    <span className="text-xs text-gray-400">
+                                      {new Date(order.orderDate).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                  
+                                  <p className="font-semibold">{order.customerName || 'Unknown Customer'}</p>
+                                  {order.customerEmail && (
+                                    <p className="text-sm text-gray-600">{order.customerEmail}</p>
+                                  )}
+                                  
+                                  <div className="mt-2 space-y-1">
+                                    <p className="text-sm font-medium">Items ({order.items?.length || 0}):</p>
+                                    {(order.items || []).slice(0, 3).map((item: any, idx: number) => (
+                                      <p key={idx} className="text-sm text-gray-700 truncate">
+                                        • {item.itemName || item.productName || 'Item'} x{item.quantity} - ${item.price}
+                                        {item.refundedQuantity > 0 && (
+                                          <span className="text-red-600 ml-2">
+                                            (Refunded: {item.refundedQuantity})
+                                          </span>
+                                        )}
+                                      </p>
+                                    ))}
+                                    {(order.items?.length || 0) > 3 && (
+                                      <p className="text-xs text-gray-500">+{order.items.length - 3} more items</p>
+                                    )}
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-4 mt-2">
+                                    <p className="text-lg font-bold text-green-700">
+                                      Total: ${order.totalAmount}
+                                    </p>
+                                    {order.taxAmount && parseFloat(order.taxAmount) > 0 && (
+                                      <p className="text-xs text-gray-500">
+                                        (Tax: ${order.taxAmount})
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                                
+                                <div className="flex flex-col gap-2 sm:w-32">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      setSelectedOrderForRefund(order);
+                                      setSelectedRefundItems({});
+                                      setRefundReason('');
+                                      setRefundNotes('');
+                                      setRefundModalOpen(true);
+                                    }}
+                                    className="border-red-300 text-red-700 hover:bg-red-50"
+                                  >
+                                    <RotateCcw className="w-4 h-4 mr-1" />
+                                    Refund
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      
+                      {allOrdersWithItems.filter((o: any) => o.approvalStatus === 'picked_up' || o.status === 'completed').length === 0 && (
+                        <div className="text-center py-8 text-gray-500">
+                          <ShoppingBag className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                          <p>No completed orders yet</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           )}
+          
+          {/* Refund Modal */}
+          <Dialog open={refundModalOpen} onOpenChange={setRefundModalOpen}>
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Record Refund - Order #{selectedOrderForRefund?.id}</DialogTitle>
+              </DialogHeader>
+              
+              {selectedOrderForRefund && (
+                <div className="space-y-4">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Important:</strong> This records the refund for inventory tracking only. 
+                      Process the actual card refund through ExaTouch POS.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Select Items to Refund</Label>
+                    {(selectedOrderForRefund.items || []).map((item: any) => {
+                      const maxRefundable = item.quantity - (item.refundedQuantity || 0);
+                      const isSelected = selectedRefundItems[item.id];
+                      
+                      return (
+                        <div key={item.id} className="flex items-center gap-3 p-2 border rounded">
+                          <Checkbox
+                            checked={!!isSelected}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedRefundItems(prev => ({
+                                  ...prev,
+                                  [item.id]: { 
+                                    quantity: maxRefundable, 
+                                    amount: (parseFloat(item.price) * maxRefundable).toFixed(2)
+                                  }
+                                }));
+                              } else {
+                                setSelectedRefundItems(prev => {
+                                  const newItems = { ...prev };
+                                  delete newItems[item.id];
+                                  return newItems;
+                                });
+                              }
+                            }}
+                            disabled={maxRefundable <= 0}
+                          />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">{item.itemName || item.productName || 'Item'}</p>
+                            <p className="text-xs text-gray-500">
+                              ${item.price} x {item.quantity}
+                              {item.refundedQuantity > 0 && (
+                                <span className="text-red-600 ml-1">({item.refundedQuantity} already refunded)</span>
+                              )}
+                            </p>
+                          </div>
+                          {isSelected && maxRefundable > 1 && (
+                            <div className="flex items-center gap-2">
+                              <Label className="text-xs">Qty:</Label>
+                              <Input
+                                type="number"
+                                min={1}
+                                max={maxRefundable}
+                                value={isSelected.quantity}
+                                onChange={(e) => {
+                                  const qty = Math.min(Math.max(1, parseInt(e.target.value) || 1), maxRefundable);
+                                  setSelectedRefundItems(prev => ({
+                                    ...prev,
+                                    [item.id]: { 
+                                      quantity: qty, 
+                                      amount: (parseFloat(item.price) * qty).toFixed(2)
+                                    }
+                                  }));
+                                }}
+                                className="w-16 h-8"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Reason for Refund</Label>
+                    <Select value={refundReason} onValueChange={setRefundReason}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select reason..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="customer_request">Customer Request</SelectItem>
+                        <SelectItem value="defective">Defective Product</SelectItem>
+                        <SelectItem value="wrong_item">Wrong Item</SelectItem>
+                        <SelectItem value="not_as_described">Not As Described</SelectItem>
+                        <SelectItem value="duplicate_charge">Duplicate Charge</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Notes (Optional)</Label>
+                    <Textarea
+                      value={refundNotes}
+                      onChange={(e) => setRefundNotes(e.target.value)}
+                      placeholder="Additional notes about this refund..."
+                      className="h-20"
+                    />
+                  </div>
+                  
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="font-medium">Refund Summary</p>
+                    <p className="text-2xl font-bold text-red-600">
+                      ${Object.values(selectedRefundItems).reduce((sum, item) => sum + parseFloat(item.amount), 0).toFixed(2)}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {Object.keys(selectedRefundItems).length} item(s) selected
+                    </p>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setRefundModalOpen(false)}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        const totalAmount = Object.values(selectedRefundItems).reduce((sum, item) => sum + parseFloat(item.amount), 0);
+                        const itemIds = Object.keys(selectedRefundItems);
+                        
+                        if (itemIds.length === 0) {
+                          toast({ title: "Error", description: "Please select at least one item to refund", variant: "destructive" });
+                          return;
+                        }
+                        
+                        // Create refund for each selected item
+                        itemIds.forEach(itemId => {
+                          const refundItem = selectedRefundItems[parseInt(itemId)];
+                          createRefundMutation.mutate({
+                            orderId: selectedOrderForRefund.id,
+                            orderItemId: parseInt(itemId),
+                            quantity: refundItem.quantity,
+                            amount: refundItem.amount,
+                            reason: refundReason || 'Customer request',
+                            notes: refundNotes,
+                            refundType: 'partial'
+                          });
+                        });
+                        
+                        setRefundModalOpen(false);
+                      }}
+                      disabled={Object.keys(selectedRefundItems).length === 0 || createRefundMutation.isPending}
+                      className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      {createRefundMutation.isPending ? 'Processing...' : 'Record Refund'}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
         {/* Appointments Tab - Separate from Orders */}
