@@ -25,7 +25,7 @@ import { sendPasswordResetEmail } from './sendgrid';
 // Google Calendar integration removed - transition period complete
 import { normalizePhoneNumber } from './phoneUtils';
 import { db, resetPool } from './db';
-import { eq } from 'drizzle-orm';
+import { eq, and, or, isNull } from 'drizzle-orm';
 import { expandProductAbbreviations } from './abbreviationExpansion';
 import { hashPassword, verifyPassword, isPasswordComplexEnough, getPasswordRequirementsMessage } from './passwordUtils';
 
@@ -1944,6 +1944,33 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     } catch (error) {
       console.error("Error marking order picked up:", error);
       res.status(500).json({ message: "Failed to mark order picked up" });
+    }
+  });
+
+  // Fix orders that were picked up but still show pending status
+  app.post("/api/admin/fix-picked-up-orders", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      // Fix all orders that have approval_status='picked_up' but status is still 'pending'
+      const result = await db
+        .update(orders)
+        .set({ status: 'completed', updatedAt: new Date() })
+        .where(and(
+          eq(orders.approvalStatus, 'picked_up'),
+          or(eq(orders.status, 'pending'), isNull(orders.status))
+        ))
+        .returning();
+      
+      res.json({ success: true, message: `Fixed ${result.length} orders`, fixedOrders: result.map(o => o.id) });
+    } catch (error) {
+      console.error("Error fixing picked up orders:", error);
+      res.status(500).json({ message: "Failed to fix orders" });
     }
   });
 

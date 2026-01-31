@@ -1,16 +1,25 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Package, Calendar, DollarSign, ChevronRight, RefreshCw, RotateCcw } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { ArrowLeft, Package, Calendar, DollarSign, ChevronRight, RefreshCw, RotateCcw, ShoppingCart, Check } from "lucide-react";
 import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Order, OrderItem, Supply, Pet, Refund } from "@shared/schema";
 import { safeGoBack } from "@/lib/navigation";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+
+interface OrderItemWithDetails extends OrderItem {
+  supplyName?: string;
+  petName?: string;
+  imageUrl?: string;
+}
 
 interface OrderWithDetails extends Order {
-  items?: OrderItem[];
+  items?: OrderItemWithDetails[];
   supplies?: Supply[];
   pets?: Pet[];
   refunds?: Refund[];
@@ -19,6 +28,66 @@ interface OrderWithDetails extends Order {
 export default function OrderHistory() {
   const [, setLocation] = useLocation();
   const [selectedOrder, setSelectedOrder] = useState<OrderWithDetails | null>(null);
+  const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
+  const { toast } = useToast();
+
+  const addToCartMutation = useMutation({
+    mutationFn: async (items: { supplyId?: number; petId?: number; quantity: number }[]) => {
+      for (const item of items) {
+        await apiRequest("POST", "/api/cart", item);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+      toast({
+        title: "Added to Cart",
+        description: "Items have been added to your cart.",
+      });
+      setSelectedOrder(null);
+      setSelectedItems(new Set());
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to add items to cart.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleReorderSelected = () => {
+    if (!selectedOrder?.items) return;
+    const itemsToAdd = selectedOrder.items
+      .filter((item) => selectedItems.has(item.id))
+      .map((item) => ({
+        supplyId: item.supplyId || undefined,
+        petId: item.petId || undefined,
+        quantity: item.quantity,
+      }));
+    addToCartMutation.mutate(itemsToAdd);
+  };
+
+  const handleReorderAll = () => {
+    if (!selectedOrder?.items) return;
+    const itemsToAdd = selectedOrder.items.map((item) => ({
+      supplyId: item.supplyId || undefined,
+      petId: item.petId || undefined,
+      quantity: item.quantity,
+    }));
+    addToCartMutation.mutate(itemsToAdd);
+  };
+
+  const toggleItemSelection = (itemId: number) => {
+    setSelectedItems((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId);
+      } else {
+        newSet.add(itemId);
+      }
+      return newSet;
+    });
+  };
 
   const { data: orders, isLoading } = useQuery<Order[]>({
     queryKey: ["/api/orders"],
@@ -63,18 +132,58 @@ export default function OrderHistory() {
         }),
       ]);
 
-      let items: OrderItem[] = [];
+      let items: OrderItemWithDetails[] = [];
       let refunds: Refund[] = [];
 
       if (orderResponse.ok) {
         const orderDetails = await orderResponse.json();
-        items = orderDetails.items || [];
+        const rawItems = orderDetails.items || [];
+        
+        // Fetch supply/pet details for each item
+        const itemsWithDetails = await Promise.all(
+          rawItems.map(async (item: OrderItem) => {
+            let supplyName = '';
+            let petName = '';
+            let imageUrl = '';
+            
+            if (item.supplyId) {
+              try {
+                const supplyRes = await fetch(`/api/supplies/${item.supplyId}`, { credentials: 'include' });
+                if (supplyRes.ok) {
+                  const supply = await supplyRes.json();
+                  supplyName = supply.name || `Supply #${item.supplyId}`;
+                  imageUrl = supply.imageUrl || '';
+                }
+              } catch { 
+                supplyName = `Supply #${item.supplyId}`;
+              }
+            }
+            
+            if (item.petId) {
+              try {
+                const petRes = await fetch(`/api/pets/${item.petId}`, { credentials: 'include' });
+                if (petRes.ok) {
+                  const pet = await petRes.json();
+                  petName = pet.name || `Pet #${item.petId}`;
+                  imageUrl = pet.imageUrl || '';
+                }
+              } catch {
+                petName = `Pet #${item.petId}`;
+              }
+            }
+            
+            return { ...item, supplyName, petName, imageUrl };
+          })
+        );
+        
+        items = itemsWithDetails;
       }
 
       if (refundsResponse.ok) {
         refunds = await refundsResponse.json();
       }
 
+      setSelectedItems(new Set());
       setSelectedOrder({ ...order, items, refunds });
     } catch (error) {
       console.error("Error fetching order details:", error);
@@ -211,13 +320,47 @@ export default function OrderHistory() {
 
               {selectedOrder.items && selectedOrder.items.length > 0 && (
                 <div>
-                  <h3 className="font-semibold mb-2">Order Items</h3>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold">Order Items</h3>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleReorderSelected}
+                        disabled={selectedItems.size === 0 || addToCartMutation.isPending}
+                        className="text-xs"
+                      >
+                        <ShoppingCart className="w-3 h-3 mr-1" />
+                        Reorder Selected
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={handleReorderAll}
+                        disabled={addToCartMutation.isPending}
+                        className="text-xs bg-brand-green hover:bg-green-700"
+                      >
+                        <ShoppingCart className="w-3 h-3 mr-1" />
+                        Reorder All
+                      </Button>
+                    </div>
+                  </div>
                   <div className="space-y-2">
                     {selectedOrder.items.map((item, index) => (
-                      <div key={item.id || index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                      <div key={item.id || index} className="flex items-center gap-3 p-3 bg-gray-50 rounded">
+                        <Checkbox
+                          checked={selectedItems.has(item.id)}
+                          onCheckedChange={() => toggleItemSelection(item.id)}
+                        />
+                        {item.imageUrl && (
+                          <img 
+                            src={item.imageUrl} 
+                            alt={item.supplyName || item.petName || ''} 
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                        )}
                         <div className="flex-1">
                           <p className="font-medium">
-                            {item.supplyId ? `Supply #${item.supplyId}` : `Pet #${item.petId}`}
+                            {item.supplyName || item.petName || (item.supplyId ? `Supply #${item.supplyId}` : `Pet #${item.petId}`)}
                           </p>
                           <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
                         </div>
