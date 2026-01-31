@@ -6,6 +6,8 @@ import {
   cartItems,
   orders,
   orderItems,
+  refunds,
+  refundReportSettings,
   appointments,
   appointmentPets,
   customerPets,
@@ -39,6 +41,10 @@ import {
   type InsertOrder,
   type OrderItem,
   type InsertOrderItem,
+  type Refund,
+  type InsertRefund,
+  type RefundReportSetting,
+  type InsertRefundReportSetting,
   type Appointment,
   type InsertAppointment,
   type CustomerPet,
@@ -2300,6 +2306,92 @@ export class DatabaseStorage implements IStorage {
     if (!result.rowCount || result.rowCount === 0) {
       throw new Error('Order not found');
     }
+  }
+
+  // Search orders by customer name
+  async searchOrders(searchQuery: string): Promise<Order[]> {
+    const searchPattern = `%${searchQuery.toLowerCase()}%`;
+    return await db.select().from(orders)
+      .where(sql`LOWER(${orders.customerName}) LIKE ${searchPattern}`)
+      .orderBy(desc(orders.orderDate));
+  }
+
+  // Get all orders with items for admin
+  async getAllOrdersWithItems(): Promise<any[]> {
+    const allOrders = await db.select().from(orders).orderBy(desc(orders.orderDate));
+    
+    const ordersWithItems = await Promise.all(allOrders.map(async (order) => {
+      const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
+      const [customer] = await db.select().from(users).where(eq(users.id, order.userId));
+      
+      const enrichedItems = await Promise.all(items.map(async (item) => {
+        let itemName = item.productName || 'Unknown Item';
+        let category = item.category || 'uncategorized';
+        
+        if (!item.productName && item.supplyId) {
+          const [supply] = await db.select().from(supplies).where(eq(supplies.id, item.supplyId));
+          itemName = supply?.name || `Supply #${item.supplyId}`;
+          category = supply?.category || 'uncategorized';
+        } else if (!item.productName && item.petId) {
+          const [pet] = await db.select().from(pets).where(eq(pets.id, item.petId));
+          itemName = pet?.name || `Pet #${item.petId}`;
+          category = 'pets';
+        }
+        
+        return { ...item, itemName, category };
+      }));
+      
+      return {
+        ...order,
+        customerName: order.customerName || (customer ? `${customer.firstName} ${customer.lastName}` : 'Unknown Customer'),
+        items: enrichedItems,
+      };
+    }));
+    
+    return ordersWithItems;
+  }
+
+  // Refund operations
+  async createRefund(refund: InsertRefund): Promise<Refund> {
+    const [newRefund] = await db.insert(refunds).values(refund).returning();
+    return newRefund;
+  }
+
+  async getRefunds(): Promise<Refund[]> {
+    return await db.select().from(refunds).orderBy(desc(refunds.createdAt));
+  }
+
+  async getRefundsByOrderId(orderId: number): Promise<Refund[]> {
+    return await db.select().from(refunds).where(eq(refunds.orderId, orderId)).orderBy(desc(refunds.createdAt));
+  }
+
+  async getRefundsByDateRange(startDate: Date, endDate: Date): Promise<Refund[]> {
+    return await db.select().from(refunds)
+      .where(and(
+        gte(refunds.createdAt, startDate),
+        lte(refunds.createdAt, endDate)
+      ))
+      .orderBy(desc(refunds.createdAt));
+  }
+
+  async updateOrderItemRefund(orderItemId: number, refundedQuantity: number, refundedAmount: string): Promise<void> {
+    await db.update(orderItems)
+      .set({ refundedQuantity, refundedAmount })
+      .where(eq(orderItems.id, orderItemId));
+  }
+
+  // Refund report settings
+  async getRefundReportEmails(): Promise<RefundReportSetting[]> {
+    return await db.select().from(refundReportSettings).where(eq(refundReportSettings.isActive, true));
+  }
+
+  async addRefundReportEmail(email: string): Promise<RefundReportSetting> {
+    const [setting] = await db.insert(refundReportSettings).values({ email, isActive: true }).returning();
+    return setting;
+  }
+
+  async removeRefundReportEmail(id: number): Promise<void> {
+    await db.delete(refundReportSettings).where(eq(refundReportSettings.id, id));
   }
 
   // Appointment operations
