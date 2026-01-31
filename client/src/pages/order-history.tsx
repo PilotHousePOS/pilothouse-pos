@@ -1,18 +1,19 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Package, Calendar, DollarSign, ChevronRight } from "lucide-react";
+import { ArrowLeft, Package, Calendar, DollarSign, ChevronRight, RefreshCw, RotateCcw } from "lucide-react";
 import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import type { Order, OrderItem, Supply, Pet } from "@shared/schema";
+import type { Order, OrderItem, Supply, Pet, Refund } from "@shared/schema";
 import { safeGoBack } from "@/lib/navigation";
 
 interface OrderWithDetails extends Order {
   items?: OrderItem[];
   supplies?: Supply[];
   pets?: Pet[];
+  refunds?: Refund[];
 }
 
 export default function OrderHistory() {
@@ -52,15 +53,32 @@ export default function OrderHistory() {
 
   const handleOrderClick = async (order: Order) => {
     try {
-      const response = await fetch(`/api/orders/${order.id}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      if (response.ok) {
-        const orderDetails = await response.json();
-        setSelectedOrder({ ...order, items: orderDetails.items });
+      const [orderResponse, refundsResponse] = await Promise.all([
+        fetch(`/api/orders/${order.id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        }),
+        fetch(`/api/refunds?orderId=${order.id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        }),
+      ]);
+
+      let items: OrderItem[] = [];
+      let refunds: Refund[] = [];
+
+      if (orderResponse.ok) {
+        const orderDetails = await orderResponse.json();
+        items = orderDetails.items || [];
       }
+
+      if (refundsResponse.ok) {
+        refunds = await refundsResponse.json();
+      }
+
+      setSelectedOrder({ ...order, items, refunds });
     } catch (error) {
       console.error("Error fetching order details:", error);
     }
@@ -124,7 +142,15 @@ export default function OrderHistory() {
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <p className="text-sm text-gray-500">Order #{order.id}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-gray-500">Order #{order.id}</p>
+                      {order.isRecurring && (
+                        <Badge variant="outline" className="text-xs px-1.5 py-0 border-blue-300 text-blue-600">
+                          <RefreshCw className="w-3 h-3 mr-1" />
+                          Recurring
+                        </Badge>
+                      )}
+                    </div>
                     <div className="flex items-center mt-1 text-sm text-gray-600">
                       <Calendar className="w-4 h-4 mr-1" />
                       {formatDate(order.orderDate || new Date())}
@@ -201,6 +227,67 @@ export default function OrderHistory() {
                         <p className="font-semibold">${item.price}</p>
                       </div>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Refunds Section */}
+              {selectedOrder.refunds && selectedOrder.refunds.length > 0 && (
+                <div className="border-t pt-4">
+                  <h3 className="font-semibold mb-2 flex items-center">
+                    <RotateCcw className="w-4 h-4 mr-2 text-orange-500" />
+                    Refunds Applied
+                  </h3>
+                  <div className="space-y-2">
+                    {selectedOrder.refunds.map((refund) => (
+                      <div key={refund.id} className="p-3 bg-orange-50 rounded border border-orange-200">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm text-gray-600">
+                            {formatDate(refund.refundDate || new Date())}
+                          </span>
+                          <span className="font-bold text-orange-600">
+                            -${refund.refundAmount}
+                          </span>
+                        </div>
+                        {refund.reason && (
+                          <p className="text-sm text-gray-600">
+                            <span className="font-medium">Reason:</span> {refund.reason}
+                          </p>
+                        )}
+                        {refund.notes && (
+                          <p className="text-sm text-gray-500 mt-1">{refund.notes}</p>
+                        )}
+                      </div>
+                    ))}
+                    <div className="flex justify-between items-center pt-2 border-t border-orange-200">
+                      <span className="font-medium text-gray-700">Total Refunded:</span>
+                      <span className="font-bold text-orange-600">
+                        -${selectedOrder.refunds.reduce((sum, r) => sum + parseFloat(r.refundAmount), 0).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Recurring Order Info */}
+              {selectedOrder.isRecurring && (
+                <div className="border-t pt-4">
+                  <h3 className="font-semibold mb-2 flex items-center">
+                    <RefreshCw className="w-4 h-4 mr-2 text-blue-500" />
+                    Recurring Order
+                  </h3>
+                  <div className="p-3 bg-blue-50 rounded border border-blue-200">
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">Frequency:</span>{' '}
+                      {selectedOrder.recurringFrequency === 'weekly' ? 'Weekly' :
+                       selectedOrder.recurringFrequency === 'biweekly' ? 'Every 2 Weeks' : 'Monthly'}
+                    </p>
+                    {selectedOrder.nextRecurringDate && (
+                      <p className="text-sm text-gray-600 mt-1">
+                        <span className="font-medium">Next Order:</span>{' '}
+                        {formatDate(selectedOrder.nextRecurringDate)}
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
