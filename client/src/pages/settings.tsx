@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLocation } from "wouter";
-import { ArrowLeft, Mail, Save, User as UserIcon, Lock } from "lucide-react";
+import { ArrowLeft, Mail, Save, User as UserIcon, Lock, Phone } from "lucide-react";
 import type { User } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { z } from "zod";
@@ -15,6 +15,10 @@ import { safeGoBack } from "@/lib/navigation";
 const updateNameSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
+});
+
+const updatePhoneSchema = z.object({
+  phoneNumber: z.string().min(10, "Phone number must be at least 10 digits").regex(/^[\d\s\-\(\)]+$/, "Please enter a valid phone number"),
 });
 
 const updateEmailSchema = z.object({
@@ -37,6 +41,7 @@ export default function Settings() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -176,6 +181,40 @@ export default function Settings() {
     },
   });
 
+  const updatePhoneMutation = useMutation({
+    mutationFn: async (newPhone: string) => {
+      const result = updatePhoneSchema.safeParse({ phoneNumber: newPhone });
+      if (!result.success) {
+        throw new Error(result.error.errors[0].message);
+      }
+      
+      const response = await apiRequest("PATCH", "/api/auth/update-phone", { phoneNumber: newPhone });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Failed to update phone: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      toast({
+        title: "Phone updated",
+        description: "Your phone number has been successfully updated.",
+      });
+      setPhoneNumber("");
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update failed",
+        description: error.message || "Failed to update phone number. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   if (!hasToken) {
     setLocation("/");
     return null;
@@ -267,6 +306,30 @@ export default function Settings() {
     updatePasswordMutation.mutate({ currentPassword, newPassword, confirmPassword });
   };
 
+  const handleUpdatePhone = () => {
+    if (!phoneNumber.trim()) {
+      toast({
+        title: "Phone number required",
+        description: "Please enter a phone number.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Remove non-digit characters for validation
+    const digitsOnly = phoneNumber.replace(/\D/g, '');
+    if (digitsOnly.length < 10) {
+      toast({
+        title: "Invalid phone number",
+        description: "Please enter a valid phone number with at least 10 digits.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    updatePhoneMutation.mutate(phoneNumber);
+  };
+
   return (
     <div className="pb-20">
       {/* Fixed Back Button */}
@@ -310,6 +373,12 @@ export default function Settings() {
           <div>
             <Label className="text-sm text-gray-500">Current Email</Label>
             <p className="text-gray-900 font-medium" data-testid="text-current-email">{currentUser.email}</p>
+          </div>
+          <div>
+            <Label className="text-sm text-gray-500">Phone Number</Label>
+            <p className="text-gray-900 font-medium" data-testid="text-current-phone">
+              {currentUser.phoneNumber || "Not set"}
+            </p>
           </div>
           {currentUser.isAdmin && (
             <div>
@@ -361,6 +430,40 @@ export default function Settings() {
           >
             <Save className="w-4 h-4 mr-2" />
             {updateNameMutation.isPending ? "Updating..." : "Update Name"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Update Phone */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Phone className="w-5 h-5" />
+            Update Phone Number
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label htmlFor="phone-number">Phone Number</Label>
+            <Input
+              id="phone-number"
+              type="tel"
+              placeholder="Enter phone number (e.g., 555-123-4567)"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="mt-1"
+              data-testid="input-phone-number"
+            />
+            <p className="text-xs text-gray-500 mt-1">Required for grooming appointments and order notifications</p>
+          </div>
+          <Button
+            onClick={handleUpdatePhone}
+            disabled={updatePhoneMutation.isPending || !phoneNumber.trim()}
+            className="w-full bg-brand-blue hover:bg-blue-600"
+            data-testid="button-update-phone"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {updatePhoneMutation.isPending ? "Updating..." : "Update Phone"}
           </Button>
         </CardContent>
       </Card>

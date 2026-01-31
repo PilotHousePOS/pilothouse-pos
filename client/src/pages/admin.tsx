@@ -5417,6 +5417,29 @@ export default function Admin() {
     },
   });
 
+  const updateAppointmentGroomingCompletedMutation = useMutation({
+    mutationFn: async ({ id, groomingCompleted }: { id: number; groomingCompleted: boolean }) => {
+      const result = await apiRequest("PATCH", `/api/appointments/${id}/grooming-completed`, { groomingCompleted });
+      return result;
+    },
+    onSuccess: async (_, variables) => {
+      toast({
+        title: "Grooming Status Updated",
+        description: variables.groomingCompleted ? "Grooming marked as completed - SMS sent if configured" : "Grooming marked as not completed",
+      });
+      // Force immediate refetch of appointments data
+      await queryClient.refetchQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: (error) => {
+      console.error('Error updating groomingCompleted status:', error);
+      toast({
+        title: "Update Failed",
+        description: "Failed to update grooming status. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const deleteAppointmentMutation = useMutation({
     mutationFn: async (id: number) => {
       await apiRequest("DELETE", `/api/admin/appointments/${id}`, {});
@@ -6633,13 +6656,9 @@ export default function Admin() {
         </Card>
       </div>
 
-      <Tabs defaultValue="orders" className="w-full">
+      <Tabs defaultValue="appointments" className="w-full">
         <div className="overflow-x-auto pb-1">
           <TabsList className="inline-flex gap-1 h-auto p-1 min-w-full lg:min-w-0">
-            <TabsTrigger value="orders" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              <span className="hidden lg:inline">Orders & Refunds</span>
-              <span className="lg:hidden">Orders</span>
-            </TabsTrigger>
             <TabsTrigger value="appointments" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
               Appointments
             </TabsTrigger>
@@ -6710,6 +6729,10 @@ export default function Admin() {
                 Settings
               </TabsTrigger>
             )}
+            <TabsTrigger value="orders" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+              <span className="hidden lg:inline">Orders & Refunds</span>
+              <span className="lg:hidden">Orders</span>
+            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -7802,6 +7825,25 @@ export default function Admin() {
                                 className="text-xs font-medium cursor-pointer"
                               >
                                 Paid
+                              </label>
+                            </div>
+                            <div className="flex items-center gap-1.5 px-2 py-1 border rounded bg-white">
+                              <Checkbox
+                                id={`grooming-completed-${currentAppointment.id}`}
+                                checked={currentAppointment.groomingCompleted || false}
+                                onCheckedChange={(checked) => {
+                                  updateAppointmentGroomingCompletedMutation.mutate({ 
+                                    id: currentAppointment.id, 
+                                    groomingCompleted: checked as boolean 
+                                  });
+                                }}
+                                data-testid={`checkbox-grooming-completed-${currentAppointment.id}`}
+                              />
+                              <label 
+                                htmlFor={`grooming-completed-${currentAppointment.id}`}
+                                className="text-xs font-medium cursor-pointer"
+                              >
+                                Done
                               </label>
                             </div>
                           </div>

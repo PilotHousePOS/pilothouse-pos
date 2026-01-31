@@ -488,6 +488,63 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Update phone number
+  app.patch('/api/auth/update-phone', async (req, res) => {
+    try {
+      // Check both cookies and Authorization header
+      const cookieToken = req.cookies?.auth_token;
+      const authHeader = req.headers.authorization;
+      const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+      
+      const token = headerToken || cookieToken;
+      
+      if (!token) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const user = verifyToken(token);
+      
+      if (!user) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+
+      const { phoneNumber } = req.body;
+
+      if (!phoneNumber) {
+        return res.status(400).json({ message: "Phone number is required" });
+      }
+
+      // Validate phone number format (at least 10 digits)
+      const digitsOnly = phoneNumber.replace(/\D/g, '');
+      if (digitsOnly.length < 10) {
+        return res.status(400).json({ message: "Phone number must have at least 10 digits" });
+      }
+
+      // Get current user data
+      const currentUser = await storage.getUser(user.id);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Update user with new phone number
+      const updatedUser = await storage.upsertUser({
+        ...currentUser,
+        phoneNumber: phoneNumber.trim(),
+        updatedAt: new Date(),
+      });
+
+      // Generate new token
+      const newToken = generateToken(updatedUser);
+      setAuthCookie(res, newToken);
+
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json({ ...userWithoutPassword, token: newToken });
+    } catch (error) {
+      console.error("Error updating phone number:", error);
+      res.status(500).json({ message: "Failed to update phone number" });
+    }
+  });
+
   // Request password reset
   app.post('/api/auth/forgot-password', async (req, res) => {
     try {
@@ -2961,6 +3018,59 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     } catch (error) {
       console.error("Error updating appointment payment status:", error);
       res.status(500).json({ message: "Failed to update appointment payment status" });
+    }
+  });
+
+  // Update appointment grooming completed status and send SMS notification
+  app.patch("/api/appointments/:id/grooming-completed", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin && !user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const { groomingCompleted } = req.body;
+      
+      if (typeof groomingCompleted !== 'boolean') {
+        return res.status(400).json({ message: "groomingCompleted must be a boolean" });
+      }
+
+      const appointment = await storage.updateAppointmentGroomingCompleted(id, groomingCompleted);
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+
+      // Send SMS notification when grooming is marked as completed
+      if (groomingCompleted && appointment.ownerPhoneNumber) {
+        try {
+          const appointmentPets = await storage.getAppointmentPets(id);
+          let petNames: string;
+          if (appointmentPets && appointmentPets.length > 0) {
+            petNames = appointmentPets.map(p => p.petName).join(' and ');
+          } else {
+            petNames = appointment.petName || 'your pet';
+          }
+
+          const smsSent = await notificationService.sendPetReadyNotification(
+            appointment.ownerPhoneNumber,
+            appointment.ownerFirstName || 'Customer',
+            petNames
+          );
+          
+          if (smsSent) {
+            console.log(`Grooming completed SMS sent for appointment ${id}`);
+          }
+        } catch (smsError) {
+          console.error('Failed to send grooming completed SMS:', smsError);
+          // Don't fail the request if SMS fails
+        }
+      }
+
+      res.json(appointment);
+    } catch (error) {
+      console.error("Error updating appointment grooming completed status:", error);
+      res.status(500).json({ message: "Failed to update appointment grooming completed status" });
     }
   });
 

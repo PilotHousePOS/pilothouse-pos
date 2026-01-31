@@ -324,7 +324,7 @@ class SMSService {
       const twilio = await import('twilio');
       const client = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
-      const message = `Hi ${firstName}! ${petName} is all done and looking great! 🐾 Come pick up your fur baby at Animal House Pet Store. Thank you!`;
+      const message = `Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way. The Animal House 318-323-6090.`;
 
       await client.messages.create({
         body: message,

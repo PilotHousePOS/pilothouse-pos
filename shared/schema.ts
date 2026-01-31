@@ -223,6 +223,7 @@ export const appointments = pgTable("appointments", {
   isApproved: boolean("is_approved").default(false), // pending admin approval
   isHere: boolean("is_here").default(false), // customer has arrived
   isPaid: boolean("is_paid").default(false), // customer has paid
+  groomingCompleted: boolean("grooming_completed").default(false), // grooming is finished, ready for pickup
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   pricingMode: varchar("pricing_mode", { length: 20 }).default("individual"), // individual (sum of pet prices) or override (total price overrides individual)
   source: varchar("source", { length: 50 }).default("manual"), // manual or google_calendar
