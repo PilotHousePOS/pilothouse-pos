@@ -2247,6 +2247,108 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Get available appointment slots for a date range (public endpoint for calendar display)
+  app.get("/api/appointments/available-slots", async (req, res) => {
+    try {
+      const { startDate, endDate } = req.query;
+      
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "startDate and endDate query parameters are required" });
+      }
+      
+      const start = new Date(startDate as string);
+      const end = new Date(endDate as string);
+      
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return res.status(400).json({ message: "Invalid date format" });
+      }
+      
+      // Get all weekly limits
+      const weeklyLimits = await storage.getAllWeeklyAppointmentLimits();
+      const limitsByDay = new Map<number, { bathLimit: number; groomLimit: number }>();
+      for (const limit of weeklyLimits) {
+        limitsByDay.set(limit.dayOfWeek, {
+          bathLimit: limit.maxBathAppointments,
+          groomLimit: limit.maxGroomAppointments
+        });
+      }
+      
+      // Get all confirmed appointments in the date range
+      const allAppointments = await storage.getAppointments();
+      const confirmedAppointments = allAppointments.filter((apt: any) => 
+        apt.status === 'confirmed' && apt.appointmentDate
+      );
+      
+      // Count booked slots per date
+      const bookedByDate = new Map<string, { bathCount: number; groomCount: number }>();
+      
+      for (const apt of confirmedAppointments) {
+        const dateStr = apt.appointmentDate.split('T')[0];
+        const aptDate = new Date(dateStr);
+        
+        if (aptDate >= start && aptDate <= end) {
+          // Get pets for this appointment to count services
+          const pets = await storage.getAppointmentPets(apt.id);
+          let bathCount = 0;
+          let groomCount = 0;
+          
+          for (const pet of pets) {
+            if (pet.serviceType === 'bath' || pet.serviceType === 'Bath Only') {
+              bathCount++;
+            } else if (pet.serviceType === 'groom' || pet.serviceType === 'Full Grooming') {
+              groomCount++;
+            }
+          }
+          
+          const existing = bookedByDate.get(dateStr) || { bathCount: 0, groomCount: 0 };
+          bookedByDate.set(dateStr, {
+            bathCount: existing.bathCount + bathCount,
+            groomCount: existing.groomCount + groomCount
+          });
+        }
+      }
+      
+      // Build response with available slots for each date
+      const availableSlots: Record<string, { bathAvailable: number; groomAvailable: number; totalAvailable: number; isOpen: boolean }> = {};
+      
+      const currentDate = new Date(start);
+      while (currentDate <= end) {
+        const dateStr = currentDate.toISOString().split('T')[0];
+        const dayOfWeek = currentDate.getDay();
+        
+        const limits = limitsByDay.get(dayOfWeek);
+        const booked = bookedByDate.get(dateStr) || { bathCount: 0, groomCount: 0 };
+        
+        if (limits) {
+          const bathAvailable = Math.max(0, limits.bathLimit - booked.bathCount);
+          const groomAvailable = Math.max(0, limits.groomLimit - booked.groomCount);
+          
+          availableSlots[dateStr] = {
+            bathAvailable,
+            groomAvailable,
+            totalAvailable: bathAvailable + groomAvailable,
+            isOpen: bathAvailable > 0 || groomAvailable > 0
+          };
+        } else {
+          // No limits set for this day = closed
+          availableSlots[dateStr] = {
+            bathAvailable: 0,
+            groomAvailable: 0,
+            totalAvailable: 0,
+            isOpen: false
+          };
+        }
+        
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      
+      res.json(availableSlots);
+    } catch (error) {
+      console.error("Error fetching available slots:", error);
+      res.status(500).json({ message: "Failed to fetch available slots" });
+    }
+  });
+
   // Get single appointment with pets (for editing)
   app.get("/api/appointments/:id", authMiddleware, async (req: any, res) => {
     try {
