@@ -4714,6 +4714,27 @@ export default function Admin() {
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
+  // Fetch available slots for calendar display (next 60 days)
+  const { data: availableSlots = {} } = useQuery({
+    queryKey: ["/api/appointments/available-slots"],
+    queryFn: async () => {
+      const today = new Date();
+      const endDate = new Date();
+      endDate.setDate(today.getDate() + 60);
+      
+      const startStr = today.toISOString().split('T')[0];
+      const endStr = endDate.toISOString().split('T')[0];
+      
+      const response = await fetch(`/api/appointments/available-slots?startDate=${startStr}&endDate=${endStr}`, {
+        credentials: 'include'
+      });
+      if (!response.ok) return {};
+      return response.json();
+    },
+    enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
+    staleTime: 30000,
+  });
+
   const { data: weeklyLimits = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/weekly-limits"],
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
@@ -11155,6 +11176,30 @@ export default function Admin() {
                 onSelect={setBookingSelectedDate}
                 disabled={(date) => !isBookingDateAvailable(date)}
                 className="rounded-md border"
+                components={{
+                  DayContent: ({ date }) => {
+                    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                    const slots = (availableSlots as any)[dateStr];
+                    const isAvailable = isBookingDateAvailable(date);
+                    const totalSlots = slots ? slots.totalAvailable : 0;
+                    
+                    return (
+                      <div className="flex flex-col items-center">
+                        <span>{date.getDate()}</span>
+                        {isAvailable && totalSlots > 0 && (
+                          <span className="text-[10px] text-green-600 font-medium leading-none">
+                            {totalSlots} left
+                          </span>
+                        )}
+                        {isAvailable && totalSlots === 0 && slots && (
+                          <span className="text-[10px] text-red-500 font-medium leading-none">
+                            Full
+                          </span>
+                        )}
+                      </div>
+                    );
+                  }
+                }}
               />
             </div>
 
