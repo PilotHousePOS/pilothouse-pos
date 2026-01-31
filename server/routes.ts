@@ -1872,6 +1872,189 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Get all orders with items for admin
+  app.get("/api/admin/orders-with-items", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const orders = await storage.getAllOrdersWithItems();
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching orders with items:", error);
+      res.status(500).json({ message: "Failed to fetch orders" });
+    }
+  });
+
+  // Search orders by customer name
+  app.get("/api/admin/orders/search", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const { q } = req.query;
+      if (!q || typeof q !== 'string') {
+        return res.status(400).json({ message: "Search query is required" });
+      }
+      
+      const orders = await storage.searchOrders(q);
+      res.json(orders);
+    } catch (error) {
+      console.error("Error searching orders:", error);
+      res.status(500).json({ message: "Failed to search orders" });
+    }
+  });
+
+  // Refund routes
+  app.get("/api/admin/refunds", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const { startDate, endDate } = req.query;
+      
+      if (startDate && endDate) {
+        const refunds = await storage.getRefundsByDateRange(
+          new Date(startDate as string),
+          new Date(endDate as string)
+        );
+        res.json(refunds);
+      } else {
+        const refunds = await storage.getRefunds();
+        res.json(refunds);
+      }
+    } catch (error) {
+      console.error("Error fetching refunds:", error);
+      res.status(500).json({ message: "Failed to fetch refunds" });
+    }
+  });
+
+  app.post("/api/admin/refunds", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const { orderId, orderItemId, quantity, amount, reason, notes, refundType } = req.body;
+      
+      if (!orderId || !amount) {
+        return res.status(400).json({ message: "Order ID and amount are required" });
+      }
+      
+      const refund = await storage.createRefund({
+        orderId,
+        orderItemId,
+        quantity,
+        amount,
+        reason: reason || 'Customer request',
+        notes,
+        refundType: refundType || 'partial',
+        processedBy: userId,
+      });
+      
+      // Update order item refund tracking if item-level refund
+      if (orderItemId && quantity) {
+        await storage.updateOrderItemRefund(orderItemId, quantity, amount);
+      }
+      
+      res.json(refund);
+    } catch (error) {
+      console.error("Error creating refund:", error);
+      res.status(500).json({ message: "Failed to create refund" });
+    }
+  });
+
+  app.get("/api/admin/refunds/order/:orderId", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const orderId = parseInt(req.params.orderId);
+      const refunds = await storage.getRefundsByOrderId(orderId);
+      res.json(refunds);
+    } catch (error) {
+      console.error("Error fetching order refunds:", error);
+      res.status(500).json({ message: "Failed to fetch refunds" });
+    }
+  });
+
+  // Refund report email settings
+  app.get("/api/admin/refund-report-emails", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const emails = await storage.getRefundReportEmails();
+      res.json(emails);
+    } catch (error) {
+      console.error("Error fetching refund report emails:", error);
+      res.status(500).json({ message: "Failed to fetch emails" });
+    }
+  });
+
+  app.post("/api/admin/refund-report-emails", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      
+      const setting = await storage.addRefundReportEmail(email);
+      res.json(setting);
+    } catch (error) {
+      console.error("Error adding refund report email:", error);
+      res.status(500).json({ message: "Failed to add email" });
+    }
+  });
+
+  app.delete("/api/admin/refund-report-emails/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const id = parseInt(req.params.id);
+      await storage.removeRefundReportEmail(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error removing refund report email:", error);
+      res.status(500).json({ message: "Failed to remove email" });
+    }
+  });
+
   // Wishlist routes
   app.get("/api/wishlist", authMiddleware, async (req: any, res) => {
     try {
