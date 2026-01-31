@@ -21,7 +21,12 @@ import {
   FileText,
   Send,
   RotateCcw,
-  Download
+  Download,
+  MessageSquare,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Search
 } from "lucide-react";
 
 function RefundReportSection() {
@@ -208,7 +213,7 @@ interface EmailCenterProps {
 export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'email' | 'sms' | 'automated' | 'daily-reports'>('email');
+  const [activeTab, setActiveTab] = useState<'email' | 'sms' | 'automated' | 'daily-reports' | 'sms-management'>('email');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [sendToAll, setSendToAll] = useState(true);
@@ -241,8 +246,22 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
   const [taxRate, setTaxRate] = useState('0');
   const [isSavingTax, setIsSavingTax] = useState(false);
 
+  // SMS Management state
+  const [smsContactSearch, setSmsContactSearch] = useState('');
+  const [smsLogFilter, setSmsLogFilter] = useState<'all' | 'failed' | 'skipped'>('all');
+
   const { data: automatedMessages = [], isLoading: loadingAutoMessages } = useQuery<any[]>({
     queryKey: ['/api/admin/automated-messages'],
+  });
+
+  const { data: allContacts = [], isLoading: loadingContacts } = useQuery<any[]>({
+    queryKey: ['/api/contacts'],
+    enabled: activeTab === 'sms-management',
+  });
+
+  const { data: smsLogs = [], isLoading: loadingSmsLogs } = useQuery<any[]>({
+    queryKey: ['/api/admin/sms-logs'],
+    enabled: activeTab === 'sms-management',
   });
 
   const { data: dailyReportData, isLoading: loadingDailyReport } = useQuery<any>({
@@ -724,6 +743,15 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
               <FileText className="w-4 h-4 mr-2" />
               Daily Reports
             </Button>
+            <Button
+              variant={activeTab === 'sms-management' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => { setActiveTab('sms-management'); setSelectedRecipients([]); }}
+              className="flex-shrink-0"
+            >
+              <MessageSquare className="w-4 h-4 mr-2" />
+              SMS Settings
+            </Button>
           </div>
 
           {activeTab === 'automated' && (
@@ -1008,6 +1036,185 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
                   Send a report of all refunds processed during a selected date range for ExaTouch POS reconciliation.
                 </p>
                 <RefundReportSection />
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'sms-management' && (
+            <div className="space-y-6">
+              {/* Customer SMS Opt-Out Management */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Phone className="w-4 h-4" />
+                    Customer SMS Preferences
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    Search customers and manage their SMS opt-in/opt-out status. Customers are opted-in by default.
+                  </p>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Search className="w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by name or phone number..."
+                    value={smsContactSearch}
+                    onChange={(e) => setSmsContactSearch(e.target.value)}
+                    className="max-w-sm"
+                  />
+                </div>
+
+                <ScrollArea className="h-64 border rounded-lg">
+                  {loadingContacts ? (
+                    <div className="text-center py-8 text-muted-foreground">Loading contacts...</div>
+                  ) : (
+                    <div className="p-2 space-y-1">
+                      {(allContacts as any[])
+                        .filter((c: any) => {
+                          if (!smsContactSearch) return true;
+                          const search = smsContactSearch.toLowerCase();
+                          return (
+                            c.name?.toLowerCase().includes(search) ||
+                            c.phoneNumber?.includes(search)
+                          );
+                        })
+                        .slice(0, 50)
+                        .map((contact: any) => (
+                          <div key={contact.id} className="flex items-center justify-between p-3 hover:bg-muted rounded-lg border">
+                            <div>
+                              <p className="font-medium">{contact.name}</p>
+                              <p className="text-sm text-muted-foreground">{contact.phoneNumber || 'No phone'}</p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <Badge variant={contact.smsOptOut ? 'destructive' : 'default'}>
+                                {contact.smsOptOut ? 'Opted Out' : 'Opted In'}
+                              </Badge>
+                              <Switch
+                                checked={!contact.smsOptOut}
+                                onCheckedChange={async (checked) => {
+                                  try {
+                                    await fetch(`/api/contacts/${contact.id}/sms-opt-out`, {
+                                      method: 'PATCH',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      credentials: 'include',
+                                      body: JSON.stringify({ optOut: !checked })
+                                    });
+                                    queryClient.invalidateQueries({ queryKey: ['/api/contacts'] });
+                                    toast({
+                                      title: checked ? 'Opted In' : 'Opted Out',
+                                      description: `${contact.name} ${checked ? 'will now receive' : 'will no longer receive'} SMS messages`,
+                                    });
+                                  } catch (error) {
+                                    toast({
+                                      title: 'Error',
+                                      description: 'Failed to update SMS preference',
+                                      variant: 'destructive'
+                                    });
+                                  }
+                                }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      {(allContacts as any[]).filter((c: any) => {
+                        if (!smsContactSearch) return true;
+                        const search = smsContactSearch.toLowerCase();
+                        return c.name?.toLowerCase().includes(search) || c.phoneNumber?.includes(search);
+                      }).length === 0 && (
+                        <div className="text-center py-8 text-muted-foreground">
+                          No contacts found matching "{smsContactSearch}"
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </ScrollArea>
+              </div>
+
+              {/* SMS Delivery Logs */}
+              <div className="border-t pt-6 space-y-4">
+                <div>
+                  <h4 className="font-medium flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4" />
+                    SMS Delivery History
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    View recent SMS messages and their delivery status
+                  </p>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    variant={smsLogFilter === 'all' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSmsLogFilter('all')}
+                  >
+                    All Messages
+                  </Button>
+                  <Button
+                    variant={smsLogFilter === 'failed' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSmsLogFilter('failed')}
+                  >
+                    <XCircle className="w-4 h-4 mr-1" />
+                    Failed
+                  </Button>
+                  <Button
+                    variant={smsLogFilter === 'skipped' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSmsLogFilter('skipped')}
+                  >
+                    <AlertTriangle className="w-4 h-4 mr-1" />
+                    Skipped (Opt-out)
+                  </Button>
+                </div>
+
+                <ScrollArea className="h-72 border rounded-lg">
+                  {loadingSmsLogs ? (
+                    <div className="text-center py-8 text-muted-foreground">Loading SMS logs...</div>
+                  ) : (
+                    <div className="p-2 space-y-2">
+                      {(smsLogs as any[])
+                        .filter((log: any) => {
+                          if (smsLogFilter === 'all') return true;
+                          return log.status === smsLogFilter;
+                        })
+                        .slice(0, 100)
+                        .map((log: any) => (
+                          <div key={log.id} className="p-3 border rounded-lg text-sm">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <Badge variant={
+                                    log.status === 'sent' ? 'default' :
+                                    log.status === 'failed' ? 'destructive' :
+                                    'secondary'
+                                  }>
+                                    {log.status === 'sent' && <CheckCircle className="w-3 h-3 mr-1" />}
+                                    {log.status === 'failed' && <XCircle className="w-3 h-3 mr-1" />}
+                                    {log.status === 'skipped' && <AlertTriangle className="w-3 h-3 mr-1" />}
+                                    {log.status}
+                                  </Badge>
+                                  <span className="text-muted-foreground">{log.phoneNumber}</span>
+                                </div>
+                                <p className="text-muted-foreground truncate">{log.message}</p>
+                                {log.errorMessage && (
+                                  <p className="text-destructive text-xs mt-1">{log.errorMessage}</p>
+                                )}
+                              </div>
+                              <div className="text-xs text-muted-foreground whitespace-nowrap">
+                                {log.sentAt ? new Date(log.sentAt).toLocaleString() : 'Unknown'}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      {(smsLogs as any[]).filter((log: any) => smsLogFilter === 'all' || log.status === smsLogFilter).length === 0 && (
+                        <div className="text-center py-8 text-muted-foreground">
+                          {smsLogFilter === 'all' ? 'No SMS messages sent yet' : `No ${smsLogFilter} messages`}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </ScrollArea>
               </div>
             </div>
           )}
