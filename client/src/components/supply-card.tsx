@@ -170,6 +170,7 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
                   <Button 
                     className="bg-brand-blue hover:bg-blue-600 text-white px-3 py-1 rounded-full text-xs mt-1"
                     onClick={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
                       addToCartMutation.mutate();
                     }}
