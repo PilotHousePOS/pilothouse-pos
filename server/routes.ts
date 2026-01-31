@@ -1950,6 +1950,62 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Update order items (for editing before approval)
+  app.put("/api/admin/orders/:id/items", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const orderId = parseInt(req.params.id);
+      const { items } = req.body;
+      
+      // Delete existing order items
+      await db.delete(orderItems).where(eq(orderItems.orderId, orderId));
+      
+      // Insert updated items and calculate new total
+      let newTotal = 0;
+      for (const item of items) {
+        if (item.quantity > 0) {
+          await db.insert(orderItems).values({
+            orderId,
+            supplyId: item.supplyId || null,
+            petId: item.petId || null,
+            quantity: item.quantity,
+            price: item.price,
+            productName: item.productName || item.itemName,
+            category: item.category || 'uncategorized',
+          });
+          newTotal += parseFloat(item.price) * item.quantity;
+        }
+      }
+      
+      // Get tax rate and recalculate totals
+      const orderData = await storage.getOrder(orderId);
+      const taxRate = orderData?.taxRate ? parseFloat(orderData.taxRate) : 10.99;
+      const taxAmount = (newTotal * taxRate / 100);
+      const totalWithTax = newTotal + taxAmount;
+      
+      // Update order total
+      await db.update(orders)
+        .set({ 
+          subtotal: newTotal.toFixed(2),
+          taxAmount: taxAmount.toFixed(2),
+          totalAmount: totalWithTax.toFixed(2),
+          updatedAt: new Date()
+        })
+        .where(eq(orders.id, orderId));
+      
+      res.json({ success: true, message: "Order items updated" });
+    } catch (error) {
+      console.error("Error updating order items:", error);
+      res.status(500).json({ message: "Failed to update order items" });
+    }
+  });
+
   // Get all orders with items for admin
   app.get("/api/admin/orders-with-items", authMiddleware, async (req: any, res) => {
     try {

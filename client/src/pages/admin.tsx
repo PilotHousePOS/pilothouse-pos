@@ -40,6 +40,7 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   Plus,
+  Minus,
   Edit,
   Trash2,
   User as UserIcon,
@@ -4550,6 +4551,9 @@ export default function Admin() {
   const [selectedRefundItems, setSelectedRefundItems] = useState<{[key: number]: { quantity: number; amount: string }}>({}); 
   const [refundReason, setRefundReason] = useState('');
   const [refundNotes, setRefundNotes] = useState('');
+  const [editingOrder, setEditingOrder] = useState<any>(null);
+  const [editOrderModalOpen, setEditOrderModalOpen] = useState(false);
+  const [editOrderItems, setEditOrderItems] = useState<any[]>([]);
   const [filterByHere, setFilterByHere] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<any>(null);
   const [isCategorizing, setIsCategorizing] = useState(false);
@@ -5750,6 +5754,29 @@ export default function Admin() {
       toast({
         title: "Error",
         description: "Failed to mark order as picked up.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateOrderItemsMutation = useMutation({
+    mutationFn: async ({ orderId, items }: { orderId: number; items: any[] }) => {
+      return await apiRequest("PUT", `/api/admin/orders/${orderId}/items`, { items });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Order Updated",
+        description: "Order items have been updated.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pending-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+      setEditOrderModalOpen(false);
+      setEditingOrder(null);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update order items.",
         variant: "destructive",
       });
     },
@@ -7374,18 +7401,27 @@ export default function Admin() {
                     
                     const isPendingApproval = order.approvalStatus === 'pending_approval';
                     const isApproved = order.approvalStatus === 'approved';
+                    const isReadyForPickup = order.approvalStatus === 'ready_for_pickup';
+                    
+                    const getStatusBadge = () => {
+                      if (isPendingApproval) return { color: 'bg-amber-500', text: 'Pending Approval' };
+                      if (isApproved) return { color: 'bg-blue-500', text: 'Approved - Preparing' };
+                      if (isReadyForPickup) return { color: 'bg-green-500', text: 'Ready for Pickup' };
+                      return { color: 'bg-gray-500', text: order.approvalStatus };
+                    };
+                    const statusBadge = getStatusBadge();
                     
                     return (
                       <Card 
                         key={order.id} 
-                        className={`border-2 ${isPendingApproval ? 'border-amber-300 bg-amber-50' : 'border-blue-300 bg-blue-50'}`}
+                        className={`border-2 ${isPendingApproval ? 'border-amber-300 bg-amber-50' : isReadyForPickup ? 'border-green-300 bg-green-50' : 'border-blue-300 bg-blue-50'}`}
                       >
                         <CardContent className="p-4">
                           <div className="flex flex-col sm:flex-row justify-between gap-3">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
-                                <Badge className={isPendingApproval ? 'bg-amber-500' : 'bg-blue-500'}>
-                                  {isPendingApproval ? 'Pending Approval' : 'Approved - Preparing'}
+                                <Badge className={statusBadge.color}>
+                                  {statusBadge.text}
                                 </Badge>
                                 <span className="text-sm text-gray-500">Order #{order.id}</span>
                               </div>
@@ -7429,14 +7465,27 @@ export default function Admin() {
                             
                             <div className="flex flex-col gap-2 sm:w-40">
                               {isPendingApproval && (
-                                <Button
-                                  onClick={() => approveOrderMutation.mutate(order.id)}
-                                  disabled={approveOrderMutation.isPending}
-                                  className="bg-green-600 hover:bg-green-700 text-white"
-                                >
-                                  <Check className="w-4 h-4 mr-2" />
-                                  {approveOrderMutation.isPending ? 'Approving...' : 'Approve Order'}
-                                </Button>
+                                <>
+                                  <Button
+                                    onClick={() => approveOrderMutation.mutate(order.id)}
+                                    disabled={approveOrderMutation.isPending}
+                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                  >
+                                    <Check className="w-4 h-4 mr-2" />
+                                    {approveOrderMutation.isPending ? 'Approving...' : 'Approve Order'}
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                      setEditingOrder({ order, items });
+                                      setEditOrderModalOpen(true);
+                                    }}
+                                    className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                                  >
+                                    <Edit className="w-4 h-4 mr-2" />
+                                    Edit Order
+                                  </Button>
+                                </>
                               )}
                               
                               {isApproved && (
@@ -7450,7 +7499,7 @@ export default function Admin() {
                                 </Button>
                               )}
                               
-                              {isApproved && (
+                              {(isApproved || isReadyForPickup) && (
                                 <Button
                                   variant="outline"
                                   onClick={() => orderPickedUpMutation.mutate(order.id)}
@@ -7615,6 +7664,111 @@ export default function Admin() {
             </div>
           )}
           
+          {/* Edit Order Modal */}
+          <Dialog open={editOrderModalOpen} onOpenChange={(open) => {
+            setEditOrderModalOpen(open);
+            if (open && editingOrder) {
+              setEditOrderItems(editingOrder.items.map((item: any) => ({ ...item })));
+            }
+          }}>
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Edit Order #{editingOrder?.order?.id}</DialogTitle>
+              </DialogHeader>
+              
+              {editingOrder && (
+                <div className="space-y-4">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p className="text-sm text-blue-800">
+                      <strong>Edit Items:</strong> Adjust quantities or remove items before approving.
+                      Set quantity to 0 to remove an item.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {editOrderItems.map((item: any, idx: number) => (
+                      <div key={item.id || idx} className="flex items-center justify-between gap-3 p-3 border rounded">
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">{item.itemName || item.productName || 'Item'}</p>
+                          <p className="text-xs text-gray-500">${item.price} each</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setEditOrderItems(prev => prev.map((it, i) => 
+                                i === idx ? { ...it, quantity: Math.max(0, it.quantity - 1) } : it
+                              ));
+                            }}
+                          >
+                            <Minus className="w-4 h-4" />
+                          </Button>
+                          <span className="w-8 text-center font-medium">{item.quantity}</span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setEditOrderItems(prev => prev.map((it, i) => 
+                                i === idx ? { ...it, quantity: it.quantity + 1 } : it
+                              ));
+                            }}
+                          >
+                            <Plus className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => {
+                              setEditOrderItems(prev => prev.map((it, i) => 
+                                i === idx ? { ...it, quantity: 0 } : it
+                              ));
+                            }}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="border-t pt-3">
+                    <div className="flex justify-between font-semibold">
+                      <span>New Subtotal:</span>
+                      <span>
+                        ${editOrderItems.reduce((sum: number, item: any) => 
+                          sum + (parseFloat(item.price) * item.quantity), 0
+                        ).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setEditOrderModalOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                      onClick={() => {
+                        updateOrderItemsMutation.mutate({
+                          orderId: editingOrder.order.id,
+                          items: editOrderItems
+                        });
+                      }}
+                      disabled={updateOrderItemsMutation.isPending}
+                    >
+                      {updateOrderItemsMutation.isPending ? 'Saving...' : 'Save Changes'}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+
           {/* Refund Modal */}
           <Dialog open={refundModalOpen} onOpenChange={setRefundModalOpen}>
             <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
