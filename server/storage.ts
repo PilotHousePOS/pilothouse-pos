@@ -235,6 +235,7 @@ export interface IStorage {
   getOrderWithItems(id: number): Promise<{ order: Order; items: OrderItem[] } | undefined>;
   updateOrderStatus(id: number, status: string): Promise<Order>;
   updateOrderApprovalStatus(id: number, approvalStatus: string): Promise<Order>;
+  hideOrderFromAdmin(id: number): Promise<Order>;
   deleteOrder(id: number): Promise<void>;
 
   // Appointment operations
@@ -2306,6 +2307,15 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
+  async hideOrderFromAdmin(id: number): Promise<Order> {
+    const [updated] = await db
+      .update(orders)
+      .set({ hiddenFromAdmin: true, updatedAt: new Date() })
+      .where(eq(orders.id, id))
+      .returning();
+    return updated;
+  }
+
   async deleteOrder(id: number): Promise<void> {
     // Delete order items first
     await db.delete(orderItems).where(eq(orderItems.orderId, id));
@@ -2324,9 +2334,11 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(orders.orderDate));
   }
 
-  // Get all orders with items for admin
+  // Get all orders with items for admin (excludes hidden orders)
   async getAllOrdersWithItems(): Promise<any[]> {
-    const allOrders = await db.select().from(orders).orderBy(desc(orders.orderDate));
+    const allOrders = await db.select().from(orders)
+      .where(sql`${orders.hiddenFromAdmin} IS NOT TRUE`)
+      .orderBy(desc(orders.orderDate));
     
     const ordersWithItems = await Promise.all(allOrders.map(async (order) => {
       const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));

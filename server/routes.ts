@@ -1929,6 +1929,26 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Hide completed order from admin view (customer history persists)
+  app.post("/api/admin/orders/:id/hide", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const orderId = parseInt(req.params.id);
+      await storage.hideOrderFromAdmin(orderId);
+      
+      res.json({ success: true, message: "Order hidden from admin view" });
+    } catch (error) {
+      console.error("Error hiding order:", error);
+      res.status(500).json({ message: "Failed to hide order" });
+    }
+  });
+
   // Get all orders with items for admin
   app.get("/api/admin/orders-with-items", authMiddleware, async (req: any, res) => {
     try {
