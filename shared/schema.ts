@@ -364,8 +364,22 @@ export const contacts = pgTable("contacts", {
   breed: varchar("breed", { length: 255 }), // specific breed (especially for dogs)
   linkedUserId: varchar("linked_user_id").references(() => users.id),
   source: varchar("source", { length: 50 }).default("manual"), // manual, google_calendar
+  smsOptOut: boolean("sms_opt_out").default(false), // Customer opted out of SMS notifications
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// SMS delivery log - tracks sent messages and failures
+export const smsLogs = pgTable("sms_logs", {
+  id: serial("id").primaryKey(),
+  contactId: integer("contact_id").references(() => contacts.id, { onDelete: "set null" }),
+  phoneNumber: varchar("phone_number", { length: 20 }).notNull(),
+  message: text("message").notNull(),
+  status: varchar("status", { length: 20 }).notNull(), // sent, failed, bounced
+  errorMessage: text("error_message"), // Error details if failed
+  twilioSid: varchar("twilio_sid", { length: 50 }), // Twilio message SID for tracking
+  sentAt: timestamp("sent_at").defaultNow(),
+  appointmentId: integer("appointment_id").references(() => appointments.id, { onDelete: "set null" }),
 });
 
 // Appointment history - preserves completed appointments for contact records
