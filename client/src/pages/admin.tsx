@@ -7542,7 +7542,22 @@ export default function Admin() {
                 {showCompletedOrders ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
               </Button>
               
-              {showCompletedOrders && (
+              {showCompletedOrders && (() => {
+                const completedOrdersList = allOrdersWithItems.filter((order: any) => {
+                  if (search) {
+                    const searchLower = search.toLowerCase();
+                    return ((order.customerName || '').toLowerCase().includes(searchLower) ||
+                           (order.customerEmail || '').toLowerCase().includes(searchLower)) &&
+                           (order.approvalStatus === 'picked_up' || order.status === 'completed');
+                  }
+                  return order.approvalStatus === 'picked_up' || order.status === 'completed';
+                });
+                const ordersPerPage = 5;
+                const totalOrderPages = Math.ceil(completedOrdersList.length / ordersPerPage);
+                const currentOrderPage = Math.min(completedOrdersPage, Math.max(0, totalOrderPages - 1));
+                const paginatedOrders = completedOrdersList.slice(currentOrderPage * ordersPerPage, (currentOrderPage + 1) * ordersPerPage);
+                
+                return (
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base">
@@ -7555,23 +7570,13 @@ export default function Admin() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {allOrdersWithItems
-                        .filter((order: any) => {
-                          if (search) {
-                            const searchLower = search.toLowerCase();
-                            return (order.customerName || '').toLowerCase().includes(searchLower) ||
-                                   (order.customerEmail || '').toLowerCase().includes(searchLower);
-                          }
-                          return order.approvalStatus === 'picked_up' || order.status === 'completed';
-                        })
-                        .slice(0, 20)
-                        .map((order: any) => (
+                      {paginatedOrders.map((order: any) => (
                           <Card key={order.id} className="border">
-                            <CardContent className="p-4">
-                              <div className="flex flex-col sm:flex-row justify-between gap-3">
+                            <CardContent className="p-3">
+                              <div className="flex flex-col gap-3">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                    <Badge variant={order.approvalStatus === 'picked_up' ? 'default' : 'secondary'}>
+                                    <Badge variant={order.approvalStatus === 'picked_up' ? 'default' : 'secondary'} className="bg-green-600">
                                       {order.approvalStatus === 'picked_up' ? 'Completed' : order.approvalStatus || order.status}
                                     </Badge>
                                     <span className="text-sm text-gray-500">Order #{order.id}</span>
@@ -7588,7 +7593,7 @@ export default function Admin() {
                                   <div className="mt-2 space-y-1">
                                     <p className="text-sm font-medium">Items ({order.items?.length || 0}):</p>
                                     {(order.items || []).slice(0, 3).map((item: any, idx: number) => (
-                                      <p key={idx} className="text-sm text-gray-700 truncate">
+                                      <p key={idx} className="text-sm text-gray-700">
                                         • {item.itemName || item.productName || 'Item'} x{item.quantity} - ${item.price}
                                         {item.refundedQuantity > 0 && (
                                           <span className="text-red-600 ml-2">
@@ -7614,7 +7619,7 @@ export default function Admin() {
                                   </div>
                                 </div>
                                 
-                                <div className="flex flex-col gap-2 min-w-[100px]">
+                                <div className="flex flex-wrap gap-2">
                                   <Button
                                     variant="outline"
                                     size="sm"
@@ -7625,12 +7630,11 @@ export default function Admin() {
                                       setRefundNotes('');
                                       setRefundModalOpen(true);
                                     }}
-                                    className="border-red-300 text-red-700 hover:bg-red-50 w-full"
+                                    className="border-red-300 text-red-700 hover:bg-red-50"
                                   >
                                     <RotateCcw className="w-4 h-4 mr-1" />
                                     Refund
                                   </Button>
-                                  {/* Show Remove button for orders older than 30 days */}
                                   {(new Date().getTime() - new Date(order.orderDate).getTime()) > (30 * 24 * 60 * 60 * 1000) && (
                                     <Button
                                       variant="outline"
@@ -7645,7 +7649,7 @@ export default function Admin() {
                                           }
                                         }
                                       }}
-                                      className="border-gray-300 text-gray-600 hover:bg-gray-50 w-full"
+                                      className="border-gray-300 text-gray-600 hover:bg-gray-50"
                                     >
                                       <Trash2 className="w-4 h-4 mr-1" />
                                       Remove
@@ -7657,16 +7661,41 @@ export default function Admin() {
                           </Card>
                         ))}
                       
-                      {allOrdersWithItems.filter((o: any) => o.approvalStatus === 'picked_up' || o.status === 'completed').length === 0 && (
+                      {completedOrdersList.length === 0 && (
                         <div className="text-center py-8 text-gray-500">
                           <ShoppingBag className="w-12 h-12 mx-auto mb-3 opacity-50" />
                           <p>No completed orders yet</p>
                         </div>
                       )}
+                      
+                      {totalOrderPages > 1 && (
+                        <div className="flex items-center justify-center gap-2 pt-3 border-t">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCompletedOrdersPage(prev => Math.max(0, prev - 1))}
+                            disabled={currentOrderPage === 0}
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </Button>
+                          <span className="text-sm text-gray-600">
+                            Page {currentOrderPage + 1} of {totalOrderPages}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCompletedOrdersPage(prev => Math.min(totalOrderPages - 1, prev + 1))}
+                            disabled={currentOrderPage >= totalOrderPages - 1}
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
-              )}
+              );
+              })()}
             </div>
           )}
           
