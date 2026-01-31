@@ -6598,8 +6598,11 @@ export default function Admin() {
         <div className="overflow-x-auto pb-1">
           <TabsList className="inline-flex gap-1 h-auto p-1 min-w-full lg:min-w-0">
             <TabsTrigger value="orders" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              <span className="hidden lg:inline">Orders & Appointments</span>
+              <span className="hidden lg:inline">Orders & Refunds</span>
               <span className="lg:hidden">Orders</span>
+            </TabsTrigger>
+            <TabsTrigger value="appointments" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+              Appointments
             </TabsTrigger>
             <TabsTrigger value="calendar" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
               Calendar
@@ -7043,17 +7046,9 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="orders" className="space-y-6">
-          {/* Book Appointment Button */}
+          {/* Orders Header */}
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Orders & Appointments</h2>
-            <Button 
-              onClick={() => setIsBookAppointmentOpen(true)}
-              className="bg-brand-blue hover:bg-blue-700 text-white"
-              data-testid="button-book-appointment-admin"
-            >
-              <CalendarIcon className="w-4 h-4 mr-2" />
-              Book Appointment
-            </Button>
+            <h2 className="text-xl font-semibold">Orders & Refunds</h2>
           </div>
 
           {/* Search Bar */}
@@ -7061,11 +7056,11 @@ export default function Admin() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               type="text"
-              placeholder="Search Orders & Appointments by customer name, phone, or pet name..."
+              placeholder="Search orders by customer name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 pr-10 border-gray-300 rounded-xl"
-              data-testid="input-search"
+              data-testid="input-search-orders"
             />
             {search && (
               <button
@@ -7201,6 +7196,67 @@ export default function Admin() {
               )}
             </div>
           )}
+
+          {/* All Orders Section with Refund Management */}
+          {typedUser?.isAdmin && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShoppingBag className="w-5 h-5" />
+                  Order History & Refunds
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 mb-4">
+                  View all orders, process refunds, and track order status. Refunds are recorded here for inventory tracking - actual card refunds are processed through ExaTouch POS.
+                </p>
+                <div className="text-center py-8 text-gray-500">
+                  <ShoppingBag className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>Order management with refund tracking coming soon</p>
+                  <p className="text-sm mt-2">Search for orders above to view details</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        {/* Appointments Tab - Separate from Orders */}
+        <TabsContent value="appointments" className="space-y-6">
+          {/* Appointments Header */}
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold">Appointments</h2>
+            <Button 
+              onClick={() => setIsBookAppointmentOpen(true)}
+              className="bg-brand-blue hover:bg-blue-700 text-white"
+              data-testid="button-book-appointment-admin"
+            >
+              <CalendarIcon className="w-4 h-4 mr-2" />
+              Book Appointment
+            </Button>
+          </div>
+
+          {/* Appointment Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Input
+              type="text"
+              placeholder="Search appointments by customer name, phone, or pet name..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10 pr-10 border-gray-300 rounded-xl"
+              data-testid="input-search-appointments"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                data-testid="button-clear-search-appointments"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
 
           {/* Approved Appointments - Collapsible Button */}
           <div className="space-y-2">
