@@ -165,6 +165,7 @@ export const orders = pgTable("orders", {
   recurringFrequency: varchar("recurring_frequency", { length: 20 }), // weekly, biweekly, monthly
   nextRecurringDate: timestamp("next_recurring_date"), // When to remind/place next order
   recurringParentId: integer("recurring_parent_id"), // Links to original order if this is a recurring copy
+  hiddenFromAdmin: boolean("hidden_from_admin").default(false), // Hidden from admin view but visible in customer history
 });
 
 // Order items
