@@ -42,9 +42,17 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     enabled: isOpen,
   });
 
+  // Get supply IDs from cart to fetch only what we need
+  const supplyIds = cartItems.filter((item: any) => item.supplyId).map((item: any) => item.supplyId);
+  
   const { data: suppliesData } = useQuery({
-    queryKey: ["/api/supplies"],
-    enabled: isOpen && cartItems.length > 0,
+    queryKey: ["/api/supplies", { ids: supplyIds.join(',') }],
+    queryFn: async () => {
+      if (supplyIds.length === 0) return { items: [] };
+      const res = await fetch(`/api/supplies?ids=${supplyIds.join(',')}`);
+      return res.json();
+    },
+    enabled: isOpen && supplyIds.length > 0,
   });
   const supplies = suppliesData?.items || [];
 

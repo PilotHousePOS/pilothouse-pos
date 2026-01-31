@@ -158,6 +158,7 @@ export interface IStorage {
     healthcareType?: string;
   }): Promise<{ items: Supply[]; total: number }>;
   getSupply(id: number): Promise<Supply | undefined>;
+  getSuppliesByIds(ids: number[]): Promise<Supply[]>;
   getRelatedSupplies(excludeId: number, category: string, brand: string | null, limit?: number, productName?: string): Promise<Supply[]>;
   createSupply(supply: InsertSupply): Promise<Supply>;
   updateSupply(id: number, supply: Partial<InsertSupply>): Promise<Supply>;
@@ -1214,6 +1215,11 @@ export class DatabaseStorage implements IStorage {
   async getSupply(id: number): Promise<Supply | undefined> {
     const [supply] = await db.select().from(supplies).where(eq(supplies.id, id));
     return supply;
+  }
+
+  async getSuppliesByIds(ids: number[]): Promise<Supply[]> {
+    if (ids.length === 0) return [];
+    return await db.select().from(supplies).where(inArray(supplies.id, ids));
   }
 
   async getRelatedSupplies(excludeId: number, category: string, brand: string | null, limit: number = 6, productName?: string): Promise<Supply[]> {

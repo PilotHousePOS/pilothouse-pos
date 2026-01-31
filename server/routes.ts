@@ -1379,7 +1379,16 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   // Supply routes with pagination
   app.get("/api/supplies", async (req, res) => {
     try {
-      const { category, search, page = '0', limit = '24', animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType, petFoodAnimalType, treatAnimalType, filterType: filterTypeParam } = req.query;
+      const { category, search, page = '0', limit = '24', animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType, petFoodAnimalType, treatAnimalType, filterType: filterTypeParam, ids } = req.query;
+      
+      // If specific IDs requested (for cart display), fetch those directly
+      if (ids && typeof ids === 'string') {
+        const idList = ids.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+        if (idList.length > 0) {
+          const items = await storage.getSuppliesByIds(idList);
+          return res.json({ items, total: items.length, page: 0, pageSize: items.length });
+        }
+      }
       
       // Parse pagination parameters with defaults
       const pageNum = Math.max(0, parseInt(page as string) || 0);
