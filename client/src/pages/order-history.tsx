@@ -295,6 +295,13 @@ export default function OrderHistory() {
                 </div>
               )}
 
+              {/* No items found */}
+              {selectedOrder.items && selectedOrder.items.length === 0 && (
+                <div className="text-center py-4">
+                  <p className="text-sm text-gray-500">No items found for this order.</p>
+                </div>
+              )}
+
               {selectedOrder.items && selectedOrder.items.length > 0 && (
                 <div>
                   <div className="flex items-center justify-between mb-2">
