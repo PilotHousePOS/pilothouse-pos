@@ -7926,21 +7926,11 @@ export default function Admin() {
                                 id={`grooming-completed-${currentAppointment.id}`}
                                 checked={currentAppointment.groomingCompleted || false}
                                 onCheckedChange={(checked) => {
-                                  if (checked) {
-                                    // Open SMS confirmation dialog when checking Done
-                                    const contact = allBookingContacts?.find((c: any) => c.id === currentAppointment.contactId);
-                                    openSmsConfirmDialog(
-                                      currentAppointment.id,
-                                      currentAppointment.customerName || 'Customer',
-                                      contact?.phoneNumber || ''
-                                    );
-                                  } else {
-                                    // Allow unchecking without dialog
-                                    updateAppointmentGroomingCompletedMutation.mutate({ 
-                                      id: currentAppointment.id, 
-                                      groomingCompleted: false 
-                                    });
-                                  }
+                                  // Simply toggle the done status without SMS
+                                  updateAppointmentGroomingCompletedMutation.mutate({ 
+                                    id: currentAppointment.id, 
+                                    groomingCompleted: !!checked 
+                                  });
                                 }}
                                 data-testid={`checkbox-grooming-completed-${currentAppointment.id}`}
                               />
