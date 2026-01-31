@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Package, Calendar, DollarSign, ChevronRight, RefreshCw, RotateCcw, ShoppingCart, Check } from "lucide-react";
+import { ArrowLeft, Package, Calendar, DollarSign, ChevronRight, RefreshCw, RotateCcw, ShoppingCart, Check, Plus, Minus } from "lucide-react";
 import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +30,20 @@ export default function OrderHistory() {
   const [, setLocation] = useLocation();
   const [selectedOrder, setSelectedOrder] = useState<OrderWithDetails | null>(null);
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
+  const [reorderQuantities, setReorderQuantities] = useState<Record<number, number>>({});
   const { toast } = useToast();
+
+  const getReorderQuantity = (itemId: number, originalQuantity: number) => {
+    return reorderQuantities[itemId] ?? originalQuantity;
+  };
+
+  const updateReorderQuantity = (itemId: number, delta: number, originalQuantity: number) => {
+    setReorderQuantities((prev) => {
+      const current = prev[itemId] ?? originalQuantity;
+      const newQty = Math.max(1, current + delta);
+      return { ...prev, [itemId]: newQty };
+    });
+  };
 
   const addToCartMutation = useMutation({
     mutationFn: async (items: { supplyId?: number; petId?: number; quantity: number }[]) => {
@@ -63,7 +76,7 @@ export default function OrderHistory() {
       .map((item) => ({
         supplyId: item.supplyId || undefined,
         petId: item.petId || undefined,
-        quantity: item.quantity,
+        quantity: getReorderQuantity(item.id, item.quantity),
       }));
     addToCartMutation.mutate(itemsToAdd);
   };
@@ -73,7 +86,7 @@ export default function OrderHistory() {
     const itemsToAdd = selectedOrder.items.map((item) => ({
       supplyId: item.supplyId || undefined,
       petId: item.petId || undefined,
-      quantity: item.quantity,
+      quantity: getReorderQuantity(item.id, item.quantity),
     }));
     addToCartMutation.mutate(itemsToAdd);
   };
@@ -125,6 +138,7 @@ export default function OrderHistory() {
   const handleOrderClick = async (order: Order) => {
     // Set order immediately to show modal
     setSelectedItems(new Set());
+    setReorderQuantities({});
     setSelectedOrder({ ...order, items: undefined, refunds: [] });
     
     try {
@@ -348,13 +362,34 @@ export default function OrderHistory() {
                             className="w-12 h-12 object-cover rounded"
                           />
                         )}
-                        <div className="flex-1">
-                          <p className="font-medium">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">
                             {item.itemName || item.supplyName || item.petName || (item.supplyId ? `Supply #${item.supplyId}` : `Pet #${item.petId}`)}
                           </p>
-                          <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
+                          <p className="text-xs text-gray-500">Original qty: {item.quantity}</p>
                         </div>
-                        <p className="font-semibold">${item.price}</p>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            className="h-7 w-7"
+                            onClick={() => updateReorderQuantity(item.id, -1, item.quantity)}
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <span className="w-8 text-center font-medium">
+                            {getReorderQuantity(item.id, item.quantity)}
+                          </span>
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            className="h-7 w-7"
+                            onClick={() => updateReorderQuantity(item.id, 1, item.quantity)}
+                          >
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        <p className="font-semibold text-sm w-16 text-right">${item.price}</p>
                       </div>
                     ))}
                   </div>
