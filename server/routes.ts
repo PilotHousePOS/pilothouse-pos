@@ -4683,6 +4683,22 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const groomerData = req.body;
       const groomer = await storage.createGroomer(groomerData);
       
+      // Automatically add default availability for new groomer (Mon-Sat, 8am-1:30pm)
+      try {
+        for (let dayOfWeek = 1; dayOfWeek <= 6; dayOfWeek++) {
+          await storage.setGroomerAvailability({
+            groomerId: groomer.id,
+            dayOfWeek,
+            isAvailable: true,
+            startTime: '08:00',
+            endTime: '13:30',
+          });
+        }
+      } catch (availError) {
+        console.error("Error setting default groomer availability:", availError);
+        // Don't fail groomer creation if availability setup fails
+      }
+      
       // Try to link groomer with existing user account by email or phone
       if (groomerData.email || groomerData.phone) {
         try {
