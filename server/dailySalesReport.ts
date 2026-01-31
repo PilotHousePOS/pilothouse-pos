@@ -83,6 +83,8 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
   
   // Calculate totals from completed orders only
   let total = 0;
+  let subtotal = 0;
+  let totalTax = 0;
   let totalItems = 0;
   const categorySales: Map<string, CategorySales> = new Map();
   
@@ -91,7 +93,12 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
     if (!orderWithItems) continue;
 
     const orderTotal = parseFloat(order.totalAmount) || 0;
+    const orderSubtotal = parseFloat((order as any).subtotal) || orderTotal;
+    const orderTax = parseFloat((order as any).taxAmount) || 0;
+    
     total += orderTotal;
+    subtotal += orderSubtotal;
+    totalTax += orderTax;
     
     const items = orderWithItems.items || [];
     for (const item of items) {
@@ -137,6 +144,7 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
 
   // Calculate refunded amount
   const refundedTotal = refundedOrders.reduce((sum, order) => sum + (parseFloat(order.totalAmount) || 0), 0);
+  const refundedTax = refundedOrders.reduce((sum, order) => sum + (parseFloat((order as any).taxAmount) || 0), 0);
   
   // Average ticket (from completed orders only, guard against zero)
   const transactionCount = completedOrders.length;
@@ -218,8 +226,8 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
         ${dataRow('Open orders', '0.00', '')}
         ${dataRow('Transactions', formatCurrency(total), String(transactionCount))}
         ${dataRow('Discounts', '0.00', '0')}
-        ${dataRow('Subtotal', formatCurrency(total), '')}
-        ${dataRow('Taxes', 'Incl.', '')}
+        ${dataRow('Subtotal', formatCurrency(subtotal), '')}
+        ${dataRow('Taxes (10.99%)', formatCurrency(totalTax), '')}
         ${dataRow('In Trx Tips', '0.00', '')}
         ${dataRow('Admin Fee', '0.00', '0')}
         ${dataRow('CF Refunded', '0.00', '')}
@@ -263,11 +271,10 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
         ${dataRow('<strong>Total</strong>', `<strong>${formatCurrency(total)}</strong>`, '')}
         
         ${sectionHeader('Taxes')}
-        <tr>
-          <td colspan="3" style="text-align: center; padding: 8px; color: #666; font-size: 11px;">
-            (Taxes included in order totals - see POS for breakdown)
-          </td>
-        </tr>
+        ${headerRow('', 'Total $', 'Rate %')}
+        ${dataRow('State Tax (5.00%)', formatCurrency(totalTax * 0.4549), '5.0000%')}
+        ${dataRow('Federal Tax (5.99%)', formatCurrency(totalTax * 0.5451), '5.9900%')}
+        ${dataRow('<strong>Total Tax</strong>', `<strong>${formatCurrency(totalTax)}</strong>`, '10.9900%')}
         
         ${sectionHeader('Payments Transactions')}
         ${headerRow('', 'Total $', 'Sales %')}
@@ -367,8 +374,16 @@ End: ${startDateStr} 11:59PM
 -- Order Summary --
                           Total $    Count #
 Transactions              ${formatCurrency(total).padStart(10)}    ${String(transactionCount).padStart(5)}
+Subtotal                  ${formatCurrency(subtotal).padStart(10)}
+Taxes (10.99%)            ${formatCurrency(totalTax).padStart(10)}
 Total                     ${formatCurrency(total).padStart(10)}
 Avg. Ticket               ${formatCurrency(avgTicket).padStart(10)}
+
+-- Taxes --
+                          Total $    Rate %
+State Tax                 ${formatCurrency(totalTax * 0.4549).padStart(10)}    5.0000%
+Federal Tax               ${formatCurrency(totalTax * 0.5451).padStart(10)}    5.9900%
+Total Tax                 ${formatCurrency(totalTax).padStart(10)}   10.9900%
 
 -- Gross Sales By Category --
                           Total $    Sales %
