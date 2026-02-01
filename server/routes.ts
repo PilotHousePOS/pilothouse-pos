@@ -1693,6 +1693,31 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       });
       
       const validatedData = orderSchema.parse({ ...orderData, userId, items });
+      
+      // If loyalty credits are being applied, validate and deduct them from user's balance
+      let verifiedLoyaltyCredits = 0;
+      const requestedLoyaltyCredits = parseFloat(orderData.loyaltyCreditsApplied || "0");
+      if (requestedLoyaltyCredits > 0) {
+        const user = await storage.getUser(userId);
+        if (user) {
+          const currentCredits = parseFloat(user.loyaltyCredits || "0");
+          const subtotal = parseFloat(orderData.subtotal || "0");
+          const taxAmount = parseFloat(orderData.taxAmount || "0");
+          const orderTotal = subtotal + taxAmount;
+          
+          // Server-side validation: credits can't exceed available balance or order total
+          verifiedLoyaltyCredits = Math.min(requestedLoyaltyCredits, currentCredits, orderTotal);
+          
+          if (verifiedLoyaltyCredits > 0) {
+            const newCredits = Math.max(0, currentCredits - verifiedLoyaltyCredits);
+            await storage.updateUserLoyalty(userId, { loyaltyCredits: newCredits.toFixed(2) });
+          }
+        }
+      }
+      
+      // Update the order data with verified loyalty credits
+      validatedData.loyaltyCreditsApplied = verifiedLoyaltyCredits.toFixed(2);
+      
       const order = await storage.createOrder(
         { ...validatedData, userId },
         validatedData.items.map(item => ({ ...item, orderId: 0 }))

@@ -159,6 +159,7 @@ export const orders = pgTable("orders", {
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }), // Base price before tax
   taxRate: decimal("tax_rate", { precision: 5, scale: 3 }), // Tax rate applied (e.g., 8.250)
   taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }), // Tax amount
+  loyaltyCreditsApplied: decimal("loyalty_credits_applied", { precision: 10, scale: 2 }).default("0"), // Loyalty credits used on order
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
   status: varchar("status", { length: 50 }).default("pending"), // pending, confirmed, shipped, delivered, cancelled
   approvalStatus: varchar("approval_status", { length: 50 }).default("pending_approval"), // pending_approval, approved, ready_for_pickup, picked_up

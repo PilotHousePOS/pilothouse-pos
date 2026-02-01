@@ -22,7 +22,8 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import { Minus, Plus, Trash2, ShoppingCart, X } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingCart, X, Gift, Star } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -36,6 +37,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const [outOfStockPreference, setOutOfStockPreference] = useState("contact_me");
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringFrequency, setRecurringFrequency] = useState("monthly");
+  const [applyLoyaltyCredits, setApplyLoyaltyCredits] = useState(false);
 
   const { data: cartItems = [], isLoading } = useQuery({
     queryKey: ["/api/cart"],
@@ -68,6 +70,16 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     enabled: isOpen,
   });
   const taxRate = taxData?.taxRate || 0;
+
+  // Fetch user's loyalty credits
+  const { data: loyaltyData } = useQuery<{
+    loyaltyCredits: string;
+    totalSpent: string;
+  }>({
+    queryKey: ["/api/user/loyalty"],
+    enabled: isOpen,
+  });
+  const availableLoyaltyCredits = parseFloat(loyaltyData?.loyaltyCredits || "0");
 
   const updateQuantityMutation = useMutation({
     mutationFn: async ({ id, quantity }: { id: number; quantity: number }) => {
@@ -199,7 +211,11 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   }, 0);
   
   const taxAmount = subtotal * (taxRate / 100);
-  const totalAmount = subtotal + taxAmount;
+  const subtotalWithTax = subtotal + taxAmount;
+  
+  // Calculate loyalty credit discount (can't exceed the order total)
+  const loyaltyDiscount = applyLoyaltyCredits ? Math.min(availableLoyaltyCredits, subtotalWithTax) : 0;
+  const totalAmount = subtotalWithTax - loyaltyDiscount;
 
   const handleCheckout = () => {
     if (cartItems.length === 0) {
@@ -243,6 +259,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
       orderData: {
         subtotal: subtotal.toFixed(2),
         taxAmount: taxAmount.toFixed(2),
+        loyaltyCreditsApplied: loyaltyDiscount.toFixed(2),
         totalAmount: totalAmount.toFixed(2),
         shippingAddress: "In-Store Pickup - Animal House Pet Store",
         outOfStockPreference,
@@ -410,12 +427,45 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     <span>${taxAmount.toFixed(2)}</span>
                   </div>
                 )}
+                {loyaltyDiscount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Loyalty Credit:</span>
+                    <span>-${loyaltyDiscount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between font-semibold">
                   <span>Total:</span>
                   <span className="text-brand-red">${totalAmount.toFixed(2)}</span>
                 </div>
               </div>
             </div>
+
+            {/* Loyalty Credits Section */}
+            {availableLoyaltyCredits > 0 && (
+              <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Gift className="w-5 h-5 text-amber-500" />
+                    <div>
+                      <span className="font-medium text-sm">Use Loyalty Credits</span>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        Available: <span className="font-bold text-amber-600">${availableLoyaltyCredits.toFixed(2)}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={applyLoyaltyCredits}
+                    onCheckedChange={setApplyLoyaltyCredits}
+                  />
+                </div>
+                {applyLoyaltyCredits && (
+                  <div className="mt-2 text-xs text-green-600 flex items-center gap-1">
+                    <Star className="w-3 h-3" />
+                    Saving ${loyaltyDiscount.toFixed(2)} on this order!
+                  </div>
+                )}
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium mb-2">
