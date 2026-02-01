@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { useLocation } from "wouter";
 import { 
   ShoppingBag, 
@@ -12,7 +13,9 @@ import {
   Settings, 
   Edit, 
   Plus,
-  Shield
+  Shield,
+  Gift,
+  Star
 } from "lucide-react";
 import type { User, CustomerPet, Order, Appointment } from "@shared/schema";
 
@@ -38,6 +41,17 @@ export default function Profile() {
 
   const { data: appointments = [] } = useQuery<Appointment[]>({
     queryKey: ["/api/appointments"],
+    enabled: !!currentUser,
+  });
+
+  const { data: loyaltyStatus } = useQuery<{
+    totalSpent: string;
+    loyaltyCredits: string;
+    progressToNextReward: number;
+    spendingThreshold: string;
+    rewardAmount: string;
+  }>({
+    queryKey: ["/api/user/loyalty"],
     enabled: !!currentUser,
   });
 
@@ -111,6 +125,52 @@ export default function Profile() {
           </Badge>
         </div>
       </div>
+
+      {/* Loyalty Card Section */}
+      {loyaltyStatus && (
+        <div className="mb-8">
+          <Card className="bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 text-white shadow-lg overflow-hidden">
+            <CardContent className="p-5 relative">
+              <div className="absolute top-2 right-2 opacity-20">
+                <Star className="w-16 h-16" />
+              </div>
+              <div className="flex items-center gap-2 mb-3">
+                <Gift className="w-5 h-5" />
+                <h3 className="text-lg font-bold">Loyalty Rewards</h3>
+              </div>
+              
+              {parseFloat(loyaltyStatus.loyaltyCredits) > 0 && (
+                <div className="bg-white/20 backdrop-blur rounded-lg p-3 mb-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Available Credit</span>
+                    <span className="text-2xl font-bold">${parseFloat(loyaltyStatus.loyaltyCredits).toFixed(2)}</span>
+                  </div>
+                  <p className="text-xs text-white/80 mt-1">Apply at checkout!</p>
+                </div>
+              )}
+              
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span>Progress to next ${loyaltyStatus.rewardAmount} reward</span>
+                  <span className="font-semibold">{Math.round(loyaltyStatus.progressToNextReward)}%</span>
+                </div>
+                <Progress 
+                  value={loyaltyStatus.progressToNextReward} 
+                  className="h-3 bg-white/30"
+                />
+                <div className="flex items-center justify-between text-xs text-white/80">
+                  <span>Spent: ${parseFloat(loyaltyStatus.totalSpent).toFixed(2)}</span>
+                  <span>Goal: ${loyaltyStatus.spendingThreshold}</span>
+                </div>
+              </div>
+              
+              <p className="text-xs text-white/70 mt-3 text-center">
+                Earn ${loyaltyStatus.rewardAmount} credit for every ${loyaltyStatus.spendingThreshold} spent!
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* My Pets Section */}
       <div className="mb-8">
