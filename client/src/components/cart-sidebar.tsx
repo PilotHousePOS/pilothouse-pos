@@ -373,6 +373,9 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
               >
                 Proceed to Checkout
               </Button>
+              <p className="text-xs text-gray-400 mt-3 text-center leading-relaxed">
+                Disclaimer: Purchase transactions are only completed once your order is approved by management. No funds will be removed from your account until such time of the approval to ensure accuracy of your order.
+              </p>
             </div>
           )}
         </SheetContent>
