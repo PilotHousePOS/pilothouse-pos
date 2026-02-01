@@ -37,7 +37,18 @@ export const users = pgTable("users", {
   phoneNumber: varchar("phone_number", { length: 20 }),
   isAdmin: boolean("is_admin").default(false),
   isGroomer: boolean("is_groomer").default(false),
+  totalSpent: decimal("total_spent", { precision: 10, scale: 2 }).default("0"),
+  loyaltyCredits: decimal("loyalty_credits", { precision: 10, scale: 2 }).default("0"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Loyalty program settings (admin-configurable)
+export const loyaltySettings = pgTable("loyalty_settings", {
+  id: serial("id").primaryKey(),
+  spendingThreshold: decimal("spending_threshold", { precision: 10, scale: 2 }).default("250").notNull(),
+  rewardAmount: decimal("reward_amount", { precision: 10, scale: 2 }).default("20").notNull(),
+  isActive: boolean("is_active").default(true),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
@@ -598,9 +609,16 @@ export const insertAppointmentHistorySchema = createInsertSchema(appointmentHist
   createdAt: true,
 });
 
+export const insertLoyaltySettingsSchema = createInsertSchema(loyaltySettings).omit({
+  id: true,
+  updatedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+export type LoyaltySettings = typeof loyaltySettings.$inferSelect;
+export type InsertLoyaltySettings = z.infer<typeof insertLoyaltySettingsSchema>;
 export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 export type InsertPasswordResetToken = z.infer<typeof insertPasswordResetTokenSchema>;
 export type Pet = typeof pets.$inferSelect;
