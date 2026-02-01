@@ -90,7 +90,8 @@ import {
   Clock,
   RotateCcw,
   Check,
-  Settings
+  Settings,
+  Gift
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -4274,6 +4275,138 @@ function SettingsPanel() {
             {isSaving ? 'Saving...' : 'Save Tax Settings'}
           </Button>
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Loyalty Settings Panel Component
+function LoyaltySettingsPanel() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [spendingThreshold, setSpendingThreshold] = useState<string>("250");
+  const [rewardAmount, setRewardAmount] = useState<string>("20");
+  const [isActive, setIsActive] = useState<boolean>(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const { data: loyaltySettings, isLoading } = useQuery<{
+    spendingThreshold: string;
+    rewardAmount: string;
+    isActive: boolean;
+  }>({
+    queryKey: ['/api/loyalty-settings'],
+  });
+
+  useEffect(() => {
+    if (loyaltySettings) {
+      setSpendingThreshold(loyaltySettings.spendingThreshold);
+      setRewardAmount(loyaltySettings.rewardAmount);
+      setIsActive(loyaltySettings.isActive);
+    }
+  }, [loyaltySettings]);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/loyalty-settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ spendingThreshold, rewardAmount, isActive }),
+      });
+      
+      if (!response.ok) throw new Error('Failed to save loyalty settings');
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/loyalty-settings'] });
+      toast({
+        title: "Settings saved",
+        description: `Loyalty: Spend $${spendingThreshold} → Get $${rewardAmount} credit`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save loyalty settings",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Gift className="w-5 h-5 text-amber-500" />
+          Loyalty Program Settings
+        </CardTitle>
+        <CardDescription>Configure customer loyalty rewards program</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+          <div className="flex items-center gap-2">
+            <Star className="w-5 h-5 text-amber-500" />
+            <span className="font-medium">Loyalty Program Active</span>
+          </div>
+          <Switch
+            checked={isActive}
+            onCheckedChange={setIsActive}
+            disabled={isLoading}
+          />
+        </div>
+
+        <div className="grid gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="spending-threshold">Spending Threshold ($)</Label>
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-semibold text-gray-500">$</span>
+              <Input
+                id="spending-threshold"
+                type="number"
+                min="1"
+                step="1"
+                value={spendingThreshold}
+                onChange={(e) => setSpendingThreshold(e.target.value)}
+                className="w-32"
+                disabled={isLoading}
+              />
+            </div>
+            <p className="text-sm text-gray-500">Amount customers need to spend to earn a reward</p>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="reward-amount">Reward Amount ($)</Label>
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-semibold text-gray-500">$</span>
+              <Input
+                id="reward-amount"
+                type="number"
+                min="1"
+                step="1"
+                value={rewardAmount}
+                onChange={(e) => setRewardAmount(e.target.value)}
+                className="w-32"
+                disabled={isLoading}
+              />
+            </div>
+            <p className="text-sm text-gray-500">Credit amount customers receive when they reach the threshold</p>
+          </div>
+        </div>
+
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+          <p className="text-sm">
+            <strong>Current Program:</strong> Customers earn <span className="text-amber-600 font-bold">${rewardAmount}</span> credit 
+            for every <span className="text-green-600 font-bold">${spendingThreshold}</span> spent in the app.
+          </p>
+        </div>
+        
+        <Button 
+          onClick={handleSave} 
+          disabled={isSaving || isLoading}
+          className="bg-amber-600 hover:bg-amber-700"
+        >
+          {isSaving ? 'Saving...' : 'Save Loyalty Settings'}
+        </Button>
       </CardContent>
     </Card>
   );
@@ -10208,6 +10341,7 @@ export default function Admin() {
 
         <TabsContent value="settings" className="space-y-6">
           <SettingsPanel />
+          <LoyaltySettingsPanel />
         </TabsContent>
       </Tabs>
 
