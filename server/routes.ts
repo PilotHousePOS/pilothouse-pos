@@ -8975,5 +8975,83 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // ========== LOYALTY PROGRAM ROUTES ==========
+
+  // Get loyalty settings
+  app.get("/api/loyalty-settings", async (req, res) => {
+    try {
+      const settings = await storage.getLoyaltySettings();
+      res.json(settings);
+    } catch (error) {
+      console.error('Error fetching loyalty settings:', error);
+      res.status(500).json({ message: "Failed to fetch loyalty settings" });
+    }
+  });
+
+  // Update loyalty settings (admin only)
+  app.put("/api/loyalty-settings", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const { spendingThreshold, rewardAmount, isActive } = req.body;
+      const settings = await storage.updateLoyaltySettings({
+        spendingThreshold,
+        rewardAmount,
+        isActive
+      });
+      res.json(settings);
+    } catch (error) {
+      console.error('Error updating loyalty settings:', error);
+      res.status(500).json({ message: "Failed to update loyalty settings" });
+    }
+  });
+
+  // Get user's loyalty status
+  app.get("/api/user/loyalty", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      const loyaltyStatus = await storage.getUserLoyaltyStatus(userId);
+      res.json(loyaltyStatus);
+    } catch (error) {
+      console.error('Error fetching loyalty status:', error);
+      res.status(500).json({ message: "Failed to fetch loyalty status" });
+    }
+  });
+
+  // Apply loyalty credit to order
+  app.post("/api/apply-loyalty-credit", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      const { amount } = req.body;
+      const result = await storage.applyLoyaltyCredit(userId, parseFloat(amount));
+      res.json(result);
+    } catch (error: any) {
+      console.error('Error applying loyalty credit:', error);
+      res.status(400).json({ message: error.message || "Failed to apply loyalty credit" });
+    }
+  });
+
+  // Admin: Update user loyalty credits manually
+  app.put("/api/admin/users/:id/loyalty", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const { loyaltyCredits, totalSpent } = req.body;
+      const result = await storage.updateUserLoyalty(req.params.id, { loyaltyCredits, totalSpent });
+      res.json(result);
+    } catch (error) {
+      console.error('Error updating user loyalty:', error);
+      res.status(500).json({ message: "Failed to update user loyalty" });
+    }
+  });
+
   // Server is now created externally in index.ts
 }

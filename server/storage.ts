@@ -28,6 +28,7 @@ import {
   groomingScheduleEntries,
   orderPhotos,
   extractedOrderItems,
+  loyaltySettings,
   type User,
   type UpsertUser,
   type Pet,
@@ -413,6 +414,14 @@ export interface IStorage {
   
   getPurchaseSyncLogByOrder(orderId: number): Promise<AstroPurchaseSyncLog[]>;
   createPurchaseSyncLog(log: InsertAstroPurchaseSyncLog): Promise<AstroPurchaseSyncLog>;
+
+  // Loyalty program operations
+  getLoyaltySettings(): Promise<{ spendingThreshold: string; rewardAmount: string; isActive: boolean }>;
+  updateLoyaltySettings(settings: { spendingThreshold?: string; rewardAmount?: string; isActive?: boolean }): Promise<{ spendingThreshold: string; rewardAmount: string; isActive: boolean }>;
+  getUserLoyaltyStatus(userId: string): Promise<{ totalSpent: string; loyaltyCredits: string; progressToNextReward: number; spendingThreshold: string; rewardAmount: string }>;
+  applyLoyaltyCredit(userId: string, amount: number): Promise<{ success: boolean; remainingCredits: string }>;
+  updateUserLoyalty(userId: string, data: { loyaltyCredits?: string; totalSpent?: string }): Promise<User>;
+  addToUserTotalSpent(userId: string, amount: number): Promise<{ newCreditsEarned: boolean; creditsAmount: string }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -4040,6 +4049,171 @@ export class DatabaseStorage implements IStorage {
 
   async getAutomatedMessageLogs(messageId: number): Promise<AutomatedMessageLog[]> {
     return []; // Disabled
+  }
+
+  // Loyalty program operations
+  async getLoyaltySettings(): Promise<{ spendingThreshold: string; rewardAmount: string; isActive: boolean }> {
+    try {
+      const [settings] = await db.select().from(loyaltySettings).limit(1);
+      if (settings) {
+        return {
+          spendingThreshold: settings.spendingThreshold,
+          rewardAmount: settings.rewardAmount,
+          isActive: settings.isActive ?? true
+        };
+      }
+      // Create default settings if none exist
+      const [newSettings] = await db.insert(loyaltySettings).values({
+        spendingThreshold: "250",
+        rewardAmount: "20",
+        isActive: true
+      }).returning();
+      return {
+        spendingThreshold: newSettings.spendingThreshold,
+        rewardAmount: newSettings.rewardAmount,
+        isActive: newSettings.isActive ?? true
+      };
+    } catch (error) {
+      console.error('Error getting loyalty settings:', error);
+      return { spendingThreshold: "250", rewardAmount: "20", isActive: true };
+    }
+  }
+
+  async updateLoyaltySettings(settings: { spendingThreshold?: string; rewardAmount?: string; isActive?: boolean }): Promise<{ spendingThreshold: string; rewardAmount: string; isActive: boolean }> {
+    try {
+      const existing = await this.getLoyaltySettings();
+      const [updated] = await db.update(loyaltySettings)
+        .set({
+          spendingThreshold: settings.spendingThreshold ?? existing.spendingThreshold,
+          rewardAmount: settings.rewardAmount ?? existing.rewardAmount,
+          isActive: settings.isActive ?? existing.isActive,
+          updatedAt: new Date()
+        })
+        .returning();
+      if (!updated) {
+        // Insert if no rows updated
+        const [newSettings] = await db.insert(loyaltySettings).values({
+          spendingThreshold: settings.spendingThreshold ?? "250",
+          rewardAmount: settings.rewardAmount ?? "20",
+          isActive: settings.isActive ?? true
+        }).returning();
+        return {
+          spendingThreshold: newSettings.spendingThreshold,
+          rewardAmount: newSettings.rewardAmount,
+          isActive: newSettings.isActive ?? true
+        };
+      }
+      return {
+        spendingThreshold: updated.spendingThreshold,
+        rewardAmount: updated.rewardAmount,
+        isActive: updated.isActive ?? true
+      };
+    } catch (error) {
+      console.error('Error updating loyalty settings:', error);
+      throw error;
+    }
+  }
+
+  async getUserLoyaltyStatus(userId: string): Promise<{ totalSpent: string; loyaltyCredits: string; progressToNextReward: number; spendingThreshold: string; rewardAmount: string }> {
+    try {
+      const user = await this.getUser(userId);
+      const settings = await this.getLoyaltySettings();
+      
+      const totalSpent = parseFloat(user?.totalSpent || "0");
+      const threshold = parseFloat(settings.spendingThreshold);
+      const progressToNextReward = Math.min(100, (totalSpent % threshold) / threshold * 100);
+      
+      return {
+        totalSpent: user?.totalSpent || "0",
+        loyaltyCredits: user?.loyaltyCredits || "0",
+        progressToNextReward,
+        spendingThreshold: settings.spendingThreshold,
+        rewardAmount: settings.rewardAmount
+      };
+    } catch (error) {
+      console.error('Error getting user loyalty status:', error);
+      throw error;
+    }
+  }
+
+  async applyLoyaltyCredit(userId: string, amount: number): Promise<{ success: boolean; remainingCredits: string }> {
+    try {
+      const user = await this.getUser(userId);
+      if (!user) throw new Error("User not found");
+      
+      const currentCredits = parseFloat(user.loyaltyCredits || "0");
+      if (amount > currentCredits) {
+        throw new Error("Insufficient loyalty credits");
+      }
+      
+      const newCredits = (currentCredits - amount).toFixed(2);
+      const [updated] = await db.update(users)
+        .set({ loyaltyCredits: newCredits, updatedAt: new Date() })
+        .where(eq(users.id, userId))
+        .returning();
+      
+      return { success: true, remainingCredits: updated.loyaltyCredits || "0" };
+    } catch (error) {
+      console.error('Error applying loyalty credit:', error);
+      throw error;
+    }
+  }
+
+  async updateUserLoyalty(userId: string, data: { loyaltyCredits?: string; totalSpent?: string }): Promise<User> {
+    try {
+      const updateData: any = { updatedAt: new Date() };
+      if (data.loyaltyCredits !== undefined) updateData.loyaltyCredits = data.loyaltyCredits;
+      if (data.totalSpent !== undefined) updateData.totalSpent = data.totalSpent;
+      
+      const [updated] = await db.update(users)
+        .set(updateData)
+        .where(eq(users.id, userId))
+        .returning();
+      
+      return updated;
+    } catch (error) {
+      console.error('Error updating user loyalty:', error);
+      throw error;
+    }
+  }
+
+  async addToUserTotalSpent(userId: string, amount: number): Promise<{ newCreditsEarned: boolean; creditsAmount: string }> {
+    try {
+      const user = await this.getUser(userId);
+      if (!user) throw new Error("User not found");
+      
+      const settings = await this.getLoyaltySettings();
+      const threshold = parseFloat(settings.spendingThreshold);
+      const reward = parseFloat(settings.rewardAmount);
+      
+      const oldTotal = parseFloat(user.totalSpent || "0");
+      const newTotal = oldTotal + amount;
+      
+      // Check if user crossed a threshold
+      const oldRewardCount = Math.floor(oldTotal / threshold);
+      const newRewardCount = Math.floor(newTotal / threshold);
+      const newCreditsEarned = newRewardCount > oldRewardCount;
+      
+      const currentCredits = parseFloat(user.loyaltyCredits || "0");
+      const additionalCredits = (newRewardCount - oldRewardCount) * reward;
+      const newCredits = currentCredits + additionalCredits;
+      
+      await db.update(users)
+        .set({ 
+          totalSpent: newTotal.toFixed(2), 
+          loyaltyCredits: newCredits.toFixed(2),
+          updatedAt: new Date() 
+        })
+        .where(eq(users.id, userId));
+      
+      return { 
+        newCreditsEarned, 
+        creditsAmount: additionalCredits > 0 ? additionalCredits.toFixed(2) : "0" 
+      };
+    } catch (error) {
+      console.error('Error adding to user total spent:', error);
+      throw error;
+    }
   }
 }
 
