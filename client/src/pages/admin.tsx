@@ -7587,10 +7587,10 @@ export default function Admin() {
                   <CardContent>
                     <div className="space-y-3">
                       {paginatedOrders.map((order: any) => (
-                          <Card key={order.id} className="border">
-                            <CardContent className="p-3">
-                              <div className="flex flex-col gap-3">
-                                <div className="flex-1">
+                          <Card key={order.id} className="border overflow-hidden">
+                            <CardContent className="p-3 overflow-hidden">
+                              <div className="flex flex-col gap-3 overflow-hidden">
+                                <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2 mb-2 flex-wrap">
                                     <Badge variant={order.approvalStatus === 'picked_up' ? 'default' : 'secondary'} className="bg-green-600">
                                       {order.approvalStatus === 'picked_up' ? 'Completed' : order.approvalStatus || order.status}
@@ -7606,10 +7606,10 @@ export default function Admin() {
                                     <p className="text-sm text-gray-600">{order.customerEmail}</p>
                                   )}
                                   
-                                  <div className="mt-2 space-y-1">
+                                  <div className="mt-2 space-y-1 min-w-0">
                                     <p className="text-sm font-medium">Items ({order.items?.length || 0}):</p>
                                     {(order.items || []).slice(0, 3).map((item: any, idx: number) => (
-                                      <p key={idx} className="text-sm text-gray-700">
+                                      <p key={idx} className="text-sm text-gray-700 break-words">
                                         • {item.itemName || item.productName || 'Item'} x{item.quantity} - ${item.price}
                                         {item.refundedQuantity > 0 && (
                                           <span className="text-red-600 ml-2">
