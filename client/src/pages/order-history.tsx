@@ -195,11 +195,11 @@ export default function OrderHistory() {
       </div>
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-brand-blue to-brand-red text-white p-4 sticky top-0 z-10 shadow-md">
+      <div className="bg-gradient-to-r from-brand-blue to-brand-red p-4 sticky top-0 z-10 shadow-md">
         <div className="flex items-center pl-12">
           <div>
-            <h1 className="text-2xl font-bold">Order History</h1>
-            <p className="text-sm text-white/80">View your past purchases</p>
+            <h1 className="text-2xl font-extrabold text-white drop-shadow-md">Order History</h1>
+            <p className="text-sm font-medium text-white drop-shadow-sm">View your past purchases</p>
           </div>
         </div>
       </div>
