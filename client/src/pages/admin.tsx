@@ -7733,7 +7733,16 @@ export default function Admin() {
                                   
                                   <p className="font-semibold">{order.customerName || 'Unknown Customer'}</p>
                                   {order.customerEmail && (
-                                    <p className="text-sm text-gray-600">{order.customerEmail}</p>
+                                    <a href={`mailto:${order.customerEmail}`} className="text-sm text-blue-600 hover:underline flex items-center gap-1">
+                                      <Mail className="w-3 h-3" />
+                                      {order.customerEmail}
+                                    </a>
+                                  )}
+                                  {order.customerPhone && (
+                                    <a href={`tel:${order.customerPhone}`} className="text-sm text-blue-600 hover:underline flex items-center gap-1">
+                                      <Phone className="w-3 h-3" />
+                                      {order.customerPhone}
+                                    </a>
                                   )}
                                   
                                   <div className="mt-2 space-y-1 min-w-0">
