@@ -1964,11 +1964,41 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       
       const orderId = parseInt(req.params.id);
       await storage.updateOrderApprovalStatus(orderId, 'picked_up');
+      // Also mark the order status as completed when picked up
+      await storage.updateOrder(orderId, { status: 'completed' });
       
       res.json({ success: true, message: "Order marked as picked up" });
     } catch (error) {
       console.error("Error marking order picked up:", error);
       res.status(500).json({ message: "Failed to mark order picked up" });
+    }
+  });
+
+  // Sync order statuses - fix orders where approval_status is picked_up but status is still pending
+  app.post("/api/admin/orders/sync-statuses", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const allOrders = await storage.getOrders();
+      let fixedCount = 0;
+      
+      for (const order of allOrders) {
+        // If approval_status is picked_up but status is not completed, fix it
+        if (order.approvalStatus === 'picked_up' && order.status !== 'completed') {
+          await storage.updateOrder(order.id, { status: 'completed' });
+          fixedCount++;
+        }
+      }
+      
+      res.json({ success: true, message: `Fixed ${fixedCount} order(s) with inconsistent status` });
+    } catch (error) {
+      console.error("Error syncing order statuses:", error);
+      res.status(500).json({ message: "Failed to sync order statuses" });
     }
   });
 

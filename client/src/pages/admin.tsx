@@ -6887,7 +6887,13 @@ export default function Admin() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {
+              onClick={async () => {
+                // First sync order statuses to fix any inconsistencies
+                try {
+                  await apiRequest('POST', '/api/admin/orders/sync-statuses');
+                } catch (err) {
+                  // Ignore errors - sync is best effort
+                }
                 queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
                 queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
                 queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
