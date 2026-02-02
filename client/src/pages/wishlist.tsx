@@ -102,11 +102,11 @@ export default function Wishlist() {
       </div>
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-brand-red to-pink-500 text-white p-4 sticky top-0 z-10 shadow-md">
+      <div className="bg-brand-red text-white p-4 sticky top-0 z-10 shadow-lg">
         <div className="flex items-center pl-12">
           <div>
-            <h1 className="text-2xl font-bold">Wishlist</h1>
-            <p className="text-sm text-white/80">Items you want to purchase later</p>
+            <h1 className="text-2xl font-extrabold" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>Wishlist</h1>
+            <p className="text-sm font-semibold text-white" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.4)' }}>Items you want to purchase later</p>
           </div>
         </div>
       </div>
