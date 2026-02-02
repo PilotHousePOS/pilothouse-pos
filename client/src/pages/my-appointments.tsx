@@ -108,11 +108,11 @@ export default function MyAppointments() {
       </div>
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-brand-blue to-brand-red text-white p-4 sticky top-0 z-10 shadow-md">
+      <div className="bg-brand-blue text-white p-4 sticky top-0 z-10 shadow-lg">
         <div className="flex items-center pl-12">
           <div>
-            <h1 className="text-2xl font-bold">My Appointments</h1>
-            <p className="text-sm text-white/80">Manage your grooming appointments</p>
+            <h1 className="text-2xl font-extrabold" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>My Appointments</h1>
+            <p className="text-sm font-semibold text-white" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.4)' }}>Manage your grooming appointments</p>
           </div>
         </div>
       </div>
