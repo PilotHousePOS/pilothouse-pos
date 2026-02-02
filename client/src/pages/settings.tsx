@@ -18,7 +18,7 @@ const updateNameSchema = z.object({
 });
 
 const updatePhoneSchema = z.object({
-  phoneNumber: z.string().min(10, "Phone number must be at least 10 digits").regex(/^[\d\s\-\(\)]+$/, "Please enter a valid phone number"),
+  phoneNumber: z.string().min(10, "Phone number must be at least 10 digits").regex(/^[\d\s\-\(\),]+$/, "Please enter valid phone number(s)"),
 });
 
 const updateEmailSchema = z.object({
@@ -444,17 +444,17 @@ export default function Settings() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="phone-number">Phone Number</Label>
+            <Label htmlFor="phone-number">Phone Number(s)</Label>
             <Input
               id="phone-number"
               type="tel"
-              placeholder="Enter phone number (e.g., 555-123-4567)"
+              placeholder="e.g., 555-123-4567 or 555-123-4567, 555-987-6543"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               className="mt-1"
               data-testid="input-phone-number"
             />
-            <p className="text-xs text-gray-500 mt-1">Required for grooming appointments and order notifications</p>
+            <p className="text-xs text-gray-500 mt-1">For notifications. Separate multiple numbers with commas.</p>
           </div>
           <Button
             onClick={handleUpdatePhone}
