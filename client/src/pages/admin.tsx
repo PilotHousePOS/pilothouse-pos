@@ -7605,6 +7605,16 @@ export default function Admin() {
                                           className="border-orange-500 text-orange-600 hover:bg-orange-50"
                                           onClick={() => {
                                             setEditingOrder(order);
+                                            // Populate editOrderItems with existing order items
+                                            const existingItems = (order.items || []).map((item: any) => ({
+                                              id: item.id,
+                                              supplyId: item.supplyId,
+                                              itemName: item.itemName || item.productName,
+                                              productName: item.productName || item.itemName,
+                                              price: item.price,
+                                              quantity: item.quantity
+                                            }));
+                                            setEditOrderItems(existingItems);
                                             setEditOrderModalOpen(true);
                                           }}
                                         >
@@ -7830,7 +7840,7 @@ export default function Admin() {
           <Dialog open={editOrderModalOpen} onOpenChange={setEditOrderModalOpen}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Edit Order #{editingOrder?.order?.id}</DialogTitle>
+                <DialogTitle>Edit Order #{editingOrder?.id}</DialogTitle>
               </DialogHeader>
               
               {editingOrder && (
@@ -8011,7 +8021,7 @@ export default function Admin() {
                       className="flex-1 bg-blue-600 hover:bg-blue-700"
                       onClick={() => {
                         updateOrderItemsMutation.mutate({
-                          orderId: editingOrder.order.id,
+                          orderId: editingOrder.id,
                           items: editOrderItems.filter(it => it.quantity > 0)
                         });
                       }}
