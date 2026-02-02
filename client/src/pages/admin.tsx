@@ -6651,7 +6651,10 @@ export default function Admin() {
   });
 
   const pendingAppointments = (appointments as any[]).filter((a: any) => a.status === 'scheduled').length;
-  const pendingOrdersCount = (orders as any[]).filter((o: any) => o.status === 'pending').length;
+  // Count orders that are NOT picked up (pending_approval, approved, ready_for_pickup are all "pending" from admin perspective)
+  const pendingOrdersCount = (orders as any[]).filter((o: any) => 
+    o.approvalStatus !== 'picked_up' && o.status !== 'completed' && o.status !== 'cancelled' && o.status !== 'refunded'
+  ).length;
   
   // Calculate customers here - filter appointments with isHere = true from today onwards
   const today = new Date();
