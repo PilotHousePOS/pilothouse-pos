@@ -86,6 +86,8 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
   let subtotal = 0;
   let totalTax = 0;
   let totalItems = 0;
+  let totalLoyaltyDiscounts = 0;
+  let loyaltyDiscountCount = 0;
   const categorySales: Map<string, CategorySales> = new Map();
   
   for (const order of completedOrders) {
@@ -95,10 +97,16 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
     const orderTotal = parseFloat(order.totalAmount) || 0;
     const orderSubtotal = parseFloat((order as any).subtotal) || orderTotal;
     const orderTax = parseFloat((order as any).taxAmount) || 0;
+    const loyaltyDiscount = parseFloat((order as any).loyaltyDiscount) || 0;
     
     total += orderTotal;
     subtotal += orderSubtotal;
     totalTax += orderTax;
+    
+    if (loyaltyDiscount > 0) {
+      totalLoyaltyDiscounts += loyaltyDiscount;
+      loyaltyDiscountCount++;
+    }
     
     const items = orderWithItems.items || [];
     for (const item of items) {
@@ -223,22 +231,12 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
         ${noOrdersMessage}
         ${transactionCount > 0 ? `
         ${headerRow('', 'Total $', 'Count #')}
-        ${dataRow('Open orders', '0.00', '')}
-        ${dataRow('Transactions', formatCurrency(total), String(transactionCount))}
-        ${dataRow('Discounts', '0.00', '0')}
+        ${dataRow('Transactions', formatCurrency(total + totalLoyaltyDiscounts), String(transactionCount))}
+        ${dataRow('Loyalty Discounts', totalLoyaltyDiscounts > 0 ? `-${formatCurrency(totalLoyaltyDiscounts)}` : '0.00', String(loyaltyDiscountCount))}
         ${dataRow('Subtotal', formatCurrency(subtotal), '')}
         ${dataRow('Taxes (10.99%)', formatCurrency(totalTax), '')}
-        ${dataRow('In Trx Tips', '0.00', '')}
-        ${dataRow('Admin Fee', '0.00', '0')}
-        ${dataRow('CF Refunded', '0.00', '')}
-        ${dataRow('Convenience Fee', '0.00', '')}
-        ${dataRow('Delivery Fee', '0.00', '')}
-        ${dataRow('Other', '0.00', '')}
         ${dataRow('<strong>Total</strong>', `<strong>${formatCurrency(total)}</strong>`, '')}
         <tr><td colspan="3" style="padding: 8px 0;"></td></tr>
-        ${dataRow('Bottles Return', '0.00', '')}
-        ${dataRow('Exchanges', '0.00', '')}
-        ${dataRow('Payment On Acc', '0.00', '')}
         ${dataRow('Avg. Ticket', formatCurrency(avgTicket), '')}
         ` : ''}
         
@@ -252,9 +250,11 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
           : dataRow('(No categorized items)', '0.00', '')}
         ${dataRow('<strong>Total</strong>', `<strong>${formatCurrency(categoryTotal)}</strong>`, '')}
         
-        ${sectionHeader('Discount By Category')}
-        ${headerRow('', 'Total $', 'Disc %')}
-        ${dataRow('(None)', '0.00', '0.00%')}
+        ${sectionHeader('Discounts Applied')}
+        ${headerRow('', 'Total $', 'Count #')}
+        ${totalLoyaltyDiscounts > 0 
+          ? dataRow('Loyalty Rewards', formatCurrency(totalLoyaltyDiscounts), String(loyaltyDiscountCount))
+          : dataRow('(None)', '0.00', '0')}
         
         ${sectionHeader('Total Sales By Category')}
         ${headerRow('', 'Total $', 'Disc %')}
@@ -276,36 +276,19 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
         ${dataRow('Federal Tax (5.99%)', formatCurrency(totalTax * 0.5451), '5.9900%')}
         ${dataRow('<strong>Total Tax</strong>', `<strong>${formatCurrency(totalTax)}</strong>`, '10.9900%')}
         
-        ${sectionHeader('Payments Transactions')}
+        ${sectionHeader('Payments')}
         ${headerRow('', 'Total $', 'Sales %')}
-        ${dataRow('Cash', '0.00', '0.00%')}
         ${dataRow('Credit (Online)', formatCurrency(total), '100.00%')}
-        ${dataRow('Discount', '0.00', '0.00%')}
-        
-        ${sectionHeader('Company Pay In Details')}
-        ${headerRow('', 'Total $', 'Count #')}
-        ${dataRow('(None)', '0.00', '0')}
         
         ${sectionHeader('Refunded Payments')}
         ${headerRow('', 'Total $', 'Count #')}
         ${dataRow('Total', formatCurrency(refundedTotal), String(refundedOrders.length))}
         
-        ${sectionHeader('Voided Payments')}
-        ${headerRow('', 'Total $', 'Sales %')}
-        ${dataRow('(None)', '0.00', '0.00%')}
-        
         ${sectionHeader('Settlement')}
         ${headerRow('', 'Total $', 'Count #')}
         ${dataRow('Credit Sales', formatCurrency(total), String(transactionCount))}
         ${dataRow('Credit Refunds', formatCurrency(refundedTotal), String(refundedOrders.length))}
-        ${dataRow('Total Credit', formatCurrency(total - refundedTotal), '')}
-        ${dataRow('Debit Sales', '0.00', '')}
-        ${dataRow('Debit Refunds', '0.00', '')}
-        ${dataRow('Total Debit', '0.00', '')}
-        ${dataRow('EBT Sales', '0.00', '')}
-        ${dataRow('EBT Refunds', '0.00', '')}
-        ${dataRow('Total EBT', '0.00', '')}
-        ${dataRow('<strong>Total</strong>', `<strong>${formatCurrency(total - refundedTotal)}</strong>`, '')}
+        ${dataRow('<strong>Net Credit</strong>', `<strong>${formatCurrency(total - refundedTotal)}</strong>`, '')}
         
         ${sectionHeader('Online Credit Card Trans.')}
         ${headerRow('', 'Total $', 'Count #')}
@@ -316,18 +299,12 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
           </td>
         </tr>
         
-        ${sectionHeader('Promotions and Discounts')}
-        ${headerRow('', 'Total $', 'Count #')}
-        ${dataRow('Discount', '0.00', '0')}
-        
         ${sectionHeader('Summary')}
         ${headerRow('', 'Total $', 'Count #')}
-        ${dataRow('Cash', '0.00', '0')}
-        ${dataRow('Pay in', '0.00', '0')}
-        ${dataRow('Net Cash', '0.00', '')}
-        ${dataRow('Credit (Online)', formatCurrency(total), String(transactionCount))}
-        ${dataRow('<strong>Total</strong>', `<strong>${formatCurrency(total)}</strong>`, '')}
-        ${dataRow('Net Online Sales', formatCurrency(total - refundedTotal), '')}
+        ${dataRow('Credit Sales', formatCurrency(total), String(transactionCount))}
+        ${totalLoyaltyDiscounts > 0 ? dataRow('Loyalty Discounts Applied', `-${formatCurrency(totalLoyaltyDiscounts)}`, String(loyaltyDiscountCount)) : ''}
+        ${dataRow('Credit Refunds', `-${formatCurrency(refundedTotal)}`, String(refundedOrders.length))}
+        ${dataRow('<strong>Net Online Sales</strong>', `<strong>${formatCurrency(total - refundedTotal)}</strong>`, '')}
         ` : ''}
         
       </table>
@@ -373,7 +350,8 @@ End: ${startDateStr} 11:59PM
 
 -- Order Summary --
                           Total $    Count #
-Transactions              ${formatCurrency(total).padStart(10)}    ${String(transactionCount).padStart(5)}
+Transactions              ${formatCurrency(total + totalLoyaltyDiscounts).padStart(10)}    ${String(transactionCount).padStart(5)}
+Loyalty Discounts         ${(totalLoyaltyDiscounts > 0 ? '-' + formatCurrency(totalLoyaltyDiscounts) : '0.00').padStart(10)}    ${String(loyaltyDiscountCount).padStart(5)}
 Subtotal                  ${formatCurrency(subtotal).padStart(10)}
 Taxes (10.99%)            ${formatCurrency(totalTax).padStart(10)}
 Total                     ${formatCurrency(total).padStart(10)}
@@ -392,21 +370,21 @@ ${sortedCategories.map(cat =>
 ).join('\n')}
 Total                     ${formatCurrency(categoryTotal).padStart(10)}
 
--- Payments Transactions --
+-- Payments --
                           Total $    Sales %
-Cash                           0.00     0.00%
 Credit (Online)           ${formatCurrency(total).padStart(10)}   100.00%
 
 -- Settlement --
                           Total $    Count #
 Credit Sales              ${formatCurrency(total).padStart(10)}    ${String(transactionCount).padStart(5)}
 Credit Refunds            ${formatCurrency(refundedTotal).padStart(10)}    ${String(refundedOrders.length).padStart(5)}
-Total                     ${formatCurrency(total - refundedTotal).padStart(10)}
+Net Credit                ${formatCurrency(total - refundedTotal).padStart(10)}
 
 -- Summary --
                           Total $    Count #
-Credit (Online)           ${formatCurrency(total).padStart(10)}    ${String(transactionCount).padStart(5)}
-Total                     ${formatCurrency(total).padStart(10)}
+Credit Sales              ${formatCurrency(total).padStart(10)}    ${String(transactionCount).padStart(5)}${totalLoyaltyDiscounts > 0 ? `
+Loyalty Discounts        -${formatCurrency(totalLoyaltyDiscounts).padStart(10)}    ${String(loyaltyDiscountCount).padStart(5)}` : ''}
+Credit Refunds           -${formatCurrency(refundedTotal).padStart(10)}    ${String(refundedOrders.length).padStart(5)}
 Net Online Sales          ${formatCurrency(total - refundedTotal).padStart(10)}
 
 ---
