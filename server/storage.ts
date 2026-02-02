@@ -2384,7 +2384,7 @@ export class DatabaseStorage implements IStorage {
         ...order,
         customerName: order.customerName || (customer ? `${customer.firstName} ${customer.lastName}` : 'Unknown Customer'),
         customerEmail: order.customerEmail || customer?.email || null,
-        customerPhone: order.customerPhone || customer?.phone || null,
+        customerPhone: order.customerPhone || customer?.phoneNumber || null,
         items: enrichedItems,
       };
     }));
