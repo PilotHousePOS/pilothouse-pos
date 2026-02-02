@@ -2314,12 +2314,19 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const petsByAppointmentId = await storage.getAppointmentPetsByAppointmentIds(appointmentIds);
       
       // Get all contacts for looking up notes by phone number
+      // Index contacts by all their phone numbers (supports comma-separated)
       const allContacts = await storage.getAllContacts();
       const contactsByPhone = new Map<string, any>();
       for (const contact of allContacts) {
         if (contact.phoneNumber) {
-          const normalizedPhone = contact.phoneNumber.replace(/\D/g, '');
-          contactsByPhone.set(normalizedPhone, contact);
+          // Split by comma to handle multiple phone numbers
+          const phoneNumbers = contact.phoneNumber.split(',').map((p: string) => p.trim());
+          for (const phone of phoneNumbers) {
+            const normalizedPhone = phone.replace(/\D/g, '');
+            if (normalizedPhone.length >= 10) {
+              contactsByPhone.set(normalizedPhone, contact);
+            }
+          }
         }
       }
       

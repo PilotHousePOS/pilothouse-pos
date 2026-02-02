@@ -1499,15 +1499,6 @@ function ContactsManager() {
                       )}
                     </div>
                     
-                    {/* Right side - Permanent Notes */}
-                    {contact.notes && (
-                      <div className="flex-shrink-0 max-w-[140px] bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2 border border-amber-200 dark:border-amber-800 self-start">
-                        <p className="text-xs font-medium text-amber-800 dark:text-amber-300 mb-1">Notes</p>
-                        <p className="text-xs text-amber-700 dark:text-amber-400 break-words line-clamp-3 overflow-hidden">
-                          {contact.notes}
-                        </p>
-                      </div>
-                    )}
                   </div>
                   
                   <div className="flex flex-col gap-2 min-w-0 mt-2">
@@ -8229,6 +8220,13 @@ export default function Admin() {
                               <p>Phone: {currentAppointment.ownerPhoneNumber}</p>
                               <p className="text-gray-500">{parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
                             </div>
+                            {/* Show contact notes (from contact record) */}
+                            {currentAppointment.contactNotes && (
+                              <div className="text-xs mt-1.5 p-1.5 bg-amber-50 rounded border border-amber-200" data-testid={`contact-notes-${currentAppointment.id}`}>
+                                <span className="font-medium text-amber-800">Contact Notes:</span>{' '}
+                                <span className="text-amber-700">{currentAppointment.contactNotes}</span>
+                              </div>
+                            )}
                             {/* Show all notes - appointment level and per-pet */}
                             {(currentAppointment.specialNotes || (currentAppointment.pets && currentAppointment.pets.some((p: any) => p.specialNotes))) && (
                               <div className="text-xs text-gray-700 mt-1.5 break-words whitespace-pre-wrap" data-testid={`appointment-notes-${currentAppointment.id}`}>
@@ -8615,6 +8613,12 @@ export default function Admin() {
                         <p className="text-sm text-gray-600">Owner: {capitalizeWords(currentAppointment.ownerFirstName)} {capitalizeWords(currentAppointment.ownerLastName)}</p>
                         <p className="text-sm text-gray-600">Phone: {currentAppointment.ownerPhoneNumber}</p>
                         <p className="text-xs text-gray-500">{parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
+                        {currentAppointment.contactNotes && (
+                          <div className="text-xs mt-1.5 p-1.5 bg-amber-50 rounded border border-amber-200">
+                            <span className="font-medium text-amber-800">Contact Notes:</span>{' '}
+                            <span className="text-amber-700">{currentAppointment.contactNotes}</span>
+                          </div>
+                        )}
                         {currentAppointment.price && (
                           <p className="text-xs text-green-700 font-medium mt-1">
                             Price: ${currentAppointment.price}
@@ -8773,6 +8777,12 @@ export default function Admin() {
                                 <p>Phone: {currentAppointment.ownerPhoneNumber}</p>
                                 <p className="text-gray-500">{parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
                               </div>
+                              {currentAppointment.contactNotes && (
+                                <div className="text-xs mt-1.5 p-1.5 bg-amber-50 rounded border border-amber-200">
+                                  <span className="font-medium text-amber-800">Contact Notes:</span>{' '}
+                                  <span className="text-amber-700">{currentAppointment.contactNotes}</span>
+                                </div>
+                              )}
                               {currentAppointment.price && (
                                 <p className="text-xs text-green-700 font-medium mt-1">
                                   Price: ${currentAppointment.price}
