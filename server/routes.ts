@@ -2342,13 +2342,18 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           }
         }
         
-        // Look up contact notes by phone number
+        // Look up contact notes by phone number (supports multiple comma-separated numbers)
         let contactNotes = null;
         if (apt.ownerPhoneNumber) {
-          const normalizedPhone = apt.ownerPhoneNumber.replace(/\D/g, '');
-          const contact = contactsByPhone.get(normalizedPhone);
-          if (contact?.notes) {
-            contactNotes = contact.notes;
+          // Split by comma and check each phone number
+          const phoneNumbers = apt.ownerPhoneNumber.split(',').map((p: string) => p.trim());
+          for (const phone of phoneNumbers) {
+            const normalizedPhone = phone.replace(/\D/g, '');
+            const contact = contactsByPhone.get(normalizedPhone);
+            if (contact?.notes) {
+              contactNotes = contact.notes;
+              break; // Use first matching contact's notes
+            }
           }
         }
         

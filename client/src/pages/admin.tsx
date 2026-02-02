@@ -1501,9 +1501,9 @@ function ContactsManager() {
                     
                     {/* Right side - Permanent Notes */}
                     {contact.notes && (
-                      <div className="flex-shrink-0 w-32 sm:w-40 bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2 border border-amber-200 dark:border-amber-800">
+                      <div className="flex-shrink-0 max-w-[140px] bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2 border border-amber-200 dark:border-amber-800 self-start">
                         <p className="text-xs font-medium text-amber-800 dark:text-amber-300 mb-1">Notes</p>
-                        <p className="text-xs text-amber-700 dark:text-amber-400 break-words line-clamp-4">
+                        <p className="text-xs text-amber-700 dark:text-amber-400 break-words line-clamp-3 overflow-hidden">
                           {contact.notes}
                         </p>
                       </div>
