@@ -25,10 +25,21 @@ app.get('/__health', (_req, res) => {
   res.status(200).send('OK');
 });
 
-// Basic middleware (lightweight, no heavy imports)
+// CORS middleware with trusted origins only
+const trustedOrigins = [
+  `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`,
+  `https://${process.env.REPL_SLUG}--${process.env.REPL_OWNER}.repl.co`,
+  process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : null,
+  process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}` : null,
+  'https://animal-house-pet-store.replit.app',
+].filter(Boolean) as string[];
+
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  const origin = req.headers.origin;
+  if (origin && trustedOrigins.some(trusted => origin.startsWith(trusted.replace(/\/$/, '')))) {
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   if (req.method === 'OPTIONS') {
@@ -97,7 +108,9 @@ app.use((req, res, next) => {
     const duration = Date.now() - start;
     if (reqPath.startsWith("/api")) {
       let logLine = `${req.method} ${reqPath} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
+      const sensitiveEndpoints = ['/api/auth', '/api/admin/users', '/api/orders', '/api/admin/orders', '/api/contacts', '/api/appointments'];
+      const isSensitive = sensitiveEndpoints.some(ep => reqPath.startsWith(ep));
+      if (capturedJsonResponse && !isSensitive) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
       if (logLine.length > 80) {
