@@ -1967,7 +1967,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       
       await storage.updateOrderApprovalStatus(orderId, 'picked_up');
       // Also mark the order status as completed when picked up
-      await storage.updateOrder(orderId, { status: 'completed' });
+      await storage.updateOrderStatus(orderId, 'completed');
       
       // Send email notification
       if (orderWithItems) {
