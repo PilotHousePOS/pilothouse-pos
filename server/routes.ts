@@ -1963,9 +1963,58 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       }
       
       const orderId = parseInt(req.params.id);
+      const orderWithItems = await storage.getOrderWithItems(orderId);
+      
       await storage.updateOrderApprovalStatus(orderId, 'picked_up');
       // Also mark the order status as completed when picked up
       await storage.updateOrder(orderId, { status: 'completed' });
+      
+      // Send email notification
+      if (orderWithItems) {
+        const order = orderWithItems.order;
+        const customerEmail = orderWithItems.customerEmail || order.customerEmail;
+        if (customerEmail) {
+          try {
+            const { getUncachableSendGridClient } = await import('./sendgridIntegration');
+            const { client, fromEmail } = await getUncachableSendGridClient();
+            
+            await client.send({
+              to: customerEmail,
+              from: fromEmail,
+              subject: 'Thank You for Shopping at Animal House!',
+              text: `Hi ${orderWithItems.customerName || 'Valued Customer'},
+
+Your order #${orderId} has been picked up and completed!
+
+Thank you for shopping with Animal House Pet Store. We appreciate your business!
+
+If you have any questions, please don't hesitate to contact us.
+
+See you again soon!
+
+Animal House Pet Store
+2934 Cypress St
+West Monroe LA 71291
+318 322-3023`,
+              html: `
+                <h2>Thank You for Shopping at Animal House!</h2>
+                <p>Hi ${orderWithItems.customerName || 'Valued Customer'},</p>
+                <p>Your order #${orderId} has been picked up and completed!</p>
+                <p>Thank you for shopping with Animal House Pet Store. We appreciate your business!</p>
+                <p>If you have any questions, please don't hesitate to contact us.</p>
+                <p>See you again soon!</p>
+                <br>
+                <p><strong>Animal House Pet Store</strong><br>
+                2934 Cypress St<br>
+                West Monroe LA 71291<br>
+                318 322-3023</p>
+              `
+            });
+          } catch (emailError) {
+            console.error("Failed to send pickup confirmation email:", emailError);
+          }
+        }
+      }
       
       res.json({ success: true, message: "Order marked as picked up" });
     } catch (error) {

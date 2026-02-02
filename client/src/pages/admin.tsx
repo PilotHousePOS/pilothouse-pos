@@ -5833,6 +5833,7 @@ export default function Admin() {
         description: "Customer has been notified via email.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/pending-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/orders-with-items"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
     },
     onError: () => {
@@ -5854,6 +5855,7 @@ export default function Admin() {
         description: "Customer has been notified their order is ready for pickup.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/pending-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/orders-with-items"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
     },
     onError: () => {
@@ -5872,9 +5874,10 @@ export default function Admin() {
     onSuccess: () => {
       toast({
         title: "Order Complete",
-        description: "Order has been marked as picked up.",
+        description: "Customer has been sent a thank you email.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/pending-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/orders-with-items"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
     },
     onError: () => {
@@ -7593,21 +7596,35 @@ export default function Admin() {
                                 
                                 <div className="flex items-center justify-between mt-2 pt-2 border-t">
                                   <p className="font-bold text-lg">${parseFloat(order.totalAmount || 0).toFixed(2)}</p>
-                                  <div className="flex gap-2">
+                                  <div className="flex gap-2 flex-wrap">
                                     {order.approvalStatus === 'pending_approval' && (
-                                      <Button
-                                        size="sm"
-                                        className="bg-blue-600 hover:bg-blue-700"
-                                        onClick={() => approveOrderMutation.mutate(order.id)}
-                                      >
-                                        Approve
-                                      </Button>
+                                      <>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="border-orange-500 text-orange-600 hover:bg-orange-50"
+                                          onClick={() => {
+                                            setEditingOrder(order);
+                                            setEditOrderModalOpen(true);
+                                          }}
+                                        >
+                                          <Pencil className="w-3 h-3 mr-1" />
+                                          Edit
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          className="bg-blue-600 hover:bg-blue-700"
+                                          onClick={() => approveOrderMutation.mutate(order.id)}
+                                        >
+                                          Approve
+                                        </Button>
+                                      </>
                                     )}
                                     {order.approvalStatus === 'approved' && (
                                       <Button
                                         size="sm"
                                         className="bg-green-600 hover:bg-green-700"
-                                        onClick={() => markReadyMutation.mutate(order.id)}
+                                        onClick={() => orderReadyMutation.mutate(order.id)}
                                       >
                                         Mark Ready
                                       </Button>
@@ -7616,7 +7633,7 @@ export default function Admin() {
                                       <Button
                                         size="sm"
                                         className="bg-purple-600 hover:bg-purple-700"
-                                        onClick={() => markPickedUpMutation.mutate(order.id)}
+                                        onClick={() => orderPickedUpMutation.mutate(order.id)}
                                       >
                                         Mark Picked Up
                                       </Button>
