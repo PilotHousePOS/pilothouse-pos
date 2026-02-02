@@ -195,11 +195,11 @@ export default function OrderHistory() {
       </div>
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-brand-blue to-brand-red p-4 sticky top-0 z-10 shadow-md">
+      <div className="bg-brand-blue p-4 sticky top-0 z-10 shadow-lg">
         <div className="flex items-center pl-12">
           <div>
-            <h1 className="text-2xl font-extrabold text-white drop-shadow-md">Order History</h1>
-            <p className="text-sm font-medium text-white drop-shadow-sm">View your past purchases</p>
+            <h1 className="text-2xl font-extrabold text-white" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>Order History</h1>
+            <p className="text-sm font-semibold text-white" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.4)' }}>View your past purchases</p>
           </div>
         </div>
       </div>
