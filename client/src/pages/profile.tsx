@@ -40,7 +40,7 @@ export default function Profile() {
   });
 
   const { data: appointments = [] } = useQuery<Appointment[]>({
-    queryKey: ["/api/appointments"],
+    queryKey: ["/api/user/appointments"],
     enabled: !!currentUser,
   });
 

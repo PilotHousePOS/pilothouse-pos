@@ -13,7 +13,7 @@ export default function MyAppointments() {
   const [appointmentGroupIndexes, setAppointmentGroupIndexes] = useState<Record<string, number>>({});
 
   const { data: appointments, isLoading } = useQuery<Appointment[]>({
-    queryKey: ["/api/appointments"],
+    queryKey: ["/api/user/appointments"],
   });
 
   const getStatusIcon = (appointment: Appointment) => {

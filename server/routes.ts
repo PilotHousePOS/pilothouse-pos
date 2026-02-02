@@ -9000,6 +9000,41 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // ========== USER-SPECIFIC APPOINTMENTS (for profile page) ==========
+  // This endpoint ALWAYS returns only the logged-in user's own appointments
+  // regardless of whether they are admin/groomer (for profile page use)
+  app.get("/api/user/appointments", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      
+      // Always filter by user ID - admins see all appointments in admin panel, not here
+      const appointments = await storage.getAppointments(userId);
+      
+      // Filter out old completed/cancelled appointments (older than 30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      const filteredAppointments = appointments.filter((apt: any) => {
+        // Keep all scheduled appointments
+        if (apt.status === 'scheduled') {
+          return true;
+        }
+        
+        // For completed/cancelled appointments: only keep recent ones
+        const aptDate = new Date(apt.appointmentDate);
+        return aptDate >= thirtyDaysAgo;
+      });
+      
+      res.json(filteredAppointments);
+    } catch (error) {
+      console.error("Error fetching user appointments:", error);
+      res.status(500).json({ message: "Failed to fetch appointments" });
+    }
+  });
+
   // ========== LOYALTY PROGRAM ROUTES ==========
 
   // Get loyalty settings
