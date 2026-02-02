@@ -7518,6 +7518,128 @@ export default function Admin() {
           {/* All Orders Section with Refund Management */}
           {typedUser?.isAdmin && (
             <div className="space-y-4">
+              {/* Pending Orders Section */}
+              <Button
+                variant="outline"
+                className="w-full justify-between border-2 border-orange-300 bg-orange-50 hover:bg-orange-100"
+                onClick={() => setShowPendingOrders(!showPendingOrders)}
+              >
+                <span className="flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-orange-600" />
+                  Pending Orders ({allOrdersWithItems.filter((o: any) => 
+                    o.approvalStatus !== 'picked_up' && o.status !== 'completed' && o.status !== 'cancelled' && o.status !== 'refunded'
+                  ).length})
+                </span>
+                {showPendingOrders ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+              </Button>
+              
+              {showPendingOrders && (() => {
+                const pendingOrdersList = allOrdersWithItems.filter((order: any) => {
+                  const isPending = order.approvalStatus !== 'picked_up' && order.status !== 'completed' && order.status !== 'cancelled' && order.status !== 'refunded';
+                  if (search) {
+                    const searchLower = search.toLowerCase();
+                    return ((order.customerName || '').toLowerCase().includes(searchLower) ||
+                           (order.customerEmail || '').toLowerCase().includes(searchLower)) && isPending;
+                  }
+                  return isPending;
+                });
+                
+                return pendingOrdersList.length > 0 ? (
+                  <Card className="border-orange-200">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-base text-orange-700">
+                        <Clock className="w-5 h-5" />
+                        Orders Awaiting Action
+                      </CardTitle>
+                      <p className="text-sm text-gray-600">
+                        Approve orders, mark as ready, or mark as picked up.
+                      </p>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {pendingOrdersList.map((order: any) => (
+                          <Card key={order.id} className="border overflow-hidden">
+                            <CardContent className="p-3">
+                              <div className="flex flex-col gap-3">
+                                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                  <Badge variant="secondary" className={
+                                    order.approvalStatus === 'ready_for_pickup' ? 'bg-green-600 text-white' :
+                                    order.approvalStatus === 'approved' ? 'bg-blue-600 text-white' :
+                                    'bg-orange-500 text-white'
+                                  }>
+                                    {order.approvalStatus === 'ready_for_pickup' ? 'Ready for Pickup' :
+                                     order.approvalStatus === 'approved' ? 'Approved' :
+                                     'Pending Approval'}
+                                  </Badge>
+                                  <span className="text-sm text-gray-500">Order #{order.id}</span>
+                                  <span className="text-xs text-gray-400">
+                                    {new Date(order.orderDate).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                
+                                <p className="font-semibold">{order.customerName || 'Unknown Customer'}</p>
+                                {order.customerEmail && (
+                                  <p className="text-sm text-gray-600">{order.customerEmail}</p>
+                                )}
+                                
+                                <div className="mt-2 space-y-1">
+                                  <p className="text-sm font-medium">Items ({order.items?.length || 0}):</p>
+                                  {(order.items || []).map((item: any, idx: number) => (
+                                    <p key={idx} className="text-sm text-gray-700 break-words">
+                                      • {item.itemName || item.productName || 'Item'} x{item.quantity} - ${item.price}
+                                    </p>
+                                  ))}
+                                </div>
+                                
+                                <div className="flex items-center justify-between mt-2 pt-2 border-t">
+                                  <p className="font-bold text-lg">${parseFloat(order.totalAmount || 0).toFixed(2)}</p>
+                                  <div className="flex gap-2">
+                                    {order.approvalStatus === 'pending_approval' && (
+                                      <Button
+                                        size="sm"
+                                        className="bg-blue-600 hover:bg-blue-700"
+                                        onClick={() => approveOrderMutation.mutate(order.id)}
+                                      >
+                                        Approve
+                                      </Button>
+                                    )}
+                                    {order.approvalStatus === 'approved' && (
+                                      <Button
+                                        size="sm"
+                                        className="bg-green-600 hover:bg-green-700"
+                                        onClick={() => markReadyMutation.mutate(order.id)}
+                                      >
+                                        Mark Ready
+                                      </Button>
+                                    )}
+                                    {order.approvalStatus === 'ready_for_pickup' && (
+                                      <Button
+                                        size="sm"
+                                        className="bg-purple-600 hover:bg-purple-700"
+                                        onClick={() => markPickedUpMutation.mutate(order.id)}
+                                      >
+                                        Mark Picked Up
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card className="border-orange-200">
+                    <CardContent className="p-4 text-center text-gray-500">
+                      No pending orders
+                    </CardContent>
+                  </Card>
+                );
+              })()}
+
+              {/* Completed Orders Section */}
               <Button
                 variant="outline"
                 className="w-full justify-between border-2 border-gray-200 bg-gray-50 hover:bg-gray-100"
