@@ -1183,7 +1183,7 @@ function ContactsManager() {
                       id="contact-phone"
                       data-testid="input-contact-phone"
                       type="tel"
-                      placeholder="(555) 123-4567"
+                      placeholder="555-123-4567 (comma separated)"
                       value={contactFormData.phoneNumber}
                       onChange={(e) => setContactFormData({ ...contactFormData, phoneNumber: e.target.value })}
                       required
@@ -1301,7 +1301,7 @@ function ContactsManager() {
                       id="edit-contact-phone"
                       data-testid="input-edit-contact-phone"
                       type="tel"
-                      placeholder="(555) 123-4567"
+                      placeholder="555-123-4567 (comma separated)"
                       value={contactFormData.phoneNumber}
                       onChange={(e) => setContactFormData({ ...contactFormData, phoneNumber: e.target.value })}
                       required
@@ -1515,11 +1515,11 @@ function ContactsManager() {
                     
                     {/* Action buttons - only visible when expanded */}
                     {contact.isDatabaseContact && isExpanded && (
-                      <div className="flex gap-2 pt-2 mt-1 border-t border-gray-200">
+                      <div className="flex flex-wrap gap-1 pt-2 mt-1 border-t border-gray-200">
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 px-3 flex-1"
+                          className="h-8 px-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleEditContact(contact);
@@ -1527,12 +1527,12 @@ function ContactsManager() {
                           data-testid={`button-edit-contact-${index}`}
                         >
                           <Edit className="w-4 h-4 mr-1" />
-                          <span className="text-sm">Edit</span>
+                          <span className="text-xs">Edit</span>
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 px-3 flex-1"
+                          className="h-8 px-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             setHistoryDialogContact({ id: contact.id, name: contact.displayName || contact.name });
@@ -1540,12 +1540,12 @@ function ContactsManager() {
                           data-testid={`button-view-history-${index}`}
                         >
                           <History className="w-4 h-4 mr-1" />
-                          <span className="text-sm">History</span>
+                          <span className="text-xs">History</span>
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 px-3 hover:text-red-600"
+                          className="h-8 px-2 hover:text-red-600"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteContact(contact.id);
