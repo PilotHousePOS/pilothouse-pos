@@ -6891,6 +6891,9 @@ export default function Admin() {
                 queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
                 queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
                 queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/admin/pending-orders"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/admin/orders-with-items"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/admin/refunds"] });
                 queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
                 queryClient.invalidateQueries({ queryKey: ["/api/admin/appointments/unapproved"] });
                 queryClient.invalidateQueries({ queryKey: ["/api/groomers"] });
