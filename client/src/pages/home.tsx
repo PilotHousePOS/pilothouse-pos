@@ -91,8 +91,8 @@ export default function Home() {
       {/* Modern Header */}
       <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 px-4 py-4 sticky top-0 z-10">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="relative">
+          <div className="flex items-center space-x-3 min-w-0 flex-shrink-0">
+            <div className="relative flex-shrink-0">
               <div className="w-12 h-12 bg-gradient-to-br from-brand-red to-brand-orange rounded-2xl flex items-center justify-center shadow-lg">
                 <img 
                   src={animalHouseLogoPath} 
@@ -102,11 +102,11 @@ export default function Home() {
               </div>
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-brand-blue to-brand-red bg-clip-text text-transparent">
+            <div className="min-w-0">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-brand-blue to-brand-red bg-clip-text text-transparent whitespace-nowrap">
                 Animal House
               </h1>
-              <p className="text-xs text-gray-500 font-medium">
+              <p className="text-xs text-gray-500 font-medium truncate">
                 {isLoading ? 'Loading...' : 
                  user && (user as any).firstName ? `Welcome, ${(user as any).firstName}${(user as any).isAdmin ? ' (Admin)' : ''}` : 
                  'Where pets find families'}
