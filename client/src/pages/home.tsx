@@ -90,8 +90,8 @@ export default function Home() {
     <div className="pb-20 bg-gradient-to-b from-gray-50 to-white">
       {/* Modern Header */}
       <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 px-4 py-4 sticky top-0 z-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3 min-w-0 flex-shrink-0">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center space-x-3 flex-1 min-w-0">
             <div className="relative flex-shrink-0">
               <div className="w-12 h-12 bg-gradient-to-br from-brand-red to-brand-orange rounded-2xl flex items-center justify-center shadow-lg">
                 <img 
@@ -102,8 +102,8 @@ export default function Home() {
               </div>
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>
             </div>
-            <div className="min-w-0">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-brand-blue to-brand-red bg-clip-text text-transparent whitespace-nowrap">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl font-bold text-brand-red whitespace-nowrap">
                 Animal House
               </h1>
               <p className="text-xs text-gray-500 font-medium truncate">
@@ -113,7 +113,7 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 flex-shrink-0">
             <button 
               className={`relative p-3 rounded-full transition-colors ${
                 notificationsEnabled 
