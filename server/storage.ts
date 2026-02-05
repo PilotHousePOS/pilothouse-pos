@@ -424,6 +424,7 @@ export interface IStorage {
   applyLoyaltyCredit(userId: string, amount: number): Promise<{ success: boolean; remainingCredits: string }>;
   updateUserLoyalty(userId: string, data: { loyaltyCredits?: string; totalSpent?: string }): Promise<User>;
   addToUserTotalSpent(userId: string, amount: number): Promise<{ newCreditsEarned: boolean; creditsAmount: string }>;
+  updateUserStripeInfo(userId: string, data: { stripeCustomerId?: string; stripeDefaultPaymentMethod?: string }): Promise<User>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -4221,6 +4222,24 @@ export class DatabaseStorage implements IStorage {
       };
     } catch (error) {
       console.error('Error adding to user total spent:', error);
+      throw error;
+    }
+  }
+
+  async updateUserStripeInfo(userId: string, data: { stripeCustomerId?: string; stripeDefaultPaymentMethod?: string }): Promise<User> {
+    try {
+      const updateData: any = { updatedAt: new Date() };
+      if (data.stripeCustomerId !== undefined) updateData.stripeCustomerId = data.stripeCustomerId;
+      if (data.stripeDefaultPaymentMethod !== undefined) updateData.stripeDefaultPaymentMethod = data.stripeDefaultPaymentMethod;
+      
+      const [updated] = await db.update(users)
+        .set(updateData)
+        .where(eq(users.id, userId))
+        .returning();
+      
+      return updated;
+    } catch (error) {
+      console.error('Error updating user Stripe info:', error);
       throw error;
     }
   }

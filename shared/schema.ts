@@ -39,6 +39,8 @@ export const users = pgTable("users", {
   isGroomer: boolean("is_groomer").default(false),
   totalSpent: decimal("total_spent", { precision: 10, scale: 2 }).default("0"),
   loyaltyCredits: decimal("loyalty_credits", { precision: 10, scale: 2 }).default("0"),
+  stripeCustomerId: varchar("stripe_customer_id", { length: 255 }), // Stripe customer ID for saved payment methods
+  stripeDefaultPaymentMethod: varchar("stripe_default_payment_method", { length: 255 }), // Default payment method ID
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

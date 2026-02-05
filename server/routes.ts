@@ -122,6 +122,204 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     next();
   });
 
+  // Stripe API routes
+  app.get("/api/stripe/config", async (req, res) => {
+    try {
+      const { getStripePublishableKey } = await import('./stripeClient');
+      const publishableKey = await getStripePublishableKey();
+      res.json({ publishableKey });
+    } catch (error: any) {
+      console.error("Failed to get Stripe config:", error);
+      res.status(500).json({ error: "Stripe not configured" });
+    }
+  });
+
+  // Get or create Stripe customer for current user
+  app.post("/api/stripe/customer", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const { getUncachableStripeClient } = await import('./stripeClient');
+      const stripe = await getUncachableStripeClient();
+      
+      // Check if user already has a Stripe customer ID
+      if (user.stripeCustomerId) {
+        try {
+          // Verify customer still exists in Stripe
+          const customer = await stripe.customers.retrieve(user.stripeCustomerId);
+          if (!customer.deleted) {
+            return res.json({ customerId: user.stripeCustomerId });
+          }
+        } catch (e) {
+          // Customer doesn't exist, will create new one
+        }
+      }
+      
+      // Create new Stripe customer
+      const customer = await stripe.customers.create({
+        email: user.email || undefined,
+        name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || undefined,
+        phone: user.phoneNumber || undefined,
+        metadata: {
+          userId: userId,
+        },
+      });
+      
+      // Save customer ID to user
+      await storage.updateUserStripeInfo(userId, { stripeCustomerId: customer.id });
+      
+      res.json({ customerId: customer.id });
+    } catch (error: any) {
+      console.error("Failed to create/get Stripe customer:", error);
+      res.status(500).json({ error: "Failed to create customer" });
+    }
+  });
+
+  // Create a SetupIntent for saving a new card
+  app.post("/api/stripe/setup-intent", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const { getUncachableStripeClient } = await import('./stripeClient');
+      const stripe = await getUncachableStripeClient();
+      
+      // Ensure user has a Stripe customer
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email || undefined,
+          name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || undefined,
+          metadata: { userId },
+        });
+        customerId = customer.id;
+        await storage.updateUserStripeInfo(userId, { stripeCustomerId: customerId });
+      }
+      
+      // Create SetupIntent for saving card
+      const setupIntent = await stripe.setupIntents.create({
+        customer: customerId,
+        payment_method_types: ['card'],
+        usage: 'off_session', // Allow charging when customer is not present
+      });
+      
+      res.json({
+        clientSecret: setupIntent.client_secret,
+        customerId: customerId,
+      });
+    } catch (error: any) {
+      console.error("Failed to create setup intent:", error);
+      res.status(500).json({ error: "Failed to create setup intent" });
+    }
+  });
+
+  // Get user's saved payment methods
+  app.get("/api/stripe/payment-methods", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.stripeCustomerId) {
+        return res.json({ paymentMethods: [], defaultPaymentMethod: null });
+      }
+      
+      const { getUncachableStripeClient } = await import('./stripeClient');
+      const stripe = await getUncachableStripeClient();
+      
+      const paymentMethods = await stripe.paymentMethods.list({
+        customer: user.stripeCustomerId,
+        type: 'card',
+      });
+      
+      res.json({
+        paymentMethods: paymentMethods.data.map(pm => ({
+          id: pm.id,
+          brand: pm.card?.brand,
+          last4: pm.card?.last4,
+          expMonth: pm.card?.exp_month,
+          expYear: pm.card?.exp_year,
+        })),
+        defaultPaymentMethod: user.stripeDefaultPaymentMethod,
+      });
+    } catch (error: any) {
+      console.error("Failed to get payment methods:", error);
+      res.status(500).json({ error: "Failed to get payment methods" });
+    }
+  });
+
+  // Set default payment method
+  app.post("/api/stripe/default-payment-method", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const { paymentMethodId } = req.body;
+      
+      if (!paymentMethodId) {
+        return res.status(400).json({ error: "Payment method ID required" });
+      }
+      
+      const user = await storage.getUser(userId);
+      if (!user || !user.stripeCustomerId) {
+        return res.status(400).json({ error: "No Stripe customer found" });
+      }
+      
+      const { getUncachableStripeClient } = await import('./stripeClient');
+      const stripe = await getUncachableStripeClient();
+      
+      // Update default payment method in Stripe
+      await stripe.customers.update(user.stripeCustomerId, {
+        invoice_settings: {
+          default_payment_method: paymentMethodId,
+        },
+      });
+      
+      // Save to our database too
+      await storage.updateUserStripeInfo(userId, { stripeDefaultPaymentMethod: paymentMethodId });
+      
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Failed to set default payment method:", error);
+      res.status(500).json({ error: "Failed to set default payment method" });
+    }
+  });
+
+  // Delete a payment method
+  app.delete("/api/stripe/payment-methods/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const paymentMethodId = req.params.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.stripeCustomerId) {
+        return res.status(400).json({ error: "No Stripe customer found" });
+      }
+      
+      const { getUncachableStripeClient } = await import('./stripeClient');
+      const stripe = await getUncachableStripeClient();
+      
+      // Detach the payment method
+      await stripe.paymentMethods.detach(paymentMethodId);
+      
+      // If this was the default, clear it
+      if (user.stripeDefaultPaymentMethod === paymentMethodId) {
+        await storage.updateUserStripeInfo(userId, { stripeDefaultPaymentMethod: undefined });
+      }
+      
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Failed to delete payment method:", error);
+      res.status(500).json({ error: "Failed to delete payment method" });
+    }
+  });
+
   // Customer signup
   app.post('/api/auth/signup', async (req, res) => {
     try {
@@ -1718,8 +1916,16 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       // Update the order data with verified loyalty credits
       validatedData.loyaltyCreditsApplied = verifiedLoyaltyCredits.toFixed(2);
       
+      // Get payment intent ID if provided (from Stripe checkout)
+      const paymentIntentId = orderData.stripePaymentIntentId;
+      
       const order = await storage.createOrder(
-        { ...validatedData, userId },
+        { 
+          ...validatedData, 
+          userId,
+          stripePaymentIntentId: paymentIntentId || null,
+          paymentStatus: paymentIntentId ? 'authorized' : 'unpaid', // Card is authorized but not charged
+        },
         validatedData.items.map(item => ({ ...item, orderId: 0 }))
       );
       
@@ -1836,116 +2042,74 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const customerEmail = orderWithItems.customerEmail || order.customerEmail;
       const customerName = orderWithItems.customerName || 'Valued Customer';
       
-      // Create Stripe checkout session for payment
-      let paymentUrl = null;
-      let checkoutSessionId = null;
+      // Get the order owner to find their saved payment method
+      const orderOwner = await storage.getUser(order.userId);
       
-      try {
-        const { getUncachableStripeClient } = await import('./stripeClient');
-        const stripe = await getUncachableStripeClient();
-        
-        // Build line items from order
-        const lineItems = orderWithItems.items.map((item: any) => ({
-          price_data: {
+      let paymentSuccessful = false;
+      let paymentError = null;
+      let paymentIntentId = null;
+      
+      // Try to charge the customer's saved payment method
+      if (orderOwner?.stripeCustomerId && orderOwner?.stripeDefaultPaymentMethod) {
+        try {
+          const { getUncachableStripeClient } = await import('./stripeClient');
+          const stripe = await getUncachableStripeClient();
+          
+          const amountCents = Math.round(parseFloat(order.totalAmount) * 100);
+          
+          // Create and confirm a PaymentIntent with the saved payment method
+          const paymentIntent = await stripe.paymentIntents.create({
+            amount: amountCents,
             currency: 'usd',
-            product_data: {
-              name: item.productName || item.itemName || 'Item',
+            customer: orderOwner.stripeCustomerId,
+            payment_method: orderOwner.stripeDefaultPaymentMethod,
+            off_session: true, // Charging without customer present
+            confirm: true, // Charge immediately
+            description: `Order #${orderId} - Animal House Pet Store`,
+            metadata: {
+              orderId: orderId.toString(),
+              customerId: order.userId,
             },
-            unit_amount: Math.round(parseFloat(item.price) * 100), // Convert to cents
-          },
-          quantity: item.quantity || 1,
-        }));
-        
-        // Add tax as a separate line item if applicable
-        if (order.taxAmount && parseFloat(order.taxAmount) > 0) {
-          lineItems.push({
-            price_data: {
-              currency: 'usd',
-              product_data: {
-                name: 'Sales Tax',
-              },
-              unit_amount: Math.round(parseFloat(order.taxAmount) * 100),
-            },
-            quantity: 1,
           });
+          
+          if (paymentIntent.status === 'succeeded') {
+            paymentSuccessful = true;
+            paymentIntentId = paymentIntent.id;
+            
+            // Update order with payment info
+            await storage.updateOrderStripePayment(orderId, {
+              stripePaymentIntentId: paymentIntentId,
+              paymentStatus: 'paid',
+              paidAt: new Date(),
+            });
+            
+            // Update order to ready_for_pickup since payment is complete
+            await storage.updateOrderApprovalStatus(orderId, 'ready_for_pickup');
+            
+            console.log(`Order #${orderId} approved and charged successfully: ${paymentIntentId}`);
+          } else {
+            paymentError = `Payment status: ${paymentIntent.status}`;
+          }
+        } catch (stripeError: any) {
+          console.error("Failed to charge saved payment method:", stripeError);
+          paymentError = stripeError.message;
         }
+      } else {
+        paymentError = "No saved payment method";
+      }
+      
+      // If automatic charge failed, just approve and notify admin
+      if (!paymentSuccessful) {
+        console.warn(`Order #${orderId} approved but payment failed: ${paymentError}`);
         
-        // Calculate line items total to validate against order total
-        const lineItemsTotal = lineItems.reduce((sum, item) => {
-          return sum + (item.price_data.unit_amount * item.quantity);
-        }, 0);
-        const orderTotalCents = Math.round(parseFloat(order.totalAmount) * 100);
-        const loyaltyCreditsApplied = order.loyaltyCreditsApplied ? Math.round(parseFloat(order.loyaltyCreditsApplied) * 100) : 0;
-        
-        // Account for loyalty credits - line items include full price, order total has credits deducted
-        const expectedTotal = lineItemsTotal - loyaltyCreditsApplied;
-        
-        if (Math.abs(expectedTotal - orderTotalCents) > 1) {
-          // Small tolerance for rounding errors
-          console.warn(`Checkout amount mismatch for order #${orderId}: lineItems=${lineItemsTotal/100}, orderTotal=${order.totalAmount}, loyaltyCredits=${loyaltyCreditsApplied/100}`);
-        }
-        
-        // If loyalty credits are applied, use Stripe's discount feature
-        let discounts: any[] = [];
-        if (loyaltyCreditsApplied > 0) {
-          // Create a coupon on-the-fly for the loyalty credits
-          const coupon = await stripe.coupons.create({
-            amount_off: loyaltyCreditsApplied,
-            currency: 'usd',
-            duration: 'once',
-            name: `Loyalty Credits - Order #${orderId}`,
-          });
-          discounts = [{ coupon: coupon.id }];
-        }
-        
-        // Get base URL for success/cancel redirects
-        const baseUrl = process.env.REPLIT_DOMAINS 
-          ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`
-          : 'http://localhost:5000';
-        
-        // Create checkout session
-        const sessionParams: any = {
-          customer_email: customerEmail || undefined,
-          payment_method_types: ['card'],
-          line_items: lineItems,
-          mode: 'payment',
-          success_url: `${baseUrl}/order-confirmed?order_id=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${baseUrl}/orders?cancelled=true`,
-          metadata: {
-            orderId: orderId.toString(),
-          },
-          expires_at: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hour expiration
-        };
-        
-        // Add discounts if loyalty credits were applied
-        if (discounts.length > 0) {
-          sessionParams.discounts = discounts;
-        }
-        
-        const session = await stripe.checkout.sessions.create(sessionParams);
-        
-        paymentUrl = session.url;
-        checkoutSessionId = session.id;
-        
-        // Store Stripe session info on order
+        // Update order status to approved (not ready, since not paid)
+        await storage.updateOrderApprovalStatus(orderId, 'approved');
         await storage.updateOrderStripePayment(orderId, {
-          stripeCheckoutSessionId: checkoutSessionId,
-          stripePaymentUrl: paymentUrl || undefined,
-          paymentStatus: 'pending',
-        });
-        
-      } catch (stripeError: any) {
-        console.error("Failed to create Stripe checkout session:", stripeError);
-        // Set payment status to indicate manual payment needed
-        await storage.updateOrderStripePayment(orderId, {
-          paymentStatus: 'manual_required',
+          paymentStatus: 'payment_failed',
         });
       }
       
-      // Update order approval status
-      await storage.updateOrderApprovalStatus(orderId, 'approved');
-      
-      // Send email notification with payment link
+      // Send email notification
       if (customerEmail) {
         try {
           const { getUncachableSendGridClient } = await import('./sendgridIntegration');
@@ -1954,44 +2118,38 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
             `• ${item.productName || item.itemName || 'Item'} x${item.quantity} - $${item.price}`
           ).join('\n');
           
-          // Build payment section for email
-          const paymentSection = paymentUrl 
-            ? `
-                  <div style="background: #16a34a; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
-                    <p style="color: white; margin: 0 0 15px 0; font-size: 16px;">Ready to complete your purchase?</p>
-                    <a href="${paymentUrl}" style="display: inline-block; background: white; color: #16a34a; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 18px;">
-                      Pay Now - $${order.totalAmount}
-                    </a>
-                    <p style="color: white; margin: 15px 0 0 0; font-size: 12px;">This payment link expires in 24 hours</p>
-                  </div>
-                `
-            : `<p><strong>Please visit the store or call us to arrange payment.</strong></p>`;
+          const emailSubject = paymentSuccessful 
+            ? 'Payment Received - Your Order is Being Prepared!'
+            : 'Your Animal House Order Has Been Approved';
+          
+          const statusMessage = paymentSuccessful
+            ? `<h2 style="color: #16a34a;">✓ Payment Received!</h2>
+               <p>Your payment of <strong>$${order.totalAmount}</strong> has been processed successfully.</p>
+               <p>Your order is now being prepared and will be ready for pickup soon!</p>`
+            : `<h2 style="color: #16a34a;">Order Approved!</h2>
+               <p>Your order has been approved. Please contact the store to arrange payment.</p>`;
           
           await client.send({
             to: customerEmail,
             from: fromEmail,
-            subject: 'Your Animal House Order Has Been Approved - Pay Now!',
+            subject: emailSubject,
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
                   <h1 style="margin: 0;">🐾 Animal House Pet Store</h1>
                 </div>
                 <div style="padding: 20px; background-color: #f9fafb;">
-                  <h2 style="color: #16a34a;">Order Approved!</h2>
+                  ${statusMessage}
                   <p>Hi ${customerName},</p>
-                  <p>Great news! Your order <strong>#${order.id}</strong> has been approved.</p>
                   
                   <div style="background: white; border-radius: 8px; padding: 15px; margin: 15px 0;">
-                    <h3 style="margin-top: 0;">Order Details:</h3>
+                    <h3 style="margin-top: 0;">Order #${order.id} Details:</h3>
                     <pre style="white-space: pre-wrap; font-family: Arial;">${itemsList}</pre>
                     ${order.taxAmount && parseFloat(order.taxAmount) > 0 ? `<p>Tax: $${order.taxAmount}</p>` : ''}
                     ${order.loyaltyCreditsApplied && parseFloat(order.loyaltyCreditsApplied) > 0 ? `<p style="color: #16a34a;">Loyalty Credits Applied: -$${order.loyaltyCreditsApplied}</p>` : ''}
                     <p style="font-weight: bold; font-size: 18px; color: #dc2626;">Total: $${order.totalAmount}</p>
                   </div>
                   
-                  ${paymentSection}
-                  
-                  <p>Once payment is received, we'll prepare your order and notify you when it's ready for pickup!</p>
                   <p>Thank you for shopping with us!</p>
                 </div>
                 <div style="background-color: #1f2937; color: white; padding: 15px; text-align: center; font-size: 12px;">
@@ -2007,9 +2165,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       
       res.json({ 
         success: true, 
-        message: "Order approved and customer notified",
-        paymentUrl: paymentUrl,
-        checkoutSessionId: checkoutSessionId
+        paymentSuccessful,
+        message: paymentSuccessful 
+          ? "Order approved and payment charged successfully" 
+          : `Order approved but payment failed: ${paymentError}`,
+        paymentIntentId,
       });
     } catch (error) {
       console.error("Error approving order:", error);
