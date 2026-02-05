@@ -7595,6 +7595,21 @@ export default function Admin() {
                                      order.approvalStatus === 'approved' ? 'Approved' :
                                      'Pending Approval'}
                                   </Badge>
+                                  {order.paymentStatus && (
+                                    <Badge variant="outline" className={
+                                      order.paymentStatus === 'paid' ? 'border-green-600 text-green-600 bg-green-50' :
+                                      order.paymentStatus === 'pending' ? 'border-yellow-600 text-yellow-600 bg-yellow-50' :
+                                      order.paymentStatus === 'failed' ? 'border-red-600 text-red-600 bg-red-50' :
+                                      order.paymentStatus === 'expired' ? 'border-gray-500 text-gray-500 bg-gray-50' :
+                                      'border-gray-400 text-gray-400'
+                                    }>
+                                      {order.paymentStatus === 'paid' ? '$ Paid' :
+                                       order.paymentStatus === 'pending' ? '$ Awaiting Payment' :
+                                       order.paymentStatus === 'failed' ? '$ Payment Failed' :
+                                       order.paymentStatus === 'expired' ? '$ Link Expired' :
+                                       '$ Unpaid'}
+                                    </Badge>
+                                  )}
                                   <span className="text-sm text-gray-500">Order #{order.id}</span>
                                   <span className="text-xs text-gray-400">
                                     {new Date(order.orderDate).toLocaleDateString()}
@@ -7661,13 +7676,31 @@ export default function Admin() {
                                       </>
                                     )}
                                     {order.approvalStatus === 'approved' && (
-                                      <Button
-                                        size="sm"
-                                        className="bg-green-600 hover:bg-green-700"
-                                        onClick={() => orderReadyMutation.mutate(order.id)}
-                                      >
-                                        Mark Ready
-                                      </Button>
+                                      <>
+                                        {order.paymentStatus === 'paid' ? (
+                                          <Button
+                                            size="sm"
+                                            className="bg-green-600 hover:bg-green-700"
+                                            onClick={() => orderReadyMutation.mutate(order.id)}
+                                          >
+                                            Mark Ready
+                                          </Button>
+                                        ) : (
+                                          <span className="text-xs text-yellow-600 italic">Waiting for payment...</span>
+                                        )}
+                                        {order.stripePaymentUrl && order.paymentStatus !== 'paid' && (
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="border-blue-500 text-blue-600"
+                                            onClick={() => {
+                                              window.open(order.stripePaymentUrl, '_blank');
+                                            }}
+                                          >
+                                            View Payment Link
+                                          </Button>
+                                        )}
+                                      </>
                                     )}
                                     {order.approvalStatus === 'ready_for_pickup' && (
                                       <Button
