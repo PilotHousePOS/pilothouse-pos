@@ -7601,12 +7601,14 @@ export default function Admin() {
                                       order.paymentStatus === 'pending' ? 'border-yellow-600 text-yellow-600 bg-yellow-50' :
                                       order.paymentStatus === 'failed' ? 'border-red-600 text-red-600 bg-red-50' :
                                       order.paymentStatus === 'expired' ? 'border-gray-500 text-gray-500 bg-gray-50' :
+                                      order.paymentStatus === 'manual_required' ? 'border-orange-600 text-orange-600 bg-orange-50' :
                                       'border-gray-400 text-gray-400'
                                     }>
                                       {order.paymentStatus === 'paid' ? '$ Paid' :
                                        order.paymentStatus === 'pending' ? '$ Awaiting Payment' :
                                        order.paymentStatus === 'failed' ? '$ Payment Failed' :
                                        order.paymentStatus === 'expired' ? '$ Link Expired' :
+                                       order.paymentStatus === 'manual_required' ? '$ Manual Payment' :
                                        '$ Unpaid'}
                                     </Badge>
                                   )}
@@ -7677,13 +7679,13 @@ export default function Admin() {
                                     )}
                                     {order.approvalStatus === 'approved' && (
                                       <>
-                                        {order.paymentStatus === 'paid' ? (
+                                        {(order.paymentStatus === 'paid' || order.paymentStatus === 'manual_required') ? (
                                           <Button
                                             size="sm"
                                             className="bg-green-600 hover:bg-green-700"
                                             onClick={() => orderReadyMutation.mutate(order.id)}
                                           >
-                                            Mark Ready
+                                            {order.paymentStatus === 'manual_required' ? 'Mark Ready (Manual Pay)' : 'Mark Ready'}
                                           </Button>
                                         ) : (
                                           <span className="text-xs text-yellow-600 italic">Waiting for payment...</span>

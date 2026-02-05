@@ -1905,7 +1905,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         
       } catch (stripeError: any) {
         console.error("Failed to create Stripe checkout session:", stripeError);
-        // Continue with approval even if Stripe fails - order can be paid manually
+        // Set payment status to indicate manual payment needed
+        await storage.updateOrderStripePayment(orderId, {
+          paymentStatus: 'manual_required',
+        });
       }
       
       // Update order approval status
