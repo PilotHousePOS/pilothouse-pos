@@ -22,8 +22,9 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import { Minus, Plus, Trash2, ShoppingCart, X, Gift, Star } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingCart, X, Gift, Star, CreditCard, AlertCircle, Settings } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Link } from "wouter";
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -80,6 +81,25 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     enabled: isOpen,
   });
   const availableLoyaltyCredits = parseFloat(loyaltyData?.loyaltyCredits || "0");
+
+  // Fetch saved payment methods
+  const { data: paymentMethodsData } = useQuery<{
+    paymentMethods: Array<{
+      id: string;
+      brand: string;
+      last4: string;
+      expMonth: number;
+      expYear: number;
+    }>;
+    defaultPaymentMethod: string | null;
+  }>({
+    queryKey: ["/api/stripe/payment-methods"],
+    enabled: isOpen,
+  });
+  const hasPaymentMethod = (paymentMethodsData?.paymentMethods?.length || 0) > 0;
+  const defaultCard = paymentMethodsData?.paymentMethods?.find(
+    pm => pm.id === paymentMethodsData?.defaultPaymentMethod
+  ) || paymentMethodsData?.paymentMethods?.[0];
 
   const updateQuantityMutation = useMutation({
     mutationFn: async ({ id, quantity }: { id: number; quantity: number }) => {
@@ -466,6 +486,40 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                 )}
               </div>
             )}
+
+            {/* Payment Method Info */}
+            <div className={`p-3 border rounded-lg ${hasPaymentMethod ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20' : 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20'}`}>
+              <div className="flex items-start gap-3">
+                {hasPaymentMethod ? (
+                  <CreditCard className="w-5 h-5 text-green-600 mt-0.5" />
+                ) : (
+                  <AlertCircle className="w-5 h-5 text-amber-500 mt-0.5" />
+                )}
+                <div className="flex-1">
+                  {hasPaymentMethod ? (
+                    <>
+                      <p className="font-medium text-sm text-green-800 dark:text-green-200">Payment on file</p>
+                      <p className="text-xs text-green-700 dark:text-green-300">
+                        Your {defaultCard?.brand} ending in {defaultCard?.last4} will be charged automatically when your order is approved.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-medium text-sm text-amber-800 dark:text-amber-200">No payment method saved</p>
+                      <p className="text-xs text-amber-700 dark:text-amber-300">
+                        You'll need to provide payment when your order is approved.
+                      </p>
+                      <Link href="/settings" onClick={() => setIsCheckoutOpen(false)}>
+                        <Button variant="link" size="sm" className="h-auto p-0 mt-1 text-amber-700">
+                          <Settings className="w-3 h-3 mr-1" />
+                          Add payment method
+                        </Button>
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">
