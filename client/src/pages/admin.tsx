@@ -11179,8 +11179,8 @@ export default function Admin() {
                         <SelectValue placeholder="Select service" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="grooming-full">Full Grooming ($35)</SelectItem>
-                        <SelectItem value="grooming-bath">Bath Only ($20)</SelectItem>
+                        <SelectItem value="grooming-full">Full Grooming $35 (Prices will vary)</SelectItem>
+                        <SelectItem value="grooming-bath">Bath Only $20 (Prices will vary)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

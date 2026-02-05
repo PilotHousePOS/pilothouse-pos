@@ -16,8 +16,8 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { safeGoBack } from "@/lib/navigation";
 
 const SERVICES = [
-  { id: 'grooming-full', name: 'Full Grooming', description: 'Complete grooming service', price: 75 },
-  { id: 'grooming-bath', name: 'Bath Only', description: 'Professional bath and dry', price: 45 },
+  { id: 'grooming-full', name: 'Full Grooming', description: 'Complete grooming service', price: 35 },
+  { id: 'grooming-bath', name: 'Bath Only', description: 'Professional bath and dry', price: 20 },
 ];
 
 export default function Booking() {
@@ -990,8 +990,8 @@ export default function Booking() {
                         <div key={service.id} className="flex items-center space-x-3 p-2 border rounded-lg hover:bg-gray-50">
                           <RadioGroupItem value={service.id} id={`${service.id}-${index}`} data-testid={`radio-service-${service.id}-${index}`} />
                           <Label htmlFor={`${service.id}-${index}`} className="flex-1 cursor-pointer">
-                            <div className="font-medium text-gray-900">{service.name}</div>
-                            <div className="text-xs text-gray-500">{service.description}</div>
+                            <div className="font-medium text-gray-900">{service.name} ${service.price}</div>
+                            <div className="text-xs text-gray-500">(Prices will vary. This is an estimated price.)</div>
                           </Label>
                         </div>
                       ))}
