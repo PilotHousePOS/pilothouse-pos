@@ -1,4 +1,4 @@
-const CACHE_NAME = 'animal-house-v1';
+const CACHE_NAME = 'animal-house-v2';
 const urlsToCache = [
   '/',
   '/manifest.json',
