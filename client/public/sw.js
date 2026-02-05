@@ -1,4 +1,4 @@
-const CACHE_NAME = 'animal-house-v2';
+const CACHE_NAME = 'animal-house-v3';
 const urlsToCache = [
   '/',
   '/manifest.json',
@@ -15,6 +15,12 @@ self.addEventListener('install', function(event) {
       })
   );
   self.skipWaiting();
+});
+
+self.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('activate', function(event) {

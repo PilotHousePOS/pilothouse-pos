@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first web application for online retail of exotic reptiles, pet supplies, and grooming services. It aims to provide an intuitive user experience, streamline product and service management, and ensure secure transactions. Key capabilities include robust inventory and appointment management, secure authentication, and AI-powered data processing for product information and categorization. The business vision is to become a leader in the exotic pet retail and service industry, focusing on exotic pet retail and services.
+The Animal House Pet Store is a mobile-first web application for online retail of exotic reptiles, pet supplies, and grooming services. Its purpose is to provide an intuitive user experience, streamline product and service management, and ensure secure transactions. The business vision is to become a leader in the exotic pet retail and service industry.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -110,8 +110,8 @@ The Animal House Pet Store is a mobile-first web application for online retail o
     - Classic Catch / Country Select = Teal
     - Elements dry food bags = Black
     - Elements Crispy Crispers (treats only) = Purple
-    - Chompy Chompers = Purple
-    - Grillin' Grillers = Purple
+    - Elements Chompy Chompers = Purple
+    - Elements Grillin' Grillers = Purple
     - Little Bites (most) = Purple
     - Chicken Lamb & Fish 13oz can = Burgundy (red can)
     - Large Breed Puppy = Purple
@@ -183,26 +183,16 @@ Step 5: NEVER mark task complete until verification passes
 
 ## System Architecture
 The Animal House Pet Store application is a full-stack, mobile-first web solution.
-**UI/UX Decisions:**
-- Dark, bold, and high-contrast aesthetic with Amazon-style image carousels.
-- Optimized for mobile with full-screen modal forms and prominent warning banners.
-- Utilizes a consistent universal admin dashboard.
-**Technical Implementations & Feature Specifications:**
-- **Core Management**: Inventory tracking, multi-image upload, and advanced appointment scheduling with 15-minute intervals, admin approval, notifications, and Google Calendar sync.
-- **Authentication & Authorization**: JWT tokens for secure authentication, password resets, user settings, and three-tier role-based access control (Customer, Groomer, Admin).
-- **Specialized Systems**: Customer wishlists, deep Google Calendar integration, a CMS for animal categories, comprehensive admin order management, and sophisticated search functionalities.
-- **Advanced Management**: Database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, and automated brand extraction.
-- **Admin Tools**: Dashboard for managing product images, employee schedules, and grooming appointments.
-- **AI & Integrations**: OpenAI's GPT-5 Vision for AI-powered processing of order photos, item extraction, and categorization.
-- **UPC Matching System**: Robust UPC matching with abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
-**System Design Choices:**
-- **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
-- **Backend**: Express.js and TypeScript.
-- **Database**: PostgreSQL with Drizzle ORM.
-- **Authentication**: JWT tokens stored in cookies.
-- **State Management**: TanStack Query.
-- **Routing**: Wouter.
-- **Development Practices**: Strict TypeScript, proper HTTP status codes, environment-aware configurations.
+- **UI/UX Decisions:** Dark, bold, and high-contrast aesthetic with Amazon-style image carousels, optimized for mobile with full-screen modal forms and prominent warning banners, and a consistent universal admin dashboard.
+- **Technical Implementations:** Core management includes inventory tracking, multi-image upload, and advanced appointment scheduling with 15-minute intervals, admin approval, notifications, and Google Calendar sync. Authentication uses JWT tokens for secure authentication, password resets, user settings, and three-tier role-based access control. Specialized systems cover customer wishlists, deep Google Calendar integration, a CMS for animal categories, comprehensive admin order management, and sophisticated search functionalities. Advanced management features database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, and automated brand extraction. Admin tools include dashboards for managing product images, employee schedules, and grooming appointments. AI-powered processing of order photos, item extraction, and categorization is handled by OpenAI's GPT-5 Vision. A robust UPC matching system features abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
+- **System Design Choices:**
+  - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
+  - **Backend**: Express.js and TypeScript.
+  - **Database**: PostgreSQL with Drizzle ORM.
+  - **Authentication**: JWT tokens stored in cookies.
+  - **State Management**: TanStack Query.
+  - **Routing**: Wouter.
+  - **Development Practices**: Strict TypeScript, proper HTTP status codes, environment-aware configurations.
 
 ## External Dependencies
 - PostgreSQL
