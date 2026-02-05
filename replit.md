@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first web application for online retail of exotic reptiles, pet supplies, and grooming services. Its purpose is to provide an intuitive user experience, streamline product and service management, and ensure secure transactions. The business vision is to become a leader in the exotic pet retail and service industry.
+The Animal House Pet Store is a mobile-first web application for online retail of exotic reptiles, pet supplies, and grooming services. Its primary purpose is to deliver an intuitive user experience, streamline product and service management, and facilitate secure transactions. The project aims to become a leading platform in the exotic pet retail and service industry by offering advanced features for inventory, appointments, and customer engagement.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -182,9 +182,9 @@ Step 5: NEVER mark task complete until verification passes
 - **Pro Plan**: https://purina.com/pro-plan/
 
 ## System Architecture
-The Animal House Pet Store application is a full-stack, mobile-first web solution.
-- **UI/UX Decisions:** Dark, bold, and high-contrast aesthetic with Amazon-style image carousels, optimized for mobile with full-screen modal forms and prominent warning banners, and a consistent universal admin dashboard.
-- **Technical Implementations:** Core management includes inventory tracking, multi-image upload, and advanced appointment scheduling with 15-minute intervals, admin approval, notifications, and Google Calendar sync. Authentication uses JWT tokens for secure authentication, password resets, user settings, and three-tier role-based access control. Specialized systems cover customer wishlists, deep Google Calendar integration, a CMS for animal categories, comprehensive admin order management, and sophisticated search functionalities. Advanced management features database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, and automated brand extraction. Admin tools include dashboards for managing product images, employee schedules, and grooming appointments. AI-powered processing of order photos, item extraction, and categorization is handled by OpenAI's GPT-5 Vision. A robust UPC matching system features abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
+The Animal House Pet Store is a full-stack, mobile-first web application.
+- **UI/UX Decisions:** Features a dark, bold, and high-contrast design with Amazon-style image carousels. It is optimized for mobile with full-screen modal forms and warning banners. A consistent universal admin dashboard is provided.
+- **Technical Implementations:** Includes inventory tracking, multi-image upload, and advanced appointment scheduling with 15-minute intervals, admin approval, notifications, and Google Calendar sync. Authentication uses JWT tokens for secure authentication, password resets, user settings, and three-tier role-based access control. Specialized systems cover customer wishlists, deep Google Calendar integration, a CMS for animal categories, comprehensive admin order management, and sophisticated search functionalities. Advanced management features database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, and automated brand extraction. Admin tools include dashboards for managing product images, employee schedules, and grooming appointments. AI-powered processing of order photos, item extraction, and categorization. A robust UPC matching system features abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
 - **System Design Choices:**
   - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
   - **Backend**: Express.js and TypeScript.
