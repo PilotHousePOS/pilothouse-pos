@@ -178,6 +178,11 @@ export const orders = pgTable("orders", {
   nextRecurringDate: timestamp("next_recurring_date"), // When to remind/place next order
   recurringParentId: integer("recurring_parent_id"), // Links to original order if this is a recurring copy
   hiddenFromAdmin: boolean("hidden_from_admin").default(false), // Hidden from admin view but visible in customer history
+  stripeCheckoutSessionId: varchar("stripe_checkout_session_id", { length: 255 }), // Stripe checkout session for payment
+  stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 255 }), // Stripe payment intent ID
+  stripePaymentUrl: text("stripe_payment_url"), // Payment link URL sent to customer
+  paymentStatus: varchar("payment_status", { length: 50 }).default("unpaid"), // unpaid, pending, paid, failed, refunded
+  paidAt: timestamp("paid_at"), // When payment was completed
 });
 
 // Order items
