@@ -1870,9 +1870,33 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           });
         }
         
-        // Deduct loyalty credits if applied (as negative line item or discount)
-        // Note: Stripe doesn't support negative line items, so we reduce total instead
-        // The total already reflects the loyalty discount from order creation
+        // Calculate line items total to validate against order total
+        const lineItemsTotal = lineItems.reduce((sum, item) => {
+          return sum + (item.price_data.unit_amount * item.quantity);
+        }, 0);
+        const orderTotalCents = Math.round(parseFloat(order.totalAmount) * 100);
+        const loyaltyCreditsApplied = order.loyaltyCreditsApplied ? Math.round(parseFloat(order.loyaltyCreditsApplied) * 100) : 0;
+        
+        // Account for loyalty credits - line items include full price, order total has credits deducted
+        const expectedTotal = lineItemsTotal - loyaltyCreditsApplied;
+        
+        if (Math.abs(expectedTotal - orderTotalCents) > 1) {
+          // Small tolerance for rounding errors
+          console.warn(`Checkout amount mismatch for order #${orderId}: lineItems=${lineItemsTotal/100}, orderTotal=${order.totalAmount}, loyaltyCredits=${loyaltyCreditsApplied/100}`);
+        }
+        
+        // If loyalty credits are applied, use Stripe's discount feature
+        let discounts: any[] = [];
+        if (loyaltyCreditsApplied > 0) {
+          // Create a coupon on-the-fly for the loyalty credits
+          const coupon = await stripe.coupons.create({
+            amount_off: loyaltyCreditsApplied,
+            currency: 'usd',
+            duration: 'once',
+            name: `Loyalty Credits - Order #${orderId}`,
+          });
+          discounts = [{ coupon: coupon.id }];
+        }
         
         // Get base URL for success/cancel redirects
         const baseUrl = process.env.REPLIT_DOMAINS 
@@ -1880,7 +1904,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           : 'http://localhost:5000';
         
         // Create checkout session
-        const session = await stripe.checkout.sessions.create({
+        const sessionParams: any = {
           customer_email: customerEmail || undefined,
           payment_method_types: ['card'],
           line_items: lineItems,
@@ -1891,7 +1915,14 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
             orderId: orderId.toString(),
           },
           expires_at: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hour expiration
-        });
+        };
+        
+        // Add discounts if loyalty credits were applied
+        if (discounts.length > 0) {
+          sessionParams.discounts = discounts;
+        }
+        
+        const session = await stripe.checkout.sessions.create(sessionParams);
         
         paymentUrl = session.url;
         checkoutSessionId = session.id;
