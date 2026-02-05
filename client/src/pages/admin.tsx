@@ -6603,6 +6603,27 @@ export default function Admin() {
     },
   });
 
+  // Update groomer weekly off-days mutation
+  const updateGroomerOffDaysMutation = useMutation({
+    mutationFn: async ({ id, offDays }: { id: number; offDays: number[] }) => {
+      await apiRequest("PUT", `/api/admin/groomers/${id}`, { offDays });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Off Days Updated",
+        description: "Groomer's weekly off-days have been updated.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/groomers"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update off-days.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Groomer blocked days mutations
   const createBlockedDayMutation = useMutation({
     mutationFn: async (blockedDayData: { groomerId: number; dates: string[]; reason: string; notes?: string }) => {
@@ -10374,6 +10395,37 @@ export default function Admin() {
                             </div>
                           )}
                         </div>
+                        
+                        {/* Weekly Off-Days - Admin only */}
+                        {typedUser?.isAdmin && (
+                          <div className="mt-3 pt-3 border-t">
+                            <p className="text-xs text-gray-500 mb-2">Weekly Off-Days (click to toggle)</p>
+                            <div className="flex flex-wrap gap-1">
+                              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => {
+                                const isOffDay = groomer.offDays?.includes(idx) || false;
+                                return (
+                                  <Button
+                                    key={day}
+                                    variant={isOffDay ? "destructive" : "outline"}
+                                    size="sm"
+                                    className="text-xs px-2 py-1 h-7"
+                                    onClick={() => {
+                                      const currentOffDays = groomer.offDays || [];
+                                      const newOffDays = isOffDay
+                                        ? currentOffDays.filter((d: number) => d !== idx)
+                                        : [...currentOffDays, idx];
+                                      updateGroomerOffDaysMutation.mutate({ id: groomer.id, offDays: newOffDays });
+                                    }}
+                                    disabled={updateGroomerOffDaysMutation.isPending}
+                                  >
+                                    {day}
+                                  </Button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
                         {typedUser?.isAdmin && (
                           <div className="flex flex-wrap gap-2 mt-4">
                             <Button

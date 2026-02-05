@@ -337,6 +337,7 @@ export const groomers = pgTable("groomers", {
   phone: varchar("phone", { length: 20 }),
   specialties: text("specialties"), // e.g., "full grooming, bath only"
   isActive: boolean("is_active").default(true),
+  offDays: integer("off_days").array(), // Array of day numbers: 0=Sunday, 1=Monday, etc.
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

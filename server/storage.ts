@@ -2869,26 +2869,42 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAvailableGroomersForDay(dayOfWeek: number): Promise<Groomer[]> {
-    // All active groomers are available by default - no availability table entries required
-    return await db
-      .select()
-      .from(groomers)
-      .where(eq(groomers.isActive, true))
-      .orderBy(groomers.name);
-  }
-
-  async getAvailableGroomersForDate(date: string): Promise<Groomer[]> {
-    // All active groomers are available by default, minus those blocked on this specific date
+    // All active groomers are available by default, filtered by their weekly off-days
     const allActiveGroomers = await db
       .select()
       .from(groomers)
       .where(eq(groomers.isActive, true))
       .orderBy(groomers.name);
     
+    // Filter out groomers who have this day as an off-day
+    return allActiveGroomers.filter(g => {
+      if (!g.offDays || g.offDays.length === 0) return true;
+      return !g.offDays.includes(dayOfWeek);
+    });
+  }
+
+  async getAvailableGroomersForDate(date: string): Promise<Groomer[]> {
+    // All active groomers are available by default, minus those blocked on this specific date or weekly off-day
+    const dateObj = new Date(date + 'T00:00:00');
+    const dayOfWeek = dateObj.getDay();
+    
+    const allActiveGroomers = await db
+      .select()
+      .from(groomers)
+      .where(eq(groomers.isActive, true))
+      .orderBy(groomers.name);
+    
+    // Filter out groomers who have this day as a weekly off-day
+    const groomersNotOnOffDay = allActiveGroomers.filter(g => {
+      if (!g.offDays || g.offDays.length === 0) return true;
+      return !g.offDays.includes(dayOfWeek);
+    });
+    
+    // Also filter out groomers blocked on this specific date
     const blockedDays = await this.getGroomerBlockedDaysForDate(date);
     const blockedGroomerIds = new Set(blockedDays.map(bd => bd.groomerId));
     
-    return allActiveGroomers.filter(g => !blockedGroomerIds.has(g.id));
+    return groomersNotOnOffDay.filter(g => !blockedGroomerIds.has(g.id));
   }
 
   async setGroomerAvailability(availabilityData: InsertGroomerAvailability): Promise<GroomerAvailability> {
