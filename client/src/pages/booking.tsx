@@ -16,17 +16,17 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { safeGoBack } from "@/lib/navigation";
 
 const DEFAULT_SERVICES = [
-  { id: 'grooming-full', name: 'Full Grooming', description: 'Complete grooming service', price: 35 },
-  { id: 'grooming-bath', name: 'Bath Only', description: 'Professional bath and dry', price: 20 },
+  { id: 'grooming-full', name: 'Full Grooming', description: 'Complete grooming service', price: '35' },
+  { id: 'grooming-bath', name: 'Bath Only', description: 'Professional bath and dry', price: '20' },
 ];
 
 export default function Booking() {
   // Fetch service prices from settings
-  const { data: servicePrices } = useQuery({
+  const { data: servicePrices } = useQuery<{ fullGrooming: string; bathOnly: string }>({
     queryKey: ["/api/service-prices"],
   });
 
-  // Build services list with dynamic prices
+  // Build services list with dynamic prices (supports ranges like "40-80")
   const SERVICES = servicePrices ? [
     { id: 'grooming-full', name: 'Full Grooming', description: 'Complete grooming service', price: servicePrices.fullGrooming },
     { id: 'grooming-bath', name: 'Bath Only', description: 'Professional bath and dry', price: servicePrices.bathOnly },
@@ -415,11 +415,11 @@ export default function Booking() {
       return;
     }
 
-    // Calculate total price from all pets
-    const totalPrice = pets.reduce((sum, pet) => {
+    // Build price description from all pets (supports ranges like "40-80")
+    const priceDescription = pets.map(pet => {
       const serviceData = SERVICES.find(s => s.id === pet.serviceType);
-      return sum + (serviceData?.price || 0);
-    }, 0);
+      return serviceData?.price || '0';
+    }).join(' + ');
 
     // Build list of dates to create appointments for
     const formatDate = (d: Date) => {
@@ -464,7 +464,7 @@ export default function Booking() {
       ownerFirstName: ownerInfo.firstName,
       ownerLastName: ownerInfo.lastName,
       ownerPhoneNumber: ownerInfo.phoneNumber,
-      price: totalPrice.toString(),
+      price: priceDescription,
       isRecurring: isRecurring,
       recurringType: isRecurring ? recurringType : undefined,
       pets: pets.map(pet => ({
