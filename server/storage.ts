@@ -2869,55 +2869,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAvailableGroomersForDay(dayOfWeek: number): Promise<Groomer[]> {
+    // All active groomers are available by default - no availability table entries required
     return await db
-      .select({
-        id: groomers.id,
-        name: groomers.name,
-        email: groomers.email,
-        phone: groomers.phone,
-        specialties: groomers.specialties,
-        isActive: groomers.isActive,
-        createdAt: groomers.createdAt,
-        updatedAt: groomers.updatedAt,
-      })
+      .select()
       .from(groomers)
-      .innerJoin(groomerAvailability, eq(groomers.id, groomerAvailability.groomerId))
-      .where(and(
-        eq(groomers.isActive, true),
-        eq(groomerAvailability.dayOfWeek, dayOfWeek),
-        eq(groomerAvailability.isAvailable, true)
-      ))
+      .where(eq(groomers.isActive, true))
       .orderBy(groomers.name);
   }
 
   async getAvailableGroomersForDate(date: string): Promise<Groomer[]> {
-    const dateObj = new Date(date + 'T00:00:00');
-    const dayOfWeek = dateObj.getDay();
-    
-    const availableGroomers = await db
-      .select({
-        id: groomers.id,
-        name: groomers.name,
-        email: groomers.email,
-        phone: groomers.phone,
-        specialties: groomers.specialties,
-        isActive: groomers.isActive,
-        createdAt: groomers.createdAt,
-        updatedAt: groomers.updatedAt,
-      })
+    // All active groomers are available by default, minus those blocked on this specific date
+    const allActiveGroomers = await db
+      .select()
       .from(groomers)
-      .innerJoin(groomerAvailability, eq(groomers.id, groomerAvailability.groomerId))
-      .where(and(
-        eq(groomers.isActive, true),
-        eq(groomerAvailability.dayOfWeek, dayOfWeek),
-        eq(groomerAvailability.isAvailable, true)
-      ))
+      .where(eq(groomers.isActive, true))
       .orderBy(groomers.name);
     
     const blockedDays = await this.getGroomerBlockedDaysForDate(date);
     const blockedGroomerIds = new Set(blockedDays.map(bd => bd.groomerId));
     
-    return availableGroomers.filter(g => !blockedGroomerIds.has(g.id));
+    return allActiveGroomers.filter(g => !blockedGroomerIds.has(g.id));
   }
 
   async setGroomerAvailability(availabilityData: InsertGroomerAvailability): Promise<GroomerAvailability> {
