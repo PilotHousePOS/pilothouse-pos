@@ -4835,9 +4835,10 @@ West Monroe LA 71291
       const fullGroomingPrice = settings.find(s => s.setting === 'full_grooming_price')?.value || '35';
       const bathOnlyPrice = settings.find(s => s.setting === 'bath_only_price')?.value || '20';
       
+      // Return as strings to support price ranges like "40-80"
       res.json({
-        fullGrooming: parseInt(fullGroomingPrice),
-        bathOnly: parseInt(bathOnlyPrice)
+        fullGrooming: fullGroomingPrice,
+        bathOnly: bathOnlyPrice
       });
     } catch (error) {
       console.error("Error fetching service prices:", error);
