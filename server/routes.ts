@@ -4828,6 +4828,23 @@ West Monroe LA 71291
     }
   });
 
+  // Service prices endpoint (public - for booking page)
+  app.get("/api/service-prices", async (req, res) => {
+    try {
+      const settings = await storage.getGroomingSettings();
+      const fullGroomingPrice = settings.find(s => s.setting === 'full_grooming_price')?.value || '35';
+      const bathOnlyPrice = settings.find(s => s.setting === 'bath_only_price')?.value || '20';
+      
+      res.json({
+        fullGrooming: parseInt(fullGroomingPrice),
+        bathOnly: parseInt(bathOnlyPrice)
+      });
+    } catch (error) {
+      console.error("Error fetching service prices:", error);
+      res.status(500).json({ message: "Failed to fetch service prices" });
+    }
+  });
+
   // Groomer routes
   app.get("/api/groomers", async (req, res) => {
     try {

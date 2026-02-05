@@ -15,12 +15,22 @@ import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { safeGoBack } from "@/lib/navigation";
 
-const SERVICES = [
+const DEFAULT_SERVICES = [
   { id: 'grooming-full', name: 'Full Grooming', description: 'Complete grooming service', price: 35 },
   { id: 'grooming-bath', name: 'Bath Only', description: 'Professional bath and dry', price: 20 },
 ];
 
 export default function Booking() {
+  // Fetch service prices from settings
+  const { data: servicePrices } = useQuery({
+    queryKey: ["/api/service-prices"],
+  });
+
+  // Build services list with dynamic prices
+  const SERVICES = servicePrices ? [
+    { id: 'grooming-full', name: 'Full Grooming', description: 'Complete grooming service', price: servicePrices.fullGrooming },
+    { id: 'grooming-bath', name: 'Bath Only', description: 'Professional bath and dry', price: servicePrices.bathOnly },
+  ] : DEFAULT_SERVICES;
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedGroomer, setSelectedGroomer] = useState('');

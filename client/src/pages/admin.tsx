@@ -9934,6 +9934,42 @@ export default function Admin() {
                 </div>
               </div>
 
+              {/* Service Prices */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Service Prices</h3>
+                <p className="text-sm text-gray-600">Set estimated prices for grooming services. These are displayed to customers with a note that prices may vary.</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Full Grooming Price ($)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      defaultValue={groomingSettings.find((s: any) => s.setting === 'full_grooming_price')?.value || '35'}
+                      className="w-full p-2 border rounded"
+                      onChange={(e) => updateGroomingSettingMutation.mutate({
+                        setting: 'full_grooming_price',
+                        value: e.target.value
+                      })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Bath Only Price ($)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      defaultValue={groomingSettings.find((s: any) => s.setting === 'bath_only_price')?.value || '20'}
+                      className="w-full p-2 border rounded"
+                      onChange={(e) => updateGroomingSettingMutation.mutate({
+                        setting: 'bath_only_price',
+                        value: e.target.value
+                      })}
+                    />
+                  </div>
+                </div>
+              </div>
+
               {/* Appointment Duration */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Appointment Settings</h3>
