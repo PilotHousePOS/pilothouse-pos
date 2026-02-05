@@ -18,16 +18,23 @@ export class WebhookHandlers {
     const sync = await getStripeSync();
     await sync.processWebhook(payload, signature);
     
-    // Also handle custom order payment logic
+    // Also handle custom order payment logic with signature verification
     try {
       const stripe = await getUncachableStripeClient();
       const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+      const isProduction = process.env.NODE_ENV === 'production';
       
       if (webhookSecret) {
+        // Verify signature and construct event
         const event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
         await WebhookHandlers.handleStripeEvent(event);
+      } else if (isProduction) {
+        // In production, require signature verification - reject unverified webhooks
+        console.error('SECURITY: Webhook rejected - STRIPE_WEBHOOK_SECRET required in production');
+        throw new Error('Webhook signature verification required in production');
       } else {
-        // No webhook secret - parse event directly (less secure, for testing)
+        // Development only - allow unverified for local testing
+        console.warn('WARNING: Processing webhook without signature verification (dev mode only)');
         const event = JSON.parse(payload.toString());
         await WebhookHandlers.handleStripeEvent(event);
       }
