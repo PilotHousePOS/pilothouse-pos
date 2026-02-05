@@ -6,11 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLocation } from "wouter";
-import { ArrowLeft, Mail, Save, User as UserIcon, Lock, Phone } from "lucide-react";
+import { ArrowLeft, Mail, Save, User as UserIcon, Lock, Phone, CreditCard, Trash2, Star, Plus, Loader2 } from "lucide-react";
 import type { User } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { z } from "zod";
 import { safeGoBack } from "@/lib/navigation";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
 const updateNameSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -34,6 +36,124 @@ const updatePasswordSchema = z.object({
   path: ["confirmPassword"],
 });
 
+interface PaymentMethod {
+  id: string;
+  brand: string;
+  last4: string;
+  expMonth: number;
+  expYear: number;
+}
+
+function AddCardForm({ onSuccess, onCancel }: { onSuccess: () => void; onCancel: () => void }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const { toast } = useToast();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [setAsDefault, setSetAsDefault] = useState(true);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+
+    setIsProcessing(true);
+
+    try {
+      const setupResponse = await apiRequest("POST", "/api/stripe/setup-intent", {});
+      if (!setupResponse.ok) {
+        throw new Error("Failed to create setup intent");
+      }
+      const { clientSecret } = await setupResponse.json();
+
+      const cardElement = elements.getElement(CardElement);
+      if (!cardElement) {
+        throw new Error("Card element not found");
+      }
+
+      const { error, setupIntent } = await stripe.confirmCardSetup(clientSecret, {
+        payment_method: {
+          card: cardElement,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message || "Failed to save card");
+      }
+
+      if (setupIntent?.status === "succeeded" && setAsDefault && setupIntent.payment_method) {
+        await apiRequest("POST", "/api/stripe/default-payment-method", {
+          paymentMethodId: setupIntent.payment_method,
+        });
+      }
+
+      toast({
+        title: "Card saved",
+        description: "Your payment method has been saved successfully.",
+      });
+      onSuccess();
+    } catch (error: any) {
+      toast({
+        title: "Failed to save card",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="p-3 border rounded-md bg-white">
+        <CardElement
+          options={{
+            style: {
+              base: {
+                fontSize: "16px",
+                color: "#424770",
+                "::placeholder": {
+                  color: "#aab7c4",
+                },
+              },
+              invalid: {
+                color: "#9e2146",
+              },
+            },
+          }}
+        />
+      </div>
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          id="set-default"
+          checked={setAsDefault}
+          onChange={(e) => setSetAsDefault(e.target.checked)}
+          className="rounded border-gray-300"
+        />
+        <Label htmlFor="set-default" className="text-sm">Set as default payment method</Label>
+      </div>
+      <div className="flex gap-2">
+        <Button
+          type="submit"
+          disabled={!stripe || isProcessing}
+          className="flex-1 bg-brand-blue hover:bg-blue-600"
+        >
+          {isProcessing ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            "Save Card"
+          )}
+        </Button>
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 export default function Settings() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
@@ -45,12 +165,79 @@ export default function Settings() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showAddCard, setShowAddCard] = useState(false);
+  const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
 
   const { data: currentUser, isLoading: userLoading, error: userError } = useQuery<User>({
     queryKey: ["/api/auth/user"],
     enabled: hasToken,
     retry: false,
     staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: stripeConfig } = useQuery<{ configured: boolean; publishableKey?: string }>({
+    queryKey: ["/api/stripe/config"],
+    enabled: hasToken,
+  });
+
+  const { data: paymentMethodsData, isLoading: paymentMethodsLoading } = useQuery<{
+    paymentMethods: PaymentMethod[];
+    defaultPaymentMethod: string | null;
+  }>({
+    queryKey: ["/api/stripe/payment-methods"],
+    enabled: hasToken && !!stripeConfig?.configured,
+  });
+
+  useEffect(() => {
+    if (stripeConfig?.publishableKey && !stripePromise) {
+      setStripePromise(loadStripe(stripeConfig.publishableKey));
+    }
+  }, [stripeConfig?.publishableKey, stripePromise]);
+
+  const deletePaymentMethodMutation = useMutation({
+    mutationFn: async (paymentMethodId: string) => {
+      const response = await apiRequest("DELETE", `/api/stripe/payment-methods/${paymentMethodId}`, {});
+      if (!response.ok) throw new Error("Failed to delete payment method");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/stripe/payment-methods"] });
+      toast({
+        title: "Card removed",
+        description: "Your payment method has been removed.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to remove card",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const setDefaultPaymentMethodMutation = useMutation({
+    mutationFn: async (paymentMethodId: string) => {
+      const response = await apiRequest("POST", "/api/stripe/default-payment-method", {
+        paymentMethodId,
+      });
+      if (!response.ok) throw new Error("Failed to set default payment method");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/stripe/payment-methods"] });
+      toast({
+        title: "Default card updated",
+        description: "Your default payment method has been updated.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to update default",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 
   useEffect(() => {
@@ -388,6 +575,104 @@ export default function Settings() {
           )}
         </CardContent>
       </Card>
+
+      {/* Payment Methods */}
+      {stripeConfig?.configured && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <CreditCard className="w-5 h-5" />
+              Payment Methods
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-gray-500">
+              Save a card for faster checkout. Your saved card will be automatically charged when orders are approved.
+            </p>
+            
+            {paymentMethodsLoading ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+              </div>
+            ) : paymentMethodsData?.paymentMethods && paymentMethodsData.paymentMethods.length > 0 ? (
+              <div className="space-y-3">
+                {paymentMethodsData.paymentMethods.map((pm) => (
+                  <div
+                    key={pm.id}
+                    className={`flex items-center justify-between p-3 border rounded-lg ${
+                      pm.id === paymentMethodsData.defaultPaymentMethod
+                        ? "border-brand-blue bg-blue-50"
+                        : "border-gray-200"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <CreditCard className="w-6 h-6 text-gray-600" />
+                      <div>
+                        <p className="font-medium capitalize">
+                          {pm.brand} ending in {pm.last4}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Expires {pm.expMonth}/{pm.expYear}
+                        </p>
+                      </div>
+                      {pm.id === paymentMethodsData.defaultPaymentMethod && (
+                        <span className="text-xs bg-brand-blue text-white px-2 py-1 rounded-full flex items-center gap-1">
+                          <Star className="w-3 h-3" /> Default
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {pm.id !== paymentMethodsData.defaultPaymentMethod && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDefaultPaymentMethodMutation.mutate(pm.id)}
+                          disabled={setDefaultPaymentMethodMutation.isPending}
+                        >
+                          Set Default
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deletePaymentMethodMutation.mutate(pm.id)}
+                        disabled={deletePaymentMethodMutation.isPending}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-sm py-2">No saved payment methods</p>
+            )}
+
+            {showAddCard && stripePromise ? (
+              <Elements stripe={stripePromise}>
+                <AddCardForm
+                  onSuccess={() => {
+                    setShowAddCard(false);
+                    queryClient.invalidateQueries({ queryKey: ["/api/stripe/payment-methods"] });
+                  }}
+                  onCancel={() => setShowAddCard(false)}
+                />
+              </Elements>
+            ) : (
+              <Button
+                onClick={() => setShowAddCard(true)}
+                variant="outline"
+                className="w-full"
+                disabled={!stripeConfig?.publishableKey}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Payment Method
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
         {/* Update Name */}
         <Card className="mb-6">
