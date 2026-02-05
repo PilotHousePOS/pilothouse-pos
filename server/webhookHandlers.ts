@@ -18,20 +18,24 @@ export class WebhookHandlers {
     const sync = await getStripeSync();
     await sync.processWebhook(payload, signature);
     
-    // Also handle custom order payment logic with signature verification
+    // Check production security before processing
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const isProduction = process.env.NODE_ENV === 'production';
+    
+    if (isProduction && !webhookSecret) {
+      // In production, require signature verification - reject unverified webhooks
+      console.error('SECURITY: Webhook rejected - STRIPE_WEBHOOK_SECRET required in production');
+      throw new Error('Webhook signature verification required in production');
+    }
+    
+    // Handle custom order payment logic with signature verification
     try {
       const stripe = await getUncachableStripeClient();
-      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-      const isProduction = process.env.NODE_ENV === 'production';
       
       if (webhookSecret) {
         // Verify signature and construct event
         const event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
         await WebhookHandlers.handleStripeEvent(event);
-      } else if (isProduction) {
-        // In production, require signature verification - reject unverified webhooks
-        console.error('SECURITY: Webhook rejected - STRIPE_WEBHOOK_SECRET required in production');
-        throw new Error('Webhook signature verification required in production');
       } else {
         // Development only - allow unverified for local testing
         console.warn('WARNING: Processing webhook without signature verification (dev mode only)');
@@ -40,7 +44,11 @@ export class WebhookHandlers {
       }
     } catch (err: any) {
       console.error('Custom webhook handler error:', err.message);
-      // Don't throw - the sync already processed successfully
+      // Re-throw signature verification errors
+      if (err.message.includes('signature') || err.message.includes('verification')) {
+        throw err;
+      }
+      // For other errors, don't throw - the sync already processed successfully
     }
   }
   
