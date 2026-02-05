@@ -23,8 +23,8 @@ export interface AuthRequest extends Request {
 }
 
 export function generateToken(user: User): string {
-  const { password, ...userWithoutPassword } = user;
-  return jwt.sign(userWithoutPassword, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+  const { password, stripeCustomerId, stripeDefaultPaymentMethod, ...safePayload } = user as any;
+  return jwt.sign(safePayload, JWT_SECRET, { expiresIn: JWT_EXPIRES });
 }
 
 export function verifyToken(token: string): JWTUser | null {

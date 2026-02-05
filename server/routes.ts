@@ -29,6 +29,12 @@ import { eq } from 'drizzle-orm';
 import { expandProductAbbreviations } from './abbreviationExpansion';
 import { hashPassword, verifyPassword, isPasswordComplexEnough, getPasswordRequirementsMessage } from './passwordUtils';
 
+// Strip sensitive fields from user objects before sending to client
+function sanitizeUser(user: any) {
+  const { password, stripeCustomerId, stripeDefaultPaymentMethod, ...safeUser } = user;
+  return safeUser;
+}
+
 // Retry helper for transient database errors
 async function withRetry<T>(operation: () => Promise<T>, maxRetries = 3, delayMs = 1000): Promise<T> {
   let lastError: Error | null = null;
@@ -389,8 +395,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       setAuthCookie(res, token);
       
       console.log('User created, token generated:', newUser.id);
-      const { password: _, ...userWithoutPassword } = newUser;
-      res.json({ ...userWithoutPassword, token });
+      res.json({ ...sanitizeUser(newUser), token });
     } catch (error) {
       console.error("Signup error:", error);
       res.status(500).json({ message: "Signup failed" });
@@ -415,8 +420,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (existingUser) {
         // Return existing user instead of error
         console.log('Test user already exists, returning existing:', email);
-        const { password: _, ...userWithoutPassword } = existingUser;
-        return res.json(userWithoutPassword);
+        return res.json(sanitizeUser(existingUser));
       }
 
       // Create new user
@@ -435,8 +439,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       }
 
       console.log('Test user created:', email, 'isAdmin:', isAdmin, 'isGroomer:', isGroomer);
-      const { password: _, ...userWithoutPassword } = newUser;
-      res.json(userWithoutPassword);
+      res.json(sanitizeUser(newUser));
     } catch (error) {
       console.error("Test user creation error:", error);
       res.status(500).json({ message: "Failed to create test user" });
@@ -469,8 +472,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       setAuthCookie(res, token);
       
       console.log('User logged in, token generated:', user.id);
-      const { password: _, ...userWithoutPassword } = user;
-      res.json({ ...userWithoutPassword, token });
+      res.json({ ...sanitizeUser(user), token });
     } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ message: "Login failed" });
@@ -509,8 +511,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(404).json({ message: "User not found" });
       }
       
-      const { password, ...userWithoutPassword } = freshUser;
-      res.json(userWithoutPassword);
+      res.json(sanitizeUser(freshUser));
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
@@ -572,8 +573,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const newToken = generateToken(updatedUser);
       setAuthCookie(res, newToken);
 
-      const { password, ...userWithoutPassword } = updatedUser;
-      res.json({ ...userWithoutPassword, token: newToken });
+      res.json({ ...sanitizeUser(updatedUser), token: newToken });
     } catch (error) {
       console.error("Error updating email:", error);
       res.status(500).json({ message: "Failed to update email" });
@@ -635,8 +635,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         updatedAt: new Date(),
       });
 
-      const { password, ...userWithoutPassword } = updatedUser;
-      res.json({ message: "Password updated successfully", user: userWithoutPassword });
+      res.json({ message: "Password updated successfully", user: sanitizeUser(updatedUser) });
     } catch (error) {
       console.error("Error updating password:", error);
       res.status(500).json({ message: "Failed to update password" });
@@ -692,8 +691,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const newToken = generateToken(updatedUser);
       setAuthCookie(res, newToken);
 
-      const { password, ...userWithoutPassword } = updatedUser;
-      res.json({ ...userWithoutPassword, token: newToken });
+      res.json({ ...sanitizeUser(updatedUser), token: newToken });
     } catch (error) {
       console.error("Error updating name:", error);
       res.status(500).json({ message: "Failed to update name" });
@@ -749,8 +747,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const newToken = generateToken(updatedUser);
       setAuthCookie(res, newToken);
 
-      const { password, ...userWithoutPassword } = updatedUser;
-      res.json({ ...userWithoutPassword, token: newToken });
+      res.json({ ...sanitizeUser(updatedUser), token: newToken });
     } catch (error) {
       console.error("Error updating phone number:", error);
       res.status(500).json({ message: "Failed to update phone number" });
@@ -2095,10 +2092,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
               paidAt: new Date(),
             });
             
-            // Update order to ready_for_pickup since payment is complete
-            await storage.updateOrderApprovalStatus(orderId, 'ready_for_pickup');
+            // Keep order in "approved" status - admin needs to manually gather items
+            // and move to "ready_for_pickup" when the order is actually ready
+            await storage.updateOrderApprovalStatus(orderId, 'approved');
             
-            console.log(`Order #${orderId} approved and charged successfully: ${paymentIntentId}`);
+            console.log(`Order #${orderId} approved and payment charged successfully: ${paymentIntentId}`);
           } else {
             paymentError = `Payment status: ${paymentIntent.status}`;
           }
@@ -2131,13 +2129,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           ).join('\n');
           
           const emailSubject = paymentSuccessful 
-            ? 'Payment Received - Your Order is Being Prepared!'
+            ? 'Payment Received - Your Animal House Order Has Been Approved!'
             : 'Your Animal House Order Has Been Approved';
           
           const statusMessage = paymentSuccessful
             ? `<h2 style="color: #16a34a;">✓ Payment Received!</h2>
                <p>Your payment of <strong>$${order.totalAmount}</strong> has been processed successfully.</p>
-               <p>Your order is now being prepared and will be ready for pickup soon!</p>`
+               <p>Your order has been approved and we're getting it ready. We'll notify you when it's ready for pickup!</p>`
             : `<h2 style="color: #16a34a;">Order Approved!</h2>
                <p>Your order has been approved. Please contact the store to arrange payment.</p>`;
           
@@ -4330,8 +4328,7 @@ West Monroe LA 71291
       }
 
       const users = await storage.getAllUsers();
-      // Remove password field from response
-      const safeUsers = users.map(({ password, ...user }) => user);
+      const safeUsers = users.map(user => sanitizeUser(user));
       res.json(safeUsers);
     } catch (error) {
       console.error("Error fetching users:", error);

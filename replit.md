@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first web application for online retail of exotic reptiles, pet supplies, and grooming services. It aims to provide an intuitive user experience, streamline product and service management, and facilitate secure transactions. The project aspires to be a leader in the exotic pet retail and service industry through advanced inventory, appointment, and customer engagement features.
+The Animal House Pet Store is a mobile-first web application for online retail of exotic reptiles, pet supplies, and grooming services. Its primary goal is to provide an intuitive user experience, streamline product and service management, and ensure secure transactions. The project aims to become a leader in the exotic pet retail and services market through advanced inventory, appointment, and customer engagement features, backed by robust data and system functionality.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -183,7 +183,7 @@ Step 5: NEVER mark task complete until verification passes
 
 ## System Architecture
 The Animal House Pet Store is a full-stack, mobile-first web application.
-- **UI/UX Decisions:** Features a dark, bold, high-contrast aesthetic with Amazon-style image carousels. It prioritizes mobile responsiveness with full-screen modal forms and warning banners, and includes a consistent universal admin dashboard.
+- **UI/UX Decisions:** Features a dark, bold, high-contrast aesthetic with Amazon-style image carousels, mobile responsiveness with full-screen modal forms and warning banners, and a consistent universal admin dashboard.
 - **Technical Implementations:** Core functionalities include inventory tracking, multi-image upload, advanced appointment scheduling (15-minute intervals, admin approval, notifications, Google Calendar sync), secure JWT-based authentication (password resets, user settings, three-tier role-based access control), customer wishlists, CMS for animal categories, and comprehensive admin order management. Sophisticated search functionalities are implemented across all product types. Advanced management features include database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and admin dashboards for managing product images, employee schedules, and grooming appointments. AI-powered processing is utilized for order photo analysis, item extraction, and categorization. A robust UPC matching system incorporates abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
 - **System Design Choices:**
   - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
