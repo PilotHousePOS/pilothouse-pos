@@ -127,10 +127,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     try {
       const { getStripePublishableKey } = await import('./stripeClient');
       const publishableKey = await getStripePublishableKey();
-      res.json({ publishableKey });
+      res.json({ configured: !!publishableKey, publishableKey });
     } catch (error: any) {
       console.error("Failed to get Stripe config:", error);
-      res.status(500).json({ error: "Stripe not configured" });
+      res.json({ configured: false, publishableKey: null });
     }
   });
 
@@ -274,6 +274,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const { getUncachableStripeClient } = await import('./stripeClient');
       const stripe = await getUncachableStripeClient();
       
+      // Verify ownership: check that this payment method belongs to the user's customer
+      const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+      if (paymentMethod.customer !== user.stripeCustomerId) {
+        return res.status(403).json({ error: "Payment method does not belong to this customer" });
+      }
+      
       // Update default payment method in Stripe
       await stripe.customers.update(user.stripeCustomerId, {
         invoice_settings: {
@@ -304,6 +310,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       
       const { getUncachableStripeClient } = await import('./stripeClient');
       const stripe = await getUncachableStripeClient();
+      
+      // Verify ownership: check that this payment method belongs to the user's customer
+      const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+      if (paymentMethod.customer !== user.stripeCustomerId) {
+        return res.status(403).json({ error: "Payment method does not belong to this customer" });
+      }
       
       // Detach the payment method
       await stripe.paymentMethods.detach(paymentMethodId);
