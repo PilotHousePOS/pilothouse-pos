@@ -237,6 +237,8 @@ export interface IStorage {
   getOrderWithItems(id: number): Promise<{ order: Order; items: OrderItem[] } | undefined>;
   updateOrderStatus(id: number, status: string): Promise<Order>;
   updateOrderApprovalStatus(id: number, approvalStatus: string): Promise<Order>;
+  updateOrderStripePayment(id: number, data: { stripeCheckoutSessionId?: string; stripePaymentIntentId?: string; stripePaymentUrl?: string; paymentStatus?: string; paidAt?: Date }): Promise<Order>;
+  getOrderByStripeCheckoutSession(sessionId: string): Promise<Order | undefined>;
   hideOrderFromAdmin(id: number): Promise<Order>;
   deleteOrder(id: number): Promise<void>;
 
@@ -2324,6 +2326,24 @@ export class DatabaseStorage implements IStorage {
       .where(eq(orders.id, id))
       .returning();
     return updated;
+  }
+
+  async updateOrderStripePayment(id: number, data: { stripeCheckoutSessionId?: string; stripePaymentIntentId?: string; stripePaymentUrl?: string; paymentStatus?: string; paidAt?: Date }): Promise<Order> {
+    const [updated] = await db
+      .update(orders)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(orders.id, id))
+      .returning();
+    return updated;
+  }
+
+  async getOrderByStripeCheckoutSession(sessionId: string): Promise<Order | undefined> {
+    const [order] = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.stripeCheckoutSessionId, sessionId))
+      .limit(1);
+    return order;
   }
 
   async hideOrderFromAdmin(id: number): Promise<Order> {

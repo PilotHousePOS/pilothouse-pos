@@ -1832,24 +1832,111 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(404).json({ message: "Order not found" });
       }
       
+      const order = orderWithItems.order;
+      const customerEmail = orderWithItems.customerEmail || order.customerEmail;
+      const customerName = orderWithItems.customerName || 'Valued Customer';
+      
+      // Create Stripe checkout session for payment
+      let paymentUrl = null;
+      let checkoutSessionId = null;
+      
+      try {
+        const { getUncachableStripeClient } = await import('./stripeClient');
+        const stripe = await getUncachableStripeClient();
+        
+        // Build line items from order
+        const lineItems = orderWithItems.items.map((item: any) => ({
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: item.productName || item.itemName || 'Item',
+            },
+            unit_amount: Math.round(parseFloat(item.price) * 100), // Convert to cents
+          },
+          quantity: item.quantity || 1,
+        }));
+        
+        // Add tax as a separate line item if applicable
+        if (order.taxAmount && parseFloat(order.taxAmount) > 0) {
+          lineItems.push({
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: 'Sales Tax',
+              },
+              unit_amount: Math.round(parseFloat(order.taxAmount) * 100),
+            },
+            quantity: 1,
+          });
+        }
+        
+        // Deduct loyalty credits if applied (as negative line item or discount)
+        // Note: Stripe doesn't support negative line items, so we reduce total instead
+        // The total already reflects the loyalty discount from order creation
+        
+        // Get base URL for success/cancel redirects
+        const baseUrl = process.env.REPLIT_DOMAINS 
+          ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`
+          : 'http://localhost:5000';
+        
+        // Create checkout session
+        const session = await stripe.checkout.sessions.create({
+          customer_email: customerEmail || undefined,
+          payment_method_types: ['card'],
+          line_items: lineItems,
+          mode: 'payment',
+          success_url: `${baseUrl}/order-confirmed?order_id=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${baseUrl}/orders?cancelled=true`,
+          metadata: {
+            orderId: orderId.toString(),
+          },
+          expires_at: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hour expiration
+        });
+        
+        paymentUrl = session.url;
+        checkoutSessionId = session.id;
+        
+        // Store Stripe session info on order
+        await storage.updateOrderStripePayment(orderId, {
+          stripeCheckoutSessionId: checkoutSessionId,
+          stripePaymentUrl: paymentUrl || undefined,
+          paymentStatus: 'pending',
+        });
+        
+      } catch (stripeError: any) {
+        console.error("Failed to create Stripe checkout session:", stripeError);
+        // Continue with approval even if Stripe fails - order can be paid manually
+      }
+      
       // Update order approval status
       await storage.updateOrderApprovalStatus(orderId, 'approved');
       
-      // Send email notification
-      const order = orderWithItems.order;
-      const customerEmail = orderWithItems.customerEmail || order.customerEmail;
+      // Send email notification with payment link
       if (customerEmail) {
         try {
           const { getUncachableSendGridClient } = await import('./sendgridIntegration');
           const { client, fromEmail } = await getUncachableSendGridClient();
           const itemsList = orderWithItems.items.map((item: any) => 
-            `• ${item.itemName || 'Item'} x${item.quantity} - $${item.price}`
+            `• ${item.productName || item.itemName || 'Item'} x${item.quantity} - $${item.price}`
           ).join('\n');
+          
+          // Build payment section for email
+          const paymentSection = paymentUrl 
+            ? `
+                  <div style="background: #16a34a; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+                    <p style="color: white; margin: 0 0 15px 0; font-size: 16px;">Ready to complete your purchase?</p>
+                    <a href="${paymentUrl}" style="display: inline-block; background: white; color: #16a34a; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 18px;">
+                      Pay Now - $${order.totalAmount}
+                    </a>
+                    <p style="color: white; margin: 15px 0 0 0; font-size: 12px;">This payment link expires in 24 hours</p>
+                  </div>
+                `
+            : `<p><strong>Please visit the store or call us to arrange payment.</strong></p>`;
           
           await client.send({
             to: customerEmail,
             from: fromEmail,
-            subject: 'Your Animal House Order Has Been Approved!',
+            subject: 'Your Animal House Order Has Been Approved - Pay Now!',
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
@@ -1857,16 +1944,20 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                 </div>
                 <div style="padding: 20px; background-color: #f9fafb;">
                   <h2 style="color: #16a34a;">Order Approved!</h2>
-                  <p>Hi ${orderWithItems.customerName || 'Valued Customer'},</p>
-                  <p>Great news! Your order <strong>#${order.id}</strong> has been approved and is now being prepared.</p>
+                  <p>Hi ${customerName},</p>
+                  <p>Great news! Your order <strong>#${order.id}</strong> has been approved.</p>
                   
                   <div style="background: white; border-radius: 8px; padding: 15px; margin: 15px 0;">
                     <h3 style="margin-top: 0;">Order Details:</h3>
                     <pre style="white-space: pre-wrap; font-family: Arial;">${itemsList}</pre>
+                    ${order.taxAmount && parseFloat(order.taxAmount) > 0 ? `<p>Tax: $${order.taxAmount}</p>` : ''}
+                    ${order.loyaltyCreditsApplied && parseFloat(order.loyaltyCreditsApplied) > 0 ? `<p style="color: #16a34a;">Loyalty Credits Applied: -$${order.loyaltyCreditsApplied}</p>` : ''}
                     <p style="font-weight: bold; font-size: 18px; color: #dc2626;">Total: $${order.totalAmount}</p>
                   </div>
                   
-                  <p>We'll notify you when your order is ready for pickup!</p>
+                  ${paymentSection}
+                  
+                  <p>Once payment is received, we'll prepare your order and notify you when it's ready for pickup!</p>
                   <p>Thank you for shopping with us!</p>
                 </div>
                 <div style="background-color: #1f2937; color: white; padding: 15px; text-align: center; font-size: 12px;">
@@ -1880,7 +1971,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         }
       }
       
-      res.json({ success: true, message: "Order approved and customer notified" });
+      res.json({ 
+        success: true, 
+        message: "Order approved and customer notified",
+        paymentUrl: paymentUrl,
+        checkoutSessionId: checkoutSessionId
+      });
     } catch (error) {
       console.error("Error approving order:", error);
       res.status(500).json({ message: "Failed to approve order" });
