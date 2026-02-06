@@ -2522,13 +2522,55 @@ West Monroe LA 71291
         return res.status(400).json({ message: "Order ID and amount are required" });
       }
       
+      // Look up the order to find the Stripe payment intent for actual refund
+      const order = await storage.getOrder(orderId);
+      let stripeRefundId = null;
+      let stripeRefundError = null;
+      
+      if (order?.stripePaymentIntentId && order?.paymentStatus === 'paid') {
+        try {
+          const { getUncachableStripeClient } = await import('./stripeClient');
+          const stripe = await getUncachableStripeClient();
+          
+          const refundAmountCents = Math.round(parseFloat(amount) * 100);
+          
+          const stripeRefund = await stripe.refunds.create({
+            payment_intent: order.stripePaymentIntentId,
+            amount: refundAmountCents,
+            reason: 'requested_by_customer',
+            metadata: {
+              orderId: orderId.toString(),
+              reason: reason || 'Customer request',
+            },
+          });
+          
+          stripeRefundId = stripeRefund.id;
+          console.log(`Stripe refund processed for Order #${orderId}: ${stripeRefundId}, amount: $${amount}`);
+          
+          // Update order payment status if full refund
+          const totalRefundedSoFar = parseFloat(amount);
+          if (totalRefundedSoFar >= parseFloat(order.totalAmount)) {
+            await storage.updateOrderStripePayment(orderId, {
+              paymentStatus: 'refunded',
+            });
+          }
+        } catch (stripeError: any) {
+          console.error("Stripe refund failed:", stripeError);
+          stripeRefundError = stripeError.message;
+        }
+      }
+      
       const refund = await storage.createRefund({
         orderId,
         orderItemId,
         quantity,
         amount,
         reason: reason || 'Customer request',
-        notes,
+        notes: stripeRefundId 
+          ? `${notes || ''} [Stripe Refund: ${stripeRefundId}]`.trim()
+          : stripeRefundError 
+            ? `${notes || ''} [Stripe refund failed: ${stripeRefundError}]`.trim()
+            : notes,
         refundType: refundType || 'partial',
         processedBy: userId,
       });
@@ -2538,7 +2580,12 @@ West Monroe LA 71291
         await storage.updateOrderItemRefund(orderItemId, quantity, amount);
       }
       
-      res.json(refund);
+      res.json({ 
+        ...refund, 
+        stripeRefundId,
+        stripeRefundError,
+        paymentRefunded: !!stripeRefundId,
+      });
     } catch (error) {
       console.error("Error creating refund:", error);
       res.status(500).json({ message: "Failed to create refund" });
