@@ -2350,7 +2350,7 @@ West Monroe LA 71291
       for (const order of allOrders) {
         // If approval_status is picked_up but status is not completed, fix it
         if (order.approvalStatus === 'picked_up' && order.status !== 'completed') {
-          await storage.updateOrder(order.id, { status: 'completed' });
+          await storage.updateOrderStatus(order.id, 'completed');
           fixedCount++;
         }
       }
