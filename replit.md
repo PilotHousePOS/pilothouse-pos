@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first web application for online retail of exotic reptiles, pet supplies, and grooming services. Its primary goal is to provide an intuitive user experience, streamline product and service management, and ensure secure transactions. The project aims to become a leader in the exotic pet retail and services market through advanced inventory, appointment, and customer engagement features, backed by robust data and system functionality.
+The Animal House Pet Store is a mobile-first web application for online retail of exotic reptiles, pet supplies, and grooming services. Its primary goal is to offer an intuitive user experience, streamline product and service management, and ensure secure transactions. The project aims to achieve market leadership in exotic pet retail by providing advanced inventory management, efficient appointment scheduling, and robust customer engagement, ultimately delivering a seamless and secure platform for exotic pet enthusiasts.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -182,17 +182,16 @@ Step 5: NEVER mark task complete until verification passes
 - **Pro Plan**: https://purina.com/pro-plan/
 
 ## System Architecture
-The Animal House Pet Store is a full-stack, mobile-first web application.
-- **UI/UX Decisions:** Features a dark, bold, high-contrast aesthetic with Amazon-style image carousels, mobile responsiveness with full-screen modal forms and warning banners, and a consistent universal admin dashboard.
-- **Technical Implementations:** Core functionalities include inventory tracking, multi-image upload, advanced appointment scheduling (15-minute intervals, admin approval, notifications, Google Calendar sync), secure JWT-based authentication (password resets, user settings, three-tier role-based access control), customer wishlists, CMS for animal categories, and comprehensive admin order management. Sophisticated search functionalities are implemented across all product types. Advanced management features include database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and admin dashboards for managing product images, employee schedules, and grooming appointments. AI-powered processing is utilized for order photo analysis, item extraction, and categorization. A robust UPC matching system incorporates abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
-- **System Design Choices:**
-  - **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
-  - **Backend**: Express.js, TypeScript.
-  - **Database**: PostgreSQL with Drizzle ORM.
-  - **Authentication**: JWT tokens stored in cookies.
-  - **State Management**: TanStack Query.
-  - **Routing**: Wouter.
-  - **Development Practices**: Strict TypeScript standards, proper HTTP status codes, environment-aware configurations.
+The Animal House Pet Store is a full-stack, mobile-first web application featuring a dark, bold, high-contrast UI/UX, Amazon-style image carousels, and full mobile responsiveness. It includes a consistent universal admin dashboard. Key features encompass inventory tracking, multi-image uploads, and advanced appointment scheduling with 15-minute intervals, admin approval, notifications, and Google Calendar synchronization. Secure JWT-based authentication with three-tier role-based access control is a core component. The system also supports customer wishlists, a CMS for animal categories, comprehensive admin order management, and sophisticated search functionalities. Advanced management capabilities include database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and admin dashboards. AI-powered processing handles order photo analysis, item extraction, and categorization. A robust UPC matching system incorporates abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
+
+The technology stack includes:
+- **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
+- **Backend**: Express.js, TypeScript.
+- **Database**: PostgreSQL with Drizzle ORM.
+- **Authentication**: JWT tokens stored in cookies.
+- **State Management**: TanStack Query.
+- **Routing**: Wouter.
+- **Development Practices**: Strict TypeScript standards, proper HTTP status codes, and environment-aware configurations.
 
 ## External Dependencies
 - PostgreSQL

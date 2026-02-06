@@ -298,6 +298,34 @@ export default function OrderHistory() {
                     <p className="font-bold text-brand-green">${selectedOrder.totalAmount}</p>
                   </div>
                 </div>
+                {(selectedOrder.subtotal || selectedOrder.taxAmount || selectedOrder.convenienceFee) && (
+                  <div className="mt-2 pt-2 border-t border-gray-100 space-y-1">
+                    {selectedOrder.subtotal && (
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>Subtotal:</span>
+                        <span>${selectedOrder.subtotal}</span>
+                      </div>
+                    )}
+                    {selectedOrder.taxAmount && parseFloat(selectedOrder.taxAmount) > 0 && (
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>Tax:</span>
+                        <span>${selectedOrder.taxAmount}</span>
+                      </div>
+                    )}
+                    {selectedOrder.loyaltyCreditsApplied && parseFloat(selectedOrder.loyaltyCreditsApplied) > 0 && (
+                      <div className="flex justify-between text-xs text-green-600">
+                        <span>Loyalty Credit:</span>
+                        <span>-${selectedOrder.loyaltyCreditsApplied}</span>
+                      </div>
+                    )}
+                    {selectedOrder.convenienceFee && parseFloat(selectedOrder.convenienceFee) > 0 && (
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>Convenience Fee (2.9% + $0.30):</span>
+                        <span>${selectedOrder.convenienceFee}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {selectedOrder.shippingAddress && (

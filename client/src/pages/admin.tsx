@@ -7818,13 +7818,18 @@ export default function Admin() {
                                     )}
                                   </div>
                                   
-                                  <div className="flex items-center gap-4 mt-2">
+                                  <div className="flex items-center gap-4 mt-2 flex-wrap">
                                     <p className="text-lg font-bold text-green-700">
                                       Total: ${order.totalAmount}
                                     </p>
                                     {order.taxAmount && parseFloat(order.taxAmount) > 0 && (
                                       <p className="text-xs text-gray-500">
                                         (Tax: ${order.taxAmount})
+                                      </p>
+                                    )}
+                                    {order.convenienceFee && parseFloat(order.convenienceFee) > 0 && (
+                                      <p className="text-xs text-gray-500">
+                                        (Fee: ${order.convenienceFee})
                                       </p>
                                     )}
                                   </div>
