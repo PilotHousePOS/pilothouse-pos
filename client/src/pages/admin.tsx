@@ -7865,26 +7865,33 @@ export default function Admin() {
                                     <RotateCcw className="w-4 h-4 mr-1" />
                                     Refund
                                   </Button>
-                                  {(new Date().getTime() - new Date(order.orderDate).getTime()) > (30 * 24 * 60 * 60 * 1000) && (
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={async () => {
-                                        if (confirm('Remove this order from admin view? Customer will still see it in their order history.')) {
-                                          try {
-                                            await apiRequest('POST', `/api/admin/orders/${order.id}/hide`);
-                                            queryClient.invalidateQueries({ queryKey: ['/api/admin/orders-with-items'] });
-                                          } catch (err) {
-                                            console.error('Failed to hide order:', err);
-                                          }
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={async () => {
+                                      if (confirm(`Delete Order #${order.id} from admin view?\n\nThis will remove it from your completed orders list, but the customer will still see it in their order history.`)) {
+                                        try {
+                                          await apiRequest('POST', `/api/admin/orders/${order.id}/hide`);
+                                          queryClient.invalidateQueries({ queryKey: ['/api/admin/orders-with-items'] });
+                                          toast({
+                                            title: "Order Removed",
+                                            description: `Order #${order.id} has been removed from admin view.`,
+                                          });
+                                        } catch (err) {
+                                          console.error('Failed to hide order:', err);
+                                          toast({
+                                            title: "Error",
+                                            description: "Failed to remove order. Please try again.",
+                                            variant: "destructive",
+                                          });
                                         }
-                                      }}
-                                      className="border-gray-300 text-gray-600 hover:bg-gray-50"
-                                    >
-                                      <Trash2 className="w-4 h-4 mr-1" />
-                                      Remove
-                                    </Button>
-                                  )}
+                                      }
+                                    }}
+                                    className="border-red-300 text-red-600 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="w-4 h-4 mr-1" />
+                                    Delete
+                                  </Button>
                                 </div>
                               </div>
                             </CardContent>
