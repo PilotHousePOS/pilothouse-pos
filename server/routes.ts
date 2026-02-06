@@ -3345,7 +3345,13 @@ West Monroe LA 71291
       if (ownerFirstName !== undefined) updates.ownerFirstName = ownerFirstName;
       if (ownerLastName !== undefined) updates.ownerLastName = ownerLastName;
       if (ownerPhoneNumber !== undefined) updates.ownerPhoneNumber = ownerPhoneNumber;
-      if (price !== undefined) updates.price = price;
+      if (price !== undefined) {
+        let safePrice = price;
+        if (typeof safePrice === 'string' && safePrice.includes('-')) {
+          safePrice = safePrice.split('-')[0].trim();
+        }
+        updates.price = safePrice;
+      }
       if (pricingMode !== undefined) updates.pricingMode = pricingMode;
       if (appointmentDate !== undefined) updates.appointmentDate = appointmentDate;
       if (appointmentTime !== undefined) updates.appointmentTime = appointmentTime;
@@ -3372,14 +3378,20 @@ West Monroe LA 71291
             await storage.deleteAppointmentPets(id);
             
             // Create new appointment_pets records
-            const petsWithPrice = pets.map((pet: any) => ({
-              petName: pet.petName,
-              petType: pet.petType,
-              serviceType: pet.serviceType,
-              specialNotes: pet.specialNotes || '',
-              price: pet.price ? pet.price.toString() : '0',
-              groomerId: pet.groomerId || null,
-            }));
+            const petsWithPrice = pets.map((pet: any) => {
+              let petPrice = pet.price ? pet.price.toString() : '0';
+              if (petPrice.includes('-')) {
+                petPrice = petPrice.split('-')[0].trim();
+              }
+              return {
+                petName: pet.petName,
+                petType: pet.petType,
+                serviceType: pet.serviceType,
+                specialNotes: pet.specialNotes || '',
+                price: petPrice,
+                groomerId: pet.groomerId || null,
+              };
+            });
             
             await storage.createAppointmentPets(id, petsWithPrice);
           }
@@ -3982,8 +3994,24 @@ West Monroe LA 71291
       console.log(`[FINAL CAPACITY CHECK] PASSED - proceeding with appointment creation`);
       
       // All appointments are auto-approved with capacity safeguards in place
+      // Parse price - handle range strings like "40-80" by taking the lower bound
+      let parsedPrice = req.body.price;
+      if (typeof parsedPrice === 'string' && parsedPrice.includes('-')) {
+        const lowerBound = parsedPrice.split('-')[0].trim();
+        parsedPrice = lowerBound || '0';
+      }
+      if (typeof parsedPrice === 'string' && parsedPrice.includes('+')) {
+        const parts = parsedPrice.split('+').map((p: string) => {
+          const trimmed = p.trim();
+          if (trimmed.includes('-')) return trimmed.split('-')[0].trim();
+          return trimmed;
+        });
+        parsedPrice = parts.reduce((sum: number, p: string) => sum + (parseFloat(p) || 0), 0).toString();
+      }
+      
       const appointmentData = insertAppointmentSchema.parse({ 
         ...req.body,
+        price: parsedPrice,
         // Use first pet's data for backward compatibility
         petName: firstPet.petName,
         petType: firstPet.petType,
