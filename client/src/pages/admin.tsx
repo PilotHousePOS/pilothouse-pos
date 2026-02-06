@@ -5927,13 +5927,18 @@ export default function Admin() {
   });
 
   const createRefundMutation = useMutation({
-    mutationFn: async (refundData: { orderId: number; orderItemId?: number; quantity?: number; amount: string; reason?: string; notes?: string; refundType?: string }) => {
+    mutationFn: async (refundData: any) => {
       return await apiRequest("POST", "/api/admin/refunds", refundData);
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
+      const message = data.paymentRefunded 
+        ? `$${data.totalRefunded} has been refunded to the customer's card.`
+        : data.stripeRefundError
+          ? `Refund recorded but card refund failed: ${data.stripeRefundError}`
+          : "Refund has been recorded. No card payment was found to refund.";
       toast({
-        title: "Refund Processed",
-        description: "Refund has been processed. When electronic payments are connected, this will refund to the customer's payment method automatically.",
+        title: data.paymentRefunded ? "Refund Processed" : "Refund Recorded",
+        description: message,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/orders-with-items"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/refunds"] });
@@ -5942,7 +5947,7 @@ export default function Admin() {
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to record refund.",
+        description: "Failed to process refund.",
         variant: "destructive",
       });
     },
@@ -8146,7 +8151,7 @@ export default function Admin() {
                 <div className="space-y-4">
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                     <p className="text-sm text-blue-800">
-                      <strong>Note:</strong> When electronic payments are connected, this will automatically process a refund to the customer's payment method.
+                      <strong>Note:</strong> If this order was paid by card, the refund will be automatically returned to the customer's card.
                     </p>
                   </div>
                   
@@ -8246,16 +8251,25 @@ export default function Admin() {
                     <p className="font-medium">Refund Summary</p>
                     {(() => {
                       const subtotal = Object.values(selectedRefundItems).reduce((sum, item) => sum + parseFloat(item.amount), 0);
-                      const taxRate = 10.99; // Same tax rate as checkout
-                      const taxAmount = subtotal * (taxRate / 100);
+                      const orderTaxRate = selectedOrderForRefund.subtotal && parseFloat(selectedOrderForRefund.subtotal) > 0 && selectedOrderForRefund.taxAmount
+                        ? (parseFloat(selectedOrderForRefund.taxAmount) / parseFloat(selectedOrderForRefund.subtotal)) * 100
+                        : 0;
+                      const taxAmount = subtotal * (orderTaxRate / 100);
                       const totalRefund = subtotal + taxAmount;
                       return (
                         <>
                           <p className="text-sm text-gray-600">Subtotal: ${subtotal.toFixed(2)}</p>
-                          <p className="text-sm text-gray-600">Tax ({taxRate}%): ${taxAmount.toFixed(2)}</p>
+                          {orderTaxRate > 0 && (
+                            <p className="text-sm text-gray-600">Tax ({orderTaxRate.toFixed(2)}%): ${taxAmount.toFixed(2)}</p>
+                          )}
                           <p className="text-2xl font-bold text-red-600">
-                            Total: ${totalRefund.toFixed(2)}
+                            Total Refund: ${totalRefund.toFixed(2)}
                           </p>
+                          {selectedOrderForRefund.paymentStatus === 'paid' && (
+                            <p className="text-xs text-green-700 font-medium mt-1">
+                              This will be refunded to the customer's card
+                            </p>
+                          )}
                         </>
                       );
                     })()}
@@ -8274,10 +8288,6 @@ export default function Admin() {
                     </Button>
                     <Button
                       onClick={() => {
-                        const subtotal = Object.values(selectedRefundItems).reduce((sum, item) => sum + parseFloat(item.amount), 0);
-                        const taxRate = 10.99;
-                        const taxAmount = subtotal * (taxRate / 100);
-                        const totalWithTax = subtotal + taxAmount;
                         const itemIds = Object.keys(selectedRefundItems);
                         
                         if (itemIds.length === 0) {
@@ -8285,22 +8295,31 @@ export default function Admin() {
                           return;
                         }
                         
-                        // Create refund for each selected item (with proportional tax)
-                        itemIds.forEach(itemId => {
+                        const orderTaxRate = selectedOrderForRefund.subtotal && parseFloat(selectedOrderForRefund.subtotal) > 0 && selectedOrderForRefund.taxAmount
+                          ? (parseFloat(selectedOrderForRefund.taxAmount) / parseFloat(selectedOrderForRefund.subtotal)) * 100
+                          : 0;
+                        
+                        const refundItemsData = itemIds.map(itemId => {
                           const refundItem = selectedRefundItems[parseInt(itemId)];
                           const itemSubtotal = parseFloat(refundItem.amount);
-                          const itemTax = itemSubtotal * (taxRate / 100);
-                          const itemTotalWithTax = itemSubtotal + itemTax;
+                          const itemTax = itemSubtotal * (orderTaxRate / 100);
+                          const itemTotal = itemSubtotal + itemTax;
                           
-                          createRefundMutation.mutate({
-                            orderId: selectedOrderForRefund.id,
+                          return {
                             orderItemId: parseInt(itemId),
                             quantity: refundItem.quantity,
-                            amount: itemTotalWithTax.toFixed(2),
-                            reason: refundReason || 'Customer request',
-                            notes: refundNotes,
-                            refundType: 'partial'
-                          });
+                            subtotal: itemSubtotal.toFixed(2),
+                            tax: itemTax.toFixed(2),
+                            total: itemTotal.toFixed(2),
+                          };
+                        });
+                        
+                        createRefundMutation.mutate({
+                          orderId: selectedOrderForRefund.id,
+                          items: refundItemsData,
+                          reason: refundReason || 'Customer request',
+                          notes: refundNotes,
+                          refundType: 'partial'
                         });
                         
                         setRefundModalOpen(false);

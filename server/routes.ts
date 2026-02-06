@@ -2516,43 +2516,72 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Access denied. Admin only." });
       }
       
-      const { orderId, orderItemId, quantity, amount, reason, notes, refundType } = req.body;
+      const { orderId, items, reason, notes, refundType } = req.body;
       
-      if (!orderId || !amount) {
-        return res.status(400).json({ message: "Order ID and amount are required" });
+      // Support both batch format (items array) and legacy single-item format
+      const refundItems: Array<{ orderItemId: number; quantity: number; subtotal: string; tax: string; total: string }> = items || [];
+      
+      // Legacy single-item support
+      if (!items && req.body.orderItemId) {
+        const subtotal = req.body.subtotal || req.body.amount || "0";
+        const tax = req.body.tax || "0";
+        const total = req.body.total || req.body.amount || subtotal;
+        refundItems.push({
+          orderItemId: req.body.orderItemId,
+          quantity: req.body.quantity || 1,
+          subtotal,
+          tax,
+          total,
+        });
       }
+      
+      if (!orderId || refundItems.length === 0) {
+        return res.status(400).json({ message: "Order ID and refund items are required" });
+      }
+      
+      // Calculate total refund amount across all items
+      const totalRefundAmount = refundItems.reduce((sum, item) => sum + parseFloat(item.total), 0);
+      const totalSubtotalRefund = refundItems.reduce((sum, item) => sum + parseFloat(item.subtotal), 0);
+      const totalTaxRefund = refundItems.reduce((sum, item) => sum + parseFloat(item.tax), 0);
       
       // Look up the order to find the Stripe payment intent for actual refund
       const order = await storage.getOrder(orderId);
       let stripeRefundId = null;
       let stripeRefundError = null;
       
+      // Process ONE Stripe refund for the total amount (not per-item)
       if (order?.stripePaymentIntentId && order?.paymentStatus === 'paid') {
         try {
           const { getUncachableStripeClient } = await import('./stripeClient');
           const stripe = await getUncachableStripeClient();
           
-          const refundAmountCents = Math.round(parseFloat(amount) * 100);
+          const refundAmountCents = Math.round(totalRefundAmount * 100);
           
-          const stripeRefund = await stripe.refunds.create({
-            payment_intent: order.stripePaymentIntentId,
-            amount: refundAmountCents,
-            reason: 'requested_by_customer',
-            metadata: {
-              orderId: orderId.toString(),
-              reason: reason || 'Customer request',
-            },
-          });
-          
-          stripeRefundId = stripeRefund.id;
-          console.log(`Stripe refund processed for Order #${orderId}: ${stripeRefundId}, amount: $${amount}`);
-          
-          // Update order payment status if full refund
-          const totalRefundedSoFar = parseFloat(amount);
-          if (totalRefundedSoFar >= parseFloat(order.totalAmount)) {
-            await storage.updateOrderStripePayment(orderId, {
-              paymentStatus: 'refunded',
+          if (refundAmountCents > 0) {
+            const stripeRefund = await stripe.refunds.create({
+              payment_intent: order.stripePaymentIntentId,
+              amount: refundAmountCents,
+              reason: 'requested_by_customer',
+              metadata: {
+                orderId: orderId.toString(),
+                reason: reason || 'Customer request',
+                itemCount: refundItems.length.toString(),
+              },
             });
+            
+            stripeRefundId = stripeRefund.id;
+            console.log(`Stripe refund processed for Order #${orderId}: ${stripeRefundId}, amount: $${totalRefundAmount.toFixed(2)} (${refundItems.length} items)`);
+            
+            // Check if total refunded (including previous refunds) covers the full order
+            const existingRefunds = await storage.getRefundsByOrderId(orderId);
+            const previouslyRefunded = existingRefunds.reduce((sum, r) => sum + parseFloat(r.totalRefunded || "0"), 0);
+            const allTimeRefunded = previouslyRefunded + totalRefundAmount;
+            
+            if (allTimeRefunded >= parseFloat(order.totalAmount)) {
+              await storage.updateOrderStripePayment(orderId, {
+                paymentStatus: 'refunded',
+              });
+            }
           }
         } catch (stripeError: any) {
           console.error("Stripe refund failed:", stripeError);
@@ -2560,31 +2589,41 @@ West Monroe LA 71291
         }
       }
       
-      const refund = await storage.createRefund({
-        orderId,
-        orderItemId,
-        quantity,
-        amount,
-        reason: reason || 'Customer request',
-        notes: stripeRefundId 
-          ? `${notes || ''} [Stripe Refund: ${stripeRefundId}]`.trim()
+      // Create refund records for each item with correct schema fields
+      const createdRefunds = [];
+      for (const item of refundItems) {
+        const reasonWithStripeInfo = stripeRefundId 
+          ? `${reason || 'Customer request'} | Stripe Refund: ${stripeRefundId}${notes ? ' | Notes: ' + notes : ''}`
           : stripeRefundError 
-            ? `${notes || ''} [Stripe refund failed: ${stripeRefundError}]`.trim()
-            : notes,
-        refundType: refundType || 'partial',
-        processedBy: userId,
-      });
-      
-      // Update order item refund tracking if item-level refund
-      if (orderItemId && quantity) {
-        await storage.updateOrderItemRefund(orderItemId, quantity, amount);
+            ? `${reason || 'Customer request'} | Stripe refund failed: ${stripeRefundError}${notes ? ' | Notes: ' + notes : ''}`
+            : `${reason || 'Customer request'}${notes ? ' | Notes: ' + notes : ''}`;
+        
+        const refund = await storage.createRefund({
+          orderId,
+          orderItemId: item.orderItemId,
+          quantity: item.quantity,
+          subtotalRefunded: item.subtotal,
+          taxRefunded: item.tax,
+          totalRefunded: item.total,
+          reason: reasonWithStripeInfo,
+          refundType: refundType || 'partial',
+          processedBy: userId,
+        });
+        
+        // Update order item refund tracking
+        if (item.orderItemId && item.quantity) {
+          await storage.updateOrderItemRefund(item.orderItemId, item.quantity, item.total);
+        }
+        
+        createdRefunds.push(refund);
       }
       
       res.json({ 
-        ...refund, 
+        refunds: createdRefunds,
         stripeRefundId,
         stripeRefundError,
         paymentRefunded: !!stripeRefundId,
+        totalRefunded: totalRefundAmount.toFixed(2),
       });
     } catch (error) {
       console.error("Error creating refund:", error);
