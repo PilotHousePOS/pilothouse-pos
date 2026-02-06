@@ -3870,6 +3870,50 @@ West Monroe LA 71291
         });
       }
       
+      // SAFEGUARD #1b: Check if the day of week is enabled in grooming settings
+      const groomingSettings = await storage.getGroomingSettings();
+      const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      const dayEnabledSetting = groomingSettings.find(s => s.setting === `${dayNames[dayOfWeek]}_enabled`);
+      if (dayEnabledSetting && dayEnabledSetting.value === 'false') {
+        return res.status(400).json({
+          message: `Sorry, grooming appointments are not available on ${dayNames[dayOfWeek].charAt(0).toUpperCase() + dayNames[dayOfWeek].slice(1)}s. Please select a different day.`
+        });
+      }
+      
+      // SAFEGUARD #1c: Check if this specific date is in the blocked dates list
+      const blockedDatesSetting = groomingSettings.find(s => s.setting === 'blocked_dates');
+      if (blockedDatesSetting && blockedDatesSetting.value) {
+        const blockedList = blockedDatesSetting.value.split(',').map((d: string) => d.trim()).filter((d: string) => d);
+        if (blockedList.includes(appointmentDateStr)) {
+          return res.status(400).json({
+            message: "Sorry, this date has been blocked for grooming appointments. Please select a different date."
+          });
+        }
+      }
+      
+      // SAFEGUARD #1d: Validate appointment time is not after 1:30 PM cutoff
+      // Skip this check for special dates (they have their own allowed times list)
+      if (!specialDate) {
+        const requestedTimeStr = req.body.appointmentTime;
+        if (requestedTimeStr) {
+          const timeParts = requestedTimeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+          if (timeParts) {
+            let hours = parseInt(timeParts[1]);
+            const minutes = parseInt(timeParts[2]);
+            const period = timeParts[3].toUpperCase();
+            if (period === 'PM' && hours !== 12) hours += 12;
+            if (period === 'AM' && hours === 12) hours = 0;
+            const totalMinutes = hours * 60 + minutes;
+            const cutoffMinutes = 13 * 60 + 30; // 1:30 PM = 810 minutes
+            if (totalMinutes > cutoffMinutes) {
+              return res.status(400).json({
+                message: "Sorry, grooming appointments are not available after 1:30 PM. Please select an earlier time."
+              });
+            }
+          }
+        }
+      }
+      
       // Get weekly limit for this day of week (1-6 for Monday-Saturday)
       if (dayOfWeek >= 1 && dayOfWeek <= 6) {
         const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
@@ -3963,12 +4007,27 @@ West Monroe LA 71291
       // Validate groomer availability for the selected date
       const appointmentDateObj = new Date(appointmentDateStr + 'T00:00:00');
       const appointmentDayOfWeek = appointmentDateObj.getDay();
+      
+      // Get groomer-specific blocked days for this date (sick days, vacation, etc.)
+      const groomerBlockedDaysForDate = await storage.getGroomerBlockedDaysForDate(appointmentDateStr);
+      const blockedGroomerIds = new Set(groomerBlockedDaysForDate.map((bd: any) => bd.groomerId));
+      
       for (const pet of petsArray) {
         if (pet.groomerId) {
-          const groomer = await storage.getGroomer(pet.groomerId);
+          const groomerId = typeof pet.groomerId === 'string' ? parseInt(pet.groomerId) : pet.groomerId;
+          const groomer = await storage.getGroomer(groomerId);
+          
+          // Check weekly off-days
           if (groomer && groomer.offDays && groomer.offDays.includes(appointmentDayOfWeek)) {
             return res.status(400).json({
               message: `${groomer.name} is not available on ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][appointmentDayOfWeek]}s. Please select a different groomer or date.`
+            });
+          }
+          
+          // Check specific blocked days (sick days, vacation)
+          if (blockedGroomerIds.has(groomerId)) {
+            return res.status(400).json({
+              message: `${groomer?.name || 'Selected groomer'} is not available on this date (blocked day). Please select a different groomer or date.`
             });
           }
         }

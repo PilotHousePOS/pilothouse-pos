@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first web application specializing in the online retail of exotic reptiles, pet supplies, and grooming services. Its core purpose is to provide an intuitive user experience, streamline product and service management, and ensure secure transactions. The project aims to be a leading online destination for exotic pet enthusiasts through advanced inventory management, efficient scheduling, robust customer engagement, secure transactions, and comprehensive administrative tools. The project emphasizes a dark, bold, high-contrast aesthetic.
+The Animal House Pet Store is a mobile-first web application specializing in online retail of exotic reptiles, pet supplies, and grooming services. The project aims to provide a competitive online retail platform with a distinctive aesthetic, offering a seamless and secure shopping experience, advanced inventory management, efficient scheduling, robust customer engagement, and comprehensive administrative tools. Its primary goal is to deliver an intuitive user experience and streamline product and service management. The business vision is to become a leading online retailer in the exotic pet and pet supply market, known for its unique product offerings and exceptional customer service.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -183,11 +183,7 @@ Step 5: NEVER mark task complete until verification passes
 - **Pro Plan**: https://purina.com/pro-plan/
 
 ## System Architecture
-The Animal House Pet Store is a full-stack, mobile-first web application featuring a dark, bold, high-contrast UI/UX with Amazon-style image carousels. Key architectural decisions include a universal admin dashboard, inventory tracking, multi-image uploads, and advanced appointment scheduling with 15-minute intervals, admin approval, notifications, and Google Calendar synchronization. Security is managed via JWT-based authentication and a three-tier role-based access control system.
-
-Core features include customer wishlists, a CMS for animal categories, comprehensive admin order management, and sophisticated search functionalities. Advanced capabilities encompass database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and AI-powered processing for order photo analysis, item extraction, and categorization. A robust UPC matching system integrates abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
-
-The frontend is built with React, Vite, TypeScript, Tailwind CSS, and shadcn/ui. The backend utilizes Express.js and TypeScript. PostgreSQL and Drizzle ORM are used for data management. Authentication relies on JWT tokens stored in cookies, state management is handled by TanStack Query, and Wouter is employed for routing.
+The Animal House Pet Store is a full-stack, mobile-first web application. The UI/UX features a dark, bold, high-contrast design with Amazon-style image carousels. Security is implemented with JWT-based authentication and a three-tier role-based access control system. Core functionalities include customer wishlists, a CMS for animal categories, comprehensive admin order management, and sophisticated search capabilities. Advanced features encompass database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and AI-powered processing for order photo analysis, item extraction, and categorization. A robust UPC matching system integrates abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion. The frontend is built with React, Vite, TypeScript, Tailwind CSS, and shadcn/ui. The backend utilizes Express.js and TypeScript. Data management is handled by PostgreSQL and Drizzle ORM. Authentication relies on JWT tokens stored in cookies, state management uses TanStack Query, and Wouter is employed for routing.
 
 ## External Dependencies
 - PostgreSQL

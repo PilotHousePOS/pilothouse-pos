@@ -5284,7 +5284,7 @@ export default function Admin() {
     if (!isDayEnabled) return false;
     
     const blockedDates = settings.find(s => s.setting === 'blocked_dates')?.value || '';
-    const dateString = date.toISOString().split('T')[0];
+    const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     const blockedList = blockedDates.split(',').map((d: string) => d.trim()).filter((d: string) => d);
     
     if (blockedList.includes(dateString)) return false;
