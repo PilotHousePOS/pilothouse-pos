@@ -42,5 +42,3 @@ integrations = ["javascript_log_in_with_replit:1.0.0", "sendgrid:1.0.0", "google
 [userenv]
 
 [userenv.shared]
-TESTING_VITE_STRIPE_PUBLIC_KEY = "jumproof123"
-TESTING_STRIPE_SECRET_KEY = "jumproof123"
