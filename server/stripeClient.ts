@@ -1,11 +1,19 @@
 // Stripe client for Animal House Pet Store
-// Uses Replit's Stripe connection for secure credential management
+// Uses user-provided API keys, falls back to Replit connector
 
 import Stripe from 'stripe';
 
-let connectionSettings: any;
-
 async function getCredentials() {
+  const userSecretKey = process.env.STRIPE_SECRET_KEY;
+  const userPublishableKey = process.env.STRIPE_PUBLISHABLE_KEY;
+
+  if (userSecretKey && userPublishableKey) {
+    return {
+      publishableKey: userPublishableKey,
+      secretKey: userSecretKey,
+    };
+  }
+
   const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
   const xReplitToken = process.env.REPL_IDENTITY
     ? 'repl ' + process.env.REPL_IDENTITY
@@ -14,7 +22,7 @@ async function getCredentials() {
       : null;
 
   if (!xReplitToken) {
-    throw new Error('X_REPLIT_TOKEN not found for repl/depl');
+    throw new Error('Stripe API keys not configured. Please set STRIPE_SECRET_KEY and STRIPE_PUBLISHABLE_KEY.');
   }
 
   const connectorName = 'stripe';
@@ -34,8 +42,7 @@ async function getCredentials() {
   });
 
   const data = await response.json();
-  
-  connectionSettings = data.items?.[0];
+  const connectionSettings = data.items?.[0];
 
   if (!connectionSettings || (!connectionSettings.settings.publishable || !connectionSettings.settings.secret)) {
     throw new Error(`Stripe ${targetEnvironment} connection not found`);
@@ -47,7 +54,6 @@ async function getCredentials() {
   };
 }
 
-// Get a fresh Stripe client - never cache this
 export async function getUncachableStripeClient() {
   const { secretKey } = await getCredentials();
 
@@ -56,19 +62,16 @@ export async function getUncachableStripeClient() {
   });
 }
 
-// Get publishable key for client-side operations
 export async function getStripePublishableKey() {
   const { publishableKey } = await getCredentials();
   return publishableKey;
 }
 
-// Get secret key for server-side operations
 export async function getStripeSecretKey() {
   const { secretKey } = await getCredentials();
   return secretKey;
 }
 
-// StripeSync singleton for webhook processing and data sync
 let stripeSync: any = null;
 
 export async function getStripeSync() {
