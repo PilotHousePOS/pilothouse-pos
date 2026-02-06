@@ -5001,6 +5001,20 @@ export default function Admin() {
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
 
+  const bookingSelectedDateStr = bookingSelectedDate 
+    ? `${bookingSelectedDate.getFullYear()}-${String(bookingSelectedDate.getMonth() + 1).padStart(2, '0')}-${String(bookingSelectedDate.getDate()).padStart(2, '0')}`
+    : '';
+  const { data: availableGroomersForBooking = [] } = useQuery<any[]>({
+    queryKey: ["/api/groomers/available-for-date", bookingSelectedDateStr],
+    queryFn: async () => {
+      if (!bookingSelectedDateStr) return [];
+      const response = await fetch(`/api/groomers/available-for-date/${bookingSelectedDateStr}`);
+      if (!response.ok) return [];
+      return response.json();
+    },
+    enabled: !!bookingSelectedDateStr,
+  });
+
   // Fetch groomer blocked days (sick days, vacation, etc.)
   const { data: groomerBlockedDays = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/groomer-blocked-days"],
@@ -8491,17 +8505,20 @@ export default function Admin() {
                                 Price: ${currentAppointment.price}
                               </p>
                             )}
-                            {currentAppointment.groomerId && (
-                              <p className="text-xs text-blue-700 font-medium mt-1" data-testid={`appointment-groomer-${currentAppointment.id}`}>
-                                Groomer: {(() => {
-                                  const groomer = groomers.find((g: any) => 
-                                    g.id === currentAppointment.groomerId || 
-                                    g.id === parseInt(currentAppointment.groomerId as any)
-                                  );
-                                  return groomer?.name || 'Unknown';
-                                })()}
-                              </p>
-                            )}
+                            {(() => {
+                              const groomerIdToShow = currentAppointment.groomerId || 
+                                (currentAppointment.pets && currentAppointment.pets[0]?.groomerId);
+                              const groomerNameFromPets = currentAppointment.pets && currentAppointment.pets[0]?.groomerName;
+                              if (!groomerIdToShow && !groomerNameFromPets) return null;
+                              const groomerName = groomerNameFromPets || groomers.find((g: any) => 
+                                g.id === groomerIdToShow || g.id === parseInt(groomerIdToShow as any)
+                              )?.name || 'Unknown';
+                              return (
+                                <p className="text-xs text-blue-700 font-medium mt-1" data-testid={`appointment-groomer-${currentAppointment.id}`}>
+                                  Groomer: {groomerName}
+                                </p>
+                              );
+                            })()}
                             <p className="text-xs text-purple-600 mt-0.5 font-medium">{hasMultiple ? 'Click purple badge to cycle through dates' : 'Click to view details'}</p>
                           </div>
                           <div className="flex flex-col gap-2 items-end">
@@ -11326,13 +11343,16 @@ export default function Admin() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">No Preference</SelectItem>
-                        {Array.isArray(groomers) && groomers.map((groomer: any) => (
+                        {Array.isArray(availableGroomersForBooking) && availableGroomersForBooking.map((groomer: any) => (
                           <SelectItem key={groomer.id} value={groomer.id.toString()}>
                             {groomer.specialties ? `${groomer.name} (${groomer.specialties})` : groomer.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    {bookingSelectedDateStr && availableGroomersForBooking.length === 0 && (
+                      <p className="text-xs text-amber-600 mt-1">No groomers available on this date</p>
+                    )}
                   </div>
 
                   <div>
@@ -11372,7 +11392,10 @@ export default function Admin() {
                 <Calendar
                   mode="single"
                   selected={bookingSelectedDate}
-                  onSelect={setBookingSelectedDate}
+                  onSelect={(date) => {
+                    setBookingSelectedDate(date);
+                    setBookingPets(prev => prev.map(pet => ({ ...pet, groomerId: '' })));
+                  }}
                   disabled={(date) => !isBookingDateAvailable(date)}
                   className="rounded-md border flex-shrink-0"
                   components={{

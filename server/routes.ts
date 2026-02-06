@@ -3960,6 +3960,20 @@ West Monroe LA 71291
         }
       }
       
+      // Validate groomer availability for the selected date
+      const appointmentDateObj = new Date(appointmentDateStr + 'T00:00:00');
+      const appointmentDayOfWeek = appointmentDateObj.getDay();
+      for (const pet of petsArray) {
+        if (pet.groomerId) {
+          const groomer = await storage.getGroomer(pet.groomerId);
+          if (groomer && groomer.offDays && groomer.offDays.includes(appointmentDayOfWeek)) {
+            return res.status(400).json({
+              message: `${groomer.name} is not available on ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][appointmentDayOfWeek]}s. Please select a different groomer or date.`
+            });
+          }
+        }
+      }
+      
       // For multi-pet appointments, use first pet's info in main record for backward compatibility
       const firstPet = petsArray[0];
       const petNamesStr = petsArray.map((p: any) => p.petName).join(', ');
@@ -4009,6 +4023,7 @@ West Monroe LA 71291
         parsedPrice = parts.reduce((sum: number, p: string) => sum + (parseFloat(p) || 0), 0).toString();
       }
       
+      const firstGroomerId = firstPet.groomerId || req.body.groomerId || null;
       const appointmentData = insertAppointmentSchema.parse({ 
         ...req.body,
         price: parsedPrice,
@@ -4017,6 +4032,7 @@ West Monroe LA 71291
         petType: firstPet.petType,
         serviceType: firstPet.serviceType,
         specialNotes: firstPet.specialNotes,
+        groomerId: firstGroomerId,
         userId,
         isApproved: true,
         status: 'confirmed'

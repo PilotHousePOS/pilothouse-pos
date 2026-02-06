@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first web application for online retail, specializing in exotic reptiles, pet supplies, and grooming services. Its primary goal is to deliver an intuitive user experience, streamline product and service management, and ensure secure transactions. The project aims to become a leading online destination for exotic pet enthusiasts through advanced inventory management, efficient scheduling, and robust customer engagement, with a strong focus on data accuracy and user experience.
+The Animal House Pet Store is a mobile-first web application specializing in online retail of exotic reptiles, pet supplies, and grooming services. Its core purpose is to provide an intuitive user experience, streamline product and service management, and ensure secure transactions. The project aims to be a leading online destination for exotic pet enthusiasts through advanced inventory management, efficient scheduling, robust customer engagement, secure transactions, and comprehensive administrative tools, focusing on a dark, bold, high-contrast aesthetic.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -20,7 +20,7 @@ The Animal House Pet Store is a mobile-first web application for online retail, 
 - Product Recommendations ("You May Also Like"): Smart cross-category recommendations based on product type.
 - Extended Product Information: Sourced from reliable retailers (Chewy, Amazon, manufacturer websites).
 - Data Quality Validation Rules:
-  - Wet vs Dry Food Ingredients: Wet food (cans, stews, broths, entrees) ingredients differ significantly from dry food (kibble, bags). Never copy dry food ingredients to wet food products.
+  - Wet vs Dry Food Ingredients: Wet food (cans, stews, broths, broths, entrees) ingredients differ significantly from dry food (kibble, bags). Never copy dry food ingredients to wet food products.
   - Product Format Detection Rules:
     - Bone broth toppers (Come-Pooch-A): Must start with "[protein] bone broth" (e.g., "Turkey bone broth, liquid Lactobacillus...")
     - Canned wet food (13oz, 5.5oz cans): Must start with "[protein], [protein] broth" (e.g., "Chicken, chicken broth, chicken liver...")
@@ -40,6 +40,7 @@ The Animal House Pet Store is a mobile-first web application for online retail, 
   - Step 2: Copy ingredients EXACTLY as shown on manufacturer website (including order and spelling)
   - Step 3: Copy guaranteed analysis table with exact percentages from manufacturer
   - Step 4: Only then run UPDATE query with verified data
+  - Step 5: NEVER mark task complete until verification passes
 - Multi-Image Collection Strategy:
   - Pull ALL available product photos from Amazon, Chewy, or manufacturer websites
   - Image order matters: First image = main display, subsequent images append in carousel order
@@ -48,8 +49,8 @@ The Animal House Pet Store is a mobile-first web application for online retail, 
   - **SIZE = FORMAT (MANDATORY):**
     - oz sizes (2.8oz, 2.9oz, 5.5oz, 5.8oz, 12.8oz, 13oz) = CAN/WET FOOD - Must show can image
     - lb sizes (3.5lb, 7lb, 15.5lb, 22lb, 30lb) = BAG/DRY FOOD - Must show bag image
-    - NEVER show a bag image for an oz-sized product (e.g., 5.8oz is a CAN, not a bag!)
-    - NEVER show a can image for a lb-sized product (e.g., 7lb is a BAG, not a can!)
+    - NEVER show a bag image for an oz-sized product (e.8., 5.8oz is a CAN, not a bag!)
+    - NEVER show a can image for a lb-sized product (e.8., 7lb is a BAG, not a can!)
   - **EXACT SIZE MATCHING:**
     - 5.8oz can ≠ 13oz can - Different can sizes have different images
     - Search for exact weight match on manufacturer website
@@ -182,9 +183,11 @@ Step 5: NEVER mark task complete until verification passes
 - **Pro Plan**: https://purina.com/pro-plan/
 
 ## System Architecture
-The Animal House Pet Store is a full-stack, mobile-first web application. The UI/UX features a dark, bold, high-contrast design with Amazon-style image carousels. Key technical implementations include a universal admin dashboard, inventory tracking, multi-image uploads, and advanced appointment scheduling with 15-minute intervals, admin approval, notifications, and Google Calendar synchronization. Security is managed with JWT-based authentication and three-tier role-based access control. The system supports customer wishlists, a CMS for animal categories, comprehensive admin order management, and sophisticated search functionalities. Advanced capabilities encompass database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and admin dashboards. AI-powered processing handles order photo analysis, item extraction, and categorization. A robust UPC matching system includes abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
+The Animal House Pet Store is a full-stack, mobile-first web application featuring a dark, bold, high-contrast UI/UX with Amazon-style image carousels. Key architectural decisions include a universal admin dashboard, inventory tracking, multi-image uploads, and advanced appointment scheduling with 15-minute intervals, admin approval, notifications, and Google Calendar synchronization. Security is managed via JWT-based authentication and a three-tier role-based access control system.
 
-The technology stack is built with React, Vite, TypeScript, Tailwind CSS, and shadcn/ui for the frontend, and Express.js with TypeScript for the backend. PostgreSQL with Drizzle ORM is used for the database. Authentication relies on JWT tokens stored in cookies, state management uses TanStack Query, and routing is handled by Wouter. Development adheres to strict TypeScript standards, proper HTTP status codes, and environment-aware configurations.
+Core features include customer wishlists, a CMS for animal categories, comprehensive admin order management, and sophisticated search functionalities. Advanced capabilities encompass database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and AI-powered processing for order photo analysis, item extraction, and categorization. A robust UPC matching system integrates abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
+
+The frontend is built with React, Vite, TypeScript, Tailwind CSS, and shadcn/ui. The backend utilizes Express.js and TypeScript. PostgreSQL and Drizzle ORM are used for data management. Authentication relies on JWT tokens stored in cookies, state management is handled by TanStack Query, and Wouter is employed for routing.
 
 ## External Dependencies
 - PostgreSQL
