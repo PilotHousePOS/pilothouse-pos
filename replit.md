@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first web application for online retail of exotic reptiles, pet supplies, and grooming services. It aims to provide an intuitive user experience, streamline product and service management, and ensure secure transactions. The project's vision is to become a leading online destination for exotic pet enthusiasts by offering advanced inventory management, efficient scheduling, and robust customer engagement, coupled with sophisticated features for product data management and customer interaction.
+The Animal House Pet Store is a mobile-first web application for online retail, specializing in exotic reptiles, pet supplies, and grooming services. Its primary goal is to deliver an intuitive user experience, streamline product and service management, and ensure secure transactions. The project aims to become a leading online destination for exotic pet enthusiasts through advanced inventory management, efficient scheduling, and robust customer engagement, with a strong focus on data accuracy and user experience.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -182,16 +182,9 @@ Step 5: NEVER mark task complete until verification passes
 - **Pro Plan**: https://purina.com/pro-plan/
 
 ## System Architecture
-The Animal House Pet Store is a full-stack, mobile-first web application designed with a dark, bold, high-contrast UI/UX and Amazon-style image carousels. It features a universal admin dashboard, inventory tracking, multi-image uploads, and advanced appointment scheduling with 15-minute intervals, admin approval, notifications, and Google Calendar synchronization. Security is handled via JWT-based authentication with three-tier role-based access control. The system includes customer wishlists, a CMS for animal categories, comprehensive admin order management, and sophisticated search functionalities. Advanced management capabilities encompass database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and admin dashboards. AI-powered processing handles order photo analysis, item extraction, and categorization. A robust UPC matching system incorporates abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
+The Animal House Pet Store is a full-stack, mobile-first web application. The UI/UX features a dark, bold, high-contrast design with Amazon-style image carousels. Key technical implementations include a universal admin dashboard, inventory tracking, multi-image uploads, and advanced appointment scheduling with 15-minute intervals, admin approval, notifications, and Google Calendar synchronization. Security is managed with JWT-based authentication and three-tier role-based access control. The system supports customer wishlists, a CMS for animal categories, comprehensive admin order management, and sophisticated search functionalities. Advanced capabilities encompass database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and admin dashboards. AI-powered processing handles order photo analysis, item extraction, and categorization. A robust UPC matching system includes abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
 
-The technology stack includes:
-- **Frontend**: React, Vite, TypeScript, Tailwind CSS, shadcn/ui.
-- **Backend**: Express.js, TypeScript.
-- **Database**: PostgreSQL with Drizzle ORM.
-- **Authentication**: JWT tokens stored in cookies.
-- **State Management**: TanStack Query.
-- **Routing**: Wouter.
-- **Development Practices**: Strict TypeScript standards, proper HTTP status codes, and environment-aware configurations.
+The technology stack is built with React, Vite, TypeScript, Tailwind CSS, and shadcn/ui for the frontend, and Express.js with TypeScript for the backend. PostgreSQL with Drizzle ORM is used for the database. Authentication relies on JWT tokens stored in cookies, state management uses TanStack Query, and routing is handled by Wouter. Development adheres to strict TypeScript standards, proper HTTP status codes, and environment-aware configurations.
 
 ## External Dependencies
 - PostgreSQL
