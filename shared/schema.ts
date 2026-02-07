@@ -34,7 +34,7 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
-  phoneNumber: varchar("phone_number", { length: 20 }),
+  phoneNumber: varchar("phone_number", { length: 100 }),
   isAdmin: boolean("is_admin").default(false),
   isGroomer: boolean("is_groomer").default(false),
   totalSpent: decimal("total_spent", { precision: 10, scale: 2 }).default("0"),
@@ -382,7 +382,7 @@ export const contacts = pgTable("contacts", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }), // Optional - use phone as placeholder if not provided
-  phoneNumber: varchar("phone_number", { length: 20 }),
+  phoneNumber: varchar("phone_number", { length: 100 }),
   petNames: text("pet_names").array(), // Array of pet names from appointments
   notes: text("notes"),
   animalType: varchar("animal_type", { length: 100 }), // dog, cat, bird, reptile, etc.
@@ -398,7 +398,7 @@ export const contacts = pgTable("contacts", {
 export const smsLogs = pgTable("sms_logs", {
   id: serial("id").primaryKey(),
   contactId: integer("contact_id").references(() => contacts.id, { onDelete: "set null" }),
-  phoneNumber: varchar("phone_number", { length: 20 }).notNull(),
+  phoneNumber: varchar("phone_number", { length: 100 }).notNull(),
   message: text("message").notNull(),
   status: varchar("status", { length: 20 }).notNull(), // sent, failed, bounced
   errorMessage: text("error_message"), // Error details if failed
@@ -890,7 +890,7 @@ export const astroCustomers = pgTable("astro_customers", {
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   astroCustomerId: varchar("astro_customer_id", { length: 255 }).notNull().unique(), // Astro's customer ID
   email: varchar("email", { length: 255 }).notNull(), // Email used in Astro (required by Astro)
-  phoneNumber: varchar("phone_number", { length: 20 }), // Phone number in Astro
+  phoneNumber: varchar("phone_number", { length: 100 }), // Phone number in Astro
   loyaltyPoints: integer("loyalty_points").default(0), // Current loyalty points balance
   lastSyncedAt: timestamp("last_synced_at"), // Last time we synced with Astro API
   syncStatus: varchar("sync_status", { length: 50 }).default("pending"), // pending, synced, error
