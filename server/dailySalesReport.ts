@@ -77,17 +77,19 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
     return orderDateStr === todayDateStr;
   });
 
-  // Separate completed and refunded orders
   const completedOrders = todaysOrders.filter(order => order.status !== 'refunded');
   const refundedOrders = todaysOrders.filter(order => order.status === 'refunded');
   
-  // Calculate totals from completed orders only
   let total = 0;
   let subtotal = 0;
   let totalTax = 0;
   let totalItems = 0;
   let totalLoyaltyDiscounts = 0;
   let loyaltyDiscountCount = 0;
+  let totalConvenienceFees = 0;
+  let convenienceFeeCount = 0;
+  let cardPaymentCount = 0;
+  let cardPaymentTotal = 0;
   const categorySales: Map<string, CategorySales> = new Map();
   
   for (const order of completedOrders) {
@@ -98,10 +100,21 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
     const orderSubtotal = parseFloat((order as any).subtotal) || orderTotal;
     const orderTax = parseFloat((order as any).taxAmount) || 0;
     const loyaltyDiscount = parseFloat((order as any).loyaltyDiscount) || 0;
+    const convenienceFee = parseFloat((order as any).convenienceFee) || 0;
     
     total += orderTotal;
     subtotal += orderSubtotal;
     totalTax += orderTax;
+    
+    if (convenienceFee > 0) {
+      totalConvenienceFees += convenienceFee;
+      convenienceFeeCount++;
+    }
+    
+    if ((order as any).paymentStatus === 'paid' || (order as any).stripePaymentIntentId) {
+      cardPaymentCount++;
+      cardPaymentTotal += orderTotal;
+    }
     
     if (loyaltyDiscount > 0) {
       totalLoyaltyDiscounts += loyaltyDiscount;
@@ -113,7 +126,6 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
       totalItems += item.quantity || 1;
       const itemPrice = (parseFloat(item.price) || 0) * (item.quantity || 1);
       
-      // Categorize by item type (simplified categories)
       let category = 'Misc.';
       const itemName = (item.itemName || '').toLowerCase();
       
@@ -150,22 +162,64 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
     }
   }
 
-  // Calculate refunded amount
-  const refundedTotal = refundedOrders.reduce((sum, order) => sum + (parseFloat(order.totalAmount) || 0), 0);
-  const refundedTax = refundedOrders.reduce((sum, order) => sum + (parseFloat((order as any).taxAmount) || 0), 0);
+  // Get actual refund records for today (more accurate than just order status)
+  const todayStart = new Date(today);
+  todayStart.setHours(0, 0, 0, 0);
+  const todayEnd = new Date(today);
+  todayEnd.setHours(23, 59, 59, 999);
   
-  // Average ticket (from completed orders only, guard against zero)
+  let todaysRefunds: any[] = [];
+  try {
+    todaysRefunds = await storage.getRefundsByDateRange(todayStart, todayEnd);
+  } catch (e) {
+    // Fallback if method not available
+  }
+  
+  const refundSubtotal = todaysRefunds.reduce((sum, r) => sum + (parseFloat(r.subtotalRefunded) || 0), 0);
+  const refundTax = todaysRefunds.reduce((sum, r) => sum + (parseFloat(r.taxRefunded) || 0), 0);
+  const refundTotal = todaysRefunds.reduce((sum, r) => sum + (parseFloat(r.totalRefunded) || 0), 0);
+  const refundCount = todaysRefunds.length;
+  
+  // Fallback to order-level refund data if no refund records found
+  const refundedTotal = refundCount > 0 ? refundTotal : refundedOrders.reduce((sum, order) => sum + (parseFloat(order.totalAmount) || 0), 0);
+  const refundedTaxTotal = refundCount > 0 ? refundTax : refundedOrders.reduce((sum, order) => sum + (parseFloat((order as any).taxAmount) || 0), 0);
+  const refundedSubtotalTotal = refundCount > 0 ? refundSubtotal : refundedOrders.reduce((sum, order) => sum + (parseFloat((order as any).subtotal) || 0), 0);
+  const totalRefundCount = refundCount > 0 ? refundCount : refundedOrders.length;
+
+  // Convenience fees refunded - look at orders that had full refunds today
+  let convenienceFeesRefunded = 0;
+  for (const refund of todaysRefunds) {
+    if (refund.refundType === 'full' && refund.orderId) {
+      try {
+        const refundOrder = await storage.getOrder(refund.orderId);
+        if (refundOrder?.convenienceFee) {
+          convenienceFeesRefunded += parseFloat(refundOrder.convenienceFee) || 0;
+        }
+      } catch (e) {}
+    }
+  }
+  const netConvenienceFees = totalConvenienceFees - convenienceFeesRefunded;
+
+  // Stripe processing fees (2.9% + $0.30 per transaction on the total charged)
+  // This is what Stripe charges YOU - it's a tax-deductible business expense
+  const stripeProcessingFees = cardPaymentCount > 0 
+    ? (cardPaymentTotal * 0.029) + (cardPaymentCount * 0.30)
+    : 0;
+  
+  // Net revenue calculations
+  const grossRevenue = subtotal; // Product sales before tax
+  const netAfterRefunds = grossRevenue - refundedSubtotalTotal;
+  const estimatedStripePayout = total - refundedTotal - stripeProcessingFees;
+
   const transactionCount = completedOrders.length;
   const avgTicket = transactionCount > 0 ? total / transactionCount : 0;
 
-  // Sort categories by total
   const sortedCategories = Array.from(categorySales.values()).sort((a, b) => b.total - a.total);
   const categoryTotal = sortedCategories.reduce((sum, cat) => sum + cat.total, 0);
 
-  // Build the receipt-style HTML
   const receiptStyle = `
     font-family: 'Courier New', Courier, monospace;
-    max-width: 400px;
+    max-width: 420px;
     margin: 0 auto;
     background-color: #ffffff;
     padding: 20px;
@@ -196,7 +250,6 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
     </tr>
   `;
 
-  // Handle no orders case
   const noOrdersMessage = transactionCount === 0 ? `
     <tr>
       <td colspan="3" style="text-align: center; padding: 20px; color: #666; font-style: italic;">
@@ -209,7 +262,7 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
     <div style="${receiptStyle}">
       <!-- Header -->
       <div style="text-align: center; margin-bottom: 16px;">
-        <div style="font-size: 24px; font-weight: bold; margin-bottom: 8px;">🐾 Animal House</div>
+        <div style="font-size: 24px; font-weight: bold; margin-bottom: 8px;">&#128062; Animal House</div>
         <div style="font-size: 12px;">
           <strong>ANIMAL HOUSE LLC</strong><br>
           2934 Cypress St<br>
@@ -233,9 +286,10 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
         ${headerRow('', 'Total $', 'Count #')}
         ${dataRow('Transactions', formatCurrency(total + totalLoyaltyDiscounts), String(transactionCount))}
         ${dataRow('Loyalty Discounts', totalLoyaltyDiscounts > 0 ? `-${formatCurrency(totalLoyaltyDiscounts)}` : '0.00', String(loyaltyDiscountCount))}
-        ${dataRow('Subtotal', formatCurrency(subtotal), '')}
+        ${dataRow('Subtotal', formatCurrency(subtotal), String(totalItems) + ' items')}
         ${dataRow('Taxes (10.99%)', formatCurrency(totalTax), '')}
-        ${dataRow('<strong>Total</strong>', `<strong>${formatCurrency(total)}</strong>`, '')}
+        ${dataRow('Convenience Fees', formatCurrency(totalConvenienceFees), String(convenienceFeeCount))}
+        ${dataRow('<strong>Total Collected</strong>', `<strong>${formatCurrency(total)}</strong>`, '')}
         <tr><td colspan="3" style="padding: 8px 0;"></td></tr>
         ${dataRow('Avg. Ticket', formatCurrency(avgTicket), '')}
         ` : ''}
@@ -270,41 +324,71 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
         ${dataRow('Online Sales', formatCurrency(total), '100.00%')}
         ${dataRow('<strong>Total</strong>', `<strong>${formatCurrency(total)}</strong>`, '')}
         
-        ${sectionHeader('Taxes')}
+        ${sectionHeader('Taxes Collected')}
         ${headerRow('', 'Total $', 'Rate %')}
         ${dataRow('State Tax (5.00%)', formatCurrency(totalTax * 0.4549), '5.0000%')}
-        ${dataRow('Federal Tax (5.99%)', formatCurrency(totalTax * 0.5451), '5.9900%')}
+        ${dataRow('Parish Tax (5.99%)', formatCurrency(totalTax * 0.5451), '5.9900%')}
         ${dataRow('<strong>Total Tax</strong>', `<strong>${formatCurrency(totalTax)}</strong>`, '10.9900%')}
+        ${totalRefundCount > 0 ? dataRow('Tax Refunded', `-${formatCurrency(refundedTaxTotal)}`, '') : ''}
+        ${totalRefundCount > 0 ? dataRow('<strong>Net Tax Owed</strong>', `<strong>${formatCurrency(totalTax - refundedTaxTotal)}</strong>`, '') : ''}
+        
+        ${sectionHeader('Convenience Fees (Revenue)')}
+        ${headerRow('', 'Total $', 'Count #')}
+        ${dataRow('Fees Collected', formatCurrency(totalConvenienceFees), String(convenienceFeeCount))}
+        ${convenienceFeesRefunded > 0 ? dataRow('Fees Refunded', `-${formatCurrency(convenienceFeesRefunded)}`, '') : ''}
+        ${convenienceFeesRefunded > 0 ? dataRow('<strong>Net Fees</strong>', `<strong>${formatCurrency(netConvenienceFees)}</strong>`, '') : ''}
+        <tr>
+          <td colspan="3" style="text-align: center; padding: 4px; color: #666; font-size: 11px;">
+            Convenience fees are pass-through revenue (2.9% + $0.30)
+          </td>
+        </tr>
+        
+        ${sectionHeader('Stripe Processing Fees (Expense)')}
+        ${headerRow('', 'Total $', 'Count #')}
+        ${dataRow('Processing Fees', formatCurrency(stripeProcessingFees), String(cardPaymentCount))}
+        <tr>
+          <td colspan="3" style="text-align: center; padding: 4px; color: #666; font-size: 11px;">
+            Tax-deductible business expense (est. 2.9% + $0.30/txn)
+          </td>
+        </tr>
         
         ${sectionHeader('Payments')}
         ${headerRow('', 'Total $', 'Sales %')}
-        ${dataRow('Credit (Online)', formatCurrency(total), '100.00%')}
+        ${dataRow('Credit Card (Online)', formatCurrency(cardPaymentTotal), cardPaymentCount > 0 ? formatPercent(cardPaymentTotal, total) : '0.00%')}
+        ${total - cardPaymentTotal > 0 ? dataRow('Other/Pending', formatCurrency(total - cardPaymentTotal), formatPercent(total - cardPaymentTotal, total)) : ''}
         
-        ${sectionHeader('Refunded Payments')}
+        ${sectionHeader('Refunds')}
         ${headerRow('', 'Total $', 'Count #')}
-        ${dataRow('Total', formatCurrency(refundedTotal), String(refundedOrders.length))}
+        ${dataRow('Subtotal Refunded', formatCurrency(refundedSubtotalTotal), String(totalRefundCount))}
+        ${dataRow('Tax Refunded', formatCurrency(refundedTaxTotal), '')}
+        ${dataRow('<strong>Total Refunded</strong>', `<strong>${formatCurrency(refundedTotal)}</strong>`, '')}
         
         ${sectionHeader('Settlement')}
         ${headerRow('', 'Total $', 'Count #')}
         ${dataRow('Credit Sales', formatCurrency(total), String(transactionCount))}
-        ${dataRow('Credit Refunds', formatCurrency(refundedTotal), String(refundedOrders.length))}
+        ${dataRow('Credit Refunds', `-${formatCurrency(refundedTotal)}`, String(totalRefundCount))}
         ${dataRow('<strong>Net Credit</strong>', `<strong>${formatCurrency(total - refundedTotal)}</strong>`, '')}
         
-        ${sectionHeader('Online Credit Card Trans.')}
-        ${headerRow('', 'Total $', 'Count #')}
-        ${dataRow('All Online Payments', formatCurrency(total), String(transactionCount))}
-        <tr>
-          <td colspan="3" style="text-align: center; padding: 8px; color: #666; font-size: 11px;">
-            (Card type breakdown not available for online orders)
-          </td>
-        </tr>
+        ${sectionHeader('Financial Summary')}
+        ${headerRow('', 'Total $', '')}
+        ${dataRow('Gross Product Sales', formatCurrency(grossRevenue), '')}
+        ${dataRow('Sales Tax Collected', formatCurrency(totalTax), '')}
+        ${dataRow('Convenience Fees Collected', formatCurrency(totalConvenienceFees), '')}
+        ${dataRow('<strong>Total Collected</strong>', `<strong>${formatCurrency(total)}</strong>`, '')}
+        <tr><td colspan="3" style="padding: 4px 0;"></td></tr>
+        ${dataRow('Less: Refunds', `-${formatCurrency(refundedTotal)}`, '')}
+        ${dataRow('Less: Stripe Fees (est.)', `-${formatCurrency(stripeProcessingFees)}`, '')}
+        ${dataRow('<strong>Est. Stripe Payout</strong>', `<strong>${formatCurrency(estimatedStripePayout > 0 ? estimatedStripePayout : 0)}</strong>`, '')}
+        <tr><td colspan="3" style="padding: 4px 0;"></td></tr>
+        ${dataRow('<strong>Net Product Revenue</strong>', `<strong>${formatCurrency(netAfterRefunds > 0 ? netAfterRefunds : 0)}</strong>`, '')}
+        ${dataRow('Net Tax Owed', formatCurrency(totalTax - refundedTaxTotal), '')}
+        ${totalLoyaltyDiscounts > 0 ? dataRow('Loyalty Discounts Given', `-${formatCurrency(totalLoyaltyDiscounts)}`, '') : ''}
         
-        ${sectionHeader('Summary')}
-        ${headerRow('', 'Total $', 'Count #')}
-        ${dataRow('Credit Sales', formatCurrency(total), String(transactionCount))}
-        ${totalLoyaltyDiscounts > 0 ? dataRow('Loyalty Discounts Applied', `-${formatCurrency(totalLoyaltyDiscounts)}`, String(loyaltyDiscountCount)) : ''}
-        ${dataRow('Credit Refunds', `-${formatCurrency(refundedTotal)}`, String(refundedOrders.length))}
-        ${dataRow('<strong>Net Online Sales</strong>', `<strong>${formatCurrency(total - refundedTotal)}</strong>`, '')}
+        ${sectionHeader('Tax Remittance Summary')}
+        ${headerRow('', 'Collected $', 'Refunded $')}
+        ${dataRow('State Tax (5.00%)', formatCurrency(totalTax * 0.4549), formatCurrency(refundedTaxTotal * 0.4549))}
+        ${dataRow('Parish Tax (5.99%)', formatCurrency(totalTax * 0.5451), formatCurrency(refundedTaxTotal * 0.5451))}
+        ${dataRow('<strong>Net Tax Due</strong>', `<strong>${formatCurrency(totalTax - refundedTaxTotal)}</strong>`, '')}
         ` : ''}
         
       </table>
@@ -316,11 +400,11 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
         <p style="margin: 4px 0;"><strong>Online Sales Report</strong> - Animal House Pet Store</p>
         <p style="margin: 4px 0;">This report shows online orders only.</p>
         <p style="margin: 4px 0;">Combine with POS daily report for full reconciliation.</p>
+        <p style="margin: 4px 0;">Stripe fees are estimated. Verify in Stripe Dashboard for exact amounts.</p>
       </div>
     </div>
   `;
 
-  // Plain text version
   const textBody = transactionCount === 0 
     ? `
 ANIMAL HOUSE LLC
@@ -352,16 +436,31 @@ End: ${startDateStr} 11:59PM
                           Total $    Count #
 Transactions              ${formatCurrency(total + totalLoyaltyDiscounts).padStart(10)}    ${String(transactionCount).padStart(5)}
 Loyalty Discounts         ${(totalLoyaltyDiscounts > 0 ? '-' + formatCurrency(totalLoyaltyDiscounts) : '0.00').padStart(10)}    ${String(loyaltyDiscountCount).padStart(5)}
-Subtotal                  ${formatCurrency(subtotal).padStart(10)}
+Subtotal                  ${formatCurrency(subtotal).padStart(10)}    ${(totalItems + ' items').padStart(5)}
 Taxes (10.99%)            ${formatCurrency(totalTax).padStart(10)}
-Total                     ${formatCurrency(total).padStart(10)}
+Convenience Fees          ${formatCurrency(totalConvenienceFees).padStart(10)}    ${String(convenienceFeeCount).padStart(5)}
+Total Collected           ${formatCurrency(total).padStart(10)}
 Avg. Ticket               ${formatCurrency(avgTicket).padStart(10)}
 
--- Taxes --
+-- Taxes Collected --
                           Total $    Rate %
 State Tax                 ${formatCurrency(totalTax * 0.4549).padStart(10)}    5.0000%
-Federal Tax               ${formatCurrency(totalTax * 0.5451).padStart(10)}    5.9900%
+Parish Tax                ${formatCurrency(totalTax * 0.5451).padStart(10)}    5.9900%
 Total Tax                 ${formatCurrency(totalTax).padStart(10)}   10.9900%
+${totalRefundCount > 0 ? `Tax Refunded             -${formatCurrency(refundedTaxTotal).padStart(10)}
+Net Tax Owed              ${formatCurrency(totalTax - refundedTaxTotal).padStart(10)}` : ''}
+
+-- Convenience Fees (Revenue) --
+                          Total $    Count #
+Fees Collected            ${formatCurrency(totalConvenienceFees).padStart(10)}    ${String(convenienceFeeCount).padStart(5)}
+${convenienceFeesRefunded > 0 ? `Fees Refunded            -${formatCurrency(convenienceFeesRefunded).padStart(10)}
+Net Fees                  ${formatCurrency(netConvenienceFees).padStart(10)}` : ''}
+  (Pass-through revenue: 2.9% + $0.30)
+
+-- Stripe Processing Fees (Expense) --
+                          Total $    Count #
+Processing Fees           ${formatCurrency(stripeProcessingFees).padStart(10)}    ${String(cardPaymentCount).padStart(5)}
+  (Tax-deductible business expense, est. 2.9% + $0.30/txn)
 
 -- Gross Sales By Category --
                           Total $    Sales %
@@ -372,25 +471,47 @@ Total                     ${formatCurrency(categoryTotal).padStart(10)}
 
 -- Payments --
                           Total $    Sales %
-Credit (Online)           ${formatCurrency(total).padStart(10)}   100.00%
+Credit Card (Online)      ${formatCurrency(cardPaymentTotal).padStart(10)}   ${cardPaymentCount > 0 ? formatPercent(cardPaymentTotal, total) : '0.00%'}
+${total - cardPaymentTotal > 0 ? `Other/Pending             ${formatCurrency(total - cardPaymentTotal).padStart(10)}   ${formatPercent(total - cardPaymentTotal, total)}` : ''}
+
+-- Refunds --
+                          Total $    Count #
+Subtotal Refunded         ${formatCurrency(refundedSubtotalTotal).padStart(10)}    ${String(totalRefundCount).padStart(5)}
+Tax Refunded              ${formatCurrency(refundedTaxTotal).padStart(10)}
+Total Refunded            ${formatCurrency(refundedTotal).padStart(10)}
 
 -- Settlement --
                           Total $    Count #
 Credit Sales              ${formatCurrency(total).padStart(10)}    ${String(transactionCount).padStart(5)}
-Credit Refunds            ${formatCurrency(refundedTotal).padStart(10)}    ${String(refundedOrders.length).padStart(5)}
+Credit Refunds           -${formatCurrency(refundedTotal).padStart(10)}    ${String(totalRefundCount).padStart(5)}
 Net Credit                ${formatCurrency(total - refundedTotal).padStart(10)}
 
--- Summary --
-                          Total $    Count #
-Credit Sales              ${formatCurrency(total).padStart(10)}    ${String(transactionCount).padStart(5)}${totalLoyaltyDiscounts > 0 ? `
-Loyalty Discounts        -${formatCurrency(totalLoyaltyDiscounts).padStart(10)}    ${String(loyaltyDiscountCount).padStart(5)}` : ''}
-Credit Refunds           -${formatCurrency(refundedTotal).padStart(10)}    ${String(refundedOrders.length).padStart(5)}
-Net Online Sales          ${formatCurrency(total - refundedTotal).padStart(10)}
+-- Financial Summary --
+                          Total $
+Gross Product Sales       ${formatCurrency(grossRevenue).padStart(10)}
+Sales Tax Collected       ${formatCurrency(totalTax).padStart(10)}
+Convenience Fees          ${formatCurrency(totalConvenienceFees).padStart(10)}
+Total Collected           ${formatCurrency(total).padStart(10)}
+
+Less: Refunds            -${formatCurrency(refundedTotal).padStart(10)}
+Less: Stripe Fees (est.) -${formatCurrency(stripeProcessingFees).padStart(10)}
+Est. Stripe Payout        ${formatCurrency(estimatedStripePayout > 0 ? estimatedStripePayout : 0).padStart(10)}
+
+Net Product Revenue       ${formatCurrency(netAfterRefunds > 0 ? netAfterRefunds : 0).padStart(10)}
+Net Tax Owed              ${formatCurrency(totalTax - refundedTaxTotal).padStart(10)}
+${totalLoyaltyDiscounts > 0 ? `Loyalty Discounts Given   -${formatCurrency(totalLoyaltyDiscounts).padStart(10)}` : ''}
+
+-- Tax Remittance Summary --
+                       Collected    Refunded
+State Tax (5.00%)      ${formatCurrency(totalTax * 0.4549).padStart(10)}  -${formatCurrency(refundedTaxTotal * 0.4549).padStart(10)}
+Parish Tax (5.99%)     ${formatCurrency(totalTax * 0.5451).padStart(10)}  -${formatCurrency(refundedTaxTotal * 0.5451).padStart(10)}
+Net Tax Due            ${formatCurrency(totalTax - refundedTaxTotal).padStart(10)}
 
 ---
 Animal House Pet Store - Daily Online Sales Report
 This report shows online orders only.
 Combine with POS daily report for full reconciliation.
+Stripe fees are estimated. Verify in Stripe Dashboard for exact amounts.
   `;
 
   const todayStr = today.toLocaleDateString('en-US', { 

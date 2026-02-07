@@ -8334,17 +8334,13 @@ export default function Admin() {
                           };
                         });
                         
-                        const convFeeAmount = includeConvenienceFee && selectedOrderForRefund.convenienceFee 
-                          ? parseFloat(selectedOrderForRefund.convenienceFee) : 0;
-                        
                         createRefundMutation.mutate({
                           orderId: selectedOrderForRefund.id,
                           items: refundItemsData,
                           reason: refundReason || 'Customer request',
                           notes: refundNotes,
                           refundType: includeConvenienceFee ? 'full' : 'partial',
-                          includeConvenienceFee: convFeeAmount > 0,
-                          convenienceFeeAmount: convFeeAmount.toFixed(2),
+                          includeConvenienceFee: includeConvenienceFee,
                         });
                         
                         setRefundModalOpen(false);
