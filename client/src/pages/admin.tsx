@@ -496,11 +496,49 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                               </div>
                             </div>
                             
-                            {/* Right side - Contact Notes and Badge */}
+                            {/* Right side - Badge, Here/Done toggles, Contact Notes */}
                             <div className="flex flex-col items-end gap-2 flex-shrink-0">
                               <Badge variant="default" className="bg-green-600">
                                 Grooming
                               </Badge>
+                              <div className="flex flex-col gap-1.5">
+                                <div className="flex items-center gap-1.5 px-2 py-1 border rounded bg-white">
+                                  <Checkbox
+                                    id={`cal-is-here-${appointment.id}`}
+                                    checked={appointment.isHere || false}
+                                    onCheckedChange={(checked) => {
+                                      updateAppointmentIsHereMutation.mutate({ 
+                                        id: appointment.id, 
+                                        isHere: checked as boolean 
+                                      });
+                                    }}
+                                  />
+                                  <label 
+                                    htmlFor={`cal-is-here-${appointment.id}`}
+                                    className="text-xs font-medium cursor-pointer"
+                                  >
+                                    Here
+                                  </label>
+                                </div>
+                                <div className="flex items-center gap-1.5 px-2 py-1 border rounded bg-white">
+                                  <Checkbox
+                                    id={`cal-grooming-completed-${appointment.id}`}
+                                    checked={appointment.groomingCompleted || false}
+                                    onCheckedChange={(checked) => {
+                                      updateAppointmentGroomingCompletedMutation.mutate({ 
+                                        id: appointment.id, 
+                                        groomingCompleted: !!checked 
+                                      });
+                                    }}
+                                  />
+                                  <label 
+                                    htmlFor={`cal-grooming-completed-${appointment.id}`}
+                                    className="text-xs font-medium cursor-pointer"
+                                  >
+                                    Done
+                                  </label>
+                                </div>
+                              </div>
                               {appointment.contactNotes && (
                                 <div className="w-32 sm:w-40 bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2 border border-amber-200 dark:border-amber-800">
                                   <p className="text-xs font-medium text-amber-800 dark:text-amber-300 mb-1">Notes</p>
