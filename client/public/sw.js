@@ -1,4 +1,4 @@
-const CACHE_NAME = 'animal-house-v4';
+const CACHE_NAME = 'animal-house-v5';
 const urlsToCache = [
   '/',
   '/manifest.json',
@@ -20,6 +20,9 @@ self.addEventListener('install', function(event) {
 self.addEventListener('message', function(event) {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
+  }
+  if (event.data && event.data.type === 'STORE_VAPID_KEY') {
+    self.__vapidPublicKey = event.data.key;
   }
 });
 
@@ -65,46 +68,109 @@ self.addEventListener('fetch', function(event) {
 });
 
 self.addEventListener('push', function(event) {
-  console.log('Push notification received:', event);
+  console.log('[SW] Push notification received');
   
-  if (event.data) {
-    const data = event.data.json();
-    
-    const options = {
-      body: data.body,
-      icon: data.icon || '/icons/icon-192x192.png',
-      badge: data.badge || '/icons/icon-72x72.png',
-      tag: data.tag,
-      data: { url: data.url || '/' },
-      requireInteraction: true,
-      vibrate: [200, 100, 200]
-    };
+  let notificationData = {
+    title: 'Animal House Pet Store',
+    body: 'You have a new notification',
+    icon: '/icons/icon-192x192.png',
+    badge: '/icons/icon-72x72.png',
+    tag: 'default',
+    data: { url: '/' }
+  };
 
-    event.waitUntil(
-      self.registration.showNotification(data.title, options)
-    );
+  if (event.data) {
+    try {
+      const data = event.data.json();
+      notificationData = {
+        title: data.title || notificationData.title,
+        body: data.body || notificationData.body,
+        icon: data.icon || notificationData.icon,
+        badge: data.badge || notificationData.badge,
+        tag: data.tag || notificationData.tag,
+        data: { url: data.url || '/' }
+      };
+    } catch (e) {
+      console.error('[SW] Error parsing push data:', e);
+      notificationData.body = event.data.text() || notificationData.body;
+    }
   }
+
+  const options = {
+    body: notificationData.body,
+    icon: notificationData.icon,
+    badge: notificationData.badge,
+    tag: notificationData.tag,
+    data: notificationData.data,
+    requireInteraction: true,
+    vibrate: [200, 100, 200],
+    renotify: true,
+    actions: [
+      { action: 'open', title: 'Open' },
+      { action: 'dismiss', title: 'Dismiss' }
+    ]
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(notificationData.title, options)
+  );
 });
 
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-  
-  const url = event.notification.data?.url || '/';
-  
+
+  if (event.action === 'dismiss') {
+    return;
+  }
+
+  const targetUrl = event.notification.data?.url || '/';
+  const fullUrl = new URL(targetUrl, self.location.origin).href;
+
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(windowClients) {
       for (var i = 0; i < windowClients.length; i++) {
         var client = windowClients[i];
-        if (client.url.includes(self.location.origin) && 'focus' in client) {
-          client.navigate(url);
-          return client.focus();
+        if (client.url.startsWith(self.location.origin) && 'focus' in client) {
+          return client.navigate(fullUrl).then(function(c) {
+            return c.focus();
+          });
         }
       }
-      return clients.openWindow(url);
+      return clients.openWindow(fullUrl);
     })
   );
 });
 
 self.addEventListener('notificationclose', function(event) {
-  console.log('Notification closed:', event);
+  console.log('[SW] Notification closed:', event.notification.tag);
 });
+
+self.addEventListener('pushsubscriptionchange', function(event) {
+  console.log('[SW] Push subscription changed - resubscribing');
+  
+  var subscribeOptions = event.oldSubscription ? event.oldSubscription.options : {
+    userVisibleOnly: true,
+    applicationServerKey: self.__vapidPublicKey || null
+  };
+  
+  if (!subscribeOptions || !subscribeOptions.applicationServerKey) {
+    console.warn('[SW] No applicationServerKey available for re-subscription');
+    return;
+  }
+  
+  event.waitUntil(
+    self.registration.pushManager.subscribe(subscribeOptions)
+      .then(function(subscription) {
+        return fetch('/api/push/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subscription: subscription.toJSON() }),
+          credentials: 'include'
+        });
+      })
+      .catch(function(err) {
+        console.error('[SW] Failed to resubscribe:', err);
+      })
+  );
+});
+

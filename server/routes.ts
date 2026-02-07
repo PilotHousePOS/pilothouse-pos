@@ -4135,6 +4135,75 @@ West Monroe LA 71291
         }
       }
       
+      // GROOMER DAILY FULL-GROOM LIMIT: Max 5 full grooming appointments per groomer per day
+      // Bath-only appointments do NOT count toward this limit
+      const GROOMER_DAILY_FULL_GROOM_LIMIT = 5;
+      
+      // Collect all groomer IDs assigned to full groom pets in this request
+      const groomerFullGroomCounts: Record<number, number> = {};
+      const appointmentLevelGroomerId = req.body.groomerId ? parseInt(req.body.groomerId) : null;
+      
+      for (const pet of petsArray) {
+        const serviceType = (pet.serviceType || '').toLowerCase();
+        const isFullGroom = serviceType.includes('full') || (serviceType.includes('groom') && !serviceType.includes('bath'));
+        
+        if (isFullGroom) {
+          // Per-pet groomer takes priority, then appointment-level groomer
+          const petGroomerId = pet.groomerId ? (typeof pet.groomerId === 'string' ? parseInt(pet.groomerId) : pet.groomerId) : appointmentLevelGroomerId;
+          if (petGroomerId) {
+            groomerFullGroomCounts[petGroomerId] = (groomerFullGroomCounts[petGroomerId] || 0) + 1;
+          }
+        }
+      }
+      
+      // Check each groomer's existing full groom count for this date
+      if (Object.keys(groomerFullGroomCounts).length > 0) {
+        const allAppointmentsForGroomerCheck = await storage.getAppointments();
+        const appointmentsOnDateForGroomer = allAppointmentsForGroomerCheck.filter((apt: any) => {
+          const aptDateStr = typeof apt.appointmentDate === 'string' 
+            ? apt.appointmentDate.split('T')[0] 
+            : new Date(apt.appointmentDate).toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+          return aptDateStr === appointmentDateStr && 
+                 apt.status !== 'cancelled' && 
+                 apt.status !== 'rejected';
+        });
+        
+        for (const [groomerIdStr, requestedCount] of Object.entries(groomerFullGroomCounts)) {
+          const gid = parseInt(groomerIdStr);
+          let existingFullGrooms = 0;
+          
+          for (const apt of appointmentsOnDateForGroomer) {
+            const aptPets = await storage.getAppointmentPets(apt.id);
+            if (aptPets && aptPets.length > 0) {
+              for (const p of aptPets) {
+                const pGroomerId = p.groomerId || apt.groomerId;
+                if (pGroomerId === gid) {
+                  const sType = (p.serviceType || '').toLowerCase();
+                  if (sType.includes('full') || (sType.includes('groom') && !sType.includes('bath'))) {
+                    existingFullGrooms++;
+                  }
+                }
+              }
+            } else {
+              if (apt.groomerId === gid) {
+                const sType = (apt.serviceType || '').toLowerCase();
+                if (sType.includes('full') || (sType.includes('groom') && !sType.includes('bath'))) {
+                  existingFullGrooms++;
+                }
+              }
+            }
+          }
+          
+          if (existingFullGrooms + requestedCount > GROOMER_DAILY_FULL_GROOM_LIMIT) {
+            const groomer = await storage.getGroomer(gid);
+            const remaining = Math.max(0, GROOMER_DAILY_FULL_GROOM_LIMIT - existingFullGrooms);
+            return res.status(400).json({
+              message: `${groomer?.name || 'Selected groomer'} already has ${existingFullGrooms} full groom${existingFullGrooms !== 1 ? 's' : ''} booked for this date (limit: ${GROOMER_DAILY_FULL_GROOM_LIMIT}). ${remaining > 0 ? `Only ${remaining} more full groom slot${remaining !== 1 ? 's' : ''} available.` : 'No more full groom slots available.'} Bath appointments are still available with this groomer.`
+            });
+          }
+        }
+      }
+      
       // For multi-pet appointments, use first pet's info in main record for backward compatibility
       const firstPet = petsArray[0];
       const petNamesStr = petsArray.map((p: any) => p.petName).join(', ');
@@ -5400,7 +5469,49 @@ West Monroe LA 71291
       }
       
       const groomers = await storage.getAvailableGroomersForDate(date);
-      res.json(groomers);
+      
+      const GROOMER_DAILY_FULL_GROOM_LIMIT = 5;
+      const allAppointments = await storage.getAppointments();
+      const appointmentsOnDate = allAppointments.filter((apt: any) => {
+        const aptDateStr = typeof apt.appointmentDate === 'string' 
+          ? apt.appointmentDate.split('T')[0] 
+          : new Date(apt.appointmentDate).toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+        return aptDateStr === date && 
+               apt.status !== 'cancelled' && 
+               apt.status !== 'rejected';
+      });
+      
+      const groomerFullGroomMap: Record<number, number> = {};
+      for (const apt of appointmentsOnDate) {
+        const aptPets = await storage.getAppointmentPets(apt.id);
+        if (aptPets && aptPets.length > 0) {
+          for (const p of aptPets) {
+            const pGroomerId = p.groomerId || apt.groomerId;
+            if (pGroomerId) {
+              const sType = (p.serviceType || '').toLowerCase();
+              if (sType.includes('full') || (sType.includes('groom') && !sType.includes('bath'))) {
+                groomerFullGroomMap[pGroomerId] = (groomerFullGroomMap[pGroomerId] || 0) + 1;
+              }
+            }
+          }
+        } else {
+          if (apt.groomerId) {
+            const sType = (apt.serviceType || '').toLowerCase();
+            if (sType.includes('full') || (sType.includes('groom') && !sType.includes('bath'))) {
+              groomerFullGroomMap[apt.groomerId] = (groomerFullGroomMap[apt.groomerId] || 0) + 1;
+            }
+          }
+        }
+      }
+      
+      const groomersWithAvailability = groomers.map((g: any) => ({
+        ...g,
+        fullGroomsBooked: groomerFullGroomMap[g.id] || 0,
+        fullGroomsRemaining: GROOMER_DAILY_FULL_GROOM_LIMIT - (groomerFullGroomMap[g.id] || 0),
+        fullGroomLimit: GROOMER_DAILY_FULL_GROOM_LIMIT,
+      }));
+      
+      res.json(groomersWithAvailability);
     } catch (error) {
       console.error("Error fetching available groomers for date:", error);
       res.status(500).json({ message: "Failed to fetch available groomers" });

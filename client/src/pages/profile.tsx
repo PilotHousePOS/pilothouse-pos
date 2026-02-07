@@ -62,6 +62,9 @@ export default function Profile() {
         const reg = await navigator.serviceWorker.ready;
         const vapidRes = await fetch('/api/push/vapid-key');
         const { publicKey } = await vapidRes.json();
+        if (reg.active) {
+          reg.active.postMessage({ type: 'STORE_VAPID_KEY', key: publicKey });
+        }
         const sub = await reg.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(publicKey),

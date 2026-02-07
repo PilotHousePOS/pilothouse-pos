@@ -848,15 +848,19 @@ export default function Booking() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">No Preference</SelectItem>
-              {Array.isArray(availableGroomers) && availableGroomers.map((groomer: any) => (
-                <SelectItem key={groomer.id} value={groomer.id.toString()}>
-                  {groomer.specialties ? `${groomer.name} (${groomer.specialties})` : groomer.name}
-                </SelectItem>
-              ))}
+              {Array.isArray(availableGroomers) && availableGroomers.map((groomer: any) => {
+                const remaining = groomer.fullGroomsRemaining ?? 5;
+                const isFull = remaining <= 0;
+                return (
+                  <SelectItem key={groomer.id} value={groomer.id.toString()}>
+                    {groomer.name}{groomer.specialties ? ` (${groomer.specialties})` : ''}{isFull ? ' - Full Grooms Full' : remaining < 5 ? ` - ${remaining} full groom${remaining !== 1 ? 's' : ''} left` : ''}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
           <p className="text-xs text-gray-500 mt-1">
-            Choose a preferred groomer or leave as "No Preference"
+            Choose a preferred groomer or leave as "No Preference". Each groomer can take up to 5 full grooms per day.
           </p>
         </div>
 
@@ -1028,11 +1032,15 @@ export default function Booking() {
                       <SelectItem value="default">
                         {selectedGroomer ? "Use Appointment Default" : "No Preference"}
                       </SelectItem>
-                      {Array.isArray(availableGroomers) && availableGroomers.map((groomer: any) => (
-                        <SelectItem key={groomer.id} value={groomer.id.toString()}>
-                          {groomer.specialties ? `${groomer.name} (${groomer.specialties})` : groomer.name}
-                        </SelectItem>
-                      ))}
+                      {Array.isArray(availableGroomers) && availableGroomers.map((groomer: any) => {
+                        const remaining = groomer.fullGroomsRemaining ?? 5;
+                        const isFull = remaining <= 0;
+                        return (
+                          <SelectItem key={groomer.id} value={groomer.id.toString()}>
+                            {groomer.name}{groomer.specialties ? ` (${groomer.specialties})` : ''}{isFull ? ' - Full Grooms Full' : remaining < 5 ? ` - ${remaining} full groom${remaining !== 1 ? 's' : ''} left` : ''}
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-gray-500 mt-1">
