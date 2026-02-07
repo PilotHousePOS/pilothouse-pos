@@ -8547,11 +8547,30 @@ export default function Admin() {
                                 )}
                               </div>
                             )}
-                            {currentAppointment.price && (
-                              <p className="text-xs text-green-700 font-medium mt-1" data-testid={`appointment-price-${currentAppointment.id}`}>
-                                Price: ${currentAppointment.price}
-                              </p>
-                            )}
+                            {currentAppointment.price && (() => {
+                              const price = parseFloat(currentAppointment.price);
+                              const serviceType = currentAppointment.serviceType || (currentAppointment.pets?.[0]?.serviceType) || '';
+                              const isFullGrooming = serviceType.includes('full');
+                              const defaultPrice = isFullGrooming ? 35 : 20;
+                              const isUnedited = price === defaultPrice;
+                              
+                              if (isUnedited) {
+                                const rangeSetting = isFullGrooming 
+                                  ? groomingSettings.find((s: any) => s.setting === 'full_grooming_price')?.value 
+                                  : groomingSettings.find((s: any) => s.setting === 'bath_only_price')?.value;
+                                const rangeDisplay = rangeSetting || (isFullGrooming ? '40-80' : '20-35');
+                                return (
+                                  <p className="text-xs text-amber-600 font-bold mt-1 bg-amber-50 px-2 py-1 rounded border border-amber-300" data-testid={`appointment-price-${currentAppointment.id}`}>
+                                    ⚠ Price: ${rangeDisplay} (needs update)
+                                  </p>
+                                );
+                              }
+                              return (
+                                <p className="text-xs text-green-700 font-medium mt-1" data-testid={`appointment-price-${currentAppointment.id}`}>
+                                  Price: ${currentAppointment.price}
+                                </p>
+                              );
+                            })()}
                             {(() => {
                               const groomerIdToShow = currentAppointment.groomerId || 
                                 (currentAppointment.pets && currentAppointment.pets[0]?.groomerId);
@@ -10864,14 +10883,37 @@ export default function Admin() {
                   )}
                 </div>
                 {/* Total Price Section */}
-                {selectedAppointment.price && (
-                  <div className="border-t pt-3">
-                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-                      <Label className="text-sm font-semibold text-green-800">Total Price</Label>
-                      <p className="text-xl font-bold text-green-700">${selectedAppointment.price}</p>
+                {selectedAppointment.price && (() => {
+                  const price = parseFloat(selectedAppointment.price);
+                  const serviceType = selectedAppointment.serviceType || (selectedAppointment.pets?.[0]?.serviceType) || '';
+                  const isFullGrooming = serviceType.includes('full');
+                  const defaultPrice = isFullGrooming ? 35 : 20;
+                  const isUnedited = price === defaultPrice;
+                  
+                  if (isUnedited) {
+                    const rangeSetting = isFullGrooming 
+                      ? groomingSettings.find((s: any) => s.setting === 'full_grooming_price')?.value 
+                      : groomingSettings.find((s: any) => s.setting === 'bath_only_price')?.value;
+                    const rangeDisplay = rangeSetting || (isFullGrooming ? '40-80' : '20-35');
+                    return (
+                      <div className="border-t pt-3">
+                        <div className="bg-amber-50 p-3 rounded-lg border border-amber-300">
+                          <Label className="text-sm font-semibold text-amber-800">Total Price</Label>
+                          <p className="text-xl font-bold text-amber-600">${rangeDisplay}</p>
+                          <p className="text-xs text-amber-700 font-medium mt-1">&#9888; Price not confirmed - call to verify</p>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div className="border-t pt-3">
+                      <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                        <Label className="text-sm font-semibold text-green-800">Total Price</Label>
+                        <p className="text-xl font-bold text-green-700">${selectedAppointment.price}</p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
                 <div className="border-t pt-3">
                   <h4 className="font-semibold text-gray-900 mb-2">Owner Information</h4>
                   <div className="space-y-2">
