@@ -8549,8 +8549,13 @@ export default function Admin() {
                             )}
                             {currentAppointment.price && (() => {
                               const price = parseFloat(currentAppointment.price);
-                              const serviceType = currentAppointment.serviceType || (currentAppointment.pets?.[0]?.serviceType) || '';
-                              const isFullGrooming = serviceType.includes('full');
+                              const serviceType = (currentAppointment.serviceType || (currentAppointment.pets?.[0]?.serviceType) || '').toLowerCase();
+                              const hasFullGrooming = serviceType.includes('full') || serviceType.includes('groom') && !serviceType.includes('bath');
+                              const hasPetsWithFullGrooming = currentAppointment.pets?.some((p: any) => {
+                                const st = (p.serviceType || '').toLowerCase();
+                                return st.includes('full') || (st.includes('groom') && !st.includes('bath'));
+                              });
+                              const isFullGrooming = hasFullGrooming || hasPetsWithFullGrooming;
                               const defaultPrice = isFullGrooming ? 35 : 20;
                               const isUnedited = price === defaultPrice;
                               
@@ -10885,8 +10890,13 @@ export default function Admin() {
                 {/* Total Price Section */}
                 {selectedAppointment.price && (() => {
                   const price = parseFloat(selectedAppointment.price);
-                  const serviceType = selectedAppointment.serviceType || (selectedAppointment.pets?.[0]?.serviceType) || '';
-                  const isFullGrooming = serviceType.includes('full');
+                  const serviceType = (selectedAppointment.serviceType || (selectedAppointment.pets?.[0]?.serviceType) || '').toLowerCase();
+                  const hasFullGrooming = serviceType.includes('full') || serviceType.includes('groom') && !serviceType.includes('bath');
+                  const hasPetsWithFullGrooming = selectedAppointment.pets?.some((p: any) => {
+                    const st = (p.serviceType || '').toLowerCase();
+                    return st.includes('full') || (st.includes('groom') && !st.includes('bath'));
+                  });
+                  const isFullGrooming = hasFullGrooming || hasPetsWithFullGrooming;
                   const defaultPrice = isFullGrooming ? 35 : 20;
                   const isUnedited = price === defaultPrice;
                   
