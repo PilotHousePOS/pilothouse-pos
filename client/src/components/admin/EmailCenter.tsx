@@ -44,6 +44,7 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
   const [selectedRecipients, setSelectedRecipients] = useState<string[]>([]);
   const [isSending, setIsSending] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isMarketing, setIsMarketing] = useState(false);
   
   const [showAutoMessageForm, setShowAutoMessageForm] = useState(false);
   const [editingAutoMessage, setEditingAutoMessage] = useState<any>(null);
@@ -153,7 +154,8 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
           message,
           sendToAll,
           roleFilter: sendToAll ? roleFilter : undefined,
-          recipients: sendToAll ? undefined : selectedRecipients
+          recipients: sendToAll ? undefined : selectedRecipients,
+          isMarketing
         })
       });
 
@@ -167,6 +169,7 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
         setSubject('');
         setMessage('');
         setSelectedRecipients([]);
+        setIsMarketing(false);
       } else {
         toast({
           title: "Failed to Send",
@@ -1148,6 +1151,26 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
               </div>
             )}
           </div>
+
+          {activeTab === 'email' && (
+            <div className="flex items-start gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50">
+              <Checkbox
+                id="is-marketing"
+                checked={isMarketing}
+                onCheckedChange={(checked) => setIsMarketing(checked as boolean)}
+              />
+              <div>
+                <Label htmlFor="is-marketing" className="text-sm font-medium cursor-pointer">
+                  This is a marketing email
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {isMarketing 
+                    ? "Users who opted out of marketing emails will NOT receive this." 
+                    : "Leave unchecked for important updates (app changes, store notices) — these go to everyone."}
+                </p>
+              </div>
+            </div>
+          )}
 
           <Button
             className="w-full bg-brand-blue hover:bg-blue-600"

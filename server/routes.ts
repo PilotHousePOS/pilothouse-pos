@@ -4636,25 +4636,22 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      const { recipients, subject, message, sendToAll, roleFilter } = req.body;
+      const { recipients, subject, message, sendToAll, roleFilter, isMarketing } = req.body;
 
       if (!subject || !message) {
         return res.status(400).json({ message: "Subject and message are required" });
       }
 
-      // Get SendGrid client
       const { getUncachableSendGridClient } = await import('./sendgridIntegration');
       const { client: sgMail, fromEmail } = await getUncachableSendGridClient();
 
       let targetUsers: any[] = [];
 
       if (sendToAll) {
-        // Get all users with email addresses
         targetUsers = await storage.getAllUsers();
         targetUsers = targetUsers.filter((u: any) => {
           if (!u.email || u.email.startsWith('temp_')) return false;
           
-          // Apply role filter if specified
           if (roleFilter && roleFilter !== 'all') {
             switch (roleFilter) {
               case 'customers':
@@ -4670,7 +4667,6 @@ West Monroe LA 71291
           return true;
         });
       } else if (recipients && Array.isArray(recipients) && recipients.length > 0) {
-        // Get specific users by ID
         for (const userId of recipients) {
           const user = await storage.getUser(userId);
           if (user && user.email && !user.email.startsWith('temp_')) {
@@ -4679,6 +4675,13 @@ West Monroe LA 71291
         }
       } else {
         return res.status(400).json({ message: "No recipients specified" });
+      }
+
+      let skippedOptOut = 0;
+      if (isMarketing) {
+        const beforeCount = targetUsers.length;
+        targetUsers = targetUsers.filter((u: any) => u.marketingEmailsOptIn !== false);
+        skippedOptOut = beforeCount - targetUsers.length;
       }
 
       if (targetUsers.length === 0) {
@@ -4722,13 +4725,15 @@ West Monroe LA 71291
         }
       }
 
+      const optOutMsg = skippedOptOut > 0 ? `, ${skippedOptOut} skipped (opted out of marketing)` : '';
       res.json({
-        message: `Emails sent: ${successCount} successful, ${failedCount} failed`,
+        message: `Emails sent: ${successCount} successful, ${failedCount} failed${optOutMsg}`,
         stats: {
           total: targetUsers.length,
           success: successCount,
           failed: failedCount,
-          errors: errors.slice(0, 5) // Return first 5 errors
+          skippedOptOut,
+          errors: errors.slice(0, 5)
         }
       });
     } catch (error: any) {
@@ -9734,6 +9739,25 @@ West Monroe LA 71291
     } catch (error) {
       console.error('Error updating user loyalty:', error);
       res.status(500).json({ message: "Failed to update user loyalty" });
+    }
+  });
+
+  // Marketing email opt-in/out
+  app.put("/api/user/marketing-emails", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      const { optIn } = req.body;
+      await db.update(users).set({ 
+        marketingEmailsOptIn: !!optIn,
+        updatedAt: new Date()
+      }).where(eq(users.id, userId));
+      res.json({ success: true, marketingEmailsOptIn: !!optIn });
+    } catch (error) {
+      console.error('Error updating marketing preference:', error);
+      res.status(500).json({ message: "Failed to update preference" });
     }
   });
 

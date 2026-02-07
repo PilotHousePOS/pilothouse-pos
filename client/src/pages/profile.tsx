@@ -25,7 +25,9 @@ import {
   Star,
   Bell,
   BellOff,
-  Loader2
+  Loader2,
+  Mail,
+  MailX
 } from "lucide-react";
 import type { User, CustomerPet, Order, Appointment } from "@shared/schema";
 
@@ -93,6 +95,23 @@ export default function Profile() {
     }
     setNotifLoading(false);
   }
+
+  const marketingOptIn = currentUser?.marketingEmailsOptIn !== false;
+
+  const handleMarketingToggle = async (enable: boolean) => {
+    try {
+      await apiRequest('PUT', '/api/user/marketing-emails', { optIn: enable });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      toast({
+        title: enable ? "Marketing emails enabled" : "Marketing emails disabled",
+        description: enable
+          ? "You'll receive promotions and updates from us."
+          : "You won't receive marketing emails. Order and important updates will still be sent.",
+      });
+    } catch (err: any) {
+      toast({ title: "Error", description: "Failed to update preference", variant: "destructive" });
+    }
+  };
 
   function urlBase64ToUint8Array(base64String: string) {
     const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -457,6 +476,29 @@ export default function Profile() {
                   onCheckedChange={handleNotificationToggle}
                 />
               )}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="mt-3">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                {marketingOptIn ? (
+                  <Mail className="w-5 h-5 text-brand-blue" />
+                ) : (
+                  <MailX className="w-5 h-5 text-gray-400" />
+                )}
+                <div>
+                  <span className="font-semibold text-gray-900">Marketing Emails</span>
+                  <p className="text-xs text-gray-500">
+                    Receive promotions, deals, and updates. Order emails are always sent.
+                  </p>
+                </div>
+              </div>
+              <Switch
+                checked={marketingOptIn}
+                onCheckedChange={handleMarketingToggle}
+              />
             </div>
           </CardContent>
         </Card>

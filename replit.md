@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first web application for online retail of exotic reptiles, pet supplies, and grooming services. It aims to provide a secure, seamless, and comprehensive shopping experience with advanced inventory management, efficient scheduling, robust customer engagement, and extensive administrative tools. The project's vision is to be a leader in the exotic pet market by offering unique products, exceptional customer service, and innovative technology, thereby enhancing the online pet retail experience.
+The Animal House Pet Store is a mobile-first web application for online retail of exotic reptiles, pet supplies, and grooming services. Its purpose is to provide a secure, seamless, and comprehensive shopping experience, complemented by advanced inventory management, efficient scheduling, robust customer engagement, and extensive administrative tools. The project aims to become a leader in the exotic pet market by offering unique products, exceptional customer service, and innovative technology.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -183,16 +183,7 @@ Step 5: NEVER mark task complete until verification passes
 - **Pro Plan**: https://purina.com/pro-plan/
 
 ## System Architecture
-The Animal House Pet Store is a full-stack, mobile-first web application featuring a dark, bold, high-contrast UI/UX with Amazon-style image carousels. Security is managed with JWT-based authentication and a three-tier role-based access control system. The frontend uses React, Vite, TypeScript, Tailwind CSS, and shadcn/ui. The backend is built with Express.js and TypeScript, utilizing PostgreSQL as the database and Drizzle ORM. Authentication relies on JWT tokens stored in cookies, state management by TanStack Query, and Wouter for routing. Key features include customer wishlists, CMS for animal categories, admin order management, advanced search, database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, AI-powered processing for order photo analysis, item extraction, and categorization, and Web Push Notifications for real-time order alerts. A robust UPC matching system incorporates abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
-### Push Notifications
-- Uses Web Push API with VAPID keys (stored in env vars: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT)
-- `push_subscriptions` table stores per-device subscriptions linked to users
-- `users.notificationsEnabled` tracks opt-in status
-- Service Worker (client/public/sw.js) handles push events and notification clicks
-- Server utility (server/pushNotifications.ts) sends notifications and cleans up expired subscriptions
-- Admin notifications: New order alerts sent to all admin users with push enabled
-- Customer notifications: Order approved and order ready for pickup alerts
-- Profile page has toggle to enable/disable push notifications per user
+The Animal House Pet Store is a full-stack, mobile-first web application featuring a dark, bold, high-contrast UI/UX with Amazon-style image carousels. Security is managed via JWT-based authentication and a three-tier role-based access control. The frontend leverages React, Vite, TypeScript, Tailwind CSS, and shadcn/ui, while the backend is built with Express.js and TypeScript, using PostgreSQL and Drizzle ORM. Authentication relies on JWT tokens in cookies, state management is handled by TanStack Query, and Wouter is used for routing. Key features include customer wishlists, a CMS for animal categories, admin order management, advanced search capabilities, database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, AI-powered processing for order photo analysis, item extraction, and categorization. Web Push Notifications, utilizing the Web Push API with VAPID keys, are implemented for real-time order alerts, storing subscriptions in a `push_subscriptions` table and enabling user opt-in via `users.notificationsEnabled`. A Service Worker manages client-side push events, and a server utility handles sending notifications and cleaning up expired subscriptions. Notifications serve for admin order alerts and customer order status updates, with users able to toggle them on their profile page.
 
 ## External Dependencies
 - PostgreSQL
