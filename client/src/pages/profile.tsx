@@ -40,9 +40,83 @@ export default function Profile() {
   const [notifLoading, setNotifLoading] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
 
+  const { data: currentUser, isLoading: userLoading, error } = useQuery<User>({
+    queryKey: ["/api/auth/user"],
+    retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  const { data: customerPets = [] } = useQuery<CustomerPet[]>({
+    queryKey: ["/api/customer-pets"],
+    enabled: !!currentUser,
+  });
+
+  const addPetMutation = useMutation({
+    mutationFn: async (petData: typeof newPet) => {
+      const res = await apiRequest("POST", "/api/customer-pets", petData);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/customer-pets"] });
+      setShowAddPet(false);
+      setNewPet({ name: '', species: 'dog', breed: '', age: '', notes: '' });
+      toast({ title: "Pet added!", description: "Your pet has been added to your profile." });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to add pet. Please try again.", variant: "destructive" });
+    },
+  });
+
+  const { data: orders = [] } = useQuery<Order[]>({
+    queryKey: ["/api/orders"],
+    enabled: !!currentUser,
+  });
+
+  const { data: appointments = [] } = useQuery<Appointment[]>({
+    queryKey: ["/api/user/appointments"],
+    enabled: !!currentUser,
+  });
+
+  const { data: loyaltyStatus } = useQuery<{
+    totalSpent: string;
+    loyaltyCredits: string;
+    progressToNextReward: number;
+    spendingThreshold: string;
+    rewardAmount: string;
+  }>({
+    queryKey: ["/api/user/loyalty"],
+    enabled: !!currentUser,
+  });
+
+  // Handle authentication errors and redirects
+  useEffect(() => {
+    if (error && !userLoading) {
+      console.error("Profile authentication error:", error);
+      toast({
+        title: "Session expired",
+        description: "Please sign in again.",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
+    }
+  }, [error, userLoading, toast]);
+
   useEffect(() => {
     setNotifEnabled(!!currentUser?.notificationsEnabled);
   }, [currentUser?.notificationsEnabled]);
+
+  function urlBase64ToUint8Array(base64String: string) {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  }
 
   async function handleNotificationToggle(enable: boolean) {
     setNotifLoading(true);
@@ -115,80 +189,6 @@ export default function Profile() {
       toast({ title: "Error", description: "Failed to update preference", variant: "destructive" });
     }
   };
-
-  function urlBase64ToUint8Array(base64String: string) {
-    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i);
-    }
-    return outputArray;
-  }
-
-  const { data: currentUser, isLoading: userLoading, error } = useQuery<User>({
-    queryKey: ["/api/auth/user"],
-    retry: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-
-  const { data: customerPets = [] } = useQuery<CustomerPet[]>({
-    queryKey: ["/api/customer-pets"],
-    enabled: !!currentUser,
-  });
-
-  const addPetMutation = useMutation({
-    mutationFn: async (petData: typeof newPet) => {
-      const res = await apiRequest("POST", "/api/customer-pets", petData);
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/customer-pets"] });
-      setShowAddPet(false);
-      setNewPet({ name: '', species: 'dog', breed: '', age: '', notes: '' });
-      toast({ title: "Pet added!", description: "Your pet has been added to your profile." });
-    },
-    onError: () => {
-      toast({ title: "Error", description: "Failed to add pet. Please try again.", variant: "destructive" });
-    },
-  });
-
-  const { data: orders = [] } = useQuery<Order[]>({
-    queryKey: ["/api/orders"],
-    enabled: !!currentUser,
-  });
-
-  const { data: appointments = [] } = useQuery<Appointment[]>({
-    queryKey: ["/api/user/appointments"],
-    enabled: !!currentUser,
-  });
-
-  const { data: loyaltyStatus } = useQuery<{
-    totalSpent: string;
-    loyaltyCredits: string;
-    progressToNextReward: number;
-    spendingThreshold: string;
-    rewardAmount: string;
-  }>({
-    queryKey: ["/api/user/loyalty"],
-    enabled: !!currentUser,
-  });
-
-  // Handle authentication errors and redirects
-  useEffect(() => {
-    if (error && !userLoading) {
-      console.error("Profile authentication error:", error);
-      toast({
-        title: "Session expired",
-        description: "Please sign in again.",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 1000);
-    }
-  }, [error, userLoading, toast]);
 
   if (userLoading || !currentUser) {
     return (
