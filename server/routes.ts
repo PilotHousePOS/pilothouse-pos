@@ -2516,7 +2516,7 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Access denied. Admin only." });
       }
       
-      const { orderId, items, reason, notes, refundType } = req.body;
+      const { orderId, items, reason, notes, refundType, includeConvenienceFee, convenienceFeeAmount } = req.body;
       
       // Support both batch format (items array) and legacy single-item format
       const refundItems: Array<{ orderItemId: number; quantity: number; subtotal: string; tax: string; total: string }> = items || [];
@@ -2540,9 +2540,11 @@ West Monroe LA 71291
       }
       
       // Calculate total refund amount across all items
-      const totalRefundAmount = refundItems.reduce((sum, item) => sum + parseFloat(item.total), 0);
+      const itemsRefundAmount = refundItems.reduce((sum, item) => sum + parseFloat(item.total), 0);
       const totalSubtotalRefund = refundItems.reduce((sum, item) => sum + parseFloat(item.subtotal), 0);
       const totalTaxRefund = refundItems.reduce((sum, item) => sum + parseFloat(item.tax), 0);
+      const convFeeRefund = includeConvenienceFee && convenienceFeeAmount ? parseFloat(convenienceFeeAmount) : 0;
+      const totalRefundAmount = itemsRefundAmount + convFeeRefund;
       
       // Look up the order to find the Stripe payment intent for actual refund
       const order = await storage.getOrder(orderId);
@@ -2566,6 +2568,7 @@ West Monroe LA 71291
                 orderId: orderId.toString(),
                 reason: reason || 'Customer request',
                 itemCount: refundItems.length.toString(),
+                ...(convFeeRefund > 0 ? { convenienceFeeRefunded: convFeeRefund.toFixed(2) } : {}),
               },
             });
             

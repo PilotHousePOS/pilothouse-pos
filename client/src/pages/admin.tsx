@@ -4675,6 +4675,7 @@ export default function Admin() {
   const [selectedRefundItems, setSelectedRefundItems] = useState<{[key: number]: { quantity: number; amount: string }}>({}); 
   const [refundReason, setRefundReason] = useState('');
   const [refundNotes, setRefundNotes] = useState('');
+  const [includeConvenienceFee, setIncludeConvenienceFee] = useState(false);
   const [editingOrder, setEditingOrder] = useState<any>(null);
   const [editOrderModalOpen, setEditOrderModalOpen] = useState(false);
   const [editOrderItems, setEditOrderItems] = useState<any[]>([]);
@@ -7863,6 +7864,7 @@ export default function Admin() {
                                       setSelectedRefundItems({});
                                       setRefundReason('');
                                       setRefundNotes('');
+                                      setIncludeConvenienceFee(false);
                                       setRefundModalOpen(true);
                                     }}
                                     className="border-red-300 text-red-700 hover:bg-red-50"
@@ -8247,6 +8249,20 @@ export default function Admin() {
                     />
                   </div>
                   
+                  {selectedOrderForRefund.convenienceFee && parseFloat(selectedOrderForRefund.convenienceFee) > 0 && (
+                    <div className="flex items-center gap-3 p-3 border rounded-lg bg-amber-50 border-amber-200">
+                      <Checkbox
+                        id="includeConvenienceFee"
+                        checked={includeConvenienceFee}
+                        onCheckedChange={(checked) => setIncludeConvenienceFee(!!checked)}
+                      />
+                      <label htmlFor="includeConvenienceFee" className="text-sm cursor-pointer">
+                        <span className="font-medium">Include convenience fee in refund</span>
+                        <span className="text-amber-700 ml-1">(${parseFloat(selectedOrderForRefund.convenienceFee).toFixed(2)})</span>
+                      </label>
+                    </div>
+                  )}
+
                   <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="font-medium">Refund Summary</p>
                     {(() => {
@@ -8255,12 +8271,16 @@ export default function Admin() {
                         ? (parseFloat(selectedOrderForRefund.taxAmount) / parseFloat(selectedOrderForRefund.subtotal)) * 100
                         : 0;
                       const taxAmount = subtotal * (orderTaxRate / 100);
-                      const totalRefund = subtotal + taxAmount;
+                      const convFee = includeConvenienceFee && selectedOrderForRefund.convenienceFee ? parseFloat(selectedOrderForRefund.convenienceFee) : 0;
+                      const totalRefund = subtotal + taxAmount + convFee;
                       return (
                         <>
                           <p className="text-sm text-gray-600">Subtotal: ${subtotal.toFixed(2)}</p>
                           {orderTaxRate > 0 && (
                             <p className="text-sm text-gray-600">Tax ({orderTaxRate.toFixed(2)}%): ${taxAmount.toFixed(2)}</p>
+                          )}
+                          {convFee > 0 && (
+                            <p className="text-sm text-gray-600">Convenience Fee: ${convFee.toFixed(2)}</p>
                           )}
                           <p className="text-2xl font-bold text-red-600">
                             Total Refund: ${totalRefund.toFixed(2)}
@@ -8314,12 +8334,17 @@ export default function Admin() {
                           };
                         });
                         
+                        const convFeeAmount = includeConvenienceFee && selectedOrderForRefund.convenienceFee 
+                          ? parseFloat(selectedOrderForRefund.convenienceFee) : 0;
+                        
                         createRefundMutation.mutate({
                           orderId: selectedOrderForRefund.id,
                           items: refundItemsData,
                           reason: refundReason || 'Customer request',
                           notes: refundNotes,
-                          refundType: 'partial'
+                          refundType: includeConvenienceFee ? 'full' : 'partial',
+                          includeConvenienceFee: convFeeAmount > 0,
+                          convenienceFeeAmount: convFeeAmount.toFixed(2),
                         });
                         
                         setRefundModalOpen(false);
