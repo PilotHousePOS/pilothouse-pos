@@ -7104,15 +7104,6 @@ export default function Admin() {
               Contacts
             </TabsTrigger>
             {typedUser?.isAdmin && (
-              <TabsTrigger value="grooming" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                <span className="hidden lg:inline">Grooming Settings</span>
-                <span className="lg:hidden">Grooming</span>
-              </TabsTrigger>
-            )}
-            <TabsTrigger value="groomers" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              Groomers
-            </TabsTrigger>
-            {typedUser?.isAdmin && (
               <TabsTrigger value="boarding" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 Boarding
               </TabsTrigger>
@@ -7122,6 +7113,15 @@ export default function Admin() {
                 Schedule
               </TabsTrigger>
             )}
+            {typedUser?.isAdmin && (
+              <TabsTrigger value="grooming" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                <span className="hidden lg:inline">Grooming Settings</span>
+                <span className="lg:hidden">Grooming</span>
+              </TabsTrigger>
+            )}
+            <TabsTrigger value="groomers" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+              Groomers
+            </TabsTrigger>
             <TabsTrigger value="inventory" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
               Inventory
             </TabsTrigger>
