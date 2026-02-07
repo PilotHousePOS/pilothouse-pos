@@ -42,3 +42,4 @@ integrations = ["javascript_log_in_with_replit:1.0.0", "sendgrid:1.0.0", "google
 [userenv]
 
 [userenv.shared]
+STRIPE_SK_LIVE = "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"

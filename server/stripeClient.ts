@@ -4,8 +4,8 @@
 import Stripe from 'stripe';
 
 async function getCredentials() {
-  const liveSecretKey = process.env.STRIPE_LIVE_SECRET_KEY?.trim();
-  const livePublishableKey = process.env.STRIPE_LIVE_PUBLISHABLE_KEY?.trim();
+  const liveSecretKey = (process.env.STRIPE_SK_LIVE || process.env.STRIPE_LIVE_SECRET_KEY)?.trim();
+  const livePublishableKey = (process.env.STRIPE_PK_LIVE || process.env.STRIPE_LIVE_PUBLISHABLE_KEY)?.trim();
   if (liveSecretKey && livePublishableKey) {
     return {
       publishableKey: livePublishableKey,
