@@ -7113,6 +7113,9 @@ export default function Admin() {
                 Schedule
               </TabsTrigger>
             )}
+            <TabsTrigger value="inventory" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+              Inventory
+            </TabsTrigger>
             {typedUser?.isAdmin && (
               <TabsTrigger value="grooming" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 <span className="hidden lg:inline">Grooming Settings</span>
@@ -7122,18 +7125,15 @@ export default function Admin() {
             <TabsTrigger value="groomers" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
               Groomers
             </TabsTrigger>
-            <TabsTrigger value="inventory" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              Inventory
-            </TabsTrigger>
+            {typedUser?.isAdmin && (
+              <TabsTrigger value="users" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                Users
+              </TabsTrigger>
+            )}
             {typedUser?.isAdmin && (
               <TabsTrigger value="product-images" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 <span className="hidden lg:inline">Product Images</span>
                 <span className="lg:hidden">Images</span>
-              </TabsTrigger>
-            )}
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="users" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                Users
               </TabsTrigger>
             )}
             {typedUser?.isAdmin && (
@@ -7159,15 +7159,15 @@ export default function Admin() {
                 <span className="lg:hidden">Email</span>
               </TabsTrigger>
             )}
+            <TabsTrigger value="orders" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+              <span className="hidden lg:inline">Orders & Refunds</span>
+              <span className="lg:hidden">Orders</span>
+            </TabsTrigger>
             {typedUser?.isAdmin && (
               <TabsTrigger value="settings" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 Settings
               </TabsTrigger>
             )}
-            <TabsTrigger value="orders" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              <span className="hidden lg:inline">Orders & Refunds</span>
-              <span className="lg:hidden">Orders</span>
-            </TabsTrigger>
           </TabsList>
         </div>
 
