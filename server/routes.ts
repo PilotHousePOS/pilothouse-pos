@@ -3862,16 +3862,15 @@ West Monroe LA 71291
       const isAdmin = user?.isAdmin;
       const isAdminOrGroomer = user?.isAdmin || user?.isGroomer;
       
-      // Validate same-day booking restriction for customers (not admins/groomers)
+      // Validate past-date and same-day booking restriction for customers (not admins/groomers)
       if (!isAdminOrGroomer) {
-        const appointmentDate = new Date(req.body.appointmentDate);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        appointmentDate.setHours(0, 0, 0, 0);
+        const appointmentDate = new Date(req.body.appointmentDate + 'T00:00:00');
+        const nowCentral = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+        const todayCentral = new Date(nowCentral.getFullYear(), nowCentral.getMonth(), nowCentral.getDate());
         
-        if (appointmentDate <= today) {
+        if (appointmentDate <= todayCentral) {
           return res.status(400).json({ 
-            message: "Same-day appointments are not allowed. Please book for tomorrow or later." 
+            message: "Same-day and past-date appointments are not allowed. Please book for tomorrow or later." 
           });
         }
         

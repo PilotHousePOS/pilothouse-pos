@@ -222,13 +222,19 @@ export default function Booking() {
 
   // Check if a date is available for booking
   const isDateAvailable = (date: Date) => {
+    // Block past dates using Central Time
+    const nowCentral = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+    const todayCentral = new Date(nowCentral.getFullYear(), nowCentral.getMonth(), nowCentral.getDate());
+    const checkDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    if (checkDate < todayCentral) return false;
+
     // Use local date string to avoid timezone issues
     const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     
     // Check if this is a special date - special dates override normal restrictions
     const hasSpecialDate = (allSpecialDates as any[]).some(sd => sd.date === dateString);
     if (hasSpecialDate) {
-      // Special dates are always available regardless of other settings
+      // Special dates are always available regardless of other settings (but still can't be in the past)
       return true;
     }
     
