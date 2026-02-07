@@ -1970,9 +1970,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           customerName,
           order.totalAmount
         );
+
+        const { notifyAdminsNewOrder } = await import('./pushNotifications');
+        await notifyAdminsNewOrder(order.id, customerName || 'Customer', order.totalAmount);
       } catch (notificationError) {
         console.error('Failed to send admin notifications for new order:', notificationError);
-        // Don't fail the order if notifications fail
       }
       
       res.json(order);
@@ -2130,7 +2132,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         });
       }
       
-      // Send email notification
+      try {
+        const { notifyCustomerOrderApproved } = await import('./pushNotifications');
+        await notifyCustomerOrderApproved(order.userId, orderId);
+      } catch (pushErr) {
+        console.error('Push notification failed for order approval:', pushErr);
+      }
+
       if (customerEmail) {
         try {
           const { getUncachableSendGridClient } = await import('./sendgridIntegration');
@@ -2214,10 +2222,15 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(404).json({ message: "Order not found" });
       }
       
-      // Update order status to ready
       await storage.updateOrderApprovalStatus(orderId, 'ready_for_pickup');
       
-      // Send email notification
+      try {
+        const { notifyCustomerOrderReady } = await import('./pushNotifications');
+        await notifyCustomerOrderReady(orderWithItems.order.userId, orderId);
+      } catch (pushErr) {
+        console.error('Push notification failed for order ready:', pushErr);
+      }
+
       const order = orderWithItems.order;
       const customerEmail = orderWithItems.customerEmail || order.customerEmail;
       if (customerEmail) {
@@ -9721,6 +9734,70 @@ West Monroe LA 71291
     } catch (error) {
       console.error('Error updating user loyalty:', error);
       res.status(500).json({ message: "Failed to update user loyalty" });
+    }
+  });
+
+  // Push notification endpoints
+  app.get("/api/push/vapid-key", (_req, res) => {
+    const publicKey = process.env.VAPID_PUBLIC_KEY;
+    if (!publicKey) {
+      return res.status(500).json({ message: "Push notifications not configured" });
+    }
+    res.json({ publicKey });
+  });
+
+  app.post("/api/push/subscribe", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      const { subscription } = req.body;
+      if (!subscription?.endpoint || !subscription?.keys?.p256dh || !subscription?.keys?.auth) {
+        return res.status(400).json({ message: "Invalid subscription data" });
+      }
+      const { saveSubscription } = await import('./pushNotifications');
+      const saved = await saveSubscription(userId, subscription);
+      res.json({ success: true, id: saved.id });
+    } catch (error) {
+      console.error('Error saving push subscription:', error);
+      res.status(500).json({ message: "Failed to save subscription" });
+    }
+  });
+
+  app.post("/api/push/unsubscribe", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      const { endpoint } = req.body;
+      if (endpoint) {
+        const { removeSubscription } = await import('./pushNotifications');
+        await removeSubscription(userId, endpoint);
+      } else {
+        const { removeAllSubscriptions } = await import('./pushNotifications');
+        await removeAllSubscriptions(userId);
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error removing push subscription:', error);
+      res.status(500).json({ message: "Failed to remove subscription" });
+    }
+  });
+
+  app.post("/api/push/test", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      const { notifyCustomerOrderReady } = await import('./pushNotifications');
+      await notifyCustomerOrderReady(userId, 0);
+      res.json({ success: true, message: "Test notification sent" });
+    } catch (error) {
+      console.error('Error sending test notification:', error);
+      res.status(500).json({ message: "Failed to send test notification" });
     }
   });
 

@@ -183,7 +183,17 @@ Step 5: NEVER mark task complete until verification passes
 - **Pro Plan**: https://purina.com/pro-plan/
 
 ## System Architecture
-The Animal House Pet Store is a full-stack, mobile-first web application featuring a dark, bold, high-contrast UI/UX with Amazon-style image carousels. Security is managed with JWT-based authentication and a three-tier role-based access control system. The frontend uses React, Vite, TypeScript, Tailwind CSS, and shadcn/ui. The backend is built with Express.js and TypeScript, utilizing PostgreSQL as the database and Drizzle ORM. Authentication relies on JWT tokens stored in cookies, state management by TanStack Query, and Wouter for routing. Key features include customer wishlists, CMS for animal categories, admin order management, advanced search, database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and AI-powered processing for order photo analysis, item extraction, and categorization. A robust UPC matching system incorporates abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
+The Animal House Pet Store is a full-stack, mobile-first web application featuring a dark, bold, high-contrast UI/UX with Amazon-style image carousels. Security is managed with JWT-based authentication and a three-tier role-based access control system. The frontend uses React, Vite, TypeScript, Tailwind CSS, and shadcn/ui. The backend is built with Express.js and TypeScript, utilizing PostgreSQL as the database and Drizzle ORM. Authentication relies on JWT tokens stored in cookies, state management by TanStack Query, and Wouter for routing. Key features include customer wishlists, CMS for animal categories, admin order management, advanced search, database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, AI-powered processing for order photo analysis, item extraction, and categorization, and Web Push Notifications for real-time order alerts. A robust UPC matching system incorporates abbreviation expansion, text normalization, brand mappings, validation, and brand prefix expansion.
+
+### Push Notifications
+- Uses Web Push API with VAPID keys (stored in env vars: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT)
+- `push_subscriptions` table stores per-device subscriptions linked to users
+- `users.notificationsEnabled` tracks opt-in status
+- Service Worker (client/public/sw.js) handles push events and notification clicks
+- Server utility (server/pushNotifications.ts) sends notifications and cleans up expired subscriptions
+- Admin notifications: New order alerts sent to all admin users with push enabled
+- Customer notifications: Order approved and order ready for pickup alerts
+- Profile page has toggle to enable/disable push notifications per user
 
 ## External Dependencies
 - PostgreSQL

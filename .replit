@@ -43,3 +43,6 @@ integrations = ["javascript_log_in_with_replit:1.0.0", "sendgrid:1.0.0", "google
 
 [userenv.shared]
 STRIPE_SK_LIVE = "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"
+VAPID_PUBLIC_KEY = "BKD3C8rqqUQKdtFhZDiIyoGZ2-q9gfv5tZ4TyckWF3rSIjdZ9W7gSzwRSThOwP7T9RwCd1linIFbWb83Rkw9_tw"
+VAPID_PRIVATE_KEY = "G2E9rThV1O1P3XYQQ0ogb-EzMrHHm7mK0zn5fpukZQ8"
+VAPID_SUBJECT = "mailto:theanimalhouse@comcast.net"

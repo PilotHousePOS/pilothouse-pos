@@ -39,8 +39,9 @@ export const users = pgTable("users", {
   isGroomer: boolean("is_groomer").default(false),
   totalSpent: decimal("total_spent", { precision: 10, scale: 2 }).default("0"),
   loyaltyCredits: decimal("loyalty_credits", { precision: 10, scale: 2 }).default("0"),
-  stripeCustomerId: varchar("stripe_customer_id", { length: 255 }), // Stripe customer ID for saved payment methods
-  stripeDefaultPaymentMethod: varchar("stripe_default_payment_method", { length: 255 }), // Default payment method ID
+  stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
+  stripeDefaultPaymentMethod: varchar("stripe_default_payment_method", { length: 255 }),
+  notificationsEnabled: boolean("notifications_enabled").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -430,7 +431,24 @@ export const appointmentHistory = pgTable("appointment_history", {
   appointmentDateIdx: index("appointment_history_date_idx").on(table.appointmentDate),
 }));
 
+// Push notification subscriptions
+export const pushSubscriptions = pgTable("push_subscriptions", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  endpoint: text("endpoint").notNull(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  userIdIdx: index("push_sub_user_id_idx").on(table.userId),
+  endpointIdx: index("push_sub_endpoint_idx").on(table.endpoint),
+}));
+
 // Relations
+export const pushSubscriptionsRelations = relations(pushSubscriptions, ({ one }) => ({
+  user: one(users, { fields: [pushSubscriptions.userId], references: [users.id] }),
+}));
+
 export const usersRelations = relations(users, ({ many }) => ({
   cartItems: many(cartItems),
   orders: many(orders),
@@ -624,6 +642,11 @@ export const insertLoyaltySettingsSchema = createInsertSchema(loyaltySettings).o
   updatedAt: true,
 });
 
+export const insertPushSubscriptionSchema = createInsertSchema(pushSubscriptions).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -675,6 +698,8 @@ export type SpecialDateAllowedTime = typeof specialDateAllowedTimes.$inferSelect
 export type InsertSpecialDateAllowedTime = z.infer<typeof insertSpecialDateAllowedTimeSchema>;
 export type AppointmentHistory = typeof appointmentHistory.$inferSelect;
 export type InsertAppointmentHistory = z.infer<typeof insertAppointmentHistorySchema>;
+export type PushSubscription = typeof pushSubscriptions.$inferSelect;
+export type InsertPushSubscription = z.infer<typeof insertPushSubscriptionSchema>;
 
 // Pet Boarding/Babysitting records
 export const boardingRecords = pgTable("boarding_records", {

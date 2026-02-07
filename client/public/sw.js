@@ -1,4 +1,4 @@
-const CACHE_NAME = 'animal-house-v3';
+const CACHE_NAME = 'animal-house-v4';
 const urlsToCache = [
   '/',
   '/manifest.json',
@@ -75,18 +75,7 @@ self.addEventListener('push', function(event) {
       icon: data.icon || '/icons/icon-192x192.png',
       badge: data.badge || '/icons/icon-72x72.png',
       tag: data.tag,
-      data: data.data,
-      actions: [
-        {
-          action: 'view',
-          title: 'View',
-          icon: '/icons/icon-72x72.png'
-        },
-        {
-          action: 'close',
-          title: 'Close'
-        }
-      ],
+      data: { url: data.url || '/' },
       requireInteraction: true,
       vibrate: [200, 100, 200]
     };
@@ -98,14 +87,22 @@ self.addEventListener('push', function(event) {
 });
 
 self.addEventListener('notificationclick', function(event) {
-  console.log('Notification clicked:', event);
   event.notification.close();
   
-  if (event.action === 'view') {
-    event.waitUntil(
-      clients.openWindow(event.notification.data?.url || '/')
-    );
-  }
+  const url = event.notification.data?.url || '/';
+  
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(windowClients) {
+      for (var i = 0; i < windowClients.length; i++) {
+        var client = windowClients[i];
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate(url);
+          return client.focus();
+        }
+      }
+      return clients.openWindow(url);
+    })
+  );
 });
 
 self.addEventListener('notificationclose', function(event) {

@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Textarea } from "@/components/ui/textarea";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
+import { Switch } from "@/components/ui/switch";
 import { 
   ShoppingBag, 
   Calendar, 
@@ -21,7 +22,10 @@ import {
   Plus,
   Shield,
   Gift,
-  Star
+  Star,
+  Bell,
+  BellOff,
+  Loader2
 } from "lucide-react";
 import type { User, CustomerPet, Order, Appointment } from "@shared/schema";
 
@@ -31,6 +35,75 @@ export default function Profile() {
   const queryClient = useQueryClient();
   const [showAddPet, setShowAddPet] = useState(false);
   const [newPet, setNewPet] = useState({ name: '', species: 'dog', breed: '', age: '', notes: '' });
+  const [notifLoading, setNotifLoading] = useState(false);
+  const [notifEnabled, setNotifEnabled] = useState(false);
+
+  useEffect(() => {
+    setNotifEnabled(!!currentUser?.notificationsEnabled);
+  }, [currentUser?.notificationsEnabled]);
+
+  async function handleNotificationToggle(enable: boolean) {
+    setNotifLoading(true);
+    try {
+      if (enable) {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+          toast({ title: "Not supported", description: "Push notifications are not supported on this browser.", variant: "destructive" });
+          setNotifLoading(false);
+          return;
+        }
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          toast({ title: "Permission denied", description: "Please allow notifications in your browser settings.", variant: "destructive" });
+          setNotifLoading(false);
+          return;
+        }
+        const reg = await navigator.serviceWorker.ready;
+        const vapidRes = await fetch('/api/push/vapid-key');
+        const { publicKey } = await vapidRes.json();
+        const sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(publicKey),
+        });
+        const subJson = sub.toJSON();
+        await apiRequest('POST', '/api/push/subscribe', {
+          subscription: {
+            endpoint: subJson.endpoint,
+            keys: { p256dh: subJson.keys!.p256dh, auth: subJson.keys!.auth },
+          },
+        });
+        setNotifEnabled(true);
+        queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+        toast({ title: "Notifications enabled", description: "You'll get alerts for order updates!" });
+      } else {
+        const reg = await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.getSubscription();
+        if (sub) {
+          await apiRequest('POST', '/api/push/unsubscribe', { endpoint: sub.endpoint });
+          await sub.unsubscribe();
+        } else {
+          await apiRequest('POST', '/api/push/unsubscribe', {});
+        }
+        setNotifEnabled(false);
+        queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+        toast({ title: "Notifications disabled", description: "You won't receive push notifications anymore." });
+      }
+    } catch (err: any) {
+      console.error('Notification toggle error:', err);
+      toast({ title: "Error", description: err.message || "Failed to update notification settings", variant: "destructive" });
+    }
+    setNotifLoading(false);
+  }
+
+  function urlBase64ToUint8Array(base64String: string) {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  }
 
   const { data: currentUser, isLoading: userLoading, error } = useQuery<User>({
     queryKey: ["/api/auth/user"],
@@ -353,6 +426,40 @@ export default function Profile() {
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Notifications */}
+      <div className="mb-8">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Notifications</h3>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                {notifEnabled ? (
+                  <Bell className="w-5 h-5 text-brand-blue" />
+                ) : (
+                  <BellOff className="w-5 h-5 text-gray-400" />
+                )}
+                <div>
+                  <span className="font-semibold text-gray-900">Push Notifications</span>
+                  <p className="text-xs text-gray-500">
+                    {currentUser?.isAdmin 
+                      ? "Get notified when new orders come in" 
+                      : "Get notified when your order is approved or ready"}
+                  </p>
+                </div>
+              </div>
+              {notifLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+              ) : (
+                <Switch
+                  checked={notifEnabled}
+                  onCheckedChange={handleNotificationToggle}
+                />
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Admin Panel */}
