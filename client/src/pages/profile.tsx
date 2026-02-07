@@ -1,11 +1,17 @@
-import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { useLocation } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
 import { 
   ShoppingBag, 
   Calendar, 
@@ -22,6 +28,9 @@ import type { User, CustomerPet, Order, Appointment } from "@shared/schema";
 export default function Profile() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
+  const [showAddPet, setShowAddPet] = useState(false);
+  const [newPet, setNewPet] = useState({ name: '', species: 'dog', breed: '', age: '', notes: '' });
 
   const { data: currentUser, isLoading: userLoading, error } = useQuery<User>({
     queryKey: ["/api/auth/user"],
@@ -32,6 +41,22 @@ export default function Profile() {
   const { data: customerPets = [] } = useQuery<CustomerPet[]>({
     queryKey: ["/api/customer-pets"],
     enabled: !!currentUser,
+  });
+
+  const addPetMutation = useMutation({
+    mutationFn: async (petData: typeof newPet) => {
+      const res = await apiRequest("POST", "/api/customer-pets", petData);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/customer-pets"] });
+      setShowAddPet(false);
+      setNewPet({ name: '', species: 'dog', breed: '', age: '', notes: '' });
+      toast({ title: "Pet added!", description: "Your pet has been added to your profile." });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to add pet. Please try again.", variant: "destructive" });
+    },
   });
 
   const { data: orders = [] } = useQuery<Order[]>({
@@ -176,7 +201,7 @@ export default function Profile() {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-gray-900">My Pets</h3>
-          <Button variant="ghost" size="sm" className="text-brand-blue">
+          <Button variant="ghost" size="sm" className="text-brand-blue" onClick={() => setShowAddPet(true)}>
             <Plus className="w-4 h-4 mr-1" />
             Add Pet
           </Button>
@@ -216,6 +241,76 @@ export default function Profile() {
             ))
           )}
         </div>
+
+        <Dialog open={showAddPet} onOpenChange={setShowAddPet}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Add a Pet</DialogTitle>
+              <DialogDescription>Add your pet's information to your profile.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="pet-name">Name *</Label>
+                <Input
+                  id="pet-name"
+                  placeholder="Pet's name"
+                  value={newPet.name}
+                  onChange={(e) => setNewPet({ ...newPet, name: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="pet-species">Species *</Label>
+                <Select value={newPet.species} onValueChange={(value) => setNewPet({ ...newPet, species: value })}>
+                  <SelectTrigger id="pet-species">
+                    <SelectValue placeholder="Select species" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dog">Dog</SelectItem>
+                    <SelectItem value="cat">Cat</SelectItem>
+                    <SelectItem value="bird">Bird</SelectItem>
+                    <SelectItem value="reptile">Reptile</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="pet-breed">Breed</Label>
+                <Input
+                  id="pet-breed"
+                  placeholder="e.g., Chihuahua, Persian, Parakeet"
+                  value={newPet.breed}
+                  onChange={(e) => setNewPet({ ...newPet, breed: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="pet-age">Age</Label>
+                <Input
+                  id="pet-age"
+                  placeholder="e.g., 3 years"
+                  value={newPet.age}
+                  onChange={(e) => setNewPet({ ...newPet, age: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="pet-notes">Notes</Label>
+                <Textarea
+                  id="pet-notes"
+                  placeholder="Any special notes about your pet"
+                  value={newPet.notes}
+                  onChange={(e) => setNewPet({ ...newPet, notes: e.target.value })}
+                  rows={2}
+                />
+              </div>
+              <Button
+                className="w-full"
+                disabled={!newPet.name.trim() || addPetMutation.isPending}
+                onClick={() => addPetMutation.mutate(newPet)}
+              >
+                {addPetMutation.isPending ? "Adding..." : "Add Pet"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Quick Actions */}

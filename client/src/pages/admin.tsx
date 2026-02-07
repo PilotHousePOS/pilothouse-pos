@@ -853,16 +853,6 @@ function ContactsManager() {
   const [expandedContactId, setExpandedContactId] = useState<string | number | null>(null);
   const [historyDialogContact, setHistoryDialogContact] = useState<{ id: number; name: string } | null>(null);
 
-  // Dog breeds list for the breed selector
-  const dogBreeds = [
-    'Golden Retriever', 'Labrador Retriever', 'German Shepherd', 'French Bulldog',
-    'Bulldog', 'Poodle', 'Beagle', 'Rottweiler', 'Yorkshire Terrier', 'Boxer',
-    'Dachshund', 'Siberian Husky', 'Great Dane', 'Doberman Pinscher', 'Shih Tzu',
-    'Boston Terrier', 'Pomeranian', 'Havanese', 'Cavalier King Charles Spaniel',
-    'Shetland Sheepdog', 'Miniature Schnauzer', 'Pembroke Welsh Corgi', 'Chihuahua',
-    'Australian Shepherd', 'Mastiff', 'Cocker Spaniel', 'Border Collie', 'Pug',
-    'Other/Mixed Breed'
-  ].sort();
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const { toast } = useToast();
@@ -1239,21 +1229,13 @@ function ContactsManager() {
                   {contactFormData.animalType === 'dog' && (
                     <div>
                       <Label htmlFor="contact-breed">Dog Breed</Label>
-                      <Select
+                      <Input
+                        id="contact-breed"
+                        data-testid="input-dog-breed"
+                        placeholder="e.g., Chihuahua, Poodle, Mixed"
                         value={contactFormData.breed}
-                        onValueChange={(value) => setContactFormData({ ...contactFormData, breed: value })}
-                      >
-                        <SelectTrigger id="contact-breed" data-testid="select-dog-breed">
-                          <SelectValue placeholder="Select dog breed" />
-                        </SelectTrigger>
-                        <SelectContent className="max-h-[300px]">
-                          {dogBreeds.map((breed) => (
-                            <SelectItem key={breed} value={breed}>
-                              {breed}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        onChange={(e) => setContactFormData({ ...contactFormData, breed: e.target.value })}
+                      />
                     </div>
                   )}
                   <div>
@@ -1357,21 +1339,13 @@ function ContactsManager() {
                   {contactFormData.animalType === 'dog' && (
                     <div>
                       <Label htmlFor="edit-contact-breed">Dog Breed</Label>
-                      <Select
+                      <Input
+                        id="edit-contact-breed"
+                        data-testid="input-edit-dog-breed"
+                        placeholder="e.g., Chihuahua, Poodle, Mixed"
                         value={contactFormData.breed}
-                        onValueChange={(value) => setContactFormData({ ...contactFormData, breed: value })}
-                      >
-                        <SelectTrigger id="edit-contact-breed" data-testid="select-edit-dog-breed">
-                          <SelectValue placeholder="Select dog breed" />
-                        </SelectTrigger>
-                        <SelectContent className="max-h-[300px]">
-                          {dogBreeds.map((breed) => (
-                            <SelectItem key={breed} value={breed}>
-                              {breed}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        onChange={(e) => setContactFormData({ ...contactFormData, breed: e.target.value })}
+                      />
                     </div>
                   )}
                   <div>

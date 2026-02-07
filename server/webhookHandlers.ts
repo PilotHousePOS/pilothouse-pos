@@ -88,6 +88,7 @@ export class WebhookHandlers {
       if (orderId) {
         const orderById = await storage.getOrder(parseInt(orderId));
         if (orderById) {
+          const alreadyPaid = orderById.paymentStatus === 'paid';
           await storage.updateOrderStripePayment(parseInt(orderId), {
             stripePaymentIntentId: session.payment_intent,
             paymentStatus: 'paid',
@@ -96,6 +97,21 @@ export class WebhookHandlers {
           
           // Update order to ready_for_pickup since payment is complete
           await storage.updateOrderApprovalStatus(parseInt(orderId), 'ready_for_pickup');
+          
+          // Track loyalty rewards for the customer (only if not already paid to prevent double-credit on webhook replay)
+          if (!alreadyPaid && orderById.userId) {
+            try {
+              const orderAmount = parseFloat(orderById.totalAmount || "0");
+              const convenienceFee = parseFloat(orderById.convenienceFee || "0");
+              const loyaltyAmount = orderAmount - convenienceFee;
+              if (loyaltyAmount > 0) {
+                const result = await storage.addToUserTotalSpent(orderById.userId, loyaltyAmount);
+                console.log(`Loyalty updated for user ${orderById.userId}: earned=${result.newCreditsEarned}, credits=${result.creditsAmount}`);
+              }
+            } catch (loyaltyError) {
+              console.error('Error updating loyalty for order:', loyaltyError);
+            }
+          }
           
           console.log(`Order #${orderId} marked as paid and ready for pickup`);
           
@@ -106,6 +122,7 @@ export class WebhookHandlers {
       return;
     }
     
+    const alreadyPaid = order.paymentStatus === 'paid';
     // Update order payment status
     await storage.updateOrderStripePayment(order.id, {
       stripePaymentIntentId: session.payment_intent,
@@ -115,6 +132,21 @@ export class WebhookHandlers {
     
     // Update order to ready_for_pickup since payment is complete
     await storage.updateOrderApprovalStatus(order.id, 'ready_for_pickup');
+    
+    // Track loyalty rewards for the customer (only if not already paid to prevent double-credit on webhook replay)
+    if (!alreadyPaid && order.userId) {
+      try {
+        const orderAmount = parseFloat(order.totalAmount || "0");
+        const convenienceFee = parseFloat(order.convenienceFee || "0");
+        const loyaltyAmount = orderAmount - convenienceFee;
+        if (loyaltyAmount > 0) {
+          const result = await storage.addToUserTotalSpent(order.userId, loyaltyAmount);
+          console.log(`Loyalty updated for user ${order.userId}: earned=${result.newCreditsEarned}, credits=${result.creditsAmount}`);
+        }
+      } catch (loyaltyError) {
+        console.error('Error updating loyalty for order:', loyaltyError);
+      }
+    }
     
     console.log(`Order #${order.id} marked as paid and ready for pickup`);
     
