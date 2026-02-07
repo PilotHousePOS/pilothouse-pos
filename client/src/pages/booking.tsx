@@ -225,8 +225,8 @@ export default function Booking() {
     // Block past dates using Central Time
     const nowCentral = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }));
     const todayCentral = new Date(nowCentral.getFullYear(), nowCentral.getMonth(), nowCentral.getDate());
-    const checkDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    if (checkDate < todayCentral) return false;
+    const dateToCheck = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    if (dateToCheck < todayCentral) return false;
 
     // Use local date string to avoid timezone issues
     const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
