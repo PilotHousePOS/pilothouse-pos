@@ -1773,6 +1773,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
+      if (req.body.petId || req.body.itemType === "pet") {
+        return res.status(400).json({ message: "Live animals are view-only and cannot be purchased online. Please visit the store for live animal inquiries." });
+      }
       const cartItemData = insertCartItemSchema.parse({ ...req.body, userId });
       const cartItem = await storage.addToCart(cartItemData);
       res.json(cartItem);

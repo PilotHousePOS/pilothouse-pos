@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ShoppingCart, Sparkles, X, ChevronLeft, ChevronRight, ArrowLeft, Search } from "lucide-react";
+import { ShoppingCart, Sparkles, X, ChevronLeft, ChevronRight, ArrowLeft, Search, Eye, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -225,16 +225,20 @@ export default function ReptilesPage() {
                       <div className="text-lg font-bold text-green-600">
                         ${pet.price}
                       </div>
+                      {pet.age && (
+                        <p className="text-xs text-gray-500">Age: {pet.age}</p>
+                      )}
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleAddToCart(pet, "pet");
+                          setSelectedItem(pet);
+                          setSelectedType("pet");
                         }}
                         className="w-full bg-green-600 hover:bg-green-700"
-                        data-testid={`add-to-cart-pet-${pet.id}`}
+                        data-testid={`view-details-pet-${pet.id}`}
                       >
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Add to Cart
+                        <Eye className="w-4 h-4 mr-2" />
+                        View Details
                       </Button>
                     </div>
                   </CardContent>
@@ -525,18 +529,25 @@ export default function ReptilesPage() {
                 </div>
               </div>
 
-                <Button
-                  onClick={() => {
-                    handleAddToCart(selectedItem, selectedType!);
-                    setSelectedItem(null);
-                    setCurrentImageIndex(0);
-                  }}
-                  className="w-full bg-green-600 hover:bg-green-700"
-                  data-testid={`dialog-add-to-cart-${selectedItem.id}`}
-                >
-                  <ShoppingCart className="w-4 h-4 mr-2" />
-                  Add to Cart
-                </Button>
+                {selectedType === "pet" ? (
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
+                    <Info className="w-5 h-5 text-amber-600 mx-auto mb-1" />
+                    <p className="text-sm text-amber-800 font-medium">Visit us in store for live animal inquiries</p>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      handleAddToCart(selectedItem, selectedType!);
+                      setSelectedItem(null);
+                      setCurrentImageIndex(0);
+                    }}
+                    className="w-full bg-green-600 hover:bg-green-700"
+                    data-testid={`dialog-add-to-cart-${selectedItem.id}`}
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    Add to Cart
+                  </Button>
+                )}
               </div>
             );
           })()}

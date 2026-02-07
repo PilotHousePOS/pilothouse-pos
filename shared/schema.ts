@@ -78,6 +78,7 @@ export const pets = pgTable("pets", {
   imageUrl: varchar("image_url", { length: 500 }),
   imageUrls: text("image_urls").array(), // Multiple images support
   isAvailable: boolean("is_available").default(true),
+  quantity: integer("quantity"), // Optional manual quantity for inventory tracking
   // POS Integration & Priority Tracking
   priceSource: varchar("price_source", { length: 20 }).default("default"), // manual, pos, ai_extraction, import, default
   manualPriceOverride: boolean("manual_price_override").default(false), // If true, POS won't override price

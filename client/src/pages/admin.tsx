@@ -7289,9 +7289,14 @@ export default function Admin() {
                     </div>
                     {/* Actions on separate row */}
                     <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
-                      <Badge variant={pet.isAvailable ? "default" : "secondary"} className="text-xs">
-                        {pet.isAvailable ? "Available" : "Sold"}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={pet.isAvailable ? "default" : "secondary"} className="text-xs">
+                          {pet.isAvailable ? "Available" : "Unavailable"}
+                        </Badge>
+                        {pet.quantity != null && (
+                          <span className="text-xs text-gray-500">Qty: {pet.quantity}</span>
+                        )}
+                      </div>
                       {typedUser?.isAdmin && (
                         <div className="flex gap-1">
                           <Button
@@ -11680,11 +11685,13 @@ function EditPetForm({ pet, onSubmit }: { pet: any; onSubmit: (data: any) => voi
     description: pet.description || "",
     imageUrl: pet.imageUrl || "",
     isAvailable: pet.isAvailable || false,
+    quantity: pet.quantity ?? "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    const submitData = { ...formData, quantity: formData.quantity === "" ? null : Number(formData.quantity) };
+    onSubmit(submitData);
   };
 
   return (
@@ -11756,12 +11763,23 @@ function EditPetForm({ pet, onSubmit }: { pet: any; onSubmit: (data: any) => voi
         imageUrl={formData.imageUrl} 
         onImageChange={(url) => setFormData({ ...formData, imageUrl: url })} 
       />
+      <div>
+        <label className="block text-sm font-medium mb-1">Quantity (optional)</label>
+        <input
+          type="number"
+          min="0"
+          value={formData.quantity}
+          onChange={(e) => setFormData({ ...formData, quantity: e.target.value === "" ? "" : parseInt(e.target.value) })}
+          className="w-full p-2 border rounded"
+          placeholder="Leave blank if not tracking"
+        />
+      </div>
       <div className="flex items-center space-x-2">
         <Switch
           checked={formData.isAvailable}
           onCheckedChange={(checked) => setFormData({ ...formData, isAvailable: checked })}
         />
-        <label className="text-sm">Available for adoption</label>
+        <label className="text-sm">Available</label>
       </div>
       <Button type="submit" className="w-full bg-brand-blue hover:bg-blue-600">
         Update Pet
@@ -13040,11 +13058,13 @@ function AddPetForm({ onSubmit }: { onSubmit: (data: any) => void }) {
     description: '',
     imageUrl: '',
     isAvailable: true,
+    quantity: '' as string | number,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    const submitData = { ...formData, quantity: formData.quantity === "" ? null : Number(formData.quantity) };
+    onSubmit(submitData);
   };
 
   return (
@@ -13115,13 +13135,24 @@ function AddPetForm({ onSubmit }: { onSubmit: (data: any) => void }) {
         imageUrl={formData.imageUrl} 
         onImageChange={(url) => setFormData({ ...formData, imageUrl: url })} 
       />
+      <div>
+        <Label htmlFor="quantity">Quantity (optional)</Label>
+        <Input
+          id="quantity"
+          type="number"
+          min="0"
+          value={formData.quantity}
+          onChange={(e) => setFormData({ ...formData, quantity: e.target.value === "" ? "" : parseInt(e.target.value) })}
+          placeholder="Leave blank if not tracking"
+        />
+      </div>
       <div className="flex items-center space-x-2">
         <Switch
           id="isAvailable"
           checked={formData.isAvailable}
           onCheckedChange={(checked) => setFormData({ ...formData, isAvailable: checked })}
         />
-        <Label htmlFor="isAvailable">Available for adoption</Label>
+        <Label htmlFor="isAvailable">Available</Label>
       </div>
       <Button type="submit" className="w-full">Add Pet</Button>
     </form>
