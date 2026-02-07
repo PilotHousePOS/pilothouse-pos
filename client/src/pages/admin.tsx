@@ -97,7 +97,6 @@ import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import AdminNotifications from "@/components/admin-notifications";
 import EmailCenter from "@/components/admin/EmailCenter";
-import ProductImageManager from "@/components/admin/ProductImageManager";
 import { safeGoBack } from "@/lib/navigation";
 import { capitalizeWords } from "@/lib/stringUtils";
 import { formatCategory } from "@/lib/formatCategory";
@@ -7131,12 +7130,6 @@ export default function Admin() {
               </TabsTrigger>
             )}
             {typedUser?.isAdmin && (
-              <TabsTrigger value="product-images" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                <span className="hidden lg:inline">Product Images</span>
-                <span className="lg:hidden">Images</span>
-              </TabsTrigger>
-            )}
-            {typedUser?.isAdmin && (
               <TabsTrigger value="order-photos" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 <span className="hidden lg:inline">Order Photos</span>
                 <span className="lg:hidden">Photos</span>
@@ -9328,9 +9321,6 @@ export default function Admin() {
           <ContactsManager />
         </TabsContent>
 
-        <TabsContent value="product-images" className="space-y-6">
-          <ProductImageManager />
-        </TabsContent>
 
 
         <TabsContent value="order-photos" className="space-y-6">
