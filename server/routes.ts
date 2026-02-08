@@ -2601,6 +2601,7 @@ West Monroe LA 71291
               await storage.updateOrderStripePayment(orderId, {
                 paymentStatus: 'refunded',
               });
+              await storage.updateOrderStatus(orderId, 'refunded');
             }
           }
         } catch (stripeError: any) {
