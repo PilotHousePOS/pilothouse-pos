@@ -78,7 +78,6 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
     return orderDateStr === todayDateStr;
   });
 
-  const completedOrders = todaysOrders.filter(order => order.status !== 'refunded' && (order as any).paymentStatus !== 'refunded');
   const refundedOrders = todaysOrders.filter(order => order.status === 'refunded' || (order as any).paymentStatus === 'refunded');
   
   let total = 0;
@@ -93,7 +92,8 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
   let cardPaymentTotal = 0;
   const categorySales: Map<string, CategorySales> = new Map();
   
-  for (const order of completedOrders) {
+  // Process ALL today's orders for gross sales (including refunded ones)
+  for (const order of todaysOrders) {
     const orderWithItems = await storage.getOrderWithItems(order.id);
     if (!orderWithItems) continue;
 
@@ -257,7 +257,7 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
   const netAfterRefunds = grossRevenue - refundedSubtotalTotal;
   const estimatedStripePayout = total - refundedTotal - stripeProcessingFees;
 
-  const transactionCount = completedOrders.length;
+  const transactionCount = todaysOrders.length;
   const avgTicket = transactionCount > 0 ? total / transactionCount : 0;
 
   const sortedCategories = Array.from(categorySales.values()).sort((a, b) => b.total - a.total);
