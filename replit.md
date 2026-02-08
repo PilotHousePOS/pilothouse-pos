@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first web application for online retail specializing in exotic reptiles, pet supplies, and grooming services. Its core purpose is to deliver a secure and seamless shopping experience through advanced inventory management, efficient service scheduling, robust customer engagement, and comprehensive administrative functionalities. The project aims to establish itself as a market leader in the exotic pet sector by offering unique products, superior customer service, and innovative technology.
+The Animal House Pet Store is a mobile-first web application for online retail, specializing in exotic reptiles, pet supplies, and grooming services. Its core purpose is to provide a secure and seamless shopping experience through advanced inventory management, efficient service scheduling, robust customer engagement, and comprehensive administrative functionalities. The project aims to become a market leader in the exotic pet sector by offering unique products, superior customer service, and innovative technology.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -20,7 +20,7 @@ The Animal House Pet Store is a mobile-first web application for online retail s
 - Product Recommendations ("You May Also Like"): Smart cross-category recommendations based on product type.
 - Extended Product Information: Sourced from reliable retailers (Chewy, Amazon, manufacturer websites).
 - Data Quality Validation Rules:
-  - Wet vs Dry Food Ingredients: Wet food (cans, stews, broths, entrees) ingredients differ significantly from dry food (kibble, bags). Never copy dry food ingredients to wet food products.
+  - Wet vs Dry Food Ingredients: Wet food (cans, stews, broths, broths, entrees) ingredients differ significantly from dry food (kibble, bags). Never copy dry food ingredients to wet food products.
   - Product Format Detection Rules:
     - Bone broth toppers (Come-Pooch-A): Must start with "[protein] bone broth" (e.g., "Turkey bone broth, liquid Lactobacillus...")
     - Canned wet food (13oz, 5.5oz cans): Must start with "[protein], [protein] broth" (e.g., "Chicken, chicken broth, chicken liver...")
