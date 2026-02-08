@@ -351,6 +351,8 @@ export interface IStorage {
   deleteWeeklyAppointmentLimit(id: number): Promise<void>;
   
   // Atomic capacity check - prevents race conditions by counting in the same transaction as creation
+  acquireBookingLock(dateStr: string): Promise<void>;
+  releaseBookingLock(dateStr: string): Promise<void>;
   checkAndReserveCapacity(
     dateStr: string, 
     dayOfWeek: number,
@@ -3246,14 +3248,24 @@ export class DatabaseStorage implements IStorage {
     await db.delete(weeklyAppointmentLimits).where(eq(weeklyAppointmentLimits.id, id));
   }
 
-  // Atomic capacity check - uses transaction with row locking to prevent race conditions
+  async acquireBookingLock(dateStr: string): Promise<void> {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const lockKey = year * 10000 + month * 100 + day;
+    await db.execute(sql`SELECT pg_advisory_lock(${lockKey})`);
+  }
+
+  async releaseBookingLock(dateStr: string): Promise<void> {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const lockKey = year * 10000 + month * 100 + day;
+    await db.execute(sql`SELECT pg_advisory_unlock(${lockKey})`);
+  }
+
   async checkAndReserveCapacity(
     dateStr: string, 
     dayOfWeek: number,
     requestedBaths: number,
     requestedGrooms: number
   ): Promise<{ withinCapacity: boolean; bathCount: number; groomCount: number; bathLimit: number; groomLimit: number; reason?: string }> {
-    // Get the weekly limit for this day
     const [limit] = await db.select().from(weeklyAppointmentLimits).where(eq(weeklyAppointmentLimits.dayOfWeek, dayOfWeek));
     
     if (!limit) {
@@ -3267,9 +3279,6 @@ export class DatabaseStorage implements IStorage {
       };
     }
     
-    // Count existing appointments for this date using raw SQL for atomicity
-    // This counts pets by service type from both appointment_pets table and legacy appointments table
-    // IMPORTANT: Only match the exact stored date - no timezone conversion to avoid counting adjacent days
     const countResult = await db.execute(sql`
       WITH date_appointments AS (
         SELECT a.id, a.service_type as legacy_service_type
@@ -3304,7 +3313,6 @@ export class DatabaseStorage implements IStorage {
     
     console.log(`[ATOMIC CAPACITY CHECK] Date: ${dateStr}, Current: ${currentGrooms} grooms, ${currentBaths} baths. Requested: ${requestedGrooms} grooms, ${requestedBaths} baths. Limits: ${limit.maxGroomAppointments} grooms, ${limit.maxBathAppointments} baths`);
     
-    // Check if adding would exceed capacity
     if (currentBaths + requestedBaths > limit.maxBathAppointments) {
       return {
         withinCapacity: false,

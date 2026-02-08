@@ -4217,7 +4217,7 @@ West Monroe LA 71291
       const petNamesStr = petsArray.map((p: any) => p.petName).join(', ');
       
       // SAFEGUARD #3: Final atomic capacity check right before creating - prevents race conditions
-      // This is a database-level double-check using raw SQL for maximum reliability
+      // Uses advisory lock to serialize concurrent booking attempts for the same date
       let requestedBathsFinal = 0;
       let requestedGroomsFinal = 0;
       for (const p of petsArray) {
@@ -4229,76 +4229,85 @@ West Monroe LA 71291
         }
       }
       
-      const atomicCheck = await storage.checkAndReserveCapacity(
-        appointmentDateStr,
-        dayOfWeek,
-        requestedBathsFinal,
-        requestedGroomsFinal
-      );
+      // Acquire advisory lock for this date - serializes concurrent booking attempts
+      // The lock is held until after the appointment + pets are fully inserted
+      await storage.acquireBookingLock(appointmentDateStr);
       
-      if (!atomicCheck.withinCapacity) {
-        console.error(`[FINAL CAPACITY CHECK] BLOCKED - ${atomicCheck.reason}`);
-        return res.status(400).json({
-          message: `This date is fully booked. ${atomicCheck.reason} Please select a different date.`
-        });
-      }
-      
-      console.log(`[FINAL CAPACITY CHECK] PASSED - proceeding with appointment creation`);
-      
-      // All appointments are auto-approved with capacity safeguards in place
-      // Parse price - handle range strings like "40-80" by taking the lower bound
-      let parsedPrice = req.body.price;
-      if (typeof parsedPrice === 'string' && parsedPrice.includes('-')) {
-        const lowerBound = parsedPrice.split('-')[0].trim();
-        parsedPrice = lowerBound || '0';
-      }
-      if (typeof parsedPrice === 'string' && parsedPrice.includes('+')) {
-        const parts = parsedPrice.split('+').map((p: string) => {
-          const trimmed = p.trim();
-          if (trimmed.includes('-')) return trimmed.split('-')[0].trim();
-          return trimmed;
-        });
-        parsedPrice = parts.reduce((sum: number, p: string) => sum + (parseFloat(p) || 0), 0).toString();
-      }
-      
-      const firstGroomerId = firstPet.groomerId || req.body.groomerId || null;
-      const appointmentData = insertAppointmentSchema.parse({ 
-        ...req.body,
-        price: parsedPrice,
-        // Use first pet's data for backward compatibility
-        petName: firstPet.petName,
-        petType: firstPet.petType,
-        serviceType: firstPet.serviceType,
-        specialNotes: firstPet.specialNotes,
-        groomerId: firstGroomerId,
-        userId,
-        isApproved: true,
-        status: 'confirmed'
-      });
-      const appointment = await storage.createAppointment(appointmentData);
-      
-      // Create appointment_pets records for all pets
-      if (req.body.pets && req.body.pets.length > 0) {
-        const SERVICES = [
-          { id: 'grooming-full', price: 35 },
-          { id: 'grooming-bath', price: 20 },
-        ];
+      let appointment;
+      try {
+        const atomicCheck = await storage.checkAndReserveCapacity(
+          appointmentDateStr,
+          dayOfWeek,
+          requestedBathsFinal,
+          requestedGroomsFinal
+        );
         
-        const petsWithPrice = petsArray.map((pet: any) => {
-          const service = SERVICES.find(s => s.id === pet.serviceType);
-          // Use per-pet groomerId if specified, otherwise fall back to appointment-level groomerId
-          const groomerId = pet.groomerId || req.body.groomerId;
-          return {
-            petName: pet.petName,
-            petType: pet.petType,
-            serviceType: pet.serviceType,
-            specialNotes: pet.specialNotes,
-            price: service ? service.price.toString() : '0',
-            groomerId: groomerId || null,
-          };
+        if (!atomicCheck.withinCapacity) {
+          console.error(`[FINAL CAPACITY CHECK] BLOCKED - ${atomicCheck.reason}`);
+          return res.status(400).json({
+            message: `This date is fully booked. ${atomicCheck.reason} Please select a different date.`
+          });
+        }
+        
+        console.log(`[FINAL CAPACITY CHECK] PASSED - proceeding with appointment creation (lock held)`);
+        
+        // All appointments are auto-approved with capacity safeguards in place
+        // Parse price - handle range strings like "40-80" by taking the lower bound
+        let parsedPrice = req.body.price;
+        if (typeof parsedPrice === 'string' && parsedPrice.includes('-')) {
+          const lowerBound = parsedPrice.split('-')[0].trim();
+          parsedPrice = lowerBound || '0';
+        }
+        if (typeof parsedPrice === 'string' && parsedPrice.includes('+')) {
+          const parts = parsedPrice.split('+').map((p: string) => {
+            const trimmed = p.trim();
+            if (trimmed.includes('-')) return trimmed.split('-')[0].trim();
+            return trimmed;
+          });
+          parsedPrice = parts.reduce((sum: number, p: string) => sum + (parseFloat(p) || 0), 0).toString();
+        }
+        
+        const firstGroomerId = firstPet.groomerId || req.body.groomerId || null;
+        const appointmentData = insertAppointmentSchema.parse({ 
+          ...req.body,
+          price: parsedPrice,
+          petName: firstPet.petName,
+          petType: firstPet.petType,
+          serviceType: firstPet.serviceType,
+          specialNotes: firstPet.specialNotes,
+          groomerId: firstGroomerId,
+          userId,
+          isApproved: true,
+          status: 'confirmed'
         });
         
-        await storage.createAppointmentPets(appointment.id, petsWithPrice);
+        appointment = await storage.createAppointment(appointmentData);
+        
+        // Create appointment_pets records for all pets
+        if (req.body.pets && req.body.pets.length > 0) {
+          const SERVICES = [
+            { id: 'grooming-full', price: 35 },
+            { id: 'grooming-bath', price: 20 },
+          ];
+          
+          const petsWithPrice = petsArray.map((pet: any) => {
+            const service = SERVICES.find(s => s.id === pet.serviceType);
+            const groomerId = pet.groomerId || req.body.groomerId;
+            return {
+              petName: pet.petName,
+              petType: pet.petType,
+              serviceType: pet.serviceType,
+              specialNotes: pet.specialNotes,
+              price: service ? service.price.toString() : '0',
+              groomerId: groomerId || null,
+            };
+          });
+          
+          await storage.createAppointmentPets(appointment.id, petsWithPrice);
+        }
+      } finally {
+        // Always release the booking lock after appointment creation (or failure)
+        await storage.releaseBookingLock(appointmentDateStr);
       }
       
       // Send admin notifications for new appointment
