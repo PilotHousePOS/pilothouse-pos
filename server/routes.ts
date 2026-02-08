@@ -4312,10 +4312,10 @@ West Monroe LA 71291
       
       // Send admin notifications for new appointment
       try {
-        const customerName = `${appointmentData.ownerFirstName} ${appointmentData.ownerLastName}`;
+        const customerName = `${appointment.ownerFirstName} ${appointment.ownerLastName}`;
         const serviceInfo = petsArray.length > 1 
           ? `${petsArray.length} pets: ${petNamesStr}`
-          : appointmentData.serviceType;
+          : appointment.serviceType;
         
         // Get all admin users
         const allUsers = await storage.getAllUsers();
@@ -4329,12 +4329,11 @@ West Monroe LA 71291
           appointment.id,
           customerName,
           serviceInfo,
-          appointmentData.appointmentDate,
-          appointmentData.appointmentTime
+          appointment.appointmentDate,
+          appointment.appointmentTime
         );
       } catch (notificationError) {
         console.error('Failed to send admin notifications for new appointment:', notificationError);
-        // Don't fail the appointment if notifications fail
       }
       
       // Calculate remaining slots after booking
