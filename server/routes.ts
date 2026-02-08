@@ -4727,16 +4727,12 @@ West Monroe LA 71291
           if (!u.email || u.email.startsWith('temp_')) return false;
           
           if (roleFilter && roleFilter !== 'all') {
-            switch (roleFilter) {
-              case 'customers':
-                return !u.isAdmin && !u.isGroomer;
-              case 'groomers':
-                return u.isGroomer;
-              case 'admins':
-                return u.isAdmin;
-              default:
-                return true;
-            }
+            const roles = Array.isArray(roleFilter) ? roleFilter : [roleFilter];
+            const isCustomer = !u.isAdmin && !u.isGroomer;
+            if (roles.includes('customers') && isCustomer) return true;
+            if (roles.includes('groomers') && u.isGroomer) return true;
+            if (roles.includes('admins') && u.isAdmin) return true;
+            return false;
           }
           return true;
         });
@@ -4875,23 +4871,17 @@ West Monroe LA 71291
         targetUsers = targetUsers.filter((u: any) => {
           if (!u.phoneNumber) return false;
           
-          // Apply role filter if specified
           if (roleFilter && roleFilter !== 'all') {
-            switch (roleFilter) {
-              case 'customers':
-                return !u.isAdmin && !u.isGroomer;
-              case 'groomers':
-                return u.isGroomer;
-              case 'admins':
-                return u.isAdmin;
-              default:
-                return true;
-            }
+            const roles = Array.isArray(roleFilter) ? roleFilter : [roleFilter];
+            const isCustomer = !u.isAdmin && !u.isGroomer;
+            if (roles.includes('customers') && isCustomer) return true;
+            if (roles.includes('groomers') && u.isGroomer) return true;
+            if (roles.includes('admins') && u.isAdmin) return true;
+            return false;
           }
           return true;
         });
       } else if (recipients && Array.isArray(recipients) && recipients.length > 0) {
-        // Get specific users by ID
         for (const userId of recipients) {
           const user = await storage.getUser(userId);
           if (user && user.phoneNumber) {

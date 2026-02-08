@@ -40,7 +40,7 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [sendToAll, setSendToAll] = useState(true);
-  const [roleFilter, setRoleFilter] = useState<'all' | 'customers' | 'groomers' | 'admins'>('all');
+  const [roleFilters, setRoleFilters] = useState<Set<string>>(new Set(['customers', 'groomers', 'admins']));
   const [selectedRecipients, setSelectedRecipients] = useState<string[]>([]);
   const [isSending, setIsSending] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -103,6 +103,8 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
     queryKey: ['/api/admin/email/recipients'],
   });
 
+  const allRolesSelected = roleFilters.size === 3 && roleFilters.has('customers') && roleFilters.has('groomers') && roleFilters.has('admins');
+
   const filteredRecipients = (recipients as any[]).filter((r: any) => {
     const matchesSearch = r.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       r.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -110,16 +112,12 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
     
     if (!matchesSearch) return false;
     
-    switch (roleFilter) {
-      case 'customers':
-        return !r.isAdmin && !r.isGroomer;
-      case 'groomers':
-        return r.isGroomer;
-      case 'admins':
-        return r.isAdmin;
-      default:
-        return true;
-    }
+    if (allRolesSelected || roleFilters.size === 0) return true;
+    
+    if (roleFilters.has('customers') && !r.isAdmin && !r.isGroomer) return true;
+    if (roleFilters.has('groomers') && r.isGroomer) return true;
+    if (roleFilters.has('admins') && r.isAdmin) return true;
+    return false;
   });
 
   const recipientsWithPhones = filteredRecipients.filter((r: any) => r.phoneNumber);
@@ -153,7 +151,7 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
           subject,
           message,
           sendToAll,
-          roleFilter: sendToAll ? roleFilter : undefined,
+          roleFilter: sendToAll ? (allRolesSelected ? 'all' : Array.from(roleFilters)) : undefined,
           recipients: sendToAll ? undefined : selectedRecipients,
           isMarketing
         })
@@ -216,7 +214,7 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
         body: JSON.stringify({
           message,
           sendToAll,
-          roleFilter: sendToAll ? roleFilter : undefined,
+          roleFilter: sendToAll ? (allRolesSelected ? 'all' : Array.from(roleFilters)) : undefined,
           recipients: sendToAll ? undefined : selectedRecipients
         })
       });
@@ -981,34 +979,42 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
             <Label className="text-sm font-medium">Target Audience</Label>
             <div className="flex flex-wrap gap-2">
               <Button
-                variant={roleFilter === 'all' ? 'default' : 'outline'}
+                variant={allRolesSelected ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => setRoleFilter('all')}
+                onClick={() => {
+                  setRoleFilters(new Set(['customers', 'groomers', 'admins']));
+                  setSelectedRecipients([]);
+                }}
               >
                 All ({getRoleCount('all')})
               </Button>
-              <Button
-                variant={roleFilter === 'customers' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setRoleFilter('customers')}
-              >
-                Customers ({getRoleCount('customers')})
-              </Button>
-              <Button
-                variant={roleFilter === 'groomers' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setRoleFilter('groomers')}
-              >
-                Groomers ({getRoleCount('groomers')})
-              </Button>
-              <Button
-                variant={roleFilter === 'admins' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setRoleFilter('admins')}
-              >
-                Admins ({getRoleCount('admins')})
-              </Button>
+              {(['customers', 'groomers', 'admins'] as const).map((role) => (
+                <Button
+                  key={role}
+                  variant={roleFilters.has(role) && !allRolesSelected ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => {
+                    setRoleFilters(prev => {
+                      const next = new Set(prev);
+                      if (next.has(role)) {
+                        if (next.size > 1) next.delete(role);
+                      } else {
+                        next.add(role);
+                      }
+                      return next;
+                    });
+                    setSelectedRecipients([]);
+                  }}
+                >
+                  {role.charAt(0).toUpperCase() + role.slice(1)} ({getRoleCount(role)})
+                </Button>
+              ))}
             </div>
+            {!allRolesSelected && (
+              <p className="text-xs text-muted-foreground">
+                Sending to: {Array.from(roleFilters).map(r => r.charAt(0).toUpperCase() + r.slice(1)).join(' + ')}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -1103,7 +1109,7 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
                     setSelectedRecipients([]);
                   }}
                 >
-                  All {roleFilter !== 'all' ? roleFilter : 'users'} ({activeTab === 'sms' ? recipientsWithPhones.length : filteredRecipients.length})
+                  All {!allRolesSelected ? Array.from(roleFilters).join(' & ') : 'users'} ({activeTab === 'sms' ? recipientsWithPhones.length : filteredRecipients.length})
                 </Button>
                 <Button
                   variant={!sendToAll ? 'default' : 'outline'}
@@ -1195,7 +1201,7 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
               <>
                 <Send className="w-4 h-4 mr-2" />
                 {activeTab === 'email' 
-                  ? `Send Email${sendToAll ? ` to ${getRoleCount(roleFilter)} ${roleFilter === 'all' ? 'users' : roleFilter}` : ` to ${selectedRecipients.length} selected`}`
+                  ? `Send Email${sendToAll ? ` to ${filteredRecipients.length} ${allRolesSelected ? 'users' : Array.from(roleFilters).join(' & ')}` : ` to ${selectedRecipients.length} selected`}`
                   : `Send Text${sendToAll ? ` to ${recipientsWithPhones.length} users with phones` : ` to ${selectedRecipients.length} selected`}`}
               </>
             )}
