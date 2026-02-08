@@ -5943,7 +5943,8 @@ export default function Admin() {
 
   const createRefundMutation = useMutation({
     mutationFn: async (refundData: any) => {
-      return await apiRequest("POST", "/api/admin/refunds", refundData);
+      const res = await apiRequest("POST", "/api/admin/refunds", refundData);
+      return await res.json();
     },
     onSuccess: (data: any) => {
       const message = data.paymentRefunded 
