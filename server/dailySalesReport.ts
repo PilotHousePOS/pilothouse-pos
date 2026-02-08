@@ -1,5 +1,6 @@
 import { getUncachableSendGridClient } from './sendgridIntegration';
 import { storage } from './storage';
+import { getUncachableStripeClient } from './stripeClient';
 
 interface OrderItem {
   id: number;
@@ -162,25 +163,54 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
     }
   }
 
-  // Get actual refund records for today (more accurate than just order status)
-  const todayStart = new Date(today);
-  todayStart.setHours(0, 0, 0, 0);
-  const todayEnd = new Date(today);
-  todayEnd.setHours(23, 59, 59, 999);
-  
+  // Get refund data - try database first, then fall back to Stripe API
+  const cstNow = new Date(today.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+  const todayCST = new Date(cstNow.getFullYear(), cstNow.getMonth(), cstNow.getDate());
+  const tomorrowCST = new Date(todayCST);
+  tomorrowCST.setDate(tomorrowCST.getDate() + 1);
+
+  const cstOffsetMs = today.getTime() - cstNow.getTime();
+  const todayStartUTC = new Date(todayCST.getTime() + cstOffsetMs);
+  const todayEndUTC = new Date(tomorrowCST.getTime() + cstOffsetMs - 1);
+
   let todaysRefunds: any[] = [];
   try {
-    todaysRefunds = await storage.getRefundsByDateRange(todayStart, todayEnd);
+    todaysRefunds = await storage.getRefundsByDateRange(todayStartUTC, todayEndUTC);
   } catch (e) {
     // Fallback if method not available
   }
-  
-  const refundSubtotal = todaysRefunds.reduce((sum, r) => sum + (parseFloat(r.subtotalRefunded) || 0), 0);
-  const refundTax = todaysRefunds.reduce((sum, r) => sum + (parseFloat(r.taxRefunded) || 0), 0);
-  const refundTotal = todaysRefunds.reduce((sum, r) => sum + (parseFloat(r.totalRefunded) || 0), 0);
-  const refundCount = todaysRefunds.length;
-  
-  // Fallback to order-level refund data if no refund records found
+
+  let refundSubtotal = todaysRefunds.reduce((sum, r) => sum + (parseFloat(r.subtotalRefunded) || 0), 0);
+  let refundTax = todaysRefunds.reduce((sum, r) => sum + (parseFloat(r.taxRefunded) || 0), 0);
+  let refundTotal = todaysRefunds.reduce((sum, r) => sum + (parseFloat(r.totalRefunded) || 0), 0);
+  let refundCount = todaysRefunds.length;
+
+  // If no refund records in DB, query Stripe API directly for today's refunds
+  if (refundCount === 0 && refundedOrders.length === 0) {
+    try {
+      const stripe = await getUncachableStripeClient();
+      const startOfDayUnix = Math.floor(todayStartUTC.getTime() / 1000);
+      const endOfDayUnix = Math.floor(todayEndUTC.getTime() / 1000);
+
+      const stripeRefunds = await stripe.refunds.list({
+        created: { gte: startOfDayUnix, lte: endOfDayUnix },
+        limit: 100,
+      });
+
+      if (stripeRefunds.data.length > 0) {
+        refundCount = stripeRefunds.data.length;
+        refundTotal = stripeRefunds.data.reduce((sum, r) => sum + (r.amount / 100), 0);
+        const taxRate = 0.1099;
+        refundSubtotal = parseFloat((refundTotal / (1 + taxRate)).toFixed(2));
+        refundTax = parseFloat((refundTotal - refundSubtotal).toFixed(2));
+        console.log(`Sales report: Retrieved ${refundCount} refunds ($${refundTotal.toFixed(2)}) from Stripe API`);
+      }
+    } catch (stripeErr: any) {
+      console.error('Failed to fetch refunds from Stripe API:', stripeErr.message);
+    }
+  }
+
+  // Final fallback to order-level refund data
   const refundedTotal = refundCount > 0 ? refundTotal : refundedOrders.reduce((sum, order) => sum + (parseFloat(order.totalAmount) || 0), 0);
   const refundedTaxTotal = refundCount > 0 ? refundTax : refundedOrders.reduce((sum, order) => sum + (parseFloat((order as any).taxAmount) || 0), 0);
   const refundedSubtotalTotal = refundCount > 0 ? refundSubtotal : refundedOrders.reduce((sum, order) => sum + (parseFloat((order as any).subtotal) || 0), 0);
