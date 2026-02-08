@@ -3591,11 +3591,9 @@ function EditAppointmentDialog({
     onClose();
   };
   
-  // Service prices constant
-  const SERVICES = [
-    { id: 'grooming-full', name: 'Full Grooming', price: 35 },
-    { id: 'grooming-bath', name: 'Bath Only', price: 20 },
-  ];
+  const { data: editServicePrices } = useQuery<{ fullGrooming: string; bathOnly: string }>({
+    queryKey: ["/api/service-prices"],
+  });
   
   // Fetch appointment and appointment_pets data
   const { data: appointmentData, isLoading: isLoadingAppointment } = useQuery({
@@ -3676,12 +3674,12 @@ function EditAppointmentDialog({
     const updated = [...pets];
     updated[index] = { ...updated[index], [field]: value };
     
-    // Auto-update price when service changes in individual mode
     if (field === 'serviceType' && pricingMode === 'individual') {
-      const service = SERVICES.find(s => s.id === value);
-      if (service) {
-        updated[index].price = service.price.toString();
-      }
+      const priceStr = value === 'grooming-full' 
+        ? (editServicePrices?.fullGrooming || '35') 
+        : (editServicePrices?.bathOnly || '20');
+      const basePrice = priceStr.includes('-') ? priceStr.split('-')[0] : priceStr;
+      updated[index].price = basePrice;
     }
     
     setPets(updated);
@@ -3904,8 +3902,8 @@ function EditAppointmentDialog({
                         <SelectValue placeholder="Select service" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="grooming-full">Full Grooming $35 (Prices will vary)</SelectItem>
-                        <SelectItem value="grooming-bath">Bath Only $20 (Prices will vary)</SelectItem>
+                        <SelectItem value="grooming-full">Full Grooming ${editServicePrices?.fullGrooming || '35'} (Prices will vary)</SelectItem>
+                        <SelectItem value="grooming-bath">Bath Only ${editServicePrices?.bathOnly || '20'} (Prices will vary)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -4963,6 +4961,11 @@ export default function Admin() {
 
   const { data: groomers = [] } = useQuery<any[]>({
     queryKey: ["/api/groomers"],
+    enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
+  });
+
+  const { data: servicePrices } = useQuery<{ fullGrooming: string; bathOnly: string }>({
+    queryKey: ["/api/service-prices"],
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
 
@@ -6180,15 +6183,16 @@ export default function Admin() {
       return;
     }
 
-    const SERVICES = [
-      { id: 'grooming-full', name: 'Full Grooming', price: 35 },
-      { id: 'grooming-bath', name: 'Bath Only', price: 20 },
-    ];
+    const fullPrice = servicePrices?.fullGrooming || '35';
+    const bathPrice = servicePrices?.bathOnly || '20';
+    const getBasePrice = (priceStr: string) => {
+      const base = priceStr.includes('-') ? priceStr.split('-')[0] : priceStr;
+      return parseFloat(base) || 0;
+    };
 
-    // Calculate total price from all pets
     const totalPrice = bookingPets.reduce((sum, pet) => {
-      const serviceData = SERVICES.find(s => s.id === pet.serviceType);
-      return sum + (serviceData?.price || 0);
+      const price = pet.serviceType === 'grooming-full' ? getBasePrice(fullPrice) : getBasePrice(bathPrice);
+      return sum + price;
     }, 0);
 
     // Build list of dates to create appointments for
@@ -11427,8 +11431,8 @@ export default function Admin() {
                         <SelectValue placeholder="Select service" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="grooming-full">Full Grooming $35 (Prices will vary)</SelectItem>
-                        <SelectItem value="grooming-bath">Bath Only $20 (Prices will vary)</SelectItem>
+                        <SelectItem value="grooming-full">Full Grooming ${servicePrices?.fullGrooming || '35'} (Prices will vary)</SelectItem>
+                        <SelectItem value="grooming-bath">Bath Only ${servicePrices?.bathOnly || '20'} (Prices will vary)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
