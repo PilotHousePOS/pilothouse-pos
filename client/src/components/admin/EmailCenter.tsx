@@ -1091,62 +1091,71 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
             />
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="send-to-all"
-                  checked={sendToAll}
-                  onCheckedChange={(checked) => {
-                    setSendToAll(checked as boolean);
-                    if (checked) setSelectedRecipients([]);
+              <Label className="text-sm font-medium">Recipients</Label>
+              <div className="flex gap-2">
+                <Button
+                  variant={sendToAll ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => {
+                    setSendToAll(true);
+                    setSelectedRecipients([]);
                   }}
-                />
-                <Label htmlFor="send-to-all">Send to all {roleFilter !== 'all' ? roleFilter : 'users'}</Label>
+                >
+                  All {roleFilter !== 'all' ? roleFilter : 'users'} ({activeTab === 'sms' ? recipientsWithPhones.length : filteredRecipients.length})
+                </Button>
+                <Button
+                  variant={!sendToAll ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSendToAll(false)}
+                >
+                  Pick Individually
+                </Button>
               </div>
             </div>
 
             {!sendToAll && (
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
                   <Input
                     placeholder={activeTab === 'sms' ? "Search by name or phone..." : "Search by name or email..."}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="max-w-xs"
+                    className="flex-1"
                   />
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={selectAll}>Select All</Button>
-                    <Button variant="outline" size="sm" onClick={clearAll}>Clear</Button>
-                  </div>
+                  <Button variant="outline" size="sm" onClick={selectAll}>Select All</Button>
+                  <Button variant="outline" size="sm" onClick={clearAll}>Clear</Button>
                 </div>
 
-                <ScrollArea className="h-48 border rounded-lg p-2">
+                <ScrollArea className="h-52 border rounded-lg p-2">
                   {loadingRecipients ? (
                     <div className="text-center py-4 text-muted-foreground">Loading...</div>
+                  ) : (activeTab === 'sms' ? recipientsWithPhones : filteredRecipients).length === 0 ? (
+                    <div className="text-center py-4 text-muted-foreground text-sm">No matching recipients</div>
                   ) : (
                     <div className="space-y-1">
                       {(activeTab === 'sms' ? recipientsWithPhones : filteredRecipients).map((recipient: any) => (
-                        <div key={recipient.id} className="flex items-center gap-2 p-2 hover:bg-muted rounded">
+                        <div key={recipient.id} className="flex items-center gap-2 p-2 hover:bg-muted rounded cursor-pointer" onClick={() => toggleRecipient(recipient.id)}>
                           <Checkbox
                             checked={selectedRecipients.includes(String(recipient.id))}
                             onCheckedChange={() => toggleRecipient(recipient.id)}
                           />
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">{recipient.fullName}</p>
-                            <p className="text-xs text-muted-foreground">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{recipient.fullName}</p>
+                            <p className="text-xs text-muted-foreground truncate">
                               {activeTab === 'sms' ? recipient.phoneNumber : recipient.email}
                             </p>
                           </div>
+                          {recipient.isGroomer && <span className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-1.5 py-0.5 rounded">Groomer</span>}
+                          {recipient.isAdmin && <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded">Admin</span>}
                         </div>
                       ))}
                     </div>
                   )}
                 </ScrollArea>
                 <p className="text-sm text-muted-foreground">
-                  {activeTab === 'email' 
-                    ? `${selectedRecipients.length} recipient(s) selected`
-                    : `${selectedRecipients.length} recipient(s) with phone numbers selected`}
+                  {selectedRecipients.length} of {(activeTab === 'sms' ? recipientsWithPhones : filteredRecipients).length} selected
                 </p>
               </div>
             )}
