@@ -239,6 +239,7 @@ export interface IStorage {
   updateOrderApprovalStatus(id: number, approvalStatus: string): Promise<Order>;
   updateOrderStripePayment(id: number, data: { stripeCheckoutSessionId?: string; stripePaymentIntentId?: string; stripePaymentUrl?: string; paymentStatus?: string; paidAt?: Date }): Promise<Order>;
   getOrderByStripeCheckoutSession(sessionId: string): Promise<Order | undefined>;
+  getOrderByStripePaymentIntent(paymentIntentId: string): Promise<Order | undefined>;
   hideOrderFromAdmin(id: number): Promise<Order>;
   deleteOrder(id: number): Promise<void>;
 
@@ -2343,6 +2344,15 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(orders)
       .where(eq(orders.stripeCheckoutSessionId, sessionId))
+      .limit(1);
+    return order;
+  }
+
+  async getOrderByStripePaymentIntent(paymentIntentId: string): Promise<Order | undefined> {
+    const [order] = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.stripePaymentIntentId, paymentIntentId))
       .limit(1);
     return order;
   }

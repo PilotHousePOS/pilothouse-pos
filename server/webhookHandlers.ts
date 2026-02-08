@@ -70,8 +70,11 @@ export class WebhookHandlers {
         await WebhookHandlers.handlePaymentIntentFailed(event.data.object);
         break;
         
+      case 'charge.refunded':
+        await WebhookHandlers.handleChargeRefunded(event.data.object);
+        break;
+        
       default:
-        // Unhandled event type - ignore
         break;
     }
   }
@@ -181,6 +184,82 @@ export class WebhookHandlers {
         paymentStatus: 'failed',
       });
       console.log(`Order #${orderId} payment failed`);
+    }
+  }
+  
+  static async handleChargeRefunded(charge: any): Promise<void> {
+    console.log('Processing charge.refunded:', charge.id);
+    
+    const paymentIntentId = charge.payment_intent;
+    if (!paymentIntentId) {
+      console.log('No payment_intent on refunded charge, skipping');
+      return;
+    }
+    
+    const order = await storage.getOrderByStripePaymentIntent(paymentIntentId);
+    if (!order) {
+      console.log(`No order found for payment_intent ${paymentIntentId}, skipping refund recording`);
+      return;
+    }
+    
+    const amountRefunded = (charge.amount_refunded || 0) / 100;
+    const totalCharged = (charge.amount || 0) / 100;
+    const isFullRefund = charge.refunded === true;
+    
+    const existingRefunds = await storage.getRefundsByOrderId(order.id);
+    const alreadyRecorded = existingRefunds.some(
+      (r: any) => r.reason?.includes(charge.id)
+    );
+    
+    if (alreadyRecorded) {
+      console.log(`Refund for charge ${charge.id} already recorded for order #${order.id}`);
+      return;
+    }
+    
+    const latestRefund = charge.refunds?.data?.[0];
+    const stripeRefundId = latestRefund?.id || charge.id;
+    const refundAmount = latestRefund ? (latestRefund.amount / 100) : amountRefunded;
+    
+    const orderTotal = parseFloat(order.totalAmount || "0");
+    const orderTax = parseFloat(order.taxAmount || "0");
+    const orderSubtotal = parseFloat(order.subtotal || "0");
+    
+    let taxPortion = 0;
+    let subtotalPortion = 0;
+    
+    if (isFullRefund || refundAmount >= orderTotal) {
+      taxPortion = orderTax;
+      subtotalPortion = orderSubtotal;
+    } else if (orderTotal > 0) {
+      const ratio = refundAmount / orderTotal;
+      taxPortion = parseFloat((orderTax * ratio).toFixed(2));
+      subtotalPortion = parseFloat((refundAmount - taxPortion).toFixed(2));
+    }
+    
+    try {
+      await storage.createRefund({
+        orderId: order.id,
+        orderItemId: null,
+        refundType: isFullRefund ? 'full' : 'partial',
+        quantity: 1,
+        subtotalRefunded: subtotalPortion.toFixed(2),
+        taxRefunded: taxPortion.toFixed(2),
+        totalRefunded: refundAmount.toFixed(2),
+        reason: `Stripe refund ${stripeRefundId} (via Stripe dashboard) | Charge: ${charge.id}`,
+        processedBy: null,
+        posTransactionId: null,
+      });
+      
+      if (isFullRefund) {
+        await storage.updateOrderStripePayment(order.id, {
+          paymentStatus: 'refunded',
+        });
+        await storage.updateOrderStatus(order.id, 'refunded');
+      }
+      
+      console.log(`Refund recorded for order #${order.id}: $${refundAmount.toFixed(2)} (${isFullRefund ? 'full' : 'partial'})`);
+    } catch (err: any) {
+      console.error(`Failed to record refund for order #${order.id}:`, err.message);
     }
   }
   
