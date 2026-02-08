@@ -9703,7 +9703,6 @@ export default function Admin() {
                     });
                     
                     queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
-                    queryClient.invalidateQueries({ queryKey: ['/api/admin/supplies/image-stats'] });
                   } catch (error) {
                     toast({
                       title: "Sync failed",

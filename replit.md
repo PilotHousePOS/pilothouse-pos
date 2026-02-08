@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first web application for online retail, specializing in exotic reptiles, pet supplies, and grooming services. Its core purpose is to provide a secure and seamless shopping experience through advanced inventory management, efficient service scheduling, robust customer engagement, and comprehensive administrative functionalities. The project aims to become a market leader in the exotic pet sector by offering unique products, superior customer service, and innovative technology.
+The Animal House Pet Store is a mobile-first web application for online retail, specializing in exotic reptiles, pet supplies, and grooming services. Its purpose is to deliver a secure and seamless shopping experience through advanced inventory management, efficient service scheduling, robust customer engagement, and comprehensive administrative functionalities. The project aims to become a market leader in the exotic pet sector by offering unique products, superior customer service, and innovative technology, ultimately achieving sustainable growth and significant market share.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -182,12 +182,12 @@ Step 5: NEVER mark task complete until verification passes
 - **Blue Buffalo**: https://bluebuffalo.com/
 - **Pro Plan**: https://purina.com/pro-plan/
 
-- Groomer Daily Limit: Each groomer can accept max 5 full grooming appointments per day. Bath-only appointments do NOT count toward this limit. Frontend groomer dropdowns show remaining slots.
+- Groomer Daily Limit: Each groomer can accept max 5 full grooming appointments per day. Bath-only appointments do NOT count toward this limit. Frontend groomer dropdowns shows remaining slots.
 - Push Notifications: Web Push via VAPID keys, PWA-compatible service worker with pushsubscriptionchange auto-resubscribe. Notifications work in browser AND as installed PWA app.
 - Marketing Email Opt-Out: Users can opt out of marketing emails in profile. Admin Email Center has "This is a marketing email" checkbox that filters opted-out users. Order emails and important updates bypass opt-out.
 
 ## System Architecture
-The Animal House Pet Store is a full-stack, mobile-first web application featuring a dark, bold, high-contrast UI/UX with Amazon-style image carousels. It utilizes JWT-based authentication with a three-tier role-based access control system. The frontend is built with React, Vite, TypeScript, Tailwind CSS, and shadcn/ui. The backend uses Express.js and TypeScript, integrated with PostgreSQL and Drizzle ORM. Authentication relies on JWT tokens stored in cookies, state management is handled by TanStack Query, and Wouter manages client-side routing. Key functionalities include customer wishlists, a CMS for animal categories, administrative order management, advanced search, database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and AI-powered processing for order photo analysis, item extraction, and categorization. Real-time alerts are delivered via Web Push Notifications using VAPID keys.
+The Animal House Pet Store is a full-stack, mobile-first web application. The UI/UX features a dark, bold, high-contrast aesthetic with Amazon-style image carousels. It implements JWT-based authentication with a three-tier role-based access control system. The frontend is built with React, Vite, TypeScript, Tailwind CSS, and shadcn/ui. The backend uses Express.js and TypeScript, integrated with PostgreSQL and Drizzle ORM. Authentication relies on JWT tokens stored in cookies, state management is handled by TanStack Query, and Wouter manages client-side routing. Key functionalities include customer wishlists, a CMS for animal categories, administrative order management, advanced search capabilities, database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and AI-powered processing for order photo analysis, item extraction, and categorization. Real-time alerts are delivered via Web Push Notifications using VAPID keys.
 
 ## External Dependencies
 - PostgreSQL
