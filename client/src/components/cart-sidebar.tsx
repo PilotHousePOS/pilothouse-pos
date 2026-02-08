@@ -226,20 +226,20 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     details: getItemDetails(item)
   }));
 
-  const subtotal = cartItemsWithDetails.reduce((total, item) => {
+  const subtotal = Math.round(cartItemsWithDetails.reduce((total, item) => {
     return total + (parseFloat(item.details.price) * item.quantity);
-  }, 0);
+  }, 0) * 100) / 100;
   
-  const taxAmount = subtotal * (taxRate / 100);
-  const subtotalWithTax = subtotal + taxAmount;
+  const taxAmount = Math.round(subtotal * (taxRate / 100) * 100) / 100;
+  const subtotalWithTax = Math.round((subtotal + taxAmount) * 100) / 100;
   
   // Calculate loyalty credit discount (can't exceed the order total)
-  const loyaltyDiscount = applyLoyaltyCredits ? Math.min(availableLoyaltyCredits, subtotalWithTax) : 0;
-  const amountBeforeFee = subtotalWithTax - loyaltyDiscount;
+  const loyaltyDiscount = applyLoyaltyCredits ? Math.round(Math.min(availableLoyaltyCredits, subtotalWithTax) * 100) / 100 : 0;
+  const amountBeforeFee = Math.round((subtotalWithTax - loyaltyDiscount) * 100) / 100;
   
   // Card processing convenience fee: 2.9% + $0.30
-  const convenienceFee = amountBeforeFee > 0 ? (amountBeforeFee * 0.029) + 0.30 : 0;
-  const totalAmount = amountBeforeFee + convenienceFee;
+  const convenienceFee = amountBeforeFee > 0 ? Math.round(((amountBeforeFee * 0.029) + 0.30) * 100) / 100 : 0;
+  const totalAmount = Math.round((amountBeforeFee + convenienceFee) * 100) / 100;
 
   const handleCheckout = () => {
     if (cartItems.length === 0) {

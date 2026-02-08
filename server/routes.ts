@@ -1929,14 +1929,15 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       validatedData.loyaltyCreditsApplied = verifiedLoyaltyCredits.toFixed(2);
       
       // Server-side recalculation of convenience fee to prevent tampering
-      const orderSubtotal = parseFloat(orderData.subtotal || "0");
-      const orderTax = parseFloat(orderData.taxAmount || "0");
-      const amountBeforeFee = orderSubtotal + orderTax - verifiedLoyaltyCredits;
-      const serverConvenienceFee = amountBeforeFee > 0 ? (amountBeforeFee * 0.029) + 0.30 : 0;
+      // Round each component to 2 decimal places to match frontend precision
+      const orderSubtotal = Math.round(parseFloat(orderData.subtotal || "0") * 100) / 100;
+      const orderTax = Math.round(parseFloat(orderData.taxAmount || "0") * 100) / 100;
+      const amountBeforeFee = Math.round((orderSubtotal + orderTax - verifiedLoyaltyCredits) * 100) / 100;
+      const serverConvenienceFee = amountBeforeFee > 0 ? Math.round(((amountBeforeFee * 0.029) + 0.30) * 100) / 100 : 0;
       validatedData.convenienceFee = serverConvenienceFee.toFixed(2);
       
       // Recalculate total with server-verified values
-      const serverTotal = amountBeforeFee + serverConvenienceFee;
+      const serverTotal = Math.round((amountBeforeFee + serverConvenienceFee) * 100) / 100;
       validatedData.totalAmount = serverTotal.toFixed(2);
       
       // Get payment intent ID if provided (from Stripe checkout)
