@@ -30,14 +30,31 @@ async function getCredentials() {
   return {apiKey: connectionSettings.settings.api_key, email: connectionSettings.settings.from_email};
 }
 
+async function getAlternateReplyToEmail(): Promise<string | null> {
+  try {
+    const { storage } = await import('./storage');
+    const settings = await storage.getGroomingSettings();
+    const setting = settings.find((s: any) => s.setting === 'alternate_reply_email');
+    return setting?.value || null;
+  } catch {
+    return null;
+  }
+}
+
 // WARNING: Never cache this client.
 // Access tokens expire, so a new client must be created each time.
 // Always call this function again to get a fresh client.
 export async function getUncachableSendGridClient() {
   const {apiKey, email} = await getCredentials();
   sgMail.setApiKey(apiKey);
+  const alternateEmail = await getAlternateReplyToEmail();
+  const replyToList: {email: string}[] = [{email}];
+  if (alternateEmail && alternateEmail !== email) {
+    replyToList.push({email: alternateEmail});
+  }
   return {
     client: sgMail,
-    fromEmail: email
+    fromEmail: email,
+    replyToList,
   };
 }

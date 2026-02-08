@@ -2146,7 +2146,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (customerEmail) {
         try {
           const { getUncachableSendGridClient } = await import('./sendgridIntegration');
-          const { client, fromEmail } = await getUncachableSendGridClient();
+          const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
           const itemsList = orderWithItems.items.map((item: any) => 
             `• ${item.productName || item.itemName || 'Item'} x${item.quantity} - $${item.price}`
           ).join('\n');
@@ -2165,6 +2165,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           await client.send({
             to: customerEmail,
             from: fromEmail,
+            replyToList,
             subject: emailSubject,
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -2240,11 +2241,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (customerEmail) {
         try {
           const { getUncachableSendGridClient } = await import('./sendgridIntegration');
-          const { client, fromEmail } = await getUncachableSendGridClient();
+          const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
           
           await client.send({
             to: customerEmail,
             from: fromEmail,
+            replyToList,
             subject: 'Your Animal House Order Is Ready for Pickup!',
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -2304,11 +2306,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         if (customerEmail) {
           try {
             const { getUncachableSendGridClient } = await import('./sendgridIntegration');
-            const { client, fromEmail } = await getUncachableSendGridClient();
+            const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
             
             await client.send({
               to: customerEmail,
               from: fromEmail,
+              replyToList,
               subject: 'Thank You for Shopping at Animal House!',
               text: `Hi ${orderWithItems.customerName || 'Valued Customer'},
 
@@ -4717,7 +4720,7 @@ West Monroe LA 71291
       }
 
       const { getUncachableSendGridClient } = await import('./sendgridIntegration');
-      const { client: sgMail, fromEmail } = await getUncachableSendGridClient();
+      const { client: sgMail, fromEmail, replyToList } = await getUncachableSendGridClient();
 
       let targetUsers: any[] = [];
 
@@ -4768,6 +4771,7 @@ West Monroe LA 71291
           await sgMail.send({
             to: user.email,
             from: fromEmail,
+            replyToList,
             subject: subject,
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -5264,6 +5268,43 @@ West Monroe LA 71291
     } catch (error) {
       console.error("Error setting tax rate:", error);
       res.status(500).json({ message: "Failed to set tax rate" });
+    }
+  });
+
+  app.get("/api/settings/alternate-reply-email", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const settings = await storage.getGroomingSettings();
+      const setting = settings.find(s => s.setting === 'alternate_reply_email');
+      res.json({ email: setting?.value || '' });
+    } catch (error) {
+      res.json({ email: '' });
+    }
+  });
+
+  app.put("/api/admin/settings/alternate-reply-email", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const { email } = req.body;
+      if (email && typeof email === 'string' && email.trim()) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.trim())) {
+          return res.status(400).json({ message: "Please enter a valid email address" });
+        }
+        await storage.upsertGroomingSetting({ setting: 'alternate_reply_email', value: email.trim() });
+      } else {
+        await storage.upsertGroomingSetting({ setting: 'alternate_reply_email', value: '' });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error saving alternate reply email:", error);
+      res.status(500).json({ message: "Failed to save alternate reply email" });
     }
   });
 

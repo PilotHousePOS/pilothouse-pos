@@ -5,7 +5,7 @@ import { storage } from './storage';
 class EmailService {
   async sendAdminNewOrderEmail(adminEmail: string, orderId: number, customerName: string, totalAmount: string): Promise<boolean> {
     try {
-      const { client, fromEmail } = await getUncachableSendGridClient();
+      const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
       
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -28,6 +28,7 @@ class EmailService {
       await client.send({
         to: adminEmail,
         from: fromEmail,
+        replyToList,
         subject: `New Order #${orderId} - Animal House Admin Alert`,
         html: emailContent,
       });
@@ -41,7 +42,7 @@ class EmailService {
 
   async sendAdminNewAppointmentEmail(adminEmail: string, appointmentId: number, customerName: string, serviceType: string, appointmentDate: string, appointmentTime: string): Promise<boolean> {
     try {
-      const { client, fromEmail } = await getUncachableSendGridClient();
+      const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
       
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -65,6 +66,7 @@ class EmailService {
       await client.send({
         to: adminEmail,
         from: fromEmail,
+        replyToList,
         subject: `New Appointment #${appointmentId} - Animal House Admin Alert`,
         html: emailContent,
       });
@@ -78,7 +80,7 @@ class EmailService {
 
   async sendOrderStatusEmail(to: string, firstName: string, orderId: number, status: string): Promise<boolean> {
     try {
-      const { client, fromEmail } = await getUncachableSendGridClient();
+      const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
       
       const statusMessages = {
         'in_progress': {
@@ -120,6 +122,7 @@ class EmailService {
       await client.send({
         to,
         from: fromEmail,
+        replyToList,
         subject: statusInfo.subject,
         html: emailContent,
       });
@@ -134,7 +137,7 @@ class EmailService {
 
   async sendAppointmentConfirmedEmail(to: string, firstName: string, appointmentId: number, serviceType: string, appointmentDate: string, appointmentTime: string): Promise<boolean> {
     try {
-      const { client, fromEmail } = await getUncachableSendGridClient();
+      const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
       
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -170,6 +173,7 @@ class EmailService {
       await client.send({
         to,
         from: fromEmail,
+        replyToList,
         subject: `Appointment Confirmed - ${serviceType} on ${new Date(appointmentDate).toLocaleDateString()}`,
         html: emailContent,
       });
@@ -184,7 +188,7 @@ class EmailService {
 
   async sendAppointmentRejectedEmail(to: string, firstName: string, appointmentId: number, serviceType: string, appointmentDate: string, appointmentTime: string): Promise<boolean> {
     try {
-      const { client, fromEmail } = await getUncachableSendGridClient();
+      const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
       
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -207,6 +211,7 @@ class EmailService {
       await client.send({
         to,
         from: fromEmail,
+        replyToList,
         subject: 'Animal House - Appointment Update',
         html: emailContent,
       });

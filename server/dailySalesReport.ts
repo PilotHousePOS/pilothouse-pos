@@ -42,7 +42,7 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
     throw new Error('No recipient emails provided');
   }
 
-  const { client, fromEmail } = await getUncachableSendGridClient();
+  const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
 
   const today = new Date();
   const cstOptions = { timeZone: 'America/Chicago' };
@@ -572,6 +572,7 @@ Stripe fees are estimated. Verify in Stripe Dashboard for exact amounts.
     const msg = {
       to: email.trim(),
       from: fromEmail,
+      replyToList,
       subject: `Daily Online Sales Report - ${todayStr}`,
       text: textBody,
       html: htmlBody,

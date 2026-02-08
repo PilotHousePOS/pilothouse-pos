@@ -4137,10 +4137,22 @@ function SettingsPanel() {
   const [defaultForItems, setDefaultForItems] = useState<boolean>(true);
   const [defaultForServices, setDefaultForServices] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [alternateReplyEmail, setAlternateReplyEmail] = useState('');
+  const [isSavingEmail, setIsSavingEmail] = useState(false);
 
   const { data: taxData, isLoading } = useQuery({
     queryKey: ['/api/settings/tax-rate'],
   });
+
+  const { data: replyEmailData } = useQuery({
+    queryKey: ['/api/settings/alternate-reply-email'],
+  });
+
+  useEffect(() => {
+    if (replyEmailData) {
+      setAlternateReplyEmail((replyEmailData as any).email || '');
+    }
+  }, [replyEmailData]);
 
   useEffect(() => {
     if (taxData) {
@@ -4331,6 +4343,68 @@ function SettingsPanel() {
           >
             {isSaving ? 'Saving...' : 'Save Tax Settings'}
           </Button>
+        </div>
+
+        <div className="border-t pt-6 space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <Mail className="w-5 h-5" />
+            Alternate Reply-To Email
+          </h3>
+          <p className="text-sm text-gray-500">
+            When customers, groomers, or admins reply to any email from Animal House, the reply will go to both the main sending email and this alternate address. Useful as a fallback if your primary email has delivery issues.
+          </p>
+          <div className="flex gap-2 items-end">
+            <div className="flex-1">
+              <Label htmlFor="alternate-reply-email" className="text-sm mb-1 block">Fallback Email Address</Label>
+              <Input
+                id="alternate-reply-email"
+                type="email"
+                placeholder="backup@example.com"
+                value={alternateReplyEmail}
+                onChange={(e) => setAlternateReplyEmail(e.target.value)}
+              />
+            </div>
+            <Button
+              onClick={async () => {
+                setIsSavingEmail(true);
+                try {
+                  const response = await fetch('/api/admin/settings/alternate-reply-email', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ email: alternateReplyEmail }),
+                  });
+                  if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.message || 'Failed to save');
+                  }
+                  toast({
+                    title: "Saved",
+                    description: alternateReplyEmail 
+                      ? `Replies will also go to ${alternateReplyEmail}` 
+                      : "Alternate reply-to email cleared",
+                  });
+                } catch (error: any) {
+                  toast({
+                    title: "Error",
+                    description: error.message || "Failed to save alternate email",
+                    variant: "destructive",
+                  });
+                } finally {
+                  setIsSavingEmail(false);
+                }
+              }}
+              disabled={isSavingEmail}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {isSavingEmail ? 'Saving...' : 'Save'}
+            </Button>
+          </div>
+          {alternateReplyEmail && (
+            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+              <span>Replies will go to both your main email and {alternateReplyEmail}</span>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
