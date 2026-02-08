@@ -3195,16 +3195,18 @@ function BoardingManagement({ isAddOpen, setIsAddOpen }: { isAddOpen: boolean; s
   };
   
   const calculateTotal = (record: any) => {
-    let startDate, endDate, isActual;
+    if (record.totalPriceOverride) {
+      return parseFloat(record.totalPriceOverride) || 0;
+    }
+    
+    let startDate, endDate;
     
     if (record.actualDropOffDate && record.actualPickUpDate) {
       startDate = record.actualDropOffDate;
       endDate = record.actualPickUpDate;
-      isActual = true;
     } else {
       startDate = record.estimatedDropOffDate;
       endDate = record.estimatedPickUpDate;
-      isActual = false;
     }
     
     if (startDate && endDate) {
@@ -3266,7 +3268,12 @@ function BoardingManagement({ isAddOpen, setIsAddOpen }: { isAddOpen: boolean; s
                   <div className="flex items-center justify-between pt-2 border-t">
                     <div>
                       <p className="text-sm text-gray-600">Daily Rate: ${parseFloat(record.dailyRate || 0).toFixed(2)}</p>
-                      {record.status === 'completed' && record.actualDropOffDate && record.actualPickUpDate ? (
+                      {record.totalPriceOverride ? (
+                        <p className="text-lg font-semibold text-amber-600">
+                          Charge Total: ${parseFloat(record.totalPriceOverride).toFixed(2)}
+                          <span className="text-xs font-normal ml-1">(override)</span>
+                        </p>
+                      ) : record.status === 'completed' && record.actualDropOffDate && record.actualPickUpDate ? (
                         <p className="text-lg font-semibold text-green-600">
                           Final Total: ${calculateTotal(record).toFixed(2)}
                         </p>
@@ -3379,8 +3386,10 @@ function BoardingForm({ initialData, onSubmit, onCancel, isPending }: any) {
     estimatedDropOffDate: initialData?.estimatedDropOffDate || new Date().toISOString().split('T')[0],
     estimatedPickUpDate: initialData?.estimatedPickUpDate || new Date(Date.now() + 86400000).toISOString().split('T')[0],
     dailyRate: initialData?.dailyRate || '25.00',
+    totalPriceOverride: initialData?.totalPriceOverride || '',
     notes: initialData?.notes || '',
   });
+  const [useOverride, setUseOverride] = useState(!!initialData?.totalPriceOverride);
   
   const estimatedDays = useMemo(() => {
     if (formData.estimatedDropOffDate && formData.estimatedPickUpDate) {
@@ -3395,11 +3404,22 @@ function BoardingForm({ initialData, onSubmit, onCancel, isPending }: any) {
   const estimatedTotal = useMemo(() => {
     return estimatedDays * parseFloat(formData.dailyRate || 0);
   }, [estimatedDays, formData.dailyRate]);
+
+  const finalTotal = useMemo(() => {
+    if (useOverride && formData.totalPriceOverride) {
+      return parseFloat(formData.totalPriceOverride) || 0;
+    }
+    return estimatedTotal;
+  }, [useOverride, formData.totalPriceOverride, estimatedTotal]);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('BoardingForm submit with data:', formData);
-    onSubmit(formData);
+    const submitData = {
+      ...formData,
+      totalPriceOverride: useOverride && formData.totalPriceOverride ? formData.totalPriceOverride : null,
+    };
+    console.log('BoardingForm submit with data:', submitData);
+    onSubmit(submitData);
   };
   
   return (
@@ -3497,12 +3517,49 @@ function BoardingForm({ initialData, onSubmit, onCancel, isPending }: any) {
         />
       </div>
       
-      <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+      <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md space-y-2">
         <p className="text-sm">
           <span className="font-medium">Estimated Days:</span> {estimatedDays} day{estimatedDays !== 1 ? 's' : ''}
         </p>
-        <p className="text-sm font-semibold mt-1">
-          <span>Estimated Total:</span> ${estimatedTotal.toFixed(2)}
+        <p className="text-sm">
+          <span className="font-medium">Projected Total:</span> ${estimatedTotal.toFixed(2)}
+          <span className="text-xs text-gray-500 ml-1">({estimatedDays} × ${parseFloat(formData.dailyRate || '0').toFixed(2)})</span>
+        </p>
+        
+        <div className="flex items-center gap-2 pt-1">
+          <input
+            type="checkbox"
+            id="use-override"
+            checked={useOverride}
+            onChange={(e) => setUseOverride(e.target.checked)}
+            className="rounded border-gray-300"
+          />
+          <label htmlFor="use-override" className="text-sm font-medium cursor-pointer">
+            Override Total Price
+          </label>
+        </div>
+        
+        {useOverride && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">$</span>
+            <Input
+              type="number"
+              step="0.01"
+              min="0"
+              value={formData.totalPriceOverride}
+              onChange={(e) => setFormData({ ...formData, totalPriceOverride: e.target.value })}
+              placeholder="80.00"
+              className="w-32 h-8 text-sm"
+              data-testid="input-price-override"
+            />
+          </div>
+        )}
+        
+        <p className="text-sm font-bold mt-1 pt-1 border-t border-blue-200 dark:border-blue-700">
+          <span>Charge Total:</span> ${finalTotal.toFixed(2)}
+          {useOverride && formData.totalPriceOverride && (
+            <span className="text-xs font-normal text-amber-600 dark:text-amber-400 ml-2">(override)</span>
+          )}
         </p>
       </div>
       

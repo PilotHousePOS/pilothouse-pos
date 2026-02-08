@@ -724,6 +724,7 @@ export const boardingRecords = pgTable("boarding_records", {
   
   // Pricing
   dailyRate: decimal("daily_rate", { precision: 10, scale: 2 }).notNull(), // Price per day
+  totalPriceOverride: decimal("total_price_override", { precision: 10, scale: 2 }), // Optional: override the calculated total
   
   // Status
   status: varchar("status", { length: 50 }).default("active").notNull(), // active, completed, cancelled
