@@ -87,6 +87,7 @@ import {
   type InsertOrderPhoto,
   type ExtractedOrderItem,
   type InsertExtractedOrderItem,
+  pushSubscriptions,
   astroCustomers,
   astroFrequentBuyerProgress,
   astroPurchaseSyncLog,
@@ -2827,10 +2828,46 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteUser(id: string): Promise<void> {
-    const result = await db.delete(users).where(eq(users.id, id));
-    if (!result.rowCount || result.rowCount === 0) {
+    const [existingUser] = await db.select().from(users).where(eq(users.id, id));
+    if (!existingUser) {
       throw new Error('User not found');
     }
+
+    await db.transaction(async (tx) => {
+      await tx.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, id));
+      await tx.delete(cartItems).where(eq(cartItems.userId, id));
+      await tx.delete(wishlistItems).where(eq(wishlistItems.userId, id));
+      await tx.delete(pushSubscriptions).where(eq(pushSubscriptions.userId, id));
+      await tx.delete(customerPets).where(eq(customerPets.userId, id));
+      await tx.delete(appointmentPets).where(inArray(appointmentPets.appointmentId, 
+        tx.select({ id: appointments.id }).from(appointments).where(eq(appointments.userId, id))
+      ));
+      await tx.delete(appointments).where(eq(appointments.userId, id));
+
+      const userOrderIds = tx.select({ id: orders.id }).from(orders).where(eq(orders.userId, id));
+      await tx.delete(orderItems).where(inArray(orderItems.orderId, userOrderIds));
+
+      await tx.update(refunds).set({ processedBy: null }).where(eq(refunds.processedBy, id));
+
+      const userAstroIds = tx.select({ id: astroCustomers.id }).from(astroCustomers).where(eq(astroCustomers.userId, id));
+      await tx.delete(astroPurchaseSyncLog).where(inArray(astroPurchaseSyncLog.astroCustomerId, userAstroIds));
+      await tx.delete(astroFrequentBuyerProgress).where(inArray(astroFrequentBuyerProgress.astroCustomerId, userAstroIds));
+      await tx.delete(astroCustomers).where(eq(astroCustomers.userId, id));
+
+      await tx.delete(refunds).where(inArray(refunds.orderId, userOrderIds));
+      await tx.delete(orders).where(eq(orders.userId, id));
+
+      await tx.delete(extractedOrderItems).where(
+        inArray(extractedOrderItems.orderPhotoId, 
+          tx.select({ id: orderPhotos.id }).from(orderPhotos).where(eq(orderPhotos.userId, id))
+        )
+      );
+      await tx.delete(orderPhotos).where(eq(orderPhotos.userId, id));
+
+      await tx.update(contacts).set({ linkedUserId: null }).where(eq(contacts.linkedUserId, id));
+
+      await tx.delete(users).where(eq(users.id, id));
+    });
   }
 
   // Grooming settings operations

@@ -161,17 +161,15 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
   const createOrderMutation = useMutation({
     mutationFn: async (orderData: any) => {
-      await apiRequest("POST", "/api/orders", orderData);
+      const res = await apiRequest("POST", "/api/orders", orderData);
+      return res.json();
     },
-    onSuccess: () => {
-      toast({
-        title: "Order Placed!",
-        description: "Your order has been placed successfully.",
-      });
+    onSuccess: (data) => {
       setIsCheckoutOpen(false);
       onClose();
       queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+      window.location.href = "/order-confirmation/" + data.id;
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {

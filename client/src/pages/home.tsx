@@ -4,16 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
-import { Bell, ShoppingCart, Heart, Star, ArrowRight, Sparkles } from "lucide-react";
+import { Bell, ShoppingCart, Heart, Star, ArrowRight, Sparkles, Eye, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { getRecentlyViewedIds } from "@/lib/recentlyViewed";
 import animalHouseLogoPath from "@assets/Circle Mascot Logo_1750438195696.jpg";
 import { pushNotificationManager } from "@/lib/pushNotifications";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import StoreFooter from "@/components/store-footer";
 
 export default function Home() {
   const { user, isLoading } = useAuth();
   const { toast } = useToast();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleNotificationClick = async () => {
     try {
@@ -60,6 +64,27 @@ export default function Home() {
     window.location.href = '/';
   };
   const [, setLocation] = useLocation();
+
+  const [recentlyViewedIds, setRecentlyViewedIds] = useState<number[]>([]);
+
+  useEffect(() => {
+    const items = getRecentlyViewedIds();
+    setRecentlyViewedIds(items.map(item => item.id));
+  }, []);
+
+  const { data: recentlyViewedData } = useQuery({
+    queryKey: ["/api/supplies", { ids: recentlyViewedIds.join(",") }],
+    queryFn: async () => {
+      const res = await fetch(`/api/supplies?ids=${recentlyViewedIds.join(",")}`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    },
+    enabled: recentlyViewedIds.length > 0,
+  });
+
+  const recentlyViewedSupplies = recentlyViewedIds
+    .map(id => ((recentlyViewedData as any)?.items || []).find((s: any) => s.id === id))
+    .filter(Boolean);
 
   const { data: petsData } = useQuery({
     queryKey: ["/api/pets"],
@@ -149,8 +174,29 @@ export default function Home() {
         </div>
       </header>
 
+      {/* Search Bar */}
+      <div className="px-4 pt-4">
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          if (searchQuery.trim()) {
+            setLocation(`/supplies?search=${encodeURIComponent(searchQuery.trim())}`);
+          }
+        }}>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Search pets, supplies, food..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4 py-3 w-full rounded-full border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-blue/20"
+            />
+          </div>
+        </form>
+      </div>
+
       {/* Hero Section with Modern Cards */}
-      <section className="px-6 py-8">
+      <section className="px-6 py-6">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
             <Sparkles className="w-6 h-6 text-brand-orange mr-2" />
@@ -161,8 +207,6 @@ export default function Home() {
           </h3>
           <p className="text-gray-600 dark:text-gray-300 text-lg">Discover loving companions waiting for their forever home</p>
         </div>
-
-
       </section>
 
       {/* Featured Pets - Modern Carousel Style */}
@@ -240,6 +284,38 @@ export default function Home() {
         )}
       </section>
 
+      {/* Recently Viewed */}
+      {recentlyViewedSupplies.length > 0 && (
+        <section className="px-6 pb-8">
+          <div className="flex items-center mb-4">
+            <Eye className="w-5 h-5 text-gray-500 mr-2" />
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Recently Viewed</h3>
+          </div>
+          <div className="overflow-x-auto flex gap-3 pb-2">
+            {recentlyViewedSupplies.map((supply: any) => {
+              const imgUrl = supply.imageUrl || (supply.image_urls && supply.image_urls[0]) || '';
+              return (
+                <div
+                  key={supply.id}
+                  className="min-w-[140px] w-[140px] flex-shrink-0 cursor-pointer"
+                  onClick={() => setLocation(`/supplies/${supply.id}`)}
+                >
+                  <div className="w-full h-[140px] rounded-xl overflow-hidden bg-gray-100 mb-2">
+                    <img
+                      src={imgUrl || 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300'}
+                      alt={supply.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{supply.name}</p>
+                  <p className="text-sm font-bold text-brand-red">${Number(supply.price).toFixed(2)}</p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {/* Services Grid - Modern Design */}
       <section className="px-6 pb-8">
         <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
@@ -303,6 +379,8 @@ export default function Home() {
           </Card>
         </div>
       </section>
+
+      <StoreFooter />
     </div>
   );
 }

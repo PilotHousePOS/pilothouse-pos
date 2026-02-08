@@ -11,6 +11,7 @@ import type { Order, OrderItem, Supply, Pet, Refund } from "@shared/schema";
 import { safeGoBack } from "@/lib/navigation";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import OrderStatusTimeline from "@/components/order-status-timeline";
 
 interface OrderItemWithDetails extends OrderItem {
   supplyName?: string;
@@ -297,6 +298,9 @@ export default function OrderHistory() {
                     <p className="text-xs text-gray-500">Total</p>
                     <p className="font-bold text-brand-green">${selectedOrder.totalAmount}</p>
                   </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-gray-200">
+                  <OrderStatusTimeline status={selectedOrder.status || "pending"} />
                 </div>
                 {(selectedOrder.subtotal || selectedOrder.taxAmount || selectedOrder.convenienceFee) && (
                   <div className="mt-2 pt-2 border-t border-gray-100 space-y-1">

@@ -19,10 +19,12 @@ import Profile from "@/pages/profile";
 import Settings from "@/pages/settings";
 import Admin from "@/pages/admin";
 import OrderHistory from "@/pages/order-history";
+import OrderConfirmation from "@/pages/order-confirmation";
 import MyAppointments from "@/pages/my-appointments";
 import Wishlist from "@/pages/wishlist";
 import NotFound from "@/pages/not-found";
 import BottomNav from "@/components/bottom-nav";
+import BackToTop from "@/components/back-to-top";
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -62,6 +64,7 @@ function Router() {
             <Route path="/settings" component={Settings} />
             <Route path="/admin" component={Admin} />
             <Route path="/orders" component={OrderHistory} />
+            <Route path="/order-confirmation/:orderId" component={OrderConfirmation} />
             <Route path="/appointments" component={MyAppointments} />
             <Route path="/wishlist" component={Wishlist} />
           </>
@@ -69,6 +72,7 @@ function Router() {
         <Route component={NotFound} />
       </Switch>
       {isAuthenticated && <BottomNav />}
+      {isAuthenticated && <BackToTop />}
     </div>
   );
 }

@@ -2,10 +2,14 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Home, PawPrint, ShoppingBag, Calendar, User, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
 
 export default function BottomNav() {
   const [location, setLocation] = useLocation();
   const { user } = useAuth() as { user: any };
+
+  const { data: cartItems = [] } = useQuery({ queryKey: ["/api/cart"] });
+  const cartCount = (cartItems as any[]).length;
 
   const NAV_ITEMS = [
     { path: "/", icon: Home, label: "Home" },
@@ -17,9 +21,7 @@ export default function BottomNav() {
   ];
 
   const handleNavClick = (path: string) => {
-    // Always navigate to the path
     setLocation(path);
-    // Scroll to top of page
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -40,7 +42,14 @@ export default function BottomNav() {
               onClick={() => handleNavClick(item.path)}
               data-testid={`nav-${item.label.toLowerCase()}`}
             >
-              <Icon className="w-5 h-5" />
+              <div className="relative">
+                <Icon className="w-5 h-5" />
+                {item.label === "Supplies" && cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                    {cartCount > 9 ? '9+' : cartCount}
+                  </span>
+                )}
+              </div>
               <span className="text-xs font-medium">{item.label}</span>
             </Button>
           );
