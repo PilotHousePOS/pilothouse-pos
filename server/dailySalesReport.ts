@@ -364,8 +364,8 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
     ? (cardPaymentTotal * 0.029) + (cardPaymentCount * 0.30)
     : 0;
   
-  // Total out-of-pocket cost on refunds: Stripe keeps original fees + you refunded the convenience fee
-  const totalRefundCost = stripeFeesPaidOnRefundedOrders + convenienceFeesRefunded;
+  // Total out-of-pocket cost on refunds: only the Stripe fees they keep (convenience fee is already in refund total, not a double charge)
+  const totalRefundCost = stripeFeesPaidOnRefundedOrders;
   
   // Net revenue calculations
   const grossRevenue = subtotal; // Product sales before tax
@@ -599,9 +599,7 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
         ${totalRefundCount > 0 ? `
         <tr><td colspan="3" style="padding: 4px 0;"></td></tr>
         ${headerRow('Cost of Refunds (Your Loss)', '', '')}
-        ${dataRow('Stripe Fees Not Returned', formatCurrency(stripeFeesPaidOnRefundedOrders), '')}
-        ${convenienceFeesRefunded > 0 ? dataRow('Conv. Fees You Refunded', formatCurrency(convenienceFeesRefunded), '') : ''}
-        ${dataRow('<strong>Total Out-of-Pocket</strong>', `<strong style="color: #dc2626;">${totalRefundCost > 0 ? '-' + formatCurrency(totalRefundCost) : formatCurrency(0)}</strong>`, '')}
+        ${dataRow('Stripe Fees Not Returned', `<strong style="color: #dc2626;">-${formatCurrency(stripeFeesPaidOnRefundedOrders)}</strong>`, '')}
         <tr>
           <td colspan="3" style="text-align: center; padding: 4px; color: #666; font-size: 11px;">
             Stripe keeps the original processing fee on refunds
@@ -779,9 +777,7 @@ ${convenienceFeesRefunded > 0 ? `Conv. Fees Refunded       ${formatCurrency(conv
 Total Refunded            ${formatCurrency(refundedTotal).padStart(10)}
 ${totalRefundCount > 0 ? `
 Cost of Refunds (Your Loss):
-Stripe Fees Not Returned  ${formatCurrency(stripeFeesPaidOnRefundedOrders).padStart(10)}
-${convenienceFeesRefunded > 0 ? `Conv. Fees You Refunded   ${formatCurrency(convenienceFeesRefunded).padStart(10)}` : ''}
-Total Out-of-Pocket      -${formatCurrency(totalRefundCost).padStart(9)}
+Stripe Fees Not Returned -${formatCurrency(stripeFeesPaidOnRefundedOrders).padStart(9)}
   (Stripe keeps the original processing fee on refunds)` : ''}
 
 -- Voided Payments --
