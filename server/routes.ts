@@ -2321,6 +2321,28 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       // Also mark the order status as completed when picked up
       await storage.updateOrderStatus(orderId, 'completed');
       
+      // Update loyalty rewards - add the order amount to the customer's total spent
+      if (orderWithItems) {
+        const order = orderWithItems.order;
+        const orderUserId = order.userId;
+        if (orderUserId) {
+          try {
+            // Use subtotal (product cost) for loyalty tracking, not convenience fees
+            const subtotal = parseFloat(order.subtotal || order.totalAmount || '0');
+            const loyaltyCreditsApplied = parseFloat(order.loyaltyCreditsApplied || '0');
+            // Track the actual amount the customer spent (subtotal minus any loyalty credits used)
+            const amountForLoyalty = Math.max(0, subtotal - loyaltyCreditsApplied);
+            
+            if (amountForLoyalty > 0) {
+              const loyaltyResult = await storage.addToUserTotalSpent(orderUserId, amountForLoyalty);
+              console.log(`[LOYALTY] Updated total spent for user ${orderUserId}: +$${amountForLoyalty.toFixed(2)}${loyaltyResult.newCreditsEarned ? ` - NEW REWARD EARNED: $${loyaltyResult.creditsAmount}` : ''}`);
+            }
+          } catch (loyaltyError) {
+            console.error("Failed to update loyalty rewards:", loyaltyError);
+          }
+        }
+      }
+      
       // Send email notification
       if (orderWithItems) {
         const order = orderWithItems.order;
@@ -2663,6 +2685,16 @@ West Monroe LA 71291
         }
         
         createdRefunds.push(refund);
+      }
+      
+      // Deduct refunded subtotal from loyalty rewards (only the product cost, not fees/tax)
+      if (order?.userId && totalSubtotalRefund > 0) {
+        try {
+          const loyaltyResult = await storage.addToUserTotalSpent(order.userId, -totalSubtotalRefund);
+          console.log(`[LOYALTY] Deducted $${totalSubtotalRefund.toFixed(2)} from user ${order.userId} total spent due to refund on Order #${orderId}`);
+        } catch (loyaltyError) {
+          console.error("Failed to update loyalty for refund:", loyaltyError);
+        }
       }
       
       res.json({ 
