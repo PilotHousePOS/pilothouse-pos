@@ -4241,7 +4241,6 @@ West Monroe LA 71291
         const allAppointmentsForDupeCheck = await storage.getAppointments();
         const normalizedPhone = phoneForDupeCheck.replace(/\D/g, '').slice(-10);
         
-        // Get appointments on same date for same phone number
         const sameDateSamePhone = allAppointmentsForDupeCheck.filter((apt: any) => {
           if (apt.status === 'cancelled' || apt.status === 'rejected') return false;
           const aptPhone = (apt.ownerPhoneNumber || '').replace(/\D/g, '').slice(-10);
@@ -4253,24 +4252,10 @@ West Monroe LA 71291
         });
         
         if (sameDateSamePhone.length > 0) {
-          // Collect all pet names from existing appointments (main record + appointment_pets table)
-          const existingPetNames = new Set<string>();
-          for (const apt of sameDateSamePhone) {
-            if (apt.petName) existingPetNames.add(apt.petName.toLowerCase().trim());
-            const aptPets = await storage.getAppointmentPets(apt.id);
-            for (const p of aptPets) {
-              if (p.petName) existingPetNames.add(p.petName.toLowerCase().trim());
-            }
-          }
-          
-          for (const pet of petsArray) {
-            const petNameLower = (pet.petName || '').toLowerCase().trim();
-            if (existingPetNames.has(petNameLower)) {
-              return res.status(400).json({
-                message: `${pet.petName} already has an appointment booked for this date. The same pet cannot have two appointments on the same day.`
-              });
-            }
-          }
+          const customerName = `${req.body.ownerFirstName || ''} ${req.body.ownerLastName || ''}`.trim() || 'This customer';
+          return res.status(400).json({
+            message: `${customerName} already has an appointment on this date. Please edit the existing appointment or review the information entered.`
+          });
         }
       }
 
