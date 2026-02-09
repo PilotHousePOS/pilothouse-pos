@@ -338,16 +338,24 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
 
   // Convenience fees refunded - look at orders that had full refunds today
   let convenienceFeesRefunded = 0;
+  let stripeFeesPaidOnRefundedOrders = 0;
   for (const refund of todaysRefunds) {
-    if (refund.refundType === 'full' && refund.orderId) {
+    if (refund.orderId) {
       try {
         const refundOrder = await storage.getOrder(refund.orderId);
-        if (refundOrder?.convenienceFee) {
-          convenienceFeesRefunded += parseFloat(refundOrder.convenienceFee) || 0;
+        if (refundOrder) {
+          if (refund.refundType === 'full' && refundOrder.convenienceFee) {
+            convenienceFeesRefunded += parseFloat(refundOrder.convenienceFee) || 0;
+          }
+          const originalOrderTotal = parseFloat(refundOrder.totalAmount) || 0;
+          if (originalOrderTotal > 0) {
+            stripeFeesPaidOnRefundedOrders += (originalOrderTotal * 0.029) + 0.30;
+          }
         }
       } catch (e) {}
     }
   }
+  stripeFeesPaidOnRefundedOrders = Math.round(stripeFeesPaidOnRefundedOrders * 100) / 100;
   const netConvenienceFees = totalConvenienceFees - convenienceFeesRefunded;
 
   // Stripe processing fees (2.9% + $0.30 per transaction on the total charged)
@@ -355,6 +363,9 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
   const stripeProcessingFees = cardPaymentCount > 0 
     ? (cardPaymentTotal * 0.029) + (cardPaymentCount * 0.30)
     : 0;
+  
+  // Total out-of-pocket cost on refunds: Stripe keeps original fees + you refunded the convenience fee
+  const totalRefundCost = stripeFeesPaidOnRefundedOrders + convenienceFeesRefunded;
   
   // Net revenue calculations
   const grossRevenue = subtotal; // Product sales before tax
@@ -583,7 +594,20 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
         ${headerRow('', 'Total $', 'Count #')}
         ${dataRow('Subtotal Refunded', formatCurrency(refundedSubtotalTotal), String(totalRefundCount))}
         ${dataRow('Tax Refunded', formatCurrency(refundedTaxTotal), '')}
-        ${dataRow('<strong>Total Refunded</strong>', `<strong>${formatCurrency(refundedTotal)}</strong>`, '')}
+        ${convenienceFeesRefunded > 0 ? dataRow('Conv. Fees Refunded', formatCurrency(convenienceFeesRefunded), '') : ''}
+        ${dataRow('<strong>Total Refunded to Customer</strong>', `<strong>${formatCurrency(refundedTotal)}</strong>`, '')}
+        ${totalRefundCount > 0 ? `
+        <tr><td colspan="3" style="padding: 4px 0;"></td></tr>
+        ${headerRow('Cost of Refunds (Your Loss)', '', '')}
+        ${dataRow('Stripe Fees Not Returned', formatCurrency(stripeFeesPaidOnRefundedOrders), '')}
+        ${convenienceFeesRefunded > 0 ? dataRow('Conv. Fees You Refunded', formatCurrency(convenienceFeesRefunded), '') : ''}
+        ${dataRow('<strong>Total Out-of-Pocket</strong>', `<strong style="color: #dc2626;">${totalRefundCost > 0 ? '-' + formatCurrency(totalRefundCost) : formatCurrency(0)}</strong>`, '')}
+        <tr>
+          <td colspan="3" style="text-align: center; padding: 4px; color: #666; font-size: 11px;">
+            Stripe keeps the original processing fee on refunds
+          </td>
+        </tr>
+        ` : ''}
         
         ${sectionHeader('Voided Payments')}
         ${headerRow('', 'Total $', 'Count #')}
@@ -604,7 +628,11 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
         <tr><td colspan="3" style="padding: 4px 0;"></td></tr>
         ${dataRow('Less: Refunds', refundedTotal > 0 ? `-${formatCurrency(refundedTotal)}` : formatCurrency(0), '')}
         ${dataRow('Less: Stripe Fees (est.)', `-${formatCurrency(stripeProcessingFees)}`, '')}
-        ${dataRow('<strong>Est. Stripe Payout</strong>', `<strong>${estimatedStripePayout < 0 ? '-' + formatCurrency(Math.abs(estimatedStripePayout)) : formatCurrency(estimatedStripePayout)}</strong>`, '')}
+        ${totalRefundCost > 0 ? dataRow('Less: Refund Costs', `-${formatCurrency(totalRefundCost)}`, '') : ''}
+        ${(() => {
+          const payout = total - refundedTotal - stripeProcessingFees - totalRefundCost;
+          return dataRow('<strong>Est. Net Payout</strong>', `<strong>${payout < 0 ? '-' + formatCurrency(Math.abs(payout)) : formatCurrency(payout)}</strong>`, '');
+        })()}
         <tr><td colspan="3" style="padding: 4px 0;"></td></tr>
         ${dataRow('<strong>Net Product Revenue</strong>', `<strong>${netAfterRefunds < 0 ? '-' + formatCurrency(Math.abs(netAfterRefunds)) : formatCurrency(netAfterRefunds)}</strong>`, '')}
         ${dataRow('Net Tax Owed', formatCurrency(totalTax - refundedTaxTotal), '')}
@@ -632,10 +660,11 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
         ${dataRow('Total Collected', formatCurrency(total), '')}
         ${dataRow('Less: Refunds', refundedTotal > 0 ? `-${formatCurrency(refundedTotal)}` : formatCurrency(0), '')}
         ${dataRow('Less: Stripe Fees', `-${formatCurrency(hasStripeBalanceData ? stripeFeesTotal : stripeProcessingFees)}`, '')}
+        ${totalRefundCost > 0 ? dataRow('Less: Refund Costs', `-${formatCurrency(totalRefundCost)}`, '') : ''}
         ${(() => {
           const actualFees = hasStripeBalanceData ? stripeFeesTotal : stripeProcessingFees;
-          const nd = total - refundedTotal - actualFees;
-          return dataRow('<strong>Net Deposit Amount</strong>', `<strong>${nd < 0 ? '-' + formatCurrency(Math.abs(nd)) : formatCurrency(nd)}</strong>`, '');
+          const nd = total - refundedTotal - actualFees - totalRefundCost;
+          return dataRow('<strong>Net Deposit Amount</strong>', `<strong style="${nd < 0 ? 'color: #dc2626;' : ''}">${nd < 0 ? '-' + formatCurrency(Math.abs(nd)) : formatCurrency(nd)}</strong>`, '');
         })()}
         
         ${sectionHeader('Tax Remittance Summary')}
@@ -746,7 +775,14 @@ ${total - cardPaymentTotal > 0 ? `Other/Pending             ${formatCurrency(tot
                           Total $    Count #
 Subtotal Refunded         ${formatCurrency(refundedSubtotalTotal).padStart(10)}    ${String(totalRefundCount).padStart(5)}
 Tax Refunded              ${formatCurrency(refundedTaxTotal).padStart(10)}
+${convenienceFeesRefunded > 0 ? `Conv. Fees Refunded       ${formatCurrency(convenienceFeesRefunded).padStart(10)}` : ''}
 Total Refunded            ${formatCurrency(refundedTotal).padStart(10)}
+${totalRefundCount > 0 ? `
+Cost of Refunds (Your Loss):
+Stripe Fees Not Returned  ${formatCurrency(stripeFeesPaidOnRefundedOrders).padStart(10)}
+${convenienceFeesRefunded > 0 ? `Conv. Fees You Refunded   ${formatCurrency(convenienceFeesRefunded).padStart(10)}` : ''}
+Total Out-of-Pocket      -${formatCurrency(totalRefundCost).padStart(9)}
+  (Stripe keeps the original processing fee on refunds)` : ''}
 
 -- Voided Payments --
                           Total $    Count #
@@ -767,7 +803,8 @@ Total Collected           ${formatCurrency(total).padStart(10)}
 
 Less: Refunds            ${refundedTotal > 0 ? '-' + formatCurrency(refundedTotal).padStart(9) : formatCurrency(0).padStart(10)}
 Less: Stripe Fees (est.) -${formatCurrency(stripeProcessingFees).padStart(9)}
-Est. Stripe Payout        ${(estimatedStripePayout < 0 ? '-' + formatCurrency(Math.abs(estimatedStripePayout)) : formatCurrency(estimatedStripePayout)).padStart(10)}
+${totalRefundCost > 0 ? `Less: Refund Costs       -${formatCurrency(totalRefundCost).padStart(9)}` : ''}
+Est. Net Payout           ${(() => { const p = total - refundedTotal - stripeProcessingFees - totalRefundCost; return (p < 0 ? '-' + formatCurrency(Math.abs(p)) : formatCurrency(p)).padStart(10); })()}
 
 Net Product Revenue       ${(netAfterRefunds < 0 ? '-' + formatCurrency(Math.abs(netAfterRefunds)) : formatCurrency(netAfterRefunds)).padStart(10)}
 Net Tax Owed              ${formatCurrency(totalTax - refundedTaxTotal).padStart(10)}
@@ -793,7 +830,8 @@ Refunds                  ${stripeRefundGross > 0 ? '-' + formatCurrency(stripeRe
 Total Collected           ${formatCurrency(total).padStart(10)}
 Less: Refunds            ${refundedTotal > 0 ? '-' + formatCurrency(refundedTotal).padStart(9) : formatCurrency(0).padStart(10)}
 Less: Stripe Fees        -${formatCurrency(hasStripeBalanceData ? stripeFeesTotal : stripeProcessingFees).padStart(9)}
-Net Deposit Amount        ${(() => { const af = hasStripeBalanceData ? stripeFeesTotal : stripeProcessingFees; const nd = total - refundedTotal - af; return (nd < 0 ? '-' + formatCurrency(Math.abs(nd)) : formatCurrency(nd)).padStart(10); })()}
+${totalRefundCost > 0 ? `Less: Refund Costs       -${formatCurrency(totalRefundCost).padStart(9)}` : ''}
+Net Deposit Amount        ${(() => { const af = hasStripeBalanceData ? stripeFeesTotal : stripeProcessingFees; const nd = total - refundedTotal - af - totalRefundCost; return (nd < 0 ? '-' + formatCurrency(Math.abs(nd)) : formatCurrency(nd)).padStart(10); })()}
 
 -- Tax Remittance Summary --
                        Collected    Refunded
