@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
-import { CheckCircle, Package, ArrowLeft, ShoppingBag } from "lucide-react";
+import { CheckCircle, Package, ArrowLeft, ShoppingBag, Home, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -63,14 +63,14 @@ export default function OrderConfirmation() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 right-4 z-50">
         <Button
           variant="ghost"
           size="icon"
-          onClick={safeGoBack}
+          onClick={() => setLocation("/")}
           className="bg-white shadow-lg hover:bg-gray-100 rounded-full"
         >
-          <ArrowLeft className="w-6 h-6" />
+          <X className="w-6 h-6" />
         </Button>
       </div>
 
