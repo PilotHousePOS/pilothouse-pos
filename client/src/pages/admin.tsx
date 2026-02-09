@@ -4967,6 +4967,7 @@ export default function Admin() {
   const [isAddPetOpen, setIsAddPetOpen] = useState(false);
   const [isAddSupplyOpen, setIsAddSupplyOpen] = useState(false);
   const [editingPet, setEditingPet] = useState<any>(null);
+  const [petToDelete, setPetToDelete] = useState<any>(null);
   const [editingSupply, setEditingSupply] = useState<any>(null);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [isAddGroomerOpen, setIsAddGroomerOpen] = useState(false);
@@ -7650,7 +7651,7 @@ export default function Admin() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => deletePetMutation.mutate(pet.id)}
+                            onClick={() => setPetToDelete(pet)}
                             disabled={deletePetMutation.isPending}
                           >
                             <Trash2 className="w-4 h-4" />
@@ -11330,6 +11331,32 @@ export default function Admin() {
           bookingAvailableTimeSlots={bookingAvailableTimeSlots}
         />
       )}
+
+      {/* Delete Pet Confirmation */}
+      <AlertDialog open={!!petToDelete} onOpenChange={(open) => !open && setPetToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this pet?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove <span className="font-semibold">{petToDelete?.name}</span> ({petToDelete?.species}{petToDelete?.morph ? ` - ${petToDelete.morph}` : ''}) from the inventory. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              onClick={() => {
+                if (petToDelete) {
+                  deletePetMutation.mutate(petToDelete.id);
+                  setPetToDelete(null);
+                }
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Edit Pet Dialog */}
       {editingPet && (
