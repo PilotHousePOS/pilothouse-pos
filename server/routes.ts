@@ -1956,7 +1956,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       // Clear cart after successful order
       await storage.clearCart(userId);
       
-      // Send admin notifications for new order
+      // Send notifications for new order
       try {
         const user = req.user;
         const customerName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
@@ -1977,8 +1977,30 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
         const { notifyAdminsNewOrder } = await import('./pushNotifications');
         await notifyAdminsNewOrder(order.id, customerName || 'Customer', order.totalAmount);
+
+        // Send "We got your order" confirmation email to customer
+        const customerEmail = user.email;
+        if (customerEmail) {
+          const orderWithItems = await storage.getOrderWithItems(order.id);
+          const enrichedItems = (orderWithItems?.items || []).map((item: any) => ({
+            name: item.itemName || item.name || 'Item',
+            quantity: item.quantity || 1,
+            price: item.price || '0',
+          }));
+          await notificationService.sendOrderReceivedNotification(
+            customerEmail,
+            user.firstName || 'Customer',
+            order.id,
+            enrichedItems,
+            order.subtotal || '0',
+            order.taxAmount || '0',
+            order.convenienceFee || '0',
+            order.loyaltyCreditsApplied || '0',
+            order.totalAmount || '0'
+          );
+        }
       } catch (notificationError) {
-        console.error('Failed to send admin notifications for new order:', notificationError);
+        console.error('Failed to send notifications for new order:', notificationError);
       }
       
       res.json(order);

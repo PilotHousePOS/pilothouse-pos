@@ -102,7 +102,7 @@ import {
   type InsertAstroPurchaseSyncLog,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, and, or, not, ilike, lt, isNull, count, sql, inArray, ne, notInArray } from "drizzle-orm";
+import { eq, desc, asc, and, or, not, ilike, lt, lte, isNull, count, sql, inArray, ne, notInArray } from "drizzle-orm";
 import { phoneNumbersMatch } from "./phoneUtils";
 import { SUPPLY_FILTERS, type FilterType } from "./filterConfig";
 import { 
@@ -230,6 +230,8 @@ export interface IStorage {
   updateCartItem(id: number, quantity: number): Promise<CartItem>;
   removeFromCart(id: number): Promise<void>;
   clearCart(userId: string): Promise<void>;
+  getAbandonedCarts(hoursOld: number): Promise<Array<{userId: string; email: string; firstName: string; items: CartItem[]; oldestItemAt: Date}>>;
+  updateAbandonedCartEmailSent(userId: string): Promise<void>;
 
   // Order operations
   createOrder(order: InsertOrder, items: InsertOrderItem[]): Promise<Order>;
@@ -2239,6 +2241,57 @@ export class DatabaseStorage implements IStorage {
 
   async clearCart(userId: string): Promise<void> {
     await db.delete(cartItems).where(eq(cartItems.userId, userId));
+    await db.update(users).set({ abandonedCartEmailSentAt: null }).where(eq(users.id, userId));
+  }
+
+  async getAbandonedCarts(hoursOld: number): Promise<Array<{userId: string; email: string; firstName: string; items: CartItem[]; oldestItemAt: Date}>> {
+    const cutoff = new Date(Date.now() - hoursOld * 60 * 60 * 1000);
+    
+    const allCartItems = await db.select().from(cartItems);
+    
+    if (allCartItems.length === 0) return [];
+    
+    const userIds = [...new Set(allCartItems.map(item => item.userId))];
+    const result: Array<{userId: string; email: string; firstName: string; items: CartItem[]; oldestItemAt: Date}> = [];
+    
+    for (const userId of userIds) {
+      const userItems = allCartItems.filter(item => item.userId === userId);
+      
+      const newestItemAt = userItems.reduce((newest, item) => {
+        const itemDate = new Date(item.createdAt!);
+        return itemDate > newest ? itemDate : newest;
+      }, new Date(0));
+      
+      if (newestItemAt > cutoff) continue;
+      
+      const user = await this.getUser(userId);
+      if (!user || !user.email) continue;
+      if (user.marketingEmailsOptIn === false) continue;
+      if (user.abandonedCartEmailSentAt) {
+        const sentAt = new Date(user.abandonedCartEmailSentAt);
+        const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+        if (sentAt > threeDaysAgo) continue;
+      }
+      
+      const oldestItemAt = userItems.reduce((oldest, item) => {
+        const itemDate = new Date(item.createdAt!);
+        return itemDate < oldest ? itemDate : oldest;
+      }, new Date());
+      
+      result.push({
+        userId,
+        email: user.email,
+        firstName: user.firstName || 'Customer',
+        items: userItems,
+        oldestItemAt,
+      });
+    }
+    
+    return result;
+  }
+
+  async updateAbandonedCartEmailSent(userId: string): Promise<void> {
+    await db.update(users).set({ abandonedCartEmailSentAt: new Date() }).where(eq(users.id, userId));
   }
 
   // Order operations

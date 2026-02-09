@@ -78,6 +78,156 @@ class EmailService {
     }
   }
 
+  async sendOrderReceivedEmail(to: string, firstName: string, orderId: number, items: Array<{name: string; quantity: number; price: string}>, subtotal: string, taxAmount: string, convenienceFee: string, loyaltyCreditsApplied: string, totalAmount: string): Promise<boolean> {
+    try {
+      const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
+
+      const itemRows = items.map(item => `
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">$${(parseFloat(item.price) * item.quantity).toFixed(2)}</td>
+        </tr>
+      `).join('');
+
+      const loyaltyCredits = parseFloat(loyaltyCreditsApplied || '0');
+
+      const emailContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0;">Animal House Pet Store</h1>
+          </div>
+          <div style="padding: 30px; background-color: #f9f9f9;">
+            <h2 style="color: #333; margin-bottom: 20px;">We Got Your Order! #${orderId}</h2>
+            <p style="font-size: 16px; line-height: 1.5;">Hi ${firstName},</p>
+            <p style="font-size: 16px; line-height: 1.5;">
+              Thank you for your order! We've received it and our team will review it shortly.
+              You'll get another email once we start preparing your items.
+            </p>
+
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+              <thead>
+                <tr style="background-color: #f3f4f6;">
+                  <th style="padding: 8px; text-align: left;">Item</th>
+                  <th style="padding: 8px; text-align: center;">Qty</th>
+                  <th style="padding: 8px; text-align: right;">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemRows}
+              </tbody>
+            </table>
+
+            <div style="border-top: 2px solid #dc2626; padding-top: 15px; margin-top: 10px;">
+              <p style="margin: 4px 0;"><strong>Subtotal:</strong> $${parseFloat(subtotal).toFixed(2)}</p>
+              <p style="margin: 4px 0;"><strong>Tax:</strong> $${parseFloat(taxAmount).toFixed(2)}</p>
+              ${loyaltyCredits > 0 ? `<p style="margin: 4px 0; color: #16a34a;"><strong>Loyalty Credits:</strong> -$${loyaltyCredits.toFixed(2)}</p>` : ''}
+              <p style="margin: 4px 0;"><strong>Convenience Fee:</strong> $${parseFloat(convenienceFee).toFixed(2)}</p>
+              <p style="margin: 8px 0; font-size: 20px; font-weight: bold; color: #dc2626;">Total: $${parseFloat(totalAmount).toFixed(2)}</p>
+            </div>
+
+            <div style="background-color: #fef3c7; color: #92400e; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <strong>What happens next?</strong><br>
+              Our team will review your order and begin preparing it. We'll send you updates as your order progresses.
+              When it's ready, we'll let you know so you can pick it up!
+            </div>
+
+            <p style="font-size: 14px; color: #666; margin-top: 30px;">
+              Thank you for choosing Animal House Pet Store!
+            </p>
+          </div>
+        </div>
+      `;
+
+      await client.send({
+        to,
+        from: fromEmail,
+        replyToList,
+        subject: `Order Received #${orderId} - Animal House Pet Store`,
+        html: emailContent,
+      });
+
+      console.log(`Order received confirmation email sent to ${to} for order ${orderId}`);
+      return true;
+    } catch (error) {
+      console.error('Order received email error:', error);
+      return false;
+    }
+  }
+
+  async sendAbandonedCartEmail(to: string, firstName: string, items: Array<{name: string; price: string; quantity: number}>): Promise<boolean> {
+    try {
+      const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
+
+      const itemList = items.map(item => `
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">$${parseFloat(item.price).toFixed(2)}</td>
+        </tr>
+      `).join('');
+
+      const baseUrl = process.env.REPLIT_DOMAINS 
+        ? `https://${process.env.REPLIT_DOMAINS}`
+        : 'http://localhost:5000';
+
+      const emailContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0;">Animal House Pet Store</h1>
+          </div>
+          <div style="padding: 30px; background-color: #f9f9f9;">
+            <h2 style="color: #333; margin-bottom: 20px;">You Left Something Behind!</h2>
+            <p style="font-size: 16px; line-height: 1.5;">Hi ${firstName},</p>
+            <p style="font-size: 16px; line-height: 1.5;">
+              We noticed you have items waiting in your cart. Don't miss out on these great finds for your furry friends!
+            </p>
+
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+              <thead>
+                <tr style="background-color: #f3f4f6;">
+                  <th style="padding: 8px; text-align: left;">Item</th>
+                  <th style="padding: 8px; text-align: center;">Qty</th>
+                  <th style="padding: 8px; text-align: right;">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemList}
+              </tbody>
+            </table>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${baseUrl}" style="background-color: #dc2626; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold;">
+                Complete Your Order
+              </a>
+            </div>
+
+            <p style="font-size: 14px; color: #666; margin-top: 30px;">
+              Questions? Call us at <strong>318-323-6090</strong> - we're happy to help!
+            </p>
+            <p style="font-size: 12px; color: #999; margin-top: 20px;">
+              If you no longer wish to receive these reminders, you can update your notification preferences in your account settings.
+            </p>
+          </div>
+        </div>
+      `;
+
+      await client.send({
+        to,
+        from: fromEmail,
+        replyToList,
+        subject: `Don't Forget Your Cart - Animal House Pet Store`,
+        html: emailContent,
+      });
+
+      console.log(`Abandoned cart email sent to ${to}`);
+      return true;
+    } catch (error) {
+      console.error('Abandoned cart email error:', error);
+      return false;
+    }
+  }
+
   async sendOrderStatusEmail(to: string, firstName: string, orderId: number, status: string): Promise<boolean> {
     try {
       const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
@@ -546,6 +696,33 @@ export class NotificationService {
       appointmentDate, 
       appointmentTime
     );
+  }
+
+  async sendOrderReceivedNotification(
+    userEmail: string,
+    userFirstName: string,
+    orderId: number,
+    items: Array<{name: string; quantity: number; price: string}>,
+    subtotal: string,
+    taxAmount: string,
+    convenienceFee: string,
+    loyaltyCreditsApplied: string,
+    totalAmount: string
+  ): Promise<void> {
+    console.log(`Sending order received confirmation to ${userEmail} for order ${orderId}`);
+    await this.emailService.sendOrderReceivedEmail(
+      userEmail, userFirstName, orderId, items,
+      subtotal, taxAmount, convenienceFee, loyaltyCreditsApplied, totalAmount
+    );
+  }
+
+  async sendAbandonedCartNotification(
+    userEmail: string,
+    userFirstName: string,
+    items: Array<{name: string; price: string; quantity: number}>
+  ): Promise<boolean> {
+    console.log(`Sending abandoned cart email to ${userEmail}`);
+    return await this.emailService.sendAbandonedCartEmail(userEmail, userFirstName, items);
   }
 
   async sendPetReadyNotification(

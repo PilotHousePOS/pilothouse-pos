@@ -207,7 +207,61 @@ export function initializeScheduledTasks() {
     timezone: "America/Chicago"
   });
 
+  // Abandoned cart recovery - runs every 6 hours, sends email for carts idle 24+ hours
+  cron.schedule('0 */6 * * *', async () => {
+    try {
+      console.log('Running abandoned cart recovery check...');
+      const abandonedCarts = await storage.getAbandonedCarts(24);
+      
+      if (abandonedCarts.length === 0) {
+        console.log('No abandoned carts found');
+        return;
+      }
+
+      console.log(`Found ${abandonedCarts.length} abandoned carts to notify`);
+      
+      const { notificationService } = await import('./notifications');
+
+      for (const cart of abandonedCarts) {
+        try {
+          // Resolve item names from supply IDs
+          const enrichedItems: Array<{name: string; price: string; quantity: number}> = [];
+          for (const item of cart.items) {
+            let name = 'Item';
+            let price = '0';
+            if (item.supplyId) {
+              const supply = await storage.getSupply(item.supplyId);
+              if (supply) {
+                name = supply.name;
+                price = supply.price?.toString() || '0';
+              }
+            }
+            enrichedItems.push({ name, price, quantity: item.quantity || 1 });
+          }
+
+          const sent = await notificationService.sendAbandonedCartNotification(
+            cart.email,
+            cart.firstName,
+            enrichedItems
+          );
+
+          if (sent) {
+            await storage.updateAbandonedCartEmailSent(cart.userId);
+            console.log(`Abandoned cart email sent to ${cart.email}`);
+          }
+        } catch (err) {
+          console.error(`Failed to send abandoned cart email to ${cart.email}:`, err);
+        }
+      }
+    } catch (error) {
+      console.error('Error running abandoned cart recovery:', error);
+    }
+  }, {
+    timezone: "America/Chicago"
+  });
+
   console.log('Scheduled tasks initialized:');
   console.log('- Clear approved appointments and reset "Here"/"Paid" flags: Daily at 12:00 AM (CST)');
   console.log('- Daily Sales Report: Hourly check (sends at configured time if enabled)');
+  console.log('- Abandoned Cart Recovery: Every 6 hours (24+ hour idle carts)');
 }

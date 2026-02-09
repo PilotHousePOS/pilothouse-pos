@@ -43,6 +43,7 @@ export const users = pgTable("users", {
   stripeDefaultPaymentMethod: varchar("stripe_default_payment_method", { length: 255 }),
   notificationsEnabled: boolean("notifications_enabled").default(false),
   marketingEmailsOptIn: boolean("marketing_emails_opt_in").default(true),
+  abandonedCartEmailSentAt: timestamp("abandoned_cart_email_sent_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

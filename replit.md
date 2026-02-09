@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first web application specializing in online retail of exotic reptiles, pet supplies, and grooming services. It provides a secure e-commerce platform with advanced inventory management, service scheduling, robust customer engagement, and comprehensive administrative tools. The project aims to be the leading online destination for exotic pet owners, offering a seamless and intuitive shopping and service booking experience, with a focus on mobile-first design and a business vision of being the ultimate resource for exotic pet enthusiasts, providing a curated selection of products and services.
+The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its purpose is to be a premier online destination for exotic pet owners, offering a seamless shopping experience, robust service booking, advanced inventory management, customer engagement, and comprehensive administrative functionalities. The project aims to deliver a high-quality online experience for a niche market with significant growth potential.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -185,9 +185,11 @@ Step 5: NEVER mark task complete until verification passes
 - Groomer Daily Limit: Each groomer can accept max 5 full grooming appointments per day. Bath-only appointments do NOT count toward this limit. Frontend groomer dropdowns shows remaining slots.
 - Push Notifications: Web Push via VAPID keys, PWA-compatible service worker with pushsubscriptionchange auto-resubscribe. Notifications work in browser AND as installed PWA app.
 - Marketing Email Opt-Out: Users can opt out of marketing emails in profile. Admin Email Center has "This is a marketing email" checkbox that filters opted-out users. Order emails and important updates bypass opt-out.
+- Order Confirmation Email: "We got your order" email sent immediately to customer when order is placed, with full item breakdown and pricing. Bypasses marketing opt-out (transactional).
+- Abandoned Cart Recovery: Scheduled every 6 hours, emails customers whose entire cart has been idle 24+ hours. Respects marketing opt-out. 3-day cooldown between emails per user. Reset when cart is cleared.
 
 ## System Architecture
-The Animal House Pet Store is a full-stack, mobile-first web application featuring a dark, bold, high-contrast UI/UX with Amazon-style image carousels. Authentication is JWT-based with a three-tier role-based access control. The frontend uses React, Vite, TypeScript, Tailwind CSS, and shadcn/ui. The backend is built with Express.js and TypeScript, integrated with PostgreSQL and Drizzle ORM. Authentication relies on JWT tokens stored in cookies, state management uses TanStack Query, and Wouter handles client-side routing. Key functionalities include customer wishlists, a CMS for animal categories, administrative order management, advanced search, database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and AI-powered processing for order photo analysis, item extraction, and categorization. Real-time alerts are delivered via Web Push Notifications using VAPID keys.
+The Animal House Pet Store is a full-stack, mobile-first web application featuring a dark, bold, high-contrast UI/UX with Amazon-style image carousels. It implements JWT-based authentication with three-tier role-based access control. The frontend is built using React, Vite, TypeScript, Tailwind CSS, and shadcn/ui. The backend utilizes Express.js and TypeScript, integrated with PostgreSQL and Drizzle ORM. Authentication relies on JWT tokens stored in cookies, state management uses TanStack Query, and Wouter handles client-side routing. Key features include customer wishlists, a CMS for animal categories, administrative order management, advanced search, database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and AI-powered processing for order photo analysis, item extraction, and categorization. Real-time alerts are delivered via Web Push Notifications using VAPID keys.
 
 ## External Dependencies
 - PostgreSQL
