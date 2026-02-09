@@ -256,6 +256,65 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
   const grossRevenue = subtotal; // Product sales before tax
   const netAfterRefunds = grossRevenue - refundedSubtotalTotal;
   const estimatedStripePayout = total - refundedTotal - stripeProcessingFees;
+  const netDeposit = total - refundedTotal - stripeProcessingFees;
+
+  // Fetch Stripe balance data for the report period
+  let stripeChargeCount = 0;
+  let stripeChargeGross = 0;
+  let stripeFeesTotal = 0;
+  let stripeRefundCount = 0;
+  let stripeRefundGross = 0;
+  let stripeActivityBeforeFees = 0;
+  let stripeBalanceChange = 0;
+  let stripeStartingBalance = 0;
+  let stripeEndingBalance = 0;
+  let stripePayoutsTotal = 0;
+  let hasStripeBalanceData = false;
+
+  try {
+    const stripe = await getUncachableStripeClient();
+    const startOfDayUnix = Math.floor(todayStartUTC.getTime() / 1000);
+    const endOfDayUnix = Math.floor(todayEndUTC.getTime() / 1000);
+
+    let allTxns: any[] = [];
+    let hasMore = true;
+    let startingAfter: string | undefined;
+    while (hasMore) {
+      const params: any = {
+        created: { gte: startOfDayUnix, lte: endOfDayUnix },
+        limit: 100,
+      };
+      if (startingAfter) params.starting_after = startingAfter;
+      const batch = await stripe.balanceTransactions.list(params);
+      allTxns = allTxns.concat(batch.data);
+      hasMore = batch.has_more;
+      if (batch.data.length > 0) startingAfter = batch.data[batch.data.length - 1].id;
+    }
+
+    for (const txn of allTxns) {
+      stripeFeesTotal += txn.fee / 100;
+
+      if (txn.type === 'charge') {
+        stripeChargeCount++;
+        stripeChargeGross += txn.amount / 100;
+      } else if (txn.type === 'refund') {
+        stripeRefundCount++;
+        stripeRefundGross += Math.abs(txn.amount) / 100;
+      } else if (txn.type === 'payout') {
+        stripePayoutsTotal += Math.abs(txn.amount) / 100;
+      }
+    }
+
+    stripeActivityBeforeFees = stripeChargeGross - stripeRefundGross;
+    stripeBalanceChange = stripeActivityBeforeFees - stripeFeesTotal;
+
+    const balance = await stripe.balance.retrieve();
+    stripeEndingBalance = (balance.available?.[0]?.amount || 0) / 100 + (balance.pending?.[0]?.amount || 0) / 100;
+    stripeStartingBalance = stripeEndingBalance - stripeBalanceChange + stripePayoutsTotal;
+    hasStripeBalanceData = true;
+  } catch (e: any) {
+    console.log('Could not fetch Stripe balance data for report:', e.message);
+  }
 
   const transactionCount = todaysOrders.length;
   const avgTicket = transactionCount > 0 ? total / transactionCount : 0;
@@ -422,13 +481,41 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
         ${dataRow('Convenience Fees Collected', formatCurrency(totalConvenienceFees), '')}
         ${dataRow('<strong>Total Collected</strong>', `<strong>${formatCurrency(total)}</strong>`, '')}
         <tr><td colspan="3" style="padding: 4px 0;"></td></tr>
-        ${dataRow('Less: Refunds', `-${formatCurrency(refundedTotal)}`, '')}
+        ${dataRow('Less: Refunds', refundedTotal > 0 ? `-${formatCurrency(refundedTotal)}` : formatCurrency(0), '')}
         ${dataRow('Less: Stripe Fees (est.)', `-${formatCurrency(stripeProcessingFees)}`, '')}
-        ${dataRow('<strong>Est. Stripe Payout</strong>', `<strong>${formatCurrency(estimatedStripePayout > 0 ? estimatedStripePayout : 0)}</strong>`, '')}
+        ${dataRow('<strong>Est. Stripe Payout</strong>', `<strong>${estimatedStripePayout < 0 ? '-' + formatCurrency(Math.abs(estimatedStripePayout)) : formatCurrency(estimatedStripePayout)}</strong>`, '')}
         <tr><td colspan="3" style="padding: 4px 0;"></td></tr>
-        ${dataRow('<strong>Net Product Revenue</strong>', `<strong>${formatCurrency(netAfterRefunds > 0 ? netAfterRefunds : 0)}</strong>`, '')}
+        ${dataRow('<strong>Net Product Revenue</strong>', `<strong>${netAfterRefunds < 0 ? '-' + formatCurrency(Math.abs(netAfterRefunds)) : formatCurrency(netAfterRefunds)}</strong>`, '')}
         ${dataRow('Net Tax Owed', formatCurrency(totalTax - refundedTaxTotal), '')}
         ${totalLoyaltyDiscounts > 0 ? dataRow('Loyalty Discounts Given', `-${formatCurrency(totalLoyaltyDiscounts)}`, '') : ''}
+        
+        ${hasStripeBalanceData ? `
+        ${sectionHeader('Stripe Balance Summary')}
+        ${headerRow('', 'Total $', '')}
+        ${dataRow('Starting Balance', `${stripeStartingBalance < 0 ? '-' + formatCurrency(Math.abs(stripeStartingBalance)) : formatCurrency(stripeStartingBalance)}`, '')}
+        <tr><td colspan="3" style="padding: 2px 0;"></td></tr>
+        ${headerRow('Balance change from activity', '', '')}
+        ${dataRow('&nbsp;&nbsp;Account activity before fees', `${stripeActivityBeforeFees < 0 ? '-' + formatCurrency(Math.abs(stripeActivityBeforeFees)) : formatCurrency(stripeActivityBeforeFees)}`, '')}
+        ${dataRow('&nbsp;&nbsp;Less fees', stripeFeesTotal > 0 ? `-${formatCurrency(stripeFeesTotal)}` : formatCurrency(0), '')}
+        ${dataRow('<strong>Net balance change</strong>', `<strong>${stripeBalanceChange < 0 ? '-' + formatCurrency(Math.abs(stripeBalanceChange)) : formatCurrency(stripeBalanceChange)}</strong>`, '')}
+        ${dataRow('Total Payouts', stripePayoutsTotal > 0 ? `-${formatCurrency(stripePayoutsTotal)}` : formatCurrency(0), '')}
+        ${dataRow('<strong>Ending Balance</strong>', `<strong>${stripeEndingBalance < 0 ? '-' + formatCurrency(Math.abs(stripeEndingBalance)) : formatCurrency(stripeEndingBalance)}</strong>`, '')}
+        <tr><td colspan="3" style="padding: 4px 0;"></td></tr>
+        ${headerRow('Activity Breakdown', 'Total $', 'Count #')}
+        ${dataRow('Charges', formatCurrency(stripeChargeGross), String(stripeChargeCount))}
+        ${dataRow('Refunds', stripeRefundGross > 0 ? `-${formatCurrency(stripeRefundGross)}` : formatCurrency(0), String(stripeRefundCount))}
+        ` : ''}
+        
+        ${sectionHeader('Net Deposit')}
+        ${headerRow('', 'Total $', '')}
+        ${dataRow('Total Collected', formatCurrency(total), '')}
+        ${dataRow('Less: Refunds', refundedTotal > 0 ? `-${formatCurrency(refundedTotal)}` : formatCurrency(0), '')}
+        ${dataRow('Less: Stripe Fees', `-${formatCurrency(hasStripeBalanceData ? stripeFeesTotal : stripeProcessingFees)}`, '')}
+        ${(() => {
+          const actualFees = hasStripeBalanceData ? stripeFeesTotal : stripeProcessingFees;
+          const nd = total - refundedTotal - actualFees;
+          return dataRow('<strong>Net Deposit Amount</strong>', `<strong>${nd < 0 ? '-' + formatCurrency(Math.abs(nd)) : formatCurrency(nd)}</strong>`, '');
+        })()}
         
         ${sectionHeader('Tax Remittance Summary')}
         ${headerRow('', 'Collected $', 'Refunded $')}
@@ -539,13 +626,35 @@ Sales Tax Collected       ${formatCurrency(totalTax).padStart(10)}
 Convenience Fees          ${formatCurrency(totalConvenienceFees).padStart(10)}
 Total Collected           ${formatCurrency(total).padStart(10)}
 
-Less: Refunds            -${formatCurrency(refundedTotal).padStart(10)}
-Less: Stripe Fees (est.) -${formatCurrency(stripeProcessingFees).padStart(10)}
-Est. Stripe Payout        ${formatCurrency(estimatedStripePayout > 0 ? estimatedStripePayout : 0).padStart(10)}
+Less: Refunds            ${refundedTotal > 0 ? '-' + formatCurrency(refundedTotal).padStart(9) : formatCurrency(0).padStart(10)}
+Less: Stripe Fees (est.) -${formatCurrency(stripeProcessingFees).padStart(9)}
+Est. Stripe Payout        ${(estimatedStripePayout < 0 ? '-' + formatCurrency(Math.abs(estimatedStripePayout)) : formatCurrency(estimatedStripePayout)).padStart(10)}
 
-Net Product Revenue       ${formatCurrency(netAfterRefunds > 0 ? netAfterRefunds : 0).padStart(10)}
+Net Product Revenue       ${(netAfterRefunds < 0 ? '-' + formatCurrency(Math.abs(netAfterRefunds)) : formatCurrency(netAfterRefunds)).padStart(10)}
 Net Tax Owed              ${formatCurrency(totalTax - refundedTaxTotal).padStart(10)}
 ${totalLoyaltyDiscounts > 0 ? `Loyalty Discounts Given   -${formatCurrency(totalLoyaltyDiscounts).padStart(10)}` : ''}
+${hasStripeBalanceData ? `
+-- Stripe Balance Summary --
+                          Total $
+Starting Balance          ${(stripeStartingBalance < 0 ? '-' + formatCurrency(Math.abs(stripeStartingBalance)) : formatCurrency(stripeStartingBalance)).padStart(10)}
+
+Balance change from activity
+  Activity before fees    ${(stripeActivityBeforeFees < 0 ? '-' + formatCurrency(Math.abs(stripeActivityBeforeFees)) : formatCurrency(stripeActivityBeforeFees)).padStart(10)}
+  Less fees              -${formatCurrency(stripeFeesTotal).padStart(9)}
+Net balance change        ${(stripeBalanceChange < 0 ? '-' + formatCurrency(Math.abs(stripeBalanceChange)) : formatCurrency(stripeBalanceChange)).padStart(10)}
+Total Payouts            ${stripePayoutsTotal > 0 ? '-' + formatCurrency(stripePayoutsTotal).padStart(9) : formatCurrency(0).padStart(10)}
+Ending Balance            ${(stripeEndingBalance < 0 ? '-' + formatCurrency(Math.abs(stripeEndingBalance)) : formatCurrency(stripeEndingBalance)).padStart(10)}
+
+Activity Breakdown        Total $    Count #
+Charges                   ${formatCurrency(stripeChargeGross).padStart(10)}    ${String(stripeChargeCount).padStart(5)}
+Refunds                  ${stripeRefundGross > 0 ? '-' + formatCurrency(stripeRefundGross).padStart(9) : formatCurrency(0).padStart(10)}    ${String(stripeRefundCount).padStart(5)}` : ''}
+
+-- Net Deposit --
+                          Total $
+Total Collected           ${formatCurrency(total).padStart(10)}
+Less: Refunds            ${refundedTotal > 0 ? '-' + formatCurrency(refundedTotal).padStart(9) : formatCurrency(0).padStart(10)}
+Less: Stripe Fees        -${formatCurrency(hasStripeBalanceData ? stripeFeesTotal : stripeProcessingFees).padStart(9)}
+Net Deposit Amount        ${(() => { const af = hasStripeBalanceData ? stripeFeesTotal : stripeProcessingFees; const nd = total - refundedTotal - af; return (nd < 0 ? '-' + formatCurrency(Math.abs(nd)) : formatCurrency(nd)).padStart(10); })()}
 
 -- Tax Remittance Summary --
                        Collected    Refunded
