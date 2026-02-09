@@ -6113,7 +6113,18 @@ West Monroe LA 71291
       }
 
       const appointments = await storage.getAppointmentsByPhoneNumber(contact.phoneNumber);
-      res.json(appointments);
+      
+      const enrichedAppointments = await Promise.all(
+        appointments.map(async (apt: any) => {
+          if (apt.groomerId) {
+            const groomer = await storage.getGroomer(apt.groomerId);
+            return { ...apt, groomerName: groomer?.name || null };
+          }
+          return { ...apt, groomerName: null };
+        })
+      );
+      
+      res.json(enrichedAppointments);
     } catch (error) {
       console.error("Error fetching contact appointments:", error);
       res.status(500).json({ message: "Failed to fetch contact appointments" });

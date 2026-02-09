@@ -696,6 +696,9 @@ function ContactAppointmentHistory({ contactId, onViewFullHistory }: { contactId
                 <p className="font-medium">{formatService(apt.serviceType || apt.service)}</p>
                 <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
                 <p className="text-gray-500">{parseLocalDate(apt.appointmentDate).toLocaleDateString()}</p>
+                {apt.groomerName && (
+                  <p className="text-blue-700 font-medium">Groomer: {apt.groomerName}</p>
+                )}
               </div>
               {apt.price && (
                 <p className="text-green-700 font-semibold">${apt.price}</p>
