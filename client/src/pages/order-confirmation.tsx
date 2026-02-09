@@ -53,12 +53,13 @@ export default function OrderConfirmation() {
     });
   };
 
+  const orderData = order.order || order;
   const items = order.items || [];
-  const subtotal = order.subtotal || "0.00";
-  const taxAmount = order.taxAmount || "0.00";
-  const loyaltyCreditsApplied = order.loyaltyCreditsApplied || "0.00";
-  const convenienceFee = order.convenienceFee || "0.00";
-  const totalAmount = order.totalAmount || "0.00";
+  const subtotal = orderData.subtotal || "0.00";
+  const taxAmount = orderData.taxAmount || "0.00";
+  const loyaltyCreditsApplied = orderData.loyaltyCreditsApplied || "0.00";
+  const convenienceFee = orderData.convenienceFee || "0.00";
+  const totalAmount = orderData.totalAmount || "0.00";
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -89,16 +90,16 @@ export default function OrderConfirmation() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <p className="text-xs text-gray-500">Order Number</p>
-                <p className="font-semibold">#{order.id}</p>
+                <p className="font-semibold">#{orderData.id}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">Date</p>
-                <p className="font-semibold text-sm">{formatDate(order.orderDate || new Date())}</p>
+                <p className="font-semibold text-sm">{formatDate(orderData.orderDate || new Date())}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">Status</p>
                 <Badge className="bg-green-500">
-                  {(order.status || "pending").charAt(0).toUpperCase() + (order.status || "pending").slice(1)}
+                  {(orderData.status || "pending").charAt(0).toUpperCase() + (orderData.status || "pending").slice(1)}
                 </Badge>
               </div>
               <div>
@@ -107,7 +108,7 @@ export default function OrderConfirmation() {
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-gray-200">
-              <OrderStatusTimeline status={order.status || "pending"} />
+              <OrderStatusTimeline status={orderData.status || "pending"} />
             </div>
           </CardContent>
         </Card>
