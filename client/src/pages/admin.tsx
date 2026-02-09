@@ -691,22 +691,22 @@ function ContactAppointmentHistory({ contactId, onViewFullHistory }: { contactId
       <div className="space-y-2 max-h-48 overflow-y-auto">
         {completedAppointments.slice(0, 3).map((apt: any) => (
           <div key={apt.id} className="bg-gray-50 rounded p-2 text-xs" data-testid={`appointment-history-${apt.id}`}>
-            <div className="flex justify-between items-start gap-2">
-              <div className="min-w-0">
+            <div>
+              <div className="flex justify-between items-start">
                 <p className="font-medium">{formatService(apt.serviceType || apt.service)}</p>
-                <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
-                <p className="text-gray-500">{parseLocalDate(apt.appointmentDate).toLocaleDateString()}</p>
-                {apt.groomerName && (
-                  <p className="text-blue-700 font-medium">Groomer: {apt.groomerName}</p>
+                {apt.price && (
+                  <span className="text-green-700 font-semibold ml-2 whitespace-nowrap">${apt.price}</span>
                 )}
               </div>
-              {apt.price && (
-                <p className="text-green-700 font-semibold flex-shrink-0">${apt.price}</p>
+              <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
+              <p className="text-gray-500">{parseLocalDate(apt.appointmentDate).toLocaleDateString()}</p>
+              {apt.groomerName && (
+                <p className="text-blue-700 font-medium">Groomer: {apt.groomerName}</p>
+              )}
+              {apt.specialNotes && (
+                <p className="text-gray-600 mt-1 italic break-words">{apt.specialNotes}</p>
               )}
             </div>
-            {apt.specialNotes && (
-              <p className="text-gray-600 mt-1 italic break-words">{apt.specialNotes}</p>
-            )}
           </div>
         ))}
         {completedAppointments.length > 3 && (
@@ -1469,7 +1469,7 @@ function ContactsManager() {
               return (
                 <div 
                   key={uniqueKey} 
-                  className={`border rounded-lg p-4 transition-all cursor-pointer hover:bg-gray-50 min-w-0 overflow-hidden ${isExpanded ? 'ring-2 ring-blue-400' : ''}`}
+                  className={`border rounded-lg p-4 transition-all cursor-pointer hover:bg-gray-50 min-w-0 ${isExpanded ? 'ring-2 ring-blue-400 md:col-span-2 xl:col-span-3' : ''}`}
                   onClick={() => {
                     // Toggle expand/collapse for contacts
                     setExpandedContactId(isExpanded ? null : (contact.id || contact.resourceName || contact.email));
