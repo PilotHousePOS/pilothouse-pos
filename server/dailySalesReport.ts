@@ -1,6 +1,9 @@
 import { getUncachableSendGridClient } from './sendgridIntegration';
 import { storage } from './storage';
 import { getUncachableStripeClient } from './stripeClient';
+import { db } from './db';
+import { supplies } from '@shared/schema';
+import { eq } from 'drizzle-orm';
 
 interface OrderItem {
   id: number;
@@ -27,6 +30,36 @@ interface CategorySales {
   total: number;
   count: number;
 }
+
+interface DayPartSales {
+  name: string;
+  total: number;
+  count: number;
+}
+
+const CATEGORY_DISPLAY_NAMES: Record<string, string> = {
+  'dogFood': 'Dog Food',
+  'catFood': 'Cat Food',
+  'dogTreats': 'Dog Treats',
+  'catTreats': 'Cat Treats',
+  'food': 'Food',
+  'treats': 'Treats',
+  'leashesAndCollars': 'Leashes & Collars',
+  'leashes': 'Leashes & Collars',
+  'accessories': 'Accessories',
+  'aquatics': 'Aquatics',
+  'reptiles': 'Reptiles',
+  'smallanimal': 'Small Animals',
+  'toys': 'Toys',
+  'healthcare': 'Healthcare',
+  'birdSupplies': 'Bird Supplies',
+  'beds': 'Beds',
+  'dogCages': 'Dog Cages',
+  'grooming': 'Grooming',
+  'Treats': 'Treats',
+  'Accessories': 'Accessories',
+  'Healthcare': 'Healthcare',
+};
 
 function formatCurrency(amount: number): string {
   return amount.toFixed(2);
@@ -80,6 +113,10 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
 
   const refundedOrders = todaysOrders.filter(order => order.status === 'refunded' || (order as any).paymentStatus === 'refunded');
   
+  // Separate cancelled/voided orders from active orders
+  const cancelledOrders = todaysOrders.filter(order => order.status === 'cancelled');
+  const activeOrders = todaysOrders.filter(order => order.status !== 'cancelled');
+
   let total = 0;
   let subtotal = 0;
   let totalTax = 0;
@@ -91,9 +128,24 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
   let cardPaymentCount = 0;
   let cardPaymentTotal = 0;
   const categorySales: Map<string, CategorySales> = new Map();
+  const dayPartSales: Map<string, DayPartSales> = new Map();
+  let groomingOrderTotal = 0;
+  let groomingOrderCount = 0;
+  let supplyOrderTotal = 0;
+  let supplyOrderCount = 0;
+  let voidedTotal = 0;
+  let voidedCount = cancelledOrders.length;
+
+  // Cache supply categories to avoid repeated DB lookups
+  const supplyCategoryCache: Map<number, string> = new Map();
   
-  // Process ALL today's orders for gross sales (including refunded ones)
-  for (const order of todaysOrders) {
+  // Calculate voided order totals
+  for (const order of cancelledOrders) {
+    voidedTotal += parseFloat(order.totalAmount) || 0;
+  }
+  
+  // Process active orders (non-cancelled) for gross sales
+  for (const order of activeOrders) {
     const orderWithItems = await storage.getOrderWithItems(order.id);
     if (!orderWithItems) continue;
 
@@ -121,45 +173,97 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
       totalLoyaltyDiscounts += loyaltyDiscount;
       loyaltyDiscountCount++;
     }
-    
+
+    // Net Sales By Day Part - categorize by order time in CST
+    if (order.orderDate) {
+      const orderHour = parseInt(new Date(order.orderDate).toLocaleString('en-US', { timeZone: 'America/Chicago', hour: 'numeric', hour12: false }));
+      let dayPart = 'Evening (5PM-Close)';
+      if (orderHour >= 7 && orderHour < 12) {
+        dayPart = 'Morning (7AM-12PM)';
+      } else if (orderHour >= 12 && orderHour < 17) {
+        dayPart = 'Afternoon (12PM-5PM)';
+      } else if (orderHour < 7) {
+        dayPart = 'After Hours (12AM-7AM)';
+      }
+      const existing = dayPartSales.get(dayPart) || { name: dayPart, total: 0, count: 0 };
+      existing.total += orderTotal;
+      existing.count++;
+      dayPartSales.set(dayPart, existing);
+    }
+
+    // Determine order type (grooming vs supply)
+    let hasGrooming = false;
     const items = orderWithItems.items || [];
     for (const item of items) {
       totalItems += item.quantity || 1;
       const itemPrice = (parseFloat(item.price) || 0) * (item.quantity || 1);
       
-      let category = 'Misc.';
-      const itemName = (item.itemName || '').toLowerCase();
-      
-      if (itemName.includes('dog food') || itemName.includes('kibble')) {
-        category = 'Dog Food';
-      } else if (itemName.includes('cat food')) {
-        category = 'Cat Food';
-      } else if (itemName.includes('dog treat')) {
-        category = 'Dog Treats';
-      } else if (itemName.includes('cat treat')) {
-        category = 'Cat Treats';
-      } else if (itemName.includes('reptile') || itemName.includes('feeder')) {
-        category = 'Reptiles/Feeders';
-      } else if (itemName.includes('aqua') || itemName.includes('fish')) {
-        category = 'Aquatics';
-      } else if (itemName.includes('bird')) {
-        category = 'Bird Supplies';
-      } else if (itemName.includes('toy')) {
-        category = 'Toys';
-      } else if (itemName.includes('groom') || itemName.includes('bath')) {
-        category = 'Grooming';
-      } else if (itemName.includes('treat')) {
-        category = 'Treats';
-      } else if (itemName.includes('food')) {
-        category = 'Food';
-      } else if (itemName.includes('accessory') || itemName.includes('collar') || itemName.includes('leash')) {
-        category = 'Accessories';
+      // Look up actual category from DB using supplyId
+      let categoryDisplay = 'Misc.';
+      if (item.supplyId) {
+        let dbCategory = supplyCategoryCache.get(item.supplyId);
+        if (dbCategory === undefined) {
+          try {
+            const [supply] = await db.select({ category: supplies.category }).from(supplies).where(eq(supplies.id, item.supplyId));
+            dbCategory = supply?.category || null;
+            supplyCategoryCache.set(item.supplyId, dbCategory || '');
+          } catch { supplyCategoryCache.set(item.supplyId, ''); }
+        }
+        if (dbCategory && CATEGORY_DISPLAY_NAMES[dbCategory]) {
+          categoryDisplay = CATEGORY_DISPLAY_NAMES[dbCategory];
+        } else if (dbCategory) {
+          categoryDisplay = dbCategory.charAt(0).toUpperCase() + dbCategory.slice(1);
+        }
       }
+
+      // Fallback: guess from item name if no supplyId or category
+      if (categoryDisplay === 'Misc.' && !item.supplyId) {
+        const itemName = (item.itemName || '').toLowerCase();
+        if (itemName.includes('groom') || itemName.includes('bath')) {
+          categoryDisplay = 'Grooming';
+          hasGrooming = true;
+        } else if (itemName.includes('dog food') || itemName.includes('kibble')) {
+          categoryDisplay = 'Dog Food';
+        } else if (itemName.includes('cat food')) {
+          categoryDisplay = 'Cat Food';
+        } else if (itemName.includes('dog treat')) {
+          categoryDisplay = 'Dog Treats';
+        } else if (itemName.includes('cat treat')) {
+          categoryDisplay = 'Cat Treats';
+        } else if (itemName.includes('reptile') || itemName.includes('feeder')) {
+          categoryDisplay = 'Reptiles';
+        } else if (itemName.includes('aqua') || itemName.includes('fish')) {
+          categoryDisplay = 'Aquatics';
+        } else if (itemName.includes('bird')) {
+          categoryDisplay = 'Bird Supplies';
+        } else if (itemName.includes('toy')) {
+          categoryDisplay = 'Toys';
+        } else if (itemName.includes('treat')) {
+          categoryDisplay = 'Treats';
+        } else if (itemName.includes('food')) {
+          categoryDisplay = 'Food';
+        } else if (itemName.includes('collar') || itemName.includes('leash')) {
+          categoryDisplay = 'Leashes & Collars';
+        } else if (itemName.includes('accessory')) {
+          categoryDisplay = 'Accessories';
+        } else if (itemName.includes('health') || itemName.includes('medic')) {
+          categoryDisplay = 'Healthcare';
+        }
+      }
+      if (categoryDisplay === 'Grooming') hasGrooming = true;
       
-      const existing = categorySales.get(category) || { name: category, total: 0, count: 0 };
+      const existing = categorySales.get(categoryDisplay) || { name: categoryDisplay, total: 0, count: 0 };
       existing.total += itemPrice;
       existing.count += item.quantity || 1;
-      categorySales.set(category, existing);
+      categorySales.set(categoryDisplay, existing);
+    }
+
+    if (hasGrooming) {
+      groomingOrderTotal += orderTotal;
+      groomingOrderCount++;
+    } else {
+      supplyOrderTotal += orderTotal;
+      supplyOrderCount++;
     }
   }
 
@@ -316,11 +420,16 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
     console.log('Could not fetch Stripe balance data for report:', e.message);
   }
 
-  const transactionCount = todaysOrders.length;
+  const transactionCount = activeOrders.length;
   const avgTicket = transactionCount > 0 ? total / transactionCount : 0;
 
   const sortedCategories = Array.from(categorySales.values()).sort((a, b) => b.total - a.total);
   const categoryTotal = sortedCategories.reduce((sum, cat) => sum + cat.total, 0);
+
+  const dayPartOrder = ['Morning (7AM-12PM)', 'Afternoon (12PM-5PM)', 'Evening (5PM-Close)', 'After Hours (12AM-7AM)'];
+  const sortedDayParts = dayPartOrder
+    .filter(dp => dayPartSales.has(dp))
+    .map(dp => dayPartSales.get(dp)!);
 
   const receiptStyle = `
     font-family: 'Courier New', Courier, monospace;
@@ -409,20 +518,27 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
           : dataRow('(No categorized items)', '0.00', '')}
         ${dataRow('<strong>Total</strong>', `<strong>${formatCurrency(categoryTotal)}</strong>`, '')}
         
+        ${sectionHeader('Net Sales By Day Part')}
+        ${headerRow('', 'Total $', 'Sales %')}
+        ${sortedDayParts.length > 0
+          ? sortedDayParts.map(dp =>
+              dataRow(dp.name, formatCurrency(dp.total), formatPercent(dp.total, total))
+            ).join('')
+          : dataRow('(No orders)', '0.00', '')}
+        ${dataRow('<strong>Report Total</strong>', `<strong>${formatCurrency(total)}</strong>`, '<strong>100.00%</strong>')}
+        
+        ${sectionHeader('Online Sales By Order Type')}
+        ${headerRow('', 'Total $', 'Sales %')}
+        ${supplyOrderCount > 0 ? dataRow('Supply Orders', formatCurrency(supplyOrderTotal), formatPercent(supplyOrderTotal, total)) : ''}
+        ${groomingOrderCount > 0 ? dataRow('Grooming Orders', formatCurrency(groomingOrderTotal), formatPercent(groomingOrderTotal, total)) : ''}
+        ${supplyOrderCount === 0 && groomingOrderCount === 0 ? dataRow('(No orders)', '0.00', '') : ''}
+        ${dataRow('<strong>Total</strong>', `<strong>${formatCurrency(total)}</strong>`, '')}
+        
         ${sectionHeader('Discounts Applied')}
         ${headerRow('', 'Total $', 'Count #')}
         ${totalLoyaltyDiscounts > 0 
           ? dataRow('Loyalty Rewards', formatCurrency(totalLoyaltyDiscounts), String(loyaltyDiscountCount))
           : dataRow('(None)', '0.00', '0')}
-        
-        ${sectionHeader('Total Sales By Category')}
-        ${headerRow('', 'Total $', 'Disc %')}
-        ${sortedCategories.length > 0
-          ? sortedCategories.map(cat => 
-              dataRow(cat.name, formatCurrency(cat.total), formatPercent(cat.total, categoryTotal))
-            ).join('')
-          : dataRow('(No categorized items)', '0.00', '')}
-        ${dataRow('<strong>Total</strong>', `<strong>${formatCurrency(categoryTotal)}</strong>`, '')}
         
         ${sectionHeader('Sales By Staff')}
         ${headerRow('', 'Total $', 'Sales %')}
@@ -457,16 +573,21 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
           </td>
         </tr>
         
-        ${sectionHeader('Payments')}
+        ${sectionHeader('Payment Transactions')}
         ${headerRow('', 'Total $', 'Sales %')}
-        ${dataRow('Credit Card (Online)', formatCurrency(cardPaymentTotal), cardPaymentCount > 0 ? formatPercent(cardPaymentTotal, total) : '0.00%')}
+        ${dataRow('Credit', formatCurrency(cardPaymentTotal), cardPaymentCount > 0 ? formatPercent(cardPaymentTotal, total) : '0.00%')}
+        ${totalLoyaltyDiscounts > 0 ? dataRow('Discount (Loyalty)', formatCurrency(totalLoyaltyDiscounts), formatPercent(totalLoyaltyDiscounts, total + totalLoyaltyDiscounts)) : ''}
         ${total - cardPaymentTotal > 0 ? dataRow('Other/Pending', formatCurrency(total - cardPaymentTotal), formatPercent(total - cardPaymentTotal, total)) : ''}
         
-        ${sectionHeader('Refunds')}
+        ${sectionHeader('Refunded Payments')}
         ${headerRow('', 'Total $', 'Count #')}
         ${dataRow('Subtotal Refunded', formatCurrency(refundedSubtotalTotal), String(totalRefundCount))}
         ${dataRow('Tax Refunded', formatCurrency(refundedTaxTotal), '')}
         ${dataRow('<strong>Total Refunded</strong>', `<strong>${formatCurrency(refundedTotal)}</strong>`, '')}
+        
+        ${sectionHeader('Voided Payments')}
+        ${headerRow('', 'Total $', 'Count #')}
+        ${dataRow('Voided/Cancelled', formatCurrency(voidedTotal), String(voidedCount))}
         
         ${sectionHeader('Settlement')}
         ${headerRow('', 'Total $', 'Count #')}
@@ -533,7 +654,7 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
         <p style="margin: 4px 0;"><strong>Online Sales Report</strong> - Animal House Pet Store</p>
         <p style="margin: 4px 0;">This report shows online orders only.</p>
         <p style="margin: 4px 0;">Combine with POS daily report for full reconciliation.</p>
-        <p style="margin: 4px 0;">Stripe fees are estimated. Verify in Stripe Dashboard for exact amounts.</p>
+        <p style="margin: 4px 0;">${hasStripeBalanceData ? 'Stripe fees pulled from Stripe API.' : 'Stripe fees are estimated (2.9% + $0.30). Verify in Stripe Dashboard.'}</p>
       </div>
     </div>
   `;
@@ -602,16 +723,34 @@ ${sortedCategories.map(cat =>
 ).join('\n')}
 Total                     ${formatCurrency(categoryTotal).padStart(10)}
 
--- Payments --
+-- Net Sales By Day Part --
                           Total $    Sales %
-Credit Card (Online)      ${formatCurrency(cardPaymentTotal).padStart(10)}   ${cardPaymentCount > 0 ? formatPercent(cardPaymentTotal, total) : '0.00%'}
+${sortedDayParts.map(dp =>
+  `${dp.name.padEnd(24)} ${formatCurrency(dp.total).padStart(10)}    ${formatPercent(dp.total, total).padStart(7)}`
+).join('\n')}
+Report Total              ${formatCurrency(total).padStart(10)}   100.00%
+
+-- Online Sales By Order Type --
+                          Total $    Sales %
+${supplyOrderCount > 0 ? `Supply Orders             ${formatCurrency(supplyOrderTotal).padStart(10)}   ${formatPercent(supplyOrderTotal, total)}` : ''}
+${groomingOrderCount > 0 ? `Grooming Orders           ${formatCurrency(groomingOrderTotal).padStart(10)}   ${formatPercent(groomingOrderTotal, total)}` : ''}
+Total                     ${formatCurrency(total).padStart(10)}
+
+-- Payment Transactions --
+                          Total $    Sales %
+Credit                    ${formatCurrency(cardPaymentTotal).padStart(10)}   ${cardPaymentCount > 0 ? formatPercent(cardPaymentTotal, total) : '0.00%'}
+${totalLoyaltyDiscounts > 0 ? `Discount (Loyalty)        ${formatCurrency(totalLoyaltyDiscounts).padStart(10)}   ${formatPercent(totalLoyaltyDiscounts, total + totalLoyaltyDiscounts)}` : ''}
 ${total - cardPaymentTotal > 0 ? `Other/Pending             ${formatCurrency(total - cardPaymentTotal).padStart(10)}   ${formatPercent(total - cardPaymentTotal, total)}` : ''}
 
--- Refunds --
+-- Refunded Payments --
                           Total $    Count #
 Subtotal Refunded         ${formatCurrency(refundedSubtotalTotal).padStart(10)}    ${String(totalRefundCount).padStart(5)}
 Tax Refunded              ${formatCurrency(refundedTaxTotal).padStart(10)}
 Total Refunded            ${formatCurrency(refundedTotal).padStart(10)}
+
+-- Voided Payments --
+                          Total $    Count #
+Voided/Cancelled          ${formatCurrency(voidedTotal).padStart(10)}    ${String(voidedCount).padStart(5)}
 
 -- Settlement --
                           Total $    Count #
@@ -666,7 +805,7 @@ Net Tax Due            ${formatCurrency(totalTax - refundedTaxTotal).padStart(10
 Animal House Pet Store - Daily Online Sales Report
 This report shows online orders only.
 Combine with POS daily report for full reconciliation.
-Stripe fees are estimated. Verify in Stripe Dashboard for exact amounts.
+${hasStripeBalanceData ? 'Stripe fees pulled from Stripe API.' : 'Stripe fees are estimated (2.9% + $0.30). Verify in Stripe Dashboard.'}
   `;
 
   const todayStr = today.toLocaleDateString('en-US', { 

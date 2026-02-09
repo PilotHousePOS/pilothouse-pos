@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first web application for online retail, specializing in exotic reptiles, pet supplies, and grooming services. It aims to provide a secure and seamless shopping experience through advanced inventory management, efficient service scheduling, robust customer engagement, and comprehensive administrative tools. The project's vision is to lead the exotic pet market by offering unique products, superior customer service, and innovative technology.
+The Animal House Pet Store is a mobile-first web application for online retail, specializing in exotic reptiles, pet supplies, and grooming services. It aims to provide a secure and seamless shopping experience through advanced inventory management, efficient service scheduling, robust customer engagement, and comprehensive administrative tools. The project's vision is to lead the exotic pet market with unique products, superior customer service, and innovative technology.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -187,7 +187,7 @@ Step 5: NEVER mark task complete until verification passes
 - Marketing Email Opt-Out: Users can opt out of marketing emails in profile. Admin Email Center has "This is a marketing email" checkbox that filters opted-out users. Order emails and important updates bypass opt-out.
 
 ## System Architecture
-The Animal House Pet Store is a full-stack, mobile-first web application with a dark, bold, high-contrast UI/UX featuring Amazon-style image carousels. Authentication is JWT-based with a three-tier role-based access control. The frontend uses React, Vite, TypeScript, Tailwind CSS, and shadcn/ui. The backend is built with Express.js and TypeScript, integrated with PostgreSQL and Drizzle ORM. Authentication relies on JWT tokens stored in cookies, state management uses TanStack Query, and Wouter handles client-side routing. Key functionalities include customer wishlists, a CMS for animal categories, administrative order management, advanced search, database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and AI-powered processing for order photo analysis, item extraction, and categorization. Real-time alerts are delivered via Web Push Notifications using VAPID keys.
+The Animal House Pet Store is a full-stack, mobile-first web application. It features a dark, bold, high-contrast UI/UX with Amazon-style image carousels. Authentication is JWT-based with a three-tier role-based access control. The frontend uses React, Vite, TypeScript, Tailwind CSS, and shadcn/ui. The backend is built with Express.js and TypeScript, integrated with PostgreSQL and Drizzle ORM. Authentication relies on JWT tokens stored in cookies, state management uses TanStack Query, and Wouter handles client-side routing. Key functionalities include customer wishlists, a CMS for animal categories, administrative order management, advanced search, database synchronization, automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, automated brand extraction, and AI-powered processing for order photo analysis, item extraction, and categorization. Real-time alerts are delivered via Web Push Notifications using VAPID keys.
 
 ## External Dependencies
 - PostgreSQL
