@@ -5316,6 +5316,70 @@ West Monroe LA 71291
     }
   });
 
+  // Store Hours endpoints
+  const DAYS_OF_WEEK = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  const DEFAULT_STORE_HOURS: Record<string, { open: boolean; openTime: string; closeTime: string }> = {
+    monday: { open: true, openTime: '07:00', closeTime: '18:00' },
+    tuesday: { open: true, openTime: '07:00', closeTime: '18:00' },
+    wednesday: { open: true, openTime: '07:00', closeTime: '18:00' },
+    thursday: { open: true, openTime: '07:00', closeTime: '18:00' },
+    friday: { open: true, openTime: '07:00', closeTime: '18:00' },
+    saturday: { open: true, openTime: '07:00', closeTime: '18:00' },
+    sunday: { open: true, openTime: '13:00', closeTime: '18:00' },
+  };
+
+  app.get("/api/settings/store-hours", async (_req, res) => {
+    try {
+      const settings = await storage.getGroomingSettings();
+      const hours: Record<string, any> = {};
+      for (const day of DAYS_OF_WEEK) {
+        const setting = settings.find(s => s.setting === `store_hours_${day}`);
+        if (setting) {
+          try {
+            hours[day] = JSON.parse(setting.value);
+          } catch {
+            hours[day] = DEFAULT_STORE_HOURS[day];
+          }
+        } else {
+          hours[day] = DEFAULT_STORE_HOURS[day];
+        }
+      }
+      res.json(hours);
+    } catch (error) {
+      console.error("Error fetching store hours:", error);
+      res.json(DEFAULT_STORE_HOURS);
+    }
+  });
+
+  app.put("/api/admin/settings/store-hours", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { hours } = req.body;
+      if (!hours || typeof hours !== 'object') {
+        return res.status(400).json({ message: "Invalid store hours data" });
+      }
+
+      for (const day of DAYS_OF_WEEK) {
+        if (hours[day]) {
+          const { open, openTime, closeTime } = hours[day];
+          await storage.upsertGroomingSetting({
+            setting: `store_hours_${day}`,
+            value: JSON.stringify({ open: !!open, openTime: openTime || '07:00', closeTime: closeTime || '18:00' }),
+          });
+        }
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error saving store hours:", error);
+      res.status(500).json({ message: "Failed to save store hours" });
+    }
+  });
+
   // Daily appointment limit routes
   app.get("/api/admin/daily-limits", authMiddleware, async (req: any, res) => {
     try {

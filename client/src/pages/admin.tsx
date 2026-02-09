@@ -4411,6 +4411,180 @@ function SettingsPanel() {
   );
 }
 
+// Store Hours Panel Component
+function StoreHoursPanel() {
+  const { toast } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
+  const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
+  const DAY_LABELS: Record<string, string> = {
+    monday: 'Monday', tuesday: 'Tuesday', wednesday: 'Wednesday',
+    thursday: 'Thursday', friday: 'Friday', saturday: 'Saturday', sunday: 'Sunday',
+  };
+
+  const [hours, setHours] = useState<Record<string, { open: boolean; openTime: string; closeTime: string }>>({
+    monday: { open: true, openTime: '07:00', closeTime: '18:00' },
+    tuesday: { open: true, openTime: '07:00', closeTime: '18:00' },
+    wednesday: { open: true, openTime: '07:00', closeTime: '18:00' },
+    thursday: { open: true, openTime: '07:00', closeTime: '18:00' },
+    friday: { open: true, openTime: '07:00', closeTime: '18:00' },
+    saturday: { open: true, openTime: '07:00', closeTime: '18:00' },
+    sunday: { open: true, openTime: '13:00', closeTime: '18:00' },
+  });
+
+  const { data: storeHoursData, isLoading } = useQuery({
+    queryKey: ['/api/settings/store-hours'],
+  });
+
+  useEffect(() => {
+    if (storeHoursData) {
+      const data = storeHoursData as Record<string, any>;
+      const newHours: Record<string, { open: boolean; openTime: string; closeTime: string }> = {};
+      for (const day of DAYS) {
+        if (data[day]) {
+          newHours[day] = {
+            open: data[day].open ?? true,
+            openTime: data[day].openTime || '07:00',
+            closeTime: data[day].closeTime || '18:00',
+          };
+        } else {
+          newHours[day] = hours[day];
+        }
+      }
+      setHours(newHours);
+    }
+  }, [storeHoursData]);
+
+  const formatTime12h = (time24: string) => {
+    const [h, m] = time24.split(':').map(Number);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    return `${hour12}:${String(m).padStart(2, '0')} ${ampm}`;
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/admin/settings/store-hours', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ hours }),
+      });
+      if (!response.ok) throw new Error('Failed to save');
+      toast({ title: "Store hours saved", description: "Your updated hours are now visible to customers." });
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to save store hours", variant: "destructive" });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const updateDay = (day: string, field: string, value: any) => {
+    setHours(prev => ({ ...prev, [day]: { ...prev[day], [field]: value } }));
+  };
+
+  const timeOptions = [];
+  for (let h = 0; h < 24; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      const val = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      timeOptions.push(val);
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Clock className="w-5 h-5" />
+          Store Hours
+        </CardTitle>
+        <CardDescription>Set your store's operating hours displayed to customers. These are separate from grooming appointment settings.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {isLoading ? (
+          <div className="text-center py-4 text-gray-500">Loading...</div>
+        ) : (
+          <>
+            <div className="space-y-3">
+              {DAYS.map(day => (
+                <div key={day} className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                  <div className="w-24 font-medium text-sm">{DAY_LABELS[day]}</div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={hours[day].open}
+                      onChange={(e) => updateDay(day, 'open', e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300"
+                    />
+                    <span className="text-xs text-gray-500 w-10">{hours[day].open ? 'Open' : 'Closed'}</span>
+                  </div>
+                  {hours[day].open ? (
+                    <div className="flex items-center gap-2 flex-1">
+                      <select
+                        value={hours[day].openTime}
+                        onChange={(e) => updateDay(day, 'openTime', e.target.value)}
+                        className="text-sm border rounded px-2 py-1.5 bg-white dark:bg-gray-700 dark:border-gray-600"
+                      >
+                        {timeOptions.map(t => (
+                          <option key={t} value={t}>{formatTime12h(t)}</option>
+                        ))}
+                      </select>
+                      <span className="text-gray-400 text-sm">to</span>
+                      <select
+                        value={hours[day].closeTime}
+                        onChange={(e) => updateDay(day, 'closeTime', e.target.value)}
+                        className="text-sm border rounded px-2 py-1.5 bg-white dark:bg-gray-700 dark:border-gray-600"
+                      >
+                        {timeOptions.map(t => (
+                          <option key={t} value={t}>{formatTime12h(t)}</option>
+                        ))}
+                      </select>
+                    </div>
+                  ) : (
+                    <span className="text-sm text-red-500 italic">Closed</span>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+              <p className="text-xs text-blue-700 dark:text-blue-300">
+                Preview: {(() => {
+                  const groups: { days: string[]; time: string }[] = [];
+                  for (const day of DAYS) {
+                    const h = hours[day];
+                    const timeStr = h.open ? `${formatTime12h(h.openTime)} - ${formatTime12h(h.closeTime)}` : 'Closed';
+                    const lastGroup = groups[groups.length - 1];
+                    if (lastGroup && lastGroup.time === timeStr) {
+                      lastGroup.days.push(DAY_LABELS[day].slice(0, 3));
+                    } else {
+                      groups.push({ days: [DAY_LABELS[day].slice(0, 3)], time: timeStr });
+                    }
+                  }
+                  return groups.map(g => {
+                    const dayRange = g.days.length > 2
+                      ? `${g.days[0]}-${g.days[g.days.length - 1]}`
+                      : g.days.join(', ');
+                    return `${dayRange}: ${g.time}`;
+                  }).join(' · ');
+                })()}
+              </p>
+            </div>
+
+            <Button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {isSaving ? 'Saving...' : 'Save Store Hours'}
+            </Button>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 // Loyalty Settings Panel Component
 function LoyaltySettingsPanel() {
   const { toast } = useToast();
@@ -10885,6 +11059,7 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">
+          <StoreHoursPanel />
           <SettingsPanel />
           <LoyaltySettingsPanel />
         </TabsContent>
