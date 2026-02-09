@@ -691,8 +691,8 @@ function ContactAppointmentHistory({ contactId, onViewFullHistory }: { contactId
       <div className="space-y-2 max-h-48 overflow-y-auto">
         {completedAppointments.slice(0, 3).map((apt: any) => (
           <div key={apt.id} className="bg-gray-50 rounded p-2 text-xs" data-testid={`appointment-history-${apt.id}`}>
-            <div className="flex justify-between items-start">
-              <div>
+            <div className="flex justify-between items-start gap-2">
+              <div className="min-w-0">
                 <p className="font-medium">{formatService(apt.serviceType || apt.service)}</p>
                 <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
                 <p className="text-gray-500">{parseLocalDate(apt.appointmentDate).toLocaleDateString()}</p>
@@ -701,11 +701,11 @@ function ContactAppointmentHistory({ contactId, onViewFullHistory }: { contactId
                 )}
               </div>
               {apt.price && (
-                <p className="text-green-700 font-semibold">${apt.price}</p>
+                <p className="text-green-700 font-semibold flex-shrink-0">${apt.price}</p>
               )}
             </div>
             {apt.specialNotes && (
-              <p className="text-gray-600 mt-1 italic">{apt.specialNotes}</p>
+              <p className="text-gray-600 mt-1 italic break-words">{apt.specialNotes}</p>
             )}
           </div>
         ))}
@@ -1480,7 +1480,7 @@ function ContactsManager() {
                     {/* Left side - Contact Info */}
                     <div className="flex flex-col gap-2 min-w-0 flex-1">
                       {/* Name */}
-                      <p className="font-semibold text-base break-words truncate">
+                      <p className="font-semibold text-base break-words">
                         {contact.displayName || contact.name}
                       </p>
                       
