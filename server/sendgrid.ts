@@ -47,11 +47,11 @@ export async function sendPasswordResetEmail(toEmail: string, resetToken: string
             <p style="font-size: 12px; color: #999; word-break: break-all;">
               ${resetLink}
             </p>
-            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-            <p style="color: #9ca3af; font-size: 12px; text-align: center;">
-              Animal House Pet Store | 318-323-6090<br>
-              Your trusted pet care partner
-            </p>
+          </div>
+          <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+            <p style="margin: 0;">Phone: (318) 322-3023</p>
           </div>
         </div>
       `,
@@ -94,10 +94,11 @@ export async function sendAppointmentRejectionEmail(
             <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">
               The Animal House regrets to inform you that we could not accept your appointment. This may have been due to several reasons. If you have any questions about this please contact us at <strong>318-323-6090</strong>.
             </p>
-            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-            <p style="color: #9ca3af; font-size: 12px; text-align: center;">
-              Animal House Pet Store - Your trusted pet care partner
-            </p>
+          </div>
+          <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+            <p style="margin: 0;">Phone: (318) 322-3023</p>
           </div>
         </div>
       `,

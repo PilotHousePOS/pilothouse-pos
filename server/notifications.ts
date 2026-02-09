@@ -22,6 +22,11 @@ class EmailService {
               Please review and process this order in the admin dashboard.
             </div>
           </div>
+          <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+            <p style="margin: 0;">Phone: (318) 322-3023</p>
+          </div>
         </div>
       `;
 
@@ -59,6 +64,11 @@ class EmailService {
               <strong>Action Required:</strong><br>
               Please review and confirm this appointment in the admin dashboard.
             </div>
+          </div>
+          <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+            <p style="margin: 0;">Phone: (318) 322-3023</p>
           </div>
         </div>
       `;
@@ -136,6 +146,11 @@ class EmailService {
               Thank you for choosing Animal House Pet Store!
             </p>
           </div>
+          <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+            <p style="margin: 0;">Phone: (318) 322-3023</p>
+          </div>
         </div>
       `;
 
@@ -203,11 +218,15 @@ class EmailService {
             </div>
 
             <p style="font-size: 14px; color: #666; margin-top: 30px;">
-              Questions? Call us at <strong>318-323-6090</strong> - we're happy to help!
+              Questions? Call us at <strong>(318) 322-3023</strong> - we're happy to help!
             </p>
-            <p style="font-size: 12px; color: #999; margin-top: 20px;">
-              If you no longer wish to receive these reminders, you can update your notification preferences in your account settings.
-            </p>
+          </div>
+          <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+            <p style="margin: 0 0 10px 0;">Phone: (318) 322-3023</p>
+            <p style="margin: 0 0 5px 0;">You are receiving this email because you have an account with Animal House Pet Store.</p>
+            <p style="margin: 0;"><a href="${baseUrl}/profile" style="color: #93c5fd; text-decoration: underline;">Unsubscribe from marketing emails</a></p>
           </div>
         </div>
       `;
@@ -266,6 +285,11 @@ class EmailService {
               Thank you for choosing Animal House Pet Store!
             </p>
           </div>
+          <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+            <p style="margin: 0;">Phone: (318) 322-3023</p>
+          </div>
         </div>
       `;
 
@@ -317,6 +341,11 @@ class EmailService {
               Thank you for choosing Animal House Pet Store!
             </p>
           </div>
+          <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+            <p style="margin: 0;">Phone: (318) 322-3023</p>
+          </div>
         </div>
       `;
 
@@ -350,10 +379,11 @@ class EmailService {
             <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">
               The Animal House regrets to inform you that we could not accept your appointment. This may have been due to several reasons. If you have any questions about this please contact us at <strong>318-323-6090</strong>.
             </p>
-            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-            <p style="color: #9ca3af; font-size: 12px; text-align: center;">
-              Animal House Pet Store - Your trusted pet care partner
-            </p>
+          </div>
+          <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+            <p style="margin: 0;">Phone: (318) 322-3023</p>
           </div>
         </div>
       `;

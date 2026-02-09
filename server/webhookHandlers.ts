@@ -306,8 +306,10 @@ export class WebhookHandlers {
               <p>We'll send you another email when it's ready for pickup.</p>
               <p>Thank you for shopping with us!</p>
             </div>
-            <div style="background-color: #1f2937; color: white; padding: 15px; text-align: center; font-size: 12px;">
-              <p>Animal House Pet Store</p>
+            <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+              <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+              <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+              <p style="margin: 0;">Phone: (318) 322-3023</p>
             </div>
           </div>
         `

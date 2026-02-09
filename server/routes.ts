@@ -2208,8 +2208,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                   
                   <p>Thank you for shopping with us!</p>
                 </div>
-                <div style="background-color: #1f2937; color: white; padding: 15px; text-align: center; font-size: 12px;">
-                  <p>Animal House Pet Store</p>
+                <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+                  <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+                  <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+                  <p style="margin: 0;">Phone: (318) 322-3023</p>
                 </div>
               </div>
             `
@@ -2287,8 +2289,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                   
                   <p>Thank you for shopping with Animal House Pet Store!</p>
                 </div>
-                <div style="background-color: #1f2937; color: white; padding: 15px; text-align: center; font-size: 12px;">
-                  <p>Animal House Pet Store</p>
+                <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+                  <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+                  <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+                  <p style="margin: 0;">Phone: (318) 322-3023</p>
                 </div>
               </div>
             `
@@ -4855,6 +4859,10 @@ West Monroe LA 71291
 
       for (const user of targetUsers) {
         try {
+          const emailBaseUrl = process.env.REPLIT_DOMAINS 
+            ? `https://${process.env.REPLIT_DOMAINS}`
+            : 'http://localhost:5000';
+          
           await sgMail.send({
             to: user.email,
             from: fromEmail,
@@ -4871,9 +4879,12 @@ West Monroe LA 71291
                     ${message.replace(/\n/g, '<br>')}
                   </div>
                 </div>
-                <div style="background: #f3f4f6; padding: 20px; text-align: center; color: #6b7280; font-size: 12px;">
-                  <p>Animal House Pet Store</p>
-                  <p>If you have any questions, please contact us.</p>
+                <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+                  <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+                  <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+                  <p style="margin: 0 0 10px 0;">Phone: (318) 322-3023</p>
+                  ${isMarketing ? `<p style="margin: 0 0 5px 0;">You are receiving this email because you have an account with Animal House Pet Store.</p>
+                  <p style="margin: 0;"><a href="${emailBaseUrl}/profile" style="color: #93c5fd; text-decoration: underline;">Unsubscribe from marketing emails</a></p>` : `<p style="margin: 0;">If you have any questions, please contact us.</p>`}
                 </div>
               </div>
             `,
