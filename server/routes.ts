@@ -4234,6 +4234,46 @@ West Monroe LA 71291
         }
       }
       
+      // DUPLICATE CHECK: Prevent same customer + same pet + same date duplicates
+      // Works for both admin and customer bookings, regardless of source
+      const phoneForDupeCheck = req.body.ownerPhoneNumber || req.body.phone;
+      if (phoneForDupeCheck) {
+        const allAppointmentsForDupeCheck = await storage.getAppointments();
+        const normalizedPhone = phoneForDupeCheck.replace(/\D/g, '').slice(-10);
+        
+        // Get appointments on same date for same phone number
+        const sameDateSamePhone = allAppointmentsForDupeCheck.filter((apt: any) => {
+          if (apt.status === 'cancelled' || apt.status === 'rejected') return false;
+          const aptPhone = (apt.ownerPhoneNumber || '').replace(/\D/g, '').slice(-10);
+          if (aptPhone !== normalizedPhone) return false;
+          const aptDateStr = typeof apt.appointmentDate === 'string'
+            ? apt.appointmentDate.split('T')[0]
+            : new Date(apt.appointmentDate).toISOString().split('T')[0];
+          return aptDateStr === appointmentDateStr;
+        });
+        
+        if (sameDateSamePhone.length > 0) {
+          // Collect all pet names from existing appointments (main record + appointment_pets table)
+          const existingPetNames = new Set<string>();
+          for (const apt of sameDateSamePhone) {
+            if (apt.petName) existingPetNames.add(apt.petName.toLowerCase().trim());
+            const aptPets = await storage.getAppointmentPets(apt.id);
+            for (const p of aptPets) {
+              if (p.petName) existingPetNames.add(p.petName.toLowerCase().trim());
+            }
+          }
+          
+          for (const pet of petsArray) {
+            const petNameLower = (pet.petName || '').toLowerCase().trim();
+            if (existingPetNames.has(petNameLower)) {
+              return res.status(400).json({
+                message: `${pet.petName} already has an appointment booked for this date. The same pet cannot have two appointments on the same day.`
+              });
+            }
+          }
+        }
+      }
+
       // For multi-pet appointments, use first pet's info in main record for backward compatibility
       const firstPet = petsArray[0];
       const petNamesStr = petsArray.map((p: any) => p.petName).join(', ');
