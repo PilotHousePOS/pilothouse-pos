@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Allow: /privacy-policy
+Allow: /terms-of-service
+Disallow: /admin
+Disallow: /api/
+Disallow: /settings
+
+Sitemap: https://animalhouseexperience.replit.app/sitemap.xml
