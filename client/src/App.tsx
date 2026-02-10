@@ -22,6 +22,8 @@ import OrderHistory from "@/pages/order-history";
 import OrderConfirmation from "@/pages/order-confirmation";
 import MyAppointments from "@/pages/my-appointments";
 import Wishlist from "@/pages/wishlist";
+import PrivacyPolicy from "@/pages/privacy-policy";
+import TermsOfService from "@/pages/terms-of-service";
 import NotFound from "@/pages/not-found";
 import BottomNav from "@/components/bottom-nav";
 import BackToTop from "@/components/back-to-top";
@@ -44,12 +46,14 @@ function Router() {
         {/* Public routes accessible to everyone */}
         <Route path="/forgot-password" component={ForgotPassword} />
         <Route path="/reset-password" component={ResetPassword} />
+        <Route path="/privacy-policy" component={PrivacyPolicy} />
+        <Route path="/terms-of-service" component={TermsOfService} />
         
         {!isAuthenticated ? (
           <>
             <Route path="/" component={Landing} />
             <Route path="/auth" component={Auth} />
-            <Route path="*" component={() => <Landing />} />
+            <Route component={NotFound} />
           </>
         ) : (
           <>

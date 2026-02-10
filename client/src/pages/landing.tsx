@@ -134,6 +134,13 @@ export default function Landing() {
             <div className="text-sm font-bold text-white uppercase">Rating</div>
           </div>
         </div>
+
+        {/* Footer Links */}
+        <div className="mt-8 flex items-center justify-center gap-3 text-xs text-white/60">
+          <a href="/privacy-policy" className="hover:text-white/90 underline">Privacy Policy</a>
+          <span>•</span>
+          <a href="/terms-of-service" className="hover:text-white/90 underline">Terms of Service</a>
+        </div>
       </div>
     </div>
   );
