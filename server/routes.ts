@@ -9209,5 +9209,54 @@ West Monroe LA 71291
     }
   });
 
+  // Legal pages API (public read, admin write)
+  app.get("/api/legal/:slug", async (req, res) => {
+    try {
+      const page = await storage.getLegalPage(req.params.slug);
+      if (!page) {
+        return res.status(404).json({ message: "Page not found" });
+      }
+      res.json(page);
+    } catch (error) {
+      console.error('Error fetching legal page:', error);
+      res.status(500).json({ message: "Failed to fetch page" });
+    }
+  });
+
+  app.get("/api/admin/legal-pages", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const pages = await storage.getAllLegalPages();
+      res.json(pages);
+    } catch (error) {
+      console.error('Error fetching legal pages:', error);
+      res.status(500).json({ message: "Failed to fetch pages" });
+    }
+  });
+
+  app.put("/api/admin/legal/:slug", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const { title, content } = req.body;
+      if (!title || !content) {
+        return res.status(400).json({ message: "Title and content are required" });
+      }
+      const page = await storage.upsertLegalPage({
+        slug: req.params.slug,
+        title,
+        content,
+        lastUpdatedBy: req.user.id,
+      });
+      res.json(page);
+    } catch (error) {
+      console.error('Error saving legal page:', error);
+      res.status(500).json({ message: "Failed to save page" });
+    }
+  });
+
   // Server is now created externally in index.ts
 }

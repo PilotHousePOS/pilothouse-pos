@@ -100,6 +100,9 @@ import {
   type InsertAstroFrequentBuyerProgress,
   type AstroPurchaseSyncLog,
   type InsertAstroPurchaseSyncLog,
+  legalPages,
+  type LegalPage,
+  type InsertLegalPage,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, and, or, not, ilike, lt, lte, isNull, count, sql, inArray, ne, notInArray } from "drizzle-orm";
@@ -431,6 +434,11 @@ export interface IStorage {
   updateUserLoyalty(userId: string, data: { loyaltyCredits?: string; totalSpent?: string }): Promise<User>;
   addToUserTotalSpent(userId: string, amount: number): Promise<{ newCreditsEarned: boolean; creditsAmount: string }>;
   updateUserStripeInfo(userId: string, data: { stripeCustomerId?: string; stripeDefaultPaymentMethod?: string }): Promise<User>;
+
+  // Legal pages operations
+  getLegalPage(slug: string): Promise<LegalPage | undefined>;
+  upsertLegalPage(data: { slug: string; title: string; content: string; lastUpdatedBy?: string }): Promise<LegalPage>;
+  getAllLegalPages(): Promise<LegalPage[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -4350,6 +4358,31 @@ export class DatabaseStorage implements IStorage {
       console.error('Error updating user Stripe info:', error);
       throw error;
     }
+  }
+
+  async getLegalPage(slug: string): Promise<LegalPage | undefined> {
+    const [page] = await db.select().from(legalPages).where(eq(legalPages.slug, slug));
+    return page;
+  }
+
+  async upsertLegalPage(data: { slug: string; title: string; content: string; lastUpdatedBy?: string }): Promise<LegalPage> {
+    const existing = await this.getLegalPage(data.slug);
+    if (existing) {
+      const [updated] = await db.update(legalPages)
+        .set({ title: data.title, content: data.content, lastUpdatedBy: data.lastUpdatedBy || null, updatedAt: new Date() })
+        .where(eq(legalPages.slug, data.slug))
+        .returning();
+      return updated;
+    } else {
+      const [created] = await db.insert(legalPages)
+        .values({ slug: data.slug, title: data.title, content: data.content, lastUpdatedBy: data.lastUpdatedBy || null })
+        .returning();
+      return created;
+    }
+  }
+
+  async getAllLegalPages(): Promise<LegalPage[]> {
+    return db.select().from(legalPages).orderBy(asc(legalPages.slug));
   }
 }
 

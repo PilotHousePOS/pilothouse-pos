@@ -958,6 +958,25 @@ export const insertAstroPurchaseSyncLogSchema = createInsertSchema(astroPurchase
 export type AstroPurchaseSyncLog = typeof astroPurchaseSyncLog.$inferSelect;
 export type InsertAstroPurchaseSyncLog = z.infer<typeof insertAstroPurchaseSyncLogSchema>;
 
+// Legal Pages (Privacy Policy, Terms of Service - admin-editable)
+export const legalPages = pgTable("legal_pages", {
+  id: serial("id").primaryKey(),
+  slug: varchar("slug", { length: 100 }).notNull().unique(),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  lastUpdatedBy: varchar("last_updated_by").references(() => users.id),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertLegalPageSchema = createInsertSchema(legalPages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type LegalPage = typeof legalPages.$inferSelect;
+export type InsertLegalPage = z.infer<typeof insertLegalPageSchema>;
+
 // Automated Messages - TEMPORARILY DISABLED for publishing test
 // Will be re-enabled after confirming publishing works
 

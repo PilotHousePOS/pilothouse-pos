@@ -1,4 +1,4 @@
-import { MapPin, Clock, Phone } from "lucide-react";
+import { MapPin, Clock, Phone, FileText } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 function formatTime12h(time24: string) {
@@ -68,6 +68,15 @@ export default function StoreFooter() {
             className="text-xs text-brand-blue hover:underline font-medium"
           >
             Animal House Pet Store
+          </a>
+        </div>
+        <div className="flex items-center justify-center gap-3 pt-2 border-t border-gray-200 mt-2">
+          <a href="/privacy-policy" className="text-xs text-gray-500 hover:text-brand-blue hover:underline">
+            Privacy Policy
+          </a>
+          <span className="text-gray-300">•</span>
+          <a href="/terms-of-service" className="text-xs text-gray-500 hover:text-brand-blue hover:underline">
+            Terms of Service
           </a>
         </div>
       </div>

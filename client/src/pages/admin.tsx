@@ -4720,6 +4720,164 @@ function LoyaltySettingsPanel() {
   );
 }
 
+// Legal Pages Panel Component
+function LegalPagesPanel() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [editingSlug, setEditingSlug] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editContent, setEditContent] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const LEGAL_PAGES = [
+    { slug: 'privacy-policy', label: 'Privacy Policy' },
+    { slug: 'terms-of-service', label: 'Terms of Service' },
+  ];
+
+  const { data: pages = [], isLoading } = useQuery<any[]>({
+    queryKey: ['/api/admin/legal-pages'],
+  });
+
+  const loadPage = async (slug: string) => {
+    try {
+      const res = await fetch(`/api/legal/${slug}`, { credentials: 'include' });
+      const pageConfig = LEGAL_PAGES.find(p => p.slug === slug);
+      if (res.ok) {
+        const data = await res.json();
+        setEditTitle(data.title);
+        setEditContent(data.content);
+      } else {
+        setEditTitle(pageConfig?.label || slug);
+        setEditContent('');
+      }
+      setEditingSlug(slug);
+    } catch (error) {
+      console.error('Error loading page:', error);
+    }
+  };
+
+  const savePage = async () => {
+    if (!editingSlug) return;
+    setIsSaving(true);
+    try {
+      const res = await fetch(`/api/admin/legal/${editingSlug}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ title: editTitle, content: editContent }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/legal-pages'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/legal', editingSlug] });
+      toast({ title: 'Saved', description: `${editTitle} has been updated.` });
+      setEditingSlug(null);
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to save page.', variant: 'destructive' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const getPageData = (slug: string) => pages.find((p: any) => p.slug === slug);
+
+  if (editingSlug) {
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => setEditingSlug(null)}>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <div>
+              <CardTitle className="text-base">Edit {editTitle}</CardTitle>
+              <CardDescription>Update the content using HTML formatting</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label htmlFor="page-title">Page Title</Label>
+            <Input
+              id="page-title"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              placeholder="Page title"
+            />
+          </div>
+          <div>
+            <Label htmlFor="page-content">Content (HTML)</Label>
+            <p className="text-xs text-muted-foreground mb-2">
+              Use HTML tags: &lt;h2&gt; for headings, &lt;p&gt; for paragraphs, &lt;ul&gt;&lt;li&gt; for lists, &lt;strong&gt; for bold, &lt;a href="..."&gt; for links
+            </p>
+            <Textarea
+              id="page-content"
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              className="min-h-[400px] font-mono text-xs"
+              placeholder="Enter page content in HTML..."
+            />
+          </div>
+          <div className="border rounded-lg p-4 bg-gray-50">
+            <Label className="text-sm font-semibold mb-2 block">Preview</Label>
+            <div
+              className="text-sm text-gray-700 leading-relaxed legal-content max-h-[300px] overflow-y-auto"
+              dangerouslySetInnerHTML={{ __html: editContent }}
+            />
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => setEditingSlug(null)}>Cancel</Button>
+            <Button onClick={savePage} disabled={isSaving} className="bg-brand-blue hover:bg-blue-700">
+              <Save className="w-4 h-4 mr-2" />
+              {isSaving ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <FileText className="w-5 h-5" />
+          Legal Pages
+        </CardTitle>
+        <CardDescription>Edit your Privacy Policy and Terms of Service</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {LEGAL_PAGES.map(({ slug, label }) => {
+          const pageData = getPageData(slug);
+          return (
+            <div key={slug} className="flex items-center justify-between p-3 border rounded-lg">
+              <div>
+                <p className="font-medium text-sm">{label}</p>
+                {pageData ? (
+                  <p className="text-xs text-muted-foreground">
+                    Last updated: {new Date(pageData.updatedAt).toLocaleDateString()}
+                  </p>
+                ) : (
+                  <p className="text-xs text-amber-600">Using default content — click Edit to customize</p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" asChild>
+                  <a href={`/${slug}`} target="_blank" rel="noopener noreferrer">
+                    <Eye className="w-4 h-4 mr-1" /> View
+                  </a>
+                </Button>
+                <Button size="sm" onClick={() => loadPage(slug)} className="bg-brand-blue hover:bg-blue-700">
+                  <Pencil className="w-4 h-4 mr-1" /> Edit
+                </Button>
+              </div>
+            </div>
+          );
+        })}
+      </CardContent>
+    </Card>
+  );
+}
+
 // Astro Loyalty Manager Component
 function AstroLoyaltyManager() {
   const { toast } = useToast();
@@ -11066,6 +11224,7 @@ export default function Admin() {
           <StoreHoursPanel />
           <SettingsPanel />
           <LoyaltySettingsPanel />
+          <LegalPagesPanel />
         </TabsContent>
       </Tabs>
 
