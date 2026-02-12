@@ -4785,21 +4785,11 @@ function LegalPagesPanel() {
 
   const editorRef = useRef<HTMLDivElement>(null);
   const [showHtml, setShowHtml] = useState(false);
-  const pendingContent = useRef<string>('');
-
-  const editorCallbackRef = useCallback((node: HTMLDivElement | null) => {
-    editorRef.current = node;
-    if (node && pendingContent.current) {
-      node.innerHTML = pendingContent.current;
-    }
-  }, []);
+  const [editorKey, setEditorKey] = useState(0);
 
   useEffect(() => {
     if (editingSlug && !showHtml) {
-      pendingContent.current = editContent;
-      if (editorRef.current) {
-        editorRef.current.innerHTML = editContent;
-      }
+      setEditorKey(k => k + 1);
     }
   }, [editingSlug, showHtml]);
 
@@ -4813,7 +4803,6 @@ function LegalPagesPanel() {
 
   const handleEditorInput = () => {
     if (editorRef.current) {
-      pendingContent.current = editorRef.current.innerHTML;
       setEditContent(editorRef.current.innerHTML);
     }
   };
@@ -4899,19 +4888,13 @@ function LegalPagesPanel() {
               ) : (
                 <div className="relative">
                   <div
-                    ref={editorCallbackRef}
+                    key={editorKey}
+                    ref={editorRef}
                     contentEditable
+                    suppressContentEditableWarning
                     onInput={handleEditorInput}
-                    onFocus={() => {
-                      const el = editorRef.current;
-                      if (el && el.textContent?.trim() === '') {
-                        el.classList.add('editor-has-focus');
-                      }
-                    }}
-                    onBlur={() => {
-                      editorRef.current?.classList.remove('editor-has-focus');
-                    }}
-                    className="min-h-[400px] p-4 text-sm leading-relaxed focus:outline-none legal-content overflow-y-auto bg-white dark:bg-gray-950 dark:text-gray-100 empty:before:content-['Tap_here_to_start_typing_your_page_content...'] empty:before:text-gray-400 empty:before:pointer-events-none"
+                    dangerouslySetInnerHTML={{ __html: editContent }}
+                    className="min-h-[400px] p-4 text-sm leading-relaxed focus:outline-none legal-content overflow-y-auto bg-white dark:bg-gray-950 dark:text-gray-100"
                     style={{ wordBreak: 'break-word' }}
                   />
                 </div>
