@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useLocation } from "wouter";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Switch } from "@/components/ui/switch";
 import { 
   ShoppingBag, 
@@ -227,6 +227,9 @@ export default function Profile() {
     } catch (error) {
       console.error('Logout error:', error);
     }
+    localStorage.removeItem('token');
+    localStorage.clear();
+    queryClient.clear();
     window.location.href = '/';
   };
 

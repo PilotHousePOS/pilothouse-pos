@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -57,8 +58,9 @@ export default function Home() {
       console.error('Logout error:', error);
     }
     
-    // Clear any localStorage (legacy)
+    localStorage.removeItem('token');
     localStorage.clear();
+    queryClient.clear();
     
     // Redirect to landing page
     window.location.href = '/';
