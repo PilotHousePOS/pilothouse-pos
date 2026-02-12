@@ -251,6 +251,180 @@ async function initStripe() {
   }
 }
 
+async function seedLegalPages() {
+  try {
+    const { storage } = await import('./storage');
+    const existing = await storage.getAllLegalPages();
+    const slugs = existing.map(p => p.slug);
+    
+    if (!slugs.includes('privacy-policy')) {
+      await storage.upsertLegalPage({
+        slug: 'privacy-policy',
+        title: 'Privacy Policy',
+        content: `<p class="text-xs text-gray-500">Last Updated: February 10, 2026</p>
+
+<h2>1. Introduction</h2>
+<p>Animal House Pet Store ("we," "us," or "our"), located at 2934 Cypress St, West Monroe, LA 71291, is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and mobile application (the "Service").</p>
+
+<h2>2. Information We Collect</h2>
+<p><strong>Personal Information:</strong></p>
+<ul>
+<li>Name, email address, and phone number when you create an account</li>
+<li>Pet information (name, breed, type) when you add pets to your profile</li>
+<li>Payment information processed securely through Stripe (we do not store card numbers)</li>
+<li>Order history and grooming appointment records</li>
+<li>Communication preferences (email and SMS opt-in/opt-out)</li>
+</ul>
+<p><strong>Automatically Collected Information:</strong></p>
+<ul>
+<li>Device information and browser type</li>
+<li>Push notification subscription data (if you opt in)</li>
+<li>Usage data such as pages visited and features used</li>
+</ul>
+
+<h2>3. How We Use Your Information</h2>
+<ul>
+<li>To process orders and manage your account</li>
+<li>To schedule and manage grooming appointments</li>
+<li>To send transactional emails (order confirmations, appointment updates, password resets)</li>
+<li>To send marketing communications (only with your consent; you may opt out at any time)</li>
+<li>To send abandoned cart reminders (you may opt out of these)</li>
+<li>To send SMS notifications about order and appointment status</li>
+<li>To manage our loyalty rewards program</li>
+<li>To improve our services and customer experience</li>
+</ul>
+
+<h2>4. Payment Processing</h2>
+<p>All payment transactions are processed through Stripe, a PCI-compliant payment processor. We do not store your full credit card number, expiration date, or CVV on our servers. Please review <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer">Stripe's Privacy Policy</a> for information about how they handle your payment data.</p>
+
+<h2>5. Communication Preferences</h2>
+<p>You can manage your communication preferences at any time through your Profile page:</p>
+<ul>
+<li><strong>Marketing Emails:</strong> Opt out via your profile settings or the unsubscribe link in any marketing email.</li>
+<li><strong>SMS Notifications:</strong> Reply STOP to any text message to opt out.</li>
+<li><strong>Push Notifications:</strong> Manage through your browser or device settings.</li>
+<li><strong>Transactional Messages:</strong> Order confirmations and appointment updates cannot be opted out of as they are necessary for service delivery.</li>
+</ul>
+
+<h2>6. Data Sharing</h2>
+<p>We do not sell your personal information. We may share your data with:</p>
+<ul>
+<li><strong>Stripe:</strong> For payment processing</li>
+<li><strong>SendGrid:</strong> For sending emails</li>
+<li><strong>Twilio:</strong> For sending SMS messages</li>
+<li><strong>Google Calendar:</strong> For appointment scheduling</li>
+</ul>
+<p>These service providers are bound by their own privacy policies and are only permitted to use your information as necessary to provide services to us.</p>
+
+<h2>7. Data Security</h2>
+<p>We implement appropriate technical and organizational security measures to protect your personal information, including encrypted connections (HTTPS), secure password hashing, and token-based authentication. However, no method of transmission over the internet is 100% secure.</p>
+
+<h2>8. Data Retention</h2>
+<p>We retain your personal information for as long as your account is active or as needed to provide services. You may request account deletion by contacting us. Order and appointment records may be retained for legal and business purposes.</p>
+
+<h2>9. Children's Privacy</h2>
+<p>Our Service is not directed to children under 13. We do not knowingly collect personal information from children under 13. If you believe we have collected information from a child under 13, please contact us immediately.</p>
+
+<h2>10. Changes to This Policy</h2>
+<p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the "Last Updated" date.</p>
+
+<h2>11. Contact Us</h2>
+<p>If you have questions about this Privacy Policy, please contact us:</p>
+<p><strong>Animal House Pet Store</strong><br/>2934 Cypress St<br/>West Monroe, LA 71291<br/>Phone: (318) 322-3023</p>`,
+      });
+      log('Seeded privacy-policy legal page');
+    }
+    
+    if (!slugs.includes('terms-of-service')) {
+      await storage.upsertLegalPage({
+        slug: 'terms-of-service',
+        title: 'Terms of Service',
+        content: `<p class="text-xs text-gray-500">Last Updated: February 10, 2026</p>
+
+<h2>1. Acceptance of Terms</h2>
+<p>By accessing or using the Animal House Pet Store website and mobile application (the "Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.</p>
+
+<h2>2. Account Registration</h2>
+<ul>
+<li>You must provide accurate and complete information when creating an account.</li>
+<li>You are responsible for maintaining the security of your account credentials.</li>
+<li>You must be at least 18 years old to create an account and make purchases.</li>
+<li>One account per person; duplicate accounts may be merged or removed.</li>
+</ul>
+
+<h2>3. Orders and Purchases</h2>
+<ul>
+<li>All orders are subject to product availability and approval by store staff.</li>
+<li>Live animals displayed on the Service are for viewing purposes only and cannot be purchased online.</li>
+<li>Prices are listed in US dollars and are subject to change without notice.</li>
+<li>Orders require in-store pickup; we do not currently offer shipping.</li>
+<li>Payment is processed securely through Stripe at the time of order placement.</li>
+<li>Orders may be cancelled or modified before they are approved by staff.</li>
+</ul>
+
+<h2>4. Grooming Services</h2>
+<ul>
+<li>Grooming appointments must be booked in advance through the Service.</li>
+<li>We offer Bath Only and Full Grooming services.</li>
+<li>Appointments are available Monday through Saturday, 7:00 AM to 1:30 PM (last appointment).</li>
+<li>No appointments are available on Sundays.</li>
+<li>Cancellations should be made at least 24 hours in advance.</li>
+<li>We reserve the right to refuse service for the safety of pets or staff.</li>
+<li>Pet owners must disclose any health conditions, behavioral issues, or special needs.</li>
+</ul>
+
+<h2>5. Loyalty Rewards Program</h2>
+<ul>
+<li>Rewards are earned on qualifying purchases and grooming services.</li>
+<li>Points have no cash value and cannot be transferred between accounts.</li>
+<li>We reserve the right to modify or discontinue the rewards program at any time.</li>
+<li>Fraudulent activity will result in forfeiture of all rewards and account suspension.</li>
+</ul>
+
+<h2>6. User Conduct</h2>
+<p>You agree not to:</p>
+<ul>
+<li>Use the Service for any unlawful purpose</li>
+<li>Attempt to gain unauthorized access to any part of the Service</li>
+<li>Interfere with or disrupt the Service or its servers</li>
+<li>Submit false or misleading information</li>
+<li>Harass or threaten other users or staff</li>
+</ul>
+
+<h2>7. Communications</h2>
+<ul>
+<li>By creating an account, you consent to receive transactional communications (order confirmations, appointment reminders).</li>
+<li>Marketing emails require separate opt-in and can be disabled in your profile settings.</li>
+<li>SMS notifications can be opted out of by replying STOP to any message.</li>
+<li>Push notifications can be managed through your browser or device settings.</li>
+</ul>
+
+<h2>8. Intellectual Property</h2>
+<p>All content on the Service, including text, images, logos, and software, is the property of Animal House Pet Store and is protected by applicable intellectual property laws. You may not reproduce, distribute, or create derivative works without our express written permission.</p>
+
+<h2>9. Limitation of Liability</h2>
+<p>Animal House Pet Store shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service. Our total liability shall not exceed the amount you paid for the specific product or service giving rise to the claim.</p>
+
+<h2>10. Disclaimer of Warranties</h2>
+<p>The Service is provided "as is" without warranties of any kind. We do not guarantee that the Service will be uninterrupted, error-free, or free of harmful components.</p>
+
+<h2>11. Governing Law</h2>
+<p>These Terms shall be governed by the laws of the State of Louisiana. Any disputes shall be resolved in the courts of Ouachita Parish, Louisiana.</p>
+
+<h2>12. Changes to Terms</h2>
+<p>We reserve the right to modify these Terms at any time. Changes will be effective immediately upon posting. Your continued use of the Service constitutes acceptance of the modified Terms.</p>
+
+<h2>13. Contact Us</h2>
+<p>If you have questions about these Terms of Service, please contact us:</p>
+<p><strong>Animal House Pet Store</strong><br/>2934 Cypress St<br/>West Monroe, LA 71291<br/>Phone: (318) 322-3023</p>`,
+      });
+      log('Seeded terms-of-service legal page');
+    }
+  } catch (error) {
+    console.error('Error seeding legal pages:', error);
+  }
+}
+
 // Heavy initialization - runs AFTER server is already listening
 async function initializeApp() {
   try {
@@ -266,6 +440,9 @@ async function initializeApp() {
     
     // Register all routes (this no longer creates server, just adds routes)
     await registerRoutes(app, server);
+    
+    // Seed legal pages if they don't exist
+    await seedLegalPages();
     
     // Initialize WebSocket server
     const wsServer = new NotificationWebSocketServer(server);
