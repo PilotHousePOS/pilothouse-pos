@@ -23,7 +23,6 @@ import {
 import { z } from "zod";
 import { notificationService } from './notifications';
 import { sendPasswordResetEmail } from './sendgrid';
-// Google Calendar integration removed - transition period complete
 import { normalizePhoneNumber } from './phoneUtils';
 import { db, resetPool } from './db';
 import { eq } from 'drizzle-orm';
@@ -6011,8 +6010,6 @@ West Monroe LA 71291
       res.status(500).json({ message: "Failed to save push subscription" });
     }
   });
-
-  // Google Calendar integration removed - transition period complete
 
   // Manual contacts CRUD operations
   app.get("/api/contacts", authMiddleware, async (req: any, res) => {
