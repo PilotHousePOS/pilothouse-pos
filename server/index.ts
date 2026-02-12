@@ -54,7 +54,7 @@ app.use((req, res, next) => {
 
 // Security headers
 app.use((_req, res, next) => {
-  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
@@ -69,7 +69,7 @@ app.use((_req, res, next) => {
       "font-src 'self' data:",
       "connect-src 'self' https://api.stripe.com https://merchant-ui-api.stripe.com wss: ws:",
       "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
-      "frame-ancestors 'none'",
+      "frame-ancestors 'self' https://*.replit.dev https://*.repl.co https://*.replit.app",
       "base-uri 'self'",
       "form-action 'self'",
     ].join('; '));

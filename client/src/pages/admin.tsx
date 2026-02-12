@@ -4728,6 +4728,7 @@ function LegalPagesPanel() {
   const [editTitle, setEditTitle] = useState('');
   const [editContent, setEditContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const pendingContent = useRef('');
 
   const LEGAL_PAGES = [
     { slug: 'privacy-policy', label: 'Privacy Policy' },
