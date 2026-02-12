@@ -176,11 +176,9 @@ export default function Booking() {
     let lastName = '';
     
     if (nameParts.length >= 2) {
-      // First word is firstName, second word is lastName
       firstName = nameParts[0];
-      lastName = nameParts[1];
+      lastName = nameParts.slice(1).join(' ');
     } else if (nameParts.length === 1) {
-      // Only one name provided - use as lastName
       lastName = nameParts[0];
     }
     
