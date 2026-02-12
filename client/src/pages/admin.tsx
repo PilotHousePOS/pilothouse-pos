@@ -4747,9 +4747,11 @@ function LegalPagesPanel() {
         const data = await res.json();
         setEditTitle(data.title);
         setEditContent(data.content);
+        pendingContent.current = data.content;
       } else {
         setEditTitle(pageConfig?.label || slug);
         setEditContent('');
+        pendingContent.current = '';
       }
       setEditingSlug(slug);
     } catch (error) {
@@ -4783,19 +4785,35 @@ function LegalPagesPanel() {
 
   const editorRef = useRef<HTMLDivElement>(null);
   const [showHtml, setShowHtml] = useState(false);
+  const pendingContent = useRef<string>('');
+
+  const editorCallbackRef = useCallback((node: HTMLDivElement | null) => {
+    editorRef.current = node;
+    if (node && pendingContent.current) {
+      node.innerHTML = pendingContent.current;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (editingSlug && !showHtml) {
+      pendingContent.current = editContent;
+      if (editorRef.current) {
+        editorRef.current.innerHTML = editContent;
+      }
+    }
+  }, [editingSlug, showHtml]);
 
   const execCmd = (command: string, value?: string) => {
     document.execCommand(command, false, value);
     editorRef.current?.focus();
     if (editorRef.current) {
-      isUserEditing.current = true;
       setEditContent(editorRef.current.innerHTML);
     }
   };
 
   const handleEditorInput = () => {
     if (editorRef.current) {
-      isUserEditing.current = true;
+      pendingContent.current = editorRef.current.innerHTML;
       setEditContent(editorRef.current.innerHTML);
     }
   };
@@ -4806,21 +4824,6 @@ function LegalPagesPanel() {
       execCmd('createLink', url);
     }
   };
-
-  const editorInitialized = useRef(false);
-  const isUserEditing = useRef(false);
-
-  useEffect(() => {
-    editorInitialized.current = false;
-  }, [editingSlug]);
-
-  useEffect(() => {
-    if (editingSlug && editorRef.current && !showHtml && !isUserEditing.current) {
-      editorRef.current.innerHTML = editContent;
-      editorInitialized.current = true;
-    }
-    isUserEditing.current = false;
-  }, [editingSlug, showHtml, editContent]);
 
   if (editingSlug) {
     return (
@@ -4896,7 +4899,7 @@ function LegalPagesPanel() {
               ) : (
                 <div className="relative">
                   <div
-                    ref={editorRef}
+                    ref={editorCallbackRef}
                     contentEditable
                     onInput={handleEditorInput}
                     onFocus={() => {
