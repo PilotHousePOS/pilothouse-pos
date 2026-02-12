@@ -4740,6 +4740,7 @@ function LegalPagesPanel() {
 
   const loadPage = async (slug: string) => {
     try {
+      setShowHtml(false);
       const res = await fetch(`/api/legal/${slug}`, { credentials: 'include' });
       const pageConfig = LEGAL_PAGES.find(p => p.slug === slug);
       if (res.ok) {
@@ -4780,6 +4781,38 @@ function LegalPagesPanel() {
 
   const getPageData = (slug: string) => pages.find((p: any) => p.slug === slug);
 
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [showHtml, setShowHtml] = useState(false);
+
+  const execCmd = (command: string, value?: string) => {
+    document.execCommand(command, false, value);
+    editorRef.current?.focus();
+    if (editorRef.current) {
+      setEditContent(editorRef.current.innerHTML);
+    }
+  };
+
+  const handleEditorInput = () => {
+    if (editorRef.current) {
+      setEditContent(editorRef.current.innerHTML);
+    }
+  };
+
+  const insertLink = () => {
+    const url = prompt('Enter the URL:');
+    if (url) {
+      execCmd('createLink', url);
+    }
+  };
+
+  useEffect(() => {
+    if (editingSlug && editorRef.current && !showHtml) {
+      if (editorRef.current.innerHTML !== editContent) {
+        editorRef.current.innerHTML = editContent;
+      }
+    }
+  }, [editingSlug, showHtml]);
+
   if (editingSlug) {
     return (
       <Card>
@@ -4790,7 +4823,7 @@ function LegalPagesPanel() {
             </Button>
             <div>
               <CardTitle className="text-base">Edit {editTitle}</CardTitle>
-              <CardDescription>Update the content using HTML formatting</CardDescription>
+              <CardDescription>Edit your page content directly below</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -4805,24 +4838,62 @@ function LegalPagesPanel() {
             />
           </div>
           <div>
-            <Label htmlFor="page-content">Content (HTML)</Label>
-            <p className="text-xs text-muted-foreground mb-2">
-              Use HTML tags: &lt;h2&gt; for headings, &lt;p&gt; for paragraphs, &lt;ul&gt;&lt;li&gt; for lists, &lt;strong&gt; for bold, &lt;a href="..."&gt; for links
-            </p>
-            <Textarea
-              id="page-content"
-              value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
-              className="min-h-[400px] font-mono text-xs"
-              placeholder="Enter page content in HTML..."
-            />
-          </div>
-          <div className="border rounded-lg p-4 bg-gray-50">
-            <Label className="text-sm font-semibold mb-2 block">Preview</Label>
-            <div
-              className="text-sm text-gray-700 leading-relaxed legal-content max-h-[300px] overflow-y-auto"
-              dangerouslySetInnerHTML={{ __html: editContent }}
-            />
+            <Label className="mb-2 block">Content</Label>
+            <div className="border rounded-lg overflow-hidden">
+              <div className="flex flex-wrap items-center gap-1 p-2 bg-gray-100 dark:bg-gray-800 border-b">
+                <Button type="button" variant="ghost" size="sm" className="h-8 px-2 font-bold" onClick={() => execCmd('bold')} title="Bold">
+                  B
+                </Button>
+                <Button type="button" variant="ghost" size="sm" className="h-8 px-2 italic" onClick={() => execCmd('italic')} title="Italic">
+                  I
+                </Button>
+                <Button type="button" variant="ghost" size="sm" className="h-8 px-2 underline" onClick={() => execCmd('underline')} title="Underline">
+                  U
+                </Button>
+                <span className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+                <Button type="button" variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => execCmd('formatBlock', 'h2')} title="Heading">
+                  H2
+                </Button>
+                <Button type="button" variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => execCmd('formatBlock', 'h3')} title="Subheading">
+                  H3
+                </Button>
+                <Button type="button" variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => execCmd('formatBlock', 'p')} title="Paragraph">
+                  P
+                </Button>
+                <span className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+                <Button type="button" variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => execCmd('insertUnorderedList')} title="Bullet List">
+                  • List
+                </Button>
+                <Button type="button" variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => execCmd('insertOrderedList')} title="Numbered List">
+                  1. List
+                </Button>
+                <span className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+                <Button type="button" variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={insertLink} title="Insert Link">
+                  Link
+                </Button>
+                <div className="ml-auto">
+                  <Button type="button" variant="ghost" size="sm" className="h-8 px-2 text-xs text-muted-foreground" onClick={() => setShowHtml(!showHtml)}>
+                    {showHtml ? 'Visual' : 'HTML'}
+                  </Button>
+                </div>
+              </div>
+              {showHtml ? (
+                <Textarea
+                  value={editContent}
+                  onChange={(e) => setEditContent(e.target.value)}
+                  className="min-h-[400px] font-mono text-xs border-0 rounded-none focus-visible:ring-0"
+                  placeholder="HTML content..."
+                />
+              ) : (
+                <div
+                  ref={editorRef}
+                  contentEditable
+                  onInput={handleEditorInput}
+                  className="min-h-[400px] p-4 text-sm leading-relaxed focus:outline-none legal-content overflow-y-auto bg-white dark:bg-gray-950 dark:text-gray-100"
+                  style={{ wordBreak: 'break-word' }}
+                />
+              )}
+            </div>
           </div>
           <div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={() => setEditingSlug(null)}>Cancel</Button>
