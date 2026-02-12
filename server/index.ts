@@ -54,26 +54,24 @@ app.use((req, res, next) => {
 
 // Security headers
 app.use((_req, res, next) => {
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  if (process.env.NODE_ENV === 'production') {
-    res.setHeader('Content-Security-Policy', [
-      "default-src 'self'",
-      "script-src 'self' https://js.stripe.com",
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https: http:",
-      "font-src 'self' data:",
-      "connect-src 'self' https://api.stripe.com https://merchant-ui-api.stripe.com wss: ws:",
-      "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
-      "frame-ancestors 'self' https://*.replit.dev https://*.repl.co https://*.replit.app",
-      "base-uri 'self'",
-      "form-action 'self'",
-    ].join('; '));
-  }
+  const cspDirectives = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' https://js.stripe.com",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https: http:",
+    "font-src 'self' data:",
+    "connect-src 'self' https://api.stripe.com https://merchant-ui-api.stripe.com wss: ws:",
+    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
+    "frame-ancestors 'self' https://*.replit.com https://*.replit.dev https://*.repl.co https://*.replit.app",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ];
+  res.setHeader('Content-Security-Policy', cspDirectives.join('; '));
   next();
 });
 
