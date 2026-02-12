@@ -174,6 +174,7 @@ export default function Profile() {
   }
 
   const marketingOptIn = currentUser?.marketingEmailsOptIn !== false;
+  const appointmentEmailsOptIn = (currentUser as any)?.appointmentEmailsOptIn !== false;
 
   const handleMarketingToggle = async (enable: boolean) => {
     try {
@@ -184,6 +185,21 @@ export default function Profile() {
         description: enable
           ? "You'll receive promotions and updates from us."
           : "You won't receive marketing emails. Order and important updates will still be sent.",
+      });
+    } catch (err: any) {
+      toast({ title: "Error", description: "Failed to update preference", variant: "destructive" });
+    }
+  };
+
+  const handleAppointmentEmailToggle = async (enable: boolean) => {
+    try {
+      await apiRequest('PUT', '/api/user/appointment-emails', { optIn: enable });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      toast({
+        title: enable ? "Appointment emails enabled" : "Appointment emails disabled",
+        description: enable
+          ? "You'll receive email alerts when new appointments are booked."
+          : "You won't receive appointment booking emails. Push notifications are unaffected.",
       });
     } catch (err: any) {
       toast({ title: "Error", description: "Failed to update preference", variant: "destructive" });
@@ -505,6 +521,32 @@ export default function Profile() {
             </div>
           </CardContent>
         </Card>
+
+        {currentUser?.isAdmin && (
+          <Card className="mt-3">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  {appointmentEmailsOptIn ? (
+                    <Calendar className="w-5 h-5 text-brand-blue" />
+                  ) : (
+                    <Calendar className="w-5 h-5 text-gray-400" />
+                  )}
+                  <div>
+                    <span className="font-semibold text-gray-900">Appointment Emails</span>
+                    <p className="text-xs text-gray-500">
+                      Receive email alerts when customers book appointments.
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={appointmentEmailsOptIn}
+                  onCheckedChange={handleAppointmentEmailToggle}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Admin Panel */}

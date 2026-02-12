@@ -4421,10 +4421,10 @@ West Monroe LA 71291
           ? `${petsArray.length} pets: ${petNamesStr}`
           : appointment.serviceType;
         
-        // Get all admin users
+        // Get all admin users who haven't opted out of appointment emails
         const allUsers = await storage.getAllUsers();
         const adminEmails = allUsers
-          .filter(u => u.isAdmin)
+          .filter(u => u.isAdmin && u.appointmentEmailsOptIn !== false)
           .map(u => u.email)
           .filter((email): email is string => !!email);
         
@@ -9123,6 +9123,31 @@ West Monroe LA 71291
     } catch (error) {
       console.error('Error updating user loyalty:', error);
       res.status(500).json({ message: "Failed to update user loyalty" });
+    }
+  });
+
+  // Appointment email opt-in/out (for admin users only)
+  app.put("/api/user/appointment-emails", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const { optIn } = req.body;
+      if (typeof optIn !== 'boolean') {
+        return res.status(400).json({ message: "optIn must be a boolean" });
+      }
+      await db.update(users).set({ 
+        appointmentEmailsOptIn: optIn,
+        updatedAt: new Date()
+      }).where(eq(users.id, userId));
+      res.json({ success: true, appointmentEmailsOptIn: optIn });
+    } catch (error) {
+      console.error('Error updating appointment email preference:', error);
+      res.status(500).json({ message: "Failed to update preference" });
     }
   });
 
