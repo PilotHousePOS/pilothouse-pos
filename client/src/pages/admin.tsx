@@ -3919,13 +3919,51 @@ function EditAppointmentDialog({
           
           {/* Pets Section */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-sm">Pets ({pets.length})</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-sm">Pets ({pets.length})</h3>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="text-green-700 border-green-300 hover:bg-green-50"
+                onClick={() => {
+                  const defaultPrice = editServicePrices?.fullGrooming || '35';
+                  const basePrice = defaultPrice.includes('-') ? defaultPrice.split('-')[0] : defaultPrice;
+                  setPets([...pets, {
+                    id: null,
+                    name: '',
+                    type: 'Dog',
+                    serviceType: 'grooming-full',
+                    notes: '',
+                    groomerId: null,
+                    price: basePrice,
+                  }]);
+                }}
+                data-testid="button-add-pet"
+              >
+                <Plus className="w-3.5 h-3.5 mr-1" />
+                Add Pet
+              </Button>
+            </div>
             
             {/* Pet Cards - Stacked */}
             {pets.map((pet, index) => (
               <div key={index} className="p-4 border rounded-lg space-y-3 bg-gray-50">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center justify-between mb-2">
                   <span className="font-semibold text-sm">Pet {index + 1}</span>
+                  {pets.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 h-7 px-2"
+                      onClick={() => setPets(pets.filter((_, i) => i !== index))}
+                      data-testid={`button-remove-pet-${index}`}
+                    >
+                      <X className="w-3.5 h-3.5 mr-1" />
+                      Remove
+                    </Button>
+                  )}
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">
