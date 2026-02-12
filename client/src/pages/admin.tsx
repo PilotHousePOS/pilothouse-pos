@@ -12771,42 +12771,42 @@ function SupplyImageUpload({ supplyId, currentImageUrl, onImageUploaded }: {
           <div className="text-center py-6">
             <Upload className="w-10 h-10 text-gray-400 mx-auto mb-2" />
             <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Drag & drop or paste an image here
+              Tap here to paste an image
             </p>
             <p className="text-xs text-gray-500 mt-1">
               Click here first, then Ctrl+V to paste
             </p>
           </div>
         )}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) handleFileUploadInternal(file);
-            e.target.value = '';
-          }}
-          className="hidden"
-          data-testid="input-supply-image-upload"
-        />
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full mt-3"
-          onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-          disabled={uploading}
-          data-testid="button-supply-upload-image"
-        >
-          {uploading ? (
-            <>
-              <span className="animate-spin mr-2">⏳</span>
-              Uploading to Object Storage...
-            </>
-          ) : currentImageUrl ? 'Replace Image' : 'Upload Image'}
-        </Button>
       </div>
-      <p className="text-xs text-gray-500">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleFileUploadInternal(file);
+          e.target.value = '';
+        }}
+        className="hidden"
+        data-testid="input-supply-image-upload"
+      />
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full mt-2"
+        onClick={() => fileInputRef.current?.click()}
+        disabled={uploading}
+        data-testid="button-supply-upload-image"
+      >
+        {uploading ? (
+          <>
+            <span className="animate-spin mr-2">⏳</span>
+            Uploading to Object Storage...
+          </>
+        ) : currentImageUrl ? 'Replace Image' : 'Upload Image'}
+      </Button>
+      <p className="text-xs text-gray-500 mt-1">
         Drag & drop, paste (Ctrl+V), or browse to upload. Images are permanently stored.
       </p>
     </div>
@@ -13425,30 +13425,29 @@ function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageCha
         ) : (
           <div className="text-center sm:py-8 py-4">
             <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-            <p className="text-sm text-gray-500">Drag & drop, paste (Ctrl+V), or click to upload</p>
+            <p className="text-sm text-gray-500">Tap above to paste, or use button below to browse</p>
           </div>
         )}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          capture={false as any}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) handleFileUpload(file);
-          }}
-          className="hidden"
-        />
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full mt-3"
-          onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-          disabled={uploading}
-        >
-          {uploading ? 'Uploading...' : imageUrl ? 'Change Image' : 'Upload Image'}
-        </Button>
       </div>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleFileUpload(file);
+        }}
+        className="hidden"
+      />
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full mt-2"
+        onClick={() => fileInputRef.current?.click()}
+        disabled={uploading}
+      >
+        {uploading ? 'Uploading...' : imageUrl ? 'Change Image' : 'Upload Image'}
+      </Button>
     </div>
   );
 }
