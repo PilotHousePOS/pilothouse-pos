@@ -4783,36 +4783,45 @@ function LegalPagesPanel() {
 
   const getPageData = (slug: string) => pages.find((p: any) => p.slug === slug);
 
-  const editorRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [showHtml, setShowHtml] = useState(false);
-  const [editorKey, setEditorKey] = useState(0);
+  const editContentRef = useRef(editContent);
+  editContentRef.current = editContent;
 
-  useEffect(() => {
-    if (editingSlug && !showHtml) {
-      setEditorKey(k => k + 1);
+  const getIframeDoc = useCallback(() => {
+    return iframeRef.current?.contentDocument || iframeRef.current?.contentWindow?.document || null;
+  }, []);
+
+  const syncFromIframe = useCallback(() => {
+    const doc = getIframeDoc();
+    if (doc?.body) {
+      setEditContent(doc.body.innerHTML);
     }
-  }, [editingSlug, showHtml]);
+  }, [getIframeDoc]);
 
-  const execCmd = (command: string, value?: string) => {
-    document.execCommand(command, false, value);
-    editorRef.current?.focus();
-    if (editorRef.current) {
-      setEditContent(editorRef.current.innerHTML);
+  const handleIframeLoad = useCallback(() => {
+    const doc = getIframeDoc();
+    if (!doc) return;
+    doc.designMode = 'on';
+    doc.body.innerHTML = editContentRef.current;
+    doc.body.addEventListener('input', syncFromIframe);
+    doc.body.addEventListener('keyup', syncFromIframe);
+  }, [getIframeDoc, syncFromIframe]);
+
+  const execCmd = useCallback((command: string, value?: string) => {
+    const doc = getIframeDoc();
+    if (doc) {
+      doc.execCommand(command, false, value);
+      syncFromIframe();
     }
-  };
+  }, [getIframeDoc, syncFromIframe]);
 
-  const handleEditorInput = () => {
-    if (editorRef.current) {
-      setEditContent(editorRef.current.innerHTML);
-    }
-  };
-
-  const insertLink = () => {
+  const insertLink = useCallback(() => {
     const url = prompt('Enter the URL:');
     if (url) {
       execCmd('createLink', url);
     }
-  };
+  }, [execCmd]);
 
   if (editingSlug) {
     return (
@@ -4886,18 +4895,21 @@ function LegalPagesPanel() {
                   placeholder="HTML content..."
                 />
               ) : (
-                <div className="relative">
-                  <div
-                    key={editorKey}
-                    ref={editorRef}
-                    contentEditable
-                    suppressContentEditableWarning
-                    onInput={handleEditorInput}
-                    dangerouslySetInnerHTML={{ __html: editContent }}
-                    className="min-h-[400px] p-4 text-sm leading-relaxed focus:outline-none legal-content overflow-y-auto bg-white dark:bg-gray-950 dark:text-gray-100"
-                    style={{ wordBreak: 'break-word' }}
-                  />
-                </div>
+                <iframe
+                  ref={iframeRef}
+                  onLoad={handleIframeLoad}
+                  srcDoc={`<!DOCTYPE html><html><head><style>
+                    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; padding: 16px; margin: 0; color: #333; }
+                    h2 { font-size: 1.25em; font-weight: 600; margin: 1em 0 0.5em; }
+                    h3 { font-size: 1.1em; font-weight: 600; margin: 1em 0 0.5em; }
+                    p { margin: 0.5em 0; }
+                    ul, ol { padding-left: 1.5em; }
+                    a { color: #2563eb; }
+                  </style></head><body></body></html>`}
+                  className="w-full border-0 bg-white"
+                  style={{ minHeight: '400px' }}
+                  title="Page editor"
+                />
               )}
             </div>
           </div>
