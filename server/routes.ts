@@ -62,10 +62,18 @@ async function withRetry<T>(operation: () => Promise<T>, maxRetries = 3, delayMs
 import { extractOrderFromPhoto, apply99Pricing } from './orderPhotoProcessor';
 import { categorizeProduct, detectLiveAnimal } from './productCategorization';
 
+// Helper: clean a name string — collapse extra spaces, trim
+function cleanName(name: string | undefined | null): string {
+  if (!name) return '';
+  return name.replace(/\s+/g, ' ').trim();
+}
+
 // Helper function to capitalize first letter of each word
 function capitalizeWords(text: string | undefined | null): string | undefined | null {
   if (!text) return text;
   return text
+    .replace(/\s+/g, ' ')
+    .trim()
     .split(' ')
     .map(word => {
       if (!word) return word;
@@ -362,11 +370,14 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   // Customer signup
   app.post('/api/auth/signup', async (req, res) => {
     try {
-      const { email, password, firstName, lastName, phoneNumber } = req.body;
+      const { email, password, firstName: rawFirst, lastName: rawLast, phoneNumber } = req.body;
       
-      if (!email || !password || !firstName || !lastName || !phoneNumber) {
+      if (!email || !password || !rawFirst || !rawLast || !phoneNumber) {
         return res.status(400).json({ message: "All fields including phone number are required" });
       }
+
+      const firstName = cleanName(rawFirst);
+      const lastName = cleanName(rawLast);
 
       // Validate password complexity
       const passwordValidation = isPasswordComplexEnough(password);
@@ -430,11 +441,14 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
 
     try {
-      const { email, password, firstName, lastName, phoneNumber, isAdmin, isGroomer } = req.body;
+      const { email, password, firstName: rawFirst, lastName: rawLast, phoneNumber, isAdmin, isGroomer } = req.body;
       
-      if (!email || !password || !firstName || !lastName) {
+      if (!email || !password || !rawFirst || !rawLast) {
         return res.status(400).json({ message: "Email, password, firstName, and lastName are required" });
       }
+
+      const firstName = cleanName(rawFirst);
+      const lastName = cleanName(rawLast);
 
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
@@ -683,14 +697,17 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(401).json({ message: "Invalid token" });
       }
 
-      const { firstName, lastName } = req.body;
+      const { firstName: rawFirst, lastName: rawLast } = req.body;
 
-      if (!firstName || !lastName) {
+      if (!rawFirst || !rawLast) {
         return res.status(400).json({ message: "First name and last name are required" });
       }
 
+      const firstName = cleanName(rawFirst);
+      const lastName = cleanName(rawLast);
+
       // Validate name lengths
-      if (firstName.trim().length === 0 || lastName.trim().length === 0) {
+      if (firstName.length === 0 || lastName.length === 0) {
         return res.status(400).json({ message: "Names cannot be empty" });
       }
 
@@ -703,8 +720,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       // Update user with new name
       const updatedUser = await storage.upsertUser({
         ...currentUser,
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
+        firstName,
+        lastName,
         updatedAt: new Date(),
       });
 
@@ -3350,7 +3367,9 @@ West Monroe LA 71291
       }
 
       const id = parseInt(req.params.id);
-      const { ownerFirstName, ownerLastName, ownerPhoneNumber, pets, pricingMode, price, appointmentDate, appointmentTime } = req.body;
+      const { ownerFirstName: rawOwnerFirst, ownerLastName: rawOwnerLast, ownerPhoneNumber, pets, pricingMode, price, appointmentDate, appointmentTime } = req.body;
+      const ownerFirstName = rawOwnerFirst ? cleanName(rawOwnerFirst) : rawOwnerFirst;
+      const ownerLastName = rawOwnerLast ? cleanName(rawOwnerLast) : rawOwnerLast;
       console.log(`[EDIT DEBUG] Editing appointment ${id}, appointmentDate: ${appointmentDate}`);
 
       // VALIDATION: Ensure pets array has at least one pet if provided
@@ -4372,8 +4391,12 @@ West Monroe LA 71291
         }
         
         const firstGroomerId = firstPet.groomerId || req.body.groomerId || null;
+        const cleanedOwnerFirst = req.body.ownerFirstName ? cleanName(req.body.ownerFirstName) : req.body.ownerFirstName;
+        const cleanedOwnerLast = req.body.ownerLastName ? cleanName(req.body.ownerLastName) : req.body.ownerLastName;
         const appointmentData = insertAppointmentSchema.parse({ 
           ...req.body,
+          ownerFirstName: cleanedOwnerFirst,
+          ownerLastName: cleanedOwnerLast,
           price: parsedPrice,
           petName: firstPet.petName,
           petType: firstPet.petType,
