@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. The project aims to provide a premium online shopping experience, efficient service booking, robust inventory management, and comprehensive administrative tools. Its vision is to be a leader in the exotic pet industry, fostering customer trust and enhancing operational efficiency and user engagement through AI.
+The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. The project aims to be a leader in the exotic pet industry, providing a premium online shopping experience, efficient service booking, robust inventory management, and comprehensive administrative tools. It seeks to foster customer trust and enhance operational efficiency and user engagement through AI.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -189,7 +189,7 @@ Step 5: NEVER mark task complete until verification passes
 - Abandoned Cart Recovery: Scheduled every 6 hours, emails customers whose entire cart has been idle 24+ hours. Respects marketing opt-out. 3-day cooldown between emails per user. Reset when cart is cleared.
 
 ## System Architecture
-The Animal House Pet Store is a full-stack, mobile-first web application. It features a dark, bold, high-contrast UI/UX with Amazon-style image carousels. Authentication uses JWT with a three-tier role-based access control. The frontend is built with React, Vite, TypeScript, Tailwind CSS, shadcn/ui, Wouter for routing, and TanStack Query. The backend utilizes Express.js and TypeScript, integrated with PostgreSQL and Drizzle ORM. Key features include automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, and real-time Web Push Notifications via VAPID keys.
+The Animal House Pet Store is a full-stack, mobile-first web application featuring a dark, bold, high-contrast UI/UX with Amazon-style image carousels. Authentication uses JWT with a three-tier role-based access control. The frontend is built with React, Vite, TypeScript, Tailwind CSS, shadcn/ui, Wouter for routing, and TanStack Query. The backend utilizes Express.js and TypeScript, integrated with PostgreSQL and Drizzle ORM. Key features include automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, and real-time Web Push Notifications via VAPID keys.
 
 ## External Dependencies
 - PostgreSQL

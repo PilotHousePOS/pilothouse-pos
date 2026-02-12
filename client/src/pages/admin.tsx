@@ -12794,7 +12794,7 @@ function SupplyImageUpload({ supplyId, currentImageUrl, onImageUploaded }: {
           type="button"
           variant="outline"
           className="w-full mt-3"
-          onClick={() => fileInputRef.current?.click()}
+          onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
           disabled={uploading}
           data-testid="button-supply-upload-image"
         >
@@ -13417,7 +13417,7 @@ function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageCha
               variant="outline"
               size="sm"
               className="absolute top-2 right-2"
-              onClick={() => onImageChange('')}
+              onClick={(e) => { e.stopPropagation(); onImageChange(''); }}
             >
               <X className="w-4 h-4" />
             </Button>
@@ -13432,6 +13432,7 @@ function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageCha
           ref={fileInputRef}
           type="file"
           accept="image/*"
+          capture={false as any}
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) handleFileUpload(file);
@@ -13442,7 +13443,7 @@ function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageCha
           type="button"
           variant="outline"
           className="w-full mt-3"
-          onClick={() => fileInputRef.current?.click()}
+          onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
           disabled={uploading}
         >
           {uploading ? 'Uploading...' : imageUrl ? 'Change Image' : 'Upload Image'}
