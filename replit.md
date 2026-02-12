@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. It aims to deliver a premium online shopping experience, efficient service booking, robust inventory management, and comprehensive administrative tools. The project is designed with a high-contrast, dark-themed UI/UX, ensuring a seamless and intuitive user experience across all devices, and seeks to establish itself as a leader in the exotic pet industry.
+The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. It aims to deliver a premium online shopping experience, efficient service booking, robust inventory management, and comprehensive administrative tools. The project is designed to establish itself as a leader in the exotic pet industry, focusing on quality data, accurate product representation, and a seamless user experience.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -144,11 +144,6 @@ The Animal House Pet Store is a mobile-first e-commerce platform specializing in
   - `sku` (UPC codes) - Manually curated, must always persist
   - `name` (Product titles) - Manually curated, must always persist
   - All scrapers/automation must explicitly exclude these fields from updates
-- Testing Credentials:
-  - Email: theanimalhouse@comcast.net
-  - Password: password
-  - Role: Admin
-  - Login Flow: Navigate to main page (/), click "Start Now", enter credentials. Do NOT bypass the main page.
 - MANDATORY Product Data Checklist (CRITICAL - Never Skip)
 ### Required Fields for ALL Products:
 1. **image_urls** (array) - Minimum 6 carousel images from manufacturer website
