@@ -4788,12 +4788,14 @@ function LegalPagesPanel() {
     document.execCommand(command, false, value);
     editorRef.current?.focus();
     if (editorRef.current) {
+      isUserEditing.current = true;
       setEditContent(editorRef.current.innerHTML);
     }
   };
 
   const handleEditorInput = () => {
     if (editorRef.current) {
+      isUserEditing.current = true;
       setEditContent(editorRef.current.innerHTML);
     }
   };
@@ -4805,13 +4807,20 @@ function LegalPagesPanel() {
     }
   };
 
+  const editorInitialized = useRef(false);
+  const isUserEditing = useRef(false);
+
   useEffect(() => {
-    if (editingSlug && editorRef.current && !showHtml) {
-      if (editorRef.current.innerHTML !== editContent) {
-        editorRef.current.innerHTML = editContent;
-      }
+    editorInitialized.current = false;
+  }, [editingSlug]);
+
+  useEffect(() => {
+    if (editingSlug && editorRef.current && !showHtml && !isUserEditing.current) {
+      editorRef.current.innerHTML = editContent;
+      editorInitialized.current = true;
     }
-  }, [editingSlug, showHtml]);
+    isUserEditing.current = false;
+  }, [editingSlug, showHtml, editContent]);
 
   if (editingSlug) {
     return (
@@ -4885,13 +4894,24 @@ function LegalPagesPanel() {
                   placeholder="HTML content..."
                 />
               ) : (
-                <div
-                  ref={editorRef}
-                  contentEditable
-                  onInput={handleEditorInput}
-                  className="min-h-[400px] p-4 text-sm leading-relaxed focus:outline-none legal-content overflow-y-auto bg-white dark:bg-gray-950 dark:text-gray-100"
-                  style={{ wordBreak: 'break-word' }}
-                />
+                <div className="relative">
+                  <div
+                    ref={editorRef}
+                    contentEditable
+                    onInput={handleEditorInput}
+                    onFocus={() => {
+                      const el = editorRef.current;
+                      if (el && el.textContent?.trim() === '') {
+                        el.classList.add('editor-has-focus');
+                      }
+                    }}
+                    onBlur={() => {
+                      editorRef.current?.classList.remove('editor-has-focus');
+                    }}
+                    className="min-h-[400px] p-4 text-sm leading-relaxed focus:outline-none legal-content overflow-y-auto bg-white dark:bg-gray-950 dark:text-gray-100 empty:before:content-['Tap_here_to_start_typing_your_page_content...'] empty:before:text-gray-400 empty:before:pointer-events-none"
+                    style={{ wordBreak: 'break-word' }}
+                  />
+                </div>
               )}
             </div>
           </div>
