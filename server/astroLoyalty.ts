@@ -80,7 +80,10 @@ async function astroRequest(endpoint: string, jsonData?: Record<string, any>): P
     params.jsonData = JSON.stringify(jsonData);
   }
 
-  const response = await fetch(`${ASTRO_API_BASE}/${endpoint}/`, {
+  const url = `${ASTRO_API_BASE}/${endpoint}/`;
+  console.log(`[ASTRO] API call: ${endpoint}`, jsonData ? JSON.stringify(jsonData) : '(no params)');
+
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -91,14 +94,18 @@ async function astroRequest(endpoint: string, jsonData?: Record<string, any>): P
 
   if (!response.ok) {
     const errorText = await response.text();
+    console.error(`[ASTRO] API ${endpoint} HTTP error ${response.status}:`, errorText);
     throw new Error(`Astro API ${endpoint} failed (${response.status}): ${errorText}`);
   }
 
   const data = await response.json();
+  const astroStatus = data.astro_status || data.status;
+  console.log(`[ASTRO] API ${endpoint} response status:`, astroStatus, 'returnData keys:', data.returnData && typeof data.returnData === 'object' ? Object.keys(data.returnData) : String(data.returnData));
 
-  if (data.status && data.status !== 100) {
-    const statusMsg = data.status_messsage || data.status_message || 'Unknown error';
-    throw new AstroApiError(data.status, statusMsg, endpoint);
+  if (astroStatus && astroStatus !== 100) {
+    const statusMsg = data.astro_status_message || data.status_messsage || data.status_message || 'Unknown error';
+    console.error(`[ASTRO] API ${endpoint} error status ${astroStatus}:`, statusMsg);
+    throw new AstroApiError(astroStatus, statusMsg, endpoint);
   }
 
   return data;
@@ -165,6 +172,10 @@ export interface AstroCustomerStatus {
     programTitle: string;
     manufacturer: string;
     status: string;
+    requiredPurchases: number;
+    rewardCount: number;
+    programImage?: string;
+    programDescription?: string;
     purchases: Array<{
       transactionId: string;
       itemCode: string;
@@ -270,7 +281,7 @@ export async function lookupOrCreateAstroCustomer(
       let points = 0;
       try {
         const pointsData = await astroRequest('customerPointsStatus', {
-          customerID: customerData.customerId || existing.astroCustomerId,
+          astro_customer_id: existing.astroCustomerId,
         });
         points = pointsData.returnData?.astroPointsBalance || 0;
       } catch (e) {
@@ -311,12 +322,17 @@ export async function getCustomerStatus(
 
   try {
     const data = await astroRequest('customerStatus', {
-      customerID,
+      astro_customer_id: customerID,
       completed_cards: includeCompleted ? 1 : 0,
     });
 
     const rd = data.returnData;
-    if (!rd) return null;
+    if (!rd) {
+      console.log('[ASTRO] customerStatus: no returnData in response');
+      return null;
+    }
+
+    console.log(`[ASTRO] customerStatus for ${customerID}: points=${rd.astroPointsBalance}, cards=${(rd.astroCardData || []).length}, offers=${(rd.astroOfferRewards || []).length}`);
 
     return {
       astroCustomerId: String(rd.astro_customer_id),
@@ -331,6 +347,10 @@ export async function getCustomerStatus(
         programTitle: card.astro_program_title,
         manufacturer: card.astro_mfg_name || '',
         status: card.astro_card_status,
+        requiredPurchases: parseInt(card.card_purchase_required_count) || 12,
+        rewardCount: parseInt(card.card_reward_count) || 1,
+        programImage: card.astro_program_image || undefined,
+        programDescription: card.astro_program_long_description || undefined,
         purchases: (card.cardPurchases || []).map((p: any) => ({
           transactionId: String(p.imported_transaction_id),
           itemCode: p.item_code,
@@ -394,7 +414,7 @@ export async function syncPurchaseToAstro(
     if (itemsWithUpc.length === 1) {
       const item = itemsWithUpc[0];
       const result = await astroRequest('addTransaction', {
-        customerID: purchaseData.customerId,
+        astro_customer_id: purchaseData.customerId,
         transactionID: `${purchaseData.transactionId}-${item.productId}`,
         saleID: purchaseData.transactionId,
         item_code: item.sku,
@@ -417,7 +437,7 @@ export async function syncPurchaseToAstro(
     }));
 
     const result = await astroRequest('addTransactionBatch', {
-      customerID: purchaseData.customerId,
+      astro_customer_id: purchaseData.customerId,
       saleID: purchaseData.transactionId,
       transactions,
     });
@@ -444,7 +464,7 @@ export async function addPointsByDollar(
 
   try {
     const result = await astroRequest('addPointsByDollar', {
-      customerID,
+      astro_customer_id: customerID,
       dollarAmount,
     });
 
@@ -469,7 +489,7 @@ export async function redeemPoints(
 
   try {
     const result = await astroRequest('redeemPoints', {
-      customerID,
+      astro_customer_id: customerID,
       astro_points_reward_id: astroPointsRewardId,
     });
 
@@ -494,7 +514,7 @@ export async function checkRedemptionEligibility(
 
   try {
     const result = await astroRequest('checkRedemptionEligibility', {
-      customerID,
+      astro_customer_id: customerID,
       item_code: itemCode,
     });
 
@@ -525,7 +545,7 @@ export async function addRedemption(
 
   try {
     const data: Record<string, any> = {
-      customerID,
+      astro_customer_id: customerID,
       astro_reward_id: astroRewardId,
       astro_item_id: astroItemId,
     };
@@ -655,7 +675,7 @@ export async function getLoyaltyPoints(customerId: string): Promise<number> {
 
   try {
     const result = await astroRequest('customerPointsStatus', {
-      customerID: customerId,
+      astro_customer_id: customerId,
     });
     return result.returnData?.astroPointsBalance || 0;
   } catch (error) {
@@ -674,7 +694,7 @@ export async function updateAstroCustomer(
   if (!isAstroEnabled()) return false;
 
   try {
-    const updateData: Record<string, string> = { customerID };
+    const updateData: Record<string, string> = { astro_customer_id: customerID };
     if (data.firstName) updateData.first_name = data.firstName;
     if (data.lastName) updateData.last_name = data.lastName;
     if (data.email) updateData.email_address = data.email;

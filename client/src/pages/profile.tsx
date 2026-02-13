@@ -405,44 +405,61 @@ export default function Profile() {
                 {/* Frequent Buyer Cards */}
                 {astroStatus.frequentBuyerCards?.length > 0 && (
                   <div>
-                    <h4 className="font-semibold text-sm text-gray-700 mb-2">Frequent Buyer Programs</h4>
-                    <div className="space-y-2">
-                      {astroStatus.frequentBuyerCards.map((card: any) => (
-                        <div key={card.cardId} className="border rounded-lg p-3 bg-gray-50 dark:bg-gray-800">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <p className="font-medium text-sm">{card.programTitle}</p>
-                              <p className="text-xs text-gray-500">{card.manufacturer}</p>
+                    <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-2">Frequent Buyer Programs</h4>
+                    <div className="space-y-3">
+                      {astroStatus.frequentBuyerCards.map((card: any) => {
+                        const totalRequired = card.requiredPurchases || 12;
+                        const purchaseCount = card.purchases?.length || 0;
+                        return (
+                          <div key={card.cardId} className="border rounded-lg p-3 bg-gray-50 dark:bg-gray-800">
+                            <div className="flex items-start gap-3">
+                              {card.programImage && (
+                                <img src={card.programImage} alt={card.manufacturer} className="w-10 h-10 rounded object-contain flex-shrink-0" />
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-sm leading-tight">{card.programTitle}</p>
+                                <p className="text-xs text-gray-500 mt-0.5">{card.manufacturer}</p>
+                                <p className="text-xs text-gray-500">Buy {totalRequired}, Get {card.rewardCount || 1} Free</p>
+                              </div>
+                              <Badge variant="secondary" className="text-xs flex-shrink-0">
+                                {card.status === 'open' ? 'Active' : card.status}
+                              </Badge>
                             </div>
-                            <Badge variant="secondary" className="text-xs">
-                              {card.status === 'active' ? 'Active' : card.status}
-                            </Badge>
-                          </div>
-                          {card.purchases?.length > 0 && (
-                            <div className="mt-2">
-                              <Progress 
-                                value={card.purchases.length * 10} 
-                                className="h-2"
-                              />
-                              <p className="text-xs text-gray-500 mt-1">
-                                {card.purchases.length} qualifying purchase{card.purchases.length !== 1 ? 's' : ''}
+                            <div className="mt-3">
+                              <div className="flex flex-wrap gap-1.5">
+                                {Array.from({ length: totalRequired }).map((_, i) => (
+                                  <div 
+                                    key={i} 
+                                    className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 ${
+                                      i < purchaseCount
+                                        ? 'bg-green-500 border-green-600 text-white'
+                                        : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-400'
+                                    }`}
+                                  >
+                                    {i < purchaseCount ? '✓' : i + 1}
+                                  </div>
+                                ))}
+                              </div>
+                              <p className="text-xs text-gray-500 mt-2">
+                                {purchaseCount} of {totalRequired} purchases
+                                {purchaseCount >= totalRequired && ' — Reward earned!'}
                               </p>
                             </div>
-                          )}
-                          {card.freeGoods?.length > 0 && (
-                            <div className="mt-2 space-y-1">
-                              {card.freeGoods.filter((fg: any) => !fg.redeemedOn).map((fg: any) => (
-                                <div key={fg.rewardId} className="flex items-center justify-between bg-green-50 dark:bg-green-900/30 rounded p-2">
-                                  <span className="text-xs text-green-700 dark:text-green-400 font-medium">
-                                    Free: {fg.itemDescription}
-                                  </span>
-                                  <Badge className="bg-green-600 text-xs">Ready!</Badge>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                            {card.freeGoods?.length > 0 && (
+                              <div className="mt-2 space-y-1">
+                                {card.freeGoods.filter((fg: any) => !fg.redeemedOn).map((fg: any) => (
+                                  <div key={fg.rewardId} className="flex items-center justify-between bg-green-50 dark:bg-green-900/30 rounded p-2">
+                                    <span className="text-xs text-green-700 dark:text-green-400 font-medium">
+                                      Free: {fg.itemDescription}
+                                    </span>
+                                    <Badge className="bg-green-600 text-xs">Ready!</Badge>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

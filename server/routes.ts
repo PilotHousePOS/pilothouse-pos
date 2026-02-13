@@ -8719,7 +8719,9 @@ West Monroe LA 71291
       }
 
       const { getCustomerStatus } = await import('./astroLoyalty');
+      console.log(`[ASTRO] Fetching live status for astro customer ${astroCustomer.astroCustomerId}`);
       const liveStatus = await getCustomerStatus(astroCustomer.astroCustomerId);
+      console.log(`[ASTRO] Live status result:`, liveStatus ? `points=${liveStatus.pointsBalance}, cards=${liveStatus.frequentBuyerCards?.length}, offers=${liveStatus.offerRewards?.length}` : 'null');
 
       if (liveStatus) {
         const currentPoints = parseFloat(String(astroCustomer.loyaltyPoints) || '0');
