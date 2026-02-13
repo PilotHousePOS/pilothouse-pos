@@ -2273,6 +2273,79 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
   
+  app.post("/api/admin/orders/:id/retry-payment", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const orderId = parseInt(req.params.id);
+      const orderWithItems = await storage.getOrderWithItems(orderId);
+      
+      if (!orderWithItems) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      
+      const order = orderWithItems.order;
+      
+      if (order.paymentStatus === 'paid') {
+        return res.status(400).json({ message: "Order is already paid" });
+      }
+      
+      const orderOwner = await storage.getUser(order.userId);
+      
+      if (!orderOwner?.stripeCustomerId || !orderOwner?.stripeDefaultPaymentMethod) {
+        return res.status(400).json({ message: "Customer has no saved payment method on file" });
+      }
+      
+      const { getUncachableStripeClient } = await import('./stripeClient');
+      const stripe = await getUncachableStripeClient();
+      
+      const amountCents = Math.round(parseFloat(order.totalAmount) * 100);
+      
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amountCents,
+        currency: 'usd',
+        customer: orderOwner.stripeCustomerId,
+        payment_method: orderOwner.stripeDefaultPaymentMethod,
+        off_session: true,
+        confirm: true,
+        description: `Order #${orderId} - Animal House Pet Store (Retry)`,
+        metadata: {
+          orderId: orderId.toString(),
+          customerId: order.userId,
+        },
+      });
+      
+      if (paymentIntent.status === 'succeeded') {
+        await storage.updateOrderStripePayment(orderId, {
+          stripePaymentIntentId: paymentIntent.id,
+          paymentStatus: 'paid',
+          paidAt: new Date(),
+        });
+        
+        console.log(`Order #${orderId} payment retry succeeded: ${paymentIntent.id}`);
+        
+        res.json({ 
+          success: true, 
+          message: "Payment charged successfully",
+          paymentIntentId: paymentIntent.id,
+        });
+      } else {
+        res.status(400).json({ 
+          success: false, 
+          message: `Payment status: ${paymentIntent.status}` 
+        });
+      }
+    } catch (error: any) {
+      console.error("Error retrying payment:", error);
+      res.status(500).json({ message: `Payment retry failed: ${error.message}` });
+    }
+  });
+
   app.post("/api/admin/orders/:id/ready", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;

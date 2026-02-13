@@ -8392,7 +8392,37 @@ export default function Admin() {
                                             {order.paymentStatus === 'manual_required' ? 'Mark Ready (Manual Pay)' : 'Mark Ready'}
                                           </Button>
                                         ) : (
-                                          <span className="text-xs text-yellow-600 italic">Waiting for payment...</span>
+                                          <>
+                                            <span className="text-xs text-yellow-600 italic">Waiting for payment...</span>
+                                            {(order.paymentStatus === 'payment_failed' || order.paymentStatus === 'failed') && (
+                                              <Button
+                                                size="sm"
+                                                variant="outline"
+                                                className="border-red-500 text-red-600 hover:bg-red-50"
+                                                onClick={async () => {
+                                                  try {
+                                                    const res = await fetch(`/api/admin/orders/${order.id}/retry-payment`, {
+                                                      method: 'POST',
+                                                      headers: { 'Content-Type': 'application/json' },
+                                                      credentials: 'include',
+                                                    });
+                                                    const data = await res.json();
+                                                    if (data.success) {
+                                                      toast({ title: "Payment Charged", description: `$${parseFloat(order.totalAmount).toFixed(2)} charged successfully` });
+                                                      queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-orders'] });
+                                                    } else {
+                                                      toast({ title: "Payment Failed", description: data.message, variant: "destructive" });
+                                                    }
+                                                  } catch (err: any) {
+                                                    toast({ title: "Error", description: err.message, variant: "destructive" });
+                                                  }
+                                                }}
+                                              >
+                                                <RefreshCw className="w-3 h-3 mr-1" />
+                                                Retry Payment
+                                              </Button>
+                                            )}
+                                          </>
                                         )}
                                         {order.stripePaymentUrl && order.paymentStatus !== 'paid' && (
                                           <Button
