@@ -413,13 +413,17 @@ export async function syncPurchaseToAstro(
 
     if (itemsWithUpc.length === 1) {
       const item = itemsWithUpc[0];
+      const txDate = purchaseData.purchaseDate instanceof Date 
+        ? purchaseData.purchaseDate.toISOString().split('T')[0]
+        : new Date(purchaseData.purchaseDate).toISOString().split('T')[0];
       const result = await astroRequest('addTransaction', {
         astro_customer_id: purchaseData.customerId,
         transactionID: `${purchaseData.transactionId}-${item.productId}`,
         saleID: purchaseData.transactionId,
         item_code: item.sku,
         item_qty: item.quantity,
-        item_transaction_date: purchaseData.purchaseDate.toISOString().split('T')[0],
+        item_amount: item.totalPrice || item.unitPrice,
+        item_transaction_date: txDate,
       });
 
       console.log('[ASTRO] Single transaction synced:', result.returnData);
@@ -429,11 +433,15 @@ export async function syncPurchaseToAstro(
       };
     }
 
+    const batchTxDate = purchaseData.purchaseDate instanceof Date 
+      ? purchaseData.purchaseDate.toISOString().split('T')[0]
+      : new Date(purchaseData.purchaseDate).toISOString().split('T')[0];
     const transactions = itemsWithUpc.map(item => ({
       transactionID: `${purchaseData.transactionId}-${item.productId}`,
       item_code: item.sku,
       item_qty: item.quantity,
-      item_transaction_date: purchaseData.purchaseDate.toISOString().split('T')[0],
+      item_amount: item.totalPrice || item.unitPrice,
+      item_transaction_date: batchTxDate,
     }));
 
     const result = await astroRequest('addTransactionBatch', {
