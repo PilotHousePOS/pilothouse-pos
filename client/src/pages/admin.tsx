@@ -5012,14 +5012,18 @@ function AstroLoyaltyManager() {
   const queryClient = useQueryClient();
   const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [connectionResult, setConnectionResult] = useState<any>(null);
+  const [expandedCustomer, setExpandedCustomer] = useState<string | null>(null);
 
-  // Fetch Astro customers
   const { data: astroCustomers = [], isLoading } = useQuery({
     queryKey: ['/api/admin/astro/customers'],
     enabled: true
   });
 
-  // Test connection mutation
+  const { data: astroOffers = [] } = useQuery<any[]>({
+    queryKey: ['/api/admin/astro/offers'],
+    enabled: !!connectionResult?.success
+  });
+
   const testConnection = async () => {
     setIsTestingConnection(true);
     try {
@@ -5028,152 +5032,162 @@ function AstroLoyaltyManager() {
       });
       const result = await response.json();
       setConnectionResult(result);
-      
       if (result.success) {
-        toast({
-          title: "Connection successful!",
-          description: "Astro Loyalty API is configured and working"
-        });
+        queryClient.invalidateQueries({ queryKey: ['/api/admin/astro/offers'] });
+        toast({ title: "Connected!", description: "Astro Loyalty API is working" });
       } else {
-        toast({
-          title: "Connection failed",
-          description: result.message || "Please check your API credentials",
-          variant: "destructive"
-        });
+        toast({ title: "Connection failed", description: result.message, variant: "destructive" });
       }
     } catch (error) {
-      console.error('Test connection error:', error);
-      toast({
-        title: "Connection test failed",
-        description: "Failed to test Astro connection",
-        variant: "destructive"
-      });
       setConnectionResult({ success: false, message: "Network error" });
+      toast({ title: "Connection test failed", description: "Failed to test Astro connection", variant: "destructive" });
     } finally {
       setIsTestingConnection(false);
     }
   };
 
+  useEffect(() => {
+    const autoTest = async () => {
+      try {
+        const response = await fetch('/api/admin/astro/test-connection', { credentials: 'include' });
+        const result = await response.json();
+        setConnectionResult(result);
+      } catch {}
+    };
+    autoTest();
+  }, []);
+
+  const isConnected = connectionResult?.success === true;
+
   return (
     <div className="space-y-6">
-      {/* Integration Status Card */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5" />
             Astro Loyalty Integration
+            {isConnected && (
+              <Badge className="bg-green-600 ml-2">Connected</Badge>
+            )}
           </CardTitle>
           <CardDescription>
-            Manage customer loyalty program integration with Astro
+            {isConnected
+              ? "Astro Loyalty is active and syncing customer purchases and rewards"
+              : "Manage customer loyalty program integration with Astro"
+            }
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Setup Instructions Banner */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-500 flex-shrink-0 mt-0.5" />
-              <div className="text-sm">
-                <p className="font-semibold text-blue-800 dark:text-blue-300 mb-2">Setup Required</p>
-                <div className="space-y-2 text-blue-700 dark:text-blue-400">
-                  <p>To enable Astro Loyalty integration:</p>
-                  <ol className="list-decimal list-inside space-y-1 ml-2">
-                    <li>Contact <a href="mailto:developer1.astroloyalty.com" className="underline font-medium">developer1.astroloyalty.com</a> to get API credentials</li>
-                    <li>Subscription cost: $50/month</li>
-                    <li>Add the following environment variables to your Replit Secrets:
-                      <ul className="list-disc list-inside ml-4 mt-1 space-y-0.5">
-                        <li><code className="bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded text-xs">ASTRO_API_KEY</code></li>
-                        <li><code className="bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded text-xs">ASTRO_STORE_ID</code></li>
-                        <li><code className="bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded text-xs">ASTRO_API_URL</code> (optional, defaults to production)</li>
-                      </ul>
-                    </li>
-                    <li>Test the connection using the button below</li>
-                  </ol>
+          {isConnected ? (
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-500 flex-shrink-0 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-semibold text-green-800 dark:text-green-300 mb-1">Integration Active</p>
+                  <p className="text-green-700 dark:text-green-400">{connectionResult.message}</p>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Connection Test */}
-          <div className="space-y-3">
-            <Button
-              onClick={testConnection}
-              disabled={isTestingConnection}
-              className="bg-brand-blue hover:bg-blue-600"
-              data-testid="button-test-astro-connection"
-            >
-              {isTestingConnection ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Testing...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Test Connection
-                </>
-              )}
-            </Button>
-
-            {/* Connection Status */}
-            {connectionResult && (
-              <div className={`rounded-lg p-3 ${
-                connectionResult.success 
-                  ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
-                  : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
-              }`}>
-                <div className="flex items-start gap-2">
-                  {connectionResult.success ? (
-                    <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-500 mt-0.5" />
-                  ) : (
-                    <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-500 mt-0.5" />
-                  )}
-                  <div className="text-sm">
-                    <p className={`font-semibold ${
-                      connectionResult.success 
-                        ? 'text-green-800 dark:text-green-300'
-                        : 'text-red-800 dark:text-red-300'
-                    }`}>
-                      {connectionResult.success ? 'Connected' : 'Connection Failed'}
-                    </p>
-                    <p className={
-                      connectionResult.success 
-                        ? 'text-green-700 dark:text-green-400'
-                        : 'text-red-700 dark:text-red-400'
-                    }>
-                      {connectionResult.message}
-                    </p>
+          ) : (
+            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-semibold text-amber-800 dark:text-amber-300 mb-2">Not Connected</p>
+                  <div className="space-y-2 text-amber-700 dark:text-amber-400">
+                    <p>Required environment variables:</p>
+                    <ul className="list-disc list-inside ml-2 space-y-0.5">
+                      <li><code className="bg-amber-100 dark:bg-amber-900 px-1 py-0.5 rounded text-xs">ASTRO_USERNAME</code></li>
+                      <li><code className="bg-amber-100 dark:bg-amber-900 px-1 py-0.5 rounded text-xs">ASTRO_PASSWORD</code></li>
+                      <li><code className="bg-amber-100 dark:bg-amber-900 px-1 py-0.5 rounded text-xs">ASTRO_CLIENT_ID</code></li>
+                    </ul>
+                    {connectionResult && !connectionResult.success && (
+                      <p className="text-red-600 dark:text-red-400 mt-2">{connectionResult.message}</p>
+                    )}
                   </div>
                 </div>
               </div>
-            )}
+            </div>
+          )}
+
+          <div className="flex gap-3">
+            <Button
+              onClick={testConnection}
+              disabled={isTestingConnection}
+              variant={isConnected ? "outline" : "default"}
+              className={isConnected ? "" : "bg-brand-blue hover:bg-blue-600"}
+              data-testid="button-test-astro-connection"
+            >
+              {isTestingConnection ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Testing...</>
+              ) : (
+                <><RefreshCw className="w-4 h-4 mr-2" />{isConnected ? 'Re-test Connection' : 'Test Connection'}</>
+              )}
+            </Button>
           </div>
 
-          {/* Features List */}
           <div className="pt-4 border-t">
-            <h3 className="font-semibold mb-3">Features</h3>
+            <h3 className="font-semibold mb-3">How It Works</h3>
             <ul className="space-y-2 text-sm">
               <li className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>Automatic customer account creation and linking</span>
+                <CheckCircle2 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isConnected ? 'text-green-600' : 'text-gray-400'}`} />
+                <span>Customers link their account from their Profile page</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>Purchase sync to Astro for loyalty points tracking</span>
+                <CheckCircle2 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isConnected ? 'text-green-600' : 'text-gray-400'}`} />
+                <span>Purchases automatically sync to Astro using product UPC codes</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>Frequent buyer program progress tracking</span>
+                <CheckCircle2 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isConnected ? 'text-green-600' : 'text-gray-400'}`} />
+                <span>Frequent buyer programs track progress toward free items</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>Customer loyalty dashboard and status display</span>
+                <CheckCircle2 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isConnected ? 'text-green-600' : 'text-gray-400'}`} />
+                <span>Customers view and redeem rewards from their Profile</span>
               </li>
             </ul>
           </div>
         </CardContent>
       </Card>
 
-      {/* Linked Customers Card */}
+      {isConnected && astroOffers.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Gift className="w-5 h-5" />
+              Active Programs & Offers ({astroOffers.length})
+            </CardTitle>
+            <CardDescription>
+              Current manufacturer programs your store is enrolled in
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {astroOffers.map((offer: any) => (
+                <div key={offer.programId} className="border rounded-lg p-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="font-semibold text-sm">{offer.title}</p>
+                      <p className="text-xs text-gray-500">{offer.manufacturer}</p>
+                    </div>
+                    <Badge variant="secondary" className="text-xs">
+                      {offer.inStoreOnly ? 'In-Store Only' : 'Online & In-Store'}
+                    </Badge>
+                  </div>
+                  {offer.description && (
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{offer.description}</p>
+                  )}
+                  <div className="flex gap-4 text-xs text-gray-500 mt-2">
+                    <span>Starts: {new Date(offer.startDate).toLocaleDateString()}</span>
+                    <span>Ends: {new Date(offer.endDate).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -5200,7 +5214,8 @@ function AstroLoyaltyManager() {
               {astroCustomers.map((customer: any) => (
                 <div 
                   key={customer.id}
-                  className="border rounded-lg p-4 space-y-2"
+                  className="border rounded-lg p-4 space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                  onClick={() => setExpandedCustomer(expandedCustomer === customer.astroCustomerId ? null : customer.astroCustomerId)}
                 >
                   <div className="flex items-start justify-between">
                     <div>

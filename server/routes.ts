@@ -2381,6 +2381,46 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           } catch (loyaltyError) {
             console.error("Failed to update loyalty rewards:", loyaltyError);
           }
+
+          try {
+            const astroCustomer = await storage.getAstroCustomerByUserId(orderUserId);
+            if (astroCustomer && orderWithItems) {
+              const { syncPurchaseToAstro, addPointsByDollar } = await import('./astroLoyalty');
+              const orderItems = orderWithItems.items || [];
+              const items = [];
+              for (const item of orderItems) {
+                if (item.supplyId) {
+                  const supply = await storage.getSupply(item.supplyId);
+                  if (supply) {
+                    items.push({
+                      productId: supply.id.toString(),
+                      productName: supply.name,
+                      brand: supply.brand || undefined,
+                      sku: supply.sku || undefined,
+                      quantity: item.quantity,
+                      unitPrice: parseFloat(item.price),
+                      totalPrice: parseFloat(item.price) * item.quantity,
+                    });
+                  }
+                }
+              }
+              if (items.length > 0) {
+                const syncResult = await syncPurchaseToAstro({
+                  customerId: astroCustomer.astroCustomerId,
+                  transactionId: orderId.toString(),
+                  items,
+                  purchaseDate: orderWithItems.order.orderDate || new Date(),
+                  totalAmount: parseFloat(orderWithItems.order.totalAmount),
+                });
+                if (syncResult) {
+                  console.log(`[ASTRO] Auto-synced order #${orderId} to Astro for customer ${astroCustomer.astroCustomerId}`);
+                  await addPointsByDollar(astroCustomer.astroCustomerId, parseFloat(orderWithItems.order.totalAmount));
+                }
+              }
+            }
+          } catch (astroError) {
+            console.error("[ASTRO] Failed to auto-sync purchase:", astroError);
+          }
         }
       }
       
@@ -8879,6 +8919,72 @@ West Monroe LA 71291
     } catch (error) {
       console.error("Error syncing purchase to Astro:", error);
       res.status(500).json({ message: "Failed to sync purchase" });
+    }
+  });
+
+  // Get active Astro offers/programs (Admin only)
+  app.get("/api/admin/astro/offers", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { listOffers } = await import('./astroLoyalty');
+      const offers = await listOffers();
+      res.json(offers);
+    } catch (error) {
+      console.error("Error getting Astro offers:", error);
+      res.status(500).json({ message: "Failed to get Astro offers" });
+    }
+  });
+
+  // Get detailed Astro customer status (Admin only)
+  app.get("/api/admin/astro/customer-status/:astroCustomerId", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { getCustomerStatus } = await import('./astroLoyalty');
+      const status = await getCustomerStatus(req.params.astroCustomerId);
+      if (!status) {
+        return res.status(404).json({ message: "Customer not found in Astro" });
+      }
+      res.json(status);
+    } catch (error) {
+      console.error("Error getting Astro customer status:", error);
+      res.status(500).json({ message: "Failed to get customer status" });
+    }
+  });
+
+  // Redeem a points reward for a customer
+  app.post("/api/astro/redeem-points", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const { rewardId } = req.body;
+
+      if (!rewardId) {
+        return res.status(400).json({ message: "Reward ID is required" });
+      }
+
+      const astroCustomer = await storage.getAstroCustomerByUserId(userId);
+      if (!astroCustomer) {
+        return res.status(400).json({ message: "Account is not linked to Astro Loyalty" });
+      }
+
+      const { redeemPoints } = await import('./astroLoyalty');
+      const result = await redeemPoints(astroCustomer.astroCustomerId, rewardId);
+
+      if (!result) {
+        return res.status(503).json({ message: "Failed to redeem reward" });
+      }
+
+      res.json({ success: true, message: "Reward redeemed successfully!", ...result });
+    } catch (error) {
+      console.error("Error redeeming points:", error);
+      res.status(500).json({ message: "Failed to redeem points" });
     }
   });
 
