@@ -191,6 +191,8 @@ export const orders = pgTable("orders", {
   stripePaymentUrl: text("stripe_payment_url"), // Payment link URL sent to customer
   paymentStatus: varchar("payment_status", { length: 50 }).default("unpaid"), // unpaid, pending, paid, failed, refunded
   paidAt: timestamp("paid_at"), // When payment was completed
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).default("0"),
+  discountReason: text("discount_reason"),
 });
 
 // Order items
