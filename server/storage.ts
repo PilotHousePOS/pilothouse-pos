@@ -243,6 +243,7 @@ export interface IStorage {
   getOrderWithItems(id: number): Promise<{ order: Order; items: OrderItem[] } | undefined>;
   updateOrderStatus(id: number, status: string): Promise<Order>;
   updateOrderApprovalStatus(id: number, approvalStatus: string): Promise<Order>;
+  applyOrderDiscount(id: number, discountAmount: string, discountReason: string): Promise<Order>;
   updateOrderStripePayment(id: number, data: { stripeCheckoutSessionId?: string; stripePaymentIntentId?: string; stripePaymentUrl?: string; paymentStatus?: string; paidAt?: Date }): Promise<Order>;
   getOrderByStripeCheckoutSession(sessionId: string): Promise<Order | undefined>;
   getOrderByStripePaymentIntent(paymentIntentId: string): Promise<Order | undefined>;
@@ -2389,6 +2390,30 @@ export class DatabaseStorage implements IStorage {
     const [updated] = await db
       .update(orders)
       .set(updateData)
+      .where(eq(orders.id, id))
+      .returning();
+    return updated;
+  }
+
+  async applyOrderDiscount(id: number, discountAmount: string, discountReason: string): Promise<Order> {
+    const [order] = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+    if (!order) throw new Error("Order not found");
+
+    const discount = parseFloat(discountAmount);
+    const subtotal = parseFloat(order.subtotal || "0");
+    const taxAmount = parseFloat(order.taxAmount || "0");
+    const convenienceFee = parseFloat(order.convenienceFee || "0");
+    const loyaltyCredits = parseFloat(order.loyaltyCreditsApplied || "0");
+    const newTotal = Math.max(0, subtotal + taxAmount + convenienceFee - loyaltyCredits - discount);
+
+    const [updated] = await db
+      .update(orders)
+      .set({
+        discountAmount: discount.toFixed(2),
+        discountReason,
+        totalAmount: newTotal.toFixed(2),
+        updatedAt: new Date(),
+      })
       .where(eq(orders.id, id))
       .returning();
     return updated;

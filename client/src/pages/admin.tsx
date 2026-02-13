@@ -91,7 +91,8 @@ import {
   RotateCcw,
   Check,
   Settings,
-  Gift
+  Gift,
+  Tag
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -5298,6 +5299,10 @@ export default function Admin() {
   const [editingOrder, setEditingOrder] = useState<any>(null);
   const [editOrderModalOpen, setEditOrderModalOpen] = useState(false);
   const [editOrderItems, setEditOrderItems] = useState<any[]>([]);
+  const [discountOrderId, setDiscountOrderId] = useState<number | null>(null);
+  const [discountAmount, setDiscountAmount] = useState('');
+  const [discountReason, setDiscountReason] = useState('');
+  const [discountModalOpen, setDiscountModalOpen] = useState(false);
   const [editOrderSearchQuery, setEditOrderSearchQuery] = useState('');
   const [editOrderSearchResults, setEditOrderSearchResults] = useState<any[]>([]);
   const [isSearchingProducts, setIsSearchingProducts] = useState(false);
@@ -6479,6 +6484,35 @@ export default function Admin() {
       toast({
         title: "Error",
         description: "Failed to approve order.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const applyDiscountMutation = useMutation({
+    mutationFn: async ({ orderId, amount, reason }: { orderId: number; amount: string; reason: string }) => {
+      return await apiRequest("POST", `/api/admin/orders/${orderId}/discount`, {
+        discountAmount: amount,
+        discountReason: reason,
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Discount Applied",
+        description: "The discount has been applied to the order total.",
+      });
+      setDiscountModalOpen(false);
+      setDiscountOrderId(null);
+      setDiscountAmount('');
+      setDiscountReason('');
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pending-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/orders-with-items"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to apply discount.",
         variant: "destructive",
       });
     },
@@ -8286,6 +8320,18 @@ export default function Admin() {
                                   ))}
                                 </div>
                                 
+                                {parseFloat(order.discountAmount || "0") > 0 && (
+                                  <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded border border-green-200 dark:border-green-800">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-sm font-medium text-green-700 dark:text-green-400">Discount Applied</span>
+                                      <span className="text-sm font-bold text-green-700 dark:text-green-400">-${parseFloat(order.discountAmount).toFixed(2)}</span>
+                                    </div>
+                                    {order.discountReason && (
+                                      <p className="text-xs text-green-600 dark:text-green-500 mt-0.5">{order.discountReason}</p>
+                                    )}
+                                  </div>
+                                )}
+                                
                                 <div className="flex items-center justify-between mt-2 pt-2 border-t">
                                   <p className="font-bold text-lg">${parseFloat(order.totalAmount || 0).toFixed(2)}</p>
                                   <div className="flex gap-2 flex-wrap">
@@ -8297,7 +8343,6 @@ export default function Admin() {
                                           className="border-orange-500 text-orange-600 hover:bg-orange-50"
                                           onClick={() => {
                                             setEditingOrder(order);
-                                            // Populate editOrderItems with existing order items
                                             const existingItems = (order.items || []).map((item: any) => ({
                                               id: item.id,
                                               supplyId: item.supplyId,
@@ -8312,6 +8357,20 @@ export default function Admin() {
                                         >
                                           <Pencil className="w-3 h-3 mr-1" />
                                           Edit
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="border-green-500 text-green-600 hover:bg-green-50"
+                                          onClick={() => {
+                                            setDiscountOrderId(order.id);
+                                            setDiscountAmount(order.discountAmount && parseFloat(order.discountAmount) > 0 ? order.discountAmount : '');
+                                            setDiscountReason(order.discountReason || '');
+                                            setDiscountModalOpen(true);
+                                          }}
+                                        >
+                                          <Tag className="w-3 h-3 mr-1" />
+                                          {parseFloat(order.discountAmount || "0") > 0 ? 'Edit Discount' : 'Discount'}
                                         </Button>
                                         <Button
                                           size="sm"
@@ -8764,6 +8823,74 @@ export default function Admin() {
                   </div>
                 </div>
               )}
+            </DialogContent>
+          </Dialog>
+
+          {/* Discount Modal */}
+          <Dialog open={discountModalOpen} onOpenChange={(open) => {
+            setDiscountModalOpen(open);
+            if (!open) {
+              setDiscountOrderId(null);
+              setDiscountAmount('');
+              setDiscountReason('');
+            }
+          }}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Apply Discount to Order #{discountOrderId}</DialogTitle>
+                <DialogDescription>
+                  Enter the discount amount and reason. The total will be recalculated before any payment is charged.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-2">
+                <div>
+                  <Label htmlFor="discount-amount">Discount Amount ($)</Label>
+                  <div className="relative mt-1">
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input
+                      id="discount-amount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="0.00"
+                      value={discountAmount}
+                      onChange={(e) => setDiscountAmount(e.target.value)}
+                      className="pl-9"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="discount-reason">Reason</Label>
+                  <Textarea
+                    id="discount-reason"
+                    placeholder="e.g. 20% employee discount, loyalty customer, price match..."
+                    value={discountReason}
+                    onChange={(e) => setDiscountReason(e.target.value)}
+                    className="mt-1"
+                    rows={2}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setDiscountModalOpen(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  className="bg-green-600 hover:bg-green-700"
+                  disabled={!discountAmount || !discountReason.trim() || applyDiscountMutation.isPending}
+                  onClick={() => {
+                    if (discountOrderId) {
+                      applyDiscountMutation.mutate({
+                        orderId: discountOrderId,
+                        amount: discountAmount,
+                        reason: discountReason,
+                      });
+                    }
+                  }}
+                >
+                  {applyDiscountMutation.isPending ? 'Applying...' : 'Apply Discount'}
+                </Button>
+              </DialogFooter>
             </DialogContent>
           </Dialog>
 

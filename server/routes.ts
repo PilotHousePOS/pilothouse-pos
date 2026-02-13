@@ -2240,6 +2240,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                     <pre style="white-space: pre-wrap; font-family: Arial;">${itemsList}</pre>
                     ${order.taxAmount && parseFloat(order.taxAmount) > 0 ? `<p>Tax: $${order.taxAmount}</p>` : ''}
                     ${order.loyaltyCreditsApplied && parseFloat(order.loyaltyCreditsApplied) > 0 ? `<p style="color: #16a34a;">Loyalty Credits Applied: -$${order.loyaltyCreditsApplied}</p>` : ''}
+                    ${order.discountAmount && parseFloat(order.discountAmount) > 0 ? `<p style="color: #16a34a;">Discount: -$${parseFloat(order.discountAmount).toFixed(2)}${order.discountReason ? ` (${order.discountReason})` : ''}</p>` : ''}
                     <p style="font-weight: bold; font-size: 18px; color: #dc2626;">Total: $${order.totalAmount}</p>
                   </div>
                   
@@ -2527,6 +2528,48 @@ West Monroe LA 71291
     }
   });
 
+  // Apply discount to an order before approval
+  app.post("/api/admin/orders/:id/discount", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const orderId = parseInt(req.params.id);
+      const { discountAmount, discountReason } = req.body;
+      
+      const parsedDiscount = parseFloat(discountAmount);
+      if (!discountAmount || !Number.isFinite(parsedDiscount) || parsedDiscount <= 0) {
+        return res.status(400).json({ message: "Please enter a valid discount amount greater than $0." });
+      }
+      
+      if (!discountReason || !discountReason.trim()) {
+        return res.status(400).json({ message: "Please enter a reason for the discount." });
+      }
+      
+      const order = await storage.getOrder(orderId);
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      
+      if (order.approvalStatus !== 'pending_approval') {
+        return res.status(400).json({ message: "Discounts can only be applied to pending orders." });
+      }
+      
+      const updated = await storage.applyOrderDiscount(orderId, discountAmount, discountReason.trim());
+      
+      console.log(`Discount applied to order #${orderId}: $${discountAmount} - "${discountReason}" by admin ${userId}`);
+      
+      res.json({ success: true, order: updated });
+    } catch (error) {
+      console.error("Error applying discount:", error);
+      res.status(500).json({ message: "Failed to apply discount" });
+    }
+  });
+
   // Update order items (for editing before approval)
   app.put("/api/admin/orders/:id/items", authMiddleware, async (req: any, res) => {
     try {
@@ -2560,11 +2603,14 @@ West Monroe LA 71291
         }
       }
       
-      // Get tax rate and recalculate totals
+      // Get tax rate and recalculate totals (preserving any existing discount)
       const orderData = await storage.getOrder(orderId);
       const taxRate = orderData?.taxRate ? parseFloat(orderData.taxRate) : 10.99;
       const taxAmount = (newTotal * taxRate / 100);
-      const totalWithTax = newTotal + taxAmount;
+      const convenienceFee = parseFloat(orderData?.convenienceFee || "0");
+      const loyaltyCredits = parseFloat(orderData?.loyaltyCreditsApplied || "0");
+      const discount = parseFloat(orderData?.discountAmount || "0");
+      const totalWithTax = Math.max(0, newTotal + taxAmount + convenienceFee - loyaltyCredits - discount);
       
       // Update order total
       await db.update(orders)
