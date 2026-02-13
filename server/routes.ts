@@ -2483,7 +2483,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                   customerId: astroCustomer.astroCustomerId,
                   transactionId: orderId.toString(),
                   items,
-                  purchaseDate: orderWithItems.order.orderDate || new Date(),
+                  purchaseDate: new Date(orderWithItems.order.orderDate || Date.now()),
                   totalAmount: parseFloat(orderWithItems.order.totalAmount),
                 });
                 if (syncResult) {
@@ -2550,6 +2550,80 @@ West Monroe LA 71291
     } catch (error) {
       console.error("Error marking order picked up:", error);
       res.status(500).json({ message: "Failed to mark order picked up" });
+    }
+  });
+
+  app.post("/api/admin/orders/:id/sync-astro", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+      
+      const orderId = parseInt(req.params.id);
+      const orderWithItems = await storage.getOrderWithItems(orderId);
+      
+      if (!orderWithItems) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      
+      const order = orderWithItems.order;
+      const orderOwner = await storage.getUser(order.userId);
+      
+      if (!orderOwner) {
+        return res.status(400).json({ message: "Order owner not found" });
+      }
+      
+      const astroCustomer = await storage.getAstroCustomerByUserId(order.userId);
+      if (!astroCustomer) {
+        return res.status(400).json({ message: "Customer not linked to Astro Loyalty" });
+      }
+      
+      const { syncPurchaseToAstro, addPointsByDollar } = await import('./astroLoyalty');
+      const orderItems = orderWithItems.items || [];
+      const items = [];
+      for (const item of orderItems) {
+        if (item.supplyId) {
+          const supply = await storage.getSupply(item.supplyId);
+          if (supply) {
+            items.push({
+              productId: supply.id.toString(),
+              productName: supply.name,
+              brand: supply.brand || undefined,
+              sku: supply.sku || undefined,
+              quantity: item.quantity,
+              unitPrice: parseFloat(item.price),
+              totalPrice: parseFloat(item.price) * item.quantity,
+            });
+          }
+        }
+      }
+      
+      if (items.length === 0) {
+        return res.status(400).json({ message: "No items with UPCs found in this order" });
+      }
+      
+      const timestamp = Date.now().toString().slice(-6);
+      const syncResult = await syncPurchaseToAstro({
+        customerId: astroCustomer.astroCustomerId,
+        transactionId: `${orderId}-retry-${timestamp}`,
+        items,
+        purchaseDate: new Date(order.orderDate || Date.now()),
+        totalAmount: parseFloat(order.totalAmount),
+      });
+      
+      if (syncResult?.success) {
+        await addPointsByDollar(astroCustomer.astroCustomerId, parseFloat(order.totalAmount));
+        console.log(`[ASTRO] Manual sync for order #${orderId} succeeded`);
+        res.json({ success: true, message: "Order synced to Astro Loyalty successfully" });
+      } else {
+        res.status(500).json({ success: false, message: "Astro sync failed - check server logs" });
+      }
+    } catch (error: any) {
+      console.error("[ASTRO] Manual sync error:", error);
+      res.status(500).json({ message: `Astro sync failed: ${error.message}` });
     }
   });
 

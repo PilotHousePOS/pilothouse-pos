@@ -8590,6 +8590,31 @@ export default function Admin() {
                                     variant="outline"
                                     size="sm"
                                     onClick={async () => {
+                                      try {
+                                        const res = await fetch(`/api/admin/orders/${order.id}/sync-astro`, {
+                                          method: 'POST',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          credentials: 'include',
+                                        });
+                                        const data = await res.json();
+                                        if (data.success) {
+                                          toast({ title: "Astro Synced", description: `Order #${order.id} synced to Astro Loyalty` });
+                                        } else {
+                                          toast({ title: "Sync Failed", description: data.message, variant: "destructive" });
+                                        }
+                                      } catch (err: any) {
+                                        toast({ title: "Error", description: err.message, variant: "destructive" });
+                                      }
+                                    }}
+                                    className="border-purple-300 text-purple-700 hover:bg-purple-50"
+                                  >
+                                    <RefreshCw className="w-4 h-4 mr-1" />
+                                    Sync Astro
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={async () => {
                                       if (confirm(`Delete Order #${order.id} from admin view?\n\nThis will remove it from your completed orders list, but the customer will still see it in their order history.`)) {
                                         try {
                                           await apiRequest('POST', `/api/admin/orders/${order.id}/hide`);
