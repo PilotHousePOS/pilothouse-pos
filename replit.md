@@ -176,7 +176,6 @@ Step 5: NEVER mark task complete until verification passes
 - **Science Diet**: https://hillspet.com/dog-food or /cat-food
 - **Blue Buffalo**: https://bluebuffalo.com/
 - **Pro Plan**: https://purina.com/pro-plan/
-
 - Groomer Daily Limit: Each groomer can accept max 5 full grooming appointments per day. Bath-only appointments do NOT count toward this limit. Frontend groomer dropdowns shows remaining slots.
 - Push Notifications: Web Push via VAPID keys, PWA-compatible service worker with pushsubscriptionchange auto-rescribe. Notifications work in browser AND as installed PWA app.
 - Marketing Email Opt-Out: Users can opt out of marketing emails in profile. Admin Email Center has "This is a marketing email" checkbox that filters opted-out users. Order emails and important updates bypass opt-out.

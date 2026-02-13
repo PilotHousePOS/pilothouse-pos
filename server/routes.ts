@@ -8678,17 +8678,41 @@ West Monroe LA 71291
         });
       }
 
-      // Get frequent buyer progress
-      const progress = await storage.getFrequentBuyerProgressByCustomer(astroCustomer.id);
+      const { getCustomerStatus } = await import('./astroLoyalty');
+      const liveStatus = await getCustomerStatus(astroCustomer.astroCustomerId);
 
-      res.json({
-        linked: true,
-        loyaltyPoints: astroCustomer.loyaltyPoints,
-        email: astroCustomer.email,
-        lastSyncedAt: astroCustomer.lastSyncedAt,
-        syncStatus: astroCustomer.syncStatus,
-        frequentBuyerPrograms: progress
-      });
+      if (liveStatus) {
+        const currentPoints = parseFloat(String(astroCustomer.loyaltyPoints) || '0');
+        if (liveStatus.pointsBalance !== currentPoints) {
+          await storage.updateAstroCustomer(astroCustomer.id, {
+            loyaltyPoints: String(liveStatus.pointsBalance),
+            lastSyncedAt: new Date(),
+            syncStatus: 'synced',
+          });
+        }
+
+        res.json({
+          linked: true,
+          loyaltyPoints: liveStatus.pointsBalance,
+          email: astroCustomer.email,
+          lastSyncedAt: new Date(),
+          syncStatus: 'synced',
+          frequentBuyerCards: liveStatus.frequentBuyerCards,
+          offerRewards: liveStatus.offerRewards,
+          pointsTransactions: liveStatus.pointsTransactions,
+          eligiblePointsRewards: liveStatus.eligiblePointsRewards,
+        });
+      } else {
+        const progress = await storage.getFrequentBuyerProgressByCustomer(astroCustomer.id);
+        res.json({
+          linked: true,
+          loyaltyPoints: astroCustomer.loyaltyPoints,
+          email: astroCustomer.email,
+          lastSyncedAt: astroCustomer.lastSyncedAt,
+          syncStatus: astroCustomer.syncStatus,
+          frequentBuyerPrograms: progress
+        });
+      }
     } catch (error) {
       console.error("Error getting Astro status:", error);
       res.status(500).json({ message: "Failed to get loyalty status" });
@@ -8791,7 +8815,6 @@ West Monroe LA 71291
         return res.status(400).json({ message: "Order has no items" });
       }
 
-      // Prepare purchase data
       const { syncPurchaseToAstro } = await import('./astroLoyalty');
       const items = [];
       
@@ -8803,6 +8826,7 @@ West Monroe LA 71291
               productId: supply.id.toString(),
               productName: supply.name,
               brand: supply.brand || undefined,
+              sku: supply.sku || undefined,
               quantity: item.quantity,
               unitPrice: parseFloat(item.price),
               totalPrice: parseFloat(item.price) * item.quantity,
