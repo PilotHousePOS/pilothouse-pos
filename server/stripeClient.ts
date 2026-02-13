@@ -3,26 +3,55 @@
 
 import Stripe from 'stripe';
 
+let validatedCredentials: { publishableKey: string; secretKey: string } | null = null;
+
 async function getCredentials() {
+  if (validatedCredentials) return validatedCredentials;
+
+  const candidates: { publishableKey: string; secretKey: string; source: string }[] = [];
+
   const liveSecretKey = (process.env.STRIPE_SK_LIVE || process.env.STRIPE_LIVE_SECRET_KEY)?.trim();
   const livePublishableKey = (process.env.STRIPE_PK_LIVE || process.env.STRIPE_LIVE_PUBLISHABLE_KEY)?.trim();
   if (liveSecretKey && livePublishableKey) {
-    return {
-      publishableKey: livePublishableKey,
-      secretKey: liveSecretKey,
-    };
+    candidates.push({ publishableKey: livePublishableKey, secretKey: liveSecretKey, source: 'live env vars' });
   }
 
   const userSecretKey = process.env.STRIPE_SECRET_KEY?.trim();
   const userPublishableKey = process.env.STRIPE_PUBLISHABLE_KEY?.trim();
-
   if (userSecretKey && userPublishableKey) {
-    return {
-      publishableKey: userPublishableKey,
-      secretKey: userSecretKey,
-    };
+    candidates.push({ publishableKey: userPublishableKey, secretKey: userSecretKey, source: 'test env vars' });
   }
 
+  try {
+    const connectorCreds = await getConnectorCredentials();
+    if (connectorCreds) {
+      candidates.push({ ...connectorCreds, source: 'Stripe connector' });
+    }
+  } catch (e) {}
+
+  for (const cred of candidates) {
+    try {
+      const testStripe = new Stripe(cred.secretKey, { apiVersion: '2025-08-27.basil' });
+      await testStripe.accounts.retrieve();
+      console.log(`[Stripe] Using validated key from: ${cred.source}`);
+      validatedCredentials = { publishableKey: cred.publishableKey, secretKey: cred.secretKey };
+      return validatedCredentials;
+    } catch (err: any) {
+      console.warn(`[Stripe] Key from ${cred.source} failed validation: ${err.message?.substring(0, 80)}`);
+    }
+  }
+
+  if (candidates.length > 0) {
+    console.warn('[Stripe] No key passed validation, using first available (live keys)');
+    const fallback = candidates[0];
+    validatedCredentials = { publishableKey: fallback.publishableKey, secretKey: fallback.secretKey };
+    return validatedCredentials;
+  }
+
+  throw new Error('No Stripe API keys configured.');
+}
+
+async function getConnectorCredentials(): Promise<{ publishableKey: string; secretKey: string } | null> {
   const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
   const xReplitToken = process.env.REPL_IDENTITY
     ? 'repl ' + process.env.REPL_IDENTITY
@@ -30,9 +59,7 @@ async function getCredentials() {
       ? 'depl ' + process.env.WEB_REPL_RENEWAL
       : null;
 
-  if (!xReplitToken) {
-    throw new Error('Stripe API keys not configured. Please set STRIPE_SECRET_KEY and STRIPE_PUBLISHABLE_KEY.');
-  }
+  if (!xReplitToken || !hostname) return null;
 
   const connectorName = 'stripe';
   const isProduction = process.env.REPLIT_DEPLOYMENT === '1';
@@ -53,8 +80,8 @@ async function getCredentials() {
   const data = await response.json();
   const connectionSettings = data.items?.[0];
 
-  if (!connectionSettings || (!connectionSettings.settings.publishable || !connectionSettings.settings.secret)) {
-    throw new Error(`Stripe ${targetEnvironment} connection not found`);
+  if (!connectionSettings?.settings?.publishable || !connectionSettings?.settings?.secret) {
+    return null;
   }
 
   return {
