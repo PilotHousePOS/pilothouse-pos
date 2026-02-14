@@ -134,6 +134,7 @@ export interface AstroCustomerData {
 
 export interface AstroPurchaseData {
   customerId: string;
+  internalCustomerId?: string;
   transactionId: string;
   items: Array<{
     productId: string;
@@ -394,6 +395,34 @@ export async function getCustomerStatus(
 }
 
 /**
+ * Ensure a customer is linked in Astro with an internal customerID.
+ * The Astro API requires `customerID` (internal POS ID) for addTransaction,
+ * not `astro_customer_id`. We must link first using linkCustomer.
+ */
+async function ensureCustomerLinked(
+  astroCustomerId: string,
+  internalId?: string
+): Promise<string> {
+  const customerID = internalId || `animalhouse-${astroCustomerId}`;
+  
+  try {
+    await astroRequest('linkCustomer', {
+      customerID,
+      astro_customer_id: astroCustomerId,
+    });
+    console.log(`[ASTRO] Linked customer: internal=${customerID} -> astro=${astroCustomerId}`);
+  } catch (error) {
+    if (error instanceof AstroApiError && error.statusCode === 320) {
+      console.log(`[ASTRO] Customer already linked: ${customerID}`);
+    } else {
+      console.warn('[ASTRO] linkCustomer warning (proceeding anyway):', error);
+    }
+  }
+  
+  return customerID;
+}
+
+/**
  * Sync a purchase to Astro for frequent buyer tracking
  */
 export async function syncPurchaseToAstro(
@@ -412,18 +441,22 @@ export async function syncPurchaseToAstro(
       return { transactionId: purchaseData.transactionId, success: true };
     }
 
+    const linkedCustomerID = await ensureCustomerLinked(
+      purchaseData.customerId,
+      purchaseData.internalCustomerId
+    );
+
     if (itemsWithUpc.length === 1) {
       const item = itemsWithUpc[0];
       const txDate = purchaseData.purchaseDate instanceof Date 
         ? purchaseData.purchaseDate.toISOString().split('T')[0]
         : new Date(purchaseData.purchaseDate).toISOString().split('T')[0];
       const result = await astroRequest('addTransaction', {
-        astro_customer_id: purchaseData.customerId,
+        customerID: linkedCustomerID,
         transactionID: `${purchaseData.transactionId}-${item.productId}`,
         saleID: purchaseData.transactionId,
         item_code: item.sku,
         item_qty: item.quantity,
-        item_amount: item.totalPrice || item.unitPrice,
         item_transaction_date: txDate,
       });
 
@@ -441,12 +474,11 @@ export async function syncPurchaseToAstro(
       transactionID: `${purchaseData.transactionId}-${item.productId}`,
       item_code: item.sku,
       item_qty: item.quantity,
-      item_amount: item.totalPrice || item.unitPrice,
       item_transaction_date: batchTxDate,
     }));
 
     const result = await astroRequest('addTransactionBatch', {
-      astro_customer_id: purchaseData.customerId,
+      customerID: linkedCustomerID,
       saleID: purchaseData.transactionId,
       transactions,
     });
@@ -464,16 +496,21 @@ export async function syncPurchaseToAstro(
 
 /**
  * Add loyalty points by dollar amount
+ * Note: Uses astro_customer_id since points may not require linked customerID
  */
 export async function addPointsByDollar(
-  customerID: string,
-  dollarAmount: number
+  astroCustomerID: string,
+  dollarAmount: number,
+  internalId?: string
 ): Promise<{ pointsTransactionId: string; totalPoints: number } | null> {
   if (!isAstroEnabled()) return null;
 
   try {
+    const linkedID = internalId || `animalhouse-${astroCustomerID}`;
+    await ensureCustomerLinked(astroCustomerID, linkedID);
+    
     const result = await astroRequest('addPointsByDollar', {
-      astro_customer_id: customerID,
+      customerID: linkedID,
       dollarAmount,
     });
 

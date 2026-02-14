@@ -2481,6 +2481,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
               if (items.length > 0) {
                 const syncResult = await syncPurchaseToAstro({
                   customerId: astroCustomer.astroCustomerId,
+                  internalCustomerId: `animalhouse-${orderUserId}`,
                   transactionId: orderId.toString(),
                   items,
                   purchaseDate: new Date(orderWithItems.order.orderDate || Date.now()),
@@ -2608,6 +2609,7 @@ West Monroe LA 71291
       const timestamp = Date.now().toString().slice(-6);
       const syncResult = await syncPurchaseToAstro({
         customerId: astroCustomer.astroCustomerId,
+        internalCustomerId: `animalhouse-${order.userId}`,
         transactionId: `${orderId}-retry-${timestamp}`,
         items,
         purchaseDate: new Date(order.orderDate || Date.now()),
@@ -9072,6 +9074,7 @@ West Monroe LA 71291
 
       const syncResult = await syncPurchaseToAstro({
         customerId: astroCustomer.astroCustomerId,
+        internalCustomerId: `animalhouse-${order.userId}`,
         transactionId: orderId.toString(),
         items,
         purchaseDate: order.orderDate,
