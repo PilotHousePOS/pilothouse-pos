@@ -3138,13 +3138,11 @@ West Monroe LA 71291
             let voidedCount = 0;
             
             // Check if order had Astro rewards applied (free bag items)
-            let hadAstroReward = false;
             let rewardedSupplyIds = new Set<number>();
             if (order?.discountReason?.startsWith('Astro Loyalty Reward:')) {
               try {
                 const jsonStr = order.discountReason.replace('Astro Loyalty Reward: ', '');
                 const rewardInfo = JSON.parse(jsonStr);
-                hadAstroReward = true;
                 if (rewardInfo.appliedRewards) {
                   for (const ar of rewardInfo.appliedRewards) {
                     if (ar.supplyId) rewardedSupplyIds.add(ar.supplyId);
@@ -3222,20 +3220,7 @@ West Monroe LA 71291
               }
             }
             
-            // Check if any refunded items were covered by Astro rewards
-            let rewardWarning: string | null = null;
-            if (hadAstroReward && orderWithItems) {
-              const refundedItemIds = new Set(refundItems.map(ri => ri.orderItemId));
-              const refundedRewardItems = orderWithItems.items.filter(
-                (item: any) => refundedItemIds.has(item.id) && item.supplyId && rewardedSupplyIds.has(item.supplyId)
-              );
-              if (refundedRewardItems.length > 0) {
-                rewardWarning = `${refundedRewardItems.length} refunded item(s) were covered by Astro free bag reward(s). The reward redemption cannot be automatically reversed - please check the customer's Astro account manually if needed.`;
-                console.warn(`[ASTRO] WARNING: Refund on Order #${orderId} includes ${refundedRewardItems.length} item(s) that were covered by Astro rewards`);
-              }
-            }
-            
-            astroReversalResult = { voided: voidedCount, pointsDeducted, errors: reversalErrors, rewardWarning } as any;
+            astroReversalResult = { voided: voidedCount, pointsDeducted, errors: reversalErrors } as any;
             if (voidedCount > 0 || pointsDeducted) {
               console.log(`[ASTRO] Refund reversal for Order #${orderId}: ${voidedCount} transactions voided, points deducted: ${pointsDeducted}`);
             }

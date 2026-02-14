@@ -6644,13 +6644,6 @@ export default function Admin() {
         if (ar.voided > 0 || ar.pointsDeducted) {
           message += ` Astro: ${ar.voided} purchase(s) reversed${ar.pointsDeducted ? ', points deducted' : ''}.`;
         }
-        if (ar.rewardWarning) {
-          toast({
-            title: "Astro Reward Warning",
-            description: ar.rewardWarning,
-            variant: "destructive",
-          });
-        }
       }
       
       toast({
