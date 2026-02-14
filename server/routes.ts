@@ -9394,6 +9394,81 @@ West Monroe LA 71291
     }
   });
 
+  // Admin: Fix unredeemed rewards for completed orders
+  app.post("/api/admin/astro/fix-unredeemed-rewards", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { getCustomerStatus, addRedemption, ensureCustomerLinked } = await import('./astroLoyalty');
+      
+      const allOrdersWithItems = await storage.getAllOrdersWithItems();
+      const allOrders = allOrdersWithItems.map((o: any) => o.order || o);
+      const fixedRewards: any[] = [];
+      const errors: any[] = [];
+      
+      for (const order of allOrders) {
+        if (order.status !== 'completed' || !order.discountReason?.startsWith('Astro Loyalty Reward:')) continue;
+        
+        try {
+          const jsonStr = order.discountReason.replace('Astro Loyalty Reward: ', '');
+          const rewardInfo = JSON.parse(jsonStr);
+          if (!rewardInfo.appliedRewards?.length) continue;
+          
+          const astroCustomer = await storage.getAstroCustomerByUserId(order.userId);
+          if (!astroCustomer) continue;
+          
+          const internalId = `animalhouse-${order.userId}`;
+          const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
+          if (!status) continue;
+          
+          for (const applied of rewardInfo.appliedRewards) {
+            let itemId: string | null = null;
+            let foundUnredeemed = false;
+            
+            for (const card of status.frequentBuyerCards) {
+              const fg = card.freeGoods.find((fg: any) => fg.rewardId === applied.rewardId && !fg.redeemedOn);
+              if (fg) {
+                itemId = fg.itemId;
+                foundUnredeemed = true;
+                break;
+              }
+            }
+            
+            if (!foundUnredeemed) {
+              fixedRewards.push({ orderId: order.id, rewardId: applied.rewardId, status: 'already_redeemed_or_not_found' });
+              continue;
+            }
+            
+            const redeemed = await addRedemption(
+              astroCustomer.astroCustomerId,
+              applied.rewardId,
+              itemId || applied.rewardId,
+              undefined,
+              internalId
+            );
+            
+            fixedRewards.push({
+              orderId: order.id,
+              rewardId: applied.rewardId,
+              itemId,
+              status: redeemed ? 'redeemed_now' : 'redemption_failed'
+            });
+          }
+        } catch (e: any) {
+          errors.push({ orderId: order.id, error: e.message });
+        }
+      }
+      
+      res.json({ fixedRewards, errors });
+    } catch (error) {
+      console.error("Error fixing unredeemed rewards:", error);
+      res.status(500).json({ message: "Failed to fix unredeemed rewards" });
+    }
+  });
+
   // Get all Astro customers (Admin only)
   app.get("/api/admin/astro/customers", authMiddleware, async (req: any, res) => {
     try {

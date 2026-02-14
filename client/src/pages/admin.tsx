@@ -92,7 +92,8 @@ import {
   Check,
   Settings,
   Gift,
-  Tag
+  Tag,
+  Wrench
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -5058,6 +5059,33 @@ function AstroLoyaltyManager() {
     autoTest();
   }, []);
 
+  const [isFixingRewards, setIsFixingRewards] = useState(false);
+
+  const fixUnredeemedRewards = async () => {
+    setIsFixingRewards(true);
+    try {
+      const response = await fetch('/api/admin/astro/fix-unredeemed-rewards', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      const result = await response.json();
+      if (result.fixedRewards?.length > 0) {
+        const redeemed = result.fixedRewards.filter((r: any) => r.status === 'redeemed_now').length;
+        const alreadyDone = result.fixedRewards.filter((r: any) => r.status === 'already_redeemed_or_not_found').length;
+        toast({ 
+          title: "Rewards Fixed", 
+          description: `${redeemed} reward(s) redeemed, ${alreadyDone} already handled` 
+        });
+      } else {
+        toast({ title: "No Fix Needed", description: "No unredeemed rewards found on completed orders" });
+      }
+    } catch (error) {
+      toast({ title: "Fix Failed", description: "Could not fix unredeemed rewards", variant: "destructive" });
+    } finally {
+      setIsFixingRewards(false);
+    }
+  };
+
   const isConnected = connectionResult?.success === true;
 
   return (
@@ -5125,6 +5153,20 @@ function AstroLoyaltyManager() {
                 <><RefreshCw className="w-4 h-4 mr-2" />{isConnected ? 'Re-test Connection' : 'Test Connection'}</>
               )}
             </Button>
+            {isConnected && (
+              <Button
+                onClick={fixUnredeemedRewards}
+                disabled={isFixingRewards}
+                variant="outline"
+                className="border-amber-500 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+              >
+                {isFixingRewards ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Fixing...</>
+                ) : (
+                  <><Wrench className="w-4 h-4 mr-2" />Fix Unredeemed Rewards</>
+                )}
+              </Button>
+            )}
           </div>
 
           <div className="pt-4 border-t">
