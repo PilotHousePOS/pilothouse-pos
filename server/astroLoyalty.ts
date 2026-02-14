@@ -105,6 +105,7 @@ async function astroRequest(endpoint: string, jsonData?: Record<string, any>): P
   if (astroStatus && astroStatus !== 100) {
     const statusMsg = data.astro_status_message || data.status_messsage || data.status_message || 'Unknown error';
     console.error(`[ASTRO] API ${endpoint} error status ${astroStatus}:`, statusMsg);
+    console.error(`[ASTRO] Full response data:`, JSON.stringify(data));
     throw new AstroApiError(astroStatus, statusMsg, endpoint);
   }
 
