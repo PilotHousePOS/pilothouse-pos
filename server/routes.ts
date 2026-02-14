@@ -1976,7 +1976,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           if (astroCustomer) {
             const { getCustomerStatus } = await import('./astroLoyalty');
             const internalId = `animalhouse-${userId}`;
-            const status = await getCustomerStatus(astroCustomer.astroCustomerId, true, internalId);
+            const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
             
             if (status) {
               const parsedInfo = JSON.parse(orderData.astroRewardInfo);
@@ -2609,7 +2609,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
               
               if (appliedRewardsList.length > 0) {
                 try {
-                  const status = await getCustomerStatus(astroCustomer.astroCustomerId, true, internalId);
+                  const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
                   if (status) {
                     for (const applied of appliedRewardsList) {
                       let itemId: string | null = null;
@@ -9175,7 +9175,7 @@ West Monroe LA 71291
       const { getCustomerStatus } = await import('./astroLoyalty');
       const internalId = `animalhouse-${astroCustomer.userId}`;
       console.log(`[ASTRO] Fetching live status for astro customer ${astroCustomer.astroCustomerId} with internalId ${internalId}`);
-      const liveStatus = await getCustomerStatus(astroCustomer.astroCustomerId, true, internalId);
+      const liveStatus = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
       console.log(`[ASTRO] Live status result:`, liveStatus ? `points=${liveStatus.pointsBalance}, cards=${liveStatus.frequentBuyerCards?.length}, offers=${liveStatus.offerRewards?.length}` : 'null');
 
       if (liveStatus) {
@@ -9228,7 +9228,7 @@ West Monroe LA 71291
 
       const { getCustomerStatus } = await import('./astroLoyalty');
       const internalId = `animalhouse-${userId}`;
-      const status = await getCustomerStatus(astroCustomer.astroCustomerId, true, internalId);
+      const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
       
       if (!status) {
         return res.json({ rewards: [] });
@@ -9463,7 +9463,7 @@ West Monroe LA 71291
       const { getCustomerStatus } = await import('./astroLoyalty');
       const astroCustomer = await storage.getAstroCustomerByAstroId(req.params.astroCustomerId);
       const internalId = astroCustomer?.userId ? `animalhouse-${astroCustomer.userId}` : undefined;
-      const status = await getCustomerStatus(req.params.astroCustomerId, true, internalId);
+      const status = await getCustomerStatus(req.params.astroCustomerId, false, internalId);
       if (!status) {
         return res.status(404).json({ message: "Customer not found in Astro" });
       }
@@ -9537,7 +9537,7 @@ West Monroe LA 71291
           }
           
           const internalId = `animalhouse-${order.userId}`;
-          const status = await getCustomerStatus(astroCustomer.astroCustomerId, true, internalId);
+          const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
           if (!status) {
             console.log(`[ASTRO FIX] Could not get customer status for ${astroCustomer.astroCustomerId}`);
             continue;
