@@ -9174,7 +9174,7 @@ West Monroe LA 71291
 
       const { getCustomerStatus } = await import('./astroLoyalty');
       console.log(`[ASTRO] Fetching live status for astro customer ${astroCustomer.astroCustomerId}`);
-      const liveStatus = await getCustomerStatus(astroCustomer.astroCustomerId);
+      const liveStatus = await getCustomerStatus(astroCustomer.astroCustomerId, true);
       console.log(`[ASTRO] Live status result:`, liveStatus ? `points=${liveStatus.pointsBalance}, cards=${liveStatus.frequentBuyerCards?.length}, offers=${liveStatus.offerRewards?.length}` : 'null');
 
       if (liveStatus) {
@@ -9460,7 +9460,7 @@ West Monroe LA 71291
       }
 
       const { getCustomerStatus } = await import('./astroLoyalty');
-      const status = await getCustomerStatus(req.params.astroCustomerId);
+      const status = await getCustomerStatus(req.params.astroCustomerId, true);
       if (!status) {
         return res.status(404).json({ message: "Customer not found in Astro" });
       }
