@@ -22,9 +22,21 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import { Minus, Plus, Trash2, ShoppingCart, X, Gift, Star, CreditCard, AlertCircle, Settings } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingCart, X, Gift, Star, CreditCard, AlertCircle, Settings, Award } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Link } from "wouter";
+
+interface AstroReward {
+  rewardId: string;
+  programId?: string;
+  programTitle: string;
+  manufacturer?: string;
+  itemDescription?: string;
+  freeQty?: number;
+  programImage?: string;
+  type?: string;
+  rebateAmount?: number;
+}
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -39,6 +51,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringFrequency, setRecurringFrequency] = useState("monthly");
   const [applyLoyaltyCredits, setApplyLoyaltyCredits] = useState(false);
+  const [appliedRewards, setAppliedRewards] = useState<Record<number, AstroReward>>({});
 
   const { data: cartItems = [], isLoading } = useQuery({
     queryKey: ["/api/cart"],
@@ -81,6 +94,13 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     enabled: isOpen,
   });
   const availableLoyaltyCredits = parseFloat(loyaltyData?.loyaltyCredits || "0");
+
+  // Fetch Astro loyalty rewards (ready to redeem)
+  const { data: astroRewardsData } = useQuery<{ rewards: AstroReward[] }>({
+    queryKey: ["/api/astro/cart-rewards"],
+    enabled: isOpen && cartItems.length > 0,
+  });
+  const availableRewards = astroRewardsData?.rewards || [];
 
   // Fetch saved payment methods
   const { data: paymentMethodsData } = useQuery<{
@@ -224,12 +244,22 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     details: getItemDetails(item)
   }));
 
+  // Calculate Astro reward discount (free items)
+  const astroDiscount = Math.round(Object.entries(appliedRewards).reduce((total, [cartItemId, reward]) => {
+    const item = cartItemsWithDetails.find(i => i.id === parseInt(cartItemId));
+    if (item) {
+      return total + parseFloat(item.details.price) * Math.min(reward.freeQty || 1, item.quantity);
+    }
+    return total;
+  }, 0) * 100) / 100;
+
   const subtotal = Math.round(cartItemsWithDetails.reduce((total, item) => {
     return total + (parseFloat(item.details.price) * item.quantity);
   }, 0) * 100) / 100;
   
-  const taxAmount = Math.round(subtotal * (taxRate / 100) * 100) / 100;
-  const subtotalWithTax = Math.round((subtotal + taxAmount) * 100) / 100;
+  const subtotalAfterRewards = Math.round((subtotal - astroDiscount) * 100) / 100;
+  const taxAmount = Math.round(subtotalAfterRewards * (taxRate / 100) * 100) / 100;
+  const subtotalWithTax = Math.round((subtotalAfterRewards + taxAmount) * 100) / 100;
   
   // Calculate loyalty credit discount (can't exceed the order total)
   const loyaltyDiscount = applyLoyaltyCredits ? Math.round(Math.min(availableLoyaltyCredits, subtotalWithTax) * 100) / 100 : 0;
@@ -277,6 +307,16 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
       }
     }
 
+    const astroRewardInfo = Object.keys(appliedRewards).length > 0 ? {
+      appliedRewards: Object.entries(appliedRewards).map(([cartItemId, reward]) => ({
+        cartItemId: parseInt(cartItemId),
+        rewardId: reward.rewardId,
+        programId: reward.programId,
+        programTitle: reward.programTitle,
+      })),
+      astroDiscount: astroDiscount.toFixed(2),
+    } : undefined;
+
     createOrderMutation.mutate({
       orderData: {
         subtotal: subtotal.toFixed(2),
@@ -284,6 +324,8 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         loyaltyCreditsApplied: loyaltyDiscount.toFixed(2),
         convenienceFee: convenienceFee.toFixed(2),
         totalAmount: totalAmount.toFixed(2),
+        astroRewardDiscount: astroDiscount > 0 ? astroDiscount.toFixed(2) : "0.00",
+        astroRewardInfo: astroRewardInfo ? JSON.stringify(astroRewardInfo) : null,
         shippingAddress: "In-Store Pickup - Animal House Pet Store",
         outOfStockPreference,
         isRecurring,
@@ -340,8 +382,27 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                           {item.details.breed && (
                             <p className="text-xs text-gray-500">{item.details.breed}</p>
                           )}
-                          <div className="flex items-center justify-between mt-2">
-                            <p className="text-sm font-bold text-brand-red">${item.details.price}</p>
+                          {appliedRewards[item.id] && (
+                          <div className="flex items-center gap-1 mt-1">
+                            <Award className="w-3 h-3 text-green-600" />
+                            <span className="text-xs font-semibold text-green-600">FREE - Astro Reward Applied</span>
+                            <button
+                              onClick={() => {
+                                const updated = { ...appliedRewards };
+                                delete updated[item.id];
+                                setAppliedRewards(updated);
+                              }}
+                              className="text-xs text-gray-400 hover:text-red-500 ml-1"
+                            >
+                              (remove)
+                            </button>
+                          </div>
+                        )}
+                        <div className="flex items-center justify-between mt-2">
+                            <p className={`text-sm font-bold ${appliedRewards[item.id] ? 'line-through text-gray-400' : 'text-brand-red'}`}>${item.details.price}</p>
+                            {appliedRewards[item.id] && (
+                              <span className="text-sm font-bold text-green-600 ml-1">$0.00</span>
+                            )}
                             <div className="flex items-center space-x-2">
                               <Button
                                 variant="outline"
@@ -390,11 +451,73 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
           {cartItems.length > 0 && (
             <div className="border-t p-6 space-y-4">
+              {/* Astro Reward Banner */}
+              {availableRewards.length > 0 && Object.keys(appliedRewards).length === 0 && (
+                <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <Award className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm text-green-800 dark:text-green-200">
+                        You have {availableRewards.length} free bag reward{availableRewards.length > 1 ? 's' : ''} ready!
+                      </p>
+                      <p className="text-xs text-green-700 dark:text-green-300 mt-0.5">
+                        {availableRewards[0].programTitle}
+                      </p>
+                      <div className="mt-2 space-y-1">
+                        {cartItemsWithDetails.map(item => (
+                          <Button
+                            key={item.id}
+                            variant="outline"
+                            size="sm"
+                            className="w-full text-xs h-7 border-green-300 text-green-700 hover:bg-green-100"
+                            onClick={() => {
+                              setAppliedRewards(prev => ({
+                                ...prev,
+                                [item.id]: availableRewards[0]
+                              }));
+                              toast({
+                                title: "Reward Applied!",
+                                description: `Free bag reward applied to ${item.details.name}`,
+                              });
+                            }}
+                          >
+                            Apply to: {item.details.name}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Applied Reward Summary */}
+              {astroDiscount > 0 && (
+                <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Award className="w-5 h-5 text-green-600" />
+                    <div>
+                      <p className="font-semibold text-sm text-green-800 dark:text-green-200">
+                        Astro Reward Applied!
+                      </p>
+                      <p className="text-xs text-green-700 dark:text-green-300">
+                        Saving ${astroDiscount.toFixed(2)} with your free bag reward
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <div className="flex justify-between items-center text-sm">
                   <span>Subtotal:</span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
+                {astroDiscount > 0 && (
+                  <div className="flex justify-between items-center text-sm text-green-600 font-medium">
+                    <span>Astro Reward Discount:</span>
+                    <span>-${astroDiscount.toFixed(2)}</span>
+                  </div>
+                )}
                 {taxRate > 0 && (
                   <div className="flex justify-between items-center text-sm text-muted-foreground">
                     <span>Tax ({taxRate}%):</span>
@@ -439,8 +562,13 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
               <div className="space-y-2 max-h-40 overflow-y-auto">
                 {cartItemsWithDetails.map((item) => (
                   <div key={item.id} className="flex justify-between text-sm">
-                    <span>{item.details.name} x{item.quantity}</span>
-                    <span>${(parseFloat(item.details.price) * item.quantity).toFixed(2)}</span>
+                    <span className={appliedRewards[item.id] ? 'text-green-600' : ''}>
+                      {item.details.name} x{item.quantity}
+                      {appliedRewards[item.id] && ' (FREE)'}
+                    </span>
+                    <span className={appliedRewards[item.id] ? 'line-through text-gray-400' : ''}>
+                      ${(parseFloat(item.details.price) * item.quantity).toFixed(2)}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -450,6 +578,12 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                   <span>Subtotal:</span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
+                {astroDiscount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600 font-medium">
+                    <span>Astro Reward Discount:</span>
+                    <span>-${astroDiscount.toFixed(2)}</span>
+                  </div>
+                )}
                 {taxRate > 0 && (
                   <div className="flex justify-between text-sm text-muted-foreground">
                     <span>Tax ({taxRate}%):</span>

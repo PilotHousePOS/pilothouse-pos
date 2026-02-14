@@ -1965,13 +1965,95 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       // Update the order data with verified loyalty credits
       validatedData.loyaltyCreditsApplied = verifiedLoyaltyCredits.toFixed(2);
       
-      // Server-side recalculation of convenience fee to prevent tampering
-      // Round each component to 2 decimal places to match frontend precision
+      // Handle Astro reward discount with server-side validation
+      let verifiedAstroDiscount = 0;
+      let verifiedAstroInfo: string | null = null;
+      const requestedAstroDiscount = Math.round(parseFloat(orderData.astroRewardDiscount || "0") * 100) / 100;
+      
+      if (requestedAstroDiscount > 0 && orderData.astroRewardInfo) {
+        try {
+          const astroCustomer = await storage.getAstroCustomerByUserId(userId);
+          if (astroCustomer) {
+            const { getCustomerStatus } = await import('./astroLoyalty');
+            const internalId = `animalhouse-${userId}`;
+            const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
+            
+            if (status) {
+              const parsedInfo = JSON.parse(orderData.astroRewardInfo);
+              const appliedRewards: Array<{cartItemId: number; rewardId: string}> = parsedInfo.appliedRewards || [];
+              
+              const validRewardIds = new Set<string>();
+              for (const card of status.frequentBuyerCards) {
+                const purchaseCount = card.purchases?.length || 0;
+                if (purchaseCount >= card.requiredPurchases) {
+                  const unredeemed = (card.freeGoods || []).filter((fg: any) => !fg.redeemedOn);
+                  for (const fg of unredeemed) {
+                    validRewardIds.add(fg.rewardId);
+                  }
+                }
+              }
+              
+              const cartItems = await storage.getCartItems(userId);
+              let serverComputedDiscount = 0;
+              const verifiedAppliedRewards: typeof appliedRewards = [];
+              const usedRewardIds = new Set<string>();
+              
+              for (const applied of appliedRewards) {
+                if (usedRewardIds.has(applied.rewardId)) continue;
+                if (!validRewardIds.has(applied.rewardId)) continue;
+                
+                const cartItem = cartItems.find(ci => ci.id === applied.cartItemId);
+                if (!cartItem) continue;
+                
+                let itemPrice = 0;
+                if (cartItem.supplyId) {
+                  const supply = await storage.getSupply(cartItem.supplyId);
+                  if (supply) {
+                    itemPrice = Math.round(parseFloat(String(supply.price || "0")) * (cartItem.quantity || 1) * 100) / 100;
+                  }
+                }
+                
+                serverComputedDiscount += itemPrice;
+                usedRewardIds.add(applied.rewardId);
+                verifiedAppliedRewards.push(applied);
+              }
+              
+              if (verifiedAppliedRewards.length > 0) {
+                const orderSubtotalRaw = Math.round(parseFloat(orderData.subtotal || "0") * 100) / 100;
+                verifiedAstroDiscount = Math.min(serverComputedDiscount, orderSubtotalRaw);
+                verifiedAstroInfo = JSON.stringify({
+                  ...parsedInfo,
+                  appliedRewards: verifiedAppliedRewards,
+                  astroDiscount: verifiedAstroDiscount.toFixed(2),
+                });
+                console.log(`[ASTRO] Server-verified reward discount: $${verifiedAstroDiscount} from ${verifiedAppliedRewards.length} valid rewards`);
+              } else {
+                console.warn('[ASTRO] No valid unredeemed rewards matched applied cart items');
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('[ASTRO] Could not verify reward, proceeding without discount:', e);
+        }
+      }
+      
+      // Server-side recalculation of all amounts
       const orderSubtotal = Math.round(parseFloat(orderData.subtotal || "0") * 100) / 100;
-      const orderTax = Math.round(parseFloat(orderData.taxAmount || "0") * 100) / 100;
-      const amountBeforeFee = Math.round((orderSubtotal + orderTax - verifiedLoyaltyCredits) * 100) / 100;
+      const subtotalAfterAstro = Math.round(Math.max(0, orderSubtotal - verifiedAstroDiscount) * 100) / 100;
+      
+      // Recalculate tax from server tax rate
+      const settings = await storage.getGroomingSettings();
+      const cityTax = parseFloat(settings.find(s => s.setting === 'tax_city')?.value || '0');
+      const countyTax = parseFloat(settings.find(s => s.setting === 'tax_county')?.value || '0');
+      const stateTax = parseFloat(settings.find(s => s.setting === 'tax_state')?.value || '5.0000');
+      const federalTax = parseFloat(settings.find(s => s.setting === 'tax_federal')?.value || '5.9900');
+      const serverTaxRate = cityTax + countyTax + stateTax + federalTax;
+      
+      const orderTax = Math.round(subtotalAfterAstro * (serverTaxRate / 100) * 100) / 100;
+      const amountBeforeFee = Math.round((subtotalAfterAstro + orderTax - verifiedLoyaltyCredits) * 100) / 100;
       const serverConvenienceFee = amountBeforeFee > 0 ? Math.round(((amountBeforeFee * 0.029) + 0.30) * 100) / 100 : 0;
       validatedData.convenienceFee = serverConvenienceFee.toFixed(2);
+      validatedData.taxAmount = orderTax.toFixed(2);
       
       // Recalculate total with server-verified values
       const serverTotal = Math.round((amountBeforeFee + serverConvenienceFee) * 100) / 100;
@@ -1984,6 +2066,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         { 
           ...validatedData, 
           userId,
+          discountAmount: verifiedAstroDiscount > 0 ? verifiedAstroDiscount.toFixed(2) : "0",
+          discountReason: verifiedAstroInfo ? `Astro Loyalty Reward: ${verifiedAstroInfo}` : null,
           stripePaymentIntentId: paymentIntentId || null,
           paymentStatus: paymentIntentId ? 'authorized' : 'unpaid', // Card is authorized but not charged
         },
@@ -8953,6 +9037,61 @@ West Monroe LA 71291
     } catch (error) {
       console.error("Error getting Astro status:", error);
       res.status(500).json({ message: "Failed to get loyalty status" });
+    }
+  });
+
+  // Get eligible Astro rewards for cart items
+  app.get("/api/astro/cart-rewards", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const astroCustomer = await storage.getAstroCustomerByUserId(userId);
+      
+      if (!astroCustomer) {
+        return res.json({ rewards: [] });
+      }
+
+      const { getCustomerStatus } = await import('./astroLoyalty');
+      const internalId = `animalhouse-${userId}`;
+      const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
+      
+      if (!status) {
+        return res.json({ rewards: [] });
+      }
+
+      const readyRewards: any[] = [];
+
+      for (const card of status.frequentBuyerCards) {
+        const purchaseCount = card.purchases?.length || 0;
+        if (purchaseCount >= card.requiredPurchases) {
+          const unredeemedGoods = (card.freeGoods || []).filter(fg => !fg.redeemedOn);
+          for (const fg of unredeemedGoods) {
+            readyRewards.push({
+              rewardId: fg.rewardId,
+              programId: card.programId,
+              programTitle: card.programTitle,
+              manufacturer: card.manufacturer,
+              itemDescription: fg.itemDescription,
+              freeQty: fg.freeQty,
+              programImage: card.programImage,
+            });
+          }
+        }
+      }
+
+      // Also include offer rewards
+      for (const offer of (status.offerRewards || [])) {
+        readyRewards.push({
+          rewardId: offer.rewardId,
+          programTitle: offer.title,
+          type: 'offer',
+          rebateAmount: offer.rebateAmount,
+        });
+      }
+
+      res.json({ rewards: readyRewards });
+    } catch (error) {
+      console.error("Error getting cart rewards:", error);
+      res.json({ rewards: [] });
     }
   });
 
