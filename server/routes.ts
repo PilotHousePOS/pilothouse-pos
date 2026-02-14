@@ -9502,116 +9502,96 @@ West Monroe LA 71291
     }
   });
 
-  // Admin: Fix unredeemed rewards for completed orders
+  // Admin: Diagnose reward card data - just fetches and returns raw card info
+  app.get("/api/admin/astro/diagnose-rewards/:userId", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const { getCustomerStatus } = await import('./astroLoyalty');
+      const targetUserId = req.params.userId;
+      const astroCustomer = await storage.getAstroCustomerByUserId(targetUserId);
+      if (!astroCustomer) {
+        return res.json({ error: 'No Astro customer found for this user' });
+      }
+      const internalId = `animalhouse-${targetUserId}`;
+      
+      // Run both calls in parallel to save time
+      const [statusWith, statusWithout] = await Promise.all([
+        getCustomerStatus(astroCustomer.astroCustomerId, true, internalId).catch((e: any) => ({ error: e.message })),
+        getCustomerStatus(astroCustomer.astroCustomerId, false, internalId).catch((e: any) => ({ error: e.message }))
+      ]);
+      
+      const cardsWithCompleted = (statusWith as any)?.frequentBuyerCards || [];
+      const cardsWithoutCompleted = (statusWithout as any)?.frequentBuyerCards || [];
+      
+      const allFreeGoods: any[] = [];
+      for (const card of [...cardsWithCompleted, ...cardsWithoutCompleted]) {
+        if (card.freeGoods?.length > 0) {
+          for (const fg of card.freeGoods) {
+            allFreeGoods.push({
+              cardId: card.cardId,
+              cardName: card.programName,
+              rewardId: fg.rewardId,
+              itemId: fg.itemId,
+              redeemedOn: fg.redeemedOn || null,
+              source: cardsWithCompleted.includes(card) ? 'completed_cards=1' : 'completed_cards=0'
+            });
+          }
+        }
+      }
+      
+      res.json({
+        astroCustomerId: astroCustomer.astroCustomerId,
+        internalId,
+        cardsFromCompleted1: cardsWithCompleted.length,
+        cardsFromCompleted0: cardsWithoutCompleted.length,
+        freeGoods: allFreeGoods,
+        rawCompleted1Cards: cardsWithCompleted.map((c: any) => ({ cardId: c.cardId, programName: c.programName, freeGoodsCount: c.freeGoods?.length || 0 })),
+        rawCompleted0Cards: cardsWithoutCompleted.map((c: any) => ({ cardId: c.cardId, programName: c.programName, freeGoodsCount: c.freeGoods?.length || 0 }))
+      });
+    } catch (error: any) {
+      console.error("Error diagnosing rewards:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Admin: Fix unredeemed rewards - Step 2: actually redeem with known itemId
   app.post("/api/admin/astro/fix-unredeemed-rewards", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
+      
+      const { rewardId, itemId, userId } = req.body;
+      if (!rewardId || !itemId || !userId) {
+        return res.status(400).json({ message: "rewardId, itemId, and userId are required" });
+      }
 
-      const { addRedemption, getCustomerStatus } = await import('./astroLoyalty');
-      
-      const allOrdersWithItems = await storage.getAllOrdersWithItems();
-      const allOrders = allOrdersWithItems.map((o: any) => o.order || o);
-      const fixedRewards: any[] = [];
-      const errors: any[] = [];
-      
-      const ordersWithRewards = allOrders.filter((order: any) => 
-        order.status === 'completed' && order.discountReason?.startsWith('Astro Loyalty Reward:')
-      );
-      
-      console.log(`[ASTRO FIX] Found ${ordersWithRewards.length} orders with Astro rewards out of ${allOrders.length} total`);
-      
-      for (const order of ordersWithRewards) {
-        try {
-          const jsonStr = order.discountReason.replace('Astro Loyalty Reward: ', '');
-          const rewardInfo = JSON.parse(jsonStr);
-          if (!rewardInfo.appliedRewards?.length) continue;
-          
-          const astroCustomer = await storage.getAstroCustomerByUserId(order.userId);
-          if (!astroCustomer) {
-            console.log(`[ASTRO FIX] No Astro customer for user ${order.userId}, skipping`);
-            continue;
-          }
-          
-          const internalId = `animalhouse-${order.userId}`;
-          
-          // Try completed_cards=1 to get freeGoods with item IDs for completed cards
-          console.log(`[ASTRO FIX] Getting customer status with completed_cards=1 to find item IDs...`);
-          const statusWithCompleted = await getCustomerStatus(astroCustomer.astroCustomerId, true, internalId);
-          // Also try completed_cards=0 as fallback
-          const statusWithoutCompleted = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
-          
-          const allCards = [
-            ...(statusWithCompleted?.frequentBuyerCards || []),
-            ...(statusWithoutCompleted?.frequentBuyerCards || [])
-          ];
-          
-          console.log(`[ASTRO FIX] Cards from completed=1: ${statusWithCompleted?.frequentBuyerCards?.length || 0}, completed=0: ${statusWithoutCompleted?.frequentBuyerCards?.length || 0}`);
-          
-          // Log all freeGoods across all cards
-          for (const card of allCards) {
-            if (card.freeGoods.length > 0) {
-              console.log(`[ASTRO FIX] Card ${card.cardId} freeGoods:`, card.freeGoods.map((fg: any) => 
-                `rewardId=${fg.rewardId} itemId=${fg.itemId} redeemed=${fg.redeemedOn || 'NO'}`));
-            }
-          }
-          
-          for (const applied of rewardInfo.appliedRewards) {
-            // Find the item ID from freeGoods
-            let itemId: string | null = null;
-            for (const card of allCards) {
-              const fg = card.freeGoods.find((fg: any) => fg.rewardId === applied.rewardId && !fg.redeemedOn);
-              if (fg) {
-                itemId = fg.itemId;
-                console.log(`[ASTRO FIX] Found unredeemed reward ${applied.rewardId} with itemId=${itemId}`);
-                break;
-              }
-            }
-            
-            if (!itemId) {
-              // Check if already redeemed
-              for (const card of allCards) {
-                const fg = card.freeGoods.find((fg: any) => fg.rewardId === applied.rewardId);
-                if (fg && fg.redeemedOn) {
-                  console.log(`[ASTRO FIX] Reward ${applied.rewardId} already redeemed on ${fg.redeemedOn}`);
-                  fixedRewards.push({ orderId: order.id, rewardId: applied.rewardId, status: 'already_redeemed' });
-                  continue;
-                }
-              }
-              console.log(`[ASTRO FIX] Could not find itemId for reward ${applied.rewardId} - reward may need manual redemption in Astro POS`);
-              fixedRewards.push({ orderId: order.id, rewardId: applied.rewardId, status: 'item_id_not_found' });
-              continue;
-            }
-            
-            console.log(`[ASTRO FIX] Order #${order.id}: addRedemption reward=${applied.rewardId} item=${itemId}`);
-            const redeemed = await addRedemption(
-              astroCustomer.astroCustomerId,
-              applied.rewardId,
-              itemId,
-              undefined,
-              internalId
-            );
-            console.log(`[ASTRO FIX] addRedemption result: ${redeemed ? 'SUCCESS' : 'FAILED'}`);
-            fixedRewards.push({
-              orderId: order.id,
-              rewardId: applied.rewardId,
-              itemId,
-              status: redeemed ? 'redeemed_now' : 'redemption_failed'
-            });
-          }
-        } catch (e: any) {
-          console.error(`[ASTRO FIX] Error processing order ${order.id}:`, e.message);
-          errors.push({ orderId: order.id, error: e.message });
-        }
+      const { addRedemption } = await import('./astroLoyalty');
+      const astroCustomer = await storage.getAstroCustomerByUserId(userId);
+      if (!astroCustomer) {
+        return res.status(404).json({ message: "No Astro customer found" });
       }
       
-      console.log(`[ASTRO FIX] Complete. Results:`, JSON.stringify(fixedRewards));
-      res.json({ fixedRewards, errors });
-    } catch (error) {
-      console.error("Error fixing unredeemed rewards:", error);
-      res.status(500).json({ message: "Failed to fix unredeemed rewards" });
+      const internalId = `animalhouse-${userId}`;
+      console.log(`[ASTRO FIX] Attempting redemption: reward=${rewardId} item=${itemId} customer=${astroCustomer.astroCustomerId}`);
+      
+      const redeemed = await addRedemption(
+        astroCustomer.astroCustomerId,
+        rewardId,
+        itemId,
+        undefined,
+        internalId
+      );
+      
+      console.log(`[ASTRO FIX] Result: ${redeemed ? 'SUCCESS' : 'FAILED'}`);
+      res.json({ success: redeemed, rewardId, itemId });
+    } catch (error: any) {
+      console.error("Error fixing reward:", error);
+      res.status(500).json({ message: error.message });
     }
   });
 
