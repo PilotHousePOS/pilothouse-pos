@@ -101,6 +101,9 @@ async function astroRequest(endpoint: string, jsonData?: Record<string, any>): P
   const data = await response.json();
   const astroStatus = data.astro_status || data.status;
   console.log(`[ASTRO] API ${endpoint} response status:`, astroStatus, 'returnData keys:', data.returnData && typeof data.returnData === 'object' ? Object.keys(data.returnData) : String(data.returnData));
+  if (endpoint === 'customerStatus') {
+    console.log(`[ASTRO] Full customerStatus response:`, JSON.stringify(data).substring(0, 2000));
+  }
 
   if (astroStatus && astroStatus !== 100) {
     const statusMsg = data.astro_status_message || data.status_messsage || data.status_message || 'Unknown error';
@@ -342,6 +345,10 @@ export async function getCustomerStatus(
     }
 
     console.log(`[ASTRO] customerStatus for ${astroCustomerID}: points=${rd.astroPointsBalance}, cards=${(rd.astroCardData || []).length}, offers=${(rd.astroOfferRewards || []).length}`);
+    if ((rd.astroCardData || []).length === 0) {
+      console.log(`[ASTRO] Raw astroCardData value:`, JSON.stringify(rd.astroCardData));
+      console.log(`[ASTRO] All returnData keys:`, Object.keys(rd));
+    }
 
     return {
       astroCustomerId: String(rd.astro_customer_id),

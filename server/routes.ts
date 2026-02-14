@@ -9611,10 +9611,9 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      const allOrdersWithItems = await storage.getAllOrdersWithItems();
-      const completedOrders = allOrdersWithItems
-        .map((o: any) => o.order || o)
-        .filter((o: any) => o.status === 'completed');
+      const allOrders = await db.select().from(orders);
+      const completedOrders = allOrders.filter((o: any) => o.status === 'completed');
+      console.log(`[LOYALTY RECALC] Processing ${completedOrders.length} completed orders (including hidden)`);
 
       const userSpending: Record<string, number> = {};
       const userCreditsUsed: Record<string, number> = {};
@@ -9625,6 +9624,8 @@ West Monroe LA 71291
         const loyaltyCreditsApplied = parseFloat(order.loyaltyCreditsApplied || '0');
         const discountAmount = parseFloat(order.discountAmount || '0');
         const amountForLoyalty = Math.max(0, subtotal - loyaltyCreditsApplied - discountAmount);
+
+        console.log(`[LOYALTY RECALC] Order #${order.id} user=${order.userId}: subtotal=${subtotal}, loyaltyCredits=${loyaltyCreditsApplied}, discount=${discountAmount} → amountForLoyalty=${amountForLoyalty.toFixed(2)}`);
 
         if (!userSpending[order.userId]) userSpending[order.userId] = 0;
         if (!userCreditsUsed[order.userId]) userCreditsUsed[order.userId] = 0;
