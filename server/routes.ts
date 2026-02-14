@@ -2069,7 +2069,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           discountAmount: verifiedAstroDiscount > 0 ? verifiedAstroDiscount.toFixed(2) : "0",
           discountReason: verifiedAstroInfo ? `Astro Loyalty Reward: ${verifiedAstroInfo}` : null,
           stripePaymentIntentId: paymentIntentId || null,
-          paymentStatus: paymentIntentId ? 'authorized' : 'unpaid', // Card is authorized but not charged
+          paymentStatus: serverTotal <= 0 ? 'paid' : (paymentIntentId ? 'authorized' : 'unpaid'),
         },
         validatedData.items.map(item => ({ ...item, orderId: 0 }))
       );

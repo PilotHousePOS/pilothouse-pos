@@ -8327,7 +8327,18 @@ export default function Admin() {
                                       <span className="text-sm font-bold text-green-700 dark:text-green-400">-${parseFloat(order.discountAmount).toFixed(2)}</span>
                                     </div>
                                     {order.discountReason && (
-                                      <p className="text-xs text-green-600 dark:text-green-500 mt-0.5">{order.discountReason}</p>
+                                      <p className="text-xs text-green-600 dark:text-green-500 mt-0.5">
+                                        {order.discountReason.startsWith('Astro Loyalty Reward:') 
+                                          ? (() => {
+                                              try {
+                                                const jsonStr = order.discountReason.replace('Astro Loyalty Reward: ', '');
+                                                const info = JSON.parse(jsonStr);
+                                                const rewardCount = info.appliedRewards?.length || 1;
+                                                return `Astro Loyalty - ${rewardCount} free bag reward${rewardCount > 1 ? 's' : ''} redeemed`;
+                                              } catch { return 'Astro Loyalty Reward Applied'; }
+                                            })()
+                                          : order.discountReason}
+                                      </p>
                                     )}
                                   </div>
                                 )}
@@ -8383,13 +8394,13 @@ export default function Admin() {
                                     )}
                                     {order.approvalStatus === 'approved' && (
                                       <>
-                                        {(order.paymentStatus === 'paid' || order.paymentStatus === 'manual_required') ? (
+                                        {(order.paymentStatus === 'paid' || order.paymentStatus === 'manual_required' || parseFloat(order.totalAmount || '0') <= 0) ? (
                                           <Button
                                             size="sm"
                                             className="bg-green-600 hover:bg-green-700"
                                             onClick={() => orderReadyMutation.mutate(order.id)}
                                           >
-                                            {order.paymentStatus === 'manual_required' ? 'Mark Ready (Manual Pay)' : 'Mark Ready'}
+                                            {parseFloat(order.totalAmount || '0') <= 0 ? 'Mark Ready (No Payment)' : (order.paymentStatus === 'manual_required' ? 'Mark Ready (Manual Pay)' : 'Mark Ready')}
                                           </Button>
                                         ) : (
                                           <>

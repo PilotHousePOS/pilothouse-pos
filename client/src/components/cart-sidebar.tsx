@@ -453,14 +453,14 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             <div className="border-t p-6 space-y-4">
               {/* Astro Reward Banner */}
               {availableRewards.length > 0 && Object.keys(appliedRewards).length === 0 && (
-                <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg overflow-hidden">
                   <div className="flex items-start gap-2">
                     <Award className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <p className="font-semibold text-sm text-green-800 dark:text-green-200">
                         You have {availableRewards.length} free bag reward{availableRewards.length > 1 ? 's' : ''} ready!
                       </p>
-                      <p className="text-xs text-green-700 dark:text-green-300 mt-0.5">
+                      <p className="text-xs text-green-700 dark:text-green-300 mt-0.5 break-words">
                         {availableRewards[0].programTitle}
                       </p>
                       <div className="mt-2 space-y-1">
@@ -469,7 +469,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                             key={item.id}
                             variant="outline"
                             size="sm"
-                            className="w-full text-xs h-7 border-green-300 text-green-700 hover:bg-green-100"
+                            className="w-full text-xs h-auto py-1.5 border-green-300 text-green-700 hover:bg-green-100 whitespace-normal text-left"
                             onClick={() => {
                               setAppliedRewards(prev => ({
                                 ...prev,
@@ -638,38 +638,52 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             )}
 
             {/* Payment Method Info */}
-            <div className={`p-3 border rounded-lg ${hasPaymentMethod ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20' : 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20'}`}>
-              <div className="flex items-start gap-3">
-                {hasPaymentMethod ? (
-                  <CreditCard className="w-5 h-5 text-green-600 mt-0.5" />
-                ) : (
-                  <AlertCircle className="w-5 h-5 text-amber-500 mt-0.5" />
-                )}
-                <div className="flex-1">
-                  {hasPaymentMethod ? (
-                    <>
-                      <p className="font-medium text-sm text-green-800 dark:text-green-200">Payment on file</p>
-                      <p className="text-xs text-green-700 dark:text-green-300">
-                        Your {defaultCard?.brand} ending in {defaultCard?.last4} will be charged automatically when your order is approved.
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="font-medium text-sm text-amber-800 dark:text-amber-200">No payment method saved</p>
-                      <p className="text-xs text-amber-700 dark:text-amber-300">
-                        You'll need to provide payment when your order is approved.
-                      </p>
-                      <Link href="/settings" onClick={() => setIsCheckoutOpen(false)}>
-                        <Button variant="link" size="sm" className="h-auto p-0 mt-1 text-amber-700">
-                          <Settings className="w-3 h-3 mr-1" />
-                          Add payment method
-                        </Button>
-                      </Link>
-                    </>
-                  )}
+            {totalAmount <= 0 ? (
+              <div className="p-3 border rounded-lg border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20">
+                <div className="flex items-start gap-3">
+                  <Award className="w-5 h-5 text-green-600 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-medium text-sm text-green-800 dark:text-green-200">No payment needed</p>
+                    <p className="text-xs text-green-700 dark:text-green-300">
+                      Your Astro Loyalty reward covers this order completely!
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className={`p-3 border rounded-lg ${hasPaymentMethod ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20' : 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20'}`}>
+                <div className="flex items-start gap-3">
+                  {hasPaymentMethod ? (
+                    <CreditCard className="w-5 h-5 text-green-600 mt-0.5" />
+                  ) : (
+                    <AlertCircle className="w-5 h-5 text-amber-500 mt-0.5" />
+                  )}
+                  <div className="flex-1">
+                    {hasPaymentMethod ? (
+                      <>
+                        <p className="font-medium text-sm text-green-800 dark:text-green-200">Payment on file</p>
+                        <p className="text-xs text-green-700 dark:text-green-300">
+                          Your {defaultCard?.brand} ending in {defaultCard?.last4} will be charged automatically when your order is approved.
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="font-medium text-sm text-amber-800 dark:text-amber-200">No payment method saved</p>
+                        <p className="text-xs text-amber-700 dark:text-amber-300">
+                          You'll need to provide payment when your order is approved.
+                        </p>
+                        <Link href="/settings" onClick={() => setIsCheckoutOpen(false)}>
+                          <Button variant="link" size="sm" className="h-auto p-0 mt-1 text-amber-700">
+                            <Settings className="w-3 h-3 mr-1" />
+                            Add payment method
+                          </Button>
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium mb-2">
