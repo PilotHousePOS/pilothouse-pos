@@ -9510,7 +9510,7 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      const { addRedemption } = await import('./astroLoyalty');
+      const { addRedemption, getCustomerStatus } = await import('./astroLoyalty');
       
       const allOrdersWithItems = await storage.getAllOrdersWithItems();
       const allOrders = allOrdersWithItems.map((o: any) => o.order || o);
@@ -9537,12 +9537,59 @@ West Monroe LA 71291
           
           const internalId = `animalhouse-${order.userId}`;
           
+          // Try completed_cards=1 to get freeGoods with item IDs for completed cards
+          console.log(`[ASTRO FIX] Getting customer status with completed_cards=1 to find item IDs...`);
+          const statusWithCompleted = await getCustomerStatus(astroCustomer.astroCustomerId, true, internalId);
+          // Also try completed_cards=0 as fallback
+          const statusWithoutCompleted = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
+          
+          const allCards = [
+            ...(statusWithCompleted?.frequentBuyerCards || []),
+            ...(statusWithoutCompleted?.frequentBuyerCards || [])
+          ];
+          
+          console.log(`[ASTRO FIX] Cards from completed=1: ${statusWithCompleted?.frequentBuyerCards?.length || 0}, completed=0: ${statusWithoutCompleted?.frequentBuyerCards?.length || 0}`);
+          
+          // Log all freeGoods across all cards
+          for (const card of allCards) {
+            if (card.freeGoods.length > 0) {
+              console.log(`[ASTRO FIX] Card ${card.cardId} freeGoods:`, card.freeGoods.map((fg: any) => 
+                `rewardId=${fg.rewardId} itemId=${fg.itemId} redeemed=${fg.redeemedOn || 'NO'}`));
+            }
+          }
+          
           for (const applied of rewardInfo.appliedRewards) {
-            console.log(`[ASTRO FIX] Order #${order.id}: Attempting direct addRedemption for reward ${applied.rewardId}`);
+            // Find the item ID from freeGoods
+            let itemId: string | null = null;
+            for (const card of allCards) {
+              const fg = card.freeGoods.find((fg: any) => fg.rewardId === applied.rewardId && !fg.redeemedOn);
+              if (fg) {
+                itemId = fg.itemId;
+                console.log(`[ASTRO FIX] Found unredeemed reward ${applied.rewardId} with itemId=${itemId}`);
+                break;
+              }
+            }
+            
+            if (!itemId) {
+              // Check if already redeemed
+              for (const card of allCards) {
+                const fg = card.freeGoods.find((fg: any) => fg.rewardId === applied.rewardId);
+                if (fg && fg.redeemedOn) {
+                  console.log(`[ASTRO FIX] Reward ${applied.rewardId} already redeemed on ${fg.redeemedOn}`);
+                  fixedRewards.push({ orderId: order.id, rewardId: applied.rewardId, status: 'already_redeemed' });
+                  continue;
+                }
+              }
+              console.log(`[ASTRO FIX] Could not find itemId for reward ${applied.rewardId} - reward may need manual redemption in Astro POS`);
+              fixedRewards.push({ orderId: order.id, rewardId: applied.rewardId, status: 'item_id_not_found' });
+              continue;
+            }
+            
+            console.log(`[ASTRO FIX] Order #${order.id}: addRedemption reward=${applied.rewardId} item=${itemId}`);
             const redeemed = await addRedemption(
               astroCustomer.astroCustomerId,
               applied.rewardId,
-              applied.rewardId,
+              itemId,
               undefined,
               internalId
             );
@@ -9550,6 +9597,7 @@ West Monroe LA 71291
             fixedRewards.push({
               orderId: order.id,
               rewardId: applied.rewardId,
+              itemId,
               status: redeemed ? 'redeemed_now' : 'redemption_failed'
             });
           }
