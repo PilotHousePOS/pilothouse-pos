@@ -2015,7 +2015,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                 
                 serverComputedDiscount += itemPrice;
                 usedRewardIds.add(applied.rewardId);
-                verifiedAppliedRewards.push(applied);
+                verifiedAppliedRewards.push({ ...applied, supplyId: cartItem.supplyId });
               }
               
               if (verifiedAppliedRewards.length > 0) {
@@ -2543,10 +2543,36 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           try {
             const astroCustomer = await storage.getAstroCustomerByUserId(orderUserId);
             if (astroCustomer && orderWithItems) {
-              const { syncPurchaseToAstro, addPointsByDollar } = await import('./astroLoyalty');
+              const { syncPurchaseToAstro, addPointsByDollar, addRedemption, getCustomerStatus } = await import('./astroLoyalty');
               const orderItems = orderWithItems.items || [];
+              const internalId = `animalhouse-${orderUserId}`;
+              
+              let rewardedSupplyIds = new Set<number>();
+              let appliedRewardsList: Array<{rewardId: string; supplyId?: number}> = [];
+              
+              if (orderWithItems.order.discountReason?.startsWith('Astro Loyalty Reward:')) {
+                try {
+                  const jsonStr = orderWithItems.order.discountReason.replace('Astro Loyalty Reward: ', '');
+                  const rewardInfo = JSON.parse(jsonStr);
+                  if (rewardInfo.appliedRewards) {
+                    for (const ar of rewardInfo.appliedRewards) {
+                      appliedRewardsList.push({ rewardId: ar.rewardId, supplyId: ar.supplyId });
+                      if (ar.supplyId) {
+                        rewardedSupplyIds.add(ar.supplyId);
+                      }
+                    }
+                  }
+                } catch (e) {
+                  console.warn('[ASTRO] Could not parse reward info from discount reason');
+                }
+              }
+              
               const items = [];
               for (const item of orderItems) {
+                if (item.supplyId && rewardedSupplyIds.has(item.supplyId)) {
+                  console.log(`[ASTRO] Skipping supply #${item.supplyId} from purchase sync (covered by Astro reward)`);
+                  continue;
+                }
                 if (item.supplyId) {
                   const supply = await storage.getSupply(item.supplyId);
                   if (supply) {
@@ -2563,17 +2589,60 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                 }
               }
               if (items.length > 0) {
+                const paidSubtotal = items.reduce((sum, i) => sum + i.totalPrice, 0);
                 const syncResult = await syncPurchaseToAstro({
                   customerId: astroCustomer.astroCustomerId,
-                  internalCustomerId: `animalhouse-${orderUserId}`,
+                  internalCustomerId: internalId,
                   transactionId: orderId.toString(),
                   items,
                   purchaseDate: new Date(orderWithItems.order.orderDate || Date.now()),
-                  totalAmount: parseFloat(orderWithItems.order.totalAmount),
+                  totalAmount: paidSubtotal,
                 });
                 if (syncResult) {
-                  console.log(`[ASTRO] Auto-synced order #${orderId} to Astro for customer ${astroCustomer.astroCustomerId}`);
-                  await addPointsByDollar(astroCustomer.astroCustomerId, parseFloat(orderWithItems.order.totalAmount));
+                  console.log(`[ASTRO] Auto-synced order #${orderId} to Astro (${items.length} paid items, $${paidSubtotal.toFixed(2)})`);
+                  if (paidSubtotal > 0) {
+                    await addPointsByDollar(astroCustomer.astroCustomerId, paidSubtotal);
+                  }
+                }
+              }
+              
+              if (appliedRewardsList.length > 0) {
+                try {
+                  const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
+                  if (status) {
+                    for (const applied of appliedRewardsList) {
+                      let itemId: string | null = null;
+                      let foundReward = false;
+                      for (const card of status.frequentBuyerCards) {
+                        const fg = card.freeGoods.find(fg => fg.rewardId === applied.rewardId && !fg.redeemedOn);
+                        if (fg) {
+                          itemId = fg.itemId;
+                          foundReward = true;
+                          break;
+                        }
+                      }
+                      
+                      if (!foundReward) {
+                        console.warn(`[ASTRO] Reward ${applied.rewardId} not found as unredeemed in customer status, skipping redemption`);
+                        continue;
+                      }
+                      
+                      const redeemed = await addRedemption(
+                        astroCustomer.astroCustomerId,
+                        applied.rewardId,
+                        itemId || applied.rewardId,
+                        undefined,
+                        internalId
+                      );
+                      if (redeemed) {
+                        console.log(`[ASTRO] Redeemed reward ${applied.rewardId} for order #${orderId}`);
+                      } else {
+                        console.warn(`[ASTRO] Failed to redeem reward ${applied.rewardId}`);
+                      }
+                    }
+                  }
+                } catch (redeemError) {
+                  console.error('[ASTRO] Error redeeming rewards:', redeemError);
                 }
               }
             }

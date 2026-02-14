@@ -186,6 +186,7 @@ export interface AstroCustomerStatus {
     }>;
     freeGoods: Array<{
       rewardId: string;
+      itemId: string;
       itemDescription: string;
       freeQty: number;
       redeemedOn: string | null;
@@ -367,6 +368,7 @@ export async function getCustomerStatus(
         })),
         freeGoods: (card.cardFreeGoods || []).map((fg: any) => ({
           rewardId: String(fg.astro_reward_id),
+          itemId: String(fg.astro_item_id || fg.astro_reward_id),
           itemDescription: fg.item_description,
           freeQty: fg.free_qty,
           redeemedOn: fg.redeemed_on,
