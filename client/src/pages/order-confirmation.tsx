@@ -58,6 +58,8 @@ export default function OrderConfirmation() {
   const subtotal = orderData.subtotal || "0.00";
   const taxAmount = orderData.taxAmount || "0.00";
   const loyaltyCreditsApplied = orderData.loyaltyCreditsApplied || "0.00";
+  const discountAmount = orderData.discountAmount || "0.00";
+  const discountReason = orderData.discountReason || "Discount";
   const convenienceFee = orderData.convenienceFee || "0.00";
   const totalAmount = orderData.totalAmount || "0.00";
 
@@ -164,6 +166,12 @@ export default function OrderConfirmation() {
               <div className="flex justify-between text-sm text-green-600">
                 <span>Loyalty Credits Applied</span>
                 <span>-${parseFloat(loyaltyCreditsApplied).toFixed(2)}</span>
+              </div>
+            )}
+            {parseFloat(discountAmount) > 0 && (
+              <div className="flex justify-between text-sm text-green-600">
+                <span>{discountReason}</span>
+                <span>-${parseFloat(discountAmount).toFixed(2)}</span>
               </div>
             )}
             {parseFloat(convenienceFee) > 0 && (

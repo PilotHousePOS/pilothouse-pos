@@ -322,6 +322,12 @@ export default function OrderHistory() {
                         <span>-${selectedOrder.loyaltyCreditsApplied}</span>
                       </div>
                     )}
+                    {selectedOrder.discountAmount && parseFloat(selectedOrder.discountAmount) > 0 && (
+                      <div className="flex justify-between text-xs text-green-600">
+                        <span>{selectedOrder.discountReason || 'Discount'}:</span>
+                        <span>-${parseFloat(selectedOrder.discountAmount).toFixed(2)}</span>
+                      </div>
+                    )}
                     {selectedOrder.convenienceFee && parseFloat(selectedOrder.convenienceFee) > 0 && (
                       <div className="flex justify-between text-xs text-gray-500">
                         <span>Convenience Fee (2.9% + $0.30):</span>
