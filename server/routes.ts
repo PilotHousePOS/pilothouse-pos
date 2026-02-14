@@ -9510,24 +9510,24 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      const { getCustomerStatus, addRedemption, ensureCustomerLinked } = await import('./astroLoyalty');
+      const { addRedemption } = await import('./astroLoyalty');
       
       const allOrdersWithItems = await storage.getAllOrdersWithItems();
       const allOrders = allOrdersWithItems.map((o: any) => o.order || o);
       const fixedRewards: any[] = [];
       const errors: any[] = [];
       
-      console.log(`[ASTRO FIX] Scanning ${allOrders.length} orders for unredeemed rewards...`);
+      const ordersWithRewards = allOrders.filter((order: any) => 
+        order.status === 'completed' && order.discountReason?.startsWith('Astro Loyalty Reward:')
+      );
       
-      for (const order of allOrders) {
-        if (order.status !== 'completed' || !order.discountReason?.startsWith('Astro Loyalty Reward:')) continue;
-        
+      console.log(`[ASTRO FIX] Found ${ordersWithRewards.length} orders with Astro rewards out of ${allOrders.length} total`);
+      
+      for (const order of ordersWithRewards) {
         try {
           const jsonStr = order.discountReason.replace('Astro Loyalty Reward: ', '');
           const rewardInfo = JSON.parse(jsonStr);
           if (!rewardInfo.appliedRewards?.length) continue;
-          
-          console.log(`[ASTRO FIX] Order #${order.id} has ${rewardInfo.appliedRewards.length} applied reward(s):`, JSON.stringify(rewardInfo.appliedRewards));
           
           const astroCustomer = await storage.getAstroCustomerByUserId(order.userId);
           if (!astroCustomer) {
@@ -9536,75 +9536,20 @@ West Monroe LA 71291
           }
           
           const internalId = `animalhouse-${order.userId}`;
-          const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
-          if (!status) {
-            console.log(`[ASTRO FIX] Could not get customer status for ${astroCustomer.astroCustomerId}`);
-            continue;
-          }
-          
-          console.log(`[ASTRO FIX] Customer has ${status.frequentBuyerCards.length} cards (including completed)`);
-          for (const card of status.frequentBuyerCards) {
-            console.log(`[ASTRO FIX] Card ${card.cardId} (status=${card.status}): ${card.freeGoods.length} free goods -`, 
-              card.freeGoods.map((fg: any) => `rewardId=${fg.rewardId} itemId=${fg.itemId} redeemed=${fg.redeemedOn || 'NO'}`));
-          }
           
           for (const applied of rewardInfo.appliedRewards) {
-            let itemId: string | null = null;
-            let foundUnredeemed = false;
-            
-            for (const card of status.frequentBuyerCards) {
-              const fg = card.freeGoods.find((fg: any) => fg.rewardId === applied.rewardId && !fg.redeemedOn);
-              if (fg) {
-                itemId = fg.itemId;
-                foundUnredeemed = true;
-                console.log(`[ASTRO FIX] Found unredeemed reward ${applied.rewardId} with itemId=${itemId}`);
-                break;
-              }
-            }
-            
-            if (!foundUnredeemed) {
-              console.log(`[ASTRO FIX] Reward ${applied.rewardId} not found in freeGoods (completed cards may not include freeGoods with completed_cards=0). Attempting direct redemption anyway...`);
-              for (const card of status.frequentBuyerCards) {
-                const anyMatch = card.freeGoods.find((fg: any) => fg.rewardId === applied.rewardId);
-                if (anyMatch) {
-                  console.log(`[ASTRO FIX] Found reward ${applied.rewardId} but it's already redeemed on ${anyMatch.redeemedOn}`);
-                  fixedRewards.push({ orderId: order.id, rewardId: applied.rewardId, status: 'already_redeemed' });
-                  continue;
-                }
-              }
-              console.log(`[ASTRO FIX] Attempting direct addRedemption with rewardId as itemId: ${applied.rewardId}`);
-              const directRedeemed = await addRedemption(
-                astroCustomer.astroCustomerId,
-                applied.rewardId,
-                applied.rewardId,
-                undefined,
-                internalId
-              );
-              console.log(`[ASTRO FIX] Direct addRedemption result: ${directRedeemed ? 'SUCCESS' : 'FAILED'}`);
-              fixedRewards.push({
-                orderId: order.id,
-                rewardId: applied.rewardId,
-                itemId: applied.rewardId,
-                status: directRedeemed ? 'redeemed_directly' : 'direct_redemption_failed'
-              });
-              continue;
-            }
-            
-            console.log(`[ASTRO FIX] Attempting addRedemption: astroCustomerId=${astroCustomer.astroCustomerId}, rewardId=${applied.rewardId}, itemId=${itemId}`);
+            console.log(`[ASTRO FIX] Order #${order.id}: Attempting direct addRedemption for reward ${applied.rewardId}`);
             const redeemed = await addRedemption(
               astroCustomer.astroCustomerId,
               applied.rewardId,
-              itemId || applied.rewardId,
+              applied.rewardId,
               undefined,
               internalId
             );
-            
             console.log(`[ASTRO FIX] addRedemption result: ${redeemed ? 'SUCCESS' : 'FAILED'}`);
-            
             fixedRewards.push({
               orderId: order.id,
               rewardId: applied.rewardId,
-              itemId,
               status: redeemed ? 'redeemed_now' : 'redemption_failed'
             });
           }

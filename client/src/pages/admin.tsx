@@ -5063,16 +5063,24 @@ function AstroLoyaltyManager() {
 
   const fixUnredeemedRewards = async () => {
     setIsFixingRewards(true);
+    toast({ title: "Processing...", description: "Scanning orders and contacting Astro API. This may take a minute..." });
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000);
       const response = await fetch('/api/admin/astro/fix-unredeemed-rewards', {
         method: 'POST',
-        credentials: 'include'
+        credentials: 'include',
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       const result = await response.json();
       if (result.fixedRewards?.length > 0) {
-        const redeemed = result.fixedRewards.filter((r: any) => r.status === 'redeemed_now').length;
-        const alreadyDone = result.fixedRewards.filter((r: any) => r.status === 'already_redeemed_or_not_found').length;
-        const failed = result.fixedRewards.filter((r: any) => r.status === 'redemption_failed').length;
+        const redeemed = result.fixedRewards.filter((r: any) => 
+          r.status === 'redeemed_now' || r.status === 'redeemed_directly').length;
+        const alreadyDone = result.fixedRewards.filter((r: any) => 
+          r.status === 'already_redeemed_or_not_found' || r.status === 'already_redeemed').length;
+        const failed = result.fixedRewards.filter((r: any) => 
+          r.status === 'redemption_failed' || r.status === 'direct_redemption_failed').length;
         let desc = `${redeemed} reward(s) redeemed, ${alreadyDone} already handled`;
         if (failed > 0) desc += `, ${failed} failed`;
         toast({ 
@@ -5083,8 +5091,12 @@ function AstroLoyaltyManager() {
       } else {
         toast({ title: "No Fix Needed", description: "No unredeemed rewards found on completed orders" });
       }
-    } catch (error) {
-      toast({ title: "Fix Failed", description: "Could not fix unredeemed rewards", variant: "destructive" });
+    } catch (error: any) {
+      if (error?.name === 'AbortError') {
+        toast({ title: "Still Processing", description: "The fix is still running on the server. Check logs for results.", variant: "default" });
+      } else {
+        toast({ title: "Fix Failed", description: "Could not fix unredeemed rewards", variant: "destructive" });
+      }
     } finally {
       setIsFixingRewards(false);
     }
