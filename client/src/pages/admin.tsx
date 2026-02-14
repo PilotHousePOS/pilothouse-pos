@@ -5072,9 +5072,13 @@ function AstroLoyaltyManager() {
       if (result.fixedRewards?.length > 0) {
         const redeemed = result.fixedRewards.filter((r: any) => r.status === 'redeemed_now').length;
         const alreadyDone = result.fixedRewards.filter((r: any) => r.status === 'already_redeemed_or_not_found').length;
+        const failed = result.fixedRewards.filter((r: any) => r.status === 'redemption_failed').length;
+        let desc = `${redeemed} reward(s) redeemed, ${alreadyDone} already handled`;
+        if (failed > 0) desc += `, ${failed} failed`;
         toast({ 
-          title: "Rewards Fixed", 
-          description: `${redeemed} reward(s) redeemed, ${alreadyDone} already handled` 
+          title: redeemed > 0 ? "Rewards Fixed" : failed > 0 ? "Fix Had Issues" : "Rewards Already Handled", 
+          description: desc,
+          variant: failed > 0 ? "destructive" : "default"
         });
       } else {
         toast({ title: "No Fix Needed", description: "No unredeemed rewards found on completed orders" });
@@ -5139,7 +5143,7 @@ function AstroLoyaltyManager() {
             </div>
           )}
 
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <Button
               onClick={testConnection}
               disabled={isTestingConnection}
@@ -5158,7 +5162,7 @@ function AstroLoyaltyManager() {
                 onClick={fixUnredeemedRewards}
                 disabled={isFixingRewards}
                 variant="outline"
-                className="border-amber-500 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                className="border-amber-500 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 whitespace-nowrap"
               >
                 {isFixingRewards ? (
                   <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Fixing...</>

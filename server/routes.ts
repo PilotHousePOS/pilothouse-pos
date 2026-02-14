@@ -2529,8 +2529,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
             // Use subtotal (product cost) for loyalty tracking, not convenience fees
             const subtotal = parseFloat(order.subtotal || order.totalAmount || '0');
             const loyaltyCreditsApplied = parseFloat(order.loyaltyCreditsApplied || '0');
-            // Track the actual amount the customer spent (subtotal minus any loyalty credits used)
-            const amountForLoyalty = Math.max(0, subtotal - loyaltyCreditsApplied);
+            const astroDiscountApplied = parseFloat(order.discountAmount || '0');
+            // Track the actual amount the customer spent (subtotal minus loyalty credits and Astro free bag rewards)
+            const amountForLoyalty = Math.max(0, subtotal - loyaltyCreditsApplied - astroDiscountApplied);
             
             if (amountForLoyalty > 0) {
               const loyaltyResult = await storage.addToUserTotalSpent(orderUserId, amountForLoyalty);
@@ -9514,6 +9515,8 @@ West Monroe LA 71291
       const fixedRewards: any[] = [];
       const errors: any[] = [];
       
+      console.log(`[ASTRO FIX] Scanning ${allOrders.length} orders for unredeemed rewards...`);
+      
       for (const order of allOrders) {
         if (order.status !== 'completed' || !order.discountReason?.startsWith('Astro Loyalty Reward:')) continue;
         
@@ -9522,12 +9525,26 @@ West Monroe LA 71291
           const rewardInfo = JSON.parse(jsonStr);
           if (!rewardInfo.appliedRewards?.length) continue;
           
+          console.log(`[ASTRO FIX] Order #${order.id} has ${rewardInfo.appliedRewards.length} applied reward(s):`, JSON.stringify(rewardInfo.appliedRewards));
+          
           const astroCustomer = await storage.getAstroCustomerByUserId(order.userId);
-          if (!astroCustomer) continue;
+          if (!astroCustomer) {
+            console.log(`[ASTRO FIX] No Astro customer for user ${order.userId}, skipping`);
+            continue;
+          }
           
           const internalId = `animalhouse-${order.userId}`;
           const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
-          if (!status) continue;
+          if (!status) {
+            console.log(`[ASTRO FIX] Could not get customer status for ${astroCustomer.astroCustomerId}`);
+            continue;
+          }
+          
+          console.log(`[ASTRO FIX] Customer has ${status.frequentBuyerCards.length} cards`);
+          for (const card of status.frequentBuyerCards) {
+            console.log(`[ASTRO FIX] Card ${card.cardId}: ${card.freeGoods.length} free goods -`, 
+              card.freeGoods.map((fg: any) => `rewardId=${fg.rewardId} itemId=${fg.itemId} redeemed=${fg.redeemedOn || 'NO'}`));
+          }
           
           for (const applied of rewardInfo.appliedRewards) {
             let itemId: string | null = null;
@@ -9538,15 +9555,24 @@ West Monroe LA 71291
               if (fg) {
                 itemId = fg.itemId;
                 foundUnredeemed = true;
+                console.log(`[ASTRO FIX] Found unredeemed reward ${applied.rewardId} with itemId=${itemId}`);
                 break;
               }
             }
             
             if (!foundUnredeemed) {
+              console.log(`[ASTRO FIX] Reward ${applied.rewardId} not found as unredeemed - checking all freeGoods for any match...`);
+              for (const card of status.frequentBuyerCards) {
+                const anyMatch = card.freeGoods.find((fg: any) => fg.rewardId === applied.rewardId);
+                if (anyMatch) {
+                  console.log(`[ASTRO FIX] Found reward ${applied.rewardId} but it's already redeemed on ${anyMatch.redeemedOn}`);
+                }
+              }
               fixedRewards.push({ orderId: order.id, rewardId: applied.rewardId, status: 'already_redeemed_or_not_found' });
               continue;
             }
             
+            console.log(`[ASTRO FIX] Attempting addRedemption: astroCustomerId=${astroCustomer.astroCustomerId}, rewardId=${applied.rewardId}, itemId=${itemId}`);
             const redeemed = await addRedemption(
               astroCustomer.astroCustomerId,
               applied.rewardId,
@@ -9554,6 +9580,8 @@ West Monroe LA 71291
               undefined,
               internalId
             );
+            
+            console.log(`[ASTRO FIX] addRedemption result: ${redeemed ? 'SUCCESS' : 'FAILED'}`);
             
             fixedRewards.push({
               orderId: order.id,
@@ -9563,10 +9591,12 @@ West Monroe LA 71291
             });
           }
         } catch (e: any) {
+          console.error(`[ASTRO FIX] Error processing order ${order.id}:`, e.message);
           errors.push({ orderId: order.id, error: e.message });
         }
       }
       
+      console.log(`[ASTRO FIX] Complete. Results:`, JSON.stringify(fixedRewards));
       res.json({ fixedRewards, errors });
     } catch (error) {
       console.error("Error fixing unredeemed rewards:", error);

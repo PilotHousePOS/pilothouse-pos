@@ -676,10 +676,12 @@ export async function addRedemption(
     if (customerInfo?.state) data.customer_state = customerInfo.state;
     if (customerInfo?.zip) data.customer_zip = customerInfo.zip;
 
-    await astroRequest('addRedemption', data);
+    console.log(`[ASTRO] addRedemption request:`, JSON.stringify(data));
+    const result = await astroRequest('addRedemption', data);
+    console.log(`[ASTRO] addRedemption response:`, JSON.stringify(result));
     return true;
-  } catch (error) {
-    console.error('[ASTRO] Error adding redemption:', error);
+  } catch (error: any) {
+    console.error('[ASTRO] Error adding redemption:', error?.message || error);
     return false;
   }
 }
