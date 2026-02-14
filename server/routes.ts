@@ -2624,8 +2624,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                       }
                       
                       if (!foundReward) {
-                        console.warn(`[ASTRO] Reward ${applied.rewardId} not found as unredeemed in customer status (completed cards included), skipping redemption`);
-                        continue;
+                        console.log(`[ASTRO] Reward ${applied.rewardId} not found in freeGoods, attempting direct redemption with rewardId as itemId`);
                       }
                       
                       const redeemed = await addRedemption(
@@ -9564,14 +9563,30 @@ West Monroe LA 71291
             }
             
             if (!foundUnredeemed) {
-              console.log(`[ASTRO FIX] Reward ${applied.rewardId} not found as unredeemed - checking all freeGoods for any match...`);
+              console.log(`[ASTRO FIX] Reward ${applied.rewardId} not found in freeGoods (completed cards may not include freeGoods with completed_cards=0). Attempting direct redemption anyway...`);
               for (const card of status.frequentBuyerCards) {
                 const anyMatch = card.freeGoods.find((fg: any) => fg.rewardId === applied.rewardId);
                 if (anyMatch) {
                   console.log(`[ASTRO FIX] Found reward ${applied.rewardId} but it's already redeemed on ${anyMatch.redeemedOn}`);
+                  fixedRewards.push({ orderId: order.id, rewardId: applied.rewardId, status: 'already_redeemed' });
+                  continue;
                 }
               }
-              fixedRewards.push({ orderId: order.id, rewardId: applied.rewardId, status: 'already_redeemed_or_not_found' });
+              console.log(`[ASTRO FIX] Attempting direct addRedemption with rewardId as itemId: ${applied.rewardId}`);
+              const directRedeemed = await addRedemption(
+                astroCustomer.astroCustomerId,
+                applied.rewardId,
+                applied.rewardId,
+                undefined,
+                internalId
+              );
+              console.log(`[ASTRO FIX] Direct addRedemption result: ${directRedeemed ? 'SUCCESS' : 'FAILED'}`);
+              fixedRewards.push({
+                orderId: order.id,
+                rewardId: applied.rewardId,
+                itemId: applied.rewardId,
+                status: directRedeemed ? 'redeemed_directly' : 'direct_redemption_failed'
+              });
               continue;
             }
             
