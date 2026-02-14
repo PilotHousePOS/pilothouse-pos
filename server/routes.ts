@@ -1976,7 +1976,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           if (astroCustomer) {
             const { getCustomerStatus } = await import('./astroLoyalty');
             const internalId = `animalhouse-${userId}`;
-            const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
+            const status = await getCustomerStatus(astroCustomer.astroCustomerId, true, internalId);
             
             if (status) {
               const parsedInfo = JSON.parse(orderData.astroRewardInfo);
@@ -2609,7 +2609,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
               
               if (appliedRewardsList.length > 0) {
                 try {
-                  const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
+                  const status = await getCustomerStatus(astroCustomer.astroCustomerId, true, internalId);
                   if (status) {
                     for (const applied of appliedRewardsList) {
                       let itemId: string | null = null;
@@ -2624,7 +2624,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                       }
                       
                       if (!foundReward) {
-                        console.warn(`[ASTRO] Reward ${applied.rewardId} not found as unredeemed in customer status, skipping redemption`);
+                        console.warn(`[ASTRO] Reward ${applied.rewardId} not found as unredeemed in customer status (completed cards included), skipping redemption`);
                         continue;
                       }
                       
@@ -9227,7 +9227,7 @@ West Monroe LA 71291
 
       const { getCustomerStatus } = await import('./astroLoyalty');
       const internalId = `animalhouse-${userId}`;
-      const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
+      const status = await getCustomerStatus(astroCustomer.astroCustomerId, true, internalId);
       
       if (!status) {
         return res.json({ rewards: [] });
@@ -9534,15 +9534,15 @@ West Monroe LA 71291
           }
           
           const internalId = `animalhouse-${order.userId}`;
-          const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
+          const status = await getCustomerStatus(astroCustomer.astroCustomerId, true, internalId);
           if (!status) {
             console.log(`[ASTRO FIX] Could not get customer status for ${astroCustomer.astroCustomerId}`);
             continue;
           }
           
-          console.log(`[ASTRO FIX] Customer has ${status.frequentBuyerCards.length} cards`);
+          console.log(`[ASTRO FIX] Customer has ${status.frequentBuyerCards.length} cards (including completed)`);
           for (const card of status.frequentBuyerCards) {
-            console.log(`[ASTRO FIX] Card ${card.cardId}: ${card.freeGoods.length} free goods -`, 
+            console.log(`[ASTRO FIX] Card ${card.cardId} (status=${card.status}): ${card.freeGoods.length} free goods -`, 
               card.freeGoods.map((fg: any) => `rewardId=${fg.rewardId} itemId=${fg.itemId} redeemed=${fg.redeemedOn || 'NO'}`));
           }
           
