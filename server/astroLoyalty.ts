@@ -282,8 +282,10 @@ export async function lookupOrCreateAstroCustomer(
 
       let points = 0;
       try {
+        const internalID = customerData.customerId || `animalhouse-${existing.astroCustomerId}`;
+        await ensureCustomerLinked(existing.astroCustomerId, internalID);
         const pointsData = await astroRequest('customerPointsStatus', {
-          astro_customer_id: existing.astroCustomerId,
+          customerID: internalID,
         });
         points = pointsData.returnData?.astroPointsBalance || 0;
       } catch (e) {
@@ -317,14 +319,18 @@ export async function lookupOrCreateAstroCustomer(
  * Get full customer status from Astro (frequent buyer cards, offers, points)
  */
 export async function getCustomerStatus(
-  customerID: string,
-  includeCompleted: boolean = false
+  astroCustomerID: string,
+  includeCompleted: boolean = false,
+  internalId?: string
 ): Promise<AstroCustomerStatus | null> {
   if (!isAstroEnabled()) return null;
 
   try {
+    const linkedID = internalId || `animalhouse-${astroCustomerID}`;
+    await ensureCustomerLinked(astroCustomerID, linkedID);
+    
     const data = await astroRequest('customerStatus', {
-      astro_customer_id: customerID,
+      customerID: linkedID,
       completed_cards: includeCompleted ? 1 : 0,
     });
 
@@ -334,7 +340,7 @@ export async function getCustomerStatus(
       return null;
     }
 
-    console.log(`[ASTRO] customerStatus for ${customerID}: points=${rd.astroPointsBalance}, cards=${(rd.astroCardData || []).length}, offers=${(rd.astroOfferRewards || []).length}`);
+    console.log(`[ASTRO] customerStatus for ${astroCustomerID}: points=${rd.astroPointsBalance}, cards=${(rd.astroCardData || []).length}, offers=${(rd.astroOfferRewards || []).length}`);
 
     return {
       astroCustomerId: String(rd.astro_customer_id),
@@ -495,8 +501,7 @@ export async function syncPurchaseToAstro(
 }
 
 /**
- * Add loyalty points by dollar amount
- * Note: Uses astro_customer_id since points may not require linked customerID
+ * Add loyalty points by dollar amount - uses customerID (internal linked ID)
  */
 export async function addPointsByDollar(
   astroCustomerID: string,
@@ -528,14 +533,18 @@ export async function addPointsByDollar(
  * Redeem points reward
  */
 export async function redeemPoints(
-  customerID: string,
-  astroPointsRewardId: string
+  astroCustomerID: string,
+  astroPointsRewardId: string,
+  internalId?: string
 ): Promise<{ success: boolean; pointsDeducted: number } | null> {
   if (!isAstroEnabled()) return null;
 
   try {
+    const linkedID = internalId || `animalhouse-${astroCustomerID}`;
+    await ensureCustomerLinked(astroCustomerID, linkedID);
+    
     const result = await astroRequest('redeemPoints', {
-      astro_customer_id: customerID,
+      customerID: linkedID,
       astro_points_reward_id: astroPointsRewardId,
     });
 
@@ -553,14 +562,18 @@ export async function redeemPoints(
  * Check if a UPC is eligible for a free item reward
  */
 export async function checkRedemptionEligibility(
-  customerID: string,
-  itemCode: string
+  astroCustomerID: string,
+  itemCode: string,
+  internalId?: string
 ): Promise<{ isEligible: boolean; rewardId?: string; programType?: string } | null> {
   if (!isAstroEnabled()) return null;
 
   try {
+    const linkedID = internalId || `animalhouse-${astroCustomerID}`;
+    await ensureCustomerLinked(astroCustomerID, linkedID);
+    
     const result = await astroRequest('checkRedemptionEligibility', {
-      astro_customer_id: customerID,
+      customerID: linkedID,
       item_code: itemCode,
     });
 
@@ -582,16 +595,20 @@ export async function checkRedemptionEligibility(
  * Add a frequent buyer redemption
  */
 export async function addRedemption(
-  customerID: string,
+  astroCustomerID: string,
   astroRewardId: string,
   astroItemId: string,
-  customerInfo?: { email?: string; address?: string; city?: string; state?: string; zip?: string }
+  customerInfo?: { email?: string; address?: string; city?: string; state?: string; zip?: string },
+  internalId?: string
 ): Promise<boolean> {
   if (!isAstroEnabled()) return false;
 
   try {
+    const linkedID = internalId || `animalhouse-${astroCustomerID}`;
+    await ensureCustomerLinked(astroCustomerID, linkedID);
+    
     const data: Record<string, any> = {
-      astro_customer_id: customerID,
+      customerID: linkedID,
       astro_reward_id: astroRewardId,
       astro_item_id: astroItemId,
     };
@@ -716,12 +733,15 @@ export async function getFrequentBuyerProgress(
 /**
  * Get customer's current loyalty points balance
  */
-export async function getLoyaltyPoints(customerId: string): Promise<number> {
+export async function getLoyaltyPoints(astroCustomerId: string, internalId?: string): Promise<number> {
   if (!isAstroEnabled()) return 0;
 
   try {
+    const linkedID = internalId || `animalhouse-${astroCustomerId}`;
+    await ensureCustomerLinked(astroCustomerId, linkedID);
+    
     const result = await astroRequest('customerPointsStatus', {
-      astro_customer_id: customerId,
+      customerID: linkedID,
     });
     return result.returnData?.astroPointsBalance || 0;
   } catch (error) {
