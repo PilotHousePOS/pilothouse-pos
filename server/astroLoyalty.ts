@@ -532,6 +532,62 @@ export async function addPointsByDollar(
 }
 
 /**
+ * Void/reverse a transaction in Astro - uses customerID (internal linked ID)
+ * Used when refunding an order to remove the purchase from loyalty tracking
+ */
+export async function voidTransaction(
+  astroCustomerID: string,
+  transactionId: string,
+  internalId?: string
+): Promise<boolean> {
+  if (!isAstroEnabled()) return false;
+
+  try {
+    const linkedID = internalId || `animalhouse-${astroCustomerID}`;
+    await ensureCustomerLinked(astroCustomerID, linkedID);
+    
+    await astroRequest('voidTransaction', {
+      customerID: linkedID,
+      transactionID: transactionId,
+    });
+
+    console.log(`[ASTRO] Voided transaction ${transactionId} for customer ${astroCustomerID}`);
+    return true;
+  } catch (error) {
+    console.error('[ASTRO] Error voiding transaction:', error);
+    return false;
+  }
+}
+
+/**
+ * Deduct loyalty points by dollar amount - reversal of addPointsByDollar
+ * Used when refunding an order to remove points that were earned
+ */
+export async function deductPointsByDollar(
+  astroCustomerID: string,
+  dollarAmount: number,
+  internalId?: string
+): Promise<boolean> {
+  if (!isAstroEnabled()) return false;
+
+  try {
+    const linkedID = internalId || `animalhouse-${astroCustomerID}`;
+    await ensureCustomerLinked(astroCustomerID, linkedID);
+    
+    await astroRequest('addPointsByDollar', {
+      customerID: linkedID,
+      dollarAmount: -dollarAmount,
+    });
+
+    console.log(`[ASTRO] Deducted points for $${dollarAmount.toFixed(2)} from customer ${astroCustomerID}`);
+    return true;
+  } catch (error) {
+    console.error('[ASTRO] Error deducting points by dollar:', error);
+    return false;
+  }
+}
+
+/**
  * Redeem points reward
  */
 export async function redeemPoints(

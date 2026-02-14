@@ -6633,11 +6633,26 @@ export default function Admin() {
       return await res.json();
     },
     onSuccess: (data: any) => {
-      const message = data.paymentRefunded 
+      let message = data.paymentRefunded 
         ? `$${data.totalRefunded} has been refunded to the customer's card.`
         : data.stripeRefundError
           ? `Refund recorded but card refund failed: ${data.stripeRefundError}`
           : "Refund has been recorded. No card payment was found to refund.";
+      
+      if (data.astroReversalResult) {
+        const ar = data.astroReversalResult;
+        if (ar.voided > 0 || ar.pointsDeducted) {
+          message += ` Astro: ${ar.voided} purchase(s) reversed${ar.pointsDeducted ? ', points deducted' : ''}.`;
+        }
+        if (ar.rewardWarning) {
+          toast({
+            title: "Astro Reward Warning",
+            description: ar.rewardWarning,
+            variant: "destructive",
+          });
+        }
+      }
+      
       toast({
         title: data.paymentRefunded ? "Refund Processed" : "Refund Recorded",
         description: message,

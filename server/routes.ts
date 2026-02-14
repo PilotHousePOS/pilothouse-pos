@@ -3126,12 +3126,132 @@ West Monroe LA 71291
         }
       }
       
+      // Reverse Astro Loyalty purchase sync for refunded items
+      let astroReversalResult: { voided: number; pointsDeducted: boolean; errors: string[] } | null = null;
+      if (order?.userId) {
+        try {
+          const astroCustomer = await storage.getAstroCustomerByUserId(order.userId);
+          if (astroCustomer) {
+            const { voidTransaction, deductPointsByDollar } = await import('./astroLoyalty');
+            const internalId = `animalhouse-${order.userId}`;
+            const reversalErrors: string[] = [];
+            let voidedCount = 0;
+            
+            // Check if order had Astro rewards applied (free bag items)
+            let hadAstroReward = false;
+            let rewardedSupplyIds = new Set<number>();
+            if (order?.discountReason?.startsWith('Astro Loyalty Reward:')) {
+              try {
+                const jsonStr = order.discountReason.replace('Astro Loyalty Reward: ', '');
+                const rewardInfo = JSON.parse(jsonStr);
+                hadAstroReward = true;
+                if (rewardInfo.appliedRewards) {
+                  for (const ar of rewardInfo.appliedRewards) {
+                    if (ar.supplyId) rewardedSupplyIds.add(ar.supplyId);
+                  }
+                }
+              } catch (e) {}
+            }
+            
+            // Get order items to find supply IDs for transaction voiding
+            const orderWithItems = await storage.getOrderWithItems(orderId);
+            if (orderWithItems) {
+              // Build map of refunded order item IDs
+              const refundedItemIds = new Set(refundItems.map(ri => ri.orderItemId));
+              
+              let paidRefundSubtotal = 0;
+              
+              for (const orderItem of orderWithItems.items) {
+                if (!refundedItemIds.has(orderItem.id)) continue;
+                if (!orderItem.supplyId) continue;
+                
+                // Skip voiding for items that were covered by Astro rewards (they were never synced)
+                if (rewardedSupplyIds.has(orderItem.supplyId)) {
+                  console.log(`[ASTRO] Skipping void for supply #${orderItem.supplyId} (was covered by Astro reward, never synced)`);
+                  continue;
+                }
+                
+                // Track paid item subtotal for points deduction
+                paidRefundSubtotal += parseFloat(orderItem.price) * (orderItem.quantity || 1);
+                
+                // Transaction IDs follow the pattern: orderId-supplyId
+                const txId = `${orderId}-${orderItem.supplyId}`;
+                try {
+                  const voided = await voidTransaction(
+                    astroCustomer.astroCustomerId,
+                    txId,
+                    internalId
+                  );
+                  if (voided) {
+                    voidedCount++;
+                    console.log(`[ASTRO] Voided transaction ${txId} for refund on Order #${orderId}`);
+                  } else {
+                    reversalErrors.push(`Failed to void transaction ${txId}`);
+                  }
+                } catch (voidError: any) {
+                  console.warn(`[ASTRO] Could not void transaction ${txId}:`, voidError.message);
+                  reversalErrors.push(`Void failed for ${txId}: ${voidError.message}`);
+                }
+              }
+            }
+            
+            // Deduct loyalty points earned from paid (non-reward) refunded items only
+            let pointsDeducted = false;
+            const paidRefundAmount = orderWithItems 
+              ? (() => {
+                  const refundedItemIds = new Set(refundItems.map(ri => ri.orderItemId));
+                  return orderWithItems.items
+                    .filter((item: any) => refundedItemIds.has(item.id) && item.supplyId && !rewardedSupplyIds.has(item.supplyId))
+                    .reduce((sum: number, item: any) => sum + parseFloat(item.price) * (item.quantity || 1), 0);
+                })()
+              : totalSubtotalRefund;
+            
+            if (paidRefundAmount > 0) {
+              try {
+                pointsDeducted = await deductPointsByDollar(
+                  astroCustomer.astroCustomerId,
+                  paidRefundAmount,
+                  internalId
+                );
+                if (pointsDeducted) {
+                  console.log(`[ASTRO] Deducted points for $${paidRefundAmount.toFixed(2)} paid refund on Order #${orderId}`);
+                }
+              } catch (pointsError: any) {
+                console.warn(`[ASTRO] Could not deduct points:`, pointsError.message);
+                reversalErrors.push(`Points deduction failed: ${pointsError.message}`);
+              }
+            }
+            
+            // Check if any refunded items were covered by Astro rewards
+            let rewardWarning: string | null = null;
+            if (hadAstroReward && orderWithItems) {
+              const refundedItemIds = new Set(refundItems.map(ri => ri.orderItemId));
+              const refundedRewardItems = orderWithItems.items.filter(
+                (item: any) => refundedItemIds.has(item.id) && item.supplyId && rewardedSupplyIds.has(item.supplyId)
+              );
+              if (refundedRewardItems.length > 0) {
+                rewardWarning = `${refundedRewardItems.length} refunded item(s) were covered by Astro free bag reward(s). The reward redemption cannot be automatically reversed - please check the customer's Astro account manually if needed.`;
+                console.warn(`[ASTRO] WARNING: Refund on Order #${orderId} includes ${refundedRewardItems.length} item(s) that were covered by Astro rewards`);
+              }
+            }
+            
+            astroReversalResult = { voided: voidedCount, pointsDeducted, errors: reversalErrors, rewardWarning } as any;
+            if (voidedCount > 0 || pointsDeducted) {
+              console.log(`[ASTRO] Refund reversal for Order #${orderId}: ${voidedCount} transactions voided, points deducted: ${pointsDeducted}`);
+            }
+          }
+        } catch (astroError) {
+          console.error("[ASTRO] Failed to reverse purchase on refund:", astroError);
+        }
+      }
+      
       res.json({ 
         refunds: createdRefunds,
         stripeRefundId,
         stripeRefundError,
         paymentRefunded: !!stripeRefundId,
         totalRefunded: totalRefundAmount.toFixed(2),
+        astroReversalResult,
       });
     } catch (error) {
       console.error("Error creating refund:", error);
