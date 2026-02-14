@@ -9604,6 +9604,77 @@ West Monroe LA 71291
     }
   });
 
+  app.post("/api/admin/recalculate-loyalty", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const allOrdersWithItems = await storage.getAllOrdersWithItems();
+      const completedOrders = allOrdersWithItems
+        .map((o: any) => o.order || o)
+        .filter((o: any) => o.status === 'completed');
+
+      const userSpending: Record<string, number> = {};
+      const userCreditsUsed: Record<string, number> = {};
+
+      for (const order of completedOrders) {
+        if (!order.userId) continue;
+        const subtotal = parseFloat(order.subtotal || order.totalAmount || '0');
+        const loyaltyCreditsApplied = parseFloat(order.loyaltyCreditsApplied || '0');
+        const discountAmount = parseFloat(order.discountAmount || '0');
+        const amountForLoyalty = Math.max(0, subtotal - loyaltyCreditsApplied - discountAmount);
+
+        if (!userSpending[order.userId]) userSpending[order.userId] = 0;
+        if (!userCreditsUsed[order.userId]) userCreditsUsed[order.userId] = 0;
+        userSpending[order.userId] += amountForLoyalty;
+        userCreditsUsed[order.userId] += loyaltyCreditsApplied;
+      }
+
+      const settings = await storage.getLoyaltySettings();
+      const threshold = parseFloat(settings.spendingThreshold);
+      const reward = parseFloat(settings.rewardAmount);
+      const results: any[] = [];
+
+      for (const [userId, correctTotal] of Object.entries(userSpending)) {
+        const u = await storage.getUser(userId);
+        if (!u) continue;
+
+        const oldTotal = parseFloat(u.totalSpent || '0');
+        const oldCredits = parseFloat(u.loyaltyCredits || '0');
+
+        const correctRewardCount = Math.floor(correctTotal / threshold);
+        const totalCreditsEarned = correctRewardCount * reward;
+        const totalCreditsUsed = userCreditsUsed[userId] || 0;
+        const newCredits = Math.max(0, totalCreditsEarned - totalCreditsUsed);
+
+        await db.update(users)
+          .set({
+            totalSpent: correctTotal.toFixed(2),
+            loyaltyCredits: newCredits.toFixed(2),
+            updatedAt: new Date()
+          })
+          .where(eq(users.id, userId));
+
+        results.push({
+          userId,
+          name: u.firstName ? `${u.firstName} ${u.lastName || ''}`.trim() : u.email || userId,
+          oldTotalSpent: oldTotal.toFixed(2),
+          newTotalSpent: correctTotal.toFixed(2),
+          oldCredits: oldCredits.toFixed(2),
+          newCredits: newCredits.toFixed(2),
+          changed: oldTotal.toFixed(2) !== correctTotal.toFixed(2)
+        });
+      }
+
+      res.json({ results, ordersProcessed: completedOrders.length });
+    } catch (error) {
+      console.error("Error recalculating loyalty:", error);
+      res.status(500).json({ message: "Failed to recalculate loyalty" });
+    }
+  });
+
   // Get all Astro customers (Admin only)
   app.get("/api/admin/astro/customers", authMiddleware, async (req: any, res) => {
     try {

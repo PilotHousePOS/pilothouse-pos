@@ -5090,6 +5090,34 @@ function AstroLoyaltyManager() {
     }
   };
 
+  const [isRecalculating, setIsRecalculating] = useState(false);
+
+  const recalculateLoyalty = async () => {
+    setIsRecalculating(true);
+    try {
+      const response = await fetch('/api/admin/recalculate-loyalty', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      const result = await response.json();
+      if (result.results?.length > 0) {
+        const changed = result.results.filter((r: any) => r.changed);
+        if (changed.length > 0) {
+          const details = changed.map((r: any) => `${r.name}: $${r.oldTotalSpent} → $${r.newTotalSpent}`).join(', ');
+          toast({ title: "Loyalty Recalculated", description: `Updated ${changed.length} user(s): ${details}` });
+        } else {
+          toast({ title: "All Correct", description: "All loyalty totals are already accurate" });
+        }
+      } else {
+        toast({ title: "No Data", description: "No completed orders found to recalculate" });
+      }
+    } catch (error) {
+      toast({ title: "Recalculation Failed", description: "Could not recalculate loyalty totals", variant: "destructive" });
+    } finally {
+      setIsRecalculating(false);
+    }
+  };
+
   const isConnected = connectionResult?.success === true;
 
   return (
@@ -5171,6 +5199,18 @@ function AstroLoyaltyManager() {
                 )}
               </Button>
             )}
+            <Button
+              onClick={recalculateLoyalty}
+              disabled={isRecalculating}
+              variant="outline"
+              className="border-orange-500 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 whitespace-nowrap"
+            >
+              {isRecalculating ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Recalculating...</>
+              ) : (
+                <><RefreshCw className="w-4 h-4 mr-2" />Recalculate Loyalty</>
+              )}
+            </Button>
           </div>
 
           <div className="pt-4 border-t">
