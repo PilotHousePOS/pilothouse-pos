@@ -472,6 +472,7 @@ export async function syncPurchaseToAstro(
         saleID: purchaseData.transactionId,
         item_code: item.sku,
         item_qty: item.quantity,
+        item_amount: item.totalPrice,
         item_transaction_date: txDate,
       });
 
@@ -489,6 +490,7 @@ export async function syncPurchaseToAstro(
       transactionID: `${purchaseData.transactionId}-${item.productId}`,
       item_code: item.sku,
       item_qty: item.quantity,
+      item_amount: item.totalPrice,
       item_transaction_date: batchTxDate,
     }));
 
