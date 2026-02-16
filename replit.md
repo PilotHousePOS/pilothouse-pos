@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its primary goal is to deliver a premium online shopping experience, efficient service booking, robust inventory management, and comprehensive administrative tools. The project aims to foster business growth and secure market leadership in the niche online pet store sector.
+The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its core purpose is to deliver a premium online shopping experience, streamline service bookings, facilitate robust inventory management, and provide comprehensive administrative tools. The project's vision is to achieve market leadership in the online pet store sector.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -49,8 +49,8 @@ The Animal House Pet Store is a mobile-first e-commerce platform specializing in
   - **SIZE = FORMAT (MANDATORY):**
     - oz sizes (2.8oz, 2.9oz, 5.5oz, 5.8oz, 12.8oz, 13oz) = CAN/WET FOOD - Must show can image
     - lb sizes (3.5lb, 7lb, 15.5lb, 22lb, 30lb) = BAG/DRY FOOD - Must show bag image
-    - NEVER show a bag image for an oz-sized product (e.8., 5.8oz is a CAN, not a bag!)
-    - NEVER show a can image for a lb-sized product (e.8., 7lb is a BAG, not a can!)
+    - NEVER show a bag image for an oz-sized product (e.g., 5.8oz is a CAN, not a bag!)
+    - NEVER show a can image for a lb-sized product (e.g., 7lb is a BAG, not a can!)
   - **EXACT SIZE MATCHING:**
     - 5.8oz can ≠ 13oz can - Different can sizes have different images
     - Search for exact weight match on manufacturer website
@@ -183,7 +183,7 @@ Step 5: NEVER mark task complete until verification passes
 - Abandoned Cart Recovery: Scheduled every 6 hours, emails customers whose entire cart has been idle 24+ hours. Respects marketing opt-out. 3-day cooldown between emails per user. Reset when cart is cleared.
 
 ## System Architecture
-The Animal House Pet Store is a full-stack, mobile-first web application featuring a dark, bold, high-contrast UI/UX with Amazon-style image carousels. Authentication is managed via JWT with a three-tier role-based access control system. The frontend is built using React, Vite, TypeScript, Tailwind CSS, shadcn/ui, Wouter for routing, and TanStack Query. The backend utilizes Express.js and TypeScript, integrated with PostgreSQL and Drizzle ORM. Key functionalities include automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, and real-time Web Push Notifications.
+The Animal House Pet Store is a full-stack, mobile-first web application featuring a dark, bold, high-contrast UI/UX with Amazon-style image carousels. Authentication is managed via JWT with a three-tier role-based access control system. The frontend leverages React, Vite, TypeScript, Tailwind CSS, shadcn/ui, Wouter for routing, and TanStack Query. The backend is built with Express.js and TypeScript, integrated with PostgreSQL and Drizzle ORM. Key features include automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, and real-time Web Push Notifications.
 
 ## External Dependencies
 - PostgreSQL

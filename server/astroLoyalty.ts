@@ -543,6 +543,7 @@ export async function addPointsByDollar(
 /**
  * Void/reverse a transaction in Astro - uses customerID (internal linked ID)
  * Used when refunding an order to remove the purchase from loyalty tracking
+ * Tries removeTransaction first, falls back to voidTransaction
  */
 export async function voidTransaction(
   astroCustomerID: string,
@@ -555,13 +556,29 @@ export async function voidTransaction(
     const linkedID = internalId || `animalhouse-${astroCustomerID}`;
     await ensureCustomerLinked(astroCustomerID, linkedID);
     
-    await astroRequest('voidTransaction', {
-      customerID: linkedID,
-      transactionID: transactionId,
-    });
-
-    console.log(`[ASTRO] Voided transaction ${transactionId} for customer ${astroCustomerID}`);
-    return true;
+    // Try removeTransaction (the correct Astro API endpoint)
+    try {
+      await astroRequest('removeTransaction', {
+        customerID: linkedID,
+        transactionID: transactionId,
+      });
+      console.log(`[ASTRO] Removed transaction ${transactionId} for customer ${astroCustomerID} via removeTransaction`);
+      return true;
+    } catch (removeError: any) {
+      console.warn(`[ASTRO] removeTransaction failed for ${transactionId}:`, removeError.message);
+      // If removeTransaction doesn't work, try deleteTransaction
+      try {
+        await astroRequest('deleteTransaction', {
+          customerID: linkedID,
+          transactionID: transactionId,
+        });
+        console.log(`[ASTRO] Removed transaction ${transactionId} for customer ${astroCustomerID} via deleteTransaction`);
+        return true;
+      } catch (deleteError: any) {
+        console.warn(`[ASTRO] deleteTransaction also failed for ${transactionId}:`, deleteError.message);
+        throw removeError; // Throw the original error
+      }
+    }
   } catch (error) {
     console.error('[ASTRO] Error voiding transaction:', error);
     return false;
