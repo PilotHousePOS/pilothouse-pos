@@ -5276,10 +5276,16 @@ function AstroLoyaltyManager() {
                   {offer.description && (
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{offer.description}</p>
                   )}
-                  <div className="flex gap-4 text-xs text-gray-500 mt-2">
-                    <span>Starts: {new Date(offer.startDate).toLocaleDateString()}</span>
-                    <span>Ends: {new Date(offer.endDate).toLocaleDateString()}</span>
-                  </div>
+                  {(offer.startDate || offer.endDate) && (
+                    <div className="flex gap-4 text-xs text-gray-500 mt-2">
+                      {offer.startDate && !isNaN(new Date(offer.startDate).getTime()) && (
+                        <span>Starts: {new Date(offer.startDate).toLocaleDateString()}</span>
+                      )}
+                      {offer.endDate && !isNaN(new Date(offer.endDate).getTime()) && (
+                        <span>Ends: {new Date(offer.endDate).toLocaleDateString()}</span>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

@@ -104,6 +104,9 @@ async function astroRequest(endpoint: string, jsonData?: Record<string, any>): P
   if (endpoint === 'customerStatus') {
     console.log(`[ASTRO] Full customerStatus response:`, JSON.stringify(data).substring(0, 2000));
   }
+  if (endpoint === 'listOffers') {
+    console.log(`[ASTRO] Full listOffers response:`, JSON.stringify(data).substring(0, 3000));
+  }
 
   if (astroStatus && astroStatus !== 100) {
     const statusMsg = data.astro_status_message || data.status_messsage || data.status_message || 'Unknown error';
@@ -729,18 +732,25 @@ export async function listOffers(): Promise<Array<{
 
   try {
     const result = await astroRequest('listOffers');
-    const offers = Array.isArray(result.returnData) ? result.returnData : 
-                   result.returnData ? [result.returnData] : [];
+    const rawData = result.returnData;
+    const offers = Array.isArray(rawData) ? rawData : 
+                   rawData?.program_list ? (Array.isArray(rawData.program_list) ? rawData.program_list : [rawData.program_list]) :
+                   rawData ? [rawData] : [];
+    
+    if (offers.length > 0) {
+      console.log('[ASTRO] Raw offers keys:', Object.keys(offers[0]));
+      console.log('[ASTRO] Raw first offer full data:', JSON.stringify(offers[0], null, 2));
+    }
     
     return offers.map((offer: any) => ({
-      programId: String(offer.astro_program_id),
-      manufacturer: offer.astro_mfg_name,
-      title: offer.astro_program_title,
-      description: offer.astro_program_long_description || '',
-      startDate: offer.astro_program_start_date,
-      endDate: offer.astro_program_end_date,
-      imageUrl: offer.astro_program_image,
-      inStoreOnly: offer.in_store_only === 1,
+      programId: String(offer.astro_program_id || offer.programId || offer.program_id || ''),
+      manufacturer: offer.astro_mfg_name || offer.manufacturer || offer.mfg_name || '',
+      title: offer.astro_program_title || offer.program_title || offer.title || offer.name || offer.astro_program_name || offer.program_name || 'Unnamed Program',
+      description: offer.astro_program_long_description || offer.long_description || offer.description || '',
+      startDate: offer.astro_program_start_date || offer.start_date || offer.startDate || '',
+      endDate: offer.astro_program_end_date || offer.end_date || offer.endDate || '',
+      imageUrl: offer.astro_program_image || offer.program_image || offer.image || '',
+      inStoreOnly: offer.in_store_only === 1 || offer.inStoreOnly === true,
     }));
   } catch (error) {
     console.error('[ASTRO] Error listing offers:', error);
