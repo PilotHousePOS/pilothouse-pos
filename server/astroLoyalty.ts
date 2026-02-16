@@ -441,11 +441,13 @@ async function ensureCustomerLinked(
 }
 
 /**
- * Sync a purchase to Astro for frequent buyer tracking
+ * Sync a purchase to Astro for frequent buyer tracking.
+ * Sends each item individually so that recognized items still get tracked
+ * even if some UPCs aren't in Astro's item database (status 550).
  */
 export async function syncPurchaseToAstro(
   purchaseData: AstroPurchaseData
-): Promise<{ transactionId: string; success: boolean } | null> {
+): Promise<{ transactionId: string; success: boolean; syncedItems: number; failedItems: number } | null> {
   if (!isAstroEnabled()) {
     console.log('[ASTRO] Integration not enabled - skipping purchase sync');
     return null;
@@ -456,7 +458,7 @@ export async function syncPurchaseToAstro(
     
     if (itemsWithUpc.length === 0) {
       console.log('[ASTRO] No items with UPCs to sync for order:', purchaseData.transactionId);
-      return { transactionId: purchaseData.transactionId, success: true };
+      return { transactionId: purchaseData.transactionId, success: true, syncedItems: 0, failedItems: 0 };
     }
 
     const linkedCustomerID = await ensureCustomerLinked(
@@ -464,49 +466,52 @@ export async function syncPurchaseToAstro(
       purchaseData.internalCustomerId
     );
 
-    if (itemsWithUpc.length === 1) {
-      const item = itemsWithUpc[0];
-      const txDate = purchaseData.purchaseDate instanceof Date 
-        ? purchaseData.purchaseDate.toISOString().split('T')[0]
-        : new Date(purchaseData.purchaseDate).toISOString().split('T')[0];
-      const result = await astroRequest('addTransaction', {
-        customerID: linkedCustomerID,
-        transactionID: `${purchaseData.transactionId}-${item.productId}`,
-        saleID: purchaseData.transactionId,
-        item_code: item.sku,
-        item_qty: item.quantity,
-        item_amount: item.totalPrice,
-        item_transaction_date: txDate,
-      });
-
-      console.log('[ASTRO] Single transaction synced:', result.returnData);
-      return {
-        transactionId: purchaseData.transactionId,
-        success: true,
-      };
-    }
-
-    const batchTxDate = purchaseData.purchaseDate instanceof Date 
+    const txDate = purchaseData.purchaseDate instanceof Date 
       ? purchaseData.purchaseDate.toISOString().split('T')[0]
       : new Date(purchaseData.purchaseDate).toISOString().split('T')[0];
-    const transactions = itemsWithUpc.map(item => ({
-      transactionID: `${purchaseData.transactionId}-${item.productId}`,
-      item_code: item.sku,
-      item_qty: item.quantity,
-      item_amount: item.totalPrice,
-      item_transaction_date: batchTxDate,
-    }));
 
-    const result = await astroRequest('addTransactionBatch', {
-      customerID: linkedCustomerID,
-      saleID: purchaseData.transactionId,
-      transactions,
-    });
+    let syncedItems = 0;
+    let failedItems = 0;
+    const notFoundItems: string[] = [];
 
-    console.log('[ASTRO] Batch transaction synced:', result.returnData);
+    for (const item of itemsWithUpc) {
+      try {
+        const result = await astroRequest('addTransaction', {
+          customerID: linkedCustomerID,
+          transactionID: `${purchaseData.transactionId}-${item.productId}`,
+          saleID: purchaseData.transactionId,
+          item_code: item.sku,
+          item_qty: item.quantity,
+          item_amount: item.totalPrice,
+          item_transaction_date: txDate,
+        });
+        console.log(`[ASTRO] Transaction synced for item ${item.productName || item.productId} (UPC: ${item.sku}):`, result.returnData);
+        syncedItems++;
+      } catch (itemError: any) {
+        if (itemError instanceof AstroApiError && itemError.statusCode === 550) {
+          console.warn(`[ASTRO] Item not found in Astro DB - UPC: ${item.sku}, product: ${item.productName || item.productId}. This item won't track toward frequent buyer programs.`);
+          notFoundItems.push(`${item.productName || item.productId} (${item.sku})`);
+          failedItems++;
+        } else if (itemError instanceof AstroApiError && itemError.statusCode === 333) {
+          console.log(`[ASTRO] Transaction already exists for item ${item.productName || item.productId} (UPC: ${item.sku}) - skipping`);
+          syncedItems++;
+        } else {
+          console.error(`[ASTRO] Error syncing item ${item.productName || item.productId} (UPC: ${item.sku}):`, itemError);
+          failedItems++;
+        }
+      }
+    }
+
+    if (notFoundItems.length > 0) {
+      console.warn(`[ASTRO] ${notFoundItems.length} item(s) not found in Astro's item database (won't track for frequent buyer): ${notFoundItems.join(', ')}`);
+    }
+
+    console.log(`[ASTRO] Purchase sync complete for order ${purchaseData.transactionId}: ${syncedItems} synced, ${failedItems} failed out of ${itemsWithUpc.length} items`);
     return {
       transactionId: purchaseData.transactionId,
       success: true,
+      syncedItems,
+      failedItems,
     };
   } catch (error) {
     console.error('[ASTRO] Error syncing purchase:', error);

@@ -2667,9 +2667,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                   totalAmount: paidSubtotal,
                 });
                 if (syncResult) {
-                  console.log(`[ASTRO] Auto-synced order #${orderId} to Astro (${items.length} paid items, $${paidSubtotal.toFixed(2)})`);
+                  console.log(`[ASTRO] Auto-synced order #${orderId} to Astro (${syncResult.syncedItems}/${items.length} items tracked, ${syncResult.failedItems} not in Astro DB, $${paidSubtotal.toFixed(2)})`);
                   if (paidSubtotal > 0) {
                     await addPointsByDollar(astroCustomer.astroCustomerId, paidSubtotal);
+                    console.log(`[ASTRO] Points awarded for order #${orderId}: $${paidSubtotal.toFixed(2)}`);
                   }
                 }
               }
@@ -2838,8 +2839,11 @@ West Monroe LA 71291
       
       if (syncResult?.success) {
         await addPointsByDollar(astroCustomer.astroCustomerId, parseFloat(order.totalAmount));
-        console.log(`[ASTRO] Manual sync for order #${orderId} succeeded`);
-        res.json({ success: true, message: "Order synced to Astro Loyalty successfully" });
+        console.log(`[ASTRO] Manual sync for order #${orderId}: ${syncResult.syncedItems} tracked, ${syncResult.failedItems} not in Astro DB`);
+        const msg = syncResult.failedItems > 0
+          ? `Order synced - ${syncResult.syncedItems} item(s) tracked, ${syncResult.failedItems} item(s) not found in Astro's database (points still awarded)`
+          : "Order synced to Astro Loyalty successfully";
+        res.json({ success: true, message: msg, syncedItems: syncResult.syncedItems, failedItems: syncResult.failedItems });
       } else {
         res.status(500).json({ success: false, message: "Astro sync failed - check server logs" });
       }
