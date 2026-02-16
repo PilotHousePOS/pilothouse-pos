@@ -2611,7 +2611,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           try {
             const astroCustomer = await storage.getAstroCustomerByUserId(orderUserId);
             if (astroCustomer && orderWithItems) {
-              const { syncPurchaseToAstro, addPointsByDollar, addRedemption, getCustomerStatus } = await import('./astroLoyalty');
+              const { syncPurchaseToAstro, addRedemption, getCustomerStatus } = await import('./astroLoyalty');
               const orderItems = orderWithItems.items || [];
               const internalId = `animalhouse-${orderUserId}`;
               
@@ -2668,10 +2668,6 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                 });
                 if (syncResult) {
                   console.log(`[ASTRO] Auto-synced order #${orderId} to Astro (${syncResult.syncedItems}/${items.length} items tracked, ${syncResult.failedItems} not in Astro DB, $${paidSubtotal.toFixed(2)})`);
-                  if (paidSubtotal > 0) {
-                    await addPointsByDollar(astroCustomer.astroCustomerId, paidSubtotal);
-                    console.log(`[ASTRO] Points awarded for order #${orderId}: $${paidSubtotal.toFixed(2)}`);
-                  }
                 }
               }
               
@@ -2803,7 +2799,7 @@ West Monroe LA 71291
         return res.status(400).json({ message: "Customer not linked to Astro Loyalty" });
       }
       
-      const { syncPurchaseToAstro, addPointsByDollar } = await import('./astroLoyalty');
+      const { syncPurchaseToAstro } = await import('./astroLoyalty');
       const orderItems = orderWithItems.items || [];
       const items = [];
       for (const item of orderItems) {
@@ -2838,10 +2834,9 @@ West Monroe LA 71291
       });
       
       if (syncResult?.success) {
-        await addPointsByDollar(astroCustomer.astroCustomerId, parseFloat(order.totalAmount));
         console.log(`[ASTRO] Manual sync for order #${orderId}: ${syncResult.syncedItems} tracked, ${syncResult.failedItems} not in Astro DB`);
         const msg = syncResult.failedItems > 0
-          ? `Order synced - ${syncResult.syncedItems} item(s) tracked, ${syncResult.failedItems} item(s) not found in Astro's database (points still awarded)`
+          ? `Order synced - ${syncResult.syncedItems} item(s) tracked, ${syncResult.failedItems} item(s) not found in Astro's database`
           : "Order synced to Astro Loyalty successfully";
         res.json({ success: true, message: msg, syncedItems: syncResult.syncedItems, failedItems: syncResult.failedItems });
       } else {
@@ -3215,7 +3210,7 @@ West Monroe LA 71291
         try {
           const astroCustomer = await storage.getAstroCustomerByUserId(order.userId);
           if (astroCustomer) {
-            const { voidTransaction, deductPointsByDollar } = await import('./astroLoyalty');
+            const { voidTransaction } = await import('./astroLoyalty');
             const internalId = `animalhouse-${order.userId}`;
             const reversalErrors: string[] = [];
             let voidedCount = 0;
@@ -3237,10 +3232,7 @@ West Monroe LA 71291
             // Get order items to find supply IDs for transaction voiding
             const orderWithItems = await storage.getOrderWithItems(orderId);
             if (orderWithItems) {
-              // Build map of refunded order item IDs
               const refundedItemIds = new Set(refundItems.map(ri => ri.orderItemId));
-              
-              let paidRefundSubtotal = 0;
               
               for (const orderItem of orderWithItems.items) {
                 if (!refundedItemIds.has(orderItem.id)) continue;
@@ -3251,9 +3243,6 @@ West Monroe LA 71291
                   console.log(`[ASTRO] Skipping void for supply #${orderItem.supplyId} (was covered by Astro reward, never synced)`);
                   continue;
                 }
-                
-                // Track paid item subtotal for points deduction
-                paidRefundSubtotal += parseFloat(orderItem.price) * (orderItem.quantity || 1);
                 
                 // Transaction IDs follow the pattern: orderId-supplyId
                 const txId = `${orderId}-${orderItem.supplyId}`;
@@ -3276,36 +3265,9 @@ West Monroe LA 71291
               }
             }
             
-            // Deduct loyalty points earned from paid (non-reward) refunded items only
-            let pointsDeducted = false;
-            const paidRefundAmount = orderWithItems 
-              ? (() => {
-                  const refundedItemIds = new Set(refundItems.map(ri => ri.orderItemId));
-                  return orderWithItems.items
-                    .filter((item: any) => refundedItemIds.has(item.id) && item.supplyId && !rewardedSupplyIds.has(item.supplyId))
-                    .reduce((sum: number, item: any) => sum + parseFloat(item.price) * (item.quantity || 1), 0);
-                })()
-              : totalSubtotalRefund;
-            
-            if (paidRefundAmount > 0) {
-              try {
-                pointsDeducted = await deductPointsByDollar(
-                  astroCustomer.astroCustomerId,
-                  paidRefundAmount,
-                  internalId
-                );
-                if (pointsDeducted) {
-                  console.log(`[ASTRO] Deducted points for $${paidRefundAmount.toFixed(2)} paid refund on Order #${orderId}`);
-                }
-              } catch (pointsError: any) {
-                console.warn(`[ASTRO] Could not deduct points:`, pointsError.message);
-                reversalErrors.push(`Points deduction failed: ${pointsError.message}`);
-              }
-            }
-            
-            astroReversalResult = { voided: voidedCount, pointsDeducted, errors: reversalErrors } as any;
-            if (voidedCount > 0 || pointsDeducted) {
-              console.log(`[ASTRO] Refund reversal for Order #${orderId}: ${voidedCount} transactions voided, points deducted: ${pointsDeducted}`);
+            astroReversalResult = { voided: voidedCount, errors: reversalErrors } as any;
+            if (voidedCount > 0) {
+              console.log(`[ASTRO] Refund reversal for Order #${orderId}: ${voidedCount} transactions voided`);
             }
           }
         } catch (astroError) {

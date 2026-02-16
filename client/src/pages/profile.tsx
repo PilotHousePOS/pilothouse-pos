@@ -43,7 +43,7 @@ export default function Profile() {
   const [newPet, setNewPet] = useState({ name: '', species: 'dog', breed: '', age: '', notes: '' });
   const [notifLoading, setNotifLoading] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
-  const [astroExpanded, setAstroExpanded] = useState(false);
+
   const [isLinkingAstro, setIsLinkingAstro] = useState(false);
 
   const { data: currentUser, isLoading: userLoading, error } = useQuery<User>({
@@ -117,20 +117,6 @@ export default function Profile() {
     }
   };
 
-  const handleRedeemPoints = async (rewardId: string, title: string) => {
-    try {
-      const res = await apiRequest("POST", "/api/astro/redeem-points", { rewardId });
-      const result = await res.json();
-      if (result.success) {
-        toast({ title: "Reward redeemed!", description: `${title} has been applied to your account.` });
-        refetchAstro();
-      } else {
-        toast({ title: "Redemption failed", description: result.message, variant: "destructive" });
-      }
-    } catch {
-      toast({ title: "Error", description: "Failed to redeem reward.", variant: "destructive" });
-    }
-  };
 
   // Handle authentication errors and redirects
   useEffect(() => {
@@ -391,17 +377,6 @@ export default function Profile() {
               </div>
             ) : (
               <div className="space-y-4">
-                {/* Points Balance */}
-                <div className="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg p-4 text-white">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-white/80">Loyalty Points</p>
-                      <p className="text-3xl font-bold">{astroStatus.loyaltyPoints || 0}</p>
-                    </div>
-                    <Star className="w-10 h-10 text-white/30" />
-                  </div>
-                </div>
-
                 {/* Frequent Buyer Cards */}
                 {astroStatus.frequentBuyerCards?.length > 0 && (
                   <div>
@@ -490,61 +465,8 @@ export default function Profile() {
                   </div>
                 )}
 
-                {/* Eligible Points Rewards */}
-                {astroStatus.eligiblePointsRewards?.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-sm text-gray-700 mb-2">Redeem Points</h4>
-                    <div className="space-y-2">
-                      {astroStatus.eligiblePointsRewards.map((reward: any) => (
-                        <div key={reward.rewardId} className="border rounded-lg p-3 flex items-center justify-between">
-                          <div>
-                            <p className="font-medium text-sm">{reward.title}</p>
-                            <p className="text-xs text-gray-500">{reward.pointsRequired} points needed</p>
-                          </div>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            disabled={(astroStatus.loyaltyPoints || 0) < reward.pointsRequired}
-                            onClick={() => handleRedeemPoints(reward.rewardId, reward.title)}
-                          >
-                            Redeem
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Points History Toggle */}
-                {astroStatus.pointsTransactions?.length > 0 && (
-                  <div>
-                    <button 
-                      onClick={() => setAstroExpanded(!astroExpanded)}
-                      className="flex items-center gap-1 text-sm text-purple-600 font-medium w-full"
-                    >
-                      {astroExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                      Points History ({astroStatus.pointsTransactions.length})
-                    </button>
-                    {astroExpanded && (
-                      <div className="mt-2 space-y-1 max-h-40 overflow-y-auto">
-                        {astroStatus.pointsTransactions.map((tx: any) => (
-                          <div key={tx.transactionId} className="flex items-center justify-between text-xs border-b py-1.5">
-                            <div>
-                              <p className="text-gray-700">{tx.description}</p>
-                              <p className="text-gray-400">{new Date(tx.date).toLocaleDateString()}</p>
-                            </div>
-                            <span className={`font-semibold ${tx.total > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {tx.total > 0 ? '+' : ''}{tx.total}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
                 {/* No data yet */}
-                {!astroStatus.frequentBuyerCards?.length && !astroStatus.offerRewards?.length && !astroStatus.eligiblePointsRewards?.length && !astroStatus.pointsTransactions?.length && (
+                {!astroStatus.frequentBuyerCards?.length && !astroStatus.offerRewards?.length && (
                   <p className="text-sm text-gray-500 text-center py-2">
                     Your rewards will appear here as you make qualifying purchases!
                   </p>

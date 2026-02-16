@@ -5337,10 +5337,6 @@ function AstroLoyaltyManager() {
                   
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-600 dark:text-gray-400">Loyalty Points</p>
-                      <p className="font-semibold">{customer.loyaltyPoints || 0}</p>
-                    </div>
-                    <div>
                       <p className="text-gray-600 dark:text-gray-400">Last Synced</p>
                       <p className="font-semibold">
                         {customer.lastSyncedAt 
