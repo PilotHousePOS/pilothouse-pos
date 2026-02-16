@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its core purpose is to deliver a premium online shopping experience, streamline service bookings, facilitate robust inventory management, and provide comprehensive administrative tools. The project's vision is to achieve market leadership in the online pet store sector.
+The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its primary goal is to deliver a superior online shopping experience, streamline service bookings, and provide robust inventory management and administrative tools. The project aims for market leadership in the online pet store sector by offering a unique product selection and exceptional service quality.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -183,14 +183,20 @@ Step 5: NEVER mark task complete until verification passes
 - Abandoned Cart Recovery: Scheduled every 6 hours, emails customers whose entire cart has been idle 24+ hours. Respects marketing opt-out. 3-day cooldown between emails per user. Reset when cart is cleared.
 
 ## System Architecture
-The Animal House Pet Store is a full-stack, mobile-first web application featuring a dark, bold, high-contrast UI/UX with Amazon-style image carousels. Authentication is managed via JWT with a three-tier role-based access control system. The frontend leverages React, Vite, TypeScript, Tailwind CSS, shadcn/ui, Wouter for routing, and TanStack Query. The backend is built with Express.js and TypeScript, integrated with PostgreSQL and Drizzle ORM. Key features include automated product categorization, live animal detection, category cleanup, smart abbreviation expansion, and real-time Web Push Notifications.
+The Animal House Pet Store is a full-stack, mobile-first web application built with the following core architectural components:
+- **UI/UX:** Features a dark, bold, high-contrast design with Amazon-style image carousels for product displays.
+- **Authentication:** Implemented using JWT-based authentication with a three-tier, role-based access control system.
+- **Frontend:** Developed with React, Vite, TypeScript, Tailwind CSS, shadcn/ui for UI components, Wouter for routing, and TanStack Query for data fetching.
+- **Backend:** Powered by Express.js and TypeScript, handling API requests and business logic.
+- **Database & ORM:** Utilizes PostgreSQL as the relational database, managed by Drizzle ORM for data interaction.
+- **Key Features:** Includes automated product categorization, live animal detection, intelligent category cleanup, smart abbreviation expansion, and real-time Web Push Notifications for enhanced user engagement.
 
 ## External Dependencies
 - PostgreSQL
 - Drizzle ORM
-- SendGrid
-- Twilio
-- Google Calendar
-- Astro Loyalty
-- OpenAI (AI Vision)
-- Electronic Payments (electronicpayments.com)
+- SendGrid (for email services)
+- Twilio (for SMS services)
+- Google Calendar (for scheduling and appointments)
+- Astro Loyalty (loyalty program integration)
+- OpenAI (specifically for AI Vision functionalities)
+- Electronic Payments (for payment processing, via electronicpayments.com)
