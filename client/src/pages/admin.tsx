@@ -9083,67 +9083,87 @@ export default function Admin() {
                   
                   <div className="space-y-2">
                     <Label>Select Items to Refund</Label>
-                    {(selectedOrderForRefund.items || []).map((item: any) => {
-                      const maxRefundable = item.quantity - (item.refundedQuantity || 0);
-                      const isSelected = selectedRefundItems[item.id];
+                    {(() => {
+                      const orderSubtotal = parseFloat(selectedOrderForRefund.subtotal || "0");
+                      const orderDiscount = parseFloat(selectedOrderForRefund.discountAmount || "0");
+                      const orderLoyaltyCredits = parseFloat(selectedOrderForRefund.loyaltyCreditsApplied || "0");
+                      const totalDiscount = orderDiscount + orderLoyaltyCredits;
+                      const discountRatio = orderSubtotal > 0 ? totalDiscount / orderSubtotal : 0;
                       
-                      return (
-                        <div key={item.id} className="flex items-center gap-3 p-2 border rounded">
-                          <Checkbox
-                            checked={!!isSelected}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setSelectedRefundItems(prev => ({
-                                  ...prev,
-                                  [item.id]: { 
-                                    quantity: maxRefundable, 
-                                    amount: (parseFloat(item.price) * maxRefundable).toFixed(2)
-                                  }
-                                }));
-                              } else {
-                                setSelectedRefundItems(prev => {
-                                  const newItems = { ...prev };
-                                  delete newItems[item.id];
-                                  return newItems;
-                                });
-                              }
-                            }}
-                            disabled={maxRefundable <= 0}
-                          />
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">{item.itemName || item.productName || 'Item'}</p>
-                            <p className="text-xs text-gray-500">
-                              ${item.price} x {item.quantity}
-                              {item.refundedQuantity > 0 && (
-                                <span className="text-red-600 ml-1">({item.refundedQuantity} already refunded)</span>
-                              )}
-                            </p>
-                          </div>
-                          {isSelected && maxRefundable > 1 && (
-                            <div className="flex items-center gap-2">
-                              <Label className="text-xs">Qty:</Label>
-                              <Input
-                                type="number"
-                                min={1}
-                                max={maxRefundable}
-                                value={isSelected.quantity}
-                                onChange={(e) => {
-                                  const qty = Math.min(Math.max(1, parseInt(e.target.value) || 1), maxRefundable);
+                      return (selectedOrderForRefund.items || []).map((item: any) => {
+                        const maxRefundable = item.quantity - (item.refundedQuantity || 0);
+                        const isSelected = selectedRefundItems[item.id];
+                        const originalPrice = parseFloat(item.price);
+                        const effectivePrice = Math.max(0, originalPrice * (1 - discountRatio));
+                        const hasDiscount = totalDiscount > 0;
+                        
+                        return (
+                          <div key={item.id} className="flex items-center gap-3 p-2 border rounded">
+                            <Checkbox
+                              checked={!!isSelected}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
                                   setSelectedRefundItems(prev => ({
                                     ...prev,
                                     [item.id]: { 
-                                      quantity: qty, 
-                                      amount: (parseFloat(item.price) * qty).toFixed(2)
+                                      quantity: maxRefundable, 
+                                      amount: (effectivePrice * maxRefundable).toFixed(2)
                                     }
                                   }));
-                                }}
-                                className="w-16 h-8"
-                              />
+                                } else {
+                                  setSelectedRefundItems(prev => {
+                                    const newItems = { ...prev };
+                                    delete newItems[item.id];
+                                    return newItems;
+                                  });
+                                }
+                              }}
+                              disabled={maxRefundable <= 0}
+                            />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">{item.itemName || item.productName || 'Item'}</p>
+                              <p className="text-xs text-gray-500">
+                                {hasDiscount ? (
+                                  <>
+                                    <span className="line-through">${originalPrice.toFixed(2)}</span>
+                                    <span className="text-green-600 font-medium ml-1">${effectivePrice.toFixed(2)}</span>
+                                    <span> x {item.quantity}</span>
+                                    <span className="text-green-600 ml-1">(after discount)</span>
+                                  </>
+                                ) : (
+                                  <>${originalPrice.toFixed(2)} x {item.quantity}</>
+                                )}
+                                {item.refundedQuantity > 0 && (
+                                  <span className="text-red-600 ml-1">({item.refundedQuantity} already refunded)</span>
+                                )}
+                              </p>
                             </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                            {isSelected && maxRefundable > 1 && (
+                              <div className="flex items-center gap-2">
+                                <Label className="text-xs">Qty:</Label>
+                                <Input
+                                  type="number"
+                                  min={1}
+                                  max={maxRefundable}
+                                  value={isSelected.quantity}
+                                  onChange={(e) => {
+                                    const qty = Math.min(Math.max(1, parseInt(e.target.value) || 1), maxRefundable);
+                                    setSelectedRefundItems(prev => ({
+                                      ...prev,
+                                      [item.id]: { 
+                                        quantity: qty, 
+                                        amount: (effectivePrice * qty).toFixed(2)
+                                      }
+                                    }));
+                                  }}
+                                  className="w-16 h-8"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      });
+                    })()}
                   </div>
                   
                   <div className="space-y-2">
@@ -9190,24 +9210,44 @@ export default function Admin() {
                   <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="font-medium">Refund Summary</p>
                     {(() => {
-                      const subtotal = Object.values(selectedRefundItems).reduce((sum, item) => sum + parseFloat(item.amount), 0);
-                      const orderTaxRate = selectedOrderForRefund.subtotal && parseFloat(selectedOrderForRefund.subtotal) > 0 && selectedOrderForRefund.taxAmount
-                        ? (parseFloat(selectedOrderForRefund.taxAmount) / parseFloat(selectedOrderForRefund.subtotal)) * 100
-                        : 0;
-                      const taxAmount = subtotal * (orderTaxRate / 100);
-                      const convFee = includeConvenienceFee && selectedOrderForRefund.convenienceFee ? parseFloat(selectedOrderForRefund.convenienceFee) : 0;
-                      const totalRefund = subtotal + taxAmount + convFee;
+                      const refundSubtotal = Object.values(selectedRefundItems).reduce((sum, item) => sum + parseFloat(item.amount), 0);
+                      const orderSubtotal = parseFloat(selectedOrderForRefund.subtotal || "0");
+                      const orderDiscount = parseFloat(selectedOrderForRefund.discountAmount || "0");
+                      const orderLoyaltyCredits = parseFloat(selectedOrderForRefund.loyaltyCreditsApplied || "0");
+                      const totalDiscount = orderDiscount + orderLoyaltyCredits;
+                      const orderTax = parseFloat(selectedOrderForRefund.taxAmount || "0");
+                      const orderTotal = parseFloat(selectedOrderForRefund.totalAmount || "0");
+                      const orderConvFee = parseFloat(selectedOrderForRefund.convenienceFee || "0");
+                      const orderAmountWithoutFees = orderTotal - orderConvFee;
+                      const originalSubtotalForSelected = Object.keys(selectedRefundItems).reduce((sum, itemId) => {
+                        const orderItem = (selectedOrderForRefund.items || []).find((i: any) => i.id === parseInt(itemId));
+                        if (orderItem) {
+                          return sum + parseFloat(orderItem.price) * selectedRefundItems[parseInt(itemId)].quantity;
+                        }
+                        return sum;
+                      }, 0);
+                      const itemShareOfOrder = orderSubtotal > 0 ? originalSubtotalForSelected / orderSubtotal : 0;
+                      const proportionalRefund = orderAmountWithoutFees * itemShareOfOrder;
+                      const convFee = includeConvenienceFee ? orderConvFee : 0;
+                      const totalRefund = Math.round((proportionalRefund + convFee) * 100) / 100;
+                      const maxRefundable = orderTotal;
                       return (
                         <>
-                          <p className="text-sm text-gray-600">Subtotal: ${subtotal.toFixed(2)}</p>
-                          {orderTaxRate > 0 && (
-                            <p className="text-sm text-gray-600">Tax ({orderTaxRate.toFixed(2)}%): ${taxAmount.toFixed(2)}</p>
+                          <p className="text-sm text-gray-600">Subtotal (after discounts): ${refundSubtotal.toFixed(2)}</p>
+                          {orderTax > 0 && (
+                            <p className="text-sm text-gray-600">Tax: ${(orderTax * itemShareOfOrder).toFixed(2)}</p>
                           )}
                           {convFee > 0 && (
                             <p className="text-sm text-gray-600">Convenience Fee: ${convFee.toFixed(2)}</p>
                           )}
+                          {totalDiscount > 0 && (
+                            <p className="text-xs text-green-600">Discount applied to order: -${totalDiscount.toFixed(2)}</p>
+                          )}
                           <p className="text-2xl font-bold text-red-600">
                             Total Refund: ${totalRefund.toFixed(2)}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            (Order total paid: ${orderTotal.toFixed(2)})
                           </p>
                           {selectedOrderForRefund.paymentStatus === 'paid' && (
                             <p className="text-xs text-green-700 font-medium mt-1">
@@ -9239,15 +9279,21 @@ export default function Admin() {
                           return;
                         }
                         
-                        const orderTaxRate = selectedOrderForRefund.subtotal && parseFloat(selectedOrderForRefund.subtotal) > 0 && selectedOrderForRefund.taxAmount
-                          ? (parseFloat(selectedOrderForRefund.taxAmount) / parseFloat(selectedOrderForRefund.subtotal)) * 100
-                          : 0;
+                        const orderSubtotalVal = parseFloat(selectedOrderForRefund.subtotal || "0");
+                        const orderTaxVal = parseFloat(selectedOrderForRefund.taxAmount || "0");
+                        const orderTotalVal = parseFloat(selectedOrderForRefund.totalAmount || "0");
+                        const orderConvFeeVal = parseFloat(selectedOrderForRefund.convenienceFee || "0");
+                        const orderAmountWithoutFeesVal = orderTotalVal - orderConvFeeVal;
                         
                         const refundItemsData = itemIds.map(itemId => {
                           const refundItem = selectedRefundItems[parseInt(itemId)];
                           const itemSubtotal = parseFloat(refundItem.amount);
-                          const itemTax = itemSubtotal * (orderTaxRate / 100);
-                          const itemTotal = itemSubtotal + itemTax;
+                          const orderItem = (selectedOrderForRefund.items || []).find((i: any) => i.id === parseInt(itemId));
+                          const originalItemPrice = orderItem ? parseFloat(orderItem.price) * refundItem.quantity : 0;
+                          const itemShare = orderSubtotalVal > 0 ? originalItemPrice / orderSubtotalVal : 0;
+                          const proportionalItemRefund = orderAmountWithoutFeesVal * itemShare;
+                          const itemTax = Math.round((orderTaxVal * itemShare) * 100) / 100;
+                          const itemTotal = Math.round(proportionalItemRefund * 100) / 100;
                           
                           return {
                             orderItemId: parseInt(itemId),

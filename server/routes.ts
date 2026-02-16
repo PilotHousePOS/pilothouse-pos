@@ -3040,7 +3040,19 @@ West Monroe LA 71291
       const order = await storage.getOrder(orderId);
       // Derive convenience fee from order record (never trust client-provided amounts)
       const convFeeRefund = includeConvenienceFee && order?.convenienceFee ? parseFloat(order.convenienceFee) : 0;
-      const totalRefundAmount = itemsRefundAmount + convFeeRefund;
+      let totalRefundAmount = itemsRefundAmount + convFeeRefund;
+      
+      // Safety cap: never refund more than the order total minus already-refunded amounts
+      if (order) {
+        const orderTotal = parseFloat(order.totalAmount);
+        const existingRefundsForCap = await storage.getRefundsByOrderId(orderId);
+        const previouslyRefundedAmount = existingRefundsForCap.reduce((sum, r) => sum + parseFloat(r.totalRefunded || "0"), 0);
+        const maxAllowedRefund = Math.max(0, orderTotal - previouslyRefundedAmount);
+        if (totalRefundAmount > maxAllowedRefund) {
+          console.warn(`[REFUND] Capping refund from $${totalRefundAmount.toFixed(2)} to $${maxAllowedRefund.toFixed(2)} (order total: $${orderTotal.toFixed(2)}, already refunded: $${previouslyRefundedAmount.toFixed(2)})`);
+          totalRefundAmount = maxAllowedRefund;
+        }
+      }
       
       let stripeRefundId = null;
       let stripeRefundError = null;
