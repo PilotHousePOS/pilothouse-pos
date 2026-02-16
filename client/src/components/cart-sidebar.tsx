@@ -38,6 +38,27 @@ interface AstroReward {
   rebateAmount?: number;
 }
 
+interface AstroDeal {
+  programId: string;
+  programTitle: string;
+  manufacturer: string;
+  description: string;
+  imageUrl: string;
+  dealType: 'dollar_off' | 'bogo' | 'free_with_purchase' | 'buy_x_get_y' | 'unknown';
+  discountAmount?: number;
+  buyQty?: number;
+  freeQty?: number;
+  matchingCartItems: Array<{
+    supplyId: number;
+    supplyName: string;
+    sku: string;
+    price: number;
+    quantity: number;
+  }>;
+  calculatedDiscount: number;
+  autoApply: boolean;
+}
+
 interface CartSidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -101,6 +122,16 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     enabled: isOpen && cartItems.length > 0,
   });
   const availableRewards = astroRewardsData?.rewards || [];
+
+  const { data: astroDealsData } = useQuery<{ deals: AstroDeal[]; totalDiscount: number }>({
+    queryKey: ["/api/astro/cart-deals"],
+    enabled: isOpen && cartItems.length > 0,
+  });
+  const activeDeals = astroDealsData?.deals || [];
+  const autoAppliedDeals = activeDeals.filter(d => d.autoApply && d.calculatedDiscount > 0);
+  const dealDiscount = Math.round(
+    autoAppliedDeals.reduce((sum, d) => sum + d.calculatedDiscount, 0) * 100
+  ) / 100;
 
   // Fetch saved payment methods
   const { data: paymentMethodsData } = useQuery<{
@@ -257,7 +288,8 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     return total + (parseFloat(item.details.price) * item.quantity);
   }, 0) * 100) / 100;
   
-  const subtotalAfterRewards = Math.round((subtotal - astroDiscount) * 100) / 100;
+  const totalAstroSavings = Math.round((astroDiscount + dealDiscount) * 100) / 100;
+  const subtotalAfterRewards = Math.round(Math.max(0, subtotal - totalAstroSavings) * 100) / 100;
   const taxAmount = Math.round(subtotalAfterRewards * (taxRate / 100) * 100) / 100;
   const subtotalWithTax = Math.round((subtotalAfterRewards + taxAmount) * 100) / 100;
   
@@ -307,15 +339,25 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
       }
     }
 
-    const astroRewardInfo = Object.keys(appliedRewards).length > 0 ? {
+    const astroRewardInfo = Object.keys(appliedRewards).length > 0 || autoAppliedDeals.length > 0 ? {
       appliedRewards: Object.entries(appliedRewards).map(([cartItemId, reward]) => ({
         cartItemId: parseInt(cartItemId),
         rewardId: reward.rewardId,
         programId: reward.programId,
         programTitle: reward.programTitle,
       })),
+      appliedDeals: autoAppliedDeals.map(d => ({
+        programId: d.programId,
+        programTitle: d.programTitle,
+        dealType: d.dealType,
+        discount: d.calculatedDiscount.toFixed(2),
+        matchingItems: d.matchingCartItems.map(i => i.supplyName),
+      })),
       astroDiscount: astroDiscount.toFixed(2),
+      dealDiscount: dealDiscount.toFixed(2),
     } : undefined;
+
+    const totalAstroDiscountForOrder = Math.round((astroDiscount + dealDiscount) * 100) / 100;
 
     createOrderMutation.mutate({
       orderData: {
@@ -324,7 +366,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         loyaltyCreditsApplied: loyaltyDiscount.toFixed(2),
         convenienceFee: convenienceFee.toFixed(2),
         totalAmount: totalAmount.toFixed(2),
-        astroRewardDiscount: astroDiscount > 0 ? astroDiscount.toFixed(2) : "0.00",
+        astroRewardDiscount: totalAstroDiscountForOrder > 0 ? totalAstroDiscountForOrder.toFixed(2) : "0.00",
         astroRewardInfo: astroRewardInfo ? JSON.stringify(astroRewardInfo) : null,
         shippingAddress: "In-Store Pickup - Animal House Pet Store",
         outOfStockPreference,
@@ -451,6 +493,51 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
           {cartItems.length > 0 && (
             <div className="border-t p-6 space-y-4">
+              {/* Astro Deals Auto-Applied */}
+              {autoAppliedDeals.length > 0 && (
+                <div className="p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <Gift className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm text-orange-800 dark:text-orange-200">
+                        {autoAppliedDeals.length} Deal{autoAppliedDeals.length > 1 ? 's' : ''} Applied!
+                      </p>
+                      <div className="mt-1 space-y-1.5">
+                        {autoAppliedDeals.map(deal => (
+                          <div key={deal.programId} className="text-xs">
+                            <p className="font-medium text-orange-700 dark:text-orange-300 break-words">
+                              {deal.programTitle}
+                            </p>
+                            <p className="text-orange-600 dark:text-orange-400">
+                              Saving ${deal.calculatedDiscount.toFixed(2)}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Informational deals (eligible but not auto-applied) */}
+              {activeDeals.filter(d => !d.autoApply && d.matchingCartItems.length > 0).length > 0 && (
+                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <Gift className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm text-blue-800 dark:text-blue-200">
+                        Eligible Deals
+                      </p>
+                      {activeDeals.filter(d => !d.autoApply && d.matchingCartItems.length > 0).map(deal => (
+                        <p key={deal.programId} className="text-xs text-blue-700 dark:text-blue-300 mt-1 break-words">
+                          {deal.programTitle}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Astro Reward Banner */}
               {availableRewards.length > 0 && Object.keys(appliedRewards).length === 0 && (
                 <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg overflow-hidden">
@@ -518,6 +605,12 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     <span>-${astroDiscount.toFixed(2)}</span>
                   </div>
                 )}
+                {dealDiscount > 0 && (
+                  <div className="flex justify-between items-center text-sm text-orange-600 font-medium">
+                    <span>Astro Deal Savings:</span>
+                    <span>-${dealDiscount.toFixed(2)}</span>
+                  </div>
+                )}
                 {taxRate > 0 && (
                   <div className="flex justify-between items-center text-sm text-muted-foreground">
                     <span>Tax ({taxRate}%):</span>
@@ -582,6 +675,12 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                   <div className="flex justify-between text-sm text-green-600 font-medium">
                     <span>Astro Reward Discount:</span>
                     <span>-${astroDiscount.toFixed(2)}</span>
+                  </div>
+                )}
+                {dealDiscount > 0 && (
+                  <div className="flex justify-between text-sm text-orange-600 font-medium">
+                    <span>Astro Deal Savings:</span>
+                    <span>-${dealDiscount.toFixed(2)}</span>
                   </div>
                 )}
                 {taxRate > 0 && (

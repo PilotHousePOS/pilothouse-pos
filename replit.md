@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its purpose is to deliver a superior online shopping experience, streamline service bookings, and provide comprehensive inventory management and administrative tools. The project aims for market leadership through specialized offerings, advanced online functionalities, and a mobile-first framework.
+The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its primary purpose is to offer a superior online shopping experience, streamline service bookings, and provide comprehensive inventory management and administrative tools. The project aims to achieve market leadership in specialized pet offerings through advanced online functionalities and a mobile-first framework, with a vision to become a niche market leader in exotic pet supplies and services.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -181,6 +181,7 @@ Step 5: NEVER mark task complete until verification passes
 - Marketing Email Opt-Out: Users can opt out of marketing emails in profile. Admin Email Center has "This is a marketing email" checkbox that filters opted-out users. Order emails and important updates bypass opt-out.
 - Order Confirmation Email: "We got your order" email sent immediately to customer when order is placed, with full item breakdown and pricing. Bypasses marketing opt-out (transactional).
 - Abandoned Cart Recovery: Scheduled every 6 hours, emails customers whose entire cart has been idle 24+ hours. Respects marketing opt-out. 3-day cooldown between emails per user. Reset when cart is cleared.
+- Astro Deal Auto-Application: For linked Astro customers, cart automatically detects eligible manufacturer deals (via eligiblePurchaseItems + listOffers cross-reference). Only "Online & In-Store" offer-type programs are applied. Supports $X OFF (rebate), BOGO, and Buy X Get Y $OFF deal types. Deal discount applied pre-tax in cart totals. Deal info persisted in order's astroRewardInfo JSON for admin audit.
 
 ## System Architecture
 The Animal House Pet Store is a full-stack, mobile-first web application designed for high performance and scalability.

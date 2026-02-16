@@ -9238,6 +9238,61 @@ West Monroe LA 71291
     }
   });
 
+  app.get("/api/astro/cart-deals", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const astroCustomer = await storage.getAstroCustomerByUserId(userId);
+      
+      if (!astroCustomer) {
+        return res.json({ deals: [], totalDiscount: 0 });
+      }
+
+      const cartItems = await storage.getCartItems(userId);
+      if (cartItems.length === 0) {
+        return res.json({ deals: [], totalDiscount: 0 });
+      }
+
+      const supplyIds = cartItems.filter((item: any) => item.supplyId).map((item: any) => item.supplyId);
+      if (supplyIds.length === 0) {
+        return res.json({ deals: [], totalDiscount: 0 });
+      }
+
+      const supplies = await Promise.all(
+        supplyIds.map(id => storage.getSupply(id))
+      );
+
+      const cartItemsWithDetails = cartItems
+        .filter((item: any) => item.supplyId)
+        .map((item: any) => {
+          const supply = supplies.find(s => s && s.id === item.supplyId);
+          return {
+            supplyId: item.supplyId,
+            supplyName: supply?.name || 'Unknown',
+            sku: supply?.sku || '',
+            price: parseFloat(supply?.price || '0'),
+            quantity: item.quantity,
+          };
+        })
+        .filter(item => item.sku && item.sku.trim() !== '');
+
+      if (cartItemsWithDetails.length === 0) {
+        return res.json({ deals: [], totalDiscount: 0 });
+      }
+
+      const { evaluateCartDeals } = await import('./astroLoyalty');
+      const deals = await evaluateCartDeals(cartItemsWithDetails);
+      
+      const totalDiscount = Math.round(
+        deals.filter(d => d.autoApply).reduce((sum, d) => sum + d.calculatedDiscount, 0) * 100
+      ) / 100;
+
+      res.json({ deals, totalDiscount });
+    } catch (error) {
+      console.error("Error getting cart deals:", error);
+      res.json({ deals: [], totalDiscount: 0 });
+    }
+  });
+
   // Get eligible Astro rewards for cart items
   app.get("/api/astro/cart-rewards", authMiddleware, async (req: any, res) => {
     try {

@@ -758,6 +758,218 @@ export async function listOffers(): Promise<Array<{
   }
 }
 
+export interface AstroDeal {
+  programId: string;
+  programTitle: string;
+  manufacturer: string;
+  description: string;
+  imageUrl: string;
+  dealType: 'dollar_off' | 'bogo' | 'free_with_purchase' | 'buy_x_get_y' | 'unknown';
+  discountAmount?: number;
+  buyQty?: number;
+  freeQty?: number;
+  matchingCartItems: Array<{
+    supplyId: number;
+    supplyName: string;
+    sku: string;
+    price: number;
+    quantity: number;
+  }>;
+  calculatedDiscount: number;
+  autoApply: boolean;
+}
+
+function parseDealType(title: string): { 
+  dealType: AstroDeal['dealType']; 
+  discountAmount?: number; 
+  buyQty?: number; 
+  freeQty?: number;
+} {
+  const titleUpper = title.toUpperCase();
+  
+  const dollarOffMatch = title.match(/\$(\d+(?:\.\d{2})?)\s+OFF/i);
+  if (dollarOffMatch && !titleUpper.includes('BUY')) {
+    return { dealType: 'dollar_off', discountAmount: parseFloat(dollarOffMatch[1]) };
+  }
+  
+  const bogoMatch = title.match(/Buy\s+(\d+),?\s*Get\s+(\d+)\s+FREE/i);
+  if (bogoMatch) {
+    return { dealType: 'bogo', buyQty: parseInt(bogoMatch[1]), freeQty: parseInt(bogoMatch[2]) };
+  }
+  
+  const buyGetOffMatch = title.match(/Buy\s+(\d+),?\s*Get\s+(\d+)\s+\$(\d+(?:\.\d{2})?)\s+OFF/i);
+  if (buyGetOffMatch) {
+    return { 
+      dealType: 'buy_x_get_y', 
+      buyQty: parseInt(buyGetOffMatch[1]), 
+      freeQty: parseInt(buyGetOffMatch[2]),
+      discountAmount: parseFloat(buyGetOffMatch[3])
+    };
+  }
+  
+  const freeWithPurchaseMatch = titleUpper.match(/FREE\s+.+\s+WITH\s+.+\s+PURCHASE/i);
+  if (freeWithPurchaseMatch) {
+    return { dealType: 'free_with_purchase' };
+  }
+
+  if (titleUpper.includes('DOLLARS OFF')) {
+    return { dealType: 'dollar_off' };
+  }
+  
+  return { dealType: 'unknown' };
+}
+
+function calculateDealDiscount(
+  deal: { dealType: AstroDeal['dealType']; discountAmount?: number; buyQty?: number; freeQty?: number },
+  matchingItems: Array<{ price: number; quantity: number }>
+): number {
+  const totalQty = matchingItems.reduce((sum, i) => sum + i.quantity, 0);
+  
+  switch (deal.dealType) {
+    case 'dollar_off': {
+      if (deal.discountAmount && totalQty > 0) {
+        const totalItemValue = matchingItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+        return Math.min(deal.discountAmount, totalItemValue);
+      }
+      return 0;
+    }
+    case 'bogo': {
+      const buyQty = deal.buyQty || 1;
+      const freeQty = deal.freeQty || 1;
+      const totalNeeded = buyQty + freeQty;
+      if (totalQty >= totalNeeded) {
+        const sets = Math.floor(totalQty / totalNeeded);
+        const lowestPrice = Math.min(...matchingItems.map(i => i.price));
+        return Math.round(sets * freeQty * lowestPrice * 100) / 100;
+      }
+      return 0;
+    }
+    case 'buy_x_get_y': {
+      const buyQ = deal.buyQty || 1;
+      const freeQ = deal.freeQty || 1;
+      const totalN = buyQ + freeQ;
+      if (totalQty >= totalN && deal.discountAmount) {
+        const sets = Math.floor(totalQty / totalN);
+        return Math.round(sets * freeQ * deal.discountAmount * 100) / 100;
+      }
+      return 0;
+    }
+    case 'free_with_purchase': {
+      if (totalQty > 0) {
+        const lowestPrice = Math.min(...matchingItems.map(i => i.price));
+        return lowestPrice;
+      }
+      return 0;
+    }
+    default:
+      return 0;
+  }
+}
+
+export async function evaluateCartDeals(
+  cartItems: Array<{ supplyId: number; supplyName: string; sku: string; price: number; quantity: number }>
+): Promise<AstroDeal[]> {
+  if (!isAstroEnabled()) return [];
+  
+  const itemsWithSku = cartItems.filter(item => item.sku && item.sku.trim() !== '');
+  if (itemsWithSku.length === 0) return [];
+  
+  try {
+    const [offers, eligibleItems] = await Promise.all([
+      listOffers(),
+      checkEligibleItems(itemsWithSku.map(i => i.sku)),
+    ]);
+    
+    if (eligibleItems.length === 0) {
+      console.log('[ASTRO] No cart items are eligible for any programs');
+      return [];
+    }
+    
+    const onlineOffers = offers.filter(o => !o.inStoreOnly);
+    const offerProgramIds = new Set(onlineOffers.map(o => o.programId));
+    
+    const deals: AstroDeal[] = [];
+    const processedPrograms = new Set<string>();
+    
+    for (const eligible of eligibleItems) {
+      const offerPrograms = eligible.programs.filter(p => 
+        p.type === 'offer' && !p.inStoreOnly && offerProgramIds.has(p.programId)
+      );
+      
+      for (const program of offerPrograms) {
+        if (processedPrograms.has(program.programId)) {
+          const existingDeal = deals.find(d => d.programId === program.programId);
+          if (existingDeal) {
+            const cartItem = itemsWithSku.find(i => i.sku === eligible.itemCode);
+            if (cartItem && !existingDeal.matchingCartItems.find(m => m.supplyId === cartItem.supplyId)) {
+              existingDeal.matchingCartItems.push({
+                supplyId: cartItem.supplyId,
+                supplyName: cartItem.supplyName,
+                sku: cartItem.sku,
+                price: cartItem.price,
+                quantity: cartItem.quantity,
+              });
+            }
+          }
+          continue;
+        }
+        
+        processedPrograms.add(program.programId);
+        
+        const offer = onlineOffers.find(o => o.programId === program.programId);
+        if (!offer) continue;
+        const title = offer.title || program.programTitle;
+        const parsed = parseDealType(title);
+        
+        if (program.rebateAmount && parsed.dealType !== 'bogo' && parsed.dealType !== 'buy_x_get_y') {
+          parsed.dealType = 'dollar_off';
+          parsed.discountAmount = program.rebateAmount;
+        }
+        
+        const cartItem = itemsWithSku.find(i => i.sku === eligible.itemCode);
+        const matchingCartItems = cartItem ? [{
+          supplyId: cartItem.supplyId,
+          supplyName: cartItem.supplyName,
+          sku: cartItem.sku,
+          price: cartItem.price,
+          quantity: cartItem.quantity,
+        }] : [];
+        
+        const calculatedDiscount = calculateDealDiscount(parsed, matchingCartItems);
+        
+        deals.push({
+          programId: program.programId,
+          programTitle: title,
+          manufacturer: offer?.manufacturer || eligible.manufacturer,
+          description: offer?.description || '',
+          imageUrl: offer?.imageUrl || '',
+          dealType: parsed.dealType,
+          discountAmount: parsed.discountAmount,
+          buyQty: parsed.buyQty,
+          freeQty: parsed.freeQty,
+          matchingCartItems,
+          calculatedDiscount,
+          autoApply: parsed.dealType !== 'unknown',
+        });
+      }
+    }
+    
+    for (const deal of deals) {
+      if (deal.matchingCartItems.length > 1) {
+        const parsed = parseDealType(deal.programTitle);
+        if (deal.discountAmount) parsed.discountAmount = deal.discountAmount;
+        deal.calculatedDiscount = calculateDealDiscount(parsed, deal.matchingCartItems);
+      }
+    }
+    
+    console.log(`[ASTRO] Evaluated ${deals.length} applicable deals for cart with ${cartItems.length} items`);
+    return deals.filter(d => d.matchingCartItems.length > 0);
+  } catch (error) {
+    console.error('[ASTRO] Error evaluating cart deals:', error);
+    return [];
+  }
+}
+
 /**
  * Check which UPCs are eligible for Astro programs
  */
@@ -767,7 +979,15 @@ export async function checkEligibleItems(
   itemCode: string;
   itemDescription: string;
   manufacturer: string;
-  programs: Array<{ programId: string; programTitle: string; type: string }>;
+  manufacturerId: string;
+  programs: Array<{ 
+    programId: string; 
+    programTitle: string; 
+    type: string;
+    rebateAmount?: number;
+    inStoreOnly?: boolean;
+    rewardType?: string;
+  }>;
 }>> {
   if (!isAstroEnabled()) return [];
 
@@ -786,10 +1006,14 @@ export async function checkEligibleItems(
       itemCode: item.item_code,
       itemDescription: item.item_description,
       manufacturer: item.astro_mfg_name,
+      manufacturerId: String(item.astro_mfg_id),
       programs: item.available_programs ? (Array.isArray(item.available_programs) ? item.available_programs : [item.available_programs]).map((p: any) => ({
         programId: String(p.astro_mfg_program_id),
         programTitle: p.astro_mfg_program_title,
         type: p.astro_mfg_program_type,
+        rebateAmount: p.rebate_amount ? parseFloat(p.rebate_amount) : undefined,
+        inStoreOnly: p.in_store_only === 1 || p.in_store_only === true,
+        rewardType: p.astro_reward_type,
       })) : [],
     }));
   } catch (error) {
