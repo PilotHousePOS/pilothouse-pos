@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its primary purpose is to deliver a superior online shopping experience, streamline service bookings, and provide comprehensive inventory management and administrative tools. The project aims for market leadership by offering a unique product selection and exceptional service quality through a mobile-first framework, differentiating itself with specialized offerings and advanced online functionalities.
+The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. It aims to deliver a superior online shopping experience, streamline service bookings, and provide comprehensive inventory management and administrative tools. The project seeks to achieve market leadership by offering a unique product selection and high-quality services through a mobile-first framework, differentiating itself with specialized offerings and advanced online functionalities.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -183,7 +183,7 @@ Step 5: NEVER mark task complete until verification passes
 - Abandoned Cart Recovery: Scheduled every 6 hours, emails customers whose entire cart has been idle 24+ hours. Respects marketing opt-out. 3-day cooldown between emails per user. Reset when cart is cleared.
 
 ## System Architecture
-The Animal House Pet Store is a full-stack, mobile-first web application built for high performance and scalability.
+The Animal House Pet Store is a full-stack, mobile-first web application designed for high performance and scalability.
 - **UI/UX:** Features a dark, bold, high-contrast design with Amazon-style image carousels.
 - **Authentication:** Employs robust JWT-based authentication and a three-tier, role-based access control system.
 - **Frontend:** Developed using React, Vite, and TypeScript. Styling is managed with Tailwind CSS and shadcn/ui components. Wouter is used for client-side routing, and TanStack Query for data fetching.
