@@ -48,10 +48,9 @@ export async function getUncachableSendGridClient() {
   const {apiKey, email} = await getCredentials();
   sgMail.setApiKey(apiKey);
   const alternateEmail = await getAlternateReplyToEmail();
-  const replyToList: {email: string}[] = [{email}];
-  if (alternateEmail && alternateEmail !== email) {
-    replyToList.push({email: alternateEmail});
-  }
+  const replyToList: {email: string}[] = alternateEmail 
+    ? [{email: alternateEmail}]
+    : [{email}];
   return {
     client: sgMail,
     fromEmail: email,
