@@ -1966,7 +1966,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       validatedData.loyaltyCreditsApplied = verifiedLoyaltyCredits.toFixed(2);
       
       // Handle Astro reward discount with server-side validation
-      let verifiedAstroDiscount = 0;
+      let verifiedRewardDiscount = 0;
+      let verifiedDealDiscount = 0;
       let verifiedAstroInfo: string | null = null;
       const requestedAstroDiscount = Math.round(parseFloat(orderData.astroRewardDiscount || "0") * 100) / 100;
       
@@ -1974,68 +1975,121 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         try {
           const astroCustomer = await storage.getAstroCustomerByUserId(userId);
           if (astroCustomer) {
-            const { getCustomerStatus } = await import('./astroLoyalty');
-            const internalId = `animalhouse-${userId}`;
-            const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
+            const parsedInfo = JSON.parse(orderData.astroRewardInfo);
             
-            if (status) {
-              const parsedInfo = JSON.parse(orderData.astroRewardInfo);
-              const appliedRewards: Array<{cartItemId: number; rewardId: string}> = parsedInfo.appliedRewards || [];
+            // --- Validate frequent buyer rewards ---
+            const appliedRewards: Array<{cartItemId: number; rewardId: string}> = parsedInfo.appliedRewards || [];
+            if (appliedRewards.length > 0) {
+              const { getCustomerStatus } = await import('./astroLoyalty');
+              const internalId = `animalhouse-${userId}`;
+              const status = await getCustomerStatus(astroCustomer.astroCustomerId, false, internalId);
               
-              const validRewardIds = new Set<string>();
-              for (const card of status.frequentBuyerCards) {
-                const purchaseCount = card.purchases?.length || 0;
-                if (purchaseCount >= card.requiredPurchases) {
-                  const unredeemed = (card.freeGoods || []).filter((fg: any) => !fg.redeemedOn);
-                  for (const fg of unredeemed) {
-                    validRewardIds.add(fg.rewardId);
+              if (status) {
+                const validRewardIds = new Set<string>();
+                for (const card of status.frequentBuyerCards) {
+                  const purchaseCount = card.purchases?.length || 0;
+                  if (purchaseCount >= card.requiredPurchases) {
+                    const unredeemed = (card.freeGoods || []).filter((fg: any) => !fg.redeemedOn);
+                    for (const fg of unredeemed) {
+                      validRewardIds.add(fg.rewardId);
+                    }
                   }
                 }
+                
+                const cartItems = await storage.getCartItems(userId);
+                let serverComputedRewardDiscount = 0;
+                const verifiedAppliedRewards: typeof appliedRewards = [];
+                const usedRewardIds = new Set<string>();
+                
+                for (const applied of appliedRewards) {
+                  if (usedRewardIds.has(applied.rewardId)) continue;
+                  if (!validRewardIds.has(applied.rewardId)) continue;
+                  
+                  const cartItem = cartItems.find(ci => ci.id === applied.cartItemId);
+                  if (!cartItem) continue;
+                  
+                  let itemPrice = 0;
+                  if (cartItem.supplyId) {
+                    const supply = await storage.getSupply(cartItem.supplyId);
+                    if (supply) {
+                      itemPrice = Math.round(parseFloat(String(supply.price || "0")) * (cartItem.quantity || 1) * 100) / 100;
+                    }
+                  }
+                  
+                  serverComputedRewardDiscount += itemPrice;
+                  usedRewardIds.add(applied.rewardId);
+                  verifiedAppliedRewards.push({ ...applied, supplyId: cartItem.supplyId });
+                }
+                
+                if (verifiedAppliedRewards.length > 0) {
+                  const orderSubtotalRaw = Math.round(parseFloat(orderData.subtotal || "0") * 100) / 100;
+                  verifiedRewardDiscount = Math.min(serverComputedRewardDiscount, orderSubtotalRaw);
+                  parsedInfo.appliedRewards = verifiedAppliedRewards;
+                  parsedInfo.astroDiscount = verifiedRewardDiscount.toFixed(2);
+                  console.log(`[ASTRO] Server-verified reward discount: $${verifiedRewardDiscount} from ${verifiedAppliedRewards.length} valid rewards`);
+                } else {
+                  console.warn('[ASTRO] No valid unredeemed rewards matched applied cart items');
+                }
               }
-              
+            }
+            
+            // --- Validate deal discounts (manufacturer offers) ---
+            const appliedDeals = parsedInfo.appliedDeals || [];
+            if (appliedDeals.length > 0) {
               const cartItems = await storage.getCartItems(userId);
-              let serverComputedDiscount = 0;
-              const verifiedAppliedRewards: typeof appliedRewards = [];
-              const usedRewardIds = new Set<string>();
+              const supplyIds = cartItems.filter((item: any) => item.supplyId).map((item: any) => item.supplyId);
+              const supplies = await Promise.all(supplyIds.map((id: number) => storage.getSupply(id)));
               
-              for (const applied of appliedRewards) {
-                if (usedRewardIds.has(applied.rewardId)) continue;
-                if (!validRewardIds.has(applied.rewardId)) continue;
-                
-                const cartItem = cartItems.find(ci => ci.id === applied.cartItemId);
-                if (!cartItem) continue;
-                
-                let itemPrice = 0;
-                if (cartItem.supplyId) {
-                  const supply = await storage.getSupply(cartItem.supplyId);
-                  if (supply) {
-                    itemPrice = Math.round(parseFloat(String(supply.price || "0")) * (cartItem.quantity || 1) * 100) / 100;
-                  }
-                }
-                
-                serverComputedDiscount += itemPrice;
-                usedRewardIds.add(applied.rewardId);
-                verifiedAppliedRewards.push({ ...applied, supplyId: cartItem.supplyId });
-              }
+              const cartItemsWithDetails = cartItems
+                .filter((item: any) => item.supplyId)
+                .map((item: any) => {
+                  const supply = supplies.find(s => s && s.id === item.supplyId);
+                  return {
+                    supplyId: item.supplyId,
+                    supplyName: supply?.name || 'Unknown',
+                    sku: supply?.sku || '',
+                    price: parseFloat(supply?.price || '0'),
+                    quantity: item.quantity,
+                  };
+                })
+                .filter((item: any) => item.sku && item.sku.trim() !== '');
               
-              if (verifiedAppliedRewards.length > 0) {
+              if (cartItemsWithDetails.length > 0) {
+                const { evaluateCartDeals } = await import('./astroLoyalty');
+                const serverDeals = await evaluateCartDeals(cartItemsWithDetails);
+                const serverAutoDeals = serverDeals.filter(d => d.autoApply && d.calculatedDiscount > 0);
+                
+                verifiedDealDiscount = Math.round(
+                  serverAutoDeals.reduce((sum, d) => sum + d.calculatedDiscount, 0) * 100
+                ) / 100;
+                
                 const orderSubtotalRaw = Math.round(parseFloat(orderData.subtotal || "0") * 100) / 100;
-                verifiedAstroDiscount = Math.min(serverComputedDiscount, orderSubtotalRaw);
-                verifiedAstroInfo = JSON.stringify({
-                  ...parsedInfo,
-                  appliedRewards: verifiedAppliedRewards,
-                  astroDiscount: verifiedAstroDiscount.toFixed(2),
-                });
-                console.log(`[ASTRO] Server-verified reward discount: $${verifiedAstroDiscount} from ${verifiedAppliedRewards.length} valid rewards`);
-              } else {
-                console.warn('[ASTRO] No valid unredeemed rewards matched applied cart items');
+                const remainingSubtotal = Math.max(0, orderSubtotalRaw - verifiedRewardDiscount);
+                verifiedDealDiscount = Math.min(verifiedDealDiscount, remainingSubtotal);
+                
+                parsedInfo.appliedDeals = serverAutoDeals.map((d: any) => ({
+                  programId: d.programId,
+                  programTitle: d.programTitle,
+                  dealType: d.dealType,
+                  discount: d.calculatedDiscount.toFixed(2),
+                  matchingItems: d.matchingCartItems.map((i: any) => i.supplyName),
+                }));
+                parsedInfo.dealDiscount = verifiedDealDiscount.toFixed(2);
+                console.log(`[ASTRO] Server-verified deal discount: $${verifiedDealDiscount} from ${serverAutoDeals.length} auto-applied deals`);
               }
+            }
+            
+            const totalVerifiedDiscount = Math.round((verifiedRewardDiscount + verifiedDealDiscount) * 100) / 100;
+            if (totalVerifiedDiscount > 0) {
+              verifiedAstroInfo = JSON.stringify(parsedInfo);
             }
           }
         } catch (e) {
-          console.warn('[ASTRO] Could not verify reward, proceeding without discount:', e);
+          console.warn('[ASTRO] Could not verify astro discounts, proceeding without:', e);
         }
       }
+      
+      const verifiedAstroDiscount = Math.round((verifiedRewardDiscount + verifiedDealDiscount) * 100) / 100;
       
       // Server-side recalculation of all amounts
       const orderSubtotal = Math.round(parseFloat(orderData.subtotal || "0") * 100) / 100;
@@ -2117,7 +2171,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
             order.taxAmount || '0',
             order.convenienceFee || '0',
             order.loyaltyCreditsApplied || '0',
-            order.totalAmount || '0'
+            order.totalAmount || '0',
+            order.discountAmount || '0'
           );
         }
       } catch (notificationError) {
@@ -2300,7 +2355,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (customerEmail) {
         try {
           const { getUncachableSendGridClient } = await import('./sendgridIntegration');
-          const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
+          const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
           const itemsList = orderWithItems.items.map((item: any) => 
             `• ${item.productName || item.itemName || 'Item'} x${item.quantity} - $${item.price}`
           ).join('\n');
@@ -2319,7 +2374,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           await client.send({
             to: customerEmail,
             from: fromEmail,
-            replyToList,
+            replyTo,
             subject: emailSubject,
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -2471,12 +2526,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (customerEmail) {
         try {
           const { getUncachableSendGridClient } = await import('./sendgridIntegration');
-          const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
+          const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
           
           await client.send({
             to: customerEmail,
             from: fromEmail,
-            replyToList,
+            replyTo,
             subject: 'Your Animal House Order Is Ready for Pickup!',
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -2670,12 +2725,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         if (customerEmail) {
           try {
             const { getUncachableSendGridClient } = await import('./sendgridIntegration');
-            const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
+            const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
             
             await client.send({
               to: customerEmail,
               from: fromEmail,
-              replyToList,
+              replyTo,
               subject: 'Thank You for Shopping at Animal House!',
               text: `Hi ${orderWithItems.customerName || 'Valued Customer'},
 
@@ -5370,7 +5425,7 @@ West Monroe LA 71291
       }
 
       const { getUncachableSendGridClient } = await import('./sendgridIntegration');
-      const { client: sgMail, fromEmail, replyToList } = await getUncachableSendGridClient();
+      const { client: sgMail, fromEmail, replyTo, adminBcc } = await getUncachableSendGridClient();
 
       let targetUsers: any[] = [];
 
@@ -5422,10 +5477,13 @@ West Monroe LA 71291
             ? `https://${process.env.REPLIT_DOMAINS}`
             : 'http://localhost:5000';
           
+          const bccList = (adminBcc && user.email !== adminBcc) ? [{ email: adminBcc }] : [];
+          
           await sgMail.send({
             to: user.email,
             from: fromEmail,
-            replyToList,
+            replyTo,
+            ...(bccList.length > 0 ? { bcc: bccList } : {}),
             subject: subject,
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

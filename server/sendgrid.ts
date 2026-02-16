@@ -2,7 +2,7 @@ import { getUncachableSendGridClient } from './sendgridIntegration';
 
 export async function sendPasswordResetEmail(toEmail: string, resetToken: string): Promise<void> {
   try {
-    const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
+    const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
     
     // Get the base URL for the reset link
     const baseUrl = process.env.REPLIT_DOMAINS 
@@ -17,7 +17,7 @@ export async function sendPasswordResetEmail(toEmail: string, resetToken: string
         email: fromEmail,
         name: 'Animal House Pet Store'
       },
-      replyToList,
+      replyTo,
       subject: 'Your Animal House Account - Action Required',
       text: `Animal House Pet Store - Account Security\n\nHello,\n\nWe received a request to update your account credentials. To complete this process, please visit:\n\n${resetLink}\n\nThis link expires in 1 hour.\n\nIf you did not make this request, no action is needed - your account remains secure.\n\nThank you,\nAnimal House Pet Store\n318-323-6090`,
       html: `
@@ -76,12 +76,12 @@ export async function sendAppointmentRejectionEmail(
   appointmentTime: string
 ): Promise<void> {
   try {
-    const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
+    const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
     
     const msg = {
       to: toEmail,
       from: fromEmail,
-      replyToList,
+      replyTo,
       subject: 'Animal House - Appointment Update',
       text: `The Animal House regrets to inform you that we could not accept your appointment. This may have been due to several reasons. If you have any questions about this please contact us at 318-323-6090`,
       html: `

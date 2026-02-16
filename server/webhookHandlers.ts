@@ -275,7 +275,7 @@ export class WebhookHandlers {
       if (!customerEmail) return;
       
       const { getUncachableSendGridClient } = await import('./sendgridIntegration');
-      const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
+      const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
       
       const itemsList = orderWithItems.items.map((item: any) => 
         `• ${item.productName || item.itemName || 'Item'} x${item.quantity} - $${item.price}`
@@ -284,7 +284,7 @@ export class WebhookHandlers {
       await client.send({
         to: customerEmail,
         from: fromEmail,
-        replyToList,
+        replyTo,
         subject: 'Payment Received - Your Order is Being Prepared!',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

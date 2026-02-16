@@ -5,7 +5,7 @@ import { storage } from './storage';
 class EmailService {
   async sendAdminNewOrderEmail(adminEmail: string, orderId: number, customerName: string, totalAmount: string): Promise<boolean> {
     try {
-      const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
+      const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
       
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -33,7 +33,7 @@ class EmailService {
       await client.send({
         to: adminEmail,
         from: fromEmail,
-        replyToList,
+        replyTo,
         subject: `New Order #${orderId} - Animal House Admin Alert`,
         html: emailContent,
       });
@@ -47,7 +47,7 @@ class EmailService {
 
   async sendAdminNewAppointmentEmail(adminEmail: string, appointmentId: number, customerName: string, serviceType: string, appointmentDate: string, appointmentTime: string): Promise<boolean> {
     try {
-      const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
+      const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
       
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -76,7 +76,7 @@ class EmailService {
       await client.send({
         to: adminEmail,
         from: fromEmail,
-        replyToList,
+        replyTo,
         subject: `New Appointment #${appointmentId} - Animal House Admin Alert`,
         html: emailContent,
       });
@@ -88,9 +88,9 @@ class EmailService {
     }
   }
 
-  async sendOrderReceivedEmail(to: string, firstName: string, orderId: number, items: Array<{name: string; quantity: number; price: string}>, subtotal: string, taxAmount: string, convenienceFee: string, loyaltyCreditsApplied: string, totalAmount: string): Promise<boolean> {
+  async sendOrderReceivedEmail(to: string, firstName: string, orderId: number, items: Array<{name: string; quantity: number; price: string}>, subtotal: string, taxAmount: string, convenienceFee: string, loyaltyCreditsApplied: string, totalAmount: string, discountAmount?: string): Promise<boolean> {
     try {
-      const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
+      const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
 
       const itemRows = items.map(item => `
         <tr>
@@ -101,6 +101,7 @@ class EmailService {
       `).join('');
 
       const loyaltyCredits = parseFloat(loyaltyCreditsApplied || '0');
+      const astroDiscount = parseFloat(discountAmount || '0');
 
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -130,6 +131,7 @@ class EmailService {
 
             <div style="border-top: 2px solid #dc2626; padding-top: 15px; margin-top: 10px;">
               <p style="margin: 4px 0;"><strong>Subtotal:</strong> $${parseFloat(subtotal).toFixed(2)}</p>
+              ${astroDiscount > 0 ? `<p style="margin: 4px 0; color: #ea580c;"><strong>Astro Loyalty Savings:</strong> -$${astroDiscount.toFixed(2)}</p>` : ''}
               <p style="margin: 4px 0;"><strong>Tax:</strong> $${parseFloat(taxAmount).toFixed(2)}</p>
               ${loyaltyCredits > 0 ? `<p style="margin: 4px 0; color: #16a34a;"><strong>Loyalty Credits:</strong> -$${loyaltyCredits.toFixed(2)}</p>` : ''}
               <p style="margin: 4px 0;"><strong>Convenience Fee:</strong> $${parseFloat(convenienceFee).toFixed(2)}</p>
@@ -157,7 +159,7 @@ class EmailService {
       await client.send({
         to,
         from: fromEmail,
-        replyToList,
+        replyTo,
         subject: `Order Received #${orderId} - Animal House Pet Store`,
         html: emailContent,
       });
@@ -172,7 +174,7 @@ class EmailService {
 
   async sendAbandonedCartEmail(to: string, firstName: string, items: Array<{name: string; price: string; quantity: number}>): Promise<boolean> {
     try {
-      const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
+      const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
 
       const itemList = items.map(item => `
         <tr>
@@ -234,7 +236,7 @@ class EmailService {
       await client.send({
         to,
         from: fromEmail,
-        replyToList,
+        replyTo,
         subject: `Don't Forget Your Cart - Animal House Pet Store`,
         html: emailContent,
       });
@@ -249,7 +251,7 @@ class EmailService {
 
   async sendOrderStatusEmail(to: string, firstName: string, orderId: number, status: string): Promise<boolean> {
     try {
-      const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
+      const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
       
       const statusMessages = {
         'in_progress': {
@@ -296,7 +298,7 @@ class EmailService {
       await client.send({
         to,
         from: fromEmail,
-        replyToList,
+        replyTo,
         subject: statusInfo.subject,
         html: emailContent,
       });
@@ -311,7 +313,7 @@ class EmailService {
 
   async sendAppointmentConfirmedEmail(to: string, firstName: string, appointmentId: number, serviceType: string, appointmentDate: string, appointmentTime: string): Promise<boolean> {
     try {
-      const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
+      const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
       
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -352,7 +354,7 @@ class EmailService {
       await client.send({
         to,
         from: fromEmail,
-        replyToList,
+        replyTo,
         subject: `Appointment Confirmed - ${serviceType} on ${new Date(appointmentDate).toLocaleDateString()}`,
         html: emailContent,
       });
@@ -367,7 +369,7 @@ class EmailService {
 
   async sendAppointmentRejectedEmail(to: string, firstName: string, appointmentId: number, serviceType: string, appointmentDate: string, appointmentTime: string): Promise<boolean> {
     try {
-      const { client, fromEmail, replyToList } = await getUncachableSendGridClient();
+      const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
       
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -391,7 +393,7 @@ class EmailService {
       await client.send({
         to,
         from: fromEmail,
-        replyToList,
+        replyTo,
         subject: 'Animal House - Appointment Update',
         html: emailContent,
       });
@@ -737,12 +739,13 @@ export class NotificationService {
     taxAmount: string,
     convenienceFee: string,
     loyaltyCreditsApplied: string,
-    totalAmount: string
+    totalAmount: string,
+    discountAmount?: string
   ): Promise<void> {
     console.log(`Sending order received confirmation to ${userEmail} for order ${orderId}`);
     await this.emailService.sendOrderReceivedEmail(
       userEmail, userFirstName, orderId, items,
-      subtotal, taxAmount, convenienceFee, loyaltyCreditsApplied, totalAmount
+      subtotal, taxAmount, convenienceFee, loyaltyCreditsApplied, totalAmount, discountAmount
     );
   }
 
