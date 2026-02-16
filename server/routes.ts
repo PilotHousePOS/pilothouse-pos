@@ -2218,13 +2218,24 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       let paymentError = null;
       let paymentIntentId = null;
       
-      // Try to charge the customer's saved payment method
-      if (orderOwner?.stripeCustomerId && orderOwner?.stripeDefaultPaymentMethod) {
+      const orderTotalAmount = parseFloat(order.totalAmount);
+      
+      // If order total is $0 (fully discounted), skip Stripe entirely and mark as paid
+      if (orderTotalAmount <= 0) {
+        paymentSuccessful = true;
+        await storage.updateOrderStripePayment(orderId, {
+          paymentStatus: 'paid',
+          paidAt: new Date(),
+        });
+        await storage.updateOrderApprovalStatus(orderId, 'approved');
+        console.log(`Order #${orderId} approved - fully discounted ($0.00), no payment needed`);
+      } else if (orderOwner?.stripeCustomerId && orderOwner?.stripeDefaultPaymentMethod) {
+        // Try to charge the customer's saved payment method
         try {
           const { getUncachableStripeClient } = await import('./stripeClient');
           const stripe = await getUncachableStripeClient();
           
-          const amountCents = Math.round(parseFloat(order.totalAmount) * 100);
+          const amountCents = Math.round(orderTotalAmount * 100);
           
           // Create and confirm a PaymentIntent with the saved payment method
           const paymentIntent = await stripe.paymentIntents.create({

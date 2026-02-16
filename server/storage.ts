@@ -2407,7 +2407,8 @@ export class DatabaseStorage implements IStorage {
     const taxRate = parseFloat(order.taxRate || "0") || 10.99;
     const discountedSubtotal = Math.max(0, subtotal - loyaltyCredits - discount);
     const newTaxAmount = Math.round(discountedSubtotal * (taxRate / 100) * 100) / 100;
-    const newTotal = Math.max(0, discountedSubtotal + newTaxAmount + convenienceFee);
+    const effectiveConvFee = discountedSubtotal <= 0 ? 0 : convenienceFee;
+    const newTotal = Math.max(0, discountedSubtotal + newTaxAmount + effectiveConvFee);
 
     const [updated] = await db
       .update(orders)
@@ -2415,6 +2416,7 @@ export class DatabaseStorage implements IStorage {
         discountAmount: discount.toFixed(2),
         discountReason,
         taxAmount: newTaxAmount.toFixed(2),
+        convenienceFee: effectiveConvFee.toFixed(2),
         totalAmount: newTotal.toFixed(2),
         updatedAt: new Date(),
       })
