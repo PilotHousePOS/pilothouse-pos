@@ -2404,16 +2404,7 @@ export class DatabaseStorage implements IStorage {
     const convenienceFee = parseFloat(order.convenienceFee || "0");
     const loyaltyCredits = parseFloat(order.loyaltyCreditsApplied || "0");
     const existingDiscount = parseFloat(order.discountAmount || "0");
-    let taxRate = parseFloat(order.taxRate || "0");
-    if (taxRate === 0 && subtotal > 0) {
-      const originalTax = parseFloat(order.taxAmount || "0");
-      const originalTaxableSubtotal = Math.max(0, subtotal - loyaltyCredits - existingDiscount);
-      if (originalTaxableSubtotal > 0) {
-        taxRate = (originalTax / originalTaxableSubtotal) * 100;
-      } else if (subtotal > 0) {
-        taxRate = (originalTax / subtotal) * 100;
-      }
-    }
+    const taxRate = parseFloat(order.taxRate || "0") || 10.99;
     const discountedSubtotal = Math.max(0, subtotal - loyaltyCredits - discount);
     const newTaxAmount = Math.round(discountedSubtotal * (taxRate / 100) * 100) / 100;
     const newTotal = Math.max(0, discountedSubtotal + newTaxAmount + convenienceFee);
