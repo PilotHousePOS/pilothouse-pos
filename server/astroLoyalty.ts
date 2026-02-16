@@ -867,7 +867,7 @@ function calculateDealDiscount(
 }
 
 export async function evaluateCartDeals(
-  cartItems: Array<{ supplyId: number; supplyName: string; sku: string; price: number; quantity: number }>
+  cartItems: Array<{ supplyId: number; supplyName: string; sku: string; price: number; quantity: number; brand?: string }>
 ): Promise<AstroDeal[]> {
   if (!isAstroEnabled()) return [];
   
@@ -880,77 +880,146 @@ export async function evaluateCartDeals(
       checkEligibleItems(itemsWithSku.map(i => i.sku)),
     ]);
     
-    if (eligibleItems.length === 0) {
-      console.log('[ASTRO] No cart items are eligible for any programs');
-      return [];
-    }
-    
     const onlineOffers = offers.filter(o => !o.inStoreOnly);
     const offerProgramIds = new Set(onlineOffers.map(o => o.programId));
     
     const deals: AstroDeal[] = [];
     const processedPrograms = new Set<string>();
     
-    for (const eligible of eligibleItems) {
-      const offerPrograms = eligible.programs.filter(p => 
-        p.type === 'offer' && !p.inStoreOnly && offerProgramIds.has(p.programId)
-      );
-      
-      for (const program of offerPrograms) {
-        if (processedPrograms.has(program.programId)) {
-          const existingDeal = deals.find(d => d.programId === program.programId);
-          if (existingDeal) {
-            const cartItem = itemsWithSku.find(i => i.sku === eligible.itemCode);
-            if (cartItem && !existingDeal.matchingCartItems.find(m => m.supplyId === cartItem.supplyId)) {
-              existingDeal.matchingCartItems.push({
-                supplyId: cartItem.supplyId,
-                supplyName: cartItem.supplyName,
-                sku: cartItem.sku,
-                price: cartItem.price,
-                quantity: cartItem.quantity,
-              });
+    if (eligibleItems.length > 0) {
+      for (const eligible of eligibleItems) {
+        const offerPrograms = eligible.programs.filter(p => 
+          p.type === 'offer' && !p.inStoreOnly && offerProgramIds.has(p.programId)
+        );
+        
+        for (const program of offerPrograms) {
+          if (processedPrograms.has(program.programId)) {
+            const existingDeal = deals.find(d => d.programId === program.programId);
+            if (existingDeal) {
+              const cartItem = itemsWithSku.find(i => i.sku === eligible.itemCode);
+              if (cartItem && !existingDeal.matchingCartItems.find(m => m.supplyId === cartItem.supplyId)) {
+                existingDeal.matchingCartItems.push({
+                  supplyId: cartItem.supplyId,
+                  supplyName: cartItem.supplyName,
+                  sku: cartItem.sku,
+                  price: cartItem.price,
+                  quantity: cartItem.quantity,
+                });
+              }
             }
+            continue;
           }
-          continue;
+          
+          processedPrograms.add(program.programId);
+          
+          const offer = onlineOffers.find(o => o.programId === program.programId);
+          if (!offer) continue;
+          const title = offer.title || program.programTitle;
+          const parsed = parseDealType(title);
+          
+          if (program.rebateAmount && parsed.dealType !== 'bogo' && parsed.dealType !== 'buy_x_get_y') {
+            parsed.dealType = 'dollar_off';
+            parsed.discountAmount = program.rebateAmount;
+          }
+          
+          const cartItem = itemsWithSku.find(i => i.sku === eligible.itemCode);
+          const matchingCartItems = cartItem ? [{
+            supplyId: cartItem.supplyId,
+            supplyName: cartItem.supplyName,
+            sku: cartItem.sku,
+            price: cartItem.price,
+            quantity: cartItem.quantity,
+          }] : [];
+          
+          const calculatedDiscount = calculateDealDiscount(parsed, matchingCartItems);
+          
+          deals.push({
+            programId: program.programId,
+            programTitle: title,
+            manufacturer: offer?.manufacturer || eligible.manufacturer,
+            description: offer?.description || '',
+            imageUrl: offer?.imageUrl || '',
+            dealType: parsed.dealType,
+            discountAmount: parsed.discountAmount,
+            buyQty: parsed.buyQty,
+            freeQty: parsed.freeQty,
+            matchingCartItems,
+            calculatedDiscount,
+            autoApply: parsed.dealType !== 'unknown',
+          });
         }
+      }
+    }
+    
+    // Fallback: match cart items to deals by manufacturer/brand + product keywords
+    // when eligiblePurchaseItems doesn't recognize the UPC
+    if (onlineOffers.length > 0) {
+      for (const offer of onlineOffers) {
+        if (processedPrograms.has(offer.programId)) continue;
         
-        processedPrograms.add(program.programId);
+        const titleKeywords = extractDealKeywords(offer.title);
+        if (!titleKeywords.manufacturer) continue;
         
-        const offer = onlineOffers.find(o => o.programId === program.programId);
-        if (!offer) continue;
-        const title = offer.title || program.programTitle;
-        const parsed = parseDealType(title);
+        const parsed = parseDealType(offer.title);
+        if (parsed.dealType === 'free_with_purchase' || parsed.dealType === 'unknown') continue;
         
-        if (program.rebateAmount && parsed.dealType !== 'bogo' && parsed.dealType !== 'buy_x_get_y') {
-          parsed.dealType = 'dollar_off';
-          parsed.discountAmount = program.rebateAmount;
-        }
-        
-        const cartItem = itemsWithSku.find(i => i.sku === eligible.itemCode);
-        const matchingCartItems = cartItem ? [{
-          supplyId: cartItem.supplyId,
-          supplyName: cartItem.supplyName,
-          sku: cartItem.sku,
-          price: cartItem.price,
-          quantity: cartItem.quantity,
-        }] : [];
-        
-        const calculatedDiscount = calculateDealDiscount(parsed, matchingCartItems);
-        
-        deals.push({
-          programId: program.programId,
-          programTitle: title,
-          manufacturer: offer?.manufacturer || eligible.manufacturer,
-          description: offer?.description || '',
-          imageUrl: offer?.imageUrl || '',
-          dealType: parsed.dealType,
-          discountAmount: parsed.discountAmount,
-          buyQty: parsed.buyQty,
-          freeQty: parsed.freeQty,
-          matchingCartItems,
-          calculatedDiscount,
-          autoApply: parsed.dealType !== 'unknown',
+        const matchingItems = itemsWithSku.filter(item => {
+          const itemBrand = (item.brand || '').toLowerCase().trim();
+          const itemName = item.supplyName.toLowerCase();
+          const mfg = titleKeywords.manufacturer.toLowerCase();
+          
+          const brandMatch = (itemBrand.length > 0 && (itemBrand.includes(mfg) || mfg.includes(itemBrand))) ||
+            itemName.startsWith(mfg);
+          if (!brandMatch) return false;
+          
+          if (titleKeywords.productKeywords.length > 0) {
+            const matchedKeywords = titleKeywords.productKeywords.filter(kw => {
+              const kwLower = kw.toLowerCase();
+              if (itemName.includes(kwLower)) return true;
+              if (kwLower.length >= 5) {
+                const prefix = kwLower.substring(0, Math.min(6, kwLower.length));
+                return itemName.includes(prefix);
+              }
+              return false;
+            });
+            const sizeKeywords = titleKeywords.productKeywords.filter(kw => /^\d+(\.\d+)?(oz|lb|lbs)$/i.test(kw));
+            const hasSizeMatch = sizeKeywords.some(sz => {
+              const szLower = sz.toLowerCase();
+              return itemName.includes(szLower) || itemName.match(new RegExp(`\\b${szLower.replace('.', '\\.')}\\b`));
+            });
+            return matchedKeywords.length >= 1 && (sizeKeywords.length === 0 || hasSizeMatch);
+          }
+          return true;
         });
+        
+        if (matchingItems.length > 0) {
+          const cartMatchItems = matchingItems.map(item => ({
+            supplyId: item.supplyId,
+            supplyName: item.supplyName,
+            sku: item.sku,
+            price: item.price,
+            quantity: item.quantity,
+          }));
+          
+          const calculatedDiscount = calculateDealDiscount(parsed, cartMatchItems);
+          
+          deals.push({
+            programId: offer.programId,
+            programTitle: offer.title,
+            manufacturer: offer.manufacturer,
+            description: offer.description || '',
+            imageUrl: offer.imageUrl || '',
+            dealType: parsed.dealType,
+            discountAmount: parsed.discountAmount,
+            buyQty: parsed.buyQty,
+            freeQty: parsed.freeQty,
+            matchingCartItems: cartMatchItems,
+            calculatedDiscount,
+            autoApply: true,
+          });
+          processedPrograms.add(offer.programId);
+          console.log(`[ASTRO] Fallback match: "${offer.title}" matched ${matchingItems.length} cart item(s) by brand/keyword`);
+        }
       }
     }
     
@@ -968,6 +1037,40 @@ export async function evaluateCartDeals(
     console.error('[ASTRO] Error evaluating cart deals:', error);
     return [];
   }
+}
+
+/**
+ * Extract manufacturer and product keywords from deal title
+ * Examples: "Fromm | Buy 1, Get 1 FREE on PurrSnickitty 3oz Cans" → { manufacturer: "fromm", productKeywords: ["purrsnick", "3oz"] }
+ */
+function extractDealKeywords(title: string): { manufacturer: string; productKeywords: string[] } {
+  const pipeIndex = title.indexOf('|');
+  let manufacturer = '';
+  let productPart = title;
+  
+  if (pipeIndex > 0) {
+    manufacturer = title.substring(0, pipeIndex).trim();
+    productPart = title.substring(pipeIndex + 1).trim();
+  }
+  
+  const cleanedProduct = productPart
+    .replace(/Buy\s+\d+,?\s*Get\s+\d+\s+(FREE|\$[\d.]+\s+OFF)/gi, '')
+    .replace(/\$[\d.]+\s+OFF/gi, '')
+    .replace(/FREE\s+/gi, '')
+    .replace(/\b(on|with|select|purchase|of)\b/gi, '')
+    .trim();
+  
+  const words = cleanedProduct.split(/\s+/).filter(w => w.length > 2);
+  const sizeWords = words.filter(w => /^\d+(\.\d+)?(oz|lb|lbs)$/i.test(w));
+  const productWords = words.filter(w => 
+    !/^\d+(\.\d+)?(oz|lb|lbs)$/i.test(w) && 
+    !/^(cans?|bags?|pouche?s?|boxes?)$/i.test(w) &&
+    w.length > 3
+  );
+  
+  const keywords = [...productWords, ...sizeWords];
+  
+  return { manufacturer, productKeywords: keywords };
 }
 
 /**
@@ -1000,7 +1103,10 @@ export async function checkEligibleItems(
     }
 
     const result = await astroRequest('eligiblePurchaseItems', data);
-    const items = Array.isArray(result.returnData) ? result.returnData : [];
+    console.log('[ASTRO] eligiblePurchaseItems full response:', JSON.stringify(result).substring(0, 500));
+    const rawData = result.returnData;
+    const items = Array.isArray(rawData) ? rawData : 
+                  rawData && typeof rawData === 'object' && !Array.isArray(rawData) ? [rawData] : [];
     
     return items.map((item: any) => ({
       itemCode: item.item_code,

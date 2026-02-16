@@ -2050,6 +2050,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                     sku: supply?.sku || '',
                     price: parseFloat(supply?.price || '0'),
                     quantity: item.quantity,
+                    brand: supply?.brand || '',
                   };
                 })
                 .filter((item: any) => item.sku && item.sku.trim() !== '');
@@ -9329,6 +9330,7 @@ West Monroe LA 71291
             sku: supply?.sku || '',
             price: parseFloat(supply?.price || '0'),
             quantity: item.quantity,
+            brand: supply?.brand || '',
           };
         })
         .filter(item => item.sku && item.sku.trim() !== '');
