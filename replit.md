@@ -94,7 +94,7 @@ The Animal House Pet Store is a mobile-first e-commerce platform specializing in
   - **Science Diet Color Rules (based on packaging band):**
     - Puppy & Kitten = Green band
     - Small & Mini / Little Bites = Pink band
-    - Specialty (Hairball, Sensitive, Urinary, Vitality, Perfect Digestion) = Silver band
+    - Specialty (Hairball, Sensitive, Urinary, Urinary, Vitality, Perfect Digestion) = Silver band
     - Light products = Red band (NOT specialty)
     - Regular Adult & Senior (7+, 11+) = Red band
     - Treats = Red band (EXCEPT Flexi-Stix, Soft-Baked, Grain Free Crunchy)
