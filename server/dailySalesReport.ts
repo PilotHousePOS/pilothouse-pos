@@ -183,17 +183,42 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
       totalOrderDiscounts += orderDiscountAmount;
       orderDiscountCount++;
       let discountType = 'Other';
+      let alreadySplit = false;
       if (orderDiscountReason.toLowerCase().includes('employee')) {
         discountType = 'Employee Discount';
       } else if (orderDiscountReason.toLowerCase().includes('astro') || orderDiscountReason.toLowerCase().includes('loyalty') || orderDiscountReason.toLowerCase().includes('reward')) {
-        discountType = 'Astro Loyalty Reward';
+        try {
+          const jsonStr = orderDiscountReason.replace('Astro Loyalty Reward: ', '');
+          const parsed = JSON.parse(jsonStr);
+          const hasRewards = parsed.appliedRewards && parsed.appliedRewards.length > 0;
+          const hasDeals = parsed.appliedDeals && parsed.appliedDeals.length > 0;
+          if (hasRewards && hasDeals) {
+            const rewardTotal = parsed.appliedRewards.reduce((s: number, r: any) => s + (parseFloat(r.discountAmount) || 0), 0);
+            const dealTotal = orderDiscountAmount - rewardTotal;
+            if (rewardTotal > 0) {
+              discountDetails.push({ orderId: order.id, amount: rewardTotal, reason: orderDiscountReason, type: 'Astro Loyalty Reward' });
+            }
+            if (dealTotal > 0) {
+              discountDetails.push({ orderId: order.id, amount: dealTotal, reason: orderDiscountReason, type: 'Astro Mfg Deal' });
+            }
+            alreadySplit = true;
+          } else if (hasDeals && !hasRewards) {
+            discountType = 'Astro Mfg Deal';
+          } else {
+            discountType = 'Astro Loyalty Reward';
+          }
+        } catch {
+          discountType = 'Astro Loyalty Reward';
+        }
       }
-      discountDetails.push({
-        orderId: order.id,
-        amount: orderDiscountAmount,
-        reason: orderDiscountReason,
-        type: discountType,
-      });
+      if (!alreadySplit) {
+        discountDetails.push({
+          orderId: order.id,
+          amount: orderDiscountAmount,
+          reason: orderDiscountReason,
+          type: discountType,
+        });
+      }
     }
 
     // Net Sales By Day Part - categorize by order time in CST
@@ -576,13 +601,16 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
         ${(() => {
           const employeeDiscounts = discountDetails.filter(d => d.type === 'Employee Discount');
           const astroDiscounts = discountDetails.filter(d => d.type === 'Astro Loyalty Reward');
+          const astroDealDiscounts = discountDetails.filter(d => d.type === 'Astro Mfg Deal');
           const otherDiscounts = discountDetails.filter(d => d.type === 'Other');
           const empTotal = employeeDiscounts.reduce((s, d) => s + d.amount, 0);
           const astroTotal = astroDiscounts.reduce((s, d) => s + d.amount, 0);
+          const astroDealTotal = astroDealDiscounts.reduce((s, d) => s + d.amount, 0);
           const otherTotal = otherDiscounts.reduce((s, d) => s + d.amount, 0);
           let rows = '';
           if (empTotal > 0) rows += dataRow('Employee Discounts', formatCurrency(empTotal), String(employeeDiscounts.length));
           if (astroTotal > 0) rows += dataRow('Astro Rewards', formatCurrency(astroTotal), String(astroDiscounts.length));
+          if (astroDealTotal > 0) rows += dataRow('Astro Mfg Deals', formatCurrency(astroDealTotal), String(astroDealDiscounts.length));
           if (otherTotal > 0) rows += dataRow('Other Discounts', formatCurrency(otherTotal), String(otherDiscounts.length));
           const allTotal = totalLoyaltyDiscounts + totalOrderDiscounts;
           if (allTotal > 0) {
@@ -601,6 +629,11 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
               const parsed = JSON.parse(d.reason.replace('Astro Loyalty Reward: ', ''));
               reasonDisplay = parsed.appliedRewards?.map((r: any) => r.rewardName || 'Free Item').join(', ') || 'Astro Reward';
             } catch { reasonDisplay = 'Astro Reward'; }
+          } else if (d.type === 'Astro Mfg Deal') {
+            try {
+              const parsed = JSON.parse(d.reason.replace('Astro Loyalty Reward: ', ''));
+              reasonDisplay = parsed.appliedDeals?.map((dl: any) => dl.dealName || dl.programName || 'Mfg Deal').join(', ') || 'Mfg Deal';
+            } catch { reasonDisplay = 'Mfg Deal'; }
           } else if (d.type === 'Employee Discount') {
             const pctMatch = d.reason.match(/(\d+)%/);
             reasonDisplay = pctMatch ? `Employee (${pctMatch[1]}%)` : 'Employee Discount';
@@ -828,13 +861,16 @@ ${totalLoyaltyDiscounts > 0 ? `Loyalty Credits           ${formatCurrency(totalL
 ${(() => {
   const employeeDiscounts = discountDetails.filter(d => d.type === 'Employee Discount');
   const astroDiscounts = discountDetails.filter(d => d.type === 'Astro Loyalty Reward');
+  const astroDealDiscounts = discountDetails.filter(d => d.type === 'Astro Mfg Deal');
   const otherDiscounts = discountDetails.filter(d => d.type === 'Other');
   const empTotal = employeeDiscounts.reduce((s, d) => s + d.amount, 0);
   const astroTotal = astroDiscounts.reduce((s, d) => s + d.amount, 0);
+  const astroDealTotal = astroDealDiscounts.reduce((s, d) => s + d.amount, 0);
   const otherTotal = otherDiscounts.reduce((s, d) => s + d.amount, 0);
   let rows = '';
   if (empTotal > 0) rows += `Employee Discounts        ${formatCurrency(empTotal).padStart(10)}    ${String(employeeDiscounts.length).padStart(5)}\n`;
   if (astroTotal > 0) rows += `Astro Rewards             ${formatCurrency(astroTotal).padStart(10)}    ${String(astroDiscounts.length).padStart(5)}\n`;
+  if (astroDealTotal > 0) rows += `Astro Mfg Deals           ${formatCurrency(astroDealTotal).padStart(10)}    ${String(astroDealDiscounts.length).padStart(5)}\n`;
   if (otherTotal > 0) rows += `Other Discounts           ${formatCurrency(otherTotal).padStart(10)}    ${String(otherDiscounts.length).padStart(5)}\n`;
   const allTotal = totalLoyaltyDiscounts + totalOrderDiscounts;
   if (allTotal > 0) rows += `Total Discounts           ${formatCurrency(allTotal).padStart(10)}    ${String(loyaltyDiscountCount + orderDiscountCount).padStart(5)}\n`;
@@ -850,6 +886,11 @@ ${discountDetails.map(d => {
       const parsed = JSON.parse(d.reason.replace('Astro Loyalty Reward: ', ''));
       reasonDisplay = parsed.appliedRewards?.map((r: any) => r.rewardName || 'Free Item').join(', ') || 'Astro Reward';
     } catch { reasonDisplay = 'Astro Reward'; }
+  } else if (d.type === 'Astro Mfg Deal') {
+    try {
+      const parsed = JSON.parse(d.reason.replace('Astro Loyalty Reward: ', ''));
+      reasonDisplay = parsed.appliedDeals?.map((dl: any) => dl.dealName || dl.programName || 'Mfg Deal').join(', ') || 'Mfg Deal';
+    } catch { reasonDisplay = 'Mfg Deal'; }
   } else if (d.type === 'Employee Discount') {
     const pctMatch = d.reason.match(/(\d+)%/);
     reasonDisplay = pctMatch ? `Employee (${pctMatch[1]}%)` : 'Employee Discount';
