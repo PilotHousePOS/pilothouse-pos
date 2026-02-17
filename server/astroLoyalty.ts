@@ -72,7 +72,7 @@ async function getAccessToken(): Promise<string> {
   return tokenData.access_token;
 }
 
-async function astroRequest(endpoint: string, jsonData?: Record<string, any>): Promise<any> {
+async function astroRequest(endpoint: string, jsonData?: Record<string, any>, _retried?: boolean): Promise<any> {
   const token = await getAccessToken();
 
   const params: Record<string, string> = {};
@@ -106,6 +106,13 @@ async function astroRequest(endpoint: string, jsonData?: Record<string, any>): P
   }
   if (endpoint === 'listOffers') {
     console.log(`[ASTRO] Full listOffers response:`, JSON.stringify(data).substring(0, 3000));
+  }
+
+  if (astroStatus === 300 && !_retried) {
+    console.log('[ASTRO] Token expired, refreshing and retrying...');
+    cachedToken = null;
+    tokenExpiresAt = 0;
+    return astroRequest(endpoint, jsonData, true);
   }
 
   if (astroStatus && astroStatus !== 100) {
