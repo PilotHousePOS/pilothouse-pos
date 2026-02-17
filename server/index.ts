@@ -137,6 +137,11 @@ app.get('/.well-known/assetlinks.json', (_req, res) => {
   res.sendFile(getPwaFilePath('.well-known/assetlinks.json'));
 });
 
+app.get('/google4267b0cfa31092a0.html', (_req, res) => {
+  res.setHeader('Content-Type', 'text/html');
+  res.sendFile(getPwaFilePath('google4267b0cfa31092a0.html'));
+});
+
 app.get('/manifest.json', (_req, res) => {
   res.sendFile(getPwaFilePath('manifest.json'));
 });
