@@ -1871,6 +1871,7 @@ export class DatabaseStorage implements IStorage {
     catToyToToys: number;
     filterTypeSynced: number;
     beefhideFixed: number;
+    groomingToHealthcare: number;
     total: number;
   }> {
     const stats = {

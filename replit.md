@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its primary goal is to deliver a superior online shopping experience, streamline service bookings, and provide comprehensive inventory and administration tools. The project aims to become a market leader by enhancing customer engagement, improving operational efficiency, and increasing customer retention and market share.
+The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its core purpose is to deliver a superior online shopping experience, streamline service bookings, and provide comprehensive inventory and administration tools. The project aims to become a market leader by enhancing customer engagement, improving operational efficiency, and increasing customer retention and market share.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -20,7 +20,7 @@ The Animal House Pet Store is a mobile-first e-commerce platform specializing in
 - Product Recommendations ("You May Also Like"): Smart cross-category recommendations based on product type.
 - Extended Product Information: Sourced from reliable retailers (Chewy, Amazon, manufacturer websites).
 - Data Quality Validation Rules:
-  - Wet vs Dry Food Ingredients: Wet food (cans, stews, broths, broths, entrees) ingredients differ significantly from dry food (kibble, bags). Never copy dry food ingredients to wet food products.
+  - Wet vs Dry Food Ingredients: Wet food (cans, stews, broths, entrees) ingredients differ significantly from dry food (kibble, bags). Never copy dry food ingredients to wet food products.
   - Product Format Detection Rules:
     - Bone broth toppers (Come-Pooch-A): Must start with "[protein] bone broth" (e.g., "Turkey bone broth, liquid Lactobacillus...")
     - Canned wet food (13oz, 5.5oz cans): Must start with "[protein], [protein] broth" (e.g., "Chicken, chicken broth, chicken liver...")
@@ -94,7 +94,7 @@ The Animal House Pet Store is a mobile-first e-commerce platform specializing in
   - **Science Diet Color Rules (based on packaging band):**
     - Puppy & Kitten = Green band
     - Small & Mini / Little Bites = Pink band
-    - Specialty (Hairball, Sensitive, Urinary, Urinary, Vitality, Perfect Digestion) = Silver band
+    - Specialty (Hairball, Sensitive, Urinary, Vitality, Perfect Digestion) = Silver band
     - Light products = Red band (NOT specialty)
     - Regular Adult & Senior (7+, 11+) = Red band
     - Treats = Red band (EXCEPT Flexi-Stix, Soft-Baked, Grain Free Crunchy)

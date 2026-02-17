@@ -1310,10 +1310,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           brand: supply.brand || '',
           category: supply.category || '',
           price: supply.price ? `$${supply.price}` : '',
-          stock: supply.stock || 0,
+          stock: (supply as any).stockQuantity || 0,
           description: supply.description || '',
-          specialtySection: supply.specialtySection || '',
-          productType: supply.productType || '',
+          specialtySection: (supply as any).filterType || '',
+          productType: supply.category || '',
         });
       });
 
@@ -1555,7 +1555,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           costLow: '',
           costEntered: '',
           stockType: 2,
-          qtyOnHand: supply.stock || 0,
+          qtyOnHand: (supply as any).stockQuantity || 0,
           minQty: 1,
           qtyReorder: 5,
           limitQty: '',
@@ -1565,7 +1565,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           sku: supply.sku || supply.id.toString(),
           altSku: supply.sku ? supply.id.toString() : '',
           category: formatCategory(supply.category || ''),
-          subCategory: formatCategory(supply.productType || ''),
+          subCategory: formatCategory(supply.category || ''),
           mfg: supply.brand || '',
           mfgPart: supply.mfgPart || '',
           color: supply.color || '',
@@ -1576,7 +1576,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           sbf: '',
           unit: 'ea',
           chargeUnit: 'ea',
-          customField1: supply.specialtySection || '',
+          customField1: (supply as any).filterType || '',
           customField2: '',
           customField3: '',
           customField4: '',
@@ -5835,9 +5835,12 @@ West Monroe LA 71291
       `;
 
       // Send email using sendGrid
-      const { sendEmail } = await import('./notifications');
-      await sendEmail({
+      const { getUncachableSendGridClient } = await import('./sendgridIntegration');
+      const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
+      await client.send({
         to: email,
+        from: { email: fromEmail, name: 'Animal House Pet Store' },
+        replyTo,
         subject: `Refund Report: ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}`,
         html: emailHtml
       });
@@ -9465,7 +9468,8 @@ West Monroe LA 71291
       }
 
       // Get order items
-      const orderItemsList = await storage.getOrderItemsByOrder(orderId);
+      const orderWithItems = await storage.getOrderWithItems(orderId);
+      const orderItemsList = orderWithItems?.items || [];
       if (orderItemsList.length === 0) {
         return res.status(400).json({ message: "Order has no items" });
       }
