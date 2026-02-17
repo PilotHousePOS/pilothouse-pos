@@ -138,7 +138,7 @@ The Animal House Pet Store is a mobile-first e-commerce platform specializing in
   2. Chewy.com product pages (detailed, verified)
   3. Amazon product listings (comprehensive)
   4. Product packaging (for ingredients/analysis)
-- SKU = UPC: The SKU field is used for UPC codes. All UPC data is stored in the SKU field. Manual UPC assignments (SKU values in production) must be preserved during sync/import. UPCs must be validated for leading zeros and standard 12-digit length. UPC prefix must match brand's known prefix. Attribute-based matching (size, wattage, weight, dimension, count) is critical for exact product identification.
+- SKU = UPC: The SKU field is for UPC codes. All UPC data is stored in the SKU field. Manual UPC assignments (SKU values in production) must be preserved during sync/import. UPCs must be validated for leading zeros and standard 12-digit length. UPC prefix must match brand's known prefix. Attribute-based matching (size, wattage, weight, dimension, count) is critical for exact product identification.
 - PROTECTED FIELDS (NEVER modify via scripts):
   - `sku` (UPC codes) - Manually curated, must always persist
   - `name` (Product titles) - Manually curated, must always persist
