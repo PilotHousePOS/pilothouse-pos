@@ -132,6 +132,11 @@ app.use('/icons', (req, res, next) => {
   express.static(iconsPath)(req, res, next);
 });
 
+app.get('/.well-known/assetlinks.json', (_req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.sendFile(getPwaFilePath('.well-known/assetlinks.json'));
+});
+
 app.get('/manifest.json', (_req, res) => {
   res.sendFile(getPwaFilePath('manifest.json'));
 });

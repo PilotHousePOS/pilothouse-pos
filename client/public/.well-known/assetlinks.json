@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.replit.animalhouseexperience.twa",
+        "sha256_cert_fingerprints": ["16:70:EC:0A:F1:9F:77:A2:02:AA:6B:80:99:11:30:47:F7:9E:02:58:9F:29:07:7A:F1:2B:8F:0A:6A:26:43:66"]
+      }
+    }]
