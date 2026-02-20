@@ -13098,8 +13098,8 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
         supplyId={supply.id}
         mainImageUrl={formData.imageUrl}
         additionalImageUrls={formData.imageUrls}
-        onMainImageChange={(newUrl) => setFormData({ ...formData, imageUrl: newUrl })}
-        onAdditionalImagesChange={(urls) => setFormData({ ...formData, imageUrls: urls })}
+        onMainImageChange={(newUrl) => setFormData(prev => ({ ...prev, imageUrl: newUrl }))}
+        onAdditionalImagesChange={(urls) => setFormData(prev => ({ ...prev, imageUrls: urls }))}
       />
       <Button type="submit" className="w-full bg-brand-blue hover:bg-blue-600">
         Update Supply
@@ -14482,7 +14482,7 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
         supplyId={null}
         mainImageUrl={formData.imageUrl}
         additionalImageUrls={additionalImageUrls}
-        onMainImageChange={(url) => setFormData({ ...formData, imageUrl: url })}
+        onMainImageChange={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
         onAdditionalImagesChange={setAdditionalImageUrls}
       />
       <Button type="submit" className="w-full">Add Supply</Button>
