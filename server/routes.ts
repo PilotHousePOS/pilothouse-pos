@@ -155,6 +155,37 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   app.use('/api/auth/login', authLimiter);
   app.use('/api/auth/register', authLimiter);
   app.use('/api/forgot-password', authLimiter);
+  app.use('/api/auth/reset-password', authLimiter);
+  app.use('/api/auth/change-password', authLimiter);
+
+  const searchLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000,
+    max: 60,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: "Too many search requests, please slow down." },
+  });
+  app.use('/api/supplies/search', searchLimiter);
+  app.use('/api/pets', searchLimiter);
+
+  const checkoutLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: "Too many checkout attempts, please try again later." },
+  });
+  app.use('/api/orders', checkoutLimiter);
+  app.use('/api/create-payment-intent', checkoutLimiter);
+
+  const uploadLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000,
+    max: 30,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: "Too many uploads, please wait a few minutes." },
+  });
+  app.use('/api/upload', uploadLimiter);
 
   // Stripe API routes
   app.get("/api/stripe/config", async (req, res) => {
@@ -661,6 +692,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(401).json({ message: "Current password is incorrect" });
       }
 
+      // Prevent reuse of the same password
+      const isSamePassword = await verifyPassword(newPassword, currentUser.password);
+      if (isSamePassword) {
+        return res.status(400).json({ message: "New password cannot be the same as your current password" });
+      }
+
       // Hash new password and update user
       const hashedNewPassword = await hashPassword(newPassword);
       const updatedUser = await storage.upsertUser({
@@ -877,6 +914,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const user = await storage.getUser(resetToken.userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
+      }
+
+      // Prevent reuse of the same password
+      const isSamePassword = await verifyPassword(newPassword, user.password);
+      if (isSamePassword) {
+        return res.status(400).json({ message: "New password cannot be the same as your previous password. Please choose a different password." });
       }
 
       // Hash and update password
