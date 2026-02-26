@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its primary goal is to enhance the online shopping experience, streamline service bookings, and provide robust inventory and administration tools. The project aims to significantly boost customer engagement and improve operational efficiency within the pet retail sector, with a specific focus on becoming a premier online destination for exotic pet owners and their unique needs. The business vision includes expanding market reach, improving customer loyalty through personalized experiences, and optimizing internal operations to support sustainable growth in the competitive pet retail industry.
+The Animal House Pet Store is a mobile-first e-commerce platform for exotic reptiles, pet supplies, and grooming services. Its purpose is to enhance online shopping, streamline service bookings, and provide robust inventory and administration tools. The project aims to boost customer engagement and operational efficiency in the pet retail sector, becoming a premier online destination for exotic pet owners. The business vision includes expanding market reach, improving customer loyalty through personalized experiences, and optimizing internal operations for sustainable growth.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -184,12 +184,12 @@ Step 5: NEVER mark task complete until verification passes
 - Astro Deal Auto-Application: For linked Astro customers, cart automatically detects eligible manufacturer deals (via eligiblePurchaseItems + listOffers cross-reference). Only "Online & In-Store" offer-type programs are applied. Supports $X OFF (rebate), BOGO, and Buy X Get Y $OFF deal types. Deal discount applied pre-tax in cart totals. Deal info persisted in order's astroRewardInfo JSON for admin audit.
 
 ## System Architecture
-- **UI/UX:** Features a dark, bold, high-contrast design complemented by Amazon-style image carousels for product displays.
-- **Authentication:** Implements JWT-based authentication coupled with a robust three-tier, role-based access control system.
-- **Frontend:** Built with React, Vite, TypeScript, Tailwind CSS, and shadcn/ui for components. Wouter handles routing, and TanStack Query manages data fetching.
-- **Backend:** Powered by Express.js and TypeScript, providing a scalable API.
-- **Database & ORM:** Utilizes PostgreSQL for data storage, managed through Drizzle ORM for type-safe database interactions.
-- **Key Features:** Includes automated product categorization, advanced live animal detection, intelligent category cleanup, smart abbreviation expansion, and real-time Web Push Notifications.
+- **UI/UX:** Dark, bold, high-contrast design with Amazon-style image carousels.
+- **Authentication:** JWT-based authentication with a three-tier, role-based access control system.
+- **Frontend:** React, Vite, TypeScript, Tailwind CSS, shadcn/ui for components, Wouter for routing, and TanStack Query for data fetching.
+- **Backend:** Express.js and TypeScript.
+- **Database & ORM:** PostgreSQL managed through Drizzle ORM.
+- **Key Features:** Automated product categorization, advanced live animal detection, intelligent category cleanup, smart abbreviation expansion, and real-time Web Push Notifications.
 
 ## External Dependencies
 - PostgreSQL
