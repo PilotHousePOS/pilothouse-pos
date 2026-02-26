@@ -25,6 +25,7 @@ import Wishlist from "@/pages/wishlist";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import TermsOfService from "@/pages/terms-of-service";
 import VerifyEmail from "@/pages/verify-email";
+import DeleteAccount from "@/pages/delete-account";
 import NotFound from "@/pages/not-found";
 import BottomNav from "@/components/bottom-nav";
 import BackToTop from "@/components/back-to-top";
@@ -48,6 +49,7 @@ function Router() {
         <Route path="/forgot-password" component={ForgotPassword} />
         <Route path="/reset-password" component={ResetPassword} />
         <Route path="/verify-email" component={VerifyEmail} />
+        <Route path="/delete-account" component={DeleteAccount} />
         <Route path="/privacy-policy" component={PrivacyPolicy} />
         <Route path="/terms-of-service" component={TermsOfService} />
         
