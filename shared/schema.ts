@@ -61,6 +61,28 @@ export const loyaltySettings = pgTable("loyalty_settings", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Passkey / biometric credentials (WebAuthn)
+export const passkeyCredentials = pgTable("passkey_credentials", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  credentialId: text("credential_id").notNull().unique(),
+  publicKey: text("public_key").notNull(),
+  counter: integer("counter").notNull().default(0),
+  transports: text("transports"),
+  deviceName: varchar("device_name", { length: 255 }).default("Biometric Device"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Temporary WebAuthn challenges (cleaned up after verification)
+export const passkeyChallengers = pgTable("passkey_challenges", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id"),
+  challenge: text("challenge").notNull(),
+  type: varchar("type", { length: 20 }).notNull(), // "register" | "login"
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Password reset tokens
 export const passwordResetTokens = pgTable("password_reset_tokens", {
   id: serial("id").primaryKey(),
