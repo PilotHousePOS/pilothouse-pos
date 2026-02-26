@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its primary goal is to enhance the online shopping experience, streamline service bookings, and provide robust inventory and administration tools. This project aims to boost customer engagement and improve operational efficiency within the pet retail sector by offering a specialized platform for exotic pet owners and general pet supply needs.
+The Animal House Pet Store is a mobile-first e-commerce platform for exotic reptiles, pet supplies, and grooming services. Its purpose is to enhance online shopping, streamline service bookings, and provide robust inventory and administration tools. The project aims to boost customer engagement and improve operational efficiency in the pet retail sector, particularly for exotic pet owners, with a vision to become a leading online destination for exotic pet needs.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
