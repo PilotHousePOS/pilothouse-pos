@@ -45,6 +45,9 @@ export default function Profile() {
   const [notifEnabled, setNotifEnabled] = useState(false);
 
   const [isLinkingAstro, setIsLinkingAstro] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   const { data: currentUser, isLoading: userLoading, error } = useQuery<User>({
     queryKey: ["/api/auth/user"],
@@ -261,6 +264,31 @@ export default function Profile() {
     localStorage.clear();
     queryClient.clear();
     window.location.href = '/';
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText.toLowerCase() !== 'delete') return;
+    setIsDeletingAccount(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/auth/delete-account', {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (res.ok) {
+        localStorage.clear();
+        queryClient.clear();
+        window.location.href = '/';
+      } else {
+        const data = await res.json();
+        toast({ title: "Could not delete account", description: data.message, variant: "destructive" });
+        setIsDeletingAccount(false);
+      }
+    } catch {
+      toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
+      setIsDeletingAccount(false);
+    }
   };
 
   const userInitials = currentUser?.firstName && currentUser?.lastName 
@@ -758,6 +786,58 @@ export default function Profile() {
       >
         Sign Out
       </Button>
+
+      {/* Delete Account */}
+      <div className="mt-4 text-center">
+        <button
+          className="text-sm text-gray-400 underline underline-offset-2 hover:text-red-400 transition-colors"
+          onClick={() => { setShowDeleteConfirm(true); setDeleteConfirmText(""); }}
+        >
+          Delete my account
+        </button>
+      </div>
+
+      {/* Delete Account Confirmation Dialog */}
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent className="bg-gray-900 border border-gray-700 text-white max-w-sm mx-4">
+          <DialogHeader>
+            <DialogTitle className="text-red-400">Delete Account</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              This will permanently delete your account, order history, appointments, and all personal data. This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div>
+              <Label className="text-gray-300 text-sm">Type <span className="font-bold text-white">delete</span> to confirm</Label>
+              <Input
+                className="mt-2 bg-gray-800 border-gray-600 text-white"
+                placeholder="delete"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                autoCapitalize="none"
+              />
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeletingAccount}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                className="flex-1"
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText.toLowerCase() !== 'delete' || isDeletingAccount}
+              >
+                {isDeletingAccount ? "Deleting..." : "Delete Account"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

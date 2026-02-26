@@ -695,6 +695,36 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Self-service account deletion
+  app.delete('/api/auth/delete-account', async (req, res) => {
+    try {
+      const cookieToken = req.cookies?.auth_token;
+      const authHeader = req.headers.authorization;
+      const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+      const token = headerToken || cookieToken;
+
+      if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+      const decoded = verifyToken(token);
+      if (!decoded) return res.status(401).json({ message: "Invalid token" });
+
+      const user = await storage.getUser(decoded.id);
+      if (!user) return res.status(404).json({ message: "User not found" });
+
+      // Admins cannot self-delete to protect the system
+      if (user.isAdmin) {
+        return res.status(403).json({ message: "Admin accounts cannot be self-deleted. Contact another admin." });
+      }
+
+      await storage.deleteUser(user.id);
+      res.clearCookie('auth_token');
+      res.json({ message: "Account deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      res.status(500).json({ message: "Failed to delete account" });
+    }
+  });
+
   // Update user email
   app.patch('/api/auth/update-email', async (req, res) => {
     try {
