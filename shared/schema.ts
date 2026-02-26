@@ -45,6 +45,9 @@ export const users = pgTable("users", {
   marketingEmailsOptIn: boolean("marketing_emails_opt_in").default(true),
   appointmentEmailsOptIn: boolean("appointment_emails_opt_in").default(true),
   abandonedCartEmailSentAt: timestamp("abandoned_cart_email_sent_at"),
+  emailVerified: boolean("email_verified").default(true),
+  emailVerificationToken: varchar("email_verification_token", { length: 255 }),
+  emailVerificationExpiry: timestamp("email_verification_expiry"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

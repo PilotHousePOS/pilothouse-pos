@@ -11,7 +11,27 @@ import { useToast } from "@/hooks/use-toast";
 export default function Auth() {
   const [, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
+  const [verificationPending, setVerificationPending] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState("");
+  const [resendingVerification, setResendingVerification] = useState(false);
   const { toast } = useToast();
+
+  const handleResendVerification = async (email: string) => {
+    setResendingVerification(true);
+    try {
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      toast({ title: data.message });
+    } catch {
+      toast({ title: "Failed to resend. Please try again.", variant: "destructive" });
+    } finally {
+      setResendingVerification(false);
+    }
+  };
 
   const handleLogin = async (email: string, password: string) => {
     setIsLoading(true);
@@ -41,11 +61,22 @@ export default function Auth() {
       } else {
         const error = await response.json();
         console.error('Login failed:', error.message);
-        toast({
-          title: "Login Failed",
-          description: "Your email or password is incorrect. Please check your information and try again.",
-          variant: "destructive",
-        });
+        if (error.requiresVerification) {
+          setPendingEmail(email);
+          setVerificationPending(true);
+        } else if (error.verificationExpired) {
+          toast({
+            title: "Verification Expired",
+            description: "Your verification window has expired. Please register again.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Login Failed",
+            description: "Your email or password is incorrect. Please check your information and try again.",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -72,18 +103,17 @@ export default function Auth() {
       });
       
       if (response.ok) {
-        console.log('Signup successful, redirecting...');
         const userData = await response.json();
-        console.log('User data received:', userData);
-        
-        // Store token in localStorage as backup to cookies
-        if (userData.token) {
-          localStorage.setItem('token', userData.token);
-          console.log('Token stored in localStorage');
+        if (userData.requiresVerification) {
+          // Show verification pending screen
+          setPendingEmail(email);
+          setVerificationPending(true);
+        } else {
+          if (userData.token) {
+            localStorage.setItem('token', userData.token);
+          }
+          window.location.replace('/');
         }
-        
-        // Force a complete page reload to ensure authentication state is picked up
-        window.location.replace('/');
       } else {
         const error = await response.json();
         console.error('Signup failed:', error.message);
@@ -125,6 +155,42 @@ export default function Auth() {
     
     await handleLogin(email, password);
   };
+
+  if (verificationPending) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <Card className="bg-white/10 backdrop-blur-md border border-white/20 text-center">
+            <CardContent className="pt-8 pb-8 space-y-4">
+              <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center text-3xl mx-auto">✉</div>
+              <h2 className="text-2xl font-bold text-white">Check Your Email</h2>
+              <p className="text-gray-300">
+                We sent a verification link to <strong className="text-white">{pendingEmail}</strong>.
+                Click the link in that email to activate your account.
+              </p>
+              <p className="text-gray-400 text-sm">The link expires in 24 hours.</p>
+              <div className="pt-2 space-y-3">
+                <Button
+                  className="w-full bg-red-600 hover:bg-red-700"
+                  onClick={() => handleResendVerification(pendingEmail)}
+                  disabled={resendingVerification}
+                >
+                  {resendingVerification ? "Sending..." : "Resend Verification Email"}
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full text-gray-400 hover:text-white"
+                  onClick={() => { setVerificationPending(false); setPendingEmail(""); }}
+                >
+                  Back to Sign In
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-start md:items-center justify-center p-6 py-8">

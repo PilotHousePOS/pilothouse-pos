@@ -22,7 +22,7 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 import { notificationService } from './notifications';
-import { sendPasswordResetEmail } from './sendgrid';
+import { sendPasswordResetEmail, sendVerificationEmail } from './sendgrid';
 import { normalizePhoneNumber } from './phoneUtils';
 import { db, resetPool } from './db';
 import { eq } from 'drizzle-orm';
@@ -427,7 +427,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       // Hash password before storing
       const hashedPassword = await hashPassword(password);
 
-      // Create new user with hashed password
+      // Generate email verification token
+      const verificationToken = crypto.randomBytes(32).toString('hex');
+      const verificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+      // Create new user with hashed password (unverified)
       const newUser = await storage.createUser({
         email,
         password: hashedPassword,
@@ -438,8 +442,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       // Phone number is now required - update user and link to any existing contacts
       const { phoneNumbersMatch } = await import("./phoneUtils");
       
-      // Update user with phone number
-      await db.update(users).set({ phoneNumber }).where(eq(users.id, newUser.id));
+      // Update user with phone number and verification token
+      await db.update(users).set({
+        phoneNumber,
+        emailVerified: false,
+        emailVerificationToken: verificationToken,
+        emailVerificationExpiry: verificationExpiry,
+      }).where(eq(users.id, newUser.id));
       
       // Find and link any existing contacts with matching phone number
       // This will also replace temp emails with user's real email
@@ -452,12 +461,15 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
       console.log(`Linked ${matchingContacts.length} contacts to new user ${newUser.id}`)
 
-      // Generate JWT token
-      const token = generateToken(newUser);
-      setAuthCookie(res, token);
-      
-      console.log('User created, token generated:', newUser.id);
-      res.json({ ...sanitizeUser(newUser), token });
+      // Send verification email (non-blocking — don't fail signup if email fails)
+      try {
+        await sendVerificationEmail(email, firstName, verificationToken);
+      } catch (emailError) {
+        console.error('Failed to send verification email during signup:', emailError);
+      }
+
+      // Return user but indicate email verification is pending
+      res.json({ ...sanitizeUser(newUser), emailVerified: false, requiresVerification: true });
     } catch (error) {
       console.error("Signup error:", error);
       res.status(500).json({ message: "Signup failed" });
@@ -532,6 +544,22 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
+      // Block login if email is not verified and the 24-hour window has expired
+      if (user.emailVerified === false) {
+        const expiry = user.emailVerificationExpiry ? new Date(user.emailVerificationExpiry) : null;
+        if (!expiry || new Date() > expiry) {
+          return res.status(403).json({
+            message: "Your account verification has expired. Please register again.",
+            verificationExpired: true,
+          });
+        }
+        // Still within 24 hours — let them know but don't block login yet
+        return res.status(403).json({
+          message: "Please verify your email address. Check your inbox for the verification link.",
+          requiresVerification: true,
+        });
+      }
+
       // Generate JWT token
       const token = generateToken(user);
       setAuthCookie(res, token);
@@ -548,6 +576,90 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   app.post('/api/auth/logout', (req, res) => {
     res.clearCookie('auth_token');
     res.json({ message: "Logged out successfully" });
+  });
+
+  // Verify email address via token link
+  app.get('/api/auth/verify-email', async (req, res) => {
+    try {
+      const { token } = req.query;
+      if (!token || typeof token !== 'string') {
+        return res.status(400).json({ message: "Invalid verification token" });
+      }
+
+      // Find user by token
+      const [user] = await db.select().from(users).where(eq(users.emailVerificationToken, token)).limit(1);
+      if (!user) {
+        return res.status(400).json({ message: "Invalid or already used verification link" });
+      }
+
+      if (user.emailVerified) {
+        return res.json({ message: "Email already verified. You can log in." });
+      }
+
+      const expiry = user.emailVerificationExpiry ? new Date(user.emailVerificationExpiry) : null;
+      if (!expiry || new Date() > expiry) {
+        return res.status(400).json({ message: "Verification link has expired. Please register again.", expired: true });
+      }
+
+      // Mark as verified and clear token
+      await db.update(users).set({
+        emailVerified: true,
+        emailVerificationToken: null,
+        emailVerificationExpiry: null,
+      }).where(eq(users.id, user.id));
+
+      // Generate JWT and log them in automatically
+      const updatedUser = await storage.getUser(user.id);
+      if (updatedUser) {
+        const authToken = generateToken(updatedUser);
+        setAuthCookie(res, authToken);
+        return res.json({ message: "Email verified successfully!", ...sanitizeUser(updatedUser), token: authToken });
+      }
+
+      res.json({ message: "Email verified successfully! You can now log in." });
+    } catch (error) {
+      console.error("Email verification error:", error);
+      res.status(500).json({ message: "Verification failed" });
+    }
+  });
+
+  // Resend verification email
+  app.post('/api/auth/resend-verification', authLimiter, async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.json({ message: "If that account exists, a new verification email has been sent." });
+      }
+
+      if (user.emailVerified) {
+        return res.json({ message: "This account is already verified. Please log in." });
+      }
+
+      // Generate new token and expiry
+      const newToken = crypto.randomBytes(32).toString('hex');
+      const newExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+      await db.update(users).set({
+        emailVerificationToken: newToken,
+        emailVerificationExpiry: newExpiry,
+      }).where(eq(users.id, user.id));
+
+      try {
+        await sendVerificationEmail(email, user.firstName || 'there', newToken);
+      } catch (emailError) {
+        console.error('Failed to resend verification email:', emailError);
+      }
+
+      res.json({ message: "If that account exists, a new verification email has been sent." });
+    } catch (error) {
+      console.error("Resend verification error:", error);
+      res.status(500).json({ message: "Failed to resend verification email" });
+    }
   });
 
   // Auth routes

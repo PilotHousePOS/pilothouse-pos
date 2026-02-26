@@ -1,5 +1,67 @@
 import { getUncachableSendGridClient } from './sendgridIntegration';
 
+export async function sendVerificationEmail(toEmail: string, firstName: string, verificationToken: string): Promise<void> {
+  try {
+    const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
+
+    const baseUrl = process.env.REPLIT_DOMAINS
+      ? `https://${process.env.REPLIT_DOMAINS}`
+      : 'http://localhost:5000';
+
+    const verifyLink = `${baseUrl}/verify-email?token=${verificationToken}`;
+
+    const msg = {
+      to: toEmail,
+      from: { email: fromEmail, name: 'Animal House Pet Store' },
+      replyTo,
+      subject: 'Verify Your Animal House Account',
+      text: `Welcome to Animal House Pet Store, ${firstName}!\n\nPlease verify your email address within 24 hours by visiting:\n\n${verifyLink}\n\nIf you did not create an account, you can ignore this email.\n\nAnimal House Pet Store\n(318) 322-3023`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0;">Animal House Pet Store</h1>
+          </div>
+          <div style="padding: 30px; background-color: #f9f9f9;">
+            <h2 style="color: #333; margin-bottom: 10px;">Welcome, ${firstName}!</h2>
+            <p style="font-size: 16px; line-height: 1.5; color: #444;">
+              Thanks for creating an account. Please verify your email address to activate your account.
+            </p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${verifyLink}"
+                 style="background-color: #dc2626; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+                Verify My Email
+              </a>
+            </div>
+            <div style="background-color: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p style="margin: 0; color: #92400e; font-size: 14px;">
+                <strong>This link expires in 24 hours.</strong> If you don't verify in time, you'll need to re-register.
+              </p>
+            </div>
+            <p style="font-size: 14px; color: #666;">
+              If the button doesn't work, copy and paste this link into your browser:
+            </p>
+            <p style="font-size: 12px; color: #999; word-break: break-all;">${verifyLink}</p>
+          </div>
+          <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+            <p style="margin: 0;">Phone: (318) 322-3023</p>
+          </div>
+        </div>
+      `,
+    };
+
+    await client.send(msg);
+    console.log(`Verification email sent to ${toEmail}`);
+  } catch (error: any) {
+    console.error('Error sending verification email:', error);
+    if (error.response?.body) {
+      console.error('SendGrid error details:', JSON.stringify(error.response.body, null, 2));
+    }
+    throw new Error('Failed to send verification email');
+  }
+}
+
 export async function sendPasswordResetEmail(toEmail: string, resetToken: string): Promise<void> {
   try {
     const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
