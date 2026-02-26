@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its primary purpose is to enhance online shopping experiences, streamline service bookings, and provide robust inventory and administration tools. The project aims to boost customer engagement and operational efficiency within the pet retail sector, aspiring to become a premier online destination for exotic pet owners, expand market reach, improve customer loyalty through personalized experiences, and optimize internal operations for sustainable growth.
+The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its primary goal is to enhance the online shopping experience, streamline service bookings, and provide robust inventory and administration tools. The project aims to become a leading online destination for exotic pet owners, expand market reach, improve customer loyalty, and ensure sustainable growth.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -184,7 +184,7 @@ Step 5: NEVER mark task complete until verification passes
 - Astro Deal Auto-Application: For linked Astro customers, cart automatically detects eligible manufacturer deals (via eligiblePurchaseItems + listOffers cross-reference). Only "Online & In-Store" offer-type programs are applied. Supports $X OFF (rebate), BOGO, and Buy X Get Y $OFF deal types. Deal discount applied pre-tax in cart totals. Deal info persisted in order's astroRewardInfo JSON for admin audit.
 
 ## System Architecture
-- **UI/UX:** Dark, bold, high-contrast design with Amazon-style image carousels.
+- **UI/UX:** Dark, bold, high-contrast design featuring Amazon-style image carousels.
 - **Authentication:** JWT-based authentication with a three-tier, role-based access control system.
 - **Frontend:** React, Vite, TypeScript, Tailwind CSS, shadcn/ui for components, Wouter for routing, and TanStack Query for data fetching.
 - **Backend:** Express.js and TypeScript.
