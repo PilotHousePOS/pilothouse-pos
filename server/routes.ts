@@ -4282,6 +4282,7 @@ West Monroe LA 71291
           safePrice = safePrice.split('-')[0].trim();
         }
         updates.price = safePrice;
+        updates.priceConfirmed = true; // Admin explicitly reviewed/set this price
       }
       if (pricingMode !== undefined) updates.pricingMode = pricingMode;
       if (appointmentDate !== undefined) updates.appointmentDate = appointmentDate;

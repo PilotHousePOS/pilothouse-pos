@@ -9520,7 +9520,7 @@ export default function Admin() {
                               </div>
                             )}
                             {currentAppointment.price && (() => {
-                              const price = parseFloat(currentAppointment.price);
+                              const isConfirmed = currentAppointment.priceConfirmed;
                               const serviceType = (currentAppointment.serviceType || (currentAppointment.pets?.[0]?.serviceType) || '').toLowerCase();
                               const hasFullGrooming = serviceType.includes('full') || serviceType.includes('groom') && !serviceType.includes('bath');
                               const hasPetsWithFullGrooming = currentAppointment.pets?.some((p: any) => {
@@ -9528,10 +9528,8 @@ export default function Admin() {
                                 return st.includes('full') || (st.includes('groom') && !st.includes('bath'));
                               });
                               const isFullGrooming = hasFullGrooming || hasPetsWithFullGrooming;
-                              const defaultPrice = isFullGrooming ? 35 : 20;
-                              const isUnedited = price === defaultPrice;
                               
-                              if (isUnedited) {
+                              if (!isConfirmed) {
                                 const rangeSetting = isFullGrooming 
                                   ? groomingSettings.find((s: any) => s.setting === 'full_grooming_price')?.value 
                                   : groomingSettings.find((s: any) => s.setting === 'bath_only_price')?.value;
@@ -11859,7 +11857,7 @@ export default function Admin() {
                 </div>
                 {/* Total Price Section */}
                 {selectedAppointment.price && (() => {
-                  const price = parseFloat(selectedAppointment.price);
+                  const isConfirmed = selectedAppointment.priceConfirmed;
                   const serviceType = (selectedAppointment.serviceType || (selectedAppointment.pets?.[0]?.serviceType) || '').toLowerCase();
                   const hasFullGrooming = serviceType.includes('full') || serviceType.includes('groom') && !serviceType.includes('bath');
                   const hasPetsWithFullGrooming = selectedAppointment.pets?.some((p: any) => {
@@ -11867,10 +11865,8 @@ export default function Admin() {
                     return st.includes('full') || (st.includes('groom') && !st.includes('bath'));
                   });
                   const isFullGrooming = hasFullGrooming || hasPetsWithFullGrooming;
-                  const defaultPrice = isFullGrooming ? 35 : 20;
-                  const isUnedited = price === defaultPrice;
                   
-                  if (isUnedited) {
+                  if (!isConfirmed) {
                     const rangeSetting = isFullGrooming 
                       ? groomingSettings.find((s: any) => s.setting === 'full_grooming_price')?.value 
                       : groomingSettings.find((s: any) => s.setting === 'bath_only_price')?.value;

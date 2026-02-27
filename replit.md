@@ -1,7 +1,7 @@
 # Animal House Pet Store
 
 ## Overview
-The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. The project aims to become a premier online destination for exotic pet owners, expand market reach, foster customer loyalty, and enhance the online shopping experience for sustained growth.
+The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. The project aims to be a premier online destination for exotic pet owners, expand market reach, foster customer loyalty, and enhance the online shopping experience to achieve sustained growth.
 
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
@@ -184,7 +184,7 @@ Step 5: NEVER mark task complete until verification passes
 - Astro Deal Auto-Application: For linked Astro customers, cart automatically detects eligible manufacturer deals (via eligiblePurchaseItems + listOffers cross-reference). Only "Online & In-Store" offer-type programs are applied. Supports $X OFF (rebate), BOGO, and Buy X Get Y $OFF deal types. Deal discount applied pre-tax in cart totals. Deal info persisted in order's astroRewardInfo JSON for admin audit.
 
 ## System Architecture
-- **UI/UX:** Dark, bold, high-contrast design featuring Amazon-style image carousels.
+- **UI/UX:** Dark, bold, high-contrast design with Amazon-style image carousels.
 - **Authentication:** JWT-based authentication with a three-tier, role-based access control system.
 - **Frontend:** React, Vite, TypeScript, Tailwind CSS, shadcn/ui for components, Wouter for routing, and TanStack Query for data fetching.
 - **Backend:** Express.js and TypeScript.
