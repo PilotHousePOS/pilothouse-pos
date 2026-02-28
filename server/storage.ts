@@ -271,6 +271,7 @@ export interface IStorage {
     petType?: string; 
     specialNotes?: string; 
     price?: string;
+    priceConfirmed?: boolean;
     appointmentDate?: string;
     appointmentTime?: string;
     groomerId?: number | null;
@@ -2840,6 +2841,7 @@ export class DatabaseStorage implements IStorage {
     petType?: string; 
     specialNotes?: string; 
     price?: string;
+    priceConfirmed?: boolean;
     appointmentDate?: string;
     appointmentTime?: string;
     groomerId?: number | null;
@@ -2854,6 +2856,7 @@ export class DatabaseStorage implements IStorage {
     if (updates.petType !== undefined) updateData.petType = updates.petType;
     if (updates.specialNotes !== undefined) updateData.specialNotes = updates.specialNotes;
     if (updates.price !== undefined) updateData.price = updates.price;
+    if (updates.priceConfirmed !== undefined) updateData.priceConfirmed = updates.priceConfirmed;
     if (updates.appointmentDate !== undefined) updateData.appointmentDate = updates.appointmentDate;
     if (updates.appointmentTime !== undefined) updateData.appointmentTime = updates.appointmentTime;
     if (updates.groomerId !== undefined) updateData.groomerId = updates.groomerId;
