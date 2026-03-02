@@ -10354,6 +10354,32 @@ West Monroe LA 71291
     }
   });
 
+  app.post("/api/admin/email/test", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const { getUncachableSendGridClient } = await import('./sendgridIntegration');
+      const { client: sgMail, fromEmail, replyTo } = await getUncachableSendGridClient();
+      const toEmail = req.body.email || req.user.email;
+      await sgMail.send({
+        to: toEmail,
+        from: { email: fromEmail, name: 'Animal House Pet Store' },
+        replyTo,
+        subject: 'Animal House - Test Email',
+        html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+          <h2 style="color:#b45309;">Animal House Pet Store</h2>
+          <p>This is a test email confirming that your SendGrid email system is working correctly.</p>
+          <p style="color:#666;font-size:12px;">Sent at: ${new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })} CST</p>
+        </div>`,
+      });
+      res.json({ success: true, message: `Test email sent to ${toEmail}` });
+    } catch (error: any) {
+      console.error('Error sending test email:', error);
+      res.status(500).json({ message: error.message || "Failed to send test email" });
+    }
+  });
+
   // Legal pages API (public read, admin write)
   app.get("/api/legal/:slug", async (req, res) => {
     try {
