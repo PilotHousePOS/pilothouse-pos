@@ -1,7 +1,7 @@
 import sgMail from '@sendgrid/mail';
 
 async function getCredentials() {
-  const apiKey = process.env.SENDGRID_API_KEY;
+  const apiKey = process.env.SENDGRID_KEY_OVERRIDE || process.env.SENDGRID_API_KEY;
   const email = process.env.SENDGRID_FROM_EMAIL;
 
   if (apiKey && email) {
