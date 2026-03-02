@@ -82,8 +82,9 @@ class EmailService {
       });
 
       return true;
-    } catch (error) {
-      console.error('Failed to send admin new appointment email:', error);
+    } catch (error: any) {
+      const sgErrors = error.response?.body?.errors;
+      console.error('Failed to send admin new appointment email:', error.message, JSON.stringify(sgErrors));
       return false;
     }
   }

@@ -5659,8 +5659,9 @@ West Monroe LA 71291
           successCount++;
         } catch (emailError: any) {
           failedCount++;
+          const sgErrors = emailError.response?.body?.errors;
           errors.push(`Failed to send to ${user.email}: ${emailError.message}`);
-          console.error(`Failed to send email to ${user.email}:`, emailError);
+          console.error(`Failed to send email to ${user.email}:`, emailError.message, JSON.stringify(sgErrors));
         }
       }
 
