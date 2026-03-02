@@ -5160,31 +5160,28 @@ West Monroe LA 71291
         await storage.releaseBookingLock(appointmentDateStr);
       }
       
-      // Send admin notifications for new appointment
-      try {
-        const customerName = `${appointment.ownerFirstName} ${appointment.ownerLastName}`;
-        const serviceInfo = petsArray.length > 1 
-          ? `${petsArray.length} pets: ${petNamesStr}`
-          : appointment.serviceType;
-        
-        // Get all admin users who haven't opted out of appointment emails
-        const allUsers = await storage.getAllUsers();
+      // Send admin notifications for new appointment (fire-and-forget, never block the response)
+      const customerName = `${appointment.ownerFirstName} ${appointment.ownerLastName}`;
+      const serviceInfo = petsArray.length > 1 
+        ? `${petsArray.length} pets: ${petNamesStr}`
+        : appointment.serviceType;
+      const capturedAppointment = appointment;
+      storage.getAllUsers().then(allUsers => {
         const adminEmails = allUsers
           .filter(u => u.isAdmin && u.appointmentEmailsOptIn !== false)
           .map(u => u.email)
           .filter((email): email is string => !!email);
-        
-        await notificationService.sendAdminNewAppointmentNotifications(
+        return notificationService.sendAdminNewAppointmentNotifications(
           adminEmails,
-          appointment.id,
+          capturedAppointment.id,
           customerName,
           serviceInfo,
-          appointment.appointmentDate,
-          appointment.appointmentTime
+          capturedAppointment.appointmentDate,
+          capturedAppointment.appointmentTime
         );
-      } catch (notificationError) {
+      }).catch(notificationError => {
         console.error('Failed to send admin notifications for new appointment:', notificationError);
-      }
+      });
       
       // Calculate remaining slots after booking
       let remainingSlots = null;
