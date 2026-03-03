@@ -5627,7 +5627,7 @@ West Monroe LA 71291
             ? `https://${process.env.REPLIT_DOMAINS}`
             : 'http://localhost:5000';
           
-          const bccList = (adminBcc && user.email !== adminBcc) ? [{ email: adminBcc }] : [];
+          const bccList = (adminBcc && user.email.toLowerCase() !== adminBcc.toLowerCase()) ? [{ email: adminBcc }] : [];
           
           await sgMail.send({
             to: user.email,
