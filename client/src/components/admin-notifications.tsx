@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, X, Package, Calendar } from 'lucide-react';
+import { Bell, X, Package, Calendar, UserPlus } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card, CardContent } from './ui/card';
+import { queryClient } from '@/lib/queryClient';
 
 interface AdminNotification {
   id: string;
-  type: 'order' | 'appointment';
+  type: 'order' | 'appointment' | 'new_account';
   title: string;
   message: string;
   timestamp: Date;
@@ -46,7 +47,12 @@ export default function AdminNotifications() {
           
           setNotifications(prev => [newNotification, ...prev]);
           setUnreadCount(prev => prev + 1);
-          
+
+          // Refresh total accounts count when a new account is created
+          if (data.notificationType === 'new_account') {
+            queryClient.invalidateQueries({ queryKey: ['/api/admin/users/count'] });
+          }
+
           // Show browser notification if permission granted
           if (Notification.permission === 'granted') {
             new Notification(data.title, {
@@ -171,6 +177,8 @@ export default function AdminNotifications() {
                         <div className="mt-1">
                           {notification.type === 'order' ? (
                             <Package className="h-4 w-4 text-green-600" />
+                          ) : notification.type === 'new_account' ? (
+                            <UserPlus className="h-4 w-4 text-purple-600" />
                           ) : (
                             <Calendar className="h-4 w-4 text-blue-600" />
                           )}

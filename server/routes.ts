@@ -468,6 +468,20 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         console.error('Failed to send verification email during signup:', emailError);
       }
 
+      // Notify admins of new account via WebSocket
+      try {
+        const wsServer = (global as any).wsServer;
+        if (wsServer) {
+          wsServer.broadcastToAdmins({
+            notificationType: 'new_account',
+            title: 'New Account Created',
+            message: `${firstName} ${lastName} just created an account (${email})`
+          });
+        }
+      } catch (wsError) {
+        console.error('Failed to send new account WS notification:', wsError);
+      }
+
       // Return user but indicate email verification is pending
       res.json({ ...sanitizeUser(newUser), emailVerified: false, requiresVerification: true });
     } catch (error) {
@@ -5481,6 +5495,19 @@ West Monroe LA 71291
     } catch (error) {
       console.error("Error fetching users:", error);
       res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  app.get("/api/admin/users/count", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const allUsers = await storage.getAllUsers();
+      res.json({ count: allUsers.length });
+    } catch (error) {
+      console.error("Error fetching user count:", error);
+      res.status(500).json({ message: "Failed to fetch user count" });
     }
   });
 

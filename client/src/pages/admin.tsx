@@ -5640,6 +5640,13 @@ export default function Admin() {
   const suppliesTotalPages = suppliesData?.totalPages || 0;
   const suppliesTotal = suppliesData?.total || 0;
 
+  const { data: userCountData } = useQuery<{ count: number }>({
+    queryKey: ["/api/admin/users/count"],
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+    refetchInterval: 60000,
+  });
+  const totalAccounts = userCountData?.count ?? 0;
+
   const { data: orders = [] } = useQuery({
     queryKey: ["/api/orders"],
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
@@ -7752,7 +7759,16 @@ export default function Admin() {
       <div className="px-6">{/* Content continues */}
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-8">
+        {typedUser?.isAdmin && (
+          <Card className="min-h-[120px] border-purple-200 dark:border-purple-800">
+            <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
+              <UserPlus className="w-8 h-8 mb-3 text-purple-600" />
+              <div className="text-2xl font-bold mb-1">{totalAccounts}</div>
+              <div className="text-sm text-gray-500">Total Accounts</div>
+            </CardContent>
+          </Card>
+        )}
         <Card className="min-h-[120px]">
           <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
             <PawPrint className="w-8 h-8 mb-3 text-brand-blue" />
