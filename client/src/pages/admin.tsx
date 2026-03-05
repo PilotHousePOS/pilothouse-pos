@@ -7759,46 +7759,46 @@ export default function Admin() {
       <div className="px-6">{/* Content continues */}
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-8">
         {typedUser?.isAdmin && (
-          <Card className="min-h-[120px] border-purple-200 dark:border-purple-800">
-            <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
-              <UserPlus className="w-8 h-8 mb-3 text-purple-600" />
-              <div className="text-2xl font-bold mb-1">{totalAccounts}</div>
-              <div className="text-sm text-gray-500">Total Accounts</div>
+          <Card className="border-purple-200 dark:border-purple-800">
+            <CardContent className="p-3 text-center flex flex-col items-center justify-center">
+              <UserPlus className="w-6 h-6 mb-1 text-purple-600" />
+              <div className="text-xl font-bold leading-tight">{totalAccounts}</div>
+              <div className="text-xs text-gray-500 leading-tight">Total Accounts</div>
             </CardContent>
           </Card>
         )}
-        <Card className="min-h-[120px]">
-          <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
-            <PawPrint className="w-8 h-8 mb-3 text-brand-blue" />
-            <div className="text-2xl font-bold mb-1">{petsTotal}</div>
-            <div className="text-sm text-gray-500">Total Pets</div>
+        <Card>
+          <CardContent className="p-3 text-center flex flex-col items-center justify-center">
+            <PawPrint className="w-6 h-6 mb-1 text-brand-blue" />
+            <div className="text-xl font-bold leading-tight">{petsTotal}</div>
+            <div className="text-xs text-gray-500 leading-tight">Total Pets</div>
           </CardContent>
         </Card>
-        <Card className="min-h-[120px]">
-          <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
-            <Package className="w-8 h-8 mb-3 text-brand-orange" />
-            <div className="text-2xl font-bold mb-1">{suppliesTotal}</div>
-            <div className="text-sm text-gray-500">Total Supplies</div>
+        <Card>
+          <CardContent className="p-3 text-center flex flex-col items-center justify-center">
+            <Package className="w-6 h-6 mb-1 text-brand-orange" />
+            <div className="text-xl font-bold leading-tight">{suppliesTotal}</div>
+            <div className="text-xs text-gray-500 leading-tight">Total Supplies</div>
           </CardContent>
         </Card>
-        <Card className="min-h-[120px]">
-          <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
-            <ShoppingBag className="w-8 h-8 mb-3 text-brand-red" />
-            <div className="text-2xl font-bold mb-1">{pendingOrdersCount}</div>
-            <div className="text-sm text-gray-500">Pending Orders</div>
+        <Card>
+          <CardContent className="p-3 text-center flex flex-col items-center justify-center">
+            <ShoppingBag className="w-6 h-6 mb-1 text-brand-red" />
+            <div className="text-xl font-bold leading-tight">{pendingOrdersCount}</div>
+            <div className="text-xs text-gray-500 leading-tight">Pending Orders</div>
           </CardContent>
         </Card>
-        <Card className="min-h-[120px]">
-          <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
-            <CalendarIcon className="w-8 h-8 mb-3 text-green-600" />
-            <div className="text-2xl font-bold mb-1">{pendingAppointments}</div>
-            <div className="text-sm text-gray-500">Pending Appts</div>
+        <Card>
+          <CardContent className="p-3 text-center flex flex-col items-center justify-center">
+            <CalendarIcon className="w-6 h-6 mb-1 text-green-600" />
+            <div className="text-xl font-bold leading-tight">{pendingAppointments}</div>
+            <div className="text-xs text-gray-500 leading-tight">Pending Appts</div>
           </CardContent>
         </Card>
-        <Card className={`min-h-[120px] ${filterByHere ? 'ring-2 ring-blue-600' : ''}`}>
-          <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full relative">
+        <Card className={filterByHere ? 'ring-2 ring-blue-600' : ''}>
+          <CardContent className="p-3 text-center flex flex-col items-center justify-center relative">
             <div 
               className="cursor-pointer flex flex-col items-center justify-center w-full"
               onClick={() => {
@@ -7809,9 +7809,9 @@ export default function Admin() {
               }}
               data-testid="card-customers-here"
             >
-              <Users className="w-8 h-8 mb-3 text-blue-600" />
-              <div className="text-2xl font-bold mb-1" data-testid="dashboard-customers-here">{customersHere}</div>
-              <div className="text-sm text-gray-500 mb-2">Customers Here</div>
+              <Users className="w-6 h-6 mb-1 text-blue-600" />
+              <div className="text-xl font-bold leading-tight" data-testid="dashboard-customers-here">{customersHere}</div>
+              <div className="text-xs text-gray-500 leading-tight mb-1">Customers Here</div>
             </div>
             {typedUser?.isAdmin && customersHere > 0 && (
               <Button
@@ -7835,11 +7835,11 @@ export default function Admin() {
             )}
           </CardContent>
         </Card>
-        <Card className="min-h-[120px]">
-          <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full relative">
-            <DollarSign className="w-8 h-8 mb-3 text-green-600" />
-            <div className="text-2xl font-bold mb-1" data-testid="dashboard-customers-paid">{customersPaid}</div>
-            <div className="text-sm text-gray-500 mb-2">Customers Paid</div>
+        <Card>
+          <CardContent className="p-3 text-center flex flex-col items-center justify-center relative">
+            <DollarSign className="w-6 h-6 mb-1 text-green-600" />
+            <div className="text-xl font-bold leading-tight" data-testid="dashboard-customers-paid">{customersPaid}</div>
+            <div className="text-xs text-gray-500 leading-tight mb-1">Customers Paid</div>
             {typedUser?.isAdmin && customersPaid > 0 && (
               <Button
                 variant="ghost"
