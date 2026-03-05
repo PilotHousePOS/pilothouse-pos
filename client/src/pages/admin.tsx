@@ -7765,7 +7765,7 @@ export default function Admin() {
             <CardContent className="p-3 text-center flex flex-col items-center justify-center">
               <UserPlus className="w-6 h-6 mb-1 text-purple-600" />
               <div className="text-xl font-bold leading-tight">{totalAccounts}</div>
-              <div className="text-xs text-gray-500 leading-tight">Total Accounts</div>
+              <div className="text-xs text-gray-500 leading-tight">Accounts</div>
             </CardContent>
           </Card>
         )}
@@ -7811,7 +7811,7 @@ export default function Admin() {
             >
               <Users className="w-6 h-6 mb-1 text-blue-600" />
               <div className="text-xl font-bold leading-tight" data-testid="dashboard-customers-here">{customersHere}</div>
-              <div className="text-xs text-gray-500 leading-tight mb-1">Customers Here</div>
+              <div className="text-xs text-gray-500 leading-tight mb-1">Here Now</div>
             </div>
             {typedUser?.isAdmin && customersHere > 0 && (
               <Button
@@ -7839,7 +7839,7 @@ export default function Admin() {
           <CardContent className="p-3 text-center flex flex-col items-center justify-center relative">
             <DollarSign className="w-6 h-6 mb-1 text-green-600" />
             <div className="text-xl font-bold leading-tight" data-testid="dashboard-customers-paid">{customersPaid}</div>
-            <div className="text-xs text-gray-500 leading-tight mb-1">Customers Paid</div>
+            <div className="text-xs text-gray-500 leading-tight mb-1">Paid Today</div>
             {typedUser?.isAdmin && customersPaid > 0 && (
               <Button
                 variant="ghost"
