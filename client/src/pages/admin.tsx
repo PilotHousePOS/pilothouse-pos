@@ -10214,10 +10214,10 @@ export default function Admin() {
                 {users.map((userItem: any) => (
                   <Card key={userItem.id}>
                     <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                        <div className="flex-1 min-w-0">
                           <h3 className="font-semibold">{userItem.firstName} {userItem.lastName}</h3>
-                          <p className="text-sm text-gray-600">{userItem.email}</p>
+                          <p className="text-sm text-gray-600 break-all">{userItem.email}</p>
                           <p className="text-xs text-gray-500">
                             Joined: {new Date(userItem.createdAt).toLocaleDateString()}
                           </p>
@@ -10233,7 +10233,7 @@ export default function Admin() {
                             )}
                           </div>
                         </div>
-                        <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-2 sm:min-w-[140px]">
                           <div className="flex items-center justify-between gap-3">
                             <span className="text-sm font-medium">Admin</span>
                             <Switch
@@ -10263,7 +10263,7 @@ export default function Admin() {
                           <Button
                             variant="destructive"
                             size="sm"
-                            className="w-full mt-2"
+                            className="w-full"
                             onClick={() => {
                               showDeleteConfirmation(
                                 'Delete User Account',
@@ -12716,10 +12716,11 @@ function EditPetForm({ pet, onSubmit }: { pet: any; onSubmit: (data: any) => voi
     isAvailable: pet.isAvailable || false,
     quantity: pet.quantity ?? "",
   });
+  const [imageUrls, setImageUrls] = useState<string[]>(pet.imageUrls || []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const submitData = { ...formData, quantity: formData.quantity === "" ? null : Number(formData.quantity) };
+    const submitData = { ...formData, imageUrls, quantity: formData.quantity === "" ? null : Number(formData.quantity) };
     onSubmit(submitData);
   };
 
@@ -12791,6 +12792,10 @@ function EditPetForm({ pet, onSubmit }: { pet: any; onSubmit: (data: any) => voi
       <ImageUpload 
         imageUrl={formData.imageUrl} 
         onImageChange={(url) => setFormData({ ...formData, imageUrl: url })} 
+      />
+      <MultiImageUpload
+        imageUrls={imageUrls}
+        onImagesChange={setImageUrls}
       />
       <div>
         <label className="block text-sm font-medium mb-1">Quantity (optional)</label>
@@ -13955,124 +13960,108 @@ function ImageUpload({ imageUrl, onImageChange }: { imageUrl: string; onImageCha
 }
 
 // Multi-Image Upload Component
-function MultiImageUpload({ imageUrls, onImagesChange }: { imageUrls: string[]; onImagesChange: (urls: string[]) => void }) {
+function MultiImageUpload({ imageUrls, onImagesChange, label = "Additional Photos" }: { imageUrls: string[]; onImagesChange: (urls: string[]) => void; label?: string }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({ done: 0, total: 0 });
   const { toast } = useToast();
 
-  const handleFileUpload = async (file: File) => {
-    if (!file) return;
+  const uploadSingleFile = async (file: File): Promise<string | null> => {
+    const fd = new FormData();
+    fd.append('image', file);
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` },
+      body: fd,
+    });
+    if (!response.ok) throw new Error('Upload failed');
+    const data = await response.json();
+    return data.imageUrl;
+  };
 
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Invalid File",
-        description: "Please select an image file.",
-        variant: "destructive",
-      });
-      return;
+  const handleFilesSelected = async (files: FileList) => {
+    const validFiles: File[] = [];
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith('image/')) {
+        toast({ title: "Skipped", description: `${file.name} is not an image.`, variant: "destructive" });
+        continue;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast({ title: "Skipped", description: `${file.name} exceeds 5MB.`, variant: "destructive" });
+        continue;
+      }
+      validFiles.push(file);
     }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: "File Too Large",
-        description: "Please select an image under 5MB.",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (validFiles.length === 0) return;
 
     setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('image', file);
-
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Upload failed');
+    setUploadProgress({ done: 0, total: validFiles.length });
+    const newUrls: string[] = [];
+    for (const file of validFiles) {
+      try {
+        const url = await uploadSingleFile(file);
+        if (url) newUrls.push(url);
+        setUploadProgress(p => ({ ...p, done: p.done + 1 }));
+      } catch {
+        toast({ title: "Upload Failed", description: `Failed to upload ${file.name}.`, variant: "destructive" });
+        setUploadProgress(p => ({ ...p, done: p.done + 1 }));
       }
-
-      const data = await response.json();
-      // Add new image to the array
-      onImagesChange([...imageUrls, data.imageUrl]);
-      // Success toast removed to speed up workflow
-    } catch (error) {
-      console.error('Upload error:', error);
-      toast({
-        title: "Upload Failed",
-        description: "Failed to upload image. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setUploading(false);
     }
+    onImagesChange([...imageUrls, ...newUrls]);
+    setUploading(false);
   };
 
   const removeImage = (index: number) => {
-    const newUrls = imageUrls.filter((_, i) => i !== index);
-    onImagesChange(newUrls);
+    onImagesChange(imageUrls.filter((_, i) => i !== index));
   };
 
   return (
     <div className="space-y-3">
-      <Label>Product Images ({imageUrls.length})</Label>
-      
-      {/* Display existing images */}
+      <Label>{label} ({imageUrls.length})</Label>
+
       {imageUrls.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 mb-3">
+        <div className="grid grid-cols-3 gap-2">
           {imageUrls.map((url, index) => (
-            <div key={index} className="relative border-2 border-gray-300 rounded-lg overflow-hidden">
-              <img src={url} alt={`Product ${index + 1}`} className="w-full h-32 object-cover" />
-              <Button
+            <div key={index} className="relative border rounded-lg overflow-hidden">
+              <img src={url} alt={`Photo ${index + 1}`} className="w-full h-24 object-cover" />
+              <button
                 type="button"
-                variant="outline"
-                size="sm"
-                className="absolute top-2 right-2 bg-white"
+                className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
                 onClick={() => removeImage(index)}
               >
-                <X className="w-4 h-4" />
-              </Button>
-              <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded text-xs">
-                Image {index + 1}
+                <X className="w-3 h-3" />
+              </button>
+              <div className="absolute bottom-1 left-1 bg-black/50 text-white px-1 rounded text-xs">
+                {index + 1}
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Add new image button */}
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-        <div className="text-center py-4">
-          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-500">Click to add another image</p>
-        </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) handleFileUpload(file);
-            e.target.value = ''; // Reset input
-          }}
-          className="hidden"
-        />
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-        >
-          {uploading ? 'Uploading...' : '+ Add Image'}
-        </Button>
-      </div>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={(e) => {
+          if (e.target.files?.length) handleFilesSelected(e.target.files);
+          e.target.value = '';
+        }}
+      />
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full border-dashed"
+        onClick={() => fileInputRef.current?.click()}
+        disabled={uploading}
+      >
+        <Upload className="w-4 h-4 mr-2" />
+        {uploading
+          ? `Uploading ${uploadProgress.done}/${uploadProgress.total}...`
+          : 'Select Photos from Gallery'}
+      </Button>
     </div>
   );
 }
@@ -14089,10 +14078,11 @@ function AddPetForm({ onSubmit }: { onSubmit: (data: any) => void }) {
     isAvailable: true,
     quantity: '' as string | number,
   });
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const submitData = { ...formData, quantity: formData.quantity === "" ? null : Number(formData.quantity) };
+    const submitData = { ...formData, imageUrls, quantity: formData.quantity === "" ? null : Number(formData.quantity) };
     onSubmit(submitData);
   };
 
@@ -14163,6 +14153,11 @@ function AddPetForm({ onSubmit }: { onSubmit: (data: any) => void }) {
       <ImageUpload 
         imageUrl={formData.imageUrl} 
         onImageChange={(url) => setFormData({ ...formData, imageUrl: url })} 
+      />
+      <MultiImageUpload
+        imageUrls={imageUrls}
+        onImagesChange={setImageUrls}
+        label="Additional Photos"
       />
       <div>
         <Label htmlFor="quantity">Quantity (optional)</Label>
