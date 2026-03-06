@@ -38,8 +38,9 @@ export default function PetCard({ pet }: PetCardProps) {
   };
 
   const isValidImageUrl = (url: string) => url && (url.startsWith('http') || url.startsWith('/public-objects/')) && !url.includes('placeholder');
-  const images = pet.imageUrls?.filter((url: string) => isValidImageUrl(url)) || 
-                (pet.imageUrl && isValidImageUrl(pet.imageUrl) ? [pet.imageUrl] : []);
+  const mainImage = pet.imageUrl && isValidImageUrl(pet.imageUrl) ? [pet.imageUrl] : [];
+  const additionalImages = pet.imageUrls?.filter((url: string) => isValidImageUrl(url) && url !== pet.imageUrl) || [];
+  const images = [...mainImage, ...additionalImages];
   const hasMultipleImages = images.length > 1;
   const fallbackImage = defaultImages[pet.species] || defaultImages.default;
   const imageUrl = imageError || images.length === 0 ? fallbackImage : (images[currentImageIndex] || fallbackImage);

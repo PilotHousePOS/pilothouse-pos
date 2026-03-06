@@ -205,9 +205,9 @@ export default function ReptilesPage() {
                   }}
                 >
                   <div className="h-48 bg-gray-200 overflow-hidden flex-shrink-0">
-                    {(pet.imageUrls?.[0] || pet.imageUrl) && (
+                    {(pet.imageUrl || pet.imageUrls?.[0]) && (
                       <img
-                        src={pet.imageUrls?.[0] || pet.imageUrl}
+                        src={pet.imageUrl || pet.imageUrls?.[0]}
                         alt={pet.name}
                         className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
                       />
