@@ -69,6 +69,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const queryClient = useQueryClient();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [outOfStockPreference, setOutOfStockPreference] = useState("contact_me");
+  const [customerNotes, setCustomerNotes] = useState('');
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringFrequency, setRecurringFrequency] = useState("monthly");
   const [applyLoyaltyCredits, setApplyLoyaltyCredits] = useState(false);
@@ -370,6 +371,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         astroRewardInfo: astroRewardInfo ? JSON.stringify(astroRewardInfo) : null,
         shippingAddress: "In-Store Pickup - Animal House Pet Store",
         outOfStockPreference,
+        customerNotes: customerNotes.trim() || null,
         isRecurring,
         recurringFrequency: isRecurring ? recurringFrequency : null,
         nextRecurringDate: nextRecurringDate?.toISOString() || null,
@@ -832,6 +834,25 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                   </div>
                 </label>
               </div>
+            </div>
+
+            {/* Order Notes / Special Requests */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Order Notes <span className="text-gray-400 font-normal">(optional)</span>
+              </label>
+              <p className="text-xs text-gray-500 mb-2">Substitution requests, allergy info, special instructions, etc.</p>
+              <textarea
+                value={customerNotes}
+                onChange={(e) => setCustomerNotes(e.target.value)}
+                placeholder="e.g. If salmon flavor is out, please substitute chicken. Avoid grain-free options."
+                rows={3}
+                maxLength={500}
+                className="w-full border border-gray-300 rounded-lg p-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand-red"
+              />
+              {customerNotes.length > 0 && (
+                <p className="text-xs text-gray-400 text-right">{customerNotes.length}/500</p>
+              )}
             </div>
 
             {/* Recurring Purchase Option */}

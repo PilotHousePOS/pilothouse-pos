@@ -2372,7 +2372,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
             order.convenienceFee || '0',
             order.loyaltyCreditsApplied || '0',
             order.totalAmount || '0',
-            order.discountAmount || '0'
+            order.discountAmount || '0',
+            order.customerNotes || undefined
           );
         }
       } catch (notificationError) {

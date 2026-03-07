@@ -8444,6 +8444,13 @@ export default function Admin() {
                                   ))}
                                 </div>
                                 
+                                {order.customerNotes && (
+                                  <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded border border-yellow-300 dark:border-yellow-700">
+                                    <p className="text-xs font-semibold text-yellow-800 dark:text-yellow-300 mb-0.5">Customer Notes:</p>
+                                    <p className="text-sm text-yellow-900 dark:text-yellow-200 whitespace-pre-wrap break-words">{order.customerNotes}</p>
+                                  </div>
+                                )}
+
                                 {parseFloat(order.discountAmount || "0") > 0 && (
                                   <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded border border-green-200 dark:border-green-800">
                                     <div className="flex items-center justify-between">

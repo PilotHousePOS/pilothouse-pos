@@ -218,6 +218,7 @@ export const orders = pgTable("orders", {
   paidAt: timestamp("paid_at"), // When payment was completed
   discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).default("0"),
   discountReason: text("discount_reason"),
+  customerNotes: text("customer_notes"),
 });
 
 // Order items

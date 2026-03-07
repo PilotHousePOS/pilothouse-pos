@@ -89,7 +89,7 @@ class EmailService {
     }
   }
 
-  async sendOrderReceivedEmail(to: string, firstName: string, orderId: number, items: Array<{name: string; quantity: number; price: string}>, subtotal: string, taxAmount: string, convenienceFee: string, loyaltyCreditsApplied: string, totalAmount: string, discountAmount?: string): Promise<boolean> {
+  async sendOrderReceivedEmail(to: string, firstName: string, orderId: number, items: Array<{name: string; quantity: number; price: string}>, subtotal: string, taxAmount: string, convenienceFee: string, loyaltyCreditsApplied: string, totalAmount: string, discountAmount?: string, customerNotes?: string): Promise<boolean> {
     try {
       const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
 
@@ -138,6 +138,13 @@ class EmailService {
               <p style="margin: 4px 0;"><strong>Convenience Fee:</strong> $${parseFloat(convenienceFee).toFixed(2)}</p>
               <p style="margin: 8px 0; font-size: 20px; font-weight: bold; color: #dc2626;">Total: $${parseFloat(totalAmount).toFixed(2)}</p>
             </div>
+
+            ${customerNotes ? `
+            <div style="background-color: #fefce8; border: 1px solid #fde047; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <strong style="color: #854d0e;">Your Order Notes:</strong>
+              <p style="margin: 8px 0 0 0; color: #713f12; white-space: pre-wrap;">${customerNotes}</p>
+            </div>
+            ` : ''}
 
             <div style="background-color: #fef3c7; color: #92400e; padding: 15px; border-radius: 5px; margin: 20px 0;">
               <strong>What happens next?</strong><br>
@@ -741,12 +748,13 @@ export class NotificationService {
     convenienceFee: string,
     loyaltyCreditsApplied: string,
     totalAmount: string,
-    discountAmount?: string
+    discountAmount?: string,
+    customerNotes?: string
   ): Promise<void> {
     console.log(`Sending order received confirmation to ${userEmail} for order ${orderId}`);
     await this.emailService.sendOrderReceivedEmail(
       userEmail, userFirstName, orderId, items,
-      subtotal, taxAmount, convenienceFee, loyaltyCreditsApplied, totalAmount, discountAmount
+      subtotal, taxAmount, convenienceFee, loyaltyCreditsApplied, totalAmount, discountAmount, customerNotes
     );
   }
 
