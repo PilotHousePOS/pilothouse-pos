@@ -3884,10 +3884,12 @@ West Monroe LA 71291
       
       // CAPACITY CHECK: Ensure we don't exceed limits when approving
       const { getLocalDayOfWeek } = await import('./scheduler');
-      const appointmentDate = new Date(appointmentToApprove.appointmentDate);
-      // Use stored date for matching (consistent with SQL atomic check)
-      const appointmentDateStr = appointmentDate.toISOString().split('T')[0];
-      const dayOfWeek = getLocalDayOfWeek(appointmentDate);
+      // Parse date string as noon local time to avoid UTC midnight shifting day backward in CST
+      const rawApproveDate = String(appointmentToApprove.appointmentDate).split('T')[0];
+      const appointmentDateStr = rawApproveDate;
+      const [aYear, aMon, aDay] = rawApproveDate.split('-').map(Number);
+      const appointmentDateLocal = new Date(aYear, aMon - 1, aDay, 12, 0, 0);
+      const dayOfWeek = getLocalDayOfWeek(appointmentDateLocal);
       
       // Get appointment pets to count service types
       const appointmentPets = await storage.getAppointmentPets(id);
@@ -4170,10 +4172,15 @@ West Monroe LA 71291
       console.log(`[EDIT DEBUG] needsCapacityCheck=${needsCapacityCheck} (dateChanging=${isDateChanging}, serviceChanging=${isServiceChanging})`);
       
       // Use new date if provided, otherwise use current
-      const dateToCheck = appointmentDate ? new Date(appointmentDate) : new Date(currentAppointment.appointmentDate);
+      // Parse as noon local time to avoid UTC midnight shifting Saturday→Friday in CST
+      const rawEditDateStr = appointmentDate
+        ? String(appointmentDate).split('T')[0]
+        : String(currentAppointment.appointmentDate).split('T')[0];
+      const [eYear, eMon, eDay] = rawEditDateStr.split('-').map(Number);
+      const dateToCheck = new Date(eYear, eMon - 1, eDay, 12, 0, 0);
       // Use stored date for matching (consistent with SQL atomic check)
       const { getLocalDayOfWeek } = await import('./scheduler');
-      const appointmentDateStr = dateToCheck.toISOString().split('T')[0];
+      const appointmentDateStr = rawEditDateStr;
       const dayOfWeek = getLocalDayOfWeek(dateToCheck);
       
       // Get the pets/services that will be in this appointment after the update
@@ -4428,10 +4435,12 @@ West Monroe LA 71291
       // CAPACITY CHECK: When changing status to 'confirmed', check capacity limits
       if (status === 'confirmed' && oldAppointment.status !== 'confirmed') {
         const { getLocalDayOfWeek } = await import('./scheduler');
-        const appointmentDate = new Date(oldAppointment.appointmentDate);
-        // Use stored date for matching (consistent with SQL atomic check)
-        const appointmentDateStr = appointmentDate.toISOString().split('T')[0];
-        const dayOfWeek = getLocalDayOfWeek(appointmentDate);
+        // Parse as noon local time to avoid UTC midnight shifting Saturday→Friday in CST
+        const rawConfirmDateStr = String(oldAppointment.appointmentDate).split('T')[0];
+        const appointmentDateStr = rawConfirmDateStr;
+        const [cYear, cMon, cDay] = rawConfirmDateStr.split('-').map(Number);
+        const appointmentDateLocal = new Date(cYear, cMon - 1, cDay, 12, 0, 0);
+        const dayOfWeek = getLocalDayOfWeek(appointmentDateLocal);
         
         // Get appointment pets to count service types
         const appointmentPets = await storage.getAppointmentPets(id);
