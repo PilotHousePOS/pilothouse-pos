@@ -4990,7 +4990,11 @@ West Monroe LA 71291
       
       // GROOMER DAILY FULL-GROOM LIMIT: Max 5 full grooming appointments per groomer per day
       // Bath-only appointments do NOT count toward this limit
+      // ADMIN BYPASS: Admins can book beyond this limit when needed
       const GROOMER_DAILY_FULL_GROOM_LIMIT = 5;
+      if (isAdmin) {
+        // Admins bypass the per-groomer daily full-groom limit entirely
+      } else {
       
       // Collect all groomer IDs assigned to full groom pets in this request
       const groomerFullGroomCounts: Record<number, number> = {};
@@ -5056,6 +5060,7 @@ West Monroe LA 71291
           }
         }
       }
+      } // end non-admin groomer daily limit check
       
       // DUPLICATE CHECK: Prevent same customer + same pet + same date duplicates
       // Works for both admin and customer bookings, regardless of source

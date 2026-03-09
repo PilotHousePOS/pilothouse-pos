@@ -436,9 +436,29 @@ async function seedLegalPages() {
 }
 
 // Heavy initialization - runs AFTER server is already listening
+async function runAppMigrations() {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) return;
+  try {
+    const { Pool } = await import('@neondatabase/serverless');
+    const ws = (await import('ws')).default;
+    const { neonConfig } = await import('@neondatabase/serverless');
+    neonConfig.webSocketConstructor = ws;
+    const migPool = new Pool({ connectionString: databaseUrl });
+    await migPool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_notes TEXT`);
+    await migPool.end();
+    log('App migrations complete');
+  } catch (err: any) {
+    console.error('App migration error (non-fatal):', err.message);
+  }
+}
+
 async function initializeApp() {
   try {
     log('Starting app initialization...');
+    
+    // Run app-level schema migrations
+    await runAppMigrations();
     
     // Initialize Stripe
     await initStripe();
