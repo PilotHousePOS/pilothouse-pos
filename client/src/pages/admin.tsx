@@ -5478,6 +5478,7 @@ export default function Admin() {
   // Book Appointment Modal State
   const [isBookAppointmentOpen, setIsBookAppointmentOpen] = useState(false);
   const [showAdminCapacityDialog, setShowAdminCapacityDialog] = useState(false);
+  const [bookingErrorMessage, setBookingErrorMessage] = useState<string | null>(null);
   const [bookingContactSearch, setBookingContactSearch] = useState('');
   const [showBookingContactDropdown, setShowBookingContactDropdown] = useState(false);
 
@@ -6898,7 +6899,6 @@ export default function Admin() {
       // Extract error message from apiRequest error format: "400: {json}"
       let errorText = '';
       if (error?.message) {
-        // Parse the error message which is in format "statusCode: jsonText"
         const parts = error.message.split(': ', 2);
         if (parts.length === 2) {
           try {
@@ -6912,19 +6912,8 @@ export default function Admin() {
         }
       }
       
-      // Check if this is a capacity error
-      if (errorText.includes('capacity is fully booked') || errorText.includes('capacity would be exceeded')) {
-        // Show centered modal for capacity errors
-        setShowAdminCapacityDialog(true);
-        return;
-      }
-      
-      // For other errors, show toast
-      toast({
-        title: "Error",
-        description: "Failed to create appointment.",
-        variant: "destructive",
-      });
+      // Show all booking errors in a dismissible dialog so the message is visible
+      setBookingErrorMessage(errorText || 'Failed to create appointment. Please try again.');
     },
   });
 
@@ -12694,6 +12683,25 @@ export default function Admin() {
               onClick={() => setShowAdminCapacityDialog(false)}
               className="bg-brand-red hover:bg-red-600 text-white px-8"
               data-testid="button-admin-capacity-dialog-close"
+            >
+              OK
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!bookingErrorMessage} onOpenChange={(open) => { if (!open) setBookingErrorMessage(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-center text-red-600">Booking Error</DialogTitle>
+            <DialogDescription className="text-center text-base pt-4">
+              {bookingErrorMessage}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center">
+            <Button
+              onClick={() => setBookingErrorMessage(null)}
+              className="bg-brand-red hover:bg-red-600 text-white px-8"
             >
               OK
             </Button>
