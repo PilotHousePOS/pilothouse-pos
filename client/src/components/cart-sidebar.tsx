@@ -80,6 +80,13 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     enabled: isOpen,
   });
 
+  // Fetch current user profile to detect charge account status
+  const { data: currentUser } = useQuery<{ isChargeAccount?: boolean; firstName?: string }>({
+    queryKey: ["/api/auth/user"],
+    enabled: isOpen,
+  });
+  const isChargeAccount = currentUser?.isChargeAccount === true;
+
   // Get supply IDs from cart to fetch only what we need
   const supplyIds = cartItems.filter((item: any) => item.supplyId).map((item: any) => item.supplyId);
   
@@ -306,8 +313,8 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const loyaltyDiscount = applyLoyaltyCredits ? Math.round(Math.min(availableLoyaltyCredits, subtotalWithTax) * 100) / 100 : 0;
   const amountBeforeFee = Math.round((subtotalWithTax - loyaltyDiscount) * 100) / 100;
   
-  // Card processing convenience fee: 2.9% + $0.30
-  const convenienceFee = amountBeforeFee > 0 ? Math.round(((amountBeforeFee * 0.029) + 0.30) * 100) / 100 : 0;
+  // Card processing convenience fee: 2.9% + $0.30 — waived for charge accounts
+  const convenienceFee = (!isChargeAccount && amountBeforeFee > 0) ? Math.round(((amountBeforeFee * 0.029) + 0.30) * 100) / 100 : 0;
   const totalAmount = Math.round((amountBeforeFee + convenienceFee) * 100) / 100;
 
   const handleCheckout = () => {
@@ -549,7 +556,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
               )}
 
               {/* Astro Reward Banner */}
-              {availableRewards.length > 0 && Object.keys(appliedRewards).length === 0 && (
+              {!isChargeAccount && availableRewards.length > 0 && Object.keys(appliedRewards).length === 0 && (
                 <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg overflow-hidden">
                   <div className="flex items-start gap-2">
                     <Award className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
@@ -588,7 +595,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
               )}
 
               {/* Applied Reward Summary */}
-              {astroDiscount > 0 && (
+              {!isChargeAccount && astroDiscount > 0 && (
                 <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                   <div className="flex items-center gap-2">
                     <Award className="w-5 h-5 text-green-600" />
@@ -720,7 +727,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             </div>
 
             {/* Loyalty Credits Section */}
-            {availableLoyaltyCredits > 0 && (
+            {!isChargeAccount && availableLoyaltyCredits > 0 && (
               <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -747,7 +754,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             )}
 
             {/* Food Loyalty Disclaimer */}
-            {hasFoodItems && (
+            {!isChargeAccount && hasFoodItems && (
               <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <p className="text-xs text-blue-700 dark:text-blue-300">
                   <span className="font-semibold">Loyalty Note:</span> Dog &amp; cat food purchases earn loyalty credit at 25% of their value due to the low margins on food products. All other items earn at the full rate.
@@ -756,7 +763,19 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             )}
 
             {/* Payment Method Info */}
-            {totalAmount <= 0 ? (
+            {isChargeAccount ? (
+              <div className="p-3 border rounded-lg border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20">
+                <div className="flex items-start gap-3">
+                  <CreditCard className="w-5 h-5 text-orange-600 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-medium text-sm text-orange-800 dark:text-orange-200">Charge Account</p>
+                    <p className="text-xs text-orange-700 dark:text-orange-300">
+                      This order will be charged to your account and paid in-store. No card will be charged.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : totalAmount <= 0 ? (
               <div className="p-3 border rounded-lg border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20">
                 <div className="flex items-start gap-3">
                   <Award className="w-5 h-5 text-green-600 mt-0.5" />

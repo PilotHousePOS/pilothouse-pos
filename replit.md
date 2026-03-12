@@ -17,6 +17,8 @@ The Animal House Pet Store is a mobile-first e-commerce platform specializing in
 - Search Functionality: All searches (supplies, pets) with intelligent typo tolerance and brand expansion.
 - Supply Filtering: Centralized, research-based filtering system with proper brand/keyword separation (server/filterConfig.ts).
 - Food vs Treat Categorization by Size: For freeze-dried products (Vital Essentials, etc.), products >3oz are categorized as food (dogFood/catFood), products ≤3oz as treats (dogTreats/catTreats). Patties, nibbles, and mini pate in larger sizes are food; bites and small portions are treats.
+- Loyalty Multiplier: Only dogFood and catFood categories earn 25% loyalty — all other categories earn at the full rate.
+- Charge Accounts: Users flagged `isChargeAccount=true` get no convenience fee, no loyalty rewards, no Astro integration. Orders placed as `paymentStatus='charge_account'` — no Stripe charge occurs. Admin can toggle charge account status in the Users section. Cart shows orange "Charge Account" notice instead of payment info.
 - Product Recommendations ("You May Also Like"): Smart cross-category recommendations based on product type.
 - Extended Product Information: Sourced from reliable retailers (Chewy, Amazon, manufacturer websites).
 - Wet vs Dry Food Ingredients: Wet food (cans, stews, broths, entrees) ingredients differ significantly from dry food (kibble, bags). Never copy dry food ingredients to wet food products.

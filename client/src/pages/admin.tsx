@@ -7129,6 +7129,28 @@ export default function Admin() {
     },
   });
 
+  // Charge Account User Management Mutation
+  const updateChargeAccountMutation = useMutation({
+    mutationFn: async ({ userId, isChargeAccount }: { userId: string; isChargeAccount: boolean }) => {
+      const res = await apiRequest("POST", `/api/admin/users/${userId}/charge-account`, { isChargeAccount });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({
+        title: "Success",
+        description: "Charge account status updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update charge account status",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Delete User Mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
@@ -10217,14 +10239,17 @@ export default function Admin() {
                           <p className="text-xs text-gray-500">
                             Joined: {new Date(userItem.createdAt).toLocaleDateString()}
                           </p>
-                          <div className="flex gap-2 mt-2">
+                          <div className="flex gap-2 mt-2 flex-wrap">
                             {userItem.isAdmin && (
                               <Badge variant="default" className="text-xs">Admin</Badge>
                             )}
                             {userItem.isGroomer && (
                               <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">Groomer</Badge>
                             )}
-                            {!userItem.isAdmin && !userItem.isGroomer && (
+                            {userItem.isChargeAccount && (
+                              <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-700 border border-orange-300">Charge Account</Badge>
+                            )}
+                            {!userItem.isAdmin && !userItem.isGroomer && !userItem.isChargeAccount && (
                               <Badge variant="outline" className="text-xs">Customer</Badge>
                             )}
                           </div>
@@ -10254,6 +10279,19 @@ export default function Admin() {
                                 });
                               }}
                               disabled={updateUserGroomerRoleMutation.isPending}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-sm font-medium text-orange-700">Charge Acct</span>
+                            <Switch
+                              checked={!!userItem.isChargeAccount}
+                              onCheckedChange={(checked) => {
+                                updateChargeAccountMutation.mutate({
+                                  userId: userItem.id,
+                                  isChargeAccount: checked
+                                });
+                              }}
+                              disabled={updateChargeAccountMutation.isPending}
                             />
                           </div>
                           <Button

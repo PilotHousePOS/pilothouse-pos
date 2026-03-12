@@ -446,6 +446,7 @@ async function runAppMigrations() {
     neonConfig.webSocketConstructor = ws;
     const migPool = new Pool({ connectionString: databaseUrl });
     await migPool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_notes TEXT`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_charge_account BOOLEAN DEFAULT false`);
     await migPool.end();
     log('App migrations complete');
   } catch (err: any) {

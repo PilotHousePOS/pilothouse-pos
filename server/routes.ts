@@ -2139,12 +2139,53 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       });
       
       const validatedData = orderSchema.parse({ ...orderData, userId, items });
+
+      // Check if this is a charge account user — no payment processed, no loyalty, no Astro
+      const orderingUser = await storage.getUser(userId);
+      const isChargeAccountUser = orderingUser?.isChargeAccount === true;
+
+      if (isChargeAccountUser) {
+        // Zero out all fees — charge account orders are billed in-store later
+        validatedData.convenienceFee = "0";
+        validatedData.loyaltyCreditsApplied = "0";
+        validatedData.taxAmount = validatedData.taxAmount; // keep tax for record
+        const subtotalVal = parseFloat(validatedData.subtotal || "0");
+        const taxVal = parseFloat(validatedData.taxAmount || "0");
+        validatedData.totalAmount = (subtotalVal + taxVal).toFixed(2); // record actual value for receipt
+
+        const order = await storage.createOrder(
+          {
+            ...validatedData,
+            userId,
+            discountAmount: "0",
+            discountReason: "Charge Account - In-Store Payment",
+            stripePaymentIntentId: null,
+            paymentStatus: 'charge_account',
+          },
+          validatedData.items.map(item => ({ ...item, orderId: 0 }))
+        );
+
+        await storage.clearCart(userId);
+
+        // Notify admins
+        try {
+          const customerName = `${orderingUser?.firstName || ''} ${orderingUser?.lastName || ''}`.trim();
+          const allUsers = await storage.getAllUsers();
+          const adminEmails = allUsers.filter(u => u.isAdmin).map(u => u.email).filter((e): e is string => !!e);
+          await notificationService.sendAdminNewOrderNotifications(adminEmails, order.id, customerName || 'Charge Account Customer', order.totalAmount || '0');
+        } catch (notifErr) {
+          console.error("Failed to send charge account order notifications:", notifErr);
+        }
+
+        console.log(`[CHARGE ACCOUNT] Order #${order.id} created for user ${userId} — no payment required, billed in-store`);
+        return res.status(201).json(order);
+      }
       
       // If loyalty credits are being applied, validate and deduct them from user's balance
       let verifiedLoyaltyCredits = 0;
       const requestedLoyaltyCredits = parseFloat(orderData.loyaltyCreditsApplied || "0");
       if (requestedLoyaltyCredits > 0) {
-        const user = await storage.getUser(userId);
+        const user = orderingUser;
         if (user) {
           const currentCredits = parseFloat(user.loyaltyCredits || "0");
           const subtotal = parseFloat(orderData.subtotal || "0");
@@ -2791,7 +2832,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (orderWithItems) {
         const order = orderWithItems.order;
         const orderUserId = order.userId;
-        if (orderUserId) {
+        // Skip loyalty and Astro for charge account orders
+        const isChargeAccountOrder = order.paymentStatus === 'charge_account';
+        if (orderUserId && !isChargeAccountOrder) {
           try {
             // Food items (dogFood/catFood) only count 25% toward loyalty due to low markup
             const FOOD_LOYALTY_RATE = 0.25;
@@ -5595,6 +5638,32 @@ West Monroe LA 71291
         return res.status(404).json({ message: "User not found" });
       }
       res.status(500).json({ message: "Failed to update user groomer status" });
+    }
+  });
+
+  app.post("/api/admin/users/:userId/charge-account", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { userId } = req.params;
+      const { isChargeAccount } = req.body;
+
+      if (typeof isChargeAccount !== 'boolean') {
+        return res.status(400).json({ message: "isChargeAccount must be a boolean" });
+      }
+
+      const updatedUser = await storage.updateUserChargeAccount(userId, isChargeAccount);
+      const { password, ...safeUser } = updatedUser;
+      
+      res.json(safeUser);
+    } catch (error: any) {
+      console.error("Error updating charge account status:", error);
+      if (error.message === 'User not found') {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.status(500).json({ message: "Failed to update charge account status" });
     }
   });
 
