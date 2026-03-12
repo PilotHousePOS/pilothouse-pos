@@ -117,6 +117,14 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   });
   const availableLoyaltyCredits = parseFloat(loyaltyData?.loyaltyCredits || "0");
 
+  // Detect if any cart items are dog/cat food (earn only 25% loyalty)
+  const FOOD_LOYALTY_CATEGORIES = ['dogFood', 'catFood'];
+  const hasFoodItems = cartItems.some((item: any) => {
+    if (!item.supplyId) return false;
+    const supply = supplies.find((s: any) => s.id === item.supplyId);
+    return supply && FOOD_LOYALTY_CATEGORIES.includes(supply.category || '');
+  });
+
   // Fetch Astro loyalty rewards (ready to redeem)
   const { data: astroRewardsData } = useQuery<{ rewards: AstroReward[] }>({
     queryKey: ["/api/astro/cart-rewards"],
@@ -735,6 +743,15 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     Saving ${loyaltyDiscount.toFixed(2)} on this order!
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Food Loyalty Disclaimer */}
+            {hasFoodItems && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <p className="text-xs text-blue-700 dark:text-blue-300">
+                  <span className="font-semibold">Loyalty Note:</span> Dog &amp; cat food purchases earn loyalty credit at 25% of their value due to the low margins on food products. All other items earn at the full rate.
+                </p>
               </div>
             )}
 

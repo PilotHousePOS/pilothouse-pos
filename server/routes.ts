@@ -2793,12 +2793,35 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         const orderUserId = order.userId;
         if (orderUserId) {
           try {
-            // Use subtotal (product cost) for loyalty tracking, not convenience fees
-            const subtotal = parseFloat(order.subtotal || order.totalAmount || '0');
+            // Food items (dogFood/catFood) only count 25% toward loyalty due to low markup
+            const FOOD_LOYALTY_RATE = 0.25;
+            const FOOD_CATEGORIES = ['dogFood', 'catFood'];
+            const orderItemsList = orderWithItems.items || [];
+            let foodSubtotal = 0;
+            let nonFoodSubtotal = 0;
+            for (const item of orderItemsList) {
+              const itemTotal = parseFloat(item.price) * (item.quantity || 1);
+              if (item.supplyId) {
+                const supply = await storage.getSupply(item.supplyId);
+                if (supply && FOOD_CATEGORIES.includes(supply.category || '')) {
+                  foodSubtotal += itemTotal;
+                } else {
+                  nonFoodSubtotal += itemTotal;
+                }
+              } else {
+                nonFoodSubtotal += itemTotal;
+              }
+            }
+            // If no item breakdown available, fall back to raw subtotal as non-food
+            if (orderItemsList.length === 0) {
+              nonFoodSubtotal = parseFloat(order.subtotal || order.totalAmount || '0');
+            }
+            const adjustedSubtotal = nonFoodSubtotal + (foodSubtotal * FOOD_LOYALTY_RATE);
             const loyaltyCreditsApplied = parseFloat(order.loyaltyCreditsApplied || '0');
             const astroDiscountApplied = parseFloat(order.discountAmount || '0');
-            // Track the actual amount the customer spent (subtotal minus loyalty credits and Astro free bag rewards)
-            const amountForLoyalty = Math.max(0, subtotal - loyaltyCreditsApplied - astroDiscountApplied);
+            // Track the adjusted amount (food purchases earn 25% loyalty, non-food earns 100%)
+            const amountForLoyalty = Math.max(0, adjustedSubtotal - loyaltyCreditsApplied - astroDiscountApplied);
+            console.log(`[LOYALTY] Order #${orderId}: food=$${foodSubtotal.toFixed(2)} (25%=$${(foodSubtotal*FOOD_LOYALTY_RATE).toFixed(2)}), non-food=$${nonFoodSubtotal.toFixed(2)}, adjusted=$${adjustedSubtotal.toFixed(2)}`);
             
             if (amountForLoyalty > 0) {
               const loyaltyResult = await storage.addToUserTotalSpent(orderUserId, amountForLoyalty);
@@ -9940,14 +9963,39 @@ West Monroe LA 71291
       const userSpending: Record<string, number> = {};
       const userCreditsUsed: Record<string, number> = {};
 
+      const FOOD_CATEGORIES_RECALC = ['dogFood', 'catFood'];
+      const FOOD_LOYALTY_RATE_RECALC = 0.25;
+
       for (const order of completedOrders) {
         if (!order.userId) continue;
-        const subtotal = parseFloat(order.subtotal || order.totalAmount || '0');
         const loyaltyCreditsApplied = parseFloat(order.loyaltyCreditsApplied || '0');
         const discountAmount = parseFloat(order.discountAmount || '0');
-        const amountForLoyalty = Math.max(0, subtotal - loyaltyCreditsApplied - discountAmount);
 
-        console.log(`[LOYALTY RECALC] Order #${order.id} user=${order.userId}: subtotal=${subtotal}, loyaltyCredits=${loyaltyCreditsApplied}, discount=${discountAmount} → amountForLoyalty=${amountForLoyalty.toFixed(2)}`);
+        // Apply 25% loyalty rate for food items (dogFood/catFood)
+        const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
+        let foodSubtotalR = 0;
+        let nonFoodSubtotalR = 0;
+        for (const item of items) {
+          const itemTotal = parseFloat(item.price) * (item.quantity || 1);
+          if (item.supplyId) {
+            const supply = await storage.getSupply(item.supplyId);
+            if (supply && FOOD_CATEGORIES_RECALC.includes(supply.category || '')) {
+              foodSubtotalR += itemTotal;
+            } else {
+              nonFoodSubtotalR += itemTotal;
+            }
+          } else {
+            nonFoodSubtotalR += itemTotal;
+          }
+        }
+        // If no items found, fall back to raw subtotal as non-food
+        if (items.length === 0) {
+          nonFoodSubtotalR = parseFloat(order.subtotal || order.totalAmount || '0');
+        }
+        const adjustedSubtotalR = nonFoodSubtotalR + (foodSubtotalR * FOOD_LOYALTY_RATE_RECALC);
+        const amountForLoyalty = Math.max(0, adjustedSubtotalR - loyaltyCreditsApplied - discountAmount);
+
+        console.log(`[LOYALTY RECALC] Order #${order.id} user=${order.userId}: food=$${foodSubtotalR.toFixed(2)}, non-food=$${nonFoodSubtotalR.toFixed(2)}, adjusted=$${adjustedSubtotalR.toFixed(2)}, credits=${loyaltyCreditsApplied}, discount=${discountAmount} → amountForLoyalty=${amountForLoyalty.toFixed(2)}`);
 
         if (!userSpending[order.userId]) userSpending[order.userId] = 0;
         if (!userCreditsUsed[order.userId]) userCreditsUsed[order.userId] = 0;
