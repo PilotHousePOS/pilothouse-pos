@@ -7480,6 +7480,29 @@ export default function Admin() {
     },
   });
 
+  const { data: chargeAccountReports = [], isLoading: chargeReportsLoading, refetch: refetchChargeReports } = useQuery<any[]>({
+    queryKey: ["/api/admin/charge-account-reports"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/charge-account-reports");
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    },
+    enabled: !!typedUser?.isAdmin,
+  });
+
+  const emailChargeReportMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const res = await apiRequest("POST", `/api/admin/charge-account-reports/${userId}/email`, {});
+      return res.json();
+    },
+    onSuccess: (data: any) => {
+      toast({ title: "Statement Sent", description: data?.message || "Email sent successfully." });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to send the statement email.", variant: "destructive" });
+    },
+  });
+
   const pendingAppointments = (appointments as any[]).filter((a: any) => a.status === 'scheduled').length;
   // Count orders that are NOT picked up (pending_approval, approved, ready_for_pickup are all "pending" from admin perspective)
   const pendingOrdersCount = (orders as any[]).filter((o: any) => 
@@ -7940,6 +7963,12 @@ export default function Admin() {
               <span className="hidden lg:inline">Orders & Refunds</span>
               <span className="lg:hidden">Orders</span>
             </TabsTrigger>
+            {typedUser?.isAdmin && (
+              <TabsTrigger value="charge-accounts" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                <span className="hidden lg:inline">Charge Account Reports</span>
+                <span className="lg:hidden">Charge Accts</span>
+              </TabsTrigger>
+            )}
             {typedUser?.isAdmin && (
               <TabsTrigger value="settings" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 Settings
@@ -11756,6 +11785,115 @@ export default function Admin() {
 
         <TabsContent value="email-center" className="space-y-6">
           <EmailCenter groomingSettings={groomingSettings as any[]} />
+        </TabsContent>
+
+        <TabsContent value="charge-accounts" className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-white">Charge Account Reports</h2>
+              <p className="text-gray-400 text-sm mt-1">All outstanding orders billed to in-store charge accounts</p>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => refetchChargeReports()} className="border-gray-600 text-gray-300 hover:bg-gray-700">
+              Refresh
+            </Button>
+          </div>
+
+          {chargeReportsLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
+            </div>
+          ) : chargeAccountReports.length === 0 ? (
+            <Card className="bg-gray-800 border-gray-700">
+              <CardContent className="py-12 text-center text-gray-400">
+                No outstanding charge account orders found.
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-6">
+              {chargeAccountReports.map((entry: any) => {
+                const { user, orders: userOrders } = entry;
+                const grandTotal = userOrders.reduce((sum: number, { order }: any) => sum + parseFloat(order.totalAmount || '0'), 0);
+                return (
+                  <Card key={user.id} className="bg-gray-800 border-gray-700">
+                    <CardHeader className="pb-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div>
+                          <CardTitle className="text-white text-lg flex items-center gap-2">
+                            <span className="inline-block bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded">Charge Account</span>
+                            {user.firstName} {user.lastName}
+                          </CardTitle>
+                          <p className="text-gray-400 text-sm mt-1">{user.email}</p>
+                          <p className="text-gray-500 text-xs mt-0.5">
+                            {userOrders.length} order{userOrders.length !== 1 ? 's' : ''} &bull; Grand Total: <span className="text-amber-400 font-bold">${grandTotal.toFixed(2)}</span>
+                          </p>
+                        </div>
+                        <Button
+                          size="sm"
+                          className="bg-amber-500 hover:bg-amber-600 text-black font-semibold"
+                          onClick={() => emailChargeReportMutation.mutate(user.id)}
+                          disabled={emailChargeReportMutation.isPending}
+                        >
+                          {emailChargeReportMutation.isPending ? 'Sending...' : 'Email Statement'}
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-0 space-y-4">
+                      {userOrders.map(({ order, items }: any) => {
+                        const orderDate = order.orderDate
+                          ? new Date(order.orderDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+                          : 'Unknown';
+                        return (
+                          <div key={order.id} className="border border-gray-700 rounded-lg overflow-hidden">
+                            <div className="bg-gray-700 px-4 py-2 flex items-center justify-between">
+                              <span className="text-gray-200 font-medium text-sm">Order #{order.id}</span>
+                              <span className="text-gray-400 text-xs">{orderDate}</span>
+                            </div>
+                            <div className="divide-y divide-gray-700">
+                              {items.length === 0 ? (
+                                <p className="text-gray-500 text-sm px-4 py-3">No items recorded</p>
+                              ) : (
+                                <>
+                                  <div className="hidden sm:grid sm:grid-cols-[1fr_auto_auto_auto] gap-2 px-4 py-2 bg-gray-750">
+                                    <span className="text-gray-500 text-xs font-semibold uppercase">Item</span>
+                                    <span className="text-gray-500 text-xs font-semibold uppercase text-center">Qty</span>
+                                    <span className="text-gray-500 text-xs font-semibold uppercase text-right">Unit Price</span>
+                                    <span className="text-gray-500 text-xs font-semibold uppercase text-right">Total</span>
+                                  </div>
+                                  {items.map((item: any, idx: number) => (
+                                    <div key={idx} className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_auto_auto] gap-2 px-4 py-2.5 items-start">
+                                      <span className="text-gray-200 text-sm">{item.itemName}</span>
+                                      <span className="text-gray-400 text-sm text-center">×{item.quantity}</span>
+                                      <span className="text-gray-400 text-sm text-right hidden sm:block">${parseFloat(item.price || '0').toFixed(2)}</span>
+                                      <span className="text-white text-sm text-right font-medium">${(parseFloat(item.price || '0') * (item.quantity || 1)).toFixed(2)}</span>
+                                    </div>
+                                  ))}
+                                </>
+                              )}
+                            </div>
+                            <div className="bg-gray-700 px-4 py-2 text-right space-y-1">
+                              {order.discountAmount && parseFloat(order.discountAmount) > 0 && (
+                                <div className="text-green-400 text-xs">Discount: −${parseFloat(order.discountAmount).toFixed(2)}</div>
+                              )}
+                              {order.taxAmount && parseFloat(order.taxAmount) > 0 && (
+                                <div className="text-gray-400 text-xs">Tax: ${parseFloat(order.taxAmount).toFixed(2)}</div>
+                              )}
+                              <div className="text-amber-400 font-bold text-sm">Order Total: ${parseFloat(order.totalAmount || '0').toFixed(2)}</div>
+                            </div>
+                            {order.customerNotes && (
+                              <div className="bg-yellow-900/30 border-t border-yellow-700/40 px-4 py-2">
+                                <span className="text-yellow-300 text-xs font-semibold">Customer Note: </span>
+                                <span className="text-yellow-200 text-xs">{order.customerNotes}</span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">

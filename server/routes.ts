@@ -5667,6 +5667,133 @@ West Monroe LA 71291
     }
   });
 
+  // GET /api/admin/charge-account-reports — all charge account orders grouped by user
+  app.get("/api/admin/charge-account-reports", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      const data = await storage.getChargeAccountOrdersByUser();
+      res.json(data);
+    } catch (error: any) {
+      console.error("Error fetching charge account reports:", error);
+      res.status(500).json({ message: "Failed to fetch charge account reports" });
+    }
+  });
+
+  // POST /api/admin/charge-account-reports/:userId/email — email the report to the account holder
+  app.post("/api/admin/charge-account-reports/:userId/email", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { userId } = req.params;
+      const data = await storage.getChargeAccountOrdersByUser();
+      const accountData = data.find((d) => d.user.id === userId);
+
+      if (!accountData) {
+        return res.status(404).json({ message: "No charge account orders found for this user" });
+      }
+
+      const { user, orders: userOrders } = accountData;
+      const toEmail = user.email;
+      if (!toEmail || toEmail.startsWith('temp_')) {
+        return res.status(400).json({ message: "No valid email address for this account" });
+      }
+
+      const { getUncachableSendGridClient } = await import('./sendgridIntegration');
+      const { client: sgMail, fromEmail, replyTo } = await getUncachableSendGridClient();
+
+      const storeAddress = '2934 Cypress St, West Monroe, LA 71291';
+      const storePhone = '(318) 322-3023';
+
+      const grandTotal = userOrders.reduce((sum, { order }) => sum + parseFloat(order.totalAmount || '0'), 0);
+
+      const ordersHtml = userOrders.map(({ order, items }) => {
+        const orderDate = order.orderDate
+          ? new Date(order.orderDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+          : 'Unknown date';
+        const itemsHtml = items.map((item) => `
+          <tr>
+            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; color: #374151;">${item.itemName}</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: center;">${item.quantity}</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: right;">$${parseFloat(item.price || '0').toFixed(2)}</td>
+            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; color: #374151; text-align: right;">$${(parseFloat(item.price || '0') * (item.quantity || 1)).toFixed(2)}</td>
+          </tr>`).join('');
+        return `
+          <div style="margin-bottom: 28px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+            <div style="background: #f3f4f6; padding: 12px 16px; border-bottom: 1px solid #e5e7eb;">
+              <strong style="color: #1f2937;">Order #${order.id}</strong>
+              <span style="color: #6b7280; margin-left: 16px; font-size: 14px;">${orderDate}</span>
+            </div>
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background: #f9fafb;">
+                  <th style="padding: 8px 12px; text-align: left; color: #6b7280; font-size: 12px; text-transform: uppercase; font-weight: 600;">Item</th>
+                  <th style="padding: 8px 12px; text-align: center; color: #6b7280; font-size: 12px; text-transform: uppercase; font-weight: 600;">Qty</th>
+                  <th style="padding: 8px 12px; text-align: right; color: #6b7280; font-size: 12px; text-transform: uppercase; font-weight: 600;">Unit Price</th>
+                  <th style="padding: 8px 12px; text-align: right; color: #6b7280; font-size: 12px; text-transform: uppercase; font-weight: 600;">Line Total</th>
+                </tr>
+              </thead>
+              <tbody>${itemsHtml}</tbody>
+            </table>
+            <div style="padding: 10px 16px; background: #f9fafb; border-top: 1px solid #e5e7eb; text-align: right;">
+              ${order.discountAmount && parseFloat(order.discountAmount) > 0 ? `<div style="color: #374151; margin-bottom: 4px;">Discount: <strong>-$${parseFloat(order.discountAmount).toFixed(2)}</strong></div>` : ''}
+              <div style="color: #374151; margin-bottom: 4px;">Tax: <strong>$${parseFloat(order.taxAmount || '0').toFixed(2)}</strong></div>
+              <div style="color: #1f2937; font-size: 16px; font-weight: bold;">Order Total: $${parseFloat(order.totalAmount || '0').toFixed(2)}</div>
+            </div>
+          </div>`;
+      }).join('');
+
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 680px; margin: 0 auto;">
+          <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 28px 24px; text-align: center;">
+            <h1 style="color: #f59e0b; margin: 0 0 6px 0; font-size: 26px;">Animal House Pet Store</h1>
+            <p style="color: #cbd5e1; margin: 0; font-size: 14px;">Charge Account Statement</p>
+          </div>
+          <div style="padding: 32px 24px; background: #ffffff;">
+            <p style="color: #374151; margin: 0 0 8px 0;">Hello <strong>${user.firstName || 'Valued Customer'} ${user.lastName || ''}</strong>,</p>
+            <p style="color: #374151; margin: 0 0 24px 0;">
+              Please find below the statement of items charged to your account at Animal House Pet Store.
+              Payment is due in-store at your earliest convenience.
+            </p>
+            ${ordersHtml}
+            <div style="background: #1f2937; color: #f9fafb; padding: 20px 24px; border-radius: 8px; margin-top: 8px; text-align: right;">
+              <div style="font-size: 20px; font-weight: bold;">
+                Grand Total Due: <span style="color: #f59e0b;">$${grandTotal.toFixed(2)}</span>
+              </div>
+              <div style="font-size: 13px; color: #9ca3af; margin-top: 6px;">
+                ${userOrders.length} order${userOrders.length !== 1 ? 's' : ''} on file
+              </div>
+            </div>
+            <p style="color: #6b7280; margin: 24px 0 0 0; font-size: 14px;">
+              Please bring this statement or reference your account name when making payment.
+              If you have any questions about your balance, please don't hesitate to call us.
+            </p>
+          </div>
+          <div style="background-color: #1f2937; color: #d1d5db; padding: 18px 24px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 4px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 4px 0;">${storeAddress}</p>
+            <p style="margin: 0;">Phone: ${storePhone}</p>
+          </div>
+        </div>`;
+
+      await sgMail.send({
+        to: toEmail,
+        from: fromEmail,
+        replyTo,
+        subject: `Your Charge Account Statement — Animal House Pet Store`,
+        html,
+      });
+
+      res.json({ message: `Statement emailed to ${toEmail}`, grandTotal: grandTotal.toFixed(2) });
+    } catch (error: any) {
+      console.error("Error emailing charge account report:", error);
+      res.status(500).json({ message: "Failed to send charge account report email" });
+    }
+  });
+
   app.delete("/api/admin/users/:userId", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) {

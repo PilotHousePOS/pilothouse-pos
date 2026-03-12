@@ -248,6 +248,7 @@ export interface IStorage {
   updateOrderStripePayment(id: number, data: { stripeCheckoutSessionId?: string; stripePaymentIntentId?: string; stripePaymentUrl?: string; paymentStatus?: string; paidAt?: Date }): Promise<Order>;
   getOrderByStripeCheckoutSession(sessionId: string): Promise<Order | undefined>;
   getOrderByStripePaymentIntent(paymentIntentId: string): Promise<Order | undefined>;
+  getChargeAccountOrdersByUser(): Promise<Array<{ user: any; orders: Array<{ order: Order; items: any[] }> }>>;
   hideOrderFromAdmin(id: number): Promise<Order>;
   deleteOrder(id: number): Promise<void>;
 
@@ -2453,6 +2454,43 @@ export class DatabaseStorage implements IStorage {
       .where(eq(orders.stripePaymentIntentId, paymentIntentId))
       .limit(1);
     return order;
+  }
+
+  async getChargeAccountOrdersByUser(): Promise<Array<{ user: any; orders: Array<{ order: Order; items: any[] }> }>> {
+    const chargeOrders = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.paymentStatus, 'charge_account'))
+      .orderBy(desc(orders.orderDate));
+
+    if (chargeOrders.length === 0) return [];
+
+    const userMap = new Map<string, { user: any; orders: Array<{ order: Order; items: any[] }> }>();
+
+    for (const order of chargeOrders) {
+      const userId = order.userId;
+      if (!userMap.has(userId)) {
+        const [u] = await db.select().from(users).where(eq(users.id, userId));
+        userMap.set(userId, { user: u || { id: userId, firstName: 'Unknown', lastName: '', email: '' }, orders: [] });
+      }
+
+      const rawItems = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
+      const enrichedItems = await Promise.all(rawItems.map(async (item) => {
+        let itemName = 'Unknown Item';
+        if (item.supplyId) {
+          const [supply] = await db.select().from(supplies).where(eq(supplies.id, item.supplyId));
+          itemName = supply?.name || `Supply #${item.supplyId}`;
+        } else if (item.petId) {
+          const [pet] = await db.select().from(pets).where(eq(pets.id, item.petId));
+          itemName = pet?.name || `Pet #${item.petId}`;
+        }
+        return { ...item, itemName };
+      }));
+
+      userMap.get(userId)!.orders.push({ order, items: enrichedItems });
+    }
+
+    return Array.from(userMap.values());
   }
 
   async hideOrderFromAdmin(id: number): Promise<Order> {
