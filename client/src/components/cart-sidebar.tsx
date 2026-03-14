@@ -971,7 +971,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
               </div>
             </div>
 
-            <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 px-4 py-3 text-sm text-amber-800 dark:text-amber-300">
+            <div className="rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-700 px-4 py-3 text-sm text-blue-800 dark:text-blue-300">
               <p className="font-semibold mb-0.5">Order Processing Hours</p>
               <p>Orders are reviewed and approved between <span className="font-medium">10:00 AM – 5:00 PM</span>. Orders placed outside these hours will be processed the next business day. For immediate assistance, please call us at <span className="font-medium whitespace-nowrap">(318) 323-6090</span>.</p>
             </div>
