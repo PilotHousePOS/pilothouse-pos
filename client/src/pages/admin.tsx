@@ -3787,13 +3787,13 @@ function EditAppointmentDialog({
       
       await apiRequest("PATCH", `/api/admin/appointments/${appointmentId}/details`, updates);
     },
-    onSuccess: async () => {
+    onSuccess: () => {
+      handleClose();
       toast({
         title: "Appointment Updated",
         description: "Appointment details have been updated successfully.",
       });
-      await queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
-      handleClose();
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
     },
     onError: (error: any) => {
       // Extract error message from apiRequest error format: "400: {json}"
@@ -6420,17 +6420,7 @@ export default function Admin() {
       
       await apiRequest("PATCH", `/api/admin/appointments/${id}/details`, updates);
     },
-    onSuccess: async () => {
-      toast({
-        title: "Appointment Updated",
-        description: "Appointment details have been updated successfully.",
-      });
-      // Invalidate all appointment-related queries including contact-specific ones
-      await queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
-      await queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
-      await queryClient.invalidateQueries({ predicate: (query) => 
-        Array.isArray(query.queryKey) && query.queryKey.some(k => k === "appointments")
-      });
+    onSuccess: () => {
       setEditingAppointment(null);
       setEditNotes('');
       setEditPrice('');
@@ -6442,6 +6432,15 @@ export default function Admin() {
       setEditDate(undefined);
       setEditTime('');
       setEditGroomerId(null);
+      toast({
+        title: "Appointment Updated",
+        description: "Appointment details have been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
+      queryClient.invalidateQueries({ predicate: (query) => 
+        Array.isArray(query.queryKey) && query.queryKey.some(k => k === "appointments")
+      });
     },
     onError: (error: any) => {
       // Extract error message from apiRequest error format: "400: {json}"
