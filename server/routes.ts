@@ -5708,7 +5708,12 @@ West Monroe LA 71291
       const storeAddress = '2934 Cypress St, West Monroe, LA 71291';
       const storePhone = '(318) 322-3023';
 
+      const { discountPercent = 0 } = req.body;
+      const discountPct = Math.min(100, Math.max(0, Number(discountPercent) || 0));
+
       const grandTotal = userOrders.reduce((sum, { order }) => sum + parseFloat(order.totalAmount || '0'), 0);
+      const discountAmount = grandTotal * (discountPct / 100);
+      const finalTotal = grandTotal - discountAmount;
 
       const ordersHtml = userOrders.map(({ order, items }) => {
         const orderDate = order.orderDate
@@ -5760,9 +5765,19 @@ West Monroe LA 71291
             </p>
             ${ordersHtml}
             <div style="background: #1f2937; color: #f9fafb; padding: 20px 24px; border-radius: 8px; margin-top: 8px; text-align: right;">
+              ${discountPct > 0 ? `
+              <div style="font-size: 14px; color: #9ca3af; margin-bottom: 6px;">
+                Subtotal: <strong style="color: #f9fafb;">$${grandTotal.toFixed(2)}</strong>
+              </div>
+              <div style="font-size: 14px; color: #34d399; margin-bottom: 10px;">
+                Courtesy Discount (${discountPct}%): <strong>−$${discountAmount.toFixed(2)}</strong>
+              </div>
+              <div style="border-top: 1px solid #374151; padding-top: 10px; font-size: 22px; font-weight: bold;">
+                Amount Due: <span style="color: #f59e0b;">$${finalTotal.toFixed(2)}</span>
+              </div>` : `
               <div style="font-size: 20px; font-weight: bold;">
                 Grand Total Due: <span style="color: #f59e0b;">$${grandTotal.toFixed(2)}</span>
-              </div>
+              </div>`}
               <div style="font-size: 13px; color: #9ca3af; margin-top: 6px;">
                 ${userOrders.length} order${userOrders.length !== 1 ? 's' : ''} on file
               </div>
@@ -5787,7 +5802,7 @@ West Monroe LA 71291
         html,
       });
 
-      res.json({ message: `Statement emailed to ${toEmail}`, grandTotal: grandTotal.toFixed(2) });
+      res.json({ message: `Statement emailed to ${toEmail}`, grandTotal: grandTotal.toFixed(2), finalTotal: finalTotal.toFixed(2), discountPercent: discountPct });
     } catch (error: any) {
       console.error("Error emailing charge account report:", error);
       res.status(500).json({ message: "Failed to send charge account report email" });

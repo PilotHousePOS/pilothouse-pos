@@ -7491,13 +7491,18 @@ export default function Admin() {
     enabled: !!typedUser?.isAdmin,
   });
 
+  const [chargeDiscounts, setChargeDiscounts] = React.useState<Record<string, number>>({});
+
   const emailChargeReportMutation = useMutation({
-    mutationFn: async (userId: string) => {
-      const res = await apiRequest("POST", `/api/admin/charge-account-reports/${userId}/email`, {});
+    mutationFn: async ({ userId, discountPercent }: { userId: string; discountPercent: number }) => {
+      const res = await apiRequest("POST", `/api/admin/charge-account-reports/${userId}/email`, { discountPercent });
       return res.json();
     },
     onSuccess: (data: any) => {
-      toast({ title: "Statement Sent", description: data?.message || "Email sent successfully." });
+      const msg = data?.discountPercent > 0
+        ? `${data.message} — Amount due after ${data.discountPercent}% discount: $${data.finalTotal}`
+        : data?.message || "Email sent successfully.";
+      toast({ title: "Statement Sent", description: msg });
     },
     onError: () => {
       toast({ title: "Error", description: "Failed to send the statement email.", variant: "destructive" });
@@ -11817,28 +11822,86 @@ export default function Admin() {
               {chargeAccountReports.map((entry: any) => {
                 const { user, orders: userOrders } = entry;
                 const grandTotal = userOrders.reduce((sum: number, { order }: any) => sum + parseFloat(order.totalAmount || '0'), 0);
+                const discPct = chargeDiscounts[user.id] ?? 0;
+                const discAmt = grandTotal * (discPct / 100);
+                const finalAmt = grandTotal - discAmt;
                 return (
                   <Card key={user.id} className="bg-gray-800 border-gray-700">
                     <CardHeader className="pb-3">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <div>
-                          <CardTitle className="text-white text-lg flex items-center gap-2">
-                            <span className="inline-block bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded">Charge Account</span>
-                            {user.firstName} {user.lastName}
-                          </CardTitle>
-                          <p className="text-gray-400 text-sm mt-1">{user.email}</p>
-                          <p className="text-gray-500 text-xs mt-0.5">
-                            {userOrders.length} order{userOrders.length !== 1 ? 's' : ''} &bull; Grand Total: <span className="text-amber-400 font-bold">${grandTotal.toFixed(2)}</span>
-                          </p>
+                      <div className="flex flex-col gap-3">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                          <div>
+                            <CardTitle className="text-white text-lg flex items-center gap-2">
+                              <span className="inline-block bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded">Charge Account</span>
+                              {user.firstName} {user.lastName}
+                            </CardTitle>
+                            <p className="text-gray-400 text-sm mt-1">{user.email}</p>
+                            <p className="text-gray-500 text-xs mt-0.5">
+                              {userOrders.length} order{userOrders.length !== 1 ? 's' : ''}
+                            </p>
+                          </div>
                         </div>
-                        <Button
-                          size="sm"
-                          className="bg-amber-500 hover:bg-amber-600 text-black font-semibold"
-                          onClick={() => emailChargeReportMutation.mutate(user.id)}
-                          disabled={emailChargeReportMutation.isPending}
-                        >
-                          {emailChargeReportMutation.isPending ? 'Sending...' : 'Email Statement'}
-                        </Button>
+
+                        {/* Discount + Totals + Email row */}
+                        <div className="bg-gray-750 border border-gray-700 rounded-lg p-3 space-y-3">
+                          {/* Discount percentage control */}
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <span className="text-gray-300 text-sm font-medium shrink-0">Courtesy Discount:</span>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {[0, 10, 15, 20, 25, 30, 35].map((pct) => (
+                                <button
+                                  key={pct}
+                                  onClick={() => setChargeDiscounts(prev => ({ ...prev, [user.id]: pct }))}
+                                  className={`px-2.5 py-1 rounded text-xs font-semibold border transition-colors ${
+                                    discPct === pct
+                                      ? 'bg-amber-500 border-amber-400 text-black'
+                                      : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'
+                                  }`}
+                                >
+                                  {pct === 0 ? 'None' : `${pct}%`}
+                                </button>
+                              ))}
+                              <div className="flex items-center gap-1">
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={100}
+                                  value={discPct}
+                                  onChange={(e) => {
+                                    const val = Math.min(100, Math.max(0, Number(e.target.value) || 0));
+                                    setChargeDiscounts(prev => ({ ...prev, [user.id]: val }));
+                                  }}
+                                  className="w-16 bg-gray-700 border border-gray-600 text-white text-sm rounded px-2 py-1 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                  placeholder="0"
+                                />
+                                <span className="text-gray-400 text-sm">%</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Total summary + Email button */}
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-1 border-t border-gray-700">
+                            <div className="text-sm space-y-0.5">
+                              {discPct > 0 ? (
+                                <>
+                                  <div className="text-gray-400">Subtotal: <span className="text-white">${grandTotal.toFixed(2)}</span></div>
+                                  <div className="text-green-400">Discount ({discPct}%): −${discAmt.toFixed(2)}</div>
+                                  <div className="text-amber-400 font-bold text-base">Amount Due: ${finalAmt.toFixed(2)}</div>
+                                </>
+                              ) : (
+                                <div className="text-amber-400 font-bold text-base">Grand Total: ${grandTotal.toFixed(2)}</div>
+                              )}
+                            </div>
+                            <Button
+                              size="sm"
+                              className="bg-amber-500 hover:bg-amber-600 text-black font-semibold shrink-0"
+                              onClick={() => emailChargeReportMutation.mutate({ userId: user.id, discountPercent: discPct })}
+                              disabled={emailChargeReportMutation.isPending}
+                            >
+                              {emailChargeReportMutation.isPending ? 'Sending...' : 'Email Statement'}
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="pt-0 space-y-4">
