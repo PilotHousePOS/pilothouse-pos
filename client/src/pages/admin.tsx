@@ -93,7 +93,8 @@ import {
   Settings,
   Gift,
   Tag,
-  Wrench
+  Wrench,
+  CreditCard
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -10310,8 +10311,11 @@ export default function Admin() {
                               disabled={updateUserGroomerRoleMutation.isPending}
                             />
                           </div>
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-sm font-medium text-orange-700">Charge Acct</span>
+                          <div className={`flex items-center justify-between gap-3 px-2 py-1.5 rounded-md border ${userItem.isChargeAccount ? 'bg-orange-500/20 border-orange-400' : 'bg-orange-500/5 border-orange-500/30'}`}>
+                            <span className="text-sm font-semibold text-orange-400 flex items-center gap-1">
+                              <CreditCard className="w-3.5 h-3.5" />
+                              Charge Acct
+                            </span>
                             <Switch
                               checked={!!userItem.isChargeAccount}
                               onCheckedChange={(checked) => {
