@@ -1457,6 +1457,62 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Admin-only: all pets regardless of availability (for inventory management)
+  app.get("/api/admin/pets", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+
+      const { species, search, page = '1', limit = '20' } = req.query;
+      const pageNum = Math.max(1, parseInt(page as string) || 1);
+      const pageSize = Math.min(100, Math.max(1, parseInt(limit as string) || 20));
+      const offset = (pageNum - 1) * pageSize;
+
+      let allPets = await storage.getAllPetsAdmin();
+
+      if (species && typeof species === 'string') {
+        allPets = allPets.filter(p => p.species?.toLowerCase() === species.toLowerCase());
+      }
+
+      if (search && typeof search === 'string' && search.trim()) {
+        const term = search.toLowerCase();
+        allPets = allPets.filter(p =>
+          [p.name, p.species, p.breed, p.description].some(f => f?.toLowerCase().includes(term))
+        );
+      }
+
+      const total = allPets.length;
+      const paginatedPets = allPets.slice(offset, offset + pageSize);
+
+      res.json({
+        pets: paginatedPets,
+        pagination: {
+          page: pageNum,
+          pageSize,
+          total,
+          totalPages: Math.ceil(total / pageSize),
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching admin pets:", error);
+      res.status(500).json({ message: "Failed to fetch pets" });
+    }
+  });
+
+  // Admin-only: toggle pet availability
+  app.patch("/api/admin/pets/:id/availability", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const { isAvailable } = req.body;
+      if (typeof isAvailable !== 'boolean') return res.status(400).json({ message: "isAvailable must be a boolean" });
+      const updated = await storage.updatePet(id, { isAvailable });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error toggling pet availability:", error);
+      res.status(500).json({ message: "Failed to update pet availability" });
+    }
+  });
+
   // Export inventory to Excel for POS setup
   app.get("/api/export/inventory", authMiddleware, async (req: any, res) => {
     try {

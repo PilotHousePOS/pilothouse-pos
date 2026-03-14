@@ -129,6 +129,7 @@ export interface IStorage {
 
   // Pet operations
   getAllPets(): Promise<Pet[]>;
+  getAllPetsAdmin(): Promise<Pet[]>;
   getPetsBySpecies(species: string): Promise<Pet[]>;
   getPet(id: number): Promise<Pet | undefined>;
   createPet(pet: InsertPet): Promise<Pet>;
@@ -552,6 +553,10 @@ export class DatabaseStorage implements IStorage {
         }
       ];
     }
+  }
+
+  async getAllPetsAdmin(): Promise<Pet[]> {
+    return await db.select().from(pets).orderBy(desc(pets.createdAt));
   }
 
   async getPetsBySpecies(species: string): Promise<Pet[]> {

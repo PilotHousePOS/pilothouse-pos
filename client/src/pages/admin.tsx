@@ -5617,12 +5617,22 @@ export default function Admin() {
 
   // Always call all hooks at the top level
   const { data: petsData } = useQuery({
-    queryKey: ["/api/pets", { 
+    queryKey: ["/api/admin/pets", { 
       page: petsPage, 
       limit: PETS_PER_PAGE,
       search: petSearchQuery 
     }],
-    enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        page: String(petsPage),
+        limit: String(PETS_PER_PAGE),
+        ...(petSearchQuery ? { search: petSearchQuery } : {}),
+      });
+      const res = await fetch(`/api/admin/pets?${params}`);
+      if (!res.ok) throw new Error("Failed to fetch pets");
+      return res.json();
+    },
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
   const pets = (petsData as any)?.pets || [];
@@ -6062,6 +6072,7 @@ export default function Admin() {
       });
       setIsAddPetOpen(false);
       queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pets"] });
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
@@ -6095,6 +6106,7 @@ export default function Admin() {
       });
       setEditingPet(null);
       queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pets"] });
     },
     onError: (error) => {
       toast({
@@ -6116,6 +6128,7 @@ export default function Admin() {
         description: "Pet has been deleted successfully.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pets"] });
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
@@ -6134,6 +6147,26 @@ export default function Admin() {
         description: "Failed to delete pet.",
         variant: "destructive",
       });
+    },
+  });
+
+  const togglePetAvailabilityMutation = useMutation({
+    mutationFn: async ({ id, isAvailable }: { id: number; isAvailable: boolean }) => {
+      const res = await apiRequest("PATCH", `/api/admin/pets/${id}/availability`, { isAvailable });
+      return res.json();
+    },
+    onSuccess: (_, vars) => {
+      toast({
+        title: vars.isAvailable ? "Pet Enabled" : "Pet Hidden",
+        description: vars.isAvailable
+          ? "This pet is now visible to customers."
+          : "This pet is now hidden from customers.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pets"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to update pet availability.", variant: "destructive" });
     },
   });
 
@@ -8110,15 +8143,15 @@ export default function Admin() {
 
               <div className="space-y-3">
                 {(pets as any[]).map((pet: any) => (
-                  <div key={pet.id} className="p-3 border rounded-lg">
+                  <div key={pet.id} className={`p-3 border rounded-lg transition-opacity ${pet.isAvailable ? '' : 'opacity-60 border-dashed border-gray-400'}`}>
                     <div className="flex gap-3">
                       {/* Pet Thumbnail */}
-                      <div className="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                      <div className="relative flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
                         {pet.imageUrl ? (
                           <img 
                             src={pet.imageUrl} 
                             alt={pet.name}
-                            className="w-full h-full object-cover"
+                            className={`w-full h-full object-cover ${pet.isAvailable ? '' : 'grayscale'}`}
                             loading="lazy"
                             onError={(e) => {
                               (e.target as HTMLImageElement).style.display = 'none';
@@ -8130,23 +8163,39 @@ export default function Admin() {
                         <div className={`w-full h-full flex items-center justify-center ${pet.imageUrl ? 'hidden' : ''}`}>
                           <PawPrint className="w-5 h-5 text-gray-400" />
                         </div>
+                        {!pet.isAvailable && (
+                          <div className="absolute inset-0 bg-gray-900/40 flex items-center justify-center">
+                            <EyeOff className="w-4 h-4 text-white/80" />
+                          </div>
+                        )}
                       </div>
                       {/* Name gets full remaining width */}
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm leading-snug" title={pet.name}>{pet.name}</h3>
                         <p className="text-xs text-gray-600 mt-0.5">{pet.species} • {pet.breed} • ${pet.price}</p>
-                      </div>
-                    </div>
-                    {/* Actions on separate row */}
-                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
-                      <div className="flex items-center gap-2">
-                        <Badge variant={pet.isAvailable ? "default" : "secondary"} className="text-xs">
-                          {pet.isAvailable ? "Available" : "Unavailable"}
-                        </Badge>
                         {pet.quantity != null && (
                           <span className="text-xs text-gray-500">Qty: {pet.quantity}</span>
                         )}
                       </div>
+                    </div>
+                    {/* Actions on separate row */}
+                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                      {/* Availability toggle */}
+                      {typedUser?.isAdmin && (
+                        <Button
+                          size="sm"
+                          variant={pet.isAvailable ? "outline" : "secondary"}
+                          className={`text-xs h-7 px-2 ${pet.isAvailable ? 'border-green-500 text-green-600 hover:bg-green-50' : 'border-orange-500 text-orange-500 bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/20 dark:hover:bg-orange-900/40'}`}
+                          onClick={() => togglePetAvailabilityMutation.mutate({ id: pet.id, isAvailable: !pet.isAvailable })}
+                          disabled={togglePetAvailabilityMutation.isPending}
+                        >
+                          {pet.isAvailable ? (
+                            <><Eye className="w-3 h-3 mr-1" />Visible</>
+                          ) : (
+                            <><EyeOff className="w-3 h-3 mr-1" />Hidden</>
+                          )}
+                        </Button>
+                      )}
                       {typedUser?.isAdmin && (
                         <div className="flex gap-1">
                           <Button
