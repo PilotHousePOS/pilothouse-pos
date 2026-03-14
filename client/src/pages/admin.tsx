@@ -8180,22 +8180,26 @@ export default function Admin() {
                     </div>
                     {/* Actions on separate row */}
                     <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-                      {/* Availability toggle */}
-                      {typedUser?.isAdmin && (
-                        <Button
-                          size="sm"
-                          variant={pet.isAvailable ? "outline" : "secondary"}
-                          className={`text-xs h-7 px-2 ${pet.isAvailable ? 'border-green-500 text-green-600 hover:bg-green-50' : 'border-orange-500 text-orange-500 bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/20 dark:hover:bg-orange-900/40'}`}
-                          onClick={() => togglePetAvailabilityMutation.mutate({ id: pet.id, isAvailable: !pet.isAvailable })}
-                          disabled={togglePetAvailabilityMutation.isPending}
-                        >
-                          {pet.isAvailable ? (
-                            <><Eye className="w-3 h-3 mr-1" />Visible</>
-                          ) : (
-                            <><EyeOff className="w-3 h-3 mr-1" />Hidden</>
-                          )}
-                        </Button>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {typedUser?.isAdmin ? (
+                          <button
+                            onClick={() => togglePetAvailabilityMutation.mutate({ id: pet.id, isAvailable: !pet.isAvailable })}
+                            disabled={togglePetAvailabilityMutation.isPending}
+                            title={pet.isAvailable ? "Click to hide from customers" : "Click to show to customers"}
+                            className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full border cursor-pointer transition-colors ${pet.isAvailable ? 'bg-green-100 text-green-700 border-green-400 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-600' : 'bg-orange-100 text-orange-700 border-orange-400 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-600'}`}
+                          >
+                            {pet.isAvailable ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                            {pet.isAvailable ? "Available" : "Unavailable"}
+                          </button>
+                        ) : (
+                          <Badge variant={pet.isAvailable ? "default" : "secondary"} className="text-xs">
+                            {pet.isAvailable ? "Available" : "Unavailable"}
+                          </Badge>
+                        )}
+                        {pet.quantity != null && (
+                          <span className="text-xs text-gray-500">Qty: {pet.quantity}</span>
+                        )}
+                      </div>
                       {typedUser?.isAdmin && (
                         <div className="flex gap-1">
                           <Button
