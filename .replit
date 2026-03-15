@@ -10,7 +10,6 @@ packages = ["jq", "unzip", "poppler_utils", "chromium"]
 deploymentTarget = "gce"
 build = ["npm", "run", "build"]
 run = ["npm", "run", "start"]
-publicDir = "dist/public"
 
 [[ports]]
 localPort = 5000
