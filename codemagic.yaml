@@ -39,7 +39,7 @@ workflows:
 
     publishing:
       app_store_connect:
-        auth: environment_variables
+        auth: integration
         submit_to_testflight: true
       email:
         recipients:
