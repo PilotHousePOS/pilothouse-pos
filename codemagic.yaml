@@ -1,0 +1,60 @@
+workflows:
+  ios-release:
+    name: Animal House iOS Release
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+
+    integrations:
+      app_store_connect: App Store Connect API Key
+
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.animalhouseexperience.app
+      vars:
+        BUNDLE_ID: "com.animalhouseexperience.app"
+        XCODE_SCHEME: "AnimalHousePetStore"
+        APP_STORE_APPLE_ID: "YOUR_APP_APPLE_ID"
+
+    scripts:
+      - name: Install XcodeGen
+        script: |
+          brew install xcodegen
+
+      - name: Generate Xcode project
+        script: |
+          cd ios
+          xcodegen generate
+
+      - name: Set up code signing
+        script: |
+          xcode-project use-profiles
+
+      - name: Increment build number
+        script: |
+          cd ios
+          agvtool new-version -all $(($(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID") + 1))
+
+      - name: Build IPA
+        script: |
+          xcode-project build-ipa \
+            --project "ios/AnimalHousePetStore.xcodeproj" \
+            --scheme "$XCODE_SCHEME" \
+            --config Release
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+
+    publishing:
+      email:
+        recipients:
+          - theanimalhouse@comcast.net
+        notify:
+          success: true
+          failure: true
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false
