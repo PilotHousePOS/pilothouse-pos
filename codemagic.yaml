@@ -38,6 +38,9 @@ workflows:
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
 
     publishing:
+      app_store_connect:
+        auth: environment_variables
+        submit_to_testflight: true
       email:
         recipients:
           - theanimalhouse@comcast.net
