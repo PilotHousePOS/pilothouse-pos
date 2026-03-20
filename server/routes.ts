@@ -5890,6 +5890,75 @@ West Monroe LA 71291
     }
   });
 
+  // ── Specials / Deals ────────────────────────────────────────────────────────
+
+  // Public: active specials only
+  app.get("/api/specials", async (_req, res) => {
+    try {
+      const items = await storage.getActiveSpecials();
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching specials:", error);
+      res.status(500).json({ message: "Failed to fetch specials" });
+    }
+  });
+
+  // Admin: all specials
+  app.get("/api/admin/specials", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const items = await storage.getAllSpecialsAdmin();
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching admin specials:", error);
+      res.status(500).json({ message: "Failed to fetch specials" });
+    }
+  });
+
+  app.post("/api/admin/specials", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const { title, description, imageUrl, badgeText, badgeColor, linkType, linkId, externalUrl, isActive, sortOrder } = req.body;
+      if (!title?.trim()) return res.status(400).json({ message: "Title is required" });
+      const created = await storage.createSpecial({
+        title: title.trim(), description, imageUrl, badgeText, badgeColor: badgeColor || 'red',
+        linkType: linkType || 'none', linkId: linkId || null, externalUrl,
+        isActive: isActive !== false, sortOrder: sortOrder ?? 0,
+      });
+      res.json(created);
+    } catch (error) {
+      console.error("Error creating special:", error);
+      res.status(500).json({ message: "Failed to create special" });
+    }
+  });
+
+  app.put("/api/admin/specials/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const { title, description, imageUrl, badgeText, badgeColor, linkType, linkId, externalUrl, isActive, sortOrder } = req.body;
+      const updated = await storage.updateSpecial(id, {
+        title, description, imageUrl, badgeText, badgeColor, linkType, linkId, externalUrl, isActive, sortOrder,
+      });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating special:", error);
+      res.status(500).json({ message: "Failed to update special" });
+    }
+  });
+
+  app.delete("/api/admin/specials/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      await storage.deleteSpecial(id);
+      res.json({ message: "Special deleted" });
+    } catch (error) {
+      console.error("Error deleting special:", error);
+      res.status(500).json({ message: "Failed to delete special" });
+    }
+  });
+
   // Admin Email Center - Send emails to users
   app.post("/api/admin/email/send", authMiddleware, async (req: any, res) => {
     try {

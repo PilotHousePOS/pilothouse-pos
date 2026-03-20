@@ -1042,3 +1042,23 @@ export type AutomatedMessageLog = {
   errorMessage: string | null;
   sentAt: Date | null;
 };
+
+// ─── Specials / Deals ────────────────────────────────────────────────────────
+export const specials = pgTable("specials", {
+  id: serial("id").primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  imageUrl: text("image_url"),
+  badgeText: varchar("badge_text", { length: 50 }),
+  badgeColor: varchar("badge_color", { length: 20 }).default("red"),
+  linkType: varchar("link_type", { length: 20 }).default("none"),
+  linkId: integer("link_id"),
+  externalUrl: text("external_url"),
+  isActive: boolean("is_active").default(true).notNull(),
+  sortOrder: integer("sort_order").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type Special = typeof specials.$inferSelect;
+export type InsertSpecial = typeof specials.$inferInsert;

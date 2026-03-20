@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
-import { Bell, ShoppingCart, Heart, Star, ArrowRight, Sparkles, Eye, Search } from "lucide-react";
+import { Bell, ShoppingCart, Heart, Star, ArrowRight, Sparkles, Eye, Search, Tag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { getRecentlyViewedIds } from "@/lib/recentlyViewed";
 import animalHouseLogoPath from "@assets/Circle Mascot Logo_1750438195696.jpg";
@@ -13,6 +13,73 @@ import { pushNotificationManager } from "@/lib/pushNotifications";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import StoreFooter from "@/components/store-footer";
+
+const BADGE_COLORS: Record<string, string> = {
+  red: 'bg-red-500', orange: 'bg-orange-500', green: 'bg-green-500',
+  blue: 'bg-blue-500', purple: 'bg-purple-500', yellow: 'bg-yellow-400 text-gray-900',
+};
+
+function SpecialsStrip() {
+  const [, setLocation] = useLocation();
+  const { data: specials = [] } = useQuery<any[]>({
+    queryKey: ["/api/specials"],
+    staleTime: 5 * 60 * 1000,
+  });
+
+  if (!specials || specials.length === 0) return null;
+
+  const handleClick = (s: any) => {
+    if (s.linkType === 'supplies') setLocation('/supplies');
+    else if (s.linkType === 'pets') setLocation('/pets');
+    else if (s.linkType === 'external' && s.externalUrl) window.open(s.externalUrl, '_blank');
+  };
+
+  return (
+    <section className="px-4 pt-4 pb-2">
+      <div className="flex items-center gap-2 mb-3">
+        <Tag className="w-4 h-4 text-brand-red" />
+        <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wide">Specials & Deals</h3>
+      </div>
+      <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+        {specials.map((s: any) => {
+          const isClickable = s.linkType && s.linkType !== 'none';
+          const badgeClass = BADGE_COLORS[s.badgeColor || 'red'] || 'bg-red-500';
+          return (
+            <div
+              key={s.id}
+              onClick={() => isClickable && handleClick(s)}
+              className={`flex-shrink-0 w-52 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden ${isClickable ? 'cursor-pointer hover:shadow-md hover:border-brand-red transition-all' : ''}`}
+            >
+              {s.imageUrl ? (
+                <div className="relative h-28 bg-gray-100">
+                  <img src={s.imageUrl} alt={s.title} className="w-full h-full object-cover" />
+                  {s.badgeText && (
+                    <span className={`absolute top-2 left-2 text-xs font-bold px-2 py-0.5 rounded-full text-white ${badgeClass}`}>
+                      {s.badgeText}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div className="relative h-12 bg-gradient-to-r from-brand-red to-brand-orange flex items-center px-3">
+                  {s.badgeText && (
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full text-white ${badgeClass}`}>
+                      {s.badgeText}
+                    </span>
+                  )}
+                </div>
+              )}
+              <div className="p-3">
+                <p className="font-semibold text-sm text-gray-900 dark:text-white leading-tight line-clamp-1">{s.title}</p>
+                {s.description && <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">{s.description}</p>}
+                {isClickable && <p className="text-xs text-brand-red font-medium mt-1.5 flex items-center gap-0.5">Shop now <ArrowRight className="w-3 h-3" /></p>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
   const { user, isLoading } = useAuth();
@@ -196,6 +263,9 @@ export default function Home() {
           </div>
         </form>
       </div>
+
+      {/* Specials & Deals Strip */}
+      <SpecialsStrip />
 
       {/* Hero Section with Modern Cards */}
       <section className="px-6 py-6">

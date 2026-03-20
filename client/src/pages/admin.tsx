@@ -5708,6 +5708,46 @@ export default function Admin() {
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const filteredUsers = (users as any[]).filter((u: any) => {
+    if (!userSearchQuery.trim()) return true;
+    const q = userSearchQuery.toLowerCase();
+    return (
+      `${u.firstName} ${u.lastName}`.toLowerCase().includes(q) ||
+      u.email?.toLowerCase().includes(q) ||
+      u.phoneNumber?.toLowerCase().includes(q)
+    );
+  });
+
+  const { data: adminSpecials = [], refetch: refetchSpecials } = useQuery<any[]>({
+    queryKey: ["/api/admin/specials"],
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+  });
+
+  const [isAddSpecialOpen, setIsAddSpecialOpen] = useState(false);
+  const [editingSpecial, setEditingSpecial] = useState<any | null>(null);
+  const [specialForm, setSpecialForm] = useState({
+    title: '', description: '', imageUrl: '', badgeText: '', badgeColor: 'red',
+    linkType: 'none', externalUrl: '', isActive: true, sortOrder: 0,
+  });
+
+  const openAddSpecial = () => {
+    setSpecialForm({ title: '', description: '', imageUrl: '', badgeText: '', badgeColor: 'red', linkType: 'none', externalUrl: '', isActive: true, sortOrder: 0 });
+    setEditingSpecial(null);
+    setIsAddSpecialOpen(true);
+  };
+
+  const openEditSpecial = (s: any) => {
+    setSpecialForm({
+      title: s.title || '', description: s.description || '', imageUrl: s.imageUrl || '',
+      badgeText: s.badgeText || '', badgeColor: s.badgeColor || 'red',
+      linkType: s.linkType || 'none', externalUrl: s.externalUrl || '',
+      isActive: s.isActive !== false, sortOrder: s.sortOrder ?? 0,
+    });
+    setEditingSpecial(s);
+    setIsAddSpecialOpen(true);
+  };
+
   const { data: groomingSettings = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/grooming-settings"],
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
@@ -6148,6 +6188,48 @@ export default function Admin() {
         variant: "destructive",
       });
     },
+  });
+
+  const saveSpecialMutation = useMutation({
+    mutationFn: async () => {
+      if (editingSpecial) {
+        const res = await apiRequest("PUT", `/api/admin/specials/${editingSpecial.id}`, specialForm);
+        return res.json();
+      } else {
+        const res = await apiRequest("POST", "/api/admin/specials", specialForm);
+        return res.json();
+      }
+    },
+    onSuccess: () => {
+      setIsAddSpecialOpen(false);
+      setEditingSpecial(null);
+      toast({ title: editingSpecial ? "Special Updated" : "Special Created", description: "Changes saved successfully." });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/specials"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/specials"] });
+    },
+    onError: () => { toast({ title: "Error", description: "Failed to save special.", variant: "destructive" }); },
+  });
+
+  const deleteSpecialMutation = useMutation({
+    mutationFn: async (id: number) => { await apiRequest("DELETE", `/api/admin/specials/${id}`); },
+    onSuccess: () => {
+      toast({ title: "Special Deleted" });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/specials"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/specials"] });
+    },
+    onError: () => { toast({ title: "Error", description: "Failed to delete special.", variant: "destructive" }); },
+  });
+
+  const toggleSpecialActiveMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
+      const res = await apiRequest("PUT", `/api/admin/specials/${id}`, { isActive });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/specials"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/specials"] });
+    },
+    onError: () => { toast({ title: "Error", description: "Failed to toggle special.", variant: "destructive" }); },
   });
 
   const togglePetAvailabilityMutation = useMutation({
@@ -8005,6 +8087,11 @@ export default function Admin() {
               <TabsTrigger value="charge-accounts" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 <span className="hidden lg:inline">Charge Account Reports</span>
                 <span className="lg:hidden">Charge Accts</span>
+              </TabsTrigger>
+            )}
+            {typedUser?.isAdmin && (
+              <TabsTrigger value="specials" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                Specials
               </TabsTrigger>
             )}
             {typedUser?.isAdmin && (
@@ -10311,12 +10398,29 @@ export default function Admin() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="w-5 h-5" />
-                User Management ({users.length})
+                User Management ({filteredUsers.length}{userSearchQuery ? ` of ${(users as any[]).length}` : ''})
               </CardTitle>
             </CardHeader>
             <CardContent>
+              <div className="relative mb-4">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Search by name, email, or phone..."
+                  value={userSearchQuery}
+                  onChange={(e) => setUserSearchQuery(e.target.value)}
+                  className="pl-9"
+                />
+                {userSearchQuery && (
+                  <button onClick={() => setUserSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+              {filteredUsers.length === 0 && userSearchQuery && (
+                <p className="text-center text-gray-500 py-6">No users match "{userSearchQuery}"</p>
+              )}
               <div className="space-y-4">
-                {users.map((userItem: any) => (
+                {filteredUsers.map((userItem: any) => (
                   <Card key={userItem.id}>
                     <CardContent className="p-4">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
@@ -12013,6 +12117,143 @@ export default function Admin() {
               })}
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="specials" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-yellow-500" />
+                  Specials & Deals
+                </CardTitle>
+                <Button size="sm" onClick={openAddSpecial} className="bg-brand-red hover:bg-red-600">
+                  <Plus className="w-4 h-4 mr-1" /> Add Special
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {(adminSpecials as any[]).length === 0 ? (
+                <div className="text-center py-10 text-gray-500">
+                  <Sparkles className="w-10 h-10 mx-auto mb-3 text-gray-300" />
+                  <p className="font-medium">No specials yet</p>
+                  <p className="text-sm mt-1">Add a deal or promotion to show customers on the home screen.</p>
+                  <Button className="mt-4 bg-brand-red hover:bg-red-600" onClick={openAddSpecial}>
+                    <Plus className="w-4 h-4 mr-1" /> Add First Special
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {(adminSpecials as any[]).map((s: any) => (
+                    <div key={s.id} className={`flex gap-3 p-3 rounded-lg border ${s.isActive ? 'border-gray-200' : 'border-dashed border-gray-300 opacity-60'}`}>
+                      {s.imageUrl && (
+                        <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
+                          <img src={s.imageUrl} alt={s.title} className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="font-semibold text-sm truncate">{s.title}</p>
+                            {s.badgeText && (
+                              <span className={`inline-block text-xs font-bold px-2 py-0.5 rounded-full text-white mt-0.5 bg-${s.badgeColor || 'red'}-500`}>
+                                {s.badgeText}
+                              </span>
+                            )}
+                            {s.description && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{s.description}</p>}
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <button
+                              onClick={() => toggleSpecialActiveMutation.mutate({ id: s.id, isActive: !s.isActive })}
+                              title={s.isActive ? 'Click to hide' : 'Click to show'}
+                              className={`text-xs px-2 py-0.5 rounded-full border font-medium cursor-pointer transition-colors ${s.isActive ? 'bg-green-100 text-green-700 border-green-400 hover:bg-green-200' : 'bg-gray-100 text-gray-500 border-gray-300 hover:bg-gray-200'}`}
+                            >
+                              {s.isActive ? 'Live' : 'Hidden'}
+                            </button>
+                            <Button size="sm" variant="outline" onClick={() => openEditSpecial(s)} className="h-7 w-7 p-0">
+                              <Edit className="w-3 h-3" />
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => deleteSpecialMutation.mutate(s.id)} disabled={deleteSpecialMutation.isPending} className="h-7 w-7 p-0 border-red-200 text-red-500 hover:bg-red-50">
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-400 mt-1">Sort: {s.sortOrder} {s.linkType !== 'none' && `• Links to: ${s.linkType}`}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Add / Edit Special Dialog */}
+          <Dialog open={isAddSpecialOpen} onOpenChange={(open) => { if (!open) { setIsAddSpecialOpen(false); setEditingSpecial(null); } }}>
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>{editingSpecial ? 'Edit Special' : 'Add New Special'}</DialogTitle>
+                <DialogDescription>Fill in the details for this deal or promotion.</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label>Title *</Label>
+                  <Input value={specialForm.title} onChange={e => setSpecialForm(f => ({ ...f, title: e.target.value }))} placeholder="e.g. 20% Off All Dog Food" />
+                </div>
+                <div>
+                  <Label>Description</Label>
+                  <Textarea value={specialForm.description} onChange={e => setSpecialForm(f => ({ ...f, description: e.target.value }))} placeholder="Brief description of the deal..." rows={2} />
+                </div>
+                <div>
+                  <Label>Badge Text</Label>
+                  <Input value={specialForm.badgeText} onChange={e => setSpecialForm(f => ({ ...f, badgeText: e.target.value }))} placeholder="e.g. 20% OFF, SALE, BOGO" maxLength={50} />
+                </div>
+                <div>
+                  <Label>Badge Color</Label>
+                  <select value={specialForm.badgeColor} onChange={e => setSpecialForm(f => ({ ...f, badgeColor: e.target.value }))} className="w-full border rounded-md px-3 py-2 text-sm">
+                    <option value="red">Red</option>
+                    <option value="orange">Orange</option>
+                    <option value="green">Green</option>
+                    <option value="blue">Blue</option>
+                    <option value="purple">Purple</option>
+                    <option value="yellow">Yellow</option>
+                  </select>
+                </div>
+                <div>
+                  <Label>Image URL</Label>
+                  <Input value={specialForm.imageUrl} onChange={e => setSpecialForm(f => ({ ...f, imageUrl: e.target.value }))} placeholder="https://..." />
+                </div>
+                <div>
+                  <Label>Link Type</Label>
+                  <select value={specialForm.linkType} onChange={e => setSpecialForm(f => ({ ...f, linkType: e.target.value }))} className="w-full border rounded-md px-3 py-2 text-sm">
+                    <option value="none">No Link</option>
+                    <option value="supplies">Supplies Page</option>
+                    <option value="pets">Pets Page</option>
+                    <option value="external">External URL</option>
+                  </select>
+                </div>
+                {specialForm.linkType === 'external' && (
+                  <div>
+                    <Label>External URL</Label>
+                    <Input value={specialForm.externalUrl} onChange={e => setSpecialForm(f => ({ ...f, externalUrl: e.target.value }))} placeholder="https://..." />
+                  </div>
+                )}
+                <div>
+                  <Label>Sort Order <span className="text-xs text-gray-400">(lower = shows first)</span></Label>
+                  <Input type="number" value={specialForm.sortOrder} onChange={e => setSpecialForm(f => ({ ...f, sortOrder: parseInt(e.target.value) || 0 }))} />
+                </div>
+                <div className="flex items-center gap-3">
+                  <Switch checked={specialForm.isActive} onCheckedChange={v => setSpecialForm(f => ({ ...f, isActive: v }))} />
+                  <Label>{specialForm.isActive ? 'Live — visible to customers' : 'Hidden — not shown to customers'}</Label>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <Button variant="outline" className="flex-1" onClick={() => { setIsAddSpecialOpen(false); setEditingSpecial(null); }}>Cancel</Button>
+                  <Button className="flex-1 bg-brand-red hover:bg-red-600" onClick={() => saveSpecialMutation.mutate()} disabled={saveSpecialMutation.isPending || !specialForm.title.trim()}>
+                    {saveSpecialMutation.isPending ? 'Saving...' : (editingSpecial ? 'Save Changes' : 'Create Special')}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">

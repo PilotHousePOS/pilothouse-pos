@@ -447,6 +447,21 @@ async function runAppMigrations() {
     const migPool = new Pool({ connectionString: databaseUrl });
     await migPool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_notes TEXT`);
     await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_charge_account BOOLEAN DEFAULT false`);
+    await migPool.query(`CREATE TABLE IF NOT EXISTS specials (
+      id SERIAL PRIMARY KEY,
+      title VARCHAR(255) NOT NULL,
+      description TEXT,
+      image_url TEXT,
+      badge_text VARCHAR(50),
+      badge_color VARCHAR(20) DEFAULT 'red',
+      link_type VARCHAR(20) DEFAULT 'none',
+      link_id INTEGER,
+      external_url TEXT,
+      is_active BOOLEAN NOT NULL DEFAULT true,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )`);
     await migPool.end();
     log('App migrations complete');
   } catch (err: any) {

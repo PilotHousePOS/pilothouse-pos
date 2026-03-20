@@ -103,6 +103,9 @@ import {
   legalPages,
   type LegalPage,
   type InsertLegalPage,
+  specials,
+  type Special,
+  type InsertSpecial,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, and, or, not, ilike, lt, lte, isNull, count, sql, inArray, ne, notInArray } from "drizzle-orm";
@@ -444,6 +447,13 @@ export interface IStorage {
   getLegalPage(slug: string): Promise<LegalPage | undefined>;
   upsertLegalPage(data: { slug: string; title: string; content: string; lastUpdatedBy?: string }): Promise<LegalPage>;
   getAllLegalPages(): Promise<LegalPage[]>;
+
+  // Specials / Deals
+  getActiveSpecials(): Promise<Special[]>;
+  getAllSpecialsAdmin(): Promise<Special[]>;
+  createSpecial(data: InsertSpecial): Promise<Special>;
+  updateSpecial(id: number, data: Partial<InsertSpecial>): Promise<Special>;
+  deleteSpecial(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -4474,6 +4484,34 @@ export class DatabaseStorage implements IStorage {
 
   async getAllLegalPages(): Promise<LegalPage[]> {
     return db.select().from(legalPages).orderBy(asc(legalPages.slug));
+  }
+
+  async getActiveSpecials(): Promise<Special[]> {
+    return db.select().from(specials)
+      .where(eq(specials.isActive, true))
+      .orderBy(asc(specials.sortOrder), desc(specials.createdAt));
+  }
+
+  async getAllSpecialsAdmin(): Promise<Special[]> {
+    return db.select().from(specials)
+      .orderBy(asc(specials.sortOrder), desc(specials.createdAt));
+  }
+
+  async createSpecial(data: InsertSpecial): Promise<Special> {
+    const [created] = await db.insert(specials).values(data).returning();
+    return created;
+  }
+
+  async updateSpecial(id: number, data: Partial<InsertSpecial>): Promise<Special> {
+    const [updated] = await db.update(specials)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(specials.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteSpecial(id: number): Promise<void> {
+    await db.delete(specials).where(eq(specials.id, id));
   }
 }
 
