@@ -7,6 +7,9 @@ workflows:
     environment:
       groups:
         - ios-credentials
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.animalhouseexperience.app
       vars:
         BUNDLE_ID: "com.animalhouseexperience.app"
         XCODE_SCHEME: "AnimalHousePetStore"
