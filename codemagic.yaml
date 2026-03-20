@@ -4,9 +4,6 @@ workflows:
     max_build_duration: 60
     instance_type: mac_mini_m2
 
-    integrations:
-      app_store_connect: App Store Connect API Key
-
     environment:
       ios_signing:
         distribution_type: app_store
@@ -14,7 +11,10 @@ workflows:
       vars:
         BUNDLE_ID: "com.animalhouseexperience.app"
         XCODE_SCHEME: "AnimalHousePetStore"
-        APP_STORE_APPLE_ID: "YOUR_APP_APPLE_ID"
+      app_store_connect:
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        key_identifier: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        private_key: $APP_STORE_CONNECT_PRIVATE_KEY
 
     scripts:
       - name: Install XcodeGen
@@ -29,11 +29,6 @@ workflows:
       - name: Set up code signing
         script: |
           xcode-project use-profiles
-
-      - name: Increment build number
-        script: |
-          cd ios
-          agvtool new-version -all $(($(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID") + 1))
 
       - name: Build IPA
         script: |
