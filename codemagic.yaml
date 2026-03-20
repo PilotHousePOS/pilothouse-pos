@@ -5,16 +5,14 @@ workflows:
     instance_type: mac_mini_m2
 
     environment:
+      groups:
+        - ios-credentials
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.animalhouseexperience.app
       vars:
         BUNDLE_ID: "com.animalhouseexperience.app"
         XCODE_SCHEME: "AnimalHousePetStore"
-      app_store_connect:
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        key_identifier: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        private_key: $APP_STORE_CONNECT_PRIVATE_KEY
 
     scripts:
       - name: Install XcodeGen
