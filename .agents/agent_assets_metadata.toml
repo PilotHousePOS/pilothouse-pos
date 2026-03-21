@@ -36,3 +36,9 @@ id = "ZEeJIe_hQJFG6Nx56qfLx"
 uri = "file://attached_assets/appstore_final3.png"
 type = "image"
 title = "Screenshot 3 — Grooming Booking"
+
+[[outputs]]
+id = "cbGhqtQviefxXv-IHRN-f"
+uri = "file://attached_assets/appstore_ipad.png"
+type = "image"
+title = "iPad 13-inch Screenshot (2048×2732)"
