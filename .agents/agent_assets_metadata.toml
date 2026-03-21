@@ -1,0 +1,20 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "X7PcIu38m8mcxOWpTXKDs"
+uri = "file://attached_assets/appstore_screenshot_1.png"
+type = "image"
+title = "Screenshot 1 — Home / Exotic Reptiles"
+
+[[outputs]]
+id = "hQ2oxAvvw7fL-9ABSZOhR"
+uri = "file://attached_assets/appstore_screenshot_2.png"
+type = "image"
+title = "Screenshot 2 — Pet Supplies Shop"
+
+[[outputs]]
+id = "iaT5l6LBydq8CR3m6-S0n"
+uri = "file://attached_assets/appstore_screenshot_3.png"
+type = "image"
+title = "Screenshot 3 — Grooming Booking"
