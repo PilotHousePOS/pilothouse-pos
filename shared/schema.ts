@@ -1049,6 +1049,7 @@ export const specials = pgTable("specials", {
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   imageUrl: text("image_url"),
+  imageUrls: text("image_urls").array(),
   badgeText: varchar("badge_text", { length: 50 }),
   badgeColor: varchar("badge_color", { length: 20 }).default("red"),
   linkType: varchar("link_type", { length: 20 }).default("none"),

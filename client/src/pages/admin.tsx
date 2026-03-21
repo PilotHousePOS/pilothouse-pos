@@ -5727,12 +5727,12 @@ export default function Admin() {
   const [isAddSpecialOpen, setIsAddSpecialOpen] = useState(false);
   const [editingSpecial, setEditingSpecial] = useState<any | null>(null);
   const [specialForm, setSpecialForm] = useState({
-    title: '', description: '', imageUrl: '', badgeText: '', badgeColor: 'red',
+    title: '', description: '', imageUrl: '', imageUrls: [] as string[], badgeText: '', badgeColor: 'red',
     linkType: 'none', externalUrl: '', isActive: true, sortOrder: 0,
   });
 
   const openAddSpecial = () => {
-    setSpecialForm({ title: '', description: '', imageUrl: '', badgeText: '', badgeColor: 'red', linkType: 'none', externalUrl: '', isActive: true, sortOrder: 0 });
+    setSpecialForm({ title: '', description: '', imageUrl: '', imageUrls: [], badgeText: '', badgeColor: 'red', linkType: 'none', externalUrl: '', isActive: true, sortOrder: 0 });
     setEditingSpecial(null);
     setIsAddSpecialOpen(true);
   };
@@ -5740,6 +5740,7 @@ export default function Admin() {
   const openEditSpecial = (s: any) => {
     setSpecialForm({
       title: s.title || '', description: s.description || '', imageUrl: s.imageUrl || '',
+      imageUrls: s.imageUrls || [],
       badgeText: s.badgeText || '', badgeColor: s.badgeColor || 'red',
       linkType: s.linkType || 'none', externalUrl: s.externalUrl || '',
       isActive: s.isActive !== false, sortOrder: s.sortOrder ?? 0,
@@ -12218,9 +12219,11 @@ export default function Admin() {
                     <option value="yellow">Yellow</option>
                   </select>
                 </div>
-                <SpecialImageUpload
-                  currentImageUrl={specialForm.imageUrl}
-                  onImageUploaded={(url) => setSpecialForm(f => ({ ...f, imageUrl: url }))}
+                <SpecialMultiImageUpload
+                  mainImageUrl={specialForm.imageUrl}
+                  additionalImageUrls={specialForm.imageUrls}
+                  onMainImageChange={(url) => setSpecialForm(f => ({ ...f, imageUrl: url }))}
+                  onAdditionalImagesChange={(urls) => setSpecialForm(f => ({ ...f, imageUrls: urls }))}
                 />
                 <div>
                   <Label>Link Type</Label>
@@ -13676,18 +13679,30 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
   );
 }
 
-function SpecialImageUpload({ currentImageUrl, onImageUploaded }: {
-  currentImageUrl: string;
-  onImageUploaded: (url: string) => void;
+function SpecialMultiImageUpload({
+  mainImageUrl,
+  additionalImageUrls,
+  onMainImageChange,
+  onAdditionalImagesChange,
+}: {
+  mainImageUrl: string;
+  additionalImageUrls: string[];
+  onMainImageChange: (url: string) => void;
+  onAdditionalImagesChange: (urls: string[]) => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const dropZoneRef = useRef<HTMLDivElement>(null);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
-  const [pasteActive, setPasteActive] = useState(false);
+  const [pasteReady, setPasteReady] = useState(false);
+  const [urlInput, setUrlInput] = useState('');
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const { toast } = useToast();
 
+  const allImages = [mainImageUrl, ...additionalImageUrls].filter(url => url && url.trim() !== '');
+
   const handleFileUpload = async (file: File) => {
+    setPasteReady(false);
     if (!file.type.startsWith('image/')) {
       toast({ title: "Invalid File", description: "Please select an image file.", variant: "destructive" });
       return;
@@ -13700,17 +13715,14 @@ function SpecialImageUpload({ currentImageUrl, onImageUploaded }: {
     try {
       const formData = new FormData();
       formData.append('image', file);
-      const response = await fetch('/api/admin/specials/upload-image', {
-        method: 'POST',
-        credentials: 'include',
-        body: formData,
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Upload failed');
-      }
+      const response = await fetch('/api/admin/specials/upload-image', { method: 'POST', credentials: 'include', body: formData });
+      if (!response.ok) { const err = await response.json(); throw new Error(err.message || 'Upload failed'); }
       const data = await response.json();
-      onImageUploaded(data.storedPath);
+      if (!mainImageUrl || mainImageUrl.trim() === '') {
+        onMainImageChange(data.storedPath);
+      } else {
+        onAdditionalImagesChange([...additionalImageUrls, data.storedPath]);
+      }
     } catch (error: any) {
       toast({ title: "Upload Failed", description: error.message || "Failed to upload image.", variant: "destructive" });
     } finally {
@@ -13718,71 +13730,121 @@ function SpecialImageUpload({ currentImageUrl, onImageUploaded }: {
     }
   };
 
-  const handlePaste = useCallback(async (e: ClipboardEvent) => {
-    if (!pasteActive) return;
-    const items = e.clipboardData?.items;
-    if (!items) return;
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (item.type.startsWith('image/')) {
-        e.preventDefault();
-        const file = item.getAsFile();
-        if (file) { handleFileUpload(file); return; }
-      }
-    }
-  }, [pasteActive]);
-
   useEffect(() => {
-    if (pasteActive) {
-      document.addEventListener('paste', handlePaste);
-      return () => document.removeEventListener('paste', handlePaste);
-    }
-  }, [pasteActive, handlePaste]);
+    if (!pasteReady) return;
+    const handlePaste = (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith('image/')) {
+          const file = items[i].getAsFile();
+          if (file) { e.preventDefault(); handleFileUpload(file); break; }
+        }
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') setPasteReady(false); };
+    document.addEventListener('paste', handlePaste);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => { document.removeEventListener('paste', handlePaste); document.removeEventListener('keydown', handleKeyDown); };
+  }, [pasteReady, mainImageUrl, additionalImageUrls]);
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) handleFileUpload(file);
+  const addImageUrl = (url: string) => {
+    if (!url?.trim()) return;
+    const trimmed = url.trim();
+    if (!mainImageUrl || mainImageUrl.trim() === '') { onMainImageChange(trimmed); } 
+    else { onAdditionalImagesChange([...additionalImageUrls, trimmed]); }
+    setUrlInput('');
+  };
+
+  const removeImage = (index: number) => {
+    if (index === 0) {
+      if (additionalImageUrls.length > 0) { onMainImageChange(additionalImageUrls[0]); onAdditionalImagesChange(additionalImageUrls.slice(1)); }
+      else { onMainImageChange(''); }
+    } else {
+      onAdditionalImagesChange(additionalImageUrls.filter((_, i) => i !== index - 1));
+    }
+  };
+
+  const setAsPrimary = (index: number) => {
+    if (index === 0) return;
+    const newPrimary = additionalImageUrls[index - 1];
+    onMainImageChange(newPrimary);
+    onAdditionalImagesChange([mainImageUrl, ...additionalImageUrls.filter((_, i) => i !== index - 1)]);
+  };
+
+  const handleDragStart = (e: React.DragEvent, index: number) => { setDraggedIndex(index); e.dataTransfer.effectAllowed = 'move'; };
+  const handleDragEnd = () => { setDraggedIndex(null); setDragOverIndex(null); };
+  const handleDropOnImage = (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault(); e.stopPropagation();
+    const sourceIndex = draggedIndex;
+    setDraggedIndex(null); setDragOverIndex(null);
+    if (sourceIndex === null || sourceIndex === targetIndex) return;
+    const reordered = [...allImages];
+    const [moved] = reordered.splice(sourceIndex, 1);
+    reordered.splice(targetIndex, 0, moved);
+    onMainImageChange(reordered[0] || '');
+    onAdditionalImagesChange(reordered.slice(1));
   };
 
   return (
     <div className="space-y-3">
-      <Label>Image</Label>
-      {currentImageUrl && (
-        <img src={currentImageUrl} alt="Special preview" className="w-full h-32 object-cover rounded-lg border" />
+      <Label>Images ({allImages.length}) — drag to reorder, first image is main</Label>
+      {allImages.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {allImages.map((url, index) => (
+            <div
+              key={`special-img-${index}-${url.slice(-15)}`}
+              draggable
+              onDragStart={(e) => { e.stopPropagation(); handleDragStart(e, index); }}
+              onDragEnd={(e) => { e.stopPropagation(); handleDragEnd(); }}
+              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); if (draggedIndex !== null && draggedIndex !== index) setDragOverIndex(index); }}
+              onDragLeave={(e) => { e.stopPropagation(); setDragOverIndex(null); }}
+              onDrop={(e) => { e.stopPropagation(); handleDropOnImage(e, index); }}
+              className={`relative border-2 rounded-lg overflow-hidden cursor-grab active:cursor-grabbing transition-all ${
+                index === 0 ? 'border-blue-500' : 'border-gray-300'
+              } ${draggedIndex === index ? 'opacity-50 scale-95' : ''} ${dragOverIndex === index ? 'border-dashed border-orange-500' : ''}`}
+            >
+              <img src={url} alt={`Special ${index + 1}`} className="w-full h-28 object-cover bg-gray-100 dark:bg-gray-800 pointer-events-none" />
+              <div className="absolute top-1 left-1 flex gap-1">
+                {index === 0 && <span className="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded">Main</span>}
+                {url?.startsWith('/public-objects/') && <span className="bg-green-500 text-white text-xs px-1.5 py-0.5 rounded">Stored</span>}
+              </div>
+              <div className="absolute top-1 right-1 flex gap-1">
+                {index !== 0 && (
+                  <Button type="button" variant="outline" size="sm" className="h-6 w-6 p-0 bg-white hover:bg-blue-100" onClick={() => setAsPrimary(index)} title="Set as main">
+                    <Star className="w-3 h-3" />
+                  </Button>
+                )}
+                <Button type="button" variant="outline" size="sm" className="h-6 w-6 p-0 bg-white hover:bg-red-100" onClick={() => removeImage(index)}>
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
+              <div className="absolute bottom-1 left-1 bg-black/60 text-white px-1.5 py-0.5 rounded text-xs">{index + 1}</div>
+            </div>
+          ))}
+        </div>
       )}
       <div
-        ref={dropZoneRef}
-        tabIndex={0}
         className={`border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer text-center ${
-          dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' :
-          pasteActive ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-300'
+          pasteReady ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300'
         }`}
-        onDrop={handleDrop}
+        onDrop={(e) => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files?.[0]; if (f) handleFileUpload(f); }}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
-        onFocus={() => setPasteActive(true)}
-        onBlur={() => setPasteActive(false)}
-        onClick={() => dropZoneRef.current?.focus()}
+        onClick={() => { setPasteReady(true); fileInputRef.current?.click(); }}
       >
-        {pasteActive ? (
-          <p className="text-sm text-green-700 dark:text-green-300 font-medium">Ready — press Ctrl+V to paste</p>
+        {pasteReady ? (
+          <><ClipboardPaste className="w-8 h-8 text-green-600 mx-auto mb-2 animate-pulse" /><p className="text-sm text-green-700 font-medium">Ready — paste (Ctrl+V), drop, or browse</p><p className="text-xs text-green-600 mt-1">Press Escape to cancel</p></>
         ) : (
-          <p className="text-sm text-gray-500">Click here to enable paste, or drag & drop an image</p>
+          <><Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" /><p className="text-sm text-gray-500">{allImages.length === 0 ? 'Add main image' : 'Add another image'}</p><p className="text-xs text-gray-400 mt-1">Click to browse, drag & drop, or paste</p></>
         )}
       </div>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileUpload(f); e.target.value = ''; }}
-        className="hidden"
-      />
-      <Button type="button" variant="outline" className="w-full" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-        {uploading ? <><span className="animate-spin mr-2">⏳</span>Uploading...</> : currentImageUrl ? 'Replace Image' : 'Upload Image'}
-      </Button>
-      <p className="text-xs text-gray-500">Drag & drop, paste (Ctrl+V), or browse. Images stored permanently.</p>
+      <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileUpload(f); e.target.value = ''; }} className="hidden" />
+      {uploading && <div className="flex items-center justify-center gap-2 text-sm text-blue-600"><Loader2 className="w-4 h-4 animate-spin" />Uploading...</div>}
+      <div className="flex gap-2">
+        <Input placeholder="Or paste image URL here..." value={urlInput} onChange={(e) => setUrlInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addImageUrl(urlInput); } }} />
+        <Button type="button" variant="outline" onClick={() => addImageUrl(urlInput)} disabled={!urlInput.trim()}>Add</Button>
+      </div>
     </div>
   );
 }

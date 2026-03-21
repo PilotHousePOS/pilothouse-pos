@@ -5918,10 +5918,10 @@ West Monroe LA 71291
   app.post("/api/admin/specials", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
-      const { title, description, imageUrl, badgeText, badgeColor, linkType, linkId, externalUrl, isActive, sortOrder } = req.body;
+      const { title, description, imageUrl, imageUrls, badgeText, badgeColor, linkType, linkId, externalUrl, isActive, sortOrder } = req.body;
       if (!title?.trim()) return res.status(400).json({ message: "Title is required" });
       const created = await storage.createSpecial({
-        title: title.trim(), description, imageUrl, badgeText, badgeColor: badgeColor || 'red',
+        title: title.trim(), description, imageUrl, imageUrls: imageUrls || [], badgeText, badgeColor: badgeColor || 'red',
         linkType: linkType || 'none', linkId: linkId || null, externalUrl,
         isActive: isActive !== false, sortOrder: sortOrder ?? 0,
       });
@@ -5936,9 +5936,9 @@ West Monroe LA 71291
     try {
       if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
       const id = parseInt(req.params.id);
-      const { title, description, imageUrl, badgeText, badgeColor, linkType, linkId, externalUrl, isActive, sortOrder } = req.body;
+      const { title, description, imageUrl, imageUrls, badgeText, badgeColor, linkType, linkId, externalUrl, isActive, sortOrder } = req.body;
       const updated = await storage.updateSpecial(id, {
-        title, description, imageUrl, badgeText, badgeColor, linkType, linkId, externalUrl, isActive, sortOrder,
+        title, description, imageUrl, imageUrls: imageUrls || [], badgeText, badgeColor, linkType, linkId, externalUrl, isActive, sortOrder,
       });
       res.json(updated);
     } catch (error) {
