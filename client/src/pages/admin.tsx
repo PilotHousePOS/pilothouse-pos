@@ -12218,10 +12218,10 @@ export default function Admin() {
                     <option value="yellow">Yellow</option>
                   </select>
                 </div>
-                <div>
-                  <Label>Image URL</Label>
-                  <Input value={specialForm.imageUrl} onChange={e => setSpecialForm(f => ({ ...f, imageUrl: e.target.value }))} placeholder="https://..." />
-                </div>
+                <SpecialImageUpload
+                  currentImageUrl={specialForm.imageUrl}
+                  onImageUploaded={(url) => setSpecialForm(f => ({ ...f, imageUrl: url }))}
+                />
                 <div>
                   <Label>Link Type</Label>
                   <select value={specialForm.linkType} onChange={e => setSpecialForm(f => ({ ...f, linkType: e.target.value }))} className="w-full border rounded-md px-3 py-2 text-sm">
@@ -13673,6 +13673,117 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
         Update Supply
       </Button>
     </form>
+  );
+}
+
+function SpecialImageUpload({ currentImageUrl, onImageUploaded }: {
+  currentImageUrl: string;
+  onImageUploaded: (url: string) => void;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropZoneRef = useRef<HTMLDivElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const [pasteActive, setPasteActive] = useState(false);
+  const { toast } = useToast();
+
+  const handleFileUpload = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast({ title: "Invalid File", description: "Please select an image file.", variant: "destructive" });
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "File Too Large", description: "Please select an image under 10MB.", variant: "destructive" });
+      return;
+    }
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const response = await fetch('/api/admin/specials/upload-image', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Upload failed');
+      }
+      const data = await response.json();
+      onImageUploaded(data.storedPath);
+    } catch (error: any) {
+      toast({ title: "Upload Failed", description: error.message || "Failed to upload image.", variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handlePaste = useCallback(async (e: ClipboardEvent) => {
+    if (!pasteActive) return;
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.startsWith('image/')) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (file) { handleFileUpload(file); return; }
+      }
+    }
+  }, [pasteActive]);
+
+  useEffect(() => {
+    if (pasteActive) {
+      document.addEventListener('paste', handlePaste);
+      return () => document.removeEventListener('paste', handlePaste);
+    }
+  }, [pasteActive, handlePaste]);
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFileUpload(file);
+  };
+
+  return (
+    <div className="space-y-3">
+      <Label>Image</Label>
+      {currentImageUrl && (
+        <img src={currentImageUrl} alt="Special preview" className="w-full h-32 object-cover rounded-lg border" />
+      )}
+      <div
+        ref={dropZoneRef}
+        tabIndex={0}
+        className={`border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer text-center ${
+          dragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' :
+          pasteActive ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-300'
+        }`}
+        onDrop={handleDrop}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
+        onFocus={() => setPasteActive(true)}
+        onBlur={() => setPasteActive(false)}
+        onClick={() => dropZoneRef.current?.focus()}
+      >
+        {pasteActive ? (
+          <p className="text-sm text-green-700 dark:text-green-300 font-medium">Ready — press Ctrl+V to paste</p>
+        ) : (
+          <p className="text-sm text-gray-500">Click here to enable paste, or drag & drop an image</p>
+        )}
+      </div>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileUpload(f); e.target.value = ''; }}
+        className="hidden"
+      />
+      <Button type="button" variant="outline" className="w-full" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+        {uploading ? <><span className="animate-spin mr-2">⏳</span>Uploading...</> : currentImageUrl ? 'Replace Image' : 'Upload Image'}
+      </Button>
+      <p className="text-xs text-gray-500">Drag & drop, paste (Ctrl+V), or browse. Images stored permanently.</p>
+    </div>
   );
 }
 

@@ -5959,6 +5959,38 @@ West Monroe LA 71291
     }
   });
 
+  app.post("/api/admin/specials/upload-image", authMiddleware, upload.single('image'), async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      if (!req.file) return res.status(400).json({ message: "No image file uploaded" });
+
+      const fs = await import('fs/promises');
+      const fileBuffer = await fs.readFile(req.file.path);
+      const { ObjectStorageService } = await import('./objectStorageService');
+      const objectStorageService = new ObjectStorageService();
+
+      const uniqueSuffix = Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
+      const result = await objectStorageService.storeUploadedProductImage(
+        fileBuffer,
+        req.file.mimetype,
+        0,
+        `special-${uniqueSuffix}`,
+        'specials'
+      );
+
+      await fs.unlink(req.file.path).catch(() => {});
+
+      if (!result.success) {
+        return res.status(400).json({ message: result.error || "Failed to store image" });
+      }
+
+      res.json({ storedPath: result.storedPath });
+    } catch (error: any) {
+      console.error("Error uploading special image:", error);
+      res.status(500).json({ message: error.message || "Failed to upload image" });
+    }
+  });
+
   // Admin Email Center - Send emails to users
   app.post("/api/admin/email/send", authMiddleware, async (req: any, res) => {
     try {
