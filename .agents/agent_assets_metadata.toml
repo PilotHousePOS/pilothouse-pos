@@ -42,3 +42,9 @@ id = "cbGhqtQviefxXv-IHRN-f"
 uri = "file://attached_assets/appstore_ipad.png"
 type = "image"
 title = "iPad 13-inch Screenshot (2048×2732)"
+
+[[outputs]]
+id = "egVsdTYSqAsFdW7pOYZi3"
+uri = "file://attached_assets/new_icon_preview.png"
+type = "image"
+title = "New App Icon (same as Android)"
