@@ -4,13 +4,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
-import { Bell, ShoppingCart, Heart, Star, ArrowRight, Sparkles, Eye, Search, Tag } from "lucide-react";
+import { Bell, ShoppingCart, Heart, Star, ArrowRight, Sparkles, Eye, Search, Tag, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { getRecentlyViewedIds } from "@/lib/recentlyViewed";
 import animalHouseLogoPath from "@assets/Circle Mascot Logo_1750438195696.jpg";
 import { pushNotificationManager } from "@/lib/pushNotifications";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import StoreFooter from "@/components/store-footer";
 
@@ -19,20 +20,115 @@ const BADGE_COLORS: Record<string, string> = {
   blue: 'bg-blue-500', purple: 'bg-purple-500', yellow: 'bg-yellow-400 text-gray-900',
 };
 
+function SpecialDetailModal({ special, onClose }: { special: any; onClose: () => void }) {
+  const [, setLocation] = useLocation();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const allImages = [special.imageUrl, ...(special.imageUrls || [])].filter(Boolean);
+  const badgeClass = BADGE_COLORS[special.badgeColor || 'red'] || 'bg-red-500';
+  const hasLink = special.linkType && special.linkType !== 'none';
+
+  const prev = () => setCurrentIndex(i => (i - 1 + allImages.length) % allImages.length);
+  const next = () => setCurrentIndex(i => (i + 1) % allImages.length);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+      if (dx < 0) next(); else prev();
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
+  const handleCTA = () => {
+    if (special.linkType === 'supplies') { setLocation('/supplies'); onClose(); }
+    else if (special.linkType === 'pets') { setLocation('/pets'); onClose(); }
+    else if (special.linkType === 'external' && special.externalUrl) window.open(special.externalUrl, '_blank');
+  };
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="p-0 max-w-sm w-full overflow-hidden rounded-2xl border-0 [&>button]:z-10 [&>button]:text-white [&>button]:bg-black/50 [&>button]:rounded-full [&>button]:top-3 [&>button]:right-3">
+        {/* Image carousel */}
+        {allImages.length > 0 ? (
+          <div
+            className="relative bg-gray-100 dark:bg-gray-900 select-none"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            <img
+              src={allImages[currentIndex]}
+              alt={special.title}
+              className="w-full h-64 object-cover"
+            />
+            {special.badgeText && (
+              <span className={`absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full text-white ${badgeClass}`}>
+                {special.badgeText}
+              </span>
+            )}
+            {allImages.length > 1 && (
+              <>
+                <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full p-1.5">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full p-1.5">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
+                  {allImages.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentIndex(i)}
+                      className={`w-2 h-2 rounded-full transition-all ${i === currentIndex ? 'bg-white scale-110' : 'bg-white/50'}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="h-24 bg-gradient-to-r from-brand-red to-brand-orange flex items-center px-4">
+            {special.badgeText && (
+              <span className={`text-sm font-bold px-3 py-1 rounded-full text-white ${badgeClass}`}>{special.badgeText}</span>
+            )}
+          </div>
+        )}
+
+        {/* Content */}
+        <div className="p-5 space-y-3">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">{special.title}</h2>
+          {special.description && (
+            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{special.description}</p>
+          )}
+          {hasLink && (
+            <Button className="w-full bg-brand-red hover:bg-red-600 text-white mt-2" onClick={handleCTA}>
+              Shop Now <ArrowRight className="w-4 h-4 ml-1" />
+            </Button>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function SpecialsStrip() {
   const [, setLocation] = useLocation();
+  const [selectedSpecial, setSelectedSpecial] = useState<any | null>(null);
   const { data: specials = [] } = useQuery<any[]>({
     queryKey: ["/api/specials"],
     staleTime: 5 * 60 * 1000,
   });
 
   if (!specials || specials.length === 0) return null;
-
-  const handleClick = (s: any) => {
-    if (s.linkType === 'supplies') setLocation('/supplies');
-    else if (s.linkType === 'pets') setLocation('/pets');
-    else if (s.linkType === 'external' && s.externalUrl) window.open(s.externalUrl, '_blank');
-  };
 
   return (
     <section className="px-4 pt-4 pb-2">
@@ -42,20 +138,25 @@ function SpecialsStrip() {
       </div>
       <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
         {specials.map((s: any) => {
-          const isClickable = s.linkType && s.linkType !== 'none';
           const badgeClass = BADGE_COLORS[s.badgeColor || 'red'] || 'bg-red-500';
+          const allImages = [s.imageUrl, ...(s.imageUrls || [])].filter(Boolean);
           return (
             <div
               key={s.id}
-              onClick={() => isClickable && handleClick(s)}
-              className={`flex-shrink-0 w-52 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden ${isClickable ? 'cursor-pointer hover:shadow-md hover:border-brand-red transition-all' : ''}`}
+              onClick={() => setSelectedSpecial(s)}
+              className="flex-shrink-0 w-52 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden cursor-pointer hover:shadow-md hover:border-brand-red transition-all active:scale-95"
             >
-              {s.imageUrl ? (
+              {allImages.length > 0 ? (
                 <div className="relative h-28 bg-gray-100">
-                  <img src={s.imageUrl} alt={s.title} className="w-full h-full object-cover" />
+                  <img src={allImages[0]} alt={s.title} className="w-full h-full object-cover" />
                   {s.badgeText && (
                     <span className={`absolute top-2 left-2 text-xs font-bold px-2 py-0.5 rounded-full text-white ${badgeClass}`}>
                       {s.badgeText}
+                    </span>
+                  )}
+                  {allImages.length > 1 && (
+                    <span className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-1.5 py-0.5 rounded-full">
+                      1/{allImages.length}
                     </span>
                   )}
                 </div>
@@ -71,12 +172,17 @@ function SpecialsStrip() {
               <div className="p-3">
                 <p className="font-semibold text-sm text-gray-900 dark:text-white leading-tight line-clamp-1">{s.title}</p>
                 {s.description && <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">{s.description}</p>}
-                {isClickable && <p className="text-xs text-brand-red font-medium mt-1.5 flex items-center gap-0.5">Shop now <ArrowRight className="w-3 h-3" /></p>}
+                <p className="text-xs text-brand-red font-medium mt-1.5 flex items-center gap-0.5">
+                  Tap to view <ArrowRight className="w-3 h-3" />
+                </p>
               </div>
             </div>
           );
         })}
       </div>
+      {selectedSpecial && (
+        <SpecialDetailModal special={selectedSpecial} onClose={() => setSelectedSpecial(null)} />
+      )}
     </section>
   );
 }
