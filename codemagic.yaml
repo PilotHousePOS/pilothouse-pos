@@ -27,6 +27,10 @@ workflows:
           cd ios
           xcodegen generate
 
+      - name: Set build number
+        script: |
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" ios/Resources/Info.plist
+
       - name: Set up code signing
         script: |
           xcode-project use-profiles
