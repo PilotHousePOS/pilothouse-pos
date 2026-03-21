@@ -23,16 +23,16 @@ title = "Screenshot 3 — Grooming Booking"
 id = "7dVc8ijn3KUqpVuRi-_0m"
 uri = "file://attached_assets/appstore_final1.png"
 type = "image"
-title = "Screenshot 1 — Homepage (1242×2778px)"
+title = "Screenshot 1 — Home (1242×2688px)"
 
 [[outputs]]
 id = "_CajxKYtlYFN9P4ZOhsJ7"
 uri = "file://attached_assets/appstore_final2.png"
 type = "image"
-title = "Screenshot 2 — Supplies (1242×2778px)"
+title = "Screenshot 2 — Supplies (1242×2688px)"
 
 [[outputs]]
 id = "ZEeJIe_hQJFG6Nx56qfLx"
 uri = "file://attached_assets/appstore_final3.png"
 type = "image"
-title = "Screenshot 3 — Grooming (1242×2778px)"
+title = "Screenshot 3 — Grooming Booking (1242×2688px)"
