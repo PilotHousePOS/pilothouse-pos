@@ -578,7 +578,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const token = generateToken(user);
       setAuthCookie(res, token);
       
-      res.json({ ...sanitizeUser(user), token });
+      res.json(sanitizeUser(user));
     } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ message: "Login failed" });
@@ -626,7 +626,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (updatedUser) {
         const authToken = generateToken(updatedUser);
         setAuthCookie(res, authToken);
-        return res.json({ message: "Email verified successfully!", ...sanitizeUser(updatedUser), token: authToken });
+        return res.json({ message: "Email verified successfully!", ...sanitizeUser(updatedUser) });
       }
 
       res.json({ message: "Email verified successfully! You can now log in." });
@@ -793,7 +793,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const newToken = generateToken(updatedUser);
       setAuthCookie(res, newToken);
 
-      res.json({ ...sanitizeUser(updatedUser), token: newToken });
+      res.json(sanitizeUser(updatedUser));
     } catch (error) {
       console.error("Error updating email:", error);
       res.status(500).json({ message: "Failed to update email" });
@@ -920,7 +920,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const newToken = generateToken(updatedUser);
       setAuthCookie(res, newToken);
 
-      res.json({ ...sanitizeUser(updatedUser), token: newToken });
+      res.json(sanitizeUser(updatedUser));
     } catch (error) {
       console.error("Error updating name:", error);
       res.status(500).json({ message: "Failed to update name" });
@@ -976,7 +976,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const newToken = generateToken(updatedUser);
       setAuthCookie(res, newToken);
 
-      res.json({ ...sanitizeUser(updatedUser), token: newToken });
+      res.json(sanitizeUser(updatedUser));
     } catch (error) {
       console.error("Error updating phone number:", error);
       res.status(500).json({ message: "Failed to update phone number" });

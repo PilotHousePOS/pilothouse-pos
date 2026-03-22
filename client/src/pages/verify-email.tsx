@@ -29,11 +29,11 @@ export default function VerifyEmail() {
         if (data.expired) {
           setStatus("expired");
           setMessage(data.message);
-        } else if (data.token || data.message?.includes("successfully")) {
+        } else if (data.message?.includes("successfully") || data.id) {
           setStatus("success");
           setMessage(data.message || "Email verified successfully!");
           // Cookie is set by the server; redirect after a short delay
-          if (data.token) {
+          if (data.id) {
             setTimeout(() => setLocation("/"), 2000);
           }
         } else {
