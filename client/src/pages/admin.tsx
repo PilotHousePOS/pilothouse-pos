@@ -1658,7 +1658,9 @@ function OrderDetailsCard({ order, onStatusUpdate, onDelete, isHighlighted }: { 
     queryKey: ["/api/orders", order.id],
     queryFn: async () => {
       const response = await fetch(`/api/orders/${order.id}`, {
-        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
       });
       if (!response.ok) throw new Error('Failed to fetch order details');
       return response.json();
@@ -14693,7 +14695,7 @@ function MultiImageUpload({ imageUrls, onImagesChange, label = "Additional Photo
     fd.append('image', file);
     const response = await fetch('/api/upload', {
       method: 'POST',
-      credentials: 'include',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` },
       body: fd,
     });
     if (!response.ok) throw new Error('Upload failed');

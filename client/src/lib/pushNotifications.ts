@@ -76,11 +76,17 @@ export class PushNotificationManager {
 
   async savePushSubscription(subscription: PushSubscription): Promise<boolean> {
     try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.log('No auth token found');
+        return false;
+      }
+
       const response = await fetch('/api/push-subscription', {
         method: 'POST',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(subscription)
       });

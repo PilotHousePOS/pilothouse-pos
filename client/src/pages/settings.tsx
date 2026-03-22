@@ -157,6 +157,7 @@ function AddCardForm({ onSuccess, onCancel }: { onSuccess: () => void; onCancel:
 export default function Settings() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const hasToken = !!localStorage.getItem('token');
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -169,12 +170,14 @@ export default function Settings() {
 
   const { data: currentUser, isLoading: userLoading, error: userError } = useQuery<User>({
     queryKey: ["/api/auth/user"],
+    enabled: hasToken,
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
 
   const { data: stripeConfig } = useQuery<{ configured: boolean; publishableKey?: string }>({
     queryKey: ["/api/stripe/config"],
+    enabled: hasToken,
   });
 
   const { data: paymentMethodsData, isLoading: paymentMethodsLoading } = useQuery<{
@@ -182,7 +185,7 @@ export default function Settings() {
     defaultPaymentMethod: string | null;
   }>({
     queryKey: ["/api/stripe/payment-methods"],
-    enabled: !!stripeConfig?.configured,
+    enabled: hasToken && !!stripeConfig?.configured,
   });
 
   useEffect(() => {
@@ -269,7 +272,10 @@ export default function Settings() {
       const data = await response.json();
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: "Name updated",
@@ -304,7 +310,10 @@ export default function Settings() {
       const data = await response.json();
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: "Email updated",

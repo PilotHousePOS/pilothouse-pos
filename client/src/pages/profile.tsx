@@ -270,9 +270,11 @@ export default function Profile() {
     if (deleteConfirmText.toLowerCase() !== 'delete') return;
     setIsDeletingAccount(true);
     try {
+      const token = localStorage.getItem('token');
       const res = await fetch('/api/auth/delete-account', {
         method: 'DELETE',
         credentials: 'include',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (res.ok) {
         localStorage.clear();

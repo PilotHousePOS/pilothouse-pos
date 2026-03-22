@@ -46,7 +46,14 @@ export default function Auth() {
       });
       
       if (response.ok) {
-        // Cookie is set by the server; force a reload to pick up auth state
+        const userData = await response.json();
+        
+        // Store token in localStorage as backup to cookies
+        if (userData.token) {
+          localStorage.setItem('token', userData.token);
+        }
+        
+        // Force a complete page reload to ensure authentication state is picked up
         window.location.replace('/');
       } else {
         const error = await response.json();
