@@ -7216,6 +7216,16 @@ West Monroe LA 71291
         return res.status(400).json({ message: "Phone number is required" });
       }
 
+      // Check for an existing contact with the same phone number
+      const existingContact = await storage.getContactByPhoneNumber(trimmedPhone);
+      if (existingContact) {
+        return res.status(409).json({ 
+          message: "That number already has a contact. Please search for them via the phone number.",
+          duplicate: true,
+          contactId: existingContact.id
+        });
+      }
+
       // Use phone as placeholder for email if email is not provided
       const contactEmail = trimmedEmail && trimmedEmail.includes('@') ? trimmedEmail : trimmedPhone;
 

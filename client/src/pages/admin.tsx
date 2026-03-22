@@ -918,7 +918,22 @@ function ContactsManager() {
   // Manual contact mutations
   const createContactMutation = useMutation({
     mutationFn: async (contactData: any) => {
-      await apiRequest("POST", "/api/contacts", contactData);
+      const res = await fetch("/api/contacts", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          ...(localStorage.getItem("token") ? { Authorization: `Bearer ${localStorage.getItem("token")}` } : {}),
+        },
+        body: JSON.stringify(contactData),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        const err: any = new Error(data.message || "Failed to add contact");
+        err.duplicate = data.duplicate ?? false;
+        throw err;
+      }
+      return data;
     },
     onSuccess: () => {
       toast({
@@ -930,10 +945,10 @@ function ContactsManager() {
       setPetNamesInput('');
       queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
-        title: "Error",
-        description: "Failed to add contact.",
+        title: error.duplicate ? "Duplicate Phone Number" : "Error",
+        description: error.message || "Failed to add contact.",
         variant: "destructive",
       });
     },
