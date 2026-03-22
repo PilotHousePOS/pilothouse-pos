@@ -108,7 +108,7 @@ import {
   type InsertSpecial,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, and, or, not, ilike, lt, lte, isNull, count, sql, inArray, ne, notInArray } from "drizzle-orm";
+import { eq, desc, asc, and, or, not, ilike, lt, lte, isNull, isNotNull, count, sql, inArray, ne, notInArray } from "drizzle-orm";
 import { phoneNumbersMatch } from "./phoneUtils";
 import { SUPPLY_FILTERS, type FilterType } from "./filterConfig";
 import { 
@@ -160,6 +160,7 @@ export interface IStorage {
     category?: string; 
     search?: string; 
     filterType?: FilterType;
+    requireSku?: boolean;
     petFoodAnimalType?: string;
     treatAnimalType?: string;
     animalType?: string;
@@ -816,6 +817,7 @@ export class DatabaseStorage implements IStorage {
     category?: string;
     search?: string;
     filterType?: FilterType;
+    requireSku?: boolean;
     animalType?: string;
     foodType?: string;
     toyType?: string;
@@ -830,7 +832,13 @@ export class DatabaseStorage implements IStorage {
     const { limit, offset, category, search, filterType, animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType, petFoodAnimalType, treatAnimalType } = params;
 
     // Build WHERE conditions based on filters
+    const { requireSku } = params;
     let whereConditions: any[] = [eq(supplies.isActive, true)];
+
+    // For customer-facing requests, hide products with no SKU (UPC)
+    if (requireSku) {
+      whereConditions.push(and(isNotNull(supplies.sku), sql`trim(${supplies.sku}) != ''`));
+    }
     
     // Trim search to handle whitespace consistently
     const trimmedSearch = search?.trim() || '';

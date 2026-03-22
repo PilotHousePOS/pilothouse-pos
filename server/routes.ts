@@ -1878,10 +1878,22 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
 
   // Supply routes with pagination
-  app.get("/api/supplies", async (req, res) => {
+  app.get("/api/supplies", async (req: any, res) => {
     try {
       const { category, search, page = '0', limit = '24', animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType, petFoodAnimalType, treatAnimalType, filterType: filterTypeParam, ids } = req.query;
       
+      // Soft-auth: detect admin callers so they can see products without SKUs
+      let callerIsAdmin = false;
+      try {
+        const cookieToken = req.cookies?.auth_token;
+        const headerToken = req.headers.authorization?.replace('Bearer ', '');
+        const token = headerToken || cookieToken;
+        if (token) {
+          const decoded = verifyToken(token);
+          if (decoded?.isAdmin) callerIsAdmin = true;
+        }
+      } catch (_) {}
+
       // If specific IDs requested (for cart display), fetch those directly
       if (ids && typeof ids === 'string') {
         const idList = ids.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
@@ -1916,6 +1928,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         category: actualCategory,
         search: search as string | undefined,
         filterType,
+        requireSku: !callerIsAdmin,
         animalType: animalType as string | undefined,
         foodType: foodType as string | undefined,
         toyType: toyType as string | undefined,
