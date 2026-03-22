@@ -578,7 +578,6 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const token = generateToken(user);
       setAuthCookie(res, token);
       
-      console.log('User logged in, token generated:', user.id);
       res.json({ ...sanitizeUser(user), token });
     } catch (error) {
       console.error("Login error:", error);
@@ -1020,7 +1019,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         // Log the error but don't fail the request
         // This prevents the password reset flow from breaking if email service is down
         console.error("Failed to send password reset email (non-fatal):", emailError);
-        console.log(`Password reset token created for ${user.email} but email send failed. Token: ${resetToken}`);
+        console.error(`Password reset token created for ${user.email} but email send failed.`);
       }
 
       // Always return success to prevent user enumeration
