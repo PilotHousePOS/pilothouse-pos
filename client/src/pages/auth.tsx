@@ -46,17 +46,7 @@ export default function Auth() {
       });
       
       if (response.ok) {
-        console.log('Login successful, redirecting...');
-        const userData = await response.json();
-        console.log('User data received:', userData);
-        
-        // Store token in localStorage as backup to cookies
-        if (userData.token) {
-          localStorage.setItem('token', userData.token);
-          console.log('Token stored in localStorage');
-        }
-        
-        // Force a complete page reload to ensure authentication state is picked up
+        // Cookie is set by the server; force a reload to pick up auth state
         window.location.replace('/');
       } else {
         const error = await response.json();
@@ -109,9 +99,6 @@ export default function Auth() {
           setPendingEmail(email);
           setVerificationPending(true);
         } else {
-          if (userData.token) {
-            localStorage.setItem('token', userData.token);
-          }
           window.location.replace('/');
         }
       } else {

@@ -61,7 +61,7 @@ export function setAuthCookie(res: Response, token: string) {
   const isProduction = process.env.NODE_ENV === 'production';
   
   res.cookie('auth_token', token, {
-    httpOnly: false,
+    httpOnly: true,
     secure: isProduction, // true in production (HTTPS), false in development
     sameSite: isProduction ? 'none' : 'lax', // 'none' requires secure=true
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days

@@ -42,9 +42,11 @@ class NotificationWebSocketServer {
   private handleConnection(ws: AuthenticatedWebSocket, request: any) {
     ws.isAlive = true;
 
-    // Extract token from query params or headers
+    // Extract token from cookie header (sent automatically by browser) or fallback to query param/auth header
+    const cookieHeader = request.headers.cookie || '';
+    const cookieToken = cookieHeader.split(';').map((c: string) => c.trim()).find((c: string) => c.startsWith('auth_token='))?.split('=').slice(1).join('=') || '';
     const url = new URL(request.url || '', `http://${request.headers.host}`);
-    const token = url.searchParams.get('token') || request.headers.authorization?.replace('Bearer ', '');
+    const token = cookieToken || url.searchParams.get('token') || request.headers.authorization?.replace('Bearer ', '');
 
     if (token) {
       const user = verifyToken(token);

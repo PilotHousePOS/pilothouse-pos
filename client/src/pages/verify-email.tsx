@@ -32,9 +32,8 @@ export default function VerifyEmail() {
         } else if (data.token || data.message?.includes("successfully")) {
           setStatus("success");
           setMessage(data.message || "Email verified successfully!");
-          // If we got a token back, store it and redirect
+          // Cookie is set by the server; redirect after a short delay
           if (data.token) {
-            localStorage.setItem("auth_token", data.token);
             setTimeout(() => setLocation("/"), 2000);
           }
         } else {

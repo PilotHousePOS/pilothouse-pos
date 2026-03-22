@@ -29,8 +29,7 @@ export default function AdminNotifications() {
 
     // Connect to WebSocket for real-time notifications
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const token = localStorage.getItem('token');
-    const ws = new WebSocket(`${protocol}//${window.location.host}/ws?token=${token}`);
+    const ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
 
     ws.onmessage = (event) => {
       try {
