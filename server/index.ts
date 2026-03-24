@@ -523,7 +523,21 @@ async function initializeApp() {
       await setupVite(app, server);
     } else {
       const { serveStatic } = await import('./vite');
-      serveStatic(app);
+      
+      // Explicitly serve the built frontend for all non-API routes
+      // This ensures the root "/" and all SPA routes always resolve to index.html
+      const distPublicPath = path.join(process.cwd(), 'dist/public');
+      if (fs.existsSync(distPublicPath)) {
+        const indexHtmlPath = path.join(distPublicPath, 'index.html');
+        app.use(express.static(distPublicPath));
+        app.use('*', (_req, res) => {
+          res.sendFile(indexHtmlPath);
+        });
+        log(`Serving static files from: ${distPublicPath}`);
+      } else {
+        log(`WARNING: dist/public not found at ${distPublicPath}, falling back to serveStatic`);
+        serveStatic(app);
+      }
     }
     
     isFullyInitialized = true;
