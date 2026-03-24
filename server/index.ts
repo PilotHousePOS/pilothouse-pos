@@ -121,9 +121,11 @@ if (process.env.NODE_ENV === 'production') {
   const prodIndexPath = path.join(prodPublicPath, 'index.html');
   if (fs.existsSync(prodPublicPath)) {
     app.use(express.static(prodPublicPath));
-    app.use('*', (_req, res, next) => {
-      // Only serve index.html for non-API routes
-      if (_req.originalUrl.startsWith('/api') || _req.originalUrl.startsWith('/health') || _req.originalUrl.startsWith('/__health')) {
+    // app.use() with NO path is the only guaranteed catch-all in Express
+    app.use((req, res, next) => {
+      // Pass through API and health check routes so they reach their handlers
+      const url = req.originalUrl || req.url;
+      if (url.startsWith('/api') || url === '/health' || url === '/__health') {
         return next();
       }
       res.sendFile(prodIndexPath);
