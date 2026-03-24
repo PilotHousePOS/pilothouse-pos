@@ -7,7 +7,7 @@ channel = "stable-24_05"
 packages = ["jq", "unzip", "poppler_utils", "chromium"]
 
 [deployment]
-deploymentTarget = "gce"
+deploymentTarget = "vm"
 build = ["npm", "run", "build"]
 run = ["npm", "run", "start"]
 
