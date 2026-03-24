@@ -20,18 +20,11 @@ function log(message: string) {
 }
 
 // CRITICAL: Health check endpoints FIRST - must respond instantly
-// Return 503 until fully initialized so Replit doesn't route traffic too early
 app.get('/health', (_req, res) => {
-  if (!isFullyInitialized) {
-    return res.status(503).json({ status: 'starting', ready: false });
-  }
-  res.status(200).json({ status: 'ok', ready: true });
+  res.status(200).json({ status: 'ok', ready: isFullyInitialized });
 });
 
 app.get('/__health', (_req, res) => {
-  if (!isFullyInitialized) {
-    return res.status(503).send('Starting');
-  }
   res.status(200).send('OK');
 });
 
@@ -120,6 +113,23 @@ app.use(cookieParser());
 // Serve static files
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/stock-images', express.static(path.join(process.cwd(), 'attached_assets/stock_images')));
+
+// In production, serve the built frontend immediately at startup (before initializeApp finishes)
+// This prevents "Not Found" during the initialization window
+if (process.env.NODE_ENV === 'production') {
+  const prodPublicPath = path.join(process.cwd(), 'dist/public');
+  const prodIndexPath = path.join(prodPublicPath, 'index.html');
+  if (fs.existsSync(prodPublicPath)) {
+    app.use(express.static(prodPublicPath));
+    app.use('*', (_req, res, next) => {
+      // Only serve index.html for non-API routes
+      if (_req.originalUrl.startsWith('/api') || _req.originalUrl.startsWith('/health') || _req.originalUrl.startsWith('/__health')) {
+        return next();
+      }
+      res.sendFile(prodIndexPath);
+    });
+  }
+}
 
 // Serve PWA files (manifest, service worker, icons) - works in both dev and production
 const pwaDevPath = path.join(process.cwd(), 'client/public');
