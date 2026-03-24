@@ -116,20 +116,42 @@ app.use('/stock-images', express.static(path.join(process.cwd(), 'attached_asset
 
 // In production, serve the built frontend immediately at startup (before initializeApp finishes)
 // This prevents "Not Found" during the initialization window
+console.log('[STARTUP] NODE_ENV:', process.env.NODE_ENV);
 if (process.env.NODE_ENV === 'production') {
   const prodPublicPath = path.join(process.cwd(), 'dist/public');
   const prodIndexPath = path.join(prodPublicPath, 'index.html');
-  if (fs.existsSync(prodPublicPath)) {
-    app.use(express.static(prodPublicPath));
-    // app.use() with NO path is the only guaranteed catch-all in Express
+  const dirExists = fs.existsSync(prodPublicPath);
+  const fileExists = fs.existsSync(prodIndexPath);
+  console.log('[STARTUP] prodPublicPath:', prodPublicPath, '| dirExists:', dirExists, '| fileExists:', fileExists);
+
+  if (dirExists && fileExists) {
+    // Serve static assets (JS, CSS, images, etc.)
+    app.use(express.static(prodPublicPath, { index: false }));
+
+    // Explicit root handler — registered BEFORE everything else
+    const sendIndex = (res: Response) => {
+      res.sendFile(prodIndexPath, (err) => {
+        if (err) {
+          console.error('[STATIC] sendFile error for index.html:', err.message, '| path:', prodIndexPath);
+          if (!res.headersSent) res.status(500).send('Error loading app');
+        }
+      });
+    };
+
+    app.get('/', (_req, res) => sendIndex(res));
+
+    // Catch-all for all other SPA routes (no path = matches everything)
     app.use((req, res, next) => {
-      // Pass through API and health check routes so they reach their handlers
       const url = req.originalUrl || req.url;
       if (url.startsWith('/api') || url === '/health' || url === '/__health') {
         return next();
       }
-      res.sendFile(prodIndexPath);
+      sendIndex(res);
     });
+
+    console.log('[STARTUP] Static file serving registered for production');
+  } else {
+    console.error('[STARTUP] MISSING dist/public or index.html — static serving NOT registered');
   }
 }
 
@@ -541,9 +563,12 @@ async function initializeApp() {
       const distPublicPath = path.join(process.cwd(), 'dist/public');
       if (fs.existsSync(distPublicPath)) {
         const indexHtmlPath = path.join(distPublicPath, 'index.html');
-        app.use(express.static(distPublicPath));
-        app.use('*', (_req, res) => {
-          res.sendFile(indexHtmlPath);
+        app.use(express.static(distPublicPath, { index: false }));
+        // Use app.use() with no path — guaranteed catch-all in Express
+        app.use((_req, res) => {
+          res.sendFile(indexHtmlPath, (err) => {
+            if (err) console.error('[initializeApp] sendFile error:', err.message);
+          });
         });
         log(`Serving static files from: ${distPublicPath}`);
       } else {
