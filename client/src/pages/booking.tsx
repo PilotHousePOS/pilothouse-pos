@@ -152,7 +152,16 @@ export default function Booking() {
       const phoneMatch = searchDigits.length > 0 && phone.includes(searchDigits);
       
       return nameMatch || phoneMatch;
-    }).slice(0, 10); // Limit to 10 results
+    }).sort((a, b) => {
+      const aName = (a.name || '').toLowerCase();
+      const bName = (b.name || '').toLowerCase();
+      const aParts = aName.split(/\s+/);
+      const bParts = bName.split(/\s+/);
+      const aLastMatch = aParts[aParts.length - 1]?.startsWith(query) ? 0 : 1;
+      const bLastMatch = bParts[bParts.length - 1]?.startsWith(query) ? 0 : 1;
+      if (aLastMatch !== bLastMatch) return aLastMatch - bLastMatch;
+      return aName.localeCompare(bName);
+    }).slice(0, 50);
   }, [contactSearch, allContacts]);
 
   // Handle contact selection
