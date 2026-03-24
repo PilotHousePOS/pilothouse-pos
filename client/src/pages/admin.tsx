@@ -5843,12 +5843,23 @@ export default function Admin() {
     return (allBookingContacts as any[]).filter(contact => {
       const name = (contact.name || '').toLowerCase();
       const phone = (contact.phoneNumber || '').replace(/\D/g, '');
+      const petNames = (contact.petNames || []).map((p: string) => p.toLowerCase());
       
       const nameMatch = name.includes(query);
       const phoneMatch = searchDigits.length > 0 && phone.includes(searchDigits);
+      const petMatch = petNames.some((p: string) => p.includes(query));
       
-      return nameMatch || phoneMatch;
-    }).slice(0, 10);
+      return nameMatch || phoneMatch || petMatch;
+    }).sort((a, b) => {
+      const aName = (a.name || '').toLowerCase();
+      const bName = (b.name || '').toLowerCase();
+      const aParts = aName.split(/\s+/);
+      const bParts = bName.split(/\s+/);
+      const aLastMatch = aParts[aParts.length - 1]?.startsWith(query) ? 0 : 1;
+      const bLastMatch = bParts[bParts.length - 1]?.startsWith(query) ? 0 : 1;
+      if (aLastMatch !== bLastMatch) return aLastMatch - bLastMatch;
+      return aName.localeCompare(bName);
+    }).slice(0, 50);
   }, [bookingContactSearch, allBookingContacts]);
 
   // Filter orders by customer name or phone number
@@ -12814,7 +12825,7 @@ export default function Admin() {
               <div className="relative">
                 <Input
                   type="text"
-                  placeholder="Search by name or phone number..."
+                  placeholder="Search by name, phone, or pet name..."
                   value={bookingContactSearch}
                   onChange={(e) => {
                     setBookingContactSearch(e.target.value);
@@ -12851,6 +12862,9 @@ export default function Admin() {
                       <div className="font-medium">{contact.name}</div>
                       {contact.phoneNumber && (
                         <div className="text-sm text-gray-600">{contact.phoneNumber}</div>
+                      )}
+                      {contact.petNames && contact.petNames.length > 0 && (
+                        <div className="text-xs text-purple-600">🐾 {contact.petNames.join(', ')}</div>
                       )}
                       {contact.email && (
                         <div className="text-xs text-gray-500">{contact.email}</div>

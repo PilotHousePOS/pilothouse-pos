@@ -147,11 +147,13 @@ export default function Booking() {
     return (allContacts as any[]).filter(contact => {
       const name = (contact.name || '').toLowerCase();
       const phone = (contact.phoneNumber || '').replace(/\D/g, '');
+      const petNames = (contact.petNames || []).map((p: string) => p.toLowerCase());
       
       const nameMatch = name.includes(query);
       const phoneMatch = searchDigits.length > 0 && phone.includes(searchDigits);
+      const petMatch = petNames.some((p: string) => p.includes(query));
       
-      return nameMatch || phoneMatch;
+      return nameMatch || phoneMatch || petMatch;
     }).sort((a, b) => {
       const aName = (a.name || '').toLowerCase();
       const bName = (b.name || '').toLowerCase();
@@ -876,7 +878,7 @@ export default function Booking() {
           <Label className="text-sm font-semibold text-gray-900 mb-3 block">Search Existing Contact</Label>
           <Input
             type="text"
-            placeholder="Search by name or phone number..."
+            placeholder="Search by name, phone, or pet name..."
             value={contactSearch}
             onChange={(e) => {
               setContactSearch(e.target.value);
@@ -899,6 +901,9 @@ export default function Booking() {
                   <div className="font-medium text-gray-900">{contact.name}</div>
                   {contact.phoneNumber && (
                     <div className="text-sm text-gray-600">{contact.phoneNumber}</div>
+                  )}
+                  {contact.petNames && contact.petNames.length > 0 && (
+                    <div className="text-xs text-purple-600">🐾 {contact.petNames.join(', ')}</div>
                   )}
                   {contact.email && (
                     <div className="text-xs text-gray-500">{contact.email}</div>
