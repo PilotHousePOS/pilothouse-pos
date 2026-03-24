@@ -20,11 +20,18 @@ function log(message: string) {
 }
 
 // CRITICAL: Health check endpoints FIRST - must respond instantly
+// Return 503 until fully initialized so Replit doesn't route traffic too early
 app.get('/health', (_req, res) => {
-  res.status(200).json({ status: 'ok', ready: isFullyInitialized });
+  if (!isFullyInitialized) {
+    return res.status(503).json({ status: 'starting', ready: false });
+  }
+  res.status(200).json({ status: 'ok', ready: true });
 });
 
 app.get('/__health', (_req, res) => {
+  if (!isFullyInitialized) {
+    return res.status(503).send('Starting');
+  }
   res.status(200).send('OK');
 });
 
