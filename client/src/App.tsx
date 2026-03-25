@@ -24,6 +24,7 @@ import MyAppointments from "@/pages/my-appointments";
 import Wishlist from "@/pages/wishlist";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import TermsOfService from "@/pages/terms-of-service";
+import Support from "@/pages/support";
 import VerifyEmail from "@/pages/verify-email";
 import DeleteAccount from "@/pages/delete-account";
 import NotFound from "@/pages/not-found";
@@ -52,6 +53,7 @@ function Router() {
         <Route path="/delete-account" component={DeleteAccount} />
         <Route path="/privacy-policy" component={PrivacyPolicy} />
         <Route path="/terms-of-service" component={TermsOfService} />
+        <Route path="/support" component={Support} />
         
         {!isAuthenticated ? (
           <>
