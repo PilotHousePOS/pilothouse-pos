@@ -4,7 +4,7 @@ import WebKit
 class ViewController: UIViewController {
 
     private var webView: WKWebView!
-    private let appURL = "https://animal-house-pet-store.replit.app"
+    private let appURL = "https://animalhouseexperience.replit.app"
 
     override func loadView() {
         let config = WKWebViewConfiguration()
