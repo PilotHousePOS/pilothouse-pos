@@ -106,6 +106,9 @@ import {
   specials,
   type Special,
   type InsertSpecial,
+  feedback,
+  type Feedback,
+  type InsertFeedback,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, and, or, not, ilike, lt, lte, isNull, isNotNull, count, sql, inArray, ne, notInArray } from "drizzle-orm";
@@ -455,6 +458,10 @@ export interface IStorage {
   createSpecial(data: InsertSpecial): Promise<Special>;
   updateSpecial(id: number, data: Partial<InsertSpecial>): Promise<Special>;
   deleteSpecial(id: number): Promise<void>;
+
+  // Feedback
+  createFeedback(data: InsertFeedback): Promise<Feedback>;
+  getAllFeedback(): Promise<Feedback[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -4520,6 +4527,15 @@ export class DatabaseStorage implements IStorage {
 
   async deleteSpecial(id: number): Promise<void> {
     await db.delete(specials).where(eq(specials.id, id));
+  }
+
+  async createFeedback(data: InsertFeedback): Promise<Feedback> {
+    const [created] = await db.insert(feedback).values(data).returning();
+    return created;
+  }
+
+  async getAllFeedback(): Promise<Feedback[]> {
+    return db.select().from(feedback).orderBy(desc(feedback.createdAt));
   }
 }
 

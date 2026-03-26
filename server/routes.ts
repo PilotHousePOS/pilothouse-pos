@@ -10907,5 +10907,36 @@ West Monroe LA 71291
     }
   });
 
+  // Feedback routes
+  app.post("/api/feedback", authMiddleware, async (req: any, res) => {
+    try {
+      const { rating, category, message } = req.body;
+      if (!rating || rating < 1 || rating > 5) {
+        return res.status(400).json({ message: "Rating must be between 1 and 5" });
+      }
+      const entry = await storage.createFeedback({
+        userId: req.user.id,
+        rating: parseInt(rating),
+        category: category || null,
+        message: message || null,
+      });
+      res.json(entry);
+    } catch (error) {
+      console.error("Error saving feedback:", error);
+      res.status(500).json({ message: "Failed to save feedback" });
+    }
+  });
+
+  app.get("/api/admin/feedback", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Forbidden" });
+      const entries = await storage.getAllFeedback();
+      res.json(entries);
+    } catch (error) {
+      console.error("Error fetching feedback:", error);
+      res.status(500).json({ message: "Failed to fetch feedback" });
+    }
+  });
+
   // Server is now created externally in index.ts
 }

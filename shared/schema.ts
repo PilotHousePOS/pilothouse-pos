@@ -1043,6 +1043,20 @@ export type AutomatedMessageLog = {
   sentAt: Date | null;
 };
 
+// ─── Customer Feedback ───────────────────────────────────────────────────────
+export const feedback = pgTable("feedback", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  rating: integer("rating").notNull(),
+  category: varchar("category", { length: 50 }),
+  message: text("message"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertFeedbackSchema = createInsertSchema(feedback).omit({ id: true, createdAt: true });
+export type InsertFeedback = z.infer<typeof insertFeedbackSchema>;
+export type Feedback = typeof feedback.$inferSelect;
+
 // ─── Specials / Deals ────────────────────────────────────────────────────────
 export const specials = pgTable("specials", {
   id: serial("id").primaryKey(),

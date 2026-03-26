@@ -31,7 +31,9 @@ import {
   Sparkles,
   Trophy,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  MessageSquare,
+  CheckCircle2
 } from "lucide-react";
 import type { User, CustomerPet, Order, Appointment } from "@shared/schema";
 
@@ -46,6 +48,12 @@ export default function Profile() {
 
   const [isLinkingAstro, setIsLinkingAstro] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackRating, setFeedbackRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [feedbackCategory, setFeedbackCategory] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
@@ -58,6 +66,24 @@ export default function Profile() {
   const { data: customerPets = [] } = useQuery<CustomerPet[]>({
     queryKey: ["/api/customer-pets"],
     enabled: !!currentUser,
+  });
+
+  const feedbackMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/feedback", {
+        rating: feedbackRating,
+        category: feedbackCategory || undefined,
+        message: feedbackMessage || undefined,
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      setFeedbackSubmitted(true);
+      setShowFeedback(false);
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Could not submit feedback. Please try again.", variant: "destructive" });
+    },
   });
 
   const addPetMutation = useMutation({
@@ -777,6 +803,103 @@ export default function Profile() {
           </Card>
         </div>
       )}
+
+      {/* Feedback Section */}
+      <div className="mb-6">
+        {feedbackSubmitted ? (
+          <Card className="border border-green-200 bg-green-50">
+            <CardContent className="p-4 text-center">
+              <div className="flex items-center justify-center gap-2 text-green-700 mb-1">
+                <CheckCircle2 className="w-5 h-5" />
+                <span className="font-semibold">Thank you for your feedback!</span>
+              </div>
+              <p className="text-xs text-green-600">We really appreciate you taking the time.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border border-gray-200">
+            <CardContent className="p-4">
+              {!showFeedback ? (
+                <button
+                  onClick={() => setShowFeedback(true)}
+                  className="w-full flex items-center justify-between text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    <MessageSquare className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <p className="font-medium text-gray-700 text-sm">Share your feedback</p>
+                      <p className="text-xs text-gray-400">Let us know how we're doing</p>
+                    </div>
+                  </div>
+                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                </button>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-gray-800 text-sm">How are we doing?</h4>
+                    <button onClick={() => setShowFeedback(false)}>
+                      <ChevronUp className="w-4 h-4 text-gray-400" />
+                    </button>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-gray-500 mb-2">Your overall rating</p>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          onClick={() => setFeedbackRating(star)}
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                          className="p-0.5 focus:outline-none"
+                        >
+                          <Star
+                            className={`w-8 h-8 transition-colors ${
+                              star <= (hoverRating || feedbackRating)
+                                ? "fill-amber-400 text-amber-400"
+                                : "text-gray-200"
+                            }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Select value={feedbackCategory} onValueChange={setFeedbackCategory}>
+                    <SelectTrigger className="text-sm">
+                      <SelectValue placeholder="Category (optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="general">General</SelectItem>
+                      <SelectItem value="app">App Experience</SelectItem>
+                      <SelectItem value="products">Products</SelectItem>
+                      <SelectItem value="grooming">Grooming</SelectItem>
+                      <SelectItem value="ordering">Ordering</SelectItem>
+                      <SelectItem value="staff">Staff</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Textarea
+                    placeholder="Any thoughts? (optional)"
+                    value={feedbackMessage}
+                    onChange={(e) => setFeedbackMessage(e.target.value)}
+                    rows={3}
+                    className="text-sm resize-none"
+                  />
+
+                  <Button
+                    className="w-full"
+                    disabled={feedbackRating === 0 || feedbackMutation.isPending}
+                    onClick={() => feedbackMutation.mutate()}
+                  >
+                    {feedbackMutation.isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Sending...</> : "Send Feedback"}
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       {/* Logout Button */}
       <Button 
