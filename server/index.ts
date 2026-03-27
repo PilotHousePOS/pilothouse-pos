@@ -152,10 +152,18 @@ if (process.env.NODE_ENV === 'production') {
       sendIndex(res);
     });
 
-    // Catch-all for all other SPA routes (no path = matches everything)
+    // Catch-all for SPA routes — must NOT intercept image/object storage routes
     app.use((req, res, next) => {
       const url = req.originalUrl || req.url;
-      if (url.startsWith('/api') || url === '/health' || url === '/__health') {
+      if (
+        url.startsWith('/api') ||
+        url === '/health' ||
+        url === '/__health' ||
+        url.startsWith('/public-objects') ||
+        url.startsWith('/objects') ||
+        url.startsWith('/uploads') ||
+        url.startsWith('/stock-images')
+      ) {
         return next();
       }
       sendIndex(res);
@@ -552,63 +560,6 @@ async function initializeApp() {
       initializeScheduledTasks();
     });
 
-    // One-time fix: re-process uploaded pet images that have EXIF rotation + DCI-P3 color profile
-    // These cause Chrome's GPU decoder to fail, showing black image areas.
-    // Sharp rewrites them as plain sRGB JPEGs with baked-in orientation.
-    setImmediate(async () => {
-      try {
-        const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || '';
-        if (!pathsStr.trim()) return; // Object storage not configured in this env
-        const { objectStorageClient } = await import('./objectStorageService');
-        const { setObjectAclPolicy } = await import('./objectAcl');
-        const sharp = (await import('sharp')).default;
-        const searchPaths = pathsStr.split(',').map((p: string) => p.trim()).filter(Boolean);
-        const [bucketName] = searchPaths[0].split('/').filter(Boolean);
-        const bucket = objectStorageClient.bucket(bucketName);
-        const prefixPath = searchPaths[0].split('/').slice(2).join('/');
-        const [files] = await bucket.getFiles({ prefix: `${prefixPath}/uploads/` });
-        let fixed = 0;
-        for (const file of files) {
-          try {
-            const [meta] = await file.getMetadata();
-            if (meta.metadata?.sharpProcessed === 'true') continue; // already fixed
-            // Only reprocess JPEG files — PNGs/WEBPs don't need EXIF rotation and may have transparency
-            const isJpeg = meta.contentType === 'image/jpeg' || file.name.match(/\.jpe?g$/i);
-            if (!isJpeg) {
-              // Preserve existing ACL policy, just add sharpProcessed flag
-              const existingAcl = meta.metadata?.['custom:aclPolicy'] || JSON.stringify({ visibility: 'public' });
-              await file.setMetadata({ metadata: { 'custom:aclPolicy': existingAcl, sharpProcessed: 'true' } });
-              continue;
-            }
-            const chunks: Buffer[] = [];
-            await new Promise<void>((res2, rej2) => {
-              const s = file.createReadStream();
-              s.on('data', (c: Buffer) => chunks.push(c));
-              s.on('end', res2);
-              s.on('error', rej2);
-            });
-            const rawBuf = Buffer.concat(chunks);
-            const processed = await sharp(rawBuf).rotate().toColorspace('srgb').jpeg({ quality: 90 }).toBuffer();
-            await file.save(processed, { contentType: 'image/jpeg' });
-            // Set both ACL policy and sharpProcessed flag in a single setMetadata call
-            // (separate calls would overwrite each other's custom metadata)
-            await file.setMetadata({
-              cacheControl: 'public, max-age=31536000',
-              metadata: { 'custom:aclPolicy': JSON.stringify({ visibility: 'public' }), sharpProcessed: 'true' },
-            });
-            fixed++;
-            console.log(`[startup-fix] Reprocessed ${file.name}: ${rawBuf.length} → ${processed.length} bytes`);
-          } catch (e) {
-            console.warn(`[startup-fix] Skipped ${file.name}:`, (e as Error).message);
-          }
-        }
-        if (fixed > 0) console.log(`[startup-fix] Fixed ${fixed} uploaded image(s)`);
-      } catch (e) {
-        console.warn('[startup-fix] Image reprocessing skipped:', (e as Error).message);
-      }
-    });
-    
-        
     // Error handler
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
