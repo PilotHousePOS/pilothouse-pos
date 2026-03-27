@@ -38,7 +38,7 @@ export default function PetCard({ pet }: PetCardProps) {
     default: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200"
   };
 
-  const isValidImageUrl = (url: string) => url && (url.startsWith('http') || url.startsWith('/public-objects/')) && !url.includes('placeholder');
+  const isValidImageUrl = (url: string) => url && (url.startsWith('http') || url.startsWith('/public-objects/') || url.startsWith('/stock-images/') || url.startsWith('/uploads/') || url.startsWith('/objects/')) && !url.includes('placeholder');
   const mainImage = pet.imageUrl && isValidImageUrl(pet.imageUrl) ? [pet.imageUrl] : [];
   const additionalImages = pet.imageUrls?.filter((url: string) => isValidImageUrl(url) && url !== pet.imageUrl) || [];
   const images = [...mainImage, ...additionalImages];

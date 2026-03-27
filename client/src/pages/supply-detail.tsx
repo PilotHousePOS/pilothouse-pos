@@ -199,7 +199,7 @@ export default function SupplyDetail() {
     );
   }
 
-  const isValidImageUrl = (url: string) => url && (url.startsWith('http') || url.startsWith('/public-objects/'));
+  const isValidImageUrl = (url: string) => url && (url.startsWith('http') || url.startsWith('/public-objects/') || url.startsWith('/stock-images/') || url.startsWith('/uploads/') || url.startsWith('/objects/'));
   const mainImageUrl = supply.imageUrl && isValidImageUrl(supply.imageUrl) ? supply.imageUrl : null;
   const additionalImageUrls = supply.imageUrls?.filter((url: string) => isValidImageUrl(url) && url !== mainImageUrl) || [];
   const images = mainImageUrl ? [mainImageUrl, ...additionalImageUrls] : additionalImageUrls;
@@ -490,7 +490,7 @@ export default function SupplyDetail() {
 
 function RelatedProductCard({ product }: { product: Supply }) {
   const fallbackImage = defaultImages[product.category] || defaultImages.default;
-  const isValidImageUrl = (url: string) => url && (url.startsWith('http') || url.startsWith('/public-objects/'));
+  const isValidImageUrl = (url: string) => url && (url.startsWith('http') || url.startsWith('/public-objects/') || url.startsWith('/stock-images/') || url.startsWith('/uploads/') || url.startsWith('/objects/'));
   const imageUrl = product.imageUrl && isValidImageUrl(product.imageUrl) ? product.imageUrl : fallbackImage;
   const inStock = (product.stockQuantity ?? 0) > 0;
 
