@@ -25,6 +25,7 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
   const modalImageRef = useRef<HTMLImageElement>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [imageRetry, setImageRetry] = useState(0);
   const [imageError, setImageError] = useState(false);
 
   const addToCartMutation = useMutation({
@@ -93,7 +94,15 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
   const imageUrl = imageError || images.length === 0 ? fallbackImage : (images[currentImageIndex] || fallbackImage);
   
   const handleImageError = () => {
-    setImageError(true);
+    if (imageRetry < 3) {
+      setImageError(true);
+      setTimeout(() => {
+        setImageRetry(r => r + 1);
+        setImageError(false);
+      }, 2000);
+    } else {
+      setImageError(true);
+    }
   };
 
   // Minimum swipe distance (in px) required to trigger navigation
@@ -138,6 +147,7 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
         <div className="flex">
           <div className="relative w-20 h-20 overflow-hidden">
             <img 
+              key={imageRetry}
               src={imageUrl}
               alt={supply.name}
               className="w-full h-full object-cover"
@@ -198,6 +208,7 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
             onTouchEnd={onTouchEnd}
           >
             <img 
+              key={`modal-${imageRetry}`}
               ref={modalImageRef}
               src={imageUrl}
               alt={supply.name}

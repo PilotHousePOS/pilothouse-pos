@@ -17,6 +17,7 @@ export default function PetCard({ pet }: PetCardProps) {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const modalImageRef = useRef<HTMLImageElement>(null);
+  const [imageRetry, setImageRetry] = useState(0);
   const [imageError, setImageError] = useState(false);
 
   const defaultImages: Record<string, string> = {
@@ -46,7 +47,15 @@ export default function PetCard({ pet }: PetCardProps) {
   const imageUrl = imageError || images.length === 0 ? fallbackImage : (images[currentImageIndex] || fallbackImage);
   
   const handleImageError = () => {
-    setImageError(true);
+    if (imageRetry < 3) {
+      setImageError(true);
+      setTimeout(() => {
+        setImageRetry(r => r + 1);
+        setImageError(false);
+      }, 2000);
+    } else {
+      setImageError(true);
+    }
   };
 
   // Minimum swipe distance (in px) required to trigger navigation
@@ -88,6 +97,7 @@ export default function PetCard({ pet }: PetCardProps) {
       <Card className="shadow-sm overflow-hidden hover:shadow-md transition-shadow">
         <CardContent className="p-0">
           <img 
+            key={imageRetry}
             src={imageUrl}
             alt={pet.name}
             className="w-full h-32 object-cover"
