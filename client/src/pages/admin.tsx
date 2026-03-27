@@ -79,6 +79,7 @@ import {
   CheckCircle2,
   Home,
   Star,
+  MessageSquare,
   Type,
   Image,
   Camera,
@@ -5024,6 +5025,121 @@ function LegalPagesPanel() {
   );
 }
 
+function FeedbackPanel() {
+  const { data: entries = [], isLoading } = useQuery<any[]>({
+    queryKey: ['/api/admin/feedback'],
+  });
+
+  const avgRating = entries.length
+    ? (entries.reduce((sum: number, e: any) => sum + e.rating, 0) / entries.length).toFixed(1)
+    : null;
+
+  const ratingCounts = [5, 4, 3, 2, 1].map((star) => ({
+    star,
+    count: entries.filter((e: any) => e.rating === star).length,
+  }));
+
+  const categoryLabel: Record<string, string> = {
+    general: 'General',
+    app: 'App Experience',
+    products: 'Products',
+    grooming: 'Grooming',
+    ordering: 'Ordering',
+    staff: 'Staff',
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageSquare className="w-5 h-5" />
+            Customer Feedback
+            {entries.length > 0 && (
+              <Badge variant="secondary">{entries.length} response{entries.length !== 1 ? 's' : ''}</Badge>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <p className="text-sm text-gray-500">Loading feedback...</p>
+          ) : entries.length === 0 ? (
+            <div className="text-center py-10 text-gray-400">
+              <MessageSquare className="w-10 h-10 mx-auto mb-3 opacity-40" />
+              <p className="font-medium">No feedback yet</p>
+              <p className="text-sm mt-1">Feedback submitted by customers will appear here.</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Summary row */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 bg-amber-50 border border-amber-100 rounded-lg p-4 text-center">
+                  <p className="text-3xl font-bold text-amber-500">{avgRating}</p>
+                  <div className="flex justify-center gap-0.5 my-1">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star
+                        key={s}
+                        className={`w-4 h-4 ${s <= Math.round(parseFloat(avgRating!)) ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500">Average rating</p>
+                </div>
+                <div className="flex-[2] space-y-1.5">
+                  {ratingCounts.map(({ star, count }) => (
+                    <div key={star} className="flex items-center gap-2 text-sm">
+                      <span className="w-4 text-right text-gray-500">{star}</span>
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 flex-shrink-0" />
+                      <div className="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
+                        <div
+                          className="h-2 bg-amber-400 rounded-full transition-all"
+                          style={{ width: entries.length ? `${(count / entries.length) * 100}%` : '0%' }}
+                        />
+                      </div>
+                      <span className="w-6 text-xs text-gray-500">{count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Individual entries */}
+              <div className="space-y-3">
+                {entries.map((entry: any) => (
+                  <div key={entry.id} className="border rounded-lg p-4 space-y-2">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <div className="flex gap-0.5">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star
+                            key={s}
+                            className={`w-4 h-4 ${s <= entry.rating ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}`}
+                          />
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {entry.category && (
+                          <Badge variant="secondary" className="text-xs">
+                            {categoryLabel[entry.category] ?? entry.category}
+                          </Badge>
+                        )}
+                        <span className="text-xs text-gray-400">
+                          {new Date(entry.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                      </div>
+                    </div>
+                    {entry.message && (
+                      <p className="text-sm text-gray-700 leading-relaxed">{entry.message}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 // Astro Loyalty Manager Component
 function AstroLoyaltyManager() {
   const { toast } = useToast();
@@ -8119,6 +8235,11 @@ export default function Admin() {
             {typedUser?.isAdmin && (
               <TabsTrigger value="specials" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 Specials
+              </TabsTrigger>
+            )}
+            {typedUser?.isAdmin && (
+              <TabsTrigger value="feedback" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                Feedback
               </TabsTrigger>
             )}
             {typedUser?.isAdmin && (
@@ -12283,6 +12404,10 @@ export default function Admin() {
               </div>
             </DialogContent>
           </Dialog>
+        </TabsContent>
+
+        <TabsContent value="feedback" className="space-y-6">
+          <FeedbackPanel />
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">
