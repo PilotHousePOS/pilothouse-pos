@@ -1238,16 +1238,30 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       // Read the uploaded file and store it in Object Storage for persistence
       const fs = await import('fs');
       const filePath = req.file.path;
-      const fileBuffer = fs.readFileSync(filePath);
+      const rawBuffer = fs.readFileSync(filePath);
+      
+      // Process image: auto-orient (bake EXIF rotation into pixels) and convert to sRGB
+      // This fixes rendering issues with wide-gamut (DCI-P3) camera photos in Chrome
+      let fileBuffer: Buffer;
+      try {
+        const sharp = (await import('sharp')).default;
+        fileBuffer = await sharp(rawBuffer)
+          .rotate()
+          .toColorspace('srgb')
+          .jpeg({ quality: 90, mozjpeg: false })
+          .toBuffer();
+      } catch (sharpError) {
+        console.warn('Sharp processing failed, using raw buffer:', sharpError);
+        fileBuffer = rawBuffer;
+      }
       
       const { ObjectStorageService } = await import('./objectStorageService');
       const { setObjectAclPolicy } = await import('./objectAcl');
       const objectStorageService = new ObjectStorageService();
       
-      // Generate a unique filename
+      // Generate a unique filename (always .jpg since sharp outputs JPEG)
       const uniqueId = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      const extension = req.file.originalname.split('.').pop() || 'jpg';
-      const objectFileName = `uploads/${uniqueId}.${extension}`;
+      const objectFileName = `uploads/${uniqueId}.jpg`;
       
       // Get the public bucket path and upload
       const publicPaths = objectStorageService.getPublicObjectSearchPaths();
@@ -1260,13 +1274,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const fullPath = `${publicPaths[0]}/${objectFileName}`;
       const { bucketName, objectName } = parseObjectPathForUpload(fullPath);
       
-      const { Storage } = await import('@google-cloud/storage');
       const { objectStorageClient } = await import('./objectStorageService');
       const bucket = objectStorageClient.bucket(bucketName);
       const file = bucket.file(objectName);
       
       await file.save(fileBuffer, {
-        contentType: req.file.mimetype,
+        contentType: 'image/jpeg',
         metadata: {
           cacheControl: 'public, max-age=31536000',
         },
@@ -1299,6 +1312,58 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     const objectName = pathParts.slice(2).join("/");
     return { bucketName, objectName };
   }
+
+  // Admin endpoint to re-process existing pet images (fix EXIF rotation + DCI-P3 color profile)
+  app.post("/api/admin/reprocess-image", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = (req as any).user?.id;
+      const user = await storage.getUser(userId);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+
+      const { imageUrl } = req.body;
+      if (!imageUrl || !imageUrl.startsWith('/public-objects/')) {
+        return res.status(400).json({ message: "Invalid imageUrl — must start with /public-objects/" });
+      }
+
+      const filePath = imageUrl.replace('/public-objects/', '');
+      const { ObjectStorageService } = await import('./objectStorageService');
+      const { setObjectAclPolicy } = await import('./objectAcl');
+      const objectStorageService = new ObjectStorageService();
+      const file = await objectStorageService.searchPublicObject(filePath);
+      if (!file) return res.status(404).json({ message: "Image not found in object storage" });
+
+      // Download the image into a buffer
+      const chunks: Buffer[] = [];
+      await new Promise<void>((resolve, reject) => {
+        const stream = file.createReadStream();
+        stream.on('data', (chunk: Buffer) => chunks.push(chunk));
+        stream.on('end', resolve);
+        stream.on('error', reject);
+      });
+      const rawBuffer = Buffer.concat(chunks);
+
+      // Re-process: auto-orient and convert to sRGB to fix Chrome rendering issues
+      const sharp = (await import('sharp')).default;
+      const processedBuffer = await sharp(rawBuffer)
+        .rotate()
+        .toColorspace('srgb')
+        .jpeg({ quality: 90, mozjpeg: false })
+        .toBuffer();
+
+      // Overwrite the existing file in GCS
+      await file.save(processedBuffer, {
+        contentType: 'image/jpeg',
+        metadata: { cacheControl: 'public, max-age=31536000' },
+      });
+      await setObjectAclPolicy(file, { visibility: 'public' });
+
+      console.log(`[reprocess-image] Re-processed ${imageUrl}: ${rawBuffer.length} → ${processedBuffer.length} bytes`);
+      res.json({ success: true, imageUrl, originalSize: rawBuffer.length, processedSize: processedBuffer.length });
+    } catch (error) {
+      console.error("Error reprocessing image:", error);
+      res.status(500).json({ message: "Failed to reprocess image" });
+    }
+  });
 
   // Object Storage endpoints for persistent file storage (survives redeployments)
   // Get presigned upload URL for object storage

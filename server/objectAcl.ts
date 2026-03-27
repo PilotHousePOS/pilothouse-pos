@@ -59,8 +59,15 @@ export async function setObjectAclPolicy(
     throw new Error(`Object not found: ${objectFile.name}`);
   }
 
+  // Read existing custom metadata so we can MERGE rather than replace it.
+  // GCS setMetadata replaces the entire metadata block, so we must preserve
+  // any other keys (e.g. sharpProcessed) that were set by other callers.
+  const [currentMeta] = await objectFile.getMetadata();
+  const existingCustomMeta = (currentMeta.metadata as Record<string, string> | undefined) || {};
+
   await objectFile.setMetadata({
     metadata: {
+      ...existingCustomMeta,
       [ACL_POLICY_METADATA_KEY]: JSON.stringify(aclPolicy),
     },
   });
