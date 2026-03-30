@@ -1200,19 +1200,30 @@ function ContactsManager() {
 
   const syncContactsMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("POST", "/api/admin/contacts/backfill-from-appointments");
+      const res = await apiRequest("POST", "/api/admin/contacts/backfill-from-appointments");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Server error ${res.status}`);
+      }
+      return res.json();
     },
     onSuccess: (data: any) => {
+      const { created = 0, updated = 0, skipped = 0 } = data || {};
+      const total = created + updated;
+      const parts: string[] = [];
+      if (created > 0) parts.push(`${created} new contact${created !== 1 ? 's' : ''} created`);
+      if (updated > 0) parts.push(`${updated} updated`);
+      if (skipped > 0) parts.push(`${skipped} already up to date`);
       toast({
-        title: "Contacts Synced",
-        description: data?.message || "Contacts synced from completed appointments.",
+        title: total > 0 ? `Sync complete — ${total} contact${total !== 1 ? 's' : ''} affected` : "Sync complete — nothing to change",
+        description: parts.length > 0 ? parts.join(', ') : "All contacts were already up to date.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
-        title: "Error",
-        description: "Failed to sync contacts.",
+        title: "Sync failed",
+        description: error?.message || "An unexpected error occurred while syncing contacts.",
         variant: "destructive",
       });
     },
