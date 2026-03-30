@@ -7664,16 +7664,26 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      console.log(`[ContactSync] Sync started by admin user id=${req.user?.id} (${user.username || user.email || 'unknown'})`);
+
       const allAppointments = await storage.getAppointments();
       // Only process completed appointments — pet showed up, so the phone number is verified
       const completedAppointments = allAppointments.filter((apt: any) => apt.groomingCompleted === true);
 
+      console.log(`[ContactSync] Found ${allAppointments.length} total appointments, ${completedAppointments.length} marked as completed (groomingCompleted=true)`);
+
       let created = 0;
       let updated = 0;
       let skipped = 0;
+      const createdList: string[] = [];
+      const updatedList: string[] = [];
 
       for (const apt of completedAppointments) {
-        if (!apt.ownerPhoneNumber) { skipped++; continue; }
+        if (!apt.ownerPhoneNumber) {
+          console.log(`[ContactSync] SKIP appt id=${apt.id} (${apt.petName || 'unknown pet'}) — no phone number`);
+          skipped++;
+          continue;
+        }
 
         const existing = await storage.getContactByPhoneNumber(apt.ownerPhoneNumber);
         const petName = apt.petName;
@@ -7691,12 +7701,17 @@ West Monroe LA 71291
             notes: null,
             linkedUserId: null,
           });
+          console.log(`[ContactSync] CREATED contact "${contactName}" phone=${apt.ownerPhoneNumber} pet="${petName || 'none'}" (appt id=${apt.id})`);
+          createdList.push(`${contactName} (${apt.ownerPhoneNumber})`);
           created++;
         } else {
           const existingPetNames: string[] = existing.petNames || [];
           const merged = Array.from(new Set([...existingPetNames, ...(petName ? [petName] : [])]));
           if (merged.length > existingPetNames.length) {
             await storage.updateContact(existing.id, { petNames: merged });
+            const addedPets = merged.filter(p => !existingPetNames.includes(p));
+            console.log(`[ContactSync] UPDATED contact "${existing.name}" phone=${apt.ownerPhoneNumber} — added pet(s): ${addedPets.join(', ')} (appt id=${apt.id})`);
+            updatedList.push(`${existing.name} (${apt.ownerPhoneNumber}) +pet: ${addedPets.join(', ')}`);
             updated++;
           } else {
             skipped++;
@@ -7704,12 +7719,16 @@ West Monroe LA 71291
         }
       }
 
+      console.log(`[ContactSync] Sync complete — ${created} created, ${updated} updated, ${skipped} skipped`);
+      if (createdList.length > 0) console.log(`[ContactSync] New contacts:\n  ${createdList.join('\n  ')}`);
+      if (updatedList.length > 0) console.log(`[ContactSync] Updated contacts:\n  ${updatedList.join('\n  ')}`);
+
       res.json({
         message: `Synced from ${completedAppointments.length} completed appointments: ${created} contacts created, ${updated} updated, ${skipped} skipped`,
         created, updated, skipped
       });
     } catch (error) {
-      console.error("Error backfilling contacts:", error);
+      console.error(`[ContactSync] ERROR during sync:`, error);
       res.status(500).json({ message: "Failed to backfill contacts", error: (error as Error).message });
     }
   });
