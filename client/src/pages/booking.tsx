@@ -36,10 +36,10 @@ export default function Booking() {
   ] : DEFAULT_SERVICES;
 
   const ADD_ONS = [
-    { id: 'nail-grind', label: 'Nail Grind', price: servicePrices?.nailGrind || '15' },
-    { id: 'teeth-brushing', label: 'Brush Teeth', price: servicePrices?.teethBrushing || '10' },
-    { id: 'furminator', label: 'Furminator', price: servicePrices?.furminator || '20' },
-    { id: 'scent-package', label: 'Scent Package', price: servicePrices?.scentPackage || '5' },
+    { id: 'nail-grind', label: 'Nail Grind', price: servicePrices?.nailGrind || '15', priceVaries: false },
+    { id: 'teeth-brushing', label: 'Brush Teeth', price: servicePrices?.teethBrushing || '10', priceVaries: false },
+    { id: 'furminator', label: 'Furminator — Size dependent. Price determined upon arrival.', price: servicePrices?.furminator || '20', priceVaries: true },
+    { id: 'scent-package', label: 'Scent Package', price: servicePrices?.scentPackage || '5', priceVaries: false },
   ];
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState('');
@@ -1119,7 +1119,10 @@ export default function Booking() {
                             data-testid={`checkbox-addon-${addon.id}-${index}`}
                           />
                           <span className="flex-1 text-sm font-medium text-gray-900">{addon.label}</span>
-                          <span className="text-sm text-gray-500">+${addon.price}</span>
+                          {addon.priceVaries
+                            ? <span className="text-xs text-amber-600 font-medium whitespace-nowrap">price varies</span>
+                            : <span className="text-sm text-gray-500">+${addon.price}</span>
+                          }
                         </div>
                       );
                     })}

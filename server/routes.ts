@@ -7438,7 +7438,7 @@ West Monroe LA 71291
           const ADD_ON_LABELS: Record<string, string> = {
             'nail-grind': 'Nail Grind',
             'teeth-brushing': 'Brush Teeth',
-            'furminator': 'Furminator',
+            'furminator': 'Furminator (size dep.)',
             'scent-package': 'Scent Package',
           };
           const addOnLabels = allAddOns.map(id => ADD_ON_LABELS[id] || id);

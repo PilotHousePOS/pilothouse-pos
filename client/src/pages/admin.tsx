@@ -484,6 +484,15 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                                     <p className="text-xs text-blue-600">
                                       Service: {formatServiceType(pet.serviceType)}
                                     </p>
+                                    {parseAddOnLabels(pet.addOns).length > 0 && (
+                                      <div className="flex flex-wrap gap-1 mt-1">
+                                        {parseAddOnLabels(pet.addOns).map((label) => (
+                                          <span key={label} className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-700">
+                                            + {label}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
                                     {(pet.groomerName || appointment.groomerName) && (
                                       <p className="text-xs text-purple-600 mt-1">
                                         Groomer: {pet.groomerName || appointment.groomerName}
@@ -1827,6 +1836,35 @@ function formatServiceType(serviceType: string): string {
   
   // Default: return as-is for any unknown formats
   return serviceType;
+}
+
+// Add-on label lookup (kept in sync with booking.tsx ADD_ONS and server ADD_ON_LABELS)
+const ADD_ON_LABELS_CLIENT: Record<string, string> = {
+  'nail-grind': 'Nail Grind',
+  'teeth-brushing': 'Brush Teeth',
+  'furminator': 'Furminator (size dep.)',
+  'scent-package': 'Scent Package',
+};
+
+/** Parse a pet's comma-separated addOns string into display labels */
+function parseAddOnLabels(addOns: string | null | undefined): string[] {
+  if (!addOns) return [];
+  return addOns.split(',').filter(Boolean).map((id) => ADD_ON_LABELS_CLIENT[id.trim()] || id.trim());
+}
+
+/** Collect unique add-on labels across all pets in an appointment */
+function getAppointmentAddOnLabels(appointment: any): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  const pets: any[] = appointment.pets && appointment.pets.length > 0
+    ? appointment.pets
+    : (appointment.addOns ? [{ addOns: appointment.addOns }] : []);
+  for (const pet of pets) {
+    for (const label of parseAddOnLabels(pet.addOns)) {
+      if (!seen.has(label)) { seen.add(label); out.push(label); }
+    }
+  }
+  return out;
 }
 
 // Helper function to get combined service type label for multi-pet appointments
@@ -9854,6 +9892,15 @@ export default function Admin() {
                                   : currentAppointment.petName
                                 } ({currentAppointment.petType || (currentAppointment.pets && currentAppointment.pets[0]?.petType) || 'dog'})
                               </p>
+                              {getAppointmentAddOnLabels(currentAppointment).length > 0 && (
+                                <div className="flex flex-wrap gap-1 pt-0.5">
+                                  {getAppointmentAddOnLabels(currentAppointment).map((label) => (
+                                    <span key={label} className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-700">
+                                      + {label}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
                               <p>Owner: {currentAppointment.ownerFirstName} {currentAppointment.ownerLastName}</p>
                               <p>Phone: {currentAppointment.ownerPhoneNumber}</p>
                               <p className="text-gray-500">{parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
@@ -10153,6 +10200,15 @@ export default function Admin() {
                             : capitalizeWords(currentAppointment.petName)
                           } ({currentAppointment.petType || (currentAppointment.pets && currentAppointment.pets[0]?.petType) || 'dog'})
                         </p>
+                        {getAppointmentAddOnLabels(currentAppointment).length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-0.5">
+                            {getAppointmentAddOnLabels(currentAppointment).map((label) => (
+                              <span key={label} className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-700">
+                                + {label}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                         <p className="text-sm text-gray-600">Owner: {capitalizeWords(currentAppointment.ownerFirstName)} {capitalizeWords(currentAppointment.ownerLastName)}</p>
                         <p className="text-sm text-gray-600">Phone: {currentAppointment.ownerPhoneNumber}</p>
                         <p className="text-xs text-gray-500">Date: {parseLocalDate(currentAppointment.appointmentDate).toLocaleDateString()} at {currentAppointment.appointmentTime}</p>
