@@ -69,6 +69,8 @@ export default function Booking() {
   const [contactSearch, setContactSearch] = useState('');
   const [showContactDropdown, setShowContactDropdown] = useState(false);
   const [showCapacityDialog, setShowCapacityDialog] = useState(false);
+  const [showPhoneConfirmDialog, setShowPhoneConfirmDialog] = useState(false);
+  const [pendingBookingData, setPendingBookingData] = useState<{ baseData: any; dates: string[] } | null>(null);
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringType, setRecurringType] = useState<'monthly' | 'custom'>('monthly');
   const [customRecurringDates, setCustomRecurringDates] = useState<Date[]>([]);
@@ -427,6 +429,66 @@ export default function Booking() {
     },
   });
 
+  // Fires the actual booking mutation(s) — called either directly from handleSubmit
+  // or from the phone-confirm dialog when the user confirms the number is correct.
+  const fireBooking = async (baseData: any, dates: string[]) => {
+    if (dates.length === 1) {
+      createAppointmentMutation.mutate({
+        ...baseData,
+        appointmentDate: dates[0],
+      });
+    } else {
+      let successCount = 0;
+      let failedDates: string[] = [];
+      let capacityFailedDates: string[] = [];
+      let unauthorizedError = false;
+      for (const date of dates) {
+        try {
+          await apiRequest("POST", "/api/appointments", { ...baseData, appointmentDate: date });
+          successCount++;
+        } catch (err: any) {
+          if (isUnauthorizedError(err)) { unauthorizedError = true; break; }
+          let errorText = '';
+          if (err?.message) {
+            const parts = err.message.split(': ', 2);
+            if (parts.length === 2) { try { errorText = JSON.parse(parts[1]).message || ''; } catch { errorText = parts[1]; } }
+            else { errorText = err.message; }
+          }
+          if (errorText.includes('capacity is fully booked') || errorText.includes('capacity would be exceeded')) {
+            capacityFailedDates.push(date);
+          } else { failedDates.push(date); }
+        }
+      }
+      if (unauthorizedError) {
+        toast({ title: "Unauthorized", description: "You are logged out. Logging in again...", variant: "destructive" });
+        setTimeout(() => { window.location.href = "/api/login"; }, 500);
+        return;
+      }
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      const totalFailed = failedDates.length + capacityFailedDates.length;
+      if (totalFailed === 0) {
+        toast({ title: "Recurring Appointments Created", description: `Successfully created ${successCount} appointments.` });
+      } else if (capacityFailedDates.length > 0 && successCount === 0) {
+        setShowCapacityDialog(true);
+        return;
+      } else {
+        let failureMsg = `Created ${successCount} appointments.`;
+        if (capacityFailedDates.length > 0) failureMsg += ` ${capacityFailedDates.length} date(s) fully booked.`;
+        if (failedDates.length > 0) failureMsg += ` ${failedDates.length} failed.`;
+        toast({ title: "Partial Success", description: failureMsg, variant: "destructive" });
+      }
+      setSelectedDate(new Date());
+      setSelectedTime('');
+      setSelectedGroomer('');
+      setPets([{ name: '', type: 'dog', serviceType: '', notes: '', groomerId: '', addOns: [] }]);
+      setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
+      setContactSearch('');
+      setIsRecurring(false);
+      setRecurringType('monthly');
+      setCustomRecurringDates([]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -519,118 +581,25 @@ export default function Booking() {
       })),
     };
 
-    // Create appointments for all dates
-    if (uniqueAppointmentDates.length === 1) {
-      // Single appointment
-      createAppointmentMutation.mutate({
-        ...baseAppointmentData,
-        appointmentDate: uniqueAppointmentDates[0],
-      });
-    } else {
-      // Multiple appointments - create them sequentially
-      let successCount = 0;
-      let failedDates: string[] = [];
-      let capacityFailedDates: string[] = [];
-      let unauthorizedError = false;
-      
-      for (const date of uniqueAppointmentDates) {
-        try {
-          await apiRequest("POST", "/api/appointments", {
-            ...baseAppointmentData,
-            appointmentDate: date,
-          });
-          successCount++;
-        } catch (err: any) {
-          console.error(`Failed to create appointment for ${date}:`, err);
-          
-          // Check for unauthorized error
-          if (isUnauthorizedError(err)) {
-            unauthorizedError = true;
-            break; // Stop processing - need to re-authenticate
-          }
-          
-          // Check for capacity error
-          let errorText = '';
-          if (err?.message) {
-            const parts = err.message.split(': ', 2);
-            if (parts.length === 2) {
-              try {
-                const jsonData = JSON.parse(parts[1]);
-                errorText = jsonData.message || '';
-              } catch {
-                errorText = parts[1];
-              }
-            } else {
-              errorText = err.message;
-            }
-          }
-          
-          if (errorText.includes('capacity is fully booked') || errorText.includes('capacity would be exceeded')) {
-            capacityFailedDates.push(date);
-          } else {
-            failedDates.push(date);
-          }
-        }
-      }
-      
-      // Handle unauthorized error
-      if (unauthorizedError) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
+    // Phone number mismatch check — only for regular customers (not admin/groomer)
+    const user = currentUser as any;
+    const isAdminOrGroomer = user?.isAdmin || user?.isGroomer;
+    if (!isAdminOrGroomer && user?.phoneNumber) {
+      const enteredDigits = ownerInfo.phoneNumber.replace(/\D/g, '');
+      const accountDigits = (user.phoneNumber as string).replace(/\D/g, '');
+      if (enteredDigits && accountDigits && enteredDigits !== accountDigits) {
+        setPendingBookingData({ baseData: baseAppointmentData, dates: uniqueAppointmentDates });
+        setShowPhoneConfirmDialog(true);
         return;
       }
-      
-      // Invalidate cache
-      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
-      
-      // Show results
-      const totalFailed = failedDates.length + capacityFailedDates.length;
-      if (totalFailed === 0) {
-        toast({
-          title: "Recurring Appointments Created",
-          description: `Successfully created ${successCount} appointments.`,
-        });
-      } else if (capacityFailedDates.length > 0 && successCount === 0) {
-        // All failures are capacity-related - show capacity dialog
-        setShowCapacityDialog(true);
-        return;
-      } else {
-        let failureMsg = `Created ${successCount} appointments.`;
-        if (capacityFailedDates.length > 0) {
-          failureMsg += ` ${capacityFailedDates.length} date(s) fully booked.`;
-        }
-        if (failedDates.length > 0) {
-          failureMsg += ` ${failedDates.length} failed.`;
-        }
-        toast({
-          title: "Partial Success",
-          description: failureMsg,
-          variant: "destructive",
-        });
-      }
-      
-      // Reset form
-      setSelectedDate(new Date());
-      setSelectedTime('');
-      setSelectedGroomer('');
-      setPets([{ name: '', type: 'dog', serviceType: '', notes: '', groomerId: '', addOns: [] }]);
-      setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
-      setContactSearch('');
-      setIsRecurring(false);
-      setRecurringType('monthly');
-      setCustomRecurringDates([]);
-      return;
     }
+
+    // No mismatch — proceed directly
+    await fireBooking(baseAppointmentData, uniqueAppointmentDates);
   };
 
   const addPet = () => {
-    setPets([...pets, { name: '', type: 'dog', serviceType: '', notes: '', groomerId: '' }]);
+    setPets([...pets, { name: '', type: 'dog', serviceType: '', notes: '', groomerId: '', addOns: [] }]);
   };
 
   const removePet = (index: number) => {
@@ -1152,6 +1121,48 @@ export default function Booking() {
       </form>
       )}
       
+      {/* Phone Number Mismatch Confirmation Dialog */}
+      <Dialog open={showPhoneConfirmDialog} onOpenChange={setShowPhoneConfirmDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">Phone Number Doesn't Match</DialogTitle>
+            <DialogDescription className="text-base pt-3">
+              The number you entered{' '}
+              <span className="font-semibold text-gray-900">({ownerInfo.phoneNumber})</span>{' '}
+              is different from the phone number on your account{' '}
+              <span className="font-semibold text-gray-900">({(currentUser as any)?.phoneNumber})</span>.
+              <br /><br />
+              Is this the correct number to use for this appointment?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:justify-center">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowPhoneConfirmDialog(false);
+                setPendingBookingData(null);
+              }}
+              data-testid="button-phone-confirm-no"
+            >
+              No, let me change it
+            </Button>
+            <Button
+              className="bg-brand-red hover:bg-red-600 text-white"
+              onClick={async () => {
+                setShowPhoneConfirmDialog(false);
+                if (pendingBookingData) {
+                  await fireBooking(pendingBookingData.baseData, pendingBookingData.dates);
+                  setPendingBookingData(null);
+                }
+              }}
+              data-testid="button-phone-confirm-yes"
+            >
+              Yes, use this number
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Capacity Error Dialog */}
       <Dialog open={showCapacityDialog} onOpenChange={setShowCapacityDialog}>
         <DialogContent className="sm:max-w-md">

@@ -5387,50 +5387,6 @@ West Monroe LA 71291
         await storage.releaseBookingLock(appointmentDateStr);
       }
       
-      // Auto-create or update contact record when a booking is made (fire-and-forget)
-      const ownerPhone = req.body.ownerPhoneNumber;
-      if (ownerPhone) {
-        const normalizedPhone = normalizePhoneNumber(ownerPhone);
-        const capturedPets = petsArray;
-        storage.getContactByPhoneNumber(ownerPhone).then(async (existingContact: any) => {
-          const petNamesList = capturedPets.map((p: any) => p.petName).filter(Boolean);
-          const firstPetType = capturedPets[0]?.petType || null;
-          // Collect all selected add-ons across all pets
-          const allAddOns: string[] = [];
-          for (const p of capturedPets) {
-            if (p.addOns) {
-              p.addOns.split(',').filter(Boolean).forEach((a: string) => {
-                if (!allAddOns.includes(a.trim())) allAddOns.push(a.trim());
-              });
-            }
-          }
-          const ownerFirst = cleanName(req.body.ownerFirstName || '');
-          const ownerLast = cleanName(req.body.ownerLastName || '');
-          const fullName = `${ownerFirst} ${ownerLast}`.trim();
-
-          if (existingContact) {
-            const updates: any = {};
-            if (petNamesList.length > 0) updates.petNames = petNamesList;
-            if (firstPetType) updates.animalType = firstPetType;
-            if (fullName) updates.name = fullName;
-            if (Object.keys(updates).length > 0) {
-              await storage.updateContact(existingContact.id, updates);
-            }
-          } else if (fullName || normalizedPhone) {
-            // Auto-create a contact from the booking info
-            await storage.createContact({
-              name: fullName || normalizedPhone,
-              phoneNumber: ownerPhone,
-              petNames: petNamesList,
-              animalType: firstPetType || undefined,
-              source: 'booking',
-            } as any);
-          }
-        }).catch((err: any) => {
-          console.error('Error auto-creating/updating contact from booking:', err);
-        });
-      }
-
       // Send admin notifications for new appointment (fire-and-forget, never block the response)
       const customerName = `${appointment.ownerFirstName} ${appointment.ownerLastName}`;
       const serviceInfo = petsArray.length > 1 
