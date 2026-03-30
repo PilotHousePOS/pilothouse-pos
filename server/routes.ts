@@ -5802,6 +5802,32 @@ West Monroe LA 71291
     }
   });
 
+  app.post("/api/admin/users/:userId/superior-manager", authMiddleware, async (req: any, res) => {
+    try {
+      const caller = await storage.getUser(req.user?.id);
+      if (!caller?.isSuperiorManager) {
+        return res.status(403).json({ message: "Superior Manager access required" });
+      }
+
+      const { userId } = req.params;
+      const { isSuperiorManager } = req.body;
+
+      if (typeof isSuperiorManager !== 'boolean') {
+        return res.status(400).json({ message: "isSuperiorManager must be a boolean" });
+      }
+
+      const updatedUser = await storage.updateUserSuperiorManager(userId, isSuperiorManager);
+      const { password, ...safeUser } = updatedUser;
+      res.json(safeUser);
+    } catch (error: any) {
+      console.error("Error updating superior manager status:", error);
+      if (error.message === 'User not found') {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.status(500).json({ message: "Failed to update superior manager status" });
+    }
+  });
+
   // GET /api/admin/charge-account-reports — all charge account orders grouped by user
   app.get("/api/admin/charge-account-reports", authMiddleware, async (req: any, res) => {
     try {
@@ -7478,6 +7504,49 @@ West Monroe LA 71291
     } catch (error) {
       console.error("Error fetching contact appointment history:", error);
       res.status(500).json({ message: "Failed to fetch contact appointment history" });
+    }
+  });
+
+  // Edit a history record (superior manager only)
+  app.put("/api/contacts/history/:historyId", authMiddleware, async (req: any, res) => {
+    try {
+      const caller = await storage.getUser(req.user?.id);
+      if (!caller?.isSuperiorManager) {
+        return res.status(403).json({ message: "Superior Manager access required" });
+      }
+      const historyId = parseInt(req.params.historyId);
+      const { appointmentDate, appointmentTime, petName, petType, breed, serviceType, groomerName, status, notes } = req.body;
+      const updated = await storage.updateAppointmentHistoryRecord(historyId, {
+        ...(appointmentDate !== undefined && { appointmentDate }),
+        ...(appointmentTime !== undefined && { appointmentTime }),
+        ...(petName !== undefined && { petName }),
+        ...(petType !== undefined && { petType }),
+        ...(breed !== undefined && { breed }),
+        ...(serviceType !== undefined && { serviceType }),
+        ...(groomerName !== undefined && { groomerName }),
+        ...(status !== undefined && { status }),
+        ...(notes !== undefined && { notes }),
+      });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating history record:", error);
+      res.status(500).json({ message: "Failed to update history record" });
+    }
+  });
+
+  // Delete a history record (superior manager only)
+  app.delete("/api/contacts/history/:historyId", authMiddleware, async (req: any, res) => {
+    try {
+      const caller = await storage.getUser(req.user?.id);
+      if (!caller?.isSuperiorManager) {
+        return res.status(403).json({ message: "Superior Manager access required" });
+      }
+      const historyId = parseInt(req.params.historyId);
+      await storage.deleteAppointmentHistoryRecord(historyId);
+      res.json({ message: "History record deleted" });
+    } catch (error) {
+      console.error("Error deleting history record:", error);
+      res.status(500).json({ message: "Failed to delete history record" });
     }
   });
 

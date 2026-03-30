@@ -37,6 +37,7 @@ export const users = pgTable("users", {
   phoneNumber: varchar("phone_number", { length: 100 }),
   isAdmin: boolean("is_admin").default(false),
   isGroomer: boolean("is_groomer").default(false),
+  isSuperiorManager: boolean("is_superior_manager").default(false),
   isChargeAccount: boolean("is_charge_account").default(false),
   totalSpent: decimal("total_spent", { precision: 10, scale: 2 }).default("0"),
   loyaltyCredits: decimal("loyalty_credits", { precision: 10, scale: 2 }).default("0"),

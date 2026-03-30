@@ -130,6 +130,9 @@ export interface IStorage {
   updateUserAdmin(id: string, isAdmin: boolean): Promise<User>;
   updateUserGroomer(id: string, isGroomer: boolean): Promise<User>;
   updateUserChargeAccount(id: string, isChargeAccount: boolean): Promise<User>;
+  updateUserSuperiorManager(id: string, isSuperiorManager: boolean): Promise<User>;
+  updateAppointmentHistoryRecord(id: number, data: Partial<{ appointmentDate: string; appointmentTime: string; petName: string; petType: string; breed: string; serviceType: string; groomerName: string; status: string; notes: string }>): Promise<AppointmentHistory>;
+  deleteAppointmentHistoryRecord(id: number): Promise<void>;
   getAllUsers(): Promise<User[]>;
   deleteUser(id: string): Promise<void>;
 
@@ -3001,6 +3004,34 @@ export class DatabaseStorage implements IStorage {
       throw new Error('User not found');
     }
     return user;
+  }
+
+  async updateUserSuperiorManager(id: string, isSuperiorManager: boolean): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ isSuperiorManager, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
+  }
+
+  async updateAppointmentHistoryRecord(id: number, data: Partial<{ appointmentDate: string; appointmentTime: string; petName: string; petType: string; breed: string; serviceType: string; groomerName: string; status: string; notes: string }>): Promise<AppointmentHistory> {
+    const [record] = await db
+      .update(appointmentHistory)
+      .set(data as any)
+      .where(eq(appointmentHistory.id, id))
+      .returning();
+    if (!record) {
+      throw new Error('Appointment history record not found');
+    }
+    return record;
+  }
+
+  async deleteAppointmentHistoryRecord(id: number): Promise<void> {
+    await db.delete(appointmentHistory).where(eq(appointmentHistory.id, id));
   }
 
   async getAllUsers(): Promise<User[]> {

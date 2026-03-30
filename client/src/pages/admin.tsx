@@ -734,12 +734,20 @@ function ContactAppointmentHistory({ contactId, onViewFullHistory }: { contactId
 }
 
 // Full History Dialog Component
-function ContactFullHistoryDialog({ contactId, contactName, isOpen, onClose }: { 
+function ContactFullHistoryDialog({ contactId, contactName, isOpen, onClose, isSuperiorManager }: { 
   contactId: number; 
   contactName: string;
   isOpen: boolean; 
   onClose: () => void;
+  isSuperiorManager?: boolean;
 }) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [editingHistory, setEditingHistory] = useState<any>(null);
+  const [editForm, setEditForm] = useState<{ appointmentDate: string; appointmentTime: string; petName: string; petType: string; breed: string; serviceType: string; groomerName: string; status: string; notes: string }>({
+    appointmentDate: '', appointmentTime: '', petName: '', petType: '', breed: '', serviceType: '', groomerName: '', status: '', notes: '',
+  });
+
   // Fetch current appointments
   const { data: currentAppointments = [], isLoading: isLoadingCurrent, error: currentError } = useQuery<any[]>({
     queryKey: ["/api/contacts", contactId, "appointments"],
@@ -766,7 +774,34 @@ function ContactFullHistoryDialog({ contactId, contactName, isOpen, onClose }: {
     enabled: isOpen && !!contactId,
   });
 
-  const { toast } = useToast();
+  const updateHistoryMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      const res = await apiRequest("PUT", `/api/contacts/history/${id}`, data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/contacts", contactId, "history"] });
+      setEditingHistory(null);
+      toast({ title: "Updated", description: "History record updated successfully" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to update history record", variant: "destructive" });
+    },
+  });
+
+  const deleteHistoryMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await apiRequest("DELETE", `/api/contacts/history/${id}`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/contacts", contactId, "history"] });
+      toast({ title: "Deleted", description: "History record removed" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to delete history record", variant: "destructive" });
+    },
+  });
 
   // Show error toast when errors occur (using useEffect to avoid repeated renders)
   React.useEffect(() => {
@@ -858,6 +893,9 @@ function ContactFullHistoryDialog({ contactId, contactName, isOpen, onClose }: {
               <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
                 Past Appointments (Archived)
                 <Badge variant="secondary" className="bg-gray-400">Archived</Badge>
+                {isSuperiorManager && (
+                  <Badge className="bg-yellow-500 text-black text-xs">Superior Manager Edit Mode</Badge>
+                )}
               </h3>
               {historyError ? (
                 <div className="bg-red-50 border border-red-200 rounded p-3 text-sm text-red-700">
@@ -869,21 +907,103 @@ function ContactFullHistoryDialog({ contactId, contactName, isOpen, onClose }: {
                 <div className="space-y-2">
                   {historicalAppointments.map((apt: any) => (
                     <div key={`history-${apt.id}`} className="bg-gray-100 rounded p-3 text-sm opacity-80" data-testid={`history-item-${apt.id}`}>
-                      <div className="flex justify-between items-start">
-                        <div className="space-y-1">
-                          <p className="font-semibold text-gray-700">{formatService(apt.serviceType)}</p>
-                          <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
-                          <p className="text-gray-500 text-xs">
-                            {parseLocalDate(apt.appointmentDate).toLocaleDateString()} at {apt.appointmentTime}
-                          </p>
-                          {apt.groomerName && (
-                            <p className="text-gray-600 text-xs">Groomer: {apt.groomerName}</p>
-                          )}
+                      {editingHistory?.id === apt.id ? (
+                        <div className="space-y-2">
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="text-xs font-medium text-gray-600">Date</label>
+                              <Input className="h-7 text-xs" value={editForm.appointmentDate} onChange={e => setEditForm(f => ({ ...f, appointmentDate: e.target.value }))} />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-gray-600">Time</label>
+                              <Input className="h-7 text-xs" value={editForm.appointmentTime} onChange={e => setEditForm(f => ({ ...f, appointmentTime: e.target.value }))} placeholder="e.g. 9:00 AM" />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-gray-600">Pet Name</label>
+                              <Input className="h-7 text-xs" value={editForm.petName} onChange={e => setEditForm(f => ({ ...f, petName: e.target.value }))} />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-gray-600">Pet Type</label>
+                              <Input className="h-7 text-xs" value={editForm.petType} onChange={e => setEditForm(f => ({ ...f, petType: e.target.value }))} />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-gray-600">Service</label>
+                              <Input className="h-7 text-xs" value={editForm.serviceType} onChange={e => setEditForm(f => ({ ...f, serviceType: e.target.value }))} />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-gray-600">Groomer</label>
+                              <Input className="h-7 text-xs" value={editForm.groomerName} onChange={e => setEditForm(f => ({ ...f, groomerName: e.target.value }))} />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-gray-600">Status</label>
+                              <Input className="h-7 text-xs" value={editForm.status} onChange={e => setEditForm(f => ({ ...f, status: e.target.value }))} />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-gray-600">Breed</label>
+                              <Input className="h-7 text-xs" value={editForm.breed} onChange={e => setEditForm(f => ({ ...f, breed: e.target.value }))} />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-gray-600">Notes</label>
+                            <textarea className="w-full text-xs border rounded p-1 h-16 resize-none" value={editForm.notes} onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} />
+                          </div>
+                          <div className="flex gap-2">
+                            <Button size="sm" className="h-7 text-xs bg-green-600 hover:bg-green-700" onClick={() => updateHistoryMutation.mutate({ id: apt.id, data: editForm })} disabled={updateHistoryMutation.isPending}>
+                              Save
+                            </Button>
+                            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setEditingHistory(null)}>
+                              Cancel
+                            </Button>
+                          </div>
                         </div>
-                        <Badge variant="outline" className="text-xs bg-gray-200">{apt.status}</Badge>
-                      </div>
-                      {apt.notes && (
-                        <p className="text-gray-600 mt-2 italic text-xs">{apt.notes}</p>
+                      ) : (
+                        <>
+                          <div className="flex justify-between items-start">
+                            <div className="space-y-1">
+                              <p className="font-semibold text-gray-700">{formatService(apt.serviceType)}</p>
+                              <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
+                              <p className="text-gray-500 text-xs">
+                                {parseLocalDate(apt.appointmentDate).toLocaleDateString()} at {apt.appointmentTime}
+                              </p>
+                              {apt.groomerName && (
+                                <p className="text-gray-600 text-xs">Groomer: {apt.groomerName}</p>
+                              )}
+                            </div>
+                            <div className="flex flex-col items-end gap-1">
+                              <Badge variant="outline" className="text-xs bg-gray-200">{apt.status}</Badge>
+                              {isSuperiorManager && (
+                                <div className="flex gap-1 mt-1">
+                                  <Button size="sm" variant="outline" className="h-6 text-xs px-2 border-yellow-400 text-yellow-700 hover:bg-yellow-50" onClick={() => {
+                                    setEditingHistory(apt);
+                                    setEditForm({
+                                      appointmentDate: apt.appointmentDate || '',
+                                      appointmentTime: apt.appointmentTime || '',
+                                      petName: apt.petName || '',
+                                      petType: apt.petType || '',
+                                      breed: apt.breed || '',
+                                      serviceType: apt.serviceType || '',
+                                      groomerName: apt.groomerName || '',
+                                      status: apt.status || '',
+                                      notes: apt.notes || '',
+                                    });
+                                  }}>
+                                    Edit
+                                  </Button>
+                                  <Button size="sm" variant="outline" className="h-6 text-xs px-2 border-red-400 text-red-600 hover:bg-red-50" onClick={() => {
+                                    if (window.confirm('Delete this history record? This cannot be undone.')) {
+                                      deleteHistoryMutation.mutate(apt.id);
+                                    }
+                                  }} disabled={deleteHistoryMutation.isPending}>
+                                    Delete
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          {apt.notes && (
+                            <p className="text-gray-600 mt-2 italic text-xs">{apt.notes}</p>
+                          )}
+                        </>
                       )}
                     </div>
                   ))}
@@ -898,6 +1018,8 @@ function ContactFullHistoryDialog({ contactId, contactName, isOpen, onClose }: {
 }
 
 function ContactsManager() {
+  const { user: authUser } = useAuth();
+  const currentUserIsSuperiorManager = !!(authUser as any)?.isSuperiorManager;
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddContactOpen, setIsAddContactOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<any>(null);
@@ -1678,6 +1800,7 @@ function ContactsManager() {
             contactName={historyDialogContact.name ?? ''}
             isOpen={Boolean(historyDialogContact)}
             onClose={() => setHistoryDialogContact(null)}
+            isSuperiorManager={currentUserIsSuperiorManager}
           />
         )}
       </CardContent>
@@ -7456,6 +7579,21 @@ export default function Admin() {
     },
   });
 
+  // Superior Manager Mutation
+  const updateSuperiorManagerMutation = useMutation({
+    mutationFn: async ({ userId, isSuperiorManager }: { userId: string; isSuperiorManager: boolean }) => {
+      const res = await apiRequest("POST", `/api/admin/users/${userId}/superior-manager`, { isSuperiorManager });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ title: "Success", description: "Superior Manager status updated" });
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to update superior manager status", variant: "destructive" });
+    },
+  });
+
   // Delete User Mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
@@ -10644,6 +10782,9 @@ export default function Admin() {
                             Joined: {new Date(userItem.createdAt).toLocaleDateString()}
                           </p>
                           <div className="flex gap-2 mt-2 flex-wrap">
+                            {userItem.isSuperiorManager && (
+                              <Badge className="text-xs bg-yellow-400 text-black border border-yellow-500">Superior Manager</Badge>
+                            )}
                             {userItem.isAdmin && (
                               <Badge variant="default" className="text-xs">Admin</Badge>
                             )}
@@ -10653,7 +10794,7 @@ export default function Admin() {
                             {userItem.isChargeAccount && (
                               <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-700 border border-orange-300">Charge Account</Badge>
                             )}
-                            {!userItem.isAdmin && !userItem.isGroomer && !userItem.isChargeAccount && (
+                            {!userItem.isAdmin && !userItem.isGroomer && !userItem.isChargeAccount && !userItem.isSuperiorManager && (
                               <Badge variant="outline" className="text-xs">Customer</Badge>
                             )}
                           </div>
@@ -10701,6 +10842,23 @@ export default function Admin() {
                               disabled={updateChargeAccountMutation.isPending}
                             />
                           </div>
+                          {typedUser?.isSuperiorManager && (
+                            <div className={`flex items-center justify-between gap-3 px-2 py-1.5 rounded-md border ${userItem.isSuperiorManager ? 'bg-yellow-400/20 border-yellow-500' : 'bg-yellow-400/5 border-yellow-500/30'}`}>
+                              <span className="text-sm font-semibold text-yellow-600 flex items-center gap-1">
+                                ★ Sup. Mgr
+                              </span>
+                              <Switch
+                                checked={!!userItem.isSuperiorManager}
+                                onCheckedChange={(checked) => {
+                                  updateSuperiorManagerMutation.mutate({
+                                    userId: userItem.id,
+                                    isSuperiorManager: checked
+                                  });
+                                }}
+                                disabled={updateSuperiorManagerMutation.isPending}
+                              />
+                            </div>
+                          )}
                           <Button
                             variant="destructive"
                             size="sm"
