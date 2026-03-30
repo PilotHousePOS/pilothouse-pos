@@ -1142,6 +1142,26 @@ function ContactsManager() {
     },
   });
 
+  const syncContactsMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/admin/contacts/backfill-from-appointments");
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Contacts Synced",
+        description: data?.message || "Contacts synced from appointments.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to sync contacts from appointments.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Google Calendar sync removed - transition period complete
 
   // Map database contacts - all database contacts are editable (both manual and google_calendar sourced)
@@ -1343,6 +1363,17 @@ function ContactsManager() {
             </CardDescription>
           </div>
           <div className="flex flex-col gap-2 sm:flex-shrink-0">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full sm:w-auto"
+              onClick={() => syncContactsMutation.mutate()}
+              disabled={syncContactsMutation.isPending}
+              title="Create contacts for any appointment owners not yet in the contact list"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${syncContactsMutation.isPending ? 'animate-spin' : ''}`} />
+              {syncContactsMutation.isPending ? 'Syncing...' : 'Sync from Appointments'}
+            </Button>
             <Dialog open={isAddContactOpen} onOpenChange={setIsAddContactOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" data-testid="button-add-contact" className="w-full sm:w-auto" size="sm">

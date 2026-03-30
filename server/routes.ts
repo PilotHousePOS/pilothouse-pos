@@ -5387,6 +5387,34 @@ West Monroe LA 71291
         await storage.releaseBookingLock(appointmentDateStr);
       }
       
+      // Auto-create or update contact record for the appointment owner (fire-and-forget)
+      if (appointment.ownerPhoneNumber) {
+        const allPetNames = petsArray.map((p: any) => p.petName).filter(Boolean);
+        storage.getContactByPhoneNumber(appointment.ownerPhoneNumber).then(async existingContact => {
+          if (!existingContact) {
+            const contactName = `${appointment.ownerFirstName || ''} ${appointment.ownerLastName || ''}`.trim() || 'Unknown';
+            await storage.createContact({
+              name: contactName,
+              phoneNumber: appointment.ownerPhoneNumber!,
+              email: (appointment as any).ownerEmail || null,
+              petNames: allPetNames.length > 0 ? allPetNames : null,
+              animalType: appointment.petType || null,
+              breed: null,
+              source: appointment.source || 'manual',
+              notes: null,
+              linkedUserId: null,
+            });
+          } else {
+            // Update pet names if new pets were added
+            const existingPetNames: string[] = existingContact.petNames || [];
+            const mergedPetNames = Array.from(new Set([...existingPetNames, ...allPetNames]));
+            if (mergedPetNames.length > existingPetNames.length) {
+              await storage.updateContact(existingContact.id, { petNames: mergedPetNames });
+            }
+          }
+        }).catch(err => console.error('Failed to auto-create contact for appointment:', err));
+      }
+
       // Send admin notifications for new appointment (fire-and-forget, never block the response)
       const customerName = `${appointment.ownerFirstName} ${appointment.ownerLastName}`;
       const serviceInfo = petsArray.length > 1 
@@ -7626,6 +7654,60 @@ West Monroe LA 71291
     } catch (error) {
       console.error("Error cleaning up duplicate contacts:", error);
       res.status(500).json({ message: "Failed to cleanup duplicates", error: (error as Error).message });
+    }
+  });
+
+  // Backfill contacts from existing appointments (admin only)
+  app.post("/api/admin/contacts/backfill-from-appointments", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const allAppointments = await storage.getAppointments();
+      let created = 0;
+      let updated = 0;
+      let skipped = 0;
+
+      for (const apt of allAppointments) {
+        if (!apt.ownerPhoneNumber) { skipped++; continue; }
+
+        const existing = await storage.getContactByPhoneNumber(apt.ownerPhoneNumber);
+        const petName = apt.petName;
+
+        if (!existing) {
+          const contactName = `${apt.ownerFirstName || ''} ${apt.ownerLastName || ''}`.trim() || 'Unknown';
+          await storage.createContact({
+            name: contactName,
+            phoneNumber: apt.ownerPhoneNumber,
+            email: (apt as any).ownerEmail || null,
+            petNames: petName ? [petName] : null,
+            animalType: apt.petType || null,
+            breed: null,
+            source: apt.source || 'manual',
+            notes: null,
+            linkedUserId: null,
+          });
+          created++;
+        } else {
+          // Merge pet names
+          const existingPetNames: string[] = existing.petNames || [];
+          const newPetNames = petName ? [petName] : [];
+          const merged = Array.from(new Set([...existingPetNames, ...newPetNames]));
+          if (merged.length > existingPetNames.length) {
+            await storage.updateContact(existing.id, { petNames: merged });
+            updated++;
+          } else {
+            skipped++;
+          }
+        }
+      }
+
+      res.json({ message: `Backfill complete: ${created} contacts created, ${updated} updated, ${skipped} skipped`, created, updated, skipped });
+    } catch (error) {
+      console.error("Error backfilling contacts:", error);
+      res.status(500).json({ message: "Failed to backfill contacts", error: (error as Error).message });
     }
   });
 
