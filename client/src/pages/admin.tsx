@@ -1022,6 +1022,7 @@ function ContactsManager() {
   const currentUserIsSuperiorManager = !!(authUser as any)?.isSuperiorManager;
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddContactOpen, setIsAddContactOpen] = useState(false);
+  const [contactToDelete, setContactToDelete] = useState<{ id: number; name: string } | null>(null);
   const [editingContact, setEditingContact] = useState<any>(null);
   const [contactFormData, setContactFormData] = useState({
     name: '',
@@ -1137,26 +1138,6 @@ function ContactsManager() {
       toast({
         title: "Error",
         description: "Failed to delete contact.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const syncContactsMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest("POST", "/api/admin/contacts/backfill-from-appointments");
-    },
-    onSuccess: (data: any) => {
-      toast({
-        title: "Contacts Synced",
-        description: data?.message || "Contacts synced from appointments.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to sync contacts from appointments.",
         variant: "destructive",
       });
     },
@@ -1342,10 +1323,8 @@ function ContactsManager() {
     });
   };
 
-  const handleDeleteContact = (id: number) => {
-    if (confirm('Are you sure you want to delete this contact?')) {
-      deleteContactMutation.mutate(id);
-    }
+  const handleDeleteContact = (id: number, name: string) => {
+    setContactToDelete({ id, name });
   };
 
   return (
@@ -1363,17 +1342,6 @@ function ContactsManager() {
             </CardDescription>
           </div>
           <div className="flex flex-col gap-2 sm:flex-shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full sm:w-auto"
-              onClick={() => syncContactsMutation.mutate()}
-              disabled={syncContactsMutation.isPending}
-              title="Create contacts for any appointment owners not yet in the contact list"
-            >
-              <RefreshCw className={`w-4 h-4 mr-2 ${syncContactsMutation.isPending ? 'animate-spin' : ''}`} />
-              {syncContactsMutation.isPending ? 'Syncing...' : 'Sync from Appointments'}
-            </Button>
             <Dialog open={isAddContactOpen} onOpenChange={setIsAddContactOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" data-testid="button-add-contact" className="w-full sm:w-auto" size="sm">
@@ -1752,7 +1720,7 @@ function ContactsManager() {
                           className="h-8 px-2 hover:text-red-600"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDeleteContact(contact.id);
+                            handleDeleteContact(contact.id, contact.displayName || contact.name || 'this contact');
                           }}
                           data-testid={`button-delete-contact-${index}`}
                         >
@@ -1834,6 +1802,32 @@ function ContactsManager() {
             isSuperiorManager={currentUserIsSuperiorManager}
           />
         )}
+
+        {/* Delete Contact Confirmation */}
+        <AlertDialog open={!!contactToDelete} onOpenChange={(open) => { if (!open) setContactToDelete(null); }}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Contact</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete <strong>{contactToDelete?.name}</strong>? This will permanently remove them and all their history. This cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-red-600 hover:bg-red-700 text-white"
+                onClick={() => {
+                  if (contactToDelete) {
+                    deleteContactMutation.mutate(contactToDelete.id);
+                    setContactToDelete(null);
+                  }
+                }}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   );
