@@ -7936,10 +7936,11 @@ export default function Admin() {
     return groupAppointmentsByPhone(pendingAppts);
   }, [appointments, filteredAppointments, search]);
 
-  // Group approved appointments by phone number (only show today and future dates, unless searching)
+  // Group approved appointments by phone number (show yesterday + future dates, unless searching)
   const groupedApprovedAppointments = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
     
     const approvedAppts = ((search.trim() ? filteredAppointments : appointments) as any[])
       .filter((a: any) => {
@@ -7953,19 +7954,20 @@ export default function Admin() {
         // When searching, show all matching appointments regardless of date
         if (search.trim()) return true;
         
-        // Otherwise, only show appointments from today onwards
+        // Otherwise, show appointments from yesterday onwards (one day look-back)
         const appointmentDate = parseLocalDate(a.appointmentDate);
         appointmentDate.setHours(0, 0, 0, 0);
         
-        return appointmentDate >= today;
+        return appointmentDate >= yesterday;
       });
     return groupAppointmentsByPhone(approvedAppts);
   }, [appointments, filteredAppointments, search, filterByHere]);
 
-  // Group denied appointments by phone number (only show today and future dates, unless searching)
+  // Group denied appointments by phone number (show yesterday + future dates, unless searching)
   const groupedDeniedAppointments = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
     
     const deniedAppts = ((search.trim() ? filteredAppointments : appointments) as any[])
       .filter((a: any) => {
@@ -7974,11 +7976,11 @@ export default function Admin() {
         // When searching, show all matching appointments regardless of date
         if (search.trim()) return true;
         
-        // Otherwise, only show appointments from today onwards
+        // Otherwise, show appointments from yesterday onwards (one day look-back)
         const appointmentDate = parseLocalDate(a.appointmentDate);
         appointmentDate.setHours(0, 0, 0, 0);
         
-        return appointmentDate >= today;
+        return appointmentDate >= yesterday;
       });
     return groupAppointmentsByPhone(deniedAppts);
   }, [appointments, filteredAppointments, search]);
