@@ -210,7 +210,33 @@ function PhoneNumberDisplay({ phoneNumber }: { phoneNumber: string }) {
 function AppointmentCalendar({ appointments }: { appointments: any[] }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [pendingDoneId, setPendingDoneId] = useState<number | null>(null);
-  
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const updateAppointmentIsHereMutation = useMutation({
+    mutationFn: async ({ id, isHere }: { id: number; isHere: boolean }) => {
+      const result = await apiRequest("PATCH", `/api/appointments/${id}/is-here`, { isHere });
+      return result.json();
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      toast({ title: variables.isHere ? "Marked as arrived" : "Marked as not arrived" });
+    },
+    onError: () => toast({ title: "Error", description: "Failed to update status", variant: "destructive" }),
+  });
+
+  const updateAppointmentGroomingCompletedMutation = useMutation({
+    mutationFn: async ({ id, groomingCompleted }: { id: number; groomingCompleted: boolean }) => {
+      const result = await apiRequest("PATCH", `/api/appointments/${id}/grooming-completed`, { groomingCompleted });
+      return result.json();
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      toast({ title: variables.groomingCompleted ? "Marked as done" : "Marked as not done" });
+    },
+    onError: () => toast({ title: "Error", description: "Failed to update status", variant: "destructive" }),
+  });
+
   // Google Calendar integration removed - transition period complete
   const googleEvents: any[] = [];
 
