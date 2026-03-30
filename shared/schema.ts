@@ -302,6 +302,7 @@ export const appointmentPets = pgTable("appointment_pets", {
   specialNotes: text("special_notes"), // Per-pet special notes/instructions
   groomerId: integer("groomer_id").references(() => groomers.id, { onDelete: "set null" }), // Per-pet groomer assignment (overrides appointment-level)
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  addOns: text("add_ons"), // Comma-separated: nail-grind,teeth-brushing,furminator,scent-package
   createdAt: timestamp("created_at").defaultNow(),
 });
 

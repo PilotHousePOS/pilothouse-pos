@@ -22,7 +22,10 @@ const DEFAULT_SERVICES = [
 
 export default function Booking() {
   // Fetch service prices from settings
-  const { data: servicePrices } = useQuery<{ fullGrooming: string; bathOnly: string }>({
+  const { data: servicePrices } = useQuery<{
+    fullGrooming: string; bathOnly: string;
+    nailGrind: string; teethBrushing: string; furminator: string; scentPackage: string;
+  }>({
     queryKey: ["/api/service-prices"],
   });
 
@@ -31,6 +34,13 @@ export default function Booking() {
     { id: 'grooming-full', name: 'Full Grooming', description: 'Complete grooming service', price: servicePrices.fullGrooming },
     { id: 'grooming-bath', name: 'Bath Only', description: 'Professional bath and dry', price: servicePrices.bathOnly },
   ] : DEFAULT_SERVICES;
+
+  const ADD_ONS = [
+    { id: 'nail-grind', label: 'Nail Grind', price: servicePrices?.nailGrind || '15' },
+    { id: 'teeth-brushing', label: 'Brush Teeth', price: servicePrices?.teethBrushing || '10' },
+    { id: 'furminator', label: 'Furminator', price: servicePrices?.furminator || '20' },
+    { id: 'scent-package', label: 'Scent Package', price: servicePrices?.scentPackage || '5' },
+  ];
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedGroomer, setSelectedGroomer] = useState('');
@@ -40,12 +50,14 @@ export default function Booking() {
     serviceType: string;
     notes: string;
     groomerId?: string;
+    addOns: string[];
   }>>([{
     name: '',
     type: 'dog',
     serviceType: '',
     notes: '',
     groomerId: '',
+    addOns: [],
   }]);
   
   const [ownerInfo, setOwnerInfo] = useState({
@@ -360,7 +372,7 @@ export default function Booking() {
       setSelectedDate(new Date());
       setSelectedTime('');
       setSelectedGroomer('');
-      setPets([{ name: '', type: 'dog', serviceType: '', notes: '', groomerId: '' }]);
+      setPets([{ name: '', type: 'dog', serviceType: '', notes: '', groomerId: '', addOns: [] }]);
       setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
       setContactSearch('');
       setIsRecurring(false);
@@ -488,6 +500,7 @@ export default function Booking() {
         serviceType: pet.serviceType,
         specialNotes: pet.notes,
         groomerId: pet.groomerId ? parseInt(pet.groomerId) : undefined,
+        addOns: pet.addOns.length > 0 ? pet.addOns.join(',') : undefined,
       })),
     };
 
@@ -591,7 +604,7 @@ export default function Booking() {
       setSelectedDate(new Date());
       setSelectedTime('');
       setSelectedGroomer('');
-      setPets([{ name: '', type: 'dog', serviceType: '', notes: '', groomerId: '' }]);
+      setPets([{ name: '', type: 'dog', serviceType: '', notes: '', groomerId: '', addOns: [] }]);
       setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
       setContactSearch('');
       setIsRecurring(false);
@@ -620,6 +633,18 @@ export default function Booking() {
   const updatePet = (index: number, field: string, value: string) => {
     const updated = [...pets];
     updated[index] = { ...updated[index], [field]: value };
+    setPets(updated);
+  };
+
+  const togglePetAddOn = (index: number, addOnId: string) => {
+    const updated = [...pets];
+    const current = updated[index].addOns || [];
+    updated[index] = {
+      ...updated[index],
+      addOns: current.includes(addOnId)
+        ? current.filter(a => a !== addOnId)
+        : [...current, addOnId],
+    };
     setPets(updated);
   };
 
@@ -1023,14 +1048,40 @@ export default function Booking() {
                           <RadioGroupItem value={service.id} id={`${service.id}-${index}`} data-testid={`radio-service-${service.id}-${index}`} />
                           <Label htmlFor={`${service.id}-${index}`} className="flex-1 cursor-pointer">
                             <div className="font-medium text-gray-900">{service.name} ${service.price}</div>
-                            <div className="text-xs text-gray-500">(Prices will vary. This is an estimated price.)</div>
+                            <div className="text-xs text-gray-500">(Prices will vary. This is an estimated price. Price is determined by size upon arrival.)</div>
                           </Label>
                         </div>
                       ))}
                     </div>
                   </RadioGroup>
                 </div>
-                
+
+                <div>
+                  <Label className="text-xs text-gray-600 mb-2 block">Add-On Services (Optional)</Label>
+                  <div className="space-y-2">
+                    {ADD_ONS.map((addon) => {
+                      const checked = (pet.addOns || []).includes(addon.id);
+                      return (
+                        <div
+                          key={addon.id}
+                          className={`flex items-center space-x-3 p-2 border rounded-lg cursor-pointer transition-colors ${checked ? 'border-brand-red bg-red-50' : 'hover:bg-gray-50'}`}
+                          onClick={() => togglePetAddOn(index, addon.id)}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => togglePetAddOn(index, addon.id)}
+                            className="w-4 h-4 accent-red-600"
+                            data-testid={`checkbox-addon-${addon.id}-${index}`}
+                          />
+                          <span className="flex-1 text-sm font-medium text-gray-900">{addon.label}</span>
+                          <span className="text-sm text-gray-500">+${addon.price}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div>
                   <Label className="text-xs text-gray-600 mb-2 block">Groomer for this Pet (Optional)</Label>
                   <Select 

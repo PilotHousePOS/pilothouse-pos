@@ -262,7 +262,7 @@ export interface IStorage {
 
   // Appointment operations
   createAppointment(appointment: InsertAppointment): Promise<Appointment>;
-  createAppointmentPets(appointmentId: number, pets: Array<{petName: string; petType: string; serviceType: string; price: string; specialNotes?: string; groomerId?: number | null}>): Promise<void>;
+  createAppointmentPets(appointmentId: number, pets: Array<{petName: string; petType: string; serviceType: string; price: string; specialNotes?: string; groomerId?: number | null; addOns?: string}>): Promise<void>;
   getAppointmentPets(appointmentId: number): Promise<any[]>;
   getAppointmentPetsByAppointmentIds(appointmentIds: number[]): Promise<Map<number, any[]>>;
   deleteAppointmentPets(appointmentId: number): Promise<void>;
@@ -2640,7 +2640,7 @@ export class DatabaseStorage implements IStorage {
 
   async createAppointmentPets(
     appointmentId: number, 
-    pets: Array<{petName: string; petType: string; serviceType: string; price: string; specialNotes?: string; groomerId?: number | null}>
+    pets: Array<{petName: string; petType: string; serviceType: string; price: string; specialNotes?: string; groomerId?: number | null; addOns?: string}>
   ): Promise<void> {
     const petRecords = pets.map(pet => ({
       appointmentId,
@@ -2650,6 +2650,7 @@ export class DatabaseStorage implements IStorage {
       price: pet.price,
       specialNotes: pet.specialNotes,
       groomerId: pet.groomerId,
+      addOns: pet.addOns || null,
     }));
     await db.insert(appointmentPets).values(petRecords);
   }

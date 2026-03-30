@@ -4543,6 +4543,7 @@ West Monroe LA 71291
                 specialNotes: pet.specialNotes || '',
                 price: petPrice,
                 groomerId: pet.groomerId || null,
+                addOns: pet.addOns || null,
               };
             });
             
@@ -5375,6 +5376,7 @@ West Monroe LA 71291
               specialNotes: pet.specialNotes,
               price: service ? service.price.toString() : '0',
               groomerId: groomerId || null,
+              addOns: pet.addOns || null,
             };
           });
           
@@ -6899,11 +6901,18 @@ West Monroe LA 71291
       const settings = await storage.getGroomingSettings();
       const fullGroomingPrice = settings.find(s => s.setting === 'full_grooming_price')?.value || '35';
       const bathOnlyPrice = settings.find(s => s.setting === 'bath_only_price')?.value || '20';
-      
-      // Return as strings to support price ranges like "40-80"
+      const nailGrindPrice = settings.find(s => s.setting === 'addon_nail_grind_price')?.value || '15';
+      const teethBrushingPrice = settings.find(s => s.setting === 'addon_teeth_brushing_price')?.value || '10';
+      const furminatorPrice = settings.find(s => s.setting === 'addon_furminator_price')?.value || '20';
+      const scentPackagePrice = settings.find(s => s.setting === 'addon_scent_package_price')?.value || '5';
+
       res.json({
         fullGrooming: fullGroomingPrice,
-        bathOnly: bathOnlyPrice
+        bathOnly: bathOnlyPrice,
+        nailGrind: nailGrindPrice,
+        teethBrushing: teethBrushingPrice,
+        furminator: furminatorPrice,
+        scentPackage: scentPackagePrice,
       });
     } catch (error) {
       console.error("Error fetching service prices:", error);
