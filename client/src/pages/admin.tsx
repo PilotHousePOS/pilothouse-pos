@@ -209,6 +209,7 @@ function PhoneNumberDisplay({ phoneNumber }: { phoneNumber: string }) {
 // Calendar component for confirmed appointments
 function AppointmentCalendar({ appointments }: { appointments: any[] }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [pendingDoneId, setPendingDoneId] = useState<number | null>(null);
   
   // Google Calendar integration removed - transition period complete
   const googleEvents: any[] = [];
@@ -537,10 +538,14 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                                     id={`cal-grooming-completed-${appointment.id}`}
                                     checked={appointment.groomingCompleted || false}
                                     onCheckedChange={(checked) => {
-                                      updateAppointmentGroomingCompletedMutation.mutate({ 
-                                        id: appointment.id, 
-                                        groomingCompleted: !!checked 
-                                      });
+                                      if (checked) {
+                                        setPendingDoneId(appointment.id);
+                                      } else {
+                                        updateAppointmentGroomingCompletedMutation.mutate({ 
+                                          id: appointment.id, 
+                                          groomingCompleted: false 
+                                        });
+                                      }
                                     }}
                                   />
                                   <label 
@@ -624,6 +629,30 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
             })}
           </div>
         )}
+
+        <AlertDialog open={pendingDoneId !== null} onOpenChange={(open) => { if (!open) setPendingDoneId(null); }}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Has the customer been called?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Before marking this appointment as done, please confirm you have called the customer to verify their information is accurate.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setPendingDoneId(null)}>No</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (pendingDoneId !== null) {
+                    updateAppointmentGroomingCompletedMutation.mutate({ id: pendingDoneId, groomingCompleted: true });
+                    setPendingDoneId(null);
+                  }
+                }}
+              >
+                Yes, Mark Done
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   );
@@ -5865,6 +5894,9 @@ export default function Admin() {
     setDeleteConfirmation(prev => ({ ...prev, isOpen: false }));
   };
   
+  // "Has customer been called?" confirmation before marking Done
+  const [pendingDoneId, setPendingDoneId] = useState<number | null>(null);
+
   // SMS Confirmation Dialog State
   const [smsConfirmDialog, setSmsConfirmDialog] = useState<{
     isOpen: boolean;
@@ -10254,11 +10286,14 @@ export default function Admin() {
                                 id={`grooming-completed-${currentAppointment.id}`}
                                 checked={currentAppointment.groomingCompleted || false}
                                 onCheckedChange={(checked) => {
-                                  // Simply toggle the done status without SMS
-                                  updateAppointmentGroomingCompletedMutation.mutate({ 
-                                    id: currentAppointment.id, 
-                                    groomingCompleted: !!checked 
-                                  });
+                                  if (checked) {
+                                    setPendingDoneId(currentAppointment.id);
+                                  } else {
+                                    updateAppointmentGroomingCompletedMutation.mutate({ 
+                                      id: currentAppointment.id, 
+                                      groomingCompleted: false 
+                                    });
+                                  }
                                 }}
                                 data-testid={`checkbox-grooming-completed-${currentAppointment.id}`}
                               />
@@ -12802,6 +12837,31 @@ export default function Admin() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* "Has the customer been called?" confirmation before marking Done */}
+      <AlertDialog open={pendingDoneId !== null} onOpenChange={(open) => { if (!open) setPendingDoneId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Has the customer been called?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Before marking this appointment as done, please confirm you have called the customer to verify their information is accurate.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPendingDoneId(null)}>No</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (pendingDoneId !== null) {
+                  updateAppointmentGroomingCompletedMutation.mutate({ id: pendingDoneId, groomingCompleted: true });
+                  setPendingDoneId(null);
+                }
+              }}
+            >
+              Yes, Mark Done
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Appointment Details Dialog */}
       {selectedAppointment && (
