@@ -129,7 +129,11 @@ export function initializeScheduledTasks() {
         console.log(`Reset "Paid" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
       }
       
-      // Then, delete approved appointments (confirmed or completed) that have already passed
+      // Then, delete approved appointments (confirmed or completed) that are 2+ days old
+      // Yesterday's appointments are retained so admins can reference them the next morning
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+
       const pastApprovedAppointments = allAppointments.filter((apt: any) => {
         // Include both confirmed and completed as "approved" statuses
         if (apt.status !== 'confirmed' && apt.status !== 'completed') return false;
@@ -137,7 +141,8 @@ export function initializeScheduledTasks() {
         const appointmentDate = new Date(apt.appointmentDate);
         appointmentDate.setHours(0, 0, 0, 0);
         
-        return appointmentDate < today;
+        // Only delete appointments older than yesterday (2+ days ago)
+        return appointmentDate < yesterday;
       });
       
       console.log(`Saving ${pastApprovedAppointments.length} past approved appointments to history before deletion`);
