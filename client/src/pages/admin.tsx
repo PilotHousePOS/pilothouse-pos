@@ -702,6 +702,9 @@ function ContactAppointmentHistory({ contactId, onViewFullHistory }: { contactId
                   <span className="text-green-700 font-semibold ml-2 whitespace-nowrap">${apt.price}</span>
                 )}
               </div>
+              {apt.addOnLabels && apt.addOnLabels.length > 0 && (
+                <p className="text-purple-700 font-medium">+ {apt.addOnLabels.join(', ')}</p>
+              )}
               <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
               <p className="text-gray-500">{parseLocalDate(apt.appointmentDate).toLocaleDateString()}</p>
               {apt.groomerName && (
@@ -816,6 +819,12 @@ function ContactFullHistoryDialog({ contactId, contactName, isOpen, onClose }: {
                       <div className="flex justify-between items-start">
                         <div className="space-y-1">
                           <p className="font-semibold">{formatService(apt.serviceType || apt.service)}</p>
+                          {apt.addOnLabels && apt.addOnLabels.length > 0 && (
+                            <p className="text-purple-700 text-xs font-medium">+ {apt.addOnLabels.join(', ')}</p>
+                          )}
+                          {apt.price && (
+                            <p className="text-green-700 font-semibold text-xs">${apt.price}</p>
+                          )}
                           <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
                           <p className="text-gray-500 text-xs">
                             {parseLocalDate(apt.appointmentDate).toLocaleDateString()} at {apt.appointmentTime}

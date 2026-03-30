@@ -442,10 +442,25 @@ export default function Booking() {
       return;
     }
 
-    // Build price description from all pets (supports ranges like "40-80")
+    // Helper: add a dollar amount to a price string that may be a range like "40-80"
+    const addToPrice = (basePrice: string, addOnTotal: number): string => {
+      if (addOnTotal === 0) return basePrice;
+      if (basePrice.includes('-')) {
+        const [low, high] = basePrice.split('-').map(p => parseFloat(p.trim()) || 0);
+        return `${low + addOnTotal}-${high + addOnTotal}`;
+      }
+      return ((parseFloat(basePrice) || 0) + addOnTotal).toString();
+    };
+
+    // Build price description from all pets — base service price + add-on prices
     const priceDescription = pets.map(pet => {
       const serviceData = SERVICES.find(s => s.id === pet.serviceType);
-      return serviceData?.price || '0';
+      const basePrice = serviceData?.price || '0';
+      const addOnTotal = (pet.addOns || []).reduce((sum, id) => {
+        const addon = ADD_ONS.find(a => a.id === id);
+        return sum + (parseFloat(addon?.price || '0') || 0);
+      }, 0);
+      return addToPrice(basePrice, addOnTotal);
     }).join(' + ');
 
     // Build list of dates to create appointments for
