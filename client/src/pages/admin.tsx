@@ -11482,59 +11482,62 @@ export default function Admin() {
                     />
                   </div>
                 </div>
-                <h4 className="text-sm font-semibold text-gray-700 mt-4">Add-On Prices</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Nail Grind ($)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g., 15"
-                      defaultValue={groomingSettings.find((s: any) => s.setting === 'addon_nail_grind_price')?.value || '15'}
-                      className="w-full p-2 border rounded"
-                      onBlur={(e) => updateGroomingSettingMutation.mutate({
-                        setting: 'addon_nail_grind_price',
-                        value: e.target.value
-                      })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Brush Teeth ($)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g., 10"
-                      defaultValue={groomingSettings.find((s: any) => s.setting === 'addon_teeth_brushing_price')?.value || '10'}
-                      className="w-full p-2 border rounded"
-                      onBlur={(e) => updateGroomingSettingMutation.mutate({
-                        setting: 'addon_teeth_brushing_price',
-                        value: e.target.value
-                      })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Furminator ($)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g., 20"
-                      defaultValue={groomingSettings.find((s: any) => s.setting === 'addon_furminator_price')?.value || '20'}
-                      className="w-full p-2 border rounded"
-                      onBlur={(e) => updateGroomingSettingMutation.mutate({
-                        setting: 'addon_furminator_price',
-                        value: e.target.value
-                      })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Scent Package ($)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g., 5"
-                      defaultValue={groomingSettings.find((s: any) => s.setting === 'addon_scent_package_price')?.value || '5'}
-                      className="w-full p-2 border rounded"
-                      onBlur={(e) => updateGroomingSettingMutation.mutate({
-                        setting: 'addon_scent_package_price',
-                        value: e.target.value
-                      })}
-                    />
+                <div className="border border-blue-200 bg-blue-50 rounded-lg p-4 mt-2">
+                  <h4 className="text-base font-semibold text-blue-800 mb-3">Add-On Service Prices ($)</h4>
+                  <p className="text-xs text-blue-600 mb-3">These prices are shown to customers as optional add-ons during booking.</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Nail Grind</label>
+                      <input
+                        type="text"
+                        placeholder="e.g., 15"
+                        defaultValue={groomingSettings.find((s: any) => s.setting === 'addon_nail_grind_price')?.value || '15'}
+                        className="w-full p-2 border rounded bg-white"
+                        onBlur={(e) => updateGroomingSettingMutation.mutate({
+                          setting: 'addon_nail_grind_price',
+                          value: e.target.value
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Brush Teeth</label>
+                      <input
+                        type="text"
+                        placeholder="e.g., 10"
+                        defaultValue={groomingSettings.find((s: any) => s.setting === 'addon_teeth_brushing_price')?.value || '10'}
+                        className="w-full p-2 border rounded bg-white"
+                        onBlur={(e) => updateGroomingSettingMutation.mutate({
+                          setting: 'addon_teeth_brushing_price',
+                          value: e.target.value
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Furminator</label>
+                      <input
+                        type="text"
+                        placeholder="e.g., 20"
+                        defaultValue={groomingSettings.find((s: any) => s.setting === 'addon_furminator_price')?.value || '20'}
+                        className="w-full p-2 border rounded bg-white"
+                        onBlur={(e) => updateGroomingSettingMutation.mutate({
+                          setting: 'addon_furminator_price',
+                          value: e.target.value
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Scent Package</label>
+                      <input
+                        type="text"
+                        placeholder="e.g., 5"
+                        defaultValue={groomingSettings.find((s: any) => s.setting === 'addon_scent_package_price')?.value || '5'}
+                        className="w-full p-2 border rounded bg-white"
+                        onBlur={(e) => updateGroomingSettingMutation.mutate({
+                          setting: 'addon_scent_package_price',
+                          value: e.target.value
+                        })}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

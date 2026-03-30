@@ -244,6 +244,22 @@ export default function Booking() {
   };
 
   // Check if a date is available for booking
+  // True when at least one pet in the form is a cat
+  const hasCat = pets.some(p => p.type === 'cat');
+
+  // Returns true if a time string (e.g. "9:15 AM") is strictly after 9:00 AM
+  const isTimeAfter9AM = (timeStr: string) => {
+    const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!match) return false;
+    const hour = parseInt(match[1]);
+    const minute = parseInt(match[2]);
+    const period = match[3].toUpperCase();
+    if (period === 'PM') return true;
+    if (hour > 9) return true;
+    if (hour === 9 && minute > 0) return true;
+    return false;
+  };
+
   const isDateAvailable = (date: Date) => {
     // Block past dates using Central Time
     const nowCentral = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }));
@@ -276,6 +292,9 @@ export default function Booking() {
     const blockedList = blockedDates.split(',').map((d: string) => d.trim()).filter((d: string) => d);
     
     if (blockedList.includes(dateString)) return false;
+
+    // Cats are only accepted Mon (1), Tue (2), Thu (4)
+    if (hasCat && ![1, 2, 4].includes(date.getDay())) return false;
     
     // Check advance booking limit
     const advanceBookingDays = parseInt(settings.find(s => s.setting === 'advance_booking_days')?.value || '30');
@@ -620,6 +639,23 @@ export default function Booking() {
     setPets(updated);
   };
 
+  // When hasCat changes to true, clear any date/time that's now invalid for cats
+  useEffect(() => {
+    if (hasCat) {
+      if (selectedDate) {
+        const day = selectedDate.getDay();
+        if (![1, 2, 4].includes(day)) {
+          setSelectedDate(undefined);
+          setSelectedTime('');
+        }
+      }
+      if (selectedTime && isTimeAfter9AM(selectedTime)) {
+        setSelectedTime('');
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasCat]);
+
   const togglePetAddOn = (index: number, addOnId: string) => {
     const updated = [...pets];
     const current = updated[index].addOns || [];
@@ -739,26 +775,50 @@ export default function Booking() {
           </div>
         )}
 
+        {/* Cat-only notice */}
+        {hasCat && (
+          <div className="bg-purple-50 border border-purple-300 rounded-lg p-4">
+            <div className="flex items-start space-x-2">
+              <div className="text-purple-600 font-bold text-lg">🐱</div>
+              <div>
+                <h4 className="font-bold text-purple-800 mb-1">Cat Grooming — Limited Availability</h4>
+                <p className="text-sm text-purple-700">
+                  For the safety of your cat, we accept cats <strong>Monday, Tuesday, and Thursday only</strong>, and they must arrive <strong>by 9:00 AM</strong>. This minimizes exposure to dogs during peak hours.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Time Slots */}
         <div>
           <Label className="text-sm font-semibold text-gray-900 mb-3 block">Available Times</Label>
           <div className="grid grid-cols-3 gap-3">
-            {availableTimeSlots.map((time) => (
-              <Button
-                key={time}
-                type="button"
-                variant={selectedTime === time ? "default" : "outline"}
-                className={`py-2 px-3 text-sm ${
-                  selectedTime === time
-                    ? 'bg-brand-blue text-white'
-                    : 'border-gray-300 text-gray-900 hover:bg-gray-50'
-                }`}
-                onClick={() => setSelectedTime(time)}
-              >
-                {time}
-              </Button>
-            ))}
+            {availableTimeSlots.map((time) => {
+              const disabledForCat = hasCat && isTimeAfter9AM(time);
+              return (
+                <Button
+                  key={time}
+                  type="button"
+                  variant={selectedTime === time ? "default" : "outline"}
+                  disabled={disabledForCat}
+                  className={`py-2 px-3 text-sm ${
+                    selectedTime === time
+                      ? 'bg-brand-blue text-white'
+                      : disabledForCat
+                      ? 'border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed line-through opacity-60'
+                      : 'border-gray-300 text-gray-900 hover:bg-gray-50'
+                  }`}
+                  onClick={() => { if (!disabledForCat) setSelectedTime(time); }}
+                >
+                  {time}
+                </Button>
+              );
+            })}
           </div>
+          {hasCat && (
+            <p className="text-xs text-purple-600 mt-2">Times after 9:00 AM are unavailable for cats.</p>
+          )}
         </div>
 
         {/* Recurring Appointment Options */}
