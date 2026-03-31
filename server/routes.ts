@@ -11206,5 +11206,63 @@ West Monroe LA 71291
     }
   });
 
+  // ─── Job Applications ──────────────────────────────────────────────────────
+
+  // Public: submit an application (no auth required)
+  app.post("/api/job-applications", async (req, res) => {
+    try {
+      const { insertJobApplicationSchema } = await import("@shared/schema");
+      const parsed = insertJobApplicationSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: "Invalid application data", errors: parsed.error.flatten() });
+      }
+      const application = await storage.createJobApplication(parsed.data);
+      console.log(`[JobApplication] New application submitted: ${application.firstName} ${application.lastName} for "${application.positionApplied}" (id=${application.id})`);
+      res.status(201).json({ message: "Application submitted successfully", id: application.id });
+    } catch (error) {
+      console.error("[JobApplication] Error submitting application:", error);
+      res.status(500).json({ message: "Failed to submit application" });
+    }
+  });
+
+  // Admin: get all applications
+  app.get("/api/admin/job-applications", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Forbidden" });
+      const applications = await storage.getAllJobApplications();
+      res.json(applications);
+    } catch (error) {
+      console.error("[JobApplication] Error fetching applications:", error);
+      res.status(500).json({ message: "Failed to fetch applications" });
+    }
+  });
+
+  // Admin: get single application
+  app.get("/api/admin/job-applications/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Forbidden" });
+      const application = await storage.getJobApplication(parseInt(req.params.id));
+      if (!application) return res.status(404).json({ message: "Application not found" });
+      res.json(application);
+    } catch (error) {
+      console.error("[JobApplication] Error fetching application:", error);
+      res.status(500).json({ message: "Failed to fetch application" });
+    }
+  });
+
+  // Admin: update application status / notes
+  app.patch("/api/admin/job-applications/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Forbidden" });
+      const { status, adminNotes } = req.body;
+      const updated = await storage.updateJobApplicationStatus(parseInt(req.params.id), status, adminNotes);
+      console.log(`[JobApplication] Application id=${updated.id} (${updated.firstName} ${updated.lastName}) status updated to "${status}"`);
+      res.json(updated);
+    } catch (error) {
+      console.error("[JobApplication] Error updating application:", error);
+      res.status(500).json({ message: "Failed to update application" });
+    }
+  });
+
   // Server is now created externally in index.ts
 }

@@ -32,6 +32,7 @@ const Support = lazy(() => import("@/pages/support"));
 const VerifyEmail = lazy(() => import("@/pages/verify-email"));
 const DeleteAccount = lazy(() => import("@/pages/delete-account"));
 const NotFound = lazy(() => import("@/pages/not-found"));
+const Apply = lazy(() => import("@/pages/apply"));
 
 function PageLoader() {
   return (
@@ -60,6 +61,7 @@ function Router() {
           <Route path="/privacy-policy" component={PrivacyPolicy} />
           <Route path="/terms-of-service" component={TermsOfService} />
           <Route path="/support" component={Support} />
+          <Route path="/apply" component={Apply} />
           
           {!isAuthenticated ? (
             <>

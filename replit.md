@@ -63,7 +63,8 @@ The Animal House Pet Store is a mobile-first e-commerce platform specializing in
 - **Frontend:** Built with React, Vite, and TypeScript, utilizing Tailwind CSS for styling, shadcn/ui for components, Wouter for routing, and TanStack Query for data fetching.
 - **Backend:** Developed using Express.js and TypeScript.
 - **Database & ORM:** PostgreSQL is used as the database, managed through Drizzle ORM.
-- **Key Features:** Includes automated product categorization, advanced live animal detection, intelligent category cleanup, smart abbreviation expansion, and real-time Web Push Notifications.
+- **Key Features:** Includes automated product categorization, advanced live animal detection, intelligent category cleanup, smart abbreviation expansion, real-time Web Push Notifications, and online employment application system.
+- **Job Applications:** Public `/apply` route serves a full Louisiana employment application form (no login required). Submissions stored in `job_applications` table and managed in the admin panel under the "Applications" tab with status tracking (pending/reviewed/interview/hired/rejected) and admin notes.
 
 ## External Dependencies
 - PostgreSQL

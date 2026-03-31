@@ -1079,3 +1079,57 @@ export const specials = pgTable("specials", {
 
 export type Special = typeof specials.$inferSelect;
 export type InsertSpecial = typeof specials.$inferInsert;
+
+// ─── Job Applications ─────────────────────────────────────────────────────────
+export const jobApplications = pgTable("job_applications", {
+  id: serial("id").primaryKey(),
+  // Personal Information
+  firstName: varchar("first_name", { length: 100 }).notNull(),
+  lastName: varchar("last_name", { length: 100 }).notNull(),
+  middleName: varchar("middle_name", { length: 100 }),
+  address: text("address").notNull(),
+  city: varchar("city", { length: 100 }).notNull(),
+  state: varchar("state", { length: 50 }).notNull(),
+  zip: varchar("zip", { length: 20 }).notNull(),
+  phone: varchar("phone", { length: 30 }).notNull(),
+  email: varchar("email", { length: 255 }),
+  isOver18: boolean("is_over_18").notNull(),
+  // Position
+  positionApplied: varchar("position_applied", { length: 150 }).notNull(),
+  dateAvailable: varchar("date_available", { length: 50 }).notNull(),
+  desiredPay: varchar("desired_pay", { length: 50 }),
+  employmentType: varchar("employment_type", { length: 50 }).notNull(),
+  workedHereBefore: boolean("worked_here_before").default(false),
+  workedHereBeforeDetails: text("worked_here_before_details"),
+  // Employment History (stored as JSON array)
+  employmentHistory: jsonb("employment_history"),
+  // Education
+  highSchoolName: varchar("high_school_name", { length: 200 }),
+  highSchoolCity: varchar("high_school_city", { length: 100 }),
+  highSchoolGraduated: boolean("high_school_graduated"),
+  highSchoolDegree: varchar("high_school_degree", { length: 100 }),
+  collegeName: varchar("college_name", { length: 200 }),
+  collegeCity: varchar("college_city", { length: 100 }),
+  collegeGraduated: boolean("college_graduated"),
+  collegeDegree: varchar("college_degree", { length: 100 }),
+  // References (stored as JSON array)
+  references: jsonb("references"),
+  // Availability
+  availabilityDays: text("availability_days").array(),
+  availabilityNotes: text("availability_notes"),
+  // Legal
+  eligibleToWork: boolean("eligible_to_work").notNull(),
+  convictedOfFelony: boolean("convicted_of_felony").default(false),
+  felonyDetails: text("felony_details"),
+  isVeteran: boolean("is_veteran").default(false),
+  // Additional
+  additionalInfo: text("additional_info"),
+  // Status & Tracking
+  status: varchar("status", { length: 50 }).default("pending").notNull(),
+  adminNotes: text("admin_notes"),
+  submittedAt: timestamp("submitted_at").defaultNow(),
+});
+
+export const insertJobApplicationSchema = createInsertSchema(jobApplications).omit({ id: true, submittedAt: true, status: true, adminNotes: true });
+export type InsertJobApplication = z.infer<typeof insertJobApplicationSchema>;
+export type JobApplication = typeof jobApplications.$inferSelect;

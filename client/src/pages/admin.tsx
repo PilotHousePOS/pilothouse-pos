@@ -5317,6 +5317,265 @@ function LegalPagesPanel() {
   );
 }
 
+function ApplicationsPanel() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [selectedApp, setSelectedApp] = useState<any>(null);
+  const [adminNotes, setAdminNotes] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const { data: applications = [], isLoading } = useQuery<any[]>({
+    queryKey: ['/api/admin/job-applications'],
+  });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, status, notes }: { id: number; status: string; notes: string }) => {
+      const res = await apiRequest("PATCH", `/api/admin/job-applications/${id}`, { status, adminNotes: notes });
+      return res.json();
+    },
+    onSuccess: (updated) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/job-applications'] });
+      setSelectedApp(updated);
+      toast({ title: "Application updated" });
+    },
+    onError: () => toast({ title: "Error", description: "Failed to update application", variant: "destructive" }),
+  });
+
+  const STATUS_COLORS: Record<string, string> = {
+    pending: "bg-yellow-100 text-yellow-800 border-yellow-300",
+    reviewed: "bg-blue-100 text-blue-800 border-blue-300",
+    interview: "bg-purple-100 text-purple-800 border-purple-300",
+    hired: "bg-green-100 text-green-800 border-green-300",
+    rejected: "bg-red-100 text-red-800 border-red-300",
+  };
+
+  const filtered = statusFilter === "all" ? applications : applications.filter((a: any) => a.status === statusFilter);
+
+  const formatDate = (ts: string) => ts ? new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+
+  if (selectedApp) {
+    const app = selectedApp;
+    const empHistory: any[] = app.employmentHistory || [];
+    const refs: any[] = app.references || [];
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="sm" onClick={() => setSelectedApp(null)}>
+            ← Back to Applications
+          </Button>
+          <h2 className="text-lg font-bold">{app.firstName} {app.lastName}</h2>
+          <Badge className={`border ${STATUS_COLORS[app.status] || 'bg-gray-100'}`}>{app.status}</Badge>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Personal */}
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">Personal Information</CardTitle></CardHeader>
+            <CardContent className="text-sm space-y-1">
+              <p><span className="font-medium">Name:</span> {app.firstName} {app.middleName} {app.lastName}</p>
+              <p><span className="font-medium">Address:</span> {app.address}, {app.city}, {app.state} {app.zip}</p>
+              <p><span className="font-medium">Phone:</span> {app.phone}</p>
+              {app.email && <p><span className="font-medium">Email:</span> {app.email}</p>}
+              <p><span className="font-medium">18+:</span> {app.isOver18 ? "Yes" : "No"}</p>
+              <p><span className="font-medium">Veteran:</span> {app.isVeteran ? "Yes" : "No"}</p>
+              <p><span className="font-medium">Eligible to work in US:</span> {app.eligibleToWork ? "Yes" : "No"}</p>
+              {app.convictedOfFelony && (
+                <p><span className="font-medium text-red-600">Felony:</span> {app.felonyDetails || "Yes (no details)"}</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Position */}
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">Position Desired</CardTitle></CardHeader>
+            <CardContent className="text-sm space-y-1">
+              <p><span className="font-medium">Position:</span> {app.positionApplied}</p>
+              <p><span className="font-medium">Date Available:</span> {app.dateAvailable}</p>
+              <p><span className="font-medium">Desired Pay:</span> {app.desiredPay || "—"}</p>
+              <p><span className="font-medium">Employment Type:</span> {app.employmentType}</p>
+              {app.workedHereBefore && <p><span className="font-medium">Previous Employee:</span> {app.workedHereBeforeDetails || "Yes"}</p>}
+              {(app.availabilityDays || []).length > 0 && (
+                <p><span className="font-medium">Available:</span> {app.availabilityDays.join(', ')}</p>
+              )}
+              {app.availabilityNotes && <p><span className="font-medium">Hours:</span> {app.availabilityNotes}</p>}
+            </CardContent>
+          </Card>
+
+          {/* Education */}
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">Education</CardTitle></CardHeader>
+            <CardContent className="text-sm space-y-2">
+              {app.highSchoolName ? (
+                <div>
+                  <p className="font-medium text-xs text-gray-500 uppercase">High School</p>
+                  <p>{app.highSchoolName}{app.highSchoolCity ? `, ${app.highSchoolCity}` : ''}</p>
+                  {app.highSchoolDegree && <p>{app.highSchoolDegree} {app.highSchoolGraduated ? "(Graduated)" : ""}</p>}
+                </div>
+              ) : <p className="text-gray-400">No high school listed</p>}
+              {app.collegeName && (
+                <div>
+                  <p className="font-medium text-xs text-gray-500 uppercase mt-2">College / Vocational</p>
+                  <p>{app.collegeName}{app.collegeCity ? `, ${app.collegeCity}` : ''}</p>
+                  {app.collegeDegree && <p>{app.collegeDegree} {app.collegeGraduated ? "(Graduated)" : ""}</p>}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Admin Notes & Status */}
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">Admin Actions</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-gray-600 block mb-1">Status</label>
+                <Select defaultValue={app.status} onValueChange={(val) => {
+                  updateStatusMutation.mutate({ id: app.id, status: val, notes: adminNotes || app.adminNotes || "" });
+                }}>
+                  <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="reviewed">Reviewed</SelectItem>
+                    <SelectItem value="interview">Interview Scheduled</SelectItem>
+                    <SelectItem value="hired">Hired</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-600 block mb-1">Admin Notes</label>
+                <Textarea
+                  className="text-sm"
+                  rows={4}
+                  defaultValue={app.adminNotes || ""}
+                  onChange={e => setAdminNotes(e.target.value)}
+                  placeholder="Internal notes..."
+                />
+              </div>
+              <Button
+                size="sm"
+                className="w-full"
+                disabled={updateStatusMutation.isPending}
+                onClick={() => updateStatusMutation.mutate({ id: app.id, status: app.status, notes: adminNotes })}
+              >
+                Save Notes
+              </Button>
+              <p className="text-xs text-gray-400">Submitted: {formatDate(app.submittedAt)}</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Employment History */}
+        {empHistory.some(e => e.employer) && (
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">Employment History</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              {empHistory.filter(e => e.employer).map((e: any, i: number) => (
+                <div key={i} className="text-sm border-b last:border-0 pb-3 last:pb-0">
+                  <p className="font-semibold">{e.employer} — {e.position}</p>
+                  <p className="text-gray-600">{e.address} | {e.phone}</p>
+                  <p className="text-gray-600">Supervisor: {e.supervisor}</p>
+                  <p className="text-gray-600">{e.startDate} – {e.endDate} | Start: {e.startingSalary} → End: {e.endingSalary}</p>
+                  <p><span className="font-medium">Reason for Leaving:</span> {e.reasonForLeaving}</p>
+                  <p className="text-xs text-gray-500">May contact: {e.mayWeContact ? "Yes" : "No"}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* References */}
+        {refs.some(r => r.name) && (
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">References</CardTitle></CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {refs.filter(r => r.name).map((r: any, i: number) => (
+                  <div key={i} className="text-sm border rounded p-2">
+                    <p className="font-semibold">{r.name}</p>
+                    <p className="text-gray-600">{r.relationship}</p>
+                    <p className="text-gray-600">{r.phone}</p>
+                    <p className="text-gray-500 text-xs">{r.address}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Additional Info */}
+        {app.additionalInfo && (
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">Additional Information</CardTitle></CardHeader>
+            <CardContent><p className="text-sm">{app.additionalInfo}</p></CardContent>
+          </Card>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="w-5 h-5" />
+            Job Applications ({applications.length})
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="h-8 text-xs w-36"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="reviewed">Reviewed</SelectItem>
+                <SelectItem value="interview">Interview</SelectItem>
+                <SelectItem value="hired">Hired</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <p className="text-xs text-gray-500 mt-1">
+          Applications submitted via <span className="font-mono bg-gray-100 px-1 rounded">/apply</span>
+        </p>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="text-center py-8 text-gray-500">Loading applications...</div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-12 text-gray-400">
+            <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" />
+            <p>{statusFilter === "all" ? "No applications submitted yet" : `No ${statusFilter} applications`}</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filtered.map((app: any) => (
+              <div
+                key={app.id}
+                className="border rounded-lg p-3 hover:bg-gray-50 cursor-pointer flex items-start justify-between gap-3"
+                onClick={() => { setSelectedApp(app); setAdminNotes(app.adminNotes || ""); }}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-semibold text-sm">{app.firstName} {app.lastName}</p>
+                    <Badge className={`text-xs border ${STATUS_COLORS[app.status] || 'bg-gray-100'}`}>
+                      {app.status}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-0.5">{app.positionApplied} · {app.employmentType}</p>
+                  <p className="text-xs text-gray-500">{app.phone}{app.email ? ` · ${app.email}` : ''}</p>
+                  <p className="text-xs text-gray-400">Submitted {formatDate(app.submittedAt)}</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0 mt-1" />
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function FeedbackPanel() {
   const { data: entries = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/admin/feedback'],
@@ -8545,6 +8804,11 @@ export default function Admin() {
             {typedUser?.isAdmin && (
               <TabsTrigger value="specials" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 Specials
+              </TabsTrigger>
+            )}
+            {typedUser?.isAdmin && (
+              <TabsTrigger value="applications" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                Applications
               </TabsTrigger>
             )}
             {typedUser?.isAdmin && (
@@ -12813,6 +13077,10 @@ export default function Admin() {
               </div>
             </DialogContent>
           </Dialog>
+        </TabsContent>
+
+        <TabsContent value="applications" className="space-y-4">
+          <ApplicationsPanel />
         </TabsContent>
 
         <TabsContent value="feedback" className="space-y-6">

@@ -109,6 +109,9 @@ import {
   feedback,
   type Feedback,
   type InsertFeedback,
+  jobApplications,
+  type JobApplication,
+  type InsertJobApplication,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, and, or, not, ilike, lt, lte, isNull, isNotNull, count, sql, inArray, ne, notInArray } from "drizzle-orm";
@@ -465,6 +468,12 @@ export interface IStorage {
   // Feedback
   createFeedback(data: InsertFeedback): Promise<Feedback>;
   getAllFeedback(): Promise<Feedback[]>;
+
+  // Job Applications
+  createJobApplication(data: InsertJobApplication): Promise<JobApplication>;
+  getAllJobApplications(): Promise<JobApplication[]>;
+  getJobApplication(id: number): Promise<JobApplication | undefined>;
+  updateJobApplicationStatus(id: number, status: string, adminNotes?: string): Promise<JobApplication>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -4568,6 +4577,27 @@ export class DatabaseStorage implements IStorage {
 
   async getAllFeedback(): Promise<Feedback[]> {
     return db.select().from(feedback).orderBy(desc(feedback.createdAt));
+  }
+
+  async createJobApplication(data: InsertJobApplication): Promise<JobApplication> {
+    const [created] = await db.insert(jobApplications).values(data).returning();
+    return created;
+  }
+
+  async getAllJobApplications(): Promise<JobApplication[]> {
+    return db.select().from(jobApplications).orderBy(desc(jobApplications.submittedAt));
+  }
+
+  async getJobApplication(id: number): Promise<JobApplication | undefined> {
+    const [app] = await db.select().from(jobApplications).where(eq(jobApplications.id, id));
+    return app;
+  }
+
+  async updateJobApplicationStatus(id: number, status: string, adminNotes?: string): Promise<JobApplication> {
+    const updates: any = { status };
+    if (adminNotes !== undefined) updates.adminNotes = adminNotes;
+    const [updated] = await db.update(jobApplications).set(updates).where(eq(jobApplications.id, id)).returning();
+    return updated;
   }
 }
 
