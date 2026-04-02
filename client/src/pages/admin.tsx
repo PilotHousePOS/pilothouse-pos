@@ -6047,26 +6047,25 @@ function AstroLoyaltyManager() {
 }
 
 
-function InvoiceScanDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+function InvoiceScanDialog({ open, onClose, onEditSupply }: {
+  open: boolean;
+  onClose: () => void;
+  onEditSupply: (supply: any) => void;
+}) {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [scanning, setScanning] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [loadingId, setLoadingId] = useState<number | null>(null);
   const [matched, setMatched] = useState<any[]>([]);
   const [unmatched, setUnmatched] = useState<any[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [edits, setEdits] = useState<{ [id: number]: { stock: string; price: string } }>({});
-  const [saved, setSaved] = useState(false);
 
   function reset() {
     setScanning(false);
-    setSaving(false);
+    setLoadingId(null);
     setMatched([]);
     setUnmatched([]);
     setPreviewUrl(null);
-    setEdits({});
-    setSaved(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
@@ -6080,8 +6079,6 @@ function InvoiceScanDialog({ open, onClose }: { open: boolean; onClose: () => vo
     setPreviewUrl(URL.createObjectURL(file));
     setMatched([]);
     setUnmatched([]);
-    setEdits({});
-    setSaved(false);
     setScanning(true);
 
     try {
@@ -6096,21 +6093,10 @@ function InvoiceScanDialog({ open, onClose }: { open: boolean; onClose: () => vo
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Scan failed');
 
-      const matchedItems = data.matched || [];
-      setMatched(matchedItems);
+      setMatched(data.matched || []);
       setUnmatched(data.unmatched || []);
 
-      // Pre-fill editable fields with current values from the database
-      const defaults: { [id: number]: { stock: string; price: string } } = {};
-      for (const m of matchedItems) {
-        defaults[m.id] = {
-          stock: String(m.currentStock ?? 0),
-          price: String(m.price ?? ''),
-        };
-      }
-      setEdits(defaults);
-
-      if (matchedItems.length === 0) {
+      if ((data.matched || []).length === 0) {
         toast({ title: "No matches found", description: "No UPC codes in this invoice matched products in your inventory.", variant: "destructive" });
       }
     } catch (err: any) {
@@ -6120,40 +6106,31 @@ function InvoiceScanDialog({ open, onClose }: { open: boolean; onClose: () => vo
     }
   }
 
-  async function handleSave() {
-    const updates = matched
-      .filter(m => edits[m.id])
-      .map(m => ({
-        id: m.id,
-        newStock: parseInt(edits[m.id].stock) || 0,
-        newPrice: parseFloat(edits[m.id].price) || undefined,
-      }));
-
-    setSaving(true);
+  async function handleEdit(supplyId: number) {
+    setLoadingId(supplyId);
     try {
-      const res = await apiRequest('POST', '/api/admin/invoice-scan/apply', { updates });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Failed to save');
-      toast({ title: "Saved!", description: `${data.applied} products updated.` });
-      queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
-      setSaved(true);
+      const res = await fetch(`/api/supplies/${supplyId}`);
+      const supply = await res.json();
+      if (!res.ok) throw new Error(supply.message || 'Could not load product');
+      onClose();
+      onEditSupply(supply);
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
-      setSaving(false);
+      setLoadingId(null);
     }
   }
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Camera className="w-5 h-5" />
             Invoice Scanner
           </DialogTitle>
           <DialogDescription>
-            Upload a photo of a supplier invoice. The AI will find all UPC codes and pull up the matching products so you can edit them.
+            Upload a photo of your invoice. The AI reads the UPC codes and pulls up the matching products — click Edit on any one to open its full edit form.
           </DialogDescription>
         </DialogHeader>
 
@@ -6168,12 +6145,12 @@ function InvoiceScanDialog({ open, onClose }: { open: boolean; onClose: () => vo
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
             {previewUrl ? (
-              <img src={previewUrl} alt="Invoice" className="max-h-36 mx-auto rounded object-contain" />
+              <img src={previewUrl} alt="Invoice" className="max-h-32 mx-auto rounded object-contain" />
             ) : (
               <div className="flex flex-col items-center gap-2 text-gray-500">
                 <Upload className="w-9 h-9" />
                 <p className="font-medium">Click or drag an invoice photo here</p>
-                <p className="text-xs">JPG, PNG — take a photo with your phone and upload it</p>
+                <p className="text-xs">Take a photo with your phone and upload it</p>
               </div>
             )}
           </div>
@@ -6185,64 +6162,39 @@ function InvoiceScanDialog({ open, onClose }: { open: boolean; onClose: () => vo
             </div>
           )}
 
-          {/* Matched products — editable */}
+          {/* Matched products list */}
           {!scanning && matched.length > 0 && (
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <p className="font-semibold text-sm">
-                  {matched.length} product{matched.length !== 1 ? 's' : ''} found
-                  {unmatched.length > 0 && <span className="text-gray-400 font-normal ml-2">· {unmatched.length} UPCs not in system</span>}
-                </p>
-                {saved && <span className="flex items-center gap-1 text-green-600 text-sm font-medium"><CheckCircle2 className="w-4 h-4" /> Saved</span>}
-              </div>
+              <p className="font-semibold text-sm">
+                {matched.length} product{matched.length !== 1 ? 's' : ''} found
+                {unmatched.length > 0 && <span className="text-gray-400 font-normal ml-2">· {unmatched.length} UPCs not in system</span>}
+              </p>
 
-              <div className="rounded-md border overflow-x-auto">
-                <table className="w-full text-sm min-w-[560px]">
-                  <thead className="bg-gray-50 dark:bg-gray-800 text-xs text-gray-500 uppercase">
-                    <tr>
-                      <th className="text-left p-2 pl-3 font-medium">Product</th>
-                      <th className="text-left p-2 font-medium w-32">UPC</th>
-                      <th className="text-center p-2 font-medium w-28">Stock Qty</th>
-                      <th className="text-center p-2 font-medium w-28">Price ($)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                    {matched.map((m) => (
-                      <tr key={m.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/40">
-                        <td className="p-2 pl-3">
-                          <div className="font-medium leading-tight">{m.name}</div>
-                          {m.brand && <div className="text-xs text-gray-400">{m.brand}</div>}
-                        </td>
-                        <td className="p-2 font-mono text-xs text-gray-400">{m.upc}</td>
-                        <td className="p-2 text-center">
-                          <Input
-                            type="number"
-                            min={0}
-                            value={edits[m.id]?.stock ?? ''}
-                            onChange={(e) => setEdits(prev => ({ ...prev, [m.id]: { ...prev[m.id], stock: e.target.value } }))}
-                            className="w-20 h-7 text-center text-sm mx-auto"
-                          />
-                        </td>
-                        <td className="p-2 text-center">
-                          <Input
-                            type="number"
-                            min={0}
-                            step="0.01"
-                            value={edits[m.id]?.price ?? ''}
-                            onChange={(e) => setEdits(prev => ({ ...prev, [m.id]: { ...prev[m.id], price: e.target.value } }))}
-                            className="w-24 h-7 text-center text-sm mx-auto"
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="rounded-md border divide-y divide-gray-100 dark:divide-gray-700">
+                {matched.map((m) => (
+                  <div key={m.id} className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800/40">
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-sm leading-tight truncate">{m.name}</div>
+                      <div className="text-xs text-gray-400">{m.brand && `${m.brand} · `}UPC: {m.upc}</div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="ml-3 shrink-0"
+                      disabled={loadingId === m.id}
+                      onClick={() => handleEdit(m.id)}
+                    >
+                      {loadingId === m.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Edit className="w-3 h-3 mr-1" />}
+                      Edit
+                    </Button>
+                  </div>
+                ))}
               </div>
 
               {unmatched.length > 0 && (
-                <details className="text-sm text-gray-400">
-                  <summary className="cursor-pointer hover:text-gray-600 text-xs">{unmatched.length} UPC{unmatched.length !== 1 ? 's' : ''} not found in your inventory</summary>
-                  <ul className="mt-1 ml-3 space-y-0.5 text-xs">
+                <details className="text-xs text-gray-400">
+                  <summary className="cursor-pointer hover:text-gray-600">{unmatched.length} UPC{unmatched.length !== 1 ? 's' : ''} not found in your inventory</summary>
+                  <ul className="mt-1 ml-3 space-y-0.5">
                     {unmatched.map((u, i) => (
                       <li key={i}><span className="font-mono">{u.upc}</span>{u.description ? ` — ${u.description}` : ''}</li>
                     ))}
@@ -6259,12 +6211,6 @@ function InvoiceScanDialog({ open, onClose }: { open: boolean; onClose: () => vo
             <Button variant="outline" onClick={reset}>
               <RefreshCw className="w-4 h-4 mr-2" />
               Scan Another
-            </Button>
-          )}
-          {matched.length > 0 && (
-            <Button onClick={handleSave} disabled={saving} className="bg-green-600 hover:bg-green-700">
-              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-              Save Changes
             </Button>
           )}
         </DialogFooter>
@@ -9088,7 +9034,11 @@ export default function Admin() {
               </Button>
             </div>
           )}
-          <InvoiceScanDialog open={isInvoiceScanOpen} onClose={() => setIsInvoiceScanOpen(false)} />
+          <InvoiceScanDialog
+            open={isInvoiceScanOpen}
+            onClose={() => setIsInvoiceScanOpen(false)}
+            onEditSupply={(supply) => setEditingSupply(supply)}
+          />
 
           {/* Pets Section */}
           <Card>
