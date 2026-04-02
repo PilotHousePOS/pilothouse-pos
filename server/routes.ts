@@ -25,7 +25,9 @@ import { notificationService } from './notifications';
 import { sendPasswordResetEmail, sendVerificationEmail } from './sendgrid';
 import { normalizePhoneNumber } from './phoneUtils';
 import { db, resetPool } from './db';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
+import { supplies } from '@shared/schema';
+import OpenAI from 'openai';
 import { expandProductAbbreviations } from './abbreviationExpansion';
 import { hashPassword, verifyPassword, isPasswordComplexEnough, getPasswordRequirementsMessage } from './passwordUtils';
 
@@ -11261,6 +11263,146 @@ West Monroe LA 71291
     } catch (error) {
       console.error("[JobApplication] Error updating application:", error);
       res.status(500).json({ message: "Failed to update application" });
+    }
+  });
+
+  // Admin: Invoice Scanner - scan an invoice image and match UPC codes to products
+  app.post("/api/admin/invoice-scan", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Forbidden" });
+
+      const { imageBase64, mimeType } = req.body;
+      if (!imageBase64 || !mimeType) {
+        return res.status(400).json({ message: "imageBase64 and mimeType are required" });
+      }
+
+      const openai = new OpenAI({
+        baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+        apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+      });
+
+      const prompt = `You are analyzing a supplier invoice for a pet store. Your job is to extract ALL UPC/product codes and their shipped quantities.
+
+Look for columns labeled: PRODUCT UPC, UPC, UPC CODE, BARCODE, or similar.
+Look for quantities in columns labeled: QTY SHIPPED, SHIPPED, QTY, QUANTITY, or similar. Use the SHIPPED quantity if both ordered and shipped are present.
+Also extract the item description if visible.
+
+Return ONLY valid JSON in this exact format:
+{
+  "items": [
+    { "upc": "012345678901", "qty": 3, "description": "Product name here" }
+  ]
+}
+
+Rules:
+- UPC codes are typically 12-13 digits with no dashes
+- If a UPC has dashes, remove them (e.g. "0-12345-67890-1" → "012345678901")
+- Extract every line item row
+- If qty shipped is 0, still include the item with qty 0
+- Only return the JSON object, nothing else`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-5",
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: prompt },
+              { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}` } },
+            ],
+          },
+        ],
+        response_format: { type: "json_object" },
+        max_completion_tokens: 8000,
+      });
+
+      const content = response.choices[0]?.message?.content;
+      if (!content) return res.status(500).json({ message: "No response from AI" });
+
+      let parsed: { items: { upc: string; qty: number; description: string }[] };
+      try {
+        parsed = JSON.parse(content);
+      } catch {
+        return res.status(500).json({ message: "Failed to parse AI response" });
+      }
+
+      const invoiceItems = parsed.items || [];
+      console.log(`[InvoiceScan] Extracted ${invoiceItems.length} items from invoice`);
+
+      // Normalize UPCs (remove dashes/spaces, trim)
+      const normalizedItems = invoiceItems.map(item => ({
+        ...item,
+        upc: item.upc.replace(/[-\s]/g, '').trim(),
+      })).filter(item => item.upc.length >= 8);
+
+      const upcList = [...new Set(normalizedItems.map(i => i.upc))];
+
+      // Look up products by UPC (also check with/without leading zeros)
+      const dbProducts = await db.select({
+        id: supplies.id,
+        name: supplies.name,
+        brand: supplies.brand,
+        upc: supplies.upc,
+        stockQuantity: supplies.stockQuantity,
+        price: supplies.price,
+      }).from(supplies).where(inArray(supplies.upc, upcList));
+
+      // Build a UPC -> product map
+      const productByUpc = new Map<string, typeof dbProducts[0]>();
+      for (const p of dbProducts) {
+        if (p.upc) productByUpc.set(p.upc.replace(/[-\s]/g, '').trim(), p);
+      }
+
+      const matched: any[] = [];
+      const unmatched: any[] = [];
+
+      for (const item of normalizedItems) {
+        const product = productByUpc.get(item.upc);
+        if (product) {
+          matched.push({
+            id: product.id,
+            name: product.name,
+            brand: product.brand,
+            upc: item.upc,
+            currentStock: product.stockQuantity ?? 0,
+            invoiceQty: item.qty,
+            newStock: (product.stockQuantity ?? 0) + item.qty,
+            description: item.description,
+          });
+        } else {
+          unmatched.push({ upc: item.upc, qty: item.qty, description: item.description });
+        }
+      }
+
+      console.log(`[InvoiceScan] Matched ${matched.length} products, ${unmatched.length} unmatched UPCs`);
+      res.json({ matched, unmatched });
+    } catch (error: any) {
+      console.error("[InvoiceScan] Error:", error);
+      res.status(500).json({ message: error.message || "Failed to scan invoice" });
+    }
+  });
+
+  // Admin: Apply invoice scan stock updates in bulk
+  app.post("/api/admin/invoice-scan/apply", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Forbidden" });
+
+      const { updates } = req.body as { updates: { id: number; newStock: number }[] };
+      if (!Array.isArray(updates) || updates.length === 0) {
+        return res.status(400).json({ message: "updates array is required" });
+      }
+
+      let applied = 0;
+      for (const u of updates) {
+        await storage.updateSupply(u.id, { stockQuantity: u.newStock });
+        applied++;
+      }
+
+      console.log(`[InvoiceScan] Applied ${applied} stock quantity updates`);
+      res.json({ success: true, applied });
+    } catch (error: any) {
+      console.error("[InvoiceScan] Error applying updates:", error);
+      res.status(500).json({ message: error.message || "Failed to apply updates" });
     }
   });
 

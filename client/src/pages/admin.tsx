@@ -6047,6 +6047,231 @@ function AstroLoyaltyManager() {
 }
 
 
+function InvoiceScanDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [scanning, setScanning] = useState(false);
+  const [applying, setApplying] = useState(false);
+  const [matched, setMatched] = useState<any[]>([]);
+  const [unmatched, setUnmatched] = useState<any[]>([]);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [editedStock, setEditedStock] = useState<{ [id: number]: number }>({});
+  const [applied, setApplied] = useState(false);
+
+  function reset() {
+    setScanning(false);
+    setApplying(false);
+    setMatched([]);
+    setUnmatched([]);
+    setPreviewUrl(null);
+    setEditedStock({});
+    setApplied(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }
+
+  function handleClose() {
+    reset();
+    onClose();
+  }
+
+  async function handleFile(file: File) {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    setMatched([]);
+    setUnmatched([]);
+    setEditedStock({});
+    setApplied(false);
+    setScanning(true);
+
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(',')[1]);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const mimeType = file.type || 'image/jpeg';
+      const res = await apiRequest('POST', '/api/admin/invoice-scan', { imageBase64: base64, mimeType });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || 'Scan failed');
+
+      setMatched(data.matched || []);
+      setUnmatched(data.unmatched || []);
+
+      const defaults: { [id: number]: number } = {};
+      for (const m of (data.matched || [])) {
+        defaults[m.id] = m.newStock;
+      }
+      setEditedStock(defaults);
+
+      if ((data.matched || []).length === 0) {
+        toast({ title: "No matches found", description: "No UPC codes in this invoice matched products in your inventory.", variant: "destructive" });
+      }
+    } catch (err: any) {
+      toast({ title: "Scan failed", description: err.message || "Could not read invoice", variant: "destructive" });
+    } finally {
+      setScanning(false);
+    }
+  }
+
+  async function handleApply() {
+    const updates = matched.map(m => ({ id: m.id, newStock: editedStock[m.id] ?? m.newStock }));
+    setApplying(true);
+    try {
+      const res = await apiRequest('POST', '/api/admin/invoice-scan/apply', { updates });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to apply');
+      toast({ title: "Stock updated!", description: `${data.applied} products updated successfully.` });
+      queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
+      setApplied(true);
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setApplying(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Camera className="w-5 h-5" />
+            Invoice Scanner
+          </DialogTitle>
+          <DialogDescription>
+            Upload a photo of a supplier invoice. The AI will extract UPC codes and match them to products in your inventory so you can update stock quantities in bulk.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          {/* Upload Area */}
+          <div
+            className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-brand-blue transition-colors"
+            onClick={() => fileInputRef.current?.click()}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+            />
+            {previewUrl ? (
+              <img src={previewUrl} alt="Invoice preview" className="max-h-40 mx-auto rounded object-contain" />
+            ) : (
+              <div className="flex flex-col items-center gap-2 text-gray-500">
+                <Upload className="w-10 h-10" />
+                <p className="font-medium">Click or drag an invoice photo here</p>
+                <p className="text-sm">Supports JPG, PNG — use your phone camera to take a photo of the invoice</p>
+              </div>
+            )}
+          </div>
+
+          {/* Scanning state */}
+          {scanning && (
+            <div className="flex items-center justify-center gap-3 py-6 text-gray-600 dark:text-gray-300">
+              <Loader2 className="w-6 h-6 animate-spin" />
+              <span>AI is reading the invoice and matching UPC codes...</span>
+            </div>
+          )}
+
+          {/* Results */}
+          {!scanning && matched.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-green-700 dark:text-green-400">
+                  {matched.length} product{matched.length !== 1 ? 's' : ''} matched
+                  {unmatched.length > 0 && <span className="text-gray-400 font-normal ml-2">· {unmatched.length} unmatched UPCs</span>}
+                </h3>
+                {applied && <span className="flex items-center gap-1 text-green-600 text-sm"><CheckCircle2 className="w-4 h-4" /> Applied</span>}
+              </div>
+
+              <div className="rounded-md border overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 dark:bg-gray-800">
+                    <tr>
+                      <th className="text-left p-2 pl-3">Product</th>
+                      <th className="text-center p-2 w-24">Current</th>
+                      <th className="text-center p-2 w-24">Invoice Qty</th>
+                      <th className="text-center p-2 w-28">New Stock</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {matched.map((m, idx) => (
+                      <tr key={m.id} className={idx % 2 === 0 ? '' : 'bg-gray-50 dark:bg-gray-800/50'}>
+                        <td className="p-2 pl-3">
+                          <div className="font-medium leading-tight">{m.name}</div>
+                          <div className="text-xs text-gray-400">{m.upc}</div>
+                        </td>
+                        <td className="p-2 text-center text-gray-500">{m.currentStock}</td>
+                        <td className="p-2 text-center text-blue-600 font-medium">+{m.invoiceQty}</td>
+                        <td className="p-2 text-center">
+                          <Input
+                            type="number"
+                            min={0}
+                            value={editedStock[m.id] ?? m.newStock}
+                            onChange={(e) => setEditedStock(prev => ({ ...prev, [m.id]: parseInt(e.target.value) || 0 }))}
+                            className="w-20 h-7 text-center text-sm mx-auto"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {unmatched.length > 0 && (
+                <details className="text-sm text-gray-500">
+                  <summary className="cursor-pointer hover:text-gray-700">{unmatched.length} UPC codes not found in inventory</summary>
+                  <ul className="mt-1 ml-3 space-y-1 text-xs">
+                    {unmatched.map((u, i) => (
+                      <li key={i}><span className="font-mono">{u.upc}</span> — {u.description || 'unknown'} (qty: {u.qty})</li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </div>
+          )}
+
+          {!scanning && matched.length === 0 && previewUrl && !applying && (
+            <p className="text-center text-gray-500 text-sm py-2">No matches yet. Upload an invoice photo to begin.</p>
+          )}
+        </div>
+
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={handleClose}>Close</Button>
+          {previewUrl && !scanning && (
+            <Button variant="outline" onClick={reset}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Scan Another
+            </Button>
+          )}
+          {matched.length > 0 && !applied && (
+            <Button
+              onClick={handleApply}
+              disabled={applying}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {applying ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
+              Apply {matched.length} Stock Updates
+            </Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const typedUser = user as User;
@@ -6054,6 +6279,7 @@ export default function Admin() {
   const queryClient = useQueryClient();
   const [isAddPetOpen, setIsAddPetOpen] = useState(false);
   const [isAddSupplyOpen, setIsAddSupplyOpen] = useState(false);
+  const [isInvoiceScanOpen, setIsInvoiceScanOpen] = useState(false);
   const [editingPet, setEditingPet] = useState<any>(null);
   const [petToDelete, setPetToDelete] = useState<any>(null);
   const [editingSupply, setEditingSupply] = useState<any>(null);
@@ -8827,7 +9053,15 @@ export default function Admin() {
         <TabsContent value="inventory" className="space-y-6">
           {/* Export Inventory Buttons */}
           {typedUser?.isAdmin && (
-            <div className="flex justify-end gap-2">
+            <div className="flex flex-wrap justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsInvoiceScanOpen(true)}
+              >
+                <Camera className="w-4 h-4 mr-2" />
+                Scan Invoice
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -8853,6 +9087,7 @@ export default function Admin() {
               </Button>
             </div>
           )}
+          <InvoiceScanDialog open={isInvoiceScanOpen} onClose={() => setIsInvoiceScanOpen(false)} />
 
           {/* Pets Section */}
           <Card>
