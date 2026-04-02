@@ -11382,23 +11382,25 @@ Rules:
     }
   });
 
-  // Admin: Apply invoice scan stock updates in bulk
+  // Admin: Apply invoice scan edits in bulk (stock qty + optional price)
   app.post("/api/admin/invoice-scan/apply", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) return res.status(403).json({ message: "Forbidden" });
 
-      const { updates } = req.body as { updates: { id: number; newStock: number }[] };
+      const { updates } = req.body as { updates: { id: number; newStock: number; newPrice?: number }[] };
       if (!Array.isArray(updates) || updates.length === 0) {
         return res.status(400).json({ message: "updates array is required" });
       }
 
       let applied = 0;
       for (const u of updates) {
-        await storage.updateSupply(u.id, { stockQuantity: u.newStock });
+        const patch: any = { stockQuantity: u.newStock };
+        if (u.newPrice !== undefined && !isNaN(u.newPrice)) patch.price = String(u.newPrice);
+        await storage.updateSupply(u.id, patch);
         applied++;
       }
 
-      console.log(`[InvoiceScan] Applied ${applied} stock quantity updates`);
+      console.log(`[InvoiceScan] Applied ${applied} product updates`);
       res.json({ success: true, applied });
     } catch (error: any) {
       console.error("[InvoiceScan] Error applying updates:", error);
