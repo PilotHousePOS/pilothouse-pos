@@ -11354,13 +11354,13 @@ Critical rules:
       const [responseA, responseB] = await Promise.all([
         openai.chat.completions.create({
           model: "gpt-5",
-          messages: [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
+          messages: [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } }] }],
           response_format: { type: "json_object" },
           max_completion_tokens: 16000,
         }),
         openai.chat.completions.create({
           model: "gpt-5",
-          messages: [{ role: "user", content: [{ type: "text", text: promptB }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
+          messages: [{ role: "user", content: [{ type: "text", text: promptB }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } }] }],
           response_format: { type: "json_object" },
           max_completion_tokens: 16000,
         }),
