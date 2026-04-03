@@ -11351,7 +11351,7 @@ Critical rules:
             role: "user",
             content: [
               { type: "text", text: prompt },
-              { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } },
+              { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } },
             ],
           },
         ],
@@ -11447,21 +11447,29 @@ Critical rules:
           // Cross-check: make sure the UPC-matched product name is plausible given the description
           // Pull key words from description and check at least 1 appears in the product name
           const CROSS_CHECK_EXPAND: Record<string, string> = {
-            'kong': 'kong', 'bionic': 'bionic', 'catit': 'catit', 'bendeez': 'bendeez',
-            'whlsm': 'wholesome', 'whslm': 'wholesome', 'wholeso': 'wholesome',
-            'roycan': 'royal canin', 'germ': 'german', 'shphrd': 'shepherd', 'shprd': 'shepherd',
-            'crestd': 'crested', 'gecko': 'gecko', 'airdog': 'air', 'urban': 'urban',
-            'stik': 'stick', 'asst': 'assorted', 'orig': 'original', 'rwrd': 'reward',
-            'pnbt': 'peanut', 'bck': 'bacon', 'chz': 'cheese', 'sqkr': 'squeaker',
-            'tball': 'tennis', 'salmon': 'salmon', 'salm': 'salmon', 'slm': 'salmon',
-            'bendeez': 'bendeez', 'elephant': 'elephant', 'eleph': 'elephant',
+            // Brands (rc intentionally NOT expanded — breed words handle RC specificity)
+            'pp': 'pro plan', 'roycan': 'royal canin',
+            'kong': 'kong', 'bionic': 'bionic', 'catit': 'catit',
+            'whlsm': 'wholesome', 'whslm': 'wholesome',
+            // Proteins / flavors
+            'ckn': 'chicken', 'chkn': 'chicken', 'chx': 'chicken',
+            'bf': 'beef', 'slm': 'salmon', 'salm': 'salmon', 'trky': 'turkey',
+            'pnbt': 'peanut', 'bck': 'bacon', 'chz': 'cheese',
+            // Sizes / breeds
+            'germ': 'german', 'shphrd': 'shepherd', 'shprd': 'shepherd',
+            'yorksh': 'yorkshire', 'lbrd': 'large breed', 'sm': 'small', 'lg': 'large', 'md': 'medium',
+            // Products
+            'crestd': 'crested', 'gecko': 'gecko', 'airdog': 'air',
+            'urban': 'urban', 'stik': 'stick', 'sqkr': 'squeaker', 'tball': 'tennis',
+            'asst': 'assorted', 'orig': 'original', 'bendeez': 'bendeez',
           };
-          const descWords = item.description.toLowerCase().split(/[\s\/\-\#\.\(\)]+/).filter((t: string) => t.length >= 3 && !/^\d+$/.test(t));
+          // Strip leading non-alpha chars (e.g. "*REPL" → "repl")
+          const descWords = item.description.toLowerCase().split(/[\s\/\-\#\.\(\)\*]+/).filter((t: string) => t.length >= 2 && !/^\d+$/.test(t));
           const expandedWords = descWords.map((w: string) => CROSS_CHECK_EXPAND[w] || w);
           const productNameLower = (product.name || '').toLowerCase();
           const brandNameLower = (product.brand || '').toLowerCase();
-          const NOISE_WORDS = new Set(['esntl','cmplt','shrd','blnd','repl','bisc','adlt','easy','cmplt','esntl','shrd','blnd','bisc','adt']);
-          const descKeywords = expandedWords.filter((w: string) => !NOISE_WORDS.has(w) && w.length >= 3);
+          const NOISE_WORDS = new Set(['esntl','cmplt','shrd','blnd','repl','bisc','adlt','easy','bisc','adt','snk','trt','rwrd','dog','cat','pet','snack','treat','adult','puppy','pup','snk']);
+          const descKeywords = expandedWords.filter((w: string) => !NOISE_WORDS.has(w) && w.length >= 2);
           const hasDescMatch = descKeywords.length === 0 || descKeywords.some((w: string) => productNameLower.includes(w) || brandNameLower.includes(w));
 
           if (!hasDescMatch) {
