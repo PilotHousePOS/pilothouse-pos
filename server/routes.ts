@@ -11444,14 +11444,31 @@ Critical rules:
         }
 
         if (product && !seenIds.has(product.id)) {
-          seenIds.add(product.id);
-          matched.push({
-            id: product.id, name: product.name, brand: product.brand, upc: resolvedUpc,
-            scannedUpc: item.upc !== resolvedUpc ? item.upc : undefined, corrected,
-            currentStock: product.stockQuantity ?? 0, invoiceQty: item.qty,
-            newStock: (product.stockQuantity ?? 0) + item.qty, description: item.description,
+          // Cross-check: make sure the UPC-matched product name is plausible given the description
+          // Pull key words from description and check at least 1 appears in the product name
+          const descWords = item.description.toLowerCase().split(/[\s\/\-\#\.]+/).filter((t: string) => t.length >= 4 && !/^\d+$/.test(t));
+          const expandedWords = descWords.map((w: string) => {
+            const exp: Record<string, string> = { 'kong': 'kong', 'bionic': 'bionic', 'germ': 'german', 'shphrd': 'shepherd', 'shprd': 'shepherd', 'yorksh': 'yorkshire', 'crestd': 'crested', 'gecko': 'gecko', 'catit': 'catit', 'bendeez': 'bendeez' };
+            return exp[w] || w;
           });
-          if (corrected) console.log(`[InvoiceScan] AUTO-CORRECTED: ${item.upc} → ${resolvedUpc} (${product.name})`);
+          const productNameLower = (product.name || '').toLowerCase();
+          const brandNameLower = (product.brand || '').toLowerCase();
+          const descKeywords = expandedWords.filter((w: string) => !['esntl','cmplt','shrd','blnd','repl','bisc','rwrd','orig','adlt','snk','trt','pup','easy'].includes(w));
+          const hasDescMatch = descKeywords.length === 0 || descKeywords.some((w: string) => productNameLower.includes(w) || brandNameLower.includes(w));
+
+          if (!hasDescMatch) {
+            console.log(`[InvoiceScan] UPC MISMATCH REJECTED: ${item.upc} → ${product.name} (desc="${item.description}" shares no keywords)`);
+            stillUnmatched.push(item);
+          } else {
+            seenIds.add(product.id);
+            matched.push({
+              id: product.id, name: product.name, brand: product.brand, upc: resolvedUpc,
+              scannedUpc: item.upc !== resolvedUpc ? item.upc : undefined, corrected,
+              currentStock: product.stockQuantity ?? 0, invoiceQty: item.qty,
+              newStock: (product.stockQuantity ?? 0) + item.qty, description: item.description,
+            });
+            if (corrected) console.log(`[InvoiceScan] AUTO-CORRECTED: ${item.upc} → ${resolvedUpc} (${product.name})`);
+          }
         } else if (!product) {
           stillUnmatched.push(item);
         }
@@ -11499,21 +11516,36 @@ Critical rules:
         return { brand: brand ?? null, keywords };
       }
 
+      // Size/variant keywords that must always be included — never relaxed away
+      const STICKY_KEYWORDS = new Set(['small', 'large', 'medium', 'extra small', 'extra large',
+        'puppy', 'adult', 'senior', 'kitten', 'junior', 'mini']);
+
       const fallbackResults = await Promise.all(
         stillUnmatched.map(async (item) => {
           const { brand, keywords } = parseInvoiceDesc(item.description);
-          // Need at least a brand OR 2 keywords to search
           if (!brand && keywords.length < 2) return { item, product: null };
 
-          // Try progressively — most specific first (brand + 2 keywords), then relax
-          const topKeywords = [...keywords].sort((a, b) => b.length - a.length);
-          const attempts = [
-            brand ? [or(ilike(supplies.name, `%${brand}%`), ilike(supplies.brand, `%${brand}%`)), ...topKeywords.slice(0, 2).map(k => ilike(supplies.name, `%${k}%`))] : topKeywords.slice(0, 3).map(k => ilike(supplies.name, `%${k}%`)),
-            brand ? [or(ilike(supplies.name, `%${brand}%`), ilike(supplies.brand, `%${brand}%`)), ...topKeywords.slice(0, 1).map(k => ilike(supplies.name, `%${k}%`))] : topKeywords.slice(0, 2).map(k => ilike(supplies.name, `%${k}%`)),
-          ];
+          const sorted = [...keywords].sort((a, b) => b.length - a.length);
+          const stickyKws = sorted.filter(k => STICKY_KEYWORDS.has(k));   // always required
+          const flexKws = sorted.filter(k => !STICKY_KEYWORDS.has(k));    // can be relaxed
+
+          const brandCond = brand ? or(ilike(supplies.name, `%${brand}%`), ilike(supplies.brand, `%${brand}%`)) : null;
+
+          // Build attempts: keep all sticky keywords, relax flex keywords progressively
+          const attempts: any[][] = [];
+          if (brand) {
+            if (flexKws.length >= 2) attempts.push([brandCond, ...stickyKws.map(k => ilike(supplies.name, `%${k}%`)), ...flexKws.slice(0, 2).map(k => ilike(supplies.name, `%${k}%`))]);
+            if (flexKws.length >= 1) attempts.push([brandCond, ...stickyKws.map(k => ilike(supplies.name, `%${k}%`)), ...flexKws.slice(0, 1).map(k => ilike(supplies.name, `%${k}%`))]);
+            // Brand + sticky only (last resort — but only if sticky keywords exist, otherwise too broad)
+            if (stickyKws.length > 0) attempts.push([brandCond, ...stickyKws.map(k => ilike(supplies.name, `%${k}%`))]);
+          } else {
+            // No brand: require all sticky + 2 flex, then 1 flex
+            if (stickyKws.length + flexKws.length >= 3) attempts.push([...stickyKws, ...flexKws.slice(0, 2)].map(k => ilike(supplies.name, `%${k}%`)));
+            if (stickyKws.length + flexKws.length >= 2) attempts.push([...stickyKws, ...flexKws.slice(0, 1)].map(k => ilike(supplies.name, `%${k}%`)));
+          }
 
           for (const conditions of attempts) {
-            if (conditions.length === 0) continue;
+            if (conditions.length < 2) continue;
             const results = await db.select({
               id: supplies.id, name: supplies.name, brand: supplies.brand,
               upc: supplies.upc, sku: supplies.sku,
@@ -11522,18 +11554,12 @@ Critical rules:
 
             if (results.length === 1) return { item, product: results[0] };
             if (results.length > 1) {
-              // Try narrowing with additional keywords
-              if (topKeywords.length > 2) {
-                const narrowed = results.filter(p =>
-                  topKeywords.slice(2).some(k => p.name?.toLowerCase().includes(k))
-                );
-                if (narrowed.length === 1) return { item, product: narrowed[0] };
-              }
-              // Still ambiguous — pick highest-scoring match (most keywords present)
+              // Score by how many keywords match the product name
               const scored = results.map(p => ({
-                p, score: topKeywords.filter(k => p.name?.toLowerCase().includes(k)).length
+                p, score: sorted.filter(k => p.name?.toLowerCase().includes(k)).length
               })).sort((a, b) => b.score - a.score);
-              if (scored[0].score > scored[1].score && scored[0].score >= 2) {
+              // Only use best match if it clearly beats the next candidate
+              if (scored[0].score >= 2 && (scored.length === 1 || scored[0].score > scored[1].score)) {
                 return { item, product: scored[0].p };
               }
             }
