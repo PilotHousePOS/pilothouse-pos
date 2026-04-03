@@ -11267,6 +11267,40 @@ West Monroe LA 71291
   });
 
   // Admin: Invoice Scanner - scan an invoice image and match UPC codes to products
+  // UPC-A check digit helpers
+  function calcUPCCheckDigit(first11: string): number {
+    let sum = 0;
+    for (let i = 0; i < 11; i++) {
+      sum += i % 2 === 0 ? parseInt(first11[i]) * 3 : parseInt(first11[i]);
+    }
+    return (10 - (sum % 10)) % 10;
+  }
+  function isValidUPC(upc: string): boolean {
+    if (!/^\d{12}$/.test(upc)) return false;
+    return calcUPCCheckDigit(upc.slice(0, 11)) === parseInt(upc[11]);
+  }
+  // For an invalid UPC, generate every single-digit substitution that produces a valid check digit
+  function getSingleDigitCandidates(upc: string): string[] {
+    const candidates = new Set<string>();
+    for (let pos = 0; pos < 11; pos++) {
+      for (let d = 0; d <= 9; d++) {
+        if (d === parseInt(upc[pos])) continue;
+        const prefix = upc.slice(0, pos) + d + upc.slice(pos + 1, 11);
+        const corrected = prefix + calcUPCCheckDigit(prefix);
+        if (corrected !== upc) candidates.add(corrected);
+      }
+    }
+    // Also try adjacent-digit transpositions (swap two neighboring digits), positions 0-10 only
+    for (let pos = 0; pos < 10; pos++) {
+      const arr = upc.slice(0, 11).split('');
+      [arr[pos], arr[pos + 1]] = [arr[pos + 1], arr[pos]];
+      const prefix = arr.join('');
+      const corrected = prefix + calcUPCCheckDigit(prefix);
+      if (corrected !== upc) candidates.add(corrected);
+    }
+    return [...candidates];
+  }
+
   app.post("/api/admin/invoice-scan", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) return res.status(403).json({ message: "Forbidden" });
@@ -11289,8 +11323,13 @@ STEP 3 - Go row by row from top to bottom and extract EVERY item. Do not stop ea
 
 This invoice likely has 20-40 line items. Extract all of them.
 
-UPC codes on this invoice are 12-digit numbers like: 015561232609, 022517437254, 035585010489, 038100026736
-They appear in their own column. Read each one carefully digit by digit.
+UPC codes on this invoice are 12-digit numbers. Read each digit carefully — do not guess or approximate.
+
+IMPORTANT — Verify each UPC using the check digit rule before outputting it:
+- Multiply digits at positions 1,3,5,7,9,11 (odd, 1-indexed) by 3
+- Add digits at positions 2,4,6,8,10 (even, 1-indexed) × 1
+- The 12th digit (check digit) must equal (10 - (sum mod 10)) mod 10
+- If a UPC fails this test, re-read it from the image and correct it before including it
 
 Return ONLY valid JSON:
 {
@@ -11301,7 +11340,7 @@ Return ONLY valid JSON:
 
 Critical rules:
 - Extract EVERY row — do not stop until you have reached the last line item
-- UPC codes are 12 digits, read them exactly as printed
+- UPC codes are exactly 12 digits — verify check digit for every one
 - Include rows where shipped qty is 0
 - Return only the JSON object, nothing else`;
 
@@ -11332,17 +11371,38 @@ Critical rules:
 
       const invoiceItems = parsed.items || [];
       console.log(`[InvoiceScan] Extracted ${invoiceItems.length} items from invoice`);
-      console.log(`[InvoiceScan] UPCs found: ${invoiceItems.map((i: any) => i.upc).join(', ')}`);
 
       // Normalize UPCs (remove dashes/spaces, trim)
-      const normalizedItems = invoiceItems.map(item => ({
+      const normalizedItems = invoiceItems.map((item: any) => ({
         ...item,
         upc: String(item.upc).replace(/[-\s]/g, '').trim(),
-      })).filter(item => item.upc.length >= 8);
+      })).filter((item: any) => item.upc.length >= 8);
 
-      const upcList = [...new Set(normalizedItems.map(i => i.upc))];
+      // Validate check digits and collect correction candidates for invalid UPCs
+      const validItems: { upc: string; qty: number; description: string; correctedFrom?: string }[] = [];
+      const candidateMap = new Map<string, { upc: string; qty: number; description: string }>(); // candidate → original item
 
-      // Search both `upc` AND `sku` fields — many products store their UPC in the sku column
+      for (const item of normalizedItems) {
+        if (isValidUPC(item.upc)) {
+          validItems.push(item);
+        } else {
+          console.log(`[InvoiceScan] Invalid check digit: ${item.upc} (${item.description}) — generating correction candidates`);
+          const candidates = getSingleDigitCandidates(item.upc);
+          for (const c of candidates) candidateMap.set(c, item);
+          // Keep original as fallback (marked invalid)
+          validItems.push({ ...item, correctedFrom: 'invalid-checkdigit' });
+        }
+      }
+
+      console.log(`[InvoiceScan] UPCs found: ${validItems.map(i => i.upc).join(', ')}`);
+      console.log(`[InvoiceScan] Correction candidates: ${candidateMap.size}`);
+
+      // Collect all UPCs to look up: originals + correction candidates
+      const originalUPCs = [...new Set(validItems.map(i => i.upc))];
+      const candidateUPCs = [...candidateMap.keys()];
+      const allUPCs = [...new Set([...originalUPCs, ...candidateUPCs])];
+
+      // Single DB query for all UPCs (both upc and sku fields)
       const dbProducts = await db.select({
         id: supplies.id,
         name: supplies.name,
@@ -11353,8 +11413,8 @@ Critical rules:
         price: supplies.price,
       }).from(supplies).where(
         or(
-          inArray(supplies.upc, upcList),
-          inArray(supplies.sku, upcList)
+          inArray(supplies.upc, allUPCs),
+          inArray(supplies.sku, allUPCs)
         )
       );
 
@@ -11369,28 +11429,44 @@ Critical rules:
       const unmatched: any[] = [];
       const seenIds = new Set<number>();
 
-      for (const item of normalizedItems) {
-        const product = productByUpc.get(item.upc);
+      for (const item of validItems) {
+        let product = productByUpc.get(item.upc);
+        let resolvedUpc = item.upc;
+        let corrected = false;
+
+        // If no direct match and this UPC was flagged as invalid, try correction candidates
+        if (!product && item.correctedFrom === 'invalid-checkdigit') {
+          const candidates = getSingleDigitCandidates(item.upc);
+          for (const c of candidates) {
+            const cp = productByUpc.get(c);
+            if (cp) { product = cp; resolvedUpc = c; corrected = true; break; }
+          }
+        }
+
         if (product && !seenIds.has(product.id)) {
           seenIds.add(product.id);
           matched.push({
             id: product.id,
             name: product.name,
             brand: product.brand,
-            upc: item.upc,
+            upc: resolvedUpc,
+            scannedUpc: item.upc !== resolvedUpc ? item.upc : undefined,
+            corrected,
             currentStock: product.stockQuantity ?? 0,
             invoiceQty: item.qty,
             newStock: (product.stockQuantity ?? 0) + item.qty,
             description: item.description,
           });
+          if (corrected) console.log(`[InvoiceScan] AUTO-CORRECTED: ${item.upc} → ${resolvedUpc} (${product.name})`);
         } else if (!product) {
-          unmatched.push({ upc: item.upc, qty: item.qty, description: item.description });
+          const valid = isValidUPC(item.upc);
+          unmatched.push({ upc: item.upc, qty: item.qty, description: item.description, validCheckDigit: valid });
         }
       }
 
       console.log(`[InvoiceScan] Extracted ${invoiceItems.length} UPCs, matched ${matched.length} products, ${unmatched.length} unmatched`);
-      if (matched.length > 0) console.log(`[InvoiceScan] MATCHED: ${matched.map((m: any) => `${m.upc} → ${m.name}`).join(' | ')}`);
-      if (unmatched.length > 0) console.log(`[InvoiceScan] NOT IN SYSTEM: ${unmatched.map((u: any) => `${u.upc} (${u.description})`).join(' | ')}`);
+      if (matched.length > 0) console.log(`[InvoiceScan] MATCHED: ${matched.map((m: any) => `${m.upc} → ${m.name}${m.corrected ? ' [auto-corrected]' : ''}`).join(' | ')}`);
+      if (unmatched.length > 0) console.log(`[InvoiceScan] NOT IN SYSTEM: ${unmatched.map((u: any) => `${u.upc} (${u.description}) valid=${u.validCheckDigit}`).join(' | ')}`);
       res.json({ matched, unmatched });
     } catch (error: any) {
       console.error("[InvoiceScan] Error:", error);
