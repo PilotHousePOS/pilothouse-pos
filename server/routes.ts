@@ -25,7 +25,7 @@ import { notificationService } from './notifications';
 import { sendPasswordResetEmail, sendVerificationEmail } from './sendgrid';
 import { normalizePhoneNumber } from './phoneUtils';
 import { db, resetPool } from './db';
-import { eq, inArray, or, sql } from 'drizzle-orm';
+import { eq, inArray, or, and, ilike, sql } from 'drizzle-orm';
 import { supplies } from '@shared/schema';
 import OpenAI from 'openai';
 import { expandProductAbbreviations } from './abbreviationExpansion';
@@ -11426,7 +11426,7 @@ Critical rules:
       }
 
       const matched: any[] = [];
-      const unmatched: any[] = [];
+      const stillUnmatched: any[] = [];
       const seenIds = new Set<number>();
 
       for (const item of validItems) {
@@ -11446,27 +11446,123 @@ Critical rules:
         if (product && !seenIds.has(product.id)) {
           seenIds.add(product.id);
           matched.push({
-            id: product.id,
-            name: product.name,
-            brand: product.brand,
-            upc: resolvedUpc,
-            scannedUpc: item.upc !== resolvedUpc ? item.upc : undefined,
-            corrected,
-            currentStock: product.stockQuantity ?? 0,
-            invoiceQty: item.qty,
-            newStock: (product.stockQuantity ?? 0) + item.qty,
-            description: item.description,
+            id: product.id, name: product.name, brand: product.brand, upc: resolvedUpc,
+            scannedUpc: item.upc !== resolvedUpc ? item.upc : undefined, corrected,
+            currentStock: product.stockQuantity ?? 0, invoiceQty: item.qty,
+            newStock: (product.stockQuantity ?? 0) + item.qty, description: item.description,
           });
           if (corrected) console.log(`[InvoiceScan] AUTO-CORRECTED: ${item.upc} → ${resolvedUpc} (${product.name})`);
         } else if (!product) {
-          const valid = isValidUPC(item.upc);
-          unmatched.push({ upc: item.upc, qty: item.qty, description: item.description, validCheckDigit: valid });
+          stillUnmatched.push(item);
         }
       }
 
+      // ── Description-based fallback matching ──────────────────────────────────
+      // Phillips invoice description abbreviations for expansion
+      const INVOICE_BRAND: Record<string, string> = {
+        'PP': 'pro plan', 'PROVI': 'pro plan', 'ROYCAN': 'royal canin', 'RC': 'royal canin',
+        'KONG': 'kong', 'BIONIC': 'bionic', 'WHLSM': 'wholesome', 'WHOLESOME': 'wholesome',
+        'CATIT': 'catit', 'MIDWE': 'midwest', 'MIDPET': 'midwest',
+        'EXO': 'exo terra', 'HAGEN': null, 'PURINA': 'pro plan',
+        'CONTOUR': null, // Midwest brand but described by product name, no brand prefix
+      };
+      const INVOICE_EXPAND: Record<string, string> = {
+        'BF': 'beef', 'CKN': 'chicken', 'CHKN': 'chicken', 'SLM': 'salmon',
+        'PUP': 'puppy', 'ADLT': 'adult', 'LG': 'large', 'SM': 'small',
+        'MD': 'medium', 'XS': 'extra small', 'PNBT': 'peanut', 'SNK': 'snack',
+        'BCK': 'bacon', 'CHZ': 'cheese', 'SQKR': 'squeaker', 'TBALL': 'tennis',
+        'AIRDOG': 'air', 'BENDEEZ': 'bendeez', 'RWRD': 'reward', 'BISC': 'biscuit',
+        'ORIG': 'original', 'ASST': 'assorted', 'SHRD': 'shredded', 'BLND': 'blend',
+        'TERR': 'terrarium', 'CRESTD': 'crested', 'FTN': 'fountain',
+        'STSL': 'stainless', 'DBL': 'double', 'CRATE': 'crate', 'STIK': 'stick',
+        'TOSS': 'toss', 'GERM': 'german', 'SHPHRD': 'shepherd', 'SHPRD': 'shepherd',
+        'URBAN': 'urban', 'CONTOUR': 'contour', 'WAVE': 'wave', 'STUFF': 'stuff',
+      };
+
+      function parseInvoiceDesc(desc: string): { brand: string | null; keywords: string[] } {
+        const tokens = desc.toUpperCase().split(/[\s\/\-\#\.\(\)]+/).filter(t => t.length > 1);
+        let brand: string | null | undefined = undefined;
+        const keywords: string[] = [];
+        for (const token of tokens) {
+          if (brand === undefined && token in INVOICE_BRAND) {
+            brand = INVOICE_BRAND[token]; // may be null for passthrough brands
+          } else {
+            const exp = INVOICE_EXPAND[token];
+            if (exp) { keywords.push(exp); }
+            else if (token.length >= 4 && !/^\d+$/.test(token) &&
+              !['ESNTL','CMPLT','SHRD','BLND','REPL','BISC','RWRD','ASST','ORIG','WHLSM',
+                'ROYCAN','PROVI','HAGEN','MIDWE','MIDPET','CATIT','KONG','BIONIC'].includes(token)) {
+              keywords.push(token.toLowerCase());
+            }
+          }
+        }
+        return { brand: brand ?? null, keywords };
+      }
+
+      const fallbackResults = await Promise.all(
+        stillUnmatched.map(async (item) => {
+          const { brand, keywords } = parseInvoiceDesc(item.description);
+          // Need at least a brand OR 2 keywords to search
+          if (!brand && keywords.length < 2) return { item, product: null };
+
+          // Try progressively — most specific first (brand + 2 keywords), then relax
+          const topKeywords = [...keywords].sort((a, b) => b.length - a.length);
+          const attempts = [
+            brand ? [or(ilike(supplies.name, `%${brand}%`), ilike(supplies.brand, `%${brand}%`)), ...topKeywords.slice(0, 2).map(k => ilike(supplies.name, `%${k}%`))] : topKeywords.slice(0, 3).map(k => ilike(supplies.name, `%${k}%`)),
+            brand ? [or(ilike(supplies.name, `%${brand}%`), ilike(supplies.brand, `%${brand}%`)), ...topKeywords.slice(0, 1).map(k => ilike(supplies.name, `%${k}%`))] : topKeywords.slice(0, 2).map(k => ilike(supplies.name, `%${k}%`)),
+          ];
+
+          for (const conditions of attempts) {
+            if (conditions.length === 0) continue;
+            const results = await db.select({
+              id: supplies.id, name: supplies.name, brand: supplies.brand,
+              upc: supplies.upc, sku: supplies.sku,
+              stockQuantity: supplies.stockQuantity, price: supplies.price,
+            }).from(supplies).where(and(...conditions)).limit(5);
+
+            if (results.length === 1) return { item, product: results[0] };
+            if (results.length > 1) {
+              // Try narrowing with additional keywords
+              if (topKeywords.length > 2) {
+                const narrowed = results.filter(p =>
+                  topKeywords.slice(2).some(k => p.name?.toLowerCase().includes(k))
+                );
+                if (narrowed.length === 1) return { item, product: narrowed[0] };
+              }
+              // Still ambiguous — pick highest-scoring match (most keywords present)
+              const scored = results.map(p => ({
+                p, score: topKeywords.filter(k => p.name?.toLowerCase().includes(k)).length
+              })).sort((a, b) => b.score - a.score);
+              if (scored[0].score > scored[1].score && scored[0].score >= 2) {
+                return { item, product: scored[0].p };
+              }
+            }
+          }
+          return { item, product: null };
+        })
+      );
+
+      const unmatched: any[] = [];
+      for (const { item, product } of fallbackResults) {
+        if (product && !seenIds.has(product.id)) {
+          seenIds.add(product.id);
+          matched.push({
+            id: product.id, name: product.name, brand: product.brand,
+            upc: product.upc || product.sku || item.upc,
+            matchedBy: 'description',
+            currentStock: product.stockQuantity ?? 0, invoiceQty: item.qty,
+            newStock: (product.stockQuantity ?? 0) + item.qty, description: item.description,
+          });
+          console.log(`[InvoiceScan] DESC-MATCH: "${item.description}" → ${product.name}`);
+        } else {
+          unmatched.push({ upc: item.upc, qty: item.qty, description: item.description, validCheckDigit: isValidUPC(item.upc) });
+        }
+      }
+      // ── End description fallback ─────────────────────────────────────────────
+
       console.log(`[InvoiceScan] Extracted ${invoiceItems.length} UPCs, matched ${matched.length} products, ${unmatched.length} unmatched`);
-      if (matched.length > 0) console.log(`[InvoiceScan] MATCHED: ${matched.map((m: any) => `${m.upc} → ${m.name}${m.corrected ? ' [auto-corrected]' : ''}`).join(' | ')}`);
-      if (unmatched.length > 0) console.log(`[InvoiceScan] NOT IN SYSTEM: ${unmatched.map((u: any) => `${u.upc} (${u.description}) valid=${u.validCheckDigit}`).join(' | ')}`);
+      if (matched.length > 0) console.log(`[InvoiceScan] MATCHED: ${matched.map((m: any) => `${m.upc} → ${m.name}${m.corrected ? ' [corrected]' : m.matchedBy === 'description' ? ' [desc]' : ''}`).join(' | ')}`);
+      if (unmatched.length > 0) console.log(`[InvoiceScan] NOT IN SYSTEM: ${unmatched.map((u: any) => `${u.upc} (${u.description})`).join(' | ')}`);
       res.json({ matched, unmatched });
     } catch (error: any) {
       console.error("[InvoiceScan] Error:", error);
