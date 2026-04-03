@@ -11281,25 +11281,29 @@ West Monroe LA 71291
         apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
       });
 
-      const prompt = `You are analyzing a supplier invoice for a pet store. Your job is to extract ALL UPC/product codes and their shipped quantities.
+      const prompt = `You are analyzing a supplier invoice for a pet store. Extract EVERY SINGLE line item UPC code from this invoice. Do not skip any rows.
 
-Look for columns labeled: PRODUCT UPC, UPC, UPC CODE, BARCODE, or similar.
-Look for quantities in columns labeled: QTY SHIPPED, SHIPPED, QTY, QUANTITY, or similar. Use the SHIPPED quantity if both ordered and shipped are present.
-Also extract the item description if visible.
+STEP 1 - Find the UPC column: Look for the column header "PRODUCT UPC", "UPC", "UPC CODE", or "BARCODE".
+STEP 2 - Find the quantity column: Look for "QTY SHIPPED", "SHIPPED", "QTY", or "QUANTITY". If there are two sub-columns (ORDER and SHIPPED), use the SHIPPED number.
+STEP 3 - Go row by row from top to bottom and extract EVERY item. Do not stop early. Do not skip any row.
 
-Return ONLY valid JSON in this exact format:
+This invoice likely has 20-40 line items. Extract all of them.
+
+UPC codes on this invoice are 12-digit numbers like: 015561232609, 022517437254, 035585010489, 038100026736
+They appear in their own column. Read each one carefully digit by digit.
+
+Return ONLY valid JSON:
 {
   "items": [
-    { "upc": "012345678901", "qty": 3, "description": "Product name here" }
+    { "upc": "015561232609", "qty": 1, "description": "EXO TERRA CRESTD GECKO 8CUP" }
   ]
 }
 
-Rules:
-- UPC codes are typically 12-13 digits with no dashes
-- If a UPC has dashes, remove them (e.g. "0-12345-67890-1" → "012345678901")
-- Extract every line item row
-- If qty shipped is 0, still include the item with qty 0
-- Only return the JSON object, nothing else`;
+Critical rules:
+- Extract EVERY row — do not stop until you have reached the last line item
+- UPC codes are 12 digits, read them exactly as printed
+- Include rows where shipped qty is 0
+- Return only the JSON object, nothing else`;
 
       const response = await openai.chat.completions.create({
         model: "gpt-5",
@@ -11313,7 +11317,7 @@ Rules:
           },
         ],
         response_format: { type: "json_object" },
-        max_completion_tokens: 8000,
+        max_completion_tokens: 16000,
       });
 
       const content = response.choices[0]?.message?.content;
@@ -11332,33 +11336,42 @@ Rules:
       // Normalize UPCs (remove dashes/spaces, trim)
       const normalizedItems = invoiceItems.map(item => ({
         ...item,
-        upc: item.upc.replace(/[-\s]/g, '').trim(),
+        upc: String(item.upc).replace(/[-\s]/g, '').trim(),
       })).filter(item => item.upc.length >= 8);
 
       const upcList = [...new Set(normalizedItems.map(i => i.upc))];
 
-      // Look up products by UPC (also check with/without leading zeros)
+      // Search both `upc` AND `sku` fields — many products store their UPC in the sku column
       const dbProducts = await db.select({
         id: supplies.id,
         name: supplies.name,
         brand: supplies.brand,
         upc: supplies.upc,
+        sku: supplies.sku,
         stockQuantity: supplies.stockQuantity,
         price: supplies.price,
-      }).from(supplies).where(inArray(supplies.upc, upcList));
+      }).from(supplies).where(
+        or(
+          inArray(supplies.upc, upcList),
+          inArray(supplies.sku, upcList)
+        )
+      );
 
-      // Build a UPC -> product map
+      // Build lookup map keyed by both upc and sku values
       const productByUpc = new Map<string, typeof dbProducts[0]>();
       for (const p of dbProducts) {
         if (p.upc) productByUpc.set(p.upc.replace(/[-\s]/g, '').trim(), p);
+        if (p.sku) productByUpc.set(p.sku.replace(/[-\s]/g, '').trim(), p);
       }
 
       const matched: any[] = [];
       const unmatched: any[] = [];
+      const seenIds = new Set<number>();
 
       for (const item of normalizedItems) {
         const product = productByUpc.get(item.upc);
-        if (product) {
+        if (product && !seenIds.has(product.id)) {
+          seenIds.add(product.id);
           matched.push({
             id: product.id,
             name: product.name,
@@ -11369,12 +11382,12 @@ Rules:
             newStock: (product.stockQuantity ?? 0) + item.qty,
             description: item.description,
           });
-        } else {
+        } else if (!product) {
           unmatched.push({ upc: item.upc, qty: item.qty, description: item.description });
         }
       }
 
-      console.log(`[InvoiceScan] Matched ${matched.length} products, ${unmatched.length} unmatched UPCs`);
+      console.log(`[InvoiceScan] Extracted ${invoiceItems.length} UPCs, matched ${matched.length} products, ${unmatched.length} unmatched`);
       res.json({ matched, unmatched });
     } catch (error: any) {
       console.error("[InvoiceScan] Error:", error);
