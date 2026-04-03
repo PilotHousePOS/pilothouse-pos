@@ -11446,14 +11446,22 @@ Critical rules:
         if (product && !seenIds.has(product.id)) {
           // Cross-check: make sure the UPC-matched product name is plausible given the description
           // Pull key words from description and check at least 1 appears in the product name
-          const descWords = item.description.toLowerCase().split(/[\s\/\-\#\.]+/).filter((t: string) => t.length >= 4 && !/^\d+$/.test(t));
-          const expandedWords = descWords.map((w: string) => {
-            const exp: Record<string, string> = { 'kong': 'kong', 'bionic': 'bionic', 'germ': 'german', 'shphrd': 'shepherd', 'shprd': 'shepherd', 'yorksh': 'yorkshire', 'crestd': 'crested', 'gecko': 'gecko', 'catit': 'catit', 'bendeez': 'bendeez' };
-            return exp[w] || w;
-          });
+          const CROSS_CHECK_EXPAND: Record<string, string> = {
+            'kong': 'kong', 'bionic': 'bionic', 'catit': 'catit', 'bendeez': 'bendeez',
+            'whlsm': 'wholesome', 'whslm': 'wholesome', 'wholeso': 'wholesome',
+            'roycan': 'royal canin', 'germ': 'german', 'shphrd': 'shepherd', 'shprd': 'shepherd',
+            'crestd': 'crested', 'gecko': 'gecko', 'airdog': 'air', 'urban': 'urban',
+            'stik': 'stick', 'asst': 'assorted', 'orig': 'original', 'rwrd': 'reward',
+            'pnbt': 'peanut', 'bck': 'bacon', 'chz': 'cheese', 'sqkr': 'squeaker',
+            'tball': 'tennis', 'salmon': 'salmon', 'salm': 'salmon', 'slm': 'salmon',
+            'bendeez': 'bendeez', 'elephant': 'elephant', 'eleph': 'elephant',
+          };
+          const descWords = item.description.toLowerCase().split(/[\s\/\-\#\.\(\)]+/).filter((t: string) => t.length >= 3 && !/^\d+$/.test(t));
+          const expandedWords = descWords.map((w: string) => CROSS_CHECK_EXPAND[w] || w);
           const productNameLower = (product.name || '').toLowerCase();
           const brandNameLower = (product.brand || '').toLowerCase();
-          const descKeywords = expandedWords.filter((w: string) => !['esntl','cmplt','shrd','blnd','repl','bisc','rwrd','orig','adlt','snk','trt','pup','easy'].includes(w));
+          const NOISE_WORDS = new Set(['esntl','cmplt','shrd','blnd','repl','bisc','adlt','easy','cmplt','esntl','shrd','blnd','bisc','adt']);
+          const descKeywords = expandedWords.filter((w: string) => !NOISE_WORDS.has(w) && w.length >= 3);
           const hasDescMatch = descKeywords.length === 0 || descKeywords.some((w: string) => productNameLower.includes(w) || brandNameLower.includes(w));
 
           if (!hasDescMatch) {
