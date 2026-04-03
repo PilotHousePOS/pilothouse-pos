@@ -25,7 +25,7 @@ import { notificationService } from './notifications';
 import { sendPasswordResetEmail, sendVerificationEmail } from './sendgrid';
 import { normalizePhoneNumber } from './phoneUtils';
 import { db, resetPool } from './db';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, or, sql } from 'drizzle-orm';
 import { supplies } from '@shared/schema';
 import OpenAI from 'openai';
 import { expandProductAbbreviations } from './abbreviationExpansion';
