@@ -6172,9 +6172,12 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
           </div>
 
           {scanning && (
-            <div className="flex items-center justify-center gap-3 py-5 text-gray-500">
-              <Loader2 className="w-5 h-5 animate-spin" />
-              <span>Reading invoice UPC codes...</span>
+            <div className="flex flex-col items-center justify-center gap-2 py-5 text-gray-500">
+              <div className="flex items-center gap-3">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Reading invoice UPC codes...</span>
+              </div>
+              <span className="text-xs text-gray-400">High-accuracy scan — may take 1–3 minutes</span>
             </div>
           )}
 
