@@ -11344,23 +11344,42 @@ Critical rules:
 - Include rows where shipped qty is 0
 - Return only the JSON object, nothing else`;
 
-      // Run two independent scans in parallel — different prompts encourage different row coverage.
-      // Merge results by UPC so missed rows in one scan are caught by the other.
+      // SCAN B runs first — bottom-to-top prompt is reliably comprehensive.
+      // SCAN A then runs as a targeted gap-finder: it receives the UPCs already found
+      // and explicitly asks for any remaining rows not yet captured.
       const promptB = prompt.replace(
         'STEP 3 - Go row by row from top to bottom',
-        'STEP 3 - Go row by row from BOTTOM to TOP (start at the last line item and work upward)'
+        'STEP 3 - Go row by row from BOTTOM TO TOP (start at the very last line item and work upward toward the top)'
       );
 
       // Sequential scans — parallel hits rate limits and kills one scan silently
-      const responseA = await openai.chat.completions.create({
-        model: "gpt-5",
-        messages: [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } }] }],
-        response_format: { type: "json_object" },
-        max_completion_tokens: 16000,
-      });
       const responseB = await openai.chat.completions.create({
         model: "gpt-5",
         messages: [{ role: "user", content: [{ type: "text", text: promptB }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } }] }],
+        response_format: { type: "json_object" },
+        max_completion_tokens: 16000,
+      });
+
+      // Parse Scan B early so we can pass its UPCs to the gap-finder
+      let scanBRaw: any[] = [];
+      try {
+        const bContent = responseB.choices?.[0]?.message?.content ?? '{"items":[]}';
+        scanBRaw = JSON.parse(bContent).items ?? [];
+      } catch { scanBRaw = []; }
+      const scanBUpcs = scanBRaw.map((i: any) => String(i.upc ?? '').replace(/\D/g, '').padStart(12, '0'));
+
+      // Build gap-finder prompt: show already-found UPCs, ask for anything remaining
+      const foundList = scanBUpcs.length > 0
+        ? `\n\nUPCs already found (DO NOT repeat these):\n${scanBUpcs.join('\n')}\n\nLook at every row of the invoice and extract ONLY the rows whose UPC is NOT in the list above.`
+        : '\n\nExtract ALL line items.';
+      const promptA = prompt.replace(
+        'STEP 3 - Go row by row from top to bottom and extract EVERY item. Do not stop early. Do not skip any row.',
+        'STEP 3 - Carefully inspect EVERY row in the invoice image, paying special attention to rows in the upper-middle section that are easy to overlook.'
+      ) + foundList;
+
+      const responseA = await openai.chat.completions.create({
+        model: "gpt-5",
+        messages: [{ role: "user", content: [{ type: "text", text: promptA }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } }] }],
         response_format: { type: "json_object" },
         max_completion_tokens: 16000,
       });
@@ -11515,7 +11534,7 @@ Critical rules:
         'CONTOUR': null, // Midwest brand but described by product name, no brand prefix
       };
       const INVOICE_EXPAND: Record<string, string> = {
-        'BF': 'beef', 'CKN': 'chicken', 'CHKN': 'chicken', 'SLM': 'salmon',
+        'BF': 'beef', 'CKN': 'chicken', 'CHKN': 'chicken', 'SLM': 'salmon', 'SB': 'shredded',
         'PUP': 'puppy', 'ADLT': 'adult', 'LG': 'large', 'SM': 'small',
         'MD': 'medium', 'XS': 'extra small', 'PNBT': 'peanut', 'SNK': 'snack',
         'BCK': 'bacon', 'CHZ': 'cheese', 'SQKR': 'squeaker', 'TBALL': 'tennis',
@@ -11590,7 +11609,7 @@ Critical rules:
                 p, score: sorted.filter(k => p.name?.toLowerCase().includes(k)).length
               })).sort((a, b) => b.score - a.score);
               // Only use best match if it clearly beats the next candidate
-              if (scored[0].score >= 2 && (scored.length === 1 || scored[0].score > scored[1].score)) {
+              if (scored[0].score >= 1 && (scored.length === 1 || scored[0].score > scored[1].score)) {
                 return { item, product: scored[0].p };
               }
             }
