@@ -6177,7 +6177,7 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
                 <Loader2 className="w-5 h-5 animate-spin" />
                 <span>Reading invoice UPC codes...</span>
               </div>
-              <span className="text-xs text-gray-400">High-accuracy scan — may take 1–3 minutes</span>
+              <span className="text-xs text-gray-400">Scanning twice for full coverage — may take 30–60 seconds</span>
             </div>
           )}
 

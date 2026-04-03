@@ -11351,20 +11351,19 @@ Critical rules:
         'STEP 3 - Go row by row from BOTTOM to TOP (start at the last line item and work upward)'
       );
 
-      const [responseA, responseB] = await Promise.all([
-        openai.chat.completions.create({
-          model: "gpt-5",
-          messages: [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } }] }],
-          response_format: { type: "json_object" },
-          max_completion_tokens: 16000,
-        }),
-        openai.chat.completions.create({
-          model: "gpt-5",
-          messages: [{ role: "user", content: [{ type: "text", text: promptB }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } }] }],
-          response_format: { type: "json_object" },
-          max_completion_tokens: 16000,
-        }),
-      ]);
+      // Sequential scans — parallel hits rate limits and kills one scan silently
+      const responseA = await openai.chat.completions.create({
+        model: "gpt-5",
+        messages: [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } }] }],
+        response_format: { type: "json_object" },
+        max_completion_tokens: 16000,
+      });
+      const responseB = await openai.chat.completions.create({
+        model: "gpt-5",
+        messages: [{ role: "user", content: [{ type: "text", text: promptB }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } }] }],
+        response_format: { type: "json_object" },
+        max_completion_tokens: 16000,
+      });
 
       const parseResponse = (r: typeof responseA) => {
         const c = r.choices[0]?.message?.content;
