@@ -6088,7 +6088,7 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
         const objectUrl = URL.createObjectURL(file);
         img.onload = () => {
           URL.revokeObjectURL(objectUrl);
-          const MAX = 1800;
+          const MAX = 2400;
           let { width, height } = img;
           if (width > MAX || height > MAX) {
             if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
@@ -6098,7 +6098,7 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
           canvas.width = width;
           canvas.height = height;
           canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
           resolve(dataUrl.split(',')[1]);
         };
         img.onerror = reject;
