@@ -11344,32 +11344,48 @@ Critical rules:
 - Include rows where shipped qty is 0
 - Return only the JSON object, nothing else`;
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-5",
-        messages: [
-          {
-            role: "user",
-            content: [
-              { type: "text", text: prompt },
-              { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } },
-            ],
-          },
-        ],
-        response_format: { type: "json_object" },
-        max_completion_tokens: 16000,
-      });
+      // Run two independent scans in parallel — different prompts encourage different row coverage.
+      // Merge results by UPC so missed rows in one scan are caught by the other.
+      const promptB = prompt.replace(
+        'STEP 3 - Go row by row from top to bottom',
+        'STEP 3 - Go row by row from BOTTOM to TOP (start at the last line item and work upward)'
+      );
 
-      const content = response.choices[0]?.message?.content;
-      if (!content) return res.status(500).json({ message: "No response from AI" });
+      const [responseA, responseB] = await Promise.all([
+        openai.chat.completions.create({
+          model: "gpt-5",
+          messages: [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
+          response_format: { type: "json_object" },
+          max_completion_tokens: 16000,
+        }),
+        openai.chat.completions.create({
+          model: "gpt-5",
+          messages: [{ role: "user", content: [{ type: "text", text: promptB }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
+          response_format: { type: "json_object" },
+          max_completion_tokens: 16000,
+        }),
+      ]);
 
-      let parsed: { items: { upc: string; qty: number; description: string }[] };
-      try {
-        parsed = JSON.parse(content);
-      } catch {
-        return res.status(500).json({ message: "Failed to parse AI response" });
+      const parseResponse = (r: typeof responseA) => {
+        const c = r.choices[0]?.message?.content;
+        if (!c) return [];
+        try { return (JSON.parse(c).items || []) as { upc: string; qty: number; description: string }[]; }
+        catch { return []; }
+      };
+
+      const itemsA = parseResponse(responseA);
+      const itemsB = parseResponse(responseB);
+
+      // Merge: prefer scan A's version of each UPC, add any UPCs only found in scan B
+      const seenUPCs = new Set(itemsA.map((i: any) => String(i.upc).replace(/[-\s]/g, '').trim()));
+      const merged = [...itemsA];
+      for (const item of itemsB) {
+        const upc = String(item.upc).replace(/[-\s]/g, '').trim();
+        if (!seenUPCs.has(upc)) { seenUPCs.add(upc); merged.push(item); }
       }
 
-      const invoiceItems = parsed.items || [];
+      console.log(`[InvoiceScan] Scan A: ${itemsA.length} items, Scan B: ${itemsB.length} items, Merged: ${merged.length} unique items`);
+      const invoiceItems = merged;
       console.log(`[InvoiceScan] Extracted ${invoiceItems.length} items from invoice`);
 
       // Normalize UPCs (remove dashes/spaces, trim)
