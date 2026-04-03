@@ -1016,7 +1016,6 @@ export default function Booking() {
                 value={ownerInfo.lastName}
                 onChange={(e) => setOwnerInfo({ ...ownerInfo, lastName: e.target.value })}
                 className="border-gray-300 rounded-xl"
-                required
                 data-testid="input-owner-lastname"
               />
             </div>
@@ -1026,7 +1025,6 @@ export default function Booking() {
               value={ownerInfo.phoneNumber}
               onChange={(e) => setOwnerInfo({ ...ownerInfo, phoneNumber: e.target.value })}
               className="border-gray-300 rounded-xl"
-              required
               data-testid="input-owner-phone"
             />
           </div>
@@ -1073,7 +1071,6 @@ export default function Booking() {
                   value={pet.name}
                   onChange={(e) => updatePet(index, 'name', e.target.value)}
                   className="border-gray-300 rounded-xl"
-                  required
                   data-testid={`input-pet-name-${index}`}
                 />
                 
@@ -1180,7 +1177,8 @@ export default function Booking() {
 
         {/* Book Button */}
         <Button 
-          type="submit"
+          type="button"
+          onClick={handleSubmit as any}
           disabled={createAppointmentMutation.isPending}
           className="w-full bg-brand-red hover:bg-red-600 text-white py-4 rounded-xl font-semibold text-lg shadow-lg"
         >
