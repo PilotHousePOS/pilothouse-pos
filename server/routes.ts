@@ -11332,6 +11332,7 @@ Critical rules:
 
       const invoiceItems = parsed.items || [];
       console.log(`[InvoiceScan] Extracted ${invoiceItems.length} items from invoice`);
+      console.log(`[InvoiceScan] UPCs found: ${invoiceItems.map((i: any) => i.upc).join(', ')}`);
 
       // Normalize UPCs (remove dashes/spaces, trim)
       const normalizedItems = invoiceItems.map(item => ({
@@ -11388,6 +11389,8 @@ Critical rules:
       }
 
       console.log(`[InvoiceScan] Extracted ${invoiceItems.length} UPCs, matched ${matched.length} products, ${unmatched.length} unmatched`);
+      if (matched.length > 0) console.log(`[InvoiceScan] MATCHED: ${matched.map((m: any) => `${m.upc} → ${m.name}`).join(' | ')}`);
+      if (unmatched.length > 0) console.log(`[InvoiceScan] NOT IN SYSTEM: ${unmatched.map((u: any) => `${u.upc} (${u.description})`).join(' | ')}`);
       res.json({ matched, unmatched });
     } catch (error: any) {
       console.error("[InvoiceScan] Error:", error);
