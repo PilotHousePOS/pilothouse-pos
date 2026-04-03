@@ -6082,14 +6082,30 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
     setScanning(true);
 
     try {
+      // Resize image to max 1800px on longest side before sending — reduces 3-4MB phone photos to ~200KB
       const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve((reader.result as string).split(',')[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+        const img = new window.Image();
+        const objectUrl = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(objectUrl);
+          const MAX = 1800;
+          let { width, height } = img;
+          if (width > MAX || height > MAX) {
+            if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
+            else { width = Math.round(width * MAX / height); height = MAX; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+          resolve(dataUrl.split(',')[1]);
+        };
+        img.onerror = reject;
+        img.src = objectUrl;
       });
 
-      const res = await apiRequest('POST', '/api/admin/invoice-scan', { imageBase64: base64, mimeType: file.type || 'image/jpeg' });
+      const res = await apiRequest('POST', '/api/admin/invoice-scan', { imageBase64: base64, mimeType: 'image/jpeg' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Scan failed');
 
