@@ -54,7 +54,7 @@ export default function Booking() {
   }>>([{
     name: '',
     type: 'dog',
-    serviceType: '',
+    serviceType: 'grooming-full',
     notes: '',
     groomerId: '',
     addOns: [],
@@ -393,7 +393,7 @@ export default function Booking() {
       setSelectedDate(new Date());
       setSelectedTime('');
       setSelectedGroomer('');
-      setPets([{ name: '', type: 'dog', serviceType: '', notes: '', groomerId: '', addOns: [] }]);
+      setPets([{ name: '', type: 'dog', serviceType: 'grooming-full', notes: '', groomerId: '', addOns: [] }]);
       setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
       setContactSearch('');
       setIsRecurring(false);
@@ -499,7 +499,7 @@ export default function Booking() {
       setSelectedDate(new Date());
       setSelectedTime('');
       setSelectedGroomer('');
-      setPets([{ name: '', type: 'dog', serviceType: '', notes: '', groomerId: '', addOns: [] }]);
+      setPets([{ name: '', type: 'dog', serviceType: 'grooming-full', notes: '', groomerId: '', addOns: [] }]);
       setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
       setContactSearch('');
       setIsRecurring(false);
@@ -515,9 +515,17 @@ export default function Booking() {
     const invalidPet = pets.find(pet => !pet.name || !pet.type || !pet.serviceType);
     
     if (!selectedDate || !selectedTime || invalidPet || !ownerInfo.lastName || !ownerInfo.phoneNumber) {
+      const missing: string[] = [];
+      if (!selectedTime) missing.push("appointment time");
+      if (!ownerInfo.lastName) missing.push("last name");
+      if (!ownerInfo.phoneNumber) missing.push("phone number");
+      if (invalidPet) {
+        if (!invalidPet.name) missing.push("pet name");
+        if (!invalidPet.serviceType) missing.push("service type (Full Grooming or Bath Only)");
+      }
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields for all pets and owner information.",
+        description: `Please fill in: ${missing.join(", ")}.`,
         variant: "destructive",
       });
       return;
@@ -618,7 +626,7 @@ export default function Booking() {
   };
 
   const addPet = () => {
-    setPets([...pets, { name: '', type: 'dog', serviceType: '', notes: '', groomerId: '', addOns: [] }]);
+    setPets([...pets, { name: '', type: 'dog', serviceType: 'grooming-full', notes: '', groomerId: '', addOns: [] }]);
   };
 
   const removePet = (index: number) => {
