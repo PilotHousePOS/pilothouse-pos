@@ -11468,31 +11468,44 @@ Critical rules:
         console.log(`[InvoiceScan] Merge from ${label}: +${added} new, total now ${merged.length}`);
       };
 
-      // ── Split image into top and bottom halves (20% overlap) ─────────────────
-      // This gives each sub-scan higher effective resolution per row, significantly
-      // improving recall on dense invoices that the model tends to truncate.
+      // ── Split image into three overlapping sections ───────────────────────────
+      // Top (0–65%), Middle (30–75%), Bottom (50–100%). 30%+ overlap means every
+      // row appears in at least 2 scans, eliminating the seam-miss problem.
       const imgBuf = Buffer.from(imageBase64, 'base64');
       const meta = await sharp(imgBuf).metadata();
       const totalHeight = meta.height ?? 2048;
-      const topHeight = Math.round(totalHeight * 0.55);           // top 55%
-      const botTop   = Math.round(totalHeight * 0.50);           // bottom starts at 50% — 5% overlap only
-      const botHeight = totalHeight - botTop;
+      // Three overlapping cuts — 30% overlap between each — so every row appears in at least 2 scans
+      const topHeight  = Math.round(totalHeight * 0.65);  // top 65%  (0–65%)
+      const midTop     = Math.round(totalHeight * 0.30);  // mid starts at 30%
+      const midHeight  = Math.round(totalHeight * 0.45);  // mid ends  at 75%  (30–75%)
+      const botTop     = Math.round(totalHeight * 0.50);  // bot starts at 50% (50–100%)
+      const botHeight  = totalHeight - botTop;
 
-      const [topBase64, botBase64] = await Promise.all([
-        sharp(imgBuf).extract({ left: 0, top: 0, width: meta.width!, height: topHeight }).jpeg({ quality: 95 }).toBuffer().then(b => b.toString('base64')),
-        sharp(imgBuf).extract({ left: 0, top: botTop, width: meta.width!, height: botHeight }).jpeg({ quality: 95 }).toBuffer().then(b => b.toString('base64')),
+      const [topBase64, midBase64, botBase64] = await Promise.all([
+        sharp(imgBuf).extract({ left: 0, top: 0,      width: meta.width!, height: topHeight }).jpeg({ quality: 95 }).toBuffer().then(b => b.toString('base64')),
+        sharp(imgBuf).extract({ left: 0, top: midTop,  width: meta.width!, height: midHeight }).jpeg({ quality: 95 }).toBuffer().then(b => b.toString('base64')),
+        sharp(imgBuf).extract({ left: 0, top: botTop,  width: meta.width!, height: botHeight }).jpeg({ quality: 95 }).toBuffer().then(b => b.toString('base64')),
       ]);
-      console.log(`[InvoiceScan] Image split: total=${totalHeight}px, top=0-${topHeight}px, bot=${botTop}-${totalHeight}px`);
+      console.log(`[InvoiceScan] Image split: total=${totalHeight}px, top=0-${topHeight}px, mid=${midTop}-${midTop+midHeight}px, bot=${botTop}-${totalHeight}px`);
 
       const promptTop = prompt.replace(
         'STEP 3 - Go row by row from top to bottom and extract EVERY item.',
-        'STEP 3 - You are viewing the TOP PORTION of the invoice. Go row by row from top to bottom and extract EVERY item visible in this portion.'
+        'STEP 3 - You are viewing the TOP PORTION of the invoice (roughly the first 65%). Go row by row and extract EVERY line item visible.'
       ).replace(
         'This invoice may span one or two pages and likely has 20-40 line items.',
-        'This is the TOP HALF of an invoice. Extract every line item visible here — there are likely 8-15 rows in this portion.'
+        'This is the TOP PORTION of an invoice. Extract every line item visible here — there are likely 10-16 rows in this portion.'
       );
 
-      // Bottom scan prompt explicitly names the columns since headers are in the top half
+      // Middle scan — the seam between top and bottom, column headers will be visible
+      const promptMid = prompt.replace(
+        'STEP 3 - Go row by row from top to bottom and extract EVERY item.',
+        'STEP 3 - You are viewing the MIDDLE PORTION of the invoice (roughly 30%–75% of the page). Go row by row and extract EVERY line item visible.'
+      ).replace(
+        'This invoice may span one or two pages and likely has 20-40 line items.',
+        'This is the MIDDLE PORTION of an invoice. Focus carefully on every single row — there are likely 8-12 rows in this portion. Do not skip any.'
+      );
+
+      // Bottom scan prompt — column headers may not be visible
       const promptBot = prompt.replace(
         'STEP 1 - Find the UPC column: Look for the column header "PRODUCT UPC", "UPC", "UPC CODE", or "BARCODE".',
         'STEP 1 - The UPC column is labeled "PRODUCT UPC" (or similar). You are viewing the BOTTOM HALF of the invoice — the column header row may not be visible, but the column structure is the same.'
@@ -11501,18 +11514,24 @@ Critical rules:
         'STEP 2 - The quantity column is labeled "QTY SHIPPED" (use the SHIPPED sub-column if two exist).'
       ).replace(
         'STEP 3 - Go row by row from top to bottom and extract EVERY item.',
-        'STEP 3 - You are viewing the BOTTOM HALF of the invoice. Go row by row from top to bottom and extract EVERY item visible in this portion.'
+        'STEP 3 - You are viewing the BOTTOM HALF of the invoice. Go row by row and extract EVERY line item visible.'
       ).replace(
         'This invoice may span one or two pages and likely has 20-40 line items.',
-        'This is the BOTTOM HALF of an invoice (headers may not be visible). Extract every line item here — there are likely 8-14 rows in this portion.'
+        'This is the BOTTOM HALF of an invoice (headers may not be visible). Extract every line item here — there are likely 8-12 rows in this portion.'
       );
 
-      // ── Run 2 scans in parallel: top half + bottom half ──────────────────────
-      // No full-image scan — that third scan was the source of hallucinations.
-      const [respA, respB] = await Promise.all([
+      // ── 3 scans in parallel: top (0–65%) + middle (30–75%) + bottom (50–100%) ─
+      // The 30%+ overlaps ensure every row appears in at least 2 scans.
+      const [respA, respMid, respB] = await Promise.all([
         openai.chat.completions.create({
           model: "gpt-5",
           messages: [{ role: "user", content: [{ type: "text", text: promptTop }, { type: "image_url", image_url: { url: `data:image/jpeg;base64,${topBase64}`, detail: "high" } }] }],
+          response_format: { type: "json_object" },
+          max_completion_tokens: 16000,
+        }),
+        openai.chat.completions.create({
+          model: "gpt-5",
+          messages: [{ role: "user", content: [{ type: "text", text: promptMid }, { type: "image_url", image_url: { url: `data:image/jpeg;base64,${midBase64}`, detail: "high" } }] }],
           response_format: { type: "json_object" },
           max_completion_tokens: 16000,
         }),
@@ -11524,9 +11543,10 @@ Critical rules:
         }),
       ]);
 
-      mergeItems(parseItems(respA.choices?.[0]?.message?.content, 'ScanA-Top'), 'ScanA-Top');
-      mergeItems(parseItems(respB.choices?.[0]?.message?.content, 'ScanB-Bot'), 'ScanB-Bot');
-      console.log(`[InvoiceScan] finish_reasons: A=${respA.choices?.[0]?.finish_reason} B=${respB.choices?.[0]?.finish_reason}`);
+      mergeItems(parseItems(respA.choices?.[0]?.message?.content,   'ScanA-Top'), 'ScanA-Top');
+      mergeItems(parseItems(respMid.choices?.[0]?.message?.content, 'ScanB-Mid'), 'ScanB-Mid');
+      mergeItems(parseItems(respB.choices?.[0]?.message?.content,   'ScanC-Bot'), 'ScanC-Bot');
+      console.log(`[InvoiceScan] finish_reasons: A=${respA.choices?.[0]?.finish_reason} Mid=${respMid.choices?.[0]?.finish_reason} B=${respB.choices?.[0]?.finish_reason}`);
 
       // Sanity cap — prevents runaway hallucination on edge cases
       if (merged.length > 32) {
