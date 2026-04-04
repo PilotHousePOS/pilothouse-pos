@@ -6128,7 +6128,6 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
       const res = await fetch(`/api/supplies/${supplyId}`);
       const supply = await res.json();
       if (!res.ok) throw new Error(supply.message || 'Could not load product');
-      onClose();
       onEditSupply(supply);
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
