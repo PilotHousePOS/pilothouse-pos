@@ -11610,33 +11610,41 @@ Critical rules:
         }
 
         if (product && !seenIds.has(product.id)) {
-          // Cross-check only applies to auto-corrected UPCs (single-digit substitution guesses).
-          // Direct UPC matches are always trusted — description abbreviations vary too widely.
-          let acceptMatch = true;
-          if (corrected) {
-            const CROSS_CHECK_EXPAND: Record<string, string> = {
-              'pp': 'pro plan', 'roycan': 'royal canin',
-              'kong': 'kong', 'bionic': 'bionic', 'catit': 'catit',
-              'whlsm': 'wholesome', 'whslm': 'wholesome',
-              'ckn': 'chicken', 'chkn': 'chicken', 'chx': 'chicken',
-              'bf': 'beef', 'slm': 'salmon', 'salm': 'salmon', 'trky': 'turkey',
-              'pnbt': 'peanut', 'bck': 'bacon', 'chz': 'cheese',
-              'germ': 'german', 'shphrd': 'shepherd', 'shprd': 'shepherd',
-              'sm': 'small', 'lg': 'large', 'md': 'medium',
-              'crestd': 'crested', 'gecko': 'gecko', 'airdog': 'air',
-              'urban': 'urban', 'stik': 'stick', 'sqkr': 'squeaker', 'tball': 'tennis',
-              'asst': 'assorted', 'orig': 'original', 'bendeez': 'bendeez',
-            };
-            const descWords = item.description.toLowerCase().split(/[\s\/\-\#\.\(\)\*']+/).filter((t: string) => t.length >= 2 && !/^\d+$/.test(t));
-            const expandedWords = descWords.map((w: string) => CROSS_CHECK_EXPAND[w] || w);
-            const productNameLower = (product.name || '').toLowerCase();
-            const brandNameLower = (product.brand || '').toLowerCase();
-            const NOISE_WORDS = new Set(['esntl','cmplt','shrd','blnd','repl','bisc','adlt','easy','adt','snk','trt','rwrd','dog','cat','pet','snack','treat','adult','puppy','pup']);
-            const descKeywords = expandedWords.filter((w: string) => !NOISE_WORDS.has(w) && w.length >= 2);
-            acceptMatch = descKeywords.length === 0 || descKeywords.some((w: string) => productNameLower.includes(w) || brandNameLower.includes(w));
-            if (!acceptMatch) {
-              console.log(`[InvoiceScan] CORRECTION REJECTED: ${item.upc} → ${resolvedUpc} → ${product.name} (desc="${item.description}" shares no keywords)`);
-            }
+          // Cross-check the invoice description against the matched product name for EVERY match —
+          // not just corrected ones. A wrong UPC that accidentally hits a different product in the
+          // DB must be caught here before it corrupts inventory.
+          const CROSS_CHECK_EXPAND: Record<string, string> = {
+            'pp': 'pro plan', 'provi': 'pro plan', 'roycan': 'royal canin',
+            'kong': 'kong', 'bionic': 'bionic', 'catit': 'catit',
+            'whlsm': 'wholesome', 'whslm': 'wholesome',
+            'ckn': 'chicken', 'chkn': 'chicken', 'chx': 'chicken',
+            'bf': 'beef', 'slm': 'salmon', 'salm': 'salmon', 'trky': 'turkey',
+            'pnbt': 'peanut', 'bck': 'bacon', 'chz': 'cheese',
+            'germ': 'german', 'shphrd': 'shepherd', 'shprd': 'shepherd',
+            'sm': 'small', 'lg': 'large', 'md': 'medium',
+            'crestd': 'crested', 'gecko': 'gecko', 'airdog': 'air',
+            'urban': 'urban', 'stik': 'stick', 'sqkr': 'squeaker', 'tball': 'tennis',
+            'asst': 'assorted', 'orig': 'original', 'bendeez': 'bendeez',
+            'flwr': 'flower', 'ftn': 'fountain', 'stsl': 'stainless',
+            'contour': 'contour', 'dbl': 'double', 'crate': 'crate',
+            'wave': 'wave', 'terr': 'terrarium', 'smartsift': 'smartsift',
+            'midwe': 'midwest', 'midpet': 'midwest',
+          };
+          const NOISE_WORDS = new Set([
+            'esntl','cmplt','shrd','blnd','repl','bisc','adlt','easy','adt',
+            'snk','trt','rwrd','dog','cat','pet','snack','treat','adult','puppy','pup',
+            'ea','cas','rc','sb','ce','fd','u/a',
+          ]);
+          const descWords = (item.description || '').toLowerCase().split(/[\s\/\-\#\.\(\)\*'\=]+/).filter((t: string) => t.length >= 2 && !/^\d+$/.test(t));
+          const expandedWords = descWords.map((w: string) => CROSS_CHECK_EXPAND[w] || w);
+          const productNameLower = (product.name || '').toLowerCase();
+          const brandNameLower = (product.brand || '').toLowerCase();
+          const descKeywords = expandedWords.filter((w: string) => !NOISE_WORDS.has(w) && w.length >= 2);
+          const acceptMatch = descKeywords.length === 0 || descKeywords.some((w: string) => productNameLower.includes(w) || brandNameLower.includes(w));
+
+          if (!acceptMatch) {
+            const label = corrected ? 'CORRECTION REJECTED' : 'MATCH REJECTED (desc mismatch)';
+            console.log(`[InvoiceScan] ${label}: scanned=${item.upc} resolved=${resolvedUpc} product="${product.name}" desc="${item.description}" keywords=[${descKeywords.join(',')}]`);
           }
 
           if (acceptMatch) {
@@ -11648,6 +11656,7 @@ Critical rules:
               newStock: (product.stockQuantity ?? 0) + item.qty, description: item.description,
             });
             if (corrected) console.log(`[InvoiceScan] AUTO-CORRECTED: ${item.upc} → ${resolvedUpc} (${product.name})`);
+            else console.log(`[InvoiceScan] MATCH OK: ${resolvedUpc} → "${product.name}" (desc="${item.description}")`);
           } else {
             stillUnmatched.push(item);
           }
