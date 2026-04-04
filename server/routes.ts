@@ -11474,8 +11474,8 @@ Critical rules:
       const imgBuf = Buffer.from(imageBase64, 'base64');
       const meta = await sharp(imgBuf).metadata();
       const totalHeight = meta.height ?? 2048;
-      const topHeight = Math.round(totalHeight * 0.75);           // top 75%
-      const botTop   = Math.round(totalHeight * 0.20);           // bottom starts at 20% — includes headers
+      const topHeight = Math.round(totalHeight * 0.55);           // top 55%
+      const botTop   = Math.round(totalHeight * 0.50);           // bottom starts at 50% — 5% overlap only
       const botHeight = totalHeight - botTop;
 
       const [topBase64, botBase64] = await Promise.all([
@@ -11492,12 +11492,19 @@ Critical rules:
         'This is the TOP HALF of an invoice. Extract every line item visible here — there are likely 8-15 rows in this portion.'
       );
 
+      // Bottom scan prompt explicitly names the columns since headers are in the top half
       const promptBot = prompt.replace(
+        'STEP 1 - Find the UPC column: Look for the column header "PRODUCT UPC", "UPC", "UPC CODE", or "BARCODE".',
+        'STEP 1 - The UPC column is labeled "PRODUCT UPC" (or similar). You are viewing the BOTTOM HALF of the invoice — the column header row may not be visible, but the column structure is the same.'
+      ).replace(
+        'STEP 2 - Find the quantity column: Look for "QTY SHIPPED", "SHIPPED", "QTY", or "QUANTITY". If there are two sub-columns (ORDER and SHIPPED), use the SHIPPED number.',
+        'STEP 2 - The quantity column is labeled "QTY SHIPPED" (use the SHIPPED sub-column if two exist).'
+      ).replace(
         'STEP 3 - Go row by row from top to bottom and extract EVERY item.',
-        'STEP 3 - You are viewing the BOTTOM PORTION of the invoice. Go row by row from top to bottom and extract EVERY item visible in this portion.'
+        'STEP 3 - You are viewing the BOTTOM HALF of the invoice. Go row by row from top to bottom and extract EVERY item visible in this portion.'
       ).replace(
         'This invoice may span one or two pages and likely has 20-40 line items.',
-        'This is the BOTTOM HALF of an invoice. Extract every line item visible here — there are likely 8-15 rows in this portion.'
+        'This is the BOTTOM HALF of an invoice (headers may not be visible). Extract every line item here — there are likely 8-14 rows in this portion.'
       );
 
       // ── Run all 3 scans in parallel ──────────────────────────────────────────
