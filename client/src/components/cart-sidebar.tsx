@@ -133,7 +133,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   });
 
   // Categories ineligible for loyalty credit redemption
-  const LOYALTY_INELIGIBLE_CATEGORIES = ['dogFood', 'catFood', 'dogCages', 'aquatics', 'reptiles', 'reptile', 'grooming'];
+  const LOYALTY_INELIGIBLE_CATEGORIES = ['dogFood', 'catFood', 'dogCages', 'aquatics', 'reptiles', 'reptile'];
   const hasIneligibleLoyaltyItems = cartItems.some((item: any) => {
     if (!item.supplyId) return false;
     const supply = supplies.find((s: any) => s.id === item.supplyId);
@@ -767,7 +767,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                 )}
                 {hasIneligibleLoyaltyItems && (
                   <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">
-                    Not applicable to: dog food, cat food, cages, tanks, enclosures, or grooming items.
+                    Not applicable to: dog food, cat food, cages, tanks, or enclosures.
                   </p>
                 )}
                 {applyLoyaltyCredits && loyaltyEligibleWithTax === 0 && (
