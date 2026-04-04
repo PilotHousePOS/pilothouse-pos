@@ -11344,12 +11344,10 @@ Critical rules:
 - Include rows where shipped qty is 0
 - Return only the JSON object, nothing else`;
 
-      // SCAN B runs first — bottom-to-top prompt is reliably comprehensive.
-      // SCAN A then runs as a targeted gap-finder: it receives the UPCs already found
-      // and explicitly asks for any remaining rows not yet captured.
+      // Scan B — bottom-to-top, the reliably comprehensive pass.
       const promptB = prompt.replace(
         'STEP 3 - Go row by row from top to bottom',
-        'STEP 3 - Go row by row from BOTTOM TO TOP (start at the very last line item and work upward toward the top)'
+        'STEP 3 - Go row by row from BOTTOM to TOP (start at the last line item and work upward)'
       );
 
       // Sequential scans — parallel hits rate limits and kills one scan silently
@@ -11360,49 +11358,60 @@ Critical rules:
         max_completion_tokens: 16000,
       });
 
-      // Parse Scan B early so we can pass its UPCs to the gap-finder
-      let scanBRaw: any[] = [];
-      try {
-        const bContent = responseB.choices?.[0]?.message?.content ?? '{"items":[]}';
-        scanBRaw = JSON.parse(bContent).items ?? [];
-      } catch { scanBRaw = []; }
-      const scanBUpcs = scanBRaw.map((i: any) => String(i.upc ?? '').replace(/\D/g, '').padStart(12, '0'));
+      // Parse Scan B early so gap-finder can focus on missing rows
+      const parseItems = (content: string | null | undefined): { upc: string; qty: number; description: string }[] => {
+        if (!content) return [];
+        try { return (JSON.parse(content).items || []); } catch { return []; }
+      };
+      const itemsB = parseItems(responseB.choices?.[0]?.message?.content);
 
-      // Build gap-finder prompt: show already-found UPCs, ask for anything remaining
-      const foundList = scanBUpcs.length > 0
-        ? `\n\nUPCs already found (DO NOT repeat these):\n${scanBUpcs.join('\n')}\n\nLook at every row of the invoice and extract ONLY the rows whose UPC is NOT in the list above.`
-        : '\n\nExtract ALL line items.';
-      const promptA = prompt.replace(
-        'STEP 3 - Go row by row from top to bottom and extract EVERY item. Do not stop early. Do not skip any row.',
-        'STEP 3 - Carefully inspect EVERY row in the invoice image, paying special attention to rows in the upper-middle section that are easy to overlook.'
-      ) + foundList;
+      // Scan A — gap-finder: explicitly asks for rows that look different from what Scan B already captured.
+      // We pass the descriptions (not UPCs, which model can't reliably compare) found in Scan B.
+      const descList = itemsB.length > 0
+        ? `\n\nScan B already found these item descriptions (do NOT repeat them):\n${itemsB.map((i: any) => `- ${i.description}`).join('\n')}\n\nFind ONLY rows in the invoice whose description does NOT appear in the list above.`
+        : '';
+      const promptA = `You are analyzing a supplier invoice for a pet store. Your job is to find line items that a previous scan MISSED.
+
+STEP 1 - Find the UPC column: Look for "PRODUCT UPC", "UPC", or "BARCODE".
+STEP 2 - Find the QTY column: use the SHIPPED quantity if two sub-columns exist.
+STEP 3 - Scan the invoice carefully from TOP to BOTTOM focusing on the middle rows (rows 8 through 18) which are commonly skipped.
+
+UPC codes are 12-digit numbers. Verify the check digit before outputting.
+
+Return ONLY valid JSON:
+{
+  "items": [
+    { "upc": "015561232609", "qty": 1, "description": "EXO TERRA CRESTD GECKO 8CUP" }
+  ]
+}
+
+Rules:
+- UPC codes are exactly 12 digits — verify check digit
+- Return only the JSON object, nothing else${descList}`;
 
       const responseA = await openai.chat.completions.create({
         model: "gpt-5",
         messages: [{ role: "user", content: [{ type: "text", text: promptA }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } }] }],
         response_format: { type: "json_object" },
-        max_completion_tokens: 16000,
+        max_completion_tokens: 8000,
       });
 
-      const parseResponse = (r: typeof responseA) => {
-        const c = r.choices[0]?.message?.content;
-        if (!c) return [];
-        try { return (JSON.parse(c).items || []) as { upc: string; qty: number; description: string }[]; }
-        catch { return []; }
-      };
+      const itemsA = parseItems(responseA.choices?.[0]?.message?.content);
 
-      const itemsA = parseResponse(responseA);
-      const itemsB = parseResponse(responseB);
-
-      // Merge: prefer scan A's version of each UPC, add any UPCs only found in scan B
-      const seenUPCs = new Set(itemsA.map((i: any) => String(i.upc).replace(/[-\s]/g, '').trim()));
-      const merged = [...itemsA];
+      // Merge: Scan B first (comprehensive), then add any new UPCs from Scan A gap-finder.
+      // Full dedup across both scans including within-scan duplicates.
+      const seenUPCs = new Set<string>();
+      const merged: typeof itemsA = [];
       for (const item of itemsB) {
         const upc = String(item.upc).replace(/[-\s]/g, '').trim();
         if (!seenUPCs.has(upc)) { seenUPCs.add(upc); merged.push(item); }
       }
+      for (const item of itemsA) {
+        const upc = String(item.upc).replace(/[-\s]/g, '').trim();
+        if (!seenUPCs.has(upc)) { seenUPCs.add(upc); merged.push(item); }
+      }
 
-      console.log(`[InvoiceScan] Scan A: ${itemsA.length} items, Scan B: ${itemsB.length} items, Merged: ${merged.length} unique items`);
+      console.log(`[InvoiceScan] Scan A (gap-finder): ${itemsA.length} items, Scan B (main): ${itemsB.length} items, Merged: ${merged.length} unique items`);
       const invoiceItems = merged;
       console.log(`[InvoiceScan] Extracted ${invoiceItems.length} items from invoice`);
 
