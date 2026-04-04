@@ -11357,6 +11357,7 @@ Critical rules:
         messages: [{ role: "user", content: [{ type: "text", text: promptB }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
         response_format: { type: "json_object" },
         max_completion_tokens: 16000,
+        temperature: 0,
       });
 
       // Parse Scan B early so gap-finder can focus on missing rows
@@ -11395,7 +11396,7 @@ Critical rules:
         }
         const existingDescs = merged.map((i: any) => `- ${i.description}`).join('\n');
         const descList = merged.length > 0
-          ? `\n\nItems already captured (do NOT repeat these):\n${existingDescs}\n\nFind ONLY rows whose description is NOT in the list above. If you cannot find any new rows with high confidence, return { "items": [] } — do NOT guess or invent rows.`
+          ? `\n\nItems already captured (do NOT repeat these):\n${existingDescs}\n\nFind ONLY rows whose description is NOT in the list above.`
           : '';
         const promptA = `You are analyzing a supplier invoice for a pet store. Your job is to find line items that a previous scan MISSED.
 
@@ -11423,6 +11424,7 @@ Rules:
           messages: [{ role: "user", content: [{ type: "text", text: promptA }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
           response_format: { type: "json_object" },
           max_completion_tokens: 16000,
+          temperature: 0,
         });
 
         const itemsA = parseItems(responseA.choices?.[0]?.message?.content, `Scan A pass ${pass}`);
