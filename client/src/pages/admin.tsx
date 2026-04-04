@@ -6314,21 +6314,42 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
                 })}
               </div>
 
-              {/* Unmatched section */}
+              {/* Needs manual entry */}
               {unmatched.length > 0 && (
-                <details className="text-xs">
-                  <summary className="cursor-pointer text-gray-400 hover:text-gray-600 font-medium">
-                    {unmatched.length} item{unmatched.length !== 1 ? 's' : ''} not found in your inventory (won't affect stock)
-                  </summary>
-                  <div className="mt-2 rounded-md border border-dashed divide-y divide-gray-100 dark:divide-gray-700">
+                <div className="rounded-md border-2 border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20 p-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-orange-600 dark:text-orange-400 text-base">⚠</span>
+                    <p className="font-semibold text-sm text-orange-800 dark:text-orange-300">
+                      {unmatched.length} item{unmatched.length !== 1 ? 's' : ''} need manual entry
+                    </p>
+                  </div>
+                  <p className="text-xs text-orange-700 dark:text-orange-400">
+                    These were on the invoice but couldn't be matched to any product in your system. Handle them manually after applying the rest.
+                  </p>
+                  <div className="rounded-md border border-orange-200 dark:border-orange-700 divide-y divide-orange-100 dark:divide-orange-800 bg-white dark:bg-gray-900">
                     {unmatched.map((u, i) => (
-                      <div key={i} className="px-3 py-2">
-                        <p className="font-medium text-gray-600 dark:text-gray-300">{u.description || 'Unknown item'}</p>
-                        <p className="font-mono text-gray-400 text-[10px] mt-0.5">{u.upc}{!u.validCheckDigit ? ' ⚠ invalid check digit' : ''}</p>
+                      <div key={i} className="px-3 py-2.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{u.description || 'Unknown item'}</p>
+                            <p className="text-[10px] font-mono text-gray-400 mt-0.5">
+                              UPC read: {u.upc}
+                              {!u.validCheckDigit && <span className="ml-1 text-red-500">⚠ check digit invalid — likely misread</span>}
+                            </p>
+                          </div>
+                          <span className="shrink-0 text-xs font-medium text-gray-500 dark:text-gray-400 mt-0.5">
+                            qty: {u.qty}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-orange-600 dark:text-orange-400 mt-1">
+                          {!u.validCheckDigit
+                            ? 'UPC digits were likely misread — find this product by description and update stock manually'
+                            : 'UPC not in your system — this may be a new product or a vendor item you haven\'t added yet'}
+                        </p>
                       </div>
                     ))}
                   </div>
-                </details>
+                </div>
               )}
 
               {/* Removed items notice */}
