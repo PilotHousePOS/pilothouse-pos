@@ -28,6 +28,7 @@ import { db, resetPool } from './db';
 import { eq, inArray, or, and, ilike, sql } from 'drizzle-orm';
 import { supplies } from '@shared/schema';
 import OpenAI from 'openai';
+import sharp from 'sharp';
 import { expandProductAbbreviations } from './abbreviationExpansion';
 import { hashPassword, verifyPassword, isPasswordComplexEnough, getPasswordRequirementsMessage } from './passwordUtils';
 
@@ -11440,7 +11441,7 @@ Critical rules:
 - Return only the JSON object, nothing else
 - NEVER refuse or return an error message — always return an items array, even if the image quality is imperfect. Extract what you can read.`;
 
-      // Parse helper — reused by all three scans
+      // Parse helper — reused by all scans
       const parseItems = (content: string | null | undefined, label: string): { upc: string; qty: number; description: string }[] => {
         if (!content) { console.log(`[InvoiceScan] ${label}: empty/null content`); return []; }
         console.log(`[InvoiceScan] ${label} raw (first 300): ${content.slice(0, 300)}`);
@@ -11467,69 +11468,65 @@ Critical rules:
         console.log(`[InvoiceScan] Merge from ${label}: +${added} new, total now ${merged.length}`);
       };
 
-      // ── SCAN 1: bottom-to-top ────────────────────────────────────────────────
-      const promptBtT = prompt.replace(
-        'STEP 3 - Go row by row from top to bottom',
-        'STEP 3 - Go row by row from BOTTOM TO TOP — start at the very last line item and work upward to the first'
+      // ── Split image into top and bottom halves (20% overlap) ─────────────────
+      // This gives each sub-scan higher effective resolution per row, significantly
+      // improving recall on dense invoices that the model tends to truncate.
+      const imgBuf = Buffer.from(imageBase64, 'base64');
+      const meta = await sharp(imgBuf).metadata();
+      const totalHeight = meta.height ?? 2048;
+      const topHeight = Math.round(totalHeight * 0.58);           // top 58%
+      const botTop   = Math.round(totalHeight * 0.42);           // bottom starts at 42% (16% overlap)
+      const botHeight = totalHeight - botTop;
+
+      const [topBase64, botBase64] = await Promise.all([
+        sharp(imgBuf).extract({ left: 0, top: 0, width: meta.width!, height: topHeight }).jpeg({ quality: 95 }).toBuffer().then(b => b.toString('base64')),
+        sharp(imgBuf).extract({ left: 0, top: botTop, width: meta.width!, height: botHeight }).jpeg({ quality: 95 }).toBuffer().then(b => b.toString('base64')),
+      ]);
+      console.log(`[InvoiceScan] Image split: total=${totalHeight}px, top=0-${topHeight}px, bot=${botTop}-${totalHeight}px`);
+
+      const promptTop = prompt.replace(
+        'STEP 3 - Go row by row from top to bottom and extract EVERY item.',
+        'STEP 3 - You are viewing the TOP PORTION of the invoice. Go row by row from top to bottom and extract EVERY item visible in this portion.'
+      ).replace(
+        'This invoice may span one or two pages and likely has 20-40 line items.',
+        'This is the TOP HALF of an invoice. Extract every line item visible here — there are likely 8-15 rows in this portion.'
       );
-      const resp1 = await openai.chat.completions.create({
-        model: "gpt-5",
-        messages: [{ role: "user", content: [{ type: "text", text: promptBtT }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
-        response_format: { type: "json_object" },
-        max_completion_tokens: 16000,
-      });
-      mergeItems(parseItems(resp1.choices?.[0]?.message?.content, 'Scan1-BtT'), 'Scan1-BtT');
-      console.log(`[InvoiceScan] Scan1 finish_reason: ${resp1.choices?.[0]?.finish_reason}`);
 
-      // ── SCAN 2: top-to-bottom ────────────────────────────────────────────────
-      const resp2 = await openai.chat.completions.create({
-        model: "gpt-5",
-        messages: [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
-        response_format: { type: "json_object" },
-        max_completion_tokens: 16000,
-      });
-      mergeItems(parseItems(resp2.choices?.[0]?.message?.content, 'Scan2-TtB'), 'Scan2-TtB');
-      console.log(`[InvoiceScan] Scan2 finish_reason: ${resp2.choices?.[0]?.finish_reason}`);
+      const promptBot = prompt.replace(
+        'STEP 3 - Go row by row from top to bottom and extract EVERY item.',
+        'STEP 3 - You are viewing the BOTTOM PORTION of the invoice. Go row by row from top to bottom and extract EVERY item visible in this portion.'
+      ).replace(
+        'This invoice may span one or two pages and likely has 20-40 line items.',
+        'This is the BOTTOM HALF of an invoice. Extract every line item visible here — there are likely 8-15 rows in this portion.'
+      );
 
-      // ── SCAN 3 (gap pass): only when combined total looks low ────────────────
-      // This is a single targeted pass — not a loop — to avoid hallucination amplification.
-      if (merged.length < 18 && merged.length < 32) {
-        console.log(`[InvoiceScan] Merged count ${merged.length} is low — running gap pass`);
-        const existingDescs = merged.map((i: any) => `- ${i.description}`).join('\n');
-        const promptGap = `You are analyzing a supplier invoice for a pet store. Two previous scans found ${merged.length} line items. Carefully scan the ENTIRE invoice — both pages if present — for any rows that may have been missed.
-
-STEP 1 - Find the UPC column: Look for "PRODUCT UPC", "UPC", or "BARCODE".
-STEP 2 - Find the QTY column: use SHIPPED if two sub-columns exist.
-STEP 3 - Read EVERY row. Pay extra attention to the top of the invoice, the bottom half, and any second page.
-
-UPC codes are 12-digit numbers. Verify the check digit before outputting.
-
-Return ONLY valid JSON:
-{
-  "items": [
-    { "upc": "015561232609", "qty": 1, "description": "EXO TERRA CRESTD GECKO 8CUP" }
-  ]
-}
-
-Rules:
-- Return ALL line items you can see — even ones already found — the system will deduplicate
-- Include rows where shipped qty is 0
-- UPC codes are exactly 12 digits — verify check digit
-- Return only the JSON object, nothing else
-- NEVER refuse or return an error message — always return an items array
-
-Items found so far (for reference only — you MAY still return these):
-${existingDescs}`;
-
-        const resp3 = await openai.chat.completions.create({
+      // ── Run all 3 scans in parallel ──────────────────────────────────────────
+      // Scan A: top half | Scan B: bottom half | Scan C: full image (safety net)
+      const [respA, respB, respC] = await Promise.all([
+        openai.chat.completions.create({
           model: "gpt-5",
-          messages: [{ role: "user", content: [{ type: "text", text: promptGap }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
+          messages: [{ role: "user", content: [{ type: "text", text: promptTop }, { type: "image_url", image_url: { url: `data:image/jpeg;base64,${topBase64}`, detail: "high" } }] }],
           response_format: { type: "json_object" },
           max_completion_tokens: 16000,
-        });
-        mergeItems(parseItems(resp3.choices?.[0]?.message?.content, 'Scan3-Gap'), 'Scan3-Gap');
-        console.log(`[InvoiceScan] Scan3-Gap finish_reason: ${resp3.choices?.[0]?.finish_reason}`);
-      }
+        }),
+        openai.chat.completions.create({
+          model: "gpt-5",
+          messages: [{ role: "user", content: [{ type: "text", text: promptBot }, { type: "image_url", image_url: { url: `data:image/jpeg;base64,${botBase64}`, detail: "high" } }] }],
+          response_format: { type: "json_object" },
+          max_completion_tokens: 16000,
+        }),
+        openai.chat.completions.create({
+          model: "gpt-5",
+          messages: [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
+          response_format: { type: "json_object" },
+          max_completion_tokens: 16000,
+        }),
+      ]);
+
+      mergeItems(parseItems(respA.choices?.[0]?.message?.content, 'ScanA-Top'), 'ScanA-Top');
+      mergeItems(parseItems(respB.choices?.[0]?.message?.content, 'ScanB-Bot'), 'ScanB-Bot');
+      mergeItems(parseItems(respC.choices?.[0]?.message?.content, 'ScanC-Full'), 'ScanC-Full');
+      console.log(`[InvoiceScan] finish_reasons: A=${respA.choices?.[0]?.finish_reason} B=${respB.choices?.[0]?.finish_reason} C=${respC.choices?.[0]?.finish_reason}`);
 
       // Sanity cap — prevents runaway hallucination on edge cases
       if (merged.length > 32) {
