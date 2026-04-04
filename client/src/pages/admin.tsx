@@ -10805,32 +10805,9 @@ export default function Admin() {
                                 Paid
                               </label>
                             </div>
-                            <div className="flex items-center gap-1.5 px-2 py-1 border rounded bg-white">
-                              <Checkbox
-                                id={`grooming-completed-${currentAppointment.id}`}
-                                checked={currentAppointment.groomingCompleted || false}
-                                onCheckedChange={(checked) => {
-                                  if (checked) {
-                                    setPendingDoneId(currentAppointment.id);
-                                  } else {
-                                    updateAppointmentGroomingCompletedMutation.mutate({ 
-                                      id: currentAppointment.id, 
-                                      groomingCompleted: false 
-                                    });
-                                  }
-                                }}
-                                data-testid={`checkbox-grooming-completed-${currentAppointment.id}`}
-                              />
-                              <label 
-                                htmlFor={`grooming-completed-${currentAppointment.id}`}
-                                className="text-xs font-medium cursor-pointer"
-                              >
-                                Done
-                              </label>
-                            </div>
                           </div>
-                          {/* Online Payment Footer — full-width row below left+right panels */}
-                          {(currentAppointment.readyForPayment || currentAppointment.isPaid || currentAppointment.price) && (
+                          {/* Mark Ready footer — marks grooming done + notifies customer for online payment */}
+                          {(currentAppointment.readyForPayment || currentAppointment.groomingCompleted || currentAppointment.isPaid || currentAppointment.price) && (
                             <div className="w-full flex items-center justify-between pt-2 mt-1 border-t border-gray-100 gap-2">
                               <div className="flex items-center gap-2">
                                 {currentAppointment.isPaid && currentAppointment.paidOnline && (
@@ -10844,19 +10821,26 @@ export default function Admin() {
                                     Online pay pending: ${parseFloat(currentAppointment.finalAmount || currentAppointment.price || '0').toFixed(2)}
                                   </span>
                                 )}
+                                {currentAppointment.groomingCompleted && !currentAppointment.readyForPayment && !currentAppointment.isPaid && (
+                                  <span className="text-xs text-green-700 font-medium">✓ Done</span>
+                                )}
                               </div>
                               {!currentAppointment.isPaid && currentAppointment.price && (
                                 <Button
                                   size="sm"
                                   variant="outline"
                                   className={`h-7 text-xs px-2 ${currentAppointment.readyForPayment ? 'border-orange-300 text-orange-600 hover:bg-orange-50' : 'border-green-300 text-green-600 hover:bg-green-50'}`}
-                                  disabled={markReadyForPaymentMutation.isPending}
+                                  disabled={markReadyForPaymentMutation.isPending || updateAppointmentGroomingCompletedMutation.isPending}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     const amt = currentAppointment.price || '0';
                                     if (currentAppointment.readyForPayment) {
+                                      // Clear: un-mark both done and ready
                                       markReadyForPaymentMutation.mutate({ id: currentAppointment.id, finalAmount: amt, readyForPayment: false });
+                                      updateAppointmentGroomingCompletedMutation.mutate({ id: currentAppointment.id, groomingCompleted: false });
                                     } else {
+                                      // Mark Ready: mark grooming done + send online payment link
+                                      updateAppointmentGroomingCompletedMutation.mutate({ id: currentAppointment.id, groomingCompleted: true });
                                       markReadyForPaymentMutation.mutate({ id: currentAppointment.id, finalAmount: amt, readyForPayment: true });
                                     }
                                   }}

@@ -11474,8 +11474,8 @@ Critical rules:
       const imgBuf = Buffer.from(imageBase64, 'base64');
       const meta = await sharp(imgBuf).metadata();
       const totalHeight = meta.height ?? 2048;
-      const topHeight = Math.round(totalHeight * 0.58);           // top 58%
-      const botTop   = Math.round(totalHeight * 0.42);           // bottom starts at 42% (16% overlap)
+      const topHeight = Math.round(totalHeight * 0.75);           // top 75%
+      const botTop   = Math.round(totalHeight * 0.20);           // bottom starts at 20% — includes headers
       const botHeight = totalHeight - botTop;
 
       const [topBase64, botBase64] = await Promise.all([
