@@ -289,6 +289,10 @@ export const appointments = pgTable("appointments", {
   isRecurring: boolean("is_recurring").default(false), // Whether this is a recurring appointment
   recurringType: varchar("recurring_type", { length: 20 }), // "monthly" or "custom"
   recurringParentId: integer("recurring_parent_id"), // Links child appointments to original parent
+  finalAmount: decimal("final_amount", { precision: 10, scale: 2 }), // Groomer-confirmed final charge amount
+  readyForPayment: boolean("ready_for_payment").default(false), // Groomer has set final amount and customer can pay
+  paidOnline: boolean("paid_online").default(false), // Payment was completed online (vs in-store)
+  groomingStripeSessionId: varchar("grooming_stripe_session_id", { length: 255 }), // Stripe checkout session for grooming payment
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -4820,6 +4820,101 @@ West Monroe LA 71291
     }
   });
 
+  // Admin/groomer marks appointment ready for online payment with final amount
+  app.patch("/api/admin/appointments/:id/ready-for-payment", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin && !user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
+      }
+      const id = parseInt(req.params.id);
+      const { finalAmount, readyForPayment } = req.body;
+      if (readyForPayment && (finalAmount === undefined || isNaN(parseFloat(finalAmount)))) {
+        return res.status(400).json({ message: "finalAmount is required when marking ready for payment" });
+      }
+      const appointment = await storage.updateAppointmentReadyForPayment(id, String(parseFloat(finalAmount || "0").toFixed(2)), readyForPayment ?? true);
+      if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+      res.json(appointment);
+    } catch (error) {
+      console.error("Error marking appointment ready for payment:", error);
+      res.status(500).json({ message: "Failed to update appointment" });
+    }
+  });
+
+  // Customer creates Stripe checkout session to pay for grooming appointment
+  app.post("/api/appointments/:id/pay-online", authMiddleware, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const appointment = await storage.getAppointment(id);
+      if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+      if (appointment.userId !== req.user?.id) return res.status(403).json({ message: "Forbidden" });
+      if (!appointment.readyForPayment) return res.status(400).json({ message: "Appointment is not ready for payment" });
+      if (appointment.isPaid) return res.status(400).json({ message: "Appointment is already paid" });
+
+      const amount = parseFloat(appointment.finalAmount || "0");
+      if (amount <= 0) return res.status(400).json({ message: "Invalid payment amount" });
+
+      const { getUncachableStripeClient } = await import('./stripeClient');
+      const stripe = await getUncachableStripeClient();
+
+      const origin = req.headers.origin || `https://${req.headers.host}`;
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: `Grooming — ${appointment.petName}`,
+              description: `${appointment.serviceType === 'grooming' ? 'Full Grooming' : appointment.serviceType} on ${appointment.appointmentDate}`,
+            },
+            unit_amount: Math.round(amount * 100),
+          },
+          quantity: 1,
+        }],
+        mode: 'payment',
+        success_url: `${origin}/my-appointments?groomingPaid=${id}&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/my-appointments`,
+        metadata: { appointmentId: String(id), type: 'grooming' },
+      });
+
+      res.json({ checkoutUrl: session.url, sessionId: session.id });
+    } catch (error) {
+      console.error("Error creating grooming checkout session:", error);
+      res.status(500).json({ message: "Failed to create payment session" });
+    }
+  });
+
+  // Confirm grooming payment after Stripe checkout redirect
+  app.post("/api/appointments/:id/confirm-payment", authMiddleware, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { sessionId } = req.body;
+      if (!sessionId) return res.status(400).json({ message: "sessionId is required" });
+
+      const appointment = await storage.getAppointment(id);
+      if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+      if (appointment.userId !== req.user?.id) return res.status(403).json({ message: "Forbidden" });
+      if (appointment.isPaid) return res.json({ success: true, alreadyPaid: true });
+
+      const { getUncachableStripeClient } = await import('./stripeClient');
+      const stripe = await getUncachableStripeClient();
+
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      if (session.payment_status !== 'paid') {
+        return res.status(400).json({ message: "Payment not completed" });
+      }
+      if (String(session.metadata?.appointmentId) !== String(id)) {
+        return res.status(400).json({ message: "Session does not match appointment" });
+      }
+
+      const updated = await storage.updateAppointmentPaidOnline(id, sessionId);
+      res.json({ success: true, appointment: updated });
+    } catch (error) {
+      console.error("Error confirming grooming payment:", error);
+      res.status(500).json({ message: "Failed to confirm payment" });
+    }
+  });
+
   // Update appointment grooming completed status and send SMS notification
   app.patch("/api/appointments/:id/grooming-completed", authMiddleware, async (req: any, res) => {
     try {
@@ -11345,21 +11440,7 @@ Critical rules:
 - Return only the JSON object, nothing else
 - NEVER refuse or return an error message — always return an items array, even if the image quality is imperfect. Extract what you can read.`;
 
-      // Scan B — bottom-to-top, the reliably comprehensive pass.
-      const promptB = prompt.replace(
-        'STEP 3 - Go row by row from top to bottom',
-        'STEP 3 - Go row by row from BOTTOM to TOP (start at the last line item and work upward)'
-      );
-
-      // Sequential scans — parallel hits rate limits and kills one scan silently
-      const responseB = await openai.chat.completions.create({
-        model: "gpt-5",
-        messages: [{ role: "user", content: [{ type: "text", text: promptB }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
-        response_format: { type: "json_object" },
-        max_completion_tokens: 16000,
-      });
-
-      // Parse Scan B early so gap-finder can focus on missing rows
+      // Parse helper — reused by all three scans
       const parseItems = (content: string | null | undefined, label: string): { upc: string; qty: number; description: string }[] => {
         if (!content) { console.log(`[InvoiceScan] ${label}: empty/null content`); return []; }
         console.log(`[InvoiceScan] ${label} raw (first 300): ${content.slice(0, 300)}`);
@@ -11373,35 +11454,53 @@ Critical rules:
           return [];
         }
       };
-      const itemsB = parseItems(responseB.choices?.[0]?.message?.content, 'Scan B');
-      console.log(`[InvoiceScan] Scan B finish_reason: ${responseB.choices?.[0]?.finish_reason}`);
 
-      // Merge Scan B results first, then loop gap-finder up to 3 passes
+      // Merge helper — deduplicates by normalized UPC, preserves first-seen item
       const seenUPCs = new Set<string>();
-      const merged: typeof itemsB = [];
-      for (const item of itemsB) {
-        const upc = String(item.upc).replace(/[-\s]/g, '').trim();
-        if (!seenUPCs.has(upc)) { seenUPCs.add(upc); merged.push(item); }
-      }
-
-      // Gap-finder loop: fewer passes when Scan B already found most items (reduces API calls and hallucination risk)
-      const maxPasses = itemsB.length >= 18 ? 2 : itemsB.length === 0 ? 5 : 3;
-      let totalGapItems = 0;
-      for (let pass = 1; pass <= maxPasses; pass++) {
-        // Sanity cap: if we've accumulated far more than a realistic invoice size, stop
-        if (merged.length >= 32) {
-          console.log(`[InvoiceScan] Gap-finder sanity cap hit at ${merged.length} items — stopping`);
-          break;
+      const merged: { upc: string; qty: number; description: string }[] = [];
+      const mergeItems = (items: { upc: string; qty: number; description: string }[], label: string) => {
+        let added = 0;
+        for (const item of items) {
+          const upc = String(item.upc).replace(/[-\s]/g, '').trim();
+          if (!seenUPCs.has(upc)) { seenUPCs.add(upc); merged.push({ ...item, upc }); added++; }
         }
+        console.log(`[InvoiceScan] Merge from ${label}: +${added} new, total now ${merged.length}`);
+      };
+
+      // ── SCAN 1: bottom-to-top ────────────────────────────────────────────────
+      const promptBtT = prompt.replace(
+        'STEP 3 - Go row by row from top to bottom',
+        'STEP 3 - Go row by row from BOTTOM TO TOP — start at the very last line item and work upward to the first'
+      );
+      const resp1 = await openai.chat.completions.create({
+        model: "gpt-5",
+        messages: [{ role: "user", content: [{ type: "text", text: promptBtT }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
+        response_format: { type: "json_object" },
+        max_completion_tokens: 16000,
+      });
+      mergeItems(parseItems(resp1.choices?.[0]?.message?.content, 'Scan1-BtT'), 'Scan1-BtT');
+      console.log(`[InvoiceScan] Scan1 finish_reason: ${resp1.choices?.[0]?.finish_reason}`);
+
+      // ── SCAN 2: top-to-bottom ────────────────────────────────────────────────
+      const resp2 = await openai.chat.completions.create({
+        model: "gpt-5",
+        messages: [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
+        response_format: { type: "json_object" },
+        max_completion_tokens: 16000,
+      });
+      mergeItems(parseItems(resp2.choices?.[0]?.message?.content, 'Scan2-TtB'), 'Scan2-TtB');
+      console.log(`[InvoiceScan] Scan2 finish_reason: ${resp2.choices?.[0]?.finish_reason}`);
+
+      // ── SCAN 3 (gap pass): only when combined total looks low ────────────────
+      // This is a single targeted pass — not a loop — to avoid hallucination amplification.
+      if (merged.length < 18 && merged.length < 32) {
+        console.log(`[InvoiceScan] Merged count ${merged.length} is low — running gap pass`);
         const existingDescs = merged.map((i: any) => `- ${i.description}`).join('\n');
-        const descList = merged.length > 0
-          ? `\n\nItems already captured (do NOT repeat these):\n${existingDescs}\n\nFind ONLY rows whose description is NOT in the list above.`
-          : '';
-        const promptA = `You are analyzing a supplier invoice for a pet store. Your job is to find line items that a previous scan MISSED.
+        const promptGap = `You are analyzing a supplier invoice for a pet store. Two previous scans found ${merged.length} line items. Carefully scan the ENTIRE invoice — both pages if present — for any rows that may have been missed.
 
 STEP 1 - Find the UPC column: Look for "PRODUCT UPC", "UPC", or "BARCODE".
-STEP 2 - Find the QTY column: use the SHIPPED quantity if two sub-columns exist.
-STEP 3 - Scan the ENTIRE invoice from TOP to BOTTOM. If the invoice spans two pages or has a large lower section, pay special attention to ALL rows in the lower half and second page, which are most commonly missed.
+STEP 2 - Find the QTY column: use SHIPPED if two sub-columns exist.
+STEP 3 - Read EVERY row. Pay extra attention to the top of the invoice, the bottom half, and any second page.
 
 UPC codes are 12-digit numbers. Verify the check digit before outputting.
 
@@ -11413,36 +11512,32 @@ Return ONLY valid JSON:
 }
 
 Rules:
+- Return ALL line items you can see — even ones already found — the system will deduplicate
+- Include rows where shipped qty is 0
 - UPC codes are exactly 12 digits — verify check digit
 - Return only the JSON object, nothing else
-- If no missing rows are found, return { "items": [] }
-- NEVER refuse or return an error message — always return an items array, even if the image quality is imperfect${descList}`;
+- NEVER refuse or return an error message — always return an items array
 
-        const responseA = await openai.chat.completions.create({
+Items found so far (for reference only — you MAY still return these):
+${existingDescs}`;
+
+        const resp3 = await openai.chat.completions.create({
           model: "gpt-5",
-          messages: [{ role: "user", content: [{ type: "text", text: promptA }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
+          messages: [{ role: "user", content: [{ type: "text", text: promptGap }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
           response_format: { type: "json_object" },
           max_completion_tokens: 16000,
         });
-
-        const itemsA = parseItems(responseA.choices?.[0]?.message?.content, `Scan A pass ${pass}`);
-        console.log(`[InvoiceScan] Scan A pass ${pass} finish_reason: ${responseA.choices?.[0]?.finish_reason}`);
-
-        let newThisPass = 0;
-        for (const item of itemsA) {
-          const upc = String(item.upc).replace(/[-\s]/g, '').trim();
-          if (!seenUPCs.has(upc)) { seenUPCs.add(upc); merged.push(item); newThisPass++; }
-        }
-        totalGapItems += newThisPass;
-        console.log(`[InvoiceScan] Scan A pass ${pass}: ${itemsA.length} items returned, ${newThisPass} new — merged total: ${merged.length}`);
-
-        if (newThisPass === 0) {
-          console.log(`[InvoiceScan] Gap-finder converged after ${pass} pass(es)`);
-          break;
-        }
+        mergeItems(parseItems(resp3.choices?.[0]?.message?.content, 'Scan3-Gap'), 'Scan3-Gap');
+        console.log(`[InvoiceScan] Scan3-Gap finish_reason: ${resp3.choices?.[0]?.finish_reason}`);
       }
 
-      console.log(`[InvoiceScan] Scan B: ${itemsB.length} items, Gap-finder total new: ${totalGapItems}, Merged: ${merged.length} unique items`);
+      // Sanity cap — prevents runaway hallucination on edge cases
+      if (merged.length > 32) {
+        console.log(`[InvoiceScan] Sanity cap: trimming from ${merged.length} to 32`);
+        merged.splice(32);
+      }
+
+      console.log(`[InvoiceScan] Final merged: ${merged.length} unique items`);
       const invoiceItems = merged;
       console.log(`[InvoiceScan] Extracted ${invoiceItems.length} items from invoice`);
 

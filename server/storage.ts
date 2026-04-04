@@ -278,6 +278,8 @@ export interface IStorage {
   updateAppointmentStatus(id: number, status: string): Promise<Appointment>;
   updateAppointmentIsHere(id: number, isHere: boolean): Promise<Appointment>;
   updateAppointmentIsPaid(id: number, isPaid: boolean): Promise<Appointment>;
+  updateAppointmentReadyForPayment(id: number, finalAmount: string, readyForPayment: boolean): Promise<Appointment>;
+  updateAppointmentPaidOnline(id: number, sessionId: string): Promise<Appointment>;
   updateAppointmentGroomingCompleted(id: number, groomingCompleted: boolean): Promise<Appointment>;
   updateAppointmentDetails(id: number, updates: { 
     ownerFirstName?: string; 
@@ -2776,9 +2778,30 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentIsPaid(id: number, isPaid: boolean): Promise<Appointment> {
+    // When marking paid in-store, clear readyForPayment to prevent online double-payment
+    const setFields: any = { isPaid, updatedAt: new Date() };
+    if (isPaid) setFields.readyForPayment = false;
     const [updated] = await db
       .update(appointments)
-      .set({ isPaid, updatedAt: new Date() })
+      .set(setFields)
+      .where(eq(appointments.id, id))
+      .returning();
+    return updated;
+  }
+
+  async updateAppointmentReadyForPayment(id: number, finalAmount: string, readyForPayment: boolean): Promise<Appointment> {
+    const [updated] = await db
+      .update(appointments)
+      .set({ finalAmount, readyForPayment, updatedAt: new Date() })
+      .where(eq(appointments.id, id))
+      .returning();
+    return updated;
+  }
+
+  async updateAppointmentPaidOnline(id: number, sessionId: string): Promise<Appointment> {
+    const [updated] = await db
+      .update(appointments)
+      .set({ isPaid: true, paidOnline: true, readyForPayment: false, groomingStripeSessionId: sessionId, updatedAt: new Date() })
       .where(eq(appointments.id, id))
       .returning();
     return updated;

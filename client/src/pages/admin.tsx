@@ -6385,6 +6385,9 @@ export default function Admin() {
   // "Has customer been called?" confirmation before marking Done
   const [pendingDoneId, setPendingDoneId] = useState<number | null>(null);
 
+  // Final amount inputs for marking appointments ready for online payment (keyed by appointment id)
+  const [finalAmountInputs, setFinalAmountInputs] = useState<Record<number, string>>({});
+
   // SMS Confirmation Dialog State
   const [smsConfirmDialog, setSmsConfirmDialog] = useState<{
     isOpen: boolean;
@@ -7493,7 +7496,6 @@ export default function Admin() {
         title: "Payment Status Updated",
         description: variables.isPaid ? "Customer marked as paid" : "Customer marked as not paid",
       });
-      // Force immediate refetch of appointments data
       await queryClient.refetchQueries({ queryKey: ["/api/appointments"] });
     },
     onError: (error) => {
@@ -7503,6 +7505,24 @@ export default function Admin() {
         description: "Failed to update payment status. Please try again.",
         variant: "destructive",
       });
+    },
+  });
+
+  const markReadyForPaymentMutation = useMutation({
+    mutationFn: async ({ id, finalAmount, readyForPayment }: { id: number; finalAmount: string; readyForPayment: boolean }) => {
+      return await apiRequest("PATCH", `/api/admin/appointments/${id}/ready-for-payment`, { finalAmount, readyForPayment });
+    },
+    onSuccess: async (_, variables) => {
+      toast({
+        title: variables.readyForPayment ? "Ready for Payment" : "Payment Link Cleared",
+        description: variables.readyForPayment
+          ? `Customer can now pay $${parseFloat(variables.finalAmount).toFixed(2)} online`
+          : "Online payment option removed",
+      });
+      await queryClient.refetchQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: () => {
+      toast({ title: "Update Failed", description: "Failed to update payment status.", variant: "destructive" });
     },
   });
 
@@ -10811,6 +10831,54 @@ export default function Admin() {
                               </label>
                             </div>
                           </div>
+
+                          {/* Online Payment Controls */}
+                          {!currentAppointment.isPaid && (
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder="Final $"
+                                value={finalAmountInputs[currentAppointment.id] ?? (currentAppointment.finalAmount ? String(parseFloat(currentAppointment.finalAmount)) : '')}
+                                onChange={(e) => setFinalAmountInputs(prev => ({ ...prev, [currentAppointment.id]: e.target.value }))}
+                                className="w-24 h-7 text-xs border rounded px-1.5 bg-white"
+                              />
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className={`h-7 text-xs px-2 ${currentAppointment.readyForPayment ? 'border-orange-300 text-orange-600 hover:bg-orange-50' : 'border-green-300 text-green-600 hover:bg-green-50'}`}
+                                disabled={markReadyForPaymentMutation.isPending}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const amt = finalAmountInputs[currentAppointment.id] ?? (currentAppointment.finalAmount || '');
+                                  if (currentAppointment.readyForPayment) {
+                                    markReadyForPaymentMutation.mutate({ id: currentAppointment.id, finalAmount: amt || '0', readyForPayment: false });
+                                  } else {
+                                    if (!amt || parseFloat(amt) <= 0) {
+                                      toast({ title: "Enter Final Amount", description: "Please enter the final charge amount first.", variant: "destructive" });
+                                      return;
+                                    }
+                                    markReadyForPaymentMutation.mutate({ id: currentAppointment.id, finalAmount: amt, readyForPayment: true });
+                                  }
+                                }}
+                              >
+                                {currentAppointment.readyForPayment ? 'Clear' : 'Mark Ready'}
+                              </Button>
+                            </div>
+                          )}
+                          {currentAppointment.readyForPayment && !currentAppointment.isPaid && (
+                            <p className="text-xs text-amber-600 font-medium mt-0.5">
+                              Online pay pending: ${parseFloat(currentAppointment.finalAmount || '0').toFixed(2)}
+                            </p>
+                          )}
+                          {currentAppointment.isPaid && currentAppointment.paidOnline && (
+                            <p className="text-xs text-green-600 font-medium mt-0.5">✓ Paid online</p>
+                          )}
+                          {currentAppointment.isPaid && !currentAppointment.paidOnline && (
+                            <p className="text-xs text-green-600 font-medium mt-0.5">✓ Paid in-store</p>
+                          )}
+                        </div>
                         </div>
                       );
                     })}
