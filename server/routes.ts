@@ -11384,14 +11384,18 @@ Critical rules:
         if (!seenUPCs.has(upc)) { seenUPCs.add(upc); merged.push(item); }
       }
 
-      // Gap-finder loop: run up to 5 passes, convergence (0 new items) stops it early
-      const maxPasses = 5;
+      // Gap-finder loop: fewer passes when Scan B already found most items (reduces API calls and hallucination risk)
+      const maxPasses = itemsB.length >= 18 ? 2 : itemsB.length === 0 ? 5 : 3;
       let totalGapItems = 0;
       for (let pass = 1; pass <= maxPasses; pass++) {
+        // Sanity cap: if we've accumulated far more than a realistic invoice size, stop
+        if (merged.length >= 32) {
+          console.log(`[InvoiceScan] Gap-finder sanity cap hit at ${merged.length} items — stopping`);
+          break;
+        }
         const existingDescs = merged.map((i: any) => `- ${i.description}`).join('\n');
-        const capturedCount = merged.length;
-        const descList = capturedCount > 0
-          ? `\n\nItems already captured (${capturedCount} so far — do NOT repeat these):\n${existingDescs}\n\nFind ONLY rows whose description is NOT in the list above. There are likely ${Math.max(0, 25 - capturedCount)} or more rows still missing.`
+        const descList = merged.length > 0
+          ? `\n\nItems already captured (do NOT repeat these):\n${existingDescs}\n\nFind ONLY rows whose description is NOT in the list above. If you cannot find any new rows with high confidence, return { "items": [] } — do NOT guess or invent rows.`
           : '';
         const promptA = `You are analyzing a supplier invoice for a pet store. Your job is to find line items that a previous scan MISSED.
 
