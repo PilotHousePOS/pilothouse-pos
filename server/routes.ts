@@ -11569,7 +11569,9 @@ Rules:
       };
 
       function parseInvoiceDesc(desc: string): { brand: string | null; keywords: string[] } {
-        const tokens = desc.toUpperCase().split(/[\s\/\-\#\.\(\)]+/).filter(t => t.length > 1);
+        // Normalize weight tokens before splitting: "15#" → "15LB", "6#" → "6LB"
+        const normalized = desc.toUpperCase().replace(/(\d+)#/g, '$1LB');
+        const tokens = normalized.split(/[\s\/\-\#\.\(\)']+/).filter(t => t.length > 1);
         let brand: string | null | undefined = undefined;
         const keywords: string[] = [];
         for (const token of tokens) {
@@ -11653,6 +11655,9 @@ Rules:
           });
           console.log(`[InvoiceScan] DESC-MATCH: "${item.description}" → ${product.name}`);
         } else {
+          if (product && seenIds.has(product.id)) {
+            console.log(`[InvoiceScan] DESC-BLOCKED by seenIds: "${item.description}" → ${product.name} (id=${product.id})`);
+          }
           unmatched.push({ upc: item.upc, qty: item.qty, description: item.description, validCheckDigit: isValidUPC(item.upc) });
         }
       }
