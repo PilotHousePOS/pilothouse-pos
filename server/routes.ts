@@ -11359,11 +11359,21 @@ Critical rules:
       });
 
       // Parse Scan B early so gap-finder can focus on missing rows
-      const parseItems = (content: string | null | undefined): { upc: string; qty: number; description: string }[] => {
-        if (!content) return [];
-        try { return (JSON.parse(content).items || []); } catch { return []; }
+      const parseItems = (content: string | null | undefined, label: string): { upc: string; qty: number; description: string }[] => {
+        if (!content) { console.log(`[InvoiceScan] ${label}: empty/null content`); return []; }
+        console.log(`[InvoiceScan] ${label} raw (first 300): ${content.slice(0, 300)}`);
+        try {
+          const parsed = JSON.parse(content);
+          const items = parsed.items || [];
+          console.log(`[InvoiceScan] ${label}: parsed ${items.length} items`);
+          return items;
+        } catch (e: any) {
+          console.log(`[InvoiceScan] ${label}: JSON parse error — ${e.message}`);
+          return [];
+        }
       };
-      const itemsB = parseItems(responseB.choices?.[0]?.message?.content);
+      const itemsB = parseItems(responseB.choices?.[0]?.message?.content, 'Scan B');
+      console.log(`[InvoiceScan] Scan B finish_reason: ${responseB.choices?.[0]?.finish_reason}`);
 
       // Scan A — gap-finder: explicitly asks for rows that look different from what Scan B already captured.
       // We pass the descriptions (not UPCs, which model can't reliably compare) found in Scan B.
@@ -11396,7 +11406,8 @@ Rules:
         max_completion_tokens: 8000,
       });
 
-      const itemsA = parseItems(responseA.choices?.[0]?.message?.content);
+      const itemsA = parseItems(responseA.choices?.[0]?.message?.content, 'Scan A');
+      console.log(`[InvoiceScan] Scan A finish_reason: ${responseA.choices?.[0]?.finish_reason}`);
 
       // Merge: Scan B first (comprehensive), then add any new UPCs from Scan A gap-finder.
       // Full dedup across both scans including within-scan duplicates.
