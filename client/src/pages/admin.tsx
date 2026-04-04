@@ -6385,8 +6385,6 @@ export default function Admin() {
   // "Has customer been called?" confirmation before marking Done
   const [pendingDoneId, setPendingDoneId] = useState<number | null>(null);
 
-  // Final amount inputs for marking appointments ready for online payment (keyed by appointment id)
-  const [finalAmountInputs, setFinalAmountInputs] = useState<Record<number, string>>({});
 
   // SMS Confirmation Dialog State
   const [smsConfirmDialog, setSmsConfirmDialog] = useState<{
@@ -10606,7 +10604,7 @@ export default function Admin() {
                         return (
                         <div 
                           key={`${phone}-${currentAppointment.id}`}
-                          className={`flex flex-col sm:flex-row sm:items-start sm:justify-between p-3 border rounded-lg gap-2 ${
+                          className={`flex flex-col sm:flex-row sm:flex-wrap sm:items-start sm:justify-between p-3 border rounded-lg gap-2 ${
                             isHighlighted 
                               ? 'border-2 border-amber-400 bg-amber-50 shadow-md' 
                               : 'border bg-white'
@@ -10832,51 +10830,43 @@ export default function Admin() {
                             </div>
                           </div>
 
-                          {/* Online Payment Controls */}
-                          {!currentAppointment.isPaid && (
-                            <div className="flex items-center gap-1.5 mt-1">
-                              <input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                placeholder="Final $"
-                                value={finalAmountInputs[currentAppointment.id] ?? (currentAppointment.finalAmount ? String(parseFloat(currentAppointment.finalAmount)) : '')}
-                                onChange={(e) => setFinalAmountInputs(prev => ({ ...prev, [currentAppointment.id]: e.target.value }))}
-                                className="w-24 h-7 text-xs border rounded px-1.5 bg-white"
-                              />
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className={`h-7 text-xs px-2 ${currentAppointment.readyForPayment ? 'border-orange-300 text-orange-600 hover:bg-orange-50' : 'border-green-300 text-green-600 hover:bg-green-50'}`}
-                                disabled={markReadyForPaymentMutation.isPending}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const amt = finalAmountInputs[currentAppointment.id] ?? (currentAppointment.finalAmount || '');
-                                  if (currentAppointment.readyForPayment) {
-                                    markReadyForPaymentMutation.mutate({ id: currentAppointment.id, finalAmount: amt || '0', readyForPayment: false });
-                                  } else {
-                                    if (!amt || parseFloat(amt) <= 0) {
-                                      toast({ title: "Enter Final Amount", description: "Please enter the final charge amount first.", variant: "destructive" });
-                                      return;
+                        </div>
+                          {/* Online Payment Footer — full-width row below left+right panels */}
+                          {(currentAppointment.readyForPayment || currentAppointment.isPaid || currentAppointment.price) && (
+                            <div className="w-full flex items-center justify-between pt-2 mt-1 border-t border-gray-100 gap-2">
+                              <div className="flex items-center gap-2">
+                                {currentAppointment.isPaid && currentAppointment.paidOnline && (
+                                  <span className="text-xs text-green-600 font-medium">✓ Paid online</span>
+                                )}
+                                {currentAppointment.isPaid && !currentAppointment.paidOnline && (
+                                  <span className="text-xs text-green-600 font-medium">✓ Paid in-store</span>
+                                )}
+                                {currentAppointment.readyForPayment && !currentAppointment.isPaid && (
+                                  <span className="text-xs text-amber-600 font-medium">
+                                    Online pay pending: ${parseFloat(currentAppointment.finalAmount || currentAppointment.price || '0').toFixed(2)}
+                                  </span>
+                                )}
+                              </div>
+                              {!currentAppointment.isPaid && currentAppointment.price && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className={`h-7 text-xs px-2 ${currentAppointment.readyForPayment ? 'border-orange-300 text-orange-600 hover:bg-orange-50' : 'border-green-300 text-green-600 hover:bg-green-50'}`}
+                                  disabled={markReadyForPaymentMutation.isPending}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const amt = currentAppointment.price || '0';
+                                    if (currentAppointment.readyForPayment) {
+                                      markReadyForPaymentMutation.mutate({ id: currentAppointment.id, finalAmount: amt, readyForPayment: false });
+                                    } else {
+                                      markReadyForPaymentMutation.mutate({ id: currentAppointment.id, finalAmount: amt, readyForPayment: true });
                                     }
-                                    markReadyForPaymentMutation.mutate({ id: currentAppointment.id, finalAmount: amt, readyForPayment: true });
-                                  }
-                                }}
-                              >
-                                {currentAppointment.readyForPayment ? 'Clear' : 'Mark Ready'}
-                              </Button>
+                                  }}
+                                >
+                                  {currentAppointment.readyForPayment ? 'Clear' : 'Mark Ready'}
+                                </Button>
+                              )}
                             </div>
-                          )}
-                          {currentAppointment.readyForPayment && !currentAppointment.isPaid && (
-                            <p className="text-xs text-amber-600 font-medium mt-0.5">
-                              Online pay pending: ${parseFloat(currentAppointment.finalAmount || '0').toFixed(2)}
-                            </p>
-                          )}
-                          {currentAppointment.isPaid && currentAppointment.paidOnline && (
-                            <p className="text-xs text-green-600 font-medium mt-0.5">✓ Paid online</p>
-                          )}
-                          {currentAppointment.isPaid && !currentAppointment.paidOnline && (
-                            <p className="text-xs text-green-600 font-medium mt-0.5">✓ Paid in-store</p>
                           )}
                         </div>
                       );
