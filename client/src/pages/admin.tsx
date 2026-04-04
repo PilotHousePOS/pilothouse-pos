@@ -13996,6 +13996,10 @@ export default function Admin() {
                       onValueChange={(value) => {
                         const newPets = [...bookingPets];
                         newPets[index].type = value;
+                        // Cats can only have Bath Only service
+                        if (value === 'Cat') {
+                          newPets[index].serviceType = 'grooming-bath';
+                        }
                         setBookingPets(newPets);
                       }}
                     >
@@ -14013,6 +14017,9 @@ export default function Admin() {
 
                   <div>
                     <Label>Service Type *</Label>
+                    {pet.type === 'Cat' && (
+                      <p className="text-xs text-purple-600 mb-1">Cats receive Bath Only service.</p>
+                    )}
                     <Select
                       value={pet.serviceType}
                       onValueChange={(value) => {
@@ -14025,7 +14032,9 @@ export default function Admin() {
                         <SelectValue placeholder="Select service" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="grooming-full">Full Grooming ${servicePrices?.fullGrooming || '35'} (Prices will vary)</SelectItem>
+                        {pet.type !== 'Cat' && (
+                          <SelectItem value="grooming-full">Full Grooming ${servicePrices?.fullGrooming || '35'} (Prices will vary)</SelectItem>
+                        )}
                         <SelectItem value="grooming-bath">Bath Only ${servicePrices?.bathOnly || '20'} (Prices will vary)</SelectItem>
                       </SelectContent>
                     </Select>

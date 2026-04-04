@@ -643,7 +643,13 @@ export default function Booking() {
 
   const updatePet = (index: number, field: string, value: string) => {
     const updated = [...pets];
-    updated[index] = { ...updated[index], [field]: value };
+    const changes: Record<string, any> = { [field]: value };
+    // When pet type changes to cat, force Bath Only and clear add-ons
+    if (field === 'type' && value === 'cat') {
+      changes.serviceType = 'grooming-bath';
+      changes.addOns = [];
+    }
+    updated[index] = { ...updated[index], ...changes };
     setPets(updated);
   };
 
@@ -1090,9 +1096,12 @@ export default function Booking() {
                 
                 <div>
                   <Label className="text-xs text-gray-600 mb-2 block">Service Type *</Label>
+                  {pet.type === 'cat' && (
+                    <p className="text-xs text-purple-600 mb-2">Cats receive Bath Only service.</p>
+                  )}
                   <RadioGroup value={pet.serviceType} onValueChange={(value) => updatePet(index, 'serviceType', value)}>
                     <div className="space-y-2">
-                      {SERVICES.map((service) => (
+                      {SERVICES.filter(s => pet.type !== 'cat' || s.id === 'grooming-bath').map((service) => (
                         <div key={service.id} className="flex items-center space-x-3 p-2 border rounded-lg hover:bg-gray-50">
                           <RadioGroupItem value={service.id} id={`${service.id}-${index}`} data-testid={`radio-service-${service.id}-${index}`} />
                           <Label htmlFor={`${service.id}-${index}`} className="flex-1 cursor-pointer">
@@ -1105,6 +1114,7 @@ export default function Booking() {
                   </RadioGroup>
                 </div>
 
+                {pet.type !== 'cat' && (
                 <div>
                   <Label className="text-xs text-gray-600 mb-2 block">Add-On Services (Optional)</Label>
                   <div className="space-y-2">
@@ -1133,6 +1143,7 @@ export default function Booking() {
                     })}
                   </div>
                 </div>
+                )}
 
                 <div>
                   <Label className="text-xs text-gray-600 mb-2 block">Groomer for this Pet (Optional)</Label>
