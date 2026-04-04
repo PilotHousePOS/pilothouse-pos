@@ -3,6 +3,11 @@
 ## Overview
 The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its core purpose is to establish itself as the premier online destination for exotic pet owners, driving market expansion, fostering customer loyalty, and enhancing the overall online shopping experience to ensure continuous business growth.
 
+## Agent Rules (Non-Negotiable)
+- **NEVER guess at a fix.** Before changing any code, read the actual logs, error output, or data that describes the problem. Every fix must be justified by evidence from the logs or code — not by assumption.
+- **Debugging process:** Check logs first → identify the exact cause → make one targeted fix → verify with logs again. Do not chain multiple speculative changes.
+- **Invoice scanner:** When scans return 0 items, ALWAYS fetch deployment logs and read the raw response content before touching any code. The model may refuse (returns `{"error":"..."}` instead of `{"items":[]}`), hit token limits (finish_reason: `length`), or have a prompt regression. Each has a different fix.
+
 ## User Preferences
 - Dark, bold design aesthetic with strong contrast.
 - No free services - but don't display prices in booking appointments.
