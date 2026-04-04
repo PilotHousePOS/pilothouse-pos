@@ -6082,13 +6082,13 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
     setScanning(true);
 
     try {
-      // Resize image to max 1800px on longest side before sending — reduces 3-4MB phone photos to ~200KB
+      // Resize image to max 2048px on longest side — matches OpenAI high-detail tile boundary exactly
       const base64 = await new Promise<string>((resolve, reject) => {
         const img = new window.Image();
         const objectUrl = URL.createObjectURL(file);
         img.onload = () => {
           URL.revokeObjectURL(objectUrl);
-          const MAX = 1800;
+          const MAX = 2048;
           let { width, height } = img;
           if (width > MAX || height > MAX) {
             if (width > height) { height = Math.round(height * MAX / width); width = MAX; }

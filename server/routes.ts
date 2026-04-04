@@ -11321,7 +11321,7 @@ STEP 1 - Find the UPC column: Look for the column header "PRODUCT UPC", "UPC", "
 STEP 2 - Find the quantity column: Look for "QTY SHIPPED", "SHIPPED", "QTY", or "QUANTITY". If there are two sub-columns (ORDER and SHIPPED), use the SHIPPED number.
 STEP 3 - Go row by row from top to bottom and extract EVERY item. Do not stop early. Do not skip any row.
 
-This invoice likely has 20-40 line items. Extract all of them.
+This invoice may span one or two pages and likely has 20-40 line items. Extract ALL of them — do not skip the bottom half or second page.
 
 UPC codes on this invoice are 12-digit numbers. Read each digit carefully — do not guess or approximate.
 
@@ -11354,7 +11354,7 @@ Critical rules:
       // Sequential scans — parallel hits rate limits and kills one scan silently
       const responseB = await openai.chat.completions.create({
         model: "gpt-5",
-        messages: [{ role: "user", content: [{ type: "text", text: promptB }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } }] }],
+        messages: [{ role: "user", content: [{ type: "text", text: promptB }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
         response_format: { type: "json_object" },
         max_completion_tokens: 16000,
       });
@@ -11396,7 +11396,7 @@ Critical rules:
 
 STEP 1 - Find the UPC column: Look for "PRODUCT UPC", "UPC", or "BARCODE".
 STEP 2 - Find the QTY column: use the SHIPPED quantity if two sub-columns exist.
-STEP 3 - Scan the invoice carefully from TOP to BOTTOM focusing on the middle rows (rows 8 through 18) which are commonly skipped.
+STEP 3 - Scan the ENTIRE invoice from TOP to BOTTOM. If the invoice spans two pages or has a large lower section, pay special attention to ALL rows in the lower half and second page, which are most commonly missed.
 
 UPC codes are 12-digit numbers. Verify the check digit before outputting.
 
@@ -11415,7 +11415,7 @@ Rules:
 
         const responseA = await openai.chat.completions.create({
           model: "gpt-5",
-          messages: [{ role: "user", content: [{ type: "text", text: promptA }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } }] }],
+          messages: [{ role: "user", content: [{ type: "text", text: promptA }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
           response_format: { type: "json_object" },
           max_completion_tokens: 16000,
         });
