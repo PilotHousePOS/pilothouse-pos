@@ -11507,9 +11507,9 @@ Critical rules:
         'This is the BOTTOM HALF of an invoice (headers may not be visible). Extract every line item here — there are likely 8-14 rows in this portion.'
       );
 
-      // ── Run all 3 scans in parallel ──────────────────────────────────────────
-      // Scan A: top half | Scan B: bottom half | Scan C: full image (safety net)
-      const [respA, respB, respC] = await Promise.all([
+      // ── Run 2 scans in parallel: top half + bottom half ──────────────────────
+      // No full-image scan — that third scan was the source of hallucinations.
+      const [respA, respB] = await Promise.all([
         openai.chat.completions.create({
           model: "gpt-5",
           messages: [{ role: "user", content: [{ type: "text", text: promptTop }, { type: "image_url", image_url: { url: `data:image/jpeg;base64,${topBase64}`, detail: "high" } }] }],
@@ -11522,18 +11522,11 @@ Critical rules:
           response_format: { type: "json_object" },
           max_completion_tokens: 16000,
         }),
-        openai.chat.completions.create({
-          model: "gpt-5",
-          messages: [{ role: "user", content: [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
-          response_format: { type: "json_object" },
-          max_completion_tokens: 16000,
-        }),
       ]);
 
       mergeItems(parseItems(respA.choices?.[0]?.message?.content, 'ScanA-Top'), 'ScanA-Top');
       mergeItems(parseItems(respB.choices?.[0]?.message?.content, 'ScanB-Bot'), 'ScanB-Bot');
-      mergeItems(parseItems(respC.choices?.[0]?.message?.content, 'ScanC-Full'), 'ScanC-Full');
-      console.log(`[InvoiceScan] finish_reasons: A=${respA.choices?.[0]?.finish_reason} B=${respB.choices?.[0]?.finish_reason} C=${respC.choices?.[0]?.finish_reason}`);
+      console.log(`[InvoiceScan] finish_reasons: A=${respA.choices?.[0]?.finish_reason} B=${respB.choices?.[0]?.finish_reason}`);
 
       // Sanity cap — prevents runaway hallucination on edge cases
       if (merged.length > 32) {
