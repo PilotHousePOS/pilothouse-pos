@@ -10879,7 +10879,6 @@ export default function Admin() {
                             <p className="text-xs text-green-600 font-medium mt-0.5">✓ Paid in-store</p>
                           )}
                         </div>
-                        </div>
                       );
                     })}
                     </div>
