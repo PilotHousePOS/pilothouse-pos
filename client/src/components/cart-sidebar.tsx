@@ -132,6 +132,14 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     return supply && FOOD_LOYALTY_CATEGORIES.includes(supply.category || '');
   });
 
+  // Categories ineligible for loyalty credit redemption
+  const LOYALTY_INELIGIBLE_CATEGORIES = ['dogFood', 'catFood', 'dogCages', 'aquatics', 'reptiles', 'reptile', 'grooming'];
+  const hasIneligibleLoyaltyItems = cartItems.some((item: any) => {
+    if (!item.supplyId) return false;
+    const supply = supplies.find((s: any) => s.id === item.supplyId);
+    return supply && LOYALTY_INELIGIBLE_CATEGORIES.includes(supply.category || '');
+  });
+
   // Fetch Astro loyalty rewards (ready to redeem)
   const { data: astroRewardsData } = useQuery<{ rewards: AstroReward[] }>({
     queryKey: ["/api/astro/cart-rewards"],
@@ -309,8 +317,15 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const taxAmount = Math.round(subtotalAfterRewards * (taxRate / 100) * 100) / 100;
   const subtotalWithTax = Math.round((subtotalAfterRewards + taxAmount) * 100) / 100;
   
-  // Calculate loyalty credit discount (can't exceed the order total)
-  const loyaltyDiscount = applyLoyaltyCredits ? Math.round(Math.min(availableLoyaltyCredits, subtotalWithTax) * 100) / 100 : 0;
+  // Loyalty credits only apply to eligible items (not dog/cat food, cages, tanks/enclosures, or grooming)
+  const loyaltyEligibleSubtotal = Math.round(cartItemsWithDetails.reduce((total, item) => {
+    if (!item.supplyId) return total + (parseFloat(item.details.price) * item.quantity);
+    const supply = supplies.find((s: any) => s.id === item.supplyId);
+    if (supply && LOYALTY_INELIGIBLE_CATEGORIES.includes(supply.category || '')) return total;
+    return total + (parseFloat(item.details.price) * item.quantity);
+  }, 0) * 100) / 100;
+  const loyaltyEligibleWithTax = Math.round(Math.min(loyaltyEligibleSubtotal * (1 + taxRate / 100), subtotalWithTax) * 100) / 100;
+  const loyaltyDiscount = applyLoyaltyCredits ? Math.round(Math.min(availableLoyaltyCredits, loyaltyEligibleWithTax) * 100) / 100 : 0;
   const amountBeforeFee = Math.round((subtotalWithTax - loyaltyDiscount) * 100) / 100;
   
   // Card processing convenience fee: 2.9% + $0.30 — waived for charge accounts
@@ -744,11 +759,21 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     onCheckedChange={setApplyLoyaltyCredits}
                   />
                 </div>
-                {applyLoyaltyCredits && (
+                {applyLoyaltyCredits && loyaltyDiscount > 0 && (
                   <div className="mt-2 text-xs text-green-600 flex items-center gap-1">
                     <Star className="w-3 h-3" />
-                    Saving ${loyaltyDiscount.toFixed(2)} on this order!
+                    Saving ${loyaltyDiscount.toFixed(2)} on eligible items!
                   </div>
+                )}
+                {hasIneligibleLoyaltyItems && (
+                  <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">
+                    Not applicable to: dog food, cat food, cages, tanks, enclosures, or grooming items.
+                  </p>
+                )}
+                {applyLoyaltyCredits && loyaltyEligibleWithTax === 0 && (
+                  <p className="mt-2 text-xs text-red-600 dark:text-red-400">
+                    No eligible items in cart for loyalty redemption.
+                  </p>
                 )}
               </div>
             )}

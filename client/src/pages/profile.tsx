@@ -390,6 +390,9 @@ export default function Profile() {
               <p className="text-xs text-white/70 mt-3 text-center">
                 Earn ${loyaltyStatus.rewardAmount} credit for every ${loyaltyStatus.spendingThreshold} spent!
               </p>
+              <p className="text-xs text-white/60 mt-2 text-center border-t border-white/20 pt-2">
+                Credits cannot be redeemed on dog food, cat food, cages, tanks, enclosures, or grooming. Items may be identified by UPC code, product name, description, or a combination of these.
+              </p>
             </CardContent>
           </Card>
         </div>
