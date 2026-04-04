@@ -6053,25 +6053,18 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
   onEditSupply: (supply: any) => void;
 }) {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [scanning, setScanning] = useState(false);
   const [loadingId, setLoadingId] = useState<number | null>(null);
-  const [applying, setApplying] = useState(false);
   const [matched, setMatched] = useState<any[]>([]);
   const [unmatched, setUnmatched] = useState<any[]>([]);
-  const [removed, setRemoved] = useState<Set<number>>(new Set());
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-  const applicableItems = matched.filter(m => !removed.has(m.id));
 
   function reset() {
     setScanning(false);
     setLoadingId(null);
-    setApplying(false);
     setMatched([]);
     setUnmatched([]);
-    setRemoved(new Set());
     setPreviewUrl(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   }
@@ -6079,14 +6072,6 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
   function handleClose() {
     reset();
     onClose();
-  }
-
-  function removeItem(id: number) {
-    setRemoved(prev => new Set([...prev, id]));
-  }
-
-  function restoreItem(id: number) {
-    setRemoved(prev => { const s = new Set(prev); s.delete(id); return s; });
   }
 
   async function handleFile(file: File) {
@@ -6152,24 +6137,6 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
     }
   }
 
-  async function handleApply() {
-    if (applicableItems.length === 0) return;
-    setApplying(true);
-    try {
-      const updates = applicableItems.map(m => ({ id: m.id, newStock: m.newStock }));
-      const res = await apiRequest('POST', '/api/admin/invoice-scan/apply', { updates });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Apply failed');
-      toast({ title: "Inventory updated!", description: `${data.applied} product${data.applied !== 1 ? 's' : ''} updated successfully.` });
-      queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
-      handleClose();
-    } catch (err: any) {
-      toast({ title: "Apply failed", description: err.message, variant: "destructive" });
-    } finally {
-      setApplying(false);
-    }
-  }
-
   // Badge config per match type
   function getMatchBadge(m: any) {
     if (m.corrected) return { label: 'UPC Corrected', className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300' };
@@ -6186,7 +6153,7 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
             Invoice Scanner
           </DialogTitle>
           <DialogDescription>
-            Upload a photo of your invoice. Review every match below before applying — remove any that look wrong.
+            Upload a photo of your invoice. It finds the matching products — click Edit on each one to update stock.
           </DialogDescription>
         </DialogHeader>
 
@@ -6221,93 +6188,50 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
             </div>
           )}
 
-          {/* Matched products — full review panel */}
+          {/* Matched products */}
           {!scanning && matched.length > 0 && (
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="font-semibold text-sm">
-                  {applicableItems.length} of {matched.length} product{matched.length !== 1 ? 's' : ''} will be updated
-                  {unmatched.length > 0 && <span className="text-gray-400 font-normal ml-2">· {unmatched.length} not found</span>}
-                </p>
-                <span className="text-xs text-gray-400">Remove any that look wrong before applying</span>
-              </div>
-
-              {/* Legend */}
-              <div className="flex flex-wrap gap-2 text-xs">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">UPC Match — safe</span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300">UPC Corrected — verify</span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300">Description Match — review carefully</span>
-              </div>
+              <p className="font-semibold text-sm">
+                {matched.length} product{matched.length !== 1 ? 's' : ''} found
+                {unmatched.length > 0 && <span className="text-gray-400 font-normal ml-2">· {unmatched.length} need manual entry</span>}
+              </p>
 
               <div className="rounded-md border divide-y divide-gray-100 dark:divide-gray-700">
                 {matched.map((m) => {
-                  const isRemoved = removed.has(m.id);
                   const badge = getMatchBadge(m);
-                  const qtyChange = m.invoiceQty > 0 ? `+${m.invoiceQty}` : `${m.invoiceQty}`;
                   return (
                     <div
                       key={m.id}
-                      className={`px-3 py-3 transition-colors ${isRemoved ? 'opacity-40 bg-gray-50 dark:bg-gray-800/20' : m.matchedBy === 'description' ? 'bg-orange-50/50 dark:bg-orange-900/10' : ''}`}
+                      className={`px-3 py-3 ${m.matchedBy === 'description' ? 'bg-orange-50/50 dark:bg-orange-900/10' : ''}`}
                     >
-                      {/* Match confidence badge */}
+                      {/* Badge + Edit button */}
                       <div className="flex items-center justify-between mb-1.5">
                         <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${badge.className}`}>{badge.label}</span>
-                        <div className="flex items-center gap-1.5">
-                          {!isRemoved ? (
-                            <button
-                              onClick={() => removeItem(m.id)}
-                              className="text-xs text-red-500 hover:text-red-700 font-medium px-1.5 py-0.5 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                            >
-                              ✕ Remove
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => restoreItem(m.id)}
-                              className="text-xs text-gray-500 hover:text-gray-700 font-medium px-1.5 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                            >
-                              ↩ Restore
-                            </button>
-                          )}
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-6 text-xs px-2"
-                            disabled={loadingId === m.id}
-                            onClick={() => handleEdit(m.id)}
-                          >
-                            {loadingId === m.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Edit className="w-3 h-3 mr-1" />}
-                            Edit
-                          </Button>
-                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-6 text-xs px-2"
+                          disabled={loadingId === m.id}
+                          onClick={() => handleEdit(m.id)}
+                        >
+                          {loadingId === m.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Edit className="w-3 h-3 mr-1" />}
+                          Edit
+                        </Button>
                       </div>
 
-                      {/* Invoice text → DB product side by side */}
+                      {/* Invoice text → matched product */}
                       <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-start">
-                        {/* Invoice side */}
                         <div className="min-w-0">
                           <p className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-0.5">Invoice says</p>
                           <p className="text-sm font-medium leading-tight text-gray-700 dark:text-gray-200">{m.description || '—'}</p>
-                          <p className="text-[10px] font-mono text-gray-400 mt-0.5">{m.scannedUpc || m.upc}</p>
+                          <p className="text-[10px] font-mono text-gray-400 mt-0.5">qty: {m.invoiceQty} · current stock: {m.currentStock}</p>
                         </div>
-
-                        {/* Arrow */}
                         <div className="flex items-center justify-center pt-4 text-gray-300">→</div>
-
-                        {/* DB product side */}
                         <div className="min-w-0">
-                          <p className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-0.5">Matched in system</p>
+                          <p className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-0.5">Opens in system</p>
                           <p className="text-sm font-semibold leading-tight text-gray-900 dark:text-gray-100">{m.name}</p>
                           <p className="text-[10px] text-gray-400 mt-0.5">{m.brand || ''}</p>
                         </div>
-                      </div>
-
-                      {/* Stock change bar */}
-                      <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
-                        <span>Stock: <span className="font-mono">{m.currentStock}</span></span>
-                        <span className="text-green-600 dark:text-green-400 font-semibold">{qtyChange}</span>
-                        <span>→</span>
-                        <span className="font-mono font-semibold text-gray-700 dark:text-gray-200">{m.newStock}</span>
-                        {isRemoved && <span className="ml-auto text-red-400 italic">excluded from apply</span>}
                       </div>
                     </div>
                   );
@@ -6324,7 +6248,7 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
                     </p>
                   </div>
                   <p className="text-xs text-orange-700 dark:text-orange-400">
-                    These were on the invoice but couldn't be matched to any product in your system. Handle them manually after applying the rest.
+                    These were on the invoice but couldn't be matched to any product in your system — handle them manually.
                   </p>
                   <div className="rounded-md border border-orange-200 dark:border-orange-700 divide-y divide-orange-100 dark:divide-orange-800 bg-white dark:bg-gray-900">
                     {unmatched.map((u, i) => (
@@ -6337,47 +6261,28 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
                               {!u.validCheckDigit && <span className="ml-1 text-red-500">⚠ check digit invalid — likely misread</span>}
                             </p>
                           </div>
-                          <span className="shrink-0 text-xs font-medium text-gray-500 dark:text-gray-400 mt-0.5">
-                            qty: {u.qty}
-                          </span>
+                          <span className="shrink-0 text-xs font-medium text-gray-500 dark:text-gray-400 mt-0.5">qty: {u.qty}</span>
                         </div>
                         <p className="text-[10px] text-orange-600 dark:text-orange-400 mt-1">
                           {!u.validCheckDigit
                             ? 'UPC digits were likely misread — find this product by description and update stock manually'
-                            : 'UPC not in your system — this may be a new product or a vendor item you haven\'t added yet'}
+                            : "UPC not in your system — may be a new product you haven't added yet"}
                         </p>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-
-              {/* Removed items notice */}
-              {removed.size > 0 && (
-                <p className="text-xs text-orange-600 dark:text-orange-400">
-                  {removed.size} item{removed.size !== 1 ? 's' : ''} removed — {applicableItems.length} will be applied.
-                </p>
-              )}
             </div>
           )}
         </div>
 
-        <DialogFooter className="gap-2 pt-2 flex-wrap">
+        <DialogFooter className="gap-2 pt-2">
           <Button variant="outline" onClick={handleClose}>Close</Button>
-          {previewUrl && !scanning && matched.length > 0 && (
+          {previewUrl && !scanning && (
             <Button variant="outline" onClick={reset}>
               <RefreshCw className="w-4 h-4 mr-2" />
               Scan Another
-            </Button>
-          )}
-          {!scanning && applicableItems.length > 0 && (
-            <Button
-              onClick={handleApply}
-              disabled={applying}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              {applying ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-              Apply {applicableItems.length} to Inventory
             </Button>
           )}
         </DialogFooter>
