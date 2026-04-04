@@ -11376,12 +11376,22 @@ Critical rules:
       const itemsB = parseItems(responseB.choices?.[0]?.message?.content, 'Scan B');
       console.log(`[InvoiceScan] Scan B finish_reason: ${responseB.choices?.[0]?.finish_reason}`);
 
-      // Scan A — gap-finder: explicitly asks for rows that look different from what Scan B already captured.
-      // We pass the descriptions (not UPCs, which model can't reliably compare) found in Scan B.
-      const descList = itemsB.length > 0
-        ? `\n\nScan B already found these item descriptions (do NOT repeat them):\n${itemsB.map((i: any) => `- ${i.description}`).join('\n')}\n\nFind ONLY rows in the invoice whose description does NOT appear in the list above.`
-        : '';
-      const promptA = `You are analyzing a supplier invoice for a pet store. Your job is to find line items that a previous scan MISSED.
+      // Merge Scan B results first, then loop gap-finder up to 3 passes
+      const seenUPCs = new Set<string>();
+      const merged: typeof itemsB = [];
+      for (const item of itemsB) {
+        const upc = String(item.upc).replace(/[-\s]/g, '').trim();
+        if (!seenUPCs.has(upc)) { seenUPCs.add(upc); merged.push(item); }
+      }
+
+      // Gap-finder loop: run up to 3 times, stopping when no new items found
+      let totalGapItems = 0;
+      for (let pass = 1; pass <= 3; pass++) {
+        const existingDescs = merged.map((i: any) => `- ${i.description}`).join('\n');
+        const descList = merged.length > 0
+          ? `\n\nItems already captured (do NOT repeat these):\n${existingDescs}\n\nFind ONLY rows whose description is NOT in the list above.`
+          : '';
+        const promptA = `You are analyzing a supplier invoice for a pet store. Your job is to find line items that a previous scan MISSED.
 
 STEP 1 - Find the UPC column: Look for "PRODUCT UPC", "UPC", or "BARCODE".
 STEP 2 - Find the QTY column: use the SHIPPED quantity if two sub-columns exist.
@@ -11399,32 +11409,34 @@ Return ONLY valid JSON:
 Rules:
 - UPC codes are exactly 12 digits — verify check digit
 - Return only the JSON object, nothing else
+- If no missing rows are found, return { "items": [] }
 - NEVER refuse or return an error message — always return an items array, even if the image quality is imperfect${descList}`;
 
-      const responseA = await openai.chat.completions.create({
-        model: "gpt-5",
-        messages: [{ role: "user", content: [{ type: "text", text: promptA }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } }] }],
-        response_format: { type: "json_object" },
-        max_completion_tokens: 16000,
-      });
+        const responseA = await openai.chat.completions.create({
+          model: "gpt-5",
+          messages: [{ role: "user", content: [{ type: "text", text: promptA }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } }] }],
+          response_format: { type: "json_object" },
+          max_completion_tokens: 16000,
+        });
 
-      const itemsA = parseItems(responseA.choices?.[0]?.message?.content, 'Scan A');
-      console.log(`[InvoiceScan] Scan A finish_reason: ${responseA.choices?.[0]?.finish_reason}`);
+        const itemsA = parseItems(responseA.choices?.[0]?.message?.content, `Scan A pass ${pass}`);
+        console.log(`[InvoiceScan] Scan A pass ${pass} finish_reason: ${responseA.choices?.[0]?.finish_reason}`);
 
-      // Merge: Scan B first (comprehensive), then add any new UPCs from Scan A gap-finder.
-      // Full dedup across both scans including within-scan duplicates.
-      const seenUPCs = new Set<string>();
-      const merged: typeof itemsA = [];
-      for (const item of itemsB) {
-        const upc = String(item.upc).replace(/[-\s]/g, '').trim();
-        if (!seenUPCs.has(upc)) { seenUPCs.add(upc); merged.push(item); }
+        let newThisPass = 0;
+        for (const item of itemsA) {
+          const upc = String(item.upc).replace(/[-\s]/g, '').trim();
+          if (!seenUPCs.has(upc)) { seenUPCs.add(upc); merged.push(item); newThisPass++; }
+        }
+        totalGapItems += newThisPass;
+        console.log(`[InvoiceScan] Scan A pass ${pass}: ${itemsA.length} items returned, ${newThisPass} new — merged total: ${merged.length}`);
+
+        if (newThisPass === 0) {
+          console.log(`[InvoiceScan] Gap-finder converged after ${pass} pass(es)`);
+          break;
+        }
       }
-      for (const item of itemsA) {
-        const upc = String(item.upc).replace(/[-\s]/g, '').trim();
-        if (!seenUPCs.has(upc)) { seenUPCs.add(upc); merged.push(item); }
-      }
 
-      console.log(`[InvoiceScan] Scan A (gap-finder): ${itemsA.length} items, Scan B (main): ${itemsB.length} items, Merged: ${merged.length} unique items`);
+      console.log(`[InvoiceScan] Scan B: ${itemsB.length} items, Gap-finder total new: ${totalGapItems}, Merged: ${merged.length} unique items`);
       const invoiceItems = merged;
       console.log(`[InvoiceScan] Extracted ${invoiceItems.length} items from invoice`);
 
