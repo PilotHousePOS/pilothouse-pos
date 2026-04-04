@@ -11357,7 +11357,6 @@ Critical rules:
         messages: [{ role: "user", content: [{ type: "text", text: promptB }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
         response_format: { type: "json_object" },
         max_completion_tokens: 16000,
-        temperature: 0,
       });
 
       // Parse Scan B early so gap-finder can focus on missing rows
@@ -11424,7 +11423,6 @@ Rules:
           messages: [{ role: "user", content: [{ type: "text", text: promptA }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "high" } }] }],
           response_format: { type: "json_object" },
           max_completion_tokens: 16000,
-          temperature: 0,
         });
 
         const itemsA = parseItems(responseA.choices?.[0]?.message?.content, `Scan A pass ${pass}`);
