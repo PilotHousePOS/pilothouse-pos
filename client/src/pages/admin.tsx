@@ -6053,18 +6053,25 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
   onEditSupply: (supply: any) => void;
 }) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [scanning, setScanning] = useState(false);
   const [loadingId, setLoadingId] = useState<number | null>(null);
+  const [applying, setApplying] = useState(false);
   const [matched, setMatched] = useState<any[]>([]);
   const [unmatched, setUnmatched] = useState<any[]>([]);
+  const [removed, setRemoved] = useState<Set<number>>(new Set());
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const applicableItems = matched.filter(m => !removed.has(m.id));
 
   function reset() {
     setScanning(false);
     setLoadingId(null);
+    setApplying(false);
     setMatched([]);
     setUnmatched([]);
+    setRemoved(new Set());
     setPreviewUrl(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   }
@@ -6074,15 +6081,23 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
     onClose();
   }
 
+  function removeItem(id: number) {
+    setRemoved(prev => new Set([...prev, id]));
+  }
+
+  function restoreItem(id: number) {
+    setRemoved(prev => { const s = new Set(prev); s.delete(id); return s; });
+  }
+
   async function handleFile(file: File) {
     if (!file) return;
     setPreviewUrl(URL.createObjectURL(file));
     setMatched([]);
     setUnmatched([]);
+    setRemoved(new Set());
     setScanning(true);
 
     try {
-      // Resize image to max 2048px on longest side — matches OpenAI high-detail tile boundary exactly
       const base64 = await new Promise<string>((resolve, reject) => {
         const img = new window.Image();
         const objectUrl = URL.createObjectURL(file);
@@ -6137,6 +6152,31 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
     }
   }
 
+  async function handleApply() {
+    if (applicableItems.length === 0) return;
+    setApplying(true);
+    try {
+      const updates = applicableItems.map(m => ({ id: m.id, newStock: m.newStock }));
+      const res = await apiRequest('POST', '/api/admin/invoice-scan/apply', { updates });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Apply failed');
+      toast({ title: "Inventory updated!", description: `${data.applied} product${data.applied !== 1 ? 's' : ''} updated successfully.` });
+      queryClient.invalidateQueries({ queryKey: ['/api/supplies'] });
+      handleClose();
+    } catch (err: any) {
+      toast({ title: "Apply failed", description: err.message, variant: "destructive" });
+    } finally {
+      setApplying(false);
+    }
+  }
+
+  // Badge config per match type
+  function getMatchBadge(m: any) {
+    if (m.corrected) return { label: 'UPC Corrected', className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300' };
+    if (m.matchedBy === 'description') return { label: 'Description Match', className: 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300' };
+    return { label: 'UPC Match', className: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' };
+  }
+
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -6146,7 +6186,7 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
             Invoice Scanner
           </DialogTitle>
           <DialogDescription>
-            Upload a photo of your invoice. The AI reads the UPC codes and pulls up the matching products — click Edit on any one to open its full edit form.
+            Upload a photo of your invoice. Review every match below before applying — remove any that look wrong.
           </DialogDescription>
         </DialogHeader>
 
@@ -6181,55 +6221,142 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
             </div>
           )}
 
-          {/* Matched products list */}
+          {/* Matched products — full review panel */}
           {!scanning && matched.length > 0 && (
-            <div className="space-y-2">
-              <p className="font-semibold text-sm">
-                {matched.length} product{matched.length !== 1 ? 's' : ''} found
-                {unmatched.length > 0 && <span className="text-gray-400 font-normal ml-2">· {unmatched.length} UPCs not in system</span>}
-              </p>
-
-              <div className="rounded-md border divide-y divide-gray-100 dark:divide-gray-700">
-                {matched.map((m) => (
-                  <div key={m.id} className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800/40">
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium text-sm leading-tight truncate">{m.name}</div>
-                      <div className="text-xs text-gray-400">{m.brand && `${m.brand} · `}UPC: {m.upc}</div>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="ml-3 shrink-0"
-                      disabled={loadingId === m.id}
-                      onClick={() => handleEdit(m.id)}
-                    >
-                      {loadingId === m.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Edit className="w-3 h-3 mr-1" />}
-                      Edit
-                    </Button>
-                  </div>
-                ))}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="font-semibold text-sm">
+                  {applicableItems.length} of {matched.length} product{matched.length !== 1 ? 's' : ''} will be updated
+                  {unmatched.length > 0 && <span className="text-gray-400 font-normal ml-2">· {unmatched.length} not found</span>}
+                </p>
+                <span className="text-xs text-gray-400">Remove any that look wrong before applying</span>
               </div>
 
+              {/* Legend */}
+              <div className="flex flex-wrap gap-2 text-xs">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">UPC Match — safe</span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300">UPC Corrected — verify</span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300">Description Match — review carefully</span>
+              </div>
+
+              <div className="rounded-md border divide-y divide-gray-100 dark:divide-gray-700">
+                {matched.map((m) => {
+                  const isRemoved = removed.has(m.id);
+                  const badge = getMatchBadge(m);
+                  const qtyChange = m.invoiceQty > 0 ? `+${m.invoiceQty}` : `${m.invoiceQty}`;
+                  return (
+                    <div
+                      key={m.id}
+                      className={`px-3 py-3 transition-colors ${isRemoved ? 'opacity-40 bg-gray-50 dark:bg-gray-800/20' : m.matchedBy === 'description' ? 'bg-orange-50/50 dark:bg-orange-900/10' : ''}`}
+                    >
+                      {/* Match confidence badge */}
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${badge.className}`}>{badge.label}</span>
+                        <div className="flex items-center gap-1.5">
+                          {!isRemoved ? (
+                            <button
+                              onClick={() => removeItem(m.id)}
+                              className="text-xs text-red-500 hover:text-red-700 font-medium px-1.5 py-0.5 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                            >
+                              ✕ Remove
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => restoreItem(m.id)}
+                              className="text-xs text-gray-500 hover:text-gray-700 font-medium px-1.5 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            >
+                              ↩ Restore
+                            </button>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-6 text-xs px-2"
+                            disabled={loadingId === m.id}
+                            onClick={() => handleEdit(m.id)}
+                          >
+                            {loadingId === m.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Edit className="w-3 h-3 mr-1" />}
+                            Edit
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Invoice text → DB product side by side */}
+                      <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-start">
+                        {/* Invoice side */}
+                        <div className="min-w-0">
+                          <p className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-0.5">Invoice says</p>
+                          <p className="text-sm font-medium leading-tight text-gray-700 dark:text-gray-200">{m.description || '—'}</p>
+                          <p className="text-[10px] font-mono text-gray-400 mt-0.5">{m.scannedUpc || m.upc}</p>
+                        </div>
+
+                        {/* Arrow */}
+                        <div className="flex items-center justify-center pt-4 text-gray-300">→</div>
+
+                        {/* DB product side */}
+                        <div className="min-w-0">
+                          <p className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-0.5">Matched in system</p>
+                          <p className="text-sm font-semibold leading-tight text-gray-900 dark:text-gray-100">{m.name}</p>
+                          <p className="text-[10px] text-gray-400 mt-0.5">{m.brand || ''}</p>
+                        </div>
+                      </div>
+
+                      {/* Stock change bar */}
+                      <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
+                        <span>Stock: <span className="font-mono">{m.currentStock}</span></span>
+                        <span className="text-green-600 dark:text-green-400 font-semibold">{qtyChange}</span>
+                        <span>→</span>
+                        <span className="font-mono font-semibold text-gray-700 dark:text-gray-200">{m.newStock}</span>
+                        {isRemoved && <span className="ml-auto text-red-400 italic">excluded from apply</span>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Unmatched section */}
               {unmatched.length > 0 && (
-                <details className="text-xs text-gray-400">
-                  <summary className="cursor-pointer hover:text-gray-600">{unmatched.length} UPC{unmatched.length !== 1 ? 's' : ''} not found in your inventory</summary>
-                  <ul className="mt-1 ml-3 space-y-0.5">
+                <details className="text-xs">
+                  <summary className="cursor-pointer text-gray-400 hover:text-gray-600 font-medium">
+                    {unmatched.length} item{unmatched.length !== 1 ? 's' : ''} not found in your inventory (won't affect stock)
+                  </summary>
+                  <div className="mt-2 rounded-md border border-dashed divide-y divide-gray-100 dark:divide-gray-700">
                     {unmatched.map((u, i) => (
-                      <li key={i}><span className="font-mono">{u.upc}</span>{u.description ? ` — ${u.description}` : ''}</li>
+                      <div key={i} className="px-3 py-2">
+                        <p className="font-medium text-gray-600 dark:text-gray-300">{u.description || 'Unknown item'}</p>
+                        <p className="font-mono text-gray-400 text-[10px] mt-0.5">{u.upc}{!u.validCheckDigit ? ' ⚠ invalid check digit' : ''}</p>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </details>
+              )}
+
+              {/* Removed items notice */}
+              {removed.size > 0 && (
+                <p className="text-xs text-orange-600 dark:text-orange-400">
+                  {removed.size} item{removed.size !== 1 ? 's' : ''} removed — {applicableItems.length} will be applied.
+                </p>
               )}
             </div>
           )}
         </div>
 
-        <DialogFooter className="gap-2 pt-2">
+        <DialogFooter className="gap-2 pt-2 flex-wrap">
           <Button variant="outline" onClick={handleClose}>Close</Button>
-          {previewUrl && !scanning && (
+          {previewUrl && !scanning && matched.length > 0 && (
             <Button variant="outline" onClick={reset}>
               <RefreshCw className="w-4 h-4 mr-2" />
               Scan Another
+            </Button>
+          )}
+          {!scanning && applicableItems.length > 0 && (
+            <Button
+              onClick={handleApply}
+              disabled={applying}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              {applying ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+              Apply {applicableItems.length} to Inventory
             </Button>
           )}
         </DialogFooter>
