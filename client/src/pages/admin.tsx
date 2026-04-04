@@ -6079,7 +6079,6 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
     setPreviewUrl(URL.createObjectURL(file));
     setMatched([]);
     setUnmatched([]);
-    setRemoved(new Set());
     setScanning(true);
 
     try {
