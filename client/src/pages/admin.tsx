@@ -3661,7 +3661,7 @@ function BoardingManagement({ isAddOpen, setIsAddOpen }: { isAddOpen: boolean; s
       )}
       
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="max-w-md mx-auto">
+        <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>New Boarding Record</DialogTitle>
           </DialogHeader>
@@ -3674,7 +3674,7 @@ function BoardingManagement({ isAddOpen, setIsAddOpen }: { isAddOpen: boolean; s
       </Dialog>
       
       <Dialog open={!!editingRecord} onOpenChange={() => setEditingRecord(null)}>
-        <DialogContent className="max-w-md mx-auto">
+        <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Boarding Record</DialogTitle>
           </DialogHeader>
