@@ -11384,13 +11384,14 @@ Critical rules:
         if (!seenUPCs.has(upc)) { seenUPCs.add(upc); merged.push(item); }
       }
 
-      // Gap-finder loop: run up to 5 times when Scan B failed (empty), 3 when it succeeded
-      const maxPasses = itemsB.length === 0 ? 5 : 3;
+      // Gap-finder loop: run up to 5 passes, convergence (0 new items) stops it early
+      const maxPasses = 5;
       let totalGapItems = 0;
       for (let pass = 1; pass <= maxPasses; pass++) {
         const existingDescs = merged.map((i: any) => `- ${i.description}`).join('\n');
-        const descList = merged.length > 0
-          ? `\n\nItems already captured (do NOT repeat these):\n${existingDescs}\n\nFind ONLY rows whose description is NOT in the list above.`
+        const capturedCount = merged.length;
+        const descList = capturedCount > 0
+          ? `\n\nItems already captured (${capturedCount} so far — do NOT repeat these):\n${existingDescs}\n\nFind ONLY rows whose description is NOT in the list above. There are likely ${Math.max(0, 25 - capturedCount)} or more rows still missing.`
           : '';
         const promptA = `You are analyzing a supplier invoice for a pet store. Your job is to find line items that a previous scan MISSED.
 
