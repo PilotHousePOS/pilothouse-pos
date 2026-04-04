@@ -11342,7 +11342,8 @@ Critical rules:
 - Extract EVERY row — do not stop until you have reached the last line item
 - UPC codes are exactly 12 digits — verify check digit for every one
 - Include rows where shipped qty is 0
-- Return only the JSON object, nothing else`;
+- Return only the JSON object, nothing else
+- NEVER refuse or return an error message — always return an items array, even if the image quality is imperfect. Extract what you can read.`;
 
       // Scan B — bottom-to-top, the reliably comprehensive pass.
       const promptB = prompt.replace(
@@ -11397,13 +11398,14 @@ Return ONLY valid JSON:
 
 Rules:
 - UPC codes are exactly 12 digits — verify check digit
-- Return only the JSON object, nothing else${descList}`;
+- Return only the JSON object, nothing else
+- NEVER refuse or return an error message — always return an items array, even if the image quality is imperfect${descList}`;
 
       const responseA = await openai.chat.completions.create({
         model: "gpt-5",
         messages: [{ role: "user", content: [{ type: "text", text: promptA }, { type: "image_url", image_url: { url: `data:${mimeType};base64,${imageBase64}`, detail: "auto" } }] }],
         response_format: { type: "json_object" },
-        max_completion_tokens: 8000,
+        max_completion_tokens: 16000,
       });
 
       const itemsA = parseItems(responseA.choices?.[0]?.message?.content, 'Scan A');
