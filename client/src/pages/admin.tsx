@@ -10829,8 +10829,7 @@ export default function Admin() {
                               </label>
                             </div>
                           </div>
-
-                        </div>
+                          </div>
                           {/* Online Payment Footer — full-width row below left+right panels */}
                           {(currentAppointment.readyForPayment || currentAppointment.isPaid || currentAppointment.price) && (
                             <div className="w-full flex items-center justify-between pt-2 mt-1 border-t border-gray-100 gap-2">
