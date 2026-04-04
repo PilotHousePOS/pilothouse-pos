@@ -11384,9 +11384,10 @@ Critical rules:
         if (!seenUPCs.has(upc)) { seenUPCs.add(upc); merged.push(item); }
       }
 
-      // Gap-finder loop: run up to 3 times, stopping when no new items found
+      // Gap-finder loop: run up to 5 times when Scan B failed (empty), 3 when it succeeded
+      const maxPasses = itemsB.length === 0 ? 5 : 3;
       let totalGapItems = 0;
-      for (let pass = 1; pass <= 3; pass++) {
+      for (let pass = 1; pass <= maxPasses; pass++) {
         const existingDescs = merged.map((i: any) => `- ${i.description}`).join('\n');
         const descList = merged.length > 0
           ? `\n\nItems already captured (do NOT repeat these):\n${existingDescs}\n\nFind ONLY rows whose description is NOT in the list above.`
@@ -11512,38 +11513,36 @@ Rules:
         }
 
         if (product && !seenIds.has(product.id)) {
-          // Cross-check: make sure the UPC-matched product name is plausible given the description
-          // Pull key words from description and check at least 1 appears in the product name
-          const CROSS_CHECK_EXPAND: Record<string, string> = {
-            // Brands (rc intentionally NOT expanded — breed words handle RC specificity)
-            'pp': 'pro plan', 'roycan': 'royal canin',
-            'kong': 'kong', 'bionic': 'bionic', 'catit': 'catit',
-            'whlsm': 'wholesome', 'whslm': 'wholesome',
-            // Proteins / flavors
-            'ckn': 'chicken', 'chkn': 'chicken', 'chx': 'chicken',
-            'bf': 'beef', 'slm': 'salmon', 'salm': 'salmon', 'trky': 'turkey',
-            'pnbt': 'peanut', 'bck': 'bacon', 'chz': 'cheese',
-            // Sizes / breeds
-            'germ': 'german', 'shphrd': 'shepherd', 'shprd': 'shepherd',
-            'yorksh': 'yorkshire', 'lbrd': 'large breed', 'sm': 'small', 'lg': 'large', 'md': 'medium',
-            // Products
-            'crestd': 'crested', 'gecko': 'gecko', 'airdog': 'air',
-            'urban': 'urban', 'stik': 'stick', 'sqkr': 'squeaker', 'tball': 'tennis',
-            'asst': 'assorted', 'orig': 'original', 'bendeez': 'bendeez',
-          };
-          // Strip leading non-alpha chars (e.g. "*REPL" → "repl")
-          const descWords = item.description.toLowerCase().split(/[\s\/\-\#\.\(\)\*]+/).filter((t: string) => t.length >= 2 && !/^\d+$/.test(t));
-          const expandedWords = descWords.map((w: string) => CROSS_CHECK_EXPAND[w] || w);
-          const productNameLower = (product.name || '').toLowerCase();
-          const brandNameLower = (product.brand || '').toLowerCase();
-          const NOISE_WORDS = new Set(['esntl','cmplt','shrd','blnd','repl','bisc','adlt','easy','bisc','adt','snk','trt','rwrd','dog','cat','pet','snack','treat','adult','puppy','pup','snk']);
-          const descKeywords = expandedWords.filter((w: string) => !NOISE_WORDS.has(w) && w.length >= 2);
-          const hasDescMatch = descKeywords.length === 0 || descKeywords.some((w: string) => productNameLower.includes(w) || brandNameLower.includes(w));
+          // Cross-check only applies to auto-corrected UPCs (single-digit substitution guesses).
+          // Direct UPC matches are always trusted — description abbreviations vary too widely.
+          let acceptMatch = true;
+          if (corrected) {
+            const CROSS_CHECK_EXPAND: Record<string, string> = {
+              'pp': 'pro plan', 'roycan': 'royal canin',
+              'kong': 'kong', 'bionic': 'bionic', 'catit': 'catit',
+              'whlsm': 'wholesome', 'whslm': 'wholesome',
+              'ckn': 'chicken', 'chkn': 'chicken', 'chx': 'chicken',
+              'bf': 'beef', 'slm': 'salmon', 'salm': 'salmon', 'trky': 'turkey',
+              'pnbt': 'peanut', 'bck': 'bacon', 'chz': 'cheese',
+              'germ': 'german', 'shphrd': 'shepherd', 'shprd': 'shepherd',
+              'sm': 'small', 'lg': 'large', 'md': 'medium',
+              'crestd': 'crested', 'gecko': 'gecko', 'airdog': 'air',
+              'urban': 'urban', 'stik': 'stick', 'sqkr': 'squeaker', 'tball': 'tennis',
+              'asst': 'assorted', 'orig': 'original', 'bendeez': 'bendeez',
+            };
+            const descWords = item.description.toLowerCase().split(/[\s\/\-\#\.\(\)\*']+/).filter((t: string) => t.length >= 2 && !/^\d+$/.test(t));
+            const expandedWords = descWords.map((w: string) => CROSS_CHECK_EXPAND[w] || w);
+            const productNameLower = (product.name || '').toLowerCase();
+            const brandNameLower = (product.brand || '').toLowerCase();
+            const NOISE_WORDS = new Set(['esntl','cmplt','shrd','blnd','repl','bisc','adlt','easy','adt','snk','trt','rwrd','dog','cat','pet','snack','treat','adult','puppy','pup']);
+            const descKeywords = expandedWords.filter((w: string) => !NOISE_WORDS.has(w) && w.length >= 2);
+            acceptMatch = descKeywords.length === 0 || descKeywords.some((w: string) => productNameLower.includes(w) || brandNameLower.includes(w));
+            if (!acceptMatch) {
+              console.log(`[InvoiceScan] CORRECTION REJECTED: ${item.upc} → ${resolvedUpc} → ${product.name} (desc="${item.description}" shares no keywords)`);
+            }
+          }
 
-          if (!hasDescMatch) {
-            console.log(`[InvoiceScan] UPC MISMATCH REJECTED: ${item.upc} → ${product.name} (desc="${item.description}" shares no keywords)`);
-            stillUnmatched.push(item);
-          } else {
+          if (acceptMatch) {
             seenIds.add(product.id);
             matched.push({
               id: product.id, name: product.name, brand: product.brand, upc: resolvedUpc,
@@ -11552,6 +11551,8 @@ Rules:
               newStock: (product.stockQuantity ?? 0) + item.qty, description: item.description,
             });
             if (corrected) console.log(`[InvoiceScan] AUTO-CORRECTED: ${item.upc} → ${resolvedUpc} (${product.name})`);
+          } else {
+            stillUnmatched.push(item);
           }
         } else if (!product) {
           stillUnmatched.push(item);
@@ -11650,6 +11651,8 @@ Rules:
               }
             }
           }
+          const { brand: fb, keywords: fk } = parseInvoiceDesc(item.description);
+          console.log(`[InvoiceScan] DESC-FAIL: "${item.description}" brand=${fb} kws=${JSON.stringify(fk)}`);
           return { item, product: null };
         })
       );
