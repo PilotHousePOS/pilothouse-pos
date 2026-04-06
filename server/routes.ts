@@ -11696,9 +11696,15 @@ Hard rules:
 
       // UPC is the definitive match — items not found by UPC go straight to manual entry.
       // Description is used only to cross-check UPC matches (see above), not to find products.
-      const unmatched: any[] = stillUnmatched.map(item => ({
-        upc: item.upc, qty: item.qty, description: item.description, validCheckDigit: isValidUPC(item.upc),
-      }));
+      // For items with an invalid check digit, correct the last digit from the first 11 so the user
+      // sees the best-possible UPC to reference or add to the system — not the raw garbled read.
+      const unmatched: any[] = stillUnmatched.map(item => {
+        let displayUpc = item.upc;
+        if (/^\d{12}$/.test(item.upc) && !isValidUPC(item.upc)) {
+          displayUpc = item.upc.slice(0, 11) + String(calcUPCCheckDigit(item.upc.slice(0, 11)));
+        }
+        return { upc: displayUpc, qty: item.qty, description: item.description, validCheckDigit: isValidUPC(displayUpc) };
+      });
 
       console.log(`[InvoiceScan] Extracted ${invoiceItems.length} UPCs, matched ${matched.length} products, ${unmatched.length} unmatched`);
       if (matched.length > 0) console.log(`[InvoiceScan] MATCHED: ${matched.map((m: any) => `${m.upc} → ${m.name}${m.corrected ? ' [corrected]' : m.matchedBy === 'description' ? ' [desc]' : ''}`).join(' | ')}`);
