@@ -11442,12 +11442,14 @@ Rules:
 
       const fullBase64 = imgBuf.toString('base64');
 
-      // ── Single full-page scan with one automatic retry on empty ───────────────
-      // The invoice is one page with clearly printed text — one definitive read is correct.
-      // Splitting into overlapping sections caused the same row to be read from different
-      // contexts, producing inconsistent digit reads across scans.
+      // ── Single full-page scan with up to 3 retries on empty/error response ─────
+      // Retry whenever GPT returns 0 items (empty array OR error JSON). The retry
+      // condition must check parsed items, not raw content length, because
+      // {"items":[]} is valid JSON that passes a length check but means nothing.
       let resp: any = null;
-      for (let attempt = 1; attempt <= 2; attempt++) {
+      let parsedItems: { upc: string; qty: number; description: string }[] = [];
+
+      for (let attempt = 1; attempt <= 3; attempt++) {
         resp = await openai.chat.completions.create({
           model: "gpt-5",
           messages: [{ role: "user", content: [
@@ -11457,22 +11459,22 @@ Rules:
           response_format: { type: "json_object" },
           max_completion_tokens: 16000,
         });
-        const content = resp.choices?.[0]?.message?.content ?? '';
-        if (content.trim().length > 10) break;
-        console.log(`[InvoiceScan] Scan attempt ${attempt} returned empty — ${attempt < 2 ? 'retrying' : 'giving up'}`);
-      }
-      console.log(`[InvoiceScan] finish_reason: ${resp?.choices?.[0]?.finish_reason}`);
 
-      const rawContent = resp?.choices?.[0]?.message?.content ?? '';
-      console.log(`[InvoiceScan] Raw response (first 300): ${rawContent.slice(0, 300)}`);
+        const rawContent = resp?.choices?.[0]?.message?.content ?? '';
+        console.log(`[InvoiceScan] Attempt ${attempt} finish_reason: ${resp?.choices?.[0]?.finish_reason}`);
+        console.log(`[InvoiceScan] Raw response (first 300): ${rawContent.slice(0, 300)}`);
 
-      let parsedItems: { upc: string; qty: number; description: string }[] = [];
-      try {
-        const parsed = JSON.parse(rawContent);
-        parsedItems = parsed.items || [];
-        console.log(`[InvoiceScan] Parsed ${parsedItems.length} items`);
-      } catch (e: any) {
-        console.log(`[InvoiceScan] JSON parse error — ${e.message}`);
+        try {
+          const parsed = JSON.parse(rawContent);
+          parsedItems = Array.isArray(parsed.items) ? parsed.items : [];
+          console.log(`[InvoiceScan] Parsed ${parsedItems.length} items`);
+        } catch (e: any) {
+          parsedItems = [];
+          console.log(`[InvoiceScan] JSON parse error — ${e.message}`);
+        }
+
+        if (parsedItems.length > 0) break;
+        console.log(`[InvoiceScan] Attempt ${attempt} returned 0 items — ${attempt < 3 ? 'retrying' : 'giving up'}`);
       }
 
       // Deduplicate by normalized UPC — single scan should produce none, but guard anyway
