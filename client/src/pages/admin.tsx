@@ -6059,6 +6059,24 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
   const [matched, setMatched] = useState<any[]>([]);
   const [unmatched, setUnmatched] = useState<any[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [invoiceAddUpc, setInvoiceAddUpc] = useState<string | null>(null);
+
+  const invoiceCreateSupplyMutation = useMutation({
+    mutationFn: async (supplyData: any) => {
+      const response = await apiRequest("POST", "/api/supplies", supplyData);
+      return response.json();
+    },
+    onSuccess: (createdSupply) => {
+      toast({ title: "Supply Added", description: "Product added to your system." });
+      setUnmatched(prev => prev.filter(u => u.upc !== invoiceAddUpc));
+      setInvoiceAddUpc(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
+      if (createdSupply?.id) setTimeout(() => onEditSupply(createdSupply), 300);
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to add supply.", variant: "destructive" });
+    },
+  });
 
   function reset() {
     setScanning(false);
@@ -6300,7 +6318,20 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
                               {!u.validCheckDigit && <span className="ml-1 text-red-500">⚠ check digit invalid — likely misread</span>}
                             </p>
                           </div>
-                          <span className="shrink-0 text-xs font-medium text-gray-500 dark:text-gray-400 mt-0.5">qty: {u.qty}</span>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">qty: {u.qty}</span>
+                            {u.validCheckDigit && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-6 px-2 text-[10px] border-orange-300 text-orange-700 hover:bg-orange-50 dark:border-orange-700 dark:text-orange-400"
+                                onClick={() => setInvoiceAddUpc(u.upc)}
+                              >
+                                <Plus className="w-3 h-3 mr-0.5" />
+                                Add to System
+                              </Button>
+                            )}
+                          </div>
                         </div>
                         <p className="text-[10px] text-orange-600 dark:text-orange-400 mt-1">
                           {!u.validCheckDigit
@@ -6312,6 +6343,23 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
                   </div>
                 </div>
               )}
+
+              {/* Add Supply dialog triggered from unmatched items */}
+              <Dialog open={!!invoiceAddUpc} onOpenChange={(o) => { if (!o) setInvoiceAddUpc(null); }}>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Add New Supply</DialogTitle>
+                    <DialogDescription>Add this product to your inventory. UPC has been pre-filled.</DialogDescription>
+                  </DialogHeader>
+                  {invoiceAddUpc && (
+                    <AddSupplyForm
+                      key={invoiceAddUpc}
+                      initialUpc={invoiceAddUpc}
+                      onSubmit={(data) => invoiceCreateSupplyMutation.mutate(data)}
+                    />
+                  )}
+                </DialogContent>
+              </Dialog>
             </div>
           )}
         </div>
@@ -16108,7 +16156,7 @@ function AddPetForm({ onSubmit }: { onSubmit: (data: any) => void }) {
   );
 }
 
-function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
+function AddSupplyForm({ onSubmit, initialUpc }: { onSubmit: (data: any) => void; initialUpc?: string }) {
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -16123,7 +16171,7 @@ function AddSupplyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
     style: '',
     mfgPart: '',
     vendor: '',
-    sku: '',
+    sku: initialUpc || '',
     isActive: true,
     ingredients: '',
     guaranteedAnalysis: '',
