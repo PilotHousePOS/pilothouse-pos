@@ -11774,7 +11774,18 @@ Hard rules:
               stockQuantity: supplies.stockQuantity, price: supplies.price,
             }).from(supplies).where(and(...conditions)).limit(5);
 
-            if (results.length === 1) return { item, product: results[0] };
+            if (results.length === 1) {
+              // Validate: the single result must match >50% of ALL description keywords
+              // (prevents a relaxed query from returning an unrelated product, e.g.
+              //  "pro plan + shredded" returning the salmon 33lb when we actually want beef 13oz)
+              const resultNameLower = results[0].name?.toLowerCase() ?? '';
+              const allKws = [...stickyKws, ...flexKws];
+              const matchCount = allKws.filter(k => resultNameLower.includes(k)).length;
+              if (allKws.length === 0 || matchCount / allKws.length > 0.5) {
+                return { item, product: results[0] };
+              }
+              continue; // Not a strong enough match — try the next (more relaxed) attempt
+            }
             if (results.length > 1) {
               // Score by how many keywords match the product name
               const scored = results.map(p => ({
