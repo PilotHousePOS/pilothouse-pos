@@ -11456,14 +11456,41 @@ Critical rules:
         }
       };
 
-      // Merge helper — deduplicates by normalized UPC, preserves first-seen item
+      // Normalize a description to a set of significant words (3+ chars, alphanumeric only)
+      const descWords = (desc: string): Set<string> => {
+        const words = String(desc).toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length >= 3);
+        return new Set(words);
+      };
+      // Returns true if two descriptions are likely the same product
+      const descSimilar = (a: string, b: string): boolean => {
+        const wa = descWords(a);
+        const wb = descWords(b);
+        if (wa.size === 0 || wb.size === 0) return false;
+        let shared = 0;
+        for (const w of wa) { if (wb.has(w)) shared++; }
+        const smaller = Math.min(wa.size, wb.size);
+        // Same if 3+ words match OR 60%+ of the shorter description's words match
+        return shared >= 3 || (smaller > 0 && shared / smaller >= 0.6);
+      };
+
+      // Merge helper — deduplicates by normalized UPC first, then by description similarity
       const seenUPCs = new Set<string>();
       const merged: { upc: string; qty: number; description: string }[] = [];
       const mergeItems = (items: { upc: string; qty: number; description: string }[], label: string) => {
         let added = 0;
         for (const item of items) {
           const upc = String(item.upc).replace(/[-\s]/g, '').trim();
-          if (!seenUPCs.has(upc)) { seenUPCs.add(upc); merged.push({ ...item, upc }); added++; }
+          if (seenUPCs.has(upc)) continue;
+          // Secondary dedup: reject if description is too similar to an already-accepted item
+          const dupByDesc = merged.some(existing => descSimilar(existing.description, item.description));
+          if (dupByDesc) {
+            console.log(`[InvoiceScan] Desc-dedup dropped: "${item.description}" (UPC ${upc})`);
+            seenUPCs.add(upc); // mark UPC seen so it won't re-appear
+            continue;
+          }
+          seenUPCs.add(upc);
+          merged.push({ ...item, upc });
+          added++;
         }
         console.log(`[InvoiceScan] Merge from ${label}: +${added} new, total now ${merged.length}`);
       };
