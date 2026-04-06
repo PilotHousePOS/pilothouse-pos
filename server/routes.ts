@@ -11560,8 +11560,8 @@ Rules:
         'germ': 'german', 'shphrd': 'shepherd', 'shprd': 'shepherd',
         'sm': 'small', 'lg': 'large', 'md': 'medium',
         'crestd': 'crested', 'gecko': 'gecko', 'airdog': 'air',
-        'urban': 'urban', 'stik': 'stick', 'sqkr': 'squeak', 'tball': 'tennis',
-        'asst': 'assorted', 'orig': 'original', 'bendeez': 'bendeez',
+        'urban': 'urban', 'stik': 'stick', 'sqkr': 'squeak',
+        'asst': 'assorted', 'assn': 'assorted', 'orig': 'original', 'bendeez': 'bendeez',
         'flwr': 'flower', 'ftn': 'fountain', 'stsl': 'stainless',
         'contour': 'contour', 'dbl': 'double', 'crate': 'crate',
         'wave': 'wave', 'terr': 'terrarium', 'smartsift': 'smartsift',
@@ -11641,12 +11641,14 @@ Rules:
         }
 
         if (product && !seenIds.has(product.id)) {
-          // Cross-check: confirm the description keywords actually match this product.
-          // For corrected items (UPC was repaired), require AT LEAST 2 keyword matches —
-          // a single generic word like "bed" is not enough to validate a correction.
-          // For direct UPC hits, 1 keyword is sufficient (UPC is already the strong signal).
+          // Cross-check: for CORRECTED items only — the repaired UPC might not be the right one,
+          // so require ≥2 keyword matches to confirm. A single generic word like "bed" is not
+          // enough to validate a correction (prevents Wave Bed → Cuddle Bed false matches).
+          // For DIRECT UPC hits, skip the check — the 12-digit UPC is authoritative. Rejecting
+          // a direct hit because GPT also garbled the description text (e.g. "CATT SMARTSFT"
+          // instead of "CATIT SMARTSIFT") would throw away a perfectly correct match.
           const matchScore = scoreProduct(product, descKeywords);
-          const minRequired = corrected ? 2 : 1;
+          const minRequired = corrected ? 2 : 0;
           const acceptMatch = descKeywords.length === 0 || matchScore >= minRequired;
 
           if (!acceptMatch) {
