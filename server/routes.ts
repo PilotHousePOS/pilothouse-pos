@@ -11413,11 +11413,10 @@ West Monroe LA 71291
 
       const prompt = `You are extracting line items from a supplier invoice image for a pet store.
 
-STEP 1 — Locate the UPC column. Header will say "PRODUCT UPC", "UPC", "UPC CODE", or "BARCODE".
-STEP 2 — Locate the quantity column. Header will say "QTY SHIPPED", "SHIPPED", or "QTY". If two sub-columns (ORDER / SHIPPED) exist, use the SHIPPED value.
-STEP 3 — Read EVERY row from top to bottom without skipping any:
-  • For each row, read the UPC digit by digit, left to right — do not rush or approximate.
-  • Copy the 12-digit UPC exactly as printed. If a digit is unclear, output your best reading.
+STEP 1 — Locate the UPC column. The header will say "PRODUCT UPC", "UPC", "UPC CODE", or "BARCODE".
+STEP 2 — Locate the quantity shipped column. Header will say "QTY SHIPPED", "SHIPPED", or "QTY". If two sub-columns exist (ORDER / SHIPPED), use the SHIPPED value.
+STEP 3 — Go through EVERY line item row from top to bottom without skipping any:
+  • Read the UPC one digit at a time, left to right — the number is printed clearly, copy it exactly.
   • Record the shipped quantity and the item description text.
 
 Return ONLY this JSON (no other text):
@@ -11427,73 +11426,11 @@ Return ONLY this JSON (no other text):
   ]
 }
 
-Hard rules:
+Rules:
 - Include every row — even rows where shipped qty is 0.
-- Never stop before reaching the last visible row.
+- Do not stop before the last row on the page.
 - UPCs are exactly 12 digits — no dashes, no spaces.
-- If image quality is poor, extract what you can see — never refuse or return an error.`;
-
-      // Parse helper — reused by all scans
-      const parseItems = (content: string | null | undefined, label: string): { upc: string; qty: number; description: string }[] => {
-        if (!content) { console.log(`[InvoiceScan] ${label}: empty/null content`); return []; }
-        console.log(`[InvoiceScan] ${label} raw (first 300): ${content.slice(0, 300)}`);
-        try {
-          const parsed = JSON.parse(content);
-          const items = parsed.items || [];
-          console.log(`[InvoiceScan] ${label}: parsed ${items.length} items`);
-          return items;
-        } catch (e: any) {
-          console.log(`[InvoiceScan] ${label}: JSON parse error — ${e.message}`);
-          return [];
-        }
-      };
-
-      // Expand 2-char size tokens so they survive the length filter and contribute to similarity
-      const SIZE_EXPAND: Record<string, string> = {
-        'xs': 'xsmall', 'sm': 'small', 'md': 'medium', 'lg': 'large', 'xl': 'xlarge',
-      };
-      // Normalize a description to a set of significant words (3+ chars, alphanumeric only)
-      // Size abbreviations are expanded first so XS/MD/LG participate in comparison.
-      const descWords = (desc: string): Set<string> => {
-        const raw = String(desc).toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/);
-        const words = raw.map((w: string) => SIZE_EXPAND[w] || w).filter((w: string) => w.length >= 3);
-        return new Set(words);
-      };
-      // Returns true if two descriptions are almost certainly the same product.
-      // Thresholds are intentionally strict (5+ shared words OR 85%+ overlap) so that
-      // different-size variants of the same product line (e.g. PP 5lb vs PP 15lb) are
-      // NOT incorrectly deduplicated — only true near-identical duplicates are caught.
-      const descSimilar = (a: string, b: string): boolean => {
-        const wa = descWords(a);
-        const wb = descWords(b);
-        if (wa.size === 0 || wb.size === 0) return false;
-        let shared = 0;
-        for (const w of wa) { if (wb.has(w)) shared++; }
-        const smaller = Math.min(wa.size, wb.size);
-        return shared >= 5 || (smaller > 0 && shared / smaller >= 0.85);
-      };
-
-      // Merge helper — deduplicates by normalized UPC first, then by description similarity
-      const seenUPCs = new Set<string>();
-      const merged: { upc: string; qty: number; description: string }[] = [];
-      const mergeItems = (items: { upc: string; qty: number; description: string }[], label: string) => {
-        let added = 0;
-        for (const item of items) {
-          const upc = String(item.upc).replace(/[-\s]/g, '').trim();
-          if (seenUPCs.has(upc)) continue;
-          // Secondary dedup: reject if description is too similar to an already-accepted item
-          const dupByDesc = merged.some(existing => descSimilar(existing.description, item.description));
-          if (dupByDesc) {
-            console.log(`[InvoiceScan] Desc-dedup dropped: "${item.description}" (UPC ${upc})`);
-            seenUPCs.add(upc); // mark UPC seen so it won't re-appear
-            continue;
-          }
-          seenUPCs.add(upc);
-          merged.push({ ...item, upc });
-          added++;
-        }
-        console.log(`[InvoiceScan] Merge from ${label}: +${added} new, total now ${merged.length}`);
-      };
+- Copy each UPC digit by digit exactly as printed. Do not guess, infer, or "correct" any digit.`;
 
       // ── Preprocess image: normalize contrast + sharpen so digits are crisper ─
       const rawBuf = Buffer.from(imageBase64, 'base64');
@@ -11503,69 +11440,52 @@ Hard rules:
         .jpeg({ quality: 95 })
         .toBuffer();
 
-      // ── Split image into three overlapping sections ───────────────────────────
-      // Top (0–65%), Middle (30–75%), Bottom (50–100%). 30%+ overlap means every
-      // row appears in at least 2 scans, eliminating the seam-miss problem.
-      const meta = await sharp(imgBuf).metadata();
-      const totalHeight = meta.height ?? 2048;
-      const topHeight  = Math.round(totalHeight * 0.65);
-      const midTop     = Math.round(totalHeight * 0.30);
-      const midHeight  = Math.round(totalHeight * 0.45);
-      const botTop     = Math.round(totalHeight * 0.50);
-      const botHeight  = totalHeight - botTop;
+      const fullBase64 = imgBuf.toString('base64');
 
-      const [topBase64, midBase64, botBase64] = await Promise.all([
-        sharp(imgBuf).extract({ left: 0, top: 0,     width: meta.width!, height: topHeight }).jpeg({ quality: 95 }).toBuffer().then(b => b.toString('base64')),
-        sharp(imgBuf).extract({ left: 0, top: midTop, width: meta.width!, height: midHeight }).jpeg({ quality: 95 }).toBuffer().then(b => b.toString('base64')),
-        sharp(imgBuf).extract({ left: 0, top: botTop, width: meta.width!, height: botHeight }).jpeg({ quality: 95 }).toBuffer().then(b => b.toString('base64')),
-      ]);
-      console.log(`[InvoiceScan] Image split: total=${totalHeight}px, top=0-${topHeight}px, mid=${midTop}-${midTop+midHeight}px, bot=${botTop}-${totalHeight}px`);
+      // ── Single full-page scan with one automatic retry on empty ───────────────
+      // The invoice is one page with clearly printed text — one definitive read is correct.
+      // Splitting into overlapping sections caused the same row to be read from different
+      // contexts, producing inconsistent digit reads across scans.
+      let resp: any = null;
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        resp = await openai.chat.completions.create({
+          model: "gpt-5",
+          messages: [{ role: "user", content: [
+            { type: "text", text: prompt },
+            { type: "image_url", image_url: { url: `data:image/jpeg;base64,${fullBase64}`, detail: "high" } }
+          ]}],
+          response_format: { type: "json_object" },
+          max_completion_tokens: 16000,
+        });
+        const content = resp.choices?.[0]?.message?.content ?? '';
+        if (content.trim().length > 10) break;
+        console.log(`[InvoiceScan] Scan attempt ${attempt} returned empty — ${attempt < 2 ? 'retrying' : 'giving up'}`);
+      }
+      console.log(`[InvoiceScan] finish_reason: ${resp?.choices?.[0]?.finish_reason}`);
 
-      // ── Helper: run one GPT vision scan with one automatic retry on empty ─────
-      const runScan = async (b64: string, scanPrompt: string, label: string) => {
-        for (let attempt = 1; attempt <= 2; attempt++) {
-          const resp = await openai.chat.completions.create({
-            model: "gpt-5",
-            messages: [{ role: "user", content: [
-              { type: "text", text: scanPrompt },
-              { type: "image_url", image_url: { url: `data:image/jpeg;base64,${b64}`, detail: "high" } }
-            ]}],
-            response_format: { type: "json_object" },
-            max_completion_tokens: 16000,
-          });
-          const content = resp.choices?.[0]?.message?.content ?? '';
-          if (content.trim().length > 10) return resp;
-          console.log(`[InvoiceScan] ${label} attempt ${attempt} returned empty — ${attempt < 2 ? 'retrying' : 'giving up'}`);
-        }
-        return null;
-      };
+      const rawContent = resp?.choices?.[0]?.message?.content ?? '';
+      console.log(`[InvoiceScan] Raw response (first 300): ${rawContent.slice(0, 300)}`);
 
-      // Per-section prompt variants — context-aware so GPT knows which slice it's reading
-      const promptTop = prompt + '\n\nNote: You are viewing the TOP PORTION of the invoice (roughly the first 65% of the page). Column headers should be visible. Extract every line item you can see — expect around 10–16 rows in this section.';
-      const promptMid = prompt + '\n\nNote: You are viewing the MIDDLE PORTION of the invoice (roughly rows 30%–75% down the page). Column headers may or may not be visible — the column order is the same as the top. Focus carefully on every single row, expect around 8–12 rows.';
-      const promptBot = prompt + '\n\nNote: You are viewing the BOTTOM PORTION of the invoice (roughly the bottom 50% of the page). Column headers may not be visible — the UPC column and QTY SHIPPED column are in the same positions as the rest of the invoice. Extract every row you can see, expect around 8–12 rows.';
-
-      // ── 3 scans in parallel with auto-retry on empty ─────────────────────────
-      const [respA, respMid, respB] = await Promise.all([
-        runScan(topBase64, promptTop, 'ScanA-Top'),
-        runScan(midBase64, promptMid, 'ScanB-Mid'),
-        runScan(botBase64, promptBot, 'ScanC-Bot'),
-      ]);
-
-      mergeItems(parseItems(respA?.choices?.[0]?.message?.content,   'ScanA-Top'), 'ScanA-Top');
-      mergeItems(parseItems(respMid?.choices?.[0]?.message?.content, 'ScanB-Mid'), 'ScanB-Mid');
-      mergeItems(parseItems(respB?.choices?.[0]?.message?.content,   'ScanC-Bot'), 'ScanC-Bot');
-      console.log(`[InvoiceScan] finish_reasons: A=${respA?.choices?.[0]?.finish_reason} Mid=${respMid?.choices?.[0]?.finish_reason} B=${respB?.choices?.[0]?.finish_reason}`);
-
-      // Sanity cap — prevents runaway hallucination on edge cases
-      if (merged.length > 32) {
-        console.log(`[InvoiceScan] Sanity cap: trimming from ${merged.length} to 32`);
-        merged.splice(32);
+      let parsedItems: { upc: string; qty: number; description: string }[] = [];
+      try {
+        const parsed = JSON.parse(rawContent);
+        parsedItems = parsed.items || [];
+        console.log(`[InvoiceScan] Parsed ${parsedItems.length} items`);
+      } catch (e: any) {
+        console.log(`[InvoiceScan] JSON parse error — ${e.message}`);
       }
 
-      console.log(`[InvoiceScan] Final merged: ${merged.length} unique items`);
-      const invoiceItems = merged;
-      console.log(`[InvoiceScan] Extracted ${invoiceItems.length} items from invoice`);
+      // Deduplicate by normalized UPC — single scan should produce none, but guard anyway
+      const seenUPCs = new Set<string>();
+      const invoiceItems: { upc: string; qty: number; description: string }[] = [];
+      for (const item of parsedItems) {
+        const upc = String(item.upc).replace(/[-\s]/g, '').trim();
+        if (!seenUPCs.has(upc)) {
+          seenUPCs.add(upc);
+          invoiceItems.push({ ...item, upc });
+        }
+      }
+      console.log(`[InvoiceScan] Extracted ${invoiceItems.length} unique items from invoice`);
 
       // Normalize UPCs (remove dashes/spaces, trim)
       const normalizedItems = invoiceItems.map((item: any) => ({
