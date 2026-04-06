@@ -11719,7 +11719,7 @@ Critical rules:
         'KONG': 'kong', 'BIONIC': 'bionic', 'WHLSM': 'wholesome', 'WHOLESOME': 'wholesome',
         'CATIT': 'catit', 'MIDWE': 'midwest', 'MIDPET': 'midwest',
         'EXO': 'exo terra', 'HAGEN': null, 'PURINA': 'pro plan',
-        'CONTOUR': null, // Midwest brand but described by product name, no brand prefix
+        // CONTOUR intentionally removed — treated as a keyword, not a brand prefix
       };
       const INVOICE_EXPAND: Record<string, string> = {
         'BF': 'beef', 'CKN': 'chicken', 'CHKN': 'chicken', 'SLM': 'salmon', 'SB': 'shredded',
@@ -11779,9 +11779,9 @@ Critical rules:
             // Brand + sticky only (last resort — but only if sticky keywords exist, otherwise too broad)
             if (stickyKws.length > 0) attempts.push([brandCond, ...stickyKws.map(k => ilike(supplies.name, `%${k}%`))]);
           } else {
-            // No brand: require all sticky + 2 flex, then 1 flex
-            if (stickyKws.length + flexKws.length >= 3) attempts.push([...stickyKws, ...flexKws.slice(0, 2)].map(k => ilike(supplies.name, `%${k}%`)));
-            if (stickyKws.length + flexKws.length >= 2) attempts.push([...stickyKws, ...flexKws.slice(0, 1)].map(k => ilike(supplies.name, `%${k}%`)));
+            // No brand: require at least 2 total keywords for first attempt, 1 for second
+            if (stickyKws.length + flexKws.length >= 2) attempts.push([...stickyKws, ...flexKws.slice(0, 2)].map(k => ilike(supplies.name, `%${k}%`)));
+            if (stickyKws.length + flexKws.length >= 1) attempts.push([...stickyKws, ...flexKws.slice(0, 1)].map(k => ilike(supplies.name, `%${k}%`)));
           }
 
           for (const conditions of attempts) {
