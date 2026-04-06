@@ -11672,11 +11672,66 @@ Rules:
         }
       }
 
-      // UPC is the definitive match — items not found by UPC go straight to manual entry.
-      // Description is used only to cross-check UPC matches (see above), not to find products.
-      // For items with an invalid check digit, correct the last digit from the first 11 so the user
-      // sees the best-possible UPC to reference or add to the system — not the raw garbled read.
-      const unmatched: any[] = stillUnmatched.map(item => {
+      // Description-based fallback for items that completely failed UPC matching.
+      // Rescues items where GPT garbled 3+ digits (beyond single-digit correction range),
+      // as long as the description uniquely identifies exactly ONE product in the DB.
+      // Uses OR to find candidates, then scores each by keyword count — accepts only when
+      // there is a single clear best match with score ≥ 2.
+      const SEARCH_STOP_WORDS = new Set(['small', 'large', 'medium', 'extra', 'black', 'white', 'grey', 'gray', 'brown', 'clear', 'natural', 'classic', 'premium', 'grain']);
+      const finalUnmatched: any[] = [];
+      for (const item of stillUnmatched) {
+        const itemKws = getDescKeywords(item.description);
+        // Only use keywords that are real words (≥4 chars), not generic size/color, and
+        // either came from the expansion table or are long enough to be actual product terms.
+        const searchKws = itemKws.filter(kw => kw.length >= 4 && !SEARCH_STOP_WORDS.has(kw));
+
+        if (searchKws.length >= 2) {
+          try {
+            // Find all products whose name matches ANY of the search keywords
+            const orConditions = searchKws.map(kw => ilike(supplies.name, `%${kw}%`));
+            const descCandidates = await db.select({
+              id: supplies.id, name: supplies.name, brand: supplies.brand,
+              upc: supplies.upc, sku: supplies.sku,
+              stockQuantity: supplies.stockQuantity, price: supplies.price,
+            }).from(supplies).where(or(...orConditions));
+
+            // Score each candidate: how many search keywords appear in name+brand?
+            const scored = descCandidates
+              .filter(p => !seenIds.has(p.id))
+              .map(p => ({ p, score: scoreProduct(p, searchKws) }))
+              .filter(x => x.score >= 2)
+              .sort((a, b) => b.score - a.score);
+
+            // Accept only if there is a single product at the top score, OR the best product
+            // scores clearly higher than the runner-up (no ambiguity)
+            const topScore = scored[0]?.score ?? 0;
+            const topGroup = scored.filter(x => x.score === topScore);
+
+            if (topGroup.length === 1 && topScore >= 2) {
+              const p = topGroup[0].p;
+              seenIds.add(p.id);
+              matched.push({
+                id: p.id, name: p.name, brand: p.brand,
+                upc: (p.upc || p.sku || item.upc)!,
+                scannedUpc: item.upc, corrected: false, matchedBy: 'description',
+                currentStock: p.stockQuantity ?? 0, invoiceQty: item.qty,
+                newStock: (p.stockQuantity ?? 0) + item.qty, description: item.description,
+              });
+              console.log(`[InvoiceScan] DESC-MATCH: "${item.description}" → "${p.name}" (keywords=[${searchKws.join(',')}] score=${topScore})`);
+              continue;
+            } else if (topGroup.length > 1) {
+              console.log(`[InvoiceScan] DESC-AMBIGUOUS: "${item.description}" → ${topGroup.length} tied at score ${topScore} (${topGroup.map(x => x.p.name).join(', ')}) — manual`);
+            }
+          } catch (e) {
+            // Fallback query failed — just leave as unmatched
+          }
+        }
+        finalUnmatched.push(item);
+      }
+
+      // For remaining unmatched, correct the display UPC so the user sees the best-possible
+      // reference UPC (last digit fixed), not the raw garbled read from GPT.
+      const unmatched: any[] = finalUnmatched.map(item => {
         let displayUpc = item.upc;
         if (/^\d{12}$/.test(item.upc) && !isValidUPC(item.upc)) {
           displayUpc = item.upc.slice(0, 11) + String(calcUPCCheckDigit(item.upc.slice(0, 11)));
