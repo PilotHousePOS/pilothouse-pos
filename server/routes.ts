@@ -11456,12 +11456,21 @@ Critical rules:
         }
       };
 
+      // Expand 2-char size tokens so they survive the length filter and contribute to similarity
+      const SIZE_EXPAND: Record<string, string> = {
+        'xs': 'xsmall', 'sm': 'small', 'md': 'medium', 'lg': 'large', 'xl': 'xlarge',
+      };
       // Normalize a description to a set of significant words (3+ chars, alphanumeric only)
+      // Size abbreviations are expanded first so XS/MD/LG participate in comparison.
       const descWords = (desc: string): Set<string> => {
-        const words = String(desc).toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length >= 3);
+        const raw = String(desc).toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/);
+        const words = raw.map((w: string) => SIZE_EXPAND[w] || w).filter((w: string) => w.length >= 3);
         return new Set(words);
       };
-      // Returns true if two descriptions are likely the same product
+      // Returns true if two descriptions are almost certainly the same product.
+      // Thresholds are intentionally strict (5+ shared words OR 85%+ overlap) so that
+      // different-size variants of the same product line (e.g. PP 5lb vs PP 15lb) are
+      // NOT incorrectly deduplicated — only true near-identical duplicates are caught.
       const descSimilar = (a: string, b: string): boolean => {
         const wa = descWords(a);
         const wb = descWords(b);
@@ -11469,8 +11478,7 @@ Critical rules:
         let shared = 0;
         for (const w of wa) { if (wb.has(w)) shared++; }
         const smaller = Math.min(wa.size, wb.size);
-        // Same if 3+ words match OR 60%+ of the shorter description's words match
-        return shared >= 3 || (smaller > 0 && shared / smaller >= 0.6);
+        return shared >= 5 || (smaller > 0 && shared / smaller >= 0.85);
       };
 
       // Merge helper — deduplicates by normalized UPC first, then by description similarity
