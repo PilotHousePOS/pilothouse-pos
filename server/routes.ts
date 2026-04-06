@@ -11535,19 +11535,82 @@ Rules:
         )
       );
 
-      // Build lookup map keyed by both upc and sku values
-      const productByUpc = new Map<string, typeof dbProducts[0]>();
+      // Build lookup map keyed by both upc and sku values.
+      // Store ALL products per key — duplicate UPCs in the DB (e.g. two products sharing
+      // the same barcode) are kept so the description cross-check can pick the best one.
+      const productByUpc = new Map<string, (typeof dbProducts[0])[]>();
       for (const p of dbProducts) {
-        if (p.upc) productByUpc.set(p.upc.replace(/[-\s]/g, '').trim(), p);
-        if (p.sku) productByUpc.set(p.sku.replace(/[-\s]/g, '').trim(), p);
+        const addKey = (key: string) => {
+          const k = key.replace(/[-\s]/g, '').trim();
+          if (!productByUpc.has(k)) productByUpc.set(k, []);
+          productByUpc.get(k)!.push(p);
+        };
+        if (p.upc) addKey(p.upc);
+        if (p.sku) addKey(p.sku);
       }
+
+      // ── Description keyword helpers (used for both product selection and cross-check) ──
+      const CROSS_CHECK_EXPAND: Record<string, string> = {
+        'pp': 'pro plan', 'provi': 'pro plan', 'roycan': 'royal canin',
+        'kong': 'kong', 'bionic': 'bionic', 'catit': 'catit',
+        'whlsm': 'wholesome', 'whslm': 'wholesome',
+        'ckn': 'chicken', 'chkn': 'chicken', 'chx': 'chicken',
+        'bf': 'beef', 'slm': 'salmon', 'salm': 'salmon', 'trky': 'turkey',
+        'pnbt': 'peanut', 'bck': 'bacon', 'chz': 'cheese',
+        'germ': 'german', 'shphrd': 'shepherd', 'shprd': 'shepherd',
+        'sm': 'small', 'lg': 'large', 'md': 'medium',
+        'crestd': 'crested', 'gecko': 'gecko', 'airdog': 'air',
+        'urban': 'urban', 'stik': 'stick', 'sqkr': 'squeak', 'tball': 'tennis',
+        'asst': 'assorted', 'orig': 'original', 'bendeez': 'bendeez',
+        'flwr': 'flower', 'ftn': 'fountain', 'stsl': 'stainless',
+        'contour': 'contour', 'dbl': 'double', 'crate': 'crate',
+        'wave': 'wave', 'terr': 'terrarium', 'smartsift': 'smartsift',
+        'midwe': 'midwest', 'midpet': 'midwest',
+        'sb': 'shredded',
+      };
+      const NOISE_WORDS = new Set([
+        'esntl','cmplt','shrd','blnd','repl','bisc','adlt','easy','adt',
+        'snk','trt','rwrd','dog','cat','pet','snack','treat','adult','puppy','pup',
+        'ea','cas','rc','ce','fd','u/a',
+      ]);
+
+      // Compute cross-check keywords for an invoice description
+      const getDescKeywords = (description: string): string[] => {
+        const words = (description || '').toLowerCase().split(/[\s\/\-\#\.\(\)\*'\=]+/).filter((t: string) => t.length >= 2 && !/^\d+$/.test(t));
+        return words.map((w: string) => CROSS_CHECK_EXPAND[w] || w).filter((w: string) => !NOISE_WORDS.has(w) && w.length >= 2);
+      };
+
+      // Score how well a product name/brand matches the description keywords
+      const scoreProduct = (p: typeof dbProducts[0], descKeywords: string[]): number => {
+        const nameL = (p.name || '').toLowerCase();
+        const brandL = (p.brand || '').toLowerCase();
+        return descKeywords.filter(kw => nameL.includes(kw) || brandL.includes(kw)).length;
+      };
+
+      // Pick the best-matching product from a list using description keywords.
+      // Returns the product with the highest keyword score, or null if score is 0.
+      const pickBest = (products: (typeof dbProducts[0])[], descKeywords: string[]): typeof dbProducts[0] | null => {
+        if (!products || products.length === 0) return null;
+        if (products.length === 1) return products[0];
+        let best: typeof dbProducts[0] | null = null;
+        let bestScore = -1;
+        for (const p of products) {
+          const score = scoreProduct(p, descKeywords);
+          if (score > bestScore) { bestScore = score; best = p; }
+        }
+        return best;
+      };
 
       const matched: any[] = [];
       const stillUnmatched: any[] = [];
       const seenIds = new Set<number>();
 
       for (const item of validItems) {
-        let product = productByUpc.get(item.upc);
+        // Compute keywords first — needed both for best-product selection and cross-check
+        const descKeywords = getDescKeywords(item.description);
+
+        const candidates_raw = productByUpc.get(item.upc);
+        let product = candidates_raw ? pickBest(candidates_raw, descKeywords) : null;
         let resolvedUpc = item.upc;
         let corrected = false;
 
@@ -11559,9 +11622,13 @@ Rules:
           const candidates = getSingleDigitCandidates(item.upc);
           const candidateMatches = new Map<number, { cp: any; resolvedUpc: string }>();
           for (const c of candidates) {
-            const cp = productByUpc.get(c);
-            if (cp && !candidateMatches.has(cp.id)) {
-              candidateMatches.set(cp.id, { cp, resolvedUpc: c });
+            const cps = productByUpc.get(c);
+            if (cps) {
+              for (const cp of cps) {
+                if (!candidateMatches.has(cp.id)) {
+                  candidateMatches.set(cp.id, { cp, resolvedUpc: c });
+                }
+              }
             }
           }
           if (candidateMatches.size === 1) {
@@ -11574,41 +11641,17 @@ Rules:
         }
 
         if (product && !seenIds.has(product.id)) {
-          // Cross-check the invoice description against the matched product name for EVERY match —
-          // not just corrected ones. A wrong UPC that accidentally hits a different product in the
-          // DB must be caught here before it corrupts inventory.
-          const CROSS_CHECK_EXPAND: Record<string, string> = {
-            'pp': 'pro plan', 'provi': 'pro plan', 'roycan': 'royal canin',
-            'kong': 'kong', 'bionic': 'bionic', 'catit': 'catit',
-            'whlsm': 'wholesome', 'whslm': 'wholesome',
-            'ckn': 'chicken', 'chkn': 'chicken', 'chx': 'chicken',
-            'bf': 'beef', 'slm': 'salmon', 'salm': 'salmon', 'trky': 'turkey',
-            'pnbt': 'peanut', 'bck': 'bacon', 'chz': 'cheese',
-            'germ': 'german', 'shphrd': 'shepherd', 'shprd': 'shepherd',
-            'sm': 'small', 'lg': 'large', 'md': 'medium',
-            'crestd': 'crested', 'gecko': 'gecko', 'airdog': 'air',
-            'urban': 'urban', 'stik': 'stick', 'sqkr': 'squeaker', 'tball': 'tennis',
-            'asst': 'assorted', 'orig': 'original', 'bendeez': 'bendeez',
-            'flwr': 'flower', 'ftn': 'fountain', 'stsl': 'stainless',
-            'contour': 'contour', 'dbl': 'double', 'crate': 'crate',
-            'wave': 'wave', 'terr': 'terrarium', 'smartsift': 'smartsift',
-            'midwe': 'midwest', 'midpet': 'midwest',
-          };
-          const NOISE_WORDS = new Set([
-            'esntl','cmplt','shrd','blnd','repl','bisc','adlt','easy','adt',
-            'snk','trt','rwrd','dog','cat','pet','snack','treat','adult','puppy','pup',
-            'ea','cas','rc','sb','ce','fd','u/a',
-          ]);
-          const descWords = (item.description || '').toLowerCase().split(/[\s\/\-\#\.\(\)\*'\=]+/).filter((t: string) => t.length >= 2 && !/^\d+$/.test(t));
-          const expandedWords = descWords.map((w: string) => CROSS_CHECK_EXPAND[w] || w);
-          const productNameLower = (product.name || '').toLowerCase();
-          const brandNameLower = (product.brand || '').toLowerCase();
-          const descKeywords = expandedWords.filter((w: string) => !NOISE_WORDS.has(w) && w.length >= 2);
-          const acceptMatch = descKeywords.length === 0 || descKeywords.some((w: string) => productNameLower.includes(w) || brandNameLower.includes(w));
+          // Cross-check: confirm the description keywords actually match this product.
+          // For corrected items (UPC was repaired), require AT LEAST 2 keyword matches —
+          // a single generic word like "bed" is not enough to validate a correction.
+          // For direct UPC hits, 1 keyword is sufficient (UPC is already the strong signal).
+          const matchScore = scoreProduct(product, descKeywords);
+          const minRequired = corrected ? 2 : 1;
+          const acceptMatch = descKeywords.length === 0 || matchScore >= minRequired;
 
           if (!acceptMatch) {
             const label = corrected ? 'CORRECTION REJECTED' : 'MATCH REJECTED (desc mismatch)';
-            console.log(`[InvoiceScan] ${label}: scanned=${item.upc} resolved=${resolvedUpc} product="${product.name}" desc="${item.description}" keywords=[${descKeywords.join(',')}]`);
+            console.log(`[InvoiceScan] ${label}: scanned=${item.upc} resolved=${resolvedUpc} product="${product.name}" desc="${item.description}" keywords=[${descKeywords.join(',')}] score=${matchScore}/${minRequired}`);
           }
 
           if (acceptMatch) {
