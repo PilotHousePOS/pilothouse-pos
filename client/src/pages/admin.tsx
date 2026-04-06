@@ -6076,33 +6076,74 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
 
   async function handleFile(file: File) {
     if (!file) return;
-    setPreviewUrl(URL.createObjectURL(file));
     setMatched([]);
     setUnmatched([]);
     setScanning(true);
 
     try {
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const img = new window.Image();
-        const objectUrl = URL.createObjectURL(file);
-        img.onload = () => {
-          URL.revokeObjectURL(objectUrl);
-          const MAX = 2048;
-          let { width, height } = img;
-          if (width > MAX || height > MAX) {
-            if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
-            else { width = Math.round(width * MAX / height); height = MAX; }
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
-          resolve(dataUrl.split(',')[1]);
-        };
-        img.onerror = reject;
-        img.src = objectUrl;
-      });
+      let base64: string;
+
+      if (file.type === 'application/pdf') {
+        const pdfjsLib = await import('pdfjs-dist');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const PAGE_SCALE = 2.5;
+        const pageCanvases: HTMLCanvasElement[] = [];
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: PAGE_SCALE });
+          const pageCanvas = document.createElement('canvas');
+          pageCanvas.width = viewport.width;
+          pageCanvas.height = viewport.height;
+          await page.render({ canvasContext: pageCanvas.getContext('2d')!, viewport }).promise;
+          pageCanvases.push(pageCanvas);
+        }
+        const totalWidth = Math.max(...pageCanvases.map(c => c.width));
+        const totalHeight = pageCanvases.reduce((sum, c) => sum + c.height, 0);
+        const stitched = document.createElement('canvas');
+        stitched.width = totalWidth;
+        stitched.height = totalHeight;
+        const ctx = stitched.getContext('2d')!;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, totalWidth, totalHeight);
+        let y = 0;
+        for (const pc of pageCanvases) { ctx.drawImage(pc, 0, y); y += pc.height; }
+        const MAX = 4096;
+        let w = stitched.width, h = stitched.height;
+        if (w > MAX || h > MAX) {
+          const ratio = Math.min(MAX / w, MAX / h);
+          w = Math.round(w * ratio); h = Math.round(h * ratio);
+          const scaled = document.createElement('canvas');
+          scaled.width = w; scaled.height = h;
+          scaled.getContext('2d')!.drawImage(stitched, 0, 0, w, h);
+          base64 = scaled.toDataURL('image/jpeg', 0.92).split(',')[1];
+        } else {
+          base64 = stitched.toDataURL('image/jpeg', 0.92).split(',')[1];
+        }
+        setPreviewUrl('data:image/jpeg;base64,' + base64);
+      } else {
+        base64 = await new Promise<string>((resolve, reject) => {
+          const img = new window.Image();
+          const objectUrl = URL.createObjectURL(file);
+          img.onload = () => {
+            URL.revokeObjectURL(objectUrl);
+            const MAX = 2048;
+            let { width, height } = img;
+            if (width > MAX || height > MAX) {
+              if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
+              else { width = Math.round(width * MAX / height); height = MAX; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width; canvas.height = height;
+            canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', 0.88).split(',')[1]);
+          };
+          img.onerror = reject;
+          img.src = objectUrl;
+        });
+        setPreviewUrl(URL.createObjectURL(file));
+      }
 
       const res = await apiRequest('POST', '/api/admin/invoice-scan', { imageBase64: base64, mimeType: 'image/jpeg' });
       const data = await res.json();
@@ -6163,15 +6204,15 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}
           >
-            <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
+            <input ref={fileInputRef} type="file" accept="image/*,application/pdf" className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
             {previewUrl ? (
               <img src={previewUrl} alt="Invoice" className="max-h-32 mx-auto rounded object-contain" />
             ) : (
               <div className="flex flex-col items-center gap-2 text-gray-500">
                 <Upload className="w-9 h-9" />
-                <p className="font-medium">Click or drag an invoice photo here</p>
-                <p className="text-xs">Take a photo with your phone and upload it</p>
+                <p className="font-medium">Click or drag an invoice photo or PDF here</p>
+                <p className="text-xs">Supports photos and PDF files</p>
               </div>
             )}
           </div>
