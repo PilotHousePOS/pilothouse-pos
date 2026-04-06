@@ -6,6 +6,7 @@ The Animal House Pet Store is a mobile-first e-commerce platform specializing in
 ## Agent Rules (Non-Negotiable)
 - **NEVER guess at a fix.** Before changing any code, read the actual logs, error output, or data that describes the problem. Every fix must be justified by evidence from the logs or code — not by assumption.
 - **Debugging process:** Check logs first → identify the exact cause → make one targeted fix → verify with logs again. Do not chain multiple speculative changes.
+- **Always check DEPLOYED logs first.** The user tests exclusively in the deployed (production) environment, not the dev server. Use `fetch_deployment_logs` as the first debugging step for any reported issue — dev server logs will not reflect what the user is seeing.
 - **Invoice scanner:** When scans return 0 items, ALWAYS fetch deployment logs and read the raw response content before touching any code. The model may refuse (returns `{"error":"..."}` instead of `{"items":[]}`), hit token limits (finish_reason: `length`), or have a prompt regression. Each has a different fix.
 
 ## User Preferences
