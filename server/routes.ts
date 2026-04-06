@@ -11549,12 +11549,25 @@ Rules:
         let resolvedUpc = item.upc;
         let corrected = false;
 
-        // If no direct match and this UPC was flagged as invalid, try correction candidates
+        // If no direct match and this UPC was flagged as invalid, try correction candidates.
+        // Only accept the correction if it resolves to exactly ONE unique product across all
+        // candidates — multiple candidates hitting different products means it's ambiguous,
+        // and we must NOT guess (e.g. PP 13oz cans vs PP Beef Shredded 5lb vs 15lb).
         if (!product && item.correctedFrom === 'invalid-checkdigit') {
           const candidates = getSingleDigitCandidates(item.upc);
+          const candidateMatches = new Map<number, { cp: any; resolvedUpc: string }>();
           for (const c of candidates) {
             const cp = productByUpc.get(c);
-            if (cp) { product = cp; resolvedUpc = c; corrected = true; break; }
+            if (cp && !candidateMatches.has(cp.id)) {
+              candidateMatches.set(cp.id, { cp, resolvedUpc: c });
+            }
+          }
+          if (candidateMatches.size === 1) {
+            const [{ cp, resolvedUpc: ru }] = [...candidateMatches.values()];
+            product = cp; resolvedUpc = ru; corrected = true;
+          } else if (candidateMatches.size > 1) {
+            const names = [...candidateMatches.values()].map(m => m.cp.name).join(', ');
+            console.log(`[InvoiceScan] CORRECTION AMBIGUOUS: ${item.upc} → ${candidateMatches.size} candidates (${names}) — sending to manual`);
           }
         }
 
