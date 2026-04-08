@@ -769,7 +769,17 @@ function ContactAppointmentHistory({ contactId, onViewFullHistory }: { contactId
               {apt.addOnLabels && apt.addOnLabels.length > 0 && (
                 <p className="text-purple-700 font-medium">+ {apt.addOnLabels.join(', ')}</p>
               )}
-              <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
+              {apt.pets && apt.pets.length > 0 ? (
+                <div className="space-y-0.5">
+                  {apt.pets.map((p: any, pi: number) => (
+                    <p key={pi} className="text-gray-600">
+                      {p.petName} ({p.petType}){apt.pets.length > 1 ? ` — ${p.serviceType || 'Grooming'}` : ''}
+                    </p>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
+              )}
               <p className="text-gray-500">{parseLocalDate(apt.appointmentDate).toLocaleDateString()}</p>
               {apt.groomerName && (
                 <p className="text-blue-700 font-medium">Groomer: {apt.groomerName}</p>
@@ -924,7 +934,17 @@ function ContactFullHistoryDialog({ contactId, contactName, isOpen, onClose, isS
                           {apt.price && (
                             <p className="text-green-700 font-semibold text-xs">${apt.price}</p>
                           )}
-                          <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
+                          {apt.pets && apt.pets.length > 0 ? (
+                            <div className="space-y-0.5">
+                              {apt.pets.map((p: any, pi: number) => (
+                                <p key={pi} className="text-gray-600">
+                                  {p.petName} ({p.petType}){apt.pets.length > 1 ? ` — ${p.serviceType || 'Grooming'}` : ''}
+                                </p>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-gray-600">{apt.petName} ({apt.petType})</p>
+                          )}
                           <p className="text-gray-500 text-xs">
                             {parseLocalDate(apt.appointmentDate).toLocaleDateString()} at {apt.appointmentTime}
                           </p>
@@ -1764,6 +1784,16 @@ function ContactsManager() {
                           <span className="capitalize break-words">
                             {contact.animalType.replace('_', ' ')}{contact.breed && contact.animalType === 'dog' ? ` - ${contact.breed}` : ''}
                           </span>
+                        </div>
+                      )}
+
+                      {/* Contact Notes — always visible when present */}
+                      {contact.notes && (
+                        <div className="flex items-start gap-2 mt-1">
+                          <span className="text-base flex-shrink-0">📝</span>
+                          <div className="bg-amber-50 border border-amber-200 rounded px-2 py-1 text-xs text-amber-900 break-words flex-1">
+                            {contact.notes}
+                          </div>
                         </div>
                       )}
                     </div>
