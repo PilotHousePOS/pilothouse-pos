@@ -11599,6 +11599,12 @@ export default function Admin() {
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold">{userItem.firstName} {userItem.lastName}</h3>
                           <p className="text-sm text-gray-600 break-all">{userItem.email}</p>
+                          {userItem.phoneNumber && (
+                            <a href={`tel:${userItem.phoneNumber}`} className="text-sm text-blue-600 hover:underline flex items-center gap-1">
+                              <Phone className="w-3 h-3" />
+                              {userItem.phoneNumber}
+                            </a>
+                          )}
                           <p className="text-xs text-gray-500">
                             Joined: {new Date(userItem.createdAt).toLocaleDateString()}
                           </p>
@@ -13242,6 +13248,12 @@ export default function Admin() {
                               {user.firstName} {user.lastName}
                             </CardTitle>
                             <p className="text-gray-400 text-sm mt-1">{user.email}</p>
+                            {user.phoneNumber && (
+                              <a href={`tel:${user.phoneNumber}`} className="text-sm text-blue-400 hover:underline flex items-center gap-1 mt-0.5">
+                                <Phone className="w-3 h-3" />
+                                {user.phoneNumber}
+                              </a>
+                            )}
                             <p className="text-gray-500 text-xs mt-0.5">
                               {userOrders.length} order{userOrders.length !== 1 ? 's' : ''}
                             </p>
