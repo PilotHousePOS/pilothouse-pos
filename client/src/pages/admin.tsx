@@ -9832,8 +9832,9 @@ export default function Admin() {
                                           size="sm"
                                           className="bg-blue-600 hover:bg-blue-700"
                                           onClick={() => approveOrderMutation.mutate(order.id)}
+                                          disabled={approveOrderMutation.isPending}
                                         >
-                                          Approve
+                                          {approveOrderMutation.isPending ? "Approving..." : "Approve"}
                                         </Button>
                                       </>
                                     )}

@@ -2683,6 +2683,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
               orderId: orderId.toString(),
               customerId: order.userId,
             },
+          }, {
+            idempotencyKey: `order-approve-${orderId}`,
           });
           
           if (paymentIntent.status === 'succeeded') {
@@ -2834,6 +2836,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       
       const amountCents = Math.round(parseFloat(order.totalAmount) * 100);
       
+      const retryKey = req.body?.idempotencyKey || `order-retry-${orderId}-${Date.now()}`;
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amountCents,
         currency: 'usd',
@@ -2846,6 +2849,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           orderId: orderId.toString(),
           customerId: order.userId,
         },
+      }, {
+        idempotencyKey: retryKey,
       });
       
       if (paymentIntent.status === 'succeeded') {
