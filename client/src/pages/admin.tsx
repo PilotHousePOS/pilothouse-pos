@@ -6090,6 +6090,7 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
   const [unmatched, setUnmatched] = useState<any[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [invoiceAddUpc, setInvoiceAddUpc] = useState<string | null>(null);
+  const [editedIds, setEditedIds] = useState<Set<number>>(new Set());
 
   const invoiceCreateSupplyMutation = useMutation({
     mutationFn: async (supplyData: any) => {
@@ -6114,6 +6115,7 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
     setMatched([]);
     setUnmatched([]);
     setPreviewUrl(null);
+    setEditedIds(new Set());
     if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
@@ -6216,6 +6218,7 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
       const res = await fetch(`/api/supplies/${supplyId}`);
       const supply = await res.json();
       if (!res.ok) throw new Error(supply.message || 'Could not load product');
+      setEditedIds(prev => new Set(prev).add(supplyId));
       onEditSupply(supply);
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -6286,23 +6289,32 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
               <div className="rounded-md border divide-y divide-gray-100 dark:divide-gray-700">
                 {matched.map((m) => {
                   const badge = getMatchBadge(m);
+                  const isEdited = editedIds.has(m.id);
                   return (
                     <div
                       key={m.id}
-                      className={`px-3 py-3 ${m.matchedBy === 'description' ? 'bg-orange-50/50 dark:bg-orange-900/10' : ''}`}
+                      className={`px-3 py-3 transition-colors ${isEdited ? 'bg-green-50/60 dark:bg-green-900/10' : m.matchedBy === 'description' ? 'bg-orange-50/50 dark:bg-orange-900/10' : ''}`}
                     >
                       {/* Badge + Edit button */}
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${badge.className}`}>{badge.label}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${badge.className}`}>{badge.label}</span>
+                          {isEdited && (
+                            <span className="flex items-center gap-0.5 text-[10px] font-semibold text-green-700 dark:text-green-400">
+                              <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="6" fill="currentColor" opacity="0.15"/><path d="M3.5 6.5l1.8 1.8 3.2-3.6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                              Edited
+                            </span>
+                          )}
+                        </div>
                         <Button
                           size="sm"
                           variant="outline"
-                          className="h-6 text-xs px-2"
+                          className={`h-6 text-xs px-2 ${isEdited ? 'border-green-400 text-green-700 dark:border-green-600 dark:text-green-400' : ''}`}
                           disabled={loadingId === m.id}
                           onClick={() => handleEdit(m.id)}
                         >
                           {loadingId === m.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Edit className="w-3 h-3 mr-1" />}
-                          Edit
+                          {isEdited ? 'Edit Again' : 'Edit'}
                         </Button>
                       </div>
 
@@ -6312,6 +6324,7 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
                           <p className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-0.5">Invoice says</p>
                           <p className="text-sm font-medium leading-tight text-gray-700 dark:text-gray-200">{m.description || '—'}</p>
                           <p className="text-[10px] font-mono text-gray-400 mt-0.5">qty: {m.invoiceQty} · current stock: {m.currentStock}</p>
+                          <p className="text-[10px] font-mono text-gray-500 mt-0.5 select-all cursor-text">{m.upc}{m.scannedUpc ? ` (read: ${m.scannedUpc})` : ''}</p>
                         </div>
                         <div className="flex items-center justify-center pt-4 text-gray-300">→</div>
                         <div className="min-w-0">
