@@ -11598,11 +11598,11 @@ export default function Admin() {
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold">{userItem.firstName} {userItem.lastName}</h3>
-                          <p className="text-sm text-gray-600 break-all">{userItem.email}</p>
+                          <p className="text-sm text-gray-600 truncate">{userItem.email}</p>
                           {userItem.phoneNumber && (
-                            <a href={`tel:${userItem.phoneNumber}`} className="text-sm text-blue-600 hover:underline flex items-center gap-1">
-                              <Phone className="w-3 h-3" />
-                              {userItem.phoneNumber}
+                            <a href={`tel:${userItem.phoneNumber}`} className="text-sm text-blue-600 hover:underline flex items-center gap-1 truncate">
+                              <Phone className="w-3 h-3 shrink-0" />
+                              <span className="truncate">{userItem.phoneNumber}</span>
                             </a>
                           )}
                           <p className="text-xs text-gray-500">
