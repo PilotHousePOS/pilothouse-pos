@@ -6083,6 +6083,7 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
   onEditSupply: (supply: any) => void;
 }) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [scanning, setScanning] = useState(false);
   const [loadingId, setLoadingId] = useState<number | null>(null);
