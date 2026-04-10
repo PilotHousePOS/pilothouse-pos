@@ -6357,30 +6357,29 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0">
                             <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{u.description || 'Unknown item'}</p>
-                            <p className="text-[10px] font-mono text-gray-400 mt-0.5">
-                              UPC read: {u.upc}
-                              {!u.validCheckDigit && <span className="ml-1 text-red-500">⚠ check digit invalid — likely misread</span>}
-                            </p>
+                            {u.validCheckDigit ? (
+                              <p className="text-[10px] font-mono text-gray-400 mt-0.5">UPC: {u.upc}</p>
+                            ) : (
+                              <p className="text-[10px] font-mono text-red-500 mt-0.5">⚠ UPC could not be read reliably — enter manually</p>
+                            )}
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
                             <span className="text-xs font-medium text-gray-500 dark:text-gray-400">qty: {u.qty}</span>
-                            {u.validCheckDigit && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-6 px-2 text-[10px] border-orange-300 text-orange-700 hover:bg-orange-50 dark:border-orange-700 dark:text-orange-400"
-                                onClick={() => setInvoiceAddUpc(u.upc)}
-                              >
-                                <Plus className="w-3 h-3 mr-0.5" />
-                                Add to System
-                              </Button>
-                            )}
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-6 px-2 text-[10px] border-orange-300 text-orange-700 hover:bg-orange-50 dark:border-orange-700 dark:text-orange-400"
+                              onClick={() => setInvoiceAddUpc(u.validCheckDigit ? u.upc : '')}
+                            >
+                              <Plus className="w-3 h-3 mr-0.5" />
+                              Add to System
+                            </Button>
                           </div>
                         </div>
                         <p className="text-[10px] text-orange-600 dark:text-orange-400 mt-1">
-                          {!u.validCheckDigit
-                            ? 'UPC digits were likely misread — find this product by description and update stock manually'
-                            : "UPC not in your system — may be a new product you haven't added yet"}
+                          {u.validCheckDigit
+                            ? "UPC not in your system — may be a new product you haven't added yet"
+                            : 'UPC was unreadable — add this product manually and enter the correct UPC'}
                         </p>
                       </div>
                     ))}
@@ -6389,16 +6388,16 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
               )}
 
               {/* Add Supply dialog triggered from unmatched items */}
-              <Dialog open={!!invoiceAddUpc} onOpenChange={(o) => { if (!o) setInvoiceAddUpc(null); }}>
+              <Dialog open={invoiceAddUpc !== null} onOpenChange={(o) => { if (!o) setInvoiceAddUpc(null); }}>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Add New Supply</DialogTitle>
-                    <DialogDescription>Add this product to your inventory. UPC has been pre-filled.</DialogDescription>
+                    <DialogDescription>{invoiceAddUpc ? 'UPC has been pre-filled from the invoice.' : 'UPC could not be read — enter the correct UPC manually.'}</DialogDescription>
                   </DialogHeader>
-                  {invoiceAddUpc && (
+                  {invoiceAddUpc !== null && (
                     <AddSupplyForm
-                      key={invoiceAddUpc}
-                      initialUpc={invoiceAddUpc}
+                      key={invoiceAddUpc || 'no-upc'}
+                      initialUpc={invoiceAddUpc || ''}
                       onSubmit={(data) => invoiceCreateSupplyMutation.mutate(data)}
                     />
                   )}

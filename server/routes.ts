@@ -11736,14 +11736,12 @@ Rules:
         finalUnmatched.push(item);
       }
 
-      // For remaining unmatched, correct the display UPC so the user sees the best-possible
-      // reference UPC (last digit fixed), not the raw garbled read from GPT.
+      // Send unmatched items as-is — do NOT guess or correct the check digit.
+      // If the UPC was misread, the first 11 digits may also be wrong, so computing a
+      // "corrected" last digit gives false confidence and could point to the wrong product.
+      // Items with invalid check digits are flagged so the UI can warn the user.
       const unmatched: any[] = finalUnmatched.map(item => {
-        let displayUpc = item.upc;
-        if (/^\d{12}$/.test(item.upc) && !isValidUPC(item.upc)) {
-          displayUpc = item.upc.slice(0, 11) + String(calcUPCCheckDigit(item.upc.slice(0, 11)));
-        }
-        return { upc: displayUpc, qty: item.qty, description: item.description, validCheckDigit: isValidUPC(displayUpc) };
+        return { upc: item.upc, qty: item.qty, description: item.description, validCheckDigit: isValidUPC(item.upc) };
       });
 
       console.log(`[InvoiceScan] Extracted ${invoiceItems.length} UPCs, matched ${matched.length} products, ${unmatched.length} unmatched`);
