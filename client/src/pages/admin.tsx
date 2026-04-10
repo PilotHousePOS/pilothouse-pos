@@ -6231,6 +6231,7 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
   // Badge config per match type
   function getMatchBadge(m: any) {
     if (m.corrected) return { label: 'UPC Corrected', className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300' };
+    if (m.matchedBy === 'possible') return { label: 'Possible Match', className: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' };
     if (m.matchedBy === 'description') return { label: 'Description Match', className: 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300' };
     return { label: 'UPC Match', className: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' };
   }
@@ -6294,7 +6295,7 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
                   return (
                     <div
                       key={m.id}
-                      className={`px-3 py-3 transition-colors ${isEdited ? 'bg-green-50/60 dark:bg-green-900/10' : m.matchedBy === 'description' ? 'bg-orange-50/50 dark:bg-orange-900/10' : ''}`}
+                      className={`px-3 py-3 transition-colors ${isEdited ? 'bg-green-50/60 dark:bg-green-900/10' : m.matchedBy === 'possible' ? 'bg-amber-50/50 dark:bg-amber-900/10' : m.matchedBy === 'description' ? 'bg-orange-50/50 dark:bg-orange-900/10' : ''}`}
                     >
                       {/* Badge + Edit button */}
                       <div className="flex items-center justify-between mb-1.5">
@@ -6334,6 +6335,11 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
                           <p className="text-[10px] text-gray-400 mt-0.5">{m.brand || ''}</p>
                         </div>
                       </div>
+                      {m.matchedBy === 'possible' && (
+                        <p className="text-[10px] text-amber-700 dark:text-amber-400 mt-1.5">
+                          ⚠ {m.ambiguousCount} products matched — verify this is correct before editing
+                        </p>
+                      )}
                     </div>
                   );
                 })}
