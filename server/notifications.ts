@@ -502,10 +502,36 @@ class SMSService {
     }
   }
 
+  async sendAdminNewOrderSMS(phoneNumber: string, orderId: number, customerName: string, totalAmount: string): Promise<boolean> {
+    const message = `Animal House: New order #${orderId} from ${customerName} - Total: $${parseFloat(totalAmount).toFixed(2)}. Check the admin dashboard.`;
+
+    if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE_NUMBER) {
+      console.log('Twilio not configured, admin SMS skipped');
+      return false;
+    }
+
+    try {
+      const twilio = await import('twilio');
+      const client = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+      const result = await client.messages.create({
+        body: message,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: phoneNumber,
+      });
+      console.log(`Admin new-order SMS sent to ${phoneNumber} for order ${orderId}: ${result.sid}`);
+      return true;
+    } catch (error: any) {
+      console.error('Admin new-order SMS error:', error);
+      return false;
+    }
+  }
+
   async sendOrderStatusSMS(phoneNumber: string, firstName: string, orderId: number, status: string): Promise<boolean> {
     const messages = {
+      'approved': `Hi ${firstName}! Your Animal House order #${orderId} has been approved. We'll text you when it's ready for pickup!`,
       'in_progress': `Hi ${firstName}! Your Animal House order #${orderId} is being prepared. We'll text you when it's ready for pickup!`,
-      'ready': `${firstName}, your order #${orderId} is ready for pickup at Animal House Pet Store! 🐾`
+      'ready': `${firstName}, your order #${orderId} is ready for pickup at Animal House Pet Store! 🐾`,
+      'picked_up': `Hi ${firstName}! Your Animal House order #${orderId} has been picked up. Thanks for shopping with us! 🐾`,
     };
     const message = messages[status as keyof typeof messages];
     if (!message) return false;
@@ -630,13 +656,21 @@ export class NotificationService {
     adminEmails: string[],
     orderId: number,
     customerName: string,
-    totalAmount: string
+    totalAmount: string,
+    adminPhones?: string[]
   ): Promise<void> {
     console.log(`Sending admin notifications for new order ${orderId}`);
 
     // Send email notifications to all admin users
     for (const adminEmail of adminEmails) {
       await this.emailService.sendAdminNewOrderEmail(adminEmail, orderId, customerName, totalAmount);
+    }
+
+    // Send SMS notifications to admin users who have a phone number
+    if (adminPhones && adminPhones.length > 0) {
+      for (const phone of adminPhones) {
+        await this.smsService.sendAdminNewOrderSMS(phone, orderId, customerName, totalAmount);
+      }
     }
 
     // Send push notification to admin users

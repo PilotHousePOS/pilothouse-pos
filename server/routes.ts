@@ -2307,8 +2307,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         try {
           const customerName = `${orderingUser?.firstName || ''} ${orderingUser?.lastName || ''}`.trim();
           const allUsers = await storage.getAllUsers();
-          const adminEmails = allUsers.filter(u => u.isAdmin).map(u => u.email).filter((e): e is string => !!e);
-          await notificationService.sendAdminNewOrderNotifications(adminEmails, order.id, customerName || 'Charge Account Customer', order.totalAmount || '0');
+          const adminUsers = allUsers.filter(u => u.isAdmin);
+          const adminEmails = adminUsers.map(u => u.email).filter((e): e is string => !!e);
+          const adminPhones = adminUsers.map(u => u.phoneNumber).filter((p): p is string => !!p);
+          await notificationService.sendAdminNewOrderNotifications(adminEmails, order.id, customerName || 'Charge Account Customer', order.totalAmount || '0', adminPhones);
         } catch (notifErr) {
           console.error("Failed to send charge account order notifications:", notifErr);
         }
@@ -2515,16 +2517,16 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         
         // Get all admin users
         const allUsers = await storage.getAllUsers();
-        const adminEmails = allUsers
-          .filter(u => u.isAdmin)
-          .map(u => u.email)
-          .filter((email): email is string => !!email);
+        const adminUsers = allUsers.filter(u => u.isAdmin);
+        const adminEmails = adminUsers.map(u => u.email).filter((email): email is string => !!email);
+        const adminPhones = adminUsers.map(u => u.phoneNumber).filter((p): p is string => !!p);
         
         await notificationService.sendAdminNewOrderNotifications(
           adminEmails,
           order.id,
           customerName,
-          order.totalAmount
+          order.totalAmount,
+          adminPhones
         );
 
         const { notifyAdminsNewOrder } = await import('./pushNotifications');
@@ -2732,6 +2734,21 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         console.error('Push notification failed for order approval:', pushErr);
       }
 
+      // Send customer SMS if they have a phone number
+      if (orderOwner?.phoneNumber) {
+        try {
+          const { SMSService } = await import('./notifications') as any;
+          // Use the SMSService directly to send approved status
+          const twilio = await import('twilio');
+          const client = twilio.default(process.env.TWILIO_ACCOUNT_SID!, process.env.TWILIO_AUTH_TOKEN!);
+          const smsMsg = `Hi ${orderOwner.firstName || 'there'}! Your Animal House order #${orderId} has been approved. We'll text you when it's ready for pickup!`;
+          await client.messages.create({ body: smsMsg, from: process.env.TWILIO_PHONE_NUMBER!, to: orderOwner.phoneNumber });
+          console.log(`Approval SMS sent to ${orderOwner.phoneNumber} for order ${orderId}`);
+        } catch (smsErr) {
+          console.error('Approval SMS failed:', smsErr);
+        }
+      }
+
       if (customerEmail) {
         try {
           const { getUncachableSendGridClient } = await import('./sendgridIntegration');
@@ -2906,6 +2923,23 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
       const order = orderWithItems.order;
       const customerEmail = orderWithItems.customerEmail || order.customerEmail;
+
+      // Send customer SMS if they have a phone number
+      if (order.userId) {
+        try {
+          const customer = await storage.getUser(order.userId);
+          if (customer?.phoneNumber && process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) {
+            const twilio = await import('twilio');
+            const twilioClient = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+            const smsMsg = `${customer.firstName || 'Hi'}, your Animal House order #${orderId} is ready for pickup! Come grab it anytime during store hours. 🐾`;
+            await twilioClient.messages.create({ body: smsMsg, from: process.env.TWILIO_PHONE_NUMBER, to: customer.phoneNumber });
+            console.log(`Ready SMS sent to ${customer.phoneNumber} for order ${orderId}`);
+          }
+        } catch (smsErr) {
+          console.error('Ready SMS failed:', smsErr);
+        }
+      }
+
       if (customerEmail) {
         try {
           const { getUncachableSendGridClient } = await import('./sendgridIntegration');
@@ -2968,6 +3002,22 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       await storage.updateOrderApprovalStatus(orderId, 'picked_up');
       // Also mark the order status as completed when picked up
       await storage.updateOrderStatus(orderId, 'completed');
+
+      // Send customer SMS if they have a phone number
+      if (orderWithItems?.order.userId) {
+        try {
+          const pickedUpCustomer = await storage.getUser(orderWithItems.order.userId);
+          if (pickedUpCustomer?.phoneNumber && process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) {
+            const twilio = await import('twilio');
+            const twilioClient = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+            const smsMsg = `Hi ${pickedUpCustomer.firstName || 'there'}! Your Animal House order #${orderId} has been picked up. Thank you for shopping with us! 🐾`;
+            await twilioClient.messages.create({ body: smsMsg, from: process.env.TWILIO_PHONE_NUMBER, to: pickedUpCustomer.phoneNumber });
+            console.log(`Picked-up SMS sent to ${pickedUpCustomer.phoneNumber} for order ${orderId}`);
+          }
+        } catch (smsErr) {
+          console.error('Picked-up SMS failed:', smsErr);
+        }
+      }
       
       // Update loyalty rewards - add the order amount to the customer's total spent
       if (orderWithItems) {
