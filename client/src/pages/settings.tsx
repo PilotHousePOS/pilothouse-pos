@@ -740,6 +740,9 @@ export default function Settings() {
               data-testid="input-phone-number"
             />
             <p className="text-xs text-gray-500 mt-1">For notifications. Separate multiple numbers with commas.</p>
+            <p className="text-xs text-gray-400 mt-2 leading-relaxed">
+              By providing your phone number, you agree to receive order status text messages from Animal House Pet Store (e.g. order approved, ready for pickup, picked up). Msg &amp; data rates may apply. Reply <strong>STOP</strong> to opt out at any time.
+            </p>
           </div>
           <Button
             onClick={handleUpdatePhone}
