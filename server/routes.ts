@@ -11726,26 +11726,8 @@ Rules:
               });
               console.log(`[InvoiceScan] DESC-MATCH: "${item.description}" → "${p.name}" (keywords=[${searchKws.join(',')}] score=${topScore})`);
               continue;
-            } else if (topGroup.length > 1 && topScore >= 2) {
-              // Multiple products tied — pick the best candidate using brand affinity from the
-              // invoice description, then show it as a "Possible Match" so the user can confirm.
-              const descLower = (item.description || '').toLowerCase();
-              const brandMatch = topGroup.find(x => x.p.brand && descLower.includes((x.p.brand || '').toLowerCase()));
-              const best = brandMatch || topGroup[0];
-              const p = best.p;
-              if (!seenIds.has(p.id)) {
-                seenIds.add(p.id);
-                matched.push({
-                  id: p.id, name: p.name, brand: p.brand,
-                  upc: (p.upc || p.sku || item.upc)!,
-                  scannedUpc: item.upc, corrected: false, matchedBy: 'possible',
-                  ambiguousCount: topGroup.length,
-                  currentStock: p.stockQuantity ?? 0, invoiceQty: item.qty,
-                  newStock: (p.stockQuantity ?? 0) + item.qty, description: item.description,
-                });
-                console.log(`[InvoiceScan] POSSIBLE-MATCH: "${item.description}" → "${p.name}" (${topGroup.length} tied, brand=${!!brandMatch})`);
-                continue;
-              }
+            } else if (topGroup.length > 1) {
+              console.log(`[InvoiceScan] DESC-AMBIGUOUS: "${item.description}" → ${topGroup.length} tied at score ${topScore} (${topGroup.map(x => x.p.name).join(', ')}) — manual`);
             }
           } catch (e) {
             // Fallback query failed — just leave as unmatched
