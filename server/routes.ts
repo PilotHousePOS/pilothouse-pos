@@ -11468,11 +11468,14 @@ West Monroe LA 71291
 
       const prompt = `You are extracting line items from a supplier invoice image for a pet store.
 
-STEP 1 — Locate the UPC column. The header will say "PRODUCT UPC", "UPC", "UPC CODE", or "BARCODE".
-STEP 2 — Locate the quantity shipped column. Header will say "QTY SHIPPED", "SHIPPED", or "QTY". If two sub-columns exist (ORDER / SHIPPED), use the SHIPPED value.
+STEP 1 — Locate the UPC column. The header may say: "UPC", "PRODUCT UPC", "UPC CODE", "BARCODE", "ITEM UPC", or similar. It contains 12-digit numbers.
+
+STEP 2 — Locate the quantity column. It may be labeled: "QTY SHIPPED", "QTY SHIP", "SHIP QTY", "SHIPPED", "QTY", "QTY ORD", "QTY ORDERED", "ORDERED", "CASES", "CS", "SHP", or any similar label. If there are two quantity columns (ordered vs shipped), prefer the shipped/delivered column. If only one exists, use it. If the column label is unclear, use whatever numeric column appears beside the UPC.
+
 STEP 3 — Go through EVERY line item row from top to bottom without skipping any:
   • Read the UPC one digit at a time, left to right — the number is printed clearly, copy it exactly.
-  • Record the shipped quantity and the item description text.
+  • Record the quantity and the item description text.
+  • If a row has no UPC, skip it.
 
 Return ONLY this JSON (no other text):
 {
@@ -11481,7 +11484,9 @@ Return ONLY this JSON (no other text):
   ]
 }
 
-Rules:
+CRITICAL RULES:
+- NEVER return an error message or refuse to parse. If you cannot identify every column perfectly, make your best effort and return items anyway.
+- If a quantity is hard to read, default to 1.
 - Include every row — even rows where shipped qty is 0.
 - Do not stop before the last row on the page.
 - UPCs are exactly 12 digits — no dashes, no spaces.
@@ -11521,8 +11526,13 @@ Rules:
 
         try {
           const parsed = JSON.parse(rawContent);
-          parsedItems = Array.isArray(parsed.items) ? parsed.items : [];
-          console.log(`[InvoiceScan] Parsed ${parsedItems.length} items`);
+          if (parsed.error) {
+            console.log(`[InvoiceScan] AI returned error on attempt ${attempt}: ${parsed.error}`);
+            parsedItems = [];
+          } else {
+            parsedItems = Array.isArray(parsed.items) ? parsed.items : [];
+            console.log(`[InvoiceScan] Parsed ${parsedItems.length} items`);
+          }
         } catch (e: any) {
           parsedItems = [];
           console.log(`[InvoiceScan] JSON parse error — ${e.message}`);
