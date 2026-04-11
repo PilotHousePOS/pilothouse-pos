@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, Component, ReactNode } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -7,6 +7,32 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import BottomNav from "@/components/bottom-nav";
 import BackToTop from "@/components/back-to-top";
+
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="max-w-md mx-auto bg-white min-h-screen flex flex-col items-center justify-center gap-4 p-8 text-center">
+          <p className="text-gray-600">Something went wrong. Please refresh the page.</p>
+          <button
+            className="px-4 py-2 bg-primary text-white rounded-lg text-sm"
+            onClick={() => { this.setState({ hasError: false }); window.location.reload(); }}
+          >
+            Refresh
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const Landing = lazy(() => import("@/pages/landing"));
 const Auth = lazy(() => import("@/pages/auth"));
@@ -101,7 +127,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Router />
+        <ErrorBoundary>
+          <Router />
+        </ErrorBoundary>
       </TooltipProvider>
     </QueryClientProvider>
   );

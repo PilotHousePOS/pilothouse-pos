@@ -1,24 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
+import { getQueryFn } from "@/lib/queryClient";
 
 export function useAuth() {
-  const token = localStorage.getItem('token');
-  
   const { data: user, isLoading } = useQuery({
     queryKey: ["/api/auth/user"],
+    queryFn: getQueryFn({ on401: "returnNull" }),
     retry: false,
-    // Always try to fetch user - cookies might be set even without localStorage token
-    enabled: true,
-    staleTime: 0, // Always fetch fresh data to get latest admin status
+    staleTime: 5 * 60 * 1000,
     refetchOnMount: true,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   });
-
-
 
   return {
     user,
     isLoading,
-    // User is authenticated if we have user data (either from localStorage token or cookies)
     isAuthenticated: !!user,
   };
 }
