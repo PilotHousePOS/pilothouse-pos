@@ -11466,16 +11466,13 @@ West Monroe LA 71291
         apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
       });
 
-      const prompt = `You are extracting line items from a supplier invoice image for a pet store.
+      const prompt = `You are extracting UPC codes and item descriptions from a supplier invoice image for a pet store.
 
-STEP 1 — Locate the UPC column. The header may say: "UPC", "PRODUCT UPC", "UPC CODE", "BARCODE", "ITEM UPC", or similar. It contains 12-digit numbers.
+Your ONLY job is to find every 12-digit UPC code on the page and the item description next to it.
 
-STEP 2 — Locate the quantity column. It may be labeled: "QTY SHIPPED", "QTY SHIP", "SHIP QTY", "SHIPPED", "QTY", "QTY ORD", "QTY ORDERED", "ORDERED", "CASES", "CS", "SHP", or any similar label. If there are two quantity columns (ordered vs shipped), prefer the shipped/delivered column. If only one exists, use it. If the column label is unclear, use whatever numeric column appears beside the UPC.
-
-STEP 3 — Go through EVERY line item row from top to bottom without skipping any:
-  • Read the UPC one digit at a time, left to right — the number is printed clearly, copy it exactly.
-  • Record the quantity and the item description text.
-  • If a row has no UPC, skip it.
+STEP 1 — Scan the entire image for any column containing 12-digit numbers. That is the UPC column.
+STEP 2 — For each row that has a 12-digit UPC, read the item description from that row.
+STEP 3 — Output every row that has a UPC — do not skip any.
 
 Return ONLY this JSON (no other text):
 {
@@ -11485,9 +11482,8 @@ Return ONLY this JSON (no other text):
 }
 
 CRITICAL RULES:
-- NEVER return an error message or refuse to parse. If you cannot identify every column perfectly, make your best effort and return items anyway.
-- If a quantity is hard to read, default to 1.
-- Include every row — even rows where shipped qty is 0.
+- NEVER return an error message or refuse to parse. Always return items.
+- Do not worry about quantity columns at all — just set qty to 1 for every item.
 - Do not stop before the last row on the page.
 - UPCs are exactly 12 digits — no dashes, no spaces.
 - Copy each UPC digit by digit exactly as printed. Do not guess, infer, or "correct" any digit.`;
