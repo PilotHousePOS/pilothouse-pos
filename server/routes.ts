@@ -11628,10 +11628,18 @@ CRITICAL RULES:
         'wave': 'wave', 'terr': 'terrarium', 'smartsift': 'smartsift',
         'midwe': 'midwest', 'midpet': 'midwest',
         'sb': 'shredded',
+        // Brand abbreviations used by distributors
+        'kon': 'kong', 'coa': 'coastal', 'ims': 'iams', 'gre': 'greenies',
+        'ori': 'orijen', 'dos': 'petmate', 'gar': 'naturvet', 'zup': 'zupreem',
+        'ptg': 'petag', 'pbg': 'fresh', 'kmp': 'kaylor', 'jel': 'jelly',
+        'pup': 'puppy', 'kttn': 'kitten', 'ktt': 'kitten',
+        'grmg': 'grooming', 'cllr': 'collar', 'cllrs': 'collar',
+        'brsh': 'brush', 'slkr': 'slicker', 'trm': 'trimmer', 'trmr': 'trimmer',
+        'ezclear': 'ezclear', 'ziggie': 'ziggie', 'ziggies': 'ziggies',
       };
       const NOISE_WORDS = new Set([
-        'esntl','cmplt','shrd','blnd','repl','bisc','adlt','easy','adt',
-        'snk','trt','rwrd','dog','cat','pet','snack','treat','adult','puppy','pup',
+        'esntl','cmplt','shrd','blnd','repl','bisc','adlt','adt',
+        'snk','trt','rwrd','dog','cat','pet','snack','treat','adult',
         'ea','cas','rc','ce','fd','u/a',
       ]);
 
@@ -11748,7 +11756,7 @@ CRITICAL RULES:
         // either came from the expansion table or are long enough to be actual product terms.
         const searchKws = itemKws.filter(kw => kw.length >= 4 && !SEARCH_STOP_WORDS.has(kw));
 
-        if (searchKws.length >= 2) {
+        if (searchKws.length >= 1) {
           try {
             // Find all products whose name matches ANY of the search keywords
             const orConditions = searchKws.map(kw => ilike(supplies.name, `%${kw}%`));
@@ -11758,10 +11766,12 @@ CRITICAL RULES:
               stockQuantity: supplies.stockQuantity, price: supplies.price,
             }).from(supplies).where(or(...orConditions));
 
-            // Score each candidate: how many search keywords appear in name+brand?
+            // Score each candidate against the FULL keyword list (itemKws), not just the
+            // narrow searchKws — this catches size/color terms that were excluded from the
+            // DB query but are still useful discriminators (e.g. "small" vs "large" collar).
             const scored = descCandidates
               .filter(p => !seenIds.has(p.id))
-              .map(p => ({ p, score: scoreProduct(p, searchKws) }))
+              .map(p => ({ p, score: scoreProduct(p, itemKws) }))
               .filter(x => x.score >= 2)
               .sort((a, b) => b.score - a.score);
 
