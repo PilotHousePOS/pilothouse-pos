@@ -5226,6 +5226,36 @@ West Monroe LA 71291
         }
       }
       
+      // SAFEGUARD #1d-cat: Cat-specific day + time restrictions
+      // Cats are only accepted Mon (1), Tue (2), Thu (4) and must arrive by 9:00 AM.
+      // These apply to the whole appointment if ANY pet being booked is a cat.
+      const hasCat = petsArray.some((p: any) =>
+        (p.petType || p.type || '').toLowerCase() === 'cat'
+      );
+      if (hasCat && !isAdminOrGroomer) {
+        if (![1, 2, 4].includes(dayOfWeek)) {
+          return res.status(400).json({
+            message: "Cats are only accepted on Monday, Tuesday, and Thursday. Please select a valid day."
+          });
+        }
+        const catTimeStr = req.body.appointmentTime;
+        if (catTimeStr) {
+          const tp = catTimeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+          if (tp) {
+            let h = parseInt(tp[1]);
+            const m = parseInt(tp[2]);
+            const per = tp[3].toUpperCase();
+            if (per === 'AM' && h === 12) h = 0;
+            if (per === 'PM' && h !== 12) h += 12;
+            if (h * 60 + m > 9 * 60) { // strictly after 9:00 AM
+              return res.status(400).json({
+                message: "Cats must arrive by 9:00 AM. Please select an earlier time."
+              });
+            }
+          }
+        }
+      }
+
       // SAFEGUARD #1d: Validate appointment time is not after 1:30 PM cutoff
       // Skip this check for special dates (they have their own allowed times list)
       if (!specialDate) {
