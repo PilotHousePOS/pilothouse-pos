@@ -1,6 +1,5 @@
-const CACHE_NAME = 'animal-house-v6';
-const urlsToCache = [
-  '/',
+const CACHE_NAME = 'animal-house-v7';
+const OFFLINE_CACHE = [
   '/manifest.json',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png'
@@ -8,11 +7,9 @@ const urlsToCache = [
 
 self.addEventListener('install', function(event) {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(function(cache) {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(function(cache) {
+      return cache.addAll(OFFLINE_CACHE);
+    })
   );
   self.skipWaiting();
 });
@@ -43,33 +40,31 @@ self.addEventListener('activate', function(event) {
 
 self.addEventListener('fetch', function(event) {
   if (event.request.method !== 'GET') return;
-  
-  if (event.request.url.includes('/api/')) {
-    return;
-  }
-  
+
+  const url = new URL(event.request.url);
+
+  // Never intercept API calls
+  if (url.pathname.startsWith('/api/')) return;
+
+  // Never intercept HTML navigation requests — always fetch fresh from network
+  // This ensures index.html is always up to date after a deployment
+  if (event.request.mode === 'navigate') return;
+
+  // Never cache JS or CSS chunks — they have content hashes in the filename
+  // and must always be fresh. Let the browser's built-in HTTP cache handle them.
+  if (url.pathname.startsWith('/assets/')) return;
+
+  // For everything else (icons, manifest), use cache-first
   event.respondWith(
-    fetch(event.request)
-      .then(function(response) {
-        if (!response || response.status !== 200 || response.type !== 'basic') {
-          return response;
-        }
-        const responseToCache = response.clone();
-        caches.open(CACHE_NAME)
-          .then(function(cache) {
-            cache.put(event.request, responseToCache);
-          });
-        return response;
-      })
-      .catch(function() {
-        return caches.match(event.request);
-      })
+    caches.match(event.request).then(function(cached) {
+      return cached || fetch(event.request);
+    })
   );
 });
 
 self.addEventListener('push', function(event) {
   console.log('[SW] Push notification received');
-  
+
   let notificationData = {
     title: 'Animal House Pet Store',
     body: 'You have a new notification',
@@ -119,9 +114,7 @@ self.addEventListener('push', function(event) {
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
 
-  if (event.action === 'dismiss') {
-    return;
-  }
+  if (event.action === 'dismiss') return;
 
   const targetUrl = event.notification.data?.url || '/';
   const fullUrl = new URL(targetUrl, self.location.origin).href;
@@ -147,17 +140,17 @@ self.addEventListener('notificationclose', function(event) {
 
 self.addEventListener('pushsubscriptionchange', function(event) {
   console.log('[SW] Push subscription changed - resubscribing');
-  
+
   var subscribeOptions = event.oldSubscription ? event.oldSubscription.options : {
     userVisibleOnly: true,
     applicationServerKey: self.__vapidPublicKey || null
   };
-  
+
   if (!subscribeOptions || !subscribeOptions.applicationServerKey) {
     console.warn('[SW] No applicationServerKey available for re-subscription');
     return;
   }
-  
+
   event.waitUntil(
     self.registration.pushManager.subscribe(subscribeOptions)
       .then(function(subscription) {
@@ -173,4 +166,3 @@ self.addEventListener('pushsubscriptionchange', function(event) {
       })
   );
 });
-
