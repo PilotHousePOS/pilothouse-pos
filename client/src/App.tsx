@@ -8,6 +8,24 @@ import { useAuth } from "@/hooks/useAuth";
 import BottomNav from "@/components/bottom-nav";
 import BackToTop from "@/components/back-to-top";
 
+function safeLazy<T extends React.ComponentType<any>>(
+  factory: () => Promise<{ default: T }>
+) {
+  return lazy(() =>
+    factory().catch(() => {
+      let reloaded = false;
+      try { reloaded = !!sessionStorage.getItem('_chunk_reload'); } catch {}
+      if (!reloaded) {
+        try { sessionStorage.setItem('_chunk_reload', '1'); } catch {}
+        window.location.reload();
+        return new Promise<{ default: T }>(() => {});
+      }
+      try { sessionStorage.removeItem('_chunk_reload'); } catch {}
+      return Promise.resolve({ default: (() => null) as unknown as T });
+    })
+  );
+}
+
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   constructor(props: { children: ReactNode }) {
     super(props);
@@ -34,31 +52,31 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   }
 }
 
-const Landing = lazy(() => import("@/pages/landing"));
-const Auth = lazy(() => import("@/pages/auth"));
-const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
-const ResetPassword = lazy(() => import("@/pages/reset-password"));
-const Home = lazy(() => import("@/pages/home"));
-const Pets = lazy(() => import("@/pages/pets"));
-const Supplies = lazy(() => import("@/pages/supplies"));
-const SupplyDetail = lazy(() => import("@/pages/supply-detail"));
-const Aquatics = lazy(() => import("@/pages/aquatics"));
-const Reptiles = lazy(() => import("@/pages/reptiles"));
-const Booking = lazy(() => import("@/pages/booking"));
-const Profile = lazy(() => import("@/pages/profile"));
-const Settings = lazy(() => import("@/pages/settings"));
-const Admin = lazy(() => import("@/pages/admin"));
-const OrderHistory = lazy(() => import("@/pages/order-history"));
-const OrderConfirmation = lazy(() => import("@/pages/order-confirmation"));
-const MyAppointments = lazy(() => import("@/pages/my-appointments"));
-const Wishlist = lazy(() => import("@/pages/wishlist"));
-const PrivacyPolicy = lazy(() => import("@/pages/privacy-policy"));
-const TermsOfService = lazy(() => import("@/pages/terms-of-service"));
-const Support = lazy(() => import("@/pages/support"));
-const VerifyEmail = lazy(() => import("@/pages/verify-email"));
-const DeleteAccount = lazy(() => import("@/pages/delete-account"));
-const NotFound = lazy(() => import("@/pages/not-found"));
-const Apply = lazy(() => import("@/pages/apply"));
+const Landing = safeLazy(() => import("@/pages/landing"));
+const Auth = safeLazy(() => import("@/pages/auth"));
+const ForgotPassword = safeLazy(() => import("@/pages/forgot-password"));
+const ResetPassword = safeLazy(() => import("@/pages/reset-password"));
+const Home = safeLazy(() => import("@/pages/home"));
+const Pets = safeLazy(() => import("@/pages/pets"));
+const Supplies = safeLazy(() => import("@/pages/supplies"));
+const SupplyDetail = safeLazy(() => import("@/pages/supply-detail"));
+const Aquatics = safeLazy(() => import("@/pages/aquatics"));
+const Reptiles = safeLazy(() => import("@/pages/reptiles"));
+const Booking = safeLazy(() => import("@/pages/booking"));
+const Profile = safeLazy(() => import("@/pages/profile"));
+const Settings = safeLazy(() => import("@/pages/settings"));
+const Admin = safeLazy(() => import("@/pages/admin"));
+const OrderHistory = safeLazy(() => import("@/pages/order-history"));
+const OrderConfirmation = safeLazy(() => import("@/pages/order-confirmation"));
+const MyAppointments = safeLazy(() => import("@/pages/my-appointments"));
+const Wishlist = safeLazy(() => import("@/pages/wishlist"));
+const PrivacyPolicy = safeLazy(() => import("@/pages/privacy-policy"));
+const TermsOfService = safeLazy(() => import("@/pages/terms-of-service"));
+const Support = safeLazy(() => import("@/pages/support"));
+const VerifyEmail = safeLazy(() => import("@/pages/verify-email"));
+const DeleteAccount = safeLazy(() => import("@/pages/delete-account"));
+const NotFound = safeLazy(() => import("@/pages/not-found"));
+const Apply = safeLazy(() => import("@/pages/apply"));
 
 function PageLoader() {
   return (

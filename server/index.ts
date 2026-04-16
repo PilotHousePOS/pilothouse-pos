@@ -139,6 +139,9 @@ if (process.env.NODE_ENV === 'production') {
 
     // Explicit root handler — registered BEFORE everything else
     const sendIndex = (res: Response) => {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
       res.sendFile(prodIndexPath, (err) => {
         if (err) {
           console.error('[STATIC] sendFile error for index.html:', err.message, '| path:', prodIndexPath);
