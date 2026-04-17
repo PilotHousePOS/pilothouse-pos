@@ -4785,13 +4785,24 @@ West Monroe LA 71291
       
       const appointment = await storage.updateAppointmentStatus(id, status);
       
-      // Send customer notification for confirmed or rejected appointments
+      // Send customer + groomer notification for confirmed or rejected appointments
       if (oldAppointment && (status === 'confirmed' || status === 'rejected')) {
         const customerUser = await storage.getUser(oldAppointment.userId);
         if (customerUser) {
           console.log(`Sending appointment ${status} notification to customer: ${customerUser.email}`);
-          
-          // Send email notification
+
+          // Fetch groomer emails
+          let groomerEmails: string[] = [];
+          try {
+            const allUsers = await storage.getAllUsers();
+            groomerEmails = allUsers
+              .filter((u: any) => u.isGroomer && !u.isAdmin)
+              .map((u: any) => u.email)
+              .filter((e: any): e is string => !!e);
+          } catch { /* ignore */ }
+
+          const customerName = `${customerUser.firstName || ''} ${customerUser.lastName || ''}`.trim();
+
           try {
             if (status === 'confirmed') {
               await notificationService.sendAppointmentConfirmedNotification(
@@ -4800,7 +4811,9 @@ West Monroe LA 71291
                 id,
                 oldAppointment.serviceType,
                 oldAppointment.appointmentDate,
-                oldAppointment.appointmentTime
+                oldAppointment.appointmentTime,
+                groomerEmails,
+                customerName
               );
             } else if (status === 'rejected') {
               await notificationService.sendAppointmentRejectedNotification(
@@ -4809,12 +4822,13 @@ West Monroe LA 71291
                 id,
                 oldAppointment.serviceType,
                 oldAppointment.appointmentDate,
-                oldAppointment.appointmentTime
+                oldAppointment.appointmentTime,
+                groomerEmails,
+                customerName
               );
             }
           } catch (notificationError) {
             console.error('Failed to send customer notification:', notificationError);
-            // Don't fail the appointment update if notification fails
           }
         }
       }
@@ -5608,13 +5622,18 @@ West Monroe LA 71291
           .filter(u => u.isAdmin && u.appointmentEmailsOptIn !== false)
           .map(u => u.email)
           .filter((email): email is string => !!email);
+        const groomerEmails = allUsers
+          .filter(u => u.isGroomer && !u.isAdmin)
+          .map(u => u.email)
+          .filter((email): email is string => !!email);
         return notificationService.sendAdminNewAppointmentNotifications(
           adminEmails,
           capturedAppointment.id,
           customerName,
           serviceInfo,
           capturedAppointment.appointmentDate,
-          capturedAppointment.appointmentTime
+          capturedAppointment.appointmentTime,
+          groomerEmails
         );
       }).catch(notificationError => {
         console.error('Failed to send admin notifications for new appointment:', notificationError);

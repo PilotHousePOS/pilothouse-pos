@@ -30,77 +30,143 @@ import {
   Search
 } from "lucide-react";
 
-const EMAIL_TOGGLE_ROWS = [
+// Each row: label + per-role toggle keys (null = not applicable for that role)
+const EMAIL_TOGGLE_GROUPS = [
   {
     category: 'Appointments',
     rows: [
-      { label: 'New appointment booked', recipient: 'Admin', key: 'email_toggle_new_appointment_admin' },
-      { label: 'Appointment confirmed', recipient: 'Customer', key: 'email_toggle_appt_confirmed_customer' },
-      { label: 'Appointment rejected', recipient: 'Customer', key: 'email_toggle_appt_rejected_customer' },
+      {
+        label: 'New appointment booked',
+        admin:    'email_toggle_new_appointment_admin',
+        groomer:  'email_toggle_new_appointment_groomer',
+        customer: null,
+      },
+      {
+        label: 'Appointment confirmed',
+        admin:    null,
+        groomer:  'email_toggle_appt_confirmed_groomer',
+        customer: 'email_toggle_appt_confirmed_customer',
+      },
+      {
+        label: 'Appointment rejected',
+        admin:    null,
+        groomer:  'email_toggle_appt_rejected_groomer',
+        customer: 'email_toggle_appt_rejected_customer',
+      },
     ],
   },
   {
     category: 'Orders',
     rows: [
-      { label: 'New order received', recipient: 'Admin', key: 'email_toggle_new_order_admin' },
-      { label: 'Order confirmation', recipient: 'Customer', key: 'email_toggle_order_received_customer' },
-      { label: 'Order status updates (In Progress / Ready)', recipient: 'Customer', key: 'email_toggle_order_status_customer' },
+      {
+        label: 'New order placed',
+        admin:    'email_toggle_new_order_admin',
+        groomer:  null,
+        customer: null,
+      },
+      {
+        label: 'Order confirmation',
+        admin:    null,
+        groomer:  null,
+        customer: 'email_toggle_order_received_customer',
+      },
+      {
+        label: 'Order status updates',
+        admin:    null,
+        groomer:  null,
+        customer: 'email_toggle_order_status_customer',
+      },
     ],
   },
   {
     category: 'Marketing',
     rows: [
-      { label: 'Abandoned cart reminder', recipient: 'Customer', key: 'email_toggle_abandoned_cart_customer' },
+      {
+        label: 'Abandoned cart reminder',
+        admin:    null,
+        groomer:  null,
+        customer: 'email_toggle_abandoned_cart_customer',
+      },
     ],
   },
-];
+] as const;
+
+type RoleKey = 'admin' | 'groomer' | 'customer';
+
+function RoleSwitch({ toggleKey, groomingSettings, onToggle }: {
+  toggleKey: string | null;
+  groomingSettings: any[];
+  onToggle: (key: string, val: boolean) => void;
+}) {
+  if (!toggleKey) {
+    return <span className="text-gray-600 text-xs select-none">—</span>;
+  }
+  const setting = groomingSettings.find((s: any) => s.setting === toggleKey);
+  const enabled = setting ? setting.value !== 'false' : true;
+  return (
+    <Switch
+      checked={enabled}
+      onCheckedChange={(checked) => onToggle(toggleKey, checked)}
+    />
+  );
+}
 
 function NotificationTogglesPanel({ groomingSettings, queryClient, toast }: {
   groomingSettings: any[];
   queryClient: any;
   toast: any;
 }) {
-  const getToggleValue = (key: string): boolean => {
-    const setting = groomingSettings.find((s: any) => s.setting === key);
-    if (!setting) return true;
-    return setting.value !== 'false';
-  };
-
   const handleToggle = async (key: string, enabled: boolean) => {
     try {
       await apiRequest('PUT', '/api/admin/grooming-settings', { setting: key, value: enabled ? 'true' : 'false' });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/grooming-settings'] });
-      toast({ title: 'Saved', description: `Notification ${enabled ? 'enabled' : 'disabled'}.` });
+      toast({ title: enabled ? 'Enabled' : 'Disabled', description: `Email notification updated.` });
     } catch {
       toast({ title: 'Error', description: 'Failed to save setting.', variant: 'destructive' });
     }
   };
 
+  const roleLabels: { key: RoleKey; label: string }[] = [
+    { key: 'admin',    label: 'Admin' },
+    { key: 'groomer',  label: 'Groomer' },
+    { key: 'customer', label: 'Customer' },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
         <h3 className="text-sm font-semibold text-white mb-1">Email Notification Toggles</h3>
-        <p className="text-xs text-gray-400">Control which automatic emails are sent and to whom. Changes save instantly.</p>
+        <p className="text-xs text-gray-400">Control which automatic emails are sent and to whom. Each column is independent. Changes save instantly.</p>
       </div>
-      {EMAIL_TOGGLE_ROWS.map((group) => (
+      {EMAIL_TOGGLE_GROUPS.map((group) => (
         <div key={group.category}>
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{group.category}</p>
-          <div className="rounded-lg border border-gray-700 divide-y divide-gray-700">
-            {group.rows.map((row) => {
-              const enabled = getToggleValue(row.key);
-              return (
-                <div key={row.key} className="flex items-center justify-between px-4 py-3 bg-gray-800/50">
-                  <div>
-                    <p className="text-sm text-white">{row.label}</p>
-                    <p className="text-xs text-gray-400">To: {row.recipient}</p>
+          <div className="rounded-lg border border-gray-700 overflow-hidden">
+            {/* Header row */}
+            <div className="grid grid-cols-[1fr_80px_80px_80px] bg-gray-700/60 px-4 py-2">
+              <span className="text-xs font-medium text-gray-300">Email type</span>
+              {roleLabels.map(r => (
+                <span key={r.key} className="text-xs font-medium text-gray-300 text-center">{r.label}</span>
+              ))}
+            </div>
+            {/* Data rows */}
+            {group.rows.map((row, i) => (
+              <div
+                key={row.label}
+                className={`grid grid-cols-[1fr_80px_80px_80px] items-center px-4 py-3 ${i % 2 === 0 ? 'bg-gray-800/50' : 'bg-gray-800/20'}`}
+              >
+                <span className="text-sm text-white">{row.label}</span>
+                {roleLabels.map(r => (
+                  <div key={r.key} className="flex justify-center">
+                    <RoleSwitch
+                      toggleKey={(row as any)[r.key]}
+                      groomingSettings={groomingSettings}
+                      onToggle={handleToggle}
+                    />
                   </div>
-                  <Switch
-                    checked={enabled}
-                    onCheckedChange={(checked) => handleToggle(row.key, checked)}
-                  />
-                </div>
-              );
-            })}
+                ))}
+              </div>
+            ))}
           </div>
         </div>
       ))}

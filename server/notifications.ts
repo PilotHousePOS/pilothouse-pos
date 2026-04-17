@@ -5,8 +5,11 @@ import { storage } from './storage';
 // Default is enabled (true) when not configured so existing behaviour is preserved.
 export const EMAIL_TOGGLE_KEYS = {
   new_appointment_admin:       'email_toggle_new_appointment_admin',
+  new_appointment_groomer:     'email_toggle_new_appointment_groomer',
   appt_confirmed_customer:     'email_toggle_appt_confirmed_customer',
+  appt_confirmed_groomer:      'email_toggle_appt_confirmed_groomer',
   appt_rejected_customer:      'email_toggle_appt_rejected_customer',
+  appt_rejected_groomer:       'email_toggle_appt_rejected_groomer',
   new_order_admin:             'email_toggle_new_order_admin',
   order_received_customer:     'email_toggle_order_received_customer',
   order_status_customer:       'email_toggle_order_status_customer',
@@ -709,7 +712,8 @@ export class NotificationService {
     customerName: string,
     serviceType: string,
     appointmentDate: string,
-    appointmentTime: string
+    appointmentTime: string,
+    groomerEmails?: string[]
   ): Promise<void> {
     console.log(`Sending admin notifications for new appointment ${appointmentId}`);
 
@@ -727,6 +731,24 @@ export class NotificationService {
       }
     } else {
       console.log(`[EMAIL TOGGLE] New appointment admin email suppressed for appointment ${appointmentId}`);
+    }
+
+    // Send email notifications to groomers (respects toggle)
+    if (groomerEmails && groomerEmails.length > 0) {
+      if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.new_appointment_groomer)) {
+        for (const groomerEmail of groomerEmails) {
+          await this.emailService.sendAdminNewAppointmentEmail(
+            groomerEmail,
+            appointmentId,
+            customerName,
+            serviceType,
+            appointmentDate,
+            appointmentTime
+          );
+        }
+      } else {
+        console.log(`[EMAIL TOGGLE] New appointment groomer email suppressed for appointment ${appointmentId}`);
+      }
     }
 
     // Send push notification to admin users
@@ -770,24 +792,43 @@ export class NotificationService {
     appointmentId: number,
     serviceType: string,
     appointmentDate: string,
-    appointmentTime: string
+    appointmentTime: string,
+    groomerEmails?: string[],
+    customerName?: string
   ): Promise<void> {
     console.log(`Sending appointment confirmation notification for appointment ${appointmentId}`);
 
-    if (!(await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_confirmed_customer))) {
+    // Customer email
+    if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_confirmed_customer)) {
+      await this.emailService.sendAppointmentConfirmedEmail(
+        userEmail,
+        userFirstName,
+        appointmentId,
+        serviceType,
+        appointmentDate,
+        appointmentTime
+      );
+    } else {
       console.log(`[EMAIL TOGGLE] Appointment confirmed customer email suppressed for appointment ${appointmentId}`);
-      return;
     }
 
-    // Send email notification
-    await this.emailService.sendAppointmentConfirmedEmail(
-      userEmail, 
-      userFirstName, 
-      appointmentId, 
-      serviceType, 
-      appointmentDate, 
-      appointmentTime
-    );
+    // Groomer email (reuses admin appointment template so groomers see the full details)
+    if (groomerEmails && groomerEmails.length > 0) {
+      if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_confirmed_groomer)) {
+        for (const groomerEmail of groomerEmails) {
+          await this.emailService.sendAdminNewAppointmentEmail(
+            groomerEmail,
+            appointmentId,
+            customerName || userFirstName,
+            serviceType,
+            appointmentDate,
+            appointmentTime
+          );
+        }
+      } else {
+        console.log(`[EMAIL TOGGLE] Appointment confirmed groomer email suppressed for appointment ${appointmentId}`);
+      }
+    }
   }
 
   async sendAppointmentRejectedNotification(
@@ -796,24 +837,43 @@ export class NotificationService {
     appointmentId: number,
     serviceType: string,
     appointmentDate: string,
-    appointmentTime: string
+    appointmentTime: string,
+    groomerEmails?: string[],
+    customerName?: string
   ): Promise<void> {
     console.log(`Sending appointment rejection notification for appointment ${appointmentId}`);
 
-    if (!(await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_rejected_customer))) {
+    // Customer email
+    if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_rejected_customer)) {
+      await this.emailService.sendAppointmentRejectedEmail(
+        userEmail,
+        userFirstName,
+        appointmentId,
+        serviceType,
+        appointmentDate,
+        appointmentTime
+      );
+    } else {
       console.log(`[EMAIL TOGGLE] Appointment rejected customer email suppressed for appointment ${appointmentId}`);
-      return;
     }
 
-    // Send email notification
-    await this.emailService.sendAppointmentRejectedEmail(
-      userEmail, 
-      userFirstName, 
-      appointmentId, 
-      serviceType, 
-      appointmentDate, 
-      appointmentTime
-    );
+    // Groomer email
+    if (groomerEmails && groomerEmails.length > 0) {
+      if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_rejected_groomer)) {
+        for (const groomerEmail of groomerEmails) {
+          await this.emailService.sendAdminNewAppointmentEmail(
+            groomerEmail,
+            appointmentId,
+            customerName || userFirstName,
+            serviceType,
+            appointmentDate,
+            appointmentTime
+          );
+        }
+      } else {
+        console.log(`[EMAIL TOGGLE] Appointment rejected groomer email suppressed for appointment ${appointmentId}`);
+      }
+    }
   }
 
   async sendOrderReceivedNotification(
