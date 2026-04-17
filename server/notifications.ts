@@ -6,6 +6,7 @@ import { storage } from './storage';
 export const EMAIL_TOGGLE_KEYS = {
   new_appointment_admin:       'email_toggle_new_appointment_admin',
   new_appointment_groomer:     'email_toggle_new_appointment_groomer',
+  new_appointment_customer:    'email_toggle_new_appointment_customer',
   appt_confirmed_customer:     'email_toggle_appt_confirmed_customer',
   appt_confirmed_groomer:      'email_toggle_appt_confirmed_groomer',
   appt_rejected_customer:      'email_toggle_appt_rejected_customer',
@@ -400,6 +401,58 @@ class EmailService {
     }
   }
 
+  async sendAppointmentBookedCustomerEmail(to: string, firstName: string, appointmentId: number, serviceType: string, appointmentDate: string, appointmentTime: string): Promise<boolean> {
+    try {
+      const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
+
+      const emailContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #1e40af; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0;">Animal House Pet Store</h1>
+          </div>
+          <div style="background-color: #f8f9fa; padding: 30px;">
+            <h2 style="color: #1e40af; margin-bottom: 20px;">📋 Booking Received #${appointmentId}</h2>
+            <p style="font-size: 16px; line-height: 1.5;">Hi ${firstName},</p>
+            <p style="font-size: 16px; line-height: 1.5;">
+              Thanks for booking with Animal House! We've received your appointment request and it is now <strong>pending review</strong>. You'll get another email once it's been confirmed or if we need to make any changes.
+            </p>
+
+            <div style="background-color: #dbeafe; color: #1e3a8a; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <strong>📅 Appointment Details:</strong><br>
+              Service: ${serviceType}<br>
+              Date: ${new Date(appointmentDate).toLocaleDateString()}<br>
+              Time: ${appointmentTime}
+            </div>
+
+            <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
+              If you have any questions, call us at <strong>(318) 322-3023</strong>.
+            </p>
+            <p style="font-size: 14px; color: #666;">Thank you for choosing Animal House Pet Store!</p>
+          </div>
+          <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+            <p style="margin: 0;">Phone: (318) 322-3023</p>
+          </div>
+        </div>
+      `;
+
+      await client.send({
+        to,
+        from: fromEmail,
+        replyTo,
+        subject: `Booking Received – ${serviceType} on ${new Date(appointmentDate).toLocaleDateString()}`,
+        html: emailContent,
+      });
+
+      console.log(`Booking received email sent to ${to} for appointment ${appointmentId}`);
+      return true;
+    } catch (error) {
+      console.error('Booking received customer email error:', error);
+      return false;
+    }
+  }
+
   async sendAppointmentRejectedEmail(to: string, firstName: string, appointmentId: number, serviceType: string, appointmentDate: string, appointmentTime: string): Promise<boolean> {
     try {
       const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
@@ -713,7 +766,9 @@ export class NotificationService {
     serviceType: string,
     appointmentDate: string,
     appointmentTime: string,
-    groomerEmails?: string[]
+    groomerEmails?: string[],
+    customerEmail?: string,
+    customerFirstName?: string
   ): Promise<void> {
     console.log(`Sending admin notifications for new appointment ${appointmentId}`);
 
@@ -748,6 +803,22 @@ export class NotificationService {
         }
       } else {
         console.log(`[EMAIL TOGGLE] New appointment groomer email suppressed for appointment ${appointmentId}`);
+      }
+    }
+
+    // Send "booking received" email to the customer (respects toggle)
+    if (customerEmail && customerFirstName) {
+      if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.new_appointment_customer)) {
+        await this.emailService.sendAppointmentBookedCustomerEmail(
+          customerEmail,
+          customerFirstName,
+          appointmentId,
+          serviceType,
+          appointmentDate,
+          appointmentTime
+        );
+      } else {
+        console.log(`[EMAIL TOGGLE] New appointment customer email suppressed for appointment ${appointmentId}`);
       }
     }
 

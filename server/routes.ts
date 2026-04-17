@@ -5626,6 +5626,7 @@ West Monroe LA 71291
           .filter(u => u.isGroomer && !u.isAdmin)
           .map(u => u.email)
           .filter((email): email is string => !!email);
+        const customerUser = allUsers.find(u => u.id === capturedAppointment.userId);
         return notificationService.sendAdminNewAppointmentNotifications(
           adminEmails,
           capturedAppointment.id,
@@ -5633,7 +5634,9 @@ West Monroe LA 71291
           serviceInfo,
           capturedAppointment.appointmentDate,
           capturedAppointment.appointmentTime,
-          groomerEmails
+          groomerEmails,
+          customerUser?.email ?? undefined,
+          capturedAppointment.ownerFirstName || customerUser?.firstName || undefined
         );
       }).catch(notificationError => {
         console.error('Failed to send admin notifications for new appointment:', notificationError);

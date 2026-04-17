@@ -39,7 +39,7 @@ const EMAIL_TOGGLE_GROUPS = [
         label: 'New appointment booked',
         admin:    'email_toggle_new_appointment_admin',
         groomer:  'email_toggle_new_appointment_groomer',
-        customer: null,
+        customer: 'email_toggle_new_appointment_customer',
       },
       {
         label: 'Appointment confirmed',
