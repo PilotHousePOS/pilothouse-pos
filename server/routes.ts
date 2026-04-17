@@ -6804,6 +6804,17 @@ West Monroe LA 71291
   });
 
   // Grooming settings routes
+  // Public read-only endpoint — used by the booking page (no auth required)
+  app.get("/api/grooming-settings", async (_req, res) => {
+    try {
+      const settings = await storage.getGroomingSettings();
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching grooming settings:", error);
+      res.status(500).json({ message: "Failed to fetch grooming settings" });
+    }
+  });
+
   app.get("/api/admin/grooming-settings", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) {

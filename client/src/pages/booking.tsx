@@ -83,7 +83,7 @@ export default function Booking() {
 
   // Fetch grooming settings
   const { data: groomingSettings = [] } = useQuery({
-    queryKey: ["/api/admin/grooming-settings"],
+    queryKey: ["/api/grooming-settings"],
     retry: false,
   });
 
