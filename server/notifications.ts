@@ -1,6 +1,28 @@
 import { getUncachableSendGridClient } from './sendgridIntegration';
 import { storage } from './storage';
 
+// Email toggle keys — stored in grooming_settings as 'true' / 'false'
+// Default is enabled (true) when not configured so existing behaviour is preserved.
+export const EMAIL_TOGGLE_KEYS = {
+  new_appointment_admin:       'email_toggle_new_appointment_admin',
+  appt_confirmed_customer:     'email_toggle_appt_confirmed_customer',
+  appt_rejected_customer:      'email_toggle_appt_rejected_customer',
+  new_order_admin:             'email_toggle_new_order_admin',
+  order_received_customer:     'email_toggle_order_received_customer',
+  order_status_customer:       'email_toggle_order_status_customer',
+  abandoned_cart_customer:     'email_toggle_abandoned_cart_customer',
+} as const;
+
+async function isEmailEnabled(key: string): Promise<boolean> {
+  try {
+    const setting = await storage.getGroomingSetting(key);
+    if (!setting) return true; // not configured → enabled by default
+    return setting.value !== 'false';
+  } catch {
+    return true;
+  }
+}
+
 // Email notification service
 class EmailService {
   async sendAdminNewOrderEmail(adminEmail: string, orderId: number, customerName: string, totalAmount: string): Promise<boolean> {
@@ -661,9 +683,13 @@ export class NotificationService {
   ): Promise<void> {
     console.log(`Sending admin notifications for new order ${orderId}`);
 
-    // Send email notifications to all admin users
-    for (const adminEmail of adminEmails) {
-      await this.emailService.sendAdminNewOrderEmail(adminEmail, orderId, customerName, totalAmount);
+    // Send email notifications to all admin users (respects toggle)
+    if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.new_order_admin)) {
+      for (const adminEmail of adminEmails) {
+        await this.emailService.sendAdminNewOrderEmail(adminEmail, orderId, customerName, totalAmount);
+      }
+    } else {
+      console.log(`[EMAIL TOGGLE] New order admin email suppressed for order ${orderId}`);
     }
 
     // Send SMS notifications to admin users who have a phone number
@@ -687,16 +713,20 @@ export class NotificationService {
   ): Promise<void> {
     console.log(`Sending admin notifications for new appointment ${appointmentId}`);
 
-    // Send email notifications to all admin users
-    for (const adminEmail of adminEmails) {
-      await this.emailService.sendAdminNewAppointmentEmail(
-        adminEmail,
-        appointmentId,
-        customerName,
-        serviceType,
-        appointmentDate,
-        appointmentTime
-      );
+    // Send email notifications to all admin users (respects toggle)
+    if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.new_appointment_admin)) {
+      for (const adminEmail of adminEmails) {
+        await this.emailService.sendAdminNewAppointmentEmail(
+          adminEmail,
+          appointmentId,
+          customerName,
+          serviceType,
+          appointmentDate,
+          appointmentTime
+        );
+      }
+    } else {
+      console.log(`[EMAIL TOGGLE] New appointment admin email suppressed for appointment ${appointmentId}`);
     }
 
     // Send push notification to admin users
@@ -718,8 +748,12 @@ export class NotificationService {
 
     console.log(`Sending notifications for order ${orderId} status change to: ${status}`);
 
-    // Send email notification
-    await this.emailService.sendOrderStatusEmail(userEmail, userFirstName, orderId, status);
+    // Send email notification (respects toggle)
+    if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.order_status_customer)) {
+      await this.emailService.sendOrderStatusEmail(userEmail, userFirstName, orderId, status);
+    } else {
+      console.log(`[EMAIL TOGGLE] Order status customer email suppressed for order ${orderId}`);
+    }
 
     // Send push notification
     await this.pushService.sendOrderStatusPush(userId, orderId, status);
@@ -739,7 +773,12 @@ export class NotificationService {
     appointmentTime: string
   ): Promise<void> {
     console.log(`Sending appointment confirmation notification for appointment ${appointmentId}`);
-    
+
+    if (!(await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_confirmed_customer))) {
+      console.log(`[EMAIL TOGGLE] Appointment confirmed customer email suppressed for appointment ${appointmentId}`);
+      return;
+    }
+
     // Send email notification
     await this.emailService.sendAppointmentConfirmedEmail(
       userEmail, 
@@ -760,7 +799,12 @@ export class NotificationService {
     appointmentTime: string
   ): Promise<void> {
     console.log(`Sending appointment rejection notification for appointment ${appointmentId}`);
-    
+
+    if (!(await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_rejected_customer))) {
+      console.log(`[EMAIL TOGGLE] Appointment rejected customer email suppressed for appointment ${appointmentId}`);
+      return;
+    }
+
     // Send email notification
     await this.emailService.sendAppointmentRejectedEmail(
       userEmail, 
@@ -786,6 +830,10 @@ export class NotificationService {
     customerNotes?: string
   ): Promise<void> {
     console.log(`Sending order received confirmation to ${userEmail} for order ${orderId}`);
+    if (!(await isEmailEnabled(EMAIL_TOGGLE_KEYS.order_received_customer))) {
+      console.log(`[EMAIL TOGGLE] Order received customer email suppressed for order ${orderId}`);
+      return;
+    }
     await this.emailService.sendOrderReceivedEmail(
       userEmail, userFirstName, orderId, items,
       subtotal, taxAmount, convenienceFee, loyaltyCreditsApplied, totalAmount, discountAmount, customerNotes
@@ -798,6 +846,10 @@ export class NotificationService {
     items: Array<{name: string; price: string; quantity: number}>
   ): Promise<boolean> {
     console.log(`Sending abandoned cart email to ${userEmail}`);
+    if (!(await isEmailEnabled(EMAIL_TOGGLE_KEYS.abandoned_cart_customer))) {
+      console.log(`[EMAIL TOGGLE] Abandoned cart customer email suppressed`);
+      return false;
+    }
     return await this.emailService.sendAbandonedCartEmail(userEmail, userFirstName, items);
   }
 

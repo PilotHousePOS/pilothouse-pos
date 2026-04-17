@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +30,84 @@ import {
   Search
 } from "lucide-react";
 
+const EMAIL_TOGGLE_ROWS = [
+  {
+    category: 'Appointments',
+    rows: [
+      { label: 'New appointment booked', recipient: 'Admin', key: 'email_toggle_new_appointment_admin' },
+      { label: 'Appointment confirmed', recipient: 'Customer', key: 'email_toggle_appt_confirmed_customer' },
+      { label: 'Appointment rejected', recipient: 'Customer', key: 'email_toggle_appt_rejected_customer' },
+    ],
+  },
+  {
+    category: 'Orders',
+    rows: [
+      { label: 'New order received', recipient: 'Admin', key: 'email_toggle_new_order_admin' },
+      { label: 'Order confirmation', recipient: 'Customer', key: 'email_toggle_order_received_customer' },
+      { label: 'Order status updates (In Progress / Ready)', recipient: 'Customer', key: 'email_toggle_order_status_customer' },
+    ],
+  },
+  {
+    category: 'Marketing',
+    rows: [
+      { label: 'Abandoned cart reminder', recipient: 'Customer', key: 'email_toggle_abandoned_cart_customer' },
+    ],
+  },
+];
+
+function NotificationTogglesPanel({ groomingSettings, queryClient, toast }: {
+  groomingSettings: any[];
+  queryClient: any;
+  toast: any;
+}) {
+  const getToggleValue = (key: string): boolean => {
+    const setting = groomingSettings.find((s: any) => s.setting === key);
+    if (!setting) return true;
+    return setting.value !== 'false';
+  };
+
+  const handleToggle = async (key: string, enabled: boolean) => {
+    try {
+      await apiRequest('PUT', '/api/admin/grooming-settings', { setting: key, value: enabled ? 'true' : 'false' });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/grooming-settings'] });
+      toast({ title: 'Saved', description: `Notification ${enabled ? 'enabled' : 'disabled'}.` });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to save setting.', variant: 'destructive' });
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-sm font-semibold text-white mb-1">Email Notification Toggles</h3>
+        <p className="text-xs text-gray-400">Control which automatic emails are sent and to whom. Changes save instantly.</p>
+      </div>
+      {EMAIL_TOGGLE_ROWS.map((group) => (
+        <div key={group.category}>
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{group.category}</p>
+          <div className="rounded-lg border border-gray-700 divide-y divide-gray-700">
+            {group.rows.map((row) => {
+              const enabled = getToggleValue(row.key);
+              return (
+                <div key={row.key} className="flex items-center justify-between px-4 py-3 bg-gray-800/50">
+                  <div>
+                    <p className="text-sm text-white">{row.label}</p>
+                    <p className="text-xs text-gray-400">To: {row.recipient}</p>
+                  </div>
+                  <Switch
+                    checked={enabled}
+                    onCheckedChange={(checked) => handleToggle(row.key, checked)}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 interface EmailCenterProps {
   groomingSettings: any[];
 }
@@ -36,7 +115,7 @@ interface EmailCenterProps {
 export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'email' | 'sms' | 'automated' | 'daily-reports' | 'sms-management'>('email');
+  const [activeTab, setActiveTab] = useState<'email' | 'sms' | 'automated' | 'daily-reports' | 'sms-management' | 'notification-toggles'>('email');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [sendToAll, setSendToAll] = useState(true);
@@ -541,6 +620,15 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
               <MessageSquare className="w-4 h-4 mr-2" />
               SMS Settings
             </Button>
+            <Button
+              variant={activeTab === 'notification-toggles' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => { setActiveTab('notification-toggles'); setSelectedRecipients([]); }}
+              className="flex-shrink-0"
+            >
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Notifications
+            </Button>
           </div>
 
           {activeTab === 'automated' && (
@@ -971,6 +1059,10 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
                 </ScrollArea>
               </div>
             </div>
+          )}
+
+          {activeTab === 'notification-toggles' && (
+            <NotificationTogglesPanel groomingSettings={groomingSettings} queryClient={queryClient} toast={toast} />
           )}
 
           {(activeTab === 'email' || activeTab === 'sms') && (
