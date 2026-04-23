@@ -216,7 +216,7 @@ app.get('/sw.js', (_req, res) => {
 });
 
 app.get('/sitemap.xml', (_req, res) => {
-  const domain = process.env.REPLIT_DOMAINS?.split(',')[0] || 'animalhouseexperience.replit.app';
+  const domain = process.env.REPLIT_DOMAINS?.split(',')[0] || 'animalhousepetstore.com';
   const baseUrl = `https://${domain}`;
   const today = new Date().toISOString().split('T')[0];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

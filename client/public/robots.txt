@@ -6,4 +6,4 @@ Disallow: /admin
 Disallow: /api/
 Disallow: /settings
 
-Sitemap: https://animalhouseexperience.replit.app/sitemap.xml
+Sitemap: https://animalhousepetstore.com/sitemap.xml

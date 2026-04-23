@@ -32,7 +32,7 @@ export default function DeleteAccount() {
             <ol className="space-y-3 text-gray-300">
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-sm font-bold">1</span>
-                <span>Sign in to your Animal House account at <a href="https://animalhouseexperience.replit.app" className="text-red-400 underline">animalhouseexperience.replit.app</a></span>
+                <span>Sign in to your Animal House account at <a href="https://animalhousepetstore.com" className="text-red-400 underline">animalhousepetstore.com</a></span>
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-sm font-bold">2</span>
