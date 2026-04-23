@@ -11,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, getQueryFn } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { safeGoBack } from "@/lib/navigation";
 
@@ -78,7 +78,9 @@ export default function Booking() {
   // Fetch current user data to check if admin/groomer
   const { data: currentUser, isLoading: isUserLoading } = useQuery({
     queryKey: ["/api/auth/user"],
+    queryFn: getQueryFn({ on401: "returnNull" }),
     retry: false,
+    refetchOnWindowFocus: true,
   });
 
   // Fetch grooming settings
@@ -150,6 +152,13 @@ export default function Booking() {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Redirect to login if session has expired
+  useEffect(() => {
+    if (!isUserLoading && currentUser === null) {
+      window.location.href = "/api/login";
+    }
+  }, [currentUser, isUserLoading]);
 
   // Filter contacts based on search query
   const filteredContacts = useMemo(() => {
