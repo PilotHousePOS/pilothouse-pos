@@ -359,7 +359,7 @@ class EmailService {
             <div style="background-color: #22c55e; color: white; padding: 15px; border-radius: 5px; margin: 20px 0;">
               <strong>📅 Appointment Details:</strong><br>
               Service: ${serviceType}<br>
-              Date: ${new Date(appointmentDate).toLocaleDateString()}<br>
+              Date: ${new Date(appointmentDate + 'T12:00:00').toLocaleDateString('en-US', { timeZone: 'America/Chicago' })}<br>
               Time: ${appointmentTime}
             </div>
             
@@ -389,7 +389,7 @@ class EmailService {
         to,
         from: fromEmail,
         replyTo,
-        subject: `Appointment Confirmed - ${serviceType} on ${new Date(appointmentDate).toLocaleDateString()}`,
+        subject: `Appointment Confirmed - ${serviceType} on ${new Date(appointmentDate + 'T12:00:00').toLocaleDateString('en-US', { timeZone: 'America/Chicago' })}`,
         html: emailContent,
       });
 
@@ -420,7 +420,7 @@ class EmailService {
             <div style="background-color: #dbeafe; color: #1e3a8a; padding: 15px; border-radius: 5px; margin: 20px 0;">
               <strong>📅 Appointment Details:</strong><br>
               Service: ${serviceType}<br>
-              Date: ${new Date(appointmentDate).toLocaleDateString()}<br>
+              Date: ${new Date(appointmentDate + 'T12:00:00').toLocaleDateString('en-US', { timeZone: 'America/Chicago' })}<br>
               Time: ${appointmentTime}
             </div>
 
@@ -441,7 +441,7 @@ class EmailService {
         to,
         from: fromEmail,
         replyTo,
-        subject: `Booking Received – ${serviceType} on ${new Date(appointmentDate).toLocaleDateString()}`,
+        subject: `Booking Received – ${serviceType} on ${new Date(appointmentDate + 'T12:00:00').toLocaleDateString('en-US', { timeZone: 'America/Chicago' })}`,
         html: emailContent,
       });
 
