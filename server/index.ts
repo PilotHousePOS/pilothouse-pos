@@ -38,17 +38,32 @@ app.get('/__health', (_req, res) => {
 });
 
 // CORS middleware with trusted origins only
-const trustedOrigins = [
-  `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`,
-  `https://${process.env.REPL_SLUG}--${process.env.REPL_OWNER}.repl.co`,
-  process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : null,
-  process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}` : null,
-  'https://animal-house-pet-store.replit.app',
-].filter(Boolean) as string[];
+// Origins are canonicalized via URL parsing (scheme + host) to prevent prefix/suffix bypass attacks
+function parseCanonicalOrigin(url: string): string {
+  try {
+    const parsed = new URL(url);
+    return `${parsed.protocol}//${parsed.host}`;
+  } catch {
+    return '';
+  }
+}
+
+const trustedOriginSet = new Set<string>(
+  [
+    `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`,
+    `https://${process.env.REPL_SLUG}--${process.env.REPL_OWNER}.repl.co`,
+    process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : null,
+    process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}` : null,
+    'https://animal-house-pet-store.replit.app',
+  ]
+    .filter(Boolean)
+    .map(o => parseCanonicalOrigin(o as string))
+    .filter(o => o !== ''),
+);
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (origin && trustedOrigins.some(trusted => origin.startsWith(trusted.replace(/\/$/, '')))) {
+  if (origin && trustedOriginSet.has(parseCanonicalOrigin(origin))) {
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Origin', origin);
   }
@@ -511,6 +526,7 @@ async function runAppMigrations() {
     const migPool = new Pool({ connectionString: databaseUrl });
     await migPool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_notes TEXT`);
     await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_charge_account BOOLEAN DEFAULT false`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS token_version INTEGER DEFAULT 0`);
     await migPool.query(`CREATE TABLE IF NOT EXISTS specials (
       id SERIAL PRIMARY KEY,
       title VARCHAR(255) NOT NULL,

@@ -679,27 +679,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
 
   // Auth routes
-  app.get('/api/auth/user', async (req, res) => {
+  app.get('/api/auth/user', authMiddleware, async (req: any, res) => {
     try {
-      // Check both cookies and Authorization header
-      const cookieToken = req.cookies?.auth_token;
-      const authHeader = req.headers.authorization;
-      const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-      
-      const token = headerToken || cookieToken;
-      
-      if (!token) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-
-      const user = verifyToken(token);
-      
-      if (!user) {
-        return res.status(401).json({ message: "Invalid token" });
-      }
-
       // Get fresh user data from database to ensure admin status is current
-      const freshUser = await storage.getUser(user.id);
+      const freshUser = await storage.getUser(req.user.id);
       if (!freshUser) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -712,19 +695,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
 
   // Self-service account deletion
-  app.delete('/api/auth/delete-account', async (req, res) => {
+  app.delete('/api/auth/delete-account', authMiddleware, async (req: any, res) => {
     try {
-      const cookieToken = req.cookies?.auth_token;
-      const authHeader = req.headers.authorization;
-      const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-      const token = headerToken || cookieToken;
-
-      if (!token) return res.status(401).json({ message: "Unauthorized" });
-
-      const decoded = verifyToken(token);
-      if (!decoded) return res.status(401).json({ message: "Invalid token" });
-
-      const user = await storage.getUser(decoded.id);
+      const user = await storage.getUser(req.user.id);
       if (!user) return res.status(404).json({ message: "User not found" });
 
       // Admins cannot self-delete to protect the system
@@ -742,24 +715,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
 
   // Update user email
-  app.patch('/api/auth/update-email', async (req, res) => {
+  app.patch('/api/auth/update-email', authMiddleware, async (req: any, res) => {
     try {
-      // Check both cookies and Authorization header
-      const cookieToken = req.cookies?.auth_token;
-      const authHeader = req.headers.authorization;
-      const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-      
-      const token = headerToken || cookieToken;
-      
-      if (!token) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-
-      const user = verifyToken(token);
-      
-      if (!user) {
-        return res.status(401).json({ message: "Invalid token" });
-      }
+      const user = req.user;
 
       const { email } = req.body;
 
@@ -804,24 +762,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
 
   // Update user password
-  app.patch('/api/auth/update-password', async (req, res) => {
+  app.patch('/api/auth/update-password', authMiddleware, async (req: any, res) => {
     try {
-      // Check both cookies and Authorization header
-      const cookieToken = req.cookies?.auth_token;
-      const authHeader = req.headers.authorization;
-      const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-      
-      const token = headerToken || cookieToken;
-      
-      if (!token) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-
-      const user = verifyToken(token);
-      
-      if (!user) {
-        return res.status(401).json({ message: "Invalid token" });
-      }
+      const user = req.user;
 
       const { currentPassword, newPassword } = req.body;
 
@@ -864,6 +807,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         updatedAt: new Date(),
       });
 
+      // Invalidate all other sessions by bumping the token version
+      await storage.incrementTokenVersion(user.id);
+
       res.json({ message: "Password updated successfully", user: sanitizeUser(updatedUser) });
     } catch (error) {
       console.error("Error updating password:", error);
@@ -872,24 +818,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
 
   // Update user name
-  app.patch('/api/auth/update-name', async (req, res) => {
+  app.patch('/api/auth/update-name', authMiddleware, async (req: any, res) => {
     try {
-      // Check both cookies and Authorization header
-      const cookieToken = req.cookies?.auth_token;
-      const authHeader = req.headers.authorization;
-      const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-      
-      const token = headerToken || cookieToken;
-      
-      if (!token) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-
-      const user = verifyToken(token);
-      
-      if (!user) {
-        return res.status(401).json({ message: "Invalid token" });
-      }
+      const user = req.user;
 
       const { firstName: rawFirst, lastName: rawLast } = req.body;
 
@@ -931,24 +862,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
 
   // Update phone number
-  app.patch('/api/auth/update-phone', async (req, res) => {
+  app.patch('/api/auth/update-phone', authMiddleware, async (req: any, res) => {
     try {
-      // Check both cookies and Authorization header
-      const cookieToken = req.cookies?.auth_token;
-      const authHeader = req.headers.authorization;
-      const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-      
-      const token = headerToken || cookieToken;
-      
-      if (!token) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-
-      const user = verifyToken(token);
-      
-      if (!user) {
-        return res.status(401).json({ message: "Invalid token" });
-      }
+      const user = req.user;
 
       const { phoneNumber } = req.body;
 
@@ -1087,6 +1003,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         password: hashedPassword,
         updatedAt: new Date(),
       });
+
+      // Invalidate all previously issued JWTs for this user
+      await storage.incrementTokenVersion(user.id);
 
       // Mark token as used
       await storage.markTokenAsUsed(token);
@@ -1957,7 +1876,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         const token = headerToken || cookieToken;
         if (token) {
           const decoded = verifyToken(token);
-          if (decoded?.isAdmin) callerIsAdmin = true;
+          if (decoded?.isAdmin) {
+            const dbUser = await storage.getUser(decoded.id);
+            if (dbUser && (decoded.tokenVersion ?? 0) === (dbUser.tokenVersion ?? 0)) {
+              callerIsAdmin = true;
+            }
+          }
         }
       } catch (_) {}
 
@@ -5970,6 +5894,7 @@ West Monroe LA 71291
       }
 
       const updatedUser = await storage.updateUserAdmin(userId, isAdmin);
+      await storage.incrementTokenVersion(userId);
       const { password, ...safeUser } = updatedUser;
       
       res.json(safeUser);
@@ -5996,6 +5921,7 @@ West Monroe LA 71291
       }
 
       const updatedUser = await storage.updateUserGroomer(userId, isGroomer);
+      await storage.incrementTokenVersion(userId);
       const { password, ...safeUser } = updatedUser;
       
       res.json(safeUser);
@@ -6022,6 +5948,7 @@ West Monroe LA 71291
       }
 
       const updatedUser = await storage.updateUserChargeAccount(userId, isChargeAccount);
+      await storage.incrementTokenVersion(userId);
       const { password, ...safeUser } = updatedUser;
       
       res.json(safeUser);
@@ -6049,6 +5976,7 @@ West Monroe LA 71291
       }
 
       const updatedUser = await storage.updateUserSuperiorManager(userId, isSuperiorManager);
+      await storage.incrementTokenVersion(userId);
       const { password, ...safeUser } = updatedUser;
       res.json(safeUser);
     } catch (error: any) {

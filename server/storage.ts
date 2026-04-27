@@ -138,6 +138,7 @@ export interface IStorage {
   deleteAppointmentHistoryRecord(id: number): Promise<void>;
   getAllUsers(): Promise<User[]>;
   deleteUser(id: string): Promise<void>;
+  incrementTokenVersion(id: string): Promise<void>;
 
   // Pet operations
   getAllPets(): Promise<Pet[]>;
@@ -3111,6 +3112,13 @@ export class DatabaseStorage implements IStorage {
 
       await tx.delete(users).where(eq(users.id, id));
     });
+  }
+
+  async incrementTokenVersion(id: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ tokenVersion: sql`COALESCE(token_version, 0) + 1`, updatedAt: new Date() })
+      .where(eq(users.id, id));
   }
 
   // Grooming settings operations

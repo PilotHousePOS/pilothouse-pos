@@ -50,6 +50,7 @@ export const users = pgTable("users", {
   emailVerified: boolean("email_verified").default(true),
   emailVerificationToken: varchar("email_verification_token", { length: 255 }),
   emailVerificationExpiry: timestamp("email_verification_expiry"),
+  tokenVersion: integer("token_version").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
