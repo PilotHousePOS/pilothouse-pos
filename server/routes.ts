@@ -2086,9 +2086,16 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
   app.put("/api/cart/:id", authMiddleware, async (req: any, res) => {
     try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const id = parseInt(req.params.id);
       const { quantity } = req.body;
-      const cartItem = await storage.updateCartItem(id, quantity);
+      const cartItem = await storage.updateCartItem(id, quantity, userId);
+      if (!cartItem) {
+        return res.status(403).json({ message: "Access denied" });
+      }
       res.json(cartItem);
     } catch (error) {
       console.error("Error updating cart item:", error);
@@ -2098,8 +2105,15 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
   app.delete("/api/cart/:id", authMiddleware, async (req: any, res) => {
     try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const id = parseInt(req.params.id);
-      await storage.removeFromCart(id);
+      const removed = await storage.removeFromCart(id, userId);
+      if (!removed) {
+        return res.status(403).json({ message: "Access denied" });
+      }
       res.json({ message: "Item removed from cart" });
     } catch (error) {
       console.error("Error removing from cart:", error);
@@ -2204,14 +2218,46 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const orderingUser = await storage.getUser(userId);
       const isChargeAccountUser = orderingUser?.isChargeAccount === true;
 
+      // Compute subtotal and item prices server-side from the user's actual cart
+      {
+        const userCartItems = await storage.getCartItems(userId);
+        let serverSubtotal = 0;
+        const serverItems: Array<{supplyId?: number; petId?: number; quantity: number; price: string}> = [];
+        for (const ci of userCartItems) {
+          if (ci.supplyId) {
+            const supply = await storage.getSupply(ci.supplyId);
+            if (supply) {
+              const unitPrice = Math.round(parseFloat(String(supply.price || "0")) * 100) / 100;
+              const lineTotal = Math.round(unitPrice * (ci.quantity || 1) * 100) / 100;
+              serverSubtotal = Math.round((serverSubtotal + lineTotal) * 100) / 100;
+              serverItems.push({
+                supplyId: ci.supplyId,
+                quantity: ci.quantity || 1,
+                price: unitPrice.toFixed(2),
+              });
+            }
+          }
+        }
+        validatedData.subtotal = serverSubtotal.toFixed(2);
+        validatedData.items = serverItems;
+      }
+
+      // Fetch tax settings once — used in both charge-account and regular paths
+      const taxSettings = await storage.getGroomingSettings();
+      const cityTaxRate = parseFloat(taxSettings.find(s => s.setting === 'tax_city')?.value || '0');
+      const countyTaxRate = parseFloat(taxSettings.find(s => s.setting === 'tax_county')?.value || '0');
+      const stateTaxRate = parseFloat(taxSettings.find(s => s.setting === 'tax_state')?.value || '5.0000');
+      const federalTaxRate = parseFloat(taxSettings.find(s => s.setting === 'tax_federal')?.value || '5.9900');
+      const serverTaxRate = cityTaxRate + countyTaxRate + stateTaxRate + federalTaxRate;
+
       if (isChargeAccountUser) {
         // Zero out all fees — charge account orders are billed in-store later
         validatedData.convenienceFee = "0";
         validatedData.loyaltyCreditsApplied = "0";
-        validatedData.taxAmount = validatedData.taxAmount; // keep tax for record
         const subtotalVal = parseFloat(validatedData.subtotal || "0");
-        const taxVal = parseFloat(validatedData.taxAmount || "0");
-        validatedData.totalAmount = (subtotalVal + taxVal).toFixed(2); // record actual value for receipt
+        const serverTaxVal = Math.round(subtotalVal * (serverTaxRate / 100) * 100) / 100;
+        validatedData.taxAmount = serverTaxVal.toFixed(2);
+        validatedData.totalAmount = Math.round((subtotalVal + serverTaxVal) * 100 / 100).toFixed(2);
 
         const order = await storage.createOrder(
           {
@@ -2250,7 +2296,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         const user = orderingUser;
         if (user) {
           const currentCredits = parseFloat(user.loyaltyCredits || "0");
-          const subtotal = parseFloat(orderData.subtotal || "0");
+          const subtotal = parseFloat(validatedData.subtotal || "0");
           const taxAmount = parseFloat(orderData.taxAmount || "0");
           const orderTotal = subtotal + taxAmount;
           
@@ -2324,7 +2370,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                 }
                 
                 if (verifiedAppliedRewards.length > 0) {
-                  const orderSubtotalRaw = Math.round(parseFloat(orderData.subtotal || "0") * 100) / 100;
+                  const orderSubtotalRaw = Math.round(parseFloat(validatedData.subtotal || "0") * 100) / 100;
                   verifiedRewardDiscount = Math.min(serverComputedRewardDiscount, orderSubtotalRaw);
                   parsedInfo.appliedRewards = verifiedAppliedRewards;
                   parsedInfo.astroDiscount = verifiedRewardDiscount.toFixed(2);
@@ -2366,7 +2412,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                   serverAutoDeals.reduce((sum, d) => sum + d.calculatedDiscount, 0) * 100
                 ) / 100;
                 
-                const orderSubtotalRaw = Math.round(parseFloat(orderData.subtotal || "0") * 100) / 100;
+                const orderSubtotalRaw = Math.round(parseFloat(validatedData.subtotal || "0") * 100) / 100;
                 const remainingSubtotal = Math.max(0, orderSubtotalRaw - verifiedRewardDiscount);
                 verifiedDealDiscount = Math.min(verifiedDealDiscount, remainingSubtotal);
                 
@@ -2395,17 +2441,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const verifiedAstroDiscount = Math.round((verifiedRewardDiscount + verifiedDealDiscount) * 100) / 100;
       
       // Server-side recalculation of all amounts
-      const orderSubtotal = Math.round(parseFloat(orderData.subtotal || "0") * 100) / 100;
+      const orderSubtotal = Math.round(parseFloat(validatedData.subtotal || "0") * 100) / 100;
       const subtotalAfterAstro = Math.round(Math.max(0, orderSubtotal - verifiedAstroDiscount) * 100) / 100;
       
-      // Recalculate tax from server tax rate
-      const settings = await storage.getGroomingSettings();
-      const cityTax = parseFloat(settings.find(s => s.setting === 'tax_city')?.value || '0');
-      const countyTax = parseFloat(settings.find(s => s.setting === 'tax_county')?.value || '0');
-      const stateTax = parseFloat(settings.find(s => s.setting === 'tax_state')?.value || '5.0000');
-      const federalTax = parseFloat(settings.find(s => s.setting === 'tax_federal')?.value || '5.9900');
-      const serverTaxRate = cityTax + countyTax + stateTax + federalTax;
-      
+      // Recalculate tax using the already-fetched server tax rate
       const orderTax = Math.round(subtotalAfterAstro * (serverTaxRate / 100) * 100) / 100;
       const amountBeforeFee = Math.round((subtotalAfterAstro + orderTax - verifiedLoyaltyCredits) * 100) / 100;
       const serverConvenienceFee = amountBeforeFee > 0 ? Math.round(((amountBeforeFee * 0.029) + 0.30) * 100) / 100 : 0;

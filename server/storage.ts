@@ -246,8 +246,8 @@ export interface IStorage {
   // Cart operations
   getCartItems(userId: string): Promise<CartItem[]>;
   addToCart(cartItem: InsertCartItem): Promise<CartItem>;
-  updateCartItem(id: number, quantity: number): Promise<CartItem>;
-  removeFromCart(id: number): Promise<void>;
+  updateCartItem(id: number, quantity: number, userId: string): Promise<CartItem | null>;
+  removeFromCart(id: number, userId: string): Promise<boolean>;
   clearCart(userId: string): Promise<void>;
   getAbandonedCarts(hoursOld: number): Promise<Array<{userId: string; email: string; firstName: string; items: CartItem[]; oldestItemAt: Date}>>;
   updateAbandonedCartEmailSent(userId: string): Promise<void>;
@@ -2284,17 +2284,20 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async updateCartItem(id: number, quantity: number): Promise<CartItem> {
+  async updateCartItem(id: number, quantity: number, userId: string): Promise<CartItem | null> {
     const [updated] = await db
       .update(cartItems)
       .set({ quantity })
-      .where(eq(cartItems.id, id))
+      .where(and(eq(cartItems.id, id), eq(cartItems.userId, userId)))
       .returning();
-    return updated;
+    return updated ?? null;
   }
 
-  async removeFromCart(id: number): Promise<void> {
-    await db.delete(cartItems).where(eq(cartItems.id, id));
+  async removeFromCart(id: number, userId: string): Promise<boolean> {
+    const result = await db.delete(cartItems)
+      .where(and(eq(cartItems.id, id), eq(cartItems.userId, userId)))
+      .returning();
+    return result.length > 0;
   }
 
   async clearCart(userId: string): Promise<void> {
@@ -2717,27 +2720,9 @@ export class DatabaseStorage implements IStorage {
 
   async getAppointments(userId?: string): Promise<Appointment[]> {
     if (userId) {
-      // Get the user to access their phone number
-      const user = await this.getUser(userId);
-      if (!user) {
-        return [];
-      }
-
-      // If user has no phone number, return empty array
-      if (!user.phoneNumber) {
-        return [];
-      }
-
-      // Get all appointments
-      const allAppointments = await db.select().from(appointments).orderBy(asc(appointments.appointmentDate));
-      
-      // Filter by matching phone number
-      return allAppointments.filter(apt => {
-        if (apt.ownerPhoneNumber) {
-          return phoneNumbersMatch(user.phoneNumber!, apt.ownerPhoneNumber);
-        }
-        return false;
-      });
+      return await db.select().from(appointments)
+        .where(eq(appointments.userId, userId))
+        .orderBy(asc(appointments.appointmentDate));
     } else {
       return await db.select().from(appointments).orderBy(asc(appointments.appointmentDate));
     }
