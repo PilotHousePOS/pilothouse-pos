@@ -141,6 +141,68 @@ const pendingContactChanges = new Map<string, {
 }>();
 const MAX_OTP_ATTEMPTS = 5;
 
+/**
+ * Resolve the caller's user ID with full session validation (signature + DB tokenVersion).
+ * Returns the user ID string on success, undefined if no token is present or validation fails.
+ * Never rejects the request — intended for routes that allow optional authentication.
+ */
+async function resolveOptionalAuthUserId(req: any): Promise<string | undefined> {
+  const token = req.cookies?.auth_token || req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return undefined;
+  const decoded = verifyToken(token);
+  if (!decoded) return undefined;
+  try {
+    const dbUser = await storage.getUser(decoded.id);
+    if (!dbUser) return undefined;
+    const dbTokenVersion: number = dbUser.tokenVersion ?? 0;
+    const tokenVersion: number = decoded.tokenVersion ?? 0;
+    if (tokenVersion !== dbTokenVersion) return undefined;
+    return decoded.id;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Express middleware that requires an authenticated admin session.
+ * Must be placed BEFORE any file-upload middleware so that file parsing
+ * is skipped entirely for unauthenticated or non-admin callers.
+ */
+async function requireAdminMiddleware(req: any, res: any, next: any): Promise<void> {
+  const token = req.cookies?.auth_token || req.headers.authorization?.replace('Bearer ', '');
+  if (!token) {
+    res.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+  const decoded = verifyToken(token);
+  if (!decoded) {
+    res.status(401).json({ message: 'Invalid token' });
+    return;
+  }
+  try {
+    const dbUser = await storage.getUser(decoded.id);
+    if (!dbUser) {
+      res.status(401).json({ message: 'Account not found' });
+      return;
+    }
+    const dbTokenVersion: number = dbUser.tokenVersion ?? 0;
+    const tokenVersion: number = decoded.tokenVersion ?? 0;
+    if (tokenVersion !== dbTokenVersion) {
+      res.status(401).json({ message: 'Session has been invalidated. Please log in again.' });
+      return;
+    }
+    if (!dbUser.isAdmin) {
+      res.status(403).json({ message: 'Admin access required' });
+      return;
+    }
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.error('requireAdminMiddleware error:', error);
+    res.status(500).json({ message: 'Authentication check failed' });
+  }
+}
+
 export async function registerRoutes(app: Express, server?: Server): Promise<void> {
 
   // Prevent browser caching of API responses to avoid stale data
@@ -201,6 +263,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     message: { message: "Too many uploads, please wait a few minutes." },
   });
   app.use('/api/upload', uploadLimiter);
+  app.use('/api/admin/order-photos', uploadLimiter);
 
   // Stripe API routes
   app.get("/api/stripe/config", async (req, res) => {
@@ -1529,12 +1592,25 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
-  // Serve private objects from object storage (publicly accessible, no ACL check)
-  app.get("/objects/:objectPath(*)", async (req, res) => {
+  // Serve private objects from object storage with ACL enforcement
+  app.get("/objects/:objectPath(*)", async (req: any, res) => {
     try {
       const { ObjectStorageService, ObjectNotFoundError } = await import('./objectStorageService');
       const objectStorageService = new ObjectStorageService();
       const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+
+      // Resolve user ID with full session validation (signature + DB tokenVersion)
+      const userId = await resolveOptionalAuthUserId(req);
+
+      // Enforce ACL policy — deny access if the caller is not permitted
+      const allowed = await objectStorageService.canAccessObjectEntity({
+        userId,
+        objectFile,
+      });
+      if (!allowed) {
+        return res.sendStatus(403);
+      }
+
       objectStorageService.downloadObject(objectFile, res);
     } catch (error) {
       console.error("Error serving object:", error);
@@ -10072,12 +10148,9 @@ West Monroe LA 71291
   // ============================================
 
   // Upload order photo and extract items using AI Vision (Admin only)
-  app.post("/api/admin/order-photos", upload.single('photo'), authMiddleware, async (req: any, res) => {
+  app.post("/api/admin/order-photos", requireAdminMiddleware, upload.single('photo'), async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
-      if (!user?.isAdmin) {
-        return res.status(403).json({ message: "Admin access required" });
-      }
 
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
