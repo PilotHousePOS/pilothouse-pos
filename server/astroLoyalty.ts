@@ -265,7 +265,8 @@ export async function searchAstroCustomer(
  * Look up or create a customer in Astro Loyalty system
  */
 export async function lookupOrCreateAstroCustomer(
-  customerData: AstroCustomerData
+  customerData: AstroCustomerData,
+  options: { lookupByEmailOnly?: boolean } = {}
 ): Promise<{ customerId: string; loyaltyPoints: number } | null> {
   if (!isAstroEnabled()) {
     console.log('[ASTRO] Integration not enabled - skipping customer lookup');
@@ -273,7 +274,12 @@ export async function lookupOrCreateAstroCustomer(
   }
 
   try {
-    const existing = await searchAstroCustomer(customerData.email, customerData.phoneNumber);
+    // When lookupByEmailOnly is set, only search by email — never by phone.
+    // This prevents phone-number-based account hijacking at the external trust boundary.
+    const existing = await searchAstroCustomer(
+      customerData.email,
+      options.lookupByEmailOnly ? undefined : customerData.phoneNumber
+    );
     
     if (existing) {
       console.log('[ASTRO] Found existing customer:', existing.astroCustomerId);

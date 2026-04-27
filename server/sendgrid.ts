@@ -130,6 +130,58 @@ export async function sendPasswordResetEmail(toEmail: string, resetToken: string
   }
 }
 
+export async function sendContactChangeOtpEmail(
+  toEmail: string,
+  firstName: string,
+  otp: string,
+  changeType: 'email' | 'phone',
+  newValue: string,
+): Promise<void> {
+  try {
+    const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
+    const fieldLabel = changeType === 'email' ? 'email address' : 'phone number';
+    const msg = {
+      to: toEmail,
+      from: { email: fromEmail, name: 'Animal House Pet Store' },
+      replyTo,
+      subject: `Animal House – Verify Your ${changeType === 'email' ? 'New Email' : 'Phone Change'}`,
+      text: `Hi ${firstName},\n\nWe received a request to change your ${fieldLabel} to: ${newValue}\n\nYour verification code is: ${otp}\n\nThis code expires in 15 minutes. If you did not request this change, please ignore this email and your account will remain unchanged.\n\nAnimal House Pet Store\n(318) 322-3023`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0;">Animal House Pet Store</h1>
+          </div>
+          <div style="padding: 30px; background-color: #f9f9f9;">
+            <h2 style="color: #333;">Verify Your ${fieldLabel === 'email address' ? 'New Email' : 'Phone Change'}</h2>
+            <p style="font-size: 16px; color: #444;">Hi ${firstName},</p>
+            <p style="font-size: 16px; color: #444;">We received a request to change your ${fieldLabel} to: <strong>${newValue}</strong></p>
+            <p style="font-size: 16px; color: #444;">Enter this code to confirm the change:</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #dc2626; background-color: #fff; border: 2px solid #dc2626; padding: 12px 24px; border-radius: 8px;">${otp}</span>
+            </div>
+            <div style="background-color: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p style="margin: 0; color: #92400e; font-size: 14px;"><strong>This code expires in 15 minutes.</strong> If you did not request this change, ignore this email — your account will remain unchanged.</p>
+            </div>
+          </div>
+          <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+            <p style="margin: 0;">Phone: (318) 322-3023</p>
+          </div>
+        </div>
+      `,
+    };
+    await client.send(msg);
+    console.log(`Contact change OTP sent to ${toEmail}`);
+  } catch (error: any) {
+    console.error('Error sending contact change OTP email:', error);
+    if (error.response?.body) {
+      console.error('SendGrid error details:', JSON.stringify(error.response.body, null, 2));
+    }
+    throw new Error('Failed to send verification code');
+  }
+}
+
 export async function sendAppointmentRejectionEmail(
   toEmail: string, 
   ownerName: string,

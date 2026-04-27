@@ -161,7 +161,13 @@ export default function Settings() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [emailPassword, setEmailPassword] = useState("");
+  const [emailPendingToken, setEmailPendingToken] = useState("");
+  const [emailOtp, setEmailOtp] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [phonePassword, setPhonePassword] = useState("");
+  const [phonePendingToken, setPhonePendingToken] = useState("");
+  const [phoneOtp, setPhoneOtp] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -294,13 +300,13 @@ export default function Settings() {
   });
 
   const updateEmailMutation = useMutation({
-    mutationFn: async (newEmail: string) => {
+    mutationFn: async ({ newEmail, password }: { newEmail: string; password: string }) => {
       const result = updateEmailSchema.safeParse({ email: newEmail });
       if (!result.success) {
         throw new Error(result.error.errors[0].message);
       }
       
-      const response = await apiRequest("PATCH", "/api/auth/update-email", { email: newEmail });
+      const response = await apiRequest("PATCH", "/api/auth/update-email", { email: newEmail, currentPassword: password });
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -309,6 +315,45 @@ export default function Settings() {
       
       const data = await response.json();
       return data;
+    },
+    onSuccess: (data) => {
+      if (data.pendingToken) {
+        setEmailPendingToken(data.pendingToken);
+        setEmailOtp("");
+        toast({
+          title: "Check your new email",
+          description: data.message || "A verification code has been sent to your new email address.",
+        });
+      } else {
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+        toast({
+          title: "Email updated",
+          description: "Your email address has been successfully updated.",
+        });
+        setEmail("");
+        setEmailPassword("");
+      }
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update failed",
+        description: error.message || "Failed to update email. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const confirmEmailMutation = useMutation({
+    mutationFn: async ({ pendingToken, otp }: { pendingToken: string; otp: string }) => {
+      const response = await apiRequest("POST", "/api/auth/confirm-email-change", { pendingToken, otp });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Failed to confirm email change: ${response.statusText}`);
+      }
+      return response.json();
     },
     onSuccess: (data) => {
       if (data.token) {
@@ -320,11 +365,14 @@ export default function Settings() {
         description: "Your email address has been successfully updated.",
       });
       setEmail("");
+      setEmailPassword("");
+      setEmailPendingToken("");
+      setEmailOtp("");
     },
     onError: (error: Error) => {
       toast({
-        title: "Update failed",
-        description: error.message || "Failed to update email. Please try again.",
+        title: "Verification failed",
+        description: error.message || "Invalid verification code. Please try again.",
         variant: "destructive",
       });
     },
@@ -369,13 +417,13 @@ export default function Settings() {
   });
 
   const updatePhoneMutation = useMutation({
-    mutationFn: async (newPhone: string) => {
+    mutationFn: async ({ newPhone, password }: { newPhone: string; password: string }) => {
       const result = updatePhoneSchema.safeParse({ phoneNumber: newPhone });
       if (!result.success) {
         throw new Error(result.error.errors[0].message);
       }
       
-      const response = await apiRequest("PATCH", "/api/auth/update-phone", { phoneNumber: newPhone });
+      const response = await apiRequest("PATCH", "/api/auth/update-phone", { phoneNumber: newPhone, currentPassword: password });
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -385,18 +433,60 @@ export default function Settings() {
       const data = await response.json();
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data.pendingToken) {
+        setPhonePendingToken(data.pendingToken);
+        setPhoneOtp("");
+        toast({
+          title: "Check your email",
+          description: data.message || "A verification code has been sent to your email address.",
+        });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+        toast({
+          title: "Phone updated",
+          description: "Your phone number has been successfully updated.",
+        });
+        setPhoneNumber("");
+        setPhonePassword("");
+      }
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update failed",
+        description: error.message || "Failed to update phone number. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const confirmPhoneMutation = useMutation({
+    mutationFn: async ({ pendingToken, otp }: { pendingToken: string; otp: string }) => {
+      const response = await apiRequest("POST", "/api/auth/confirm-phone-change", { pendingToken, otp });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Failed to confirm phone change: ${response.statusText}`);
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: "Phone updated",
         description: "Your phone number has been successfully updated.",
       });
       setPhoneNumber("");
+      setPhonePassword("");
+      setPhonePendingToken("");
+      setPhoneOtp("");
     },
     onError: (error: Error) => {
       toast({
-        title: "Update failed",
-        description: error.message || "Failed to update phone number. Please try again.",
+        title: "Verification failed",
+        description: error.message || "Invalid verification code. Please try again.",
         variant: "destructive",
       });
     },
@@ -450,6 +540,15 @@ export default function Settings() {
       return;
     }
 
+    if (!emailPassword.trim()) {
+      toast({
+        title: "Password required",
+        description: "Please enter your current password to change your email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (email === currentUser.email) {
       toast({
         title: "No change",
@@ -459,7 +558,7 @@ export default function Settings() {
       return;
     }
 
-    updateEmailMutation.mutate(email);
+    updateEmailMutation.mutate({ newEmail: email, password: emailPassword });
   };
 
   const handleUpdatePassword = () => {
@@ -503,6 +602,15 @@ export default function Settings() {
       return;
     }
 
+    if (!phonePassword.trim()) {
+      toast({
+        title: "Password required",
+        description: "Please enter your current password to change your phone number.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Remove non-digit characters for validation
     const digitsOnly = phoneNumber.replace(/\D/g, '');
     if (digitsOnly.length < 10) {
@@ -514,7 +622,7 @@ export default function Settings() {
       return;
     }
 
-    updatePhoneMutation.mutate(phoneNumber);
+    updatePhoneMutation.mutate({ newPhone: phoneNumber, password: phonePassword });
   };
 
   return (
@@ -728,31 +836,84 @@ export default function Settings() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="phone-number">Phone Number(s)</Label>
-            <Input
-              id="phone-number"
-              type="tel"
-              placeholder="e.g., 555-123-4567 or 555-123-4567, 555-987-6543"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              className="mt-1"
-              data-testid="input-phone-number"
-            />
-            <p className="text-xs text-gray-500 mt-1">For notifications. Separate multiple numbers with commas.</p>
-            <p className="text-xs text-gray-400 mt-2 leading-relaxed">
-              By providing your phone number, you agree to receive order status text messages from Animal House Pet Store (e.g. order approved, ready for pickup, picked up). Msg &amp; data rates may apply. Reply <strong>STOP</strong> to opt out at any time.
-            </p>
-          </div>
-          <Button
-            onClick={handleUpdatePhone}
-            disabled={updatePhoneMutation.isPending || !phoneNumber.trim()}
-            className="w-full bg-brand-blue hover:bg-blue-600"
-            data-testid="button-update-phone"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {updatePhoneMutation.isPending ? "Updating..." : "Update Phone"}
-          </Button>
+          {phonePendingToken ? (
+            <>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                A 6-digit verification code has been sent to your email. Enter it below to confirm the phone number change.
+              </p>
+              <div>
+                <Label htmlFor="phone-otp">Verification Code</Label>
+                <Input
+                  id="phone-otp"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  placeholder="Enter 6-digit code"
+                  value={phoneOtp}
+                  onChange={(e) => setPhoneOtp(e.target.value.replace(/\D/g, ''))}
+                  className="mt-1 text-center text-xl tracking-widest"
+                  data-testid="input-phone-otp"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => { setPhonePendingToken(""); setPhoneOtp(""); }}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => confirmPhoneMutation.mutate({ pendingToken: phonePendingToken, otp: phoneOtp })}
+                  disabled={confirmPhoneMutation.isPending || phoneOtp.length !== 6}
+                  className="flex-1 bg-brand-blue hover:bg-blue-600"
+                  data-testid="button-confirm-phone"
+                >
+                  {confirmPhoneMutation.isPending ? "Verifying..." : "Confirm Change"}
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <Label htmlFor="phone-number">Phone Number(s)</Label>
+                <Input
+                  id="phone-number"
+                  type="tel"
+                  placeholder="e.g., 555-123-4567 or 555-123-4567, 555-987-6543"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="mt-1"
+                  data-testid="input-phone-number"
+                />
+                <p className="text-xs text-gray-500 mt-1">For notifications. Separate multiple numbers with commas.</p>
+                <p className="text-xs text-gray-400 mt-2 leading-relaxed">
+                  By providing your phone number, you agree to receive order status text messages from Animal House Pet Store (e.g. order approved, ready for pickup, picked up). Msg &amp; data rates may apply. Reply <strong>STOP</strong> to opt out at any time.
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="phone-current-password">Current Password</Label>
+                <Input
+                  id="phone-current-password"
+                  type="password"
+                  placeholder="Enter your current password to confirm"
+                  value={phonePassword}
+                  onChange={(e) => setPhonePassword(e.target.value)}
+                  className="mt-1"
+                  data-testid="input-phone-current-password"
+                />
+              </div>
+              <Button
+                onClick={handleUpdatePhone}
+                disabled={updatePhoneMutation.isPending || !phoneNumber.trim() || !phonePassword.trim()}
+                className="w-full bg-brand-blue hover:bg-blue-600"
+                data-testid="button-update-phone"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {updatePhoneMutation.isPending ? "Sending code..." : "Update Phone"}
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
 
@@ -765,27 +926,80 @@ export default function Settings() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="new-email">New Email Address</Label>
-            <Input
-              id="new-email"
-              type="email"
-              placeholder="Enter new email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1"
-              data-testid="input-new-email"
-            />
-          </div>
-          <Button
-            onClick={handleUpdateEmail}
-            disabled={updateEmailMutation.isPending || !email.trim()}
-            className="w-full bg-brand-blue hover:bg-blue-600"
-            data-testid="button-update-email"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {updateEmailMutation.isPending ? "Updating..." : "Update Email"}
-          </Button>
+          {emailPendingToken ? (
+            <>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                A 6-digit verification code has been sent to your new email address. Enter it below to confirm the change.
+              </p>
+              <div>
+                <Label htmlFor="email-otp">Verification Code</Label>
+                <Input
+                  id="email-otp"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  placeholder="Enter 6-digit code"
+                  value={emailOtp}
+                  onChange={(e) => setEmailOtp(e.target.value.replace(/\D/g, ''))}
+                  className="mt-1 text-center text-xl tracking-widest"
+                  data-testid="input-email-otp"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => { setEmailPendingToken(""); setEmailOtp(""); }}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => confirmEmailMutation.mutate({ pendingToken: emailPendingToken, otp: emailOtp })}
+                  disabled={confirmEmailMutation.isPending || emailOtp.length !== 6}
+                  className="flex-1 bg-brand-blue hover:bg-blue-600"
+                  data-testid="button-confirm-email"
+                >
+                  {confirmEmailMutation.isPending ? "Verifying..." : "Confirm Change"}
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <Label htmlFor="new-email">New Email Address</Label>
+                <Input
+                  id="new-email"
+                  type="email"
+                  placeholder="Enter new email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-1"
+                  data-testid="input-new-email"
+                />
+              </div>
+              <div>
+                <Label htmlFor="email-current-password">Current Password</Label>
+                <Input
+                  id="email-current-password"
+                  type="password"
+                  placeholder="Enter your current password to confirm"
+                  value={emailPassword}
+                  onChange={(e) => setEmailPassword(e.target.value)}
+                  className="mt-1"
+                  data-testid="input-email-current-password"
+                />
+              </div>
+              <Button
+                onClick={handleUpdateEmail}
+                disabled={updateEmailMutation.isPending || !email.trim() || !emailPassword.trim()}
+                className="w-full bg-brand-blue hover:bg-blue-600"
+                data-testid="button-update-email"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {updateEmailMutation.isPending ? "Sending code..." : "Update Email"}
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
 

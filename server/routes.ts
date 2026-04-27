@@ -22,7 +22,7 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 import { notificationService } from './notifications';
-import { sendPasswordResetEmail, sendVerificationEmail } from './sendgrid';
+import { sendPasswordResetEmail, sendVerificationEmail, sendContactChangeOtpEmail } from './sendgrid';
 import { normalizePhoneNumber } from './phoneUtils';
 import { db, resetPool } from './db';
 import { eq, inArray, or, and, ilike, sql } from 'drizzle-orm';
@@ -128,6 +128,18 @@ const excelUpload = multer({
     }
   }
 });
+
+// In-memory store for pending contact-change OTPs (email/phone).
+// Keyed by a random pendingToken returned to the client.
+const pendingContactChanges = new Map<string, {
+  userId: number;
+  type: 'email' | 'phone';
+  newValue: string;
+  otp: string;
+  expiresAt: Date;
+  attempts: number;
+}>();
+const MAX_OTP_ATTEMPTS = 5;
 
 export async function registerRoutes(app: Express, server?: Server): Promise<void> {
 
@@ -719,10 +731,14 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     try {
       const user = req.user;
 
-      const { email } = req.body;
+      const { email, currentPassword } = req.body;
 
       if (!email) {
         return res.status(400).json({ message: "Email is required" });
+      }
+
+      if (!currentPassword) {
+        return res.status(400).json({ message: "Current password is required to change email" });
       }
 
       // Validate email format
@@ -743,21 +759,113 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Update user with new email
+      // Require password re-verification before initiating the change
+      const passwordValid = await verifyPassword(currentPassword, currentUser.password);
+      if (!passwordValid) {
+        return res.status(401).json({ message: "Current password is incorrect" });
+      }
+
+      // Do NOT commit the change yet — send an OTP to the NEW email to prove ownership
+      const otp = String(Math.floor(100000 + Math.random() * 900000));
+      const pendingToken = crypto.randomBytes(32).toString('hex');
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+      pendingContactChanges.set(pendingToken, {
+        userId: currentUser.id,
+        type: 'email',
+        newValue: email,
+        otp,
+        expiresAt,
+        attempts: 0,
+      });
+
+      try {
+        await sendContactChangeOtpEmail(email, currentUser.firstName || 'there', otp, 'email', email);
+      } catch (emailErr) {
+        pendingContactChanges.delete(pendingToken);
+        console.error("Failed to send email OTP:", emailErr);
+        return res.status(502).json({ message: "Failed to send verification code. Please try again." });
+      }
+
+      res.json({
+        pendingToken,
+        message: `A 6-digit verification code has been sent to ${email}. Enter it to complete the email change.`,
+      });
+    } catch (error) {
+      console.error("Error updating email:", error);
+      res.status(500).json({ message: "Failed to update email" });
+    }
+  });
+
+  // Confirm email change with OTP
+  app.post('/api/auth/confirm-email-change', authMiddleware, async (req: any, res) => {
+    try {
+      const { pendingToken, otp } = req.body;
+
+      if (!pendingToken || !otp) {
+        return res.status(400).json({ message: "Pending token and verification code are required" });
+      }
+
+      const pending = pendingContactChanges.get(pendingToken);
+      if (!pending) {
+        return res.status(400).json({ message: "Invalid or expired verification session" });
+      }
+
+      if (pending.userId !== req.user.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      if (pending.type !== 'email') {
+        return res.status(400).json({ message: "Invalid verification session type" });
+      }
+
+      if (new Date() > pending.expiresAt) {
+        pendingContactChanges.delete(pendingToken);
+        return res.status(400).json({ message: "Verification code has expired. Please start over." });
+      }
+
+      if (pending.attempts >= MAX_OTP_ATTEMPTS) {
+        pendingContactChanges.delete(pendingToken);
+        return res.status(429).json({ message: "Too many incorrect attempts. Please start over." });
+      }
+
+      if (otp.trim() !== pending.otp) {
+        pending.attempts += 1;
+        const remaining = MAX_OTP_ATTEMPTS - pending.attempts;
+        if (remaining <= 0) {
+          pendingContactChanges.delete(pendingToken);
+          return res.status(429).json({ message: "Too many incorrect attempts. Please start over." });
+        }
+        return res.status(400).json({ message: `Incorrect verification code. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.` });
+      }
+
+      // OTP valid — commit the email change
+      pendingContactChanges.delete(pendingToken);
+
+      const currentUser = await storage.getUser(pending.userId);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Double-check the new email is still available
+      const existingUser = await storage.getUserByEmail(pending.newValue);
+      if (existingUser && existingUser.id !== currentUser.id) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
+
       const updatedUser = await storage.upsertUser({
         ...currentUser,
-        email,
+        email: pending.newValue,
         updatedAt: new Date(),
       });
 
-      // Generate new token with updated email
       const newToken = generateToken(updatedUser);
       setAuthCookie(res, newToken);
 
       res.json({ ...sanitizeUser(updatedUser), token: newToken });
     } catch (error) {
-      console.error("Error updating email:", error);
-      res.status(500).json({ message: "Failed to update email" });
+      console.error("Error confirming email change:", error);
+      res.status(500).json({ message: "Failed to confirm email change" });
     }
   });
 
@@ -861,15 +969,19 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
-  // Update phone number
+  // Update phone number (step 1: initiate with OTP sent to current email)
   app.patch('/api/auth/update-phone', authMiddleware, async (req: any, res) => {
     try {
       const user = req.user;
 
-      const { phoneNumber } = req.body;
+      const { phoneNumber, currentPassword } = req.body;
 
       if (!phoneNumber) {
         return res.status(400).json({ message: "Phone number is required" });
+      }
+
+      if (!currentPassword) {
+        return res.status(400).json({ message: "Current password is required to change phone number" });
       }
 
       // Validate phone number format (at least 10 digits)
@@ -884,21 +996,111 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Update user with new phone number
+      // Require password re-verification before initiating the change
+      const passwordValid = await verifyPassword(currentPassword, currentUser.password);
+      if (!passwordValid) {
+        return res.status(401).json({ message: "Current password is incorrect" });
+      }
+
+      if (!currentUser.email) {
+        return res.status(400).json({ message: "A verified email address is required to change your phone number" });
+      }
+
+      // Do NOT commit the change yet — send an OTP to the current email to prove account ownership
+      const otp = String(Math.floor(100000 + Math.random() * 900000));
+      const pendingToken = crypto.randomBytes(32).toString('hex');
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+      pendingContactChanges.set(pendingToken, {
+        userId: currentUser.id,
+        type: 'phone',
+        newValue: phoneNumber.trim(),
+        otp,
+        expiresAt,
+        attempts: 0,
+      });
+
+      try {
+        await sendContactChangeOtpEmail(currentUser.email, currentUser.firstName || 'there', otp, 'phone', phoneNumber.trim());
+      } catch (emailErr) {
+        pendingContactChanges.delete(pendingToken);
+        console.error("Failed to send phone change OTP:", emailErr);
+        return res.status(502).json({ message: "Failed to send verification code. Please try again." });
+      }
+
+      res.json({
+        pendingToken,
+        message: `A 6-digit verification code has been sent to your email address. Enter it to complete the phone number change.`,
+      });
+    } catch (error) {
+      console.error("Error updating phone number:", error);
+      res.status(500).json({ message: "Failed to update phone number" });
+    }
+  });
+
+  // Confirm phone change with OTP
+  app.post('/api/auth/confirm-phone-change', authMiddleware, async (req: any, res) => {
+    try {
+      const { pendingToken, otp } = req.body;
+
+      if (!pendingToken || !otp) {
+        return res.status(400).json({ message: "Pending token and verification code are required" });
+      }
+
+      const pending = pendingContactChanges.get(pendingToken);
+      if (!pending) {
+        return res.status(400).json({ message: "Invalid or expired verification session" });
+      }
+
+      if (pending.userId !== req.user.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      if (pending.type !== 'phone') {
+        return res.status(400).json({ message: "Invalid verification session type" });
+      }
+
+      if (new Date() > pending.expiresAt) {
+        pendingContactChanges.delete(pendingToken);
+        return res.status(400).json({ message: "Verification code has expired. Please start over." });
+      }
+
+      if (pending.attempts >= MAX_OTP_ATTEMPTS) {
+        pendingContactChanges.delete(pendingToken);
+        return res.status(429).json({ message: "Too many incorrect attempts. Please start over." });
+      }
+
+      if (otp.trim() !== pending.otp) {
+        pending.attempts += 1;
+        const remaining = MAX_OTP_ATTEMPTS - pending.attempts;
+        if (remaining <= 0) {
+          pendingContactChanges.delete(pendingToken);
+          return res.status(429).json({ message: "Too many incorrect attempts. Please start over." });
+        }
+        return res.status(400).json({ message: `Incorrect verification code. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.` });
+      }
+
+      // OTP valid — commit the phone change
+      pendingContactChanges.delete(pendingToken);
+
+      const currentUser = await storage.getUser(pending.userId);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
       const updatedUser = await storage.upsertUser({
         ...currentUser,
-        phoneNumber: phoneNumber.trim(),
+        phoneNumber: pending.newValue,
         updatedAt: new Date(),
       });
 
-      // Generate new token
       const newToken = generateToken(updatedUser);
       setAuthCookie(res, newToken);
 
       res.json({ ...sanitizeUser(updatedUser), token: newToken });
     } catch (error) {
-      console.error("Error updating phone number:", error);
-      res.status(500).json({ message: "Failed to update phone number" });
+      console.error("Error confirming phone change:", error);
+      res.status(500).json({ message: "Failed to confirm phone change" });
     }
   });
 
@@ -10483,14 +10685,17 @@ West Monroe LA 71291
         });
       }
 
-      // Lookup or create customer in Astro
+      // Lookup or create customer in Astro.
+      // SECURITY: Only search by email, never by phone, to prevent phone-number hijacking
+      // of third-party loyalty accounts. Phone is still stored on newly-created accounts
+      // but is never used as a match key when claiming an existing Astro record.
       const { lookupOrCreateAstroCustomer } = await import('./astroLoyalty');
       const astroData = await lookupOrCreateAstroCustomer({
         email: user.email || '',
         firstName: user.firstName || undefined,
         lastName: user.lastName || undefined,
         phoneNumber: user.phoneNumber || undefined,
-      });
+      }, { lookupByEmailOnly: true });
 
       if (!astroData) {
         return res.status(503).json({ 
@@ -10923,6 +11128,17 @@ West Monroe LA 71291
   // POS Webhook - Receive real-time product updates from POS system
   app.post("/api/pos/webhook", async (req, res) => {
     try {
+      // Validate shared secret before trusting any payload data
+      const posWebhookSecret = process.env.POS_WEBHOOK_SECRET;
+      if (!posWebhookSecret) {
+        console.error("POS_WEBHOOK_SECRET is not configured — rejecting webhook request");
+        return res.status(503).json({ message: "Webhook endpoint is not configured" });
+      }
+      const providedSecret = req.headers['x-pos-webhook-secret'];
+      if (!providedSecret || providedSecret !== posWebhookSecret) {
+        return res.status(401).json({ message: "Unauthorized: invalid or missing webhook secret" });
+      }
+
       const { products, type } = req.body; // type: 'supply' or 'pet'
       
       if (!products || !Array.isArray(products)) {
