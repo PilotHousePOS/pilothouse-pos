@@ -1174,7 +1174,7 @@ export default function Booking() {
                     <SelectTrigger className="border-gray-300 rounded-xl" data-testid={`select-pet-groomer-${index}`}>
                       <SelectValue placeholder="Use appointment default" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent side="top">
                       <SelectItem value="default">
                         {selectedGroomer ? "Use Appointment Default" : "No Preference"}
                       </SelectItem>
@@ -1211,7 +1211,7 @@ export default function Booking() {
           type="button"
           onClick={handleSubmit as any}
           disabled={createAppointmentMutation.isPending}
-          className="w-full bg-brand-red hover:bg-red-600 text-white py-4 rounded-xl font-semibold text-lg shadow-lg"
+          className="w-full bg-brand-red hover:bg-red-600 text-white py-4 rounded-xl font-semibold text-lg shadow-lg mb-6"
         >
           {createAppointmentMutation.isPending 
             ? "Booking..." 
