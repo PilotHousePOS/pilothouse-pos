@@ -517,8 +517,8 @@ export default function Booking() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    try {
     
     // Validate all pets have required fields
     const invalidPet = pets.find(pet => !pet.name || !pet.type || !pet.serviceType);
@@ -634,6 +634,14 @@ export default function Booking() {
 
     // No mismatch — proceed directly
     await fireBooking(baseAppointmentData, uniqueAppointmentDates);
+
+    } catch (err: any) {
+      toast({
+        title: "Booking Error",
+        description: err?.message || "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const addPet = () => {
@@ -729,7 +737,7 @@ export default function Booking() {
           </div>
         </div>
       ) : (
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-6">
 
         {/* Date Selection */}
         <div>
@@ -1209,7 +1217,7 @@ export default function Booking() {
         {/* Book Button */}
         <Button 
           type="button"
-          onClick={handleSubmit as any}
+          onClick={handleSubmit}
           disabled={createAppointmentMutation.isPending}
           className="w-full bg-brand-red hover:bg-red-600 text-white py-4 rounded-xl font-semibold text-lg shadow-lg mb-6"
         >
