@@ -525,11 +525,13 @@ export default function Booking() {
     
     if (!selectedDate || !selectedTime || invalidPet || !ownerInfo.lastName || !ownerInfo.phoneNumber) {
       const missing: string[] = [];
+      if (!selectedDate) missing.push("appointment date");
       if (!selectedTime) missing.push("appointment time");
       if (!ownerInfo.lastName) missing.push("last name");
       if (!ownerInfo.phoneNumber) missing.push("phone number");
       if (invalidPet) {
         if (!invalidPet.name) missing.push("pet name");
+        if (!invalidPet.type) missing.push("animal type");
         if (!invalidPet.serviceType) missing.push("service type (Full Grooming or Bath Only)");
       }
       toast({
@@ -665,15 +667,24 @@ export default function Booking() {
   // When hasCat changes to true, clear any date/time that's now invalid for cats
   useEffect(() => {
     if (hasCat) {
+      let dateCleared = false;
       if (selectedDate) {
         const day = selectedDate.getDay();
         if (![1, 2, 4].includes(day)) {
           setSelectedDate(undefined);
           setSelectedTime('');
+          dateCleared = true;
         }
       }
-      if (selectedTime && isTimeAfter9AM(selectedTime)) {
+      if (!dateCleared && selectedTime && isTimeAfter9AM(selectedTime)) {
         setSelectedTime('');
+      }
+      if (dateCleared) {
+        toast({
+          title: "Date Cleared",
+          description: "Cat grooming is only available Monday, Tuesday, and Thursday. Please select a new date.",
+          variant: "destructive",
+        });
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
