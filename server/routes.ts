@@ -787,6 +787,36 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // TEMPORARY: one-shot bulk re-verification — remove after use
+  app.post('/api/admin/bulk-resend-verification', async (req, res) => {
+    const { secret } = req.body;
+    if (secret !== 'AH_BULK_VERIFY_2026') return res.status(403).json({ message: 'Forbidden' });
+    try {
+      const unverified = await db.select().from(users).where(
+        and(eq(users.emailVerified, false))
+      );
+      const results: { email: string; status: string; error?: string }[] = [];
+      for (const user of unverified) {
+        if (!user.email) { results.push({ email: '(no email)', status: 'skipped' }); continue; }
+        const newToken = crypto.randomBytes(32).toString('hex');
+        const newExpiry = new Date(Date.now() + 48 * 60 * 60 * 1000);
+        await db.update(users).set({
+          emailVerificationToken: newToken,
+          emailVerificationExpiry: newExpiry,
+        }).where(eq(users.id, user.id));
+        try {
+          await sendVerificationEmail(user.email, user.firstName || 'there', newToken);
+          results.push({ email: user.email, status: 'sent' });
+        } catch (err: any) {
+          results.push({ email: user.email, status: 'failed', error: err.message });
+        }
+      }
+      res.json({ total: unverified.length, results });
+    } catch (err: any) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+
   // Auth routes
   app.get('/api/auth/user', authMiddleware, async (req: any, res) => {
     try {
