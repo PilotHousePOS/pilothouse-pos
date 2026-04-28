@@ -1,12 +1,11 @@
 import { getUncachableSendGridClient } from './sendgridIntegration';
+import { getBaseUrl } from './utils';
 
 export async function sendVerificationEmail(toEmail: string, firstName: string, verificationToken: string): Promise<void> {
   try {
     const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
 
-    const baseUrl = process.env.REPLIT_DOMAINS
-      ? `https://${process.env.REPLIT_DOMAINS}`
-      : 'http://localhost:5000';
+    const baseUrl = getBaseUrl();
 
     const verifyLink = `${baseUrl}/verify-email?token=${verificationToken}`;
 
@@ -66,10 +65,7 @@ export async function sendPasswordResetEmail(toEmail: string, resetToken: string
   try {
     const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
     
-    // Get the base URL for the reset link
-    const baseUrl = process.env.REPLIT_DOMAINS 
-      ? `https://${process.env.REPLIT_DOMAINS}` 
-      : 'http://localhost:5000';
+    const baseUrl = getBaseUrl();
     
     const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
     

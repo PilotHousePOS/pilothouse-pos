@@ -1,5 +1,6 @@
 import { getUncachableSendGridClient } from './sendgridIntegration';
 import { storage } from './storage';
+import { getBaseUrl } from './utils';
 
 // Email toggle keys — stored in grooming_settings as 'true' / 'false'
 // Default is enabled (true) when not configured so existing behaviour is preserved.
@@ -218,9 +219,7 @@ class EmailService {
         </tr>
       `).join('');
 
-      const baseUrl = process.env.REPLIT_DOMAINS 
-        ? `https://${process.env.REPLIT_DOMAINS}`
-        : 'http://localhost:5000';
+      const baseUrl = getBaseUrl();
 
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

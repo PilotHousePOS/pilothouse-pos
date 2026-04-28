@@ -31,6 +31,7 @@ import OpenAI from 'openai';
 import sharp from 'sharp';
 import { expandProductAbbreviations } from './abbreviationExpansion';
 import { hashPassword, verifyPassword, isPasswordComplexEnough, getPasswordRequirementsMessage } from './passwordUtils';
+import { getBaseUrl } from './utils';
 
 // Strip sensitive fields from user objects before sending to client
 function sanitizeUser(user: any) {
@@ -6635,9 +6636,7 @@ West Monroe LA 71291
 
       for (const user of targetUsers) {
         try {
-          const emailBaseUrl = process.env.REPLIT_DOMAINS 
-            ? `https://${process.env.REPLIT_DOMAINS}`
-            : 'http://localhost:5000';
+          const emailBaseUrl = getBaseUrl();
           
           const bccList = (adminBcc && user.email.toLowerCase() !== adminBcc.toLowerCase()) ? [{ email: adminBcc }] : [];
           
