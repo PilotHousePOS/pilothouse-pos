@@ -20,7 +20,7 @@ import {
   orderItems,
   orders,
 } from "@shared/schema";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { notificationService } from './notifications';
 import { sendPasswordResetEmail, sendVerificationEmail, sendContactChangeOtpEmail } from './sendgrid';
 import { normalizePhoneNumber } from './phoneUtils';
