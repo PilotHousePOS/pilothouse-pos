@@ -1174,7 +1174,7 @@ export default function Booking() {
                     <SelectTrigger className="border-gray-300 rounded-xl" data-testid={`select-pet-groomer-${index}`}>
                       <SelectValue placeholder="Use appointment default" />
                     </SelectTrigger>
-                    <SelectContent side="top">
+                    <SelectContent side="top" avoidCollisions={false}>
                       <SelectItem value="default">
                         {selectedGroomer ? "Use Appointment Default" : "No Preference"}
                       </SelectItem>
