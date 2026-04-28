@@ -670,7 +670,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     res.json({ message: "Logged out successfully" });
   });
 
-  // Verify email address via token link
+  // Check if a verification token is valid — does NOT consume it.
+  // Email privacy scanners (Google, Apple, Outlook) pre-fetch every link in an
+  // email via GET.  By keeping the GET side-effect-free we prevent the token from
+  // being burned before the real user clicks the button.
   app.get('/api/auth/verify-email', async (req, res) => {
     try {
       const { token } = req.query;
@@ -678,7 +681,37 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(400).json({ message: "Invalid verification token" });
       }
 
-      // Find user by token
+      const [user] = await db.select().from(users).where(eq(users.emailVerificationToken, token)).limit(1);
+      if (!user) {
+        return res.status(400).json({ message: "Invalid or already used verification link" });
+      }
+
+      if (user.emailVerified) {
+        return res.json({ alreadyVerified: true, message: "Email already verified. You can log in." });
+      }
+
+      const expiry = user.emailVerificationExpiry ? new Date(user.emailVerificationExpiry) : null;
+      if (!expiry || new Date() > expiry) {
+        return res.status(400).json({ message: "Verification link has expired. Please request a new one.", expired: true });
+      }
+
+      // Token is valid — tell the frontend to show the confirm button
+      return res.json({ valid: true, message: "Ready to verify" });
+    } catch (error) {
+      console.error("Email verification check error:", error);
+      res.status(500).json({ message: "Verification check failed" });
+    }
+  });
+
+  // Actually verify the email — only called when the user clicks the button.
+  // POST requests are never made by email privacy scanners, so the token is safe.
+  app.post('/api/auth/verify-email', authLimiter, async (req, res) => {
+    try {
+      const { token } = req.body;
+      if (!token || typeof token !== 'string') {
+        return res.status(400).json({ message: "Invalid verification token" });
+      }
+
       const [user] = await db.select().from(users).where(eq(users.emailVerificationToken, token)).limit(1);
       if (!user) {
         return res.status(400).json({ message: "Invalid or already used verification link" });
@@ -690,7 +723,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
       const expiry = user.emailVerificationExpiry ? new Date(user.emailVerificationExpiry) : null;
       if (!expiry || new Date() > expiry) {
-        return res.status(400).json({ message: "Verification link has expired. Please register again.", expired: true });
+        return res.status(400).json({ message: "Verification link has expired. Please request a new one.", expired: true });
       }
 
       // Mark as verified and clear token
