@@ -162,7 +162,7 @@ export default function Apply() {
             <ChevronLeft className="w-4 h-4 mr-1" /> Back
           </Link>
           <h1 className="text-2xl font-bold">Employment Application</h1>
-          <p className="text-gray-300 text-sm mt-1">The Animal House — Shreveport, Louisiana</p>
+          <p className="text-gray-300 text-sm mt-1">The Animal House — West Monroe, Louisiana</p>
         </div>
       </div>
 
