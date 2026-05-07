@@ -318,22 +318,6 @@ export default function Booking() {
     
     if (checkDate > maxDate) return false;
     
-    // Prevent same-day bookings for customers only (admins/groomers can book same-day)
-    const user = currentUser as any;
-    const isAdminOrGroomer = user?.isAdmin || user?.isGroomer;
-    
-    if (!isAdminOrGroomer) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      
-      const selectedDate = new Date(date);
-      selectedDate.setHours(0, 0, 0, 0);
-      
-      if (selectedDate < tomorrow) return false;
-    }
-    
     return true;
   };
 
@@ -352,8 +336,7 @@ export default function Booking() {
     // Otherwise, generate regular time slots
     const settings = groomingSettings as any[];
     const startTime = settings.find(s => s.setting === 'start_time')?.value || '09:00';
-    // Enforce 12:00 PM (noon) cutoff as per user requirements
-    const endTime = '12:00'; // Hard-coded 12:00 PM (noon) limit
+    const endTime = settings.find(s => s.setting === 'end_time')?.value || '13:30';
     
     const slots = [];
     const [startHour, startMin] = startTime.split(':').map(Number);
