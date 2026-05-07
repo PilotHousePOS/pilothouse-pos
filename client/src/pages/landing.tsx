@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles, Heart, Star, ArrowRight, Briefcase } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import animalHouseLogoPath from "@assets/animal house logo full_1750438187184.jpg";
 import mascotLogoPath from "@assets/Circle Mascot Logo_1750438195696.jpg";
 
@@ -11,6 +12,11 @@ export default function Landing() {
     // Navigate to dedicated auth page
     window.location.href = '/auth';
   };
+
+  const { data: hiringData } = useQuery<{ open: boolean }>({
+    queryKey: ['/api/settings/hiring-open'],
+  });
+  const hiringOpen = hiringData?.open ?? true;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white overflow-hidden relative">
@@ -135,8 +141,8 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Now Hiring Banner */}
-        <div
+        {/* Now Hiring Banner — only shown when hiring is open */}
+        {hiringOpen && <div
           className="mt-8 bg-black/50 border border-red-600 rounded-2xl p-4 flex items-center gap-4 cursor-pointer active:scale-95 transition-transform"
           onClick={() => window.location.href = '/apply'}
         >
@@ -151,7 +157,7 @@ export default function Landing() {
             <p className="text-white/60 text-xs">Join the Animal House team — tap to apply.</p>
           </div>
           <ArrowRight className="w-4 h-4 text-red-500 flex-shrink-0" />
-        </div>
+        </div>}
 
         {/* Footer Links */}
         <div className="mt-6 flex items-center justify-center gap-3 text-xs text-white/60">

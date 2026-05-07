@@ -11710,6 +11710,32 @@ West Monroe LA 71291
     }
   });
 
+  // ─── Hiring Open Setting ───────────────────────────────────────────────────
+
+  // Public: check if applications are open
+  app.get("/api/settings/hiring-open", async (_req, res) => {
+    try {
+      const setting = await storage.getGroomingSetting("hiring_open");
+      const open = setting ? setting.value === "true" : true; // default open
+      res.json({ open });
+    } catch (error) {
+      res.json({ open: true });
+    }
+  });
+
+  // Admin: toggle hiring open/closed
+  app.post("/api/admin/settings/hiring-open", authMiddleware, async (req: any, res) => {
+    if (req.user?.role !== "admin") return res.status(403).json({ message: "Forbidden" });
+    const { open } = req.body;
+    if (typeof open !== "boolean") return res.status(400).json({ message: "open must be a boolean" });
+    try {
+      await storage.upsertGroomingSetting({ setting: "hiring_open", value: String(open) });
+      res.json({ open });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update hiring setting" });
+    }
+  });
+
   // ─── Job Applications ──────────────────────────────────────────────────────
 
   // Public: submit an application (no auth required)

@@ -5358,6 +5358,23 @@ function ApplicationsPanel() {
     queryKey: ['/api/admin/job-applications'],
   });
 
+  const { data: hiringData } = useQuery<{ open: boolean }>({
+    queryKey: ['/api/settings/hiring-open'],
+  });
+  const hiringOpen = hiringData?.open ?? true;
+
+  const toggleHiringMutation = useMutation({
+    mutationFn: async (open: boolean) => {
+      const res = await apiRequest("POST", "/api/admin/settings/hiring-open", { open });
+      return res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/settings/hiring-open'] });
+      toast({ title: data.open ? "Applications are now OPEN" : "Applications are now CLOSED" });
+    },
+    onError: () => toast({ title: "Error", description: "Failed to update hiring status", variant: "destructive" }),
+  });
+
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status, notes }: { id: number; status: string; notes: string }) => {
       const res = await apiRequest("PATCH", `/api/admin/job-applications/${id}`, { status, adminNotes: notes });
@@ -5551,7 +5568,20 @@ function ApplicationsPanel() {
             <FileText className="w-5 h-5" />
             Job Applications ({applications.length})
           </CardTitle>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 border rounded-lg px-3 py-1.5">
+              <span className="text-xs font-medium text-gray-600">Applications</span>
+              <button
+                onClick={() => toggleHiringMutation.mutate(!hiringOpen)}
+                disabled={toggleHiringMutation.isPending}
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${hiringOpen ? 'bg-green-500' : 'bg-gray-300'}`}
+              >
+                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${hiringOpen ? 'translate-x-4' : 'translate-x-1'}`} />
+              </button>
+              <span className={`text-xs font-bold ${hiringOpen ? 'text-green-600' : 'text-gray-400'}`}>
+                {hiringOpen ? 'OPEN' : 'CLOSED'}
+              </span>
+            </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="h-8 text-xs w-36"><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -5566,7 +5596,7 @@ function ApplicationsPanel() {
           </div>
         </div>
         <p className="text-xs text-gray-500 mt-1">
-          Applications submitted via <span className="font-mono bg-gray-100 px-1 rounded">/apply</span>
+          Toggle the switch to open or close applications. When closed, the "Now Hiring" banner is hidden and the apply page shows a message.
         </p>
       </CardHeader>
       <CardContent>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle, ChevronLeft } from "lucide-react";
+import { CheckCircle, ChevronLeft, BriefcaseIcon } from "lucide-react";
 import { Link } from "wouter";
 
 const employmentHistorySchema = z.object({
@@ -101,6 +101,11 @@ export default function Apply() {
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
 
+  const { data: hiringData, isLoading: hiringLoading } = useQuery<{ open: boolean }>({
+    queryKey: ['/api/settings/hiring-open'],
+  });
+  const hiringOpen = hiringData?.open ?? true;
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -135,6 +140,25 @@ export default function Apply() {
       toast({ title: "Submission failed", description: err.message, variant: "destructive" });
     },
   });
+
+  if (!hiringLoading && !hiringOpen) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+            <BriefcaseIcon className="w-8 h-8 text-gray-500" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Not Accepting Applications</h1>
+          <p className="text-gray-600 mb-6">
+            We are not accepting job applications at this time. Please check back later.
+          </p>
+          <Link href="/">
+            <Button className="bg-gray-800 hover:bg-gray-700">Back to Home</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (submitted) {
     return (
