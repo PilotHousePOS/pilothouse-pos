@@ -190,7 +190,7 @@ export default function Apply() {
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto py-8 px-4">
+      <div className="max-w-3xl mx-auto py-8 px-4 pb-28">
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200 text-sm text-gray-600">
           <p>
             The Animal House is an equal opportunity employer. All applicants are considered for
