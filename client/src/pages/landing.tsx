@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sparkles, Heart, Star, ArrowRight } from "lucide-react";
+import { Sparkles, Heart, Star, ArrowRight, Briefcase } from "lucide-react";
 import animalHouseLogoPath from "@assets/animal house logo full_1750438187184.jpg";
 import mascotLogoPath from "@assets/Circle Mascot Logo_1750438195696.jpg";
 
@@ -135,8 +135,26 @@ export default function Landing() {
           </div>
         </div>
 
+        {/* Now Hiring Banner */}
+        <div
+          className="mt-8 bg-black/50 border border-red-600 rounded-2xl p-4 flex items-center gap-4 cursor-pointer active:scale-95 transition-transform"
+          onClick={() => window.location.href = '/apply'}
+        >
+          <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Briefcase className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-white font-bold text-sm">Now Hiring!</span>
+              <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">Apply Now</span>
+            </div>
+            <p className="text-white/60 text-xs">Join the Animal House team — tap to apply.</p>
+          </div>
+          <ArrowRight className="w-4 h-4 text-red-500 flex-shrink-0" />
+        </div>
+
         {/* Footer Links */}
-        <div className="mt-8 flex items-center justify-center gap-3 text-xs text-white/60">
+        <div className="mt-6 flex items-center justify-center gap-3 text-xs text-white/60">
           <a href="/privacy-policy" className="hover:text-white/90 underline">Privacy Policy</a>
           <span>•</span>
           <a href="/terms-of-service" className="hover:text-white/90 underline">Terms of Service</a>

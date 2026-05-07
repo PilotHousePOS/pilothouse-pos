@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useLocation } from "wouter";
-import { Bell, ShoppingCart, Heart, Star, ArrowRight, Sparkles, Eye, Search, Tag, ChevronLeft, ChevronRight } from "lucide-react";
+import { Bell, ShoppingCart, Heart, Star, ArrowRight, Sparkles, Eye, Search, Tag, ChevronLeft, ChevronRight, Briefcase } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { getRecentlyViewedIds } from "@/lib/recentlyViewed";
 import animalHouseLogoPath from "@assets/Circle Mascot Logo_1750438195696.jpg";
@@ -555,6 +555,26 @@ export default function Home() {
               <p className="text-gray-600 text-xs mt-1">All Your Pets Needs</p>
             </CardContent>
           </Card>
+        </div>
+      </section>
+
+      {/* Now Hiring Banner */}
+      <section className="px-6 pb-6">
+        <div
+          className="bg-gradient-to-r from-gray-900 to-gray-800 border border-red-600 rounded-2xl p-5 flex items-center gap-4 cursor-pointer shadow-lg active:scale-95 transition-transform"
+          onClick={() => setLocation('/apply')}
+        >
+          <div className="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow">
+            <Briefcase className="w-6 h-6 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-white font-bold text-base">Now Hiring!</span>
+              <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">Apply Now</span>
+            </div>
+            <p className="text-gray-400 text-sm leading-snug">Join the Animal House team — tap to fill out an application.</p>
+          </div>
+          <ArrowRight className="w-5 h-5 text-red-500 flex-shrink-0" />
         </div>
       </section>
 
