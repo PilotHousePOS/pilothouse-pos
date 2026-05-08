@@ -8393,6 +8393,21 @@ export default function Admin() {
     },
   });
 
+  // Manually Verify Email Mutation
+  const verifyEmailMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const res = await apiRequest("POST", `/api/admin/users/${userId}/verify-email`, {});
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ title: "Account Verified", description: "User email has been manually verified." });
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to verify user email", variant: "destructive" });
+    },
+  });
+
   // Superior Manager Mutation
   const updateSuperiorManagerMutation = useMutation({
     mutationFn: async ({ userId, isSuperiorManager }: { userId: string; isSuperiorManager: boolean }) => {
@@ -11660,6 +11675,9 @@ export default function Admin() {
                             {!userItem.isAdmin && !userItem.isGroomer && !userItem.isChargeAccount && !userItem.isSuperiorManager && (
                               <Badge variant="outline" className="text-xs">Customer</Badge>
                             )}
+                            {userItem.emailVerified === false && (
+                              <Badge variant="outline" className="text-xs bg-red-100 text-red-700 border-red-400">Unverified</Badge>
+                            )}
                           </div>
                         </div>
                         <div className="flex flex-col gap-2 sm:min-w-[140px]">
@@ -11705,6 +11723,16 @@ export default function Admin() {
                               disabled={updateChargeAccountMutation.isPending}
                             />
                           </div>
+                          {userItem.emailVerified === false && (
+                            <Button
+                              size="sm"
+                              className="w-full bg-green-700 hover:bg-green-600 text-white"
+                              onClick={() => verifyEmailMutation.mutate(userItem.id)}
+                              disabled={verifyEmailMutation.isPending}
+                            >
+                              ✓ Verify Account
+                            </Button>
+                          )}
                           {typedUser?.isSuperiorManager && (
                             <div className={`flex items-center justify-between gap-3 px-2 py-1.5 rounded-md border ${userItem.isSuperiorManager ? 'bg-yellow-400/20 border-yellow-500' : 'bg-yellow-400/5 border-yellow-500/30'}`}>
                               <span className="text-sm font-semibold text-yellow-600 flex items-center gap-1">

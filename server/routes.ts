@@ -6549,6 +6549,33 @@ West Monroe LA 71291
     }
   });
 
+  app.post("/api/admin/users/:userId/verify-email", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const { userId } = req.params;
+
+      const [updatedUser] = await db.update(users).set({
+        emailVerified: true,
+        emailVerificationToken: null,
+        emailVerificationExpiry: null,
+      }).where(eq(users.id, userId)).returning();
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const { password, ...safeUser } = updatedUser;
+      console.log(`Admin ${req.user.id} manually verified email for user ${userId}`);
+      res.json(safeUser);
+    } catch (error) {
+      console.error("Error manually verifying user email:", error);
+      res.status(500).json({ message: "Failed to verify user email" });
+    }
+  });
+
   app.delete("/api/admin/users/:userId", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) {
