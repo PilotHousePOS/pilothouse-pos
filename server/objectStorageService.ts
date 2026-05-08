@@ -85,14 +85,21 @@ export class ObjectStorageService {
     return null;
   }
 
-  async downloadObject(file: File, res: Response, cacheTtlSec: number = 3600) {
+  async downloadObject(file: File, res: Response, cacheTtlSec: number = 86400, forcePublic: boolean = false) {
     try {
+      // Single metadata call — used for Content-Type/Length and ACL (unless forcePublic skips ACL)
       const [metadata] = await file.getMetadata();
-      const aclPolicy = await getObjectAclPolicy(file);
-      const isPublic = aclPolicy?.visibility === "public";
+
+      let isPublic = forcePublic;
+      if (!forcePublic) {
+        // Only fetch ACL when we actually need to determine visibility (private objects route)
+        const aclPolicy = await getObjectAclPolicy(file);
+        isPublic = aclPolicy?.visibility === "public";
+      }
+
       res.set({
         "Content-Type": metadata.contentType || "application/octet-stream",
-        "Content-Length": metadata.size,
+        ...(metadata.size ? { "Content-Length": metadata.size } : {}),
         "Cache-Control": `${isPublic ? "public" : "private"}, max-age=${cacheTtlSec}`,
       });
 

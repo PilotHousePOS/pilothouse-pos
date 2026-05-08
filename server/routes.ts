@@ -1617,12 +1617,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const objectStorageService = new ObjectStorageService();
       const file = await objectStorageService.searchPublicObject(filePath);
       if (!file) {
-        return res.status(404).json({ error: "File not found" });
+        return res.status(404).send("Not found");
       }
-      objectStorageService.downloadObject(file, res);
+      // forcePublic=true: skips redundant ACL metadata call — these are always public
+      objectStorageService.downloadObject(file, res, 86400, true);
     } catch (error) {
       console.error("Error serving public object:", error);
-      return res.status(500).json({ error: "Internal server error" });
+      return res.status(500).send("Internal server error");
     }
   });
 
