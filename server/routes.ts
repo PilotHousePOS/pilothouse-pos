@@ -11725,7 +11725,7 @@ West Monroe LA 71291
 
   // Admin: toggle hiring open/closed
   app.post("/api/admin/settings/hiring-open", authMiddleware, async (req: any, res) => {
-    if (req.user?.role !== "admin") return res.status(403).json({ message: "Forbidden" });
+    if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
     const { open } = req.body;
     if (typeof open !== "boolean") return res.status(400).json({ message: "open must be a boolean" });
     try {
