@@ -1,4 +1,5 @@
-const CACHE_NAME = 'animal-house-v7';
+const CACHE_NAME = 'animal-house-v8';
+const IMAGE_CACHE_NAME = 'animal-house-images-v1';
 const OFFLINE_CACHE = [
   '/manifest.json',
   '/icons/icon-192x192.png',
@@ -28,7 +29,7 @@ self.addEventListener('activate', function(event) {
     caches.keys().then(function(cacheNames) {
       return Promise.all(
         cacheNames.filter(function(cacheName) {
-          return cacheName !== CACHE_NAME;
+          return cacheName !== CACHE_NAME && cacheName !== IMAGE_CACHE_NAME;
         }).map(function(cacheName) {
           return caches.delete(cacheName);
         })
@@ -53,6 +54,36 @@ self.addEventListener('fetch', function(event) {
   // Never cache JS or CSS chunks — they have content hashes in the filename
   // and must always be fresh. Let the browser's built-in HTTP cache handle them.
   if (url.pathname.startsWith('/assets/')) return;
+
+  // Product/pet images served from object storage — cache-first with persistent fallback.
+  // Once an image loads successfully it is stored in a dedicated image cache.
+  // If the network ever fails (GCS hiccup, server restart, etc.) the cached copy
+  // is returned, so a stale request can NEVER break a previously-loaded image.
+  if (url.pathname.startsWith('/public-objects/')) {
+    event.respondWith(
+      caches.open(IMAGE_CACHE_NAME).then(function(imageCache) {
+        return imageCache.match(event.request).then(function(cached) {
+          if (cached) {
+            // Serve instantly from cache, then silently refresh in the background
+            var networkFetch = fetch(event.request).then(function(response) {
+              if (response.ok) imageCache.put(event.request, response.clone());
+              return response;
+            }).catch(function() {/* silent — cached copy already served */});
+            return cached;
+          }
+          // Not in cache yet — fetch from network and store on success
+          return fetch(event.request).then(function(response) {
+            if (response.ok) imageCache.put(event.request, response.clone());
+            return response;
+          }).catch(function(err) {
+            // Network completely unreachable and nothing cached — nothing we can do
+            return new Response('', { status: 503, statusText: 'Offline' });
+          });
+        });
+      })
+    );
+    return;
+  }
 
   // For everything else (icons, manifest), use cache-first
   event.respondWith(

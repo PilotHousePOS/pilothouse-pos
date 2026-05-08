@@ -97,10 +97,24 @@ export class ObjectStorageService {
         isPublic = aclPolicy?.visibility === "public";
       }
 
+      // Timestamp-named uploads (e.g. uploads/1234567890-987654321.jpg) are content-addressed —
+      // the URL never refers to a different file, so browsers may cache forever without revalidating.
+      // All other public files get stale-if-error so a failed revalidation never breaks a cached image.
+      const objectName = file.name || "";
+      const isImmutableUpload = isPublic && /uploads\/\d+-\d+\.(jpg|jpeg|png|gif|webp)$/i.test(objectName);
+      let cacheControl: string;
+      if (isImmutableUpload) {
+        cacheControl = "public, max-age=31536000, immutable";
+      } else if (isPublic) {
+        cacheControl = `public, max-age=${cacheTtlSec}, stale-if-error=2592000`;
+      } else {
+        cacheControl = `private, max-age=${cacheTtlSec}`;
+      }
+
       res.set({
         "Content-Type": metadata.contentType || "application/octet-stream",
         ...(metadata.size ? { "Content-Length": metadata.size } : {}),
-        "Cache-Control": `${isPublic ? "public" : "private"}, max-age=${cacheTtlSec}`,
+        "Cache-Control": cacheControl,
       });
 
       const stream = file.createReadStream();
