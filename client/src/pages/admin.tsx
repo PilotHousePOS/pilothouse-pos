@@ -11686,10 +11686,14 @@ export default function Admin() {
                             <Switch
                               checked={userItem.isAdmin}
                               onCheckedChange={(checked) => {
-                                updateAdminMutation.mutate({
-                                  userId: userItem.id,
-                                  isAdmin: checked
-                                });
+                                showDeleteConfirmation(
+                                  checked ? 'Grant Admin Access' : 'Remove Admin Access',
+                                  checked
+                                    ? `This will give ${userItem.firstName} ${userItem.lastName} full admin privileges.`
+                                    : `This will remove admin privileges from ${userItem.firstName} ${userItem.lastName}.`,
+                                  '',
+                                  () => updateAdminMutation.mutate({ userId: userItem.id, isAdmin: checked })
+                                );
                               }}
                               disabled={updateAdminMutation.isPending}
                             />
@@ -11699,10 +11703,14 @@ export default function Admin() {
                             <Switch
                               checked={userItem.isGroomer}
                               onCheckedChange={(checked) => {
-                                updateUserGroomerRoleMutation.mutate({
-                                  userId: userItem.id,
-                                  isGroomer: checked
-                                });
+                                showDeleteConfirmation(
+                                  checked ? 'Add Groomer Role' : 'Remove Groomer Role',
+                                  checked
+                                    ? `This will add ${userItem.firstName} ${userItem.lastName} to the groomer roster.`
+                                    : `This will remove groomer access from ${userItem.firstName} ${userItem.lastName}.`,
+                                  '',
+                                  () => updateUserGroomerRoleMutation.mutate({ userId: userItem.id, isGroomer: checked })
+                                );
                               }}
                               disabled={updateUserGroomerRoleMutation.isPending}
                             />
@@ -11715,10 +11723,14 @@ export default function Admin() {
                             <Switch
                               checked={!!userItem.isChargeAccount}
                               onCheckedChange={(checked) => {
-                                updateChargeAccountMutation.mutate({
-                                  userId: userItem.id,
-                                  isChargeAccount: checked
-                                });
+                                showDeleteConfirmation(
+                                  checked ? 'Enable Charge Account' : 'Disable Charge Account',
+                                  checked
+                                    ? `${userItem.firstName} ${userItem.lastName} will be switched to a charge account — no payment collected at checkout.`
+                                    : `${userItem.firstName} ${userItem.lastName} will be returned to standard checkout with payment required.`,
+                                  '',
+                                  () => updateChargeAccountMutation.mutate({ userId: userItem.id, isChargeAccount: checked })
+                                );
                               }}
                               disabled={updateChargeAccountMutation.isPending}
                             />
@@ -11727,7 +11739,14 @@ export default function Admin() {
                             <Button
                               size="sm"
                               className="w-full bg-green-700 hover:bg-green-600 text-white"
-                              onClick={() => verifyEmailMutation.mutate(userItem.id)}
+                              onClick={() => {
+                                showDeleteConfirmation(
+                                  'Verify Email Account',
+                                  `Manually verify the email address for ${userItem.firstName} ${userItem.lastName} (${userItem.email}) so they can log in.`,
+                                  '',
+                                  () => verifyEmailMutation.mutate(userItem.id)
+                                );
+                              }}
                               disabled={verifyEmailMutation.isPending}
                             >
                               ✓ Verify Account
@@ -11741,10 +11760,14 @@ export default function Admin() {
                               <Switch
                                 checked={!!userItem.isSuperiorManager}
                                 onCheckedChange={(checked) => {
-                                  updateSuperiorManagerMutation.mutate({
-                                    userId: userItem.id,
-                                    isSuperiorManager: checked
-                                  });
+                                  showDeleteConfirmation(
+                                    checked ? 'Grant Superior Manager' : 'Remove Superior Manager',
+                                    checked
+                                      ? `This will grant Superior Manager privileges to ${userItem.firstName} ${userItem.lastName}.`
+                                      : `This will remove Superior Manager privileges from ${userItem.firstName} ${userItem.lastName}.`,
+                                    '',
+                                    () => updateSuperiorManagerMutation.mutate({ userId: userItem.id, isSuperiorManager: checked })
+                                  );
                                 }}
                                 disabled={updateSuperiorManagerMutation.isPending}
                               />
