@@ -11,6 +11,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { formatCategory } from "@/lib/formatCategory";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Supply } from "@shared/schema";
+import { getProductImageUrl } from "@/lib/imageUrl";
 
 interface SupplyCardProps {
   supply: Supply;
@@ -91,7 +92,7 @@ export default function SupplyCard({ supply }: SupplyCardProps) {
   const images = mainImage ? [mainImage, ...additionalImages] : additionalImages;
   const hasMultipleImages = images.length > 1;
   const fallbackImage = defaultImages[supply.category] || defaultImages.default;
-  const imageUrl = imageError || images.length === 0 ? fallbackImage : (images[currentImageIndex] || fallbackImage);
+  const imageUrl = getProductImageUrl(imageError || images.length === 0 ? fallbackImage : (images[currentImageIndex] || fallbackImage));
   
   const handleImageError = () => {
     if (imageRetry < 3) {

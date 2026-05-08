@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useParams, Link, useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addRecentlyViewed } from "@/lib/recentlyViewed";
+import { getProductImageUrl } from "@/lib/imageUrl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -205,7 +206,7 @@ export default function SupplyDetail() {
   const images = mainImageUrl ? [mainImageUrl, ...additionalImageUrls] : additionalImageUrls;
   const hasMultipleImages = images.length > 1;
   const fallbackImage = defaultImages[supply.category] || defaultImages.default;
-  const currentImage = imageError || images.length === 0 ? fallbackImage : (images[currentImageIndex] || fallbackImage);
+  const currentImage = getProductImageUrl(imageError || images.length === 0 ? fallbackImage : (images[currentImageIndex] || fallbackImage));
 
   const minSwipeDistance = 50;
 
@@ -306,7 +307,7 @@ export default function SupplyDetail() {
                 }`}
                 data-testid={`thumbnail-${idx}`}
               >
-                <img src={img} alt="" className="w-full h-full object-cover" />
+                <img src={getProductImageUrl(img)} alt="" className="w-full h-full object-cover" />
               </button>
             ))}
           </div>

@@ -1609,6 +1609,73 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Image proxy — re-serves external product images with correct Content-Type.
+  // Some CDNs (e.g. Colgate's pxmshare) return application/octet-stream for PNG
+  // files, which browsers refuse to render in <img> tags. This endpoint fetches
+  // the upstream file, detects the real type from magic bytes, and re-serves it.
+  app.get("/api/image-proxy", async (req, res) => {
+    const urlParam = req.query.url as string;
+    if (!urlParam) return res.status(400).send("Missing url parameter");
+
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(urlParam);
+    } catch {
+      return res.status(400).send("Invalid url");
+    }
+
+    // Only proxy known product image CDNs — prevents open-proxy abuse
+    const ALLOWED_DOMAINS = [
+      "pxmshare.colgatepalmolive.com",
+      "cdn.frommfamily.com",
+      "nutrisourcepetfoods.com",
+      "image.chewy.com",
+      "www.hillspet.com",
+      "cdn.shopify.com",
+      "images.unsplash.com",
+    ];
+    if (!ALLOWED_DOMAINS.includes(parsedUrl.hostname)) {
+      return res.status(403).send("Domain not in allowlist");
+    }
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      const upstream = await fetch(urlParam, {
+        signal: controller.signal,
+        headers: { "User-Agent": "Mozilla/5.0 (compatible; AnimalHouseBot/1.0)" },
+      });
+      clearTimeout(timeout);
+
+      if (!upstream.ok) {
+        return res.status(upstream.status).send("Upstream error");
+      }
+
+      const buffer = await upstream.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+
+      // Detect content-type from magic bytes
+      let contentType = "image/jpeg";
+      if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {
+        contentType = "image/png";
+      } else if (bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46) {
+        contentType = "image/gif";
+      } else if (bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46) {
+        contentType = "image/webp";
+      }
+
+      res.set({
+        "Content-Type": contentType,
+        "Content-Length": bytes.length.toString(),
+        "Cache-Control": "public, max-age=86400, stale-if-error=2592000",
+      });
+      return res.send(Buffer.from(buffer));
+    } catch (err: any) {
+      console.error("[image-proxy] Error fetching", urlParam, err.message);
+      return res.status(502).send("Proxy error");
+    }
+  });
+
   // Serve public objects from object storage
   app.get("/public-objects/:filePath(*)", async (req, res) => {
     try {

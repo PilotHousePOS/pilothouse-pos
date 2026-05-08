@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { getProductImageUrl } from "@/lib/imageUrl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import type { User } from "@shared/schema";
@@ -9570,7 +9571,7 @@ export default function Admin() {
                       <div className="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
                         {(supply.imageUrl || supply.imageUrls?.[0]) ? (
                           <img 
-                            src={supply.imageUrl || supply.imageUrls?.[0]} 
+                            src={getProductImageUrl(supply.imageUrl || supply.imageUrls?.[0])} 
                             alt={supply.name}
                             className="w-full h-full object-cover"
                             loading="lazy"
@@ -15665,7 +15666,7 @@ function SupplyMultiImageUpload({
               }`}
             >
               <img 
-                src={url} 
+                src={getProductImageUrl(url)} 
                 alt={`Product ${index + 1}`} 
                 className="w-full h-28 object-contain bg-gray-100 dark:bg-gray-800 pointer-events-none" 
               />
@@ -16088,7 +16089,7 @@ function MultiImageUpload({ imageUrls, onImagesChange, label = "Additional Photo
         <div className="grid grid-cols-3 gap-2">
           {imageUrls.map((url, index) => (
             <div key={index} className="relative border rounded-lg overflow-hidden">
-              <img src={url} alt={`Photo ${index + 1}`} className="w-full h-24 object-cover" />
+              <img src={getProductImageUrl(url)} alt={`Photo ${index + 1}`} className="w-full h-24 object-cover" />
               <button
                 type="button"
                 className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
