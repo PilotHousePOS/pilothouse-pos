@@ -116,6 +116,8 @@ interface DeleteConfirmation {
   description: string;
   itemName: string;
   onConfirm: () => void;
+  confirmLabel?: string;
+  confirmVariant?: 'destructive' | 'confirm';
 }
 
 function DeleteConfirmationDialog({ 
@@ -125,15 +127,17 @@ function DeleteConfirmationDialog({
   confirmation: DeleteConfirmation; 
   onClose: () => void;
 }) {
+  const isDestructive = confirmation.confirmVariant !== 'confirm';
+  const confirmLabel = confirmation.confirmLabel ?? 'Yes, Delete Permanently';
   return (
     <AlertDialog open={confirmation.isOpen} onOpenChange={(open) => !open && onClose()}>
       <AlertDialogContent className="max-w-md" data-testid="delete-confirmation-dialog">
         <AlertDialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
-              <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+            <div className={`flex h-12 w-12 items-center justify-center rounded-full ${isDestructive ? 'bg-red-100 dark:bg-red-900/30' : 'bg-blue-100 dark:bg-blue-900/30'}`}>
+              <AlertTriangle className={`h-6 w-6 ${isDestructive ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'}`} />
             </div>
-            <AlertDialogTitle className="text-xl font-bold text-red-600 dark:text-red-400">
+            <AlertDialogTitle className={`text-xl font-bold ${isDestructive ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'}`}>
               {confirmation.title}
             </AlertDialogTitle>
           </div>
@@ -141,7 +145,7 @@ function DeleteConfirmationDialog({
             {confirmation.description}
           </AlertDialogDescription>
           {confirmation.itemName && (
-            <div className="mt-3 p-3 bg-muted rounded-lg border-2 border-red-200 dark:border-red-800">
+            <div className={`mt-3 p-3 bg-muted rounded-lg border-2 ${isDestructive ? 'border-red-200 dark:border-red-800' : 'border-blue-200 dark:border-blue-800'}`}>
               <p className="text-sm font-medium text-muted-foreground">Item to be deleted:</p>
               <p className="text-lg font-bold text-foreground mt-1">{confirmation.itemName}</p>
             </div>
@@ -160,11 +164,11 @@ function DeleteConfirmationDialog({
               confirmation.onConfirm();
               onClose();
             }}
-            className="flex-1 sm:flex-none bg-red-600 hover:bg-red-700 text-white"
+            className={`flex-1 sm:flex-none text-white ${isDestructive ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
             data-testid="delete-confirm-button"
           >
-            <Trash2 className="w-4 h-4 mr-2" />
-            Yes, Delete Permanently
+            {isDestructive && <Trash2 className="w-4 h-4 mr-2" />}
+            {confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -6588,13 +6592,15 @@ export default function Admin() {
     onConfirm: () => {}
   });
   
-  const showDeleteConfirmation = (title: string, description: string, itemName: string, onConfirm: () => void) => {
+  const showDeleteConfirmation = (title: string, description: string, itemName: string, onConfirm: () => void, confirmLabel?: string, confirmVariant?: 'destructive' | 'confirm') => {
     setDeleteConfirmation({
       isOpen: true,
       title,
       description,
       itemName,
-      onConfirm
+      onConfirm,
+      confirmLabel,
+      confirmVariant,
     });
   };
   
@@ -11692,7 +11698,9 @@ export default function Admin() {
                                     ? `This will give ${userItem.firstName} ${userItem.lastName} full admin privileges.`
                                     : `This will remove admin privileges from ${userItem.firstName} ${userItem.lastName}.`,
                                   '',
-                                  () => updateAdminMutation.mutate({ userId: userItem.id, isAdmin: checked })
+                                  () => updateAdminMutation.mutate({ userId: userItem.id, isAdmin: checked }),
+                                  checked ? 'Yes, Grant Access' : 'Yes, Remove Access',
+                                  'confirm'
                                 );
                               }}
                               disabled={updateAdminMutation.isPending}
@@ -11709,7 +11717,9 @@ export default function Admin() {
                                     ? `This will add ${userItem.firstName} ${userItem.lastName} to the groomer roster.`
                                     : `This will remove groomer access from ${userItem.firstName} ${userItem.lastName}.`,
                                   '',
-                                  () => updateUserGroomerRoleMutation.mutate({ userId: userItem.id, isGroomer: checked })
+                                  () => updateUserGroomerRoleMutation.mutate({ userId: userItem.id, isGroomer: checked }),
+                                  checked ? 'Yes, Add Groomer' : 'Yes, Remove Groomer',
+                                  'confirm'
                                 );
                               }}
                               disabled={updateUserGroomerRoleMutation.isPending}
@@ -11729,7 +11739,9 @@ export default function Admin() {
                                     ? `${userItem.firstName} ${userItem.lastName} will be switched to a charge account — no payment collected at checkout.`
                                     : `${userItem.firstName} ${userItem.lastName} will be returned to standard checkout with payment required.`,
                                   '',
-                                  () => updateChargeAccountMutation.mutate({ userId: userItem.id, isChargeAccount: checked })
+                                  () => updateChargeAccountMutation.mutate({ userId: userItem.id, isChargeAccount: checked }),
+                                  checked ? 'Yes, Enable Charge Account' : 'Yes, Disable Charge Account',
+                                  'confirm'
                                 );
                               }}
                               disabled={updateChargeAccountMutation.isPending}
@@ -11744,7 +11756,9 @@ export default function Admin() {
                                   'Verify Email Account',
                                   `Manually verify the email address for ${userItem.firstName} ${userItem.lastName} (${userItem.email}) so they can log in.`,
                                   '',
-                                  () => verifyEmailMutation.mutate(userItem.id)
+                                  () => verifyEmailMutation.mutate(userItem.id),
+                                  'Yes, Verify Account',
+                                  'confirm'
                                 );
                               }}
                               disabled={verifyEmailMutation.isPending}
@@ -11766,7 +11780,9 @@ export default function Admin() {
                                       ? `This will grant Superior Manager privileges to ${userItem.firstName} ${userItem.lastName}.`
                                       : `This will remove Superior Manager privileges from ${userItem.firstName} ${userItem.lastName}.`,
                                     '',
-                                    () => updateSuperiorManagerMutation.mutate({ userId: userItem.id, isSuperiorManager: checked })
+                                    () => updateSuperiorManagerMutation.mutate({ userId: userItem.id, isSuperiorManager: checked }),
+                                    checked ? 'Yes, Grant Superior Manager' : 'Yes, Remove Superior Manager',
+                                    'confirm'
                                   );
                                 }}
                                 disabled={updateSuperiorManagerMutation.isPending}
