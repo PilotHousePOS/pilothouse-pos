@@ -3990,7 +3990,13 @@ function EditAppointmentDialog({
   
   // Track which appointment we've initialized for (prevents overwriting edits on refetch)
   const initializedAppointmentId = useRef<number | null>(null);
-  
+
+  // On mount, clear the stale cache for this appointment so we always load the
+  // latest saved data (notes, prices, etc.) — not a cached copy from a previous open.
+  useEffect(() => {
+    queryClient.removeQueries({ queryKey: ['/api/appointments', appointmentId] });
+  }, []);
+
   // Wrap onClose to reset the initialization guard
   const handleClose = () => {
     initializedAppointmentId.current = null;
