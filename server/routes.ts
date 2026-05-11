@@ -4916,7 +4916,7 @@ West Monroe LA 71291
         updates.petName = firstPet.petName;
         updates.petType = firstPet.petType;
         updates.serviceType = firstPet.serviceType;
-        try { updates.specialNotes = firstPet.specialNotes ? decodeURIComponent(firstPet.specialNotes) : ''; } catch { updates.specialNotes = firstPet.specialNotes || ''; }
+        try { const s = firstPet.specialNotes; updates.specialNotes = s ? decodeURIComponent(escape(Buffer.from(s.replace(/-/g,'+').replace(/_/g,'/') + '=='.slice(0,(4-s.replace(/-/g,'+').replace(/_/g,'/').length%4)%4), 'base64').toString('binary'))) : ''; } catch { updates.specialNotes = firstPet.specialNotes || ''; }
         updates.groomerId = firstPet.groomerId || null;
       }
 
@@ -4938,7 +4938,7 @@ West Monroe LA 71291
                 petPrice = petPrice.split('-')[0].trim();
               }
               let decodedNotes = '';
-              try { decodedNotes = pet.specialNotes ? decodeURIComponent(pet.specialNotes) : ''; } catch { decodedNotes = pet.specialNotes || ''; }
+              try { const s = pet.specialNotes; decodedNotes = s ? decodeURIComponent(escape(Buffer.from(s.replace(/-/g,'+').replace(/_/g,'/') + '=='.slice(0,(4-s.replace(/-/g,'+').replace(/_/g,'/').length%4)%4), 'base64').toString('binary'))) : ''; } catch { decodedNotes = pet.specialNotes || ''; }
               return {
                 petName: pet.petName,
                 petType: pet.petType,

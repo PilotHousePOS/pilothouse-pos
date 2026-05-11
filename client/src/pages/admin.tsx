@@ -4109,7 +4109,7 @@ function EditAppointmentDialog({
           petName: pet.name,
           petType: pet.type,
           serviceType: pet.serviceType,
-          specialNotes: pet.notes ? encodeURIComponent(pet.notes) : '',
+          specialNotes: pet.notes ? btoa(unescape(encodeURIComponent(pet.notes))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '') : '',
           groomerId: pet.groomerId || null,
           price: pet.price,
         })),
