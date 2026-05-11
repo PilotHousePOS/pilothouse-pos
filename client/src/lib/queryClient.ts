@@ -11,7 +11,19 @@ function safeGetToken(): string | null {
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
-    throw new Error(`${res.status}: ${text}`);
+    let message: string;
+    try {
+      const data = JSON.parse(text);
+      message = data.message || data.error || res.statusText;
+    } catch {
+      // Not JSON — if it's an HTML page (proxy/CDN error), use a clean status message
+      if (text.includes('<!DOCTYPE') || text.includes('<html') || text.includes('<title>')) {
+        message = res.statusText || `Request failed (${res.status})`;
+      } else {
+        message = text;
+      }
+    }
+    throw new Error(`${res.status}: ${message}`);
   }
 }
 

@@ -7647,8 +7647,8 @@ West Monroe LA 71291
   // Admin groomer management routes
   app.get("/api/admin/groomers", authMiddleware, async (req: any, res) => {
     try {
-      if (!req.user?.isAdmin) {
-        return res.status(403).json({ message: "Admin access required" });
+      if (!req.user?.isAdmin && !req.user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
       }
 
       const groomers = await storage.getAllGroomers();
