@@ -4916,7 +4916,7 @@ West Monroe LA 71291
         updates.petName = firstPet.petName;
         updates.petType = firstPet.petType;
         updates.serviceType = firstPet.serviceType;
-        updates.specialNotes = firstPet.specialNotes;
+        try { updates.specialNotes = firstPet.specialNotes ? decodeURIComponent(firstPet.specialNotes) : ''; } catch { updates.specialNotes = firstPet.specialNotes || ''; }
         updates.groomerId = firstPet.groomerId || null;
       }
 
@@ -4937,11 +4937,13 @@ West Monroe LA 71291
               if (petPrice.includes('-')) {
                 petPrice = petPrice.split('-')[0].trim();
               }
+              let decodedNotes = '';
+              try { decodedNotes = pet.specialNotes ? decodeURIComponent(pet.specialNotes) : ''; } catch { decodedNotes = pet.specialNotes || ''; }
               return {
                 petName: pet.petName,
                 petType: pet.petType,
                 serviceType: pet.serviceType,
-                specialNotes: pet.specialNotes || '',
+                specialNotes: decodedNotes,
                 price: petPrice,
                 groomerId: pet.groomerId || null,
                 addOns: pet.addOns || null,

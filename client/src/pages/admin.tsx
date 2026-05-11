@@ -4109,7 +4109,7 @@ function EditAppointmentDialog({
           petName: pet.name,
           petType: pet.type,
           serviceType: pet.serviceType,
-          specialNotes: pet.notes,
+          specialNotes: pet.notes ? encodeURIComponent(pet.notes) : '',
           groomerId: pet.groomerId || null,
           price: pet.price,
         })),
