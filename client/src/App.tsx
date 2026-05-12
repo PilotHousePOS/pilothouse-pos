@@ -77,6 +77,7 @@ const VerifyEmail = safeLazy(() => import("@/pages/verify-email"));
 const DeleteAccount = safeLazy(() => import("@/pages/delete-account"));
 const NotFound = safeLazy(() => import("@/pages/not-found"));
 const Apply = safeLazy(() => import("@/pages/apply"));
+const About = safeLazy(() => import("@/pages/about"));
 
 function PageLoader() {
   return (
@@ -106,6 +107,7 @@ function Router() {
           <Route path="/terms-of-service" component={TermsOfService} />
           <Route path="/support" component={Support} />
           <Route path="/apply" component={Apply} />
+          <Route path="/about" component={About} />
           
           {!isAuthenticated ? (
             <>
