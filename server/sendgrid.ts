@@ -33,7 +33,7 @@ export async function sendVerificationEmail(toEmail: string, firstName: string, 
             </div>
             <div style="background-color: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 5px; margin: 20px 0;">
               <p style="margin: 0; color: #92400e; font-size: 14px;">
-                <strong>This link expires in 24 hours.</strong> If you don't verify in time, you'll need to re-register.
+                <strong>This link expires in 24 hours.</strong> If it expires, you can request a new verification link from the sign-in page.
               </p>
             </div>
             <p style="font-size: 14px; color: #666;">
@@ -50,7 +50,12 @@ export async function sendVerificationEmail(toEmail: string, firstName: string, 
       `,
     };
 
-    await client.send(msg);
+    await client.send({
+      ...msg,
+      trackingSettings: {
+        clickTracking: { enable: false, enableText: false },
+      },
+    });
     console.log(`Verification email sent to ${toEmail}`);
   } catch (error: any) {
     console.error('Error sending verification email:', error);
