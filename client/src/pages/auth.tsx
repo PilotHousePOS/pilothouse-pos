@@ -62,11 +62,8 @@ export default function Auth() {
           setPendingEmail(email);
           setVerificationPending(true);
         } else if (error.verificationExpired) {
-          toast({
-            title: "Verification Expired",
-            description: "Your verification window has expired. Please register again.",
-            variant: "destructive",
-          });
+          setPendingEmail(email);
+          setVerificationPending(true);
         } else {
           toast({
             title: "Login Failed",

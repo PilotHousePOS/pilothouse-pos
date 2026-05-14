@@ -642,7 +642,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         const expiry = user.emailVerificationExpiry ? new Date(user.emailVerificationExpiry) : null;
         if (!expiry || new Date() > expiry) {
           return res.status(403).json({
-            message: "Your account verification has expired. Please register again.",
+            message: "Your verification link has expired. Please request a new one.",
             verificationExpired: true,
           });
         }
