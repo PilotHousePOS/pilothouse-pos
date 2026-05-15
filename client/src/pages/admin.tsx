@@ -215,6 +215,7 @@ function PhoneNumberDisplay({ phoneNumber }: { phoneNumber: string }) {
 function AppointmentCalendar({ appointments }: { appointments: any[] }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [pendingDoneId, setPendingDoneId] = useState<number | null>(null);
+  const [pendingDonePrice, setPendingDonePrice] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -240,6 +241,24 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
       toast({ title: variables.groomingCompleted ? "Marked as done" : "Marked as not done" });
     },
     onError: () => toast({ title: "Error", description: "Failed to update status", variant: "destructive" }),
+  });
+
+  const markReadyForPaymentMutation = useMutation({
+    mutationFn: async ({ id, finalAmount, readyForPayment }: { id: number; finalAmount: string; readyForPayment: boolean }) => {
+      return await apiRequest("PATCH", `/api/admin/appointments/${id}/ready-for-payment`, { finalAmount, readyForPayment });
+    },
+    onSuccess: async (_data, variables) => {
+      toast({
+        title: variables.readyForPayment ? "Ready for Payment" : "Payment Link Cleared",
+        description: variables.readyForPayment
+          ? `Customer can now pay $${parseFloat(variables.finalAmount).toFixed(2)} online`
+          : "Online payment option removed",
+      });
+      await queryClient.refetchQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: () => {
+      toast({ title: "Update Failed", description: "Failed to update payment status.", variant: "destructive" });
+    },
   });
 
   // Google Calendar integration removed - transition period complete
@@ -567,16 +586,22 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className={`h-7 text-xs px-2 ${appointment.groomingCompleted ? 'border-orange-300 text-orange-600 hover:bg-orange-50' : 'border-green-300 text-green-600 hover:bg-green-50'}`}
+                                  className={`h-7 text-xs px-2 ${(appointment.readyForPayment || appointment.groomingCompleted) ? 'border-orange-300 text-orange-600 hover:bg-orange-50' : 'border-green-300 text-green-600 hover:bg-green-50'}`}
+                                  disabled={markReadyForPaymentMutation.isPending || updateAppointmentGroomingCompletedMutation.isPending}
                                   onClick={() => {
-                                    if (appointment.groomingCompleted) {
+                                    if (appointment.readyForPayment || appointment.groomingCompleted) {
+                                      // Clear: unmark both done and ready-for-payment
                                       updateAppointmentGroomingCompletedMutation.mutate({ id: appointment.id, groomingCompleted: false });
+                                      if (appointment.readyForPayment && appointment.price) {
+                                        markReadyForPaymentMutation.mutate({ id: appointment.id, finalAmount: appointment.price, readyForPayment: false });
+                                      }
                                     } else {
                                       setPendingDoneId(appointment.id);
+                                      setPendingDonePrice(appointment.price || null);
                                     }
                                   }}
                                 >
-                                  {appointment.groomingCompleted ? 'Clear' : 'Mark Ready'}
+                                  {(appointment.readyForPayment || appointment.groomingCompleted) ? 'Clear' : 'Mark Ready'}
                                 </Button>
                               </div>
                               {appointment.contactNotes && (
@@ -653,7 +678,7 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
           </div>
         )}
 
-        <AlertDialog open={pendingDoneId !== null} onOpenChange={(open) => { if (!open) setPendingDoneId(null); }}>
+        <AlertDialog open={pendingDoneId !== null} onOpenChange={(open) => { if (!open) { setPendingDoneId(null); setPendingDonePrice(null); } }}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Has the customer been called?</AlertDialogTitle>
@@ -662,16 +687,20 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setPendingDoneId(null)}>No</AlertDialogCancel>
+              <AlertDialogCancel onClick={() => { setPendingDoneId(null); setPendingDonePrice(null); }}>No</AlertDialogCancel>
               <AlertDialogAction
                 onClick={() => {
                   if (pendingDoneId !== null) {
                     updateAppointmentGroomingCompletedMutation.mutate({ id: pendingDoneId, groomingCompleted: true });
+                    if (pendingDonePrice) {
+                      markReadyForPaymentMutation.mutate({ id: pendingDoneId, finalAmount: pendingDonePrice, readyForPayment: true });
+                    }
                     setPendingDoneId(null);
+                    setPendingDonePrice(null);
                   }
                 }}
               >
-                Yes, Mark Done
+                Yes, Mark Ready
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
