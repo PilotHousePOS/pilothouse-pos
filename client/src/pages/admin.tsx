@@ -564,28 +564,20 @@ function AppointmentCalendar({ appointments }: { appointments: any[] }) {
                                     Here
                                   </label>
                                 </div>
-                                <div className="flex items-center gap-1.5 px-2 py-1 border rounded bg-white">
-                                  <Checkbox
-                                    id={`cal-grooming-completed-${appointment.id}`}
-                                    checked={appointment.groomingCompleted || false}
-                                    onCheckedChange={(checked) => {
-                                      if (checked) {
-                                        setPendingDoneId(appointment.id);
-                                      } else {
-                                        updateAppointmentGroomingCompletedMutation.mutate({ 
-                                          id: appointment.id, 
-                                          groomingCompleted: false 
-                                        });
-                                      }
-                                    }}
-                                  />
-                                  <label 
-                                    htmlFor={`cal-grooming-completed-${appointment.id}`}
-                                    className="text-xs font-medium cursor-pointer"
-                                  >
-                                    Done
-                                  </label>
-                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className={`h-7 text-xs px-2 ${appointment.groomingCompleted ? 'border-orange-300 text-orange-600 hover:bg-orange-50' : 'border-green-300 text-green-600 hover:bg-green-50'}`}
+                                  onClick={() => {
+                                    if (appointment.groomingCompleted) {
+                                      updateAppointmentGroomingCompletedMutation.mutate({ id: appointment.id, groomingCompleted: false });
+                                    } else {
+                                      setPendingDoneId(appointment.id);
+                                    }
+                                  }}
+                                >
+                                  {appointment.groomingCompleted ? 'Clear' : 'Mark Ready'}
+                                </Button>
                               </div>
                               {appointment.contactNotes && (
                                 <div className="w-32 sm:w-40 bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2 border border-amber-200 dark:border-amber-800">
