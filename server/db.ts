@@ -18,16 +18,17 @@ function getPool(): Pool {
     }
     _pool = new Pool({ 
       connectionString: process.env.DATABASE_URL,
-      connectionTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000,
       idleTimeoutMillis: 30000,
-      max: 20,
+      max: 10,
       allowExitOnIdle: true,
     });
     
+    // Log pool errors but do NOT reset the pool — resetting on error causes a
+    // cascade: the next request creates a fresh pool that immediately tries to
+    // open up to `max` connections, which overwhelms Neon again.
     _pool.on('error', (err) => {
-      console.error('Unexpected pool error:', err);
-      _pool = null;
-      _db = null;
+      console.error('Unexpected pool error:', err.message);
     });
   }
   return _pool;
