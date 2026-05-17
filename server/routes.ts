@@ -542,7 +542,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
       // Send verification email (non-blocking — don't fail signup if email fails)
       try {
-        await sendVerificationEmail(email, firstName, verificationToken);
+        const proto = (req.get('x-forwarded-proto') || req.protocol || 'https').split(',')[0].trim();
+        const host = req.get('host') || '';
+        const reqBaseUrl = host ? `${proto}://${host}` : undefined;
+        await sendVerificationEmail(email, firstName, verificationToken, reqBaseUrl);
       } catch (emailError) {
         console.error('Failed to send verification email during signup:', emailError);
       }
@@ -775,7 +778,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       }).where(eq(users.id, user.id));
 
       try {
-        await sendVerificationEmail(email, user.firstName || 'there', newToken);
+        const proto = (req.get('x-forwarded-proto') || req.protocol || 'https').split(',')[0].trim();
+        const host = req.get('host') || '';
+        const reqBaseUrl = host ? `${proto}://${host}` : undefined;
+        await sendVerificationEmail(email, user.firstName || 'there', newToken, reqBaseUrl);
       } catch (emailError) {
         console.error('Failed to resend verification email:', emailError);
       }

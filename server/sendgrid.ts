@@ -1,13 +1,17 @@
 import { getUncachableSendGridClient } from './sendgridIntegration';
 import { getBaseUrl } from './utils';
 
-export async function sendVerificationEmail(toEmail: string, firstName: string, verificationToken: string): Promise<void> {
+export async function sendVerificationEmail(toEmail: string, firstName: string, verificationToken: string, baseUrl?: string): Promise<void> {
   try {
     const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
 
-    const baseUrl = getBaseUrl();
+    // Prefer the caller-supplied baseUrl (derived from req.get('host')) so the
+    // link always matches the domain the user actually signed up from.
+    // Fall back to getBaseUrl() if not provided.
+    const resolvedBaseUrl = baseUrl || getBaseUrl();
+    console.log(`[sendVerificationEmail] baseUrl resolved to: ${resolvedBaseUrl}`);
 
-    const verifyLink = `${baseUrl}/verify-email?token=${verificationToken}`;
+    const verifyLink = `${resolvedBaseUrl}/verify-email?token=${verificationToken}`;
 
     const msg = {
       to: toEmail,
