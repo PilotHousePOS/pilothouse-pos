@@ -6840,7 +6840,9 @@ export default function Admin() {
   });
 
   const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [showUnverifiedOnly, setShowUnverifiedOnly] = useState(false);
   const filteredUsers = (users as any[]).filter((u: any) => {
+    if (showUnverifiedOnly && u.emailVerified !== false) return false;
     if (!userSearchQuery.trim()) return true;
     const q = userSearchQuery.toLowerCase();
     return (
@@ -11658,22 +11660,32 @@ export default function Admin() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  placeholder="Search by name, email, or phone..."
-                  value={userSearchQuery}
-                  onChange={(e) => setUserSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
-                {userSearchQuery && (
-                  <button onClick={() => setUserSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
+              <div className="flex gap-2 mb-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    placeholder="Search by name, email, or phone..."
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                  {userSearchQuery && (
+                    <button onClick={() => setUserSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                <button
+                  onClick={() => setShowUnverifiedOnly(v => !v)}
+                  className={`px-3 py-2 rounded-md border text-sm font-medium whitespace-nowrap transition-colors ${showUnverifiedOnly ? 'bg-red-600 border-red-600 text-white' : 'bg-white border-gray-300 text-gray-600 hover:border-red-400 hover:text-red-600'}`}
+                >
+                  {showUnverifiedOnly ? 'Unverified Only ✕' : 'Unverified Only'}
+                </button>
               </div>
-              {filteredUsers.length === 0 && userSearchQuery && (
-                <p className="text-center text-gray-500 py-6">No users match "{userSearchQuery}"</p>
+              {filteredUsers.length === 0 && (userSearchQuery || showUnverifiedOnly) && (
+                <p className="text-center text-gray-500 py-6">
+                  {showUnverifiedOnly ? 'No unverified accounts found.' : `No users match "${userSearchQuery}"`}
+                </p>
               )}
               <div className="space-y-4">
                 {filteredUsers.map((userItem: any) => (
