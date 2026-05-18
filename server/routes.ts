@@ -11521,6 +11521,35 @@ West Monroe LA 71291
     }
   });
 
+  // Customer-facing cancel — only the owner can cancel their own pending appointment
+  app.patch("/api/user/appointments/:id/cancel", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return res.status(401).json({ message: "Not authenticated" });
+
+      const id = parseInt(req.params.id);
+      const appointment = await storage.getAppointment(id);
+
+      if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+
+      // Verify ownership
+      if (appointment.userId !== userId) {
+        return res.status(403).json({ message: "Not your appointment" });
+      }
+
+      // Don't allow cancelling already-finished/cancelled appointments
+      if (appointment.status === 'cancelled' || appointment.status === 'completed') {
+        return res.status(400).json({ message: "Appointment is already " + appointment.status });
+      }
+
+      await db.update(appointments).set({ status: 'cancelled' }).where(eq(appointments.id, id));
+      res.json({ message: "Appointment cancelled successfully" });
+    } catch (error) {
+      console.error("Error cancelling appointment:", error);
+      res.status(500).json({ message: "Failed to cancel appointment" });
+    }
+  });
+
   // ========== LOYALTY PROGRAM ROUTES ==========
 
   // Get loyalty settings
