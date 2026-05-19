@@ -11521,6 +11521,144 @@ West Monroe LA 71291
     }
   });
 
+  // Customer-facing reschedule — validates all the same rules as booking
+  app.patch("/api/user/appointments/:id/reschedule", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return res.status(401).json({ message: "Not authenticated" });
+
+      const id = parseInt(req.params.id);
+      const { appointmentDate: rawDateStr, appointmentTime } = req.body;
+
+      if (!rawDateStr || !appointmentTime) {
+        return res.status(400).json({ message: "appointmentDate and appointmentTime are required" });
+      }
+
+      const appointment = await storage.getAppointment(id);
+      if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+      if (appointment.userId !== userId) return res.status(403).json({ message: "Not your appointment" });
+      if (appointment.status === 'cancelled' || appointment.status === 'completed') {
+        return res.status(400).json({ message: "Cannot reschedule a " + appointment.status + " appointment" });
+      }
+
+      // Parse date safely (avoid UTC midnight shifting)
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(rawDateStr)) {
+        return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD." });
+      }
+      const [year, month, day] = rawDateStr.split('-').map(Number);
+      const localDate = new Date(year, month - 1, day, 12, 0, 0);
+      const dayOfWeek = localDate.getDay();
+      const appointmentDateStr = rawDateStr;
+
+      // Block past dates
+      const now = new Date();
+      const todayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      if (localDate < todayLocal) {
+        return res.status(400).json({ message: "Cannot reschedule to a past date." });
+      }
+
+      // No Sundays
+      if (dayOfWeek === 0) {
+        return res.status(400).json({ message: "Grooming is not available on Sundays. Please select a different day." });
+      }
+
+      // Check enabled days and blocked dates from grooming settings
+      const groomingSettings = await storage.getGroomingSettings();
+      const dayNames = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+      const dayEnabledSetting = groomingSettings.find((s: any) => s.setting === `${dayNames[dayOfWeek]}_enabled`);
+      if (dayEnabledSetting && dayEnabledSetting.value === 'false') {
+        return res.status(400).json({ message: `Grooming is not available on ${dayNames[dayOfWeek].charAt(0).toUpperCase() + dayNames[dayOfWeek].slice(1)}s. Please select a different day.` });
+      }
+
+      const blockedDatesSetting = groomingSettings.find((s: any) => s.setting === 'blocked_dates');
+      if (blockedDatesSetting?.value) {
+        const blockedList = blockedDatesSetting.value.split(',').map((d: string) => d.trim()).filter(Boolean);
+        if (blockedList.includes(appointmentDateStr)) {
+          return res.status(400).json({ message: "This date is blocked for grooming. Please select a different date." });
+        }
+      }
+
+      // Time cutoff — must be on or before 1:30 PM
+      const timeParts = appointmentTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+      if (timeParts) {
+        let hours = parseInt(timeParts[1]);
+        const minutes = parseInt(timeParts[2]);
+        const period = timeParts[3].toUpperCase();
+        if (period === 'PM' && hours !== 12) hours += 12;
+        if (period === 'AM' && hours === 12) hours = 0;
+        if (hours * 60 + minutes > 13 * 60 + 30) {
+          return res.status(400).json({ message: "Appointments are not available after 1:30 PM. Please select an earlier time." });
+        }
+      }
+
+      // Capacity check — exclude THIS appointment from the existing count
+      if (dayOfWeek >= 1 && dayOfWeek <= 6) {
+        const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
+        if (!weeklyLimit) {
+          return res.status(400).json({ message: "Booking is not available for this day. Please select a different date." });
+        }
+
+        const allAppointments = await storage.getAppointments();
+        const appointmentsOnDate = allAppointments.filter((apt: any) => {
+          if (apt.id === id) return false; // exclude self
+          const storedDateStr = typeof apt.appointmentDate === 'string'
+            ? apt.appointmentDate.split('T')[0]
+            : new Date(apt.appointmentDate).toISOString().split('T')[0];
+          return storedDateStr === appointmentDateStr &&
+                 apt.status !== 'cancelled' &&
+                 apt.status !== 'rejected';
+        });
+
+        let bathDogs = 0, groomDogs = 0;
+        for (const apt of appointmentsOnDate) {
+          const aptPets = await storage.getAppointmentPets(apt.id);
+          if (aptPets && aptPets.length > 0) {
+            for (const p of aptPets) {
+              const st = (p.serviceType || '').toLowerCase();
+              if (st.includes('bath')) bathDogs++;
+              else if (st.includes('full') || (st.includes('groom') && !st.includes('bath'))) groomDogs++;
+            }
+          } else {
+            const st = (apt.serviceType || '').toLowerCase();
+            if (st.includes('bath')) bathDogs++;
+            else if (st.includes('full') || (st.includes('groom') && !st.includes('bath'))) groomDogs++;
+          }
+        }
+
+        // Count what this appointment needs
+        const myPets = await storage.getAppointmentPets(id);
+        let myBaths = 0, myGrooms = 0;
+        if (myPets && myPets.length > 0) {
+          for (const p of myPets) {
+            const st = (p.serviceType || '').toLowerCase();
+            if (st.includes('bath')) myBaths++;
+            else if (st.includes('full') || (st.includes('groom') && !st.includes('bath'))) myGrooms++;
+          }
+        } else {
+          const st = (appointment.serviceType || '').toLowerCase();
+          if (st.includes('bath')) myBaths++;
+          else if (st.includes('full') || (st.includes('groom') && !st.includes('bath'))) myGrooms++;
+        }
+
+        if (bathDogs + myBaths > weeklyLimit.maxBathAppointments) {
+          return res.status(400).json({ message: `Bath grooming is fully booked for this date (limit: ${weeklyLimit.maxBathAppointments}). Please select a different date.` });
+        }
+        if (groomDogs + myGrooms > weeklyLimit.maxGroomAppointments) {
+          return res.status(400).json({ message: `Full grooming is fully booked for this date (limit: ${weeklyLimit.maxGroomAppointments}). Please select a different date.` });
+        }
+      }
+
+      await db.update(appointments)
+        .set({ appointmentDate: appointmentDateStr, appointmentTime, status: 'scheduled', isApproved: false })
+        .where(eq(appointments.id, id));
+
+      res.json({ message: "Appointment rescheduled successfully" });
+    } catch (error) {
+      console.error("Error rescheduling appointment:", error);
+      res.status(500).json({ message: "Failed to reschedule appointment" });
+    }
+  });
+
   // Customer-facing cancel — only the owner can cancel their own pending appointment
   app.patch("/api/user/appointments/:id/cancel", authMiddleware, async (req: any, res) => {
     try {
