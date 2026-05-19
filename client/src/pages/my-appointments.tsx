@@ -176,6 +176,25 @@ export default function MyAppointments() {
   const upcoming = (appointments || []).filter(apt => !isPast(apt) && apt.status !== "cancelled");
   const past = (appointments || []).filter(apt => isPast(apt) || apt.status === "cancelled" || apt.status === "completed");
 
+  // Group by phone — matches admin behaviour
+  const [groupIndexes, setGroupIndexes] = useState<Record<string, number>>({});
+  const groupByPhone = (list: any[]) => {
+    const grouped: Record<string, any[]> = {};
+    list.forEach(apt => {
+      const key = apt.ownerPhoneNumber || '';
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(apt);
+    });
+    Object.values(grouped).forEach(g => g.sort((a, b) => new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime()));
+    return grouped;
+  };
+  const cycleGroup = (phone: string, grouped: Record<string, any[]>) =>
+    setGroupIndexes(prev => ({ ...prev, [phone]: ((prev[phone] || 0) + 1) % grouped[phone].length }));
+  const currentInGroup = (phone: string, group: any[]) => group[groupIndexes[phone] || 0] || group[0];
+
+  const groupedUpcoming = groupByPhone(upcoming);
+  const groupedPast = groupByPhone(past);
+
   const AppointmentCard = ({ apt, dim = false }: { apt: any; dim?: boolean }) => {
     const canPayOnline = apt.readyForPayment && !apt.isPaid;
     const isPaidOnline = apt.isPaid && apt.paidOnline;
@@ -411,26 +430,64 @@ export default function MyAppointments() {
           </Card>
         ) : (
           <>
-            {upcoming.length > 0 && (
+            {Object.keys(groupedUpcoming).length > 0 && (
               <div>
                 <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center">
                   <Calendar className="w-5 h-5 mr-2 text-brand-blue" />
                   Upcoming Appointments
                 </h2>
                 <div className="space-y-3">
-                  {upcoming.map(apt => <AppointmentCard key={apt.id} apt={apt} />)}
+                  {Object.entries(groupedUpcoming).map(([phone, group]) => {
+                    const apt = currentInGroup(phone, group);
+                    const hasMultiple = group.length > 1;
+                    return (
+                      <div key={`${phone}-${apt.id}`}>
+                        {hasMultiple && (
+                          <div className="flex justify-end mb-1">
+                            <Badge
+                              variant="outline"
+                              className="bg-purple-500 text-white border-purple-600 text-xs cursor-pointer hover:bg-purple-600"
+                              onClick={() => cycleGroup(phone, groupedUpcoming)}
+                            >
+                              {(groupIndexes[phone] || 0) + 1} / {group.length}
+                            </Badge>
+                          </div>
+                        )}
+                        <AppointmentCard apt={apt} />
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {past.length > 0 && (
+            {Object.keys(groupedPast).length > 0 && (
               <div>
                 <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center">
                   <Calendar className="w-5 h-5 mr-2 text-gray-500" />
                   Past Appointments
                 </h2>
                 <div className="space-y-3">
-                  {past.map(apt => <AppointmentCard key={apt.id} apt={apt} dim />)}
+                  {Object.entries(groupedPast).map(([phone, group]) => {
+                    const apt = currentInGroup(phone, group);
+                    const hasMultiple = group.length > 1;
+                    return (
+                      <div key={`${phone}-${apt.id}`}>
+                        {hasMultiple && (
+                          <div className="flex justify-end mb-1">
+                            <Badge
+                              variant="outline"
+                              className="bg-purple-500 text-white border-purple-600 text-xs cursor-pointer hover:bg-purple-600"
+                              onClick={() => cycleGroup(phone, groupedPast)}
+                            >
+                              {(groupIndexes[phone] || 0) + 1} / {group.length}
+                            </Badge>
+                          </div>
+                        )}
+                        <AppointmentCard apt={apt} dim />
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

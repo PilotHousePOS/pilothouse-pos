@@ -11514,7 +11514,15 @@ West Monroe LA 71291
         return aptDate >= thirtyDaysAgo;
       });
       
-      res.json(filteredAppointments);
+      // Enrich each appointment with its pets array (same as admin view)
+      const enriched = await Promise.all(
+        filteredAppointments.map(async (apt: any) => {
+          const pets = await storage.getAppointmentPets(apt.id);
+          return { ...apt, pets };
+        })
+      );
+
+      res.json(enriched);
     } catch (error) {
       console.error("Error fetching user appointments:", error);
       res.status(500).json({ message: "Failed to fetch appointments" });
