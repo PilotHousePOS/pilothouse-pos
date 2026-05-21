@@ -121,38 +121,53 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   }, []);
 
   // Scan a photo taken from native camera (file input fallback)
+  // Uses canvas-based decoding to avoid ZXing's internal URL/image loading,
+  // which hangs indefinitely in some browsers (FAB AdBlocker, etc.)
   const handlePhotoCapture = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setPhotoError("");
     setCameraState("scanning-photo");
 
-    const objectUrl = URL.createObjectURL(file);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+
     try {
+      // Step 1: Load image into a bitmap via FileReader (works in all browsers)
+      const arrayBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(fr.result as ArrayBuffer);
+        fr.onerror = () => reject(new Error("read"));
+        fr.readAsArrayBuffer(file);
+      });
+
+      const blob = new Blob([arrayBuffer], { type: file.type });
+      const objectUrl = URL.createObjectURL(blob);
+
+      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const el = new Image();
+        el.onload = () => resolve(el);
+        el.onerror = () => reject(new Error("load"));
+        el.src = objectUrl;
+      });
+      URL.revokeObjectURL(objectUrl);
+
+      // Step 2: Draw image onto an offscreen canvas
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0);
+
+      // Step 3: Decode synchronously from canvas — cannot hang
       const reader = new BrowserMultiFormatReader();
-
-      // decodeFromImageUrl is the correct static-image method; wrap in a timeout
-      // so it cannot hang forever if ZXing stalls on a bad image
-      const decodeResult = await Promise.race([
-        reader.decodeFromImageUrl(objectUrl),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("timeout")), 12000)
-        ),
-      ]);
-
+      const decodeResult = (reader as any).decodeFromCanvas(canvas);
       const upc = decodeResult.getText();
       handleDetected(upc);
     } catch (err: any) {
-      const isTimeout = err?.message === "timeout";
       setPhotoError(
-        isTimeout
-          ? "Scan timed out — make sure the barcode is clear and well-lit, then try again."
-          : "No barcode found in photo. Hold the camera steady and make sure the barcode fills the frame."
+        "No barcode found. Make sure the barcode fills most of the frame and is well-lit, then try again."
       );
       setCameraState("denied");
-    } finally {
-      URL.revokeObjectURL(objectUrl);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }, [handleDetected]);
 
