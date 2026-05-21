@@ -25,16 +25,19 @@ interface BarcodeScannerProps {
 export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const readerRef = useRef<BrowserMultiFormatReader | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const [cameraState, setCameraState] = useState<"starting" | "live" | "denied">("starting");
+  // "starting" | "live" | "denied" | "scanning-photo"
+  const [cameraState, setCameraState] = useState<"starting" | "live" | "denied" | "scanning-photo">("starting");
   const [manualMode, setManualMode] = useState(false);
   const [manualUpc, setManualUpc] = useState("");
   const [torchOn, setTorchOn] = useState(false);
   const [torchSupported, setTorchSupported] = useState(false);
   const [result, setResult] = useState<Product | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [photoError, setPhotoError] = useState("");
   const [lastScanned, setLastScanned] = useState("");
   const streamRef = useRef<MediaStream | null>(null);
   const cooldownRef = useRef(false);
@@ -63,20 +66,17 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     if (cooldownRef.current || upc === lastScanned) return;
     cooldownRef.current = true;
     setLastScanned(upc);
-    if (onDetected) {
-      onDetected(upc);
-      return;
-    }
+    if (onDetected) { onDetected(upc); return; }
     lookupMutation.mutate(upc);
   }, [lastScanned, lookupMutation, onDetected]);
 
+  // Try live camera via getUserMedia
   useEffect(() => {
-    if (manualMode) return;
+    if (manualMode || cameraState === "denied") return;
     let cancelled = false;
 
     const startCamera = async () => {
       try {
-        // This call triggers the browser's own permission dialog automatically
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
         });
@@ -109,7 +109,45 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
       streamRef.current?.getTracks().forEach(t => t.stop());
       readerRef.current = null;
     };
-  }, [manualMode]);
+  }, [manualMode, cameraState === "starting"]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      streamRef.current?.getTracks().forEach(t => t.stop());
+      readerRef.current = null;
+    };
+  }, []);
+
+  // Scan a photo taken from native camera (file input fallback)
+  const handlePhotoCapture = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoError("");
+    setCameraState("scanning-photo");
+
+    const objectUrl = URL.createObjectURL(file);
+    try {
+      const img = new Image();
+      img.src = objectUrl;
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error("load"));
+      });
+
+      const reader = new BrowserMultiFormatReader();
+      const decodeResult = await (reader as any).decodeFromImageElement(img);
+      const upc = decodeResult.getText();
+      handleDetected(upc);
+    } catch {
+      setPhotoError("No barcode found in photo. Try again with better lighting and hold steady.");
+      setCameraState("denied");
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+      // Reset file input so same file can be re-selected
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }, [handleDetected]);
 
   const toggleTorch = async () => {
     const track = streamRef.current?.getVideoTracks()[0];
@@ -154,59 +192,83 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
   const imageUrl = result?.imageUrls?.[0] || null;
 
-  // ── Denied screen ──
-  if (cameraState === "denied" && !manualMode) {
+  // ── Denied / fallback screen ──
+  if ((cameraState === "denied" || cameraState === "scanning-photo") && !manualMode && !result) {
     return (
       <div className="fixed inset-0 z-50 bg-black flex flex-col">
+        {/* Hidden native camera file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handlePhotoCapture}
+        />
+
         <div className="flex items-center justify-between px-4 pt-4 pb-3 bg-[#0071CE]">
           <button onClick={onClose} className="text-white p-1"><X className="w-6 h-6" /></button>
           <span className="text-white font-semibold text-base">Scanner</span>
           <div className="w-6" />
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center px-8 text-center gap-6">
-          <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center">
-            <Camera className="w-10 h-10 text-white/60" />
-          </div>
-          <div>
-            <p className="text-white text-xl font-bold mb-2">Camera access needed</p>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              To scan barcodes, allow camera access when your browser asks — or type the barcode manually below.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 w-full">
-            <Button
-              onClick={() => { setCameraState("starting"); setManualMode(false); }}
-              className="w-full bg-[#0071CE] hover:bg-[#0058a3] text-white py-4 text-base"
-            >
-              Try Again
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setManualMode(true)}
-              className="w-full border-white/30 text-white hover:bg-white/10 py-4 text-base"
-            >
-              <Keyboard className="w-4 h-4 mr-2" />
-              Type barcode instead
-            </Button>
-          </div>
+        <div className="flex-1 flex flex-col items-center justify-center px-8 text-center gap-5">
+          {cameraState === "scanning-photo" ? (
+            <>
+              <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+              <p className="text-white text-lg font-semibold">Scanning photo…</p>
+            </>
+          ) : (
+            <>
+              <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center">
+                <Camera className="w-10 h-10 text-white/70" />
+              </div>
 
-          <div className="bg-white/5 rounded-2xl p-4 text-left w-full">
-            <p className="text-white text-xs font-semibold mb-2 uppercase tracking-wide">To enable camera:</p>
-            <ol className="text-gray-400 text-sm space-y-1 list-decimal list-inside">
-              <li>Tap the <span className="text-white font-medium">lock icon</span> in your browser's address bar</li>
-              <li>Tap <span className="text-white font-medium">Site settings</span></li>
-              <li>Set <span className="text-white font-medium">Camera</span> to Allow</li>
-              <li>Come back and tap <span className="text-white font-medium">Try Again</span></li>
-            </ol>
-          </div>
+              <div>
+                <p className="text-white text-xl font-bold mb-2">Scan a barcode</p>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Use your camera to take a photo of any barcode, or type the number manually.
+                </p>
+              </div>
+
+              {photoError && (
+                <div className="bg-red-500/20 border border-red-500/40 rounded-xl px-4 py-3 w-full">
+                  <p className="text-red-300 text-sm">{photoError}</p>
+                </div>
+              )}
+
+              <div className="flex flex-col gap-3 w-full mt-2">
+                {/* Primary: open native camera app — works in ALL browsers */}
+                <Button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full bg-[#0071CE] hover:bg-[#0058a3] text-white py-4 text-base font-semibold"
+                >
+                  <Camera className="w-5 h-5 mr-2" />
+                  Open Camera
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={() => setManualMode(true)}
+                  className="w-full border-white/30 text-white hover:bg-white/10 py-4 text-base"
+                >
+                  <Keyboard className="w-4 h-4 mr-2" />
+                  Type barcode instead
+                </Button>
+              </div>
+
+              <p className="text-gray-600 text-xs">
+                Point camera at barcode, hold steady, then take the photo
+              </p>
+            </>
+          )}
         </div>
       </div>
     );
   }
 
-  // ── Manual entry only (when denied and user taps "Type barcode") ──
-  if (manualMode && cameraState === "denied") {
+  // ── Manual entry (when denied and user taps "Type barcode") ──
+  if (manualMode) {
     return (
       <div className="fixed inset-0 z-50 bg-black flex flex-col">
         <div className="flex items-center justify-between px-4 pt-4 pb-3 bg-[#0071CE]">
@@ -264,7 +326,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     );
   }
 
-  // ── Main scanner UI ──
+  // ── Main live scanner UI ──
   return (
     <div className="fixed inset-0 z-50 bg-black flex flex-col" style={{ maxWidth: "100vw" }}>
       <div className="flex items-center justify-between px-4 pt-safe-top pt-4 pb-3 bg-[#0071CE] z-10">
@@ -310,7 +372,6 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
       )}
 
       <div className="relative flex-1 overflow-hidden">
-        {/* Starting state — spinner while camera initializes */}
         {cameraState === "starting" && (
           <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
             <div className="flex flex-col items-center gap-4">
