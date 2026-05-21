@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Search, ChevronLeft, ChevronRight, X } from "lucide-react";
 import SupplyCard from "@/components/supply-card";
 import CartSidebar from "@/components/cart-sidebar";
+import BarcodeScanner from "@/components/barcode-scanner";
 
 function getUrlParams() {
   const params = new URLSearchParams(window.location.search);
@@ -139,6 +140,7 @@ export default function Supplies() {
   const [selectedTreatAnimalType, setSelectedTreatAnimalType] = useState(urlParams.treatAnimalType);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(urlParams.page);
+  const [showScanner, setShowScanner] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   
@@ -358,23 +360,36 @@ export default function Supplies() {
             placeholder="Search supplies..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="pl-10 pr-10 bg-gray-100 border-none rounded-xl"
+            className="pl-10 pr-16 bg-gray-100 border-none rounded-xl"
             data-testid="input-search-supplies"
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          {searchInput && (
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            {searchInput && (
+              <button
+                type="button"
+                onClick={() => { setSearchInput(''); setSearchQuery(''); }}
+                className="text-gray-400 hover:text-gray-600 p-1"
+                data-testid="button-clear-search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
             <button
               type="button"
-              onClick={() => {
-                setSearchInput('');
-                setSearchQuery('');
-              }}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
-              data-testid="button-clear-search"
+              onClick={() => setShowScanner(true)}
+              className="text-gray-500 hover:text-brand-blue p-1"
+              title="Scan barcode"
+              data-testid="button-barcode-scanner"
             >
-              <X className="w-4 h-4" />
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                <path d="M3 5v2M3 19v-2M21 5v2M21 19v-2M3 5h2M3 19h2M21 5h-2M21 19h-2"/>
+                <rect x="7" y="7" width="3" height="10" rx="0.5"/>
+                <rect x="14" y="7" width="3" height="10" rx="0.5"/>
+                <rect x="11" y="7" width="1" height="10" rx="0.5"/>
+              </svg>
             </button>
-          )}
+          </div>
         </div>
         <Button 
           type="submit" 
@@ -384,6 +399,9 @@ export default function Supplies() {
           Search
         </Button>
       </form>
+
+      {/* Barcode Scanner overlay */}
+      {showScanner && <BarcodeScanner onClose={() => setShowScanner(false)} />}
 
       {/* Category Grid */}
       <div className="grid grid-cols-3 gap-4 mb-6">

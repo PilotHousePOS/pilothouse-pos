@@ -2339,6 +2339,19 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // UPC/barcode lookup — matches SKU field (with leading-zero normalization)
+  app.get("/api/supplies/by-upc/:upc", async (req, res) => {
+    try {
+      const upc = req.params.upc.trim();
+      const supply = await storage.getSupplyByUpc(upc);
+      if (!supply) return res.status(404).json({ message: "Product not found" });
+      res.json(supply);
+    } catch (error) {
+      console.error("Error looking up supply by UPC:", error);
+      res.status(500).json({ message: "Failed to look up product" });
+    }
+  });
+
   app.get("/api/supplies/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);

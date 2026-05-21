@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import BarcodeScanner from "@/components/barcode-scanner";
 import { getProductImageUrl } from "@/lib/imageUrl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
@@ -6576,6 +6577,7 @@ export default function Admin() {
   // Pagination and search for supplies
   const [supplySearchQuery, setSupplySearchQuery] = useState('');
   const [suppliesPage, setSuppliesPage] = useState(0);
+  const [showAdminScanner, setShowAdminScanner] = useState(false);
   const SUPPLIES_PER_PAGE = 20;
   
   // Pagination for in progress orders (confirmed)
@@ -9596,25 +9598,38 @@ export default function Admin() {
                     value={supplySearchQuery}
                     onChange={(e) => {
                       setSupplySearchQuery(e.target.value);
-                      setSuppliesPage(0); // Reset to first page on search
+                      setSuppliesPage(0);
                     }}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand-orange focus:border-brand-orange"
+                    className="w-full pl-10 pr-16 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand-orange focus:border-brand-orange"
                     data-testid="input-supply-search"
                   />
-                  {supplySearchQuery && (
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    {supplySearchQuery && (
+                      <button
+                        onClick={() => { setSupplySearchQuery(''); setSuppliesPage(0); }}
+                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 px-1"
+                        data-testid="button-clear-supply-search"
+                      >
+                        ×
+                      </button>
+                    )}
                     <button
-                      onClick={() => {
-                        setSupplySearchQuery('');
-                        setSuppliesPage(0);
-                      }}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                      data-testid="button-clear-supply-search"
+                      type="button"
+                      onClick={() => setShowAdminScanner(true)}
+                      className="text-gray-400 hover:text-brand-orange p-1"
+                      title="Scan barcode"
                     >
-                      ×
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                        <path d="M3 5v2M3 19v-2M21 5v2M21 19v-2M3 5h2M3 19h2M21 5h-2M21 19h-2"/>
+                        <rect x="7" y="7" width="3" height="10" rx="0.5"/>
+                        <rect x="14" y="7" width="3" height="10" rx="0.5"/>
+                        <rect x="11" y="7" width="1" height="10" rx="0.5"/>
+                      </svg>
                     </button>
-                  )}
+                  </div>
                 </div>
               </div>
+              {showAdminScanner && <BarcodeScanner onClose={() => setShowAdminScanner(false)} />}
               <div className="space-y-3">
                 {(supplies as any[]).map((supply: any) => (
                   <div key={supply.id} className="p-3 border rounded-lg">

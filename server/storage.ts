@@ -1292,6 +1292,18 @@ export class DatabaseStorage implements IStorage {
     return supply;
   }
 
+  async getSupplyByUpc(upc: string): Promise<Supply | undefined> {
+    const padded = upc.padStart(12, '0');
+    const unpadded = upc.replace(/^0+/, '') || upc;
+    const [supply] = await db.select().from(supplies).where(
+      and(
+        eq(supplies.isActive, true),
+        or(eq(supplies.sku, upc), eq(supplies.sku, padded), eq(supplies.sku, unpadded))
+      )
+    ).limit(1);
+    return supply;
+  }
+
   async getSuppliesByIds(ids: number[]): Promise<Supply[]> {
     if (ids.length === 0) return [];
     return await db.select().from(supplies).where(inArray(supplies.id, ids));

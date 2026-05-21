@@ -57,6 +57,8 @@
     "@uppy/core": "^5.2.0",
     "@uppy/dashboard": "^5.1.0",
     "@uppy/react": "^5.1.1",
+    "@zxing/browser": "^0.2.0",
+    "@zxing/library": "^0.22.0",
     "axios": "^1.15.2",
     "bcrypt": "^6.0.0",
     "class-variance-authority": "^0.7.1",
