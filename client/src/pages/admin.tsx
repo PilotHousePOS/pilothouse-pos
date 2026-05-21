@@ -15878,32 +15878,27 @@ function SupplyMultiImageUpload({
         }}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
-        onClick={() => {
-          if (supplyId) {
-            fileInputRef.current?.click();
-          } else {
-            setPasteReady(true);
-          }
-        }}
+        onClick={() => { if (!pasteReady) setPasteReady(true); }}
       >
         <div className="text-center py-2">
           {pasteReady ? (
-            <>
+            <div onClick={(e) => e.stopPropagation()}>
               <ClipboardPaste className="w-8 h-8 text-green-600 mx-auto mb-2 animate-pulse" />
-              <p className="text-sm text-green-700 font-medium">
-                {supplyId ? 'Ready - Paste (Ctrl+V), drop, or click to browse' : 'Paste image URL below'}
+              <p className="text-sm text-green-700 font-medium">Paste (Ctrl+V) or drop an image</p>
+              <p className="text-xs text-green-600 mt-1">
+                Press Escape to cancel •{' '}
+                {supplyId && (
+                  <span className="underline cursor-pointer" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}>Browse files</span>
+                )}
               </p>
-              <p className="text-xs text-green-600 mt-1">Press Escape to cancel</p>
-            </>
+            </div>
           ) : (
             <>
               <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
               <p className="text-sm text-gray-500">
                 {allImages.length === 0 ? 'Add main product image' : 'Add another image'}
               </p>
-              {supplyId && (
-                <p className="text-xs text-gray-400 mt-1">Click to browse, drag & drop, or paste</p>
-              )}
+              <p className="text-xs text-gray-400 mt-1">Click to activate paste · drag &amp; drop · or browse below</p>
             </>
           )}
         </div>
@@ -15928,6 +15923,12 @@ function SupplyMultiImageUpload({
         </div>
       )}
       
+      {supplyId && !pasteReady && !uploading && (
+        <Button type="button" variant="outline" className="w-full" onClick={() => fileInputRef.current?.click()}>
+          <Upload className="w-4 h-4 mr-2" />Browse files
+        </Button>
+      )}
+
       {/* URL Input for adding images via URL */}
       <div className="flex gap-2">
         <Input
