@@ -104,10 +104,10 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
   const allOrders = await storage.getOrders();
   
   // Fetch today's appointment items (items sold at grooming appointments)
-  const todayStr = today.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+  const todayDateStr = today.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
   let todaysApptItems: any[] = [];
   try {
-    todaysApptItems = await storage.getAppointmentItemsByDate(todayStr);
+    todaysApptItems = await storage.getAppointmentItemsByDate(todayDateStr);
   } catch (e) {
     // Table may not exist yet
   }
