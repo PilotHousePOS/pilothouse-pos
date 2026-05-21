@@ -31,6 +31,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
   // "starting" | "live" | "denied" | "scanning-photo"
   const [cameraState, setCameraState] = useState<"starting" | "live" | "denied" | "scanning-photo">("starting");
+  const [retryKey, setRetryKey] = useState(0);
   const [manualMode, setManualMode] = useState(false);
   const [manualUpc, setManualUpc] = useState("");
   const [torchOn, setTorchOn] = useState(false);
@@ -70,7 +71,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     lookupMutation.mutate(upc);
   }, [lastScanned, lookupMutation, onDetected]);
 
-  // Try live camera via getUserMedia
+  // Try live camera via getUserMedia — runs once on mount, and again if manualMode turns off
   useEffect(() => {
     if (manualMode || cameraState === "denied") return;
     let cancelled = false;
@@ -109,7 +110,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
       streamRef.current?.getTracks().forEach(t => t.stop());
       readerRef.current = null;
     };
-  }, [manualMode, cameraState === "starting"]);
+  }, [manualMode, retryKey]);
 
   // Cleanup on unmount
   useEffect(() => {
