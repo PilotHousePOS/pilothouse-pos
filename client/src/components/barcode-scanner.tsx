@@ -39,6 +39,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const [result, setResult] = useState<Product | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [photoError, setPhotoError] = useState("");
+  const [cameraError, setCameraError] = useState("");
   const [lastScanned, setLastScanned] = useState("");
   const streamRef = useRef<MediaStream | null>(null);
   const cooldownRef = useRef(false);
@@ -82,6 +83,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   // Called only from a user tap — Chrome/Android will show its permission dialog
   const requestCamera = useCallback(async () => {
     setCameraState("starting");
+    setCameraError("");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
@@ -101,7 +103,19 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
       });
 
       setCameraState("live");
-    } catch {
+    } catch (err: any) {
+      const name = err?.name || "Unknown";
+      const msg = err?.message || "";
+      console.error("Camera error:", name, msg);
+      if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+        setCameraError("DENIED");
+      } else if (name === "NotFoundError" || name === "DevicesNotFoundError") {
+        setCameraError("No camera found on this device.");
+      } else if (name === "NotReadableError" || name === "TrackStartError") {
+        setCameraError("Camera is in use by another app. Close other camera apps and try again.");
+      } else {
+        setCameraError(`Error: ${name} — ${msg}`);
+      }
       setCameraState("denied");
     }
   }, [handleDetected]);
@@ -304,12 +318,34 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
               <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center">
                 <Camera className="w-10 h-10 text-white/70" />
               </div>
-              <div>
-                <p className="text-white text-xl font-bold mb-2">Camera access needed</p>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  Allow camera access for live scanning, or take a photo of the barcode instead.
-                </p>
-              </div>
+
+              {cameraError === "DENIED" ? (
+                <div className="w-full">
+                  <p className="text-white text-xl font-bold mb-2 text-center">Camera permission blocked</p>
+                  <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-xl px-4 py-4 w-full text-left">
+                    <p className="text-yellow-300 text-sm font-semibold mb-2">To enable camera, do one of these:</p>
+                    <p className="text-yellow-200 text-sm leading-relaxed mb-1">
+                      <span className="font-bold">Option A — Android Settings:</span>{"\n"}
+                      Settings → Apps → Animal House → Permissions → Camera → Allow
+                    </p>
+                    <p className="text-yellow-200 text-sm leading-relaxed">
+                      <span className="font-bold">Option B — Chrome:</span>{"\n"}
+                      Open Chrome → go to animalhouseexperience.replit.app → tap the lock icon → Permissions → Camera → Allow
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-white text-xl font-bold mb-2">Camera access needed</p>
+                  <p className="text-gray-400 text-sm leading-relaxed">
+                    Allow camera access for live scanning, or take a photo of the barcode instead.
+                  </p>
+                  {cameraError && (
+                    <p className="text-red-400 text-xs mt-2 font-mono">{cameraError}</p>
+                  )}
+                </div>
+              )}
+
               {photoError && (
                 <div className="bg-red-500/20 border border-red-500/40 rounded-xl px-4 py-3 w-full">
                   <p className="text-red-300 text-sm">{photoError}</p>
