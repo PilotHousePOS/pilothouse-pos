@@ -5033,6 +5033,51 @@ West Monroe LA 71291
     }
   });
 
+  // Appointment items (items sold/used during grooming for inventory tracking)
+  app.get("/api/appointments/:id/items", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin && !user?.isGroomer) return res.status(403).json({ message: "Admin or groomer access required" });
+      const items = await storage.getAppointmentItems(parseInt(req.params.id));
+      res.json(items);
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.post("/api/appointments/:id/items", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin && !user?.isGroomer) return res.status(403).json({ message: "Admin or groomer access required" });
+      const { supplyId, name, sku, brand, category, price, quantity } = req.body;
+      if (!name || !price) return res.status(400).json({ message: "name and price are required" });
+      const item = await storage.addAppointmentItem({
+        appointmentId: parseInt(req.params.id),
+        supplyId: supplyId || null,
+        name,
+        sku: sku || null,
+        brand: brand || null,
+        category: category || null,
+        price: String(price),
+        quantity: quantity || 1,
+      });
+      res.json(item);
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.delete("/api/appointments/:id/items/:itemId", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin && !user?.isGroomer) return res.status(403).json({ message: "Admin or groomer access required" });
+      await storage.removeAppointmentItem(parseInt(req.params.itemId));
+      res.json({ success: true });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
   app.put("/api/appointments/:id", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);

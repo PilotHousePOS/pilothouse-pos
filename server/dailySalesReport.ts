@@ -103,6 +103,15 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
   
   const allOrders = await storage.getOrders();
   
+  // Fetch today's appointment items (items sold at grooming appointments)
+  const todayStr = today.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+  let todaysApptItems: any[] = [];
+  try {
+    todaysApptItems = await storage.getAppointmentItemsByDate(todayStr);
+  } catch (e) {
+    // Table may not exist yet
+  }
+  
   const todaysOrders = allOrders.filter((order: Order) => {
     if (!order.orderDate) return false;
     const orderDate = new Date(order.orderDate);
@@ -312,6 +321,37 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
       supplyOrderTotal += orderTotal;
       supplyOrderCount++;
     }
+  }
+
+  // Add appointment items to category sales and grooming totals
+  let apptItemsTotal = 0;
+  let apptItemsCount = 0;
+  for (const item of todaysApptItems) {
+    const itemTotal = parseFloat(item.price) * (item.quantity || 1);
+    apptItemsTotal += itemTotal;
+    apptItemsCount += item.quantity || 1;
+    
+    // Map to a display category
+    let catDisplay = 'Grooming Supplies';
+    const cat = (item.category || '').toLowerCase();
+    if (cat.includes('food') || cat.includes('dog food') || cat.includes('cat food')) catDisplay = 'Food';
+    else if (cat.includes('treat')) catDisplay = 'Treats';
+    else if (cat.includes('toy')) catDisplay = 'Toys';
+    else if (cat.includes('collar') || cat.includes('leash')) catDisplay = 'Leashes & Collars';
+    else if (cat.includes('health') || cat.includes('medic')) catDisplay = 'Healthcare';
+    else if (cat.includes('shampoo') || cat.includes('groom')) catDisplay = 'Grooming Supplies';
+    
+    const existing = categorySales.get(catDisplay) || { name: catDisplay, total: 0, count: 0 };
+    existing.total += itemTotal;
+    existing.count += item.quantity || 1;
+    categorySales.set(catDisplay, existing);
+    
+    total += itemTotal;
+    subtotal += itemTotal;
+    totalItems += item.quantity || 1;
+  }
+  if (apptItemsTotal > 0) {
+    groomingOrderTotal += apptItemsTotal;
   }
 
   // Get refund data from multiple sources for reliability

@@ -112,6 +112,7 @@ import {
   jobApplications,
   type JobApplication,
   type InsertJobApplication,
+  appointmentItems,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, and, or, not, ilike, lt, lte, isNull, isNotNull, count, sql, inArray, ne, notInArray } from "drizzle-orm";
@@ -298,6 +299,12 @@ export interface IStorage {
   }): Promise<Appointment>;
   clearAllAppointments(): Promise<void>;
   bulkCreateAppointments(appointments: InsertAppointment[]): Promise<Appointment[]>;
+
+  // Appointment items
+  getAppointmentItems(appointmentId: number): Promise<any[]>;
+  addAppointmentItem(data: { appointmentId: number; supplyId?: number | null; name: string; sku?: string | null; brand?: string | null; category?: string | null; price: string; quantity: number }): Promise<any>;
+  removeAppointmentItem(id: number): Promise<void>;
+  getAppointmentItemsByDate(date: string): Promise<any[]>;
   
   // Appointment history operations
   saveAppointmentToHistory(appointment: Appointment, options?: { groomerName?: string }): Promise<AppointmentHistory>;
@@ -2822,6 +2829,51 @@ export class DatabaseStorage implements IStorage {
     if (appointmentList.length === 0) return [];
     const newAppointments = await db.insert(appointments).values(appointmentList).returning();
     return newAppointments;
+  }
+
+  async getAppointmentItems(appointmentId: number): Promise<any[]> {
+    return db.select().from(appointmentItems).where(eq(appointmentItems.appointmentId, appointmentId)).orderBy(asc(appointmentItems.createdAt));
+  }
+
+  async addAppointmentItem(data: { appointmentId: number; supplyId?: number | null; name: string; sku?: string | null; brand?: string | null; category?: string | null; price: string; quantity: number }): Promise<any> {
+    const [item] = await db.insert(appointmentItems).values({
+      appointmentId: data.appointmentId,
+      supplyId: data.supplyId ?? null,
+      name: data.name,
+      sku: data.sku ?? null,
+      brand: data.brand ?? null,
+      category: data.category ?? null,
+      price: data.price,
+      quantity: data.quantity,
+    }).returning();
+    return item;
+  }
+
+  async removeAppointmentItem(id: number): Promise<void> {
+    await db.delete(appointmentItems).where(eq(appointmentItems.id, id));
+  }
+
+  async getAppointmentItemsByDate(date: string): Promise<any[]> {
+    // date is YYYY-MM-DD in CST
+    const dayStart = new Date(date + 'T00:00:00-06:00');
+    const dayEnd = new Date(date + 'T23:59:59-06:00');
+    const items = await db.select({
+      id: appointmentItems.id,
+      appointmentId: appointmentItems.appointmentId,
+      supplyId: appointmentItems.supplyId,
+      name: appointmentItems.name,
+      sku: appointmentItems.sku,
+      brand: appointmentItems.brand,
+      category: appointmentItems.category,
+      price: appointmentItems.price,
+      quantity: appointmentItems.quantity,
+      createdAt: appointmentItems.createdAt,
+    }).from(appointmentItems)
+      .where(and(
+        sql`${appointmentItems.createdAt} >= ${dayStart}`,
+        sql`${appointmentItems.createdAt} <= ${dayEnd}`
+      ));
+    return items;
   }
 
   // Appointment history operations

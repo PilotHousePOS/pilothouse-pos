@@ -19,9 +19,10 @@ interface Product {
 
 interface BarcodeScannerProps {
   onClose: () => void;
+  onDetected?: (upc: string) => void;
 }
 
-export default function BarcodeScanner({ onClose }: BarcodeScannerProps) {
+export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const readerRef = useRef<BrowserMultiFormatReader | null>(null);
   const [, setLocation] = useLocation();
@@ -64,8 +65,12 @@ export default function BarcodeScanner({ onClose }: BarcodeScannerProps) {
     if (cooldownRef.current || upc === lastScanned) return;
     cooldownRef.current = true;
     setLastScanned(upc);
+    if (onDetected) {
+      onDetected(upc);
+      return;
+    }
     lookupMutation.mutate(upc);
-  }, [lastScanned, lookupMutation]);
+  }, [lastScanned, lookupMutation, onDetected]);
 
   // Start camera + ZXing reader
   useEffect(() => {
@@ -119,6 +124,10 @@ export default function BarcodeScanner({ onClose }: BarcodeScannerProps) {
   const handleManualSubmit = () => {
     const upc = manualUpc.trim();
     if (!upc) return;
+    if (onDetected) {
+      onDetected(upc);
+      return;
+    }
     lookupMutation.mutate(upc);
   };
 

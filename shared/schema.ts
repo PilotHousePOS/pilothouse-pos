@@ -312,6 +312,20 @@ export const appointmentPets = pgTable("appointment_pets", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Items sold/used during a grooming appointment (for inventory tracking + sales reports)
+export const appointmentItems = pgTable("appointment_items", {
+  id: serial("id").primaryKey(),
+  appointmentId: integer("appointment_id").notNull().references(() => appointments.id, { onDelete: "cascade" }),
+  supplyId: integer("supply_id").references(() => supplies.id, { onDelete: "set null" }),
+  name: varchar("name", { length: 255 }).notNull(),
+  sku: varchar("sku", { length: 100 }),
+  brand: varchar("brand", { length: 255 }),
+  category: varchar("category", { length: 100 }),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  quantity: integer("quantity").notNull().default(1),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Customer pets (pets owned by users)
 export const customerPets = pgTable("customer_pets", {
   id: serial("id").primaryKey(),
