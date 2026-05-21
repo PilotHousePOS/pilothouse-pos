@@ -2869,9 +2869,14 @@ export class DatabaseStorage implements IStorage {
       quantity: appointmentItems.quantity,
       createdAt: appointmentItems.createdAt,
     }).from(appointmentItems)
+      .innerJoin(appointments, eq(appointmentItems.appointmentId, appointments.id))
       .where(and(
         sql`${appointmentItems.createdAt} >= ${dayStart}`,
-        sql`${appointmentItems.createdAt} <= ${dayEnd}`
+        sql`${appointmentItems.createdAt} <= ${dayEnd}`,
+        or(
+          eq(appointments.isPaid, true),
+          eq(appointments.paidOnline, true)
+        )
       ));
     return items;
   }
