@@ -147,62 +147,82 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     cooldownRef.current = false;
   };
 
-  // Load image file into an HTMLImageElement without URL loading issues
-  const loadImageFromFile = (file: File): Promise<HTMLImageElement> =>
-    new Promise((resolve, reject) => {
-      const fr = new FileReader();
-      fr.onload = () => {
-        const el = new Image();
-        el.onload = () => resolve(el);
-        el.onerror = () => reject(new Error("img-load"));
-        el.src = fr.result as string;
-      };
-      fr.onerror = () => reject(new Error("file-read"));
-      fr.readAsDataURL(file);
-    });
-
-  const drawToCanvas = (img: HTMLImageElement, rotation: 0 | 90 | 180 | 270): HTMLCanvasElement => {
-    const MAX = 1280;
-    const sw = img.naturalWidth;
-    const sh = img.naturalHeight;
-    const scale = Math.min(1, MAX / Math.max(sw, sh));
-    const dw = Math.round(sw * scale);
-    const dh = Math.round(sh * scale);
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d")!;
-    if (rotation === 0 || rotation === 180) { canvas.width = dw; canvas.height = dh; }
-    else { canvas.width = dh; canvas.height = dw; }
-    ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.rotate((rotation * Math.PI) / 180);
-    ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
-    ctx.restore();
-    return canvas;
-  };
-
   const handlePhotoCapture = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setPhotoError("");
     setCameraState("scanning-photo");
     if (fileInputRef.current) fileInputRef.current.value = "";
-    try {
-      const img = await loadImageFromFile(file);
-      const reader = new BrowserMultiFormatReader();
-      const rotations: Array<0 | 90 | 180 | 270> = [0, 90, 270, 180];
-      let upc: string | null = null;
-      for (const rotation of rotations) {
-        try {
-          const canvas = drawToCanvas(img, rotation);
-          const res = (reader as any).decodeFromCanvas(canvas);
-          upc = res.getText();
-          break;
-        } catch { /* try next rotation */ }
+
+    let upc: string | null = null;
+
+    // ── Method 1: Native BarcodeDetector API (Chrome on Android — most reliable) ──
+    if ("BarcodeDetector" in window) {
+      try {
+        const bd = new (window as any).BarcodeDetector({
+          formats: ["upc_a", "upc_e", "ean_13", "ean_8", "code_128", "code_39", "qr_code", "itf", "codabar"],
+        });
+        const bitmap = await createImageBitmap(file);
+        const barcodes = await bd.detect(bitmap);
+        bitmap.close();
+        if (barcodes.length > 0) {
+          upc = barcodes[0].rawValue;
+        }
+      } catch (err) {
+        console.warn("BarcodeDetector failed:", err);
       }
-      if (upc) { handleDetected(upc); }
-      else { throw new Error("not-found"); }
-    } catch {
-      setPhotoError("No barcode found. Point camera directly at the barcode and try again.");
+    }
+
+    // ── Method 2: ZXing via blob URL (fallback) ──
+    if (!upc) {
+      const objectUrl = URL.createObjectURL(file);
+      try {
+        const reader = new BrowserMultiFormatReader();
+        const res = await (reader as any).decodeFromImageUrl(objectUrl);
+        upc = res.getText();
+      } catch {
+        // ZXing blob URL failed — try canvas rotations
+      } finally {
+        URL.revokeObjectURL(objectUrl);
+      }
+    }
+
+    // ── Method 3: ZXing canvas with 4 rotations (last resort) ──
+    if (!upc) {
+      try {
+        const bitmap = await createImageBitmap(file);
+        const MAX = 1920;
+        const scale = Math.min(1, MAX / Math.max(bitmap.width, bitmap.height));
+        const w = Math.round(bitmap.width * scale);
+        const h = Math.round(bitmap.height * scale);
+        const reader = new BrowserMultiFormatReader();
+        const rotations: Array<0 | 90 | 180 | 270> = [0, 90, 270, 180];
+        for (const deg of rotations) {
+          try {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d")!;
+            if (deg === 0 || deg === 180) { canvas.width = w; canvas.height = h; }
+            else { canvas.width = h; canvas.height = w; }
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate((deg * Math.PI) / 180);
+            ctx.drawImage(bitmap, -w / 2, -h / 2, w, h);
+            ctx.restore();
+            const res = (reader as any).decodeFromCanvas(canvas);
+            upc = res.getText();
+            break;
+          } catch { /* try next */ }
+        }
+        bitmap.close();
+      } catch (err) {
+        console.warn("Canvas rotation fallback failed:", err);
+      }
+    }
+
+    if (upc) {
+      handleDetected(upc);
+    } else {
+      setPhotoError("No barcode detected. Make sure the barcode fills the frame and is in focus.");
       setCameraState("denied");
     }
   }, [handleDetected]);
