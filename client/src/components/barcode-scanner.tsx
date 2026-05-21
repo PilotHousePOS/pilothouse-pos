@@ -31,7 +31,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const [cameraState, setCameraState] = useState<CameraState>("prompt");
+  const [cameraState, setCameraState] = useState<CameraState>("starting");
   const [manualMode, setManualMode] = useState(false);
   const [manualUpc, setManualUpc] = useState("");
   const [torchOn, setTorchOn] = useState(false);
@@ -43,6 +43,29 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const [lastScanned, setLastScanned] = useState("");
   const streamRef = useRef<MediaStream | null>(null);
   const cooldownRef = useRef(false);
+
+  // On mount: check real permission state so we skip the prompt if already granted/denied
+  useEffect(() => {
+    let cancelled = false;
+    navigator.permissions.query({ name: "camera" as PermissionName }).then((status) => {
+      if (cancelled) return;
+      if (status.state === "granted") {
+        // Already allowed — start camera immediately, no prompt needed
+        requestCamera();
+      } else if (status.state === "denied") {
+        setCameraError("DENIED");
+        setCameraState("denied");
+      } else {
+        // "prompt" — show the allow/deny screen
+        setCameraState("prompt");
+      }
+    }).catch(() => {
+      // permissions API not supported — just show the prompt screen
+      if (!cancelled) setCameraState("prompt");
+    });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Cleanup camera on unmount
   useEffect(() => {
@@ -80,14 +103,27 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     lookupMutation.mutate(upc);
   }, [lastScanned, lookupMutation, onDetected]);
 
-  // Called only from a user tap — Chrome/Android will show its permission dialog
+  // Try to get a camera stream with progressively simpler constraints
+  const getStream = async (): Promise<MediaStream> => {
+    // Try 1: back camera with ideal resolution
+    try {
+      return await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      });
+    } catch {}
+    // Try 2: any back camera
+    try {
+      return await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+    } catch {}
+    // Try 3: any camera at all
+    return await navigator.mediaDevices.getUserMedia({ video: true });
+  };
+
   const requestCamera = useCallback(async () => {
     setCameraState("starting");
     setCameraError("");
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
-      });
+      const stream = await getStream();
 
       streamRef.current = stream;
       if (videoRef.current) videoRef.current.srcObject = stream;
@@ -112,9 +148,11 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
       } else if (name === "NotFoundError" || name === "DevicesNotFoundError") {
         setCameraError("No camera found on this device.");
       } else if (name === "NotReadableError" || name === "TrackStartError") {
-        setCameraError("Camera is in use by another app. Close other camera apps and try again.");
+        setCameraError(`Camera busy: ${msg}`);
+      } else if (name === "OverconstrainedError") {
+        setCameraError(`Camera constraints failed: ${msg}`);
       } else {
-        setCameraError(`Error: ${name} — ${msg}`);
+        setCameraError(`${name}: ${msg}`);
       }
       setCameraState("denied");
     }
@@ -154,41 +192,38 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     setCameraState("scanning-photo");
     if (fileInputRef.current) fileInputRef.current.value = "";
 
-    let upc: string | null = null;
+    // Wrap entire scan in a 12-second timeout so it can never hang
+    const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 12000));
 
-    // ── Method 1: Native BarcodeDetector API (Chrome on Android — most reliable) ──
-    if ("BarcodeDetector" in window) {
-      try {
-        const bd = new (window as any).BarcodeDetector({
-          formats: ["upc_a", "upc_e", "ean_13", "ean_8", "code_128", "code_39", "qr_code", "itf", "codabar"],
-        });
-        const bitmap = await createImageBitmap(file);
-        const barcodes = await bd.detect(bitmap);
-        bitmap.close();
-        if (barcodes.length > 0) {
-          upc = barcodes[0].rawValue;
+    const scan = async (): Promise<string | null> => {
+      // ── Method 1: Native BarcodeDetector (Chrome on Android — most reliable) ──
+      if ("BarcodeDetector" in window) {
+        try {
+          const bd = new (window as any).BarcodeDetector({
+            formats: ["upc_a", "upc_e", "ean_13", "ean_8", "code_128", "code_39", "qr_code", "itf", "codabar"],
+          });
+          const bitmap = await createImageBitmap(file);
+          const barcodes = await bd.detect(bitmap);
+          bitmap.close();
+          if (barcodes.length > 0) return barcodes[0].rawValue;
+        } catch (err) {
+          console.warn("BarcodeDetector failed:", err);
         }
-      } catch (err) {
-        console.warn("BarcodeDetector failed:", err);
       }
-    }
 
-    // ── Method 2: ZXing via blob URL (fallback) ──
-    if (!upc) {
+      // ── Method 2: ZXing via blob URL ──
       const objectUrl = URL.createObjectURL(file);
       try {
         const reader = new BrowserMultiFormatReader();
         const res = await (reader as any).decodeFromImageUrl(objectUrl);
-        upc = res.getText();
+        return res.getText();
       } catch {
-        // ZXing blob URL failed — try canvas rotations
+        // fall through
       } finally {
         URL.revokeObjectURL(objectUrl);
       }
-    }
 
-    // ── Method 3: ZXing canvas with 4 rotations (last resort) ──
-    if (!upc) {
+      // ── Method 3: ZXing canvas with 4 rotations ──
       try {
         const bitmap = await createImageBitmap(file);
         const MAX = 1920;
@@ -196,8 +231,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
         const w = Math.round(bitmap.width * scale);
         const h = Math.round(bitmap.height * scale);
         const reader = new BrowserMultiFormatReader();
-        const rotations: Array<0 | 90 | 180 | 270> = [0, 90, 270, 180];
-        for (const deg of rotations) {
+        for (const deg of [0, 90, 270, 180] as const) {
           try {
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d")!;
@@ -209,23 +243,29 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
             ctx.drawImage(bitmap, -w / 2, -h / 2, w, h);
             ctx.restore();
             const res = (reader as any).decodeFromCanvas(canvas);
-            upc = res.getText();
-            break;
-          } catch { /* try next */ }
+            bitmap.close();
+            return res.getText();
+          } catch { /* try next rotation */ }
         }
         bitmap.close();
       } catch (err) {
-        console.warn("Canvas rotation fallback failed:", err);
+        console.warn("Canvas fallback failed:", err);
       }
-    }
+
+      return null;
+    };
+
+    const upc = await Promise.race([scan(), timeout]);
 
     if (upc) {
       handleDetected(upc);
+      // If onDetected prop is used (e.g. appointment items), reset state so spinner clears
+      if (onDetected) setCameraState("prompt");
     } else {
-      setPhotoError("No barcode detected. Make sure the barcode fills the frame and is in focus.");
+      setPhotoError("No barcode detected. Make sure the entire barcode is visible and in focus.");
       setCameraState("denied");
     }
-  }, [handleDetected]);
+  }, [handleDetected, onDetected]);
 
   const addToCartMutation = useMutation({
     mutationFn: async () => {
@@ -341,17 +381,17 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
               {cameraError === "DENIED" ? (
                 <div className="w-full">
-                  <p className="text-white text-xl font-bold mb-2 text-center">Camera permission blocked</p>
+                  <p className="text-white text-xl font-bold mb-3 text-center">Camera blocked in Chrome</p>
                   <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-xl px-4 py-4 w-full text-left">
-                    <p className="text-yellow-300 text-sm font-semibold mb-2">To enable camera, do one of these:</p>
-                    <p className="text-yellow-200 text-sm leading-relaxed mb-1">
-                      <span className="font-bold">Option A — Android Settings:</span>{"\n"}
-                      Settings → Apps → Animal House → Permissions → Camera → Allow
-                    </p>
-                    <p className="text-yellow-200 text-sm leading-relaxed">
-                      <span className="font-bold">Option B — Chrome:</span>{"\n"}
-                      Open Chrome → go to animalhouseexperience.replit.app → tap the lock icon → Permissions → Camera → Allow
-                    </p>
+                    <p className="text-yellow-300 text-sm font-semibold mb-3">Android permissions are on, but Chrome has its own separate camera block for this site. Fix it in Chrome:</p>
+                    <div className="space-y-1">
+                      <p className="text-yellow-100 text-sm">1. Open the <span className="font-bold">Chrome</span> app</p>
+                      <p className="text-yellow-100 text-sm">2. Go to <span className="font-bold">animalhouseexperience.replit.app</span></p>
+                      <p className="text-yellow-100 text-sm">3. Tap the <span className="font-bold">lock icon</span> in the address bar</p>
+                      <p className="text-yellow-100 text-sm">4. Tap <span className="font-bold">Site settings</span></p>
+                      <p className="text-yellow-100 text-sm">5. Tap <span className="font-bold">Camera → Allow</span></p>
+                      <p className="text-yellow-100 text-sm">6. Come back to the app and tap <span className="font-bold">Try Live Camera</span></p>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -361,7 +401,9 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
                     Allow camera access for live scanning, or take a photo of the barcode instead.
                   </p>
                   {cameraError && (
-                    <p className="text-red-400 text-xs mt-2 font-mono">{cameraError}</p>
+                    <div className="bg-red-500/20 border border-red-500/40 rounded-lg px-3 py-2 mt-2 w-full">
+                      <p className="text-red-300 text-xs font-mono break-all">{cameraError}</p>
+                    </div>
                   )}
                 </div>
               )}
