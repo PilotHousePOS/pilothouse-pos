@@ -120,53 +120,82 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     };
   }, []);
 
+  // Load a File into an HTMLImageElement via FileReader (no URL loading issues)
+  const loadImageFromFile = (file: File): Promise<HTMLImageElement> =>
+    new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => {
+        const el = new Image();
+        el.onload = () => resolve(el);
+        el.onerror = () => reject(new Error("img-load"));
+        el.src = fr.result as string;
+      };
+      fr.onerror = () => reject(new Error("file-read"));
+      fr.readAsDataURL(file);
+    });
+
+  // Draw image onto a canvas at a scaled-down size, optionally rotated
+  const drawToCanvas = (img: HTMLImageElement, rotation: 0 | 90 | 180 | 270): HTMLCanvasElement => {
+    const MAX = 1280;
+    const sw = img.naturalWidth;
+    const sh = img.naturalHeight;
+    const scale = Math.min(1, MAX / Math.max(sw, sh));
+    const dw = Math.round(sw * scale);
+    const dh = Math.round(sh * scale);
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d")!;
+
+    if (rotation === 0 || rotation === 180) {
+      canvas.width = dw;
+      canvas.height = dh;
+    } else {
+      canvas.width = dh;
+      canvas.height = dw;
+    }
+
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate((rotation * Math.PI) / 180);
+    ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
+    ctx.restore();
+    return canvas;
+  };
+
   // Scan a photo taken from native camera (file input fallback)
-  // Uses canvas-based decoding to avoid ZXing's internal URL/image loading,
-  // which hangs indefinitely in some browsers (FAB AdBlocker, etc.)
   const handlePhotoCapture = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setPhotoError("");
     setCameraState("scanning-photo");
-
     if (fileInputRef.current) fileInputRef.current.value = "";
 
     try {
-      // Step 1: Load image into a bitmap via FileReader (works in all browsers)
-      const arrayBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
-        const fr = new FileReader();
-        fr.onload = () => resolve(fr.result as ArrayBuffer);
-        fr.onerror = () => reject(new Error("read"));
-        fr.readAsArrayBuffer(file);
-      });
-
-      const blob = new Blob([arrayBuffer], { type: file.type });
-      const objectUrl = URL.createObjectURL(blob);
-
-      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-        const el = new Image();
-        el.onload = () => resolve(el);
-        el.onerror = () => reject(new Error("load"));
-        el.src = objectUrl;
-      });
-      URL.revokeObjectURL(objectUrl);
-
-      // Step 2: Draw image onto an offscreen canvas
-      const canvas = document.createElement("canvas");
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext("2d")!;
-      ctx.drawImage(img, 0, 0);
-
-      // Step 3: Decode synchronously from canvas — cannot hang
+      const img = await loadImageFromFile(file);
       const reader = new BrowserMultiFormatReader();
-      const decodeResult = (reader as any).decodeFromCanvas(canvas);
-      const upc = decodeResult.getText();
-      handleDetected(upc);
-    } catch (err: any) {
-      setPhotoError(
-        "No barcode found. Make sure the barcode fills most of the frame and is well-lit, then try again."
-      );
+
+      // Try all 4 rotations — barcodes photographed sideways are common
+      const rotations: Array<0 | 90 | 180 | 270> = [0, 90, 270, 180];
+      let upc: string | null = null;
+
+      for (const rotation of rotations) {
+        try {
+          const canvas = drawToCanvas(img, rotation);
+          const result = (reader as any).decodeFromCanvas(canvas);
+          upc = result.getText();
+          break;
+        } catch {
+          // Try next rotation
+        }
+      }
+
+      if (upc) {
+        handleDetected(upc);
+      } else {
+        throw new Error("not-found");
+      }
+    } catch {
+      setPhotoError("No barcode found. Point camera directly at the barcode and take the photo.");
       setCameraState("denied");
     }
   }, [handleDetected]);
