@@ -129,23 +129,29 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
     const objectUrl = URL.createObjectURL(file);
     try {
-      const img = new Image();
-      img.src = objectUrl;
-      await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve();
-        img.onerror = () => reject(new Error("load"));
-      });
-
       const reader = new BrowserMultiFormatReader();
-      const decodeResult = await (reader as any).decodeFromImageElement(img);
+
+      // decodeFromImageUrl is the correct static-image method; wrap in a timeout
+      // so it cannot hang forever if ZXing stalls on a bad image
+      const decodeResult = await Promise.race([
+        reader.decodeFromImageUrl(objectUrl),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("timeout")), 12000)
+        ),
+      ]);
+
       const upc = decodeResult.getText();
       handleDetected(upc);
-    } catch {
-      setPhotoError("No barcode found in photo. Try again with better lighting and hold steady.");
+    } catch (err: any) {
+      const isTimeout = err?.message === "timeout";
+      setPhotoError(
+        isTimeout
+          ? "Scan timed out — make sure the barcode is clear and well-lit, then try again."
+          : "No barcode found in photo. Hold the camera steady and make sure the barcode fills the frame."
+      );
       setCameraState("denied");
     } finally {
       URL.revokeObjectURL(objectUrl);
-      // Reset file input so same file can be re-selected
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }, [handleDetected]);
