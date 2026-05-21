@@ -108,8 +108,12 @@ function Router() {
           <Route path="/support" component={Support} />
           <Route path="/apply" component={Apply} />
           <Route path="/about" component={About} />
-          <Route path="/store" component={Supplies} />
+          <Route path="/store" component={Home} />
+          <Route path="/pets" component={Pets} />
           <Route path="/supplies" component={Supplies} />
+          <Route path="/supplies/:id" component={SupplyDetail} />
+          <Route path="/aquatics" component={Aquatics} />
+          <Route path="/reptiles" component={Reptiles} />
           
           {!isAuthenticated ? (
             <>
