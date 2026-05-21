@@ -15298,19 +15298,31 @@ function SpecialMultiImageUpload({
         onDrop={(e) => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files?.[0]; if (f) handleFileUpload(f); }}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
-        onClick={() => { setPasteReady(true); fileInputRef.current?.click(); }}
+        onClick={() => { if (!pasteReady) setPasteReady(true); }}
       >
         {pasteReady ? (
-          <><ClipboardPaste className="w-8 h-8 text-green-600 mx-auto mb-2 animate-pulse" /><p className="text-sm text-green-700 font-medium">Ready — paste (Ctrl+V), drop, or browse</p><p className="text-xs text-green-600 mt-1">Press Escape to cancel</p></>
+          <div onClick={(e) => e.stopPropagation()}>
+            <ClipboardPaste className="w-8 h-8 text-green-600 mx-auto mb-2 animate-pulse" />
+            <p className="text-sm text-green-700 font-medium">Paste (Ctrl+V) or drop an image</p>
+            <p className="text-xs text-green-600 mt-1">
+              Press Escape to cancel •{' '}
+              <span className="underline cursor-pointer" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}>Browse files</span>
+            </p>
+          </div>
         ) : (
-          <><Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" /><p className="text-sm text-gray-500">{allImages.length === 0 ? 'Add main image' : 'Add another image'}</p><p className="text-xs text-gray-400 mt-1">Click to browse, drag & drop, or paste</p></>
+          <><Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" /><p className="text-sm text-gray-500">{allImages.length === 0 ? 'Add main image' : 'Add another image'}</p><p className="text-xs text-gray-400 mt-1">Click to activate paste · drag &amp; drop · or browse below</p></>
         )}
       </div>
       <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileUpload(f); e.target.value = ''; }} className="hidden" />
       {uploading && <div className="flex items-center justify-center gap-2 text-sm text-blue-600"><Loader2 className="w-4 h-4 animate-spin" />Uploading...</div>}
+      {!pasteReady && !uploading && (
+        <Button type="button" variant="outline" className="w-full" onClick={() => fileInputRef.current?.click()}>
+          <Upload className="w-4 h-4 mr-2" />Browse files
+        </Button>
+      )}
       <div className="flex gap-2">
-        <Input placeholder="Or paste image URL here..." value={urlInput} onChange={(e) => setUrlInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addImageUrl(urlInput); } }} />
-        <Button type="button" variant="outline" onClick={() => addImageUrl(urlInput)} disabled={!urlInput.trim()}>Add</Button>
+        <Input placeholder="Paste image URL here..." value={urlInput} onChange={(e) => setUrlInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addImageUrl(urlInput); } }} />
+        <Button type="button" variant="outline" onClick={() => addImageUrl(urlInput)} disabled={!urlInput.trim()}>Add URL</Button>
       </div>
     </div>
   );
