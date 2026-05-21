@@ -7532,9 +7532,11 @@ export default function Admin() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pending-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/orders-with-items"] });
       toast({
-        title: "Success",
-        description: "Order deleted successfully",
+        title: "Order Deleted",
+        description: "Order has been permanently removed.",
       });
     },
     onError: (error: any) => {
@@ -9990,6 +9992,23 @@ export default function Admin() {
                                         Mark Picked Up
                                       </Button>
                                     )}
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="border-red-400 text-red-600 hover:bg-red-50"
+                                      onClick={() => showDeleteConfirmation(
+                                        'Delete Order',
+                                        `Are you sure you'd like to delete Order #${order.id} for ${order.customerName || 'this customer'}? This will permanently remove it from all order history and cannot be undone.`,
+                                        `Order #${order.id} — $${parseFloat(order.totalAmount || 0).toFixed(2)}`,
+                                        () => deleteOrderMutation.mutate(order.id),
+                                        'Delete Order',
+                                        'destructive'
+                                      )}
+                                      disabled={deleteOrderMutation.isPending}
+                                    >
+                                      <Trash2 className="w-3 h-3 mr-1" />
+                                      Delete
+                                    </Button>
                                   </div>
                                 </div>
                               </div>
