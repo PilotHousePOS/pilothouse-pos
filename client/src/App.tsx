@@ -109,6 +109,7 @@ function Router() {
           <Route path="/apply" component={Apply} />
           <Route path="/about" component={About} />
           <Route path="/store" component={Supplies} />
+          <Route path="/supplies" component={Supplies} />
           
           {!isAuthenticated ? (
             <>
