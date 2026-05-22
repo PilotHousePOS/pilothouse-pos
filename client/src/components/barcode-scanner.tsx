@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { getProductImageUrl } from "@/lib/imageUrl";
 
-const SCANNER_VERSION = "v14";
+const SCANNER_VERSION = "v15";
 
 interface Product {
   id: number;
@@ -304,8 +304,8 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     );
   }
 
-  // ── Home / Denied screen ──
-  if ((cameraState === "home" || cameraState === "denied") && !manualMode && !result) {
+  // ── Home / Denied / Result screen ──
+  if ((cameraState === "home" || cameraState === "denied") && !manualMode) {
     return (
       <div className="fixed inset-0 z-50 bg-black flex flex-col">
         <input
@@ -318,61 +318,67 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
         />
         <Header title="Scanner" />
 
-        <div className="flex-1 flex flex-col items-center justify-center px-6 gap-5">
-          <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center">
-            <Camera className="w-10 h-10 text-white/70" />
-          </div>
-
-          <div className="text-center">
-            <p className="text-white text-xl font-bold mb-1">Scan a Barcode</p>
-            <p className="text-gray-400 text-sm">Take a photo of any product barcode</p>
-          </div>
-
-          {/* Photo error */}
-          {photoError && (
-            <div className="bg-orange-500/20 border border-orange-500/40 rounded-xl px-4 py-3 w-full">
-              <p className="text-orange-300 text-sm">{photoError}</p>
+        {result ? (
+          /* ── Result card ── */
+          <div className="flex-1 bg-white flex flex-col">
+            <div className="px-4 pt-6 pb-4 flex gap-4">
+              {imageUrl
+                ? <img src={imageUrl} alt={result.name} className="w-24 h-24 object-contain rounded-xl border border-gray-100 flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                : <div className="w-24 h-24 bg-gray-100 rounded-xl flex-shrink-0" />
+              }
+              <div className="flex-1 min-w-0 pt-1">
+                <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1">{result.brand || ""}</p>
+                <p className="text-base font-bold text-gray-900 leading-snug">{result.name}</p>
+                <p className="text-2xl font-bold text-[#0071CE] mt-2">${parseFloat(result.price).toFixed(2)}</p>
+              </div>
             </div>
-          )}
-
-          {/* Camera error details */}
-          {cameraState === "denied" && cameraError && (
-            <div className="bg-red-500/15 border border-red-500/30 rounded-xl px-4 py-3 w-full">
-              <p className="text-red-300 text-xs font-mono break-all">{cameraError}</p>
+            <div className="px-4 pb-6 flex gap-2">
+              <Button variant="outline" className="flex-1" onClick={handleScanAgain}>Scan Again</Button>
+              <Button variant="outline" className="flex-1" onClick={handleViewProduct}>View Item</Button>
+              <Button className="flex-1 bg-[#0071CE] hover:bg-[#0058a3] text-white" onClick={() => addToCartMutation.mutate()} disabled={addToCartMutation.isPending}>Add to Cart</Button>
             </div>
-          )}
-
-          {/* Primary: Photo */}
-          <div className="flex flex-col gap-3 w-full">
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
-            >
-              <Image className="w-5 h-5" />
-              Take Photo to Scan
-            </button>
-
-            <button
-              onClick={requestCamera}
-              className="w-full bg-white/10 text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-white/20"
-            >
-              <Camera className="w-5 h-5" />
-              Try Live Camera
-            </button>
-
-            <button
-              onClick={() => setManualMode(true)}
-              className="w-full bg-transparent border border-white/25 text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-white/10"
-            >
-              <Keyboard className="w-5 h-5" />
-              Type Barcode Instead
-            </button>
           </div>
+        ) : (
+          /* ── Scan prompt ── */
+          <div className="flex-1 flex flex-col items-center justify-center px-6 gap-5">
+            <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center">
+              <Camera className="w-10 h-10 text-white/70" />
+            </div>
 
-          <p className="text-gray-600 text-xs text-center">
-            Point camera at the barcode, hold steady, then tap the shutter
-          </p>
-        </div>
+            <div className="text-center">
+              <p className="text-white text-xl font-bold mb-1">Scan a Barcode</p>
+              <p className="text-gray-400 text-sm">Take a photo of any product barcode</p>
+            </div>
+
+            {photoError && (
+              <div className="bg-orange-500/20 border border-orange-500/40 rounded-xl px-4 py-3 w-full">
+                <p className="text-orange-300 text-sm">{photoError}</p>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-3 w-full">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
+              >
+                <Image className="w-5 h-5" />
+                Take Photo to Scan
+              </button>
+
+              <button
+                onClick={() => setManualMode(true)}
+                className="w-full bg-transparent border border-white/25 text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-white/10"
+              >
+                <Keyboard className="w-5 h-5" />
+                Type Barcode Instead
+              </button>
+            </div>
+
+            <p className="text-gray-600 text-xs text-center">
+              Point camera at the barcode, hold steady, then tap the shutter
+            </p>
+          </div>
+        )}
       </div>
     );
   }
@@ -430,8 +436,9 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     );
   }
 
-  // ── Live scanner ──
-  return (
+  // ── Live scanner (only when camera is actually running) ──
+  if (cameraState === "live") {
+    return (
     <div className="fixed inset-0 z-50 bg-black flex flex-col">
       <div className="flex items-center justify-between px-4 pt-4 pb-3 bg-[#0071CE] z-10">
         <button onClick={onClose} className="text-white p-1"><X className="w-6 h-6" /></button>
@@ -447,18 +454,6 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
           </button>
         </div>
       </div>
-
-      {manualMode && (
-        <div className="bg-white px-4 py-4 flex gap-2">
-          <input
-            autoFocus type="number" inputMode="numeric" placeholder="Enter UPC number..."
-            value={manualUpc} onChange={e => setManualUpc(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && handleManualSubmit()}
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-[#0071CE]"
-          />
-          <Button onClick={handleManualSubmit} disabled={lookupMutation.isPending} className="bg-[#0071CE] hover:bg-[#0058a3] text-white">Search</Button>
-        </div>
-      )}
 
       <div className="relative flex-1 overflow-hidden">
         <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
@@ -515,4 +510,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
       `}</style>
     </div>
   );
+  }
+
+  return null;
 }
