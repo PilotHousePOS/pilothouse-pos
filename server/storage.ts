@@ -302,6 +302,7 @@ export interface IStorage {
 
   // Appointment items
   getAppointmentItems(appointmentId: number): Promise<any[]>;
+  getAppointmentItemsBulk(appointmentIds: number[]): Promise<any[]>;
   addAppointmentItem(data: { appointmentId: number; supplyId?: number | null; name: string; sku?: string | null; brand?: string | null; category?: string | null; price: string; quantity: number }): Promise<any>;
   removeAppointmentItem(id: number): Promise<void>;
   getAppointmentItemsByDate(date: string): Promise<any[]>;
@@ -2833,6 +2834,13 @@ export class DatabaseStorage implements IStorage {
 
   async getAppointmentItems(appointmentId: number): Promise<any[]> {
     return db.select().from(appointmentItems).where(eq(appointmentItems.appointmentId, appointmentId)).orderBy(asc(appointmentItems.createdAt));
+  }
+
+  async getAppointmentItemsBulk(appointmentIds: number[]): Promise<any[]> {
+    if (appointmentIds.length === 0) return [];
+    return db.select().from(appointmentItems)
+      .where(inArray(appointmentItems.appointmentId, appointmentIds))
+      .orderBy(asc(appointmentItems.createdAt));
   }
 
   async addAppointmentItem(data: { appointmentId: number; supplyId?: number | null; name: string; sku?: string | null; brand?: string | null; category?: string | null; price: string; quantity: number }): Promise<any> {

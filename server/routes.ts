@@ -4283,6 +4283,14 @@ West Monroe LA 71291
         }
       }
       
+      // Fetch all items for these appointments in one bulk query
+      const allItems = await storage.getAppointmentItemsBulk(appointmentIds);
+      const itemsByApptId = new Map<number, any[]>();
+      for (const item of allItems) {
+        if (!itemsByApptId.has(item.appointmentId)) itemsByApptId.set(item.appointmentId, []);
+        itemsByApptId.get(item.appointmentId)!.push(item);
+      }
+
       const appointmentsWithPets = filteredAppointments.map((apt: any) => {
         let pets = petsByAppointmentId.get(apt.id);
         
@@ -4316,11 +4324,16 @@ West Monroe LA 71291
             }
           }
         }
+
+        const items = itemsByApptId.get(apt.id) || [];
+        const itemsTotal = items.reduce((sum: number, it: any) => sum + parseFloat(it.price) * it.quantity, 0);
         
         return {
           ...apt,
           pets,
-          contactNotes
+          contactNotes,
+          items,
+          itemsTotal: itemsTotal > 0 ? itemsTotal.toFixed(2) : null,
         };
       });
       

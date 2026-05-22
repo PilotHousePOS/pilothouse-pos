@@ -4127,6 +4127,7 @@ function EditAppointmentDialog({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/appointments", appointmentId, "items"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       setItemSearch('');
       setItemSearchResults([]);
     },
@@ -4137,7 +4138,10 @@ function EditAppointmentDialog({
     mutationFn: async (itemId: number) => {
       return apiRequest("DELETE", `/api/appointments/${appointmentId}/items/${itemId}`, {});
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/appointments", appointmentId, "items"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments", appointmentId, "items"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+    },
     onError: () => toast({ title: "Error", description: "Failed to remove item.", variant: "destructive" }),
   });
   
@@ -11224,6 +11228,9 @@ export default function Admin() {
                                 </p>
                               );
                             })()}
+                            {currentAppointment.itemsTotal && (
+                              <p className="text-xs text-blue-700 font-medium">+ Items: ${currentAppointment.itemsTotal}</p>
+                            )}
                             {(() => {
                               const groomerIdToShow = currentAppointment.groomerId || 
                                 (currentAppointment.pets && currentAppointment.pets[0]?.groomerId);
@@ -11633,6 +11640,9 @@ export default function Admin() {
                             Price: ${currentAppointment.price}
                           </p>
                         )}
+                        {currentAppointment.itemsTotal && (
+                          <p className="text-xs text-blue-700 font-medium">+ Items: ${currentAppointment.itemsTotal}</p>
+                        )}
                         <p className="text-xs text-purple-600 mt-1 font-medium">{hasMultiple ? 'Click purple badge to cycle through dates' : 'Click to view details'}</p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -11796,6 +11806,9 @@ export default function Admin() {
                                 <p className="text-xs text-green-700 font-medium mt-1">
                                   Price: ${currentAppointment.price}
                                 </p>
+                              )}
+                              {currentAppointment.itemsTotal && (
+                                <p className="text-xs text-blue-700 font-medium">+ Items: ${currentAppointment.itemsTotal}</p>
                               )}
                               <p className="text-xs text-purple-600 mt-0.5 font-medium">{hasMultiple ? 'Click purple badge to cycle through dates' : 'Click to view details'}</p>
                             </div>
@@ -14116,12 +14129,40 @@ export default function Admin() {
                   return (
                     <div className="border-t pt-3">
                       <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-                        <Label className="text-sm font-semibold text-green-800">Total Price</Label>
+                        <Label className="text-sm font-semibold text-green-800">Grooming Price</Label>
                         <p className="text-xl font-bold text-green-700">${selectedAppointment.price}</p>
                       </div>
                     </div>
                   );
                 })()}
+
+                {/* Items Sold section - for front desk POS lookup */}
+                {selectedAppointment.items && selectedAppointment.items.length > 0 && (
+                  <div className="border-t pt-3">
+                    <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                      <ShoppingCart className="w-4 h-4" />
+                      Items Sold ({selectedAppointment.items.length})
+                    </h4>
+                    <div className="space-y-2">
+                      {selectedAppointment.items.map((item: any) => (
+                        <div key={item.id} className="bg-blue-50 rounded-lg px-3 py-2 border border-blue-100">
+                          <p className="text-sm font-semibold text-gray-900">{item.name}</p>
+                          {item.sku && (
+                            <p className="text-xs text-gray-700 font-mono mt-0.5">UPC: {item.sku}</p>
+                          )}
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {item.brand ? `${item.brand} · ` : ''}Qty {item.quantity} × ${parseFloat(item.price).toFixed(2)} = ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                          </p>
+                        </div>
+                      ))}
+                      <div className="flex justify-between items-center pt-1 border-t border-blue-200">
+                        <span className="text-xs font-semibold text-gray-600">Items Total</span>
+                        <span className="text-sm font-bold text-blue-700">${selectedAppointment.itemsTotal}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="border-t pt-3">
                   <h4 className="font-semibold text-gray-900 mb-2">Owner Information</h4>
                   <div className="space-y-2">
