@@ -3978,6 +3978,7 @@ function EditAppointmentDialog({
   initialDate,
   initialTime,
   onClose,
+  onOpenScanner,
   groomers,
   isBookingDateAvailable,
   bookingAvailableTimeSlots
@@ -3989,6 +3990,7 @@ function EditAppointmentDialog({
   initialDate: Date | undefined;
   initialTime: string;
   onClose: () => void;
+  onOpenScanner: (cb: (upc: string) => void) => void;
   groomers: any[];
   isBookingDateAvailable: (date: Date) => boolean;
   bookingAvailableTimeSlots: string[];
@@ -4018,7 +4020,6 @@ function EditAppointmentDialog({
   const [itemSearch, setItemSearch] = useState('');
   const [itemSearchResults, setItemSearchResults] = useState<any[]>([]);
   const [itemSearching, setItemSearching] = useState(false);
-  const [showEditScanner, setShowEditScanner] = useState(false);
 
   // On mount, clear the stale cache for this appointment so we always load the
   // latest saved data (notes, prices, etc.) — not a cached copy from a previous open.
@@ -4574,7 +4575,27 @@ function EditAppointmentDialog({
             <Button
               size="sm"
               variant="outline"
-              onClick={() => setShowEditScanner(true)}
+              onClick={() => onOpenScanner(async (upc: string) => {
+                try {
+                  const res = await fetch(`/api/supplies/by-upc/${upc}`, { credentials: 'include' });
+                  if (!res.ok) {
+                    toast({ title: "Not Found", description: `No product found for UPC ${upc}`, variant: "destructive" });
+                    return;
+                  }
+                  const s = await res.json();
+                  addEditItemMutation.mutate({
+                    supplyId: s.id,
+                    name: s.name,
+                    sku: s.sku || upc,
+                    brand: s.brand || null,
+                    category: s.category || null,
+                    price: String(s.price || '0'),
+                    quantity: 1,
+                  });
+                } catch {
+                  toast({ title: "Error", description: "Failed to look up barcode.", variant: "destructive" });
+                }
+              })}
               title="Scan barcode"
               className="px-3"
             >
@@ -4646,34 +4667,6 @@ function EditAppointmentDialog({
             <p className="text-xs text-gray-400 italic">No items added yet.</p>
           )}
 
-          {/* Barcode scanner overlay */}
-          {showEditScanner && (
-            <BarcodeScanner
-              onClose={() => setShowEditScanner(false)}
-              onDetected={async (upc: string) => {
-                setShowEditScanner(false);
-                try {
-                  const res = await fetch(`/api/supplies/by-upc/${upc}`, { credentials: 'include' });
-                  if (!res.ok) {
-                    toast({ title: "Not Found", description: `No product found for UPC ${upc}`, variant: "destructive" });
-                    return;
-                  }
-                  const s = await res.json();
-                  addEditItemMutation.mutate({
-                    supplyId: s.id,
-                    name: s.name,
-                    sku: s.sku || upc,
-                    brand: s.brand || null,
-                    category: s.category || null,
-                    price: String(s.price || '0'),
-                    quantity: 1,
-                  });
-                } catch {
-                  toast({ title: "Error", description: "Failed to look up barcode.", variant: "destructive" });
-                }
-              }}
-            />
-          )}
         </div>
         
         {/* Action Buttons */}
@@ -6723,7 +6716,8 @@ export default function Admin() {
   const [editPets, setEditPets] = useState<any[]>([]);
   const [editPricingMode, setEditPricingMode] = useState<'individual' | 'override'>('individual');
   const [editTotalPriceOverride, setEditTotalPriceOverride] = useState('');
-  
+  const [editApptScannerCb, setEditApptScannerCb] = useState<((upc: string) => void) | null>(null);
+
   // Legacy single-pet editing state (kept for backward compatibility)
   const [editNotes, setEditNotes] = useState('');
   const [editPrice, setEditPrice] = useState('');
@@ -14290,9 +14284,22 @@ export default function Admin() {
             setEditDate(undefined);
             setEditTime('');
           }}
+          onOpenScanner={(cb) => setEditApptScannerCb(() => cb)}
           groomers={groomers}
           isBookingDateAvailable={isBookingDateAvailable}
           bookingAvailableTimeSlots={bookingAvailableTimeSlots}
+        />
+      )}
+
+      {/* Appointment items barcode scanner — rendered outside all dialogs so Radix/scroll-lock cannot block it */}
+      {editApptScannerCb && (
+        <BarcodeScanner
+          onClose={() => setEditApptScannerCb(null)}
+          onDetected={(upc) => {
+            const cb = editApptScannerCb;
+            setEditApptScannerCb(null);
+            cb(upc);
+          }}
         />
       )}
 
