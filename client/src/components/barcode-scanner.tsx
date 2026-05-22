@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { getProductImageUrl } from "@/lib/imageUrl";
 
 const SCANNER_VERSION = "v14";
 
@@ -264,7 +265,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     },
   });
 
-  const imageUrl = result?.imageUrls?.[0] || null;
+  const imageUrl = getProductImageUrl(result?.imageUrls?.[0]);
 
   const Header = ({ title }: { title: string }) => (
     <div className="flex items-center justify-between px-4 pt-4 pb-3 bg-[#0071CE]">
@@ -407,7 +408,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
             <div className="px-4 pb-8">
               <div className="flex gap-3 mb-4">
                 {imageUrl
-                  ? <img src={imageUrl} alt={result.name} className="w-20 h-20 object-contain rounded-lg border border-gray-100 flex-shrink-0" />
+                  ? <img src={imageUrl} alt={result.name} className="w-20 h-20 object-contain rounded-lg border border-gray-100 flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                   : <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0" />
                 }
                 <div className="flex-1 min-w-0">
@@ -488,7 +489,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
           <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
           <div className="flex gap-3 mb-4">
             {imageUrl
-              ? <img src={imageUrl} alt={result.name} className="w-20 h-20 object-contain rounded-lg border border-gray-100 flex-shrink-0" />
+              ? <img src={imageUrl} alt={result.name} className="w-20 h-20 object-contain rounded-lg border border-gray-100 flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
               : <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0" />
             }
             <div className="flex-1 min-w-0">
