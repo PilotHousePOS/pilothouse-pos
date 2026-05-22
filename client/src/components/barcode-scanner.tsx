@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { BrowserMultiFormatReader } from "@zxing/browser";
-import { X, Flashlight, FlashlightOff, Keyboard, Camera } from "lucide-react";
+import { X, Flashlight, FlashlightOff, Keyboard, Camera, Image } from "lucide-react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+
+const SCANNER_VERSION = "v11";
 
 interface Product {
   id: number;
@@ -22,7 +24,7 @@ interface BarcodeScannerProps {
   onDetected?: (upc: string) => void;
 }
 
-type CameraState = "prompt" | "starting" | "live" | "denied" | "scanning-photo";
+type CameraState = "home" | "starting" | "live" | "denied" | "scanning-photo";
 
 export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -31,7 +33,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const [cameraState, setCameraState] = useState<CameraState>("starting");
+  const [cameraState, setCameraState] = useState<CameraState>("home");
   const [manualMode, setManualMode] = useState(false);
   const [manualUpc, setManualUpc] = useState("");
   const [torchOn, setTorchOn] = useState(false);
@@ -43,29 +45,6 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const [lastScanned, setLastScanned] = useState("");
   const streamRef = useRef<MediaStream | null>(null);
   const cooldownRef = useRef(false);
-
-  // On mount: check real permission state so we skip the prompt if already granted/denied
-  useEffect(() => {
-    let cancelled = false;
-    navigator.permissions.query({ name: "camera" as PermissionName }).then((status) => {
-      if (cancelled) return;
-      if (status.state === "granted") {
-        // Already allowed — start camera immediately, no prompt needed
-        requestCamera();
-      } else if (status.state === "denied") {
-        setCameraError("DENIED");
-        setCameraState("denied");
-      } else {
-        // "prompt" — show the allow/deny screen
-        setCameraState("prompt");
-      }
-    }).catch(() => {
-      // permissions API not supported — just show the prompt screen
-      if (!cancelled) setCameraState("prompt");
-    });
-    return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Cleanup camera on unmount
   useEffect(() => {
@@ -103,19 +82,16 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     lookupMutation.mutate(upc);
   }, [lastScanned, lookupMutation, onDetected]);
 
-  // Try to get a camera stream with progressively simpler constraints
+  // Try camera with progressively simpler constraints
   const getStream = async (): Promise<MediaStream> => {
-    // Try 1: back camera with ideal resolution
     try {
       return await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
       });
     } catch {}
-    // Try 2: any back camera
     try {
       return await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
     } catch {}
-    // Try 3: any camera at all
     return await navigator.mediaDevices.getUserMedia({ video: true });
   };
 
@@ -124,36 +100,22 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     setCameraError("");
     try {
       const stream = await getStream();
-
       streamRef.current = stream;
       if (videoRef.current) videoRef.current.srcObject = stream;
-
       const track = stream.getVideoTracks()[0];
       const caps = track.getCapabilities?.() as any;
       if (caps?.torch) setTorchSupported(true);
-
       const reader = new BrowserMultiFormatReader();
       readerRef.current = reader;
       reader.decodeFromStream(stream, videoRef.current!, (res) => {
         if (res) handleDetected(res.getText());
       });
-
       setCameraState("live");
     } catch (err: any) {
       const name = err?.name || "Unknown";
       const msg = err?.message || "";
-      console.error("Camera error:", name, msg);
-      if (name === "NotAllowedError" || name === "PermissionDeniedError") {
-        setCameraError("DENIED");
-      } else if (name === "NotFoundError" || name === "DevicesNotFoundError") {
-        setCameraError("No camera found on this device.");
-      } else if (name === "NotReadableError" || name === "TrackStartError") {
-        setCameraError(`Camera busy: ${msg}`);
-      } else if (name === "OverconstrainedError") {
-        setCameraError(`Camera constraints failed: ${msg}`);
-      } else {
-        setCameraError(`${name}: ${msg}`);
-      }
+      console.error("[Scanner] Camera error:", name, msg);
+      setCameraError(`${name}: ${msg}`);
       setCameraState("denied");
     }
   }, [handleDetected]);
@@ -183,6 +145,9 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     setNotFound(false);
     setLastScanned("");
     cooldownRef.current = false;
+    setPhotoError("");
+    setCameraError("");
+    setCameraState("home");
   };
 
   const handlePhotoCapture = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -192,78 +157,80 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     setCameraState("scanning-photo");
     if (fileInputRef.current) fileInputRef.current.value = "";
 
-    // Wrap entire scan in a 12-second timeout so it can never hang
-    const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 12000));
+    const withTimeout = <T,>(p: Promise<T>, ms: number): Promise<T | null> =>
+      Promise.race([p, new Promise<null>(r => setTimeout(() => r(null), ms))]);
 
-    const scan = async (): Promise<string | null> => {
-      // ── Method 1: Native BarcodeDetector (Chrome on Android — most reliable) ──
-      if ("BarcodeDetector" in window) {
-        try {
-          const bd = new (window as any).BarcodeDetector({
-            formats: ["upc_a", "upc_e", "ean_13", "ean_8", "code_128", "code_39", "qr_code", "itf", "codabar"],
-          });
-          const bitmap = await createImageBitmap(file);
-          const barcodes = await bd.detect(bitmap);
-          bitmap.close();
-          if (barcodes.length > 0) return barcodes[0].rawValue;
-        } catch (err) {
-          console.warn("BarcodeDetector failed:", err);
-        }
-      }
+    let upc: string | null = null;
 
-      // ── Method 2: ZXing via blob URL ──
-      const objectUrl = URL.createObjectURL(file);
+    // Method 1: Native BarcodeDetector (Chrome Android — fastest and most accurate)
+    if ("BarcodeDetector" in window) {
       try {
-        const reader = new BrowserMultiFormatReader();
-        const res = await (reader as any).decodeFromImageUrl(objectUrl);
-        return res.getText();
-      } catch {
-        // fall through
-      } finally {
-        URL.revokeObjectURL(objectUrl);
-      }
-
-      // ── Method 3: ZXing canvas with 4 rotations ──
-      try {
-        const bitmap = await createImageBitmap(file);
-        const MAX = 1920;
-        const scale = Math.min(1, MAX / Math.max(bitmap.width, bitmap.height));
-        const w = Math.round(bitmap.width * scale);
-        const h = Math.round(bitmap.height * scale);
-        const reader = new BrowserMultiFormatReader();
-        for (const deg of [0, 90, 270, 180] as const) {
-          try {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d")!;
-            if (deg === 0 || deg === 180) { canvas.width = w; canvas.height = h; }
-            else { canvas.width = h; canvas.height = w; }
-            ctx.save();
-            ctx.translate(canvas.width / 2, canvas.height / 2);
-            ctx.rotate((deg * Math.PI) / 180);
-            ctx.drawImage(bitmap, -w / 2, -h / 2, w, h);
-            ctx.restore();
-            const res = (reader as any).decodeFromCanvas(canvas);
-            bitmap.close();
-            return res.getText();
-          } catch { /* try next rotation */ }
-        }
-        bitmap.close();
+        const bd = new (window as any).BarcodeDetector({
+          formats: ["upc_a", "upc_e", "ean_13", "ean_8", "code_128", "code_39", "qr_code", "itf", "codabar"],
+        });
+        const result = await withTimeout(
+          createImageBitmap(file).then(bitmap => {
+            const det = bd.detect(bitmap).then((b: any[]) => {
+              bitmap.close();
+              return b.length > 0 ? b[0].rawValue : null;
+            });
+            return det;
+          }),
+          6000
+        );
+        if (result) upc = result;
       } catch (err) {
-        console.warn("Canvas fallback failed:", err);
+        console.warn("[Scanner] BarcodeDetector failed:", err);
       }
+    }
 
-      return null;
-    };
-
-    const upc = await Promise.race([scan(), timeout]);
+    // Method 2: ZXing via canvas (draw image to canvas, then decode)
+    if (!upc) {
+      try {
+        const imgEl = await withTimeout(
+          new Promise<HTMLImageElement>((resolve, reject) => {
+            const url = URL.createObjectURL(file);
+            const img = new Image();
+            img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+            img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("img-load")); };
+            img.src = url;
+          }),
+          5000
+        );
+        if (imgEl) {
+          const MAX = 1920;
+          const sw = imgEl.naturalWidth, sh = imgEl.naturalHeight;
+          const scale = Math.min(1, MAX / Math.max(sw, sh));
+          const dw = Math.round(sw * scale), dh = Math.round(sh * scale);
+          const reader = new BrowserMultiFormatReader();
+          for (const deg of [0, 90, 270, 180] as const) {
+            try {
+              const canvas = document.createElement("canvas");
+              const ctx = canvas.getContext("2d")!;
+              if (deg === 0 || deg === 180) { canvas.width = dw; canvas.height = dh; }
+              else { canvas.width = dh; canvas.height = dw; }
+              ctx.save();
+              ctx.translate(canvas.width / 2, canvas.height / 2);
+              ctx.rotate((deg * Math.PI) / 180);
+              ctx.drawImage(imgEl, -dw / 2, -dh / 2, dw, dh);
+              ctx.restore();
+              const res = (reader as any).decodeFromCanvas(canvas);
+              upc = res.getText();
+              break;
+            } catch { /* try next rotation */ }
+          }
+        }
+      } catch (err) {
+        console.warn("[Scanner] Canvas decode failed:", err);
+      }
+    }
 
     if (upc) {
       handleDetected(upc);
-      // If onDetected prop is used (e.g. appointment items), reset state so spinner clears
-      if (onDetected) setCameraState("prompt");
+      if (onDetected) setCameraState("home");
     } else {
-      setPhotoError("No barcode detected. Make sure the entire barcode is visible and in focus.");
-      setCameraState("denied");
+      setPhotoError("No barcode found. Make sure the barcode fills the frame and is in focus, then try again.");
+      setCameraState("home");
     }
   }, [handleDetected, onDetected]);
 
@@ -283,62 +250,33 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
   const imageUrl = result?.imageUrls?.[0] || null;
 
-  // ── Walmart-style permission prompt ──
-  if (cameraState === "prompt") {
+  const Header = ({ title }: { title: string }) => (
+    <div className="flex items-center justify-between px-4 pt-4 pb-3 bg-[#0071CE]">
+      <button onClick={onClose} className="text-white p-1"><X className="w-6 h-6" /></button>
+      <span className="text-white font-semibold text-base">{title}</span>
+      <span className="text-white/40 text-xs">{SCANNER_VERSION}</span>
+    </div>
+  );
+
+  // ── Scanning photo spinner ──
+  if (cameraState === "scanning-photo") {
     return (
       <div className="fixed inset-0 z-50 bg-black flex flex-col">
-        <div className="flex items-center justify-between px-4 pt-4 pb-3 bg-[#0071CE]">
-          <button onClick={onClose} className="text-white p-1"><X className="w-6 h-6" /></button>
-          <span className="text-white font-semibold text-base">Scanner</span>
-          <div className="w-6" />
-        </div>
-
-        <div className="flex-1 bg-black/80 flex items-end justify-center">
-          <div className="w-full bg-[#1c1c1e] rounded-t-3xl px-6 pt-8 pb-12 flex flex-col items-center gap-5 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-[#0071CE]/20 flex items-center justify-center">
-              <Camera className="w-9 h-9 text-[#0071CE]" />
-            </div>
-            <div>
-              <p className="text-white text-lg font-semibold mb-1">
-                Allow <span className="font-bold">Animal House</span> to access your camera?
-              </p>
-              <p className="text-gray-400 text-sm">Used to scan barcodes and find products instantly.</p>
-            </div>
-            <div className="w-full flex flex-col mt-1">
-              <button
-                onClick={requestCamera}
-                className="w-full py-4 text-base font-semibold text-white border-b border-white/10 active:bg-white/10"
-              >
-                While using the app
-              </button>
-              <button
-                onClick={requestCamera}
-                className="w-full py-4 text-base font-semibold text-white border-b border-white/10 active:bg-white/10"
-              >
-                Only this time
-              </button>
-              <button
-                onClick={onClose}
-                className="w-full py-4 text-base font-semibold text-red-400 active:bg-white/10"
-              >
-                Don't allow
-              </button>
-            </div>
-          </div>
+        <Header title="Scanner" />
+        <div className="flex-1 flex flex-col items-center justify-center gap-4">
+          <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+          <p className="text-white text-lg font-semibold">Scanning barcode…</p>
+          <p className="text-white/40 text-sm">This may take a few seconds</p>
         </div>
       </div>
     );
   }
 
-  // ── Starting spinner ──
+  // ── Camera starting spinner ──
   if (cameraState === "starting") {
     return (
       <div className="fixed inset-0 z-50 bg-black flex flex-col">
-        <div className="flex items-center justify-between px-4 pt-4 pb-3 bg-[#0071CE]">
-          <button onClick={onClose} className="text-white p-1"><X className="w-6 h-6" /></button>
-          <span className="text-white font-semibold text-base">Scanner</span>
-          <div className="w-6" />
-        </div>
+        <Header title="Scanner" />
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
             <div className="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin" />
@@ -349,8 +287,8 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     );
   }
 
-  // ── Denied / photo fallback ──
-  if ((cameraState === "denied" || cameraState === "scanning-photo") && !manualMode && !result) {
+  // ── Home / Denied screen ──
+  if ((cameraState === "home" || cameraState === "denied") && !manualMode && !result) {
     return (
       <div className="fixed inset-0 z-50 bg-black flex flex-col">
         <input
@@ -361,83 +299,62 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
           className="hidden"
           onChange={handlePhotoCapture}
         />
-        <div className="flex items-center justify-between px-4 pt-4 pb-3 bg-[#0071CE]">
-          <button onClick={onClose} className="text-white p-1"><X className="w-6 h-6" /></button>
-          <span className="text-white font-semibold text-base">Scanner</span>
-          <div className="w-6" />
-        </div>
+        <Header title="Scanner" />
 
-        <div className="flex-1 flex flex-col items-center justify-center px-8 text-center gap-5">
-          {cameraState === "scanning-photo" ? (
-            <>
-              <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-              <p className="text-white text-lg font-semibold">Scanning photo…</p>
-            </>
-          ) : (
-            <>
-              <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center">
-                <Camera className="w-10 h-10 text-white/70" />
-              </div>
+        <div className="flex-1 flex flex-col items-center justify-center px-6 gap-5">
+          <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center">
+            <Camera className="w-10 h-10 text-white/70" />
+          </div>
 
-              {cameraError === "DENIED" ? (
-                <div className="w-full">
-                  <p className="text-white text-xl font-bold mb-3 text-center">Camera blocked in Chrome</p>
-                  <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-xl px-4 py-4 w-full text-left">
-                    <p className="text-yellow-300 text-sm font-semibold mb-3">Android permissions are on, but Chrome has its own separate camera block for this site. Fix it in Chrome:</p>
-                    <div className="space-y-1">
-                      <p className="text-yellow-100 text-sm">1. Open the <span className="font-bold">Chrome</span> app</p>
-                      <p className="text-yellow-100 text-sm">2. Go to <span className="font-bold">animalhouseexperience.replit.app</span></p>
-                      <p className="text-yellow-100 text-sm">3. Tap the <span className="font-bold">lock icon</span> in the address bar</p>
-                      <p className="text-yellow-100 text-sm">4. Tap <span className="font-bold">Site settings</span></p>
-                      <p className="text-yellow-100 text-sm">5. Tap <span className="font-bold">Camera → Allow</span></p>
-                      <p className="text-yellow-100 text-sm">6. Come back to the app and tap <span className="font-bold">Try Live Camera</span></p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <p className="text-white text-xl font-bold mb-2">Camera access needed</p>
-                  <p className="text-gray-400 text-sm leading-relaxed">
-                    Allow camera access for live scanning, or take a photo of the barcode instead.
-                  </p>
-                  {cameraError && (
-                    <div className="bg-red-500/20 border border-red-500/40 rounded-lg px-3 py-2 mt-2 w-full">
-                      <p className="text-red-300 text-xs font-mono break-all">{cameraError}</p>
-                    </div>
-                  )}
-                </div>
-              )}
+          <div className="text-center">
+            <p className="text-white text-xl font-bold mb-1">Scan a Barcode</p>
+            <p className="text-gray-400 text-sm">Take a photo of any product barcode</p>
+          </div>
 
-              {photoError && (
-                <div className="bg-red-500/20 border border-red-500/40 rounded-xl px-4 py-3 w-full">
-                  <p className="text-red-300 text-sm">{photoError}</p>
-                </div>
-              )}
-              <div className="flex flex-col gap-3 w-full mt-2">
-                <button
-                  onClick={requestCamera}
-                  className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
-                >
-                  <Camera className="w-5 h-5" />
-                  Try Live Camera
-                </button>
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full bg-white/10 text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-white/20"
-                >
-                  <Camera className="w-5 h-5" />
-                  Take a Photo to Scan
-                </button>
-                <button
-                  onClick={() => setManualMode(true)}
-                  className="w-full bg-transparent border border-white/30 text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-white/10"
-                >
-                  <Keyboard className="w-5 h-5" />
-                  Type Barcode Instead
-                </button>
-              </div>
-            </>
+          {/* Photo error */}
+          {photoError && (
+            <div className="bg-orange-500/20 border border-orange-500/40 rounded-xl px-4 py-3 w-full">
+              <p className="text-orange-300 text-sm">{photoError}</p>
+            </div>
           )}
+
+          {/* Camera error details */}
+          {cameraState === "denied" && cameraError && (
+            <div className="bg-red-500/15 border border-red-500/30 rounded-xl px-4 py-3 w-full">
+              <p className="text-red-300 text-xs font-mono break-all">{cameraError}</p>
+            </div>
+          )}
+
+          {/* Primary: Photo */}
+          <div className="flex flex-col gap-3 w-full">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
+            >
+              <Image className="w-5 h-5" />
+              Take Photo to Scan
+            </button>
+
+            <button
+              onClick={requestCamera}
+              className="w-full bg-white/10 text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-white/20"
+            >
+              <Camera className="w-5 h-5" />
+              Try Live Camera
+            </button>
+
+            <button
+              onClick={() => setManualMode(true)}
+              className="w-full bg-transparent border border-white/25 text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-white/10"
+            >
+              <Keyboard className="w-5 h-5" />
+              Type Barcode Instead
+            </button>
+          </div>
+
+          <p className="text-gray-600 text-xs text-center">
+            Point camera at the barcode, hold steady, then tap the shutter
+          </p>
         </div>
       </div>
     );
@@ -447,11 +364,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   if (manualMode) {
     return (
       <div className="fixed inset-0 z-50 bg-black flex flex-col">
-        <div className="flex items-center justify-between px-4 pt-4 pb-3 bg-[#0071CE]">
-          <button onClick={onClose} className="text-white p-1"><X className="w-6 h-6" /></button>
-          <span className="text-white font-semibold text-base">Enter Barcode</span>
-          <div className="w-6" />
-        </div>
+        <Header title="Enter Barcode" />
         <div className="bg-white flex-1 flex flex-col">
           <div className="px-4 py-6 flex flex-col gap-4">
             <p className="text-gray-500 text-sm">Type or paste the UPC barcode number</p>
@@ -471,7 +384,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
               </Button>
             </div>
             <button onClick={() => setManualMode(false)} className="text-[#0071CE] text-sm underline text-left">
-              ← Back to camera
+              ← Back
             </button>
           </div>
           {result && (
@@ -494,6 +407,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
               </div>
             </div>
           )}
+          {notFound && <p className="px-4 text-red-500 text-sm">No product found for that barcode.</p>}
         </div>
       </div>
     );
@@ -501,8 +415,8 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
   // ── Live scanner ──
   return (
-    <div className="fixed inset-0 z-50 bg-black flex flex-col" style={{ maxWidth: "100vw" }}>
-      <div className="flex items-center justify-between px-4 pt-safe-top pt-4 pb-3 bg-[#0071CE] z-10">
+    <div className="fixed inset-0 z-50 bg-black flex flex-col">
+      <div className="flex items-center justify-between px-4 pt-4 pb-3 bg-[#0071CE] z-10">
         <button onClick={onClose} className="text-white p-1"><X className="w-6 h-6" /></button>
         <span className="text-white font-semibold text-base tracking-wide">Scanner</span>
         <div className="flex items-center gap-3">
@@ -516,10 +430,6 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
           </button>
         </div>
       </div>
-
-      <button onClick={() => setManualMode(m => !m)} className="w-full bg-white/10 text-white text-sm py-2 px-4 text-center active:bg-white/20">
-        Type your barcode
-      </button>
 
       {manualMode && (
         <div className="bg-white px-4 py-4 flex gap-2">
@@ -535,31 +445,24 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
       <div className="relative flex-1 overflow-hidden">
         <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
-
         <div className="absolute inset-0">
           <div className="absolute top-0 left-0 right-0 bg-black/55" style={{ height: "25%" }} />
           <div className="absolute bottom-0 left-0 right-0 bg-black/55" style={{ height: "35%" }} />
           <div className="absolute left-0 bg-black/55" style={{ top: "25%", height: "40%", width: "8%" }} />
           <div className="absolute right-0 bg-black/55" style={{ top: "25%", height: "40%", width: "8%" }} />
           <div className="absolute" style={{ top: "25%", left: "8%", right: "8%", height: "40%" }}>
-            {cameraState === "live" && !result && !notFound && (
-              <div className="absolute left-0 right-0 h-0.5 bg-[#0071CE]/80" style={{ animation: "scanline 2s ease-in-out infinite" }} />
-            )}
+            <div className="absolute left-0 right-0 h-0.5 bg-[#0071CE]/80" style={{ animation: "scanline 2s ease-in-out infinite" }} />
             <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl" />
             <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr" />
             <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl" />
             <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-1.5 h-1.5 rounded-full bg-white/60" />
-            </div>
           </div>
         </div>
-
         <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 z-10">
           {lookupMutation.isPending && <div className="bg-black/70 text-white px-4 py-2 rounded-full text-sm">Looking up product…</div>}
           {notFound && <div className="bg-red-600/90 text-white px-4 py-2 rounded-full text-sm font-medium">Product not found — try again</div>}
-          {cameraState === "live" && !result && !notFound && !lookupMutation.isPending && (
-            <div className="bg-black/60 text-white px-4 py-2 rounded-full text-sm">Scan barcodes, QR codes, and more</div>
+          {!result && !notFound && !lookupMutation.isPending && (
+            <div className="bg-black/60 text-white px-4 py-2 rounded-full text-sm">Aim at a barcode to scan</div>
           )}
         </div>
       </div>
@@ -570,7 +473,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
           <div className="flex gap-3 mb-4">
             {imageUrl
               ? <img src={imageUrl} alt={result.name} className="w-20 h-20 object-contain rounded-lg border border-gray-100 flex-shrink-0" />
-              : <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-400 text-xs">No image</div>
+              : <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0" />
             }
             <div className="flex-1 min-w-0">
               <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-0.5">{result.brand || ""}</p>
