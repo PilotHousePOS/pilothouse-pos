@@ -8,13 +8,14 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { getProductImageUrl } from "@/lib/imageUrl";
 
-const SCANNER_VERSION = "v15";
+const SCANNER_VERSION = "v16";
 
 interface Product {
   id: number;
   name: string;
   price: string;
   brand: string | null;
+  imageUrl: string | null;
   imageUrls: string[] | null;
   sku: string | null;
   category: string | null;
@@ -265,7 +266,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     },
   });
 
-  const imageUrl = getProductImageUrl(result?.imageUrls?.[0]);
+  const imageUrl = getProductImageUrl(result?.imageUrls?.[0] || result?.imageUrl);
 
   const Header = ({ title }: { title: string }) => (
     <div className="flex items-center justify-between px-4 pt-4 pb-3 bg-[#0071CE]">
