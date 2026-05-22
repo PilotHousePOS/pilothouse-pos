@@ -7,7 +7,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 
-const SCANNER_VERSION = "v13";
+const SCANNER_VERSION = "v14";
 
 interface Product {
   id: number;
@@ -69,17 +69,20 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
         setCameraState("home");
       }
     },
-    onError: () => {
-      setNotFound(true);
+    onError: (_err, upc) => {
       setResult(null);
       if (fromPhotoRef.current) {
         fromPhotoRef.current = false;
+        setPhotoError(`Barcode scanned (${upc}) — product not found in database.`);
         setCameraState("home");
+      } else {
+        setNotFound(true);
+        setTimeout(() => {
+          setNotFound(false);
+          cooldownRef.current = false;
+        }, 2000);
       }
-      setTimeout(() => {
-        setNotFound(false);
-        cooldownRef.current = false;
-      }, 2000);
+      cooldownRef.current = false;
     },
   });
 
@@ -163,6 +166,9 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     const file = e.target.files?.[0];
     if (!file) return;
     setPhotoError("");
+    // Reset cooldown so every deliberate photo tap always fires
+    cooldownRef.current = false;
+    setLastScanned("");
     setCameraState("scanning-photo");
     if (fileInputRef.current) fileInputRef.current.value = "";
 
