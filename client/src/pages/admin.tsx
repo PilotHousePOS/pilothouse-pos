@@ -4014,6 +4014,12 @@ function EditAppointmentDialog({
   // Track which appointment we've initialized for (prevents overwriting edits on refetch)
   const initializedAppointmentId = useRef<number | null>(null);
 
+  // Items Sold state
+  const [itemSearch, setItemSearch] = useState('');
+  const [itemSearchResults, setItemSearchResults] = useState<any[]>([]);
+  const [itemSearching, setItemSearching] = useState(false);
+  const [showEditScanner, setShowEditScanner] = useState(false);
+
   // On mount, clear the stale cache for this appointment so we always load the
   // latest saved data (notes, prices, etc.) — not a cached copy from a previous open.
   useEffect(() => {
@@ -4103,6 +4109,37 @@ function EditAppointmentDialog({
   
   // Calculate total price in individual mode
   const calculatedTotal = pets.reduce((sum, pet) => sum + (parseFloat(pet.price) || 0), 0);
+
+  // Items Sold query + mutations (self-contained inside this dialog)
+  const { data: editApptItems = [] } = useQuery<any[]>({
+    queryKey: ["/api/appointments", appointmentId, "items"],
+    queryFn: async () => {
+      const res = await fetch(`/api/appointments/${appointmentId}/items`, { credentials: "include" });
+      if (!res.ok) return [];
+      return res.json();
+    },
+    enabled: !!appointmentId,
+  });
+
+  const addEditItemMutation = useMutation({
+    mutationFn: async (item: { supplyId?: number | null; name: string; sku?: string | null; brand?: string | null; category?: string | null; price: string; quantity: number }) => {
+      return apiRequest("POST", `/api/appointments/${appointmentId}/items`, item);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments", appointmentId, "items"] });
+      setItemSearch('');
+      setItemSearchResults([]);
+    },
+    onError: () => toast({ title: "Error", description: "Failed to add item.", variant: "destructive" }),
+  });
+
+  const removeEditItemMutation = useMutation({
+    mutationFn: async (itemId: number) => {
+      return apiRequest("DELETE", `/api/appointments/${appointmentId}/items/${itemId}`, {});
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/appointments", appointmentId, "items"] }),
+    onError: () => toast({ title: "Error", description: "Failed to remove item.", variant: "destructive" }),
+  });
   
   // Update pet field
   const updatePet = (index: number, field: string, value: any) => {
@@ -4498,6 +4535,141 @@ function EditAppointmentDialog({
               </div>
             )}
           </div>
+        </div>
+
+        {/* Items Sold During Appointment */}
+        <div className="space-y-3 pt-4 border-t">
+          <h3 className="font-semibold text-sm flex items-center gap-2">
+            <ShoppingCart className="w-4 h-4" />
+            Items Sold
+          </h3>
+
+          {/* Search bar + scanner button */}
+          <div className="flex gap-2">
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                placeholder="Search product by name or UPC..."
+                value={itemSearch}
+                onChange={async (e) => {
+                  const val = e.target.value;
+                  setItemSearch(val);
+                  if (val.length < 2) { setItemSearchResults([]); return; }
+                  setItemSearching(true);
+                  try {
+                    const res = await fetch(`/api/supplies?search=${encodeURIComponent(val)}&limit=8`, { credentials: 'include' });
+                    const data = await res.json();
+                    setItemSearchResults(Array.isArray(data) ? data : (data.supplies || []));
+                  } catch { setItemSearchResults([]); }
+                  setItemSearching(false);
+                }}
+                className="w-full text-sm border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {itemSearching && <span className="absolute right-2 top-2 text-xs text-gray-400">...</span>}
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowEditScanner(true)}
+              title="Scan barcode"
+              className="px-3"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9V6a2 2 0 0 1 2-2h2"/><path d="M15 4h2a2 2 0 0 1 2 2v3"/><path d="M9 20H6a2 2 0 0 1-2-2v-3"/><path d="M21 15v2a2 2 0 0 1-2 2h-2"/><line x1="7" y1="8" x2="7" y2="16"/><line x1="11" y1="8" x2="11" y2="16"/><line x1="15" y1="8" x2="15" y2="16"/><line x1="19" y1="8" x2="19" y2="16"/></svg>
+            </Button>
+          </div>
+
+          {/* Search results dropdown */}
+          {itemSearchResults.length > 0 && (
+            <div className="border border-gray-200 rounded-lg divide-y max-h-48 overflow-y-auto">
+              {itemSearchResults.map((s: any) => (
+                <div key={s.id} className="flex items-center justify-between px-3 py-2 hover:bg-gray-50">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{s.name}</p>
+                    <p className="text-xs text-gray-500">{s.brand || ''}{s.brand && s.sku ? ' · ' : ''}{s.sku || ''} — ${parseFloat(s.price || '0').toFixed(2)}</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="ml-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-3"
+                    disabled={addEditItemMutation.isPending}
+                    onClick={() => addEditItemMutation.mutate({
+                      supplyId: s.id,
+                      name: s.name,
+                      sku: s.sku || null,
+                      brand: s.brand || null,
+                      category: s.category || null,
+                      price: String(s.price || '0'),
+                      quantity: 1,
+                    })}
+                  >
+                    Add
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Added items list */}
+          {editApptItems.length > 0 ? (
+            <div className="space-y-1">
+              {editApptItems.map((item: any) => (
+                <div key={item.id} className="flex items-center justify-between bg-blue-50 rounded px-3 py-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{item.name}</p>
+                    <p className="text-xs text-gray-500">
+                      {item.brand || ''}{item.brand && item.sku ? ' · ' : ''}{item.sku || ''}
+                      {' '}× {item.quantity} = ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 px-2 h-auto shrink-0"
+                    disabled={removeEditItemMutation.isPending}
+                    onClick={() => removeEditItemMutation.mutate(item.id)}
+                  >
+                    <X className="w-3 h-3" />
+                  </Button>
+                </div>
+              ))}
+              <div className="flex justify-between items-center pt-1 border-t border-blue-200 mt-1">
+                <span className="text-xs font-semibold text-gray-600">Items Total</span>
+                <span className="text-sm font-bold text-blue-700">
+                  ${editApptItems.reduce((sum: number, it: any) => sum + parseFloat(it.price) * it.quantity, 0).toFixed(2)}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-gray-400 italic">No items added yet.</p>
+          )}
+
+          {/* Barcode scanner overlay */}
+          {showEditScanner && (
+            <BarcodeScanner
+              onClose={() => setShowEditScanner(false)}
+              onDetected={async (upc: string) => {
+                setShowEditScanner(false);
+                try {
+                  const res = await fetch(`/api/supplies/by-upc/${upc}`, { credentials: 'include' });
+                  if (!res.ok) {
+                    toast({ title: "Not Found", description: `No product found for UPC ${upc}`, variant: "destructive" });
+                    return;
+                  }
+                  const s = await res.json();
+                  addEditItemMutation.mutate({
+                    supplyId: s.id,
+                    name: s.name,
+                    sku: s.sku || upc,
+                    brand: s.brand || null,
+                    category: s.category || null,
+                    price: String(s.price || '0'),
+                    quantity: 1,
+                  });
+                } catch {
+                  toast({ title: "Error", description: "Failed to look up barcode.", variant: "destructive" });
+                }
+              }}
+            />
+          )}
         </div>
         
         {/* Action Buttons */}
@@ -13985,151 +14157,6 @@ export default function Admin() {
                   </div>
                 )}
 
-                {/* Items Sold During Appointment */}
-                {(typedUser?.isAdmin || typedUser?.isGroomer) && (
-                  <div className="border-t pt-3">
-                    <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                      <ShoppingCart className="w-4 h-4" />
-                      Items Sold
-                    </h4>
-
-                    {/* Search bar + scanner */}
-                    <div className="flex gap-2 mb-2">
-                      <div className="flex-1 relative">
-                        <input
-                          type="text"
-                          placeholder="Search product by name or UPC..."
-                          value={apptItemSearch}
-                          onChange={async (e) => {
-                            const val = e.target.value;
-                            setApptItemSearch(val);
-                            if (val.length < 2) { setApptItemSearchResults([]); return; }
-                            setApptItemSearching(true);
-                            try {
-                              const res = await fetch(`/api/supplies?search=${encodeURIComponent(val)}&limit=8`, { credentials: 'include' });
-                              const data = await res.json();
-                              setApptItemSearchResults(Array.isArray(data) ? data : (data.supplies || []));
-                            } catch { setApptItemSearchResults([]); }
-                            setApptItemSearching(false);
-                          }}
-                          className="w-full text-sm border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        {apptItemSearching && <span className="absolute right-2 top-2 text-xs text-gray-400">...</span>}
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setShowApptItemScanner(true)}
-                        title="Scan barcode"
-                        className="px-3"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9V6a2 2 0 0 1 2-2h2"/><path d="M15 4h2a2 2 0 0 1 2 2v3"/><path d="M9 20H6a2 2 0 0 1-2-2v-3"/><path d="M21 15v2a2 2 0 0 1-2 2h-2"/><line x1="7" y1="8" x2="7" y2="16"/><line x1="11" y1="8" x2="11" y2="16"/><line x1="15" y1="8" x2="15" y2="16"/><line x1="19" y1="8" x2="19" y2="16"/></svg>
-                      </Button>
-                    </div>
-
-                    {/* Search results dropdown */}
-                    {apptItemSearchResults.length > 0 && (
-                      <div className="border border-gray-200 rounded-lg bg-white shadow-sm mb-2 max-h-48 overflow-y-auto">
-                        {apptItemSearchResults.map((s: any) => (
-                          <div key={s.id} className="flex items-center justify-between p-2 hover:bg-gray-50 border-b last:border-0">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate">{s.name}</p>
-                              <p className="text-xs text-gray-500">{s.brand || ''} {s.sku ? `· ${s.sku}` : ''} · ${parseFloat(s.price || 0).toFixed(2)}</p>
-                            </div>
-                            <div className="flex items-center gap-1 ml-2 shrink-0">
-                              <input
-                                type="number"
-                                min={1}
-                                value={apptItemQty[s.id] || 1}
-                                onChange={(e) => setApptItemQty(prev => ({ ...prev, [s.id]: Math.max(1, parseInt(e.target.value) || 1) }))}
-                                className="w-12 text-xs border rounded px-1 py-1 text-center"
-                              />
-                              <Button
-                                size="sm"
-                                className="text-xs px-2 py-1 h-auto"
-                                disabled={addApptItemMutation.isPending}
-                                onClick={() => addApptItemMutation.mutate({
-                                  supplyId: s.id,
-                                  name: s.name,
-                                  sku: s.sku || null,
-                                  brand: s.brand || null,
-                                  category: s.category || null,
-                                  price: String(s.price || '0'),
-                                  quantity: apptItemQty[s.id] || 1,
-                                })}
-                              >
-                                Add
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Added items list */}
-                    {apptItems.length > 0 ? (
-                      <div className="space-y-1">
-                        {apptItems.map((item: any) => (
-                          <div key={item.id} className="flex items-center justify-between bg-blue-50 rounded px-3 py-2">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate">{item.name}</p>
-                              <p className="text-xs text-gray-500">
-                                {item.brand || ''}{item.brand && item.sku ? ' · ' : ''}{item.sku || ''}
-                                {' '}× {item.quantity} = ${(parseFloat(item.price) * item.quantity).toFixed(2)}
-                              </p>
-                            </div>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-red-500 hover:text-red-700 hover:bg-red-50 px-2 h-auto shrink-0"
-                              disabled={removeApptItemMutation.isPending}
-                              onClick={() => removeApptItemMutation.mutate({ apptId: selectedAppointment.id, itemId: item.id })}
-                            >
-                              <X className="w-3 h-3" />
-                            </Button>
-                          </div>
-                        ))}
-                        <div className="flex justify-between items-center pt-1 border-t border-blue-200 mt-1">
-                          <span className="text-xs font-semibold text-gray-600">Items Total</span>
-                          <span className="text-sm font-bold text-blue-700">
-                            ${apptItems.reduce((sum: number, it: any) => sum + parseFloat(it.price) * it.quantity, 0).toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-xs text-gray-400 italic">No items added yet.</p>
-                    )}
-
-                    {/* Inline barcode scanner */}
-                    {showApptItemScanner && (
-                      <BarcodeScanner
-                        onClose={() => setShowApptItemScanner(false)}
-                        onDetected={async (upc: string) => {
-                          setShowApptItemScanner(false);
-                          try {
-                            const res = await fetch(`/api/supplies/by-upc/${upc}`, { credentials: 'include' });
-                            if (!res.ok) {
-                              toast({ title: "Not Found", description: `No product found for UPC ${upc}`, variant: "destructive" });
-                              return;
-                            }
-                            const s = await res.json();
-                            addApptItemMutation.mutate({
-                              supplyId: s.id,
-                              name: s.name,
-                              sku: s.sku || upc,
-                              brand: s.brand || null,
-                              category: s.category || null,
-                              price: String(s.price || '0'),
-                              quantity: 1,
-                            });
-                          } catch {
-                            toast({ title: "Error", description: "Failed to look up barcode.", variant: "destructive" });
-                          }
-                        }}
-                      />
-                    )}
-                  </div>
-                )}
               </div>
             </div>
             {selectedAppointment.status === 'confirmed' && typedUser?.isAdmin && (
