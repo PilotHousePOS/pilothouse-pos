@@ -6760,6 +6760,7 @@ export default function Admin() {
   const [supplySearchQuery, setSupplySearchQuery] = useState('');
   const [suppliesPage, setSuppliesPage] = useState(0);
   const [showAdminScanner, setShowAdminScanner] = useState(false);
+  const [scannerAddUpc, setScannerAddUpc] = useState<string | null>(null);
   const SUPPLIES_PER_PAGE = 20;
   
   // Pagination for in progress orders (confirmed)
@@ -7593,6 +7594,7 @@ export default function Admin() {
         description: "Supply created! You can now add images.",
       });
       setIsAddSupplyOpen(false);
+      setScannerAddUpc(null);
       queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
       // Auto-open edit dialog so user can add images
       if (createdSupply && createdSupply.id) {
@@ -9844,7 +9846,47 @@ export default function Admin() {
                   </div>
                 </div>
               </div>
-              {showAdminScanner && <BarcodeScanner onClose={() => setShowAdminScanner(false)} />}
+              {showAdminScanner && (
+                <BarcodeScanner
+                  onClose={() => setShowAdminScanner(false)}
+                  onDetected={async (upc: string) => {
+                    setShowAdminScanner(false);
+                    try {
+                      const res = await fetch(`/api/supplies/by-upc/${upc}`, { credentials: 'include' });
+                      if (res.ok) {
+                        // Product found — populate search to highlight it
+                        setSupplySearchQuery(upc);
+                        setSuppliesPage(0);
+                        toast({ title: "Product Found", description: `UPC ${upc} matched a product in your inventory.` });
+                      } else {
+                        // Not found — prompt to add it with UPC pre-filled
+                        setScannerAddUpc(upc);
+                      }
+                    } catch {
+                      setScannerAddUpc(upc);
+                    }
+                  }}
+                />
+              )}
+
+              {/* "Not in database" prompt from barcode scan */}
+              <Dialog open={scannerAddUpc !== null} onOpenChange={(o) => { if (!o) setScannerAddUpc(null); }}>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Product Not Found — Add It?</DialogTitle>
+                    <DialogDescription>
+                      UPC <span className="font-mono font-bold">{scannerAddUpc}</span> is not in your inventory yet. Fill in the details below to add it — the UPC has been pre-filled in the SKU field.
+                    </DialogDescription>
+                  </DialogHeader>
+                  {scannerAddUpc !== null && (
+                    <AddSupplyForm
+                      key={scannerAddUpc}
+                      initialUpc={scannerAddUpc}
+                      onSubmit={(data) => createSupplyMutation.mutate(data)}
+                    />
+                  )}
+                </DialogContent>
+              </Dialog>
               <div className="space-y-3">
                 {(supplies as any[]).map((supply: any) => (
                   <div key={supply.id} className="p-3 border rounded-lg">
