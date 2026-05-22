@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { BrowserMultiFormatReader } from "@zxing/browser";
 import { X, Flashlight, FlashlightOff, Keyboard, Camera, Image } from "lucide-react";
 import { useLocation } from "wouter";
@@ -276,10 +277,14 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     </div>
   );
 
+  // Build the screen content, then portal it to document.body so it escapes
+  // any parent Dialog/transform context (fixed positioning breaks inside CSS transforms).
+  let content: React.ReactNode = null;
+
   // ── Scanning photo spinner ──
   if (cameraState === "scanning-photo") {
-    return (
-      <div className="fixed inset-0 z-50 bg-black flex flex-col">
+    content = (
+      <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
         <Header title="Scanner" />
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
           <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
@@ -291,9 +296,9 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   }
 
   // ── Camera starting spinner ──
-  if (cameraState === "starting") {
-    return (
-      <div className="fixed inset-0 z-50 bg-black flex flex-col">
+  else if (cameraState === "starting") {
+    content = (
+      <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
         <Header title="Scanner" />
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
@@ -306,9 +311,9 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   }
 
   // ── Home / Denied / Result screen ──
-  if ((cameraState === "home" || cameraState === "denied") && !manualMode) {
-    return (
-      <div className="fixed inset-0 z-50 bg-black flex flex-col">
+  else if ((cameraState === "home" || cameraState === "denied") && !manualMode) {
+    content = (
+      <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
         <input
           ref={fileInputRef}
           type="file"
@@ -385,9 +390,9 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   }
 
   // ── Manual entry ──
-  if (manualMode) {
-    return (
-      <div className="fixed inset-0 z-50 bg-black flex flex-col">
+  else if (manualMode) {
+    content = (
+      <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
         <Header title="Enter Barcode" />
         <div className="bg-white flex-1 flex flex-col">
           <div className="px-4 py-6 flex flex-col gap-4">
@@ -438,80 +443,81 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   }
 
   // ── Live scanner (only when camera is actually running) ──
-  if (cameraState === "live") {
-    return (
-    <div className="fixed inset-0 z-50 bg-black flex flex-col">
-      <div className="flex items-center justify-between px-4 pt-4 pb-3 bg-[#0071CE] z-10">
-        <button onClick={onClose} className="text-white p-1"><X className="w-6 h-6" /></button>
-        <span className="text-white font-semibold text-base tracking-wide">Scanner</span>
-        <div className="flex items-center gap-3">
-          {torchSupported && (
-            <button onClick={toggleTorch} className="text-white p-1">
-              {torchOn ? <FlashlightOff className="w-5 h-5" /> : <Flashlight className="w-5 h-5" />}
+  else if (cameraState === "live") {
+    content = (
+      <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
+        <div className="flex items-center justify-between px-4 pt-4 pb-3 bg-[#0071CE] z-10">
+          <button onClick={onClose} className="text-white p-1"><X className="w-6 h-6" /></button>
+          <span className="text-white font-semibold text-base tracking-wide">Scanner</span>
+          <div className="flex items-center gap-3">
+            {torchSupported && (
+              <button onClick={toggleTorch} className="text-white p-1">
+                {torchOn ? <FlashlightOff className="w-5 h-5" /> : <Flashlight className="w-5 h-5" />}
+              </button>
+            )}
+            <button onClick={() => setManualMode(m => !m)} className="text-white p-1">
+              <Keyboard className="w-5 h-5" />
             </button>
-          )}
-          <button onClick={() => setManualMode(m => !m)} className="text-white p-1">
-            <Keyboard className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
-      <div className="relative flex-1 overflow-hidden">
-        <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 right-0 bg-black/55" style={{ height: "25%" }} />
-          <div className="absolute bottom-0 left-0 right-0 bg-black/55" style={{ height: "35%" }} />
-          <div className="absolute left-0 bg-black/55" style={{ top: "25%", height: "40%", width: "8%" }} />
-          <div className="absolute right-0 bg-black/55" style={{ top: "25%", height: "40%", width: "8%" }} />
-          <div className="absolute" style={{ top: "25%", left: "8%", right: "8%", height: "40%" }}>
-            <div className="absolute left-0 right-0 h-0.5 bg-[#0071CE]/80" style={{ animation: "scanline 2s ease-in-out infinite" }} />
-            <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl" />
-            <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr" />
-            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl" />
-            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br" />
           </div>
         </div>
-        <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 z-10">
-          {lookupMutation.isPending && <div className="bg-black/70 text-white px-4 py-2 rounded-full text-sm">Looking up product…</div>}
-          {notFound && <div className="bg-red-600/90 text-white px-4 py-2 rounded-full text-sm font-medium">Product not found — try again</div>}
-          {!result && !notFound && !lookupMutation.isPending && (
-            <div className="bg-black/60 text-white px-4 py-2 rounded-full text-sm">Aim at a barcode to scan</div>
-          )}
-        </div>
-      </div>
 
-      {result && (
-        <div className="bg-white rounded-t-2xl shadow-2xl px-4 pt-4 pb-8 z-20">
-          <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
-          <div className="flex gap-3 mb-4">
-            {imageUrl
-              ? <img src={imageUrl} alt={result.name} className="w-20 h-20 object-contain rounded-lg border border-gray-100 flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-              : <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0" />
-            }
-            <div className="flex-1 min-w-0">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-0.5">{result.brand || ""}</p>
-              <p className="text-sm font-semibold text-gray-900 leading-snug line-clamp-3">{result.name}</p>
-              <p className="text-xl font-bold text-[#0071CE] mt-1">${parseFloat(result.price).toFixed(2)}</p>
+        <div className="relative flex-1 overflow-hidden">
+          <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0">
+            <div className="absolute top-0 left-0 right-0 bg-black/55" style={{ height: "25%" }} />
+            <div className="absolute bottom-0 left-0 right-0 bg-black/55" style={{ height: "35%" }} />
+            <div className="absolute left-0 bg-black/55" style={{ top: "25%", height: "40%", width: "8%" }} />
+            <div className="absolute right-0 bg-black/55" style={{ top: "25%", height: "40%", width: "8%" }} />
+            <div className="absolute" style={{ top: "25%", left: "8%", right: "8%", height: "40%" }}>
+              <div className="absolute left-0 right-0 h-0.5 bg-[#0071CE]/80" style={{ animation: "scanline 2s ease-in-out infinite" }} />
+              <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl" />
+              <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr" />
+              <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl" />
+              <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br" />
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="flex-1" onClick={handleScanAgain}>Scan Again</Button>
-            <Button variant="outline" className="flex-1" onClick={handleViewProduct}>View Item</Button>
-            <Button className="flex-1 bg-[#0071CE] hover:bg-[#0058a3] text-white" onClick={() => addToCartMutation.mutate()} disabled={addToCartMutation.isPending}>Add to Cart</Button>
+          <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 z-10">
+            {lookupMutation.isPending && <div className="bg-black/70 text-white px-4 py-2 rounded-full text-sm">Looking up product…</div>}
+            {notFound && <div className="bg-red-600/90 text-white px-4 py-2 rounded-full text-sm font-medium">Product not found — try again</div>}
+            {!result && !notFound && !lookupMutation.isPending && (
+              <div className="bg-black/60 text-white px-4 py-2 rounded-full text-sm">Aim at a barcode to scan</div>
+            )}
           </div>
         </div>
-      )}
 
-      <style>{`
-        @keyframes scanline {
-          0% { top: 0; }
-          50% { top: calc(100% - 2px); }
-          100% { top: 0; }
-        }
-      `}</style>
-    </div>
-  );
+        {result && (
+          <div className="bg-white rounded-t-2xl shadow-2xl px-4 pt-4 pb-8 z-20">
+            <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
+            <div className="flex gap-3 mb-4">
+              {imageUrl
+                ? <img src={imageUrl} alt={result.name} className="w-20 h-20 object-contain rounded-lg border border-gray-100 flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                : <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0" />
+              }
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-0.5">{result.brand || ""}</p>
+                <p className="text-sm font-semibold text-gray-900 leading-snug line-clamp-3">{result.name}</p>
+                <p className="text-xl font-bold text-[#0071CE] mt-1">${parseFloat(result.price).toFixed(2)}</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1" onClick={handleScanAgain}>Scan Again</Button>
+              <Button variant="outline" className="flex-1" onClick={handleViewProduct}>View Item</Button>
+              <Button className="flex-1 bg-[#0071CE] hover:bg-[#0058a3] text-white" onClick={() => addToCartMutation.mutate()} disabled={addToCartMutation.isPending}>Add to Cart</Button>
+            </div>
+          </div>
+        )}
+
+        <style>{`
+          @keyframes scanline {
+            0% { top: 0; }
+            50% { top: calc(100% - 2px); }
+            100% { top: 0; }
+          }
+        `}</style>
+      </div>
+    );
   }
 
-  return null;
+  if (!content) return null;
+  return createPortal(content, document.body);
 }
