@@ -3979,6 +3979,7 @@ function EditAppointmentDialog({
   initialTime,
   onClose,
   onOpenScanner,
+  scannerOpen,
   groomers,
   isBookingDateAvailable,
   bookingAvailableTimeSlots
@@ -3991,6 +3992,7 @@ function EditAppointmentDialog({
   initialTime: string;
   onClose: () => void;
   onOpenScanner: (cb: (upc: string) => void) => void;
+  scannerOpen: boolean;
   groomers: any[];
   isBookingDateAvailable: (date: Date) => boolean;
   bookingAvailableTimeSlots: string[];
@@ -4256,8 +4258,8 @@ function EditAppointmentDialog({
   }
   
   return (
-    <Dialog open={true} onOpenChange={handleClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={!scannerOpen} onOpenChange={handleClose}>
+      <DialogContent forceMount className={`max-w-3xl max-h-[90vh] overflow-y-auto${scannerOpen ? ' hidden' : ''}`}>
         <DialogHeader>
           <DialogTitle>Edit Appointment</DialogTitle>
           <DialogDescription>Update appointment information for all pets</DialogDescription>
@@ -14285,6 +14287,7 @@ export default function Admin() {
             setEditTime('');
           }}
           onOpenScanner={(cb) => setEditApptScannerCb(() => cb)}
+          scannerOpen={!!editApptScannerCb}
           groomers={groomers}
           isBookingDateAvailable={isBookingDateAvailable}
           bookingAvailableTimeSlots={bookingAvailableTimeSlots}
