@@ -1,4 +1,4 @@
-const CACHE_NAME = 'animal-house-v11';
+const CACHE_NAME = 'animal-house-v12';
 const IMAGE_CACHE_NAME = 'animal-house-images-v1';
 const OFFLINE_CACHE = [
   '/manifest.json',

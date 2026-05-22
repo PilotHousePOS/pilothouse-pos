@@ -7,7 +7,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 
-const SCANNER_VERSION = "v11";
+const SCANNER_VERSION = "v12";
 
 interface Product {
   id: number;
@@ -225,9 +225,10 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
       }
     }
 
+    // Always leave "scanning-photo" state — never leave the spinner up
     if (upc) {
+      setCameraState("home");
       handleDetected(upc);
-      if (onDetected) setCameraState("home");
     } else {
       setPhotoError("No barcode found. Make sure the barcode fills the frame and is in focus, then try again.");
       setCameraState("home");
