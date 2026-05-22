@@ -7,7 +7,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 
-const SCANNER_VERSION = "v12";
+const SCANNER_VERSION = "v13";
 
 interface Product {
   id: number;
@@ -45,6 +45,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const [lastScanned, setLastScanned] = useState("");
   const streamRef = useRef<MediaStream | null>(null);
   const cooldownRef = useRef(false);
+  const fromPhotoRef = useRef(false);
 
   // Cleanup camera on unmount
   useEffect(() => {
@@ -63,10 +64,18 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     onSuccess: (product) => {
       setResult(product);
       setNotFound(false);
+      if (fromPhotoRef.current) {
+        fromPhotoRef.current = false;
+        setCameraState("home");
+      }
     },
     onError: () => {
       setNotFound(true);
       setResult(null);
+      if (fromPhotoRef.current) {
+        fromPhotoRef.current = false;
+        setCameraState("home");
+      }
       setTimeout(() => {
         setNotFound(false);
         cooldownRef.current = false;
@@ -225,9 +234,9 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
       }
     }
 
-    // Always leave "scanning-photo" state — never leave the spinner up
     if (upc) {
-      setCameraState("home");
+      // Keep "scanning-photo" spinner up — mutation callbacks will dismiss it
+      fromPhotoRef.current = true;
       handleDetected(upc);
     } else {
       setPhotoError("No barcode found. Make sure the barcode fills the frame and is in focus, then try again.");
