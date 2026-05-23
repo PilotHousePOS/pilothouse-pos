@@ -1303,11 +1303,24 @@ export class DatabaseStorage implements IStorage {
   async getSupplyByUpc(upc: string): Promise<Supply | undefined> {
     const padded = upc.padStart(12, '0');
     const unpadded = upc.replace(/^0+/, '') || upc;
+    // For 12-digit UPC-A, also try the middle 10 digits (positions 1-10, i.e. strip
+    // the leading number-system digit and the trailing check digit).  Many older POS
+    // systems stored UPCs this way, so a scanned "076484066030" should still find a
+    // product whose stored SKU is "7648406603".
+    const middle10 = upc.length === 12 ? upc.slice(1, 11) : null;
+
+    const matchClauses = [
+      eq(supplies.sku, upc),
+      eq(supplies.sku, padded),
+      eq(supplies.sku, unpadded),
+      ...(middle10 ? [
+        eq(supplies.sku, middle10),
+        eq(supplies.sku, middle10.replace(/^0+/, '') || middle10),
+      ] : []),
+    ];
+
     const [supply] = await db.select().from(supplies).where(
-      and(
-        eq(supplies.isActive, true),
-        or(eq(supplies.sku, upc), eq(supplies.sku, padded), eq(supplies.sku, unpadded))
-      )
+      and(eq(supplies.isActive, true), or(...matchClauses))
     ).limit(1);
     return supply;
   }
