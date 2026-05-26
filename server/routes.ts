@@ -19,6 +19,7 @@ import {
   extractedOrderItems,
   orderItems,
   orders,
+  appointments,
 } from "@shared/schema";
 import { z } from "zod/v4";
 import { notificationService } from './notifications';
