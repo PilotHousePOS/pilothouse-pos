@@ -5350,6 +5350,28 @@ West Monroe LA 71291
       const { getUncachableStripeClient } = await import('./stripeClient');
       const stripe = await getUncachableStripeClient();
 
+      // Prefer charging the saved card directly (same as order payments — no redirect needed)
+      const customer = await storage.getUser(req.user.id);
+      if (customer?.stripeCustomerId && customer?.stripeDefaultPaymentMethod) {
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: Math.round(amount * 100),
+          currency: 'usd',
+          customer: customer.stripeCustomerId,
+          payment_method: customer.stripeDefaultPaymentMethod,
+          off_session: true,
+          confirm: true,
+          description: `Grooming appointment #${id} — ${appointment.petName}`,
+          metadata: { appointmentId: String(id), type: 'grooming' },
+        });
+
+        if (paymentIntent.status === 'succeeded') {
+          await storage.updateAppointmentPaidOnline(id, paymentIntent.id);
+          return res.json({ success: true, charged: true });
+        }
+        // If PaymentIntent didn't immediately succeed, fall through to Checkout redirect
+      }
+
+      // Fallback: no saved card — redirect to Stripe Checkout so customer can enter one
       const origin = req.headers.origin || `https://${req.headers.host}`;
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],

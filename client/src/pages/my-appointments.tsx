@@ -76,15 +76,22 @@ export default function MyAppointments() {
   const payOnlineMutation = useMutation({
     mutationFn: async (appointmentId: number) => {
       const result = await apiRequest("POST", `/api/appointments/${appointmentId}/pay-online`, {});
-      return result as { checkoutUrl: string; sessionId: string };
+      return result as { success?: boolean; charged?: boolean; checkoutUrl?: string; sessionId?: string };
     },
     onSuccess: (data) => {
       setPayingAppointmentId(null);
-      if (data?.checkoutUrl) window.location.href = data.checkoutUrl;
+      if (data?.success && data?.charged) {
+        // Saved card was charged directly — no redirect needed
+        toast({ title: "Payment Successful!", description: "Your grooming appointment has been paid. Thank you!" });
+        queryClient.invalidateQueries({ queryKey: ["/api/user/appointments"] });
+      } else if (data?.checkoutUrl) {
+        // No saved card — redirect to Stripe Checkout
+        window.location.href = data.checkoutUrl;
+      }
     },
     onError: () => {
       setPayingAppointmentId(null);
-      toast({ title: "Payment Error", description: "Could not start payment. Please try again.", variant: "destructive" });
+      toast({ title: "Payment Error", description: "Could not process payment. Please try again.", variant: "destructive" });
     },
   });
 
