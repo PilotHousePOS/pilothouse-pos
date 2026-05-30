@@ -71,6 +71,7 @@ export default function Booking() {
   const [showCapacityDialog, setShowCapacityDialog] = useState(false);
   const [showPhoneConfirmDialog, setShowPhoneConfirmDialog] = useState(false);
   const [pendingBookingData, setPendingBookingData] = useState<{ baseData: any; dates: string[] } | null>(null);
+  const [smsConsent, setSmsConsent] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringType, setRecurringType] = useState<'monthly' | 'custom'>('monthly');
   const [customRecurringDates, setCustomRecurringDates] = useState<Date[]>([]);
@@ -387,6 +388,7 @@ export default function Booking() {
       setSelectedGroomer('');
       setPets([{ name: '', type: 'dog', serviceType: 'grooming-full', notes: '', groomerId: '', addOns: [] }]);
       setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
+      setSmsConsent(false);
       setContactSearch('');
       setIsRecurring(false);
       setRecurringType('monthly');
@@ -506,6 +508,9 @@ export default function Booking() {
     // Validate all pets have required fields
     const invalidPet = pets.find(pet => !pet.name || !pet.type || !pet.serviceType);
     
+    const bookingUser = currentUser as any;
+    const isAdminOrGroomerBooking = bookingUser?.isAdmin || bookingUser?.isGroomer;
+
     if (!selectedDate || !selectedTime || invalidPet || !ownerInfo.lastName || !ownerInfo.phoneNumber) {
       const missing: string[] = [];
       if (!selectedDate) missing.push("appointment date");
@@ -520,6 +525,15 @@ export default function Booking() {
       toast({
         title: "Missing Information",
         description: `Please fill in: ${missing.join(", ")}.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isAdminOrGroomerBooking && ownerInfo.phoneNumber && !smsConsent) {
+      toast({
+        title: "SMS Consent Required",
+        description: "Please check the box to consent to receive text message updates about your appointment.",
         variant: "destructive",
       });
       return;
@@ -1044,6 +1058,21 @@ export default function Booking() {
               className="border-gray-300 rounded-xl"
               data-testid="input-owner-phone"
             />
+            {/* SMS Consent — required for Twilio toll-free compliance */}
+            {!(currentUser as any)?.isAdmin && !(currentUser as any)?.isGroomer && (
+              <label className="flex items-start gap-2 mt-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={smsConsent}
+                  onChange={(e) => setSmsConsent(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 flex-shrink-0 accent-blue-600"
+                  data-testid="checkbox-sms-consent"
+                />
+                <span className="text-xs text-gray-600 leading-snug">
+                  By providing my phone number, I consent to receive text message updates about my appointment from Animal House Pet Store. Message &amp; data rates may apply. Reply <strong>STOP</strong> to opt out.
+                </span>
+              </label>
+            )}
           </div>
         </div>
 
