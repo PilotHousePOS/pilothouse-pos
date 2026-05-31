@@ -11751,7 +11751,7 @@ West Monroe LA 71291
       }
 
       await db.update(appointments)
-        .set({ appointmentDate: appointmentDateStr, appointmentTime, status: 'scheduled', isApproved: false })
+        .set({ appointmentDate: appointmentDateStr, appointmentTime, status: 'confirmed', isApproved: true })
         .where(eq(appointments.id, id));
 
       res.json({ message: "Appointment rescheduled successfully" });
