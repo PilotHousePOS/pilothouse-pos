@@ -83,34 +83,31 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
   let windowStart: Date;
   let windowEnd: Date;
 
+  // Convert a CST local datetime string (YYYY-MM-DDTHH:MM:SS) to UTC
+  const cstToUtc = (localStr: string) => {
+    const approx = new Date(localStr + 'Z');
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Chicago',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hour12: false
+    }).formatToParts(approx);
+    const get = (type: string) => parts.find(p => p.type === type)?.value || '0';
+    const localDate = new Date(`${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}Z`);
+    const offset = approx.getTime() - localDate.getTime();
+    return new Date(approx.getTime() - offset);
+  };
+
   if (specificDate) {
     // specificDate is YYYY-MM-DD in CST — cover that full calendar day (midnight to midnight CST)
-    const [year, month, day] = specificDate.split('-').map(Number);
-    // Build midnight CST for that date using a CST offset approach
-    const startStr = `${specificDate}T00:00:00`;
-    const endStr = `${specificDate}T23:59:59`;
-    // Convert CST local time to UTC by constructing dates in the America/Chicago timezone
-    const cstToUtc = (localStr: string) => {
-      // Use Intl to find the UTC offset for that moment in Chicago
-      const approx = new Date(localStr + 'Z');
-      const parts = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'America/Chicago',
-        year: 'numeric', month: '2-digit', day: '2-digit',
-        hour: '2-digit', minute: '2-digit', second: '2-digit',
-        hour12: false
-      }).formatToParts(approx);
-      const get = (type: string) => parts.find(p => p.type === type)?.value || '0';
-      const localDate = new Date(`${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}Z`);
-      const offset = approx.getTime() - localDate.getTime();
-      return new Date(approx.getTime() - offset);
-    };
-    windowStart = cstToUtc(startStr);
-    windowEnd = cstToUtc(endStr);
+    windowStart = cstToUtc(`${specificDate}T00:00:00`);
+    windowEnd   = cstToUtc(`${specificDate}T23:59:59`);
   } else {
-    // Use a 24-hour rolling window ending now so orders placed after the previous
-    // report time are never skipped (e.g. a 7 PM order won't be missed by a 6 PM report).
-    windowEnd = now;
-    windowStart = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    // Use today's full CST calendar day (midnight → midnight) so the 6 PM closing-time
+    // report captures every order placed that day, including evening orders like 7 PM.
+    const todayDateStr = now.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+    windowStart = cstToUtc(`${todayDateStr}T00:00:00`);
+    windowEnd   = cstToUtc(`${todayDateStr}T23:59:59`);
   }
 
   const reportDate = now.toLocaleDateString('en-US', { 
