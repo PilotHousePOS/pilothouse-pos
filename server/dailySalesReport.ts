@@ -637,6 +637,9 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
   const transactionCount = activeOrders.length;
   const avgTicket = transactionCount > 0 ? total / transactionCount : 0;
 
+  // Grand total = online order revenue + grooming revenue (in-person and online)
+  const grandTotal = total + groomingServiceTotal;
+
   const sortedCategories = Array.from(categorySales.values()).sort((a, b) => b.total - a.total);
   const categoryTotal = sortedCategories.reduce((sum, cat) => sum + cat.total, 0);
 
@@ -717,7 +720,8 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
         ${dataRow('Subtotal', formatCurrency(subtotal), String(totalItems) + ' items')}
         ${dataRow('Taxes (10.99%)', formatCurrency(totalTax), '')}
         ${dataRow('Convenience Fees', formatCurrency(totalConvenienceFees), String(convenienceFeeCount))}
-        ${dataRow('<strong>Total Collected</strong>', `<strong>${formatCurrency(total)}</strong>`, '')}
+        ${groomingServiceTotal > 0 ? dataRow('Grooming Services', formatCurrency(groomingServiceTotal), String(groomingServiceCount)) : ''}
+        ${dataRow('<strong>Total Collected</strong>', `<strong>${formatCurrency(grandTotal)}</strong>`, '')}
         <tr><td colspan="3" style="padding: 8px 0;"></td></tr>
         ${dataRow('Avg. Ticket', formatCurrency(avgTicket), '')}
         ` : ''}
@@ -904,15 +908,17 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
         ${sectionHeader('Settlement')}
         ${headerRow('', 'Total $', 'Count #')}
         ${dataRow('Credit Sales', formatCurrency(total), String(transactionCount))}
+        ${groomingServiceTotal > 0 ? dataRow('Grooming Revenue', formatCurrency(groomingServiceTotal), String(groomingServiceCount)) : ''}
         ${dataRow('Credit Refunds', `-${formatCurrency(refundedTotal)}`, String(totalRefundCount))}
-        ${dataRow('<strong>Net Credit</strong>', `<strong>${formatCurrency(total - refundedTotal)}</strong>`, '')}
+        ${dataRow('<strong>Net Credit</strong>', `<strong>${formatCurrency(grandTotal - refundedTotal)}</strong>`, '')}
         
         ${sectionHeader('Financial Summary')}
         ${headerRow('', 'Total $', '')}
         ${dataRow('Gross Product Sales', formatCurrency(grossRevenue), '')}
         ${dataRow('Sales Tax Collected', formatCurrency(totalTax), '')}
         ${dataRow('Convenience Fees Collected', formatCurrency(totalConvenienceFees), '')}
-        ${dataRow('<strong>Total Collected</strong>', `<strong>${formatCurrency(total)}</strong>`, '')}
+        ${groomingServiceTotal > 0 ? dataRow('Grooming Revenue', formatCurrency(groomingServiceTotal), '') : ''}
+        ${dataRow('<strong>Total Collected</strong>', `<strong>${formatCurrency(grandTotal)}</strong>`, '')}
         <tr><td colspan="3" style="padding: 4px 0;"></td></tr>
         ${dataRow('Less: Refunds', refundedTotal > 0 ? `-${formatCurrency(refundedTotal)}` : formatCurrency(0), '')}
         ${dataRow('Less: Stripe Fees (est.)', `-${formatCurrency(stripeProcessingFees)}`, '')}
@@ -1001,7 +1007,8 @@ Loyalty Discounts         ${(totalLoyaltyDiscounts > 0 ? '-' + formatCurrency(to
 Subtotal                  ${formatCurrency(subtotal).padStart(10)}    ${(totalItems + ' items').padStart(5)}
 Taxes (10.99%)            ${formatCurrency(totalTax).padStart(10)}
 Convenience Fees          ${formatCurrency(totalConvenienceFees).padStart(10)}    ${String(convenienceFeeCount).padStart(5)}
-Total Collected           ${formatCurrency(total).padStart(10)}
+${groomingServiceTotal > 0 ? `Grooming Services         ${formatCurrency(groomingServiceTotal).padStart(10)}    ${String(groomingServiceCount).padStart(5)}` : ''}
+Total Collected           ${formatCurrency(grandTotal).padStart(10)}
 Avg. Ticket               ${formatCurrency(avgTicket).padStart(10)}
 
 -- Taxes Collected --
@@ -1136,15 +1143,17 @@ Voided/Cancelled          ${formatCurrency(voidedTotal).padStart(10)}    ${Strin
 -- Settlement --
                           Total $    Count #
 Credit Sales              ${formatCurrency(total).padStart(10)}    ${String(transactionCount).padStart(5)}
+${groomingServiceTotal > 0 ? `Grooming Revenue          ${formatCurrency(groomingServiceTotal).padStart(10)}    ${String(groomingServiceCount).padStart(5)}` : ''}
 Credit Refunds           -${formatCurrency(refundedTotal).padStart(10)}    ${String(totalRefundCount).padStart(5)}
-Net Credit                ${formatCurrency(total - refundedTotal).padStart(10)}
+Net Credit                ${formatCurrency(grandTotal - refundedTotal).padStart(10)}
 
 -- Financial Summary --
                           Total $
 Gross Product Sales       ${formatCurrency(grossRevenue).padStart(10)}
 Sales Tax Collected       ${formatCurrency(totalTax).padStart(10)}
 Convenience Fees          ${formatCurrency(totalConvenienceFees).padStart(10)}
-Total Collected           ${formatCurrency(total).padStart(10)}
+${groomingServiceTotal > 0 ? `Grooming Revenue          ${formatCurrency(groomingServiceTotal).padStart(10)}` : ''}
+Total Collected           ${formatCurrency(grandTotal).padStart(10)}
 
 Less: Refunds            ${refundedTotal > 0 ? '-' + formatCurrency(refundedTotal).padStart(9) : formatCurrency(0).padStart(10)}
 Less: Stripe Fees (est.) -${formatCurrency(stripeProcessingFees).padStart(9)}
