@@ -211,6 +211,10 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
     time: '21:00'
   });
   const [isSavingDailyReport, setIsSavingDailyReport] = useState(false);
+  const [reportSendDate, setReportSendDate] = useState(() => {
+    // Default to today in CST (YYYY-MM-DD)
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+  });
 
   // SMS Management state
   const [smsContactSearch, setSmsContactSearch] = useState('');
@@ -467,14 +471,14 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ emails: dailyReportSettings.emails })
+        body: JSON.stringify({ emails: dailyReportSettings.emails, reportDate: reportSendDate })
       });
 
       const result = await response.json();
       if (response.ok) {
         toast({
-          title: "Test Report Sent",
-          description: result.message || "Check your email for the test report"
+          title: "Report Sent",
+          description: result.message || `Report for ${reportSendDate} sent successfully`
         });
       } else {
         toast({
@@ -933,16 +937,32 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
                   >
                     {isSavingDailyReport ? 'Saving...' : 'Save Settings'}
                   </Button>
-                  {dailyReportSettings.emails && (
-                    <Button
-                      variant="outline"
-                      onClick={handleSendTestReport}
-                      disabled={isSavingDailyReport}
-                    >
-                      Send Test Report
-                    </Button>
-                  )}
                 </div>
+
+                {dailyReportSettings.emails && (
+                  <div className="space-y-2 pt-2 border-t">
+                    <Label>Send Report for Date</Label>
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="date"
+                        value={reportSendDate}
+                        max={new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' })}
+                        onChange={(e) => setReportSendDate(e.target.value)}
+                        className="w-44"
+                      />
+                      <Button
+                        variant="outline"
+                        onClick={handleSendTestReport}
+                        disabled={isSavingDailyReport || !reportSendDate}
+                      >
+                        {isSavingDailyReport ? 'Sending...' : 'Send Report'}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Pick any past date to resend that day's report to all configured emails.
+                    </p>
+                  </div>
+                )}
               </div>
 
             </div>

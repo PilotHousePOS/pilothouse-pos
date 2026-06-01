@@ -7170,7 +7170,7 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      const { emails } = req.body;
+      const { emails, reportDate } = req.body;
       
       if (!emails || !emails.trim()) {
         return res.status(400).json({ message: "Email address is required" });
@@ -7178,9 +7178,12 @@ West Monroe LA 71291
 
       // Import and call the sendDailySalesReport function
       const { sendDailySalesReport } = await import('./dailySalesReport');
-      await sendDailySalesReport(emails.split(',').map((e: string) => e.trim()).filter((e: string) => e));
+      await sendDailySalesReport(
+        emails.split(',').map((e: string) => e.trim()).filter((e: string) => e),
+        reportDate || undefined
+      );
 
-      res.json({ success: true, message: "Test report sent successfully" });
+      res.json({ success: true, message: "Report sent successfully" });
     } catch (error: any) {
       console.error("Error sending test daily report:", error);
       res.status(500).json({ message: error.message || "Failed to send test report" });

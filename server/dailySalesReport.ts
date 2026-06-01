@@ -70,7 +70,7 @@ function formatPercent(amount: number, total: number): string {
   return ((amount / total) * 100).toFixed(2) + '%';
 }
 
-export async function sendDailySalesReport(recipientEmails: string[]): Promise<void> {
+export async function sendDailySalesReport(recipientEmails: string[], specificDate?: string): Promise<void> {
   if (!recipientEmails || recipientEmails.length === 0) {
     throw new Error('No recipient emails provided');
   }
@@ -80,10 +80,38 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
   const now = new Date();
   const cstOptions = { timeZone: 'America/Chicago' };
 
-  // Use a 24-hour rolling window ending now so orders placed after the previous
-  // report time are never skipped (e.g. a 7 PM order won't be missed by a 6 PM report).
-  const windowEnd = now;
-  const windowStart = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  let windowStart: Date;
+  let windowEnd: Date;
+
+  if (specificDate) {
+    // specificDate is YYYY-MM-DD in CST — cover that full calendar day (midnight to midnight CST)
+    const [year, month, day] = specificDate.split('-').map(Number);
+    // Build midnight CST for that date using a CST offset approach
+    const startStr = `${specificDate}T00:00:00`;
+    const endStr = `${specificDate}T23:59:59`;
+    // Convert CST local time to UTC by constructing dates in the America/Chicago timezone
+    const cstToUtc = (localStr: string) => {
+      // Use Intl to find the UTC offset for that moment in Chicago
+      const approx = new Date(localStr + 'Z');
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Chicago',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false
+      }).formatToParts(approx);
+      const get = (type: string) => parts.find(p => p.type === type)?.value || '0';
+      const localDate = new Date(`${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}Z`);
+      const offset = approx.getTime() - localDate.getTime();
+      return new Date(approx.getTime() - offset);
+    };
+    windowStart = cstToUtc(startStr);
+    windowEnd = cstToUtc(endStr);
+  } else {
+    // Use a 24-hour rolling window ending now so orders placed after the previous
+    // report time are never skipped (e.g. a 7 PM order won't be missed by a 6 PM report).
+    windowEnd = now;
+    windowStart = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  }
 
   const reportDate = now.toLocaleDateString('en-US', { 
     ...cstOptions,
