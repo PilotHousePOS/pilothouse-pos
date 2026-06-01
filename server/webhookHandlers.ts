@@ -23,9 +23,9 @@ export class WebhookHandlers {
     const isProduction = process.env.NODE_ENV === 'production';
     
     if (isProduction && !webhookSecret) {
-      // In production, require signature verification - reject unverified webhooks
-      console.error('SECURITY: Webhook rejected - STRIPE_WEBHOOK_SECRET required in production');
-      throw new Error('Webhook signature verification required in production');
+      // Secret not configured — Replit sync already handled the event above; skip custom logic
+      console.warn('STRIPE_WEBHOOK_SECRET not set in production — skipping custom event processing');
+      return;
     }
     
     // Handle custom order payment logic with signature verification

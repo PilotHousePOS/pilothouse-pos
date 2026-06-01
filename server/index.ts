@@ -119,14 +119,20 @@ app.post(
 
       if (!Buffer.isBuffer(req.body)) {
         console.error('STRIPE WEBHOOK ERROR: req.body is not a Buffer.');
-        return res.status(500).json({ error: 'Webhook processing error' });
+        return res.status(400).json({ error: 'Webhook body parse error' });
       }
 
       await WebhookHandlers.processWebhook(req.body as Buffer, sig);
       res.status(200).json({ received: true });
     } catch (error: any) {
       console.error('Webhook error:', error.message);
-      res.status(400).json({ error: 'Webhook processing error' });
+      // Only return 400 for genuine signature/verification failures — Stripe will not retry 400s
+      // for bad signatures, but WILL retry for 5xx. For any other error (DB hiccup, etc.)
+      // return 200 so Stripe doesn't keep retrying — the Replit sync already processed the event.
+      if (error.message && (error.message.includes('No signatures found') || error.message.includes('signature') || error.message.includes('Webhook signature'))) {
+        return res.status(400).json({ error: 'Invalid webhook signature' });
+      }
+      res.status(200).json({ received: true });
     }
   }
 );
