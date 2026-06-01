@@ -83,7 +83,9 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
   let windowStart: Date;
   let windowEnd: Date;
 
-  // Convert a CST local datetime string (YYYY-MM-DDTHH:MM:SS) to UTC
+  // Convert a local America/Chicago datetime string (YYYY-MM-DDTHH:MM:SS) to UTC.
+  // Algorithm: treat the input as UTC to get an approximation, format that in Chicago
+  // to find the UTC↔Chicago offset, then ADD the offset to shift into real UTC.
   const cstToUtc = (localStr: string) => {
     const approx = new Date(localStr + 'Z');
     const parts = new Intl.DateTimeFormat('en-CA', {
@@ -95,20 +97,16 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
     const get = (type: string) => parts.find(p => p.type === type)?.value || '0';
     const localDate = new Date(`${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}Z`);
     const offset = approx.getTime() - localDate.getTime();
-    return new Date(approx.getTime() - offset);
+    // ADD offset (not subtract): local + offset = UTC  (e.g. CDT is UTC-5, so +5h gives UTC)
+    return new Date(approx.getTime() + offset);
   };
 
-  if (specificDate) {
-    // specificDate is YYYY-MM-DD in CST — cover that full calendar day (midnight to midnight CST)
-    windowStart = cstToUtc(`${specificDate}T00:00:00`);
-    windowEnd   = cstToUtc(`${specificDate}T23:59:59`);
-  } else {
-    // Use today's full CST calendar day (midnight → midnight) so the 6 PM closing-time
-    // report captures every order placed that day, including evening orders like 7 PM.
-    const todayDateStr = now.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
-    windowStart = cstToUtc(`${todayDateStr}T00:00:00`);
-    windowEnd   = cstToUtc(`${todayDateStr}T23:59:59`);
-  }
+  // Report window: 7:00 AM → 6:00 PM America/Chicago on the target date.
+  // Store opens at 7 AM and closes at 6 PM; any online order placed outside those
+  // hours is considered the next business day.
+  const reportDateStr = specificDate || now.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+  windowStart = cstToUtc(`${reportDateStr}T07:00:00`);
+  windowEnd   = cstToUtc(`${reportDateStr}T18:00:00`);
 
   const reportDate = now.toLocaleDateString('en-US', { 
     ...cstOptions,
@@ -129,23 +127,19 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
   const periodEndStr = windowEnd.toLocaleDateString('en-US', { ...cstOptions, month: '2-digit', day: '2-digit', year: '2-digit' })
     + ' ' + windowEnd.toLocaleTimeString('en-US', { ...cstOptions, hour: '2-digit', minute: '2-digit', hour12: true });
 
-  // Keep the report's calendar date for appointment items (appointments are date-based, not timestamped).
-  // For specific-date reports, use that date so we don't accidentally pull in today's items.
+  // The window is 7 AM–6 PM on a single calendar day, so appointment items only
+  // need to be fetched for that one date (reportDateStr).
   const today = now;
-  const todayDateStr = specificDate || now.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
-  const yesterdayDateStr = windowStart.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+  const todayDateStr = reportDateStr;
+  const yesterdayDateStr = reportDateStr; // same day — no cross-day fetch needed
 
   const allOrders = await storage.getOrders();
   
-  // Fetch appointment items for both calendar dates in the window
+  // Fetch appointment items for the report date only
   let todaysApptItems: any[] = [];
   try {
     const todayItems = await storage.getAppointmentItemsByDate(todayDateStr);
     todaysApptItems = todayItems || [];
-    if (yesterdayDateStr !== todayDateStr) {
-      const yestItems = await storage.getAppointmentItemsByDate(yesterdayDateStr);
-      if (yestItems) todaysApptItems = [...todaysApptItems, ...yestItems];
-    }
   } catch (e) {
     // Table may not exist yet
   }
