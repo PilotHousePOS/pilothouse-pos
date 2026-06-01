@@ -4022,6 +4022,7 @@ function EditAppointmentDialog({
   const [itemSearch, setItemSearch] = useState('');
   const [itemSearchResults, setItemSearchResults] = useState<any[]>([]);
   const [itemSearching, setItemSearching] = useState(false);
+  const [pendingApptItem, setPendingApptItem] = useState<{ supply: any; priceOverride: string } | null>(null);
 
   // On mount, clear the stale cache for this appointment so we always load the
   // latest saved data (notes, prices, etc.) — not a cached copy from a previous open.
@@ -4585,15 +4586,7 @@ function EditAppointmentDialog({
                     return;
                   }
                   const s = await res.json();
-                  addEditItemMutation.mutate({
-                    supplyId: s.id,
-                    name: s.name,
-                    sku: s.sku || upc,
-                    brand: s.brand || null,
-                    category: s.category || null,
-                    price: String(s.price || '0'),
-                    quantity: 1,
-                  });
+                  setPendingApptItem({ supply: { ...s, sku: s.sku || upc }, priceOverride: String(s.price || '0') });
                 } catch {
                   toast({ title: "Error", description: "Failed to look up barcode.", variant: "destructive" });
                 }
@@ -4617,21 +4610,89 @@ function EditAppointmentDialog({
                   <Button
                     size="sm"
                     className="ml-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-3"
-                    disabled={addEditItemMutation.isPending}
-                    onClick={() => addEditItemMutation.mutate({
-                      supplyId: s.id,
-                      name: s.name,
-                      sku: s.sku || null,
-                      brand: s.brand || null,
-                      category: s.category || null,
-                      price: String(s.price || '0'),
-                      quantity: 1,
-                    })}
+                    onClick={() => {
+                      setPendingApptItem({ supply: s, priceOverride: String(s.price || '0') });
+                      setItemSearch('');
+                      setItemSearchResults([]);
+                    }}
                   >
                     Add
                   </Button>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Price override card — appears after scanner/search selection, before committing */}
+          {pendingApptItem && (
+            <div className="border-2 border-orange-400 rounded-lg p-3 bg-orange-50 dark:bg-orange-950 space-y-2">
+              <p className="text-sm font-semibold text-orange-800 dark:text-orange-200">Confirm Item &amp; Price</p>
+              <p className="text-sm font-medium truncate">{pendingApptItem.supply.name}</p>
+              <p className="text-xs text-gray-500">
+                Catalog price: ${parseFloat(pendingApptItem.supply.price || '0').toFixed(2)}
+              </p>
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-600 dark:text-gray-300 whitespace-nowrap">Charge price:</label>
+                <div className="flex items-center border border-gray-300 rounded px-2 bg-white dark:bg-gray-800">
+                  <span className="text-sm text-gray-500">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={pendingApptItem.priceOverride}
+                    onChange={(e) => setPendingApptItem({ ...pendingApptItem, priceOverride: e.target.value })}
+                    className="w-20 text-sm px-1 py-1 bg-transparent focus:outline-none"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const s = pendingApptItem.supply;
+                        addEditItemMutation.mutate({
+                          supplyId: s.id,
+                          name: s.name,
+                          sku: s.sku || null,
+                          brand: s.brand || null,
+                          category: s.category || null,
+                          price: pendingApptItem.priceOverride || '0',
+                          quantity: 1,
+                        });
+                        setPendingApptItem(null);
+                      } else if (e.key === 'Escape') {
+                        setPendingApptItem(null);
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2 pt-1">
+                <Button
+                  size="sm"
+                  className="bg-orange-500 hover:bg-orange-600 text-white text-xs px-4"
+                  disabled={addEditItemMutation.isPending}
+                  onClick={() => {
+                    const s = pendingApptItem.supply;
+                    addEditItemMutation.mutate({
+                      supplyId: s.id,
+                      name: s.name,
+                      sku: s.sku || null,
+                      brand: s.brand || null,
+                      category: s.category || null,
+                      price: pendingApptItem.priceOverride || '0',
+                      quantity: 1,
+                    });
+                    setPendingApptItem(null);
+                  }}
+                >
+                  Add at ${parseFloat(pendingApptItem.priceOverride || '0').toFixed(2)}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                  onClick={() => setPendingApptItem(null)}
+                >
+                  Cancel
+                </Button>
+              </div>
             </div>
           )}
 
