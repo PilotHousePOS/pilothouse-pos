@@ -2433,9 +2433,11 @@ export class DatabaseStorage implements IStorage {
     const enrichedItems = await Promise.all(items.map(async (item) => {
       let itemName = 'Unknown Item';
       
+      let itemSku = '';
       if (item.supplyId) {
         const [supply] = await db.select().from(supplies).where(eq(supplies.id, item.supplyId));
         itemName = supply?.name || `Supply #${item.supplyId}`;
+        itemSku = supply?.sku || '';
       } else if (item.petId) {
         const [pet] = await db.select().from(pets).where(eq(pets.id, item.petId));
         itemName = pet?.name || `Pet #${item.petId}`;
@@ -2444,6 +2446,7 @@ export class DatabaseStorage implements IStorage {
       return {
         ...item,
         itemName,
+        sku: itemSku,
       };
     }));
     

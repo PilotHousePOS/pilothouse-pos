@@ -195,10 +195,14 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
     voidedTotal += parseFloat(order.totalAmount) || 0;
   }
   
+  // Collect full order details for the items breakdown section
+  const processedOrders: Array<{ order: any; items: any[]; customerName: string }> = [];
+
   // Process active orders (non-cancelled) for gross sales
   for (const order of activeOrders) {
     const orderWithItems = await storage.getOrderWithItems(order.id);
     if (!orderWithItems) continue;
+    processedOrders.push({ order, items: orderWithItems.items, customerName: orderWithItems.customerName || 'Unknown' });
 
     const orderTotal = parseFloat(order.totalAmount) || 0;
     const orderSubtotal = parseFloat((order as any).subtotal) || orderTotal;
@@ -391,6 +395,27 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
   }
   if (apptItemsTotal > 0) {
     groomingOrderTotal += apptItemsTotal;
+  }
+
+  // Fetch paid grooming appointments within the window dates
+  // appointmentDate is a calendar DATE (YYYY-MM-DD), so we check both dates in the window
+  let paidGroomingAppts: Array<{ appt: any; pets: any[] }> = [];
+  let groomingServiceTotal = 0;
+  let groomingServiceCount = 0;
+  try {
+    const allAppts = await storage.getAppointments();
+    const windowAppts = allAppts.filter((apt: any) =>
+      apt.isPaid && apt.finalAmount &&
+      apt.appointmentDate >= yesterdayDateStr && apt.appointmentDate <= todayDateStr
+    );
+    for (const appt of windowAppts) {
+      const pets = await storage.getAppointmentPets(appt.id);
+      paidGroomingAppts.push({ appt, pets });
+      groomingServiceTotal += parseFloat(appt.finalAmount) || 0;
+      groomingServiceCount++;
+    }
+  } catch (e) {
+    // Non-fatal
   }
 
   // Get refund data from multiple sources for reliability
@@ -645,6 +670,34 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
         ${dataRow('Avg. Ticket', formatCurrency(avgTicket), '')}
         ` : ''}
         
+        ${processedOrders.length > 0 ? `
+        ${sectionHeader('Items Sold')}
+        ${processedOrders.map(({ order, items, customerName }) => {
+          const orderTime = order.orderDate
+            ? new Date(order.orderDate).toLocaleString('en-US', { timeZone: 'America/Chicago', month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true })
+            : '';
+          return `
+            <tr>
+              <td colspan="3" style="padding: 6px 0 2px 0; font-weight: bold; font-size: 11px; border-top: 1px dashed #ccc;">
+                Order #${order.id} &mdash; ${customerName} &mdash; ${orderTime}
+              </td>
+            </tr>
+            ${items.map((item: any) => {
+              const lineTotal = (parseFloat(item.price) || 0) * (item.quantity || 1);
+              const skuStr = item.sku ? ` <span style="color:#666;font-size:10px;">[${item.sku}]</span>` : '';
+              return `<tr>
+                <td style="padding: 1px 8px 1px 12px; font-size: 11px;" colspan="2">${item.quantity || 1}x &nbsp;${item.itemName}${skuStr}</td>
+                <td style="text-align: right; padding: 1px 0 1px 8px; font-size: 11px; white-space: nowrap;">${formatCurrency(lineTotal)}</td>
+              </tr>`;
+            }).join('')}
+            <tr>
+              <td colspan="2" style="padding: 1px 8px 4px 12px; font-size: 11px; color:#666;">Tax ${formatCurrency(parseFloat((order as any).taxAmount) || 0)} &nbsp;|&nbsp; Fee ${formatCurrency(parseFloat((order as any).convenienceFee) || 0)}</td>
+              <td style="text-align: right; padding: 1px 0 4px 8px; font-size: 11px; font-weight:bold; white-space: nowrap;">${formatCurrency(parseFloat(order.totalAmount) || 0)}</td>
+            </tr>
+          `;
+        }).join('')}
+        ` : ''}
+
         ${transactionCount > 0 ? `
         ${sectionHeader('Gross Sales By Category')}
         ${headerRow('', 'Total $', 'Sales %')}
@@ -670,6 +723,21 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
         ${groomingOrderCount > 0 ? dataRow('Grooming Orders', formatCurrency(groomingOrderTotal), formatPercent(groomingOrderTotal, total)) : ''}
         ${supplyOrderCount === 0 && groomingOrderCount === 0 ? dataRow('(No orders)', '0.00', '') : ''}
         ${dataRow('<strong>Total</strong>', `<strong>${formatCurrency(total)}</strong>`, '')}
+
+        ${paidGroomingAppts.length > 0 ? `
+        ${sectionHeader('Grooming Revenue')}
+        ${headerRow('', 'Total $', 'Count #')}
+        ${dataRow('Grooming Services', formatCurrency(groomingServiceTotal), String(groomingServiceCount))}
+        <tr><td colspan="3" style="padding: 2px 0;"></td></tr>
+        ${paidGroomingAppts.map(({ appt, pets }) => {
+          const petList = pets.map((p: any) => `${p.petName} (${p.serviceType})`).join(', ');
+          return `<tr>
+            <td colspan="2" style="padding: 1px 8px 1px 12px; font-size: 11px;">${appt.appointmentDate} &mdash; ${appt.ownerFirstName} ${appt.ownerLastName}${petList ? ` &mdash; ${petList}` : ''}</td>
+            <td style="text-align: right; padding: 1px 0 1px 8px; font-size: 11px; white-space: nowrap;">${formatCurrency(parseFloat(appt.finalAmount) || 0)}</td>
+          </tr>`;
+        }).join('')}
+        ${dataRow('<strong>Total</strong>', `<strong>${formatCurrency(groomingServiceTotal)}</strong>`, '')}
+        ` : ''}
         
         ${sectionHeader('Discounts Applied')}
         ${headerRow('', 'Total $', 'Count #')}
@@ -925,12 +993,36 @@ ${sortedDayParts.map(dp =>
 ).join('\n')}
 Report Total              ${formatCurrency(total).padStart(10)}   100.00%
 
+${processedOrders.length > 0 ? `-- Items Sold --
+${processedOrders.map(({ order, items, customerName }) => {
+  const orderTime = order.orderDate
+    ? new Date(order.orderDate).toLocaleString('en-US', { timeZone: 'America/Chicago', month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true })
+    : '';
+  const itemLines = items.map((item: any) => {
+    const lineTotal = (parseFloat(item.price) || 0) * (item.quantity || 1);
+    const skuPart = item.sku ? `  [${item.sku}]` : '';
+    return `  ${String(item.quantity || 1).padStart(2)}x  ${item.itemName}${skuPart}  ${formatCurrency(lineTotal).padStart(8)}`;
+  }).join('\n');
+  return `Order #${order.id}  ${customerName}  ${orderTime}
+${itemLines}
+     Tax ${formatCurrency(parseFloat((order as any).taxAmount) || 0)}  Fee ${formatCurrency(parseFloat((order as any).convenienceFee) || 0)}  Total ${formatCurrency(parseFloat(order.totalAmount) || 0)}`;
+}).join('\n\n')}
+` : ''}
 -- Online Sales By Order Type --
                           Total $    Sales %
 ${supplyOrderCount > 0 ? `Supply Orders             ${formatCurrency(supplyOrderTotal).padStart(10)}   ${formatPercent(supplyOrderTotal, total)}` : ''}
 ${groomingOrderCount > 0 ? `Grooming Orders           ${formatCurrency(groomingOrderTotal).padStart(10)}   ${formatPercent(groomingOrderTotal, total)}` : ''}
 Total                     ${formatCurrency(total).padStart(10)}
 
+${paidGroomingAppts.length > 0 ? `-- Grooming Revenue --
+                          Total $    Count #
+Grooming Services         ${formatCurrency(groomingServiceTotal).padStart(10)}    ${String(groomingServiceCount).padStart(5)}
+${paidGroomingAppts.map(({ appt, pets }) => {
+  const petList = pets.map((p: any) => `${p.petName} (${p.serviceType})`).join(', ');
+  return `  ${appt.appointmentDate}  ${appt.ownerFirstName} ${appt.ownerLastName}${petList ? '  ' + petList : ''}  ${formatCurrency(parseFloat(appt.finalAmount) || 0).padStart(8)}`;
+}).join('\n')}
+Total                     ${formatCurrency(groomingServiceTotal).padStart(10)}
+` : ''}
 -- Discounts Applied --
                           Total $    Count #
 ${totalLoyaltyDiscounts > 0 ? `Loyalty Credits           ${formatCurrency(totalLoyaltyDiscounts).padStart(10)}    ${String(loyaltyDiscountCount).padStart(5)}` : ''}
