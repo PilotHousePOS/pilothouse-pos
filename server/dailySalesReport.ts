@@ -419,6 +419,19 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
     // Non-fatal
   }
 
+  // Debug logging to trace report totals
+  console.log('[DailySalesReport] === REPORT DEBUG ===');
+  console.log(`[DailySalesReport] windowStart: ${windowStart.toISOString()} (${windowStart.toLocaleString('en-US', { timeZone: 'America/Chicago' })} CST)`);
+  console.log(`[DailySalesReport] windowEnd:   ${windowEnd.toISOString()} (${windowEnd.toLocaleString('en-US', { timeZone: 'America/Chicago' })} CST)`);
+  console.log(`[DailySalesReport] todayDateStr: ${todayDateStr}, yesterdayDateStr: ${yesterdayDateStr}`);
+  console.log(`[DailySalesReport] activeOrders: ${activeOrders.length}, ids: [${activeOrders.map((o: any) => o.id).join(', ')}]`);
+  console.log(`[DailySalesReport] order totals: [${activeOrders.map((o: any) => `#${o.id}=$${o.totalAmount}`).join(', ')}]`);
+  console.log(`[DailySalesReport] apptItems: ${todaysApptItems.length}, apptItemsTotal: $${(todaysApptItems.reduce((s: number, i: any) => s + parseFloat(i.price) * (i.quantity || 1), 0)).toFixed(2)}`);
+  console.log(`[DailySalesReport] total (orders+items): $${total.toFixed(2)}`);
+  console.log(`[DailySalesReport] paidGroomingAppts: ${paidGroomingAppts.length}, ids: [${paidGroomingAppts.map(({ appt }: any) => `#${appt.id}(${appt.ownerLastName})=$${appt.finalAmount}`).join(', ')}]`);
+  console.log(`[DailySalesReport] groomingServiceTotal: $${groomingServiceTotal.toFixed(2)}`);
+  console.log('[DailySalesReport] === END DEBUG ===');
+
   // Get refund data from multiple sources for reliability
   // Source 1: Query refunds by date range (CST-aware)
   const cstNow = new Date(today.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
