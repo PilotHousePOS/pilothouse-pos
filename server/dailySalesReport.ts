@@ -722,6 +722,13 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
         ${dataRow('Convenience Fees', formatCurrency(totalConvenienceFees), String(convenienceFeeCount))}
         ${groomingServiceTotal > 0 ? dataRow('Grooming Services', formatCurrency(groomingServiceTotal), String(groomingServiceCount)) : ''}
         ${dataRow('<strong>Total Collected</strong>', `<strong>${formatCurrency(grandTotal)}</strong>`, '')}
+        ${refundedTotal > 0 ? dataRow('Less: Refunds', `-${formatCurrency(refundedTotal)}`, '') : ''}
+        ${dataRow('Less: Stripe Fees', `-${formatCurrency(hasStripeBalanceData ? stripeFeesTotal : stripeProcessingFees)}`, '')}
+        ${(() => {
+          const fees = hasStripeBalanceData ? stripeFeesTotal : stripeProcessingFees;
+          const netBank = grandTotal - refundedTotal - fees;
+          return dataRow('<strong>Est. Bank Deposit</strong>', `<strong>${netBank < 0 ? '-' + formatCurrency(Math.abs(netBank)) : formatCurrency(netBank)}</strong>`, '');
+        })()}
         <tr><td colspan="3" style="padding: 8px 0;"></td></tr>
         ${dataRow('Avg. Ticket', formatCurrency(avgTicket), '')}
         ` : ''}
@@ -1009,6 +1016,9 @@ Taxes (10.99%)            ${formatCurrency(totalTax).padStart(10)}
 Convenience Fees          ${formatCurrency(totalConvenienceFees).padStart(10)}    ${String(convenienceFeeCount).padStart(5)}
 ${groomingServiceTotal > 0 ? `Grooming Services         ${formatCurrency(groomingServiceTotal).padStart(10)}    ${String(groomingServiceCount).padStart(5)}` : ''}
 Total Collected           ${formatCurrency(grandTotal).padStart(10)}
+${refundedTotal > 0 ? `Less: Refunds            -${formatCurrency(refundedTotal).padStart(9)}` : ''}
+Less: Stripe Fees        -${formatCurrency(hasStripeBalanceData ? stripeFeesTotal : stripeProcessingFees).padStart(9)}
+${(() => { const fees = hasStripeBalanceData ? stripeFeesTotal : stripeProcessingFees; const nb = grandTotal - refundedTotal - fees; return `Est. Bank Deposit         ${(nb < 0 ? '-' + formatCurrency(Math.abs(nb)) : formatCurrency(nb)).padStart(10)}`; })()}
 Avg. Ticket               ${formatCurrency(avgTicket).padStart(10)}
 
 -- Taxes Collected --
