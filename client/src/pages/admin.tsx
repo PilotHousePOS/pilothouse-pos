@@ -4148,6 +4148,22 @@ function EditAppointmentDialog({
     },
     onError: () => toast({ title: "Error", description: "Failed to remove item.", variant: "destructive" }),
   });
+
+  const updateEditItemPriceMutation = useMutation({
+    mutationFn: async ({ itemId, price }: { itemId: number; price: string }) => {
+      return apiRequest("PATCH", `/api/appointments/${appointmentId}/items/${itemId}`, { price });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments", appointmentId, "items"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
+      setEditingItemId(null);
+      setEditingItemPrice('');
+    },
+    onError: () => toast({ title: "Error", description: "Failed to update price.", variant: "destructive" }),
+  });
+
+  const [editingItemId, setEditingItemId] = useState<number | null>(null);
+  const [editingItemPrice, setEditingItemPrice] = useState('');
   
   // Update pet field
   const updatePet = (index: number, field: string, value: any) => {
@@ -4700,23 +4716,55 @@ function EditAppointmentDialog({
           {editApptItems.length > 0 ? (
             <div className="space-y-1">
               {editApptItems.map((item: any) => (
-                <div key={item.id} className="flex items-center justify-between bg-blue-50 rounded px-3 py-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{item.name}</p>
-                    <p className="text-xs text-gray-500">
-                      {item.brand || ''}{item.brand && item.sku ? ' · ' : ''}{item.sku || ''}
-                      {' '}× {item.quantity} = ${(parseFloat(item.price) * item.quantity).toFixed(2)}
-                    </p>
+                <div key={item.id} className="bg-blue-50 rounded px-3 py-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium truncate flex-1 min-w-0">{item.name}</p>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 px-2 h-auto shrink-0"
+                      disabled={removeEditItemMutation.isPending}
+                      onClick={() => removeEditItemMutation.mutate(item.id)}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50 px-2 h-auto shrink-0"
-                    disabled={removeEditItemMutation.isPending}
-                    onClick={() => removeEditItemMutation.mutate(item.id)}
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
+                  {editingItemId === item.id ? (
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-gray-500">Qty {item.quantity} ×</span>
+                      <div className="flex items-center border border-orange-400 rounded px-2 bg-white">
+                        <span className="text-xs text-gray-500">$</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={editingItemPrice}
+                          onChange={(e) => setEditingItemPrice(e.target.value)}
+                          className="w-16 text-sm px-1 py-0.5 bg-transparent focus:outline-none"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') updateEditItemPriceMutation.mutate({ itemId: item.id, price: editingItemPrice });
+                            if (e.key === 'Escape') { setEditingItemId(null); setEditingItemPrice(''); }
+                          }}
+                        />
+                      </div>
+                      <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white text-xs h-6 px-2" disabled={updateEditItemPriceMutation.isPending} onClick={() => updateEditItemPriceMutation.mutate({ itemId: item.id, price: editingItemPrice })}>Save</Button>
+                      <Button size="sm" variant="ghost" className="text-xs h-6 px-2" onClick={() => { setEditingItemId(null); setEditingItemPrice(''); }}>×</Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <p className="text-xs text-gray-500 flex-1">
+                        {item.brand || ''}{item.brand && item.sku ? ' · ' : ''}{item.sku || ''}
+                        {' '}× {item.quantity} = ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                      </p>
+                      <button
+                        className="text-xs text-orange-500 hover:text-orange-700 underline shrink-0"
+                        onClick={() => { setEditingItemId(item.id); setEditingItemPrice(String(parseFloat(item.price).toFixed(2))); }}
+                      >
+                        Edit price
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
               <div className="flex justify-between items-center pt-1 border-t border-blue-200 mt-1">

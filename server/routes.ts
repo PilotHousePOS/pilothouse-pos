@@ -5087,6 +5087,19 @@ West Monroe LA 71291
     }
   });
 
+  app.patch("/api/appointments/:id/items/:itemId", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin && !user?.isGroomer) return res.status(403).json({ message: "Admin or groomer access required" });
+      const { price } = req.body;
+      if (!price) return res.status(400).json({ message: "price is required" });
+      const item = await storage.updateAppointmentItemPrice(parseInt(req.params.itemId), String(price));
+      res.json(item);
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
   app.delete("/api/appointments/:id/items/:itemId", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);

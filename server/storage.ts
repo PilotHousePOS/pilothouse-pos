@@ -306,6 +306,7 @@ export interface IStorage {
   getAppointmentItemsBulk(appointmentIds: number[]): Promise<any[]>;
   addAppointmentItem(data: { appointmentId: number; supplyId?: number | null; name: string; sku?: string | null; brand?: string | null; category?: string | null; price: string; quantity: number }): Promise<any>;
   removeAppointmentItem(id: number): Promise<void>;
+  updateAppointmentItemPrice(id: number, price: string): Promise<any>;
   getAppointmentItemsByDate(date: string): Promise<any[]>;
   
   // Appointment history operations
@@ -2891,6 +2892,14 @@ export class DatabaseStorage implements IStorage {
 
   async removeAppointmentItem(id: number): Promise<void> {
     await db.delete(appointmentItems).where(eq(appointmentItems.id, id));
+  }
+
+  async updateAppointmentItemPrice(id: number, price: string): Promise<any> {
+    const [item] = await db.update(appointmentItems)
+      .set({ price })
+      .where(eq(appointmentItems.id, id))
+      .returning();
+    return item;
   }
 
   async getAppointmentItemsByDate(date: string): Promise<any[]> {
