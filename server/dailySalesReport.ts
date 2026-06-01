@@ -132,9 +132,10 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
   const periodEndStr = windowEnd.toLocaleDateString('en-US', { ...cstOptions, month: '2-digit', day: '2-digit', year: '2-digit' })
     + ' ' + windowEnd.toLocaleTimeString('en-US', { ...cstOptions, hour: '2-digit', minute: '2-digit', hour12: true });
 
-  // Keep today's calendar date for appointment items (appointments are date-based, not timestamped)
+  // Keep the report's calendar date for appointment items (appointments are date-based, not timestamped).
+  // For specific-date reports, use that date so we don't accidentally pull in today's items.
   const today = now;
-  const todayDateStr = now.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+  const todayDateStr = specificDate || now.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
   const yesterdayDateStr = windowStart.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
 
   const allOrders = await storage.getOrders();
