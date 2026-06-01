@@ -11591,13 +11591,24 @@ West Monroe LA 71291
       }
       
       // Always filter by user ID - admins see all appointments in admin panel, not here
-      const appointments = await storage.getAppointments(userId);
-      
+      const byUserId = await storage.getAppointments(userId);
+
+      // Also pull in any historical appointments booked as a guest under the same phone number
+      // so customers see their full grooming history when they create an account
+      const user = await storage.getUser(userId);
+      let merged = [...byUserId];
+      if (user?.phoneNumber) {
+        const byPhone = await storage.getAppointmentsByPhoneNumber(user.phoneNumber);
+        const existingIds = new Set(byUserId.map((a: any) => a.id));
+        const phoneOnly = byPhone.filter((a: any) => !existingIds.has(a.id));
+        merged = [...byUserId, ...phoneOnly];
+      }
+
       // Filter out old completed/cancelled appointments (older than 30 days)
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       
-      const filteredAppointments = appointments.filter((apt: any) => {
+      const filteredAppointments = merged.filter((apt: any) => {
         // Keep all scheduled appointments
         if (apt.status === 'scheduled') {
           return true;
