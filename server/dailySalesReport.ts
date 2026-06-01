@@ -22,6 +22,7 @@ interface Order {
   status: string | null;
   shippingAddress: string | null;
   orderDate: Date | null;
+  paidAt: Date | null;
   updatedAt: Date | null;
 }
 
@@ -144,11 +145,12 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
     // Table may not exist yet
   }
   
-  // Filter orders to the 24-hour rolling window
+  // Filter orders to the window using paidAt (actual payment time from Stripe) or orderDate fallback
   const todaysOrders = allOrders.filter((order: Order) => {
-    if (!order.orderDate) return false;
-    const orderDate = new Date(order.orderDate);
-    return orderDate >= windowStart && orderDate <= windowEnd;
+    const timestamp = (order as any).paidAt || order.orderDate;
+    if (!timestamp) return false;
+    const paymentDate = new Date(timestamp);
+    return paymentDate >= windowStart && paymentDate <= windowEnd;
   });
 
   const refundedOrders = todaysOrders.filter(order => order.status === 'refunded' || (order as any).paymentStatus === 'refunded');
@@ -265,9 +267,10 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
       }
     }
 
-    // Net Sales By Day Part - categorize by order time in CST
-    if (order.orderDate) {
-      const orderHour = parseInt(new Date(order.orderDate).toLocaleString('en-US', { timeZone: 'America/Chicago', hour: 'numeric', hour12: false }));
+    // Net Sales By Day Part - categorize by payment time in CST
+    const orderTimestamp = (order as any).paidAt || order.orderDate;
+    if (orderTimestamp) {
+      const orderHour = parseInt(new Date(orderTimestamp).toLocaleString('en-US', { timeZone: 'America/Chicago', hour: 'numeric', hour12: false }));
       let dayPart = 'Evening (5PM-Close)';
       if (orderHour >= 7 && orderHour < 12) {
         dayPart = 'Morning (7AM-12PM)';
@@ -678,8 +681,9 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
         ${processedOrders.length > 0 ? `
         ${sectionHeader('Items Sold')}
         ${processedOrders.map(({ order, items, customerName }) => {
-          const orderTime = order.orderDate
-            ? new Date(order.orderDate).toLocaleString('en-US', { timeZone: 'America/Chicago', month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true })
+          const orderTimestamp = (order as any).paidAt || order.orderDate;
+          const orderTime = orderTimestamp
+            ? new Date(orderTimestamp).toLocaleString('en-US', { timeZone: 'America/Chicago', month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true })
             : '';
           return `
             <tr>
@@ -1000,8 +1004,9 @@ Report Total              ${formatCurrency(total).padStart(10)}   100.00%
 
 ${processedOrders.length > 0 ? `-- Items Sold --
 ${processedOrders.map(({ order, items, customerName }) => {
-  const orderTime = order.orderDate
-    ? new Date(order.orderDate).toLocaleString('en-US', { timeZone: 'America/Chicago', month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true })
+  const orderTimestamp = (order as any).paidAt || order.orderDate;
+  const orderTime = orderTimestamp
+    ? new Date(orderTimestamp).toLocaleString('en-US', { timeZone: 'America/Chicago', month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true })
     : '';
   const itemLines = items.map((item: any) => {
     const lineTotal = (parseFloat(item.price) || 0) * (item.quantity || 1);

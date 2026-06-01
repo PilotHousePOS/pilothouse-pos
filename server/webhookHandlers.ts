@@ -55,7 +55,7 @@ export class WebhookHandlers {
   static async handleStripeEvent(event: any): Promise<void> {
     switch (event.type) {
       case 'checkout.session.completed':
-        await WebhookHandlers.handleCheckoutSessionCompleted(event.data.object);
+        await WebhookHandlers.handleCheckoutSessionCompleted(event.data.object, event.created);
         break;
         
       case 'checkout.session.expired':
@@ -79,8 +79,9 @@ export class WebhookHandlers {
     }
   }
   
-  static async handleCheckoutSessionCompleted(session: any): Promise<void> {
+  static async handleCheckoutSessionCompleted(session: any, eventCreated?: number): Promise<void> {
     console.log('Processing checkout.session.completed:', session.id);
+    const paidAt = eventCreated ? new Date(eventCreated * 1000) : new Date();
     
     // Find order by checkout session ID
     const order = await storage.getOrderByStripeCheckoutSession(session.id);
@@ -95,7 +96,7 @@ export class WebhookHandlers {
           await storage.updateOrderStripePayment(parseInt(orderId), {
             stripePaymentIntentId: session.payment_intent,
             paymentStatus: 'paid',
-            paidAt: new Date(),
+            paidAt,
           });
           
           // Update order to ready_for_pickup since payment is complete
@@ -130,7 +131,7 @@ export class WebhookHandlers {
     await storage.updateOrderStripePayment(order.id, {
       stripePaymentIntentId: session.payment_intent,
       paymentStatus: 'paid',
-      paidAt: new Date(),
+      paidAt,
     });
     
     // Update order to ready_for_pickup since payment is complete
