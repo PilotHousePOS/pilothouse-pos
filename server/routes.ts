@@ -11606,7 +11606,9 @@ West Monroe LA 71291
       if (user?.phoneNumber) {
         const byPhone = await storage.getAppointmentsByPhoneNumber(user.phoneNumber);
         const existingIds = new Set(byUserId.map((a: any) => a.id));
-        const phoneOnly = byPhone.filter((a: any) => !existingIds.has(a.id));
+        // Only include appointments not already linked to a different user account
+        // (guards against recycled phone numbers or shared family numbers)
+        const phoneOnly = byPhone.filter((a: any) => !existingIds.has(a.id) && !a.userId);
         merged = [...byUserId, ...phoneOnly];
       }
 
