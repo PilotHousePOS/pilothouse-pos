@@ -277,6 +277,7 @@ export interface IStorage {
   getAppointments(userId?: string): Promise<Appointment[]>;
   getAppointment(id: number): Promise<Appointment | undefined>;
   getAppointmentsByPhoneNumber(phoneNumber: string): Promise<Appointment[]>;
+  linkAppointmentsToUser(phoneNumber: string, userId: string): Promise<number>;
   updateAppointmentStatus(id: number, status: string): Promise<Appointment>;
   updateAppointmentIsHere(id: number, isHere: boolean): Promise<Appointment>;
   updateAppointmentIsPaid(id: number, isPaid: boolean): Promise<Appointment>;
@@ -2776,6 +2777,21 @@ export class DatabaseStorage implements IStorage {
       const aptPhone = apt.ownerPhoneNumber.replace(/\D/g, '');
       return aptPhone === normalizedPhone;
     }).sort((a, b) => new Date(b.appointmentDate).getTime() - new Date(a.appointmentDate).getTime());
+  }
+
+  async linkAppointmentsToUser(phoneNumber: string, userId: string): Promise<number> {
+    // Permanently link all unlinked appointments matching this phone number to the user account
+    const normalizedPhone = phoneNumber.replace(/\D/g, '');
+    const allAppointments = await db.select().from(appointments);
+    const toLink = allAppointments.filter(apt => {
+      if (apt.userId) return false; // already linked to someone
+      const aptPhone = apt.ownerPhoneNumber.replace(/\D/g, '');
+      return aptPhone === normalizedPhone;
+    });
+    for (const apt of toLink) {
+      await db.update(appointments).set({ userId }).where(eq(appointments.id, apt.id));
+    }
+    return toLink.length;
   }
 
   async updateAppointmentStatus(id: number, status: string): Promise<Appointment> {

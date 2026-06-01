@@ -539,7 +539,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         console.log(`Linked contact ${contact.id} to user ${newUser.id}, replaced temp email with ${email}`);
       }
 
-      console.log(`Linked ${matchingContacts.length} contacts to new user ${newUser.id}`)
+      console.log(`Linked ${matchingContacts.length} contacts to new user ${newUser.id}`);
+
+      // Link any prior grooming appointments booked under the same phone number
+      const linkedAppts = await storage.linkAppointmentsToUser(phoneNumber, newUser.id);
+      if (linkedAppts > 0) {
+        console.log(`Linked ${linkedAppts} historical appointments to new user ${newUser.id} (phone match)`);
+      }
 
       // Send verification email (non-blocking — don't fail signup if email fails)
       try {
