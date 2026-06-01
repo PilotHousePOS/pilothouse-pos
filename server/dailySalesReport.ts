@@ -421,7 +421,7 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
   try {
     const allAppts = await storage.getAppointments();
     const windowAppts = allAppts.filter((apt: any) =>
-      apt.isPaid && apt.finalAmount &&
+      apt.isPaid && apt.paidOnline && apt.finalAmount &&
       apt.appointmentDate >= yesterdayDateStr && apt.appointmentDate <= todayDateStr
     );
     for (const appt of windowAppts) {
