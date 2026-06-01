@@ -77,47 +77,58 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
 
   const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
 
-  const today = new Date();
+  const now = new Date();
   const cstOptions = { timeZone: 'America/Chicago' };
-  
-  const reportDate = today.toLocaleDateString('en-US', { 
+
+  // Use a 24-hour rolling window ending now so orders placed after the previous
+  // report time are never skipped (e.g. a 7 PM order won't be missed by a 6 PM report).
+  const windowEnd = now;
+  const windowStart = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+  const reportDate = now.toLocaleDateString('en-US', { 
     ...cstOptions,
     month: '2-digit',
     day: '2-digit',
     year: '2-digit'
   });
   
-  const reportTime = today.toLocaleTimeString('en-US', {
+  const reportTime = now.toLocaleTimeString('en-US', {
     ...cstOptions,
     hour: '2-digit',
     minute: '2-digit',
     hour12: true
   });
 
-  const startDateStr = today.toLocaleDateString('en-US', { 
-    ...cstOptions,
-    month: '2-digit',
-    day: '2-digit',
-    year: '2-digit'
-  });
-  
+  const periodStartStr = windowStart.toLocaleDateString('en-US', { ...cstOptions, month: '2-digit', day: '2-digit', year: '2-digit' })
+    + ' ' + windowStart.toLocaleTimeString('en-US', { ...cstOptions, hour: '2-digit', minute: '2-digit', hour12: true });
+  const periodEndStr = windowEnd.toLocaleDateString('en-US', { ...cstOptions, month: '2-digit', day: '2-digit', year: '2-digit' })
+    + ' ' + windowEnd.toLocaleTimeString('en-US', { ...cstOptions, hour: '2-digit', minute: '2-digit', hour12: true });
+
+  // Keep today's calendar date for appointment items (appointments are date-based, not timestamped)
+  const today = now;
+  const todayDateStr = now.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+  const yesterdayDateStr = windowStart.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+
   const allOrders = await storage.getOrders();
   
-  // Fetch today's appointment items (items sold at grooming appointments)
-  const todayDateStr = today.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+  // Fetch appointment items for both calendar dates in the window
   let todaysApptItems: any[] = [];
   try {
-    todaysApptItems = await storage.getAppointmentItemsByDate(todayDateStr);
+    const todayItems = await storage.getAppointmentItemsByDate(todayDateStr);
+    todaysApptItems = todayItems || [];
+    if (yesterdayDateStr !== todayDateStr) {
+      const yestItems = await storage.getAppointmentItemsByDate(yesterdayDateStr);
+      if (yestItems) todaysApptItems = [...todaysApptItems, ...yestItems];
+    }
   } catch (e) {
     // Table may not exist yet
   }
   
+  // Filter orders to the 24-hour rolling window
   const todaysOrders = allOrders.filter((order: Order) => {
     if (!order.orderDate) return false;
     const orderDate = new Date(order.orderDate);
-    const orderDateStr = orderDate.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
-    const todayDateStr = today.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
-    return orderDateStr === todayDateStr;
+    return orderDate >= windowStart && orderDate <= windowEnd;
   });
 
   const refundedOrders = todaysOrders.filter(order => order.status === 'refunded' || (order as any).paymentStatus === 'refunded');
@@ -585,9 +596,8 @@ export async function sendDailySalesReport(recipientEmails: string[]): Promise<v
       
       <!-- Date/Time Info -->
       <div style="text-align: center; margin-bottom: 16px; font-size: 12px;">
-        <div>Date: ${reportDate} ${reportTime}</div>
-        <div>Start: ${startDateStr} 12:00AM</div>
-        <div>End: ${startDateStr} 11:59PM</div>
+        <div>Report Generated: ${reportDate} ${reportTime}</div>
+        <div>Period: ${periodStartStr} &ndash; ${periodEndStr}</div>
       </div>
       
       <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
@@ -824,9 +834,8 @@ ANIMAL HOUSE LLC
 West Monroe LA 71291
 318 322-3023
 
-Date: ${reportDate} ${reportTime}
-Start: ${startDateStr} 12:00AM
-End: ${startDateStr} 11:59PM
+Report Generated: ${reportDate} ${reportTime}
+Period: ${periodStartStr} - ${periodEndStr}
 
 -- Order Summary --
 No online orders placed today.
@@ -840,9 +849,8 @@ ANIMAL HOUSE LLC
 West Monroe LA 71291
 318 322-3023
 
-Date: ${reportDate} ${reportTime}
-Start: ${startDateStr} 12:00AM
-End: ${startDateStr} 11:59PM
+Report Generated: ${reportDate} ${reportTime}
+Period: ${periodStartStr} - ${periodEndStr}
 
 -- Order Summary --
                           Total $    Count #
