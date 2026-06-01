@@ -592,8 +592,11 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
 
   try {
     const stripe = await getUncachableStripeClient();
-    const startOfDayUnix = Math.floor(todayStartUTC.getTime() / 1000);
-    const endOfDayUnix = Math.floor(todayEndUTC.getTime() / 1000);
+    // Use the report date (not necessarily today) so historical reports get the right day's fees
+    const reportDayStart = cstToUtc(`${reportDateStr}T00:00:00`);
+    const reportDayEnd   = cstToUtc(`${reportDateStr}T23:59:59`);
+    const startOfDayUnix = Math.floor(reportDayStart.getTime() / 1000);
+    const endOfDayUnix   = Math.floor(reportDayEnd.getTime() / 1000);
 
     let allTxns: any[] = [];
     let hasMore = true;

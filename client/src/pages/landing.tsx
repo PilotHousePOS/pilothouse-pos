@@ -16,7 +16,7 @@ export default function Landing() {
   const { data: hiringData } = useQuery<{ open: boolean }>({
     queryKey: ['/api/settings/hiring-open'],
   });
-  const hiringOpen = hiringData?.open ?? true;
+  const hiringOpen = hiringData?.open ?? false;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white overflow-hidden relative">
