@@ -392,9 +392,30 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
     groomingOrderTotal += apptItemsTotal;
   }
 
-  // Fetch paid grooming appointments within the window dates
-  // appointmentDate is a calendar DATE (YYYY-MM-DD), so we check both dates in the window
-  let paidGroomingAppts: Array<{ appt: any; pets: any[] }> = [];
+  // Pre-fetch Stripe grooming charges — recovers online grooming payments even after
+  // the midnight scheduler deletes appointments from the live table.
+  let stripeGroomingCharges: Array<{ appointmentId: string; amount: number; description: string }> = [];
+  try {
+    const stripeG = await getUncachableStripeClient();
+    const startUnix = Math.floor(windowStart.getTime() / 1000);
+    const endUnix = Math.floor(windowEnd.getTime() / 1000);
+    const groomingPage = await stripeG.charges.list({ created: { gte: startUnix, lte: endUnix }, limit: 100 });
+    for (const charge of groomingPage.data) {
+      if (charge.metadata?.type === 'grooming' && charge.status === 'succeeded') {
+        stripeGroomingCharges.push({
+          appointmentId: charge.metadata.appointmentId || '',
+          amount: charge.amount / 100,
+          description: charge.description || '',
+        });
+      }
+    }
+  } catch (e: any) {
+    console.log('[DailySalesReport] Stripe grooming charges fetch skipped:', e.message);
+  }
+
+  // Fetch paid grooming appointments within the window dates from the DB.
+  // appointmentDate is a calendar DATE (YYYY-MM-DD), so filter by the report date.
+  let paidGroomingAppts: Array<{ appt: any; pets: any[]; fromStripe?: boolean }> = [];
   let groomingServiceTotal = 0;
   let groomingServiceCount = 0;
   try {
@@ -411,6 +432,29 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
     }
   } catch (e) {
     // Non-fatal
+  }
+
+  // Supplement with online grooming payments from Stripe not already found in the DB
+  // (appointments are deleted by the midnight scheduler, so historical reports need this).
+  for (const sg of stripeGroomingCharges) {
+    const alreadyInDB = paidGroomingAppts.some(({ appt }: any) => String(appt.id) === String(sg.appointmentId));
+    if (!alreadyInDB) {
+      // Parse pet name from Stripe description: "Grooming appointment #3364 — Bodie"
+      const petName = sg.description.includes('—') ? (sg.description.split('—').pop()?.trim() || '') : '';
+      paidGroomingAppts.push({
+        appt: {
+          id: sg.appointmentId,
+          ownerFirstName: 'Online',
+          ownerLastName: petName ? `(${petName})` : '',
+          appointmentDate: todayDateStr,
+          finalAmount: String(sg.amount),
+        },
+        pets: [],
+        fromStripe: true,
+      });
+      groomingServiceTotal += sg.amount;
+      groomingServiceCount++;
+    }
   }
 
   // Debug logging to trace report totals
