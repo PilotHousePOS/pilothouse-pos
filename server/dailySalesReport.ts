@@ -883,20 +883,12 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
         ${totalLoyaltyDiscounts > 0 ? dataRow('Loyalty Discounts Given', `-${formatCurrency(totalLoyaltyDiscounts)}`, '') : ''}
         
         ${hasStripeBalanceData ? `
-        ${sectionHeader('Stripe Balance Summary')}
-        ${headerRow('', 'Total $', '')}
-        ${dataRow('Starting Balance', `${stripeStartingBalance < 0 ? '-' + formatCurrency(Math.abs(stripeStartingBalance)) : formatCurrency(stripeStartingBalance)}`, '')}
-        <tr><td colspan="3" style="padding: 2px 0;"></td></tr>
-        ${headerRow('Balance change from activity', '', '')}
-        ${dataRow('&nbsp;&nbsp;Account activity before fees', `${stripeActivityBeforeFees < 0 ? '-' + formatCurrency(Math.abs(stripeActivityBeforeFees)) : formatCurrency(stripeActivityBeforeFees)}`, '')}
-        ${dataRow('&nbsp;&nbsp;Less fees', stripeFeesTotal > 0 ? `-${formatCurrency(stripeFeesTotal)}` : formatCurrency(0), '')}
-        ${dataRow('<strong>Net balance change</strong>', `<strong>${stripeBalanceChange < 0 ? '-' + formatCurrency(Math.abs(stripeBalanceChange)) : formatCurrency(stripeBalanceChange)}</strong>`, '')}
-        ${dataRow('Total Payouts', stripePayoutsTotal > 0 ? `-${formatCurrency(stripePayoutsTotal)}` : formatCurrency(0), '')}
-        ${dataRow('<strong>Ending Balance</strong>', `<strong>${stripeEndingBalance < 0 ? '-' + formatCurrency(Math.abs(stripeEndingBalance)) : formatCurrency(stripeEndingBalance)}</strong>`, '')}
-        <tr><td colspan="3" style="padding: 4px 0;"></td></tr>
+        ${sectionHeader('Stripe Activity')}
         ${headerRow('Activity Breakdown', 'Total $', 'Count #')}
         ${dataRow('Charges', formatCurrency(stripeChargeGross), String(stripeChargeCount))}
         ${dataRow('Refunds', stripeRefundGross > 0 ? `-${formatCurrency(stripeRefundGross)}` : formatCurrency(0), String(stripeRefundCount))}
+        ${dataRow('&nbsp;&nbsp;Less fees', stripeFeesTotal > 0 ? `-${formatCurrency(stripeFeesTotal)}` : formatCurrency(0), '')}
+        ${stripePayoutsTotal > 0 ? dataRow('Payouts', `-${formatCurrency(stripePayoutsTotal)}`, '') : ''}
         ` : ''}
         
         ${sectionHeader('Net Deposit')}
@@ -1119,20 +1111,12 @@ Net Product Revenue       ${(netAfterRefunds < 0 ? '-' + formatCurrency(Math.abs
 Net Tax Owed              ${formatCurrency(totalTax - refundedTaxTotal).padStart(10)}
 ${totalLoyaltyDiscounts > 0 ? `Loyalty Discounts Given   -${formatCurrency(totalLoyaltyDiscounts).padStart(10)}` : ''}
 ${hasStripeBalanceData ? `
--- Stripe Balance Summary --
-                          Total $
-Starting Balance          ${(stripeStartingBalance < 0 ? '-' + formatCurrency(Math.abs(stripeStartingBalance)) : formatCurrency(stripeStartingBalance)).padStart(10)}
-
-Balance change from activity
-  Activity before fees    ${(stripeActivityBeforeFees < 0 ? '-' + formatCurrency(Math.abs(stripeActivityBeforeFees)) : formatCurrency(stripeActivityBeforeFees)).padStart(10)}
-  Less fees              -${formatCurrency(stripeFeesTotal).padStart(9)}
-Net balance change        ${(stripeBalanceChange < 0 ? '-' + formatCurrency(Math.abs(stripeBalanceChange)) : formatCurrency(stripeBalanceChange)).padStart(10)}
-Total Payouts            ${stripePayoutsTotal > 0 ? '-' + formatCurrency(stripePayoutsTotal).padStart(9) : formatCurrency(0).padStart(10)}
-Ending Balance            ${(stripeEndingBalance < 0 ? '-' + formatCurrency(Math.abs(stripeEndingBalance)) : formatCurrency(stripeEndingBalance)).padStart(10)}
-
+-- Stripe Activity --
 Activity Breakdown        Total $    Count #
 Charges                   ${formatCurrency(stripeChargeGross).padStart(10)}    ${String(stripeChargeCount).padStart(5)}
-Refunds                  ${stripeRefundGross > 0 ? '-' + formatCurrency(stripeRefundGross).padStart(9) : formatCurrency(0).padStart(10)}    ${String(stripeRefundCount).padStart(5)}` : ''}
+Refunds                  ${stripeRefundGross > 0 ? '-' + formatCurrency(stripeRefundGross).padStart(9) : formatCurrency(0).padStart(10)}    ${String(stripeRefundCount).padStart(5)}
+  Less fees              -${formatCurrency(stripeFeesTotal).padStart(9)}
+${stripePayoutsTotal > 0 ? `Payouts                  -${formatCurrency(stripePayoutsTotal).padStart(9)}` : ''}` : ''}
 
 -- Net Deposit --
                           Total $
