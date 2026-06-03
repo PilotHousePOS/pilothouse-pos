@@ -197,7 +197,12 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const requestCamera = useCallback(async () => {
     setCameraState("starting");
     setCameraError("");
-    scanLog("camera_requested");
+    scanLog("camera_requested", {
+      md: typeof navigator.mediaDevices,
+      gum: typeof (navigator.mediaDevices as any)?.getUserMedia,
+      wkit: typeof (navigator as any).webkitGetUserMedia,
+      legacy: typeof (navigator as any).getUserMedia,
+    });
 
     try {
       const stream = await getStream();
