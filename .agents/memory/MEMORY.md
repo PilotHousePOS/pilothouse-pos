@@ -1,0 +1,1 @@
+- [iOS PWA camera bug](ios-pwa-camera.md) — navigator.mediaDevices is undefined in iOS PWA (home screen) mode; must use webkit-prefixed fallback.

@@ -112,14 +112,27 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   }, [lastScanned, lookupMutation, onDetected]);
 
   // ── Get camera stream (shared between both scan paths) ──
+  // navigator.mediaDevices is undefined in iOS PWA mode (WebKit bug) — fall back to webkit prefix.
   const getStream = async (): Promise<MediaStream> => {
-    try {
-      return await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
-      });
-    } catch {
-      return await navigator.mediaDevices.getUserMedia({ video: true });
+    const md = navigator.mediaDevices;
+    if (md?.getUserMedia) {
+      try {
+        return await md.getUserMedia({
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        });
+      } catch {
+        return await md.getUserMedia({ video: true });
+      }
     }
+    // Legacy / iOS PWA fallback
+    const legacyGUM: Function | undefined =
+      (navigator as any).getUserMedia ||
+      (navigator as any).webkitGetUserMedia ||
+      (navigator as any).mozGetUserMedia;
+    if (!legacyGUM) throw new Error("Camera not available on this device");
+    return new Promise<MediaStream>((resolve, reject) => {
+      legacyGUM.call(navigator, { video: { facingMode: "environment" } }, resolve, reject);
+    });
   };
 
   // ── Path A: Native BarcodeDetector loop (Android Chrome, Desktop Chrome) ──
