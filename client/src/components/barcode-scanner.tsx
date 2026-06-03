@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { BrowserMultiFormatReader } from "@zxing/browser";
-import { X, Flashlight, FlashlightOff, Keyboard, Camera, Image } from "lucide-react";
+import { X, Keyboard, Camera } from "lucide-react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -41,12 +40,9 @@ interface BarcodeScannerProps {
   onDetected?: (upc: string) => void;
 }
 
-type CameraState = "home" | "starting" | "live" | "denied" | "scanning-photo";
+type CameraState = "home" | "starting" | "live" | "denied";
 
 export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const readerRef = useRef<BrowserMultiFormatReader | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const quaggaContainerRef = useRef<HTMLDivElement>(null);
   const quaggaModuleRef = useRef<any>(null); // holds the imported Quagga2 module for cleanup
   const [, setLocation] = useLocation();
@@ -55,22 +51,15 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const [cameraState, setCameraState] = useState<CameraState>("home");
   const [manualMode, setManualMode] = useState(false);
   const [manualUpc, setManualUpc] = useState("");
-  const [torchOn, setTorchOn] = useState(false);
-  const [torchSupported, setTorchSupported] = useState(false);
   const [result, setResult] = useState<Product | null>(null);
   const [notFound, setNotFound] = useState(false);
-  const [photoError, setPhotoError] = useState("");
   const [cameraError, setCameraError] = useState("");
   const [lastScanned, setLastScanned] = useState("");
-  const streamRef = useRef<MediaStream | null>(null);
   const cooldownRef = useRef(false);
-  const fromPhotoRef = useRef(false);
 
-  // Cleanup camera on unmount
+  // Cleanup Quagga on unmount
   useEffect(() => {
     return () => {
-      streamRef.current?.getTracks().forEach(t => t.stop());
-      readerRef.current = null;
       if (quaggaModuleRef.current) {
         try { quaggaModuleRef.current.stop(); } catch {}
         quaggaModuleRef.current = null;
@@ -157,24 +146,14 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     onSuccess: (product) => {
       setResult(product);
       setNotFound(false);
-      if (fromPhotoRef.current) {
-        fromPhotoRef.current = false;
-        setCameraState("home");
-      }
     },
-    onError: (_err, upc) => {
+    onError: () => {
       setResult(null);
-      if (fromPhotoRef.current) {
-        fromPhotoRef.current = false;
-        setPhotoError(`Barcode scanned (${upc}) — product not found in database.`);
-        setCameraState("home");
-      } else {
-        setNotFound(true);
-        setTimeout(() => {
-          setNotFound(false);
-          cooldownRef.current = false;
-        }, 2000);
-      }
+      setNotFound(true);
+      setTimeout(() => {
+        setNotFound(false);
+        cooldownRef.current = false;
+      }, 2000);
       cooldownRef.current = false;
     },
   });
@@ -187,19 +166,6 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     lookupMutation.mutate(upc);
   }, [lastScanned, lookupMutation, onDetected]);
 
-  // Try camera with progressively simpler constraints
-  const getStream = async (): Promise<MediaStream> => {
-    try {
-      return await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
-      });
-    } catch {}
-    try {
-      return await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-    } catch {}
-    return await navigator.mediaDevices.getUserMedia({ video: true });
-  };
-
   const requestCamera = useCallback(() => {
     setCameraState("starting");
     setCameraError("");
@@ -208,15 +174,6 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     // Use rAF so the "starting" spinner renders one frame before transitioning.
     requestAnimationFrame(() => setCameraState("live"));
   }, []);
-
-  const toggleTorch = async () => {
-    const track = streamRef.current?.getVideoTracks()[0];
-    if (!track) return;
-    try {
-      await (track as any).applyConstraints({ advanced: [{ torch: !torchOn }] });
-      setTorchOn(t => !t);
-    } catch {}
-  };
 
   const handleManualSubmit = () => {
     const upc = manualUpc.trim();
@@ -235,144 +192,9 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     setNotFound(false);
     setLastScanned("");
     cooldownRef.current = false;
-    setPhotoError("");
     setCameraError("");
     setCameraState("home");
   };
-
-  const handlePhotoCapture = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setPhotoError("");
-    cooldownRef.current = false;
-    setLastScanned("");
-    setCameraState("scanning-photo");
-    if (fileInputRef.current) fileInputRef.current.value = "";
-
-    const fileSizeKB = Math.round(file.size / 1024);
-    scanLog("photo_start", { fileSizeKB });
-
-    const withTimeout = <T,>(p: Promise<T>, ms: number): Promise<T | null> =>
-      Promise.race([p, new Promise<null>(r => setTimeout(() => r(null), ms))]);
-
-    // iOS: keep resolution very small to avoid memory crashes.
-    // Android Chrome can handle larger images via BarcodeDetector.
-    const MAX = isIOS ? 800 : 1920;
-
-    let upc: string | null = null;
-
-    // Method 1: Native BarcodeDetector — fast, memory-efficient, Chrome Android only.
-    // NOT available on iOS Safari.
-    if (!isIOS && "BarcodeDetector" in window) {
-      scanLog("try_barcode_detector");
-      try {
-        const bd = new (window as any).BarcodeDetector({
-          formats: ["upc_a", "upc_e", "ean_13", "ean_8", "code_128", "code_39", "qr_code", "itf", "codabar"],
-        });
-        const imageUrl = URL.createObjectURL(file);
-        try {
-          const imgEl = await withTimeout(
-            new Promise<HTMLImageElement>((resolve, reject) => {
-              const img = new Image();
-              img.onload = () => resolve(img);
-              img.onerror = reject;
-              img.src = imageUrl;
-            }),
-            5000
-          );
-          if (imgEl) {
-            const detections = await withTimeout(bd.detect(imgEl), 6000);
-            if (detections && detections.length > 0) upc = detections[0].rawValue;
-          }
-        } finally {
-          URL.revokeObjectURL(imageUrl);
-        }
-        if (upc) scanLog("barcode_detector_success", { upc });
-        else scanLog("barcode_detector_no_result");
-      } catch (err: any) {
-        const error = String(err?.message || err).slice(0, 120);
-        scanLog("barcode_detector_error", { error });
-        console.warn("[Scanner] BarcodeDetector failed:", err);
-      }
-    }
-
-    // Method 2: ZXing via canvas — Android only.
-    // ZXing's BrowserMultiFormatReader does not work in iOS Safari (constructor fails at runtime).
-    // Loading a 2–3 MB image on iOS also risks memory-pressure crashes.
-    // Skip this entire block on iOS to avoid both problems.
-    if (!upc && !isIOS) {
-      scanLog("try_zxing", { maxPx: MAX });
-      let objectUrl: string | null = null;
-      try {
-        objectUrl = URL.createObjectURL(file);
-        const imgEl = await withTimeout(
-          new Promise<HTMLImageElement>((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => resolve(img);
-            img.onerror = () => reject(new Error("img-load"));
-            img.src = objectUrl!;
-          }),
-          5000
-        );
-
-        if (imgEl) {
-          const sw = imgEl.naturalWidth, sh = imgEl.naturalHeight;
-          const scale = Math.min(1, MAX / Math.max(sw, sh));
-          const dw = Math.round(sw * scale), dh = Math.round(sh * scale);
-          scanLog("zxing_image_loaded", { origW: sw, origH: sh, scaledW: dw, scaledH: dh });
-          const reader = new BrowserMultiFormatReader();
-
-          // Try all 4 rotations on Android.
-          const rotations: (0 | 90 | 270 | 180)[] = [0, 90, 270, 180];
-
-          for (const deg of rotations) {
-            const canvas = document.createElement("canvas");
-            try {
-              const ctx = canvas.getContext("2d")!;
-              if (deg === 0 || deg === 180) { canvas.width = dw; canvas.height = dh; }
-              else { canvas.width = dh; canvas.height = dw; }
-              ctx.save();
-              ctx.translate(canvas.width / 2, canvas.height / 2);
-              ctx.rotate((deg * Math.PI) / 180);
-              ctx.drawImage(imgEl, -dw / 2, -dh / 2, dw, dh);
-              ctx.restore();
-              const res = (reader as any).decodeFromCanvas(canvas);
-              upc = res.getText();
-              scanLog("zxing_success", { upc, deg });
-              break;
-            } catch {
-              // This rotation didn't decode — try next.
-            } finally {
-              canvas.width = 0;
-              canvas.height = 0;
-            }
-          }
-          if (!upc) scanLog("zxing_no_result");
-        } else {
-          scanLog("zxing_img_load_timeout");
-        }
-      } catch (err: any) {
-        const error = String(err?.message || err).slice(0, 120);
-        scanLog("zxing_error", { error });
-        console.warn("[Scanner] Canvas decode failed:", err);
-      } finally {
-        if (objectUrl) URL.revokeObjectURL(objectUrl);
-      }
-    }
-
-    if (upc) {
-      fromPhotoRef.current = true;
-      handleDetected(upc);
-    } else {
-      scanLog("photo_failed_all_methods", { fileSizeKB });
-      if (isIOS) {
-        setPhotoError("Photo scanning isn't supported on iPhone. Please use the 'Enter UPC Manually' option below to type or paste the barcode number.");
-      } else {
-        setPhotoError("No barcode found. Make sure the barcode fills the frame and is in focus, then try again.");
-      }
-      setCameraState("home");
-    }
-  }, [handleDetected]);
 
   const addToCartMutation = useMutation({
     mutationFn: async () => {
@@ -400,22 +222,8 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
   let content: React.ReactNode = null;
 
-  // ── Scanning photo spinner ──
-  if (cameraState === "scanning-photo") {
-    content = (
-      <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
-        <Header title="Scanner" />
-        <div className="flex-1 flex flex-col items-center justify-center gap-4">
-          <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-          <p className="text-white text-lg font-semibold">Scanning barcode…</p>
-          <p className="text-white/40 text-sm">This may take a few seconds</p>
-        </div>
-      </div>
-    );
-  }
-
   // ── Camera starting spinner ──
-  else if (cameraState === "starting") {
+  if (cameraState === "starting") {
     content = (
       <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
         <Header title="Scanner" />
@@ -433,22 +241,6 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   else if ((cameraState === "home" || cameraState === "denied") && !manualMode) {
     content = (
       <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
-        {/*
-          File input notes:
-          - iOS PWA: omit `capture` entirely — iOS will show its native "Take Photo / Photo Library"
-            sheet which is stable. Using capture="environment" in a saved-to-home-screen PWA on
-            iOS can cause the app to crash or not return the file.
-          - Android Chrome: include capture="environment" so the camera opens immediately
-            without a picker.
-        */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          {...(!isIOS && { capture: "environment" })}
-          className="hidden"
-          onChange={handlePhotoCapture}
-        />
         <Header title="Scanner" />
 
         {result ? (
@@ -482,12 +274,6 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
               <p className="text-white text-xl font-bold mb-1">Scan a Barcode</p>
               <p className="text-gray-400 text-sm">Point the camera at any product barcode</p>
             </div>
-
-            {photoError && (
-              <div className="bg-orange-500/20 border border-orange-500/40 rounded-xl px-4 py-3 w-full">
-                <p className="text-orange-300 text-sm">{photoError}</p>
-              </div>
-            )}
 
             {cameraState === "denied" && cameraError && (
               <div className="bg-red-500/20 border border-red-500/40 rounded-xl px-4 py-3 w-full">
@@ -582,16 +368,9 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
         <div className="flex items-center justify-between px-4 pt-4 pb-3 bg-[#0071CE] z-10">
           <button onClick={onClose} className="text-white p-1"><X className="w-6 h-6" /></button>
           <span className="text-white font-semibold text-base tracking-wide">Scanner</span>
-          <div className="flex items-center gap-3">
-            {torchSupported && (
-              <button onClick={toggleTorch} className="text-white p-1">
-                {torchOn ? <FlashlightOff className="w-5 h-5" /> : <Flashlight className="w-5 h-5" />}
-              </button>
-            )}
-            <button onClick={() => setManualMode(m => !m)} className="text-white p-1">
-              <Keyboard className="w-5 h-5" />
-            </button>
-          </div>
+          <button onClick={() => setManualMode(m => !m)} className="text-white p-1">
+            <Keyboard className="w-5 h-5" />
+          </button>
         </div>
 
         <div className="relative flex-1 overflow-hidden">
