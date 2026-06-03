@@ -12123,15 +12123,15 @@ West Monroe LA 71291
   // so they appear in deployment logs and can be fetched with fetch_deployment_logs.
   app.post("/api/log/scanner", (req, res) => {
     try {
-      const { event, platform, method, error, fileSizeKB, upc } = req.body || {};
+      const body = req.body || {};
+      const SKIP = new Set(['event', 'platform']);
       const parts = [
         `[Scanner]`,
-        event ? `event=${event}` : null,
-        platform ? `platform=${platform}` : null,
-        method ? `method=${method}` : null,
-        fileSizeKB != null ? `fileSize=${fileSizeKB}KB` : null,
-        upc ? `upc=${upc}` : null,
-        error ? `error=${error}` : null,
+        body.event ? `event=${body.event}` : null,
+        body.platform ? `platform=${body.platform}` : null,
+        ...Object.entries(body)
+          .filter(([k, v]) => !SKIP.has(k) && v != null && v !== '')
+          .map(([k, v]) => `${k}=${v}`),
       ].filter(Boolean).join(' ');
       console.log(parts);
       res.json({ ok: true });

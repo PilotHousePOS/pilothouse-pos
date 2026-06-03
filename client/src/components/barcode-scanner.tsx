@@ -344,7 +344,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
             <div className="flex flex-col gap-3 w-full">
               {canUseGetUserMedia ? (
-                /* getUserMedia available (Safari, Android, Desktop) — live scanner */
+                /* getUserMedia available (Android, Desktop) — live scanner */
                 <button
                   onClick={requestCamera}
                   className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
@@ -353,21 +353,28 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
                   Scan with Camera
                 </button>
               ) : (
-                /* iOS standalone PWA: camera API unavailable.
-                   Native <a target="_blank"> opens in Safari (window.open does not). */
+                /* iOS standalone PWA: getUserMedia unavailable — use native file-capture.
+                   iOS opens the camera, user takes a photo, ZXing decodes the barcode. */
                 <>
-                  <a
-                    href={`${window.location.origin}/supplies?scan=1`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => { scanLog("safari_open"); onClose(); }}
-                    className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3] no-underline"
+                  <input
+                    id="ios-barcode-capture"
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    className="sr-only"
+                    onChange={handlePhotoCapture}
+                    onClick={() => scanLog("file_input_tap")}
+                  />
+                  <label
+                    htmlFor="ios-barcode-capture"
+                    className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3] cursor-pointer select-none"
                   >
-                    <Camera className="w-5 h-5" />
-                    Scan with Camera
-                  </a>
+                    {processingPhoto
+                      ? <><Loader2 className="w-5 h-5 animate-spin" />Decoding barcode…</>
+                      : <><Camera className="w-5 h-5" />Scan with Camera</>}
+                  </label>
                   <p className="text-gray-500 text-xs text-center -mt-2">
-                    Opens scanner in Safari for camera access
+                    Opens camera — point at a barcode and take a photo
                   </p>
                 </>
               )}
