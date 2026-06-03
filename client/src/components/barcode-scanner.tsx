@@ -78,10 +78,10 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     };
   }, []);
 
-  // ── iOS live camera: initialize Quagga2 once the live-view div is in the DOM ──
-  // Quagga2 works in iOS Safari (getUserMedia + canvas), unlike ZXing which crashes.
+  // ── Live camera: initialize Quagga2 once the live-view div is in the DOM ──
+  // Quagga2 (getUserMedia + canvas) works on both iOS Safari and Android Chrome.
   useEffect(() => {
-    if (!isIOS || cameraState !== "live") return;
+    if (cameraState !== "live") return;
     let cancelled = false;
 
     const initQuagga = async () => {
@@ -200,40 +200,14 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     return await navigator.mediaDevices.getUserMedia({ video: true });
   };
 
-  const requestCamera = useCallback(async () => {
+  const requestCamera = useCallback(() => {
     setCameraState("starting");
     setCameraError("");
-
-    // On iOS, Quagga2 manages its own stream via getUserMedia internally.
-    // Just transition to "live" — the Quagga2 useEffect above will initialize it.
-    if (isIOS) {
-      scanLog("ios_camera_requested");
-      setCameraState("live");
-      return;
-    }
-
-    // Non-iOS: ZXing + getUserMedia live scanning.
-    try {
-      const stream = await getStream();
-      streamRef.current = stream;
-      if (videoRef.current) videoRef.current.srcObject = stream;
-      const track = stream.getVideoTracks()[0];
-      const caps = track.getCapabilities?.() as any;
-      if (caps?.torch) setTorchSupported(true);
-      const reader = new BrowserMultiFormatReader();
-      readerRef.current = reader;
-      reader.decodeFromStream(stream, videoRef.current!, (res) => {
-        if (res) handleDetected(res.getText());
-      });
-      setCameraState("live");
-    } catch (err: any) {
-      const name = err?.name || "Unknown";
-      const msg = err?.message || "";
-      console.error("[Scanner] Camera error:", name, msg);
-      setCameraError(`${name}: ${msg}`);
-      setCameraState("denied");
-    }
-  }, [handleDetected]);
+    scanLog("camera_requested");
+    // Quagga2 useEffect initializes once "live" state mounts the container div.
+    // Use rAF so the "starting" spinner renders one frame before transitioning.
+    requestAnimationFrame(() => setCameraState("live"));
+  }, []);
 
   const toggleTorch = async () => {
     const track = streamRef.current?.getVideoTracks()[0];
@@ -506,11 +480,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
             <div className="text-center">
               <p className="text-white text-xl font-bold mb-1">Scan a Barcode</p>
-              <p className="text-gray-400 text-sm">
-                {isIOS
-                  ? "Use the camera or type the UPC number"
-                  : "Take a photo of any product barcode"}
-              </p>
+              <p className="text-gray-400 text-sm">Point the camera at any product barcode</p>
             </div>
 
             {photoError && (
@@ -521,19 +491,17 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
             {cameraState === "denied" && cameraError && (
               <div className="bg-red-500/20 border border-red-500/40 rounded-xl px-4 py-3 w-full">
-                <p className="text-red-300 text-sm">Camera access was denied. Use photo capture instead.</p>
+                <p className="text-red-300 text-sm">Camera access was denied. Please allow camera access in your browser settings and try again.</p>
               </div>
             )}
 
             <div className="flex flex-col gap-3 w-full">
-              {/* iOS: live camera via Quagga2 (getUserMedia, no file-picker crash) */}
-              {/* Android: photo capture via file input + BarcodeDetector */}
               <button
-                onClick={isIOS ? requestCamera : () => fileInputRef.current?.click()}
+                onClick={requestCamera}
                 className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
               >
                 <Camera className="w-5 h-5" />
-                {isIOS ? "Scan with Camera" : "Take Photo to Scan"}
+                Scan with Camera
               </button>
 
               <button
@@ -546,9 +514,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
             </div>
 
             <p className="text-gray-600 text-xs text-center">
-              {isIOS
-                ? "The UPC number is printed below the barcode on the product"
-                : "Point camera at the barcode, hold steady, then tap the shutter"}
+              Hold steady with the barcode centered in the frame
             </p>
           </div>
         )}
@@ -629,11 +595,8 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
         </div>
 
         <div className="relative flex-1 overflow-hidden">
-          {/* iOS: Quagga2 renders its own <video> into this div via getUserMedia */}
-          {isIOS
-            ? <div ref={quaggaContainerRef} className="absolute inset-0 w-full h-full overflow-hidden [&_video]:absolute [&_video]:inset-0 [&_video]:w-full [&_video]:h-full [&_video]:object-cover [&_canvas]:hidden" />
-            : <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
-          }
+          {/* Quagga2 renders its own <video> into this div via getUserMedia (iOS + Android) */}
+          <div ref={quaggaContainerRef} className="absolute inset-0 w-full h-full overflow-hidden [&_video]:absolute [&_video]:inset-0 [&_video]:w-full [&_video]:h-full [&_video]:object-cover [&_canvas]:hidden" />
           <div className="absolute inset-0">
             <div className="absolute top-0 left-0 right-0 bg-black/55" style={{ height: "25%" }} />
             <div className="absolute bottom-0 left-0 right-0 bg-black/55" style={{ height: "35%" }} />
