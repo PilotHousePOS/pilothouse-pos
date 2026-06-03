@@ -17,8 +17,6 @@ const platform = /iPhone|iPad|iPod/i.test(navigator.userAgent)
   : "other";
 
 const hasNativeBarcodeDetector = "BarcodeDetector" in window;
-// Checked once at render time — stays constant for the session
-const canUseGetUserMedia = !!navigator.mediaDevices;
 
 function scanLog(event: string, extras: Record<string, string | number | undefined> = {}) {
   fetch("/api/log/scanner", {
@@ -27,7 +25,7 @@ function scanLog(event: string, extras: Record<string, string | number | undefin
     body: JSON.stringify({
       event, platform, v: SCANNER_VERSION,
       native: hasNativeBarcodeDetector ? 1 : 0,
-      gum: canUseGetUserMedia ? 1 : 0,
+      gum: !!navigator.mediaDevices ? 1 : 0,
       ...extras,
     }),
   }).catch(() => {});
@@ -54,6 +52,9 @@ interface BarcodeScannerProps {
 type CameraState = "home" | "starting" | "live" | "denied";
 
 export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerProps) {
+  // Evaluated per-render so iOS 26+ lazy-init of mediaDevices is captured correctly
+  const canUseGetUserMedia = !!navigator.mediaDevices;
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const loopRef = useRef<number | null>(null);
