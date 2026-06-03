@@ -342,19 +342,19 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
                   Scan with Camera
                 </button>
               ) : (
-                /* iOS standalone PWA: camera API unavailable here.
-                   window.open() from a PWA always opens in Safari where getUserMedia works. */
+                /* iOS standalone PWA: camera API unavailable.
+                   Native <a target="_blank"> opens in Safari (window.open does not). */
                 <>
-                  <button
-                    onClick={() => {
-                      scanLog("safari_open");
-                      window.open(window.location.origin + '/supplies?scan=1', '_blank');
-                    }}
-                    className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
+                  <a
+                    href={`${window.location.origin}/supplies?scan=1`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => { scanLog("safari_open"); onClose(); }}
+                    className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3] no-underline"
                   >
                     <Camera className="w-5 h-5" />
                     Scan with Camera
-                  </button>
+                  </a>
                   <p className="text-gray-500 text-xs text-center -mt-2">
                     Opens scanner in Safari for camera access
                   </p>
