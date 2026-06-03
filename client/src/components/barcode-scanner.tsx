@@ -14,6 +14,16 @@ const SCANNER_VERSION = "v17";
 // iOS Safari / PWA has strict memory limits and several API gaps.
 // Detect once at module load time so all paths can branch.
 const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+const platform = isIOS ? "ios" : /Android/i.test(navigator.userAgent) ? "android" : "other";
+
+// Fire-and-forget server log — shows up in deployment logs via fetch_deployment_logs.
+function scanLog(event: string, extras: Record<string, string | number | undefined> = {}) {
+  fetch("/api/log/scanner", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ event, platform, ...extras }),
+  }).catch(() => {});
+}
 
 interface Product {
   id: number;
@@ -151,6 +161,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const handleManualSubmit = () => {
     const upc = manualUpc.trim();
     if (!upc) return;
+    scanLog("manual_submit", { upc });
     if (onDetected) { onDetected(upc); return; }
     lookupMutation.mutate(upc);
   };
@@ -178,6 +189,9 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     setCameraState("scanning-photo");
     if (fileInputRef.current) fileInputRef.current.value = "";
 
+    const fileSizeKB = Math.round(file.size / 1024);
+    scanLog("photo_start", { fileSizeKB });
+
     const withTimeout = <T,>(p: Promise<T>, ms: number): Promise<T | null> =>
       Promise.race([p, new Promise<null>(r => setTimeout(() => r(null), ms))]);
 
@@ -190,6 +204,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     // Method 1: Native BarcodeDetector — fast, memory-efficient, Chrome Android only.
     // NOT available on iOS Safari.
     if (!isIOS && "BarcodeDetector" in window) {
+      scanLog("try_barcode_detector");
       try {
         const bd = new (window as any).BarcodeDetector({
           formats: ["upc_a", "upc_e", "ean_13", "ean_8", "code_128", "code_39", "qr_code", "itf", "codabar"],
@@ -212,7 +227,11 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
         } finally {
           URL.revokeObjectURL(imageUrl);
         }
-      } catch (err) {
+        if (upc) scanLog("barcode_detector_success", { upc });
+        else scanLog("barcode_detector_no_result");
+      } catch (err: any) {
+        const error = String(err?.message || err).slice(0, 120);
+        scanLog("barcode_detector_error", { error });
         console.warn("[Scanner] BarcodeDetector failed:", err);
       }
     }
@@ -221,6 +240,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     // On iOS: try only 0° (most likely orientation, avoids 4× memory allocation).
     // On Android: try all 4 rotations if 0° fails.
     if (!upc) {
+      scanLog("try_zxing", { maxPx: MAX });
       let objectUrl: string | null = null;
       try {
         objectUrl = URL.createObjectURL(file);
@@ -238,6 +258,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
           const sw = imgEl.naturalWidth, sh = imgEl.naturalHeight;
           const scale = Math.min(1, MAX / Math.max(sw, sh));
           const dw = Math.round(sw * scale), dh = Math.round(sh * scale);
+          scanLog("zxing_image_loaded", { origW: sw, origH: sh, scaledW: dw, scaledH: dh });
           const reader = new BrowserMultiFormatReader();
 
           // On iOS only try 0°; on Android try all 4 rotations.
@@ -256,6 +277,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
               ctx.restore();
               const res = (reader as any).decodeFromCanvas(canvas);
               upc = res.getText();
+              scanLog("zxing_success", { upc, deg });
               break;
             } catch {
               // This rotation didn't decode — try next.
@@ -265,8 +287,13 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
               canvas.height = 0;
             }
           }
+          if (!upc) scanLog("zxing_no_result");
+        } else {
+          scanLog("zxing_img_load_timeout");
         }
-      } catch (err) {
+      } catch (err: any) {
+        const error = String(err?.message || err).slice(0, 120);
+        scanLog("zxing_error", { error });
         console.warn("[Scanner] Canvas decode failed:", err);
       } finally {
         if (objectUrl) URL.revokeObjectURL(objectUrl);
@@ -277,6 +304,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
       fromPhotoRef.current = true;
       handleDetected(upc);
     } else {
+      scanLog("photo_failed_all_methods", { fileSizeKB });
       setPhotoError("No barcode found. Make sure the barcode fills the frame and is in focus, then try again.");
       setCameraState("home");
     }
