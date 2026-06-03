@@ -236,10 +236,11 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
       }
     }
 
-    // Method 2: ZXing via canvas.
-    // On iOS: try only 0° (most likely orientation, avoids 4× memory allocation).
-    // On Android: try all 4 rotations if 0° fails.
-    if (!upc) {
+    // Method 2: ZXing via canvas — Android only.
+    // ZXing's BrowserMultiFormatReader does not work in iOS Safari (constructor fails at runtime).
+    // Loading a 2–3 MB image on iOS also risks memory-pressure crashes.
+    // Skip this entire block on iOS to avoid both problems.
+    if (!upc && !isIOS) {
       scanLog("try_zxing", { maxPx: MAX });
       let objectUrl: string | null = null;
       try {
@@ -261,8 +262,8 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
           scanLog("zxing_image_loaded", { origW: sw, origH: sh, scaledW: dw, scaledH: dh });
           const reader = new BrowserMultiFormatReader();
 
-          // On iOS only try 0°; on Android try all 4 rotations.
-          const rotations: (0 | 90 | 270 | 180)[] = isIOS ? [0] : [0, 90, 270, 180];
+          // Try all 4 rotations on Android.
+          const rotations: (0 | 90 | 270 | 180)[] = [0, 90, 270, 180];
 
           for (const deg of rotations) {
             const canvas = document.createElement("canvas");
@@ -282,7 +283,6 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
             } catch {
               // This rotation didn't decode — try next.
             } finally {
-              // Explicitly release canvas memory — critical on iOS.
               canvas.width = 0;
               canvas.height = 0;
             }
@@ -305,7 +305,11 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
       handleDetected(upc);
     } else {
       scanLog("photo_failed_all_methods", { fileSizeKB });
-      setPhotoError("No barcode found. Make sure the barcode fills the frame and is in focus, then try again.");
+      if (isIOS) {
+        setPhotoError("Photo scanning isn't supported on iPhone. Please use the 'Enter UPC Manually' option below to type or paste the barcode number.");
+      } else {
+        setPhotoError("No barcode found. Make sure the barcode fills the frame and is in focus, then try again.");
+      }
       setCameraState("home");
     }
   }, [handleDetected]);
@@ -418,7 +422,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
               <p className="text-white text-xl font-bold mb-1">Scan a Barcode</p>
               <p className="text-gray-400 text-sm">
                 {isIOS
-                  ? "Tap below, then choose Take Photo to scan a barcode"
+                  ? "Enter the UPC number found below the barcode"
                   : "Take a photo of any product barcode"}
               </p>
             </div>
@@ -436,26 +440,33 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
             )}
 
             <div className="flex flex-col gap-3 w-full">
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
-              >
-                <Image className="w-5 h-5" />
-                {isIOS ? "Open Camera to Scan" : "Take Photo to Scan"}
-              </button>
+              {/* On iOS, photo scanning crashes Safari — hide the camera button entirely */}
+              {!isIOS && (
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
+                >
+                  <Image className="w-5 h-5" />
+                  Take Photo to Scan
+                </button>
+              )}
 
               <button
                 onClick={() => setManualMode(true)}
-                className="w-full bg-transparent border border-white/25 text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-white/10"
+                className={`w-full py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 ${
+                  isIOS
+                    ? "bg-[#0071CE] text-white active:bg-[#0058a3]"
+                    : "bg-transparent border border-white/25 text-white active:bg-white/10"
+                }`}
               >
                 <Keyboard className="w-5 h-5" />
-                Type Barcode Instead
+                {isIOS ? "Enter UPC Manually" : "Type Barcode Instead"}
               </button>
             </div>
 
             <p className="text-gray-600 text-xs text-center">
               {isIOS
-                ? "Choose \"Take Photo\" from the sheet, aim at the barcode, and tap the shutter"
+                ? "The UPC is the number printed below the barcode on the product"
                 : "Point camera at the barcode, hold steady, then tap the shutter"}
             </p>
           </div>
