@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { X, Keyboard, Camera } from "lucide-react";
+import { X, Keyboard, Camera, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -8,22 +8,19 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { getProductImageUrl } from "@/lib/imageUrl";
 
-const SCANNER_VERSION = "v19";
+const SCANNER_VERSION = "v20";
 
-const platform = /iPhone|iPad|iPod/i.test(navigator.userAgent)
-  ? "ios"
-  : /Android/i.test(navigator.userAgent)
-  ? "android"
-  : "other";
+const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+const platform = isIOS ? "ios" : /Android/i.test(navigator.userAgent) ? "android" : "other";
 
-// Native BarcodeDetector: Chrome/Edge on Android + Desktop. NOT available on iOS Safari or Firefox.
+// Native BarcodeDetector: Chrome/Edge on Android + Desktop. NOT in iOS Safari.
 const hasNativeBarcodeDetector = "BarcodeDetector" in window;
 
 function scanLog(event: string, extras: Record<string, string | number | undefined> = {}) {
   fetch("/api/log/scanner", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ event, platform, native: hasNativeBarcodeDetector ? 1 : 0, ...extras }),
+    body: JSON.stringify({ event, platform, v: SCANNER_VERSION, ...extras }),
   }).catch(() => {});
 }
 
@@ -46,14 +43,20 @@ interface BarcodeScannerProps {
 type CameraState = "home" | "starting" | "live" | "denied";
 
 export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerProps) {
+  // Live-scan refs (Android / Desktop)
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const loopRef = useRef<number | null>(null);
   const zxingReaderRef = useRef<any>(null);
+
+  // iOS photo-capture ref
+  const photoInputRef = useRef<HTMLInputElement>(null);
+
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   const [cameraState, setCameraState] = useState<CameraState>("home");
+  const [processingPhoto, setProcessingPhoto] = useState(false);
   const [manualMode, setManualMode] = useState(false);
   const [manualUpc, setManualUpc] = useState("");
   const [result, setResult] = useState<Product | null>(null);
@@ -63,26 +66,13 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const cooldownRef = useRef(false);
 
   const stopCamera = useCallback(() => {
-    if (loopRef.current !== null) {
-      cancelAnimationFrame(loopRef.current);
-      loopRef.current = null;
-    }
-    if (zxingReaderRef.current) {
-      try { zxingReaderRef.current.reset(); } catch {}
-      zxingReaderRef.current = null;
-    }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(t => t.stop());
-      streamRef.current = null;
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
+    if (loopRef.current !== null) { cancelAnimationFrame(loopRef.current); loopRef.current = null; }
+    if (zxingReaderRef.current) { try { zxingReaderRef.current.reset(); } catch {} zxingReaderRef.current = null; }
+    if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
+    if (videoRef.current) videoRef.current.srcObject = null;
   }, []);
 
-  useEffect(() => {
-    return () => stopCamera();
-  }, [stopCamera]);
+  useEffect(() => () => stopCamera(), [stopCamera]);
 
   const lookupMutation = useMutation({
     mutationFn: async (upc: string) => {
@@ -90,14 +80,10 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
       if (!res.ok) throw new Error("not found");
       return res.json() as Promise<Product>;
     },
-    onSuccess: (product) => {
-      setResult(product);
-      setNotFound(false);
-    },
+    onSuccess: (product) => { setResult(product); setNotFound(false); },
     onError: () => {
-      setResult(null);
-      setNotFound(true);
-      setTimeout(() => { setNotFound(false); cooldownRef.current = false; }, 2000);
+      setResult(null); setNotFound(true);
+      setTimeout(() => { setNotFound(false); cooldownRef.current = false; }, 2500);
       cooldownRef.current = false;
     },
   });
@@ -111,57 +97,69 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     lookupMutation.mutate(upc);
   }, [lastScanned, lookupMutation, onDetected]);
 
-  // ── Get camera stream (shared between both scan paths) ──
-  // navigator.mediaDevices is undefined in iOS PWA mode (WebKit bug) — fall back to webkit prefix.
+  // ── iOS: photo capture via native camera → ZXing decode ──
+  const handlePhotoCapture = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // Reset so the same photo can be re-submitted if needed
+    e.target.value = "";
+
+    setProcessingPhoto(true);
+    setNotFound(false);
+    scanLog("photo_captured");
+
+    const objectUrl = URL.createObjectURL(file);
+    try {
+      const { BrowserMultiFormatReader } = await import("@zxing/browser");
+      const reader = new BrowserMultiFormatReader();
+      const decoded = await reader.decodeFromImageUrl(objectUrl);
+      scanLog("detected", { upc: decoded.getText(), method: "photo" });
+      if (onDetected) { onDetected(decoded.getText()); return; }
+      lookupMutation.mutate(decoded.getText());
+    } catch {
+      scanLog("photo_no_barcode");
+      setNotFound(true);
+      setTimeout(() => setNotFound(false), 2500);
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+      setProcessingPhoto(false);
+    }
+  }, [lookupMutation, onDetected]);
+
+  // ── Android/Desktop: getUserMedia ──
   const getStream = async (): Promise<MediaStream> => {
     const md = navigator.mediaDevices;
     if (md?.getUserMedia) {
-      try {
-        return await md.getUserMedia({
-          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
-        });
-      } catch {
-        return await md.getUserMedia({ video: true });
-      }
+      try { return await md.getUserMedia({ video: { facingMode: { ideal: "environment" } } }); }
+      catch { return await md.getUserMedia({ video: true }); }
     }
-    // Legacy / iOS PWA fallback
-    const legacyGUM: Function | undefined =
-      (navigator as any).getUserMedia ||
-      (navigator as any).webkitGetUserMedia ||
-      (navigator as any).mozGetUserMedia;
-    if (!legacyGUM) throw new Error("Camera not available on this device");
-    return new Promise<MediaStream>((resolve, reject) => {
-      legacyGUM.call(navigator, { video: { facingMode: "environment" } }, resolve, reject);
-    });
+    const legacy: Function | undefined =
+      (navigator as any).getUserMedia || (navigator as any).webkitGetUserMedia;
+    if (!legacy) throw new Error("Camera API not available");
+    return new Promise<MediaStream>((res, rej) =>
+      legacy.call(navigator, { video: { facingMode: "environment" } }, res, rej)
+    );
   };
 
-  // ── Path A: Native BarcodeDetector loop (Android Chrome, Desktop Chrome) ──
+  // ── Path A: native BarcodeDetector scan loop ──
   const startNativeScan = useCallback(async (stream: MediaStream) => {
     const video = videoRef.current;
     if (!video) return;
-
     video.srcObject = stream;
     await video.play();
     scanLog("camera_started", { method: "native" });
-
     const detector = new (window as any).BarcodeDetector({
       formats: ["upc_a", "upc_e", "ean_13", "ean_8", "code_128", "code_39", "qr_code"],
     });
-
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d")!;
-    let lastDetectTime = 0;
-
+    let lastTime = 0;
     const scan = async () => {
-      if (!streamRef.current || !video.videoWidth) {
-        loopRef.current = requestAnimationFrame(scan);
-        return;
-      }
+      if (!streamRef.current || !video.videoWidth) { loopRef.current = requestAnimationFrame(scan); return; }
       const now = performance.now();
-      if (now - lastDetectTime > 120) {
-        lastDetectTime = now;
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+      if (now - lastTime > 120) {
+        lastTime = now;
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
         ctx.drawImage(video, 0, 0);
         try {
           const results = await detector.detect(canvas);
@@ -173,83 +171,50 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     loopRef.current = requestAnimationFrame(scan);
   }, [handleDetected]);
 
-  // ── Path B: ZXing BrowserMultiFormatReader (iOS Safari, Firefox, other) ──
+  // ── Path B: ZXing continuous scan (Firefox, other non-BarcodeDetector) ──
   const startZxingScan = useCallback(async (stream: MediaStream) => {
     const video = videoRef.current;
     if (!video) return;
-
     video.srcObject = stream;
-    // ZXing's decodeFromVideoElement will call play() internally
     scanLog("camera_started", { method: "zxing" });
-
     const { BrowserMultiFormatReader } = await import("@zxing/browser");
     const reader = new BrowserMultiFormatReader();
     zxingReaderRef.current = reader;
-
-    reader.decodeFromVideoElement(video, (result, err) => {
-      if (result && streamRef.current) {
-        handleDetected(result.getText());
-      }
-      // err is normal when no barcode found in a frame — ignore it
+    reader.decodeFromVideoElement(video, (res) => {
+      if (res && streamRef.current) handleDetected(res.getText());
     });
   }, [handleDetected]);
 
   const requestCamera = useCallback(async () => {
-    setCameraState("starting");
-    setCameraError("");
-    scanLog("camera_requested", {
-      md: typeof navigator.mediaDevices,
-      gum: typeof (navigator.mediaDevices as any)?.getUserMedia,
-      wkit: typeof (navigator as any).webkitGetUserMedia,
-      legacy: typeof (navigator as any).getUserMedia,
-    });
-
+    setCameraState("starting"); setCameraError("");
+    scanLog("camera_requested");
     try {
       const stream = await getStream();
       streamRef.current = stream;
       setCameraState("live");
-
       await new Promise(r => setTimeout(r, 50));
       if (!videoRef.current || !streamRef.current) { stopCamera(); setCameraState("denied"); return; }
-
-      if (hasNativeBarcodeDetector) {
-        await startNativeScan(stream);
-      } else {
-        await startZxingScan(stream);
-      }
+      if (hasNativeBarcodeDetector) await startNativeScan(stream);
+      else await startZxingScan(stream);
     } catch (err: any) {
       const error = String(err?.message || err).slice(0, 200);
       scanLog("camera_error", { error });
       stopCamera();
-      setCameraError(
-        err?.name === "NotAllowedError"
-          ? "Camera access was denied. Please allow camera access in your browser settings."
-          : "Could not start camera. Try the manual entry option below."
-      );
+      setCameraError(err?.name === "NotAllowedError"
+        ? "Camera access was denied. Allow camera access in your browser settings."
+        : `Could not start camera: ${error}`);
       setCameraState("denied");
     }
   }, [startNativeScan, startZxingScan, stopCamera]);
 
-  const handleManualSubmit = () => {
-    const upc = manualUpc.trim();
-    if (!upc) return;
-    scanLog("manual_submit", { upc });
-    if (onDetected) { onDetected(upc); return; }
-    lookupMutation.mutate(upc);
+  const handleScanAgain = () => {
+    setResult(null); setNotFound(false); setLastScanned("");
+    cooldownRef.current = false; setCameraError("");
+    stopCamera(); setCameraState("home");
   };
 
   const handleViewProduct = () => {
     if (result) { onClose(); setLocation(`/supplies/${result.id}`); }
-  };
-
-  const handleScanAgain = () => {
-    setResult(null);
-    setNotFound(false);
-    setLastScanned("");
-    cooldownRef.current = false;
-    setCameraError("");
-    stopCamera();
-    setCameraState("home");
   };
 
   const addToCartMutation = useMutation({
@@ -257,13 +222,8 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
       if (!result) return;
       return apiRequest("POST", "/api/cart", { supplyId: result.id, quantity: 1 });
     },
-    onSuccess: () => {
-      toast({ title: "Added to cart", description: result?.name });
-      onClose();
-    },
-    onError: () => {
-      toast({ title: "Could not add to cart", variant: "destructive" });
-    },
+    onSuccess: () => { toast({ title: "Added to cart", description: result?.name }); onClose(); },
+    onError: () => toast({ title: "Could not add to cart", variant: "destructive" }),
   });
 
   const imageUrl = getProductImageUrl(result?.imageUrls?.[0] || result?.imageUrl);
@@ -276,48 +236,61 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     </div>
   );
 
+  const ResultCard = () => result ? (
+    <>
+      <div className="px-4 pt-6 pb-4 flex gap-4">
+        {imageUrl
+          ? <img src={imageUrl} alt={result.name} className="w-24 h-24 object-contain rounded-xl border border-gray-100 flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+          : <div className="w-24 h-24 bg-gray-100 rounded-xl flex-shrink-0" />}
+        <div className="flex-1 min-w-0 pt-1">
+          <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1">{result.brand || ""}</p>
+          <p className="text-base font-bold text-gray-900 leading-snug">{result.name}</p>
+          <p className="text-2xl font-bold text-[#0071CE] mt-2">${parseFloat(result.price).toFixed(2)}</p>
+        </div>
+      </div>
+      <div className="px-4 pb-6 flex gap-2">
+        <Button variant="outline" className="flex-1" onClick={handleScanAgain}>Scan Again</Button>
+        <Button variant="outline" className="flex-1" onClick={handleViewProduct}>View Item</Button>
+        <Button className="flex-1 bg-[#0071CE] hover:bg-[#0058a3] text-white" onClick={() => addToCartMutation.mutate()} disabled={addToCartMutation.isPending}>Add to Cart</Button>
+      </div>
+    </>
+  ) : null;
+
   let content: React.ReactNode = null;
 
-  // ── Camera starting spinner ──
-  if (cameraState === "starting") {
+  // ── Spinner (camera starting or processing photo) ──
+  if (cameraState === "starting" || processingPhoto) {
     content = (
       <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
         <Header title="Scanner" />
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
-            <div className="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-            <p className="text-white/60 text-sm">Starting camera…</p>
+            <Loader2 className="w-10 h-10 text-white animate-spin" />
+            <p className="text-white/60 text-sm">{processingPhoto ? "Reading barcode…" : "Starting camera…"}</p>
           </div>
         </div>
       </div>
     );
   }
 
-  // ── Home / Denied / Result screen ──
+  // ── Home / Denied / Result ──
   else if ((cameraState === "home" || cameraState === "denied") && !manualMode) {
     content = (
       <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
         <Header title="Scanner" />
 
+        {/* Hidden file input for iOS photo capture */}
+        <input
+          ref={photoInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handlePhotoCapture}
+        />
+
         {result ? (
-          <div className="flex-1 bg-white flex flex-col">
-            <div className="px-4 pt-6 pb-4 flex gap-4">
-              {imageUrl
-                ? <img src={imageUrl} alt={result.name} className="w-24 h-24 object-contain rounded-xl border border-gray-100 flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                : <div className="w-24 h-24 bg-gray-100 rounded-xl flex-shrink-0" />
-              }
-              <div className="flex-1 min-w-0 pt-1">
-                <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1">{result.brand || ""}</p>
-                <p className="text-base font-bold text-gray-900 leading-snug">{result.name}</p>
-                <p className="text-2xl font-bold text-[#0071CE] mt-2">${parseFloat(result.price).toFixed(2)}</p>
-              </div>
-            </div>
-            <div className="px-4 pb-6 flex gap-2">
-              <Button variant="outline" className="flex-1" onClick={handleScanAgain}>Scan Again</Button>
-              <Button variant="outline" className="flex-1" onClick={handleViewProduct}>View Item</Button>
-              <Button className="flex-1 bg-[#0071CE] hover:bg-[#0058a3] text-white" onClick={() => addToCartMutation.mutate()} disabled={addToCartMutation.isPending}>Add to Cart</Button>
-            </div>
-          </div>
+          <div className="flex-1 bg-white flex flex-col"><ResultCard /></div>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center px-6 gap-5">
             <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center">
@@ -326,7 +299,9 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
             <div className="text-center">
               <p className="text-white text-xl font-bold mb-1">Scan a Barcode</p>
-              <p className="text-gray-400 text-sm">Point the camera at any product barcode</p>
+              <p className="text-gray-400 text-sm">
+                {isIOS ? "Open the camera and photograph a barcode" : "Point the camera at any product barcode"}
+              </p>
             </div>
 
             {cameraState === "denied" && cameraError && (
@@ -335,9 +310,21 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
               </div>
             )}
 
+            {notFound && (
+              <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-xl px-4 py-3 w-full">
+                <p className="text-yellow-300 text-sm">No barcode found in that photo — try again with better lighting or hold the camera closer.</p>
+              </div>
+            )}
+
             <div className="flex flex-col gap-3 w-full">
               <button
-                onClick={requestCamera}
+                onClick={() => {
+                  if (isIOS) {
+                    photoInputRef.current?.click();
+                  } else {
+                    requestCamera();
+                  }
+                }}
                 className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
               >
                 <Camera className="w-5 h-5" />
@@ -352,8 +339,6 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
                 Enter UPC Manually
               </button>
             </div>
-
-            <p className="text-gray-600 text-xs text-center">Hold steady with the barcode centered in the frame</p>
           </div>
         )}
       </div>
@@ -362,6 +347,13 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
   // ── Manual entry ──
   else if (manualMode) {
+    const handleManualSubmit = () => {
+      const upc = manualUpc.trim();
+      if (!upc) return;
+      scanLog("manual_submit", { upc });
+      if (onDetected) { onDetected(upc); return; }
+      lookupMutation.mutate(upc);
+    };
     content = (
       <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
         <Header title="Enter Barcode" />
@@ -380,20 +372,17 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
                 className="flex-1 border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#0071CE]"
               />
               <Button onClick={handleManualSubmit} disabled={lookupMutation.isPending} className="bg-[#0071CE] hover:bg-[#0058a3] text-white px-5">
-                Search
+                {lookupMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Search"}
               </Button>
             </div>
-            <button onClick={() => setManualMode(false)} className="text-[#0071CE] text-sm underline text-left">
-              ← Back
-            </button>
+            <button onClick={() => setManualMode(false)} className="text-[#0071CE] text-sm underline text-left">← Back</button>
           </div>
           {result && (
             <div className="px-4 pb-8">
               <div className="flex gap-3 mb-4">
                 {imageUrl
                   ? <img src={imageUrl} alt={result.name} className="w-20 h-20 object-contain rounded-lg border border-gray-100 flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                  : <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0" />
-                }
+                  : <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0" />}
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-0.5">{result.brand || ""}</p>
                   <p className="text-sm font-semibold text-gray-900 leading-snug line-clamp-3">{result.name}</p>
@@ -413,28 +402,19 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     );
   }
 
-  // ── Live scanner ──
+  // ── Live scanner (Android / Desktop) ──
   else if (cameraState === "live") {
     content = (
       <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
         <div className="flex items-center justify-between px-4 pt-4 pb-3 bg-[#0071CE] z-10">
           <button onClick={onClose} className="text-white p-1"><X className="w-6 h-6" /></button>
-          <span className="text-white font-semibold text-base tracking-wide">Scanner</span>
-          <button onClick={() => setManualMode(m => !m)} className="text-white p-1">
-            <Keyboard className="w-5 h-5" />
-          </button>
+          <span className="text-white font-semibold text-base">Scanner</span>
+          <button onClick={() => setManualMode(m => !m)} className="text-white p-1"><Keyboard className="w-5 h-5" /></button>
         </div>
 
         <div className="relative flex-1 overflow-hidden">
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
 
-          {/* Viewfinder overlay */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-0 left-0 right-0 bg-black/55" style={{ height: "25%" }} />
             <div className="absolute bottom-0 left-0 right-0 bg-black/55" style={{ height: "35%" }} />
@@ -451,9 +431,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
           {notFound && (
             <div className="absolute bottom-24 left-0 right-0 flex justify-center pointer-events-none">
-              <div className="bg-red-500/90 text-white px-4 py-2 rounded-full text-sm font-medium">
-                No product found — try again
-              </div>
+              <div className="bg-red-500/90 text-white px-4 py-2 rounded-full text-sm font-medium">No product found — try again</div>
             </div>
           )}
 
@@ -462,8 +440,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
               <div className="flex gap-3 mb-3">
                 {imageUrl
                   ? <img src={imageUrl} alt={result.name} className="w-16 h-16 object-contain rounded-lg border border-gray-100 flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                  : <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0" />
-                }
+                  : <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0" />}
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-gray-400 uppercase font-semibold mb-0.5">{result.brand || ""}</p>
                   <p className="text-sm font-bold text-gray-900 leading-snug line-clamp-2">{result.name}</p>
@@ -481,10 +458,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
         <style>{`
           .scanline { animation: scanline 2s ease-in-out infinite; }
-          @keyframes scanline {
-            0%, 100% { top: 4px; opacity: 0.8; }
-            50% { top: calc(100% - 4px); opacity: 1; }
-          }
+          @keyframes scanline { 0%,100%{top:4px;opacity:.8} 50%{top:calc(100% - 4px);opacity:1} }
         `}</style>
       </div>
     );
