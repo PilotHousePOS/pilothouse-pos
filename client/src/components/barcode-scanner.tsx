@@ -47,6 +47,8 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const videoRef = useRef<HTMLVideoElement>(null);
   const readerRef = useRef<BrowserMultiFormatReader | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const quaggaContainerRef = useRef<HTMLDivElement>(null);
+  const quaggaModuleRef = useRef<any>(null); // holds the imported Quagga2 module for cleanup
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
@@ -69,8 +71,82 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     return () => {
       streamRef.current?.getTracks().forEach(t => t.stop());
       readerRef.current = null;
+      if (quaggaModuleRef.current) {
+        try { quaggaModuleRef.current.stop(); } catch {}
+        quaggaModuleRef.current = null;
+      }
     };
   }, []);
+
+  // ── iOS live camera: initialize Quagga2 once the live-view div is in the DOM ──
+  // Quagga2 works in iOS Safari (getUserMedia + canvas), unlike ZXing which crashes.
+  useEffect(() => {
+    if (!isIOS || cameraState !== "live") return;
+    let cancelled = false;
+
+    const initQuagga = async () => {
+      // Give React one tick to mount the container div
+      await new Promise(r => setTimeout(r, 80));
+      if (cancelled) return;
+      const container = quaggaContainerRef.current;
+      if (!container) {
+        setCameraError("Camera container not ready — please try again.");
+        setCameraState("denied");
+        return;
+      }
+      try {
+        const { default: Quagga } = await import("@ericblade/quagga2");
+        if (cancelled) return;
+        await new Promise<void>((resolve, reject) => {
+          Quagga.init(
+            {
+              inputStream: {
+                name: "Live",
+                type: "LiveStream",
+                target: container,
+                constraints: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
+              },
+              decoder: {
+                readers: ["upc_reader", "upc_e_reader", "ean_reader", "ean_8_reader", "code_128_reader", "code_39_reader"],
+              },
+              locate: true,
+            },
+            (err: any) => {
+              if (err) { reject(err); return; }
+              Quagga.start();
+              quaggaModuleRef.current = Quagga;
+              resolve();
+            }
+          );
+        });
+        if (cancelled) { try { Quagga.stop(); } catch {} return; }
+        Quagga.onDetected((result: any) => {
+          const code = result?.codeResult?.code;
+          if (code && !cancelled) {
+            scanLog("quagga_detected", { upc: code });
+            handleDetected(code);
+          }
+        });
+        scanLog("quagga_started");
+      } catch (err: any) {
+        if (cancelled) return;
+        const error = String(err?.message || err).slice(0, 200);
+        scanLog("quagga_error", { error });
+        setCameraError("Could not start camera. Please grant camera access and try again.");
+        setCameraState("denied");
+      }
+    };
+
+    initQuagga();
+
+    return () => {
+      cancelled = true;
+      if (quaggaModuleRef.current) {
+        try { quaggaModuleRef.current.stop(); } catch {}
+        quaggaModuleRef.current = null;
+      }
+    };
+  }, [cameraState, handleDetected]);
 
   const lookupMutation = useMutation({
     mutationFn: async (upc: string) => {
@@ -127,6 +203,16 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const requestCamera = useCallback(async () => {
     setCameraState("starting");
     setCameraError("");
+
+    // On iOS, Quagga2 manages its own stream via getUserMedia internally.
+    // Just transition to "live" — the Quagga2 useEffect above will initialize it.
+    if (isIOS) {
+      scanLog("ios_camera_requested");
+      setCameraState("live");
+      return;
+    }
+
+    // Non-iOS: ZXing + getUserMedia live scanning.
     try {
       const stream = await getStream();
       streamRef.current = stream;
@@ -422,7 +508,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
               <p className="text-white text-xl font-bold mb-1">Scan a Barcode</p>
               <p className="text-gray-400 text-sm">
                 {isIOS
-                  ? "Enter the UPC number found below the barcode"
+                  ? "Use the camera or type the UPC number"
                   : "Take a photo of any product barcode"}
               </p>
             </div>
@@ -440,33 +526,28 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
             )}
 
             <div className="flex flex-col gap-3 w-full">
-              {/* On iOS, photo scanning crashes Safari — hide the camera button entirely */}
-              {!isIOS && (
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
-                >
-                  <Image className="w-5 h-5" />
-                  Take Photo to Scan
-                </button>
-              )}
+              {/* iOS: live camera via Quagga2 (getUserMedia, no file-picker crash) */}
+              {/* Android: photo capture via file input + BarcodeDetector */}
+              <button
+                onClick={isIOS ? requestCamera : () => fileInputRef.current?.click()}
+                className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
+              >
+                <Camera className="w-5 h-5" />
+                {isIOS ? "Scan with Camera" : "Take Photo to Scan"}
+              </button>
 
               <button
                 onClick={() => setManualMode(true)}
-                className={`w-full py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 ${
-                  isIOS
-                    ? "bg-[#0071CE] text-white active:bg-[#0058a3]"
-                    : "bg-transparent border border-white/25 text-white active:bg-white/10"
-                }`}
+                className="w-full bg-transparent border border-white/25 text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-white/10"
               >
                 <Keyboard className="w-5 h-5" />
-                {isIOS ? "Enter UPC Manually" : "Type Barcode Instead"}
+                Enter UPC Manually
               </button>
             </div>
 
             <p className="text-gray-600 text-xs text-center">
               {isIOS
-                ? "The UPC is the number printed below the barcode on the product"
+                ? "The UPC number is printed below the barcode on the product"
                 : "Point camera at the barcode, hold steady, then tap the shutter"}
             </p>
           </div>
@@ -548,7 +629,11 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
         </div>
 
         <div className="relative flex-1 overflow-hidden">
-          <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
+          {/* iOS: Quagga2 renders its own <video> into this div via getUserMedia */}
+          {isIOS
+            ? <div ref={quaggaContainerRef} className="absolute inset-0 w-full h-full overflow-hidden [&_video]:absolute [&_video]:inset-0 [&_video]:w-full [&_video]:h-full [&_video]:object-cover [&_canvas]:hidden" />
+            : <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
+          }
           <div className="absolute inset-0">
             <div className="absolute top-0 left-0 right-0 bg-black/55" style={{ height: "25%" }} />
             <div className="absolute bottom-0 left-0 right-0 bg-black/55" style={{ height: "35%" }} />
