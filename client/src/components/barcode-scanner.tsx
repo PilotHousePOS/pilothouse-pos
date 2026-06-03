@@ -8,19 +8,23 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { getProductImageUrl } from "@/lib/imageUrl";
 
-const SCANNER_VERSION = "v17";
+const SCANNER_VERSION = "v18";
 
-// iOS Safari / PWA has strict memory limits and several API gaps.
-// Detect once at module load time so all paths can branch.
-const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-const platform = isIOS ? "ios" : /Android/i.test(navigator.userAgent) ? "android" : "other";
+const platform = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+  ? "ios"
+  : /Android/i.test(navigator.userAgent)
+  ? "android"
+  : "other";
 
-// Fire-and-forget server log — shows up in deployment logs via fetch_deployment_logs.
+// BarcodeDetector is native in Chrome/Edge on Android + Desktop.
+// Not available in iOS Safari or Firefox.
+const hasBarcodeDetector = "BarcodeDetector" in window;
+
 function scanLog(event: string, extras: Record<string, string | number | undefined> = {}) {
   fetch("/api/log/scanner", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ event, platform, ...extras }),
+    body: JSON.stringify({ event, platform, hasBarcodeDetector: hasBarcodeDetector ? 1 : 0, ...extras }),
   }).catch(() => {});
 }
 
@@ -43,8 +47,10 @@ interface BarcodeScannerProps {
 type CameraState = "home" | "starting" | "live" | "denied";
 
 export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerProps) {
-  const quaggaContainerRef = useRef<HTMLDivElement>(null);
-  const quaggaModuleRef = useRef<any>(null); // holds the imported Quagga2 module for cleanup
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const loopRef = useRef<number | null>(null);
+  const detectorRef = useRef<any>(null);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
@@ -57,85 +63,24 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const [lastScanned, setLastScanned] = useState("");
   const cooldownRef = useRef(false);
 
-  // Cleanup Quagga on unmount
-  useEffect(() => {
-    return () => {
-      if (quaggaModuleRef.current) {
-        try { quaggaModuleRef.current.stop(); } catch {}
-        quaggaModuleRef.current = null;
-      }
-    };
+  // Stop camera stream and scan loop on unmount or when leaving live state
+  const stopCamera = useCallback(() => {
+    if (loopRef.current !== null) {
+      cancelAnimationFrame(loopRef.current);
+      loopRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
   }, []);
 
-  // ── Live camera: initialize Quagga2 once the live-view div is in the DOM ──
-  // Quagga2 (getUserMedia + canvas) works on both iOS Safari and Android Chrome.
   useEffect(() => {
-    if (cameraState !== "live") return;
-    let cancelled = false;
-
-    const initQuagga = async () => {
-      // Give React one tick to mount the container div
-      await new Promise(r => setTimeout(r, 80));
-      if (cancelled) return;
-      const container = quaggaContainerRef.current;
-      if (!container) {
-        setCameraError("Camera container not ready — please try again.");
-        setCameraState("denied");
-        return;
-      }
-      try {
-        const { default: Quagga } = await import("@ericblade/quagga2");
-        if (cancelled) return;
-        await new Promise<void>((resolve, reject) => {
-          Quagga.init(
-            {
-              inputStream: {
-                name: "Live",
-                type: "LiveStream",
-                target: container,
-                constraints: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
-              },
-              decoder: {
-                readers: ["upc_reader", "upc_e_reader", "ean_reader", "ean_8_reader", "code_128_reader", "code_39_reader"],
-              },
-              locate: true,
-            },
-            (err: any) => {
-              if (err) { reject(err); return; }
-              Quagga.start();
-              quaggaModuleRef.current = Quagga;
-              resolve();
-            }
-          );
-        });
-        if (cancelled) { try { Quagga.stop(); } catch {} return; }
-        Quagga.onDetected((result: any) => {
-          const code = result?.codeResult?.code;
-          if (code && !cancelled) {
-            scanLog("quagga_detected", { upc: code });
-            handleDetected(code);
-          }
-        });
-        scanLog("quagga_started");
-      } catch (err: any) {
-        if (cancelled) return;
-        const error = String(err?.message || err).slice(0, 200);
-        scanLog("quagga_error", { error });
-        setCameraError("Could not start camera. Please grant camera access and try again.");
-        setCameraState("denied");
-      }
-    };
-
-    initQuagga();
-
-    return () => {
-      cancelled = true;
-      if (quaggaModuleRef.current) {
-        try { quaggaModuleRef.current.stop(); } catch {}
-        quaggaModuleRef.current = null;
-      }
-    };
-  }, [cameraState, handleDetected]);
+    return () => stopCamera();
+  }, [stopCamera]);
 
   const lookupMutation = useMutation({
     mutationFn: async (upc: string) => {
@@ -162,18 +107,90 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     if (cooldownRef.current || upc === lastScanned) return;
     cooldownRef.current = true;
     setLastScanned(upc);
+    scanLog("detected", { upc });
     if (onDetected) { onDetected(upc); return; }
     lookupMutation.mutate(upc);
   }, [lastScanned, lookupMutation, onDetected]);
 
-  const requestCamera = useCallback(() => {
+  // ── Start live camera using getUserMedia + BarcodeDetector scan loop ──
+  const requestCamera = useCallback(async () => {
+    if (!hasBarcodeDetector) return;
     setCameraState("starting");
     setCameraError("");
     scanLog("camera_requested");
-    // Quagga2 useEffect initializes once "live" state mounts the container div.
-    // Use rAF so the "starting" spinner renders one frame before transitioning.
-    requestAnimationFrame(() => setCameraState("live"));
-  }, []);
+
+    try {
+      // Try rear camera first, fall back to any video
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        });
+      } catch {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      }
+
+      streamRef.current = stream;
+      setCameraState("live");
+
+      // Attach stream to video element — need a tick for the DOM to update
+      await new Promise(r => setTimeout(r, 50));
+      const video = videoRef.current;
+      if (!video || !streamRef.current) { stopCamera(); setCameraState("denied"); return; }
+
+      video.srcObject = stream;
+      await video.play();
+      scanLog("camera_started");
+
+      // Build BarcodeDetector with common barcode formats
+      detectorRef.current = new (window as any).BarcodeDetector({
+        formats: ["upc_a", "upc_e", "ean_13", "ean_8", "code_128", "code_39", "qr_code", "itf", "codabar"],
+      });
+
+      // Scan loop: draw each frame onto canvas, run BarcodeDetector
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d")!;
+      let lastDetectTime = 0;
+
+      const scan = async () => {
+        if (!streamRef.current || !video.videoWidth) {
+          loopRef.current = requestAnimationFrame(scan);
+          return;
+        }
+
+        const now = performance.now();
+        // Throttle to ~8 fps for battery / performance
+        if (now - lastDetectTime > 120) {
+          lastDetectTime = now;
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0);
+          try {
+            const results = await detectorRef.current.detect(canvas);
+            if (results.length > 0 && streamRef.current) {
+              handleDetected(results[0].rawValue);
+            }
+          } catch {
+            // ignore individual frame errors
+          }
+        }
+        loopRef.current = requestAnimationFrame(scan);
+      };
+
+      loopRef.current = requestAnimationFrame(scan);
+
+    } catch (err: any) {
+      const error = String(err?.message || err).slice(0, 200);
+      scanLog("camera_error", { error });
+      stopCamera();
+      if (err?.name === "NotAllowedError") {
+        setCameraError("Camera access was denied. Please allow camera access in your browser settings.");
+      } else {
+        setCameraError("Could not start camera. Try the manual entry option below.");
+      }
+      setCameraState("denied");
+    }
+  }, [handleDetected, stopCamera]);
 
   const handleManualSubmit = () => {
     const upc = manualUpc.trim();
@@ -193,6 +210,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     setLastScanned("");
     cooldownRef.current = false;
     setCameraError("");
+    stopCamera();
     setCameraState("home");
   };
 
@@ -244,7 +262,6 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
         <Header title="Scanner" />
 
         {result ? (
-          /* ── Result card ── */
           <div className="flex-1 bg-white flex flex-col">
             <div className="px-4 pt-6 pb-4 flex gap-4">
               {imageUrl
@@ -264,7 +281,6 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
             </div>
           </div>
         ) : (
-          /* ── Scan prompt ── */
           <div className="flex-1 flex flex-col items-center justify-center px-6 gap-5">
             <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center">
               <Camera className="w-10 h-10 text-white/70" />
@@ -272,27 +288,37 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
             <div className="text-center">
               <p className="text-white text-xl font-bold mb-1">Scan a Barcode</p>
-              <p className="text-gray-400 text-sm">Point the camera at any product barcode</p>
+              <p className="text-gray-400 text-sm">
+                {hasBarcodeDetector
+                  ? "Point the camera at any product barcode"
+                  : "Enter the UPC number from the product label"}
+              </p>
             </div>
 
             {cameraState === "denied" && cameraError && (
               <div className="bg-red-500/20 border border-red-500/40 rounded-xl px-4 py-3 w-full">
-                <p className="text-red-300 text-sm">Camera access was denied. Please allow camera access in your browser settings and try again.</p>
+                <p className="text-red-300 text-sm">{cameraError}</p>
               </div>
             )}
 
             <div className="flex flex-col gap-3 w-full">
-              <button
-                onClick={requestCamera}
-                className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
-              >
-                <Camera className="w-5 h-5" />
-                Scan with Camera
-              </button>
+              {hasBarcodeDetector && (
+                <button
+                  onClick={requestCamera}
+                  className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
+                >
+                  <Camera className="w-5 h-5" />
+                  Scan with Camera
+                </button>
+              )}
 
               <button
                 onClick={() => setManualMode(true)}
-                className="w-full bg-transparent border border-white/25 text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-white/10"
+                className={`w-full py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 ${
+                  hasBarcodeDetector
+                    ? "bg-transparent border border-white/25 text-white active:bg-white/10"
+                    : "bg-[#0071CE] text-white active:bg-[#0058a3]"
+                }`}
               >
                 <Keyboard className="w-5 h-5" />
                 Enter UPC Manually
@@ -300,7 +326,9 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
             </div>
 
             <p className="text-gray-600 text-xs text-center">
-              Hold steady with the barcode centered in the frame
+              {hasBarcodeDetector
+                ? "Hold steady with the barcode centered in the frame"
+                : "Type or paste the barcode number from the product label"}
             </p>
           </div>
         )}
@@ -361,7 +389,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     );
   }
 
-  // ── Live scanner (only when camera is actually running) ──
+  // ── Live scanner ──
   else if (cameraState === "live") {
     content = (
       <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
@@ -374,8 +402,15 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
         </div>
 
         <div className="relative flex-1 overflow-hidden">
-          {/* Quagga2 renders its own <video> into this div via getUserMedia (iOS + Android) */}
-          <div ref={quaggaContainerRef} className="absolute inset-0 w-full h-full overflow-hidden [&_video]:absolute [&_video]:inset-0 [&_video]:w-full [&_video]:h-full [&_video]:object-cover [&_canvas]:hidden" />
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+
+          {/* Viewfinder overlay */}
           <div className="absolute inset-0">
             <div className="absolute top-0 left-0 right-0 bg-black/55" style={{ height: "25%" }} />
             <div className="absolute bottom-0 left-0 right-0 bg-black/55" style={{ height: "35%" }} />
@@ -389,48 +424,46 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
               <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br" />
             </div>
           </div>
-          <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 z-10">
-            {lookupMutation.isPending && <div className="bg-black/70 text-white px-4 py-2 rounded-full text-sm">Looking up product…</div>}
-            {notFound && <div className="bg-red-600/90 text-white px-4 py-2 rounded-full text-sm font-medium">Product not found — try again</div>}
-            {!result && !notFound && !lookupMutation.isPending && (
-              <div className="bg-black/60 text-white px-4 py-2 rounded-full text-sm">Aim at a barcode to scan</div>
-            )}
-          </div>
-        </div>
 
-        {result && (
-          <div className="bg-white rounded-t-2xl shadow-2xl px-4 pt-4 pb-8 z-20">
-            <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
-            <div className="flex gap-3 mb-4">
-              {imageUrl
-                ? <img src={imageUrl} alt={result.name} className="w-20 h-20 object-contain rounded-lg border border-gray-100 flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                : <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0" />
-              }
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-0.5">{result.brand || ""}</p>
-                <p className="text-sm font-semibold text-gray-900 leading-snug line-clamp-3">{result.name}</p>
-                <p className="text-xl font-bold text-[#0071CE] mt-1">${parseFloat(result.price).toFixed(2)}</p>
+          {notFound && (
+            <div className="absolute bottom-24 left-0 right-0 flex justify-center">
+              <div className="bg-red-500/90 text-white px-4 py-2 rounded-full text-sm font-medium">
+                No product found — try again
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" className="flex-1" onClick={handleScanAgain}>Scan Again</Button>
-              <Button variant="outline" className="flex-1" onClick={handleViewProduct}>View Item</Button>
-              <Button className="flex-1 bg-[#0071CE] hover:bg-[#0058a3] text-white" onClick={() => addToCartMutation.mutate()} disabled={addToCartMutation.isPending}>Add to Cart</Button>
+          )}
+
+          {result && (
+            <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-4 shadow-2xl">
+              <div className="flex gap-3 mb-3">
+                {imageUrl
+                  ? <img src={imageUrl} alt={result.name} className="w-16 h-16 object-contain rounded-lg border border-gray-100 flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                  : <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0" />
+                }
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-400 uppercase font-semibold mb-0.5">{result.brand || ""}</p>
+                  <p className="text-sm font-bold text-gray-900 leading-snug line-clamp-2">{result.name}</p>
+                  <p className="text-lg font-bold text-[#0071CE]">${parseFloat(result.price).toFixed(2)}</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" className="flex-1" onClick={handleScanAgain}>Clear</Button>
+                <Button variant="outline" size="sm" className="flex-1" onClick={handleViewProduct}>View</Button>
+                <Button size="sm" className="flex-1 bg-[#0071CE] hover:bg-[#0058a3] text-white" onClick={() => addToCartMutation.mutate()} disabled={addToCartMutation.isPending}>Add to Cart</Button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         <style>{`
           @keyframes scanline {
-            0% { top: 0; }
-            50% { top: calc(100% - 2px); }
-            100% { top: 0; }
+            0%, 100% { top: 4px; opacity: 0.8; }
+            50% { top: calc(100% - 4px); opacity: 1; }
           }
         `}</style>
       </div>
     );
   }
 
-  if (!content) return null;
   return createPortal(content, document.body);
 }
