@@ -360,7 +360,6 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
                     id="ios-barcode-capture"
                     type="file"
                     accept="image/*"
-                    capture="environment"
                     className="sr-only"
                     onChange={handlePhotoCapture}
                     onClick={() => scanLog("file_input_tap")}
