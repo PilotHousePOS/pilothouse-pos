@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { getProductImageUrl } from "@/lib/imageUrl";
 
-const SCANNER_VERSION = "v21";
+const SCANNER_VERSION = "v22";
 
 const platform = /iPhone|iPad|iPod/i.test(navigator.userAgent)
   ? "ios"
@@ -16,16 +16,24 @@ const platform = /iPhone|iPad|iPod/i.test(navigator.userAgent)
   ? "android"
   : "other";
 
-// Native BarcodeDetector: Chrome/Edge on Android + Desktop. NOT in iOS Safari.
 const hasNativeBarcodeDetector = "BarcodeDetector" in window;
+// Checked once at render time — stays constant for the session
+const canUseGetUserMedia = !!navigator.mediaDevices;
 
 function scanLog(event: string, extras: Record<string, string | number | undefined> = {}) {
   fetch("/api/log/scanner", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ event, platform, v: SCANNER_VERSION, native: hasNativeBarcodeDetector ? 1 : 0, ...extras }),
+    body: JSON.stringify({
+      event, platform, v: SCANNER_VERSION,
+      native: hasNativeBarcodeDetector ? 1 : 0,
+      gum: canUseGetUserMedia ? 1 : 0,
+      ...extras,
+    }),
   }).catch(() => {});
 }
+
+const LS_SCANNER_OPEN = "ah_scanner_reopen";
 
 interface Product {
   id: number;
@@ -54,6 +62,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const { toast } = useToast();
 
   const [cameraState, setCameraState] = useState<CameraState>("home");
+  const [processingPhoto, setProcessingPhoto] = useState(false);
   const [manualMode, setManualMode] = useState(false);
   const [manualUpc, setManualUpc] = useState("");
   const [result, setResult] = useState<Product | null>(null);
@@ -61,6 +70,13 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const [cameraError, setCameraError] = useState("");
   const [lastScanned, setLastScanned] = useState("");
   const cooldownRef = useRef(false);
+
+  // When the app restarts after iOS kills the background PWA, auto-reopen scanner
+  useEffect(() => {
+    if (localStorage.getItem(LS_SCANNER_OPEN)) {
+      localStorage.removeItem(LS_SCANNER_OPEN);
+    }
+  }, []);
 
   const stopCamera = useCallback(() => {
     if (loopRef.current !== null) { cancelAnimationFrame(loopRef.current); loopRef.current = null; }
@@ -94,55 +110,63 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     lookupMutation.mutate(upc);
   }, [lastScanned, lookupMutation, onDetected]);
 
-  // ── Acquire camera stream ──
-  // navigator.mediaDevices may be undefined on iOS PWAs that cached the old
-  // camera=() Permissions-Policy header. Try modern API first, then webkit prefix.
-  const getStream = useCallback(async (): Promise<MediaStream> => {
-    const md = navigator.mediaDevices;
-    const mdLog = {
-      md: typeof md,
-      gum: typeof (md as any)?.getUserMedia,
-      wkit: typeof (navigator as any).webkitGetUserMedia,
-    };
-    scanLog("gum_check", mdLog);
+  // ── iOS photo capture via file input (label-triggered, no programmatic .click()) ──
+  const handlePhotoCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const file = files[0];
+    localStorage.removeItem(LS_SCANNER_OPEN);
+    scanLog("photo_captured", { size: file.size });
+    setProcessingPhoto(true);
+    let objectUrl: string | null = null;
+    try {
+      objectUrl = URL.createObjectURL(file);
+      const { BrowserMultiFormatReader } = await import("@zxing/browser");
+      const reader = new BrowserMultiFormatReader();
+      const decoded = await reader.decodeFromImageUrl(objectUrl);
+      scanLog("photo_decoded", { upc: decoded.getText() });
+      handleDetected(decoded.getText());
+    } catch (err: any) {
+      scanLog("photo_failed", { err: String(err?.message || err).slice(0, 100) });
+      setNotFound(true);
+      setTimeout(() => setNotFound(false), 3000);
+    } finally {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      setProcessingPhoto(false);
+    }
+  };
 
-    if (md?.getUserMedia) {
+  // ── getUserMedia (Android, Desktop, iOS when available) ──
+  const getStream = useCallback(async (): Promise<MediaStream> => {
+    if (navigator.mediaDevices?.getUserMedia) {
       try {
-        return await md.getUserMedia({
+        return await navigator.mediaDevices.getUserMedia({
           video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
         });
       } catch {
-        return await md.getUserMedia({ video: true });
+        return await navigator.mediaDevices.getUserMedia({ video: true });
       }
     }
-
-    // Webkit-prefixed fallback (very old iOS, or policy-scrubbed context)
     const legacy: Function | undefined =
       (navigator as any).getUserMedia || (navigator as any).webkitGetUserMedia;
-    if (!legacy) {
-      scanLog("gum_unavailable", mdLog);
-      throw new Error(`Camera API unavailable (md=${mdLog.md} gum=${mdLog.gum} wkit=${mdLog.wkit})`);
-    }
+    if (!legacy) throw Object.assign(new Error("Camera API unavailable"), { name: "APIUnavailable" });
     return new Promise<MediaStream>((resolve, reject) =>
       legacy.call(navigator, { video: { facingMode: "environment" } }, resolve, reject)
     );
   }, []);
 
-  // ── Path A: native BarcodeDetector loop (Android Chrome, Desktop) ──
   const startNativeScan = useCallback(async (stream: MediaStream) => {
     const video = videoRef.current;
     if (!video) return;
     video.srcObject = stream;
     await video.play();
     scanLog("camera_started", { method: "native" });
-
     const detector = new (window as any).BarcodeDetector({
       formats: ["upc_a", "upc_e", "ean_13", "ean_8", "code_128", "code_39", "qr_code"],
     });
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d")!;
     let lastTime = 0;
-
     const scan = async () => {
       if (!streamRef.current || !video.videoWidth) { loopRef.current = requestAnimationFrame(scan); return; }
       const now = performance.now();
@@ -160,7 +184,6 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     loopRef.current = requestAnimationFrame(scan);
   }, [handleDetected]);
 
-  // ── Path B: ZXing continuous decode (iOS Safari, Firefox) ──
   const startZxingScan = useCallback(async (stream: MediaStream) => {
     const video = videoRef.current;
     if (!video) return;
@@ -175,8 +198,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   }, [handleDetected]);
 
   const requestCamera = useCallback(async () => {
-    setCameraState("starting");
-    setCameraError("");
+    setCameraState("starting"); setCameraError("");
     scanLog("camera_requested");
     try {
       const stream = await getStream();
@@ -184,20 +206,15 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
       setCameraState("live");
       await new Promise(r => setTimeout(r, 50));
       if (!videoRef.current || !streamRef.current) { stopCamera(); setCameraState("denied"); return; }
-      if (hasNativeBarcodeDetector) {
-        await startNativeScan(stream);
-      } else {
-        await startZxingScan(stream);
-      }
+      if (hasNativeBarcodeDetector) await startNativeScan(stream);
+      else await startZxingScan(stream);
     } catch (err: any) {
       const error = String(err?.message || err).slice(0, 300);
       scanLog("camera_error", { error });
       stopCamera();
-      setCameraError(
-        err?.name === "NotAllowedError"
-          ? "Camera access denied — allow camera in your browser settings and try again."
-          : `Camera unavailable: ${error}`
-      );
+      setCameraError(err?.name === "NotAllowedError"
+        ? "Camera access denied — allow camera in your browser settings and try again."
+        : `Camera unavailable: ${error}`);
       setCameraState("denied");
     }
   }, [getStream, startNativeScan, startZxingScan, stopCamera]);
@@ -235,8 +252,23 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
   let content: React.ReactNode = null;
 
-  // ── Starting spinner ──
-  if (cameraState === "starting") {
+  // ── Processing spinner (iOS photo decode in progress) ──
+  if (processingPhoto) {
+    content = (
+      <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
+        <Header title="Scanner" />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-10 h-10 text-white animate-spin" />
+            <p className="text-white/60 text-sm">Reading barcode…</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── getUserMedia starting spinner ──
+  else if (cameraState === "starting") {
     content = (
       <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
         <Header title="Scanner" />
@@ -281,7 +313,11 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
             </div>
             <div className="text-center">
               <p className="text-white text-xl font-bold mb-1">Scan a Barcode</p>
-              <p className="text-gray-400 text-sm">Point the camera at any product barcode</p>
+              <p className="text-gray-400 text-sm">
+                {canUseGetUserMedia
+                  ? "Point the camera at any product barcode"
+                  : "Take a photo of a product barcode"}
+              </p>
             </div>
 
             {cameraState === "denied" && cameraError && (
@@ -289,15 +325,45 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
                 <p className="text-red-300 text-sm">{cameraError}</p>
               </div>
             )}
+            {notFound && (
+              <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-xl px-4 py-3 w-full">
+                <p className="text-yellow-300 text-sm">No barcode found — try again closer to the barcode with good lighting.</p>
+              </div>
+            )}
 
             <div className="flex flex-col gap-3 w-full">
-              <button
-                onClick={requestCamera}
-                className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
-              >
-                <Camera className="w-5 h-5" />
-                Scan with Camera
-              </button>
+              {canUseGetUserMedia ? (
+                /* getUserMedia available — live scanner */
+                <button
+                  onClick={requestCamera}
+                  className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
+                >
+                  <Camera className="w-5 h-5" />
+                  Scan with Camera
+                </button>
+              ) : (
+                /* iOS PWA: getUserMedia unavailable — use label/file-input (native tap, no programmatic click) */
+                <>
+                  {/* Hidden file input; activated by the label below */}
+                  <input
+                    id="ah-barcode-photo"
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    className="sr-only"
+                    onChange={handlePhotoCapture}
+                  />
+                  <label
+                    htmlFor="ah-barcode-photo"
+                    className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3] cursor-pointer select-none"
+                    onClick={() => localStorage.setItem(LS_SCANNER_OPEN, "1")}
+                  >
+                    <Camera className="w-5 h-5" />
+                    Scan with Camera
+                  </label>
+                </>
+              )}
+
               <button
                 onClick={() => setManualMode(true)}
                 className="w-full bg-transparent border border-white/25 text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-white/10"
@@ -369,7 +435,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     );
   }
 
-  // ── Live scanner ──
+  // ── Live scanner (getUserMedia) ──
   else if (cameraState === "live") {
     content = (
       <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
