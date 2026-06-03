@@ -333,7 +333,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
             <div className="flex flex-col gap-3 w-full">
               {canUseGetUserMedia ? (
-                /* getUserMedia available — live scanner */
+                /* getUserMedia available (Safari, Android, Desktop) — live scanner */
                 <button
                   onClick={requestCamera}
                   className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
@@ -342,25 +342,22 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
                   Scan with Camera
                 </button>
               ) : (
-                /* iOS PWA: getUserMedia unavailable — use label/file-input (native tap, no programmatic click) */
+                /* iOS standalone PWA: camera API unavailable here.
+                   window.open() from a PWA always opens in Safari where getUserMedia works. */
                 <>
-                  {/* Hidden file input; activated by the label below */}
-                  <input
-                    id="ah-barcode-photo"
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    className="sr-only"
-                    onChange={handlePhotoCapture}
-                  />
-                  <label
-                    htmlFor="ah-barcode-photo"
-                    className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3] cursor-pointer select-none"
-                    onClick={() => localStorage.setItem(LS_SCANNER_OPEN, "1")}
+                  <button
+                    onClick={() => {
+                      scanLog("safari_open");
+                      window.open(window.location.origin + '/supplies?scan=1', '_blank');
+                    }}
+                    className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
                   >
                     <Camera className="w-5 h-5" />
                     Scan with Camera
-                  </label>
+                  </button>
+                  <p className="text-gray-500 text-xs text-center -mt-2">
+                    Opens scanner in Safari for camera access
+                  </p>
                 </>
               )}
 

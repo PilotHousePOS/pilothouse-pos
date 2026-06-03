@@ -174,6 +174,18 @@ export default function Supplies() {
     }
   }, []);
 
+  // Auto-open scanner when navigated here from iOS PWA via ?scan=1
+  // (window.open from a PWA opens Safari where getUserMedia works)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('scan') === '1' && navigator.mediaDevices) {
+      setShowScanner(true);
+      // Clean the param from the URL without a page reload
+      const clean = window.location.pathname;
+      window.history.replaceState({}, '', clean);
+    }
+  }, []);
+
   const updateUrl = useCallback((updates: Record<string, string | number>) => {
     const params = new URLSearchParams(window.location.search);
     Object.entries(updates).forEach(([key, value]) => {
