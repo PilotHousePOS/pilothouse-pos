@@ -71,8 +71,18 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const [lastScanned, setLastScanned] = useState("");
   const cooldownRef = useRef(false);
 
-  // When the app restarts after iOS kills the background PWA, auto-reopen scanner
+  // Diagnostic: log context info on mount so we can see why mediaDevices may be absent
   useEffect(() => {
+    const ua = navigator.userAgent;
+    const iosMatch = ua.match(/OS (\d+_\d+)/);
+    const iosVer = iosMatch ? iosMatch[1].replace('_', '.') : 'n/a';
+    scanLog("mount", {
+      ios: iosVer as any,
+      secure: window.isSecureContext ? 1 : 0,
+      standalone: (navigator as any).standalone ? 1 : 0,
+      topFrame: window.top === window ? 1 : 0,
+      md: typeof navigator.mediaDevices as any,
+    });
     if (localStorage.getItem(LS_SCANNER_OPEN)) {
       localStorage.removeItem(LS_SCANNER_OPEN);
     }
