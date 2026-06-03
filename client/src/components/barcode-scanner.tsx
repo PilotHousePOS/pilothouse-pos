@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { getProductImageUrl } from "@/lib/imageUrl";
 
-const SCANNER_VERSION = "v18";
+const SCANNER_VERSION = "v19";
 
 const platform = /iPhone|iPad|iPod/i.test(navigator.userAgent)
   ? "ios"
@@ -16,15 +16,14 @@ const platform = /iPhone|iPad|iPod/i.test(navigator.userAgent)
   ? "android"
   : "other";
 
-// BarcodeDetector is native in Chrome/Edge on Android + Desktop.
-// Not available in iOS Safari or Firefox.
-const hasBarcodeDetector = "BarcodeDetector" in window;
+// Native BarcodeDetector: Chrome/Edge on Android + Desktop. NOT available on iOS Safari or Firefox.
+const hasNativeBarcodeDetector = "BarcodeDetector" in window;
 
 function scanLog(event: string, extras: Record<string, string | number | undefined> = {}) {
   fetch("/api/log/scanner", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ event, platform, hasBarcodeDetector: hasBarcodeDetector ? 1 : 0, ...extras }),
+    body: JSON.stringify({ event, platform, native: hasNativeBarcodeDetector ? 1 : 0, ...extras }),
   }).catch(() => {});
 }
 
@@ -50,7 +49,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const loopRef = useRef<number | null>(null);
-  const detectorRef = useRef<any>(null);
+  const zxingReaderRef = useRef<any>(null);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
@@ -63,11 +62,14 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
   const [lastScanned, setLastScanned] = useState("");
   const cooldownRef = useRef(false);
 
-  // Stop camera stream and scan loop on unmount or when leaving live state
   const stopCamera = useCallback(() => {
     if (loopRef.current !== null) {
       cancelAnimationFrame(loopRef.current);
       loopRef.current = null;
+    }
+    if (zxingReaderRef.current) {
+      try { zxingReaderRef.current.reset(); } catch {}
+      zxingReaderRef.current = null;
     }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(t => t.stop());
@@ -95,10 +97,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     onError: () => {
       setResult(null);
       setNotFound(true);
-      setTimeout(() => {
-        setNotFound(false);
-        cooldownRef.current = false;
-      }, 2000);
+      setTimeout(() => { setNotFound(false); cooldownRef.current = false; }, 2000);
       cooldownRef.current = false;
     },
   });
@@ -112,85 +111,106 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
     lookupMutation.mutate(upc);
   }, [lastScanned, lookupMutation, onDetected]);
 
-  // ── Start live camera using getUserMedia + BarcodeDetector scan loop ──
+  // ── Get camera stream (shared between both scan paths) ──
+  const getStream = async (): Promise<MediaStream> => {
+    try {
+      return await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      });
+    } catch {
+      return await navigator.mediaDevices.getUserMedia({ video: true });
+    }
+  };
+
+  // ── Path A: Native BarcodeDetector loop (Android Chrome, Desktop Chrome) ──
+  const startNativeScan = useCallback(async (stream: MediaStream) => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.srcObject = stream;
+    await video.play();
+    scanLog("camera_started", { method: "native" });
+
+    const detector = new (window as any).BarcodeDetector({
+      formats: ["upc_a", "upc_e", "ean_13", "ean_8", "code_128", "code_39", "qr_code"],
+    });
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d")!;
+    let lastDetectTime = 0;
+
+    const scan = async () => {
+      if (!streamRef.current || !video.videoWidth) {
+        loopRef.current = requestAnimationFrame(scan);
+        return;
+      }
+      const now = performance.now();
+      if (now - lastDetectTime > 120) {
+        lastDetectTime = now;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0);
+        try {
+          const results = await detector.detect(canvas);
+          if (results.length > 0 && streamRef.current) handleDetected(results[0].rawValue);
+        } catch {}
+      }
+      loopRef.current = requestAnimationFrame(scan);
+    };
+    loopRef.current = requestAnimationFrame(scan);
+  }, [handleDetected]);
+
+  // ── Path B: ZXing BrowserMultiFormatReader (iOS Safari, Firefox, other) ──
+  const startZxingScan = useCallback(async (stream: MediaStream) => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.srcObject = stream;
+    // ZXing's decodeFromVideoElement will call play() internally
+    scanLog("camera_started", { method: "zxing" });
+
+    const { BrowserMultiFormatReader } = await import("@zxing/browser");
+    const reader = new BrowserMultiFormatReader();
+    zxingReaderRef.current = reader;
+
+    reader.decodeFromVideoElement(video, (result, err) => {
+      if (result && streamRef.current) {
+        handleDetected(result.getText());
+      }
+      // err is normal when no barcode found in a frame — ignore it
+    });
+  }, [handleDetected]);
+
   const requestCamera = useCallback(async () => {
-    if (!hasBarcodeDetector) return;
     setCameraState("starting");
     setCameraError("");
     scanLog("camera_requested");
 
     try {
-      // Try rear camera first, fall back to any video
-      let stream: MediaStream;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
-        });
-      } catch {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      }
-
+      const stream = await getStream();
       streamRef.current = stream;
       setCameraState("live");
 
-      // Attach stream to video element — need a tick for the DOM to update
       await new Promise(r => setTimeout(r, 50));
-      const video = videoRef.current;
-      if (!video || !streamRef.current) { stopCamera(); setCameraState("denied"); return; }
+      if (!videoRef.current || !streamRef.current) { stopCamera(); setCameraState("denied"); return; }
 
-      video.srcObject = stream;
-      await video.play();
-      scanLog("camera_started");
-
-      // Build BarcodeDetector with common barcode formats
-      detectorRef.current = new (window as any).BarcodeDetector({
-        formats: ["upc_a", "upc_e", "ean_13", "ean_8", "code_128", "code_39", "qr_code", "itf", "codabar"],
-      });
-
-      // Scan loop: draw each frame onto canvas, run BarcodeDetector
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d")!;
-      let lastDetectTime = 0;
-
-      const scan = async () => {
-        if (!streamRef.current || !video.videoWidth) {
-          loopRef.current = requestAnimationFrame(scan);
-          return;
-        }
-
-        const now = performance.now();
-        // Throttle to ~8 fps for battery / performance
-        if (now - lastDetectTime > 120) {
-          lastDetectTime = now;
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          ctx.drawImage(video, 0, 0);
-          try {
-            const results = await detectorRef.current.detect(canvas);
-            if (results.length > 0 && streamRef.current) {
-              handleDetected(results[0].rawValue);
-            }
-          } catch {
-            // ignore individual frame errors
-          }
-        }
-        loopRef.current = requestAnimationFrame(scan);
-      };
-
-      loopRef.current = requestAnimationFrame(scan);
-
+      if (hasNativeBarcodeDetector) {
+        await startNativeScan(stream);
+      } else {
+        await startZxingScan(stream);
+      }
     } catch (err: any) {
       const error = String(err?.message || err).slice(0, 200);
       scanLog("camera_error", { error });
       stopCamera();
-      if (err?.name === "NotAllowedError") {
-        setCameraError("Camera access was denied. Please allow camera access in your browser settings.");
-      } else {
-        setCameraError("Could not start camera. Try the manual entry option below.");
-      }
+      setCameraError(
+        err?.name === "NotAllowedError"
+          ? "Camera access was denied. Please allow camera access in your browser settings."
+          : "Could not start camera. Try the manual entry option below."
+      );
       setCameraState("denied");
     }
-  }, [handleDetected, stopCamera]);
+  }, [startNativeScan, startZxingScan, stopCamera]);
 
   const handleManualSubmit = () => {
     const upc = manualUpc.trim();
@@ -288,11 +308,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
 
             <div className="text-center">
               <p className="text-white text-xl font-bold mb-1">Scan a Barcode</p>
-              <p className="text-gray-400 text-sm">
-                {hasBarcodeDetector
-                  ? "Point the camera at any product barcode"
-                  : "Enter the UPC number from the product label"}
-              </p>
+              <p className="text-gray-400 text-sm">Point the camera at any product barcode</p>
             </div>
 
             {cameraState === "denied" && cameraError && (
@@ -302,34 +318,24 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
             )}
 
             <div className="flex flex-col gap-3 w-full">
-              {hasBarcodeDetector && (
-                <button
-                  onClick={requestCamera}
-                  className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
-                >
-                  <Camera className="w-5 h-5" />
-                  Scan with Camera
-                </button>
-              )}
+              <button
+                onClick={requestCamera}
+                className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3]"
+              >
+                <Camera className="w-5 h-5" />
+                Scan with Camera
+              </button>
 
               <button
                 onClick={() => setManualMode(true)}
-                className={`w-full py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 ${
-                  hasBarcodeDetector
-                    ? "bg-transparent border border-white/25 text-white active:bg-white/10"
-                    : "bg-[#0071CE] text-white active:bg-[#0058a3]"
-                }`}
+                className="w-full bg-transparent border border-white/25 text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-white/10"
               >
                 <Keyboard className="w-5 h-5" />
                 Enter UPC Manually
               </button>
             </div>
 
-            <p className="text-gray-600 text-xs text-center">
-              {hasBarcodeDetector
-                ? "Hold steady with the barcode centered in the frame"
-                : "Type or paste the barcode number from the product label"}
-            </p>
+            <p className="text-gray-600 text-xs text-center">Hold steady with the barcode centered in the frame</p>
           </div>
         )}
       </div>
@@ -411,13 +417,13 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
           />
 
           {/* Viewfinder overlay */}
-          <div className="absolute inset-0">
+          <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-0 left-0 right-0 bg-black/55" style={{ height: "25%" }} />
             <div className="absolute bottom-0 left-0 right-0 bg-black/55" style={{ height: "35%" }} />
             <div className="absolute left-0 bg-black/55" style={{ top: "25%", height: "40%", width: "8%" }} />
             <div className="absolute right-0 bg-black/55" style={{ top: "25%", height: "40%", width: "8%" }} />
             <div className="absolute" style={{ top: "25%", left: "8%", right: "8%", height: "40%" }}>
-              <div className="absolute left-0 right-0 h-0.5 bg-[#0071CE]/80" style={{ animation: "scanline 2s ease-in-out infinite" }} />
+              <div className="absolute left-0 right-0 h-0.5 bg-[#0071CE]/80 scanline" />
               <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl" />
               <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr" />
               <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl" />
@@ -426,7 +432,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
           </div>
 
           {notFound && (
-            <div className="absolute bottom-24 left-0 right-0 flex justify-center">
+            <div className="absolute bottom-24 left-0 right-0 flex justify-center pointer-events-none">
               <div className="bg-red-500/90 text-white px-4 py-2 rounded-full text-sm font-medium">
                 No product found — try again
               </div>
@@ -456,6 +462,7 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
         </div>
 
         <style>{`
+          .scanline { animation: scanline 2s ease-in-out infinite; }
           @keyframes scanline {
             0%, 100% { top: 4px; opacity: 0.8; }
             50% { top: calc(100% - 4px); opacity: 1; }
