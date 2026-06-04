@@ -1,1 +1,1 @@
-- [iOS PWA camera bug](ios-pwa-camera.md) — navigator.mediaDevices is undefined in iOS PWA (home screen) mode; must use webkit-prefixed fallback.
+- [iOS scanner context](ios-scanner-context.md) — App is an App Store WKWebView wrapper; standalone=0, mediaDevices=undefined; use file input without capture for camera fallback.
