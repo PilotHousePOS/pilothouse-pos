@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { getProductImageUrl } from "@/lib/imageUrl";
 
-const SCANNER_VERSION = "v23";
+const SCANNER_VERSION = "v24";
 
 const platform = /iPhone|iPad|iPod/i.test(navigator.userAgent)
   ? "ios"
@@ -356,10 +356,27 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
                   Scan with Camera
                 </button>
               ) : (
-                /* getUserMedia unavailable (iOS Safari) — photo picker fallback.
-                   No capture attribute: shows iOS sheet with "Take Photo" option.
-                   This keeps the browser alive; onChange fires after photo is taken. */
+                /* getUserMedia unavailable (iOS WKWebView) — photo library fallback.
+                   "Take Photo" from the iOS sheet reloads the WebView (WKWebView bug).
+                   Workflow: use Camera app to take photo first, then pick from Photo Library here. */
                 <>
+                  {/* Step instructions */}
+                  <div className="w-full bg-white/8 border border-white/15 rounded-xl px-4 py-3 flex flex-col gap-2.5">
+                    <p className="text-white/70 text-xs font-semibold uppercase tracking-wide">How to scan</p>
+                    <div className="flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-full bg-[#0071CE] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+                      <p className="text-gray-300 text-sm leading-snug">Open your <strong className="text-white">Camera app</strong> and take a photo of the barcode</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-full bg-[#0071CE] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+                      <p className="text-gray-300 text-sm leading-snug">Come back here and tap <strong className="text-white">Scan from Photo Library</strong></p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-full bg-[#0071CE] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+                      <p className="text-gray-300 text-sm leading-snug">Choose <strong className="text-white">Photo Library</strong> and select your photo — <em className="text-yellow-400 not-italic">do not tap "Take Photo"</em></p>
+                    </div>
+                  </div>
+
                   <input
                     id="ios-barcode-capture"
                     type="file"
@@ -374,11 +391,8 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
                   >
                     {processingPhoto
                       ? <><Loader2 className="w-5 h-5 animate-spin" />Decoding barcode…</>
-                      : <><Camera className="w-5 h-5" />Scan with Camera</>}
+                      : <><Camera className="w-5 h-5" />Scan from Photo Library</>}
                   </label>
-                  <p className="text-gray-500 text-xs text-center -mt-2">
-                    Tap, then choose <strong className="text-gray-400">Take Photo</strong> — point at a barcode and shoot
-                  </p>
                 </>
               )}
 
