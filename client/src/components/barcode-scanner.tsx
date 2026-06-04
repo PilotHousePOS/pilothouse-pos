@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { getProductImageUrl } from "@/lib/imageUrl";
 
-const SCANNER_VERSION = "v22";
+const SCANNER_VERSION = "v23";
 
 const platform = /iPhone|iPad|iPod/i.test(navigator.userAgent)
   ? "ios"
@@ -355,31 +355,31 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
                   <Camera className="w-5 h-5" />
                   Scan with Camera
                 </button>
-              ) : isIosBrowser ? (
-                /* iOS in Safari/browser — camera API unavailable here.
-                   Must open from home screen icon (standalone PWA) for camera access. */
-                <div className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-4 flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <Camera className="w-5 h-5 text-yellow-400 shrink-0" />
-                    <p className="text-white text-sm font-semibold">Camera requires the home screen app</p>
-                  </div>
-                  <p className="text-gray-400 text-xs leading-relaxed">
-                    iOS only allows camera scanning when this app is opened from the <strong className="text-white">Animal House icon on your home screen</strong>, not from Safari.
-                  </p>
-                  <p className="text-gray-500 text-xs">
-                    Already have it on your home screen? Close Safari and tap the app icon.
-                  </p>
-                </div>
               ) : (
-                /* Non-iOS, no getUserMedia — shouldn't normally happen */
-                <button
-                  onClick={requestCamera}
-                  className="w-full bg-white/20 text-white/50 py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 cursor-not-allowed"
-                  disabled
-                >
-                  <Camera className="w-5 h-5" />
-                  Camera Unavailable
-                </button>
+                /* getUserMedia unavailable (iOS Safari) — photo picker fallback.
+                   No capture attribute: shows iOS sheet with "Take Photo" option.
+                   This keeps the browser alive; onChange fires after photo is taken. */
+                <>
+                  <input
+                    id="ios-barcode-capture"
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    onChange={handlePhotoCapture}
+                    onClick={() => scanLog("file_input_tap")}
+                  />
+                  <label
+                    htmlFor="ios-barcode-capture"
+                    className="w-full bg-[#0071CE] text-white py-4 text-base font-semibold rounded-xl flex items-center justify-center gap-2 active:bg-[#0058a3] cursor-pointer select-none"
+                  >
+                    {processingPhoto
+                      ? <><Loader2 className="w-5 h-5 animate-spin" />Decoding barcode…</>
+                      : <><Camera className="w-5 h-5" />Scan with Camera</>}
+                  </label>
+                  <p className="text-gray-500 text-xs text-center -mt-2">
+                    Tap, then choose <strong className="text-gray-400">Take Photo</strong> — point at a barcode and shoot
+                  </p>
+                </>
               )}
 
               <button
