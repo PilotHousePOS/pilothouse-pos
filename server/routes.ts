@@ -11628,19 +11628,18 @@ West Monroe LA 71291
         merged = [...byUserId, ...phoneOnly];
       }
 
-      // Filter out old completed/cancelled appointments (older than 30 days)
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      
+      // Show all appointments — customers should see their full grooming history.
+      // Scheduled appointments always shown; completed/cancelled kept indefinitely
+      // so pre-account history is visible after linking by phone number.
       const filteredAppointments = merged.filter((apt: any) => {
-        // Keep all scheduled appointments
-        if (apt.status === 'scheduled') {
-          return true;
+        // Drop future cancelled appointments (no reason to show those)
+        if (apt.status === 'cancelled') {
+          const aptDate = new Date(apt.appointmentDate);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          return aptDate >= today;
         }
-        
-        // For completed/cancelled appointments: only keep recent ones
-        const aptDate = new Date(apt.appointmentDate);
-        return aptDate >= thirtyDaysAgo;
+        return true;
       });
       
       // Enrich each appointment with its pets array (same as admin view)
