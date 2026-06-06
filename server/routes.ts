@@ -5357,9 +5357,26 @@ West Monroe LA 71291
   app.post("/api/appointments/:id/pay-online", authMiddleware, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
+      const userId = req.user?.id;
       const appointment = await storage.getAppointment(id);
       if (!appointment) return res.status(404).json({ message: "Appointment not found" });
-      if (appointment.userId !== req.user?.id) return res.status(403).json({ message: "Forbidden" });
+
+      // Allow if userId matches, OR if appointment is unlinked and phone number matches
+      const isOwnerById = appointment.userId === userId;
+      let isOwnerByPhone = false;
+      if (!isOwnerById && !appointment.userId) {
+        const reqUser = await storage.getUser(userId);
+        if (reqUser?.phoneNumber) {
+          const norm = (p: string) => p.replace(/\D/g, '');
+          isOwnerByPhone = norm(appointment.ownerPhoneNumber) === norm(reqUser.phoneNumber);
+        }
+      }
+      if (!isOwnerById && !isOwnerByPhone) return res.status(403).json({ message: "Forbidden" });
+      // Auto-link unlinked appointment to this user now that we've verified phone ownership
+      if (isOwnerByPhone) {
+        await db.update(appointments).set({ userId }).where(eq(appointments.id, id));
+      }
+
       if (!appointment.readyForPayment) return res.status(400).json({ message: "Appointment is not ready for payment" });
       if (appointment.isPaid) return res.status(400).json({ message: "Appointment is already paid" });
 
@@ -5427,7 +5444,20 @@ West Monroe LA 71291
 
       const appointment = await storage.getAppointment(id);
       if (!appointment) return res.status(404).json({ message: "Appointment not found" });
-      if (appointment.userId !== req.user?.id) return res.status(403).json({ message: "Forbidden" });
+      const confirmUserId = req.user?.id;
+      const confirmOwnerById = appointment.userId === confirmUserId;
+      let confirmOwnerByPhone = false;
+      if (!confirmOwnerById && !appointment.userId) {
+        const confirmUser = await storage.getUser(confirmUserId);
+        if (confirmUser?.phoneNumber) {
+          const norm = (p: string) => p.replace(/\D/g, '');
+          confirmOwnerByPhone = norm(appointment.ownerPhoneNumber) === norm(confirmUser.phoneNumber);
+        }
+      }
+      if (!confirmOwnerById && !confirmOwnerByPhone) return res.status(403).json({ message: "Forbidden" });
+      if (confirmOwnerByPhone) {
+        await db.update(appointments).set({ userId: confirmUserId }).where(eq(appointments.id, id));
+      }
       if (appointment.isPaid) return res.json({ success: true, alreadyPaid: true });
 
       const { getUncachableStripeClient } = await import('./stripeClient');
@@ -11672,7 +11702,19 @@ West Monroe LA 71291
 
       const appointment = await storage.getAppointment(id);
       if (!appointment) return res.status(404).json({ message: "Appointment not found" });
-      if (appointment.userId !== userId) return res.status(403).json({ message: "Not your appointment" });
+      const reschedOwnerById = appointment.userId === userId;
+      let reschedOwnerByPhone = false;
+      if (!reschedOwnerById && !appointment.userId) {
+        const reschedUser = await storage.getUser(userId);
+        if (reschedUser?.phoneNumber) {
+          const norm = (p: string) => p.replace(/\D/g, '');
+          reschedOwnerByPhone = norm(appointment.ownerPhoneNumber) === norm(reschedUser.phoneNumber);
+        }
+      }
+      if (!reschedOwnerById && !reschedOwnerByPhone) return res.status(403).json({ message: "Not your appointment" });
+      if (reschedOwnerByPhone) {
+        await db.update(appointments).set({ userId }).where(eq(appointments.id, id));
+      }
       if (appointment.status === 'cancelled' || appointment.status === 'completed') {
         return res.status(400).json({ message: "Cannot reschedule a " + appointment.status + " appointment" });
       }
@@ -11806,9 +11848,21 @@ West Monroe LA 71291
 
       if (!appointment) return res.status(404).json({ message: "Appointment not found" });
 
-      // Verify ownership
-      if (appointment.userId !== userId) {
+      // Allow if userId matches, OR if appointment is unlinked and phone number matches
+      const cancelOwnerById = appointment.userId === userId;
+      let cancelOwnerByPhone = false;
+      if (!cancelOwnerById && !appointment.userId) {
+        const cancelUser = await storage.getUser(userId);
+        if (cancelUser?.phoneNumber) {
+          const norm = (p: string) => p.replace(/\D/g, '');
+          cancelOwnerByPhone = norm(appointment.ownerPhoneNumber) === norm(cancelUser.phoneNumber);
+        }
+      }
+      if (!cancelOwnerById && !cancelOwnerByPhone) {
         return res.status(403).json({ message: "Not your appointment" });
+      }
+      if (cancelOwnerByPhone) {
+        await db.update(appointments).set({ userId }).where(eq(appointments.id, id));
       }
 
       // Don't allow cancelling already-finished/cancelled appointments
