@@ -78,6 +78,7 @@ const DeleteAccount = safeLazy(() => import("@/pages/delete-account"));
 const NotFound = safeLazy(() => import("@/pages/not-found"));
 const Apply = safeLazy(() => import("@/pages/apply"));
 const About = safeLazy(() => import("@/pages/about"));
+const SmsConsent = safeLazy(() => import("@/pages/sms-consent"));
 
 function PageLoader() {
   return (
@@ -108,6 +109,7 @@ function Router() {
           <Route path="/support" component={Support} />
           <Route path="/apply" component={Apply} />
           <Route path="/about" component={About} />
+          <Route path="/sms-consent" component={SmsConsent} />
           <Route path="/store" component={Home} />
           <Route path="/pets" component={Pets} />
           <Route path="/supplies" component={Supplies} />
