@@ -142,11 +142,18 @@ export default function MyAppointments() {
     return <Badge className="bg-yellow-500">Pending Approval</Badge>;
   };
 
-  const formatDate = (date: string | Date) =>
-    new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  const formatDate = (date: string | Date) => {
+    const d = typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)
+      ? new Date(date + 'T12:00:00')
+      : new Date(date);
+    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  };
 
   const isPast = (apt: Appointment) => {
-    const d = new Date(apt.appointmentDate);
+    const raw = apt.appointmentDate as string;
+    const d = typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw)
+      ? new Date(raw + 'T12:00:00')
+      : new Date(raw);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return d < today;
