@@ -685,7 +685,7 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
     </tr>
   `;
 
-  const noOrdersMessage = transactionCount === 0 ? `
+  const noOrdersMessage = transactionCount === 0 && paidGroomingAppts.length === 0 ? `
     <tr>
       <td colspan="3" style="text-align: center; padding: 20px; color: #666; font-style: italic;">
         No online orders placed today.
@@ -716,7 +716,7 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
         
         ${sectionHeader('Order Summary')}
         ${noOrdersMessage}
-        ${transactionCount > 0 ? `
+        ${transactionCount > 0 || groomingServiceTotal > 0 ? `
         ${headerRow('', 'Total $', 'Count #')}
         ${dataRow('Transactions', formatCurrency(total + totalLoyaltyDiscounts + totalOrderDiscounts), String(transactionCount))}
         ${totalOrderDiscounts > 0 ? dataRow('Order Discounts', `-${formatCurrency(totalOrderDiscounts)}`, String(orderDiscountCount)) : ''}
@@ -766,7 +766,7 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
         }).join('')}
         ` : ''}
 
-        ${transactionCount > 0 ? `
+        ${transactionCount > 0 || paidGroomingAppts.length > 0 ? `
         ${sectionHeader('Gross Sales By Category')}
         ${headerRow('', 'Total $', 'Sales %')}
         ${sortedCategories.length > 0 
@@ -985,7 +985,7 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
     </div>
   `;
 
-  const textBody = transactionCount === 0 
+  const textBody = transactionCount === 0 && paidGroomingAppts.length === 0
     ? `
 ANIMAL HOUSE LLC
 2934 Cypress St
