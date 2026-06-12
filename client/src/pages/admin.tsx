@@ -6856,6 +6856,7 @@ export default function Admin() {
   const [showInProgressOrders, setShowInProgressOrders] = useState(false);
   const [showReadyOrders, setShowReadyOrders] = useState(false);
   const [showCompletedOrders, setShowCompletedOrders] = useState(false);
+  const [showGroomingPayments, setShowGroomingPayments] = useState(false);
   const [showCancelledOrders, setShowCancelledOrders] = useState(false);
   
   // Search state for orders and appointments
@@ -7092,6 +7093,11 @@ export default function Admin() {
 
   const { data: allOrdersWithItems = [], refetch: refetchAllOrders } = useQuery<any[]>({
     queryKey: ["/api/admin/orders-with-items"],
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+  });
+
+  const { data: groomingPayments = [] } = useQuery<any[]>({
+    queryKey: ["/api/admin/grooming-payments"],
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
@@ -10617,6 +10623,107 @@ export default function Admin() {
                   </CardContent>
                 </Card>
               );
+              })()}
+
+              {/* Online Grooming Payments Section */}
+              <Button
+                variant="outline"
+                className="w-full justify-between border-2 border-purple-300 bg-purple-50 hover:bg-purple-100"
+                onClick={() => setShowGroomingPayments(!showGroomingPayments)}
+              >
+                <span className="flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-purple-600" />
+                  Online Grooming Payments ({(groomingPayments as any[]).filter((a: any) => {
+                    if (!search) return true;
+                    const q = search.toLowerCase();
+                    return `${a.ownerFirstName} ${a.ownerLastName}`.toLowerCase().includes(q) ||
+                      (a.customerEmail || '').toLowerCase().includes(q) ||
+                      (a.ownerPhoneNumber || '').includes(q);
+                  }).length})
+                </span>
+                {showGroomingPayments ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+              </Button>
+
+              {showGroomingPayments && (() => {
+                const filteredGP = (groomingPayments as any[]).filter((a: any) => {
+                  if (!search) return true;
+                  const q = search.toLowerCase();
+                  return `${a.ownerFirstName} ${a.ownerLastName}`.toLowerCase().includes(q) ||
+                    (a.customerEmail || '').toLowerCase().includes(q) ||
+                    (a.ownerPhoneNumber || '').includes(q);
+                });
+                return (
+                  <Card className="border-purple-200">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-base text-purple-700">
+                        <CreditCard className="w-5 h-5" />
+                        Online Grooming Payments
+                      </CardTitle>
+                      <p className="text-sm text-gray-600">
+                        Grooming appointments paid online via Stripe. These are permanent charges and are never reset.
+                      </p>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {filteredGP.length === 0 && (
+                          <div className="text-center py-8 text-gray-500">
+                            <CreditCard className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                            <p>No online grooming payments yet</p>
+                          </div>
+                        )}
+                        {filteredGP.map((appt: any) => (
+                          <Card key={appt.id} className="border border-purple-100 overflow-hidden">
+                            <CardContent className="p-3">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                    <Badge className="bg-purple-600 text-white">Paid Online</Badge>
+                                    <span className="text-sm text-gray-500">Appt #{appt.id}</span>
+                                    <span className="text-xs text-gray-400">
+                                      {(() => {
+                                        const d = appt.appointmentDate;
+                                        return typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)
+                                          ? new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                                          : new Date(d).toLocaleDateString();
+                                      })()}
+                                    </span>
+                                  </div>
+                                  <p className="font-semibold">{appt.ownerFirstName} {appt.ownerLastName}</p>
+                                  {appt.customerEmail && (
+                                    <a href={`mailto:${appt.customerEmail}`} className="text-sm text-blue-600 hover:underline flex items-center gap-1">
+                                      <Mail className="w-3 h-3" />
+                                      {appt.customerEmail}
+                                    </a>
+                                  )}
+                                  {appt.ownerPhoneNumber && (
+                                    <a href={`tel:${appt.ownerPhoneNumber}`} className="text-sm text-blue-600 hover:underline flex items-center gap-1">
+                                      <Phone className="w-3 h-3" />
+                                      {appt.ownerPhoneNumber}
+                                    </a>
+                                  )}
+                                  <div className="mt-2 space-y-1 text-sm text-gray-700">
+                                    <p>🐾 {appt.petName || 'Pet'} ({appt.petType || 'unknown'})</p>
+                                    <p>✂️ {appt.serviceType === 'grooming-full' ? 'Full Grooming' : appt.serviceType === 'grooming-bath' ? 'Bath Only' : appt.serviceType}</p>
+                                    <p>🕐 {appt.appointmentTime}</p>
+                                    {appt.groomerName && <p>💼 Groomer: {appt.groomerName}</p>}
+                                  </div>
+                                </div>
+                                <div className="text-right shrink-0">
+                                  <p className="text-lg font-bold text-green-700">${appt.finalAmount || '0.00'}</p>
+                                  {appt.groomingStripeSessionId && (
+                                    <p className="text-xs text-gray-400 mt-1 font-mono">
+                                      {appt.groomingStripeSessionId.slice(0, 16)}…
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
               })()}
             </div>
           )}

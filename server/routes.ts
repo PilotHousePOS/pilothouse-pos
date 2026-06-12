@@ -3824,6 +3824,35 @@ West Monroe LA 71291
   });
 
   // Get all orders with items for admin
+  // Return all appointments that were paid online via Stripe
+  app.get("/api/admin/grooming-payments", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const user = await storage.getUser(userId);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Access denied. Admin only." });
+
+      const allAppts = await storage.getAppointments();
+      const paid = allAppts
+        .filter((a: any) => a.isPaid && a.paidOnline)
+        .sort((a: any, b: any) => new Date(b.appointmentDate).getTime() - new Date(a.appointmentDate).getTime());
+
+      // Enrich each appointment with the linked user's email if available
+      const enriched = await Promise.all(paid.map(async (a: any) => {
+        let email = (a as any).ownerEmail || null;
+        if (!email && a.userId) {
+          const u = await storage.getUser(a.userId);
+          email = u?.email || null;
+        }
+        return { ...a, customerEmail: email };
+      }));
+
+      res.json(enriched);
+    } catch (error) {
+      console.error("Error fetching grooming payments:", error);
+      res.status(500).json({ message: "Failed to fetch grooming payments" });
+    }
+  });
+
   app.get("/api/admin/orders-with-items", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;

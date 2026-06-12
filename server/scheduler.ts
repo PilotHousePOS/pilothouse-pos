@@ -119,10 +119,11 @@ export function initializeScheduledTasks() {
         console.log(`Reset "Here" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
       }
       
-      // Second, reset isPaid flag for ALL appointments (regardless of date or status)
-      const appointmentsWithPaid = allAppointments.filter((apt: any) => apt.isPaid === true);
+      // Second, reset isPaid flag for appointments paid IN-STORE only.
+      // Never reset appointments paid online via Stripe (paidOnline=true) — those are permanent Stripe charges.
+      const appointmentsWithPaid = allAppointments.filter((apt: any) => apt.isPaid === true && !apt.paidOnline);
       
-      console.log(`Resetting "Paid" status for ${appointmentsWithPaid.length} appointments (all appointments, not just past ones)`);
+      console.log(`Resetting "Paid" status for ${appointmentsWithPaid.length} in-store-paid appointments (skipping online-paid)`);
       
       for (const appointment of appointmentsWithPaid) {
         await storage.updateAppointmentIsPaid(appointment.id, false);
