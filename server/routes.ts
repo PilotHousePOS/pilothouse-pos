@@ -4273,6 +4273,11 @@ West Monroe LA 71291
       const userId = req.user?.id;
       const user = await storage.getUser(userId);
       
+      // For regular customers: auto-link any phone-booked appointments so they show up by userId
+      if (user && !user.isAdmin && !user.isGroomer && user.phoneNumber) {
+        await storage.linkAppointmentsToUser(user.phoneNumber, userId);
+      }
+
       // Both admins and groomers can see all appointments
       const appointments = (user?.isAdmin || user?.isGroomer)
         ? await storage.getAppointments()
