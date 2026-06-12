@@ -119,15 +119,22 @@ export function initializeScheduledTasks() {
         console.log(`Reset "Here" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
       }
       
-      // Second, reset isPaid flag for appointments paid IN-STORE only.
-      // Never reset appointments paid online via Stripe (paidOnline=true) — those are permanent Stripe charges.
-      const appointmentsWithPaid = allAppointments.filter((apt: any) => apt.isPaid === true && !apt.paidOnline);
+      // Second, reset isPaid flag only for today's or future appointments that were marked paid in-store.
+      // Past appointments keep their paid status as a permanent historical record — customers make new
+      // appointments for new visits, so there is nothing to reset on old records.
+      // Online-paid (Stripe) appointments are never reset regardless of date.
+      const todayStr = today.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' }); // YYYY-MM-DD
+      const appointmentsWithPaid = allAppointments.filter((apt: any) =>
+        apt.isPaid === true &&
+        !apt.paidOnline &&
+        apt.appointmentDate >= todayStr
+      );
       
-      console.log(`Resetting "Paid" status for ${appointmentsWithPaid.length} in-store-paid appointments (skipping online-paid)`);
+      console.log(`Resetting "Paid" status for ${appointmentsWithPaid.length} upcoming in-store-paid appointments (past records preserved)`);
       
       for (const appointment of appointmentsWithPaid) {
         await storage.updateAppointmentIsPaid(appointment.id, false);
-        console.log(`Reset "Paid" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
+        console.log(`Reset "Paid" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${new Date(appointment.appointmentDate + 'T12:00:00').toLocaleDateString()}`);
       }
       
       // Then, delete approved appointments (confirmed or completed) that are 2+ days old
