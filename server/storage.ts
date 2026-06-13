@@ -864,6 +864,15 @@ export class DatabaseStorage implements IStorage {
   }): Promise<{ items: Supply[]; total: number }> {
     const { limit, offset, category, search, filterType, animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType, petFoodAnimalType, treatAnimalType } = params;
 
+    // Small animal food/treat products live in the 'smallanimal' category (not 'smallAnimalFood'/'smallAnimalTreats').
+    // When petFood → smallAnimal or treats → smallAnimal is requested, redirect to 'smallanimal' category
+    // with keyword filtering — exactly like the Small Animals → Food/Treat sub-filter does.
+    const effectiveSmallAnimalProductType = (category === 'petFood' && petFoodAnimalType === 'smallAnimal')
+      ? 'small-animal-food'
+      : (category === 'treats' && treatAnimalType === 'smallAnimal')
+        ? 'small-animal-supplies' // will be overridden by treat-specific keyword filtering below
+        : smallAnimalProductType;
+
     // Build WHERE conditions based on filters
     const { requireSku } = params;
     let whereConditions: any[] = [eq(supplies.isActive, true)];
@@ -892,9 +901,10 @@ export class DatabaseStorage implements IStorage {
         } else if (petFoodAnimalType === 'cat') {
           whereConditions.push(eq(supplies.category, 'catFood'));
         } else if (petFoodAnimalType === 'smallAnimal') {
-          whereConditions.push(eq(supplies.category, 'smallAnimalFood'));
+          // Small animal food lives in the 'smallanimal' category; keyword filtering below narrows to food items
+          whereConditions.push(eq(supplies.category, 'smallanimal'));
         } else {
-          // No animal type filter - show all pet food (dog, cat, and small animal)
+          // No animal type filter - show all pet food (dog, cat, and small animal food)
           whereConditions.push(or(
             eq(supplies.category, 'dogFood'),
             eq(supplies.category, 'catFood'),
@@ -1091,9 +1101,18 @@ export class DatabaseStorage implements IStorage {
     // Define small animal product type keywords for filtering
     const smallAnimalProductKeywords: Record<string, { include: string[], exclude: string[], brands?: string[] }> = {
       'small-animal-food': {
-        include: ['food', 'hay', 'pellet', 'diet', 'timothy', 'alfalfa', 'orchard', 'oat', 'treat', 'veggie', 'fruit', 'seed mix', 'fortidiet'],
-        exclude: ['cage', 'habitat', 'bedding', 'litter', 'wheel', 'ball', 'toy', 'bottle', 'feeder', 'hideout', 'tunnel', 'harness', 'leash', 'carrier', 'brush', 'clipper', 'comb', 'shampoo', 'nest', 'hammock', 'house', 'igloo', 'tube', 'ramp', 'basket'],
-        brands: []
+        include: [
+          'food', 'hay', 'pellet', 'diet', 'timothy', 'alfalfa', 'orchard', 'oat',
+          'treat', 'veggie', 'fruit', 'seed mix', 'fortidiet', 'forti-diet',
+          'grain blend', 'grain mix', 'seed blend', 'crunch', 'lovelies',
+          'muesli', 'natures harvest', 'tasty mix', 'select blend',
+          // generic food markers for small animal food bags labeled by species only
+          'essentials', 'health blend', 'natural blend', 'pro health',
+        ],
+        exclude: ['cage', 'habitat', 'bedding', 'litter', 'wheel', 'ball', 'toy', 'bottle', 'feeder', 'hideout', 'tunnel', 'harness', 'leash', 'carrier', 'brush', 'clipper', 'comb', 'shampoo', 'nest', 'hammock', 'house', 'igloo', 'tube', 'ramp', 'basket', 'dog', 'cat', 'bird', 'wood pellet', 'purcmfrt', 'pure comfort', 'hay manager', 'hayfeeder', 'hay bin', 'hay feeder'],
+        // Brand-based matching: well-known small animal food brands pass even without food keywords
+        // (exclusion list above still filters out non-food items like cages/bedding)
+        brands: ['oxbow', 'kaytee', 'vitakraft', 'vitagarden', 'sunburst', 'higgins', 'supreme', 'small pet select', 'brown\'s', 'marshall', 'tiny friends', 'friends farm'],
       },
       'small-animal-supplies': {
         include: ['cage', 'habitat', 'bedding', 'litter', 'wheel', 'ball', 'toy', 'bottle', 'feeder', 'waterer', 'hideout', 'tunnel', 'tube', 'house', 'igloo', 'hammock', 'nest', 'carrier', 'harness', 'leash', 'brush', 'nail clipper'],
@@ -1219,8 +1238,8 @@ export class DatabaseStorage implements IStorage {
       if (birdType) {
         allItems = filterByKeywords(allItems, birdType, birdKeywords);
       }
-      if (smallAnimalProductType) {
-        allItems = filterByKeywords(allItems, smallAnimalProductType, smallAnimalProductKeywords);
+      if (effectiveSmallAnimalProductType) {
+        allItems = filterByKeywords(allItems, effectiveSmallAnimalProductType, smallAnimalProductKeywords);
       }
       
       // Then apply fuzzy search filtering with typo tolerance
@@ -1242,7 +1261,7 @@ export class DatabaseStorage implements IStorage {
     }
 
     // If we have any specialty filter but no search, fetch and filter
-    if (animalType || foodType || toyType || healthcareType || aquaticType || reptileType || birdType || smallAnimalProductType) {
+    if (animalType || foodType || toyType || healthcareType || aquaticType || reptileType || birdType || effectiveSmallAnimalProductType) {
       // Fetch all items matching category/filterType first
       let allItems = await db
         .select()
@@ -1272,8 +1291,8 @@ export class DatabaseStorage implements IStorage {
       if (birdType) {
         allItems = filterByKeywords(allItems, birdType, birdKeywords);
       }
-      if (smallAnimalProductType) {
-        allItems = filterByKeywords(allItems, smallAnimalProductType, smallAnimalProductKeywords);
+      if (effectiveSmallAnimalProductType) {
+        allItems = filterByKeywords(allItems, effectiveSmallAnimalProductType, smallAnimalProductKeywords);
       }
       
       const total = allItems.length;

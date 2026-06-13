@@ -15546,8 +15546,16 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
             <SelectValue placeholder="Select category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="food">Food</SelectItem>
-            <SelectItem value="treats">Treats</SelectItem>
+            <SelectItem value="food">Food (Generic)</SelectItem>
+            <SelectItem value="treats">Treats (Generic)</SelectItem>
+            <SelectItem value="dogFood">Dog Food</SelectItem>
+            <SelectItem value="dogTreats">Dog Treats</SelectItem>
+            <SelectItem value="catFood">Cat Food</SelectItem>
+            <SelectItem value="catTreats">Cat Treats</SelectItem>
+            <SelectItem value="catToys">Cat Toys</SelectItem>
+            <SelectItem value="smallAnimalFood">Small Animal Food</SelectItem>
+            <SelectItem value="smallAnimalTreats">Small Animal Treats</SelectItem>
+            <SelectItem value="smallAnimalSupplies">Small Animal Supplies</SelectItem>
             <SelectItem value="toys">Toys</SelectItem>
             <SelectItem value="beds">Beds</SelectItem>
             <SelectItem value="leashesAndCollars">Leashes & Collars</SelectItem>
@@ -15557,12 +15565,6 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
             <SelectItem value="reptiles">Reptiles</SelectItem>
             <SelectItem value="birdSupplies">Bird Supplies</SelectItem>
             <SelectItem value="dogCages">Dog Cages/Houses</SelectItem>
-            <SelectItem value="smallAnimalSupplies">Small Animal Supplies</SelectItem>
-            <SelectItem value="catFood">Cat Food</SelectItem>
-            <SelectItem value="catTreats">Cat Treats</SelectItem>
-            <SelectItem value="catToys">Cat Toys</SelectItem>
-            <SelectItem value="dogFood">Dog Food</SelectItem>
-            <SelectItem value="dogTreats">Dog Treats</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -16983,8 +16985,16 @@ function AddSupplyForm({ onSubmit, initialUpc }: { onSubmit: (data: any) => void
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="food">Food</SelectItem>
-              <SelectItem value="treats">Treats</SelectItem>
+              <SelectItem value="food">Food (Generic)</SelectItem>
+              <SelectItem value="treats">Treats (Generic)</SelectItem>
+              <SelectItem value="dogFood">Dog Food</SelectItem>
+              <SelectItem value="dogTreats">Dog Treats</SelectItem>
+              <SelectItem value="catFood">Cat Food</SelectItem>
+              <SelectItem value="catTreats">Cat Treats</SelectItem>
+              <SelectItem value="catToys">Cat Toys</SelectItem>
+              <SelectItem value="smallAnimalFood">Small Animal Food</SelectItem>
+              <SelectItem value="smallAnimalTreats">Small Animal Treats</SelectItem>
+              <SelectItem value="smallAnimalSupplies">Small Animal Supplies</SelectItem>
               <SelectItem value="toys">Toys</SelectItem>
               <SelectItem value="beds">Beds</SelectItem>
               <SelectItem value="leashesAndCollars">Leashes & Collars</SelectItem>
@@ -16994,7 +17004,6 @@ function AddSupplyForm({ onSubmit, initialUpc }: { onSubmit: (data: any) => void
               <SelectItem value="reptiles">Reptiles</SelectItem>
               <SelectItem value="birdSupplies">Bird Supplies</SelectItem>
               <SelectItem value="dogCages">Dog Cages/Houses</SelectItem>
-              <SelectItem value="smallAnimalSupplies">Small Animal Supplies</SelectItem>
             </SelectContent>
           </Select>
         </div>
