@@ -2533,9 +2533,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const userId = req.user?.id;
       const user = await storage.getUser(userId);
       
-      const orders = user?.isAdmin 
-        ? await storage.getOrders()
-        : await storage.getOrders(userId);
+      // Always filter by userId — admins view all orders in the admin panel (/api/admin/orders-with-items)
+      const orders = await storage.getOrders(userId);
       
       res.json(orders);
     } catch (error) {
@@ -11679,11 +11678,13 @@ West Monroe LA 71291
       // Always filter by user ID - admins see all appointments in admin panel, not here
       const byUserId = await storage.getAppointments(userId);
 
-      // Also pull in any historical appointments booked as a guest under the same phone number
-      // so customers see their full grooming history when they create an account
       const user = await storage.getUser(userId);
       let merged = [...byUserId];
-      if (user?.phoneNumber) {
+
+      // For regular customers only: also pull in historical appointments booked as a guest
+      // under the same phone number so customers see their full grooming history.
+      // Admins skip this — their phone may match store-booked customer appointments.
+      if (!user?.isAdmin && !user?.isGroomer && user?.phoneNumber) {
         const byPhone = await storage.getAppointmentsByPhoneNumber(user.phoneNumber);
         const existingIds = new Set(byUserId.map((a: any) => a.id));
         // Only include appointments not already linked to a different user account
