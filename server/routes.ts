@@ -11675,22 +11675,27 @@ West Monroe LA 71291
         return res.status(401).json({ message: "Not authenticated" });
       }
       
-      // Always filter by user ID - admins see all appointments in admin panel, not here
-      const byUserId = await storage.getAppointments(userId);
-
       const user = await storage.getUser(userId);
-      let merged = [...byUserId];
+      let merged: any[] = [];
 
-      // For regular customers only: also pull in historical appointments booked as a guest
-      // under the same phone number so customers see their full grooming history.
-      // Admins skip this — their phone may match store-booked customer appointments.
-      if (!user?.isAdmin && !user?.isGroomer && user?.phoneNumber) {
-        const byPhone = await storage.getAppointmentsByPhoneNumber(user.phoneNumber);
-        const existingIds = new Set(byUserId.map((a: any) => a.id));
-        // Only include appointments not already linked to a different user account
-        // (guards against recycled phone numbers or shared family numbers)
-        const phoneOnly = byPhone.filter((a: any) => !existingIds.has(a.id) && !a.userId);
-        merged = [...byUserId, ...phoneOnly];
+      if (user?.isAdmin || user?.isGroomer) {
+        // Admins/groomers: use phone number as ground truth for their personal appointments.
+        // The userId field may have gotten polluted by historical auto-linking of customer
+        // appointments — phone match is the only reliable filter for their own records.
+        if (user.phoneNumber) {
+          merged = await storage.getAppointmentsByPhoneNumber(user.phoneNumber);
+        }
+      } else {
+        // Regular customers: query by userId (primary) then merge any unlinked phone-matched
+        // appointments so phone-booked history shows up after account creation.
+        const byUserId = await storage.getAppointments(userId);
+        merged = [...byUserId];
+        if (user?.phoneNumber) {
+          const byPhone = await storage.getAppointmentsByPhoneNumber(user.phoneNumber);
+          const existingIds = new Set(byUserId.map((a: any) => a.id));
+          const phoneOnly = byPhone.filter((a: any) => !existingIds.has(a.id) && !a.userId);
+          merged = [...byUserId, ...phoneOnly];
+        }
       }
 
       // Show all appointments — customers should see their full grooming history.
