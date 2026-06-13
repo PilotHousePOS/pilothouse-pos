@@ -312,6 +312,7 @@ export interface IStorage {
   // Appointment history operations
   saveAppointmentToHistory(appointment: Appointment, options?: { groomerName?: string }): Promise<AppointmentHistory>;
   getAppointmentHistoryByContactId(contactId: number): Promise<AppointmentHistory[]>;
+  getAppointmentHistoryForPhone(phoneNumber: string): Promise<AppointmentHistory[]>;
 
   // Customer pet operations
   getCustomerPets(userId: string): Promise<CustomerPet[]>;
@@ -2999,6 +3000,32 @@ export class DatabaseStorage implements IStorage {
       .where(eq(appointmentHistory.contactId, contactId))
       .orderBy(desc(appointmentHistory.appointmentDate));
     return history;
+  }
+
+  async getAppointmentHistoryForPhone(phoneNumber: string): Promise<AppointmentHistory[]> {
+    const normalizedPhone = normalizePhoneNumber(phoneNumber);
+    if (!normalizedPhone) return [];
+
+    const allHistory = await db.select().from(appointmentHistory);
+
+    // Method 1: direct match on denormalized ownerPhoneNumber field
+    const byPhone = allHistory.filter(h =>
+      h.ownerPhoneNumber && normalizePhoneNumber(h.ownerPhoneNumber) === normalizedPhone
+    );
+
+    // Method 2: via contact lookup — catches records where ownerPhoneNumber is null/missing
+    const contact = await this.getContactByPhoneNumber(phoneNumber);
+    if (contact) {
+      const seen = new Set(byPhone.map(h => h.id));
+      const byContact = allHistory.filter(h => h.contactId === contact.id);
+      for (const h of byContact) {
+        if (!seen.has(h.id)) byPhone.push(h);
+      }
+    }
+
+    return byPhone.sort((a, b) =>
+      new Date(b.appointmentDate).getTime() - new Date(a.appointmentDate).getTime()
+    );
   }
 
   async getUnapprovedAppointments(): Promise<Appointment[]> {

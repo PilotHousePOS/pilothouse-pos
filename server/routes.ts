@@ -11738,13 +11738,52 @@ West Monroe LA 71291
         }
       }
 
+      // Also pull archived appointment history (completed appointments moved out of
+      // the appointments table into appointment_history, linked by contact phone).
+      if (user?.phoneNumber) {
+        const historyRecords = await storage.getAppointmentHistoryForPhone(user.phoneNumber);
+        for (const h of historyRecords) {
+          // Skip if already covered by an active appointment with same date+pet+service
+          const alreadyCovered = merged.some((a: any) =>
+            a.appointmentDate === h.appointmentDate &&
+            (a.petName || '').toLowerCase() === (h.petName || '').toLowerCase() &&
+            (a.serviceType || '') === (h.serviceType || '')
+          );
+          if (!alreadyCovered) {
+            merged.push({
+              id: h.id + 9000000, // offset to avoid React key collision with active appointment ids
+              _fromHistory: true,
+              status: h.status || 'completed',
+              isApproved: true,
+              appointmentDate: h.appointmentDate,
+              appointmentTime: h.appointmentTime,
+              petName: h.petName,
+              petType: h.petType,
+              pets: h.petName ? [{ name: h.petName, petType: h.petType }] : [],
+              serviceType: h.serviceType,
+              groomerName: h.groomerName,
+              ownerFirstName: h.ownerFirstName,
+              ownerLastName: h.ownerLastName,
+              ownerPhoneNumber: h.ownerPhoneNumber || user?.phoneNumber,
+              specialNotes: h.notes,
+              readyForPayment: false,
+              isPaid: true,
+              paidOnline: false,
+              price: null,
+              finalAmount: null,
+              createdAt: h.createdAt,
+            });
+          }
+        }
+      }
+
       console.log(`[APPTS] merged=${merged.length} ids=${merged.map((a:any)=>a.id).join(',')} statuses=${merged.map((a:any)=>a.status).join(',')}`);
 
       // Show all appointments — customers should see their full grooming history.
       // Scheduled appointments always shown; completed/cancelled kept indefinitely
       // so pre-account history is visible after linking by phone number.
       const filteredAppointments = merged.filter((apt: any) => {
-        // Drop future cancelled appointments (no reason to show those)
+        // Drop past cancelled appointments (no reason to show those)
         if (apt.status === 'cancelled') {
           const aptDate = new Date(apt.appointmentDate);
           const today = new Date();
