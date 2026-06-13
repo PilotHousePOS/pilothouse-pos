@@ -11696,12 +11696,31 @@ West Monroe LA 71291
       let merged: any[] = [];
 
       if (user?.isAdmin || user?.isGroomer) {
-        // Admins/groomers: prefer phone number as ground truth to avoid showing customer
-        // appointments that got historically linked to their userId. If no phone is stored,
-        // fall back to userId so their own booked appointments still show.
-        if (user.phoneNumber) {
-          merged = await storage.getAppointmentsByPhoneNumber(user.phoneNumber);
+        // Admins/groomers: use phone number as primary lookup (staff-booked appointments
+        // have their phone stored as ownerPhoneNumber). Also include any userId-linked
+        // appointments that share their phone (covers app-booked while logged in).
+        // Exclude userId-linked appointments WITHOUT their phone to avoid showing
+        // customer appointments that got historically linked via the auto-link bug.
+        const normalizedAdminPhone = user.phoneNumber
+          ? user.phoneNumber.replace(/\D/g, '')
+          : null;
+
+        if (normalizedAdminPhone) {
+          // Primary: all appointments with admin's phone number
+          const byPhone = await storage.getAppointmentsByPhoneNumber(user.phoneNumber!);
+          // Secondary: userId-linked appointments that also have admin's phone (app-booked)
+          const byUserId = await storage.getAppointments(userId);
+          const byUserIdFiltered = byUserId.filter((a: any) =>
+            a.ownerPhoneNumber?.replace(/\D/g, '') === normalizedAdminPhone
+          );
+          // Merge, deduplicate by id
+          const seen = new Set(byPhone.map((a: any) => a.id));
+          for (const a of byUserIdFiltered) {
+            if (!seen.has(a.id)) { byPhone.push(a); seen.add(a.id); }
+          }
+          merged = byPhone;
         } else {
+          // No phone stored — fall back to userId only
           merged = await storage.getAppointments(userId);
         }
       } else {
