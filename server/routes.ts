@@ -11695,6 +11695,8 @@ West Monroe LA 71291
       const user = await storage.getUser(userId);
       let merged: any[] = [];
 
+      console.log(`[APPTS] userId=${userId} isAdmin=${user?.isAdmin} isGroomer=${user?.isGroomer} phone=${JSON.stringify(user?.phoneNumber)}`);
+
       if (user?.isAdmin || user?.isGroomer) {
         // Admins/groomers: use phone number as primary lookup (staff-booked appointments
         // have their phone stored as ownerPhoneNumber). Also include any userId-linked
