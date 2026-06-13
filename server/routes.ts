@@ -6251,6 +6251,23 @@ West Monroe LA 71291
     }
   });
 
+  app.patch("/api/customer-pets/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const petId = parseInt(req.params.id);
+      const pets = await storage.getCustomerPets(userId);
+      if (!pets.find((p: any) => p.id === petId)) {
+        return res.status(403).json({ message: "Not your pet" });
+      }
+      const { name, species, breed, age, notes } = req.body;
+      const updated = await storage.updateCustomerPet(petId, { name, species, breed, age, notes });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating customer pet:", error);
+      res.status(500).json({ message: "Failed to update pet" });
+    }
+  });
+
   // Boarding/Babysitting routes
   app.get("/api/admin/boarding", authMiddleware, async (req: any, res) => {
     try {
@@ -11679,11 +11696,13 @@ West Monroe LA 71291
       let merged: any[] = [];
 
       if (user?.isAdmin || user?.isGroomer) {
-        // Admins/groomers: use phone number as ground truth for their personal appointments.
-        // The userId field may have gotten polluted by historical auto-linking of customer
-        // appointments — phone match is the only reliable filter for their own records.
+        // Admins/groomers: prefer phone number as ground truth to avoid showing customer
+        // appointments that got historically linked to their userId. If no phone is stored,
+        // fall back to userId so their own booked appointments still show.
         if (user.phoneNumber) {
           merged = await storage.getAppointmentsByPhoneNumber(user.phoneNumber);
+        } else {
+          merged = await storage.getAppointments(userId);
         }
       } else {
         // Regular customers: query by userId (primary) then merge any unlinked phone-matched

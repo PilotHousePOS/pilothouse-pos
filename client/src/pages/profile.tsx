@@ -43,6 +43,8 @@ export default function Profile() {
   const queryClient = useQueryClient();
   const [showAddPet, setShowAddPet] = useState(false);
   const [newPet, setNewPet] = useState({ name: '', species: 'dog', breed: '', age: '', notes: '' });
+  const [showEditPet, setShowEditPet] = useState(false);
+  const [editingPet, setEditingPet] = useState<{ id: number; name: string; species: string; breed: string; age: string; notes: string } | null>(null);
   const [notifLoading, setNotifLoading] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
 
@@ -99,6 +101,23 @@ export default function Profile() {
     },
     onError: () => {
       toast({ title: "Error", description: "Failed to add pet. Please try again.", variant: "destructive" });
+    },
+  });
+
+  const editPetMutation = useMutation({
+    mutationFn: async (petData: typeof editingPet) => {
+      if (!petData) throw new Error("No pet");
+      const res = await apiRequest("PATCH", `/api/customer-pets/${petData.id}`, petData);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/customer-pets"] });
+      setShowEditPet(false);
+      setEditingPet(null);
+      toast({ title: "Pet updated!", description: "Your pet's information has been saved." });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to update pet. Please try again.", variant: "destructive" });
     },
   });
 
@@ -569,7 +588,10 @@ export default function Profile() {
                         {pet.breed && `${pet.breed} • `}{pet.age}
                       </p>
                     </div>
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={() => {
+                      setEditingPet({ id: pet.id, name: pet.name || '', species: (pet.species as string) || 'dog', breed: pet.breed || '', age: pet.age || '', notes: pet.notes || '' });
+                      setShowEditPet(true);
+                    }}>
                       <Edit className="w-4 h-4 text-gray-400" />
                     </Button>
                   </div>
@@ -646,6 +668,79 @@ export default function Profile() {
                 {addPetMutation.isPending ? "Adding..." : "Add Pet"}
               </Button>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Pet Dialog */}
+        <Dialog open={showEditPet} onOpenChange={setShowEditPet}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Edit Pet</DialogTitle>
+              <DialogDescription>Update your pet's information.</DialogDescription>
+            </DialogHeader>
+            {editingPet && (
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="edit-pet-name">Name *</Label>
+                  <Input
+                    id="edit-pet-name"
+                    placeholder="Pet's name"
+                    value={editingPet.name}
+                    onChange={(e) => setEditingPet({ ...editingPet, name: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-pet-species">Species *</Label>
+                  <Select value={editingPet.species} onValueChange={(value) => setEditingPet({ ...editingPet, species: value })}>
+                    <SelectTrigger id="edit-pet-species">
+                      <SelectValue placeholder="Select species" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dog">Dog</SelectItem>
+                      <SelectItem value="cat">Cat</SelectItem>
+                      <SelectItem value="bird">Bird</SelectItem>
+                      <SelectItem value="reptile">Reptile</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="edit-pet-breed">Breed</Label>
+                  <Input
+                    id="edit-pet-breed"
+                    placeholder="e.g., Chihuahua, Persian, Parakeet"
+                    value={editingPet.breed}
+                    onChange={(e) => setEditingPet({ ...editingPet, breed: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-pet-age">Age</Label>
+                  <Input
+                    id="edit-pet-age"
+                    placeholder="e.g., 3 years"
+                    value={editingPet.age}
+                    onChange={(e) => setEditingPet({ ...editingPet, age: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-pet-notes">Notes</Label>
+                  <Textarea
+                    id="edit-pet-notes"
+                    placeholder="Any special notes about your pet"
+                    value={editingPet.notes}
+                    onChange={(e) => setEditingPet({ ...editingPet, notes: e.target.value })}
+                    rows={2}
+                  />
+                </div>
+                <Button
+                  className="w-full"
+                  disabled={!editingPet.name.trim() || editPetMutation.isPending}
+                  onClick={() => editPetMutation.mutate(editingPet)}
+                >
+                  {editPetMutation.isPending ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       </div>
