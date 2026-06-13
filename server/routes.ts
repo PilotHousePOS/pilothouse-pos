@@ -11695,7 +11695,7 @@ West Monroe LA 71291
       const user = await storage.getUser(userId);
       let merged: any[] = [];
 
-      console.log(`[APPTS] userId=${userId} isAdmin=${user?.isAdmin} isGroomer=${user?.isGroomer} phone=${JSON.stringify(user?.phoneNumber)}`);
+      console.log(`[APPTS] userId=${userId} isAdmin=${user?.isAdmin} isGroomer=${user?.isGroomer} phone=${JSON.stringify(user?.phoneNumber)} normalizedPhone=${user?.phoneNumber ? normalizePhoneNumber(user.phoneNumber) : 'null'}`);
 
       if (user?.isAdmin || user?.isGroomer) {
         // Admins/groomers: use phone number as primary lookup (staff-booked appointments
@@ -11738,6 +11738,8 @@ West Monroe LA 71291
         }
       }
 
+      console.log(`[APPTS] merged=${merged.length} ids=${merged.map((a:any)=>a.id).join(',')} statuses=${merged.map((a:any)=>a.status).join(',')}`);
+
       // Show all appointments — customers should see their full grooming history.
       // Scheduled appointments always shown; completed/cancelled kept indefinitely
       // so pre-account history is visible after linking by phone number.
@@ -11751,6 +11753,8 @@ West Monroe LA 71291
         }
         return true;
       });
+
+      console.log(`[APPTS] afterFilter=${filteredAppointments.length}`);
       
       // Enrich each appointment with its pets array (same as admin view)
       const enriched = await Promise.all(
