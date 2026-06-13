@@ -116,7 +116,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, and, or, not, ilike, lt, lte, isNull, isNotNull, count, sql, inArray, ne, notInArray } from "drizzle-orm";
-import { phoneNumbersMatch } from "./phoneUtils";
+import { phoneNumbersMatch, normalizePhoneNumber } from "./phoneUtils";
 import { SUPPLY_FILTERS, type FilterType } from "./filterConfig";
 import { 
   createCompositeKey, 
@@ -2772,25 +2772,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAppointmentsByPhoneNumber(phoneNumber: string): Promise<Appointment[]> {
-    // Normalize the phone number by removing all non-digit characters
-    const normalizedPhone = phoneNumber.replace(/\D/g, '');
-    
-    // Get all appointments and filter by normalized phone number
+    // Normalize to last 10 digits so country-code variants (+1 xxx) match plain 10-digit stored numbers
+    const normalizedPhone = normalizePhoneNumber(phoneNumber);
+    if (!normalizedPhone) return [];
+
     const allAppointments = await db.select().from(appointments);
     return allAppointments.filter(apt => {
-      const aptPhone = apt.ownerPhoneNumber.replace(/\D/g, '');
-      return aptPhone === normalizedPhone;
+      return normalizePhoneNumber(apt.ownerPhoneNumber) === normalizedPhone;
     }).sort((a, b) => new Date(b.appointmentDate).getTime() - new Date(a.appointmentDate).getTime());
   }
 
   async linkAppointmentsToUser(phoneNumber: string, userId: string): Promise<number> {
     // Permanently link all unlinked appointments matching this phone number to the user account
-    const normalizedPhone = phoneNumber.replace(/\D/g, '');
+    const normalizedPhone = normalizePhoneNumber(phoneNumber);
+    if (!normalizedPhone) return 0;
     const allAppointments = await db.select().from(appointments);
     const toLink = allAppointments.filter(apt => {
       if (apt.userId) return false; // already linked to someone
-      const aptPhone = apt.ownerPhoneNumber.replace(/\D/g, '');
-      return aptPhone === normalizedPhone;
+      return normalizePhoneNumber(apt.ownerPhoneNumber) === normalizedPhone;
     });
     for (const apt of toLink) {
       await db.update(appointments).set({ userId }).where(eq(appointments.id, apt.id));

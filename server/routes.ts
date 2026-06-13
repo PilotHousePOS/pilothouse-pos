@@ -11702,7 +11702,7 @@ West Monroe LA 71291
         // Exclude userId-linked appointments WITHOUT their phone to avoid showing
         // customer appointments that got historically linked via the auto-link bug.
         const normalizedAdminPhone = user.phoneNumber
-          ? user.phoneNumber.replace(/\D/g, '')
+          ? normalizePhoneNumber(user.phoneNumber)
           : null;
 
         if (normalizedAdminPhone) {
@@ -11711,7 +11711,7 @@ West Monroe LA 71291
           // Secondary: userId-linked appointments that also have admin's phone (app-booked)
           const byUserId = await storage.getAppointments(userId);
           const byUserIdFiltered = byUserId.filter((a: any) =>
-            a.ownerPhoneNumber?.replace(/\D/g, '') === normalizedAdminPhone
+            normalizePhoneNumber(a.ownerPhoneNumber || '') === normalizedAdminPhone
           );
           // Merge, deduplicate by id
           const seen = new Set(byPhone.map((a: any) => a.id));
