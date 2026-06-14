@@ -9184,9 +9184,12 @@ export default function Admin() {
   });
   const customersHere = appointmentsHere.length;
 
-  // Calculate customers paid - filter appointments with isPaid = true
+  // Calculate customers paid TODAY - only count today's appointments with isPaid = true
+  const todayDateStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' }); // YYYY-MM-DD in CST
   const appointmentsPaid = (appointments as any[]).filter((a: any) => 
-    (a.status === 'confirmed' || a.status === 'completed') && a.isPaid === true
+    (a.status === 'confirmed' || a.status === 'completed') &&
+    a.isPaid === true &&
+    a.appointmentDate === todayDateStr
   );
   const customersPaid = appointmentsPaid.length;
 
