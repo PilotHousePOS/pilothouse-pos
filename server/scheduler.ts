@@ -146,6 +146,9 @@ export function initializeScheduledTasks() {
         // Include both confirmed and completed as "approved" statuses
         if (apt.status !== 'confirmed' && apt.status !== 'completed') return false;
         
+        // Never delete unpaid appointments — they stay in the Non-Payment queue until marked paid
+        if (!apt.isPaid && !apt.paidOnline) return false;
+        
         const appointmentDate = new Date(apt.appointmentDate);
         appointmentDate.setHours(0, 0, 0, 0);
         

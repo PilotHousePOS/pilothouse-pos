@@ -9193,6 +9193,15 @@ export default function Admin() {
   );
   const customersPaid = appointmentsPaid.length;
 
+  // Non-payment appointments: past/today confirmed or completed, not paid by any method
+  const nonPaymentAppointments = (appointments as any[]).filter((a: any) =>
+    (a.status === 'confirmed' || a.status === 'completed') &&
+    !a.isPaid &&
+    !a.paidOnline &&
+    a.appointmentDate <= todayDateStr
+  ).sort((a: any, b: any) => b.appointmentDate.localeCompare(a.appointmentDate));
+  const nonPaymentCount = nonPaymentAppointments.length;
+
   // Appointments pagination handlers
   const handleAppointmentsTouchStart = (e: React.TouchEvent) => {
     setAppointmentsTouchStart(e.targetTouches[0].clientX);
@@ -9516,6 +9525,13 @@ export default function Admin() {
             )}
           </CardContent>
         </Card>
+        <Card className={nonPaymentCount > 0 ? "border-red-300" : ""}>
+          <CardContent className="p-3 text-center flex flex-col items-center justify-center relative">
+            <AlertTriangle className={`w-6 h-6 mb-1 ${nonPaymentCount > 0 ? "text-red-600" : "text-gray-400"}`} />
+            <div className={`text-xl font-bold leading-tight ${nonPaymentCount > 0 ? "text-red-600" : ""}`} data-testid="dashboard-non-payment">{nonPaymentCount}</div>
+            <div className="text-xs text-gray-500 leading-tight">Non-Payment</div>
+          </CardContent>
+        </Card>
         <Card>
           <CardContent className="p-3 text-center flex flex-col items-center justify-center relative">
             <DollarSign className="w-6 h-6 mb-1 text-green-600" />
@@ -9549,6 +9565,14 @@ export default function Admin() {
           <TabsList className="inline-flex gap-1 h-auto p-1 min-w-full lg:min-w-0">
             <TabsTrigger value="appointments" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
               Appointments
+            </TabsTrigger>
+            <TabsTrigger value="non-payment" className="flex-none text-xs py-3 px-3 whitespace-nowrap relative">
+              Non-Payment
+              {nonPaymentCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                  {nonPaymentCount > 9 ? '9+' : nonPaymentCount}
+                </span>
+              )}
             </TabsTrigger>
             <TabsTrigger value="calendar" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
               Calendar
@@ -14190,6 +14214,83 @@ export default function Admin() {
           <SettingsPanel />
           <LoyaltySettingsPanel />
           <LegalPagesPanel />
+        </TabsContent>
+
+        <TabsContent value="non-payment" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
+              <h2 className="text-xl font-semibold">Non-Payment</h2>
+              {nonPaymentCount > 0 && (
+                <Badge className="bg-red-600 text-white">{nonPaymentCount}</Badge>
+              )}
+            </div>
+          </div>
+          <p className="text-sm text-gray-500">
+            Past and today's confirmed/completed appointments that have not been marked paid. These are held here until payment is collected and recorded.
+          </p>
+          {nonPaymentCount === 0 ? (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <CheckCircle2 className="w-10 h-10 text-green-500 mx-auto mb-3" />
+                <p className="text-gray-600 font-medium">All clear — no outstanding payments.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {nonPaymentAppointments.map((apt: any) => (
+                <Card key={apt.id} className="border-red-200">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-sm">
+                            {apt.ownerFirstName} {apt.ownerLastName}
+                          </span>
+                          <Badge variant="outline" className="text-xs border-red-300 text-red-700 bg-red-50">
+                            Unpaid
+                          </Badge>
+                        </div>
+                        <div className="text-xs text-gray-600 space-y-0.5">
+                          <p>
+                            Pet: {apt.pets && apt.pets.length > 0
+                              ? apt.pets.map((p: any) => capitalizeWords(p.petName)).join(', ')
+                              : apt.petName
+                            } ({apt.petType || (apt.pets && apt.pets[0]?.petType) || 'dog'})
+                          </p>
+                          <p>
+                            Service: {apt.pets && apt.pets.length > 0
+                              ? apt.pets.map((p: any) => p.serviceType).join(', ')
+                              : apt.serviceType
+                            }
+                          </p>
+                          {(apt.groomerName || (apt.pets && apt.pets[0]?.groomerName)) && (
+                            <p>Groomer: {apt.groomerName || apt.pets[0]?.groomerName}</p>
+                          )}
+                          <p>Phone: {apt.ownerPhoneNumber}</p>
+                          <p className="text-gray-500 font-medium">
+                            {parseLocalDate(apt.appointmentDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })} at {apt.appointmentTime}
+                          </p>
+                          {apt.price && (
+                            <p className="text-amber-700 font-semibold">Amount: ${apt.price}</p>
+                          )}
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white shrink-0"
+                        onClick={() => updateAppointmentIsPaidMutation.mutate({ id: apt.id, isPaid: true })}
+                        disabled={updateAppointmentIsPaidMutation.isPending}
+                      >
+                        <DollarSign className="w-3.5 h-3.5 mr-1" />
+                        Mark Paid
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
 
