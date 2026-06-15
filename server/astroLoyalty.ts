@@ -119,7 +119,7 @@ async function astroRequest(endpoint: string, jsonData?: Record<string, any>, _r
     const statusMsg = data.astro_status_message || data.status_messsage || data.status_message || 'Unknown error';
     console.error(`[ASTRO] API ${endpoint} error status ${astroStatus}:`, statusMsg);
     console.error(`[ASTRO] Full response data:`, JSON.stringify(data));
-    throw new AstroApiError(astroStatus, statusMsg, endpoint);
+    throw new AstroApiError(astroStatus, statusMsg, endpoint, data.returnData);
   }
 
   return data;
@@ -129,7 +129,8 @@ export class AstroApiError extends Error {
   constructor(
     public statusCode: number,
     public statusMessage: string,
-    public endpoint: string
+    public endpoint: string,
+    public returnData?: any
   ) {
     super(`Astro API error ${statusCode} (${endpoint}): ${statusMessage}`);
     this.name = 'AstroApiError';
@@ -324,7 +325,20 @@ export async function lookupOrCreateAstroCustomer(
     if (customerData.email) addData.email_address = customerData.email;
     if (customerData.phoneNumber) addData.phone = customerData.phoneNumber.replace(/\D/g, '');
 
-    const result = await astroRequest('addCustomer', addData);
+    let result: any;
+    try {
+      result = await astroRequest('addCustomer', addData);
+    } catch (addError) {
+      // Status 625 means the customer already exists in Astro (their search returned 310
+      // but addCustomer knows about them). Astro returns the astro_customer_id in returnData
+      // even on 625 — use it directly rather than failing.
+      if (addError instanceof AstroApiError && addError.statusCode === 625 && addError.returnData?.astro_customer_id) {
+        const astroId = String(addError.returnData.astro_customer_id);
+        console.log('[ASTRO] Customer already exists in Astro (625), using returned ID:', astroId);
+        return { customerId: astroId, loyaltyPoints: 0 };
+      }
+      throw addError;
+    }
     const astroId = String(result.returnData?.astro_customer_id);
     
     console.log('[ASTRO] Created customer:', astroId);

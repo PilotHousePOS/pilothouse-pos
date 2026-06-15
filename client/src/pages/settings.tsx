@@ -14,6 +14,16 @@ import { safeGoBack } from "@/lib/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
+// Module-level singleton — Stripe docs require loadStripe to be called outside
+// of component renders so the same instance is reused across mounts/remounts.
+let _stripePromise: ReturnType<typeof loadStripe> | null = null;
+function getStripePromise(publishableKey: string) {
+  if (!_stripePromise) {
+    _stripePromise = loadStripe(publishableKey);
+  }
+  return _stripePromise;
+}
+
 const updateNameSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
@@ -50,6 +60,7 @@ function AddCardForm({ onSuccess, onCancel }: { onSuccess: () => void; onCancel:
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   const [setAsDefault, setSetAsDefault] = useState(true);
+  const [cardReady, setCardReady] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,8 +114,14 @@ function AddCardForm({ onSuccess, onCancel }: { onSuccess: () => void; onCancel:
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="p-3 border rounded-md bg-white">
+      <div className="p-3 border rounded-md bg-white min-h-[42px] relative">
+        {!cardReady && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+          </div>
+        )}
         <CardElement
+          onReady={() => setCardReady(true)}
           options={{
             style: {
               base: {
@@ -172,7 +189,6 @@ export default function Settings() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showAddCard, setShowAddCard] = useState(false);
-  const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
 
   const { data: currentUser, isLoading: userLoading, error: userError } = useQuery<User>({
     queryKey: ["/api/auth/user"],
@@ -194,11 +210,6 @@ export default function Settings() {
     enabled: hasToken && !!stripeConfig?.configured,
   });
 
-  useEffect(() => {
-    if (stripeConfig?.publishableKey && !stripePromise) {
-      setStripePromise(loadStripe(stripeConfig.publishableKey));
-    }
-  }, [stripeConfig?.publishableKey, stripePromise]);
 
   const deletePaymentMethodMutation = useMutation({
     mutationFn: async (paymentMethodId: string) => {
@@ -757,8 +768,8 @@ export default function Settings() {
               <p className="text-gray-500 text-sm py-2">No saved payment methods</p>
             )}
 
-            {showAddCard && stripePromise ? (
-              <Elements stripe={stripePromise}>
+            {showAddCard && stripeConfig?.publishableKey ? (
+              <Elements stripe={getStripePromise(stripeConfig.publishableKey)}>
                 <AddCardForm
                   onSuccess={() => {
                     setShowAddCard(false);
