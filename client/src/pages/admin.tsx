@@ -9193,11 +9193,13 @@ export default function Admin() {
   );
   const customersPaid = appointmentsPaid.length;
 
-  // Non-payment appointments: past/today confirmed or completed, not paid by any method
+  // Non-payment appointments: past/today confirmed or completed, checked in but not paid
+  // checkedIn is a permanent flag (never resets nightly) — no-shows (checkedIn=false) are excluded
   const nonPaymentAppointments = (appointments as any[]).filter((a: any) =>
     (a.status === 'confirmed' || a.status === 'completed') &&
     !a.isPaid &&
     !a.paidOnline &&
+    a.checkedIn === true &&
     a.appointmentDate <= todayDateStr
   ).sort((a: any, b: any) => b.appointmentDate.localeCompare(a.appointmentDate));
   const nonPaymentCount = nonPaymentAppointments.length;

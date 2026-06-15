@@ -2827,9 +2827,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentIsHere(id: number, isHere: boolean): Promise<Appointment> {
+    // checkedIn is a permanent record — set to true when they arrive, never reset
+    const setFields: any = { isHere, updatedAt: new Date() };
+    if (isHere) setFields.checkedIn = true;
     const [updated] = await db
       .update(appointments)
-      .set({ isHere, updatedAt: new Date() })
+      .set(setFields)
       .where(eq(appointments.id, id))
       .returning();
     return updated;

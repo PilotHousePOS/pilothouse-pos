@@ -278,7 +278,8 @@ export const appointments = pgTable("appointments", {
   ownerPhoneNumber: varchar("owner_phone_number", { length: 20 }).notNull(),
   status: varchar("status", { length: 50 }).default("scheduled"), // scheduled, confirmed, completed, cancelled
   isApproved: boolean("is_approved").default(false), // pending admin approval
-  isHere: boolean("is_here").default(false), // customer has arrived
+  isHere: boolean("is_here").default(false), // customer has arrived (resets nightly)
+  checkedIn: boolean("checked_in").default(false), // permanent record that customer arrived (never resets)
   isPaid: boolean("is_paid").default(false), // customer has paid
   groomingCompleted: boolean("grooming_completed").default(false), // grooming is finished, ready for pickup
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
