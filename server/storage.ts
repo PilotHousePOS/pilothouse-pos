@@ -281,6 +281,7 @@ export interface IStorage {
   updateAppointmentStatus(id: number, status: string): Promise<Appointment>;
   updateAppointmentIsHere(id: number, isHere: boolean): Promise<Appointment>;
   updateAppointmentIsPaid(id: number, isPaid: boolean): Promise<Appointment>;
+  updateAppointmentTip(id: number, tipAmount: string, tipPaymentIntentId: string): Promise<Appointment>;
   updateAppointmentReadyForPayment(id: number, finalAmount: string, readyForPayment: boolean): Promise<Appointment>;
   updateAppointmentPaidOnline(id: number, sessionId: string): Promise<Appointment>;
   updateAppointmentGroomingCompleted(id: number, groomingCompleted: boolean): Promise<Appointment>;
@@ -2845,6 +2846,15 @@ export class DatabaseStorage implements IStorage {
     const [updated] = await db
       .update(appointments)
       .set(setFields)
+      .where(eq(appointments.id, id))
+      .returning();
+    return updated;
+  }
+
+  async updateAppointmentTip(id: number, tipAmount: string, tipPaymentIntentId: string): Promise<Appointment> {
+    const [updated] = await db
+      .update(appointments)
+      .set({ tipAmount, tipChargedAt: new Date(), tipPaymentIntentId, updatedAt: new Date() })
       .where(eq(appointments.id, id))
       .returning();
     return updated;

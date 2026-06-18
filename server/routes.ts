@@ -8706,19 +8706,24 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      console.log('Running manual reset: Resetting ALL "Paid" statuses across all appointments');
+      console.log('Running manual reset: Resetting today\'s in-store "Paid" statuses');
       
       const allAppointments = await storage.getAppointments();
+      const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
       
-      // Find all appointments with isPaid = true
-      const appointmentsWithPaid = allAppointments.filter((apt: any) => apt.isPaid === true);
+      // Only reset TODAY's in-store-paid appointments — same scope as the nightly scheduler.
+      // Past paid records are permanent history and must never be wiped.
+      const appointmentsWithPaid = allAppointments.filter((apt: any) =>
+        apt.isPaid === true &&
+        !apt.paidOnline &&
+        apt.appointmentDate >= todayStr
+      );
       
-      console.log(`Found ${appointmentsWithPaid.length} appointments with "Paid" status set to true`);
+      console.log(`Found ${appointmentsWithPaid.length} today/upcoming in-store-paid appointments to reset`);
       
-      // Reset all of them
       for (const appointment of appointmentsWithPaid) {
         await storage.updateAppointmentIsPaid(appointment.id, false);
-        console.log(`Reset "Paid" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
+        console.log(`Reset "Paid" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${appointment.appointmentDate}`);
       }
       
       res.json({ 
@@ -8731,6 +8736,87 @@ West Monroe LA 71291
         message: "Failed to reset all 'Paid' statuses", 
         error: (error as Error).message 
       });
+    }
+  });
+
+  // Bulk dismiss all Non-Payment appointments (mark all as paid to start fresh)
+  app.post("/api/admin/appointments/dismiss-all-nonpayment", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const allAppointments = await storage.getAppointments();
+      const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+
+      const nonPayment = allAppointments.filter((apt: any) =>
+        (apt.status === 'confirmed' || apt.status === 'completed') &&
+        !apt.isPaid &&
+        !apt.paidOnline &&
+        apt.checkedIn === true &&
+        apt.appointmentDate <= todayStr
+      );
+
+      console.log(`Dismissing ${nonPayment.length} Non-Payment appointments (bulk mark paid)`);
+      for (const apt of nonPayment) {
+        await storage.updateAppointmentIsPaid(apt.id, true);
+        console.log(`Dismissed Non-Payment appointment: ${apt.id} (${apt.ownerLastName}) from ${apt.appointmentDate}`);
+      }
+
+      res.json({ message: `Dismissed ${nonPayment.length} appointments`, count: nonPayment.length });
+    } catch (error) {
+      console.error('Error dismissing Non-Payment appointments:', error);
+      res.status(500).json({ message: "Failed to dismiss appointments", error: (error as Error).message });
+    }
+  });
+
+  // Charge a tip to a customer's saved Stripe card for a grooming appointment
+  app.post("/api/appointments/:id/tip", authMiddleware, async (req: any, res) => {
+    try {
+      const currentUser = await storage.getUser(req.user?.id);
+      if (!currentUser?.isAdmin && !currentUser?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
+      }
+
+      const id = parseInt(req.params.id);
+      const { tipAmount } = req.body;
+
+      const tipNum = parseFloat(tipAmount);
+      if (!tipAmount || isNaN(tipNum) || tipNum <= 0) {
+        return res.status(400).json({ message: "Valid tip amount required" });
+      }
+
+      const appointment = await storage.getAppointment(id);
+      if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+
+      const customer = await storage.getUser(appointment.userId);
+      if (!customer?.stripeCustomerId || !customer?.stripeDefaultPaymentMethod) {
+        return res.status(400).json({ message: "No saved payment method on file for this customer" });
+      }
+
+      const { getUncachableStripeClient } = await import('./stripeClient');
+      const stripeClient = getUncachableStripeClient();
+
+      const amountCents = Math.round(tipNum * 100);
+      const paymentIntent = await stripeClient.paymentIntents.create({
+        amount: amountCents,
+        currency: 'usd',
+        customer: customer.stripeCustomerId,
+        payment_method: customer.stripeDefaultPaymentMethod,
+        confirm: true,
+        off_session: true,
+        description: `Grooming tip — ${appointment.ownerFirstName} ${appointment.ownerLastName} (appt #${appointment.id})`,
+      });
+
+      await storage.updateAppointmentTip(id, tipAmount.toString(), paymentIntent.id);
+      console.log(`Tip of $${tipNum.toFixed(2)} charged for appointment ${id} (${appointment.ownerLastName}), PI: ${paymentIntent.id}`);
+
+      res.json({ success: true, paymentIntentId: paymentIntent.id, amount: tipNum });
+    } catch (error: any) {
+      console.error('Error charging tip:', error);
+      const msg = error?.raw?.message || error?.message || "Failed to charge tip";
+      res.status(500).json({ message: msg });
     }
   });
 

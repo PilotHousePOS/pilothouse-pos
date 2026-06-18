@@ -295,6 +295,9 @@ export const appointments = pgTable("appointments", {
   readyForPayment: boolean("ready_for_payment").default(false), // Groomer has set final amount and customer can pay
   paidOnline: boolean("paid_online").default(false), // Payment was completed online (vs in-store)
   groomingStripeSessionId: varchar("grooming_stripe_session_id", { length: 255 }), // Stripe checkout session for grooming payment
+  tipAmount: decimal("tip_amount", { precision: 10, scale: 2 }), // tip charged to saved card after service
+  tipChargedAt: timestamp("tip_charged_at"), // when tip was charged
+  tipPaymentIntentId: varchar("tip_payment_intent_id", { length: 255 }), // Stripe PI for the tip charge
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

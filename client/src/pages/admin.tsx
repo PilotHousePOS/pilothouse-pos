@@ -8365,7 +8365,7 @@ export default function Admin() {
     onSuccess: async (data: any) => {
       toast({
         title: "Reset Complete",
-        description: data.message || "All 'Paid' statuses have been reset.",
+        description: data.message || "Today's 'Paid' statuses have been reset.",
       });
       await queryClient.refetchQueries({ queryKey: ["/api/appointments"] });
     },
@@ -8380,6 +8380,46 @@ export default function Admin() {
 
   // deleteCalendarEventMutation removed - Google Calendar integration removed
 
+  const dismissAllNonPaymentMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/admin/appointments/dismiss-all-nonpayment", {});
+    },
+    onSuccess: async (data: any) => {
+      toast({
+        title: "Cleared",
+        description: data.message || "All Non-Payment appointments marked as paid.",
+      });
+      await queryClient.refetchQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: () => {
+      toast({ title: "Failed", description: "Could not dismiss appointments.", variant: "destructive" });
+    },
+  });
+
+  const chargeTipMutation = useMutation({
+    mutationFn: async ({ id, tipAmount }: { id: number; tipAmount: string }) => {
+      return await apiRequest("POST", `/api/appointments/${id}/tip`, { tipAmount });
+    },
+    onSuccess: async (data: any, variables) => {
+      toast({
+        title: "Tip Charged",
+        description: `$${parseFloat(variables.tipAmount).toFixed(2)} tip charged to saved card.`,
+      });
+      setTipAmounts(prev => { const n = { ...prev }; delete n[variables.id]; return n; });
+      setTipOpen(prev => { const n = { ...prev }; delete n[variables.id]; return n; });
+      await queryClient.refetchQueries({ queryKey: ["/api/appointments"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Tip Failed",
+        description: error?.message || "Could not charge tip. Customer may not have a saved card.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const [tipAmounts, setTipAmounts] = useState<Record<number, string>>({});
+  const [tipOpen, setTipOpen] = useState<Record<number, boolean>>({});
 
   // Clamp approved appointments pagination when list shrinks
   useEffect(() => {
@@ -14227,6 +14267,22 @@ export default function Admin() {
                 <Badge className="bg-red-600 text-white">{nonPaymentCount}</Badge>
               )}
             </div>
+            {nonPaymentCount > 0 && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs border-gray-400 text-gray-600"
+                disabled={dismissAllNonPaymentMutation.isPending}
+                onClick={() => showDeleteConfirmation(
+                  'Dismiss All Non-Payment',
+                  `This will mark all ${nonPaymentCount} appointment(s) as paid and clear the Non-Payment list. Use this to start fresh.`,
+                  `${nonPaymentCount} appointment(s)`,
+                  () => dismissAllNonPaymentMutation.mutate()
+                )}
+              >
+                {dismissAllNonPaymentMutation.isPending ? 'Clearing...' : 'Dismiss All'}
+              </Button>
+            )}
           </div>
           <p className="text-sm text-gray-500">
             Past and today's confirmed/completed appointments that have not been marked paid. These are held here until payment is collected and recorded.
@@ -14252,6 +14308,11 @@ export default function Admin() {
                           <Badge variant="outline" className="text-xs border-red-300 text-red-700 bg-red-50">
                             Unpaid
                           </Badge>
+                          {apt.tipAmount && (
+                            <Badge className="text-xs bg-purple-100 text-purple-700 border border-purple-300">
+                              Tip: ${parseFloat(apt.tipAmount).toFixed(2)}
+                            </Badge>
+                          )}
                         </div>
                         <div className="text-xs text-gray-600 space-y-0.5">
                           <p>
@@ -14278,16 +14339,60 @@ export default function Admin() {
                           )}
                         </div>
                       </div>
-                      <Button
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700 text-white shrink-0"
-                        onClick={() => updateAppointmentIsPaidMutation.mutate({ id: apt.id, isPaid: true })}
-                        disabled={updateAppointmentIsPaidMutation.isPending}
-                      >
-                        <DollarSign className="w-3.5 h-3.5 mr-1" />
-                        Mark Paid
-                      </Button>
+                      <div className="flex flex-col gap-2 shrink-0">
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                          onClick={() => updateAppointmentIsPaidMutation.mutate({ id: apt.id, isPaid: true })}
+                          disabled={updateAppointmentIsPaidMutation.isPending}
+                        >
+                          <DollarSign className="w-3.5 h-3.5 mr-1" />
+                          Mark Paid
+                        </Button>
+                        {!apt.tipAmount && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-purple-300 text-purple-700 hover:bg-purple-50 text-xs"
+                            onClick={() => setTipOpen(prev => ({ ...prev, [apt.id]: !prev[apt.id] }))}
+                          >
+                            + Tip
+                          </Button>
+                        )}
+                      </div>
                     </div>
+                    {tipOpen[apt.id] && !apt.tipAmount && (
+                      <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
+                          <input
+                            type="number"
+                            min="0.01"
+                            step="0.01"
+                            placeholder="0.00"
+                            className="w-full pl-6 pr-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-purple-400"
+                            value={tipAmounts[apt.id] || ''}
+                            onChange={e => setTipAmounts(prev => ({ ...prev, [apt.id]: e.target.value }))}
+                          />
+                        </div>
+                        <Button
+                          size="sm"
+                          className="bg-purple-600 hover:bg-purple-700 text-white text-xs"
+                          disabled={!tipAmounts[apt.id] || parseFloat(tipAmounts[apt.id]) <= 0 || chargeTipMutation.isPending}
+                          onClick={() => chargeTipMutation.mutate({ id: apt.id, tipAmount: tipAmounts[apt.id] })}
+                        >
+                          Charge to Card
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-xs text-gray-400"
+                          onClick={() => setTipOpen(prev => ({ ...prev, [apt.id]: false }))}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               ))}
