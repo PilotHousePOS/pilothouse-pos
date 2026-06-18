@@ -5413,8 +5413,12 @@ West Monroe LA 71291
       if (!appointment.readyForPayment) return res.status(400).json({ message: "Appointment is not ready for payment" });
       if (appointment.isPaid) return res.status(400).json({ message: "Appointment is already paid" });
 
-      const amount = parseFloat(appointment.finalAmount || "0");
-      if (amount <= 0) return res.status(400).json({ message: "Invalid payment amount" });
+      const serviceAmount = parseFloat(appointment.finalAmount || "0");
+      if (serviceAmount <= 0) return res.status(400).json({ message: "Invalid payment amount" });
+
+      // Optional tip the customer chose to add
+      const tipNum = parseFloat(req.body?.tipAmount || "0") || 0;
+      const totalAmount = serviceAmount + tipNum;
 
       const { getUncachableStripeClient } = await import('./stripeClient');
       const stripe = await getUncachableStripeClient();
@@ -5423,18 +5427,21 @@ West Monroe LA 71291
       const customer = await storage.getUser(req.user.id);
       if (customer?.stripeCustomerId && customer?.stripeDefaultPaymentMethod) {
         const paymentIntent = await stripe.paymentIntents.create({
-          amount: Math.round(amount * 100),
+          amount: Math.round(totalAmount * 100),
           currency: 'usd',
           customer: customer.stripeCustomerId,
           payment_method: customer.stripeDefaultPaymentMethod,
           off_session: true,
           confirm: true,
-          description: `Grooming appointment #${id} — ${appointment.petName}`,
-          metadata: { appointmentId: String(id), type: 'grooming' },
+          description: `Grooming appointment #${id} — ${appointment.petName}${tipNum > 0 ? ` (incl. $${tipNum.toFixed(2)} tip)` : ''}`,
+          metadata: { appointmentId: String(id), type: 'grooming', tipAmount: String(tipNum) },
         });
 
         if (paymentIntent.status === 'succeeded') {
           await storage.updateAppointmentPaidOnline(id, paymentIntent.id);
+          if (tipNum > 0) {
+            await storage.updateAppointmentTip(id, tipNum.toFixed(2), paymentIntent.id);
+          }
           return res.json({ success: true, charged: true });
         }
         // If PaymentIntent didn't immediately succeed, fall through to Checkout redirect
@@ -5442,23 +5449,34 @@ West Monroe LA 71291
 
       // Fallback: no saved card — redirect to Stripe Checkout so customer can enter one
       const origin = req.headers.origin || `https://${req.headers.host}`;
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: [{
+      const lineItems: any[] = [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: `Grooming — ${appointment.petName}`,
+            description: `${appointment.serviceType === 'grooming' ? 'Full Grooming' : appointment.serviceType} on ${appointment.appointmentDate}`,
+          },
+          unit_amount: Math.round(serviceAmount * 100),
+        },
+        quantity: 1,
+      }];
+      if (tipNum > 0) {
+        lineItems.push({
           price_data: {
             currency: 'usd',
-            product_data: {
-              name: `Grooming — ${appointment.petName}`,
-              description: `${appointment.serviceType === 'grooming' ? 'Full Grooming' : appointment.serviceType} on ${appointment.appointmentDate}`,
-            },
-            unit_amount: Math.round(amount * 100),
+            product_data: { name: 'Tip for groomer' },
+            unit_amount: Math.round(tipNum * 100),
           },
           quantity: 1,
-        }],
+        });
+      }
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: lineItems,
         mode: 'payment',
         success_url: `${origin}/my-appointments?groomingPaid=${id}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/my-appointments`,
-        metadata: { appointmentId: String(id), type: 'grooming' },
+        metadata: { appointmentId: String(id), type: 'grooming', tipAmount: String(tipNum) },
       });
 
       res.json({ checkoutUrl: session.url, sessionId: session.id });

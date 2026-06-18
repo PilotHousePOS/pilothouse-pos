@@ -14,6 +14,8 @@ import { useToast } from "@/hooks/use-toast";
 export default function MyAppointments() {
   const [, setLocation] = useLocation();
   const [payingAppointmentId, setPayingAppointmentId] = useState<number | null>(null);
+  const [tipSelections, setTipSelections] = useState<Record<number, string>>({}); // aptId → tip amount string
+  const [customTips, setCustomTips] = useState<Record<number, string>>({});       // aptId → custom dollar input
   const [cancellingId, setCancellingId] = useState<number | null>(null);
   const [reschedulingId, setReschedulingId] = useState<number | null>(null);
   const [rescheduleDate, setRescheduleDate] = useState("");
@@ -74,18 +76,18 @@ export default function MyAppointments() {
   }, []);
 
   const payOnlineMutation = useMutation({
-    mutationFn: async (appointmentId: number) => {
-      const result = await apiRequest("POST", `/api/appointments/${appointmentId}/pay-online`, {});
+    mutationFn: async ({ appointmentId, tipAmount }: { appointmentId: number; tipAmount?: string }) => {
+      const result = await apiRequest("POST", `/api/appointments/${appointmentId}/pay-online`, { tipAmount: tipAmount || "0" });
       return result as { success?: boolean; charged?: boolean; checkoutUrl?: string; sessionId?: string };
     },
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       setPayingAppointmentId(null);
+      setTipSelections(prev => { const n = { ...prev }; delete n[variables.appointmentId]; return n; });
+      setCustomTips(prev => { const n = { ...prev }; delete n[variables.appointmentId]; return n; });
       if (data?.success && data?.charged) {
-        // Saved card was charged directly — no redirect needed
         toast({ title: "Payment Successful!", description: "Your grooming appointment has been paid. Thank you!" });
         queryClient.invalidateQueries({ queryKey: ["/api/user/appointments"] });
       } else if (data?.checkoutUrl) {
-        // No saved card — redirect to Stripe Checkout
         window.location.href = data.checkoutUrl;
       }
     },
@@ -276,19 +278,74 @@ export default function MyAppointments() {
 
           {/* Pay Online */}
           {canPayOnline && (
-            <div className="mt-3 pt-2 border-t">
-              <p className="text-sm text-gray-700 font-medium flex items-center gap-1 mb-2">
+            <div className="mt-3 pt-2 border-t space-y-3">
+              <p className="text-sm text-gray-700 font-medium flex items-center gap-1">
                 <DollarSign className="w-4 h-4 text-green-600" />
                 Grooming complete — pay online now
               </p>
+              {/* Tip selector */}
+              <div>
+                <p className="text-xs text-gray-500 mb-1.5">Add a tip for your groomer? (optional)</p>
+                <div className="flex gap-1.5 flex-wrap">
+                  {['0', '5', '10', '15', 'custom'].map(opt => {
+                    const isCustom = opt === 'custom';
+                    const isSelected = tipSelections[apt.id] === opt;
+                    return (
+                      <button
+                        key={opt}
+                        onClick={() => {
+                          setTipSelections(prev => ({ ...prev, [apt.id]: opt }));
+                          if (!isCustom) setCustomTips(prev => { const n = { ...prev }; delete n[apt.id]; return n; });
+                        }}
+                        className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${isSelected ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-600 border-gray-300 hover:border-green-400'}`}
+                      >
+                        {opt === '0' ? 'No tip' : isCustom ? 'Custom' : `$${opt}`}
+                      </button>
+                    );
+                  })}
+                </div>
+                {tipSelections[apt.id] === 'custom' && (
+                  <div className="mt-2 relative max-w-[140px]">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
+                    <input
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                      placeholder="0.00"
+                      className="w-full pl-6 pr-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-green-400"
+                      value={customTips[apt.id] || ''}
+                      onChange={e => setCustomTips(prev => ({ ...prev, [apt.id]: e.target.value }))}
+                    />
+                  </div>
+                )}
+              </div>
+              {/* Pay button */}
               <Button
                 className="w-full bg-green-600 hover:bg-green-700 text-white"
-                onClick={() => { setPayingAppointmentId(apt.id); payOnlineMutation.mutate(apt.id); }}
-                disabled={payingAppointmentId === apt.id && payOnlineMutation.isPending}
+                onClick={() => {
+                  const sel = tipSelections[apt.id];
+                  let tipAmount = '0';
+                  if (sel === 'custom') tipAmount = customTips[apt.id] || '0';
+                  else if (sel && sel !== '0') tipAmount = sel;
+                  const tipNum = parseFloat(tipAmount) || 0;
+                  const total = parseFloat(apt.finalAmount) + tipNum;
+                  setPayingAppointmentId(apt.id);
+                  payOnlineMutation.mutate({ appointmentId: apt.id, tipAmount });
+                }}
+                disabled={
+                  (payingAppointmentId === apt.id && payOnlineMutation.isPending) ||
+                  (tipSelections[apt.id] === 'custom' && (!customTips[apt.id] || parseFloat(customTips[apt.id]) <= 0))
+                }
               >
                 {payingAppointmentId === apt.id && payOnlineMutation.isPending
-                  ? <><span className="animate-spin mr-2">⏳</span>Opening payment...</>
-                  : <><CreditCard className="w-4 h-4 mr-2" />Pay ${parseFloat(apt.finalAmount).toFixed(2)} Online</>}
+                  ? <><span className="animate-spin mr-2">⏳</span>Processing...</>
+                  : (() => {
+                      const sel = tipSelections[apt.id];
+                      const tipNum = sel === 'custom' ? (parseFloat(customTips[apt.id]) || 0) : (sel && sel !== '0' ? parseFloat(sel) : 0);
+                      const total = parseFloat(apt.finalAmount) + tipNum;
+                      return <><CreditCard className="w-4 h-4 mr-2" />Pay ${total.toFixed(2)} Online{tipNum > 0 ? ` (incl. $${tipNum.toFixed(2)} tip)` : ''}</>;
+                    })()
+                }
               </Button>
             </div>
           )}
