@@ -719,12 +719,45 @@ class SMSService {
     }
   }
 
+  private toE164(phone: string): string {
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length === 10) return `+1${digits}`;
+    if (digits.length === 11 && digits[0] === '1') return `+${digits}`;
+    return `+${digits}`;
+  }
+
   async sendGenericSMS(phoneNumber: string, message: string, appointmentId?: number): Promise<boolean> {
+    // Normalize to E.164 so Twilio always accepts it
+    const toNumber = this.toE164(phoneNumber);
+    if (!toNumber.match(/^\+1\d{10}$/)) {
+      console.log(`SMS skipped — invalid/non-US phone: ${phoneNumber}`);
+      return false;
+    }
+
+    // Duplicate guard: if we've already sent a grooming-ready SMS for this appointment, skip
+    if (appointmentId) {
+      try {
+        const { db } = await import('./db');
+        const { smsLogs } = await import('../shared/schema');
+        const { and, eq } = await import('drizzle-orm');
+        const existing = await db.select({ id: smsLogs.id })
+          .from(smsLogs)
+          .where(and(eq(smsLogs.appointmentId, appointmentId), eq(smsLogs.status, 'sent')))
+          .limit(1);
+        if (existing.length > 0) {
+          console.log(`SMS already sent for appointment ${appointmentId} — skipping duplicate`);
+          return false;
+        }
+      } catch (e) {
+        console.error('Duplicate SMS check failed (proceeding):', e);
+      }
+    }
+
     // Check opt-out status
-    const { optedOut, contactId } = await this.isOptedOut(phoneNumber);
+    const { optedOut, contactId } = await this.isOptedOut(toNumber);
     if (optedOut) {
-      console.log(`SMS skipped for ${phoneNumber} - contact opted out`);
-      await this.logSms({ contactId, phoneNumber, message, status: 'skipped', errorMessage: 'Contact opted out of SMS', appointmentId });
+      console.log(`SMS skipped for ${toNumber} - contact opted out`);
+      await this.logSms({ contactId, phoneNumber: toNumber, message, status: 'skipped', errorMessage: 'Contact opted out of SMS', appointmentId });
       return false;
     }
 
@@ -740,15 +773,15 @@ class SMSService {
       const result = await client.messages.create({
         body: message,
         from: process.env.TWILIO_PHONE_NUMBER,
-        to: phoneNumber,
+        to: toNumber,
       });
 
-      console.log(`SMS sent to ${phoneNumber}`);
-      await this.logSms({ contactId, phoneNumber, message, status: 'sent', twilioSid: result.sid, appointmentId });
+      console.log(`SMS sent to ${toNumber}${appointmentId ? ` for appointment ${appointmentId}` : ''}`);
+      await this.logSms({ contactId, phoneNumber: toNumber, message, status: 'sent', twilioSid: result.sid, appointmentId });
       return true;
     } catch (error: any) {
       console.error('SMS notification error:', error);
-      await this.logSms({ contactId, phoneNumber, message, status: 'failed', errorMessage: error.message || 'Unknown error', appointmentId });
+      await this.logSms({ contactId, phoneNumber: toNumber, message, status: 'failed', errorMessage: error.message || 'Unknown error', appointmentId });
       return false;
     }
   }
@@ -1039,10 +1072,11 @@ export class NotificationService {
 
   async sendCustomSMS(
     phoneNumber: string,
-    message: string
+    message: string,
+    appointmentId?: number
   ): Promise<boolean> {
     console.log(`Sending custom SMS to ${phoneNumber}: ${message.substring(0, 50)}...`);
-    return await this.smsService.sendGenericSMS(phoneNumber, message);
+    return await this.smsService.sendGenericSMS(phoneNumber, message, appointmentId);
   }
 
   async sendTestSMS(phoneNumber: string): Promise<{ success: boolean; sid?: string; error?: string }> {

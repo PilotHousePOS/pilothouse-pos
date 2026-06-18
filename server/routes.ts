@@ -5585,7 +5585,8 @@ West Monroe LA 71291
           
           const smsSent = await notificationService.sendCustomSMS(
             appointment.ownerPhoneNumber,
-            smsMessage
+            smsMessage,
+            id
           );
           
           if (smsSent) {
