@@ -5581,7 +5581,7 @@ West Monroe LA 71291
       if (groomingCompleted && appointment.ownerPhoneNumber) {
         try {
           // Use custom message if provided, otherwise use default
-          const smsMessage = customMessage || "Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way. The Animal House 318-323-6090.";
+          const smsMessage = customMessage || "Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way. The Animal House 318-323-6090. Reply STOP to opt out.";
           
           const smsSent = await notificationService.sendCustomSMS(
             appointment.ownerPhoneNumber,

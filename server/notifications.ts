@@ -642,10 +642,10 @@ class SMSService {
 
   async sendOrderStatusSMS(phoneNumber: string, firstName: string, orderId: number, status: string): Promise<boolean> {
     const messages = {
-      'approved': `Hi ${firstName}! Your Animal House order #${orderId} has been approved. We'll text you when it's ready for pickup!`,
-      'in_progress': `Hi ${firstName}! Your Animal House order #${orderId} is being prepared. We'll text you when it's ready for pickup!`,
-      'ready': `${firstName}, your order #${orderId} is ready for pickup at Animal House Pet Store! 🐾`,
-      'picked_up': `Hi ${firstName}! Your Animal House order #${orderId} has been picked up. Thanks for shopping with us! 🐾`,
+      'approved': `Hi ${firstName}! Your Animal House order #${orderId} has been approved. We'll text you when it's ready for pickup! Reply STOP to opt out.`,
+      'in_progress': `Hi ${firstName}! Your Animal House order #${orderId} is being prepared. We'll text you when it's ready for pickup! Reply STOP to opt out.`,
+      'ready': `${firstName}, your order #${orderId} is ready for pickup at Animal House Pet Store! 🐾 Reply STOP to opt out.`,
+      'picked_up': `Hi ${firstName}! Your Animal House order #${orderId} has been picked up. Thanks for shopping with us! 🐾 Reply STOP to opt out.`,
     };
     const message = messages[status as keyof typeof messages];
     if (!message) return false;
@@ -684,7 +684,7 @@ class SMSService {
   }
 
   async sendPetReadySMS(phoneNumber: string, firstName: string, petName: string, appointmentId?: number): Promise<boolean> {
-    const message = `Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way. The Animal House 318-323-6090.`;
+    const message = `Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way. The Animal House 318-323-6090. Reply STOP to opt out.`;
     // Route through sendGenericSMS so E.164 normalization and duplicate guard apply automatically
     return await this.sendGenericSMS(phoneNumber, message, appointmentId);
   }
