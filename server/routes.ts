@@ -7071,6 +7071,27 @@ West Monroe LA 71291
     }
   });
 
+  // Twilio inbound SMS webhook — auto-reply for customer replies to toll-free number
+  app.post("/api/twilio/inbound-sms", async (req: any, res) => {
+    try {
+      const body: string = (req.body?.Body || '').trim().toUpperCase();
+      // STOP/HELP/UNSTOP are handled automatically by Twilio at the carrier level — don't reply
+      if (['STOP', 'STOPALL', 'UNSUBSCRIBE', 'CANCEL', 'END', 'QUIT', 'HELP', 'INFO', 'UNSTOP', 'START'].includes(body)) {
+        res.set('Content-Type', 'text/xml');
+        return res.send(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`);
+      }
+
+      const autoReply = "Thanks for reaching out to Animal House Pet Store! We're unable to monitor replies to this number. Please call us at (318) 322-3023 for assistance. Reply STOP to opt out of texts.";
+
+      res.set('Content-Type', 'text/xml');
+      return res.send(`<?xml version="1.0" encoding="UTF-8"?><Response><Message>${autoReply}</Message></Response>`);
+    } catch (error) {
+      console.error('Twilio inbound SMS webhook error:', error);
+      res.set('Content-Type', 'text/xml');
+      return res.send(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`);
+    }
+  });
+
   // Admin SMS Center - Send text messages to users
   app.post("/api/admin/sms/test", authMiddleware, async (req: any, res) => {
     try {
