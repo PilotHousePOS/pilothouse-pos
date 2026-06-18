@@ -123,7 +123,10 @@ export function initializeScheduledTasks() {
       // Past appointments keep their paid status as a permanent historical record — customers make new
       // appointments for new visits, so there is nothing to reset on old records.
       // Online-paid (Stripe) appointments are never reset regardless of date.
-      const todayStr = today.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' }); // YYYY-MM-DD
+      // Compute today's date in CST/CDT directly from the live clock — NOT from the UTC-midnight
+      // `today` object above, which when converted to Chicago time resolves to yesterday evening
+      // and causes the prior day's paid appointments to get incorrectly wiped every night.
+      const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' }); // YYYY-MM-DD
       const appointmentsWithPaid = allAppointments.filter((apt: any) =>
         apt.isPaid === true &&
         !apt.paidOnline &&
