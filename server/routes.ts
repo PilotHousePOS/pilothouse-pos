@@ -7071,6 +7071,19 @@ West Monroe LA 71291
   });
 
   // Admin SMS Center - Send text messages to users
+  app.post("/api/admin/sms/test", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const { phoneNumber } = req.body;
+      if (!phoneNumber) return res.status(400).json({ message: "phoneNumber is required" });
+      const result = await notificationService.sendTestSMS(phoneNumber);
+      return res.json(result);
+    } catch (error: any) {
+      console.error("Test SMS error:", error);
+      return res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
   app.post("/api/admin/sms/send", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) {

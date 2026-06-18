@@ -579,11 +579,24 @@ class SMSService {
     }
   }
 
+  private toE164(phone: string): string {
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length === 10) return `+1${digits}`;
+    if (digits.length === 11 && digits[0] === '1') return `+${digits}`;
+    return `+${digits}`;
+  }
+
   async sendAdminNewOrderSMS(phoneNumber: string, orderId: number, customerName: string, totalAmount: string): Promise<boolean> {
     const message = `Animal House: New order #${orderId} from ${customerName} - Total: $${parseFloat(totalAmount).toFixed(2)}. Check the admin dashboard.`;
 
     if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE_NUMBER) {
       console.log('Twilio not configured, admin SMS skipped');
+      return false;
+    }
+
+    const toNumber = this.toE164(phoneNumber);
+    if (!toNumber.match(/^\+1\d{10}$/)) {
+      console.log(`Admin order SMS skipped — invalid phone: ${phoneNumber}`);
       return false;
     }
 
@@ -593,13 +606,37 @@ class SMSService {
       const result = await client.messages.create({
         body: message,
         from: process.env.TWILIO_PHONE_NUMBER,
-        to: phoneNumber,
+        to: toNumber,
       });
-      console.log(`Admin new-order SMS sent to ${phoneNumber} for order ${orderId}: ${result.sid}`);
+      console.log(`Admin new-order SMS sent to ${toNumber} for order ${orderId}: ${result.sid}`);
       return true;
     } catch (error: any) {
       console.error('Admin new-order SMS error:', error);
       return false;
+    }
+  }
+
+  async sendTestSMS(phoneNumber: string): Promise<{ success: boolean; sid?: string; error?: string }> {
+    if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE_NUMBER) {
+      return { success: false, error: 'Twilio not configured' };
+    }
+    const toNumber = this.toE164(phoneNumber);
+    if (!toNumber.match(/^\+1\d{10}$/)) {
+      return { success: false, error: `Invalid phone number: ${phoneNumber}` };
+    }
+    try {
+      const twilio = await import('twilio');
+      const client = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+      const result = await client.messages.create({
+        body: `Animal House Pet Store: SMS notifications are active! 🐾 Order alerts will be sent to this number.`,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: toNumber,
+      });
+      console.log(`Test SMS sent to ${toNumber}: ${result.sid}`);
+      return { success: true, sid: result.sid };
+    } catch (error: any) {
+      console.error('Test SMS error:', error);
+      return { success: false, error: error.message };
     }
   }
 
@@ -1006,6 +1043,10 @@ export class NotificationService {
   ): Promise<boolean> {
     console.log(`Sending custom SMS to ${phoneNumber}: ${message.substring(0, 50)}...`);
     return await this.smsService.sendGenericSMS(phoneNumber, message);
+  }
+
+  async sendTestSMS(phoneNumber: string): Promise<{ success: boolean; sid?: string; error?: string }> {
+    return await this.smsService.sendTestSMS(phoneNumber);
   }
 }
 
