@@ -685,38 +685,8 @@ class SMSService {
 
   async sendPetReadySMS(phoneNumber: string, firstName: string, petName: string, appointmentId?: number): Promise<boolean> {
     const message = `Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way. The Animal House 318-323-6090.`;
-
-    // Check opt-out status
-    const { optedOut, contactId } = await this.isOptedOut(phoneNumber);
-    if (optedOut) {
-      console.log(`SMS skipped for ${phoneNumber} - contact opted out`);
-      await this.logSms({ contactId, phoneNumber, message, status: 'skipped', errorMessage: 'Contact opted out of SMS', appointmentId });
-      return false;
-    }
-
-    if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE_NUMBER) {
-      console.log('Twilio not configured, SMS notification skipped');
-      return false;
-    }
-
-    try {
-      const twilio = await import('twilio');
-      const client = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-
-      const result = await client.messages.create({
-        body: message,
-        from: process.env.TWILIO_PHONE_NUMBER,
-        to: phoneNumber,
-      });
-
-      console.log(`Pet ready SMS sent to ${phoneNumber} for pet: ${petName}`);
-      await this.logSms({ contactId, phoneNumber, message, status: 'sent', twilioSid: result.sid, appointmentId });
-      return true;
-    } catch (error: any) {
-      console.error('Pet ready SMS notification error:', error);
-      await this.logSms({ contactId, phoneNumber, message, status: 'failed', errorMessage: error.message || 'Unknown error', appointmentId });
-      return false;
-    }
+    // Route through sendGenericSMS so E.164 normalization and duplicate guard apply automatically
+    return await this.sendGenericSMS(phoneNumber, message, appointmentId);
   }
 
   private toE164(phone: string): string {
