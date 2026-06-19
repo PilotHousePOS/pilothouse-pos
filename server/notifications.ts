@@ -1,6 +1,11 @@
 import { getUncachableSendGridClient } from './sendgridIntegration';
 import { storage } from './storage';
 import { getBaseUrl } from './utils';
+import twilio from 'twilio';
+import { db } from './db';
+import { smsLogs } from '../shared/schema';
+import { and, eq } from 'drizzle-orm';
+import { normalizePhoneNumber } from './phoneUtils';
 
 // Email toggle keys — stored in grooming_settings as 'true' / 'false'
 // Default is enabled (true) when not configured so existing behaviour is preserved.
@@ -557,7 +562,6 @@ class SMSService {
   // Helper to check if contact has opted out
   private async isOptedOut(phoneNumber: string): Promise<{ optedOut: boolean; contactId?: number }> {
     try {
-      const { normalizePhoneNumber } = await import('./phoneUtils');
       const normalizedPhone = normalizePhoneNumber(phoneNumber);
       const contact = await storage.getContactByPhoneNumber(normalizedPhone);
       if (contact) {
@@ -601,8 +605,7 @@ class SMSService {
     }
 
     try {
-      const twilio = await import('twilio');
-      const client = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+      const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
       const result = await client.messages.create({
         body: message,
         from: process.env.TWILIO_PHONE_NUMBER,
@@ -625,8 +628,7 @@ class SMSService {
       return { success: false, error: `Invalid phone number: ${phoneNumber}` };
     }
     try {
-      const twilio = await import('twilio');
-      const client = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+      const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
       const result = await client.messages.create({
         body: `Animal House Pet Store: SMS notifications are active! 🐾 Order alerts will be sent to this number.`,
         from: process.env.TWILIO_PHONE_NUMBER,
@@ -664,8 +666,7 @@ class SMSService {
     }
 
     try {
-      const twilio = await import('twilio');
-      const client = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+      const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
       const result = await client.messages.create({
         body: message,
@@ -689,13 +690,6 @@ class SMSService {
     return await this.sendGenericSMS(phoneNumber, message, appointmentId);
   }
 
-  private toE164(phone: string): string {
-    const digits = phone.replace(/\D/g, '');
-    if (digits.length === 10) return `+1${digits}`;
-    if (digits.length === 11 && digits[0] === '1') return `+${digits}`;
-    return `+${digits}`;
-  }
-
   async sendGenericSMS(phoneNumber: string, message: string, appointmentId?: number): Promise<boolean> {
     // Normalize to E.164 so Twilio always accepts it
     const toNumber = this.toE164(phoneNumber);
@@ -707,9 +701,6 @@ class SMSService {
     // Duplicate guard: if we've already sent a grooming-ready SMS for this appointment, skip
     if (appointmentId) {
       try {
-        const { db } = await import('./db');
-        const { smsLogs } = await import('../shared/schema');
-        const { and, eq } = await import('drizzle-orm');
         const existing = await db.select({ id: smsLogs.id })
           .from(smsLogs)
           .where(and(eq(smsLogs.appointmentId, appointmentId), eq(smsLogs.status, 'sent')))
@@ -737,8 +728,7 @@ class SMSService {
     }
 
     try {
-      const twilio = await import('twilio');
-      const client = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+      const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
       const result = await client.messages.create({
         body: message,
