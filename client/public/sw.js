@@ -1,4 +1,4 @@
-const CACHE_NAME = 'animal-house-v16';
+const CACHE_NAME = 'animal-house-v17';
 const IMAGE_CACHE_NAME = 'animal-house-images-v1';
 const OFFLINE_CACHE = [
   '/manifest.json',
@@ -43,6 +43,10 @@ self.addEventListener('fetch', function(event) {
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
+
+  // Never intercept cross-origin requests (e.g. Stripe CDN, Google, analytics).
+  // Intercepting third-party requests breaks iframes like Stripe's card element.
+  if (url.origin !== self.location.origin) return;
 
   // Never intercept API calls
   if (url.pathname.startsWith('/api/')) return;
