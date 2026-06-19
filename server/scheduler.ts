@@ -98,8 +98,11 @@ async function checkAppointmentCapacity(
 }
 
 export function initializeScheduledTasks() {
-  // Clear approved appointments and reset "Here" status every day at 12:00 AM
-  cron.schedule('0 0 * * *', async () => {
+  // Clear approved appointments and reset "Here" status every day at 1:00 AM CST (6:00 AM UTC)
+  // Must run at 6 AM UTC so that at fire-time the Chicago clock has already rolled to the new day —
+  // midnight UTC is only 7 PM CST, which would still see "today" as the previous CST date and
+  // incorrectly reset isPaid on appointments from that day.
+  cron.schedule('0 6 * * *', async () => {
     try {
       console.log('Running scheduled task: Clearing past approved appointments and resetting ALL "Here" and "Paid" statuses at midnight');
       
