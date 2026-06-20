@@ -360,17 +360,6 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
                    "Take Photo" from the iOS sheet reloads the WebView (WKWebView bug).
                    Workflow: use Camera app to take photo first, then pick from Photo Library here. */
                 <>
-                  {/* Critical warning — must be unmissable */}
-                  <div className="w-full bg-red-600 rounded-xl px-4 py-3 flex flex-col gap-1.5">
-                    <p className="text-white text-sm font-black uppercase tracking-wide">⚠️ IMPORTANT — Read First</p>
-                    <p className="text-white text-sm font-semibold leading-snug">
-                      When the picker opens, tap <span className="underline decoration-2">Photo Library</span>.
-                    </p>
-                    <p className="text-red-200 text-sm font-bold leading-snug">
-                      ❌ Do NOT tap "Take Photo" — it will close the app.
-                    </p>
-                  </div>
-
                   {/* Steps */}
                   <div className="w-full bg-white/8 border border-white/15 rounded-xl px-4 py-3 flex flex-col gap-2.5">
                     <p className="text-white/70 text-xs font-semibold uppercase tracking-wide">How to scan</p>
@@ -383,8 +372,8 @@ export default function BarcodeScanner({ onClose, onDetected }: BarcodeScannerPr
                       <p className="text-gray-300 text-sm leading-snug">Come back here and tap <strong className="text-white">Scan from Photo Library</strong> below</p>
                     </div>
                     <div className="flex items-start gap-3">
-                      <span className="w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
-                      <p className="text-gray-300 text-sm leading-snug">Choose <strong className="text-white">Photo Library</strong> → select your photo. <strong className="text-red-400">NEVER tap "Take Photo"</strong></p>
+                      <span className="w-5 h-5 rounded-full bg-[#0071CE] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+                      <p className="text-gray-300 text-sm leading-snug">Choose <strong className="text-white">Photo Library</strong> and select your photo</p>
                     </div>
                   </div>
 
