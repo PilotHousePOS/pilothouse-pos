@@ -67,4 +67,17 @@ extension ViewController: WKUIDelegate {
         }
         return nil
     }
+
+    // Required since iOS 15: WKWebView denies all getUserMedia requests by default.
+    // This handler grants camera (and microphone) access so the barcode scanner works.
+    @available(iOS 15.0, *)
+    func webView(
+        _ webView: WKWebView,
+        requestMediaCapturePermissionFor origin: WKSecurityOrigin,
+        initiatedByFrame frame: WKFrameInfo,
+        type: WKMediaCaptureType,
+        decisionHandler: @escaping (WKPermissionDecision) -> Void
+    ) {
+        decisionHandler(.grant)
+    }
 }
