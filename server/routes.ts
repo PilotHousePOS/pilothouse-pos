@@ -12961,5 +12961,30 @@ CRITICAL RULES:
     }
   });
 
+  // ONE-TIME price update endpoint — remove after use
+  app.post("/api/admin/run-price-update-9pct", async (req, res) => {
+    const { secret } = req.body;
+    if (secret !== "AH-PRICE-2026") return res.status(403).json({ message: "Forbidden" });
+    try {
+      const { db } = await import("./db");
+      const { sql } = await import("drizzle-orm");
+      const suppliesResult = await db.execute(sql`
+        UPDATE supplies
+        SET price = (FLOOR(CEIL(price * 1.09 * 100) / 10) * 10 + 9) / 100.0
+        WHERE price > 0
+      `);
+      const petsResult = await db.execute(sql`
+        UPDATE pets
+        SET price = (FLOOR(CEIL(price * 1.09 * 100) / 10) * 10 + 9) / 100.0
+        WHERE price > 0
+      `);
+      console.log(`[PriceUpdate] Supplies: ${suppliesResult.rowCount}, Pets: ${petsResult.rowCount}`);
+      res.json({ success: true, suppliesUpdated: suppliesResult.rowCount, petsUpdated: petsResult.rowCount });
+    } catch (error: any) {
+      console.error("[PriceUpdate] Error:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Server is now created externally in index.ts
 }
