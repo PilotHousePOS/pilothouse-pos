@@ -19,7 +19,6 @@ const DEFAULT_CONTENT = `<p class="text-xs text-gray-500">Last Updated: February
 <ul>
 <li>All orders are subject to availability and approval by our staff.</li>
 <li>Prices are listed in US Dollars and are subject to applicable sales tax.</li>
-<li>A convenience fee may apply to online orders.</li>
 <li>Orders must be picked up at our store location. We do not offer shipping at this time.</li>
 <li>Payment is processed securely through Stripe at the time of order approval.</li>
 <li>We reserve the right to refuse or cancel any order for any reason.</li>

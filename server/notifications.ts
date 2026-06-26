@@ -167,7 +167,7 @@ class EmailService {
               ${astroDiscount > 0 ? `<p style="margin: 4px 0; color: #ea580c;"><strong>Astro Loyalty Savings:</strong> -$${astroDiscount.toFixed(2)}</p>` : ''}
               <p style="margin: 4px 0;"><strong>Tax:</strong> $${parseFloat(taxAmount).toFixed(2)}</p>
               ${loyaltyCredits > 0 ? `<p style="margin: 4px 0; color: #16a34a;"><strong>Loyalty Credits:</strong> -$${loyaltyCredits.toFixed(2)}</p>` : ''}
-              <p style="margin: 4px 0;"><strong>Convenience Fee:</strong> $${parseFloat(convenienceFee).toFixed(2)}</p>
+              ${parseFloat(convenienceFee) > 0 ? `<p style="margin: 4px 0;"><strong>Convenience Fee:</strong> $${parseFloat(convenienceFee).toFixed(2)}</p>` : ''}
               <p style="margin: 8px 0; font-size: 20px; font-weight: bold; color: #dc2626;">Total: $${parseFloat(totalAmount).toFixed(2)}</p>
             </div>
 
