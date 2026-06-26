@@ -54,3 +54,9 @@ id = "1f9MCtN13-KVf3fcBz0LL"
 uri = "file://public/price-update-export.csv"
 type = "table"
 title = "Price Update Export — 8,071 Products"
+
+[[outputs]]
+id = "HDeIRW8QYPDgLuj2Xl9IQ"
+uri = "file://public/price-update-export.xlsx"
+type = "table"
+title = "Price Update — 8,071 Products"
