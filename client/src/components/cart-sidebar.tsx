@@ -328,9 +328,8 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const loyaltyDiscount = applyLoyaltyCredits ? Math.round(Math.min(availableLoyaltyCredits, loyaltyEligibleWithTax) * 100) / 100 : 0;
   const amountBeforeFee = Math.round((subtotalWithTax - loyaltyDiscount) * 100) / 100;
   
-  // Card processing convenience fee: 2.9% + $0.30 — waived for charge accounts
-  const convenienceFee = (!isChargeAccount && amountBeforeFee > 0) ? Math.round(((amountBeforeFee * 0.029) + 0.30) * 100) / 100 : 0;
-  const totalAmount = Math.round((amountBeforeFee + convenienceFee) * 100) / 100;
+  const convenienceFee = 0;
+  const totalAmount = Math.round(amountBeforeFee * 100) / 100;
 
   const handleCheckout = () => {
     if (cartItems.length === 0) {
@@ -649,12 +648,6 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     <span>${taxAmount.toFixed(2)}</span>
                   </div>
                 )}
-                {convenienceFee > 0 && (
-                  <div className="flex justify-between items-center text-sm text-muted-foreground">
-                    <span>Convenience Fee:</span>
-                    <span>${convenienceFee.toFixed(2)}</span>
-                  </div>
-                )}
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold">Total:</span>
                   <span className="text-lg font-bold text-brand-red">${totalAmount.toFixed(2)}</span>
@@ -725,12 +718,6 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                   <div className="flex justify-between text-sm text-green-600">
                     <span>Loyalty Credit:</span>
                     <span>-${loyaltyDiscount.toFixed(2)}</span>
-                  </div>
-                )}
-                {convenienceFee > 0 && (
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>Convenience Fee (2.9% + $0.30):</span>
-                    <span>${convenienceFee.toFixed(2)}</span>
                   </div>
                 )}
                 <Separator className="my-1" />

@@ -2852,12 +2852,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       // Recalculate tax using the already-fetched server tax rate
       const orderTax = Math.round(subtotalAfterAstro * (serverTaxRate / 100) * 100) / 100;
       const amountBeforeFee = Math.round((subtotalAfterAstro + orderTax - verifiedLoyaltyCredits) * 100) / 100;
-      const serverConvenienceFee = amountBeforeFee > 0 ? Math.round(((amountBeforeFee * 0.029) + 0.30) * 100) / 100 : 0;
-      validatedData.convenienceFee = serverConvenienceFee.toFixed(2);
+      validatedData.convenienceFee = "0.00";
       validatedData.taxAmount = orderTax.toFixed(2);
       
       // Recalculate total with server-verified values
-      const serverTotal = Math.round((amountBeforeFee + serverConvenienceFee) * 100) / 100;
+      const serverTotal = Math.round(amountBeforeFee * 100) / 100;
       validatedData.totalAmount = serverTotal.toFixed(2);
       
       // Get payment intent ID if provided (from Stripe checkout)
