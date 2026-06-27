@@ -5678,6 +5678,25 @@ West Monroe LA 71291
             message: "Past-date appointments are not allowed. Please select today or a future date." 
           });
         }
+
+        // Also block same-day bookings where the time slot has already passed
+        if (appointmentDate.getTime() === todayCentral.getTime()) {
+          const appointmentTime: string = req.body.appointmentTime || '';
+          const timeMatch = appointmentTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
+          if (timeMatch) {
+            let hours = parseInt(timeMatch[1]);
+            const minutes = parseInt(timeMatch[2]);
+            const period = timeMatch[3].toUpperCase();
+            if (period === 'PM' && hours !== 12) hours += 12;
+            if (period === 'AM' && hours === 12) hours = 0;
+            const slotTime = new Date(nowCentral.getFullYear(), nowCentral.getMonth(), nowCentral.getDate(), hours, minutes, 0);
+            if (slotTime <= nowCentral) {
+              return res.status(400).json({
+                message: "This time slot has already passed. Please select a future time."
+              });
+            }
+          }
+        }
         
         // LIMIT: Only 1 appointment per customer per day
         const userAppointments = await storage.getAppointments();

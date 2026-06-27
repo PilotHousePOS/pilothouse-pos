@@ -14339,15 +14339,31 @@ export default function Admin() {
                           )}
                         </div>
                       </div>
-                      <Button
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700 text-white shrink-0"
-                        onClick={() => updateAppointmentIsPaidMutation.mutate({ id: apt.id, isPaid: true })}
-                        disabled={updateAppointmentIsPaidMutation.isPending}
-                      >
-                        <DollarSign className="w-3.5 h-3.5 mr-1" />
-                        Mark Paid
-                      </Button>
+                      <div className="flex flex-col gap-2 shrink-0">
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                          onClick={() => updateAppointmentIsPaidMutation.mutate({ id: apt.id, isPaid: true })}
+                          disabled={updateAppointmentIsPaidMutation.isPending || updateAppointmentMutation.isPending}
+                        >
+                          <DollarSign className="w-3.5 h-3.5 mr-1" />
+                          Mark Paid
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-red-300 text-red-600 hover:bg-red-50"
+                          onClick={() => showDeleteConfirmation(
+                            'Cancel Appointment',
+                            `Cancel the appointment for ${apt.ownerFirstName} ${apt.ownerLastName}? This will remove it from Non-Payment.`,
+                            `${apt.ownerFirstName} ${apt.ownerLastName}'s appointment`,
+                            () => updateAppointmentMutation.mutate({ id: apt.id, status: 'cancelled' })
+                          )}
+                          disabled={updateAppointmentMutation.isPending || updateAppointmentIsPaidMutation.isPending}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
