@@ -359,7 +359,27 @@ export default function Booking() {
       slots.push(timeString);
       currentTime.setMinutes(currentTime.getMinutes() + 15); // 15-minute intervals
     }
-    
+
+    // If the selected date is today (CST), hide time slots that have already passed
+    if (selectedDate) {
+      const nowCentral = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+      const todayCentral = new Date(nowCentral.getFullYear(), nowCentral.getMonth(), nowCentral.getDate());
+      const selectedMidnight = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+      if (selectedMidnight.getTime() === todayCentral.getTime()) {
+        return slots.filter(slot => {
+          const match = slot.match(/(\d+):(\d+)\s*(AM|PM)/i);
+          if (!match) return true;
+          let h = parseInt(match[1]);
+          const m = parseInt(match[2]);
+          const period = match[3].toUpperCase();
+          if (period === 'PM' && h !== 12) h += 12;
+          if (period === 'AM' && h === 12) h = 0;
+          const slotTime = new Date(nowCentral.getFullYear(), nowCentral.getMonth(), nowCentral.getDate(), h, m, 0);
+          return slotTime > nowCentral;
+        });
+      }
+    }
+
     return slots;
   }, [groomingSettings, specialDate, selectedDate, allSpecialDates]);
 
