@@ -9839,9 +9839,9 @@ export default function Admin() {
                           <SelectValue placeholder="Select a category..." />
                         </SelectTrigger>
                         <SelectContent>
-                          {supplyCategories.map((c: any) => (
-                            <SelectItem key={c.category ?? '__null__'} value={c.category ?? ''}>
-                              {c.category || '(uncategorized)'} — {c.count} items
+                          {supplyCategories.filter((c: any) => c.category && c.category.trim() !== '').map((c: any) => (
+                            <SelectItem key={c.category} value={c.category}>
+                              {c.category} — {c.count} items
                             </SelectItem>
                           ))}
                         </SelectContent>
