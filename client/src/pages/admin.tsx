@@ -6779,6 +6779,13 @@ export default function Admin() {
   const [isAddPetOpen, setIsAddPetOpen] = useState(false);
   const [isAddSupplyOpen, setIsAddSupplyOpen] = useState(false);
   const [isInvoiceScanOpen, setIsInvoiceScanOpen] = useState(false);
+  const [priceAdjOpen, setPriceAdjOpen] = useState(false);
+  const [priceAdjTarget, setPriceAdjTarget] = useState('all');
+  const [priceAdjCategory, setPriceAdjCategory] = useState('');
+  const [priceAdjDirection, setPriceAdjDirection] = useState('increase');
+  const [priceAdjPercent, setPriceAdjPercent] = useState('');
+  const [priceAdjRounding, setPriceAdjRounding] = useState('x9');
+  const [priceAdjResult, setPriceAdjResult] = useState<{updatedCount: number; direction: string; percentage: number; target: string; rounding: string} | null>(null);
   const [editingPet, setEditingPet] = useState<any>(null);
   const [petToDelete, setPetToDelete] = useState<any>(null);
   const [editingSupply, setEditingSupply] = useState<any>(null);
@@ -8380,6 +8387,26 @@ export default function Admin() {
 
   // deleteCalendarEventMutation removed - Google Calendar integration removed
 
+  const { data: supplyCategories = [] } = useQuery<{category: string; count: number}[]>({
+    queryKey: ["/api/admin/supplies/categories"],
+  });
+
+  const priceAdjustmentMutation = useMutation({
+    mutationFn: async (payload: { target: string; category?: string; percentage: string; direction: string; rounding: string }) => {
+      const res = await apiRequest("POST", "/api/admin/price-adjustment", payload);
+      return res.json();
+    },
+    onSuccess: (data: any) => {
+      setPriceAdjResult(data);
+      queryClient.invalidateQueries({ queryKey: ["/api/supplies"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pets"] });
+      toast({ title: "Prices Updated", description: `${data.updatedCount} items updated.` });
+    },
+    onError: (err: any) => {
+      toast({ title: "Failed", description: err?.message || "Price adjustment failed.", variant: "destructive" });
+    },
+  });
+
   const dismissAllNonPaymentMutation = useMutation({
     mutationFn: async () => {
       return await apiRequest("POST", "/api/admin/appointments/dismiss-all-nonpayment", {});
@@ -9747,6 +9774,147 @@ export default function Admin() {
             onClose={() => setIsInvoiceScanOpen(false)}
             onEditSupply={(supply) => setEditingSupply(supply)}
           />
+
+          {/* Price Adjustment Tool */}
+          {typedUser?.isAdmin && (
+            <Card className="border-amber-200 bg-amber-50">
+              <CardHeader
+                className="pb-2 cursor-pointer select-none"
+                onClick={() => { setPriceAdjOpen(o => !o); setPriceAdjResult(null); }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Tag className="w-4 h-4 text-amber-700" />
+                    <CardTitle className="text-sm text-amber-800">Price Adjustment</CardTitle>
+                  </div>
+                  {priceAdjOpen ? <ChevronUp className="w-4 h-4 text-amber-600" /> : <ChevronDown className="w-4 h-4 text-amber-600" />}
+                </div>
+                <CardDescription className="text-amber-700 text-xs">Raise or lower prices by category or across all inventory</CardDescription>
+              </CardHeader>
+
+              {priceAdjOpen && (
+                <CardContent className="space-y-4 pt-0">
+                  {priceAdjResult && (
+                    <div className="bg-green-100 border border-green-300 rounded p-3 text-sm text-green-800">
+                      ✅ Done — {priceAdjResult.updatedCount} items {priceAdjResult.direction}d by {priceAdjResult.percentage}% on <strong>{priceAdjResult.target}</strong>
+                      {priceAdjResult.rounding === 'x9' ? ', rounded to X.X9' : ', standard rounding'}.
+                      <button className="ml-2 underline text-xs" onClick={() => setPriceAdjResult(null)}>Dismiss</button>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-xs font-medium">Apply To</Label>
+                      <Select value={priceAdjTarget} onValueChange={(v) => { setPriceAdjTarget(v); setPriceAdjCategory(''); }}>
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Inventory (Supplies + Pets)</SelectItem>
+                          <SelectItem value="pets">All Pets</SelectItem>
+                          <SelectItem value="category">Specific Category</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-xs font-medium">Direction</Label>
+                      <Select value={priceAdjDirection} onValueChange={setPriceAdjDirection}>
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="increase">Increase ▲</SelectItem>
+                          <SelectItem value="decrease">Decrease ▼</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {priceAdjTarget === 'category' && (
+                    <div className="space-y-1">
+                      <Label className="text-xs font-medium">Category</Label>
+                      <Select value={priceAdjCategory} onValueChange={setPriceAdjCategory}>
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue placeholder="Select a category..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {supplyCategories.map((c: any) => (
+                            <SelectItem key={c.category ?? '__null__'} value={c.category ?? ''}>
+                              {c.category || '(uncategorized)'} — {c.count} items
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-xs font-medium">Percentage (%)</Label>
+                      <Input
+                        type="number"
+                        min="0.1"
+                        step="0.1"
+                        placeholder="e.g. 9"
+                        value={priceAdjPercent}
+                        onChange={e => setPriceAdjPercent(e.target.value)}
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs font-medium">Rounding</Label>
+                      <Select value={priceAdjRounding} onValueChange={setPriceAdjRounding}>
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="x9">Round up to X.X9 (e.g. $8.99)</SelectItem>
+                          <SelectItem value="standard">Standard (e.g. $8.84)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <Button
+                    className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                    disabled={
+                      priceAdjustmentMutation.isPending ||
+                      !priceAdjPercent ||
+                      parseFloat(priceAdjPercent) <= 0 ||
+                      (priceAdjTarget === 'category' && !priceAdjCategory)
+                    }
+                    onClick={() => {
+                      const label = priceAdjTarget === 'all'
+                        ? 'all supplies and pets'
+                        : priceAdjTarget === 'pets'
+                        ? 'all pets'
+                        : `the "${priceAdjCategory}" category`;
+                      showDeleteConfirmation(
+                        `${priceAdjDirection === 'increase' ? 'Raise' : 'Lower'} Prices`,
+                        `This will ${priceAdjDirection} prices on ${label} by ${priceAdjPercent}%. This cannot be undone automatically.`,
+                        label,
+                        () => priceAdjustmentMutation.mutate({
+                          target: priceAdjTarget,
+                          category: priceAdjTarget === 'category' ? priceAdjCategory : undefined,
+                          percentage: priceAdjPercent,
+                          direction: priceAdjDirection,
+                          rounding: priceAdjRounding,
+                        })
+                      );
+                    }}
+                  >
+                    {priceAdjustmentMutation.isPending ? (
+                      <><Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />Updating prices...</>
+                    ) : (
+                      <><DollarSign className="w-3.5 h-3.5 mr-2" />Apply Price Adjustment</>
+                    )}
+                  </Button>
+                  <p className="text-xs text-amber-700 text-center">⚠️ This updates the live database. Use the Export buttons above to back up prices first.</p>
+                </CardContent>
+              )}
+            </Card>
+          )}
 
           {/* Pets Section */}
           <Card>

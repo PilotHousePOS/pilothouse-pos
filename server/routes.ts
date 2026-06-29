@@ -10349,6 +10349,82 @@ West Monroe LA 71291
     }
   });
 
+  // Get distinct supply categories with item counts (Admin only)
+  app.get("/api/admin/supplies/categories", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const rows = await db.execute(
+        sql`SELECT category, COUNT(*)::int AS count FROM supplies WHERE price > 0 GROUP BY category ORDER BY category`
+      );
+      res.json(rows.rows);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch categories" });
+    }
+  });
+
+  // Price adjustment by category or entire inventory (Admin only)
+  app.post("/api/admin/price-adjustment", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+
+      const { target, category, percentage, direction, rounding } = req.body;
+
+      if (!percentage || isNaN(parseFloat(percentage)) || parseFloat(percentage) <= 0) {
+        return res.status(400).json({ message: "Percentage must be a positive number" });
+      }
+      if (!['increase', 'decrease'].includes(direction)) {
+        return res.status(400).json({ message: "Direction must be 'increase' or 'decrease'" });
+      }
+      if (!['x9', 'standard'].includes(rounding)) {
+        return res.status(400).json({ message: "Rounding must be 'x9' or 'standard'" });
+      }
+
+      const pct = parseFloat(percentage);
+      const multiplier = direction === 'increase' ? 1 + pct / 100 : 1 - pct / 100;
+
+      // Build the new price expression based on rounding choice
+      let priceExpr: string;
+      if (rounding === 'x9') {
+        // Round up to nearest X.X9 (e.g. $8.09 → $8.79)
+        if (direction === 'increase') {
+          priceExpr = `(FLOOR(CEIL(price * ${multiplier} * 100.0) / 10) * 10 + 9) / 100.0`;
+        } else {
+          // For decreases, floor toward X.X9
+          priceExpr = `(FLOOR(price * ${multiplier} * 100.0 / 10) * 10 + 9) / 100.0`;
+        }
+      } else {
+        // Standard 2-decimal rounding
+        priceExpr = `ROUND(price * ${multiplier}, 2)`;
+      }
+
+      let updatedCount = 0;
+
+      if (target === 'pets') {
+        const result = await db.execute(sql.raw(`UPDATE pets SET price = ${priceExpr} WHERE price > 0`));
+        updatedCount = (result as any).rowCount ?? 0;
+      } else if (target === 'all') {
+        const r1 = await db.execute(sql.raw(`UPDATE supplies SET price = ${priceExpr} WHERE price > 0`));
+        const r2 = await db.execute(sql.raw(`UPDATE pets SET price = ${priceExpr} WHERE price > 0`));
+        updatedCount = ((r1 as any).rowCount ?? 0) + ((r2 as any).rowCount ?? 0);
+      } else if (target === 'category' && category) {
+        const result = await db.execute(
+          sql.raw(`UPDATE supplies SET price = ${priceExpr} WHERE price > 0 AND category = '${category.replace(/'/g, "''")}'`)
+        );
+        updatedCount = (result as any).rowCount ?? 0;
+      } else {
+        return res.status(400).json({ message: "Invalid target or missing category" });
+      }
+
+      console.log(`[PRICE ADJUSTMENT] ${direction} ${pct}% on ${target === 'category' ? category : target}, rounding=${rounding}, updated=${updatedCount} items`);
+      res.json({ updatedCount, percentage: pct, direction, target: target === 'category' ? category : target, rounding });
+    } catch (error) {
+      console.error("Price adjustment error:", error);
+      res.status(500).json({ message: "Price adjustment failed", error: (error as Error).message });
+    }
+  });
+
   // Sync categories from Excel file (Admin only)
   // Uses the Excel file as the authoritative source for product categories
   app.post("/api/admin/supplies/sync-categories-from-excel", authMiddleware, excelUpload.single('file'), async (req: any, res) => {
