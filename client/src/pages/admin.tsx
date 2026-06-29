@@ -10017,9 +10017,9 @@ export default function Admin() {
                     <div className="flex gap-3">
                       {/* Pet Thumbnail */}
                       <div className="relative flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
-                        {pet.imageUrl ? (
+                        {(pet.imageUrl || pet.imageUrls?.[0]) ? (
                           <img 
-                            src={pet.imageUrl} 
+                            src={pet.imageUrl || pet.imageUrls[0]} 
                             alt={pet.name}
                             className={`w-full h-full object-cover ${pet.isAvailable ? '' : 'grayscale'}`}
                             loading="lazy"
@@ -10030,7 +10030,7 @@ export default function Admin() {
                             data-testid={`img-pet-thumbnail-${pet.id}`}
                           />
                         ) : null}
-                        <div className={`w-full h-full flex items-center justify-center ${pet.imageUrl ? 'hidden' : ''}`}>
+                        <div className={`w-full h-full flex items-center justify-center ${(pet.imageUrl || pet.imageUrls?.[0]) ? 'hidden' : ''}`}>
                           <PawPrint className="w-5 h-5 text-gray-400" />
                         </div>
                         {!pet.isAvailable && (
