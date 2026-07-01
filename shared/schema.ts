@@ -1156,3 +1156,14 @@ export const jobApplications = pgTable("job_applications", {
 export const insertJobApplicationSchema = createInsertSchema(jobApplications).omit({ id: true, submittedAt: true, status: true, adminNotes: true });
 export type InsertJobApplication = z.infer<typeof insertJobApplicationSchema>;
 export type JobApplication = typeof jobApplications.$inferSelect;
+
+// Admin-managed supply category definitions
+export const supplyCategories = pgTable("supply_categories", {
+  id: serial("id").primaryKey(),
+  key: varchar("key", { length: 100 }).notNull().unique(),
+  label: varchar("label", { length: 100 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+export const insertSupplyCategorySchema = createInsertSchema(supplyCategories).omit({ id: true, createdAt: true });
+export type InsertSupplyCategory = z.infer<typeof insertSupplyCategorySchema>;
+export type SupplyCategoryDef = typeof supplyCategories.$inferSelect;

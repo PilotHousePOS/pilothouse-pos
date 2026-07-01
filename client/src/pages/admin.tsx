@@ -6786,6 +6786,9 @@ export default function Admin() {
   const [priceAdjPercent, setPriceAdjPercent] = useState('');
   const [priceAdjRounding, setPriceAdjRounding] = useState('x9');
   const [priceAdjResult, setPriceAdjResult] = useState<{updatedCount: number; direction: string; percentage: number; target: string; rounding: string} | null>(null);
+  const [catMgrOpen, setCatMgrOpen] = useState(false);
+  const [newCatKey, setNewCatKey] = useState('');
+  const [newCatLabel, setNewCatLabel] = useState('');
   const [editingPet, setEditingPet] = useState<any>(null);
   const [petToDelete, setPetToDelete] = useState<any>(null);
   const [editingSupply, setEditingSupply] = useState<any>(null);
@@ -8391,6 +8394,39 @@ export default function Admin() {
     queryKey: ["/api/admin/supplies/categories"],
   });
 
+  const { data: categoryDefs = [] } = useQuery<{id: number; key: string; label: string}[]>({
+    queryKey: ["/api/admin/categories"],
+    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+  });
+
+  const createCategoryMutation = useMutation({
+    mutationFn: async (payload: { key: string; label: string }) => {
+      const res = await apiRequest("POST", "/api/admin/categories", payload);
+      if (!res.ok) { const e = await res.json(); throw new Error(e.message || "Failed"); }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/categories"] });
+      setNewCatKey('');
+      setNewCatLabel('');
+      toast({ title: "Category Created", description: "The new category is now available in product forms." });
+    },
+    onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
+  });
+
+  const deleteCategoryMutation = useMutation({
+    mutationFn: async (key: string) => {
+      const res = await apiRequest("DELETE", `/api/admin/categories/${key}`);
+      if (!res.ok) { const e = await res.json(); throw new Error(e.message || "Failed"); }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/categories"] });
+      toast({ title: "Category Deleted" });
+    },
+    onError: (e: any) => toast({ title: "Cannot Delete", description: e.message, variant: "destructive" }),
+  });
+
   const priceAdjustmentMutation = useMutation({
     mutationFn: async (payload: { target: string; category?: string; percentage: string; direction: string; rounding: string }) => {
       const res = await apiRequest("POST", "/api/admin/price-adjustment", payload);
@@ -9911,6 +9947,91 @@ export default function Admin() {
                     )}
                   </Button>
                   <p className="text-xs text-amber-700 text-center">⚠️ This updates the live database. Use the Export buttons above to back up prices first.</p>
+                </CardContent>
+              )}
+            </Card>
+          )}
+
+          {/* Category Manager */}
+          {typedUser?.isAdmin && (
+            <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950/20 dark:border-blue-800">
+              <CardHeader
+                className="pb-2 cursor-pointer select-none"
+                onClick={() => setCatMgrOpen(o => !o)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Tag className="w-4 h-4 text-blue-700 dark:text-blue-400" />
+                    <CardTitle className="text-sm text-blue-800 dark:text-blue-300">Category Manager</CardTitle>
+                  </div>
+                  {catMgrOpen ? <ChevronUp className="w-4 h-4 text-blue-600" /> : <ChevronDown className="w-4 h-4 text-blue-600" />}
+                </div>
+                <CardDescription className="text-blue-700 dark:text-blue-400 text-xs">Create and manage supply categories used in product forms</CardDescription>
+              </CardHeader>
+              {catMgrOpen && (
+                <CardContent className="space-y-4 pt-0">
+                  {/* Add new category */}
+                  <div className="bg-white dark:bg-gray-900 rounded-lg border border-blue-200 dark:border-blue-800 p-3 space-y-3">
+                    <p className="text-xs font-semibold text-blue-800 dark:text-blue-300 uppercase tracking-wide">Add New Category</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-xs text-gray-600 dark:text-gray-400 mb-1 block">Key (no spaces)</label>
+                        <input
+                          type="text"
+                          className="w-full text-sm border rounded px-2 py-1.5 bg-white dark:bg-gray-800 dark:border-gray-700"
+                          placeholder="e.g. fishFood"
+                          value={newCatKey}
+                          onChange={e => setNewCatKey(e.target.value.replace(/\s/g, ''))}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600 dark:text-gray-400 mb-1 block">Display Name</label>
+                        <input
+                          type="text"
+                          className="w-full text-sm border rounded px-2 py-1.5 bg-white dark:bg-gray-800 dark:border-gray-700"
+                          placeholder="e.g. Fish Food"
+                          value={newCatLabel}
+                          onChange={e => setNewCatLabel(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      disabled={!newCatKey.trim() || !newCatLabel.trim() || createCategoryMutation.isPending}
+                      onClick={() => createCategoryMutation.mutate({ key: newCatKey.trim(), label: newCatLabel.trim() })}
+                    >
+                      <Plus className="w-3.5 h-3.5 mr-1.5" />
+                      {createCategoryMutation.isPending ? "Adding…" : "Add Category"}
+                    </Button>
+                  </div>
+
+                  {/* Existing categories list */}
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-semibold text-blue-800 dark:text-blue-300 uppercase tracking-wide">{categoryDefs.length} Categories</p>
+                    <div className="max-h-64 overflow-y-auto space-y-1">
+                      {categoryDefs.map(cat => (
+                        <div key={cat.key} className="flex items-center justify-between bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded px-3 py-1.5">
+                          <div>
+                            <span className="text-sm font-medium">{cat.label}</span>
+                            <span className="text-xs text-gray-400 ml-2 font-mono">{cat.key}</span>
+                          </div>
+                          <button
+                            className="text-red-500 hover:text-red-700 p-1 rounded"
+                            title="Delete category"
+                            disabled={deleteCategoryMutation.isPending}
+                            onClick={() => {
+                              if (window.confirm(`Delete category "${cat.label}"? This will fail if any products use it.`)) {
+                                deleteCategoryMutation.mutate(cat.key);
+                              }
+                            }}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </CardContent>
               )}
             </Card>
@@ -15897,25 +16018,9 @@ function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: an
             <SelectValue placeholder="Select category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="food">Food (Generic)</SelectItem>
-            <SelectItem value="treats">Treats (Generic)</SelectItem>
-            <SelectItem value="dogFood">Dog Food</SelectItem>
-            <SelectItem value="dogTreats">Dog Treats</SelectItem>
-            <SelectItem value="catFood">Cat Food</SelectItem>
-            <SelectItem value="catTreats">Cat Treats</SelectItem>
-            <SelectItem value="catToys">Cat Toys</SelectItem>
-            <SelectItem value="smallAnimalFood">Small Animal Food</SelectItem>
-            <SelectItem value="smallAnimalTreats">Small Animal Treats</SelectItem>
-            <SelectItem value="smallAnimalSupplies">Small Animal Supplies</SelectItem>
-            <SelectItem value="toys">Toys</SelectItem>
-            <SelectItem value="beds">Beds</SelectItem>
-            <SelectItem value="leashesAndCollars">Leashes & Collars</SelectItem>
-            <SelectItem value="healthcare">Healthcare</SelectItem>
-            <SelectItem value="accessories">Accessories</SelectItem>
-            <SelectItem value="aquatics">Aquatics</SelectItem>
-            <SelectItem value="reptiles">Reptiles</SelectItem>
-            <SelectItem value="birdSupplies">Bird Supplies</SelectItem>
-            <SelectItem value="dogCages">Dog Cages/Houses</SelectItem>
+            {categoryDefs.map(cat => (
+              <SelectItem key={cat.key} value={cat.key}>{cat.label}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -17336,25 +17441,9 @@ function AddSupplyForm({ onSubmit, initialUpc }: { onSubmit: (data: any) => void
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="food">Food (Generic)</SelectItem>
-              <SelectItem value="treats">Treats (Generic)</SelectItem>
-              <SelectItem value="dogFood">Dog Food</SelectItem>
-              <SelectItem value="dogTreats">Dog Treats</SelectItem>
-              <SelectItem value="catFood">Cat Food</SelectItem>
-              <SelectItem value="catTreats">Cat Treats</SelectItem>
-              <SelectItem value="catToys">Cat Toys</SelectItem>
-              <SelectItem value="smallAnimalFood">Small Animal Food</SelectItem>
-              <SelectItem value="smallAnimalTreats">Small Animal Treats</SelectItem>
-              <SelectItem value="smallAnimalSupplies">Small Animal Supplies</SelectItem>
-              <SelectItem value="toys">Toys</SelectItem>
-              <SelectItem value="beds">Beds</SelectItem>
-              <SelectItem value="leashesAndCollars">Leashes & Collars</SelectItem>
-              <SelectItem value="healthcare">Healthcare</SelectItem>
-              <SelectItem value="accessories">Accessories</SelectItem>
-              <SelectItem value="aquatics">Aquatics</SelectItem>
-              <SelectItem value="reptiles">Reptiles</SelectItem>
-              <SelectItem value="birdSupplies">Bird Supplies</SelectItem>
-              <SelectItem value="dogCages">Dog Cages/Houses</SelectItem>
+              {categoryDefs.map(cat => (
+                <SelectItem key={cat.key} value={cat.key}>{cat.label}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

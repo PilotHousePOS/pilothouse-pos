@@ -27,7 +27,7 @@ import { sendPasswordResetEmail, sendVerificationEmail, sendContactChangeOtpEmai
 import { normalizePhoneNumber } from './phoneUtils';
 import { db, resetPool } from './db';
 import { eq, inArray, or, and, ilike, sql } from 'drizzle-orm';
-import { supplies } from '@shared/schema';
+import { supplies, supplyCategories } from '@shared/schema';
 import OpenAI from 'openai';
 import sharp from 'sharp';
 import { expandProductAbbreviations } from './abbreviationExpansion';
@@ -10360,6 +10360,95 @@ West Monroe LA 71291
       res.json(rows.rows);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch categories" });
+    }
+  });
+
+  // Ensure supply_categories table exists and is seeded
+  (async () => {
+    try {
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS supply_categories (
+          id SERIAL PRIMARY KEY,
+          key VARCHAR(100) NOT NULL UNIQUE,
+          label VARCHAR(100) NOT NULL,
+          created_at TIMESTAMP DEFAULT NOW()
+        )
+      `);
+      const existing = await db.execute(sql`SELECT COUNT(*) FROM supply_categories`);
+      if (Number((existing.rows[0] as any).count) === 0) {
+        await db.execute(sql`
+          INSERT INTO supply_categories (key, label) VALUES
+          ('food', 'Food (Generic)'),
+          ('treats', 'Treats (Generic)'),
+          ('dogFood', 'Dog Food'),
+          ('dogTreats', 'Dog Treats'),
+          ('catFood', 'Cat Food'),
+          ('catTreats', 'Cat Treats'),
+          ('catToys', 'Cat Toys'),
+          ('smallAnimalFood', 'Small Animal Food'),
+          ('smallAnimalTreats', 'Small Animal Treats'),
+          ('smallAnimalSupplies', 'Small Animal Supplies'),
+          ('toys', 'Toys'),
+          ('beds', 'Beds'),
+          ('leashesAndCollars', 'Leashes & Collars'),
+          ('healthcare', 'Healthcare'),
+          ('accessories', 'Accessories'),
+          ('aquatics', 'Aquatics'),
+          ('reptiles', 'Reptiles'),
+          ('birdSupplies', 'Bird Supplies'),
+          ('dogCages', 'Dog Cages/Houses')
+          ON CONFLICT (key) DO NOTHING
+        `);
+      }
+    } catch (e) {
+      console.error("Failed to initialize supply_categories table:", e);
+    }
+  })();
+
+  // List all supply categories
+  app.get("/api/admin/categories", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const rows = await db.execute(sql`SELECT id, key, label FROM supply_categories ORDER BY label ASC`);
+      res.json(rows.rows);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch categories" });
+    }
+  });
+
+  // Create a new supply category
+  app.post("/api/admin/categories", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const { key, label } = req.body;
+      if (!key || !label) return res.status(400).json({ message: "key and label are required" });
+      const safeKey = key.trim().replace(/[^a-zA-Z0-9_]/g, '');
+      const safeLabel = label.trim().slice(0, 100);
+      if (!safeKey) return res.status(400).json({ message: "Key must contain alphanumeric characters" });
+      await db.execute(sql`INSERT INTO supply_categories (key, label) VALUES (${safeKey}, ${safeLabel})`);
+      res.json({ key: safeKey, label: safeLabel });
+    } catch (error: any) {
+      if (error?.message?.includes('unique') || error?.message?.includes('duplicate')) {
+        return res.status(409).json({ message: "A category with that key already exists" });
+      }
+      res.status(500).json({ message: "Failed to create category" });
+    }
+  });
+
+  // Delete a supply category
+  app.delete("/api/admin/categories/:key", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const key = req.params.key;
+      const inUse = await db.execute(sql`SELECT COUNT(*)::int AS count FROM supplies WHERE category = ${key}`);
+      const count = Number((inUse.rows[0] as any).count);
+      if (count > 0) {
+        return res.status(409).json({ message: `Cannot delete — ${count} product(s) still use this category` });
+      }
+      await db.execute(sql`DELETE FROM supply_categories WHERE key = ${key}`);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete category" });
     }
   });
 
