@@ -15853,6 +15853,9 @@ function EditPetForm({ pet, onSubmit }: { pet: any; onSubmit: (data: any) => voi
 
 function EditSupplyForm({ supply, onSubmit }: { supply: any; onSubmit: (data: any) => void }) {
   const NON_RESTOCKABLE_TEXT = "⚠️ This item will not be restocked once sold out.";
+  const { data: categoryDefs = [] } = useQuery<{id: number; key: string; label: string}[]>({
+    queryKey: ["/api/admin/categories"],
+  });
   
   const [formData, setFormData] = useState({
     name: supply.name || "",
@@ -17382,6 +17385,9 @@ function AddPetForm({ onSubmit }: { onSubmit: (data: any) => void }) {
 }
 
 function AddSupplyForm({ onSubmit, initialUpc }: { onSubmit: (data: any) => void; initialUpc?: string }) {
+  const { data: categoryDefs = [] } = useQuery<{id: number; key: string; label: string}[]>({
+    queryKey: ["/api/admin/categories"],
+  });
   const [formData, setFormData] = useState({
     name: '',
     category: '',
