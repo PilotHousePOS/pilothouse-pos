@@ -11754,6 +11754,17 @@ export default function Admin() {
                                   Synced
                                 </Badge>
                               )}
+                              {currentAppointment.source !== 'google_calendar' && (
+                                currentAppointment.bookedByAdmin ? (
+                                  <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-300 text-xs px-1.5 py-0">
+                                    Booked by Staff
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-300 text-xs px-1.5 py-0">
+                                    Booked by Customer
+                                  </Badge>
+                                )
+                              )}
                               {hasMultiple && (
                                 <Badge 
                                   variant="outline" 

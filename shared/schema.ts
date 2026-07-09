@@ -286,6 +286,7 @@ export const appointments = pgTable("appointments", {
   priceConfirmed: boolean("price_confirmed").default(false), // true when admin has explicitly reviewed/set the price
   pricingMode: varchar("pricing_mode", { length: 20 }).default("individual"), // individual (sum of pet prices) or override (total price overrides individual)
   source: varchar("source", { length: 50 }).default("manual"), // manual or google_calendar
+  bookedByAdmin: boolean("booked_by_admin").default(false), // true when an admin/groomer created this appointment on behalf of a customer (vs. customer self-booking)
   googleEventId: varchar("google_event_id", { length: 255 }), // Google Calendar event ID
   groomerTag: varchar("groomer_tag", { length: 100 }), // Groomer name/tag from calendar event
   isRecurring: boolean("is_recurring").default(false), // Whether this is a recurring appointment

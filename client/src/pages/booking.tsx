@@ -96,6 +96,13 @@ export default function Booking() {
     retry: false,
   });
 
+  // Fetch the logged-in customer's saved pets so they can quickly pick from their profile
+  const { data: savedPets = [] } = useQuery<any[]>({
+    queryKey: ["/api/customer-pets"],
+    retry: false,
+    enabled: !!currentUser && !(currentUser as any)?.isAdmin && !(currentUser as any)?.isGroomer,
+  });
+
   // Fetch all special dates for calendar availability checking
   const { data: allSpecialDates = [] } = useQuery({
     queryKey: ["/api/admin/special-dates"],
@@ -1131,6 +1138,30 @@ export default function Booking() {
                   )}
                 </div>
                 
+                {savedPets.length > 0 && (
+                  <Select
+                    value=""
+                    onValueChange={(value) => {
+                      const chosen = savedPets.find((p: any) => String(p.id) === value);
+                      if (chosen) {
+                        updatePet(index, 'name', chosen.name);
+                        updatePet(index, 'type', chosen.species);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="border-gray-300 rounded-xl bg-blue-50" data-testid={`select-saved-pet-${index}`}>
+                      <SelectValue placeholder="Or choose from your saved pets" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {savedPets.map((p: any) => (
+                        <SelectItem key={p.id} value={String(p.id)}>
+                          {p.name} ({p.species})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+
                 <Input
                   type="text"
                   placeholder="Pet Name *"

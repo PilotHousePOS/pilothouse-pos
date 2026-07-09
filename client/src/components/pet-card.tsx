@@ -102,6 +102,8 @@ export default function PetCard({ pet }: PetCardProps) {
             alt={pet.name}
             className="w-full h-32 object-cover"
             onError={handleImageError}
+            loading="lazy"
+            decoding="async"
           />
           <div className="p-3">
             <div className="flex items-start justify-between mb-2">

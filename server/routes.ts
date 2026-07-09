@@ -6142,7 +6142,8 @@ West Monroe LA 71291
           groomerId: firstGroomerId,
           userId,
           isApproved: true,
-          status: 'confirmed'
+          status: 'confirmed',
+          bookedByAdmin: !!isAdminOrGroomer
         });
         
         appointment = await storage.createAppointment(appointmentData);

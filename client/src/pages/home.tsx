@@ -428,9 +428,11 @@ export default function Home() {
                   <div className="flex">
                     <div className="relative w-32 h-32">
                       <img 
-                        src={pet.imageUrl || `https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200`}
+                        src={pet.imageUrl || pet.imageUrls?.[0] || `https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200`}
                         alt={pet.name}
                         className="w-full h-full object-cover" 
+                        loading="lazy"
+                        decoding="async"
                       />
                       <div className="absolute top-2 left-2">
                         <Badge className="bg-green-500 text-white text-xs border-0">Available</Badge>
@@ -488,6 +490,8 @@ export default function Home() {
                       src={imgUrl || 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300'}
                       alt={supply.name}
                       className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{supply.name}</p>
