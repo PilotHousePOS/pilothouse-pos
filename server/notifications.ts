@@ -685,7 +685,7 @@ class SMSService {
   }
 
   async sendPetReadySMS(phoneNumber: string, firstName: string, petName: string, appointmentId?: number): Promise<boolean> {
-    const message = `Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way. The Animal House 318-323-6090. Reply STOP to opt out.`;
+    const message = `Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way, unless you've already spoken to a groomer. The Animal House 318-323-6090. Reply STOP to opt out.`;
     // Route through sendGenericSMS so E.164 normalization and duplicate guard apply automatically
     return await this.sendGenericSMS(phoneNumber, message, appointmentId);
   }

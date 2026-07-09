@@ -6952,10 +6952,10 @@ export default function Admin() {
     appointmentId: null,
     customerName: '',
     customerPhone: '',
-    message: "Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way. The Animal House 318-323-6090."
+    message: "Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way, unless you've already spoken to a groomer. The Animal House 318-323-6090."
   });
   
-  const defaultSmsMessage = "Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way. The Animal House 318-323-6090.";
+  const defaultSmsMessage = "Your Fur Baby is ready for pick-up please give us a call to let us know you're on your way, unless you've already spoken to a groomer. The Animal House 318-323-6090.";
   
   const openSmsConfirmDialog = (appointmentId: number, customerName: string, customerPhone: string) => {
     setSmsConfirmDialog({
