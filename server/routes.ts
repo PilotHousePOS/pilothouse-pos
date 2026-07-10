@@ -4629,13 +4629,14 @@ West Monroe LA 71291
           }
           
           // HARD LIMIT: Cannot approve if it would exceed capacity
-          if (bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
+          // Bath and full groom are separate, independent capacities - only check the one(s) actually being requested
+          if (requestedBaths > 0 && bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
             return res.status(400).json({
               message: `Cannot approve: Bath grooming capacity is full for this date (limit: ${weeklyLimit.maxBathAppointments} dogs, ${bathDogs} already booked). Please reject this appointment or move it to a different date.`
             });
           }
           
-          if (groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
+          if (requestedGrooms > 0 && groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
             return res.status(400).json({
               message: `Cannot approve: Full grooming capacity is full for this date (limit: ${weeklyLimit.maxGroomAppointments} dogs, ${groomDogs} already booked). Please reject this appointment or move it to a different date.`
             });
@@ -4946,14 +4947,15 @@ West Monroe LA 71291
           console.log(`[EDIT DEBUG] Limits - maxBath=${weeklyLimit.maxBathAppointments}, maxGroom=${weeklyLimit.maxGroomAppointments}`);
           
           // Check if update would exceed capacity
-          if (bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
+          // Bath and full groom are separate, independent capacities - only check the one(s) actually being requested
+          if (requestedBaths > 0 && bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
             console.log(`[EDIT DEBUG] *** CAPACITY BLOCKED - BATH: ${bathDogs + requestedBaths} > ${weeklyLimit.maxBathAppointments} ***`);
             return res.status(400).json({
               message: `Cannot update: Bath grooming capacity would be exceeded for this date (limit: ${weeklyLimit.maxBathAppointments} dogs, ${bathDogs} already booked by other appointments). Please select a different date or reduce the number of bath services.`
             });
           }
           
-          if (groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
+          if (requestedGrooms > 0 && groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
             console.log(`[EDIT DEBUG] *** CAPACITY BLOCKED - GROOM: ${groomDogs + requestedGrooms} > ${weeklyLimit.maxGroomAppointments} ***`);
             return res.status(400).json({
               message: `Cannot update: Full grooming capacity would be exceeded for this date (limit: ${weeklyLimit.maxGroomAppointments} dogs, ${groomDogs} already booked by other appointments). Please select a different date or reduce the number of full groom services.`
@@ -5242,13 +5244,14 @@ West Monroe LA 71291
             }
             
             // HARD LIMIT: Cannot confirm if it would exceed capacity
-            if (bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
+            // Bath and full groom are separate, independent capacities - only check the one(s) actually being requested
+            if (requestedBaths > 0 && bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
               return res.status(400).json({
                 message: `Cannot confirm: Bath grooming capacity is full for this date (limit: ${weeklyLimit.maxBathAppointments} dogs, ${bathDogs} already booked). Please reject this appointment or move it to a different date.`
               });
             }
             
-            if (groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
+            if (requestedGrooms > 0 && groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
               return res.status(400).json({
                 message: `Cannot confirm: Full grooming capacity is full for this date (limit: ${weeklyLimit.maxGroomAppointments} dogs, ${groomDogs} already booked). Please reject this appointment or move it to a different date.`
               });
@@ -5933,13 +5936,14 @@ West Monroe LA 71291
           
           // HARD LIMIT: Cannot be bypassed by anyone, including admins
           // This ensures grooming capacity is never exceeded
-          if (bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
+          // Bath and full groom are separate, independent capacities - only check the one(s) actually being requested
+          if (requestedBaths > 0 && bathDogs + requestedBaths > weeklyLimit.maxBathAppointments) {
             return res.status(400).json({
               message: `Bath grooming capacity is fully booked for this date (limit: ${weeklyLimit.maxBathAppointments} dogs, ${bathDogs} already booked). Please select a different date.`
             });
           }
           
-          if (groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
+          if (requestedGrooms > 0 && groomDogs + requestedGrooms > weeklyLimit.maxGroomAppointments) {
             return res.status(400).json({
               message: `Full grooming capacity is fully booked for this date (limit: ${weeklyLimit.maxGroomAppointments} dogs, ${groomDogs} already booked). Please select a different date.`
             });

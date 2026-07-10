@@ -3723,7 +3723,8 @@ export class DatabaseStorage implements IStorage {
     
     console.log(`[ATOMIC CAPACITY CHECK] Date: ${dateStr}, Current: ${currentGrooms} grooms, ${currentBaths} baths. Requested: ${requestedGrooms} grooms, ${requestedBaths} baths. Limits: ${limit.maxGroomAppointments} grooms, ${limit.maxBathAppointments} baths`);
     
-    if (currentBaths + requestedBaths > limit.maxBathAppointments) {
+    // Bath and full groom are separate, independent capacities - only check the one(s) actually being requested
+    if (requestedBaths > 0 && currentBaths + requestedBaths > limit.maxBathAppointments) {
       return {
         withinCapacity: false,
         bathCount: currentBaths,
@@ -3734,7 +3735,7 @@ export class DatabaseStorage implements IStorage {
       };
     }
     
-    if (currentGrooms + requestedGrooms > limit.maxGroomAppointments) {
+    if (requestedGrooms > 0 && currentGrooms + requestedGrooms > limit.maxGroomAppointments) {
       return {
         withinCapacity: false,
         bathCount: currentBaths,
