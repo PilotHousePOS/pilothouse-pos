@@ -6874,6 +6874,7 @@ export default function Admin() {
   
   // Pagination and search for supplies
   const [supplySearchQuery, setSupplySearchQuery] = useState('');
+  const [supplyCategoryFilter, setSupplyCategoryFilter] = useState('');
   const [suppliesPage, setSuppliesPage] = useState(0);
   const [showAdminScanner, setShowAdminScanner] = useState(false);
   const [scannerAddUpc, setScannerAddUpc] = useState<string | null>(null);
@@ -7075,8 +7076,20 @@ export default function Admin() {
     queryKey: ["/api/supplies", { 
       page: suppliesPage, 
       limit: SUPPLIES_PER_PAGE,
-      search: supplySearchQuery 
+      search: supplySearchQuery,
+      category: supplyCategoryFilter,
     }],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        page: String(suppliesPage),
+        limit: String(SUPPLIES_PER_PAGE),
+        ...(supplySearchQuery ? { search: supplySearchQuery } : {}),
+        ...(supplyCategoryFilter ? { category: supplyCategoryFilter } : {}),
+      });
+      const res = await fetch(`/api/supplies?${params}`, { credentials: 'include' });
+      if (!res.ok) throw new Error("Failed to fetch supplies");
+      return res.json();
+    },
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
   });
   
@@ -10274,9 +10287,9 @@ export default function Admin() {
               </div>
             </CardHeader>
             <CardContent>
-              {/* Search bar */}
-              <div className="mb-4">
-                <div className="relative">
+              {/* Search bar + category filter */}
+              <div className="mb-4 flex flex-col sm:flex-row gap-2">
+                <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
@@ -10314,6 +10327,20 @@ export default function Admin() {
                     </button>
                   </div>
                 </div>
+                <select
+                  value={supplyCategoryFilter}
+                  onChange={(e) => {
+                    setSupplyCategoryFilter(e.target.value);
+                    setSuppliesPage(0);
+                  }}
+                  className="sm:w-56 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand-orange focus:border-brand-orange"
+                  data-testid="select-supply-category-filter"
+                >
+                  <option value="">All Categories</option>
+                  {categoryDefs.map((cat) => (
+                    <option key={cat.key} value={cat.key}>{cat.label}</option>
+                  ))}
+                </select>
               </div>
               {showAdminScanner && (
                 <BarcodeScanner
