@@ -551,6 +551,29 @@ async function runAppMigrations() {
       created_at TIMESTAMP DEFAULT NOW(),
       updated_at TIMESTAMP DEFAULT NOW()
     )`);
+    // One-time price sync from POS export (07/10/2026)
+    await migPool.query(`CREATE TABLE IF NOT EXISTS data_migrations (key VARCHAR(100) PRIMARY KEY, applied_at TIMESTAMP DEFAULT NOW())`);
+    const { rows: alreadyRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'price_sync_20260710'`);
+    if (alreadyRan.length === 0) {
+      try {
+        const { readFileSync } = await import('fs');
+        const { join } = await import('path');
+        const priceData: { sku: string; price: number }[] = JSON.parse(readFileSync(join(process.cwd(), 'server/priceMigration20260710.json'), 'utf8'));
+        // Build VALUES list — all values are numeric/alphanumeric from validated XLS data
+        const valuesList = priceData.map(r => `('${r.sku.replace(/'/g, "''")}', ${r.price})`).join(',');
+        await migPool.query(`
+          UPDATE supplies AS s
+          SET price = v.new_price::numeric, updated_at = NOW()
+          FROM (VALUES ${valuesList}) AS v(sku, new_price)
+          WHERE s.sku = v.sku
+        `);
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('price_sync_20260710')`);
+        log(`Price sync migration applied: ${priceData.length} items processed`);
+      } catch (priceErr: any) {
+        console.error('Price sync migration error (non-fatal):', priceErr.message);
+      }
+    }
+
     await migPool.end();
     log('App migrations complete');
   } catch (err: any) {
