@@ -4175,11 +4175,7 @@ function EditAppointmentDialog({
     updated[index] = { ...updated[index], [field]: value };
     
     if (field === 'serviceType' && pricingMode === 'individual') {
-      const priceStr = value === 'grooming-full' 
-        ? (editServicePrices?.fullGrooming || '35') 
-        : (editServicePrices?.bathOnly || '20');
-      const basePrice = priceStr.includes('-') ? priceStr.split('-')[0] : priceStr;
-      updated[index].price = basePrice;
+      updated[index].price = '0';
       setPriceWasEdited(true); // Service type change = intentional price change
     }
     
@@ -4375,8 +4371,6 @@ function EditAppointmentDialog({
                 size="sm"
                 className="text-green-700 border-green-300 hover:bg-green-50"
                 onClick={() => {
-                  const defaultPrice = editServicePrices?.fullGrooming || '35';
-                  const basePrice = defaultPrice.includes('-') ? defaultPrice.split('-')[0] : defaultPrice;
                   setPets([...pets, {
                     id: null,
                     name: '',
@@ -4384,7 +4378,7 @@ function EditAppointmentDialog({
                     serviceType: 'grooming-full',
                     notes: '',
                     groomerId: null,
-                    price: basePrice,
+                    price: '0',
                   }]);
                 }}
                 data-testid="button-add-pet"
