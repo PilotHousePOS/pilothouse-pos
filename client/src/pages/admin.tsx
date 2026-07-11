@@ -12000,7 +12000,7 @@ export default function Admin() {
                                     Online pay pending: ${parseFloat(currentAppointment.finalAmount || currentAppointment.price || '0').toFixed(2)}
                                   </span>
                                 )}
-                                {currentAppointment.groomingCompleted && !currentAppointment.readyForPayment && !currentAppointment.isPaid && (
+                                {currentAppointment.groomingCompleted && !currentAppointment.readyForPayment && (!currentAppointment.isPaid || !currentAppointment.paidOnline) && (
                                   <span className="text-xs text-green-700 font-medium">✓ Done</span>
                                 )}
                               </div>
