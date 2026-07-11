@@ -733,6 +733,27 @@ async function runAppMigrations() {
       }
     }
 
+    // Fix appointments that have grooming_completed=true but ready_for_payment=false due to
+    // the in-store payment auto-clear. Set ready_for_payment=true silently (no SMS) so the
+    // card shows the correct "Clear" state instead of "Mark Ready".
+    const { rows: apptFixRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'appt_ready_fix_20260711'`);
+    if (!apptFixRan.length) {
+      try {
+        const result = await migPool.query(`
+          UPDATE appointments
+          SET ready_for_payment = true, updated_at = NOW()
+          WHERE grooming_completed = true
+            AND is_paid = true
+            AND paid_online = false
+            AND ready_for_payment = false
+        `);
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('appt_ready_fix_20260711')`);
+        log(`Appointment ready fix applied: ${result.rowCount} appointments corrected`);
+      } catch (apptFixErr: any) {
+        console.error('Appointment ready fix migration error (non-fatal):', apptFixErr.message);
+      }
+    }
+
     await migPool.end();
     log('App migrations complete');
   } catch (err: any) {
