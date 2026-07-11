@@ -4097,7 +4097,7 @@ function EditAppointmentDialog({
         serviceType: appointmentData.serviceType || 'grooming-full',
         notes: appointmentData.specialNotes || '',
         groomerId: appointmentData.groomerId || null,
-        price: appointmentData.price ? parseFloat(appointmentData.price).toString() : '35',
+        price: appointmentData.price ? parseFloat(appointmentData.price).toString() : '0',
       }]);
     }
     
@@ -15538,7 +15538,7 @@ export default function Admin() {
                   <span className="font-semibold">Total Price:</span>
                   <span className="text-xl font-bold">
                     ${bookingPets.reduce((sum, pet) => {
-                      const prices: any = { 'grooming-full': 35, 'grooming-bath': 20 };
+                      const prices: any = { 'grooming-full': 0, 'grooming-bath': 0 };
                       return sum + (prices[pet.serviceType] || 0);
                     }, 0)}
                   </span>
