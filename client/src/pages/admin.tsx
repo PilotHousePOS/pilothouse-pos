@@ -4011,6 +4011,7 @@ function EditAppointmentDialog({
   const [pets, setPets] = useState<any[]>([]);
   const [pricingMode, setPricingMode] = useState<'individual' | 'override'>('individual');
   const [totalPriceOverride, setTotalPriceOverride] = useState('');
+  const [priceWasEdited, setPriceWasEdited] = useState(false);
   
   // State for capacity error dialog
   const [showCapacityDialog, setShowCapacityDialog] = useState(false);
@@ -4107,6 +4108,9 @@ function EditAppointmentDialog({
       setTotalPriceOverride(parseFloat(appointmentData.price).toString());
     }
     
+    // Reset price-edited flag — data just loaded, user hasn't touched price yet
+    setPriceWasEdited(false);
+    
     // Mark this appointment as initialized
     initializedAppointmentId.current = appointmentId;
   }, [appointmentData, appointmentId]);
@@ -4176,6 +4180,11 @@ function EditAppointmentDialog({
         : (editServicePrices?.bathOnly || '20');
       const basePrice = priceStr.includes('-') ? priceStr.split('-')[0] : priceStr;
       updated[index].price = basePrice;
+      setPriceWasEdited(true); // Service type change = intentional price change
+    }
+    
+    if (field === 'price') {
+      setPriceWasEdited(true); // Direct price edit
     }
     
     setPets(updated);
@@ -4199,11 +4208,14 @@ function EditAppointmentDialog({
         })),
       };
       
-      // Set total price based on mode
-      if (pricingMode === 'override') {
-        updates.price = totalPriceOverride;
-      } else {
-        updates.price = calculatedTotal.toString();
+      // Only send price if the user actually changed it — prevents auto-populated
+      // price from overwriting a custom price just because a note was added/edited
+      if (priceWasEdited) {
+        if (pricingMode === 'override') {
+          updates.price = totalPriceOverride;
+        } else {
+          updates.price = calculatedTotal.toString();
+        }
       }
       
       // Format date if changed
@@ -4550,7 +4562,7 @@ function EditAppointmentDialog({
                   step="0.01"
                   min="0"
                   value={totalPriceOverride}
-                  onChange={(e) => setTotalPriceOverride(e.target.value)}
+                  onChange={(e) => { setTotalPriceOverride(e.target.value); setPriceWasEdited(true); }}
                   placeholder="0.00"
                   data-testid="input-total-override"
                   className="max-w-xs"
