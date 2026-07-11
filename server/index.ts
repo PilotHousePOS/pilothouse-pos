@@ -643,6 +643,18 @@ async function runAppMigrations() {
       }
     }
 
+    // One-time fix: appointments saved with old hardcoded default price of 35 — reset to 0
+    const { rows: apptPriceFixRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'appt_price_fix_20260711'`);
+    if (apptPriceFixRan.length === 0) {
+      try {
+        await migPool.query(`UPDATE appointments SET price = 0 WHERE price = 35`);
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('appt_price_fix_20260711')`);
+        log('Appointment price fix migration applied');
+      } catch (apptPriceFixErr: any) {
+        console.error('Appointment price fix migration error (non-fatal):', apptPriceFixErr.message);
+      }
+    }
+
     // One-time fix: batch A category display names were set to filter_type values instead of display names
     const { rows: catFixRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'category_fix_20260711a'`);
     if (catFixRan.length === 0) {
