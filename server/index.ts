@@ -587,8 +587,8 @@ async function runAppMigrations() {
           const esc = (s: string) => s ? String(s).replace(/'/g, "''") : '';
           await migPool.query(`
             INSERT INTO supplies (name, category, brand, price, description, stock_quantity, size, sku, upc, is_active, filter_type)
-            SELECT $1,$2,$3,$4,$5,$6,$7,$8,$9,true,$10
-            WHERE NOT EXISTS (SELECT 1 FROM supplies WHERE sku = $8)
+            SELECT $1,$2,$3,$4,$5,$6,$7,$8::text,$9,true,$10
+            WHERE NOT EXISTS (SELECT 1 FROM supplies WHERE sku = $8::text)
           `, [r.name, r.category, r.brand, r.price, r.description, r.stock_quantity,
               r.size || null, r.sku || null, r.upc || null, r.filter_type]);
         }
