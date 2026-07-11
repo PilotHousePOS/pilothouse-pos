@@ -643,6 +643,50 @@ async function runAppMigrations() {
       }
     }
 
+    // One-time price sync from POS export (07/11/2026 batch C — Aquatics)
+    const { rows: priceCRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'price_sync_20260711c'`);
+    if (priceCRan.length === 0) {
+      try {
+        const { readFileSync: readFileSyncD } = await import('fs');
+        const { join: joinD } = await import('path');
+        const priceDataC: { sku: string; price: number }[] = JSON.parse(readFileSyncD(joinD(process.cwd(), 'server/priceMigration20260711c.json'), 'utf8'));
+        const valuesList = priceDataC.map(r => `('${r.sku.replace(/'/g, "''")}', ${r.price})`).join(',');
+        await migPool.query(`
+          UPDATE supplies AS s
+          SET price = v.new_price::numeric, updated_at = NOW()
+          FROM (VALUES ${valuesList}) AS v(sku, new_price)
+          WHERE s.sku = v.sku
+        `);
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('price_sync_20260711c')`);
+        log(`Price sync C migration applied: ${priceDataC.length} items processed`);
+      } catch (priceCErr: any) {
+        console.error('Price sync C migration error (non-fatal):', priceCErr.message);
+      }
+    }
+
+    // One-time supply insert from POS export (07/11/2026 batch C — Aquatics) — 333 missing items
+    const { rows: insertCRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'supply_insert_20260711c'`);
+    if (insertCRan.length === 0) {
+      try {
+        const { readFileSync: readFileSyncE } = await import('fs');
+        const { join: joinE } = await import('path');
+        const supplyDataC: any[] = JSON.parse(readFileSyncE(joinE(process.cwd(), 'server/supplyInsertMigration20260711c.json'), 'utf8'));
+        await migPool.query(`SELECT setval('supplies_id_seq', (SELECT MAX(id) FROM supplies))`);
+        for (const r of supplyDataC) {
+          await migPool.query(`
+            INSERT INTO supplies (name, category, brand, price, description, stock_quantity, size, sku, upc, is_active, filter_type, color, style)
+            SELECT $1,$2,$3,$4,$5,$6,$7,$8::text,$9,true,$10,$11,$12
+            WHERE NOT EXISTS (SELECT 1 FROM supplies WHERE sku = $8::text)
+          `, [r.name, r.category, r.brand, r.price, r.description, r.stock_quantity,
+              r.size || null, r.sku || null, r.upc || null, r.filter_type, r.color || null, r.style || null]);
+        }
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('supply_insert_20260711c')`);
+        log(`Supply insert C migration applied: ${supplyDataC.length} items processed`);
+      } catch (insertCErr: any) {
+        console.error('Supply insert C migration error (non-fatal):', insertCErr.message);
+      }
+    }
+
     await migPool.end();
     log('App migrations complete');
   } catch (err: any) {
