@@ -574,6 +574,31 @@ async function runAppMigrations() {
       }
     }
 
+    // One-time supply insert from POS export (07/11/2026) — 132 missing items
+    const { rows: insertRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'supply_insert_20260711'`);
+    if (insertRan.length === 0) {
+      try {
+        const { readFileSync } = await import('fs');
+        const { join } = await import('path');
+        const supplyData: any[] = JSON.parse(readFileSync(join(process.cwd(), 'server/supplyInsertMigration20260711.json'), 'utf8'));
+        // First sync the sequence to avoid PK conflicts
+        await migPool.query(`SELECT setval('supplies_id_seq', (SELECT MAX(id) FROM supplies))`);
+        for (const r of supplyData) {
+          const esc = (s: string) => s ? String(s).replace(/'/g, "''") : '';
+          await migPool.query(`
+            INSERT INTO supplies (name, category, brand, price, description, stock_quantity, size, sku, upc, is_active, filter_type)
+            SELECT $1,$2,$3,$4,$5,$6,$7,$8,$9,true,$10
+            WHERE NOT EXISTS (SELECT 1 FROM supplies WHERE sku = $8)
+          `, [r.name, r.category, r.brand, r.price, r.description, r.stock_quantity,
+              r.size || null, r.sku || null, r.upc || null, r.filter_type]);
+        }
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('supply_insert_20260711')`);
+        log(`Supply insert migration applied: ${supplyData.length} items processed`);
+      } catch (insertErr: any) {
+        console.error('Supply insert migration error (non-fatal):', insertErr.message);
+      }
+    }
+
     await migPool.end();
     log('App migrations complete');
   } catch (err: any) {
