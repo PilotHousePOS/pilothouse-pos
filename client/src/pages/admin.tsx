@@ -12004,7 +12004,7 @@ export default function Admin() {
                                   <span className="text-xs text-green-700 font-medium">✓ Done</span>
                                 )}
                               </div>
-                              {!currentAppointment.isPaid && currentAppointment.price && (
+                              {(!currentAppointment.isPaid || !currentAppointment.paidOnline) && currentAppointment.price && (
                                 <Button
                                   size="sm"
                                   variant="outline"
@@ -12018,7 +12018,7 @@ export default function Admin() {
                                       markReadyForPaymentMutation.mutate({ id: currentAppointment.id, finalAmount: amt, readyForPayment: false });
                                       updateAppointmentGroomingCompletedMutation.mutate({ id: currentAppointment.id, groomingCompleted: false });
                                     } else {
-                                      // Mark Ready: mark grooming done + send online payment link
+                                      // Mark Ready: mark grooming done
                                       updateAppointmentGroomingCompletedMutation.mutate({ id: currentAppointment.id, groomingCompleted: true });
                                       markReadyForPaymentMutation.mutate({ id: currentAppointment.id, finalAmount: amt, readyForPayment: true });
                                     }
