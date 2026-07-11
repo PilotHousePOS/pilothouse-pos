@@ -666,6 +666,29 @@ async function runAppMigrations() {
       }
     }
 
+    // One-time fix: batch C aquatics items had filter_type='fish' and undifferentiated category
+    const { rows: aquaticFixRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'aquatic_category_fix_20260711'`);
+    if (aquaticFixRan.length === 0) {
+      try {
+        const foodSkus = ['042055335515','042055222150','015561165754','042055310901','698220011717','042055319201','698220700192','000945880286','042055305204','000945880842','042055044110','042055043113','698220833319','046798164821','046798783015','036274008626','036274008510','036274008527','036274008534','046798165071','000945880859','046798164562','036274008619','698220834316','042055301701'];
+        const skuList = foodSkus.map(s => `'${s}'`).join(',');
+        // Fix food items: category=FishFood, filter_type=aquatic
+        await migPool.query(`
+          UPDATE supplies SET category = 'FishFood', filter_type = 'aquatic'
+          WHERE sku IN (${skuList})
+        `);
+        // Fix supply items: category=aquatics, filter_type=aquatic (all batch C non-food)
+        await migPool.query(`
+          UPDATE supplies SET category = 'aquatics', filter_type = 'aquatic'
+          WHERE filter_type = 'fish' AND sku NOT IN (${skuList})
+        `);
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('aquatic_category_fix_20260711')`);
+        log('Aquatic category fix migration applied');
+      } catch (aquaticFixErr: any) {
+        console.error('Aquatic category fix migration error (non-fatal):', aquaticFixErr.message);
+      }
+    }
+
     // One-time price sync from POS export (07/11/2026 batch C — Aquatics)
     const { rows: priceCRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'price_sync_20260711c'`);
     if (priceCRan.length === 0) {
