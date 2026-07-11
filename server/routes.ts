@@ -5547,6 +5547,10 @@ West Monroe LA 71291
         return res.status(400).json({ message: "groomingCompleted must be a boolean" });
       }
 
+      // Capture state BEFORE update so we only send SMS on true→false→true transition (first time only)
+      const existingAppointment = await storage.getAppointment(id);
+      const wasAlreadyCompleted = existingAppointment?.groomingCompleted === true;
+
       const appointment = await storage.updateAppointmentGroomingCompleted(id, groomingCompleted);
       if (!appointment) {
         return res.status(404).json({ message: "Appointment not found" });
@@ -5579,8 +5583,10 @@ West Monroe LA 71291
         }).catch(err => console.error('Failed to auto-create contact on grooming completion:', err));
       }
 
-      // Send SMS notification when grooming is marked as completed
-      if (groomingCompleted && appointment.ownerPhoneNumber) {
+      // Send SMS notification when grooming is marked as completed for the FIRST time only.
+      // wasAlreadyCompleted guards against re-sending if someone clears and re-marks ready
+      // on an appointment that was already done (e.g. paid in-store then "Mark Ready" tapped again).
+      if (groomingCompleted && !wasAlreadyCompleted && appointment.ownerPhoneNumber) {
         try {
           // Use custom message if provided, otherwise use default
           const smsMessage = customMessage || "Your Fur Baby is ready for pick-up, unless you've already spoken to a groomer, please give us a call to let us know you're on your way. The Animal House 318-323-6090. Reply STOP to opt out.";
