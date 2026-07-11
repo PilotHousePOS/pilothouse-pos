@@ -643,6 +643,29 @@ async function runAppMigrations() {
       }
     }
 
+    // One-time fix: batch A category display names were set to filter_type values instead of display names
+    const { rows: catFixRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'category_fix_20260711a'`);
+    if (catFixRan.length === 0) {
+      try {
+        await migPool.query(`
+          UPDATE supplies SET category = 'Dog Food'   WHERE category = 'dogFood';
+          UPDATE supplies SET category = 'Dog Treats' WHERE category = 'dogTreats';
+          UPDATE supplies SET category = 'Cat Food'   WHERE category = 'catFood';
+          UPDATE supplies SET category = 'Cat Treats' WHERE category = 'catTreats';
+          UPDATE supplies SET category = 'Dog Supplies' WHERE category = 'dogSupplies';
+          UPDATE supplies SET category = 'Cat Supplies' WHERE category = 'catSupplies';
+          UPDATE supplies SET category = 'Fish'       WHERE category = 'fish';
+          UPDATE supplies SET category = 'Bird'       WHERE category = 'bird';
+          UPDATE supplies SET category = 'Small Animal' WHERE category = 'smallAnimal';
+          UPDATE supplies SET category = 'Reptile'    WHERE category = 'reptile';
+        `);
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('category_fix_20260711a')`);
+        log('Category display name fix migration applied');
+      } catch (catFixErr: any) {
+        console.error('Category fix migration error (non-fatal):', catFixErr.message);
+      }
+    }
+
     // One-time price sync from POS export (07/11/2026 batch C — Aquatics)
     const { rows: priceCRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'price_sync_20260711c'`);
     if (priceCRan.length === 0) {
