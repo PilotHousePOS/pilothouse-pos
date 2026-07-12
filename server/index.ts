@@ -896,6 +896,26 @@ async function runAppMigrations() {
       }
     }
 
+    // Move Greenies Pill Pockets out of healthcare → correct treat category
+    const pillPocketCheck = await migPool.query(`SELECT key FROM data_migrations WHERE key='pill_pocket_fix_20260712'`);
+    if (pillPocketCheck.rowCount === 0) {
+      try {
+        const pp1 = await migPool.query(`
+          UPDATE supplies SET category='catTreats', updated_at=NOW()
+          WHERE category='healthcare' AND LOWER(name) LIKE '%pill pocket%'
+          AND (LOWER(name) LIKE '%feline%' OR LOWER(name) LIKE '%cat%')
+        `);
+        const pp2 = await migPool.query(`
+          UPDATE supplies SET category='dogTreats', updated_at=NOW()
+          WHERE category='healthcare' AND LOWER(name) LIKE '%pill pocket%'
+        `);
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('pill_pocket_fix_20260712')`);
+        log(`Pill Pocket fix: moved ${pp1.rowCount} cat + ${pp2.rowCount} dog pill pockets from healthcare → treats`);
+      } catch (ppErr: any) {
+        console.error('Pill Pocket fix migration error (non-fatal):', ppErr.message);
+      }
+    }
+
     // Move training/wee-wee pads out of beds → accessories
     const bedsPadCheck = await migPool.query(`SELECT key FROM data_migrations WHERE key='beds_pad_fix_20260712'`);
     if (bedsPadCheck.rowCount === 0) {
