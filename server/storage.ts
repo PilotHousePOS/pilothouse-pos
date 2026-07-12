@@ -873,7 +873,7 @@ export class DatabaseStorage implements IStorage {
     const effectiveSmallAnimalProductType = (category === 'petFood' && petFoodAnimalType === 'smallAnimal')
       ? 'small-animal-food'
       : (category === 'treats' && treatAnimalType === 'smallAnimal')
-        ? 'small-animal-supplies' // will be overridden by treat-specific keyword filtering below
+        ? 'small-animal-treats'
         : smallAnimalProductType;
 
     // Build WHERE conditions based on filters
@@ -921,7 +921,8 @@ export class DatabaseStorage implements IStorage {
         } else if (treatAnimalType === 'cat') {
           whereConditions.push(eq(supplies.category, 'catTreats'));
         } else if (treatAnimalType === 'smallAnimal') {
-          whereConditions.push(eq(supplies.category, 'smallAnimalTreats'));
+          // Small animal treats live in the 'smallanimal' category; keyword filtering narrows to treats
+          whereConditions.push(eq(supplies.category, 'smallanimal'));
         } else {
           // No animal type filter - show all treats (dog, cat, and small animal)
           whereConditions.push(or(
@@ -1155,6 +1156,11 @@ export class DatabaseStorage implements IStorage {
         include: ['cage', 'habitat', 'bedding', 'litter', 'wheel', 'ball', 'toy', 'bottle', 'feeder', 'waterer', 'hideout', 'tunnel', 'tube', 'house', 'igloo', 'hammock', 'nest', 'carrier', 'harness', 'leash', 'brush', 'nail clipper'],
         exclude: ['food', 'hay', 'pellet', 'diet', 'timothy', 'treat'],
         brands: ['kaytee', 'ware', 'oxbow', 'living world', 'prevue', 'midwest', 'super pet', 'small pet select']
+      },
+      'small-animal-treats': {
+        include: ['treat', 'yogurt', 'yogie', 'crunch', 'drop', 'nibble', 'snack', 'cookie', 'reward', 'chew', 'berry', 'fruit', 'veggie', 'vita', 'smakers', 'smak', 'stick', 'biteable', 'lovelies'],
+        exclude: ['cage', 'habitat', 'bedding', 'litter', 'wheel', 'bottle', 'waterer', 'hideout', 'tunnel', 'tube', 'house', 'igloo', 'hammock', 'nest', 'carrier', 'harness', 'leash', 'brush', 'nail clipper', 'hay', 'pellet', 'diet', 'food', 'wood pellet'],
+        brands: ['vitakraft', 'kaytee', 'oxbow', 'a & e', 'a&e', 'lafeber']
       }
     };
 
