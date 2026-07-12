@@ -818,8 +818,9 @@ async function runAppMigrations() {
         // Inaba Dashi Delights Cat Treats is a treat, not can food
         const c11 = await migPool.query(`UPDATE supplies SET category='Cat Treats', updated_at=NOW() WHERE id=9532`);
         // --- Confirmed misplacements found in aquatics scan ---
-        // Marshall & Sandcastle: description says "Marshall ferret products" → smallanimal
-        const c12 = await migPool.query(`UPDATE supplies SET category='smallanimal', updated_at=NOW() WHERE id=5330`);
+        // "Medium Marshall & Sandcastle" is actually Bird Life™ 5-Step Ladder (UPC 030172902109)
+        // Wrong name, wrong description, wrong category — fix all three
+        const c12 = await migPool.query(`UPDATE supplies SET category='birdSupplies', name='Bird Life™ 5-Step Ladder', description='Bird Life™ 5-Step Ladder Bird Accessory', updated_at=NOW() WHERE id=5330`);
         // Dogo's Ice Cream Pumpkin: Dog-O's is a dog treat brand, description confirms it's a treat
         const c13 = await migPool.query(`UPDATE supplies SET category='Dog Treats', updated_at=NOW() WHERE id=6938`);
         // Fluker's Pothos Repta-Vines: description says "perfect addition to any terrarium" → reptiles
