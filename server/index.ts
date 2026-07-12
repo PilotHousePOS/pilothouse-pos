@@ -790,6 +790,41 @@ async function runAppMigrations() {
       }
     }
 
+    // Fix miscategorized items: treats/Treats → Dog Treats/Cat Treats, food → Dog Food/Dog Treats, etc.
+    const { rows: catFixRan2 } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'category_name_fix_20260712'`);
+    if (!catFixRan2.length) {
+      try {
+        // --- Specific items that are NOT dog treats despite being in treats/Treats ---
+        // Cat treats (Inaba Churu, Greenies Feline, Icelandic for Cats, Loving Pets Cat, Tiki Cat)
+        const c1 = await migPool.query(`UPDATE supplies SET category='Cat Treats', updated_at=NOW() WHERE id IN (7772,7680,7677,7773,7678,7679,7681,7683,9666,9519,7816,7817,9668,9521)`);
+        // KONG dog toys accidentally in treats
+        const c2 = await migPool.query(`UPDATE supplies SET category='toys', updated_at=NOW() WHERE id IN (9581,9585)`);
+        // Dog bowl in treats (Penn-Plax/Loving Pets Classic Dog Bowl)
+        const c3 = await migPool.query(`UPDATE supplies SET category='accessories', updated_at=NOW() WHERE id=9650`);
+        // Guinea pig treat in treats (Tiny Friends Farm)
+        const c4 = await migPool.query(`UPDATE supplies SET category='smallanimal', updated_at=NOW() WHERE id=9676`);
+        // --- Bulk move all remaining treats/Treats → Dog Treats ---
+        const c5 = await migPool.query(`UPDATE supplies SET category='Dog Treats', updated_at=NOW() WHERE category IN ('treats','Treats')`);
+        // --- food category: sort into Dog Food vs Dog Treats ---
+        const c6 = await migPool.query(`UPDATE supplies SET category='Dog Food', updated_at=NOW() WHERE id IN (7761,7762,9208)`); // Eukanuba, Orijen
+        const c7 = await migPool.query(`UPDATE supplies SET category='Dog Treats', updated_at=NOW() WHERE id IN (7396,7393)`);    // Dogswell jerky, Nylabone edibles
+        // --- leashes → leashesAndCollars ---
+        const c8 = await migPool.query(`UPDATE supplies SET category='leashesAndCollars', updated_at=NOW() WHERE category='leashes'`);
+        // --- ReptileFood → reptiles ---
+        const c9 = await migPool.query(`UPDATE supplies SET category='reptiles', updated_at=NOW() WHERE category='ReptileFood'`);
+        // --- Cross-species fixes inside DogFoodCan/CatFoodCan ---
+        // Catit Kitten Chicken Entrée 3oz is cat food, not dog
+        const c10 = await migPool.query(`UPDATE supplies SET category='CatFoodCan', updated_at=NOW() WHERE id=9215`);
+        // Inaba Dashi Delights Cat Treats is a treat, not can food
+        const c11 = await migPool.query(`UPDATE supplies SET category='Cat Treats', updated_at=NOW() WHERE id=9532`);
+
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('category_name_fix_20260712')`);
+        log(`Category name fix: CatTreats=${c1.rowCount}, ToysFromTreats=${c2.rowCount}, AccessoriesFromTreats=${c3.rowCount}, SmallAnimalFromTreats=${c4.rowCount}, DogTreats(bulk)=${c5.rowCount}, DogFood(food)=${c6.rowCount}, DogTreats(food)=${c7.rowCount}, Leashes=${c8.rowCount}, ReptileFood=${c9.rowCount}, CatFoodCanFix=${c10.rowCount}, InabaTreatFix=${c11.rowCount}`);
+      } catch (catFixErr2: any) {
+        console.error('Category name fix migration error (non-fatal):', catFixErr2.message);
+      }
+    }
+
     await migPool.end();
     log('App migrations complete');
   } catch (err: any) {
