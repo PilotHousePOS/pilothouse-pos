@@ -941,6 +941,9 @@ export class DatabaseStorage implements IStorage {
         } else {
           whereConditions.push(eq(supplies.category, 'accessories'));
         }
+      } else if (category === 'toys' && toyType === 'small-animal-toys') {
+        // Small animal toys live in the 'smallanimal' category, not 'toys'
+        whereConditions.push(eq(supplies.category, 'smallanimal'));
       } else {
         // Standard category filter
         whereConditions.push(eq(supplies.category, category));
@@ -1030,11 +1033,10 @@ export class DatabaseStorage implements IStorage {
         brands: []
       },
       'small-animal-toys': {
-        // 'rabbit' and 'bunny' removed — too ambiguous (matches dog plush toys shaped like bunnies)
-        // Small animal rabbit toys still matched via brand names (kaytee, oxbow) or 'small animal' keyword
-        include: ['guinea pig', 'hamster', 'ferret', 'gerbil', 'chinchilla', 'small animal', 'kaytee', 'oxbow', 'living world', 'vitakraft', 'runabout', 'run-about', 'chewbular', 'comfort wheel', 'hamsteroids', 'crinkle tunnel', 'flex tunnel', 'combo toy', 'hay ball', 'exercise wheel', 'snak shak', 'chew toy', 'small pet'],
-        exclude: ['dog', 'puppy', 'cat', 'kitten', 'bird seed', 'bird food', 'airdog', 'kong', 'zippy paws', 'petstages', 'nylabone', 'multipet', 'spot', 'li\'l pals'],
-        brands: ['kaytee', 'oxbow', 'living world', 'vitakraft', 'super pet', 'ware']
+        // Queries smallanimal category (not toys) — so these keywords narrow to toy-type items within smallanimal
+        include: ['toy', 'wheel', 'ball', 'tunnel', 'chew', 'nibble', 'run-about', 'runabout', 'chewbular', 'combo toy', 'hay ball', 'exercise wheel', 'snak shak', 'small pet', 'small animal', 'roller', 'crinkle', 'flex', 'hamsteroids', 'comfort wheel'],
+        exclude: ['food', 'hay', 'pellet', 'diet', 'treat', 'bedding', 'litter', 'shampoo', 'harness', 'leash', 'carrier', 'cage', 'habitat', 'feeder', 'waterer', 'water bottle', 'bowl', 'dish'],
+        brands: ['kaytee', 'oxbow', 'living world', 'vitakraft', 'super pet', 'ware', 'a & e', 'a&e', 'benebone', 'coastal']
       }
     };
 
