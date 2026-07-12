@@ -337,22 +337,25 @@ export default function Supplies() {
   }>({
     queryKey: [
       "/api/supplies",
-      { 
-        page: currentPage, 
-        limit: ITEMS_PER_PAGE,
-        ...(selectedCategory && { category: selectedCategory }),
-        ...(searchQuery && { search: searchQuery }),
-        ...(selectedAnimalType && { animalType: selectedAnimalType }),
-        ...(selectedToyType && { toyType: selectedToyType }),
-        ...(selectedHealthcareType && { healthcareType: selectedHealthcareType }),
-        ...(selectedAquaticType && { aquaticType: selectedAquaticType }),
-        ...(selectedReptileType && { reptileType: selectedReptileType }),
-        ...(selectedBirdType && { birdType: selectedBirdType }),
-        ...(selectedSmallAnimalProductType && { smallAnimalProductType: selectedSmallAnimalProductType }),
-        ...(selectedPetFoodAnimalType && { petFoodAnimalType: selectedPetFoodAnimalType }),
-        ...(selectedTreatAnimalType && { treatAnimalType: selectedTreatAnimalType }),
-        ...(selectedAccessoryType && { accessoryType: selectedAccessoryType })
-      }
+      searchQuery
+        ? // When a search is active, search globally across all categories
+          { page: currentPage, limit: ITEMS_PER_PAGE, search: searchQuery }
+        : // No search — apply all tab/filter constraints normally
+          {
+            page: currentPage,
+            limit: ITEMS_PER_PAGE,
+            ...(selectedCategory && { category: selectedCategory }),
+            ...(selectedAnimalType && { animalType: selectedAnimalType }),
+            ...(selectedToyType && { toyType: selectedToyType }),
+            ...(selectedHealthcareType && { healthcareType: selectedHealthcareType }),
+            ...(selectedAquaticType && { aquaticType: selectedAquaticType }),
+            ...(selectedReptileType && { reptileType: selectedReptileType }),
+            ...(selectedBirdType && { birdType: selectedBirdType }),
+            ...(selectedSmallAnimalProductType && { smallAnimalProductType: selectedSmallAnimalProductType }),
+            ...(selectedPetFoodAnimalType && { petFoodAnimalType: selectedPetFoodAnimalType }),
+            ...(selectedTreatAnimalType && { treatAnimalType: selectedTreatAnimalType }),
+            ...(selectedAccessoryType && { accessoryType: selectedAccessoryType })
+          }
     ],
   });
 
