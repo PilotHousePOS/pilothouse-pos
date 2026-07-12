@@ -23,6 +23,7 @@ function getUrlParams() {
     smallAnimalProductType: params.get('smallAnimalProductType') || '',
     petFoodAnimalType: params.get('petFoodAnimalType') || '',
     treatAnimalType: params.get('treatAnimalType') || '',
+    accessoryType: params.get('accessoryType') || '',
   };
 }
 
@@ -119,6 +120,15 @@ const TREAT_ANIMAL_TYPES = [
   { id: 'smallAnimal', label: 'Small Animal Treats', emoji: '🐹' },
 ];
 
+const ACCESSORY_TYPES = [
+  { id: 'dog-accessories', label: 'Dog', emoji: '🐕' },
+  { id: 'cat-accessories', label: 'Cat', emoji: '🐈' },
+  { id: 'bowls-feeders', label: 'Bowls & Feeders', emoji: '🥣' },
+  { id: 'clothing-apparel', label: 'Clothing', emoji: '👕' },
+  { id: 'dog-cages', label: 'Dog Cages', emoji: '🏠' },
+  { id: 'cat-cages', label: 'Cat Cages', emoji: '🏠' },
+];
+
 export default function Supplies() {
   const [location, setLocation] = useLocation();
   const urlParams = getUrlParams();
@@ -138,6 +148,7 @@ export default function Supplies() {
   const [selectedSmallAnimalProductType, setSelectedSmallAnimalProductType] = useState(urlParams.smallAnimalProductType);
   const [selectedPetFoodAnimalType, setSelectedPetFoodAnimalType] = useState(urlParams.petFoodAnimalType);
   const [selectedTreatAnimalType, setSelectedTreatAnimalType] = useState(urlParams.treatAnimalType);
+  const [selectedAccessoryType, setSelectedAccessoryType] = useState(urlParams.accessoryType);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(urlParams.page);
   const [showScanner, setShowScanner] = useState(false);
@@ -160,6 +171,7 @@ export default function Supplies() {
       setSelectedSmallAnimalProductType(params.smallAnimalProductType);
       setSelectedPetFoodAnimalType(params.petFoodAnimalType);
       setSelectedTreatAnimalType(params.treatAnimalType);
+      setSelectedAccessoryType(params.accessoryType);
       setCurrentPage(params.page);
     };
     
@@ -246,7 +258,8 @@ export default function Supplies() {
       birdType: '',
       smallAnimalProductType: '',
       petFoodAnimalType: '',
-      treatAnimalType: ''
+      treatAnimalType: '',
+      accessoryType: ''
     });
     setCurrentPage(0);
     // Clear animal type when not in small animal category
@@ -282,6 +295,10 @@ export default function Supplies() {
     if (selectedCategory !== 'treats') {
       setSelectedTreatAnimalType('');
     }
+    // Clear accessory type when not in accessories category
+    if (selectedCategory !== 'accessories') {
+      setSelectedAccessoryType('');
+    }
   }, [selectedCategory, updateUrl]);
 
   // Track if subfilter effect has run once (to skip page reset on initial mount)
@@ -305,10 +322,11 @@ export default function Supplies() {
       smallAnimalProductType: selectedSmallAnimalProductType,
       petFoodAnimalType: selectedPetFoodAnimalType,
       treatAnimalType: selectedTreatAnimalType,
+      accessoryType: selectedAccessoryType,
       page: 0
     });
     setCurrentPage(0);
-  }, [selectedAnimalType, selectedToyType, selectedHealthcareType, selectedAquaticType, selectedReptileType, selectedBirdType, selectedSmallAnimalProductType, selectedPetFoodAnimalType, selectedTreatAnimalType, updateUrl]);
+  }, [selectedAnimalType, selectedToyType, selectedHealthcareType, selectedAquaticType, selectedReptileType, selectedBirdType, selectedSmallAnimalProductType, selectedPetFoodAnimalType, selectedTreatAnimalType, selectedAccessoryType, updateUrl]);
 
   const { data, isLoading } = useQuery<{
     items: any[];
@@ -332,7 +350,8 @@ export default function Supplies() {
         ...(selectedBirdType && { birdType: selectedBirdType }),
         ...(selectedSmallAnimalProductType && { smallAnimalProductType: selectedSmallAnimalProductType }),
         ...(selectedPetFoodAnimalType && { petFoodAnimalType: selectedPetFoodAnimalType }),
-        ...(selectedTreatAnimalType && { treatAnimalType: selectedTreatAnimalType })
+        ...(selectedTreatAnimalType && { treatAnimalType: selectedTreatAnimalType }),
+        ...(selectedAccessoryType && { accessoryType: selectedAccessoryType })
       }
     ],
   });
@@ -661,6 +680,32 @@ export default function Supplies() {
                 <div className="flex flex-col items-center w-full">
                   <div className="text-lg mb-1">{productType.emoji}</div>
                   <div className="text-xs leading-tight">{productType.label}</div>
+                </div>
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Accessory Type Filter (shows only for accessories category) */}
+      {selectedCategory === 'accessories' && (
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Filter by Type:</h3>
+          <div className="grid grid-cols-3 gap-3">
+            {ACCESSORY_TYPES.map((accessory) => (
+              <Button
+                key={accessory.id}
+                variant="outline"
+                size="sm"
+                className={`text-center py-3 h-auto min-h-[70px] flex items-center justify-center ${
+                  selectedAccessoryType === accessory.id ? 'bg-brand-blue text-white border-brand-blue' : 'bg-white'
+                }`}
+                onClick={() => setSelectedAccessoryType(selectedAccessoryType === accessory.id ? '' : accessory.id)}
+                data-testid={`button-filter-${accessory.id}`}
+              >
+                <div className="flex flex-col items-center w-full">
+                  <div className="text-lg mb-1">{accessory.emoji}</div>
+                  <div className="text-xs leading-tight">{accessory.label}</div>
                 </div>
               </Button>
             ))}

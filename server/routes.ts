@@ -2259,7 +2259,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   // Supply routes with pagination
   app.get("/api/supplies", async (req: any, res) => {
     try {
-      const { category, search, page = '0', limit = '24', animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType, petFoodAnimalType, treatAnimalType, filterType: filterTypeParam, ids } = req.query;
+      const { category, search, page = '0', limit = '24', animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType, petFoodAnimalType, treatAnimalType, accessoryType, filterType: filterTypeParam, ids } = req.query;
       
       // Soft-auth: detect admin callers so they can see products without SKUs
       let callerIsAdmin = false;
@@ -2322,7 +2322,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         birdType: birdType as string | undefined,
         smallAnimalProductType: smallAnimalProductType as string | undefined,
         petFoodAnimalType: petFoodAnimalType as string | undefined,
-        treatAnimalType: treatAnimalType as string | undefined
+        treatAnimalType: treatAnimalType as string | undefined,
+        accessoryType: accessoryType as string | undefined
       });
 
       // Return paginated response with metadata

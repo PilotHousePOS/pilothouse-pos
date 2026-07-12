@@ -833,6 +833,69 @@ async function runAppMigrations() {
       }
     }
 
+    // ── Comprehensive category fixes ──────────────────────────────────────────
+    const comprehensiveCheck = await migPool.query(`SELECT key FROM data_migrations WHERE key='comprehensive_category_fix_20260712'`);
+    if (comprehensiveCheck.rowCount === 0) {
+      try {
+        // Add catCages to supply_categories
+        await migPool.query(`INSERT INTO supply_categories (key, label) VALUES ('catCages','Cat Cages') ON CONFLICT (key) DO NOTHING`);
+
+        // Dog Food → other correct categories
+        await migPool.query(`UPDATE supplies SET category='catFood', updated_at=NOW() WHERE id IN (6760,9173,6783)`);
+        await migPool.query(`UPDATE supplies SET category='dogTreats', updated_at=NOW() WHERE id IN (4757,6452,6453,6454)`);
+        await migPool.query(`UPDATE supplies SET category='birdSupplies', updated_at=NOW() WHERE id=1227`);
+
+        // Cat Food → other correct categories
+        await migPool.query(`UPDATE supplies SET category='dogFood', updated_at=NOW() WHERE id IN (9206,6330)`);
+        await migPool.query(`UPDATE supplies SET category='catTreats', updated_at=NOW() WHERE id IN (9833,9832)`);
+
+        // Accessories → other correct categories
+        await migPool.query(`UPDATE supplies SET category='healthcare', updated_at=NOW() WHERE id IN (9385,1454)`);
+        await migPool.query(`UPDATE supplies SET category='catTreats', updated_at=NOW() WHERE id=6828`);
+        await migPool.query(`UPDATE supplies SET category='reptiles', updated_at=NOW() WHERE id IN (9684,9686)`);
+
+        // Healthcare → other correct categories
+        await migPool.query(`UPDATE supplies SET category='birdSupplies', updated_at=NOW() WHERE id IN (946,950)`);
+        await migPool.query(`UPDATE supplies SET category='dogFood', updated_at=NOW() WHERE id=7551`);
+        await migPool.query(`UPDATE supplies SET category='healthcare', updated_at=NOW() WHERE id=7422`);
+
+        // smallanimal → other correct categories
+        await migPool.query(`UPDATE supplies SET category='catFood', updated_at=NOW() WHERE id=4177`);
+        await migPool.query(`UPDATE supplies SET category='toys', updated_at=NOW() WHERE id=2816`);
+
+        // dogCages: Catit cat carriers → catCages, Prevue bird carrier → accessories
+        await migPool.query(`UPDATE supplies SET category='catCages', updated_at=NOW() WHERE id IN (6029,6030,6031,6032,6033,6034,9252,9253)`);
+        await migPool.query(`UPDATE supplies SET category='accessories', updated_at=NOW() WHERE id=6018`);
+
+        // Blank category → correct categories
+        await migPool.query(`UPDATE supplies SET category='birdSupplies', updated_at=NOW() WHERE id=9632`);
+        await migPool.query(`UPDATE supplies SET category='smallAnimalSupplies', updated_at=NOW() WHERE id IN (9658,9596,9517)`);
+        await migPool.query(`UPDATE supplies SET category='toys', updated_at=NOW() WHERE id IN (9640,9580)`);
+        await migPool.query(`UPDATE supplies SET category='reptiles', updated_at=NOW() WHERE id IN (9460,9464,9462,9474,9475)`);
+        await migPool.query(`UPDATE supplies SET category='healthcare', updated_at=NOW() WHERE id IN (9643,9589,9695)`);
+        await migPool.query(`UPDATE supplies SET category='dogTreats', updated_at=NOW() WHERE id IN (9638,9454,9645)`);
+        await migPool.query(`UPDATE supplies SET category='accessories', updated_at=NOW() WHERE id IN (9444,9452,9574)`);
+        await migPool.query(`UPDATE supplies SET category='aquatics', updated_at=NOW() WHERE id IN (9628,9620,9621,9622)`);
+        await migPool.query(`UPDATE supplies SET category='FishFood', updated_at=NOW() WHERE id=9459`);
+        await migPool.query(`UPDATE supplies SET category='leashesAndCollars', updated_at=NOW() WHERE id=9793`);
+
+        // Housekeeping: merge duplicate-cased categories
+        await migPool.query(`UPDATE supplies SET category='accessories', updated_at=NOW() WHERE id IN (4930,4916,4912,4927,4907,4913,4909,4893)`);
+        await migPool.query(`UPDATE supplies SET category='toys', updated_at=NOW() WHERE id IN (9817,9816,9818,9819)`);
+        await migPool.query(`UPDATE supplies SET category='smallAnimalSupplies', updated_at=NOW() WHERE id=9481`);
+
+        // Pet food key fix: 'Dog Food'/'Cat Food' (display names) → 'dogFood'/'catFood' (API keys)
+        // Storage layer queries dogFood/catFood; without this fix the Pet Food section shows 0 items
+        const pf1 = await migPool.query(`UPDATE supplies SET category='dogFood', updated_at=NOW() WHERE category='Dog Food'`);
+        const pf2 = await migPool.query(`UPDATE supplies SET category='catFood', updated_at=NOW() WHERE category='Cat Food'`);
+
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('comprehensive_category_fix_20260712')`);
+        log(`Comprehensive category fix complete. DogFood renamed=${pf1.rowCount}, CatFood renamed=${pf2.rowCount}`);
+      } catch (compErr: any) {
+        console.error('Comprehensive category fix migration error (non-fatal):', compErr.message);
+      }
+    }
+
     // Move 4 confirmed non-reptile items out of reptiles → aquatics
     const reptileAquaticCheck = await migPool.query(`SELECT key FROM data_migrations WHERE key='reptile_aquatic_fix_20260712'`);
     if (reptileAquaticCheck.rowCount === 0) {

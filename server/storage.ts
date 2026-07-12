@@ -178,6 +178,7 @@ export interface IStorage {
     foodType?: string;
     toyType?: string;
     healthcareType?: string;
+    accessoryType?: string;
   }): Promise<{ items: Supply[]; total: number }>;
   getSupply(id: number): Promise<Supply | undefined>;
   getSuppliesByIds(ids: number[]): Promise<Supply[]>;
@@ -862,8 +863,9 @@ export class DatabaseStorage implements IStorage {
     smallAnimalProductType?: string;
     petFoodAnimalType?: string;
     treatAnimalType?: string;
+    accessoryType?: string;
   }): Promise<{ items: Supply[]; total: number }> {
-    const { limit, offset, category, search, filterType, animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType, petFoodAnimalType, treatAnimalType } = params;
+    const { limit, offset, category, search, filterType, animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType, petFoodAnimalType, treatAnimalType, accessoryType } = params;
 
     // Small animal food/treat products live in the 'smallanimal' category (not 'smallAnimalFood'/'smallAnimalTreats').
     // When petFood → smallAnimal or treats → smallAnimal is requested, redirect to 'smallanimal' category
@@ -927,6 +929,16 @@ export class DatabaseStorage implements IStorage {
             eq(supplies.category, 'catTreats'),
             eq(supplies.category, 'smallAnimalTreats')
           ));
+        }
+      } else if (category === 'accessories') {
+        // Accessories sub-filter: dog-cages/cat-cages redirect to their own DB categories;
+        // all other accessoryType values use keyword filtering on the accessories table
+        if (accessoryType === 'dog-cages') {
+          whereConditions.push(eq(supplies.category, 'dogCages'));
+        } else if (accessoryType === 'cat-cages') {
+          whereConditions.push(eq(supplies.category, 'catCages'));
+        } else {
+          whereConditions.push(eq(supplies.category, 'accessories'));
         }
       } else {
         // Standard category filter
@@ -1083,6 +1095,30 @@ export class DatabaseStorage implements IStorage {
         exclude: ['food', 'diet', 'feeder', 'cricket', 'mealworm', 'calcium', 'vitamin'],
         brands: ['zoo med', 'exo terra', 'zilla', 'fluker', 'repti', 'arcadia', 'zoo med']
       }
+    };
+
+    // Define accessory type keywords for filtering
+    const accessoryKeywords: Record<string, { include: string[], exclude: string[], brands?: string[] }> = {
+      'dog-accessories': {
+        include: ['dog', 'puppy', 'canine', 'wee-wee', 'pee pad', 'tie out', 'tether', 'muzzle', 'pooper', 'poo bag', 'waste bag', 'dog bell', 'dog boot', 'paw'],
+        exclude: ['cat', 'kitten', 'feline', 'bird', 'reptile', 'fish', 'hamster', 'ferret'],
+        brands: ['wee-wee', 'simple solution']
+      },
+      'cat-accessories': {
+        include: ['cat', 'kitten', 'feline', 'litter', 'scratch', 'catnip', 'catit', 'catlife'],
+        exclude: ['dog', 'puppy', 'canine', 'bird', 'reptile', 'fish'],
+        brands: ['arm & hammer', 'catit', 'naturally fresh', 'van ness', 'intersand', 'fresh step', 'tidy cats']
+      },
+      'bowls-feeders': {
+        include: ['bowl', 'dish', 'feeder', 'waterer', 'fountain', 'water bottle', 'diner', 'pet dish', 'food bowl', 'water bowl', 'auto feeder'],
+        exclude: ['litter', 'toilet'],
+        brands: ['bellabowl', 'loving pets']
+      },
+      'clothing-apparel': {
+        include: ['sweater', 'hoodie', 'coat', 'shirt', 'dress', 'jacket', 'bandana', 'bandanna', 'pajama', 'costume', 'raincoat', 'vest', 'shawl', 'sweatshirt', 'apparel', 'clothing', 'harness coat', 'harness hoodie'],
+        exclude: [],
+        brands: ['fashion pet']
+      },
     };
 
     // Define bird type keywords for filtering
@@ -1242,6 +1278,9 @@ export class DatabaseStorage implements IStorage {
       if (effectiveSmallAnimalProductType) {
         allItems = filterByKeywords(allItems, effectiveSmallAnimalProductType, smallAnimalProductKeywords);
       }
+      if (accessoryType && accessoryType !== 'dog-cages' && accessoryType !== 'cat-cages') {
+        allItems = filterByKeywords(allItems, accessoryType, accessoryKeywords);
+      }
       
       // Then apply fuzzy search filtering with typo tolerance
       // Name is first in array - gets highest priority for sorting
@@ -1294,6 +1333,9 @@ export class DatabaseStorage implements IStorage {
       }
       if (effectiveSmallAnimalProductType) {
         allItems = filterByKeywords(allItems, effectiveSmallAnimalProductType, smallAnimalProductKeywords);
+      }
+      if (accessoryType && accessoryType !== 'dog-cages' && accessoryType !== 'cat-cages') {
+        allItems = filterByKeywords(allItems, accessoryType, accessoryKeywords);
       }
       
       const total = allItems.length;
