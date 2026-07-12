@@ -833,6 +833,20 @@ async function runAppMigrations() {
       }
     }
 
+    // Fix treat category keys: 'Dog Treats' / 'Cat Treats' (display names) → 'dogTreats' / 'catTreats' (API keys)
+    // The previous migration wrote display names; the storage layer queries by camelCase keys.
+    const treatKeyCheck = await migPool.query(`SELECT key FROM data_migrations WHERE key='treat_key_fix_20260712'`);
+    if (treatKeyCheck.rowCount === 0) {
+      try {
+        const t1 = await migPool.query(`UPDATE supplies SET category='dogTreats', updated_at=NOW() WHERE category='Dog Treats'`);
+        const t2 = await migPool.query(`UPDATE supplies SET category='catTreats', updated_at=NOW() WHERE category='Cat Treats'`);
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('treat_key_fix_20260712')`);
+        log(`Treat key fix: DogTreats=${t1.rowCount}, CatTreats=${t2.rowCount}`);
+      } catch (treatKeyErr: any) {
+        console.error('Treat key fix migration error (non-fatal):', treatKeyErr.message);
+      }
+    }
+
     await migPool.end();
     log('App migrations complete');
   } catch (err: any) {
