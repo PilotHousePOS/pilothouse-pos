@@ -833,6 +833,21 @@ async function runAppMigrations() {
       }
     }
 
+    // Move 4 confirmed non-reptile items out of reptiles → aquatics
+    const reptileAquaticCheck = await migPool.query(`SELECT key FROM data_migrations WHERE key='reptile_aquatic_fix_20260712'`);
+    if (reptileAquaticCheck.rowCount === 0) {
+      try {
+        const r1 = await migPool.query(`
+          UPDATE supplies SET category='aquatics', updated_at=NOW()
+          WHERE id IN (9293, 7252, 9363, 5311)
+        `);
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('reptile_aquatic_fix_20260712')`);
+        log(`Reptile→aquatic fix: moved ${r1.rowCount} items (Active Betta Water, Zoo Med Betta Lounge, Marina Filter Cartridge, Swimming Sea Turtle)`);
+      } catch (reptileAquaticErr: any) {
+        console.error('Reptile→aquatic fix migration error (non-fatal):', reptileAquaticErr.message);
+      }
+    }
+
     // Fix treat category keys: 'Dog Treats' / 'Cat Treats' (display names) → 'dogTreats' / 'catTreats' (API keys)
     // The previous migration wrote display names; the storage layer queries by camelCase keys.
     const treatKeyCheck = await migPool.query(`SELECT key FROM data_migrations WHERE key='treat_key_fix_20260712'`);
