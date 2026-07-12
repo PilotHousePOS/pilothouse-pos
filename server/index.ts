@@ -754,6 +754,42 @@ async function runAppMigrations() {
       }
     }
 
+    // Fix filter_type mismatches across all categories from fish batch bleed-over
+    const { rows: filterFixRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'filter_type_fix_20260711'`);
+    if (!filterFixRan.length) {
+      try {
+        // 1. Fish-flavored Dog Food incorrectly tagged aquatic → dogFood
+        const r1 = await migPool.query(`UPDATE supplies SET filter_type = 'dogFood', updated_at = NOW() WHERE category = 'Dog Food' AND filter_type = 'aquatic'`);
+        // 2. Fish-flavored Cat Food incorrectly tagged aquatic → catFood
+        const r2 = await migPool.query(`UPDATE supplies SET filter_type = 'catFood', updated_at = NOW() WHERE category = 'Cat Food' AND filter_type = 'aquatic'`);
+        // 3. Dog Treats with fish themes tagged aquatic → null (matches all other dog treats)
+        const r3 = await migPool.query(`UPDATE supplies SET filter_type = NULL, updated_at = NOW() WHERE category = 'Dog Treats' AND filter_type = 'aquatic'`);
+        // 4. Cat Treats with fish themes tagged aquatic → null
+        const r4 = await migPool.query(`UPDATE supplies SET filter_type = NULL, updated_at = NOW() WHERE category = 'Cat Treats' AND filter_type = 'aquatic'`);
+        // 5. Reptile products (turtles, hermit crabs) tagged aquatic → reptile
+        const r5 = await migPool.query(`UPDATE supplies SET filter_type = 'reptile', updated_at = NOW() WHERE category = 'reptiles' AND filter_type = 'aquatic'`);
+        // 6. Cat/dog toys with fish themes tagged aquatic → null
+        const r6 = await migPool.query(`UPDATE supplies SET filter_type = NULL, updated_at = NOW() WHERE category = 'toys' AND filter_type = 'aquatic'`);
+        // 7. Accessories (cat dishes, bowls) with fish themes tagged aquatic → null
+        const r7 = await migPool.query(`UPDATE supplies SET filter_type = NULL, updated_at = NOW() WHERE category = 'accessories' AND filter_type = 'aquatic'`);
+        // 8. Bird supplies tagged aquatic → null
+        const r8 = await migPool.query(`UPDATE supplies SET filter_type = NULL, updated_at = NOW() WHERE category = 'birdSupplies' AND filter_type = 'aquatic'`);
+        // 9. Leashes/collars tagged aquatic → null
+        const r9 = await migPool.query(`UPDATE supplies SET filter_type = NULL, updated_at = NOW() WHERE category = 'leashesAndCollars' AND filter_type = 'aquatic'`);
+        // 10. Aquatics items mistakenly tagged smallanimal → aquatic
+        const r10 = await migPool.query(`UPDATE supplies SET filter_type = 'aquatic', updated_at = NOW() WHERE category = 'aquatics' AND filter_type = 'smallanimal'`);
+        // 11. Single aquatics item tagged reptile (Fluval Red Lizard Tail Plant is an aquarium plant) → aquatic
+        const r11 = await migPool.query(`UPDATE supplies SET filter_type = 'aquatic', updated_at = NOW() WHERE category = 'aquatics' AND filter_type = 'reptile'`);
+        // 12. (Problem 6) All remaining aquatics items with no filter_type → aquatic
+        const r12 = await migPool.query(`UPDATE supplies SET filter_type = 'aquatic', updated_at = NOW() WHERE category = 'aquatics' AND (filter_type IS NULL OR filter_type = '')`);
+
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('filter_type_fix_20260711')`);
+        log(`Filter type fix applied — Dog Food: ${r1.rowCount}, Cat Food: ${r2.rowCount}, Dog Treats: ${r3.rowCount}, Cat Treats: ${r4.rowCount}, Reptiles: ${r5.rowCount}, Toys: ${r6.rowCount}, Accessories: ${r7.rowCount}, Bird: ${r8.rowCount}, Leashes: ${r9.rowCount}, Aquatics←smallanimal: ${r10.rowCount}, Aquatics←reptile: ${r11.rowCount}, Aquatics missing tag: ${r12.rowCount}`);
+      } catch (filterFixErr: any) {
+        console.error('Filter type fix migration error (non-fatal):', filterFixErr.message);
+      }
+    }
+
     await migPool.end();
     log('App migrations complete');
   } catch (err: any) {
