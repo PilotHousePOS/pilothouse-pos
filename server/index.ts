@@ -896,6 +896,27 @@ async function runAppMigrations() {
       }
     }
 
+    // Move training/wee-wee pads out of beds → accessories
+    const bedsPadCheck = await migPool.query(`SELECT key FROM data_migrations WHERE key='beds_pad_fix_20260712'`);
+    if (bedsPadCheck.rowCount === 0) {
+      try {
+        const bp = await migPool.query(`
+          UPDATE supplies SET category='accessories', updated_at=NOW()
+          WHERE category='beds' AND (
+            LOWER(name) LIKE '%training pad%'
+            OR LOWER(name) LIKE '%wee-wee%'
+            OR LOWER(name) LIKE '%wee wee%'
+            OR LOWER(name) LIKE '%pee pad%'
+            OR LOWER(name) LIKE '%puppy pad%'
+          )
+        `);
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('beds_pad_fix_20260712')`);
+        log(`Beds pad fix: moved ${bp.rowCount} training/wee-wee pad items from beds → accessories`);
+      } catch (bedsPadErr: any) {
+        console.error('Beds pad fix migration error (non-fatal):', bedsPadErr.message);
+      }
+    }
+
     // Move 4 confirmed non-reptile items out of reptiles → aquatics
     const reptileAquaticCheck = await migPool.query(`SELECT key FROM data_migrations WHERE key='reptile_aquatic_fix_20260712'`);
     if (reptileAquaticCheck.rowCount === 0) {

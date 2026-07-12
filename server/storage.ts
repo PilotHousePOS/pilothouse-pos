@@ -1030,9 +1030,11 @@ export class DatabaseStorage implements IStorage {
         brands: []
       },
       'small-animal-toys': {
-        include: ['guinea pig', 'hamster', 'rabbit', 'bunny', 'ferret', 'gerbil', 'chinchilla', 'small animal', 'kaytee', 'oxbow', 'living world', 'vitakraft', 'runabout', 'run-about', 'chewbular', 'comfort wheel', 'hamsteroids', 'crinkle tunnel', 'flex tunnel', 'combo toy', 'hay ball'],
-        exclude: ['dog', 'puppy', 'cat', 'kitten', 'bird seed', 'bird food', 'airdog'],
-        brands: []
+        // 'rabbit' and 'bunny' removed — too ambiguous (matches dog plush toys shaped like bunnies)
+        // Small animal rabbit toys still matched via brand names (kaytee, oxbow) or 'small animal' keyword
+        include: ['guinea pig', 'hamster', 'ferret', 'gerbil', 'chinchilla', 'small animal', 'kaytee', 'oxbow', 'living world', 'vitakraft', 'runabout', 'run-about', 'chewbular', 'comfort wheel', 'hamsteroids', 'crinkle tunnel', 'flex tunnel', 'combo toy', 'hay ball', 'exercise wheel', 'snak shak', 'chew toy', 'small pet'],
+        exclude: ['dog', 'puppy', 'cat', 'kitten', 'bird seed', 'bird food', 'airdog', 'kong', 'zippy paws', 'petstages', 'nylabone', 'multipet', 'spot', 'li\'l pals'],
+        brands: ['kaytee', 'oxbow', 'living world', 'vitakraft', 'super pet', 'ware']
       }
     };
 
