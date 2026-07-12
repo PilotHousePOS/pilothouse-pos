@@ -817,9 +817,16 @@ async function runAppMigrations() {
         const c10 = await migPool.query(`UPDATE supplies SET category='CatFoodCan', updated_at=NOW() WHERE id=9215`);
         // Inaba Dashi Delights Cat Treats is a treat, not can food
         const c11 = await migPool.query(`UPDATE supplies SET category='Cat Treats', updated_at=NOW() WHERE id=9532`);
+        // --- Confirmed misplacements found in aquatics scan ---
+        // Marshall & Sandcastle: description says "Marshall ferret products" → smallanimal
+        const c12 = await migPool.query(`UPDATE supplies SET category='smallanimal', updated_at=NOW() WHERE id=5330`);
+        // Dogo's Ice Cream Pumpkin: Dog-O's is a dog treat brand, description confirms it's a treat
+        const c13 = await migPool.query(`UPDATE supplies SET category='Dog Treats', updated_at=NOW() WHERE id=6938`);
+        // Fluker's Pothos Repta-Vines: description says "perfect addition to any terrarium" → reptiles
+        const c14 = await migPool.query(`UPDATE supplies SET category='reptiles', updated_at=NOW() WHERE id=9594`);
 
         await migPool.query(`INSERT INTO data_migrations (key) VALUES ('category_name_fix_20260712')`);
-        log(`Category name fix: CatTreats=${c1.rowCount}, ToysFromTreats=${c2.rowCount}, AccessoriesFromTreats=${c3.rowCount}, SmallAnimalFromTreats=${c4.rowCount}, DogTreats(bulk)=${c5.rowCount}, DogFood(food)=${c6.rowCount}, DogTreats(food)=${c7.rowCount}, Leashes=${c8.rowCount}, ReptileFood=${c9.rowCount}, CatFoodCanFix=${c10.rowCount}, InabaTreatFix=${c11.rowCount}`);
+        log(`Category name fix: CatTreats=${c1.rowCount}, ToysFromTreats=${c2.rowCount}, AccessoriesFromTreats=${c3.rowCount}, SmallAnimalFromTreats=${c4.rowCount}, DogTreats(bulk)=${c5.rowCount}, DogFood(food)=${c6.rowCount}, DogTreats(food)=${c7.rowCount}, Leashes=${c8.rowCount}, ReptileFood=${c9.rowCount}, CatFoodCanFix=${c10.rowCount}, InabaTreatFix=${c11.rowCount}, FerretFromAquatics=${c12.rowCount}, DogTreatFromAquatics=${c13.rowCount}, ReptileFromAquatics=${c14.rowCount}`);
       } catch (catFixErr2: any) {
         console.error('Category name fix migration error (non-fatal):', catFixErr2.message);
       }
