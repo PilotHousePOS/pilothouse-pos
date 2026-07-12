@@ -1034,7 +1034,7 @@ export class DatabaseStorage implements IStorage {
       },
       'small-animal-toys': {
         // Queries smallanimal category (not toys) — so these keywords narrow to toy-type items within smallanimal
-        include: ['toy', 'wheel', 'ball', 'tunnel', 'chew', 'nibble', 'run-about', 'runabout', 'chewbular', 'combo toy', 'hay ball', 'exercise wheel', 'snak shak', 'small pet', 'small animal', 'roller', 'crinkle', 'flex', 'hamsteroids', 'comfort wheel'],
+        include: ['toy', 'wheel', 'spinner', 'ball', 'tunnel', 'chew', 'nibble', 'run-about', 'runabout', 'chewbular', 'combo toy', 'hay ball', 'exercise wheel', 'snak shak', 'small pet', 'small animal', 'roller', 'crinkle', 'flex', 'hamsteroids', 'comfort wheel'],
         exclude: ['food', 'hay', 'pellet', 'diet', 'treat', 'bedding', 'litter', 'shampoo', 'harness', 'leash', 'carrier', 'cage', 'habitat', 'feeder', 'waterer', 'water bottle', 'bowl', 'dish'],
         brands: ['kaytee', 'oxbow', 'living world', 'vitakraft', 'super pet', 'ware', 'a & e', 'a&e', 'benebone', 'coastal']
       }
