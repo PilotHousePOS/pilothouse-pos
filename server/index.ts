@@ -896,6 +896,29 @@ async function runAppMigrations() {
       }
     }
 
+    // Fix misc healthcare misfits (bird food, dog food, aquatics, toys, accessories)
+    const healthcareMisfitCheck = await migPool.query(`SELECT key FROM data_migrations WHERE key='healthcare_misfit_fix_20260712'`);
+    if (healthcareMisfitCheck.rowCount === 0) {
+      try {
+        // Bird food items (Hagen hand-feeding, Higgins parakeet, Kaylor Sweet Harvest) → birdSupplies
+        const hm1 = await migPool.query(`UPDATE supplies SET category='birdSupplies', updated_at=NOW() WHERE id IN (1133,1134,1135,1144,1145,1146,1147,1148,1224,1393)`);
+        // Natural Balance Ultra Protein 5lb → dogFood
+        const hm2 = await migPool.query(`UPDATE supplies SET category='dogFood', updated_at=NOW() WHERE id = 9589`);
+        // Aquatic items (Bio-Substrate, Fluval Betta Cleaner) → aquatics
+        const hm3 = await migPool.query(`UPDATE supplies SET category='aquatics', updated_at=NOW() WHERE id IN (9695,9643)`);
+        // Cat/dog toys → toys
+        const hm4 = await migPool.query(`UPDATE supplies SET category='toys', updated_at=NOW() WHERE id IN (835,2748,2749)`);
+        // Accessories (Titan tie-out, Petmate rake & pan, SodaPup ebowl) → accessories
+        const hm5 = await migPool.query(`UPDATE supplies SET category='accessories', updated_at=NOW() WHERE id IN (1735,1832,1606)`);
+        // Penn-Plax small animal cage combo → smallanimal
+        const hm6 = await migPool.query(`UPDATE supplies SET category='smallanimal', updated_at=NOW() WHERE id = 2287`);
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('healthcare_misfit_fix_20260712')`);
+        log(`Healthcare misfit fix: bird=${hm1.rowCount}, dogFood=${hm2.rowCount}, aquatics=${hm3.rowCount}, toys=${hm4.rowCount}, accessories=${hm5.rowCount}, smallanimal=${hm6.rowCount}`);
+      } catch (hmErr: any) {
+        console.error('Healthcare misfit fix migration error (non-fatal):', hmErr.message);
+      }
+    }
+
     // Move Greenies Pill Pockets out of healthcare → correct treat category
     const pillPocketCheck = await migPool.query(`SELECT key FROM data_migrations WHERE key='pill_pocket_fix_20260712'`);
     if (pillPocketCheck.rowCount === 0) {
