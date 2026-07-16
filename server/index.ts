@@ -989,6 +989,35 @@ async function runAppMigrations() {
       }
     }
 
+    // Fix Redbarn dog food items miscategorized as dogTreats/other — stews and recipes are dogFood
+    const redbarnFoodCheck = await migPool.query(`SELECT key FROM data_migrations WHERE key='redbarn_dogfood_fix_20260716'`);
+    if (redbarnFoodCheck.rowCount === 0) {
+      try {
+        const rb = await migPool.query(`
+          UPDATE supplies SET category='dogFood', updated_at=NOW()
+          WHERE (
+            LOWER(brand) ILIKE '%redbarn%'
+            OR LOWER(brand) ILIKE '%red barn%'
+          )
+          AND category NOT IN ('dogFood', 'catFood')
+          AND LOWER(name) NOT LIKE '%bully%'
+          AND LOWER(name) NOT LIKE '%collagen%'
+          AND LOWER(name) NOT LIKE '%chew%'
+          AND LOWER(name) NOT LIKE '%tendon%'
+          AND LOWER(name) NOT LIKE '%ear%'
+          AND LOWER(name) NOT LIKE '%esophagus%'
+          AND LOWER(name) NOT LIKE '%tripe%'
+          AND LOWER(name) NOT LIKE '%puff%'
+          AND LOWER(name) NOT LIKE '%cat %'
+          AND LOWER(name) NOT LIKE '% cat%'
+        `);
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('redbarn_dogfood_fix_20260716')`);
+        log(`Redbarn dogFood fix: moved ${rb.rowCount} Redbarn food items to dogFood`);
+      } catch (redbarnErr: any) {
+        console.error('Redbarn dogFood fix migration error (non-fatal):', redbarnErr.message);
+      }
+    }
+
     await migPool.end();
     log('App migrations complete');
   } catch (err: any) {

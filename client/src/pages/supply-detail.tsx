@@ -231,7 +231,7 @@ export default function SupplyDetail() {
   };
 
   const features = supply.features as Record<string, any> | null;
-  const inStock = (supply.stockQuantity ?? 0) > 0;
+  const inStock = true; // Stock quantity is not actively managed; never block Add to Cart on detail page (consistent with list view)
 
   return (
     <div className="min-h-screen bg-black text-white pb-24">
