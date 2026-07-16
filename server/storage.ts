@@ -2892,9 +2892,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentIsPaid(id: number, isPaid: boolean): Promise<Appointment> {
-    // When marking paid in-store, clear readyForPayment to prevent online double-payment
+    // Do NOT clear readyForPayment here — online double-payment is already blocked by isPaid=true check.
+    // Clearing it caused the "Mark Ready" button to reappear after payment when groomer had already marked ready.
     const setFields: any = { isPaid, updatedAt: new Date() };
-    if (isPaid) setFields.readyForPayment = false;
     const [updated] = await db
       .update(appointments)
       .set(setFields)
