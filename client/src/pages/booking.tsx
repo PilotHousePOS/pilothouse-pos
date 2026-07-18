@@ -1196,8 +1196,12 @@ export default function Booking() {
                         <div key={service.id} className="flex items-center space-x-3 p-2 border rounded-lg hover:bg-gray-50">
                           <RadioGroupItem value={service.id} id={`${service.id}-${index}`} data-testid={`radio-service-${service.id}-${index}`} />
                           <Label htmlFor={`${service.id}-${index}`} className="flex-1 cursor-pointer">
-                            <div className="font-medium text-gray-900">{service.name} ${service.price}{service.id === 'grooming-full' && <span className="text-green-600 font-normal"> (Includes Bath)</span>}</div>
-                            <div className="text-xs text-gray-500">(Prices will vary. This is an estimated price. Price is determined by size upon arrival.)</div>
+                            <div className="font-medium text-gray-900">{service.name} ${service.price}</div>
+                            <div className="text-xs text-gray-500">
+                              (Prices will vary. This is an estimated price. Price is determined by size upon arrival.)
+                              {service.id === 'grooming-full' && <span> (Hair cut, Bath, and Nail Clip)</span>}
+                              {service.id === 'grooming-bath' && <span> (Bath, and Nail Clip)</span>}
+                            </div>
                           </Label>
                         </div>
                       ))}
