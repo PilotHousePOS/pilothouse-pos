@@ -2455,6 +2455,75 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Inventory Audit batch-apply route
+  app.post("/api/admin/inventory-audit/apply", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const { actions } = req.body as {
+        actions: Array<{ id: number; action: string; value?: number }>;
+      };
+      if (!Array.isArray(actions) || actions.length === 0) {
+        return res.status(400).json({ message: "No actions provided" });
+      }
+
+      let applied = 0;
+      const errors: string[] = [];
+
+      for (const a of actions) {
+        try {
+          const supply = await storage.getSupply(a.id);
+          if (!supply) { errors.push(`ID ${a.id}: not found`); continue; }
+
+          switch (a.action) {
+            case "delete":
+              await storage.deleteSupply(a.id);
+              break;
+            case "deactivate":
+              await storage.updateSupply(a.id, { isActive: false } as any);
+              break;
+            case "set_price":
+              if (a.value == null || isNaN(a.value)) { errors.push(`ID ${a.id}: missing price value`); continue; }
+              await storage.updateSupply(a.id, { price: String(Math.max(0, a.value).toFixed(2)) } as any);
+              break;
+            case "raise_pct":
+              if (a.value == null || isNaN(a.value)) { errors.push(`ID ${a.id}: missing % value`); continue; }
+              { const cur = parseFloat(supply.price as any) || 0;
+                await storage.updateSupply(a.id, { price: String((cur * (1 + a.value / 100)).toFixed(2)) } as any); }
+              break;
+            case "lower_pct":
+              if (a.value == null || isNaN(a.value)) { errors.push(`ID ${a.id}: missing % value`); continue; }
+              { const cur = parseFloat(supply.price as any) || 0;
+                await storage.updateSupply(a.id, { price: String(Math.max(0, cur * (1 - a.value / 100)).toFixed(2)) } as any); }
+              break;
+            case "raise_flat":
+              if (a.value == null || isNaN(a.value)) { errors.push(`ID ${a.id}: missing $ value`); continue; }
+              { const cur = parseFloat(supply.price as any) || 0;
+                await storage.updateSupply(a.id, { price: String((cur + a.value).toFixed(2)) } as any); }
+              break;
+            case "lower_flat":
+              if (a.value == null || isNaN(a.value)) { errors.push(`ID ${a.id}: missing $ value`); continue; }
+              { const cur = parseFloat(supply.price as any) || 0;
+                await storage.updateSupply(a.id, { price: String(Math.max(0, cur - a.value).toFixed(2)) } as any); }
+              break;
+            case "clear_sku":
+              await storage.updateSupply(a.id, { sku: null } as any);
+              break;
+            default:
+              errors.push(`ID ${a.id}: unknown action '${a.action}'`);
+              continue;
+          }
+          applied++;
+        } catch (err: any) {
+          errors.push(`ID ${a.id}: ${err.message || "unknown error"}`);
+        }
+      }
+
+      res.json({ applied, errors });
+    } catch (error: any) {
+      console.error("Inventory audit apply error:", error);
+      res.status(500).json({ message: "Failed to apply audit actions" });
+    }
+  });
+
   // Cart routes
   app.get("/api/cart", authMiddleware, async (req: any, res) => {
     try {

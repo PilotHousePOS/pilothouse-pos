@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import InventoryAudit from "@/components/admin/InventoryAudit";
 import BarcodeScanner from "@/components/barcode-scanner";
 import { getProductImageUrl } from "@/lib/imageUrl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -9718,6 +9719,11 @@ export default function Admin() {
               Inventory
             </TabsTrigger>
             {typedUser?.isAdmin && (
+              <TabsTrigger value="inv-audit" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
+                Audit Scanner
+              </TabsTrigger>
+            )}
+            {typedUser?.isAdmin && (
               <TabsTrigger value="grooming" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
                 <span className="hidden lg:inline">Grooming Settings</span>
                 <span className="lg:hidden">Grooming</span>
@@ -13468,6 +13474,10 @@ export default function Admin() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="inv-audit" className="space-y-4">
+          {typedUser?.isAdmin && <InventoryAudit />}
         </TabsContent>
 
         <TabsContent value="grooming">
