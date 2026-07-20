@@ -2482,40 +2482,33 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         const supplyName = (found.rows[0] as any).name;
         const supplyBrand = String((found.rows[0] as any).brand || '').toLowerCase();
 
-        // Coastal products are always auto-protected — never eligible for deletion
+        // Coastal products get a much higher threshold (50 scans ≈ 6 months at 2/week)
         const isCoastal = supplyBrand.includes('coastal') || supplyName.toLowerCase().includes('coastal') || item.brand.toLowerCase().includes('coastal');
-        if (isCoastal) {
-          await db.execute(sql`
-            INSERT INTO pos_zero_stock_tracker (supply_id, sku, item_name, zero_count, last_scan_at, deletion_eligible, protected)
-            VALUES (${supplyId}, ${item.sku}, ${supplyName}, 0, NOW(), FALSE, TRUE)
-            ON CONFLICT (supply_id) DO UPDATE SET protected = TRUE, deletion_eligible = FALSE
-          `);
-          skipped++;
-          continue;
-        }
+        const threshold = isCoastal ? 50 : 16;
 
         if (item.inStock > 0) {
           // In stock on POS — reset counter
           await db.execute(sql`
-            INSERT INTO pos_zero_stock_tracker (supply_id, sku, item_name, zero_count, last_scan_at, last_nonzero_at, deletion_eligible)
-            VALUES (${supplyId}, ${item.sku}, ${supplyName}, 0, NOW(), NOW(), FALSE)
+            INSERT INTO pos_zero_stock_tracker (supply_id, sku, item_name, zero_count, last_scan_at, last_nonzero_at, deletion_eligible, threshold)
+            VALUES (${supplyId}, ${item.sku}, ${supplyName}, 0, NOW(), NOW(), FALSE, ${threshold})
             ON CONFLICT (supply_id) DO UPDATE
-              SET zero_count = 0, last_scan_at = NOW(), last_nonzero_at = NOW(), deletion_eligible = FALSE
+              SET zero_count = 0, last_scan_at = NOW(), last_nonzero_at = NOW(), deletion_eligible = FALSE, threshold = ${threshold}
           `);
           reset++;
         } else {
           // Zero stock — increment counter
-          const existing = await db.execute(sql`SELECT zero_count, protected FROM pos_zero_stock_tracker WHERE supply_id = ${supplyId}`);
+          const existing = await db.execute(sql`SELECT zero_count, protected, threshold FROM pos_zero_stock_tracker WHERE supply_id = ${supplyId}`);
           const currentCount = existing.rows.length > 0 ? Number((existing.rows[0] as any).zero_count) : 0;
           const isProtected = existing.rows.length > 0 ? Boolean((existing.rows[0] as any).protected) : false;
+          const itemThreshold = existing.rows.length > 0 ? Number((existing.rows[0] as any).threshold) : threshold;
           const newCount = currentCount + 1;
-          const eligible = !isProtected && newCount >= 10;
+          const eligible = !isProtected && newCount >= itemThreshold;
           if (eligible) nowEligible++;
           await db.execute(sql`
-            INSERT INTO pos_zero_stock_tracker (supply_id, sku, item_name, zero_count, last_scan_at, deletion_eligible)
-            VALUES (${supplyId}, ${item.sku}, ${supplyName}, ${newCount}, NOW(), ${eligible})
+            INSERT INTO pos_zero_stock_tracker (supply_id, sku, item_name, zero_count, last_scan_at, deletion_eligible, threshold)
+            VALUES (${supplyId}, ${item.sku}, ${supplyName}, ${newCount}, NOW(), ${eligible}, ${threshold})
             ON CONFLICT (supply_id) DO UPDATE
-              SET zero_count = ${newCount}, last_scan_at = NOW(), deletion_eligible = ${eligible}
+              SET zero_count = ${newCount}, last_scan_at = NOW(), deletion_eligible = ${eligible}, threshold = ${threshold}
           `);
           incremented++;
         }
@@ -2530,13 +2523,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
   app.get("/api/admin/pos-scan/stats", requireAdminMiddleware, async (req: any, res) => {
     try {
-      const eligible = await db.execute(sql`SELECT supply_id, item_name, sku, zero_count, last_scan_at FROM pos_zero_stock_tracker WHERE deletion_eligible = TRUE AND protected = FALSE ORDER BY zero_count DESC`);
-      const approaching = await db.execute(sql`SELECT supply_id, item_name, sku, zero_count, last_scan_at FROM pos_zero_stock_tracker WHERE zero_count >= 7 AND zero_count < 10 AND protected = FALSE ORDER BY zero_count DESC`);
-      const all = await db.execute(sql`SELECT COUNT(*)::int as total, SUM(CASE WHEN deletion_eligible THEN 1 ELSE 0 END)::int as eligible_count FROM pos_zero_stock_tracker`);
+      const eligible = await db.execute(sql`SELECT supply_id, item_name, sku, zero_count, last_scan_at, threshold, protected FROM pos_zero_stock_tracker WHERE deletion_eligible = TRUE AND protected = FALSE ORDER BY zero_count DESC`);
+      const approaching = await db.execute(sql`SELECT supply_id, item_name, sku, zero_count, last_scan_at, threshold, protected FROM pos_zero_stock_tracker WHERE deletion_eligible = FALSE AND protected = FALSE AND zero_count >= (threshold - 4) AND zero_count > 0 ORDER BY (zero_count::float / threshold) DESC`);
+      const all = await db.execute(sql`SELECT COUNT(*)::int as total, SUM(CASE WHEN deletion_eligible THEN 1 ELSE 0 END)::int as eligible_count, SUM(CASE WHEN protected THEN 1 ELSE 0 END)::int as protected_count FROM pos_zero_stock_tracker`);
       res.json({
         eligible: eligible.rows,
         approaching: approaching.rows,
-        summary: all.rows[0] || { total: 0, eligible_count: 0 },
+        summary: all.rows[0] || { total: 0, eligible_count: 0, protected_count: 0 },
       });
     } catch (e: any) {
       res.status(500).json({ message: "Failed to load stats" });

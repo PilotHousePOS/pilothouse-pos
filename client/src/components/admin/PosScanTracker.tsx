@@ -12,23 +12,29 @@ interface TrackerItem {
   sku: string;
   zero_count: number;
   last_scan_at: string;
+  threshold: number;
+  protected: boolean;
 }
 
 interface Stats {
   eligible: TrackerItem[];
   approaching: TrackerItem[];
-  summary: { total: number; eligible_count: number };
+  summary: { total: number; eligible_count: number; protected_count: number };
 }
 
-function CountBar({ count }: { count: number }) {
-  const pct = Math.min((count / 10) * 100, 100);
-  const color = count >= 10 ? "bg-red-500" : count >= 7 ? "bg-orange-500" : "bg-yellow-500";
+function CountBar({ count, threshold }: { count: number; threshold: number }) {
+  const pct = Math.min((count / threshold) * 100, 100);
+  const ratio = count / threshold;
+  const color = ratio >= 1 ? "bg-red-500" : ratio >= 0.75 ? "bg-orange-500" : "bg-yellow-500";
+  const isCoastal = threshold === 50;
   return (
     <div className="flex items-center gap-2">
       <div className="flex-1 h-1.5 bg-zinc-700 rounded-full overflow-hidden">
         <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
       </div>
-      <span className="text-xs font-mono text-zinc-300 w-8 text-right">{count}/10</span>
+      <span className="text-xs font-mono text-zinc-300 w-14 text-right">
+        {count}/{threshold}{isCoastal ? " 🐍" : ""}
+      </span>
     </div>
   );
 }
@@ -109,8 +115,7 @@ export default function PosScanTracker() {
         <div>
           <h2 className="text-lg font-bold text-white">POS Zero-Stock Tracker</h2>
           <p className="text-xs text-zinc-400 mt-0.5">
-            Upload the ExaTouch Items export. Items at 0 on the POS 10 times in a row become eligible for deletion.
-            Stock in our app is ignored — only POS quantity counts.
+            Upload the ExaTouch Items export. Regular items flagged after <strong className="text-zinc-300">16 consecutive zero-stock scans</strong> (~2 months at 2/week). Coastal items require <strong className="text-zinc-300">50 scans</strong> (~6 months). Only POS quantity counts — app stock is ignored. Deletion is always manual.
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -170,11 +175,16 @@ export default function PosScanTracker() {
             {stats.summary.total?.toLocaleString() ?? 0} items tracked
           </span>
           <span className="text-xs bg-red-950 border border-red-800 rounded-full px-3 py-1 text-red-300">
-            {eligible.length} ready to delete (10+)
+            {eligible.length} ready to delete
           </span>
           <span className="text-xs bg-orange-950 border border-orange-800 rounded-full px-3 py-1 text-orange-300">
-            {approaching.length} approaching (7–9)
+            {approaching.length} approaching threshold
           </span>
+          {(stats.summary.protected_count ?? 0) > 0 && (
+            <span className="text-xs bg-green-950 border border-green-800 rounded-full px-3 py-1 text-green-300">
+              {stats.summary.protected_count} protected
+            </span>
+          )}
         </div>
       )}
 
@@ -191,7 +201,7 @@ export default function PosScanTracker() {
                 <div className="flex-1 min-w-0">
                   <div className="text-sm text-white truncate">{item.item_name}</div>
                   <div className="text-[11px] text-zinc-500">{item.sku}</div>
-                  <CountBar count={item.zero_count} />
+                  <CountBar count={item.zero_count} threshold={item.threshold ?? 16} />
                 </div>
                 <Button
                   size="sm" variant="outline"
@@ -211,7 +221,7 @@ export default function PosScanTracker() {
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-orange-400" />
-            <h3 className="text-sm font-semibold text-orange-400">Approaching Deletion — 7–9 Scans ({approaching.length})</h3>
+            <h3 className="text-sm font-semibold text-orange-400">Approaching Threshold ({approaching.length})</h3>
           </div>
           <div className="space-y-1 max-h-48 overflow-y-auto pr-1">
             {approaching.map(item => (
@@ -219,7 +229,7 @@ export default function PosScanTracker() {
                 <div className="flex-1 min-w-0">
                   <div className="text-sm text-white truncate">{item.item_name}</div>
                   <div className="text-[11px] text-zinc-500">{item.sku}</div>
-                  <CountBar count={item.zero_count} />
+                  <CountBar count={item.zero_count} threshold={item.threshold ?? 16} />
                 </div>
                 <Button
                   size="sm" variant="outline"

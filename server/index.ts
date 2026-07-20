@@ -562,8 +562,10 @@ async function runAppMigrations() {
       last_scan_at TIMESTAMP,
       last_nonzero_at TIMESTAMP,
       deletion_eligible BOOLEAN DEFAULT FALSE,
-      protected BOOLEAN DEFAULT FALSE
+      protected BOOLEAN DEFAULT FALSE,
+      threshold INTEGER DEFAULT 16
     )`);
+    await migPool.query(`ALTER TABLE pos_zero_stock_tracker ADD COLUMN IF NOT EXISTS threshold INTEGER DEFAULT 16`);
     const { rows: alreadyRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'price_sync_20260710'`);
     if (alreadyRan.length === 0) {
       try {
