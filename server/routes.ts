@@ -2455,6 +2455,38 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Audit keep-list — save and load scanned item IDs so no-delete list is server-visible
+  app.get("/api/admin/audit-keep", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const result = await pool.query(`SELECT supply_id, item_name, scanned_barcode, saved_at FROM audit_keep_list ORDER BY saved_at DESC`);
+      res.json(result.rows);
+    } catch (e: any) {
+      res.status(500).json({ message: "Failed to load keep list" });
+    }
+  });
+
+  app.post("/api/admin/audit-keep", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const { items } = req.body as { items: Array<{ supplyId: number; name: string; barcode: string }> };
+      if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ message: "No items provided" });
+      let saved = 0;
+      for (const item of items) {
+        if (!item.supplyId || isNaN(item.supplyId)) continue;
+        await pool.query(
+          `INSERT INTO audit_keep_list (supply_id, item_name, scanned_barcode, saved_at)
+           VALUES ($1, $2, $3, NOW())
+           ON CONFLICT (supply_id) DO UPDATE SET item_name = $2, scanned_barcode = $3, saved_at = NOW()`,
+          [item.supplyId, item.name || null, item.barcode || null]
+        );
+        saved++;
+      }
+      res.json({ saved });
+    } catch (e: any) {
+      console.error("Audit keep save error:", e);
+      res.status(500).json({ message: "Failed to save keep list" });
+    }
+  });
+
   // Inventory Audit batch-apply route
   app.post("/api/admin/inventory-audit/apply", requireAdminMiddleware, async (req: any, res) => {
     try {

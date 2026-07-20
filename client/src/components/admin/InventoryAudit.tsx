@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -87,6 +87,28 @@ export default function InventoryAudit() {
   const [isLooking, setIsLooking] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [applyResult, setApplyResult] = useState<{ applied: number; errors: string[] } | null>(null);
+
+  const { data: serverKeepList } = useQuery<{ supply_id: number }[]>({
+    queryKey: ["/api/admin/audit-keep"],
+    refetchOnWindowFocus: false,
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      const toSave = items
+        .filter(i => !i.notFound && i.id !== null)
+        .map(i => ({ supplyId: i.id!, name: i.name, barcode: i.scannedBarcode }));
+      if (toSave.length === 0) throw new Error("No valid items to save");
+      const res = await apiRequest("POST", "/api/admin/audit-keep", { items: toSave });
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/audit-keep"] });
+      toast({ title: `Saved ${result.saved} items to server`, description: "These items are now protected from bulk deletions" });
+    },
+    onError: (e: any) => toast({ title: "Save failed", description: e.message, variant: "destructive" }),
+  });
 
   useEffect(() => {
     saveSession(items);
@@ -263,11 +285,22 @@ export default function InventoryAudit() {
           </h2>
           <p className="text-xs text-zinc-400 mt-0.5">Scan barcodes with your scanner or type manually. Choose an action for each item, then Apply.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap justify-end">
           {items.length > 0 && (
             <Button variant="outline" size="sm" className="text-xs border-zinc-700"
               onClick={() => { setItems([]); setApplyResult(null); localStorage.removeItem(STORAGE_KEY); }}>
               <RotateCcw className="w-3 h-3 mr-1" /> Clear All
+            </Button>
+          )}
+          {items.filter(i => !i.notFound && i.id !== null).length > 0 && (
+            <Button variant="outline" size="sm"
+              className="text-xs border-blue-700 text-blue-400 hover:bg-blue-950"
+              onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
+              <CheckCircle className="w-3 h-3 mr-1" />
+              {saveMutation.isPending ? "Saving…" : `Save ${items.filter(i => !i.notFound && i.id !== null).length} to Server`}
+              {serverKeepList && serverKeepList.length > 0 && (
+                <span className="ml-1 text-zinc-500">({serverKeepList.length} saved)</span>
+              )}
             </Button>
           )}
           {pendingCount > 0 && (
