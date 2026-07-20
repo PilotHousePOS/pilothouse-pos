@@ -66,3 +66,9 @@ id = "eLybNx4Av8Mji2T2V3rMj"
 uri = "file://attached_assets/POS_Inventory_071826.csv"
 type = "table"
 title = "POS Inventory — 9,531 items (TM fixed)"
+
+[[outputs]]
+id = "24pN7imoLwfjZVs-eA9k1"
+uri = "file://attached_assets/SKU_Mismatch_Report_071826.csv"
+type = "table"
+title = "SKU Mismatch Report — 071826"

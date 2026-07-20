@@ -1018,6 +1018,45 @@ async function runAppMigrations() {
       }
     }
 
+    // Price sync from POS export (07/20/2026) — 4300 items updated by ID
+    const { rows: price20Ran } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'price_sync_20260720'`);
+    if (price20Ran.length === 0) {
+      try {
+        const { readFileSync: rfs20 } = await import('fs');
+        const { join: j20 } = await import('path');
+        const priceData20: { id: number; price: number }[] = JSON.parse(rfs20(j20(process.cwd(), 'server/priceMigration20260720.json'), 'utf8'));
+        const BATCH = 500;
+        let totalUpdated = 0;
+        for (let i = 0; i < priceData20.length; i += BATCH) {
+          const chunk = priceData20.slice(i, i + BATCH);
+          const ids = chunk.map(r => r.id).join(',');
+          const caseLines = chunk.map(r => `WHEN id = ${r.id} THEN ${r.price}`).join(' ');
+          await migPool.query(`UPDATE supplies SET price = CASE ${caseLines} ELSE price END, updated_at = NOW() WHERE id IN (${ids})`);
+          totalUpdated += chunk.length;
+        }
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('price_sync_20260720')`);
+        log(`Price sync 20260720: ${totalUpdated} items updated`);
+      } catch (price20Err: any) {
+        console.error('Price sync 20260720 migration error (non-fatal):', price20Err.message);
+      }
+    }
+
+    // SKU dedup fix (07/20/2026) — clear wrong SKU from 68 items with duplicate/misassigned SKUs
+    const { rows: skuClearRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'sku_clear_20260720'`);
+    if (skuClearRan.length === 0) {
+      try {
+        const { readFileSync: rfsSkuClear } = await import('fs');
+        const { join: jSkuClear } = await import('path');
+        const clearIds: number[] = JSON.parse(rfsSkuClear(jSkuClear(process.cwd(), 'server/skuClearMigration20260720.json'), 'utf8'));
+        const idList = clearIds.join(',');
+        const skuClearResult = await migPool.query(`UPDATE supplies SET sku = NULL, upc = NULL, updated_at = NOW() WHERE id IN (${idList})`);
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('sku_clear_20260720')`);
+        log(`SKU dedup fix 20260720: cleared SKU from ${skuClearResult.rowCount} misassigned items`);
+      } catch (skuClearErr: any) {
+        console.error('SKU clear 20260720 migration error (non-fatal):', skuClearErr.message);
+      }
+    }
+
     await migPool.end();
     log('App migrations complete');
   } catch (err: any) {
