@@ -2455,6 +2455,122 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // POS Zero-Stock Tracker — upload XLS, increment/reset counters, delete after 10 consecutive zeros
+  app.post("/api/admin/pos-scan/upload", requireAdminMiddleware, excelUpload.single('file'), async (req: any, res) => {
+    try {
+      if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+      const xlsx = await import('xlsx');
+      const wb = xlsx.read(req.file.buffer, { type: 'buffer' });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const raw: any[][] = xlsx.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+      // Headers on row 6, data from row 7
+      const dataRows = raw.slice(7).filter((r: any[]) => r[0] !== '');
+      const posItems = dataRows.map((r: any[]) => ({
+        name: String(r[0]).trim(),
+        brand: String(r[1]).trim(),
+        sku: String(r[2]).trim(),
+        inStock: Number(r[8]),
+      })).filter(i => i.sku.length >= 6);
+
+      let incremented = 0, reset = 0, nowEligible = 0, skipped = 0;
+
+      for (const item of posItems) {
+        // Find matching supply by SKU
+        const found = await db.execute(sql`SELECT id, name, brand FROM supplies WHERE sku = ${item.sku} LIMIT 1`);
+        if (!found.rows || found.rows.length === 0) { skipped++; continue; }
+        const supplyId = (found.rows[0] as any).id;
+        const supplyName = (found.rows[0] as any).name;
+        const supplyBrand = String((found.rows[0] as any).brand || '').toLowerCase();
+
+        // Coastal products are always auto-protected — never eligible for deletion
+        const isCoastal = supplyBrand.includes('coastal') || supplyName.toLowerCase().includes('coastal') || item.brand.toLowerCase().includes('coastal');
+        if (isCoastal) {
+          await db.execute(sql`
+            INSERT INTO pos_zero_stock_tracker (supply_id, sku, item_name, zero_count, last_scan_at, deletion_eligible, protected)
+            VALUES (${supplyId}, ${item.sku}, ${supplyName}, 0, NOW(), FALSE, TRUE)
+            ON CONFLICT (supply_id) DO UPDATE SET protected = TRUE, deletion_eligible = FALSE
+          `);
+          skipped++;
+          continue;
+        }
+
+        if (item.inStock > 0) {
+          // In stock on POS — reset counter
+          await db.execute(sql`
+            INSERT INTO pos_zero_stock_tracker (supply_id, sku, item_name, zero_count, last_scan_at, last_nonzero_at, deletion_eligible)
+            VALUES (${supplyId}, ${item.sku}, ${supplyName}, 0, NOW(), NOW(), FALSE)
+            ON CONFLICT (supply_id) DO UPDATE
+              SET zero_count = 0, last_scan_at = NOW(), last_nonzero_at = NOW(), deletion_eligible = FALSE
+          `);
+          reset++;
+        } else {
+          // Zero stock — increment counter
+          const existing = await db.execute(sql`SELECT zero_count, protected FROM pos_zero_stock_tracker WHERE supply_id = ${supplyId}`);
+          const currentCount = existing.rows.length > 0 ? Number((existing.rows[0] as any).zero_count) : 0;
+          const isProtected = existing.rows.length > 0 ? Boolean((existing.rows[0] as any).protected) : false;
+          const newCount = currentCount + 1;
+          const eligible = !isProtected && newCount >= 10;
+          if (eligible) nowEligible++;
+          await db.execute(sql`
+            INSERT INTO pos_zero_stock_tracker (supply_id, sku, item_name, zero_count, last_scan_at, deletion_eligible)
+            VALUES (${supplyId}, ${item.sku}, ${supplyName}, ${newCount}, NOW(), ${eligible})
+            ON CONFLICT (supply_id) DO UPDATE
+              SET zero_count = ${newCount}, last_scan_at = NOW(), deletion_eligible = ${eligible}
+          `);
+          incremented++;
+        }
+      }
+
+      res.json({ processed: posItems.length, incremented, reset, nowEligible, skipped });
+    } catch (e: any) {
+      console.error("POS scan upload error:", e);
+      res.status(500).json({ message: "Failed to process POS file: " + e.message });
+    }
+  });
+
+  app.get("/api/admin/pos-scan/stats", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const eligible = await db.execute(sql`SELECT supply_id, item_name, sku, zero_count, last_scan_at FROM pos_zero_stock_tracker WHERE deletion_eligible = TRUE AND protected = FALSE ORDER BY zero_count DESC`);
+      const approaching = await db.execute(sql`SELECT supply_id, item_name, sku, zero_count, last_scan_at FROM pos_zero_stock_tracker WHERE zero_count >= 7 AND zero_count < 10 AND protected = FALSE ORDER BY zero_count DESC`);
+      const all = await db.execute(sql`SELECT COUNT(*)::int as total, SUM(CASE WHEN deletion_eligible THEN 1 ELSE 0 END)::int as eligible_count FROM pos_zero_stock_tracker`);
+      res.json({
+        eligible: eligible.rows,
+        approaching: approaching.rows,
+        summary: all.rows[0] || { total: 0, eligible_count: 0 },
+      });
+    } catch (e: any) {
+      res.status(500).json({ message: "Failed to load stats" });
+    }
+  });
+
+  app.post("/api/admin/pos-scan/protect", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const { supplyId, protect } = req.body as { supplyId: number; protect: boolean };
+      await db.execute(sql`UPDATE pos_zero_stock_tracker SET protected = ${protect}, deletion_eligible = FALSE WHERE supply_id = ${supplyId}`);
+      res.json({ ok: true });
+    } catch (e: any) {
+      res.status(500).json({ message: "Failed to update protection" });
+    }
+  });
+
+  app.post("/api/admin/pos-scan/delete-eligible", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const toDelete = await db.execute(sql`SELECT supply_id FROM pos_zero_stock_tracker WHERE deletion_eligible = TRUE AND protected = FALSE`);
+      if (!toDelete.rows.length) return res.json({ deleted: 0 });
+      const ids = toDelete.rows.map((r: any) => r.supply_id);
+      let deleted = 0;
+      for (const id of ids) {
+        await db.execute(sql`DELETE FROM supplies WHERE id = ${id}`);
+        await db.execute(sql`DELETE FROM pos_zero_stock_tracker WHERE supply_id = ${id}`);
+        deleted++;
+      }
+      res.json({ deleted });
+    } catch (e: any) {
+      console.error("POS delete eligible error:", e);
+      res.status(500).json({ message: "Failed to delete: " + e.message });
+    }
+  });
+
   // Audit keep-list — save and load scanned item IDs so no-delete list is server-visible
   app.get("/api/admin/audit-keep", requireAdminMiddleware, async (req: any, res) => {
     try {

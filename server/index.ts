@@ -554,6 +554,16 @@ async function runAppMigrations() {
     // One-time price sync from POS export (07/10/2026)
     await migPool.query(`CREATE TABLE IF NOT EXISTS data_migrations (key VARCHAR(100) PRIMARY KEY, applied_at TIMESTAMP DEFAULT NOW())`);
     await migPool.query(`CREATE TABLE IF NOT EXISTS audit_keep_list (supply_id INTEGER PRIMARY KEY, saved_at TIMESTAMP DEFAULT NOW(), item_name TEXT, scanned_barcode TEXT)`);
+    await migPool.query(`CREATE TABLE IF NOT EXISTS pos_zero_stock_tracker (
+      supply_id INTEGER PRIMARY KEY,
+      sku VARCHAR(50),
+      item_name TEXT,
+      zero_count INTEGER DEFAULT 0,
+      last_scan_at TIMESTAMP,
+      last_nonzero_at TIMESTAMP,
+      deletion_eligible BOOLEAN DEFAULT FALSE,
+      protected BOOLEAN DEFAULT FALSE
+    )`);
     const { rows: alreadyRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'price_sync_20260710'`);
     if (alreadyRan.length === 0) {
       try {
