@@ -2458,7 +2458,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   // Audit keep-list — save and load scanned item IDs so no-delete list is server-visible
   app.get("/api/admin/audit-keep", requireAdminMiddleware, async (req: any, res) => {
     try {
-      const result = await pool.query(`SELECT supply_id, item_name, scanned_barcode, saved_at FROM audit_keep_list ORDER BY saved_at DESC`);
+      const result = await db.execute(sql`SELECT supply_id, item_name, scanned_barcode, saved_at FROM audit_keep_list ORDER BY saved_at DESC`);
       res.json(result.rows);
     } catch (e: any) {
       res.status(500).json({ message: "Failed to load keep list" });
@@ -2472,12 +2472,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       let saved = 0;
       for (const item of items) {
         if (!item.supplyId || isNaN(item.supplyId)) continue;
-        await pool.query(
-          `INSERT INTO audit_keep_list (supply_id, item_name, scanned_barcode, saved_at)
-           VALUES ($1, $2, $3, NOW())
-           ON CONFLICT (supply_id) DO UPDATE SET item_name = $2, scanned_barcode = $3, saved_at = NOW()`,
-          [item.supplyId, item.name || null, item.barcode || null]
-        );
+        await db.execute(sql`
+          INSERT INTO audit_keep_list (supply_id, item_name, scanned_barcode, saved_at)
+          VALUES (${item.supplyId}, ${item.name || null}, ${item.barcode || null}, NOW())
+          ON CONFLICT (supply_id) DO UPDATE SET item_name = ${item.name || null}, scanned_barcode = ${item.barcode || null}, saved_at = NOW()
+        `);
         saved++;
       }
       res.json({ saved });
