@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Barcode, Trash2, CheckCircle, DollarSign, EyeOff, X, RotateCcw, Zap, Image, AlertCircle, ScanLine, ChevronDown } from "lucide-react";
+import { Barcode, Trash2, CheckCircle, DollarSign, EyeOff, X, RotateCcw, Zap, Image, AlertCircle, ScanLine, Camera } from "lucide-react";
+import BarcodeScanner from "@/components/barcode-scanner";
 
 type AuditAction =
   | "keep"
@@ -84,6 +85,7 @@ export default function InventoryAudit() {
   const [barcode, setBarcode] = useState("");
   const [items, setItems] = useState<AuditItem[]>(loadSession);
   const [isLooking, setIsLooking] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
   const [applyResult, setApplyResult] = useState<{ applied: number; errors: string[] } | null>(null);
 
   useEffect(() => {
@@ -101,6 +103,52 @@ export default function InventoryAudit() {
   const removeItem = useCallback((scanId: string) => {
     setItems(prev => prev.filter(i => i.scanId !== scanId));
   }, []);
+
+  const handleScannerDetected = useCallback((upc: string) => {
+    setScannerOpen(false);
+    setBarcode(upc);
+    // slight delay so state settles before lookup fires
+    setTimeout(() => {
+      setBarcode("");
+      setIsLooking(true);
+      const code = upc.trim();
+
+      const alreadyScanned = items.find(i => i.scannedBarcode === code);
+      if (alreadyScanned) {
+        toast({ title: "Already in list", description: alreadyScanned.name });
+        setIsLooking(false);
+        return;
+      }
+
+      apiRequest("GET", `/api/supplies/by-upc/${encodeURIComponent(code)}`)
+        .then(r => r.json())
+        .then(data => {
+          const thumbUrl = Array.isArray(data.imageUrls) && data.imageUrls.length > 0 ? data.imageUrls[0] : null;
+          setItems(prev => [{
+            scanId: `${Date.now()}-${code}`,
+            id: data.id, name: data.name || "Unknown",
+            brand: data.brand || "", sku: data.sku || code,
+            category: data.category || "",
+            price: parseFloat(data.price) || 0,
+            hasPhotos: Array.isArray(data.imageUrls) && data.imageUrls.length > 0,
+            thumbUrl, action: "keep", actionValue: "",
+            notFound: false, scannedBarcode: code,
+          }, ...prev]);
+        })
+        .catch(() => {
+          setItems(prev => [{
+            scanId: `${Date.now()}-${code}`,
+            id: null, name: "Not found in inventory",
+            brand: "", sku: code, category: "",
+            price: 0, hasPhotos: false, thumbUrl: null,
+            action: "keep", actionValue: "",
+            notFound: true, scannedBarcode: code,
+          }, ...prev]);
+          toast({ title: "Barcode not in system", description: code, variant: "destructive" });
+        })
+        .finally(() => { setIsLooking(false); inputRef.current?.focus(); });
+    }, 50);
+  }, [items, toast]);
 
   const handleScan = async () => {
     const code = barcode.trim();
@@ -244,11 +292,24 @@ export default function InventoryAudit() {
           className="bg-transparent border-0 text-white placeholder:text-zinc-500 focus-visible:ring-0 text-sm flex-1 h-8 p-0"
           disabled={isLooking}
         />
+        <Button size="sm" onClick={() => setScannerOpen(true)} disabled={isLooking}
+          variant="outline"
+          className="border-zinc-600 text-zinc-300 hover:text-white hover:border-zinc-400 h-7 px-2">
+          <Camera className="w-4 h-4" />
+        </Button>
         <Button size="sm" onClick={handleScan} disabled={isLooking || !barcode.trim()}
           className="bg-yellow-500 hover:bg-yellow-400 text-black text-xs font-bold h-7 px-3">
-          {isLooking ? "…" : "Scan"}
+          {isLooking ? "…" : "Enter"}
         </Button>
       </div>
+
+      {/* Full-screen camera scanner overlay */}
+      {scannerOpen && (
+        <BarcodeScanner
+          onClose={() => setScannerOpen(false)}
+          onDetected={handleScannerDetected}
+        />
+      )}
 
       {/* Summary badges */}
       {items.length > 0 && (
