@@ -60,3 +60,9 @@ id = "HDeIRW8QYPDgLuj2Xl9IQ"
 uri = "file://public/price-update-export.xlsx"
 type = "table"
 title = "Price Update — 8,481 Products (Final Production Prices)"
+
+[[outputs]]
+id = "eLybNx4Av8Mji2T2V3rMj"
+uri = "file://attached_assets/POS_Inventory_071826.csv"
+type = "table"
+title = "POS Inventory Export — 9,531 items"
