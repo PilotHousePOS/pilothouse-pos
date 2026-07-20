@@ -1041,7 +1041,7 @@ async function runAppMigrations() {
       }
     }
 
-    // SKU dedup fix (07/20/2026) — clear wrong SKU from 68 items with duplicate/misassigned SKUs
+    // SKU dedup fix (07/20/2026) — DELETE items with misassigned SKUs; correct items will be re-imported from POS
     const { rows: skuClearRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'sku_clear_20260720'`);
     if (skuClearRan.length === 0) {
       try {
@@ -1049,11 +1049,11 @@ async function runAppMigrations() {
         const { join: jSkuClear } = await import('path');
         const clearIds: number[] = JSON.parse(rfsSkuClear(jSkuClear(process.cwd(), 'server/skuClearMigration20260720.json'), 'utf8'));
         const idList = clearIds.join(',');
-        const skuClearResult = await migPool.query(`UPDATE supplies SET sku = NULL, upc = NULL, updated_at = NOW() WHERE id IN (${idList})`);
+        const skuDeleteResult = await migPool.query(`DELETE FROM supplies WHERE id IN (${idList})`);
         await migPool.query(`INSERT INTO data_migrations (key) VALUES ('sku_clear_20260720')`);
-        log(`SKU dedup fix 20260720: cleared SKU from ${skuClearResult.rowCount} misassigned items`);
+        log(`SKU dedup fix 20260720: deleted ${skuDeleteResult.rowCount} misassigned items`);
       } catch (skuClearErr: any) {
-        console.error('SKU clear 20260720 migration error (non-fatal):', skuClearErr.message);
+        console.error('SKU dedup delete 20260720 migration error (non-fatal):', skuClearErr.message);
       }
     }
 
