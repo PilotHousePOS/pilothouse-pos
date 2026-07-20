@@ -1104,6 +1104,29 @@ async function runAppMigrations() {
       }
     }
 
+    const { rows: photoDupFixRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'photo_dup_fix_20260720'`);
+    if (photoDupFixRan.length === 0) {
+      try {
+        const { readFileSync: rfsPhotoFix } = await import('fs');
+        const { join: jPhotoFix } = await import('path');
+        const photoFix: { toDelete: number[]; toClearSku: number[] } = JSON.parse(rfsPhotoFix(jPhotoFix(process.cwd(), 'server/photoDupFixMigration20260720.json'), 'utf8'));
+        let deleted = 0;
+        for (const id of photoFix.toDelete) {
+          await migPool.query(`DELETE FROM supplies WHERE id = $1`, [id]);
+          deleted++;
+        }
+        let cleared = 0;
+        for (const id of photoFix.toClearSku) {
+          await migPool.query(`UPDATE supplies SET sku = NULL, upc = NULL WHERE id = $1`, [id]);
+          cleared++;
+        }
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('photo_dup_fix_20260720')`);
+        log(`Photo dup fix 20260720: deleted ${deleted} wrong-product entries, cleared SKU on ${cleared} real products`);
+      } catch (photoFixErr: any) {
+        console.error('Photo dup fix 20260720 migration error (non-fatal):', photoFixErr.message);
+      }
+    }
+
     await migPool.end();
     log('App migrations complete');
   } catch (err: any) {
