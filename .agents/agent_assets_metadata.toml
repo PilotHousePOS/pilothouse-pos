@@ -72,3 +72,9 @@ id = "24pN7imoLwfjZVs-eA9k1"
 uri = "file://attached_assets/SKU_Mismatch_Report_071826.csv"
 type = "table"
 title = "SKU Mismatch Report — 071826"
+
+[[outputs]]
+id = "tgH06Mxrb8VsC4JQ8fWXr"
+uri = "file://attached_assets/ZeroStock_ProdItems_072026.csv"
+type = "table"
+title = "Production Items at 0 Stock in POS — 072026"
