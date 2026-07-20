@@ -1057,6 +1057,53 @@ async function runAppMigrations() {
       }
     }
 
+    // Duplicate / wrong-SKU delete (07/20/2026) — 478 items: cross-cat collisions, exact dups, variant losers
+    const { rows: dupDelRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'dup_delete_20260720'`);
+    if (dupDelRan.length === 0) {
+      try {
+        const { readFileSync: rfsDup } = await import('fs');
+        const { join: jDup } = await import('path');
+        const dupIds: number[] = JSON.parse(rfsDup(jDup(process.cwd(), 'server/dupDeleteMigration20260720.json'), 'utf8'));
+        const dupIdList = dupIds.join(',');
+        const dupDelResult = await migPool.query(`DELETE FROM supplies WHERE id IN (${dupIdList})`);
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('dup_delete_20260720')`);
+        log(`Dup/wrong-SKU delete 20260720: deleted ${dupDelResult.rowCount} items`);
+      } catch (dupDelErr: any) {
+        console.error('Dup delete 20260720 migration error (non-fatal):', dupDelErr.message);
+      }
+    }
+
+    // New items insert from XLS (07/20/2026) — 1,588 items with stock > 0, not already in production
+    const { rows: newItemsRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'new_items_20260720'`);
+    if (newItemsRan.length === 0) {
+      try {
+        const { readFileSync: rfsNew } = await import('fs');
+        const { join: jNew } = await import('path');
+        const newItems: any[] = JSON.parse(rfsNew(jNew(process.cwd(), 'server/newItemsMigration20260720.json'), 'utf8'));
+        await migPool.query(`SELECT setval('supplies_id_seq', (SELECT MAX(id) FROM supplies))`);
+        let inserted = 0;
+        for (const r of newItems) {
+          const skuVal = r.sku || null;
+          await migPool.query(`
+            INSERT INTO supplies (name, brand, sku, upc, price, category, filter_type, stock_quantity, color, size, style, is_active, updated_at)
+            SELECT $1,$2,$3::text,$4::text,$5,$6,$7,$8,$9,$10,$11,true,NOW()
+            WHERE NOT EXISTS (SELECT 1 FROM supplies WHERE sku = $3::text AND $3::text IS NOT NULL)
+          `, [
+            r.name, r.brand || null,
+            skuVal, skuVal,
+            r.price, r.category, r.filter_type,
+            r.stock_quantity,
+            r.color || null, r.size || null, r.style || null
+          ]);
+          inserted++;
+        }
+        await migPool.query(`INSERT INTO data_migrations (key) VALUES ('new_items_20260720')`);
+        log(`New items insert 20260720: processed ${inserted} items`);
+      } catch (newItemsErr: any) {
+        console.error('New items insert 20260720 migration error (non-fatal):', newItemsErr.message);
+      }
+    }
+
     await migPool.end();
     log('App migrations complete');
   } catch (err: any) {
