@@ -575,6 +575,7 @@ async function runAppMigrations() {
       pos_stock INTEGER,
       found_at TIMESTAMP DEFAULT NOW()
     )`);
+    await migPool.query(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`);
     const { rows: alreadyRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'price_sync_20260710'`);
     if (alreadyRan.length === 0) {
       try {
@@ -1087,6 +1088,7 @@ async function runAppMigrations() {
         const { join: jDup } = await import('path');
         const dupIds: number[] = JSON.parse(rfsDup(jDup(process.cwd(), 'server/dupDeleteMigration20260720.json'), 'utf8'));
         const dupIdList = dupIds.join(',');
+        await migPool.query(`DELETE FROM cart_items WHERE supply_id IN (${dupIdList})`);
         const dupDelResult = await migPool.query(`DELETE FROM supplies WHERE id IN (${dupIdList})`);
         await migPool.query(`INSERT INTO data_migrations (key) VALUES ('dup_delete_20260720')`);
         log(`Dup/wrong-SKU delete 20260720: deleted ${dupDelResult.rowCount} items`);

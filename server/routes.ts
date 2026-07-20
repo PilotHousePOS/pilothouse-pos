@@ -2504,7 +2504,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         const found = await db.execute(sql`SELECT id, name, brand FROM supplies WHERE sku = ${item.sku} LIMIT 1`);
         if (!found.rows || found.rows.length === 0) {
           const mappedCat = POS_CATEGORY_MAP[item.posCategory] ?? null;
-          if (mappedCat) {
+          if (mappedCat && item.inStock > 0) {
             await db.execute(sql`
               INSERT INTO pos_pending_new_items (sku, item_name, brand, price, mapped_category, pos_stock, found_at)
               VALUES (${item.sku}, ${item.name}, ${item.brand || null}, ${item.price}, ${mappedCat}, ${item.inStock}, NOW())
