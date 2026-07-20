@@ -566,6 +566,15 @@ async function runAppMigrations() {
       threshold INTEGER DEFAULT 16
     )`);
     await migPool.query(`ALTER TABLE pos_zero_stock_tracker ADD COLUMN IF NOT EXISTS threshold INTEGER DEFAULT 16`);
+    await migPool.query(`CREATE TABLE IF NOT EXISTS pos_pending_new_items (
+      sku VARCHAR(50) PRIMARY KEY,
+      item_name TEXT,
+      brand TEXT,
+      price NUMERIC,
+      mapped_category VARCHAR(100),
+      pos_stock INTEGER,
+      found_at TIMESTAMP DEFAULT NOW()
+    )`);
     const { rows: alreadyRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'price_sync_20260710'`);
     if (alreadyRan.length === 0) {
       try {

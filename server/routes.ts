@@ -2469,15 +2469,53 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         name: String(r[0]).trim(),
         brand: String(r[1]).trim(),
         sku: String(r[2]).trim(),
+        posCategory: String(r[3]).trim(),
         inStock: Number(r[8]),
+        price: Number(r[9]) || 0,
       })).filter(i => i.sku.length >= 6);
 
-      let incremented = 0, reset = 0, nowEligible = 0, skipped = 0;
+      const POS_CATEGORY_MAP: Record<string, string> = {
+        'Accessories': 'accessories',
+        'Aquatic Fish/Plant': 'aquatics',
+        'Aquatics': 'aquatics',
+        'Beds': 'beds',
+        'Bird Supplies': 'birdSupplies',
+        'Cat Food': 'catFood',
+        'Cat Treats': 'catTreats',
+        'Dog Cages': 'dogCages',
+        'Dog Food': 'dogFood',
+        'Dog Treats': 'dogTreats',
+        'Healthcare': 'healthcare',
+        'Leashes And Collars': 'leashesAndCollars',
+        'Live Reptiles/Feeders': 'reptiles',
+        'Live Small Animals': 'smallAnimalSupplies',
+        'Reptiles': 'reptiles',
+        'Small Animal': 'smallAnimalSupplies',
+        'Toys': 'toys',
+        'Treats': 'dogTreats',
+      };
+      const SKIP_CATEGORIES = new Set(['Gift Cards', 'Grooming', 'Tips', 'Misc.', '']);
+
+      let incremented = 0, reset = 0, nowEligible = 0, skipped = 0, newItemCount = 0;
 
       for (const item of posItems) {
-        // Find matching supply by SKU
+        if (SKIP_CATEGORIES.has(item.posCategory)) { skipped++; continue; }
+
         const found = await db.execute(sql`SELECT id, name, brand FROM supplies WHERE sku = ${item.sku} LIMIT 1`);
-        if (!found.rows || found.rows.length === 0) { skipped++; continue; }
+        if (!found.rows || found.rows.length === 0) {
+          const mappedCat = POS_CATEGORY_MAP[item.posCategory] ?? null;
+          if (mappedCat) {
+            await db.execute(sql`
+              INSERT INTO pos_pending_new_items (sku, item_name, brand, price, mapped_category, pos_stock, found_at)
+              VALUES (${item.sku}, ${item.name}, ${item.brand || null}, ${item.price}, ${mappedCat}, ${item.inStock}, NOW())
+              ON CONFLICT (sku) DO UPDATE SET item_name = ${item.name}, brand = ${item.brand || null}, price = ${item.price}, mapped_category = ${mappedCat}, pos_stock = ${item.inStock}, found_at = NOW()
+            `);
+            newItemCount++;
+          } else {
+            skipped++;
+          }
+          continue;
+        }
         const supplyId = (found.rows[0] as any).id;
         const supplyName = (found.rows[0] as any).name;
         const supplyBrand = String((found.rows[0] as any).brand || '').toLowerCase();
@@ -2514,10 +2552,67 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         }
       }
 
-      res.json({ processed: posItems.length, incremented, reset, nowEligible, skipped });
+      res.json({ processed: posItems.length, incremented, reset, nowEligible, skipped, newItemCount });
     } catch (e: any) {
       console.error("POS scan upload error:", e);
       res.status(500).json({ message: "Failed to process POS file: " + e.message });
+    }
+  });
+
+  app.get("/api/admin/pos-scan/pending-new", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const result = await db.execute(sql`SELECT sku, item_name, brand, price, mapped_category, pos_stock, found_at FROM pos_pending_new_items ORDER BY mapped_category, item_name`);
+      res.json(result.rows);
+    } catch (e: any) {
+      res.status(500).json({ message: "Failed to load pending new items" });
+    }
+  });
+
+  app.post("/api/admin/pos-scan/add-new-item", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const { sku, item_name, brand, price, mapped_category } = req.body as { sku: string; item_name: string; brand: string; price: number; mapped_category: string };
+      if (!sku || !item_name || !mapped_category) return res.status(400).json({ message: "Missing required fields" });
+      await db.execute(sql`
+        INSERT INTO supplies (name, brand, sku, price, category, is_active, stock_quantity, created_at, updated_at)
+        VALUES (${item_name}, ${brand || null}, ${sku}, ${price || 0}, ${mapped_category}, TRUE, 0, NOW(), NOW())
+      `);
+      await db.execute(sql`DELETE FROM pos_pending_new_items WHERE sku = ${sku}`);
+      res.json({ ok: true });
+    } catch (e: any) {
+      console.error("Add new item error:", e);
+      res.status(500).json({ message: "Failed to add item: " + e.message });
+    }
+  });
+
+  app.post("/api/admin/pos-scan/dismiss-new-item", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const { sku } = req.body as { sku: string };
+      await db.execute(sql`DELETE FROM pos_pending_new_items WHERE sku = ${sku}`);
+      res.json({ ok: true });
+    } catch (e: any) {
+      res.status(500).json({ message: "Failed to dismiss" });
+    }
+  });
+
+  app.post("/api/admin/pos-scan/add-all-new", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const pending = await db.execute(sql`SELECT sku, item_name, brand, price, mapped_category FROM pos_pending_new_items`);
+      let added = 0;
+      for (const row of pending.rows as any[]) {
+        try {
+          await db.execute(sql`
+            INSERT INTO supplies (name, brand, sku, price, category, is_active, stock_quantity, created_at, updated_at)
+            VALUES (${row.item_name}, ${row.brand || null}, ${row.sku}, ${row.price || 0}, ${row.mapped_category}, TRUE, 0, NOW(), NOW())
+            ON CONFLICT DO NOTHING
+          `);
+          added++;
+        } catch { }
+      }
+      await db.execute(sql`DELETE FROM pos_pending_new_items`);
+      res.json({ added });
+    } catch (e: any) {
+      console.error("Add all new items error:", e);
+      res.status(500).json({ message: "Failed: " + e.message });
     }
   });
 

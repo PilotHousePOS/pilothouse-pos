@@ -2,9 +2,8 @@ import { useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, ShieldCheck, ShieldOff, Trash2, AlertTriangle, Clock } from "lucide-react";
+import { Upload, ShieldCheck, Trash2, AlertTriangle, Clock, PackagePlus, X, CheckCheck } from "lucide-react";
 
 interface TrackerItem {
   supply_id: number;
@@ -16,24 +15,49 @@ interface TrackerItem {
   protected: boolean;
 }
 
+interface PendingNewItem {
+  sku: string;
+  item_name: string;
+  brand: string;
+  price: number;
+  mapped_category: string;
+  pos_stock: number;
+}
+
 interface Stats {
   eligible: TrackerItem[];
   approaching: TrackerItem[];
   summary: { total: number; eligible_count: number; protected_count: number };
 }
 
+interface UploadResult {
+  processed: number;
+  incremented: number;
+  reset: number;
+  nowEligible: number;
+  skipped: number;
+  newItemCount: number;
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  accessories: "Accessories", aquatics: "Aquatics", beds: "Beds",
+  birdSupplies: "Bird Supplies", catFood: "Cat Food", catTreats: "Cat Treats",
+  dogCages: "Dog Cages", dogFood: "Dog Food", dogTreats: "Dog Treats",
+  healthcare: "Healthcare", leashesAndCollars: "Leashes & Collars",
+  reptiles: "Reptiles", smallAnimalSupplies: "Small Animal", toys: "Toys",
+};
+
 function CountBar({ count, threshold }: { count: number; threshold: number }) {
   const pct = Math.min((count / threshold) * 100, 100);
   const ratio = count / threshold;
   const color = ratio >= 1 ? "bg-red-500" : ratio >= 0.75 ? "bg-orange-500" : "bg-yellow-500";
-  const isCoastal = threshold === 50;
   return (
     <div className="flex items-center gap-2">
       <div className="flex-1 h-1.5 bg-zinc-700 rounded-full overflow-hidden">
         <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
       </div>
       <span className="text-xs font-mono text-zinc-300 w-14 text-right">
-        {count}/{threshold}{isCoastal ? " 🐍" : ""}
+        {count}/{threshold}{threshold === 50 ? " 🐍" : ""}
       </span>
     </div>
   );
@@ -42,12 +66,15 @@ function CountBar({ count, threshold }: { count: number; threshold: number }) {
 export default function PosScanTracker() {
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [uploadResult, setUploadResult] = useState<{
-    processed: number; incremented: number; reset: number; nowEligible: number; skipped: number;
-  } | null>(null);
+  const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
 
-  const { data: stats, isLoading } = useQuery<Stats>({
+  const { data: stats, isLoading: statsLoading } = useQuery<Stats>({
     queryKey: ["/api/admin/pos-scan/stats"],
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: pendingNew = [], isLoading: pendingLoading } = useQuery<PendingNewItem[]>({
+    queryKey: ["/api/admin/pos-scan/pending-new"],
     refetchOnWindowFocus: false,
   });
 
@@ -55,20 +82,17 @@ export default function PosScanTracker() {
     mutationFn: async (file: File) => {
       const form = new FormData();
       form.append("file", file);
-      const res = await fetch("/api/admin/pos-scan/upload", {
-        method: "POST",
-        body: form,
-        credentials: "include",
-      });
+      const res = await fetch("/api/admin/pos-scan/upload", { method: "POST", body: form, credentials: "include" });
       if (!res.ok) throw new Error(await res.text());
-      return res.json();
+      return res.json() as Promise<UploadResult>;
     },
     onSuccess: (result) => {
       setUploadResult(result);
       queryClient.invalidateQueries({ queryKey: ["/api/admin/pos-scan/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pos-scan/pending-new"] });
       toast({
         title: "POS file processed",
-        description: `${result.incremented} items incremented · ${result.reset} counters reset · ${result.nowEligible} newly eligible`,
+        description: `${result.incremented} incremented · ${result.reset} reset · ${result.nowEligible} newly eligible · ${result.newItemCount} new items found`,
       });
     },
     onError: (e: any) => toast({ title: "Upload failed", description: e.message, variant: "destructive" }),
@@ -77,9 +101,7 @@ export default function PosScanTracker() {
   const protectMutation = useMutation({
     mutationFn: async ({ supplyId, protect }: { supplyId: number; protect: boolean }) => {
       const res = await fetch("/api/admin/pos-scan/protect", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
         body: JSON.stringify({ supplyId, protect }),
       });
       if (!res.ok) throw new Error(await res.text());
@@ -91,58 +113,81 @@ export default function PosScanTracker() {
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/admin/pos-scan/delete-eligible", {
-        method: "POST",
-        credentials: "include",
-      });
+      const res = await fetch("/api/admin/pos-scan/delete-eligible", { method: "POST", credentials: "include" });
       if (!res.ok) throw new Error(await res.text());
       return res.json();
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/pos-scan/stats"] });
-      toast({ title: `Deleted ${result.deleted} items`, description: "Items with 10+ consecutive zero-stock scans removed" });
+      toast({ title: `Deleted ${result.deleted} items` });
     },
     onError: (e: any) => toast({ title: "Delete failed", description: e.message, variant: "destructive" }),
+  });
+
+  const addItemMutation = useMutation({
+    mutationFn: async (item: PendingNewItem) => {
+      const res = await fetch("/api/admin/pos-scan/add-new-item", {
+        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+        body: JSON.stringify({ sku: item.sku, item_name: item.item_name, brand: item.brand, price: item.price, mapped_category: item.mapped_category }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/admin/pos-scan/pending-new"] }),
+    onError: (e: any) => toast({ title: "Failed to add item", description: e.message, variant: "destructive" }),
+  });
+
+  const dismissItemMutation = useMutation({
+    mutationFn: async (sku: string) => {
+      const res = await fetch("/api/admin/pos-scan/dismiss-new-item", {
+        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+        body: JSON.stringify({ sku }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/admin/pos-scan/pending-new"] }),
+  });
+
+  const addAllMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/admin/pos-scan/add-all-new", { method: "POST", credentials: "include" });
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pos-scan/pending-new"] });
+      toast({ title: `Added ${result.added} new items to inventory` });
+    },
+    onError: (e: any) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
   });
 
   const eligible = stats?.eligible ?? [];
   const approaching = stats?.approaching ?? [];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-lg font-bold text-white">POS Zero-Stock Tracker</h2>
           <p className="text-xs text-zinc-400 mt-0.5">
-            Upload the ExaTouch Items export. Regular items flagged after <strong className="text-zinc-300">16 consecutive zero-stock scans</strong> (~2 months at 2/week). Coastal items require <strong className="text-zinc-300">50 scans</strong> (~6 months). Only POS quantity counts — app stock is ignored. Deletion is always manual.
+            Upload the ExaTouch Items export. Regular items flagged after <strong className="text-zinc-300">16 consecutive zero-stock scans</strong> (~2 months at 2/week).
+            Coastal items require <strong className="text-zinc-300">50 scans</strong> (~6 months).
+            Only POS quantity counts — app stock is ignored. Deletion is always manual.
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
           <input ref={fileRef} type="file" accept=".xls,.xlsx" className="hidden"
-            onChange={e => {
-              const f = e.target.files?.[0];
-              if (f) { uploadMutation.mutate(f); e.target.value = ""; }
-            }} />
-          <Button
-            onClick={() => fileRef.current?.click()}
-            disabled={uploadMutation.isPending}
-            className="bg-blue-600 hover:bg-blue-500 text-white text-xs"
-            size="sm">
+            onChange={e => { const f = e.target.files?.[0]; if (f) { uploadMutation.mutate(f); e.target.value = ""; } }} />
+          <Button onClick={() => fileRef.current?.click()} disabled={uploadMutation.isPending}
+            className="bg-blue-600 hover:bg-blue-500 text-white text-xs" size="sm">
             <Upload className="w-3 h-3 mr-1" />
             {uploadMutation.isPending ? "Processing…" : "Upload POS XLS"}
           </Button>
           {eligible.length > 0 && (
-            <Button
-              onClick={() => {
-                if (confirm(`Delete ${eligible.length} items that have been at 0 stock on the POS 10+ times? This cannot be undone.`)) {
-                  deleteMutation.mutate();
-                }
-              }}
-              disabled={deleteMutation.isPending}
-              variant="destructive"
-              size="sm"
-              className="text-xs">
+            <Button onClick={() => { if (confirm(`Permanently delete ${eligible.length} items with 10+ zero-stock scans?`)) deleteMutation.mutate(); }}
+              disabled={deleteMutation.isPending} variant="destructive" size="sm" className="text-xs">
               <Trash2 className="w-3 h-3 mr-1" />
               {deleteMutation.isPending ? "Deleting…" : `Delete ${eligible.length} Eligible`}
             </Button>
@@ -150,15 +195,16 @@ export default function PosScanTracker() {
         </div>
       </div>
 
-      {/* Upload result summary */}
+      {/* Upload result */}
       {uploadResult && (
-        <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-3 grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
+        <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-3 grid grid-cols-3 sm:grid-cols-6 gap-3 text-center">
           {[
             { label: "Processed", value: uploadResult.processed, color: "text-white" },
             { label: "Incremented", value: uploadResult.incremented, color: "text-yellow-400" },
             { label: "Reset to 0", value: uploadResult.reset, color: "text-green-400" },
             { label: "Now Eligible", value: uploadResult.nowEligible, color: "text-red-400" },
-            { label: "No DB Match", value: uploadResult.skipped, color: "text-zinc-500" },
+            { label: "New Items", value: uploadResult.newItemCount, color: "text-blue-400" },
+            { label: "Skipped", value: uploadResult.skipped, color: "text-zinc-500" },
           ].map(s => (
             <div key={s.label}>
               <div className={`text-xl font-bold ${s.color}`}>{s.value.toLocaleString()}</div>
@@ -169,22 +215,59 @@ export default function PosScanTracker() {
       )}
 
       {/* Summary pills */}
-      {!isLoading && stats && (
-        <div className="flex gap-3 flex-wrap">
-          <span className="text-xs bg-zinc-800 border border-zinc-700 rounded-full px-3 py-1 text-zinc-300">
-            {stats.summary.total?.toLocaleString() ?? 0} items tracked
-          </span>
-          <span className="text-xs bg-red-950 border border-red-800 rounded-full px-3 py-1 text-red-300">
-            {eligible.length} ready to delete
-          </span>
-          <span className="text-xs bg-orange-950 border border-orange-800 rounded-full px-3 py-1 text-orange-300">
-            {approaching.length} approaching threshold
-          </span>
+      {!statsLoading && stats && (
+        <div className="flex gap-2 flex-wrap">
+          <span className="text-xs bg-zinc-800 border border-zinc-700 rounded-full px-3 py-1 text-zinc-300">{stats.summary.total?.toLocaleString() ?? 0} tracked</span>
+          <span className="text-xs bg-red-950 border border-red-800 rounded-full px-3 py-1 text-red-300">{eligible.length} ready to delete</span>
+          <span className="text-xs bg-orange-950 border border-orange-800 rounded-full px-3 py-1 text-orange-300">{approaching.length} approaching</span>
           {(stats.summary.protected_count ?? 0) > 0 && (
-            <span className="text-xs bg-green-950 border border-green-800 rounded-full px-3 py-1 text-green-300">
-              {stats.summary.protected_count} protected
-            </span>
+            <span className="text-xs bg-green-950 border border-green-800 rounded-full px-3 py-1 text-green-300">{stats.summary.protected_count} protected</span>
           )}
+          {pendingNew.length > 0 && (
+            <span className="text-xs bg-blue-950 border border-blue-800 rounded-full px-3 py-1 text-blue-300">{pendingNew.length} new from POS</span>
+          )}
+        </div>
+      )}
+
+      {/* New items from POS */}
+      {pendingNew.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <PackagePlus className="w-4 h-4 text-blue-400" />
+              <h3 className="text-sm font-semibold text-blue-400">New from POS — Not Yet in App ({pendingNew.length})</h3>
+            </div>
+            <Button size="sm" className="text-xs bg-blue-700 hover:bg-blue-600 text-white h-7"
+              onClick={() => { if (confirm(`Add all ${pendingNew.length} new items to your inventory? Each will use the auto-mapped category and POS price.`)) addAllMutation.mutate(); }}
+              disabled={addAllMutation.isPending}>
+              <CheckCheck className="w-3 h-3 mr-1" />
+              {addAllMutation.isPending ? "Adding…" : `Add All ${pendingNew.length}`}
+            </Button>
+          </div>
+          <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
+            {pendingNew.map(item => (
+              <div key={item.sku} className="flex items-center gap-2 bg-zinc-900 border border-blue-900/30 rounded-lg px-3 py-2">
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm text-white truncate">{item.item_name}</div>
+                  <div className="flex gap-2 text-[11px] text-zinc-500 flex-wrap">
+                    <span>{item.brand || "—"}</span>
+                    <span>{item.sku}</span>
+                    <span className="text-green-400">${item.price?.toFixed(2)}</span>
+                    <span className="text-blue-400">{CATEGORY_LABELS[item.mapped_category] ?? item.mapped_category}</span>
+                    {item.pos_stock <= 0 && <span className="text-yellow-500">POS stock: {item.pos_stock}</span>}
+                  </div>
+                </div>
+                <Button size="sm" className="text-[10px] bg-blue-800 hover:bg-blue-700 text-white shrink-0 h-7 px-2"
+                  onClick={() => addItemMutation.mutate(item)} disabled={addItemMutation.isPending}>
+                  Add
+                </Button>
+                <Button size="sm" variant="ghost" className="text-zinc-500 hover:text-red-400 shrink-0 h-7 w-7 p-0"
+                  onClick={() => dismissItemMutation.mutate(item.sku)} disabled={dismissItemMutation.isPending}>
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -203,8 +286,7 @@ export default function PosScanTracker() {
                   <div className="text-[11px] text-zinc-500">{item.sku}</div>
                   <CountBar count={item.zero_count} threshold={item.threshold ?? 16} />
                 </div>
-                <Button
-                  size="sm" variant="outline"
+                <Button size="sm" variant="outline"
                   className="text-[10px] border-green-800 text-green-400 hover:bg-green-950 shrink-0 h-7 px-2"
                   onClick={() => protectMutation.mutate({ supplyId: item.supply_id, protect: true })}
                   disabled={protectMutation.isPending}>
@@ -231,8 +313,7 @@ export default function PosScanTracker() {
                   <div className="text-[11px] text-zinc-500">{item.sku}</div>
                   <CountBar count={item.zero_count} threshold={item.threshold ?? 16} />
                 </div>
-                <Button
-                  size="sm" variant="outline"
+                <Button size="sm" variant="outline"
                   className="text-[10px] border-green-800 text-green-400 hover:bg-green-950 shrink-0 h-7 px-2"
                   onClick={() => protectMutation.mutate({ supplyId: item.supply_id, protect: true })}
                   disabled={protectMutation.isPending}>
@@ -244,7 +325,7 @@ export default function PosScanTracker() {
         </div>
       )}
 
-      {!isLoading && eligible.length === 0 && approaching.length === 0 && (
+      {!statsLoading && !pendingLoading && eligible.length === 0 && approaching.length === 0 && pendingNew.length === 0 && (
         <div className="text-center py-10 text-zinc-500 text-sm">
           {stats?.summary.total ? (
             <p>All tracked items are below the warning threshold. Upload another POS file to update counts.</p>
