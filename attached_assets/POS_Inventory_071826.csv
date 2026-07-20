@@ -1,4 +1,4 @@
-Name,Brand,SKU,Category,SubCategory,Color,Size,In Stock,Price
+﻿Name,Brand,SKU,Category,SubCategory,Color,Size,In Stock,Price
 TetraPro Goldfish 3.03 oz,Tetra,046798770763,Aquatics,,,,2.00,$10.49
 TetraPro Goldfish 7.9 oz,Tetra,046798770770,Aquatics,,,,3.00,$26.24
 Aqueon Goldfish Granules 5.8 o,Aqueon,015905060530,Aquatics,,,,4.00,$7.63
@@ -56,9 +56,9 @@ Intersand Fresh & Natural Fresh & Scen,Natural,777979156105,Accessories,20lb,,,-
 World's Best Cat Litter Multip Litter 15lb,World's Best Cat,322591006156,Accessories,,,,1.00,$36.74
 Arm & Hammer Clump & Arm & Seal Slid,Hammer,033200973546,Accessories,,,,2.00,$25.19
 Naturally Fresh Herbal Attract,Naturally Fresh,750244220060,Accessories,,,,1.00,$29.39
-CascadeCorner Filter Rep,Penn Plax,030172072604,Aquatics,,,,2.00,$6.54
-CascadeCorner Filter Rep,Penn Plax,030172072598,Aquatics,,,,2.00,$5.45
-CascadeCorner Filter Rep,Penn Plax,030172072581,Aquatics,,,,3.00,$4.36
+Cascade(R)Corner Filter Rep,Penn Plax,030172072604,Aquatics,,,,2.00,$6.54
+Cascade(R)Corner Filter Rep,Penn Plax,030172072598,Aquatics,,,,2.00,$5.45
+Cascade(R)Corner Filter Rep,Penn Plax,030172072581,Aquatics,,,,3.00,$4.36
 Marina Slim Filter Zeolite Marina Plu,,015561102933,Aquatics,,,,3.00,$7.63
 Marina Slim Filter Carbon Marina Plus,,015561102919,Aquatics,,,,3.00,$7.63
 Marina Top Filter Cartridge fo,Marina,015561133159,Aquatics,,,,5.00,$7.63
@@ -80,29 +80,29 @@ Milk-Bone Biscuits Small Milk Bone 24 oz,,079100902026,Treats,,,,0.00,$10.49
 Milk-Bone Peanut Buttery Milk Bone Bites,,079100579648,Treats,,,,1.00,$7.63
 Fluval AquaSky 3.0 LED Fluval 35 watt,,015561166430,Aquatics,,,,0.00,$173.24
 Marina Decor Wood Ornament Ext,Marina,015561120630,Aquatics,,,,2.00,$20.99
-shorefinsBubble Wall Penn Plax UE Filt,,030172335075,Aquatics,,,,3.00,$6.54
-CascadeAqua-Mist Penn Plax Air Stone,,030172333040,Aquatics,,,,0.00,$3.27
-shorefinsSuper-Flex Airline Pink,Penn Plax,030172105333,Aquatics,,,,4.00,$4.36
-shorefinsSuper-Flex Airline,Penn Plax,030172105340,Aquatics,,,,3.00,$4.36
+shorefins(R)Bubble Wall Penn Plax UE Filt,,030172335075,Aquatics,,,,3.00,$6.54
+Cascade(R)Aqua-Mist(R) Penn Plax Air Stone,,030172333040,Aquatics,,,,0.00,$3.27
+shorefins(R)Super-Flex Airline Pink,Penn Plax,030172105333,Aquatics,,,,4.00,$4.36
+shorefins(R)Super-Flex Airline,Penn Plax,030172105340,Aquatics,,,,3.00,$4.36
 Aquatop Check Valve/Air Aquatop Filter,,810281018652,Aquatics,,,,3.00,$4.36
-Action-AirSkeleton at Penn Plax Wheel,,030172010750,Aquatics,,,,3.00,$22.04
-Action-AirTreasure Diver - M,Penn Plax,030172010651,Aquatics,,,,2.00,$22.04
-Action-AirGiant Clam - Penn Plax Mediu,,030172010514,Aquatics,,,,1.00,$18.89
+Action-Air(R)Skeleton at Penn Plax Wheel,,030172010750,Aquatics,,,,3.00,$22.04
+Action-Air(R)Treasure Diver - M,Penn Plax,030172010651,Aquatics,,,,2.00,$22.04
+Action-Air(R)Giant Clam - Penn Plax Mediu,,030172010514,Aquatics,,,,1.00,$18.89
 Aquarium Solutions Bacto-Surge,Hikari,042055960441,Aquatics,,,,2.00,$12.59
-shorefinsDecorative Aquarium,Penn Plax,030172105791,Aquatics,,,,2.00,$31.49
-shorefinsBubble Bug Air Pump,Penn Plax,030172087776,Aquatics,,,,2.00,$17.84
-shorefinsAir-Tech 2K4 - For,Penn Plax,030172290510,Aquatics,,,,2.00,$36.74
+shorefins(R)Decorative Aquarium,Penn Plax,030172105791,Aquatics,,,,2.00,$31.49
+shorefins(R)Bubble Bug Air Pump,Penn Plax,030172087776,Aquatics,,,,2.00,$17.84
+shorefins(R)Air-Tech 2K4 - For,Penn Plax,030172290510,Aquatics,,,,2.00,$36.74
 Air-Tech 2K1 10 Gal,Penn Plax,030172290480,Aquatics,,,,3.00,$20.99
-CascadeAir Pod AC/DC Aquariu,Penn Plax,030172047541,Aquatics,,,,1.00,$69.29
-CascadeLok-Tite® 2- Penn Plax Gang Valv,,030172191206,Aquatics,,,,1.00,$8.73
+Cascade(R)Air Pod AC/DC Aquariu,Penn Plax,030172047541,Aquatics,,,,1.00,$69.29
+Cascade(R)Lok-Tite(R) 2- Penn Plax Gang Valv,,030172191206,Aquatics,,,,1.00,$8.73
 Lee's Two Way Plastic Valve,Lee,010838141141,Aquatics,,,,0.00,$1.37
 Zoo Med Digital Aquarium Zoo Med Therm,,097612300260,Aquatics,,,,1.00,$11.54
 LCR Aquarium Thermometer,lcr Hallcrest,034637309618,Aquatics,,,,11.00,$3.27
 LCR Aquarium Thermometer,lcr Hallcrest,034637309724,Aquatics,,,,3.00,$4.36
 AquaLife Therma-Temp Penn Plax,,030172371035,Aquatics,,,,4.00,$5.45
-CascadeTherma- TempFloating,Penn Plax,030172371011,Aquatics,,,,6.00,$5.45
+Cascade(R)Therma- Temp(R)Floating,Penn Plax,030172371011,Aquatics,,,,6.00,$5.45
 Mag-Float Floating Magnet Glas,Mag Float,790950000303,Aquatics,,,,1.00,$27.29
-shorefinsPlant-Air Tubing,Penn Plax,030172277016,Aquatics,,,,1.00,$9.44
+shorefins(R)Plant-Air Tubing,Penn Plax,030172277016,Aquatics,,,,1.00,$9.44
 Marina EZ Care Plus Betta Aqua,Marina,015561133364,Aquatics,,White,,1.00,$36.74
 Marina EZ Care Plus Betta Aqua,Marina,015561133371,Aquatics,,Blue,,1.00,$30.44
 Tetra Water Wonders Aquarium K,Tetra,046798291374,Aquatics,,,,1.00,$47.24
@@ -111,12 +111,12 @@ Marina LED Aquarium Kit 10 gal,Marina,015561152563,Aquatics,,,,2.00,$104.99
 GloFish Cresent Aquarium Kit B,Tetra,046798290452,Aquatics,,,,0.00,$83.99
 GloFish Glass Aquarium Kit Bla,Tetra,047497331798,Aquatics,,,,1.00,$125.99
 GloFish Betta Trilogy Aquarium,Tetra,046798784081,Aquatics,,,,1.00,$104.99
-shorefinsBetta Tank Kit Penn Plax with,,030172097690,Aquatics,,,,1.00,$41.99
-CascadeGlass Tank Kit with L,Penn Plax,030172099298,Aquatics,,,,1.00,$94.49
+shorefins(R)Betta Tank Kit Penn Plax with,,030172097690,Aquatics,,,,1.00,$41.99
+Cascade(R)Glass Tank Kit with L,Penn Plax,030172099298,Aquatics,,,,1.00,$94.49
 Aqueon Standard Glass Aqueon Rectangl,,015905100106,Aquatics,,,,7.00,$20.99
 NANO FILTER & AIR PUMP USB POW,Penn Plax,030172106200,Aquatics,,,,1.00,$19.94
 Zoo Med Betta Mopani Wood Brow,Zoo Med,097612242102,Aquatics,,,,2.00,$3.27
-shorefinsBetta World Shorefins Pump &,,030172391286,Aquatics,,,,2.00,$30.44
+shorefins(R)Betta World Shorefins Pump &,,030172391286,Aquatics,,,,2.00,$30.44
 Zoo Med Betta Bling Diver Aqua,Zoo Med,097612242225,Aquatics,,,,2.00,$7.63
 Zoo Med Betta Bling Mermaid Aq,Zoo Med,097612242218,Aquatics,,,,0.00,$7.63
 Zoo Med Floating Betta Log Aqu,Zoo Med,097612240023,Aquatics,,,,2.00,$13.64
@@ -131,8 +131,8 @@ Active Betta Water 33.8fl Active Betta oz,,029904109619,Reptiles,,,,0.00,$6.54
 Fritz Betta Water Purified Fritz Wat,,080531111130,Aquatics,,,,0.00,$7.63
 Marina Decorative Gravel Marina Surf,,015561123945,Aquatics,,,,2.00,$4.36
 Jurassimite,Jurrasipet,0011685460,Reptiles,,,,0.00,$11.54
-shorefinsBetta World Aquatic,Penn Plax,030172093036,Aquatics,,,,2.00,$10.49
-shorefinsBetta World Aquatic,Penn Plax,030172093029,Aquatics,,,,0.00,$8.73
+shorefins(R)Betta World Aquatic,Penn Plax,030172093036,Aquatics,,,,2.00,$10.49
+shorefins(R)Betta World Aquatic,Penn Plax,030172093029,Aquatics,,,,0.00,$8.73
 Betta World LED Clip On Penn Plax Aquari,,030172071430,Aquatics,,,,1.00,$26.24
 Marina Decor Wood Ornament Min,Hagen,015561120555,Aquatics,,,,1.00,$5.45
 Hikari USA Betta BioGold Hikari Pelle,,042055191012,Aquatics,,,,4.00,$3.27
@@ -145,9 +145,9 @@ Zoo Med Betta Bed Leaf Zoo Med Hammock,,097612240085,Aquatics,,,,2.00,$5.45
 Fluval 3 in 1 Waster Remover/F,Fluval,015561110952,Aquatics,,,,2.00,$7.63
 Zoo Med Betta Tunnel,Zoo Med,097612240719,Aquatics,,,,2.00,$8.73
 Zoo Med Betta Floating Lounge,Zoo Med,097612240702,Aquatics,,,,2.00,$9.44
-shorefinsBetta World Decorat,Penn Plax,030172093180,Aquatics,,,,2.00,$8.73
-Tide & TreasureGlow in the D,Penn Plax,030172089046,Aquatics,,,,4.00,$4.36
-Tide & Treasure Moneywort - G,Penn Plax,030172069048,Aquatics,,,,8.00,$3.27
+shorefins(R)Betta World Decorat,Penn Plax,030172093180,Aquatics,,,,2.00,$8.73
+Tide & Treasure(R)Glow in the D,Penn Plax,030172089046,Aquatics,,,,4.00,$4.36
+Tide & Treasure(R) Moneywort - G,Penn Plax,030172069048,Aquatics,,,,8.00,$3.27
 Pro Plan Live Clear Allergen R,Pro Plan,038100191366,Cat Food,Bag,lb,,5.00,$44.09
 Vital Essentials Lamb & White,Vital Essentials,840199680238,Dog Food Bag,lb,,,1.00,$31.49
 Vital Essentials Beef & Salmon,Vital Essentials,840199680214,Dog Food Bag,lb,,,0.00,$30.44
@@ -228,8 +228,8 @@ BFF PLAY Paté Tuna & BFF Chicken,,813778016070,Cat Food,Can,Blue,3oz,6.00,$1.52
 Earthborn Holistic Harbor Earthborn Harv,,034846715132,Cat Food,Can,Pink,3oz,22.00,$1.62
 Fromm FOUR STAR GF Fromm HASEN DUCKE,,072705114603,Dog Food Bag,26lb,,,0.00,$82.94
 Fromm FOUR STAR GF Fromm BEEF Fritta,,072705114108,Dog Food Bag,26lb,,,1.00,$82.94
-Tuffy¶s Gold Chicken & Rice Fo,Tuffys,073893025504,Dog Food Can,Green,,12.5oz,16.00,$2.50
-Tuffy¶s Gold Chicken & Fish Fo,Tuffys,073893025511,Dog Food Can,Blue,,12.5oz,11.00,$2.50
+Tuffy's Gold Chicken & Rice Fo,Tuffys,073893025504,Dog Food Can,Green,,12.5oz,16.00,$2.50
+Tuffy's Gold Chicken & Fish Fo,Tuffys,073893025511,Dog Food Can,Blue,,12.5oz,11.00,$2.50
 Fromm GOLD WEIGHT Fromm MANAGEMENT D,,072705105731,Dog Food Bag,15lb,,,0.00,$37.79
 Harvest Selects Northern Nutrisource Feast,,073893020370,Dog Food Can,Blue,,13oz,2.00,$2.82
 Nutrisource Harvest Selects Fi,Nutrisource,073893020363,Dog Food Can,Burgundy,,13oz,0.00,$2.82
@@ -806,7 +806,7 @@ Safari Large Nail Trimmer Coastal Class Cab Sweater Pink Coastal Extra S,$13.64,
 Baby Shark Big Show Tank,Penn-Plax,030172103247,Aquatics,,,,1.00,$30.44
 Coastal Safari Shed Magic Long,Coastal,076484961250,Healthcare,,,,0.00,$29.39
 Coastal Safari Flea Comb Coastal,,076484513091,Healthcare,,,,78.00,$3.27
-shorefinsBetta World Aquatic,Penn Plax,030172093043,Aquatics,,,,2.00,$8.73
+shorefins(R)Betta World Aquatic,Penn Plax,030172093043,Aquatics,,,,2.00,$8.73
 "Aquaplnt 4"" Green Plant",Penn-Plax,030172093081,Aquatics,,,,5.00,$3.27
 Coastal Safari Nail Trimmer Sm,Coastal,076484006098,Healthcare,,,,3.00,$9.44
 Coastal Double-Ply Dog Collar,Coastal And Collars,076484029035,Leashes And Collars,,,,0.00,$12.99
@@ -1220,9 +1220,9 @@ Zoo Med Deluxe Shovel Scooper,Zoo Med,097612623017,Reptiles,,,,0.00,$10.49
 Zoo Med Stainless Steel Feedin,Zoo Med,097612622102,Reptiles,,,,3.00,$13.64
 Zoo Med Lizard Flower Food To,Zoo Med,097612401448,Reptiles,,,,-2.00,$7.63
 Zoo Med Creatures Food Pellet,Zoo Med,097612008616,Reptiles,,,,1.00,$2.17
-Hikari USA Herptile DragonGel,Hikari,042055206167,Reptiles,,,,-1.00,$10.49
-Hikari USA Herptile CrestGel,Hikari,042055206112,Reptiles,,,,-1.00,$10.49
-Hikari USA Herptile LeopaGel,Hikari,042055206068,Reptiles,,,,1.00,$11.54
+Hikari USA Herptile DragonGel(R),Hikari,042055206167,Reptiles,,,,-1.00,$10.49
+Hikari USA Herptile CrestGel(R),Hikari,042055206112,Reptiles,,,,-1.00,$10.49
+Hikari USA Herptile LeopaGel(R),Hikari,042055206068,Reptiles,,,,1.00,$11.54
 Perch Covers 6 pk Supplies,Penn-Plax,030172902949,Bird,,,,3.00,$5.45
 Zoo Med LED SKull Waterfall Sm,Zoo Med,097612910261,Reptiles,,,,1.00,$83.99
 Exo Tedrra Waterfall Small,Exo Terra,015561229104,Reptiles,,,,-1.00,$48.29
@@ -1297,7 +1297,7 @@ Worm Eze Liquid,Durvet,745801105454,Healthcare,,,,3.00,$12.59
 Zoo Med Naturalistic Terrarium,Zoo Med,097612325188,Reptiles,,,,1.00,$9.44
 Zoo Med Naturalistic Terrarium,Zoo Med,097612325126,Reptiles,,,,1.00,$5.45
 Galapagos Natural Spanish Moss,Galapagos,759834051602,Reptiles,,,,2.00,$9.44
-ReptologyLizard- LoungerCoc,Pennplax,030172096617,Reptiles,,,,2.00,$27.29
+Reptology(R)Lizard- Lounger(R)Coc,Pennplax,030172096617,Reptiles,,,,2.00,$27.29
 Corner Lizard Lounger Climbing,Pennplax,030172086816,Reptiles,,,,1.00,$31.49
 Fluker's Premium Tropical Flukers Cyp,,091197360114,Reptiles,,,,-1.00,$11.54
 Zilla Reptile Comfort Bedding,Zilla,096316003767,Reptiles,,,,0.00,$12.59
@@ -1380,13 +1380,13 @@ Earthbath 3 in 1 Deoderizing S,Earthbath,602644022068,Healthcare,,,,3.00,$17.84
 Earthbath Hot Spot Relief Earthbath Spra,,602644022013,Healthcare,,,,1.00,$17.84
 Furminator Deshedding Spray Furminator Rinse Free Desheddi,Furminator $14.69,811794933586,Healthcare,,,,1.00,$14.69
 Kong Zoom Groom Humidity Plus Silicone Terrari,Kong $13.64,035585511115,Healthcare,,,,1.00,$14.69
-Little Bites Peanut Butter,Nutrisource,073893800149,Dog Treats None    Purple,6,oz,,4.00,$7.63
-Little Bites Trout,Nutrisource,073893800163,Dog Treats None    Red,6,oz,,3.00,$7.63
-Little Bites Salmom,Nutrisource,073893800071,Dog Treats None    Blue,6,oz,,2.00,$7.63
-Little Bites Beef,Nutrisource,073893800170,Dog Treats None    Purple,6,oz,,4.00,$7.63
-Little Bites Turkey,Nutrisource,073893800156,Dog Treats None    Burgundy,6,oz,,4.00,$7.63
-Crispy Crispers Chicken,Nutrisource,073893301110,Dog Treats None    Purple,4,oz,,3.00,$7.63
-Big Bites Beef,Nutrisource,073893800187,Dog Treats None    Purple,14,oz,,2.00,$13.64
+Little Bites Peanut Butter,Nutrisource,073893800149,Dog Treats None Purple,6,oz,,4.00,$7.63
+Little Bites Trout,Nutrisource,073893800163,Dog Treats None Red,6,oz,,3.00,$7.63
+Little Bites Salmom,Nutrisource,073893800071,Dog Treats None Blue,6,oz,,2.00,$7.63
+Little Bites Beef,Nutrisource,073893800170,Dog Treats None Purple,6,oz,,4.00,$7.63
+Little Bites Turkey,Nutrisource,073893800156,Dog Treats None Burgundy,6,oz,,4.00,$7.63
+Crispy Crispers Chicken,Nutrisource,073893301110,Dog Treats None Purple,4,oz,,3.00,$7.63
+Big Bites Beef,Nutrisource,073893800187,Dog Treats None Purple,14,oz,,2.00,$13.64
 Grillin' Grillers Chicken,Nutrisource,073893801009,Dog Treats,Purple,,12oz,2.00,$8.73
 Grillin' Grillers Beef,Nutrisource,073893801023,Dog Treats,Purple,,12oz,3.00,$8.73
 Fromm Tenderollies ChickaRolli,Fromm,072705126200,Treats,,Burgundy,8oz,1.00,$10.49
@@ -1785,7 +1785,7 @@ Royal Canin Kitten 3oz Canin,Royal,030111410184,Cat Food,Can,,3oz,-11.00,$3.04
 Hill's Science Diet AdultScience 7+ I Hill's Science Diet Kitten,Diet,052742075815,Cat Food,Can,Red,2.8oz,12.00,$2.17
 Science Sav,Diet,052742075839,Cat Food,Can,Green,2.8oz,12.00,$1.62
 Hill's Science Diet AdultScience Urin,Diet,052742075891,Cat Food,Can,Silver,2.9oz,22.00,$2.17
-Hill's Science Diet AdultScience Urin,Diet,052742075853,Cat Food     Can      Silver,5.5,oz,,11.00,$2.17
+Hill's Science Diet AdultScience Urin,Diet,052742075853,Cat Food Can Silver,5.5,oz,,11.00,$2.17
 Hill's Science Diet AdultScience Urin,Diet,052742075556,Cat Food,Can,Silver,2.9oz,-18.00,$2.17
 Wee Wee Disposable Diapers Small,Wee-Wee,045663974404,Accessories,,,,1.00,$41.99
 Aqueon T8 Full Spec 18'l Aqueon,,045663976019,Aquatics,,,,0.00,$9.44
@@ -2062,9 +2062,9 @@ Spot Yarn Rolls 2pk,Spot,077234521571,Toys,,Brown,12.5oz,2.00,$7.63
 NutriSource PureVita Turkey St,Nutrisource,073893962076,Dog Food,Can,Burgundy,12.5oz,1.00,$3.48
 NutriSource PureVita Beef Stew,Nutrisource,073893962083,Dog Food,Can,Brown,12.5oz,2.00,$3.48
 NutriSource PureVita Chicken S,Nutrisource,073893962052,Dog Food,Can,Red,12.5oz,0.00,$3.48
-NutriSource Come- Pooch-A Beef,Nutrisource,073893905028,Dog Food     Can      Burgundy,7,oz,,5.00,$5.44
-NutriSource Come- Pooch-A Chick,Nutrisource,073893905004,Dog Food     Can      Blue,7,oz,,6.00,$5.44
-NutriSource Come- Pooch-A Turke,Nutrisource,073893905011,Dog Food     Can      Green,7,oz,,11.00,$6.53
+NutriSource Come- Pooch-A Beef,Nutrisource,073893905028,Dog Food Can Burgundy,7,oz,,5.00,$5.44
+NutriSource Come- Pooch-A Chick,Nutrisource,073893905004,Dog Food Can Blue,7,oz,,6.00,$5.44
+NutriSource Come- Pooch-A Turke,Nutrisource,073893905011,Dog Food Can Green,7,oz,,11.00,$6.53
 NutriSource S/M Puppy,Nutrisource,073893040040,Dog Food,Can,Blue,5.5oz,10.00,$2.28
 NutriSource Chicken & Rice,Nutrisource,073893021056,Dog Food,Can,Blue,12.3oz,12.00,$3.48
 NutriSource Lamb Meal & Nutrisource Rice R,,073893021063,Dog Food,Can,Tan,12.3oz,14.00,$3.70
@@ -2120,9 +2120,9 @@ VICTOR Beef & Vegetable 13.2oz,VICTOR,854524005450,Dog Food,Can,,13.5oz,0.00,$3.
 VICTOR Chicken & Vegetable 13.,VICTOR,854524005429,Dog Food,Can,,13.2oz,0.00,$3.04
 VICTOR Lamb & Rice 13.2oz,VICTOR,854524005443,Dog Food,Can,,13.2oz,8.00,$3.15
 VICTOR Chicken & Rice 13.2oz,VICTOR,854524005412,Dog Food,Can,,13.2oz,6.00,$3.15
-Hill's Science Diet Flexi- Stix,Science Diet,052742368016,Dog Treats None     Burgundy,7.1,oz,,0.00,$8.73
-Hill's Science Diet Crunchy Cr,Science Diet,052742187907,Dog Treats None     Red,6,oz,,8.00,$6.54
-Hill's Science Diet Flexi- Stix,Science Diet,052742368207,Dog Treats None     Burgundy,7.1,oz,,2.00,$9.44
+Hill's Science Diet Flexi- Stix,Science Diet,052742368016,Dog Treats None Burgundy,7.1,oz,,0.00,$8.73
+Hill's Science Diet Crunchy Cr,Science Diet,052742187907,Dog Treats None Red,6,oz,,8.00,$6.54
+Hill's Science Diet Flexi- Stix,Science Diet,052742368207,Dog Treats None Burgundy,7.1,oz,,2.00,$9.44
 Oasis Vita Drops Small Birds,Oasis Supplies,048054802577,Bird,,,,1.00,$19.94
 Valu-Pak 24/20 Red 50lb,Valu-Pak,071898431863,Dog Food,Bag,,50lb,9.00,$45.14
 Valu-Pak 28/20 Bla 50lb,Valu-Pak,071898431962,Dog Food,Bag,,50lb,23.00,$48.29
@@ -2169,7 +2169,7 @@ Primal Kibble in the Raw Chick,Primal,810076942995,Dog Food,Bag,,1.5lb,1.00,$30.
 Primal Kibble in the Raw Beef,Primal,810076942988,Dog Food,Bag,,1.5lb,1.00,$32.54
 Primal Kibble in the Raw Puppy,Primal,810076942964,Dog Food,Bag,,9lb,0.00,$118.64
 Primal Kibble in the Raw Puppy,Primal,810076943015,Dog Food,Bag,lb,,0.00,$30.44
-Orijen Original Bites 6oz,Orijen,064992724184,Dog Food     Bag,6,oz,,0.00,$18.89
+Orijen Original Bites 6oz,Orijen,064992724184,Dog Food Bag,6,oz,,0.00,$18.89
 Orijen Tundra Freeze Dried 8oz,Orijen,064992726003,Cat Treats,,,,0.00,$16.79
 Orijen Original Freeze Dried 8,Orijen,064992725983,Cat Treats,,,,0.00,$18.89
 Coastal Cat Collar SMW12,Shepherd And Collars,076484171727,Leashes And Collars,,,,2.00,$11.99
@@ -2546,14 +2546,14 @@ Royal Canin Yorkshire Terrier,Royal Canin,030111451415,Dog Food,Bag,lb,,1.00,$71
 Royal Canin Poodle Canin,Royal,030111450913,Dog Food,Bag,lb,,1.00,$71.39
 Nibbles Tiki Animal,Nibbles,048081211687,Small,,,,1.00,$10.49
 Royal Canin Small Adult Royal Adult,Canin,030111125552,Dog Food,Bag,lb,,3.00,$34.64
-Hill's Soft Savories Beef & Science Cheddar,Diet,052742335902,Dog Treats None     Red,8,oz,,5.00,$9.44
+Hill's Soft Savories Beef & Science Cheddar,Diet,052742335902,Dog Treats None Red,8,oz,,5.00,$9.44
 Hill's Soft Savories Peanut Butter & Banana Diet,Science,052742336008,Dog Treats,Red,,8oz,3.00,$9.44
-Hill's Soft Savories Chicken & Yogurt,Science Diet,052742336107,Dog Treats None     Red,8,oz,,8.00,$9.44
-Hill's Soft Baked Beef & Sweet Potato,Science Diet,052742244907,Dog Treats None     Green,8,oz,,8.00,$9.44
+Hill's Soft Savories Chicken & Yogurt,Science Diet,052742336107,Dog Treats None Red,8,oz,,8.00,$9.44
+Hill's Soft Baked Beef & Sweet Potato,Science Diet,052742244907,Dog Treats None Green,8,oz,,8.00,$9.44
 Hill's Soft Baked Duck & Science Pumpkin,Diet,052742245003,Dog Treats,Green,,8oz,1.00,$9.44
 Hill's Soft Baked Chicken Science & Carrots,Diet,052742244808,Dog Treats,Green,,8oz,-5.00,$9.44
 Hill's Fruity Cranberries & Science Oatmeal,Diet,052742008974,Dog Treats,Red,,8oz,7.00,$9.44
-Hill's Fruity Apple & Oatmeal,Science Diet,052742008998,Dog Treats None     Red,8,oz,,13.00,$9.44
+Hill's Fruity Apple & Oatmeal,Science Diet,052742008998,Dog Treats None Red,8,oz,,13.00,$9.44
 Hill's Crunchy Chicken & Science Apples,Diet,052742303208,Dog Treats,Green,,8oz,7.00,$9.44
 Hill's Science Diet Jerky Science Stri,Diet,052742187709,Dog Treats,Red,,7.1oz,5.00,$9.44
 Hill's Science Diet Mini Jerky,Science Diet,052742187501,Dog Treats,Red,,7.1oz,6.00,$8.73
@@ -3431,21 +3431,21 @@ Zignature Treats Lamb 12oz,Zignature,97612924114,Dog Treats,,,,0.00,$8.73
 Zignature Treats Trout 12oz,Zignature,888641131006,Dog Treats,,,,-1.00,$7.63
 Zignature Treats Ziggy Bars Du,Zignature,888641132331,Dog Treats,,,,-1.00,$8.73
 Rewards Mini Salmon Balance,Natural,723633852197,Dog Treats,,,,0.00,$6.54
-NutriSource Chompy Chompers Be,Nutrisource,73893301028,Dog Treats None        Purple,6,oz,,0.00,$8.73
+NutriSource Chompy Chompers Be,Nutrisource,73893301028,Dog Treats None Purple,6,oz,,0.00,$8.73
 Finleys Baked Apple & Cinnamon,Finley's,860001231281,Dog Treats,,,,0.00,$10.49
 Finleys Baked Peanut Butter &,Finley's,860001231250,Dog Treats,,,,-7.00,$9.44
-Chompy Chompers Rabbit,Nutrisource,073893301004,Dog Treats None      Purple,6,oz,,1.00,$8.73
-Chompy Chompers Turkey,Nutrisource,073893301011,Dog Treats None      Purple,6,oz,,3.00,$8.73
-Chompy Chompers Salmon,Nutrisource,073893301035,Dog Treats None      Purple,6,oz,,3.00,$8.73
+Chompy Chompers Rabbit,Nutrisource,073893301004,Dog Treats None Purple,6,oz,,1.00,$8.73
+Chompy Chompers Turkey,Nutrisource,073893301011,Dog Treats None Purple,6,oz,,3.00,$8.73
+Chompy Chompers Salmon,Nutrisource,073893301035,Dog Treats None Purple,6,oz,,3.00,$8.73
 Grillin' Grillers Whitefish,Nutrisource,073893801061,Dog Treats,Purple,,12oz,2.00,$8.73
 Grillin' Grillers Turkey,Nutrisource,073893801047,Dog Treats,Purple,,12oz,3.00,$8.73
-NutriSource Big Bites Chicken,Nutrisource,73893800088,Dog Treats None     Purple,14,oz,,0.00,$12.59
-Crispy Crispers Lamb,Nutrisource,073893301103,Dog Treats None      Purple,4,oz,,4.00,$7.63
-Crispy Crispers Turkey,Nutrisource,073893301127,Dog Treats None      Purple,4,oz,,2.00,$7.63
-Nutty Butter Bites Apple,Nutrisource,073893800507,Dog Treats None      Red,6,oz,,2.00,$8.73
-Little Bites Duck,Nutrisource,073893800064,Dog Treats None      Purple,6,oz,,2.00,$7.63
-Little Bites Chicken,Nutrisource,073893800040,Dog Treats None      Purple,6,oz,,4.00,$7.63
-Zoo Med Lamp Clamp,Zoo Med,097612320503,Reptiles     None     Purple,6,oz,,3.00,$24.14
+NutriSource Big Bites Chicken,Nutrisource,73893800088,Dog Treats None Purple,14,oz,,0.00,$12.59
+Crispy Crispers Lamb,Nutrisource,073893301103,Dog Treats None Purple,4,oz,,4.00,$7.63
+Crispy Crispers Turkey,Nutrisource,073893301127,Dog Treats None Purple,4,oz,,2.00,$7.63
+Nutty Butter Bites Apple,Nutrisource,073893800507,Dog Treats None Red,6,oz,,2.00,$8.73
+Little Bites Duck,Nutrisource,073893800064,Dog Treats None Purple,6,oz,,2.00,$7.63
+Little Bites Chicken,Nutrisource,073893800040,Dog Treats None Purple,6,oz,,4.00,$7.63
+Zoo Med Lamp Clamp,Zoo Med,097612320503,Reptiles None Purple,6,oz,,3.00,$24.14
 Vital Chicken Hearts Essentials,Vital,840199684076,Dog Treats,,,,2.00,$15.74
 Vital Chicken Breasts Essentials,Vital,840199684069,Dog Treats,,,,8.00,$12.59
 Vital Minnows Essentials,Vital,840199684113,Dog Treats,,,,3.00,$14.69
@@ -5084,7 +5084,7 @@ Titan Tieout 15' Giant,Titan,076484512094,Accessories,,,,-1.00,$30.44
 Titan Tieout 10'giant,Titan,076484512087,Accessories,,,,-1.00,$28.34
 Titan Tieout 30' Giant,Titan,076484512117,Accessories,,,,0.00,$45.14
 Titan Tieout 20' Heavy,Titan,076484890611,Accessories,,,,0.00,$26.24
-"Zoo Med Paludarium Hood 18""",Zoo Med,097612325706,Reptiles   None     Purple,14,oz,,1.00,$47.24
+"Zoo Med Paludarium Hood 18""",Zoo Med,097612325706,Reptiles None Purple,14,oz,,1.00,$47.24
 Shepherd Boy Freeze Chicken He,Shepherd Boy,097612326307,Dog Treats,,,,-1.00,$16.79
 Fourpaws Tieoutcabble20ft Supe,Four Paws,045663848200,Accessories,,,,0.00,$33.59
 Fourpawstieoutcable20ft Hvywgh,Four Paws,045663847203,Accessories,,,,1.00,$22.04
@@ -5510,7 +5510,7 @@ Petcrest Lucky Puppy,PetCrest,784099029103,Accessories,,,,0.00,$12.59
 Petcrest Brighten,PetCrest,784099029141,Accessories,,,,0.00,$14.69
 Petcrest Shed Control,PetCrest,784099029127,Healthcare,,,,-1.00,$14.69
 Exo Terra Heatwave Rock Exo Terra Small,,15561220040,Reptiles,,,,0.00,$40.94
-NutriSource Little Bites Nutrisource Grain,,15561221931,Dog Treats None     Purple,6,oz,,0.00,$7.63
+NutriSource Little Bites Nutrisource Grain,,15561221931,Dog Treats None Purple,6,oz,,0.00,$7.63
 Magiccoat Prof Series Oats She,Four Paws,045663976040,Healthcare,,,,0.00,$15.74
 Magic Coat Reduces Shedding,Four Paws,045663976446,Healthcare,,,,4.00,$11.54
 Magic Coat Reduces Odor,Four Paws,045663976408,Healthcare,,,,2.00,$9.44
@@ -6921,7 +6921,7 @@ Dashi Chicken & Salmon Inaba 2.5oz,,810100850951,Cat Food,Can,,2.5oz,13.00,$1.73
 Churu TidBit 3.36oz,,810100854997,Cat Treats,,,,1.00,$7.63
 Churu Fun Bites 3 pack,,810100851408,Cat Treats,,,,3.00,$4.36
 Science Diet Sensitive Salmon Kitten 6lb,Science Diet,052742069449,Cat Food,Bag,,6lb,1.00,$41.99
-Science Diet Cat Turkey 5.5oz,Science Diet,052742661308,Cat Food     Can,5.5,oz,,14.00,$2.82
+Science Diet Cat Turkey 5.5oz,Science Diet,052742661308,Cat Food Can,5.5,oz,,14.00,$2.82
 Mamoth Rope Toy,,746772255100,Toys,,,,2.00,$8.73
 Fromm Surf & Turf 10lb,Fromm,072705116935,Cat Food,Bag,,10lb,2.00,$40.94
 Fromm Ancient Grains 30lb,Fromm,072705105915,Dog Food,Bag,,30lb,2.00,$55.64
@@ -8033,9 +8033,9 @@ Kong Bendeez,,035585533292,Toys,,,,1.00,$17.84
 Canine Spectra 9,,745801151260,Healthcare,,,,9.00,$16.79
 NutriSource PureVita SB Nutrisource GF Salmon&Peas,,073893177111,Dog Food,Bag,,4lb,4.00,$22.04
 Vital Essentials Beef & Chicken Mini Patties Cat Essentials 8,Vital,840199691012,Cat Food,Bag,lb,,0.00,$20.99
-Vital Essentials Pork Mini Vital Patties Cat 8oz,Essentials,840199691074,Cat Food   Bag,8,oz,,0.00,$20.99
-Vital Essentials Chicken Vital Nibs 14oz,Essentials,840199680016,Dog Food   Bag,14,oz,,1.00,$31.49
-Vital Essentials Duck Soft Vital Nibs 14oz,Essentials,840199680221,Cat Food   Bag,14,oz,,2.00,$34.64
+Vital Essentials Pork Mini Vital Patties Cat 8oz,Essentials,840199691074,Cat Food Bag,8,oz,,0.00,$20.99
+Vital Essentials Chicken Vital Nibs 14oz,Essentials,840199680016,Dog Food Bag,14,oz,,1.00,$31.49
+Vital Essentials Duck Soft Vital Nibs 14oz,Essentials,840199680221,Cat Food Bag,14,oz,,2.00,$34.64
 Zoo Med River Pebbles 10lb,Zoo Med,097612742107,Reptiles,,,,1.00,$17.84
 Exo Terra Desert Stone Ocher 11lb,Exo Terra,015561231381,Reptiles,,,,1.00,$16.79
 Zoo Med Reptisand Natural 4.5lb,Zoo Med,097612760101,Reptiles,,,,3.00,$22.04
@@ -8760,8 +8760,8 @@ Pro Plan Salmon & Shrimp 3oz,Pro Plan,038100170330,Cat Food,Can,,3oz,11.00,$2.06
 "Exo Terra Terrarium Cabinet Large 36""",,015561227087,Reptiles,,,,0.00,$230.99
 Tropical Bioactive substrate kit,,097612752304,Reptiles,,,,0.00,$31.49
 Pup Cup Chicken 13oz,,860008024121,Treats,,,,6.00,$11.54
-Vital Essentials Tu Mini Patties Cat 8oz,,840199691111,Cat Food   Bag,8,oz,,1.00,$22.04
-Vital Essentials Duck Mini Nibs Cat 8oz,,840199690046,Cat Food   Bag,8,oz,,2.00,$26.24
+Vital Essentials Tu Mini Patties Cat 8oz,,840199691111,Cat Food Bag,8,oz,,1.00,$22.04
+Vital Essentials Duck Mini Nibs Cat 8oz,,840199690046,Cat Food Bag,8,oz,,2.00,$26.24
 Fruitables Skinny Minnis Apple Bacn5oz,,895352002303,Dog Treats,,,,2.00,$8.73
 Pup Cup Origional 13oz,,860008024107,Dog Treats,,,,4.00,$11.54
 Dog-O's Ice Cream Peanut Butter 3oz,,850529003910,Dog Treats,,,,10.00,$4.36
