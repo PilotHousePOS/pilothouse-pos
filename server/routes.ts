@@ -2650,16 +2650,18 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
   app.post("/api/admin/pos-scan/delete-eligible", requireAdminMiddleware, async (req: any, res) => {
     try {
-      const toDelete = await db.execute(sql`SELECT supply_id FROM pos_zero_stock_tracker WHERE deletion_eligible = TRUE AND protected = FALSE`);
-      if (!toDelete.rows.length) return res.json({ deleted: 0 });
-      const ids = toDelete.rows.map((r: any) => r.supply_id);
-      let deleted = 0;
-      for (const id of ids) {
+      const toDelete = await db.execute(sql`SELECT supply_id, item_name FROM pos_zero_stock_tracker WHERE deletion_eligible = TRUE AND protected = FALSE`);
+      if (!toDelete.rows.length) return res.json({ deleted: 0, skipped: 0 });
+      let deleted = 0, skipped = 0;
+      for (const row of toDelete.rows as any[]) {
+        const id = row.supply_id;
+        const inCart = await db.execute(sql`SELECT 1 FROM cart_items WHERE supply_id = ${id} LIMIT 1`);
+        if (inCart.rows.length > 0) { skipped++; continue; }
         await db.execute(sql`DELETE FROM supplies WHERE id = ${id}`);
         await db.execute(sql`DELETE FROM pos_zero_stock_tracker WHERE supply_id = ${id}`);
         deleted++;
       }
-      res.json({ deleted });
+      res.json({ deleted, skipped });
     } catch (e: any) {
       console.error("POS delete eligible error:", e);
       res.status(500).json({ message: "Failed to delete: " + e.message });

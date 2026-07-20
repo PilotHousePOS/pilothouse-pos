@@ -119,7 +119,8 @@ export default function PosScanTracker() {
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/pos-scan/stats"] });
-      toast({ title: `Deleted ${result.deleted} items` });
+      const msg = result.skipped > 0 ? `${result.deleted} deleted · ${result.skipped} skipped (in active carts)` : `${result.deleted} items deleted`;
+      toast({ title: msg });
     },
     onError: (e: any) => toast({ title: "Delete failed", description: e.message, variant: "destructive" }),
   });
