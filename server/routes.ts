@@ -2501,7 +2501,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       for (const item of posItems) {
         if (SKIP_CATEGORIES.has(item.posCategory)) { skipped++; continue; }
 
-        const found = await db.execute(sql`SELECT id, name, brand, manual_price_override FROM supplies WHERE sku = ${item.sku} LIMIT 1`);
+        const found = await db.execute(sql`SELECT id, name, brand FROM supplies WHERE sku = ${item.sku} LIMIT 1`);
         if (!found.rows || found.rows.length === 0) {
           const mappedCat = POS_CATEGORY_MAP[item.posCategory] ?? null;
           if (mappedCat) {
@@ -2519,10 +2519,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         const supplyId = (found.rows[0] as any).id;
         const supplyName = (found.rows[0] as any).name;
         const supplyBrand = String((found.rows[0] as any).brand || '').toLowerCase();
-        const manualPriceOverride = Boolean((found.rows[0] as any).manual_price_override);
-
-        // Update price from POS unless manually overridden
-        if (item.price > 0 && !manualPriceOverride) {
+        // POS price is always authoritative — update unconditionally
+        if (item.price > 0) {
           await db.execute(sql`
             UPDATE supplies SET price = ${item.price}, price_source = 'pos', updated_at = NOW()
             WHERE id = ${supplyId}
