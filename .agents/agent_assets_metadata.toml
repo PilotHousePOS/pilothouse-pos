@@ -78,3 +78,9 @@ id = "tgH06Mxrb8VsC4JQ8fWXr"
 uri = "file://attached_assets/ZeroStock_ProdItems_072026.csv"
 type = "table"
 title = "Production Items at 0 Stock in POS — 072026"
+
+[[outputs]]
+id = "wZuE0nMzAO4UTrze5KO07"
+uri = "file://attached_assets/InProd_ZeroStock_POS_072026.csv"
+type = "table"
+title = "Production Items at 0 Stock in POS — 072026"
