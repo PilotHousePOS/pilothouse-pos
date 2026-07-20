@@ -253,7 +253,7 @@ export default function PosScanTracker() {
                   <div className="flex gap-2 text-[11px] text-zinc-500 flex-wrap">
                     <span>{item.brand || "—"}</span>
                     <span>{item.sku}</span>
-                    <span className="text-green-400">${item.price?.toFixed(2)}</span>
+                    <span className="text-green-400">${Number(item.price || 0).toFixed(2)}</span>
                     <span className="text-blue-400">{CATEGORY_LABELS[item.mapped_category] ?? item.mapped_category}</span>
                     {item.pos_stock <= 0 && <span className="text-yellow-500">POS stock: {item.pos_stock}</span>}
                   </div>
