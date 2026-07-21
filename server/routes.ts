@@ -2481,7 +2481,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         'Toys': 'toys',
         'Treats': 'dogTreats',
       };
-      const SKIP_CATEGORIES = new Set(['Gift Cards', 'Grooming', 'Tips', 'Misc.', '']);
+      const SKIP_CATEGORIES = new Set(['Gift Cards', 'Grooming', 'Tips', 'Misc.', 'Live Reptiles/Feeders', 'Live Small Animals', 'Aquatic Fish/Plant', 'Aquatics', '']);
 
       const escStr = (s: string) => String(s ?? '').replace(/'/g, "''");
       const chunkArr = <T>(arr: T[], size: number): T[][] => {
