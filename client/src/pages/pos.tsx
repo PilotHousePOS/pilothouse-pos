@@ -293,7 +293,7 @@ export default function PosPage() {
 
             {/* Grooming services */}
             {selectedCat?.isService && selectedCat.services && (
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                 {selectedCat.services.map(svc => (
                   <button
                     key={svc.id}
@@ -312,7 +312,7 @@ export default function PosPage() {
 
             {/* DB category items */}
             {selectedCat?.dbCategory && (
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
                 {(categoryItems as SupplyItem[]).map(item => (
                   <button
                     key={item.id}
@@ -358,7 +358,7 @@ export default function PosPage() {
 
             {/* Gift Cards */}
             {selectedCatId === "giftCards" && (
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                 {[10, 15, 20, 25, 50, 75, 100].map(amt => (
                   <button key={amt} onClick={() => addItem(`Gift Card - $${amt}`, amt, "giftCards")}
                     className="bg-rose-700 hover:bg-rose-600 text-white rounded p-3 text-center active:scale-95 min-h-[60px]">
