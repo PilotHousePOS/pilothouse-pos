@@ -2691,127 +2691,212 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
   // ── POS Sales Reports ─────────────────────────────────────────────────────
 
-  // Paginated order history with optional date range filter
+  // Paginated order history — BOTH POS and online orders combined
   app.get("/api/admin/pos/sales", requireAdminMiddleware, async (req: any, res) => {
     try {
-      const { start, end, page = "1", limit = "50" } = req.query as Record<string, string>;
+      const { start, end, page = "1", limit = "50", channel } = req.query as Record<string, string>;
       const pageNum = Math.max(1, parseInt(page) || 1);
       const limitNum = Math.min(200, Math.max(1, parseInt(limit) || 50));
       const offset = (pageNum - 1) * limitNum;
       const startDate = start || "1900-01-01";
       const endDate   = end   || "2100-12-31";
+
+      // Channel filter helpers
+      const includePOS    = !channel || channel === "all" || channel === "pos";
+      const includeOnline = !channel || channel === "all" || channel === "online";
+
       const [rows, cnt] = await Promise.all([
         db.execute(sql`
-          SELECT id, order_number, items, subtotal, tax, total, payment_method,
-                 amount_tendered, change_due, cashier_id, created_at
-          FROM pos_orders
-          WHERE created_at::date >= ${startDate}::date
-            AND created_at::date <= ${endDate}::date
-          ORDER BY created_at DESC
+          WITH combined AS (
+            ${includePOS ? sql`
+            SELECT
+              'pos'::text AS channel,
+              id::text AS sale_id,
+              order_number,
+              items,
+              subtotal::numeric,
+              tax::numeric,
+              total::numeric,
+              payment_method,
+              amount_tendered::numeric,
+              change_due::numeric,
+              created_at
+            FROM pos_orders
+            WHERE created_at::date >= ${startDate}::date
+              AND created_at::date <= ${endDate}::date
+            ` : sql`SELECT NULL WHERE FALSE`}
+            ${includePOS && includeOnline ? sql`UNION ALL` : sql``}
+            ${includeOnline ? sql`
+            SELECT
+              'online'::text AS channel,
+              o.id::text AS sale_id,
+              ('ONL-' || o.id::text) AS order_number,
+              COALESCE(
+                (SELECT jsonb_agg(jsonb_build_object(
+                  'name',     COALESCE(oi.product_name, s.name, 'Unknown'),
+                  'category', COALESCE(oi.category, ''),
+                  'price',    oi.price::float,
+                  'quantity', COALESCE(oi.quantity, 1),
+                  'sku',      s.sku
+                ))
+                FROM order_items oi
+                LEFT JOIN supplies s ON oi.supply_id = s.id
+                WHERE oi.order_id = o.id),
+                '[]'::jsonb
+              ) AS items,
+              COALESCE(o.subtotal::numeric, 0),
+              COALESCE(o.tax_amount::numeric, 0) AS tax,
+              COALESCE(o.total_amount::numeric, 0) AS total,
+              'online' AS payment_method,
+              NULL::numeric AS amount_tendered,
+              NULL::numeric AS change_due,
+              o.order_date AS created_at
+            FROM orders o
+            WHERE o.payment_status = 'paid'
+              AND o.order_date::date >= ${startDate}::date
+              AND o.order_date::date <= ${endDate}::date
+            ` : sql`SELECT NULL WHERE FALSE`}
+          )
+          SELECT * FROM combined ORDER BY created_at DESC
           LIMIT ${limitNum} OFFSET ${offset}
         `),
         db.execute(sql`
-          SELECT COUNT(*) AS cnt FROM pos_orders
-          WHERE created_at::date >= ${startDate}::date
-            AND created_at::date <= ${endDate}::date
+          SELECT (
+            ${includePOS ? sql`
+            (SELECT COUNT(*) FROM pos_orders
+             WHERE created_at::date >= ${startDate}::date
+               AND created_at::date <= ${endDate}::date)
+            ` : sql`0`}
+            +
+            ${includeOnline ? sql`
+            (SELECT COUNT(*) FROM orders
+             WHERE payment_status = 'paid'
+               AND order_date::date >= ${startDate}::date
+               AND order_date::date <= ${endDate}::date)
+            ` : sql`0`}
+          ) AS cnt
         `),
       ]);
       res.json({ orders: rows.rows, total: parseInt(String(cnt.rows[0]?.cnt ?? 0)) });
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
-  // Period summary — daily breakdown for a range, monthly for a year, yearly totals
+  // Period summary — both POS + online orders combined
   app.get("/api/admin/pos/sales/summary", requireAdminMiddleware, async (req: any, res) => {
     try {
       const { start, end, groupBy = "day" } = req.query as Record<string, string>;
       const startDate = start || "1900-01-01";
       const endDate   = end   || "2100-12-31";
 
+      // Reusable CTE that unions both channels
+      const allSalesCte = sql`
+        all_sales AS (
+          SELECT subtotal::numeric, tax::numeric, total::numeric,
+                 payment_method, created_at
+          FROM pos_orders
+          WHERE created_at::date >= ${startDate}::date
+            AND created_at::date <= ${endDate}::date
+          UNION ALL
+          SELECT COALESCE(subtotal::numeric,0),
+                 COALESCE(tax_amount::numeric,0),
+                 COALESCE(total_amount::numeric,0),
+                 'online' AS payment_method,
+                 order_date AS created_at
+          FROM orders
+          WHERE payment_status = 'paid'
+            AND order_date::date >= ${startDate}::date
+            AND order_date::date <= ${endDate}::date
+        )
+      `;
+
+      const truncExpr =
+        groupBy === "month" ? sql`DATE_TRUNC('month', created_at)` :
+        groupBy === "year"  ? sql`DATE_TRUNC('year',  created_at)` :
+                              sql`created_at::date`;
+      const fmtExpr =
+        groupBy === "month" ? sql`TO_CHAR(DATE_TRUNC('month', created_at), 'Mon YYYY')` :
+        groupBy === "year"  ? sql`TO_CHAR(DATE_TRUNC('year',  created_at), 'YYYY')` :
+                              sql`TO_CHAR(created_at, 'Mon DD, YYYY')`;
+      const periodExpr =
+        groupBy === "month" ? sql`TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM')` :
+        groupBy === "year"  ? sql`TO_CHAR(DATE_TRUNC('year',  created_at), 'YYYY')` :
+                              sql`created_at::date::text`;
+
       const [totals, byPeriod, byMethod] = await Promise.all([
         db.execute(sql`
+          WITH ${allSalesCte}
           SELECT COUNT(*) AS order_count,
                  COALESCE(SUM(subtotal),0) AS subtotal,
                  COALESCE(SUM(tax),0)      AS tax,
                  COALESCE(SUM(total),0)    AS total
-          FROM pos_orders
-          WHERE created_at::date >= ${startDate}::date
-            AND created_at::date <= ${endDate}::date
+          FROM all_sales
         `),
-        groupBy === "month"
-          ? db.execute(sql`
-              SELECT TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') AS period,
-                     TO_CHAR(DATE_TRUNC('month', created_at), 'Mon YYYY') AS label,
-                     COUNT(*) AS order_count,
-                     COALESCE(SUM(subtotal),0) AS subtotal,
-                     COALESCE(SUM(tax),0)      AS tax,
-                     COALESCE(SUM(total),0)    AS total
-              FROM pos_orders
-              WHERE created_at::date >= ${startDate}::date
-                AND created_at::date <= ${endDate}::date
-              GROUP BY period, label ORDER BY period
-            `)
-          : groupBy === "year"
-          ? db.execute(sql`
-              SELECT TO_CHAR(DATE_TRUNC('year', created_at), 'YYYY') AS period,
-                     TO_CHAR(DATE_TRUNC('year', created_at), 'YYYY') AS label,
-                     COUNT(*) AS order_count,
-                     COALESCE(SUM(subtotal),0) AS subtotal,
-                     COALESCE(SUM(tax),0)      AS tax,
-                     COALESCE(SUM(total),0)    AS total
-              FROM pos_orders
-              WHERE created_at::date >= ${startDate}::date
-                AND created_at::date <= ${endDate}::date
-              GROUP BY period, label ORDER BY period
-            `)
-          : db.execute(sql`
-              SELECT created_at::date::text AS period,
-                     TO_CHAR(created_at, 'Mon DD, YYYY') AS label,
-                     COUNT(*) AS order_count,
-                     COALESCE(SUM(subtotal),0) AS subtotal,
-                     COALESCE(SUM(tax),0)      AS tax,
-                     COALESCE(SUM(total),0)    AS total
-              FROM pos_orders
-              WHERE created_at::date >= ${startDate}::date
-                AND created_at::date <= ${endDate}::date
-              GROUP BY created_at::date ORDER BY created_at::date
-            `),
         db.execute(sql`
+          WITH ${allSalesCte}
+          SELECT ${periodExpr} AS period,
+                 ${fmtExpr}   AS label,
+                 COUNT(*) AS order_count,
+                 COALESCE(SUM(subtotal),0) AS subtotal,
+                 COALESCE(SUM(tax),0)      AS tax,
+                 COALESCE(SUM(total),0)    AS total
+          FROM all_sales
+          GROUP BY period, label ORDER BY period
+        `),
+        db.execute(sql`
+          WITH ${allSalesCte}
           SELECT payment_method,
                  COUNT(*) AS order_count,
                  COALESCE(SUM(total),0) AS total
-          FROM pos_orders
-          WHERE created_at::date >= ${startDate}::date
-            AND created_at::date <= ${endDate}::date
+          FROM all_sales
           GROUP BY payment_method
         `),
       ]);
-      res.json({
-        totals:   totals.rows[0],
-        byPeriod: byPeriod.rows,
-        byMethod: byMethod.rows,
-      });
+      res.json({ totals: totals.rows[0], byPeriod: byPeriod.rows, byMethod: byMethod.rows });
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
-  // Top-selling items (JSONB unnest)
+  // Top-selling items — POS (JSONB) + online (relational) combined
   app.get("/api/admin/pos/sales/trends", requireAdminMiddleware, async (req: any, res) => {
     try {
-      const { start, end, sortBy = "revenue" } = req.query as Record<string, string>;
+      const { start, end } = req.query as Record<string, string>;
       const startDate = start || "1900-01-01";
       const endDate   = end   || "2100-12-31";
-      const order = sortBy === "quantity" ? "total_qty DESC" : "total_revenue DESC";
       const result = await db.execute(sql`
+        WITH pos_items AS (
+          SELECT
+            item->>'name'     AS name,
+            item->>'category' AS category,
+            item->>'sku'      AS sku,
+            (item->>'quantity')::numeric AS qty,
+            (item->>'price')::numeric * (item->>'quantity')::numeric AS revenue,
+            o.id AS order_id
+          FROM pos_orders o
+          CROSS JOIN LATERAL jsonb_array_elements(o.items) AS item
+          WHERE o.created_at::date >= ${startDate}::date
+            AND o.created_at::date <= ${endDate}::date
+        ),
+        online_items AS (
+          SELECT
+            COALESCE(oi.product_name, s.name, 'Unknown') AS name,
+            COALESCE(oi.category, '') AS category,
+            s.sku AS sku,
+            COALESCE(oi.quantity, 1)::numeric AS qty,
+            oi.price::numeric * COALESCE(oi.quantity,1)::numeric AS revenue,
+            oi.order_id AS order_id
+          FROM order_items oi
+          JOIN orders o ON oi.order_id = o.id
+          LEFT JOIN supplies s ON oi.supply_id = s.id
+          WHERE o.payment_status = 'paid'
+            AND o.order_date::date >= ${startDate}::date
+            AND o.order_date::date <= ${endDate}::date
+        ),
+        combined AS (SELECT * FROM pos_items UNION ALL SELECT * FROM online_items)
         SELECT
-          item->>'name'     AS name,
-          item->>'category' AS category,
-          item->>'sku'      AS sku,
-          SUM((item->>'quantity')::numeric)::numeric AS total_qty,
-          SUM((item->>'price')::numeric * (item->>'quantity')::numeric)::numeric AS total_revenue,
-          COUNT(DISTINCT o.id) AS order_count
-        FROM pos_orders o
-        CROSS JOIN LATERAL jsonb_array_elements(o.items) AS item
-        WHERE o.created_at::date >= ${startDate}::date
-          AND o.created_at::date <= ${endDate}::date
+          name, category, sku,
+          SUM(qty)::numeric     AS total_qty,
+          SUM(revenue)::numeric AS total_revenue,
+          COUNT(DISTINCT order_id) AS order_count
+        FROM combined
         GROUP BY name, category, sku
         ORDER BY total_revenue DESC
         LIMIT 200

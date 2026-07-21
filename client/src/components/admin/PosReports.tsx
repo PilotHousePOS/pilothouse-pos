@@ -5,10 +5,10 @@ import { useQuery } from "@tanstack/react-query";
 
 interface OrderItem { name: string; sku?: string; price: number; quantity: number; category: string; }
 interface SaleOrder {
-  id: number; order_number: string; items: OrderItem[];
+  id: number; sale_id: string; order_number: string; items: OrderItem[];
   subtotal: number; tax: number; total: number;
   payment_method: string; amount_tendered?: number; change_due?: number;
-  created_at: string;
+  channel: "pos" | "online"; created_at: string;
 }
 interface PeriodRow { period: string; label: string; order_count: number; subtotal: number; tax: number; total: number; }
 interface MethodRow  { payment_method: string; order_count: number; total: number; }
@@ -26,7 +26,11 @@ function today()     { return new Date().toISOString().slice(0, 10); }
 function monthStart(){ const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-01`; }
 function yearStart() { return `${new Date().getFullYear()}-01-01`; }
 
-const PAYMENT_LABELS: Record<string, string> = { cash: "Cash", credit: "Credit / Card", charge_account: "Charge Account" };
+const PAYMENT_LABELS: Record<string, string> = { cash: "Cash", credit: "Credit / Card", charge_account: "Charge Account", online: "Online (Stripe)" };
+const CHANNEL_BADGE: Record<string, { label: string; cls: string }> = {
+  pos:    { label: "In-Store POS", cls: "bg-orange-900 text-orange-300" },
+  online: { label: "Online",       cls: "bg-blue-900 text-blue-300"   },
+};
 
 const CATEGORY_LABELS: Record<string, string> = {
   dogFood:"Dog Food", catFood:"Cat Food", dogTreats:"Dog Treats", catTreats:"Cat Treats",
@@ -82,13 +86,14 @@ function DateRangeBar({
 // ─── ORDERS TAB ───────────────────────────────────────────────────────────────
 
 function OrdersTab() {
-  const [start, setStart] = useState(monthStart);
-  const [end,   setEnd  ] = useState(today);
-  const [page,  setPage ] = useState(1);
-  const [expanded, setExpanded] = useState<number | null>(null);
+  const [start,   setStart  ] = useState(monthStart);
+  const [end,     setEnd    ] = useState(today);
+  const [page,    setPage   ] = useState(1);
+  const [channel, setChannel] = useState("all");
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery<{ orders: SaleOrder[]; total: number }>({
-    queryKey: [`/api/admin/pos/sales?start=${start}&end=${end}&page=${page}&limit=50`],
+    queryKey: [`/api/admin/pos/sales?start=${start}&end=${end}&page=${page}&limit=50&channel=${channel}`],
     enabled: !!start && !!end,
   });
 
@@ -104,8 +109,9 @@ function OrdersTab() {
   ];
 
   const doExport = () => {
-    const headers = ["Order #","Date","Items","Payment","Subtotal","Tax","Total"];
+    const headers = ["Channel","Order #","Date","Items","Payment","Subtotal","Tax","Total"];
     const rows = orders.map(o => [
+      o.channel === "online" ? "Online" : "In-Store POS",
       o.order_number, new Date(o.created_at).toLocaleDateString(),
       (o.items || []).map(i => `${i.name} ×${i.quantity}`).join("; "),
       PAYMENT_LABELS[o.payment_method] ?? o.payment_method,
@@ -123,6 +129,15 @@ function OrdersTab() {
           ⬇ Export CSV
         </button>
       </div>
+      <div className="flex items-center gap-1 mb-3">
+        <span className="text-xs text-gray-400 mr-1">Channel:</span>
+        {[["all","All"], ["pos","In-Store POS"], ["online","Online"]].map(([val, lbl]) => (
+          <button key={val} onClick={() => { setChannel(val); setPage(1); }}
+            className={`text-xs px-2.5 py-1 rounded ${channel===val?"bg-blue-700 text-white":"bg-gray-700 text-gray-300 hover:bg-gray-600"}`}>
+            {lbl}
+          </button>
+        ))}
+      </div>
 
       {isLoading ? (
         <div className="text-center py-12 text-gray-500 text-sm">Loading orders…</div>
@@ -136,6 +151,7 @@ function OrdersTab() {
               <thead>
                 <tr className="text-left text-gray-400 border-b border-gray-700">
                   <th className="pb-2 pr-3">Date / Time</th>
+                  <th className="pb-2 pr-3">Channel</th>
                   <th className="pb-2 pr-3">Order #</th>
                   <th className="pb-2 pr-3">Items</th>
                   <th className="pb-2 pr-3">Payment</th>
@@ -145,14 +161,20 @@ function OrdersTab() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800">
-                {orders.map(o => (
+                {orders.map(o => {
+                  const rowKey = o.sale_id ?? String(o.id);
+                  const badge  = CHANNEL_BADGE[o.channel] ?? { label: o.channel, cls: "bg-gray-700 text-gray-300" };
+                  return (
                   <>
-                    <tr key={o.id}
-                      onClick={() => setExpanded(expanded === o.id ? null : o.id)}
+                    <tr key={rowKey}
+                      onClick={() => setExpanded(expanded === rowKey ? null : rowKey)}
                       className="hover:bg-gray-800/50 cursor-pointer">
                       <td className="py-2 pr-3 text-gray-300 whitespace-nowrap">
                         {new Date(o.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}<br/>
                         <span className="text-gray-500">{new Date(o.created_at).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",hour12:true})}</span>
+                      </td>
+                      <td className="py-2 pr-3">
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${badge.cls}`}>{badge.label}</span>
                       </td>
                       <td className="py-2 pr-3 font-mono text-yellow-400">{o.order_number || `#${o.id}`}</td>
                       <td className="py-2 pr-3 text-gray-300">{(o.items||[]).reduce((s,i)=>s+i.quantity,0)} items</td>
@@ -165,9 +187,9 @@ function OrdersTab() {
                       <td className="py-2 pr-3 text-right text-gray-400">{fmt(o.tax)}</td>
                       <td className="py-2 text-right font-semibold text-green-400">{fmt(o.total)}</td>
                     </tr>
-                    {expanded === o.id && (
-                      <tr key={`${o.id}-detail`} className="bg-gray-900">
-                        <td colSpan={7} className="px-4 py-3">
+                    {expanded === rowKey && (
+                      <tr key={`${rowKey}-detail`} className="bg-gray-900">
+                        <td colSpan={8} className="px-4 py-3">
                           <div className="text-xs text-gray-400 mb-2 font-semibold uppercase tracking-wider">Line Items</div>
                           <table className="w-full text-xs mb-2">
                             <thead>
@@ -198,7 +220,8 @@ function OrdersTab() {
                       </tr>
                     )}
                   </>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
