@@ -570,6 +570,8 @@ async function runAppMigrations() {
     // Startup cleanup: remove zero-stock items from pending queue (POS tracker)
     await migPool.query(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`);
 
+    await migPool.query(`ALTER TABLE supplies ADD COLUMN IF NOT EXISTS reorder_point INTEGER DEFAULT 1`);
+
     await migPool.query(`CREATE TABLE IF NOT EXISTS pos_orders (
       id SERIAL PRIMARY KEY,
       order_number VARCHAR(50),

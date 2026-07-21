@@ -2693,15 +2693,26 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const result = await db.execute(sql`
         SELECT id, name, sku, brand, category,
                COALESCE(price, 0) AS price,
-               COALESCE(stock_quantity, 0) AS "stockQuantity"
+               COALESCE(stock_quantity, 0) AS "stockQuantity",
+               COALESCE(reorder_point, 1) AS "reorderPoint"
         FROM supplies
         WHERE is_active = true
           AND stock_quantity IS NOT NULL
-          AND stock_quantity <= 1
+          AND stock_quantity <= COALESCE(reorder_point, 1)
         ORDER BY stock_quantity ASC, name ASC
         LIMIT 500
       `);
       res.json(result.rows);
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.patch("/api/pos/reorder-point/:id", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const reorderPoint = parseInt(req.body.reorderPoint);
+      if (!id || isNaN(reorderPoint) || reorderPoint < 0) return res.status(400).json({ message: "Invalid input" });
+      await db.execute(sql`UPDATE supplies SET reorder_point = ${reorderPoint} WHERE id = ${id}`);
+      res.json({ success: true });
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 

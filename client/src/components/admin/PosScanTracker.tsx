@@ -49,6 +49,7 @@ interface LowStockItem {
   category: string;
   price: number;
   stockQuantity: number;
+  reorderPoint: number;
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -80,9 +81,9 @@ export default function PosScanTracker() {
   const [, setLocation] = useLocation();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploadResult, setUploadResult]   = useState<UploadResult | null>(null);
-  const [showBarcodes, setShowBarcodes]   = useState(false);
-  const [labelFilter, setLabelFilter]     = useState("");
-  const [printMode, setPrintMode]         = useState(false);
+  const [showBarcodes, setShowBarcodes]     = useState(false);
+  const [labelFilter, setLabelFilter]       = useState("");
+  const [localThresholds, setLocalThresholds] = useState<Record<number, number>>({});
 
   const { data: stats, isLoading: statsLoading } = useQuery<Stats>({
     queryKey: ["/api/admin/pos-scan/stats"],
@@ -195,6 +196,20 @@ export default function PosScanTracker() {
     },
     onError: (e: any) => toast({ title: "Seed failed", description: e.message, variant: "destructive" }),
   });
+
+  const reorderPointMutation = useMutation({
+    mutationFn: ({ id, reorderPoint }: { id: number; reorderPoint: number }) =>
+      apiRequest("PATCH", `/api/pos/reorder-point/${id}`, { reorderPoint }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/pos/low-stock"] }),
+    onError: (e: any) => toast({ title: "Failed to update threshold", description: e.message, variant: "destructive" }),
+  });
+
+  const adjustThreshold = (item: LowStockItem, delta: number) => {
+    const current = localThresholds[item.id] ?? item.reorderPoint ?? 1;
+    const next = Math.max(0, current + delta);
+    setLocalThresholds(prev => ({ ...prev, [item.id]: next }));
+    reorderPointMutation.mutate({ id: item.id, reorderPoint: next });
+  };
 
   const eligible   = stats?.eligible ?? [];
   const approaching = stats?.approaching ?? [];
@@ -442,7 +457,7 @@ export default function PosScanTracker() {
             {!lowStockLoading && filteredLowStock.length > 0 && (
               <>
                 <p className="text-xs text-zinc-500 mb-3">
-                  Items with quantity ≤ 1 in inventory. Barcodes are scannable from screen or print them as shelf labels.
+                  Items at or below their reorder threshold. Use <strong>−</strong> / <strong>+</strong> on each card to set how many you need in stock before it shows here. Barcodes are scannable from screen or print as shelf labels.
                 </p>
 
                 {/* Print-only styles */}
@@ -457,27 +472,46 @@ export default function PosScanTracker() {
                 `}</style>
 
                 <div className="print-label-grid grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
-                  {filteredLowStock.map(item => (
-                    <div key={item.id}
-                      className="bg-white rounded-lg border border-zinc-300 p-2 flex flex-col items-center gap-1 text-center">
-                      <div className="text-xs font-bold text-black leading-tight line-clamp-2 w-full">{item.name}</div>
-                      {item.brand && <div className="text-[10px] text-gray-600">{item.brand}</div>}
-                      <BarcodeDisplay
-                        value={item.sku}
-                        width={1.5}
-                        height={50}
-                        displayValue={true}
-                        className="max-w-full"
-                      />
-                      <div className="flex justify-between w-full text-[10px] text-gray-700 px-1">
-                        <span>{CATEGORY_LABELS[item.category] ?? item.category}</span>
-                        <span className="font-semibold">${Number(item.price).toFixed(2)}</span>
+                  {filteredLowStock.map(item => {
+                    const threshold = localThresholds[item.id] ?? item.reorderPoint ?? 1;
+                    return (
+                      <div key={item.id}
+                        className="bg-white rounded-lg border border-zinc-300 p-2 flex flex-col items-center gap-1 text-center">
+                        <div className="text-xs font-bold text-black leading-tight line-clamp-2 w-full">{item.name}</div>
+                        {item.brand && <div className="text-[10px] text-gray-500">{item.brand}</div>}
+                        <BarcodeDisplay
+                          value={item.sku}
+                          width={1.5}
+                          height={50}
+                          displayValue={true}
+                          className="max-w-full"
+                        />
+                        <div className="flex justify-between w-full text-[10px] text-gray-700 px-1">
+                          <span>{CATEGORY_LABELS[item.category] ?? item.category}</span>
+                          <span className="font-semibold">${Number(item.price).toFixed(2)}</span>
+                        </div>
+                        <div className={`text-[10px] font-bold px-2 py-0.5 rounded w-full ${item.stockQuantity === 0 ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"}`}>
+                          {item.stockQuantity === 0 ? "OUT OF STOCK" : `LOW — QTY: ${item.stockQuantity}`}
+                        </div>
+                        {/* Reorder threshold control — hidden on print */}
+                        <div className="no-print flex items-center justify-between w-full px-1 mt-0.5">
+                          <span className="text-[10px] text-gray-400">Reorder at ≤</span>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => adjustThreshold(item, -1)}
+                              disabled={threshold <= 0}
+                              className="w-5 h-5 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-30 text-gray-700 text-xs font-bold leading-none flex items-center justify-center"
+                            >−</button>
+                            <span className="text-xs font-bold text-gray-800 w-5 text-center">{threshold}</span>
+                            <button
+                              onClick={() => adjustThreshold(item, 1)}
+                              className="w-5 h-5 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold leading-none flex items-center justify-center"
+                            >+</button>
+                          </div>
+                        </div>
                       </div>
-                      <div className={`text-[10px] font-bold px-2 py-0.5 rounded ${item.stockQuantity === 0 ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"}`}>
-                        {item.stockQuantity === 0 ? "OUT OF STOCK" : "LOW — QTY: 1"}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </>
             )}
