@@ -9575,7 +9575,8 @@ export default function Admin() {
       <div className="px-6">{/* Content continues */}
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-8">
+      <div className="overflow-x-auto -mx-6 px-6 mb-6 pb-1">
+      <div className="grid grid-flow-col auto-cols-[minmax(80px,1fr)] gap-2">
         {typedUser?.isAdmin && (
           <Card className="border-purple-200 dark:border-purple-800">
             <CardContent className="p-3 text-center flex flex-col items-center justify-center">
@@ -9685,10 +9686,11 @@ export default function Admin() {
           </CardContent>
         </Card>
       </div>
+      </div>
 
       <Tabs defaultValue="appointments" className="w-full">
-        <div className="overflow-x-auto pb-1">
-          <TabsList className="inline-flex gap-1 h-auto p-1 min-w-full lg:min-w-0">
+        <div className="overflow-x-auto pb-1 -mx-6 px-6">
+          <TabsList className="inline-flex gap-1 h-auto p-1 min-w-max">
             <TabsTrigger value="appointments" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
               Appointments
             </TabsTrigger>
