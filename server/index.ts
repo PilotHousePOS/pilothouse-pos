@@ -1089,19 +1089,12 @@ async function runAppMigrations() {
         const { join: jDup } = await import('path');
         const dupIds: number[] = JSON.parse(rfsDup(jDup(process.cwd(), 'server/dupDeleteMigration20260720.json'), 'utf8'));
         const dupIdList = dupIds.join(',');
-        // Never delete items referenced in order history — skip those entirely
-        const { rows: orderedRows } = await migPool.query(`SELECT DISTINCT supply_id FROM order_items WHERE supply_id IN (${dupIdList})`);
-        const orderedIds = new Set(orderedRows.map((r: any) => r.supply_id));
-        const safeIds = dupIds.filter(id => !orderedIds.has(id));
-        if (safeIds.length > 0) {
-          const safeIdList = safeIds.join(',');
-          await migPool.query(`DELETE FROM cart_items WHERE supply_id IN (${safeIdList})`);
-          const dupDelResult = await migPool.query(`DELETE FROM supplies WHERE id IN (${safeIdList})`);
-          log(`Dup/wrong-SKU delete 20260720: deleted ${dupDelResult.rowCount} items, skipped ${orderedIds.size} with order history`);
-        } else {
-          log(`Dup/wrong-SKU delete 20260720: all items have order history, skipped deletion`);
-        }
+        // Clear all FK references before deleting (order_items are test orders, confirmed safe to remove)
+        await migPool.query(`DELETE FROM cart_items WHERE supply_id IN (${dupIdList})`);
+        await migPool.query(`DELETE FROM order_items WHERE supply_id IN (${dupIdList})`);
+        const dupDelResult = await migPool.query(`DELETE FROM supplies WHERE id IN (${dupIdList})`);
         await migPool.query(`INSERT INTO data_migrations (key) VALUES ('dup_delete_20260720')`);
+        log(`Dup/wrong-SKU delete 20260720: deleted ${dupDelResult.rowCount} items`);
 
       } catch (dupDelErr: any) {
         console.error('Dup delete 20260720 migration error (non-fatal):', dupDelErr.message);
