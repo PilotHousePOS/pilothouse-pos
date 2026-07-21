@@ -3053,6 +3053,15 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
+    // Look up all pets on this appointment so multi-pet bookings are fully preserved in history
+    const allPets = await db.select().from(appointmentPets).where(eq(appointmentPets.appointmentId, appointment.id));
+    const resolvedPetName = allPets.length > 1
+      ? allPets.map(p => p.petName).filter(Boolean).join(', ')
+      : (appointment.petName || null);
+    const resolvedPetType = allPets.length > 1
+      ? [...new Set(allPets.map(p => p.petType).filter(Boolean))].join('/')
+      : (appointment.petType || null);
+
     // Create appointment history record
     const historyData: InsertAppointmentHistory = {
       contactId: contact.id,
@@ -3062,8 +3071,8 @@ export class DatabaseStorage implements IStorage {
       ownerLastName: appointment.ownerLastName || null,
       appointmentDate: appointment.appointmentDate,
       appointmentTime: appointment.appointmentTime,
-      petName: appointment.petName || null,
-      petType: appointment.petType || null,
+      petName: resolvedPetName,
+      petType: resolvedPetType,
       breed: appointment.breed || null,
       serviceType: appointment.serviceType || appointment.service || null,
       groomerName: groomerName,
