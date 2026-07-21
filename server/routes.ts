@@ -2463,16 +2463,6 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const wb = xlsx.read(req.file.buffer, { type: 'buffer' });
       const sheet = wb.Sheets[wb.SheetNames[0]];
       const raw: any[][] = xlsx.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-      // Headers on row 6, data from row 7
-      const dataRows = raw.slice(7).filter((r: any[]) => r[0] !== '');
-      const posItems = dataRows.map((r: any[]) => ({
-        name: String(r[0]).trim(),
-        brand: String(r[1]).trim(),
-        sku: String(r[2]).trim(),
-        posCategory: String(r[3]).trim(),
-        inStock: Number(r[8]),
-        price: Number(r[9]) || 0,
-      })).filter(i => i.sku.length >= 6);
 
       const POS_CATEGORY_MAP: Record<string, string> = {
         'Accessories': 'accessories',
@@ -2496,70 +2486,132 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       };
       const SKIP_CATEGORIES = new Set(['Gift Cards', 'Grooming', 'Tips', 'Misc.', '']);
 
-      let incremented = 0, reset = 0, nowEligible = 0, skipped = 0, newItemCount = 0;
+      const escStr = (s: string) => String(s ?? '').replace(/'/g, "''");
+      const chunkArr = <T>(arr: T[], size: number): T[][] => {
+        const out: T[][] = [];
+        for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+        return out;
+      };
+
+      // Parse all items up front
+      const posItems = raw.slice(7)
+        .filter((r: any[]) => r[0] !== '')
+        .map((r: any[]) => ({
+          name: String(r[0] ?? '').trim(),
+          brand: String(r[1] ?? '').trim(),
+          sku: String(r[2] ?? '').trim(),
+          posCategory: String(r[3] ?? '').trim(),
+          inStock: Number(r[8]) || 0,
+          price: Number(r[9]) || 0,
+        }))
+        .filter(i => i.sku.length >= 6 && !SKIP_CATEGORIES.has(i.posCategory));
+
+      // Step 1: Bulk-fetch all matching supplies in chunks of 1000 SKUs
+      const supplyMap = new Map<string, { id: number; name: string; brand: string }>();
+      for (const chunk of chunkArr(posItems.map(i => i.sku), 1000)) {
+        const skuList = chunk.map(s => `'${escStr(s)}'`).join(',');
+        const result = await db.execute(sql.raw(`SELECT id, name, brand, sku FROM supplies WHERE sku IN (${skuList})`));
+        for (const row of result.rows as any[]) {
+          supplyMap.set(row.sku, { id: Number(row.id), name: row.name, brand: row.brand ?? '' });
+        }
+      }
+
+      // Step 2: Classify items
+      type PriceUpdate = { id: number; price: number };
+      type TrackerReset = { supplyId: number; sku: string; name: string; threshold: number };
+      type TrackerIncrement = { supplyId: number; sku: string; name: string; threshold: number };
+      type NewItem = { sku: string; name: string; brand: string; price: number; category: string; inStock: number };
+
+      const priceUpdates: PriceUpdate[] = [];
+      const resetItems: TrackerReset[] = [];
+      const incrementItems: TrackerIncrement[] = [];
+      const newItems: NewItem[] = [];
+      let skipped = 0;
 
       for (const item of posItems) {
-        if (SKIP_CATEGORIES.has(item.posCategory)) { skipped++; continue; }
-
-        const found = await db.execute(sql`SELECT id, name, brand FROM supplies WHERE sku = ${item.sku} LIMIT 1`);
-        if (!found.rows || found.rows.length === 0) {
+        const existing = supplyMap.get(item.sku);
+        if (!existing) {
           const mappedCat = POS_CATEGORY_MAP[item.posCategory] ?? null;
           if (mappedCat && item.inStock > 0) {
-            await db.execute(sql`
-              INSERT INTO pos_pending_new_items (sku, item_name, brand, price, mapped_category, pos_stock, found_at)
-              VALUES (${item.sku}, ${item.name}, ${item.brand || null}, ${item.price}, ${mappedCat}, ${item.inStock}, NOW())
-              ON CONFLICT (sku) DO UPDATE SET item_name = ${item.name}, brand = ${item.brand || null}, price = ${item.price}, mapped_category = ${mappedCat}, pos_stock = ${item.inStock}, found_at = NOW()
-            `);
-            newItemCount++;
+            newItems.push({ sku: item.sku, name: item.name, brand: item.brand, price: item.price, category: mappedCat, inStock: item.inStock });
           } else {
             skipped++;
           }
           continue;
         }
-        const supplyId = (found.rows[0] as any).id;
-        const supplyName = (found.rows[0] as any).name;
-        const supplyBrand = String((found.rows[0] as any).brand || '').toLowerCase();
-        // POS price is always authoritative — update unconditionally
-        if (item.price > 0) {
-          await db.execute(sql`
-            UPDATE supplies SET price = ${item.price}, price_source = 'pos', updated_at = NOW()
-            WHERE id = ${supplyId}
-          `);
-        }
-
-        // Coastal products get a much higher threshold (50 scans ≈ 6 months at 2/week)
-        const isCoastal = supplyBrand.includes('coastal') || supplyName.toLowerCase().includes('coastal') || item.brand.toLowerCase().includes('coastal');
+        if (item.price > 0) priceUpdates.push({ id: existing.id, price: item.price });
+        const isCoastal = existing.brand.toLowerCase().includes('coastal') || existing.name.toLowerCase().includes('coastal') || item.brand.toLowerCase().includes('coastal');
         const threshold = isCoastal ? 50 : 16;
-
         if (item.inStock > 0) {
-          // In stock on POS — reset counter
-          await db.execute(sql`
-            INSERT INTO pos_zero_stock_tracker (supply_id, sku, item_name, zero_count, last_scan_at, last_nonzero_at, deletion_eligible, threshold)
-            VALUES (${supplyId}, ${item.sku}, ${supplyName}, 0, NOW(), NOW(), FALSE, ${threshold})
-            ON CONFLICT (supply_id) DO UPDATE
-              SET zero_count = 0, last_scan_at = NOW(), last_nonzero_at = NOW(), deletion_eligible = FALSE, threshold = ${threshold}
-          `);
-          reset++;
+          resetItems.push({ supplyId: existing.id, sku: item.sku, name: existing.name, threshold });
         } else {
-          // Zero stock — increment counter
-          const existing = await db.execute(sql`SELECT zero_count, protected, threshold FROM pos_zero_stock_tracker WHERE supply_id = ${supplyId}`);
-          const currentCount = existing.rows.length > 0 ? Number((existing.rows[0] as any).zero_count) : 0;
-          const isProtected = existing.rows.length > 0 ? Boolean((existing.rows[0] as any).protected) : false;
-          const itemThreshold = existing.rows.length > 0 ? Number((existing.rows[0] as any).threshold) : threshold;
-          const newCount = currentCount + 1;
-          const eligible = !isProtected && newCount >= itemThreshold;
-          if (eligible) nowEligible++;
-          await db.execute(sql`
-            INSERT INTO pos_zero_stock_tracker (supply_id, sku, item_name, zero_count, last_scan_at, deletion_eligible, threshold)
-            VALUES (${supplyId}, ${item.sku}, ${supplyName}, ${newCount}, NOW(), ${eligible}, ${threshold})
-            ON CONFLICT (supply_id) DO UPDATE
-              SET zero_count = ${newCount}, last_scan_at = NOW(), deletion_eligible = ${eligible}, threshold = ${threshold}
-          `);
-          incremented++;
+          incrementItems.push({ supplyId: existing.id, sku: item.sku, name: existing.name, threshold });
         }
       }
 
-      res.json({ processed: posItems.length, incremented, reset, nowEligible, skipped, newItemCount });
+      // Step 3: Bulk price updates
+      for (const chunk of chunkArr(priceUpdates, 500)) {
+        const vals = chunk.map(({ id, price }) => `(${id}, ${price})`).join(',');
+        await db.execute(sql.raw(`UPDATE supplies SET price = v.price::numeric, price_source = 'pos', updated_at = NOW() FROM (VALUES ${vals}) AS v(id, price) WHERE supplies.id = v.id::int`));
+      }
+
+      // Step 4: Bulk tracker resets (items back in stock)
+      for (const chunk of chunkArr(resetItems, 500)) {
+        const vals = chunk.map(({ supplyId, sku, name, threshold }) => `(${supplyId}, '${escStr(sku)}', '${escStr(name)}', ${threshold})`).join(',');
+        await db.execute(sql.raw(`
+          INSERT INTO pos_zero_stock_tracker (supply_id, sku, item_name, zero_count, last_scan_at, last_nonzero_at, deletion_eligible, threshold)
+          SELECT v.supply_id::int, v.sku, v.item_name, 0, NOW(), NOW(), FALSE, v.threshold::int
+          FROM (VALUES ${vals}) AS v(supply_id, sku, item_name, threshold)
+          ON CONFLICT (supply_id) DO UPDATE
+            SET zero_count = 0, last_scan_at = NOW(), last_nonzero_at = NOW(), deletion_eligible = FALSE, threshold = EXCLUDED.threshold
+        `));
+      }
+
+      // Step 5: Bulk tracker increments (still zero stock) — uses DB arithmetic so no read needed
+      let nowEligible = 0;
+      for (const chunk of chunkArr(incrementItems, 500)) {
+        const vals = chunk.map(({ supplyId, sku, name, threshold }) => `(${supplyId}, '${escStr(sku)}', '${escStr(name)}', ${threshold})`).join(',');
+        const result = await db.execute(sql.raw(`
+          INSERT INTO pos_zero_stock_tracker (supply_id, sku, item_name, zero_count, last_scan_at, deletion_eligible, threshold)
+          SELECT v.supply_id::int, v.sku, v.item_name, 1, NOW(), FALSE, v.threshold::int
+          FROM (VALUES ${vals}) AS v(supply_id, sku, item_name, threshold)
+          ON CONFLICT (supply_id) DO UPDATE
+            SET zero_count = pos_zero_stock_tracker.zero_count + 1,
+                last_scan_at = NOW(),
+                deletion_eligible = CASE
+                  WHEN NOT pos_zero_stock_tracker.protected
+                    AND (pos_zero_stock_tracker.zero_count + 1) >= EXCLUDED.threshold
+                  THEN TRUE
+                  ELSE pos_zero_stock_tracker.deletion_eligible
+                END,
+                threshold = EXCLUDED.threshold
+          RETURNING deletion_eligible
+        `));
+        nowEligible += (result.rows as any[]).filter((r: any) => r.deletion_eligible === true).length;
+      }
+
+      // Step 6: Bulk upsert new items
+      for (const chunk of chunkArr(newItems, 500)) {
+        const vals = chunk.map(({ sku, name, brand, price, category, inStock }) =>
+          `('${escStr(sku)}', '${escStr(name)}', ${brand ? `'${escStr(brand)}'` : 'NULL'}, ${price}, '${escStr(category)}', ${inStock}, NOW())`
+        ).join(',');
+        await db.execute(sql.raw(`
+          INSERT INTO pos_pending_new_items (sku, item_name, brand, price, mapped_category, pos_stock, found_at)
+          VALUES ${vals}
+          ON CONFLICT (sku) DO UPDATE
+            SET item_name = EXCLUDED.item_name, brand = EXCLUDED.brand, price = EXCLUDED.price,
+                mapped_category = EXCLUDED.mapped_category, pos_stock = EXCLUDED.pos_stock, found_at = NOW()
+        `));
+      }
+
+      res.json({
+        processed: posItems.length,
+        incremented: incrementItems.length,
+        reset: resetItems.length,
+        nowEligible,
+        skipped,
+        newItemCount: newItems.length,
+      });
     } catch (e: any) {
       console.error("POS scan upload error:", e);
       res.status(500).json({ message: "Failed to process POS file: " + e.message });
