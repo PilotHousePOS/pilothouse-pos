@@ -2740,6 +2740,35 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       res.json({ zeroStockUpdated: zeroResult.rowCount || 0, inStockUpdated: inStockResult.rowCount || 0 });
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
+  // POS Layout settings (persisted as JSON in grooming_settings table)
+  app.get("/api/pos/layout", requireAdminMiddleware, async (_req, res) => {
+    try {
+      const row = await storage.getGroomingSetting("pos_layout");
+      if (row) {
+        res.json(JSON.parse(row.value));
+      } else {
+        res.json(null); // client uses default
+      }
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.put("/api/admin/pos/layout", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin only" });
+      const config = req.body;
+      if (!config || !Array.isArray(config.categories)) {
+        return res.status(400).json({ message: "Invalid config" });
+      }
+      await storage.upsertGroomingSetting({ setting: "pos_layout", value: JSON.stringify(config) });
+      res.json({ ok: true });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
   // ────────────────────────────────────────────────────────────────────────────
 
   app.get("/api/admin/pos-scan/pending-new", requireAdminMiddleware, async (req: any, res) => {

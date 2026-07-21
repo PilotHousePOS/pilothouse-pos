@@ -1,11 +1,39 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ChevronLeft, DollarSign, CreditCard, Search } from "lucide-react";
+import {
+  ChevronLeft, DollarSign, CreditCard, Search, Settings, X,
+  ChevronUp, ChevronDown, Pencil, Trash2, Plus, Check, GripVertical,
+} from "lucide-react";
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+interface ServiceItem {
+  id: string;
+  label: string;
+  price: number | null;
+  color: string; // hex
+}
+
+interface PosCategory {
+  id: string;
+  label: string;
+  color: string; // hex
+  dbCategory?: string;
+  isService?: boolean;
+  services?: ServiceItem[];
+  isSpecial?: boolean;
+}
+
+interface PosConfig {
+  categories: PosCategory[];
+  tipAmounts: number[];
+  giftCardAmounts: number[];
+}
 
 interface OrderItem {
   lineId: string;
@@ -14,23 +42,6 @@ interface OrderItem {
   price: number;
   quantity: number;
   category: string;
-}
-
-interface ServiceItem {
-  id: string;
-  label: string;
-  price: number | null;
-  color: string;
-}
-
-interface PosCategory {
-  id: string;
-  label: string;
-  bgColor: string;
-  dbCategory?: string;
-  isService?: boolean;
-  services?: ServiceItem[];
-  isSpecial?: boolean;
 }
 
 interface SupplyItem {
@@ -42,47 +53,139 @@ interface SupplyItem {
   stockQuantity: number;
 }
 
-const POS_CATEGORIES: PosCategory[] = [
-  {
-    id: "grooming", label: "Grooming", bgColor: "bg-blue-700", isService: true,
-    services: [
-      { id: "bath-only",     label: "Bath Only",     price: null, color: "bg-sky-600" },
-      { id: "full-grooming", label: "Full Grooming",  price: null, color: "bg-cyan-700" },
-      { id: "nail-clip",     label: "Nail Clip",      price: 15,   color: "bg-blue-600" },
-      { id: "nail-grind",    label: "Nail Grind",     price: 20,   color: "bg-blue-600" },
-      { id: "tooth-brush",   label: "Tooth Brush",    price: 15,   color: "bg-blue-600" },
-    ],
-  },
-  { id: "dogFood",            label: "Dog Food",            bgColor: "bg-orange-700",  dbCategory: "dogFood" },
-  { id: "catFood",            label: "Cat Food",            bgColor: "bg-purple-700",  dbCategory: "catFood" },
-  { id: "dogTreats",          label: "Dog Treats",          bgColor: "bg-amber-700",   dbCategory: "dogTreats" },
-  { id: "catTreats",          label: "Cat Treats",          bgColor: "bg-pink-700",    dbCategory: "catTreats" },
-  { id: "accessories",        label: "Accessories",         bgColor: "bg-green-800",   dbCategory: "accessories" },
-  { id: "leashesAndCollars",  label: "Leashes & Collars",   bgColor: "bg-red-800",     dbCategory: "leashesAndCollars" },
-  { id: "toys",               label: "Toys",                bgColor: "bg-yellow-600",  dbCategory: "toys" },
-  { id: "beds",               label: "Beds",                bgColor: "bg-teal-700",    dbCategory: "beds" },
-  { id: "healthcare",         label: "Healthcare",          bgColor: "bg-emerald-800", dbCategory: "healthcare" },
-  { id: "aquatics",           label: "Aquatic Fish/Plant",  bgColor: "bg-sky-700",     dbCategory: "aquatics" },
-  { id: "reptiles",           label: "Live Reptiles/Feeders", bgColor: "bg-lime-700",  dbCategory: "reptiles" },
-  { id: "birdSupplies",       label: "Bird Supplies",       bgColor: "bg-violet-700",  dbCategory: "birdSupplies" },
-  { id: "smallAnimalSupplies",label: "Live Small Animals",  bgColor: "bg-orange-600",  dbCategory: "smallAnimalSupplies" },
-  { id: "tips",       label: "Tips",       bgColor: "bg-gray-600", isSpecial: true },
-  { id: "misc",       label: "Misc.",      bgColor: "bg-gray-700", isSpecial: true },
-  { id: "giftCards",  label: "Gift Cards", bgColor: "bg-rose-700", isSpecial: true },
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const COLOR_PALETTE = [
+  { hex: "#1d4ed8", name: "Blue" },
+  { hex: "#2563eb", name: "Light Blue" },
+  { hex: "#0369a1", name: "Sky" },
+  { hex: "#0284c7", name: "Cyan Dark" },
+  { hex: "#0e7490", name: "Cyan" },
+  { hex: "#0f766e", name: "Teal" },
+  { hex: "#065f46", name: "Emerald" },
+  { hex: "#166534", name: "Green" },
+  { hex: "#4d7c0f", name: "Lime" },
+  { hex: "#ca8a04", name: "Yellow" },
+  { hex: "#b45309", name: "Amber" },
+  { hex: "#c2410c", name: "Orange Dark" },
+  { hex: "#ea580c", name: "Orange" },
+  { hex: "#dc2626", name: "Red" },
+  { hex: "#991b1b", name: "Dark Red" },
+  { hex: "#be123c", name: "Rose" },
+  { hex: "#be185d", name: "Pink" },
+  { hex: "#9d174d", name: "Deep Pink" },
+  { hex: "#7e22ce", name: "Purple" },
+  { hex: "#6d28d9", name: "Violet" },
+  { hex: "#4338ca", name: "Indigo" },
+  { hex: "#4b5563", name: "Gray" },
+  { hex: "#374151", name: "Dark Gray" },
+  { hex: "#111827", name: "Black" },
 ];
+
+const DB_CATEGORIES = [
+  { value: "dogFood", label: "Dog Food" },
+  { value: "catFood", label: "Cat Food" },
+  { value: "dogTreats", label: "Dog Treats" },
+  { value: "catTreats", label: "Cat Treats" },
+  { value: "accessories", label: "Accessories" },
+  { value: "leashesAndCollars", label: "Leashes & Collars" },
+  { value: "toys", label: "Toys" },
+  { value: "beds", label: "Beds" },
+  { value: "healthcare", label: "Healthcare" },
+  { value: "aquatics", label: "Aquatics" },
+  { value: "reptiles", label: "Reptiles" },
+  { value: "birdSupplies", label: "Bird Supplies" },
+  { value: "smallAnimalSupplies", label: "Small Animals" },
+  { value: "other", label: "Other / Custom" },
+];
+
+const DEFAULT_CONFIG: PosConfig = {
+  categories: [
+    {
+      id: "grooming", label: "Grooming", color: "#1d4ed8", isService: true,
+      services: [
+        { id: "bath-only",    label: "Bath Only",    price: null, color: "#0284c7" },
+        { id: "full-grooming",label: "Full Grooming", price: null, color: "#0e7490" },
+        { id: "nail-clip",    label: "Nail Clip",     price: 15,   color: "#2563eb" },
+        { id: "nail-grind",   label: "Nail Grind",    price: 20,   color: "#2563eb" },
+        { id: "tooth-brush",  label: "Tooth Brush",   price: 15,   color: "#2563eb" },
+      ],
+    },
+    { id: "dogFood",             label: "Dog Food",             color: "#c2410c", dbCategory: "dogFood" },
+    { id: "catFood",             label: "Cat Food",             color: "#7e22ce", dbCategory: "catFood" },
+    { id: "dogTreats",           label: "Dog Treats",           color: "#b45309", dbCategory: "dogTreats" },
+    { id: "catTreats",           label: "Cat Treats",           color: "#be185d", dbCategory: "catTreats" },
+    { id: "accessories",         label: "Accessories",          color: "#166534", dbCategory: "accessories" },
+    { id: "leashesAndCollars",   label: "Leashes & Collars",    color: "#991b1b", dbCategory: "leashesAndCollars" },
+    { id: "toys",                label: "Toys",                 color: "#ca8a04", dbCategory: "toys" },
+    { id: "beds",                label: "Beds",                 color: "#0f766e", dbCategory: "beds" },
+    { id: "healthcare",          label: "Healthcare",           color: "#065f46", dbCategory: "healthcare" },
+    { id: "aquatics",            label: "Aquatic Fish/Plant",   color: "#0369a1", dbCategory: "aquatics" },
+    { id: "reptiles",            label: "Live Reptiles/Feeders",color: "#4d7c0f", dbCategory: "reptiles" },
+    { id: "birdSupplies",        label: "Bird Supplies",        color: "#6d28d9", dbCategory: "birdSupplies" },
+    { id: "smallAnimalSupplies", label: "Live Small Animals",   color: "#ea580c", dbCategory: "smallAnimalSupplies" },
+    { id: "tips",       label: "Tips",       color: "#4b5563", isSpecial: true },
+    { id: "misc",       label: "Misc.",      color: "#374151", isSpecial: true },
+    { id: "giftCards",  label: "Gift Cards", color: "#be123c", isSpecial: true },
+  ],
+  tipAmounts: [1, 2, 3, 4, 5, 10, 15, 20],
+  giftCardAmounts: [10, 15, 20, 25, 50, 75, 100],
+};
 
 function genId() { return Math.random().toString(36).substr(2, 9); }
 
 function genOrderNumber() {
   const d = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `POS-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `POS-${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
 }
+
+// ─── Color picker sub-component ──────────────────────────────────────────────
+
+function ColorPicker({ value, onChange }: { value: string; onChange: (hex: string) => void }) {
+  const [custom, setCustom] = useState(value);
+  return (
+    <div className="space-y-2">
+      <div className="grid grid-cols-8 gap-1.5">
+        {COLOR_PALETTE.map(c => (
+          <button
+            key={c.hex}
+            title={c.name}
+            onClick={() => onChange(c.hex)}
+            style={{ backgroundColor: c.hex }}
+            className={`w-7 h-7 rounded-full border-2 transition-all ${value === c.hex ? "border-white scale-110 shadow-lg" : "border-transparent hover:scale-105"}`}
+          />
+        ))}
+      </div>
+      <div className="flex items-center gap-2">
+        <input
+          type="color"
+          value={custom}
+          onChange={e => setCustom(e.target.value)}
+          className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent"
+        />
+        <span className="text-xs text-gray-400">Custom color</span>
+        <button onClick={() => onChange(custom)} className="text-xs bg-gray-600 hover:bg-gray-500 px-2 py-0.5 rounded text-white">Apply</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Category type badge ──────────────────────────────────────────────────────
+
+function TypeBadge({ cat }: { cat: PosCategory }) {
+  if (cat.isService) return <span className="text-[10px] bg-blue-900 text-blue-300 px-1.5 py-0.5 rounded">Services</span>;
+  if (cat.isSpecial) return <span className="text-[10px] bg-gray-600 text-gray-300 px-1.5 py-0.5 rounded">Special</span>;
+  return <span className="text-[10px] bg-green-900 text-green-300 px-1.5 py-0.5 rounded">Products</span>;
+}
+
+// ─── Main POS Page ─────────────────────────────────────────────────────────────
 
 export default function PosPage() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
+  // ── Order state ──
   const [orderItems, setOrderItems]           = useState<OrderItem[]>([]);
   const [selectedCatId, setSelectedCatId]     = useState<string | null>(null);
   const [showPayment, setShowPayment]         = useState(false);
@@ -94,12 +197,35 @@ export default function PosPage() {
   const [orderNumber]                         = useState(genOrderNumber);
   const [clock, setClock]                     = useState(new Date());
 
+  // ── Settings state ──
+  const [showSettings, setShowSettings]         = useState(false);
+  const [settingsTab, setSettingsTab]           = useState<"categories" | "amounts">("categories");
+  const [editingCatId, setEditingCatId]         = useState<string | null>(null); // cat id being edited, or "new"
+  const [editDraft, setEditDraft]               = useState<PosCategory | null>(null);
+  const [editSvcIdx, setEditSvcIdx]             = useState<number | null>(null); // sub-button being edited
+  const [svcDraft, setSvcDraft]                 = useState<ServiceItem | null>(null);
+  const [newTipAmt, setNewTipAmt]               = useState("");
+  const [newGcAmt, setNewGcAmt]                 = useState("");
+
+  // ── Active POS config (loaded from API, falls back to defaults) ──
+  const [posConfig, setPosConfig] = useState<PosConfig>(DEFAULT_CONFIG);
+
   useEffect(() => {
     const t = setInterval(() => setClock(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
 
-  const selectedCat = POS_CATEGORIES.find(c => c.id === selectedCatId) ?? null;
+  // ── Data queries ──
+  const { data: layoutData } = useQuery<PosConfig | null>({
+    queryKey: ["/api/pos/layout"],
+    staleTime: Infinity,
+  });
+
+  useEffect(() => {
+    if (layoutData) setPosConfig(layoutData);
+  }, [layoutData]);
+
+  const selectedCat = posConfig.categories.find(c => c.id === selectedCatId) ?? null;
 
   const { data: categoryItems = [] } = useQuery<SupplyItem[]>({
     queryKey: [`/api/pos/items?category=${selectedCatId}`],
@@ -116,6 +242,7 @@ export default function PosPage() {
     staleTime: 5 * 60 * 1000,
   });
 
+  // ── Mutations ──
   const saveOrderMutation = useMutation({
     mutationFn: (data: any) => apiRequest("POST", "/api/pos/order", data),
     onSuccess: () => {
@@ -127,13 +254,24 @@ export default function PosPage() {
     onError: () => toast({ title: "Error", description: "Failed to save order", variant: "destructive" }),
   });
 
-  const subtotal  = orderItems.reduce((s, i) => s + i.price * i.quantity, 0);
-  const taxRate   = (taxSettings?.taxRate ?? 10.99) / 100;
-  const tax       = subtotal * taxRate;
-  const total     = subtotal + tax;
+  const saveLayoutMutation = useMutation({
+    mutationFn: (config: PosConfig) => apiRequest("PUT", "/api/admin/pos/layout", config),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/layout"] });
+      toast({ title: "Layout saved", description: "POS settings updated" });
+    },
+    onError: () => toast({ title: "Error", description: "Failed to save layout", variant: "destructive" }),
+  });
+
+  // ── Totals ──
+  const subtotal = orderItems.reduce((s, i) => s + i.price * i.quantity, 0);
+  const taxRate  = (taxSettings?.taxRate ?? 10.99) / 100;
+  const tax      = subtotal * taxRate;
+  const total    = subtotal + tax;
   const tendered = parseFloat(cashTendered) || 0;
   const change   = tendered - total;
 
+  // ── Order handlers ──
   const addItem = useCallback((name: string, price: number, category: string, sku?: string) => {
     setOrderItems(prev => {
       const existing = prev.find(i => i.name === name && i.sku === sku);
@@ -161,19 +299,14 @@ export default function PosPage() {
 
   const changeQty = (lineId: string, delta: number) =>
     setOrderItems(prev => prev.map(i => i.lineId === lineId ? { ...i, quantity: Math.max(1, i.quantity + delta) } : i));
-
-  const removeLine = (lineId: string) =>
-    setOrderItems(prev => prev.filter(i => i.lineId !== lineId));
-
+  const removeLine    = (lineId: string) => setOrderItems(prev => prev.filter(i => i.lineId !== lineId));
   const removeLastLine = () => setOrderItems(prev => prev.slice(0, -1));
   const clearAll       = () => { setOrderItems([]); setSelectedCatId(null); };
 
   const pay = (method: "cash" | "credit") => {
     if (!orderItems.length) return;
     if (method === "cash") { setShowPayment(true); }
-    else {
-      saveOrderMutation.mutate({ orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: "credit" });
-    }
+    else { saveOrderMutation.mutate({ orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: "credit" }); }
   };
 
   const completeCash = () => {
@@ -184,12 +317,125 @@ export default function PosPage() {
     saveOrderMutation.mutate({ orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: "cash", amountTendered: tendered, changeDue: change });
   };
 
+  // ── Settings: category CRUD ──
+  const startEditCat = (cat: PosCategory) => {
+    setEditDraft({ ...cat, services: cat.services ? [...cat.services.map(s => ({ ...s }))] : [] });
+    setEditingCatId(cat.id);
+    setEditSvcIdx(null);
+    setSvcDraft(null);
+  };
+
+  const startNewCat = () => {
+    const draft: PosCategory = { id: genId(), label: "New Category", color: "#1d4ed8", dbCategory: "other" };
+    setEditDraft(draft);
+    setEditingCatId("new");
+    setEditSvcIdx(null);
+    setSvcDraft(null);
+  };
+
+  const cancelEdit = () => { setEditingCatId(null); setEditDraft(null); setEditSvcIdx(null); setSvcDraft(null); };
+
+  const saveCatEdit = () => {
+    if (!editDraft) return;
+    const updated = { ...posConfig };
+    if (editingCatId === "new") {
+      updated.categories = [...updated.categories, editDraft];
+    } else {
+      updated.categories = updated.categories.map(c => c.id === editDraft.id ? editDraft : c);
+    }
+    setPosConfig(updated);
+    saveLayoutMutation.mutate(updated);
+    cancelEdit();
+  };
+
+  const deleteCat = (id: string) => {
+    const updated = { ...posConfig, categories: posConfig.categories.filter(c => c.id !== id) };
+    setPosConfig(updated);
+    saveLayoutMutation.mutate(updated);
+    if (selectedCatId === id) setSelectedCatId(null);
+  };
+
+  const moveCat = (id: string, dir: -1 | 1) => {
+    const cats = [...posConfig.categories];
+    const idx = cats.findIndex(c => c.id === id);
+    const target = idx + dir;
+    if (target < 0 || target >= cats.length) return;
+    [cats[idx], cats[target]] = [cats[target], cats[idx]];
+    const updated = { ...posConfig, categories: cats };
+    setPosConfig(updated);
+    saveLayoutMutation.mutate(updated);
+  };
+
+  // ── Settings: sub-button CRUD ──
+  const startNewSvc = () => {
+    setSvcDraft({ id: genId(), label: "New Service", price: null, color: "#2563eb" });
+    setEditSvcIdx(-1); // -1 = new
+  };
+
+  const startEditSvc = (idx: number) => {
+    if (!editDraft?.services) return;
+    setSvcDraft({ ...editDraft.services[idx] });
+    setEditSvcIdx(idx);
+  };
+
+  const saveSvc = () => {
+    if (!svcDraft || !editDraft) return;
+    const svcs = editDraft.services ? [...editDraft.services] : [];
+    if (editSvcIdx === -1) {
+      svcs.push(svcDraft);
+    } else if (editSvcIdx !== null) {
+      svcs[editSvcIdx] = svcDraft;
+    }
+    setEditDraft({ ...editDraft, services: svcs });
+    setEditSvcIdx(null);
+    setSvcDraft(null);
+  };
+
+  const deleteSvc = (idx: number) => {
+    if (!editDraft?.services) return;
+    const svcs = editDraft.services.filter((_, i) => i !== idx);
+    setEditDraft({ ...editDraft, services: svcs });
+  };
+
+  // ── Settings: quick amounts ──
+  const saveAmounts = (updated: PosConfig) => {
+    setPosConfig(updated);
+    saveLayoutMutation.mutate(updated);
+  };
+
+  const addTipAmt = () => {
+    const n = parseFloat(newTipAmt);
+    if (!n || n <= 0) return;
+    const amounts = [...posConfig.tipAmounts, n].sort((a, b) => a - b);
+    saveAmounts({ ...posConfig, tipAmounts: amounts });
+    setNewTipAmt("");
+  };
+
+  const removeTipAmt = (amt: number) => {
+    saveAmounts({ ...posConfig, tipAmounts: posConfig.tipAmounts.filter(a => a !== amt) });
+  };
+
+  const addGcAmt = () => {
+    const n = parseFloat(newGcAmt);
+    if (!n || n <= 0) return;
+    const amounts = [...posConfig.giftCardAmounts, n].sort((a, b) => a - b);
+    saveAmounts({ ...posConfig, giftCardAmounts: amounts });
+    setNewGcAmt("");
+  };
+
+  const removeGcAmt = (amt: number) => {
+    saveAmounts({ ...posConfig, giftCardAmounts: posConfig.giftCardAmounts.filter(a => a !== amt) });
+  };
+
   const timeStr = clock.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true });
   const dateStr = clock.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
 
+  // ─── Render ───────────────────────────────────────────────────────────────
+
   return (
     <div className="h-screen bg-gray-900 text-white flex flex-col overflow-hidden select-none">
-      {/* Top bar */}
+
+      {/* ── Top bar ── */}
       <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-3">
           <button onClick={() => setLocation("/admin")} className="flex items-center gap-1 text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-gray-300">
@@ -198,13 +444,21 @@ export default function PosPage() {
           <span className="text-sm font-bold">Animal House Pet Store</span>
           <span className="text-xs bg-blue-700 px-2 py-0.5 rounded font-semibold">IN STORE</span>
         </div>
-        <div className="text-right">
-          <div className="text-sm font-mono font-bold">{timeStr}</div>
-          <div className="text-xs text-gray-400">{dateStr}</div>
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <div className="text-sm font-mono font-bold">{timeStr}</div>
+            <div className="text-xs text-gray-400">{dateStr}</div>
+          </div>
+          <button
+            onClick={() => setShowSettings(true)}
+            className="flex items-center gap-1.5 text-xs bg-gray-700 hover:bg-gray-600 px-2.5 py-1.5 rounded text-gray-300 border border-gray-600"
+          >
+            <Settings className="h-3.5 w-3.5" /> Settings
+          </button>
         </div>
       </div>
 
-      {/* Main area */}
+      {/* ── Main area ── */}
       <div className="flex-1 flex overflow-hidden">
 
         {/* LEFT: Order cart */}
@@ -213,8 +467,6 @@ export default function PosPage() {
             <div className="text-xs text-gray-400">Order #</div>
             <div className="text-xs font-mono text-yellow-400">{orderNumber}</div>
           </div>
-
-          {/* Items list */}
           <div className="flex-1 overflow-y-auto">
             {orderItems.length === 0 ? (
               <div className="flex items-center justify-center h-24 text-gray-600 text-xs">No items added</div>
@@ -240,47 +492,29 @@ export default function PosPage() {
               </div>
             )}
           </div>
-
-          {/* Totals */}
           <div className="border-t border-gray-700 px-3 py-2 space-y-0.5 flex-shrink-0">
-            <div className="flex justify-between text-xs text-gray-400">
-              <span>Item Count</span><span>{orderItems.reduce((s, i) => s + i.quantity, 0)}</span>
-            </div>
-            <div className="flex justify-between text-xs text-gray-400">
-              <span>Subtotal</span><span>${subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-xs text-gray-400">
-              <span>Discount</span><span>0.00</span>
-            </div>
-            <div className="flex justify-between text-xs text-gray-400">
-              <span>Tax</span><span>${tax.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-xs text-gray-400">
-              <span>Tip</span><span>0.00</span>
-            </div>
-            <div className="flex justify-between text-sm font-bold text-white border-t border-gray-600 pt-1 mt-1">
-              <span>Total</span><span>${total.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-xs text-gray-400">
-              <span>Paid</span><span>0.00</span>
-            </div>
-            <div className="flex justify-between text-xs font-semibold text-yellow-400">
-              <span>Balance Due</span><span>${total.toFixed(2)}</span>
-            </div>
+            <div className="flex justify-between text-xs text-gray-400"><span>Item Count</span><span>{orderItems.reduce((s, i) => s + i.quantity, 0)}</span></div>
+            <div className="flex justify-between text-xs text-gray-400"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
+            <div className="flex justify-between text-xs text-gray-400"><span>Discount</span><span>0.00</span></div>
+            <div className="flex justify-between text-xs text-gray-400"><span>Tax</span><span>${tax.toFixed(2)}</span></div>
+            <div className="flex justify-between text-xs text-gray-400"><span>Tip</span><span>0.00</span></div>
+            <div className="flex justify-between text-sm font-bold text-white border-t border-gray-600 pt-1 mt-1"><span>Total</span><span>${total.toFixed(2)}</span></div>
+            <div className="flex justify-between text-xs text-gray-400"><span>Paid</span><span>0.00</span></div>
+            <div className="flex justify-between text-xs font-semibold text-yellow-400"><span>Balance Due</span><span>${total.toFixed(2)}</span></div>
           </div>
         </div>
 
-        {/* CENTER: Categories column + Item grid */}
+        {/* CENTER: Categories + Item grid */}
         <div className="flex-1 flex overflow-hidden">
-
           {/* Category column */}
           <div className="w-44 border-r border-gray-700 overflow-y-auto flex-shrink-0 bg-gray-800/80">
             <div className="p-1.5 space-y-1">
-              {POS_CATEGORIES.map(cat => (
+              {posConfig.categories.map(cat => (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCatId(selectedCatId === cat.id ? null : cat.id)}
-                  className={`w-full text-left px-3 py-2.5 rounded text-xs font-semibold text-white transition-all ${cat.bgColor} ${selectedCatId === cat.id ? "ring-2 ring-white ring-offset-1 ring-offset-gray-800 brightness-110" : "opacity-90 hover:opacity-100 hover:brightness-110"}`}
+                  style={{ backgroundColor: cat.color }}
+                  className={`w-full text-left px-3 py-2.5 rounded text-xs font-semibold text-white transition-all ${selectedCatId === cat.id ? "ring-2 ring-white ring-offset-1 ring-offset-gray-800 brightness-110" : "opacity-90 hover:opacity-100 hover:brightness-110"}`}
                 >
                   {cat.label}
                 </button>
@@ -297,15 +531,13 @@ export default function PosPage() {
               </div>
             )}
 
-            {/* Grooming services */}
+            {/* Services */}
             {selectedCat?.isService && selectedCat.services && (
               <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                 {selectedCat.services.map(svc => (
-                  <button
-                    key={svc.id}
-                    onClick={() => addService(svc, selectedCat.label)}
-                    className={`${svc.color} text-white rounded p-3 text-center hover:brightness-110 active:scale-95 transition-all min-h-[70px] flex flex-col items-center justify-center`}
-                  >
+                  <button key={svc.id} onClick={() => addService(svc, selectedCat.label)}
+                    style={{ backgroundColor: svc.color }}
+                    className="text-white rounded p-3 text-center hover:brightness-110 active:scale-95 transition-all min-h-[70px] flex flex-col items-center justify-center">
                     <div className="text-sm font-semibold">{svc.label}</div>
                     {svc.price !== null
                       ? <div className="text-xs mt-1 text-white/80">${svc.price.toFixed(2)}</div>
@@ -316,15 +548,12 @@ export default function PosPage() {
               </div>
             )}
 
-            {/* DB category items */}
+            {/* DB category products */}
             {selectedCat?.dbCategory && (
               <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
                 {(categoryItems as SupplyItem[]).map(item => (
-                  <button
-                    key={item.id}
-                    onClick={() => addItem(item.name, Number(item.price), selectedCatId!, item.sku)}
-                    className="bg-gray-700 hover:bg-gray-600 active:scale-95 text-white rounded p-2 text-center transition-all min-h-[70px] flex flex-col items-center justify-center border border-gray-600 hover:border-gray-400"
-                  >
+                  <button key={item.id} onClick={() => addItem(item.name, Number(item.price), selectedCatId!, item.sku)}
+                    className="bg-gray-700 hover:bg-gray-600 active:scale-95 text-white rounded p-2 text-center transition-all min-h-[70px] flex flex-col items-center justify-center border border-gray-600 hover:border-gray-400">
                     <div className="text-xs font-medium leading-tight line-clamp-3">{item.name}</div>
                     <div className="text-xs text-green-400 font-semibold mt-1">${Number(item.price).toFixed(2)}</div>
                   </button>
@@ -338,16 +567,12 @@ export default function PosPage() {
             {/* Tips */}
             {selectedCatId === "tips" && (
               <div className="grid grid-cols-4 gap-2">
-                {[1, 2, 3, 4, 5, 10, 15, 20].map(amt => (
+                {posConfig.tipAmounts.map(amt => (
                   <button key={amt} onClick={() => addItem("Tip", amt, "tips")}
-                    className="bg-gray-600 hover:bg-gray-500 text-white rounded p-3 text-center active:scale-95 min-h-[60px] font-bold text-sm">
-                    ${amt}.00
-                  </button>
+                    className="bg-gray-600 hover:bg-gray-500 text-white rounded p-3 text-center active:scale-95 min-h-[60px] font-bold text-sm">${amt}.00</button>
                 ))}
                 <button onClick={() => { setCustomPriceItem({ name: "Tip", category: "tips" }); setCustomPrice(""); }}
-                  className="bg-gray-500 hover:bg-gray-400 text-white rounded p-3 text-center active:scale-95 min-h-[60px] col-span-2 font-semibold text-sm">
-                  Custom Tip
-                </button>
+                  className="bg-gray-500 hover:bg-gray-400 text-white rounded p-3 text-center active:scale-95 min-h-[60px] col-span-2 font-semibold text-sm">Custom Tip</button>
               </div>
             )}
 
@@ -356,16 +581,14 @@ export default function PosPage() {
               <div className="flex flex-col items-center justify-center h-48 gap-3">
                 <div className="text-gray-400 text-sm">Enter a custom misc item</div>
                 <button onClick={() => { setCustomPriceItem({ name: "Misc Item", category: "misc" }); setCustomPrice(""); }}
-                  className="bg-gray-600 hover:bg-gray-500 text-white px-6 py-3 rounded font-semibold">
-                  Add Misc Item
-                </button>
+                  className="bg-gray-600 hover:bg-gray-500 text-white px-6 py-3 rounded font-semibold">Add Misc Item</button>
               </div>
             )}
 
             {/* Gift Cards */}
             {selectedCatId === "giftCards" && (
               <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
-                {[10, 15, 20, 25, 50, 75, 100].map(amt => (
+                {posConfig.giftCardAmounts.map(amt => (
                   <button key={amt} onClick={() => addItem(`Gift Card - $${amt}`, amt, "giftCards")}
                     className="bg-rose-700 hover:bg-rose-600 text-white rounded p-3 text-center active:scale-95 min-h-[60px]">
                     <div className="text-sm font-bold">${amt}.00</div>
@@ -393,7 +616,7 @@ export default function PosPage() {
         </div>
       </div>
 
-      {/* BOTTOM: Payment + scan */}
+      {/* ── Bottom bar ── */}
       <div className="bg-gray-800 border-t border-gray-700 p-2 flex gap-2 flex-shrink-0">
         <button onClick={() => pay("cash")} disabled={!orderItems.length}
           className="flex-1 bg-green-700 hover:bg-green-600 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded py-3 font-bold text-sm flex items-center justify-center gap-2">
@@ -408,6 +631,299 @@ export default function PosPage() {
           <Search className="h-4 w-4" /> Scan / Search
         </button>
       </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          POS SETTINGS OVERLAY
+      ═══════════════════════════════════════════════════════════════════════ */}
+      {showSettings && (
+        <div className="fixed inset-0 z-50 bg-gray-950 flex flex-col">
+          {/* Header */}
+          <div className="bg-gray-800 border-b border-gray-700 px-5 py-3 flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-3">
+              <Settings className="h-5 w-5 text-blue-400" />
+              <span className="text-lg font-bold">POS Layout Settings</span>
+              {saveLayoutMutation.isPending && <span className="text-xs text-yellow-400 animate-pulse">Saving…</span>}
+            </div>
+            <button onClick={() => { setShowSettings(false); cancelEdit(); }} className="p-2 hover:bg-gray-700 rounded">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Tab bar */}
+          <div className="bg-gray-800 border-b border-gray-700 px-5 flex gap-0 flex-shrink-0">
+            {(["categories", "amounts"] as const).map(tab => (
+              <button key={tab} onClick={() => { setSettingsTab(tab); cancelEdit(); }}
+                className={`px-5 py-2.5 text-sm font-semibold capitalize border-b-2 transition-colors ${settingsTab === tab ? "border-blue-500 text-blue-400" : "border-transparent text-gray-400 hover:text-white"}`}>
+                {tab === "categories" ? "Category Buttons" : "Quick Amounts"}
+              </button>
+            ))}
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-hidden flex">
+
+            {/* ── CATEGORIES TAB ── */}
+            {settingsTab === "categories" && (
+              <div className="flex-1 flex overflow-hidden">
+
+                {/* Category list */}
+                <div className="w-80 border-r border-gray-700 flex flex-col overflow-hidden flex-shrink-0">
+                  <div className="px-4 py-2 border-b border-gray-700 text-xs text-gray-400 uppercase tracking-wider">
+                    {posConfig.categories.length} buttons — drag to reorder
+                  </div>
+                  <div className="flex-1 overflow-y-auto">
+                    {posConfig.categories.map((cat, idx) => (
+                      <div key={cat.id}
+                        className={`flex items-center gap-2 px-3 py-2 border-b border-gray-800 hover:bg-gray-800/50 ${editingCatId === cat.id ? "bg-gray-800 ring-1 ring-inset ring-blue-600" : ""}`}>
+                        {/* Color swatch */}
+                        <div className="w-4 h-8 rounded flex-shrink-0" style={{ backgroundColor: cat.color }} />
+                        {/* Label */}
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium truncate">{cat.label}</div>
+                          <TypeBadge cat={cat} />
+                        </div>
+                        {/* Reorder */}
+                        <div className="flex flex-col gap-0.5 flex-shrink-0">
+                          <button onClick={() => moveCat(cat.id, -1)} disabled={idx === 0} className="p-0.5 hover:bg-gray-600 rounded disabled:opacity-30">
+                            <ChevronUp className="h-3 w-3" />
+                          </button>
+                          <button onClick={() => moveCat(cat.id, 1)} disabled={idx === posConfig.categories.length - 1} className="p-0.5 hover:bg-gray-600 rounded disabled:opacity-30">
+                            <ChevronDown className="h-3 w-3" />
+                          </button>
+                        </div>
+                        {/* Edit */}
+                        <button onClick={() => startEditCat(cat)} className="p-1.5 hover:bg-blue-700 rounded text-blue-400 hover:text-white transition-colors">
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        {/* Delete */}
+                        <button onClick={() => deleteCat(cat.id)} className="p-1.5 hover:bg-red-700 rounded text-red-400 hover:text-white transition-colors">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="p-3 border-t border-gray-700">
+                    <button onClick={startNewCat}
+                      className="w-full flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-600 text-white rounded py-2.5 text-sm font-semibold">
+                      <Plus className="h-4 w-4" /> Add Category Button
+                    </button>
+                  </div>
+                </div>
+
+                {/* Edit panel */}
+                {editDraft ? (
+                  <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                    <h2 className="text-base font-bold text-white">
+                      {editingCatId === "new" ? "New Category" : `Edit: ${editDraft.label}`}
+                    </h2>
+
+                    {/* Label */}
+                    <div>
+                      <label className="text-xs text-gray-400 uppercase tracking-wider block mb-1.5">Button Label</label>
+                      <input
+                        className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                        value={editDraft.label}
+                        onChange={e => setEditDraft({ ...editDraft, label: e.target.value })}
+                      />
+                    </div>
+
+                    {/* Button color */}
+                    <div>
+                      <label className="text-xs text-gray-400 uppercase tracking-wider block mb-1.5">Button Color</label>
+                      <div className="mb-2 flex items-center gap-2">
+                        <div className="w-8 h-8 rounded" style={{ backgroundColor: editDraft.color }} />
+                        <span className="text-sm text-gray-300">{editDraft.color}</span>
+                      </div>
+                      <ColorPicker value={editDraft.color} onChange={hex => setEditDraft({ ...editDraft, color: hex })} />
+                    </div>
+
+                    {/* Type */}
+                    <div>
+                      <label className="text-xs text-gray-400 uppercase tracking-wider block mb-2">Button Type</label>
+                      <div className="flex gap-3">
+                        {[
+                          { key: "products", label: "Products", desc: "Loads items from inventory" },
+                          { key: "services", label: "Services", desc: "Custom sub-buttons (e.g. grooming)" },
+                          { key: "special",  label: "Special",  desc: "Tips, Misc, Gift Cards" },
+                        ].map(({ key, label, desc }) => {
+                          const active = key === "services" ? !!editDraft.isService : key === "special" ? !!editDraft.isSpecial : (!editDraft.isService && !editDraft.isSpecial);
+                          return (
+                            <button key={key}
+                              onClick={() => {
+                                const base = { ...editDraft, isService: false, isSpecial: false };
+                                if (key === "services") setEditDraft({ ...base, isService: true, dbCategory: undefined });
+                                else if (key === "special") setEditDraft({ ...base, isSpecial: true, dbCategory: undefined });
+                                else setEditDraft({ ...base, dbCategory: editDraft.dbCategory || "other" });
+                              }}
+                              className={`flex-1 rounded p-3 text-left border transition-colors ${active ? "bg-blue-700 border-blue-500 text-white" : "bg-gray-800 border-gray-600 text-gray-300 hover:border-gray-400"}`}>
+                              <div className="text-sm font-semibold">{label}</div>
+                              <div className="text-xs opacity-70 mt-0.5">{desc}</div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Products: dbCategory picker */}
+                    {!editDraft.isService && !editDraft.isSpecial && (
+                      <div>
+                        <label className="text-xs text-gray-400 uppercase tracking-wider block mb-1.5">Inventory Category</label>
+                        <select
+                          value={editDraft.dbCategory || "other"}
+                          onChange={e => setEditDraft({ ...editDraft, dbCategory: e.target.value })}
+                          className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                        >
+                          {DB_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                        </select>
+                        <div className="text-xs text-gray-500 mt-1">Items are loaded from the matching inventory category.</div>
+                      </div>
+                    )}
+
+                    {/* Services: sub-button list */}
+                    {editDraft.isService && (
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="text-xs text-gray-400 uppercase tracking-wider">Sub-Buttons</label>
+                          <button onClick={startNewSvc} className="flex items-center gap-1 text-xs bg-blue-700 hover:bg-blue-600 text-white px-2.5 py-1 rounded">
+                            <Plus className="h-3 w-3" /> Add
+                          </button>
+                        </div>
+                        <div className="space-y-1.5">
+                          {(editDraft.services || []).map((svc, idx) => (
+                            <div key={svc.id} className={`flex items-center gap-2 bg-gray-800 rounded px-3 py-2 border ${editSvcIdx === idx ? "border-blue-500" : "border-gray-700"}`}>
+                              <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: svc.color }} />
+                              <div className="flex-1 min-w-0">
+                                <span className="text-sm">{svc.label}</span>
+                                <span className="text-xs text-gray-400 ml-2">{svc.price !== null ? `$${svc.price.toFixed(2)}` : "Enter price"}</span>
+                              </div>
+                              <button onClick={() => startEditSvc(idx)} className="p-1 hover:bg-blue-700 rounded text-blue-400">
+                                <Pencil className="h-3 w-3" />
+                              </button>
+                              <button onClick={() => deleteSvc(idx)} className="p-1 hover:bg-red-700 rounded text-red-400">
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ))}
+                          {(editDraft.services || []).length === 0 && (
+                            <div className="text-xs text-gray-500 py-2 text-center">No sub-buttons yet — click Add</div>
+                          )}
+                        </div>
+
+                        {/* Sub-button edit inline */}
+                        {svcDraft && (
+                          <div className="mt-3 bg-gray-900 border border-blue-700 rounded p-4 space-y-3">
+                            <div className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
+                              {editSvcIdx === -1 ? "New Sub-Button" : "Edit Sub-Button"}
+                            </div>
+                            <div>
+                              <label className="text-xs text-gray-400 block mb-1">Label</label>
+                              <input className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                                value={svcDraft.label} onChange={e => setSvcDraft({ ...svcDraft, label: e.target.value })} />
+                            </div>
+                            <div>
+                              <label className="text-xs text-gray-400 block mb-1">Price (leave blank = enter at sale)</label>
+                              <input type="number" className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                                placeholder="e.g. 15.00"
+                                value={svcDraft.price ?? ""}
+                                onChange={e => setSvcDraft({ ...svcDraft, price: e.target.value === "" ? null : parseFloat(e.target.value) })} />
+                            </div>
+                            <div>
+                              <label className="text-xs text-gray-400 block mb-1.5">Button Color</label>
+                              <ColorPicker value={svcDraft.color} onChange={hex => setSvcDraft({ ...svcDraft, color: hex })} />
+                            </div>
+                            <div className="flex gap-2 pt-1">
+                              <button onClick={saveSvc} className="flex-1 bg-blue-700 hover:bg-blue-600 text-white rounded py-1.5 text-sm font-semibold flex items-center justify-center gap-1">
+                                <Check className="h-3.5 w-3.5" /> Save
+                              </button>
+                              <button onClick={() => { setEditSvcIdx(null); setSvcDraft(null); }} className="flex-1 bg-gray-700 hover:bg-gray-600 text-white rounded py-1.5 text-sm">Cancel</button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Save / Cancel */}
+                    <div className="flex gap-3 pt-2 border-t border-gray-700">
+                      <button onClick={saveCatEdit} disabled={saveLayoutMutation.isPending}
+                        className="flex-1 bg-blue-700 hover:bg-blue-600 disabled:opacity-50 text-white rounded py-2.5 font-bold text-sm flex items-center justify-center gap-2">
+                        <Check className="h-4 w-4" /> {editingCatId === "new" ? "Add Button" : "Save Changes"}
+                      </button>
+                      <button onClick={cancelEdit} className="flex-1 bg-gray-700 hover:bg-gray-600 text-white rounded py-2.5 font-semibold text-sm">Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex-1 flex items-center justify-center text-gray-600 flex-col gap-3">
+                    <Pencil className="h-10 w-10 opacity-30" />
+                    <div className="text-sm">Select a button to edit, or add a new one</div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── QUICK AMOUNTS TAB ── */}
+            {settingsTab === "amounts" && (
+              <div className="flex-1 overflow-y-auto p-6 space-y-8 max-w-xl">
+
+                {/* Tips */}
+                <div>
+                  <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-gray-400 inline-block" /> Tip Quick-Amounts
+                  </h3>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {posConfig.tipAmounts.map(amt => (
+                      <div key={amt} className="flex items-center gap-1 bg-gray-700 rounded px-3 py-1.5">
+                        <span className="text-sm font-semibold">${amt}</span>
+                        <button onClick={() => removeTipAmt(amt)} className="text-red-400 hover:text-red-300 ml-1">
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input type="number" placeholder="Add amount (e.g. 25)"
+                      value={newTipAmt} onChange={e => setNewTipAmt(e.target.value)}
+                      className="flex-1 bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                      onKeyDown={e => e.key === "Enter" && addTipAmt()} />
+                    <button onClick={addTipAmt} className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-semibold flex items-center gap-1">
+                      <Plus className="h-3.5 w-3.5" /> Add
+                    </button>
+                  </div>
+                </div>
+
+                {/* Gift Cards */}
+                <div>
+                  <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-rose-400 inline-block" /> Gift Card Denominations
+                  </h3>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {posConfig.giftCardAmounts.map(amt => (
+                      <div key={amt} className="flex items-center gap-1 bg-gray-700 rounded px-3 py-1.5">
+                        <span className="text-sm font-semibold">${amt}</span>
+                        <button onClick={() => removeGcAmt(amt)} className="text-red-400 hover:text-red-300 ml-1">
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input type="number" placeholder="Add amount (e.g. 200)"
+                      value={newGcAmt} onChange={e => setNewGcAmt(e.target.value)}
+                      className="flex-1 bg-gray-800 border border-gray-600 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                      onKeyDown={e => e.key === "Enter" && addGcAmt()} />
+                    <button onClick={addGcAmt} className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-semibold flex items-center gap-1">
+                      <Plus className="h-3.5 w-3.5" /> Add
+                    </button>
+                  </div>
+                </div>
+
+                <div className="text-xs text-gray-600 pt-2 border-t border-gray-800">
+                  Changes save automatically. Removing a preset doesn't affect completed orders.
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── Cash Payment Dialog ── */}
       <Dialog open={showPayment} onOpenChange={setShowPayment}>
@@ -468,15 +984,12 @@ export default function PosPage() {
               {searchQuery.length >= 2 && (searchResults as SupplyItem[]).length === 0 && (
                 <div className="text-center py-6 space-y-3">
                   <div className="text-gray-500 text-sm">No item found in system</div>
-                  <button
-                    onClick={() => {
-                      setCustomPriceItem({ name: searchQuery.trim(), category: "misc" });
-                      setCustomPrice("");
-                      setShowSearch(false);
-                      setSearchQuery("");
-                    }}
-                    className="bg-indigo-700 hover:bg-indigo-600 text-white px-4 py-2 rounded text-sm font-semibold"
-                  >
+                  <button onClick={() => {
+                    setCustomPriceItem({ name: searchQuery.trim(), category: "misc" });
+                    setCustomPrice("");
+                    setShowSearch(false);
+                    setSearchQuery("");
+                  }} className="bg-indigo-700 hover:bg-indigo-600 text-white px-4 py-2 rounded text-sm font-semibold">
                     + Add "{searchQuery.trim()}" to Order
                   </button>
                 </div>
