@@ -20,15 +20,6 @@ function log(message: string) {
   console.log(`${time} [express] ${message}`);
 }
 
-// Log ALL incoming requests (temporary diagnostic for root path 404 issue)
-app.use((req, res, next) => {
-  const url = req.originalUrl || req.url;
-  if (!url.startsWith('/api')) {
-    console.log(`[REQUEST] ${req.method} ${url} | host: ${req.hostname} | ip: ${req.ip || req.socket?.remoteAddress}`);
-  }
-  next();
-});
-
 // CRITICAL: Health check endpoints FIRST - must respond instantly
 app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok', ready: isFullyInitialized });

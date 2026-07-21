@@ -10,13 +10,10 @@ import { storage } from "./storage";
 import { generateToken, verifyToken, authMiddleware, setAuthCookie } from "./auth";
 import {
   insertPetSchema,
-  insertSupplySchema,
-  insertCartItemSchema,
   insertOrderSchema,
   insertAppointmentSchema,
   insertCustomerPetSchema,
   users,
-  extractedOrderItems,
   orderItems,
   orders,
   appointments,
