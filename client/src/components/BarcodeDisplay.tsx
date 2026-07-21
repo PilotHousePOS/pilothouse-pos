@@ -43,5 +43,9 @@ export default function BarcodeDisplay({
 
   if (!value || value.length < 6) return null;
 
-  return <svg ref={svgRef} className={className} />;
+  return (
+    <div style={{ background: "#ffffff", colorScheme: "light", display: "inline-block" }}>
+      <svg ref={svgRef} className={className} style={{ display: "block", background: "#ffffff" }} />
+    </div>
+  );
 }
