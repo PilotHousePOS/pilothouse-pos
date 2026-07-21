@@ -111,6 +111,11 @@ export default function PosPage() {
     enabled: searchQuery.length >= 2,
   });
 
+  const { data: taxSettings } = useQuery<{ taxRate: number }>({
+    queryKey: ["/api/settings/tax-rate"],
+    staleTime: 5 * 60 * 1000,
+  });
+
   const saveOrderMutation = useMutation({
     mutationFn: (data: any) => apiRequest("POST", "/api/pos/order", data),
     onSuccess: () => {
@@ -122,9 +127,10 @@ export default function PosPage() {
     onError: () => toast({ title: "Error", description: "Failed to save order", variant: "destructive" }),
   });
 
-  const subtotal = orderItems.reduce((s, i) => s + i.price * i.quantity, 0);
-  const tax      = 0;
-  const total    = subtotal + tax;
+  const subtotal  = orderItems.reduce((s, i) => s + i.price * i.quantity, 0);
+  const taxRate   = (taxSettings?.taxRate ?? 10.99) / 100;
+  const tax       = subtotal * taxRate;
+  const total     = subtotal + tax;
   const tendered = parseFloat(cashTendered) || 0;
   const change   = tendered - total;
 
@@ -460,7 +466,20 @@ export default function PosPage() {
                 </button>
               ))}
               {searchQuery.length >= 2 && (searchResults as SupplyItem[]).length === 0 && (
-                <div className="text-gray-500 text-sm text-center py-6">No items found</div>
+                <div className="text-center py-6 space-y-3">
+                  <div className="text-gray-500 text-sm">No item found in system</div>
+                  <button
+                    onClick={() => {
+                      setCustomPriceItem({ name: searchQuery.trim(), category: "misc" });
+                      setCustomPrice("");
+                      setShowSearch(false);
+                      setSearchQuery("");
+                    }}
+                    className="bg-indigo-700 hover:bg-indigo-600 text-white px-4 py-2 rounded text-sm font-semibold"
+                  >
+                    + Add "{searchQuery.trim()}" to Order
+                  </button>
+                </div>
               )}
               {searchQuery.length < 2 && (
                 <div className="text-gray-600 text-xs text-center py-6">Type at least 2 characters or hold your scanner to this screen</div>

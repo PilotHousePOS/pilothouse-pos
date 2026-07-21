@@ -148,7 +148,7 @@ function Router() {
           <Route component={NotFound} />
         </Switch>
       </Suspense>
-      {isAuthenticated && <BottomNav />}
+      {isAuthenticated && location !== "/pos" && <BottomNav />}
       {isAuthenticated && <BackToTop />}
     </div>
   );
