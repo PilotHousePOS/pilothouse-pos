@@ -18,12 +18,12 @@ export default function BarcodeDisplay({
   displayValue = true,
   className = "",
 }: BarcodeDisplayProps) {
-  const svgRef = useRef<SVGSVGElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    if (!svgRef.current || !value || value.length < 6) return;
+    if (!canvasRef.current || !value || value.length < 6) return;
     try {
-      JsBarcode(svgRef.current, value, {
+      JsBarcode(canvasRef.current, value, {
         format,
         width,
         height,
@@ -34,18 +34,21 @@ export default function BarcodeDisplay({
         fontSize: 12,
         fontOptions: "",
         font: "monospace",
+        valid: () => true,
       });
     } catch {
-      // Invalid barcode value — clear the SVG
-      if (svgRef.current) svgRef.current.innerHTML = "";
+      // Invalid barcode — clear canvas
+      const ctx = canvasRef.current?.getContext("2d");
+      if (ctx) ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     }
   }, [value, format, width, height, displayValue]);
 
   if (!value || value.length < 6) return null;
 
+  // canvas renders raw pixels — completely unaffected by dark mode CSS
   return (
-    <div style={{ background: "#ffffff", colorScheme: "light", display: "inline-block" }}>
-      <svg ref={svgRef} className={className} style={{ display: "block", background: "#ffffff" }} />
+    <div style={{ background: "#ffffff", display: "inline-block", lineHeight: 0 }}>
+      <canvas ref={canvasRef} className={className} style={{ display: "block" }} />
     </div>
   );
 }
