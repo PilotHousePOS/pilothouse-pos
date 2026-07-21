@@ -2689,6 +2689,163 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
+  // ── POS Sales Reports ─────────────────────────────────────────────────────
+
+  // Paginated order history with optional date range filter
+  app.get("/api/admin/pos/sales", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const { start, end, page = "1", limit = "50" } = req.query as Record<string, string>;
+      const pageNum = Math.max(1, parseInt(page) || 1);
+      const limitNum = Math.min(200, Math.max(1, parseInt(limit) || 50));
+      const offset = (pageNum - 1) * limitNum;
+      const startDate = start || "1900-01-01";
+      const endDate   = end   || "2100-12-31";
+      const [rows, cnt] = await Promise.all([
+        db.execute(sql`
+          SELECT id, order_number, items, subtotal, tax, total, payment_method,
+                 amount_tendered, change_due, cashier_id, created_at
+          FROM pos_orders
+          WHERE created_at::date >= ${startDate}::date
+            AND created_at::date <= ${endDate}::date
+          ORDER BY created_at DESC
+          LIMIT ${limitNum} OFFSET ${offset}
+        `),
+        db.execute(sql`
+          SELECT COUNT(*) AS cnt FROM pos_orders
+          WHERE created_at::date >= ${startDate}::date
+            AND created_at::date <= ${endDate}::date
+        `),
+      ]);
+      res.json({ orders: rows.rows, total: parseInt(String(cnt.rows[0]?.cnt ?? 0)) });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // Period summary — daily breakdown for a range, monthly for a year, yearly totals
+  app.get("/api/admin/pos/sales/summary", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const { start, end, groupBy = "day" } = req.query as Record<string, string>;
+      const startDate = start || "1900-01-01";
+      const endDate   = end   || "2100-12-31";
+
+      const [totals, byPeriod, byMethod] = await Promise.all([
+        db.execute(sql`
+          SELECT COUNT(*) AS order_count,
+                 COALESCE(SUM(subtotal),0) AS subtotal,
+                 COALESCE(SUM(tax),0)      AS tax,
+                 COALESCE(SUM(total),0)    AS total
+          FROM pos_orders
+          WHERE created_at::date >= ${startDate}::date
+            AND created_at::date <= ${endDate}::date
+        `),
+        groupBy === "month"
+          ? db.execute(sql`
+              SELECT TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') AS period,
+                     TO_CHAR(DATE_TRUNC('month', created_at), 'Mon YYYY') AS label,
+                     COUNT(*) AS order_count,
+                     COALESCE(SUM(subtotal),0) AS subtotal,
+                     COALESCE(SUM(tax),0)      AS tax,
+                     COALESCE(SUM(total),0)    AS total
+              FROM pos_orders
+              WHERE created_at::date >= ${startDate}::date
+                AND created_at::date <= ${endDate}::date
+              GROUP BY period, label ORDER BY period
+            `)
+          : groupBy === "year"
+          ? db.execute(sql`
+              SELECT TO_CHAR(DATE_TRUNC('year', created_at), 'YYYY') AS period,
+                     TO_CHAR(DATE_TRUNC('year', created_at), 'YYYY') AS label,
+                     COUNT(*) AS order_count,
+                     COALESCE(SUM(subtotal),0) AS subtotal,
+                     COALESCE(SUM(tax),0)      AS tax,
+                     COALESCE(SUM(total),0)    AS total
+              FROM pos_orders
+              WHERE created_at::date >= ${startDate}::date
+                AND created_at::date <= ${endDate}::date
+              GROUP BY period, label ORDER BY period
+            `)
+          : db.execute(sql`
+              SELECT created_at::date::text AS period,
+                     TO_CHAR(created_at, 'Mon DD, YYYY') AS label,
+                     COUNT(*) AS order_count,
+                     COALESCE(SUM(subtotal),0) AS subtotal,
+                     COALESCE(SUM(tax),0)      AS tax,
+                     COALESCE(SUM(total),0)    AS total
+              FROM pos_orders
+              WHERE created_at::date >= ${startDate}::date
+                AND created_at::date <= ${endDate}::date
+              GROUP BY created_at::date ORDER BY created_at::date
+            `),
+        db.execute(sql`
+          SELECT payment_method,
+                 COUNT(*) AS order_count,
+                 COALESCE(SUM(total),0) AS total
+          FROM pos_orders
+          WHERE created_at::date >= ${startDate}::date
+            AND created_at::date <= ${endDate}::date
+          GROUP BY payment_method
+        `),
+      ]);
+      res.json({
+        totals:   totals.rows[0],
+        byPeriod: byPeriod.rows,
+        byMethod: byMethod.rows,
+      });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // Top-selling items (JSONB unnest)
+  app.get("/api/admin/pos/sales/trends", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const { start, end, sortBy = "revenue" } = req.query as Record<string, string>;
+      const startDate = start || "1900-01-01";
+      const endDate   = end   || "2100-12-31";
+      const order = sortBy === "quantity" ? "total_qty DESC" : "total_revenue DESC";
+      const result = await db.execute(sql`
+        SELECT
+          item->>'name'     AS name,
+          item->>'category' AS category,
+          item->>'sku'      AS sku,
+          SUM((item->>'quantity')::numeric)::numeric AS total_qty,
+          SUM((item->>'price')::numeric * (item->>'quantity')::numeric)::numeric AS total_revenue,
+          COUNT(DISTINCT o.id) AS order_count
+        FROM pos_orders o
+        CROSS JOIN LATERAL jsonb_array_elements(o.items) AS item
+        WHERE o.created_at::date >= ${startDate}::date
+          AND o.created_at::date <= ${endDate}::date
+        GROUP BY name, category, sku
+        ORDER BY total_revenue DESC
+        LIMIT 200
+      `);
+      res.json(result.rows);
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // Inventory valuation (current stock × price)
+  app.get("/api/admin/pos/inventory-value", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const [byCat, totals] = await Promise.all([
+        db.execute(sql`
+          SELECT category,
+                 COUNT(*) AS item_count,
+                 SUM(COALESCE(stock_quantity, 0)) AS total_units,
+                 SUM(COALESCE(price,0) * COALESCE(stock_quantity,0)) AS total_value
+          FROM supplies
+          WHERE is_active = true AND COALESCE(stock_quantity, 0) > 0
+          GROUP BY category
+          ORDER BY total_value DESC
+        `),
+        db.execute(sql`
+          SELECT COUNT(*) AS item_count,
+                 SUM(COALESCE(stock_quantity,0)) AS total_units,
+                 SUM(COALESCE(price,0) * COALESCE(stock_quantity,0)) AS total_value
+          FROM supplies
+          WHERE is_active = true AND COALESCE(stock_quantity,0) > 0
+        `),
+      ]);
+      res.json({ byCategory: byCat.rows, totals: totals.rows[0] });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
   app.get("/api/pos/low-stock", requireAdminMiddleware, async (req: any, res) => {
     try {
       const result = await db.execute(sql`
