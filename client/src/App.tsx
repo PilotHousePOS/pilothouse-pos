@@ -100,7 +100,7 @@ function Router() {
   }
 
   return (
-    <div className={`${isWideRoute ? "w-full" : "max-w-md mx-auto"} bg-white min-h-screen relative`}>
+    <div className={`${isWideRoute ? "w-full" : "max-w-md mx-auto lg:max-w-full"} bg-white min-h-screen relative`}>
       <Suspense fallback={<PageLoader />}>
         <Switch>
           <Route path="/forgot-password" component={ForgotPassword} />
