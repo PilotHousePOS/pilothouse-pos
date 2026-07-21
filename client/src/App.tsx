@@ -66,6 +66,7 @@ const Booking = safeLazy(() => import("@/pages/booking"));
 const Profile = safeLazy(() => import("@/pages/profile"));
 const Settings = safeLazy(() => import("@/pages/settings"));
 const Admin = safeLazy(() => import("@/pages/admin"));
+const PosPage = safeLazy(() => import("@/pages/pos"));
 const OrderHistory = safeLazy(() => import("@/pages/order-history"));
 const OrderConfirmation = safeLazy(() => import("@/pages/order-confirmation"));
 const MyAppointments = safeLazy(() => import("@/pages/my-appointments"));
@@ -135,6 +136,7 @@ function Router() {
               <Route path="/profile" component={Profile} />
               <Route path="/settings" component={Settings} />
               <Route path="/admin" component={Admin} />
+              <Route path="/pos" component={PosPage} />
               <Route path="/orders" component={OrderHistory} />
               <Route path="/order-confirmation/:orderId" component={OrderConfirmation} />
               <Route path="/appointments" component={MyAppointments} />

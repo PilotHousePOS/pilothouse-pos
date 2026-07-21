@@ -570,6 +570,20 @@ async function runAppMigrations() {
     // Startup cleanup: remove zero-stock items from pending queue (POS tracker)
     await migPool.query(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`);
 
+    await migPool.query(`CREATE TABLE IF NOT EXISTS pos_orders (
+      id SERIAL PRIMARY KEY,
+      order_number VARCHAR(50),
+      items JSONB NOT NULL DEFAULT '[]',
+      subtotal NUMERIC(10,2) NOT NULL DEFAULT 0,
+      tax NUMERIC(10,2) NOT NULL DEFAULT 0,
+      total NUMERIC(10,2) NOT NULL DEFAULT 0,
+      payment_method VARCHAR(20) NOT NULL,
+      amount_tendered NUMERIC(10,2),
+      change_due NUMERIC(10,2),
+      cashier_id VARCHAR(100),
+      notes TEXT,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`);
 
     await migPool.end();
     log('App migrations complete');

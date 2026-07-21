@@ -2519,7 +2519,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       type TrackerIncrement = { supplyId: number; sku: string; name: string; threshold: number };
       type NewItem = { sku: string; name: string; brand: string; price: number; category: string; inStock: number };
 
+      type StockUpdate = { id: number; qty: number };
       const priceUpdates: PriceUpdate[] = [];
+      const stockUpdates: StockUpdate[] = [];
       const resetItems: TrackerReset[] = [];
       const incrementItems: TrackerIncrement[] = [];
       const newItems: NewItem[] = [];
@@ -2537,6 +2539,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           continue;
         }
         if (item.price > 0) priceUpdates.push({ id: existing.id, price: item.price });
+        stockUpdates.push({ id: existing.id, qty: item.inStock });
         const isCoastal = existing.brand.toLowerCase().includes('coastal') || existing.name.toLowerCase().includes('coastal') || item.brand.toLowerCase().includes('coastal');
         const threshold = isCoastal ? 50 : 16;
         if (item.inStock > 0) {
@@ -2550,6 +2553,20 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       for (const chunk of chunkArr(priceUpdates, 500)) {
         const vals = chunk.map(({ id, price }) => `(${id}, ${price})`).join(',');
         await db.execute(sql.raw(`UPDATE supplies SET price = v.price::numeric, price_source = 'pos', updated_at = NOW() FROM (VALUES ${vals}) AS v(id, price) WHERE supplies.id = v.id::int`));
+      }
+
+      // Step 3b: Bulk stock quantity updates from POS file (respects manual override)
+      if (stockUpdates.length > 0) {
+        for (const chunk of chunkArr(stockUpdates, 500)) {
+          const vals = chunk.map(({ id, qty }) => `(${id}, ${qty})`).join(',');
+          await db.execute(sql.raw(`
+            UPDATE supplies
+            SET stock_quantity = v.qty::int, quantity_source = 'pos', updated_at = NOW()
+            FROM (VALUES ${vals}) AS v(id, qty)
+            WHERE supplies.id = v.id::int
+              AND (manual_quantity_override = false OR manual_quantity_override IS NULL)
+          `));
+        }
       }
 
       // Step 4: Bulk tracker resets (items back in stock)
@@ -2614,6 +2631,104 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       res.status(500).json({ message: "Failed to process POS file: " + e.message });
     }
   });
+
+  // ── POS Sales Screen API ────────────────────────────────────────────────────
+  app.get("/api/pos/items", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const category = String(req.query.category || '');
+      if (!category) return res.json([]);
+      const result = await db.execute(sql`
+        SELECT id, name, sku, COALESCE(price, 0) AS price, brand,
+               COALESCE(stock_quantity, 0) AS "stockQuantity"
+        FROM supplies
+        WHERE category = ${category} AND is_active = true AND COALESCE(price, 0) > 0
+        ORDER BY name
+        LIMIT 300
+      `);
+      res.json(result.rows);
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.get("/api/pos/search", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const q = String(req.query.q || '').trim();
+      if (q.length < 2) return res.json([]);
+      const pattern = `%${q}%`;
+      const result = await db.execute(sql`
+        SELECT id, name, sku, COALESCE(price, 0) AS price, brand,
+               COALESCE(stock_quantity, 0) AS "stockQuantity"
+        FROM supplies
+        WHERE is_active = true AND COALESCE(price, 0) > 0
+          AND (name ILIKE ${pattern} OR sku ILIKE ${pattern} OR brand ILIKE ${pattern})
+        ORDER BY name
+        LIMIT 50
+      `);
+      res.json(result.rows);
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/pos/order", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const { orderNumber, items, subtotal, tax, total, paymentMethod, amountTendered, changeDue } = req.body;
+      await db.execute(sql`
+        INSERT INTO pos_orders (order_number, items, subtotal, tax, total, payment_method, amount_tendered, change_due, cashier_id)
+        VALUES (
+          ${orderNumber || null},
+          ${JSON.stringify(items || [])}::jsonb,
+          ${Number(subtotal) || 0},
+          ${Number(tax) || 0},
+          ${Number(total) || 0},
+          ${String(paymentMethod)},
+          ${amountTendered != null ? Number(amountTendered) : null},
+          ${changeDue != null ? Number(changeDue) : null},
+          ${req.user?.id?.toString() || null}
+        )
+      `);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.get("/api/pos/low-stock", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const result = await db.execute(sql`
+        SELECT id, name, sku, brand, category,
+               COALESCE(price, 0) AS price,
+               COALESCE(stock_quantity, 0) AS "stockQuantity"
+        FROM supplies
+        WHERE is_active = true
+          AND stock_quantity IS NOT NULL
+          AND stock_quantity <= 1
+        ORDER BY stock_quantity ASC, name ASC
+        LIMIT 500
+      `);
+      res.json(result.rows);
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/pos/seed-inventory", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const zeroResult = await db.execute(sql`
+        UPDATE supplies s
+        SET stock_quantity = 0, quantity_source = 'pos', updated_at = NOW()
+        FROM pos_zero_stock_tracker t
+        WHERE s.id = t.supply_id
+          AND t.zero_count > 0
+          AND (s.manual_quantity_override = false OR s.manual_quantity_override IS NULL)
+      `);
+      const inStockResult = await db.execute(sql`
+        UPDATE supplies s
+        SET stock_quantity = GREATEST(1, COALESCE(s.stock_quantity, 0)),
+            quantity_source = 'pos', updated_at = NOW()
+        FROM pos_zero_stock_tracker t
+        WHERE s.id = t.supply_id
+          AND t.zero_count = 0
+          AND t.last_nonzero_at IS NOT NULL
+          AND (s.manual_quantity_override = false OR s.manual_quantity_override IS NULL)
+      `);
+      res.json({ zeroStockUpdated: zeroResult.rowCount || 0, inStockUpdated: inStockResult.rowCount || 0 });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+  // ────────────────────────────────────────────────────────────────────────────
 
   app.get("/api/admin/pos-scan/pending-new", requireAdminMiddleware, async (req: any, res) => {
     try {

@@ -1,9 +1,11 @@
 import { useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, ShieldCheck, Trash2, AlertTriangle, Clock, PackagePlus, X, CheckCheck } from "lucide-react";
+import { Upload, ShieldCheck, Trash2, AlertTriangle, Clock, PackagePlus, X, CheckCheck, RefreshCw, Monitor, Package, Printer } from "lucide-react";
+import { useLocation } from "wouter";
+import BarcodeDisplay from "@/components/BarcodeDisplay";
 
 interface TrackerItem {
   supply_id: number;
@@ -39,6 +41,16 @@ interface UploadResult {
   newItemCount: number;
 }
 
+interface LowStockItem {
+  id: number;
+  name: string;
+  sku: string;
+  brand?: string;
+  category: string;
+  price: number;
+  stockQuantity: number;
+}
+
 const CATEGORY_LABELS: Record<string, string> = {
   accessories: "Accessories", aquatics: "Aquatics", beds: "Beds",
   birdSupplies: "Bird Supplies", catFood: "Cat Food", catTreats: "Cat Treats",
@@ -65,8 +77,12 @@ function CountBar({ count, threshold }: { count: number; threshold: number }) {
 
 export default function PosScanTracker() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
+  const [uploadResult, setUploadResult]   = useState<UploadResult | null>(null);
+  const [showBarcodes, setShowBarcodes]   = useState(false);
+  const [labelFilter, setLabelFilter]     = useState("");
+  const [printMode, setPrintMode]         = useState(false);
 
   const { data: stats, isLoading: statsLoading } = useQuery<Stats>({
     queryKey: ["/api/admin/pos-scan/stats"],
@@ -76,6 +92,12 @@ export default function PosScanTracker() {
   const { data: pendingNew = [], isLoading: pendingLoading } = useQuery<PendingNewItem[]>({
     queryKey: ["/api/admin/pos-scan/pending-new"],
     refetchOnWindowFocus: false,
+  });
+
+  const { data: lowStockItems = [], isLoading: lowStockLoading, refetch: refetchLowStock } = useQuery<LowStockItem[]>({
+    queryKey: ["/api/pos/low-stock"],
+    refetchOnWindowFocus: false,
+    enabled: showBarcodes,
   });
 
   const uploadMutation = useMutation({
@@ -90,6 +112,7 @@ export default function PosScanTracker() {
       setUploadResult(result);
       queryClient.invalidateQueries({ queryKey: ["/api/admin/pos-scan/stats"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/pos-scan/pending-new"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/low-stock"] });
       toast({
         title: "POS file processed",
         description: `${result.incremented} incremented · ${result.reset} reset · ${result.nowEligible} newly eligible · ${result.newItemCount} new items found`,
@@ -163,8 +186,26 @@ export default function PosScanTracker() {
     onError: (e: any) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
   });
 
-  const eligible = stats?.eligible ?? [];
+  const seedMutation = useMutation({
+    mutationFn: () => apiRequest("POST", "/api/pos/seed-inventory", {}),
+    onSuccess: async (res) => {
+      const data = await res.json();
+      queryClient.invalidateQueries({ queryKey: ["/api/pos/low-stock"] });
+      toast({ title: "Inventory seeded from tracker", description: `${data.zeroStockUpdated} set to 0 · ${data.inStockUpdated} set to in-stock` });
+    },
+    onError: (e: any) => toast({ title: "Seed failed", description: e.message, variant: "destructive" }),
+  });
+
+  const eligible   = stats?.eligible ?? [];
   const approaching = stats?.approaching ?? [];
+
+  const filteredLowStock = (lowStockItems as LowStockItem[]).filter(item =>
+    !labelFilter || item.name.toLowerCase().includes(labelFilter.toLowerCase()) || item.sku.includes(labelFilter)
+  );
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   return (
     <div className="space-y-5">
@@ -179,12 +220,22 @@ export default function PosScanTracker() {
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
+          <Button onClick={() => setLocation("/pos")}
+            className="bg-green-700 hover:bg-green-600 text-white text-xs" size="sm">
+            <Monitor className="w-3 h-3 mr-1" /> Open POS
+          </Button>
           <input ref={fileRef} type="file" accept=".xls,.xlsx" className="hidden"
             onChange={e => { const f = e.target.files?.[0]; if (f) { uploadMutation.mutate(f); e.target.value = ""; } }} />
           <Button onClick={() => fileRef.current?.click()} disabled={uploadMutation.isPending}
             className="bg-blue-600 hover:bg-blue-500 text-white text-xs" size="sm">
             <Upload className="w-3 h-3 mr-1" />
             {uploadMutation.isPending ? "Processing…" : "Upload POS XLS"}
+          </Button>
+          <Button onClick={() => { if (confirm("Seed inventory levels from the tracker data? This will mark zero-stock items as qty=0 and items last seen in stock as qty≥1. Respects manual overrides.")) seedMutation.mutate(); }}
+            disabled={seedMutation.isPending} variant="outline" size="sm"
+            className="text-xs border-zinc-600 text-zinc-300 hover:bg-zinc-800">
+            <RefreshCw className="w-3 h-3 mr-1" />
+            {seedMutation.isPending ? "Seeding…" : "Seed Inventory"}
           </Button>
           {eligible.length > 0 && (
             <Button onClick={() => { if (confirm(`Permanently delete ${eligible.length} items with 10+ zero-stock scans?`)) deleteMutation.mutate(); }}
@@ -200,12 +251,12 @@ export default function PosScanTracker() {
       {uploadResult && (
         <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-3 grid grid-cols-3 sm:grid-cols-6 gap-3 text-center">
           {[
-            { label: "Processed", value: uploadResult.processed, color: "text-white" },
-            { label: "Incremented", value: uploadResult.incremented, color: "text-yellow-400" },
-            { label: "Reset to 0", value: uploadResult.reset, color: "text-green-400" },
-            { label: "Now Eligible", value: uploadResult.nowEligible, color: "text-red-400" },
-            { label: "New Items", value: uploadResult.newItemCount, color: "text-blue-400" },
-            { label: "Skipped", value: uploadResult.skipped, color: "text-zinc-500" },
+            { label: "Processed",   value: uploadResult.processed,    color: "text-white" },
+            { label: "Incremented", value: uploadResult.incremented,  color: "text-yellow-400" },
+            { label: "Reset to 0",  value: uploadResult.reset,        color: "text-green-400" },
+            { label: "Now Eligible",value: uploadResult.nowEligible,  color: "text-red-400" },
+            { label: "New Items",   value: uploadResult.newItemCount, color: "text-blue-400" },
+            { label: "Skipped",     value: uploadResult.skipped,      color: "text-zinc-500" },
           ].map(s => (
             <div key={s.label}>
               <div className={`text-xl font-bold ${s.color}`}>{s.value.toLocaleString()}</div>
@@ -327,7 +378,7 @@ export default function PosScanTracker() {
       )}
 
       {!statsLoading && !pendingLoading && eligible.length === 0 && approaching.length === 0 && pendingNew.length === 0 && (
-        <div className="text-center py-10 text-zinc-500 text-sm">
+        <div className="text-center py-6 text-zinc-500 text-sm">
           {stats?.summary.total ? (
             <p>All tracked items are below the warning threshold. Upload another POS file to update counts.</p>
           ) : (
@@ -335,6 +386,104 @@ export default function PosScanTracker() {
           )}
         </div>
       )}
+
+      {/* ── Low Stock / Reorder List + Barcodes ────────────────────────── */}
+      <div className="border-t border-zinc-700 pt-5">
+        <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
+          <div className="flex items-center gap-2">
+            <Package className="w-4 h-4 text-yellow-400" />
+            <h3 className="text-sm font-semibold text-yellow-400">
+              Low Stock / Reorder List
+              {showBarcodes && !lowStockLoading && ` (${filteredLowStock.length} items)`}
+            </h3>
+          </div>
+          <div className="flex gap-2 flex-wrap items-center">
+            {showBarcodes && (
+              <>
+                <input
+                  type="text"
+                  value={labelFilter}
+                  onChange={e => setLabelFilter(e.target.value)}
+                  placeholder="Filter items…"
+                  className="h-7 text-xs px-2 bg-zinc-800 border border-zinc-600 rounded text-white placeholder-zinc-500 w-36"
+                />
+                <Button size="sm" variant="outline" onClick={handlePrint}
+                  className="text-xs border-zinc-600 text-zinc-300 hover:bg-zinc-800 h-7">
+                  <Printer className="w-3 h-3 mr-1" /> Print Labels
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => refetchLowStock()}
+                  className="text-xs border-zinc-600 text-zinc-300 hover:bg-zinc-800 h-7">
+                  <RefreshCw className="w-3 h-3 mr-1" /> Refresh
+                </Button>
+              </>
+            )}
+            <Button size="sm" onClick={() => setShowBarcodes(!showBarcodes)}
+              className={`text-xs h-7 ${showBarcodes ? "bg-zinc-700 hover:bg-zinc-600 text-white" : "bg-yellow-700 hover:bg-yellow-600 text-white"}`}>
+              {showBarcodes ? "Hide" : "Show Reorder List"}
+            </Button>
+          </div>
+        </div>
+
+        {showBarcodes && (
+          <>
+            {lowStockLoading && (
+              <div className="text-center py-6 text-zinc-500 text-sm">Loading low-stock items…</div>
+            )}
+
+            {!lowStockLoading && filteredLowStock.length === 0 && (
+              <div className="text-center py-6 text-zinc-500 text-sm">
+                {(lowStockItems as LowStockItem[]).length === 0
+                  ? "No items with stock ≤ 1. Upload a POS file or use Seed Inventory first."
+                  : "No items match your filter."
+                }
+              </div>
+            )}
+
+            {!lowStockLoading && filteredLowStock.length > 0 && (
+              <>
+                <p className="text-xs text-zinc-500 mb-3">
+                  Items with quantity ≤ 1 in inventory. Barcodes are scannable from screen or print them as shelf labels.
+                </p>
+
+                {/* Print-only styles */}
+                <style>{`
+                  @media print {
+                    body > * { display: none !important; }
+                    .print-label-grid { display: grid !important; }
+                    .print-label-grid * { display: block !important; color: black !important; background: white !important; }
+                    .no-print { display: none !important; }
+                    @page { size: letter; margin: 0.5in; }
+                  }
+                `}</style>
+
+                <div className="print-label-grid grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+                  {filteredLowStock.map(item => (
+                    <div key={item.id}
+                      className="bg-white rounded-lg border border-zinc-300 p-2 flex flex-col items-center gap-1 text-center">
+                      <div className="text-xs font-bold text-black leading-tight line-clamp-2 w-full">{item.name}</div>
+                      {item.brand && <div className="text-[10px] text-gray-600">{item.brand}</div>}
+                      <BarcodeDisplay
+                        value={item.sku}
+                        width={1.5}
+                        height={50}
+                        displayValue={true}
+                        className="max-w-full"
+                      />
+                      <div className="flex justify-between w-full text-[10px] text-gray-700 px-1">
+                        <span>{CATEGORY_LABELS[item.category] ?? item.category}</span>
+                        <span className="font-semibold">${Number(item.price).toFixed(2)}</span>
+                      </div>
+                      <div className={`text-[10px] font-bold px-2 py-0.5 rounded ${item.stockQuantity === 0 ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"}`}>
+                        {item.stockQuantity === 0 ? "OUT OF STOCK" : "LOW — QTY: 1"}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
