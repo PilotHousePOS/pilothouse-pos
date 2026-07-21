@@ -13,6 +13,7 @@ import {
   insertOrderSchema,
   insertAppointmentSchema,
   insertCustomerPetSchema,
+  insertSupplySchema,
   users,
   orderItems,
   orders,
