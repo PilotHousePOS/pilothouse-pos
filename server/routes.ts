@@ -2823,6 +2823,27 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  app.patch("/api/admin/pos-scan/threshold/:supplyId", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const supplyId = parseInt(req.params.supplyId);
+      const threshold = parseInt(req.body.threshold);
+      if (!supplyId || isNaN(threshold) || threshold < 1) return res.status(400).json({ message: "Invalid input" });
+      await db.execute(sql`
+        UPDATE pos_zero_stock_tracker
+        SET threshold = ${threshold},
+            deletion_eligible = CASE
+              WHEN NOT protected AND zero_count >= ${threshold} THEN TRUE
+              WHEN zero_count < ${threshold} THEN FALSE
+              ELSE deletion_eligible
+            END
+        WHERE supply_id = ${supplyId}
+      `);
+      res.json({ ok: true });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
   app.post("/api/admin/pos-scan/delete-eligible", requireAdminMiddleware, async (req: any, res) => {
     try {
       const toDelete = await db.execute(sql`SELECT supply_id, item_name FROM pos_zero_stock_tracker WHERE deletion_eligible = TRUE AND protected = FALSE`);

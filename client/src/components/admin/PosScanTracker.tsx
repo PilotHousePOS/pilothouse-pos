@@ -83,7 +83,8 @@ export default function PosScanTracker() {
   const [uploadResult, setUploadResult]   = useState<UploadResult | null>(null);
   const [showBarcodes, setShowBarcodes]     = useState(false);
   const [labelFilter, setLabelFilter]       = useState("");
-  const [localThresholds, setLocalThresholds] = useState<Record<number, number>>({});
+  const [localThresholds, setLocalThresholds]         = useState<Record<number, number>>({});
+  const [localTrackerThresholds, setLocalTrackerThresholds] = useState<Record<number, number>>({});
 
   const { data: stats, isLoading: statsLoading } = useQuery<Stats>({
     queryKey: ["/api/admin/pos-scan/stats"],
@@ -209,6 +210,20 @@ export default function PosScanTracker() {
     const next = Math.max(0, current + delta);
     setLocalThresholds(prev => ({ ...prev, [item.id]: next }));
     reorderPointMutation.mutate({ id: item.id, reorderPoint: next });
+  };
+
+  const trackerThresholdMutation = useMutation({
+    mutationFn: ({ supplyId, threshold }: { supplyId: number; threshold: number }) =>
+      apiRequest("PATCH", `/api/admin/pos-scan/threshold/${supplyId}`, { threshold }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/admin/pos-scan/stats"] }),
+    onError: (e: any) => toast({ title: "Failed to update deletion threshold", description: e.message, variant: "destructive" }),
+  });
+
+  const adjustTrackerThreshold = (item: TrackerItem, delta: number) => {
+    const current = localTrackerThresholds[item.supply_id] ?? item.threshold ?? 16;
+    const next = Math.max(1, current + delta);
+    setLocalTrackerThresholds(prev => ({ ...prev, [item.supply_id]: next }));
+    trackerThresholdMutation.mutate({ supplyId: item.supply_id, threshold: next });
   };
 
   const eligible   = stats?.eligible ?? [];
@@ -346,21 +361,35 @@ export default function PosScanTracker() {
             <h3 className="text-sm font-semibold text-red-400">Ready for Deletion ({eligible.length})</h3>
           </div>
           <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
-            {eligible.map(item => (
-              <div key={item.supply_id} className="flex items-center gap-3 bg-zinc-900 border border-red-900/40 rounded-lg px-3 py-2">
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm text-white truncate">{item.item_name}</div>
-                  <div className="text-[11px] text-zinc-500">{item.sku}</div>
-                  <CountBar count={item.zero_count} threshold={item.threshold ?? 16} />
+            {eligible.map(item => {
+              const t = localTrackerThresholds[item.supply_id] ?? item.threshold ?? 16;
+              return (
+                <div key={item.supply_id} className="flex items-center gap-2 bg-zinc-900 border border-red-900/40 rounded-lg px-3 py-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm text-white truncate">{item.item_name}</div>
+                    <div className="text-[11px] text-zinc-500">{item.sku}</div>
+                    <CountBar count={item.zero_count} threshold={t} />
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0" title="Scans needed before deletion eligibility">
+                    <button onClick={() => adjustTrackerThreshold(item, -5)}
+                      className="w-6 h-6 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-[10px] font-bold flex items-center justify-center">−5</button>
+                    <button onClick={() => adjustTrackerThreshold(item, -1)}
+                      className="w-5 h-6 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-xs font-bold flex items-center justify-center">−</button>
+                    <span className="text-xs font-mono text-white w-6 text-center">{t}</span>
+                    <button onClick={() => adjustTrackerThreshold(item, 1)}
+                      className="w-5 h-6 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-xs font-bold flex items-center justify-center">+</button>
+                    <button onClick={() => adjustTrackerThreshold(item, 5)}
+                      className="w-6 h-6 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-[10px] font-bold flex items-center justify-center">+5</button>
+                  </div>
+                  <Button size="sm" variant="outline"
+                    className="text-[10px] border-green-800 text-green-400 hover:bg-green-950 shrink-0 h-7 px-2"
+                    onClick={() => protectMutation.mutate({ supplyId: item.supply_id, protect: true })}
+                    disabled={protectMutation.isPending}>
+                    <ShieldCheck className="w-3 h-3 mr-1" /> Protect
+                  </Button>
                 </div>
-                <Button size="sm" variant="outline"
-                  className="text-[10px] border-green-800 text-green-400 hover:bg-green-950 shrink-0 h-7 px-2"
-                  onClick={() => protectMutation.mutate({ supplyId: item.supply_id, protect: true })}
-                  disabled={protectMutation.isPending}>
-                  <ShieldCheck className="w-3 h-3 mr-1" /> Protect
-                </Button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -373,21 +402,35 @@ export default function PosScanTracker() {
             <h3 className="text-sm font-semibold text-orange-400">Approaching Threshold ({approaching.length})</h3>
           </div>
           <div className="space-y-1 max-h-48 overflow-y-auto pr-1">
-            {approaching.map(item => (
-              <div key={item.supply_id} className="flex items-center gap-3 bg-zinc-900 border border-orange-900/30 rounded-lg px-3 py-2">
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm text-white truncate">{item.item_name}</div>
-                  <div className="text-[11px] text-zinc-500">{item.sku}</div>
-                  <CountBar count={item.zero_count} threshold={item.threshold ?? 16} />
+            {approaching.map(item => {
+              const t = localTrackerThresholds[item.supply_id] ?? item.threshold ?? 16;
+              return (
+                <div key={item.supply_id} className="flex items-center gap-2 bg-zinc-900 border border-orange-900/30 rounded-lg px-3 py-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm text-white truncate">{item.item_name}</div>
+                    <div className="text-[11px] text-zinc-500">{item.sku}</div>
+                    <CountBar count={item.zero_count} threshold={t} />
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0" title="Scans needed before deletion eligibility">
+                    <button onClick={() => adjustTrackerThreshold(item, -5)}
+                      className="w-6 h-6 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-[10px] font-bold flex items-center justify-center">−5</button>
+                    <button onClick={() => adjustTrackerThreshold(item, -1)}
+                      className="w-5 h-6 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-xs font-bold flex items-center justify-center">−</button>
+                    <span className="text-xs font-mono text-white w-6 text-center">{t}</span>
+                    <button onClick={() => adjustTrackerThreshold(item, 1)}
+                      className="w-5 h-6 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-xs font-bold flex items-center justify-center">+</button>
+                    <button onClick={() => adjustTrackerThreshold(item, 5)}
+                      className="w-6 h-6 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-[10px] font-bold flex items-center justify-center">+5</button>
+                  </div>
+                  <Button size="sm" variant="outline"
+                    className="text-[10px] border-green-800 text-green-400 hover:bg-green-950 shrink-0 h-7 px-2"
+                    onClick={() => protectMutation.mutate({ supplyId: item.supply_id, protect: true })}
+                    disabled={protectMutation.isPending}>
+                    <ShieldCheck className="w-3 h-3 mr-1" /> Protect
+                  </Button>
                 </div>
-                <Button size="sm" variant="outline"
-                  className="text-[10px] border-green-800 text-green-400 hover:bg-green-950 shrink-0 h-7 px-2"
-                  onClick={() => protectMutation.mutate({ supplyId: item.supply_id, protect: true })}
-                  disabled={protectMutation.isPending}>
-                  <ShieldCheck className="w-3 h-3 mr-1" /> Protect
-                </Button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
