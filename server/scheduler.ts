@@ -231,6 +231,61 @@ export function initializeScheduledTasks() {
     timezone: "America/Chicago"
   });
 
+  // Monthly Sales Report — runs daily at midnight, fires on configured day+hour
+  cron.schedule('0 * * * *', async () => {
+    try {
+      const settings = await storage.getGroomingSettings();
+      const enabled = settings.find((s: any) => s.setting === 'monthly_report_enabled')?.value === 'true';
+      const emails  = settings.find((s: any) => s.setting === 'monthly_report_emails')?.value || '';
+      const day     = parseInt(settings.find((s: any) => s.setting === 'monthly_report_day')?.value  || '1');
+      const time    = settings.find((s: any) => s.setting === 'monthly_report_time')?.value || '08:00';
+      if (!enabled || !emails) return;
+
+      const now = new Date();
+      const cstParts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Chicago', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false,
+      }).formatToParts(now);
+      const cstDay    = parseInt(cstParts.find(p => p.type === 'day')?.value    || '0');
+      const cstHour   = parseInt(cstParts.find(p => p.type === 'hour')?.value   || '0');
+      const [cfgHour] = time.split(':').map(Number);
+
+      if (cstDay === day && cstHour === cfgHour) {
+        console.log('[Scheduler] Running monthly sales report');
+        const { sendMonthlySalesReport } = await import('./periodicSalesReport');
+        await sendMonthlySalesReport(emails.split(',').map((e: string) => e.trim()).filter(Boolean));
+        console.log('[Scheduler] Monthly sales report sent');
+      }
+    } catch (err) { console.error('[Scheduler] Monthly report error:', err); }
+  }, { timezone: 'America/Chicago' });
+
+  // Yearly Sales Report — runs hourly on Jan 1, fires at configured hour
+  cron.schedule('0 * * * *', async () => {
+    try {
+      const settings = await storage.getGroomingSettings();
+      const enabled = settings.find((s: any) => s.setting === 'yearly_report_enabled')?.value === 'true';
+      const emails  = settings.find((s: any) => s.setting === 'yearly_report_emails')?.value || '';
+      const time    = settings.find((s: any) => s.setting === 'yearly_report_time')?.value || '08:00';
+      if (!enabled || !emails) return;
+
+      const now = new Date();
+      const cstParts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Chicago', month: 'numeric', day: 'numeric', hour: 'numeric', hour12: false,
+      }).formatToParts(now);
+      const cstMonth  = parseInt(cstParts.find(p => p.type === 'month')?.value ?? '0');
+      const cstDay    = parseInt(cstParts.find(p => p.type === 'day')?.value   ?? '0');
+      const cstHour   = parseInt(cstParts.find(p => p.type === 'hour')?.value  ?? '0');
+      const [cfgHour] = time.split(':').map(Number);
+
+      if (cstMonth === 1 && cstDay === 1 && cstHour === cfgHour) {
+        const prevYear = now.getFullYear() - 1;
+        console.log(`[Scheduler] Running yearly sales report for ${prevYear}`);
+        const { sendYearlySalesReport } = await import('./periodicSalesReport');
+        await sendYearlySalesReport(emails.split(',').map((e: string) => e.trim()).filter(Boolean), prevYear);
+        console.log('[Scheduler] Yearly sales report sent');
+      }
+    } catch (err) { console.error('[Scheduler] Yearly report error:', err); }
+  }, { timezone: 'America/Chicago' });
+
   // Abandoned cart recovery - runs every 6 hours, sends email for carts idle 24+ hours
   cron.schedule('0 */6 * * *', async () => {
     try {
@@ -287,5 +342,7 @@ export function initializeScheduledTasks() {
   console.log('Scheduled tasks initialized:');
   console.log('- Clear approved appointments and reset "Here"/"Paid" flags: Daily at 12:00 AM (CST)');
   console.log('- Daily Sales Report: Hourly check (sends at configured time if enabled)');
+  console.log('- Monthly Sales Report: Hourly check (sends on configured day/time if enabled)');
+  console.log('- Yearly Sales Report: Hourly check on Jan 1 (sends at configured time if enabled)');
   console.log('- Abandoned Cart Recovery: Every 6 hours (24+ hour idle carts)');
 }

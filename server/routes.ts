@@ -8147,6 +8147,88 @@ West Monroe LA 71291
     }
   });
 
+  // ── Monthly Report Settings ──────────────────────────────────────────────────
+  app.get("/api/admin/monthly-report-settings", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const settings = await storage.getGroomingSettings();
+      res.json({
+        enabled: settings.find((s: any) => s.setting === 'monthly_report_enabled')?.value === 'true',
+        emails:  settings.find((s: any) => s.setting === 'monthly_report_emails')?.value  || '',
+        day:     settings.find((s: any) => s.setting === 'monthly_report_day')?.value     || '1',
+        time:    settings.find((s: any) => s.setting === 'monthly_report_time')?.value    || '08:00',
+      });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/admin/monthly-report-settings", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const { enabled, emails, day, time } = req.body;
+      await Promise.all([
+        storage.upsertGroomingSetting({ setting: 'monthly_report_enabled', value: enabled ? 'true' : 'false' }),
+        storage.upsertGroomingSetting({ setting: 'monthly_report_emails',  value: emails || '' }),
+        storage.upsertGroomingSetting({ setting: 'monthly_report_day',     value: String(day || '1') }),
+        storage.upsertGroomingSetting({ setting: 'monthly_report_time',    value: time  || '08:00' }),
+      ]);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/admin/monthly-report-settings/test", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const { emails, month } = req.body; // month = "YYYY-MM"
+      if (!emails?.trim()) return res.status(400).json({ message: "Email address required" });
+      const { sendMonthlySalesReport } = await import('./periodicSalesReport');
+      await sendMonthlySalesReport(
+        emails.split(',').map((e: string) => e.trim()).filter(Boolean),
+        month || undefined,
+      );
+      res.json({ success: true, message: "Monthly report sent" });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // ── Yearly Report Settings ────────────────────────────────────────────────────
+  app.get("/api/admin/yearly-report-settings", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const settings = await storage.getGroomingSettings();
+      res.json({
+        enabled: settings.find((s: any) => s.setting === 'yearly_report_enabled')?.value === 'true',
+        emails:  settings.find((s: any) => s.setting === 'yearly_report_emails')?.value  || '',
+        time:    settings.find((s: any) => s.setting === 'yearly_report_time')?.value    || '08:00',
+      });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/admin/yearly-report-settings", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const { enabled, emails, time } = req.body;
+      await Promise.all([
+        storage.upsertGroomingSetting({ setting: 'yearly_report_enabled', value: enabled ? 'true' : 'false' }),
+        storage.upsertGroomingSetting({ setting: 'yearly_report_emails',  value: emails || '' }),
+        storage.upsertGroomingSetting({ setting: 'yearly_report_time',    value: time  || '08:00' }),
+      ]);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/admin/yearly-report-settings/test", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const { emails, year } = req.body; // year = number e.g. 2025
+      if (!emails?.trim()) return res.status(400).json({ message: "Email address required" });
+      const { sendYearlySalesReport } = await import('./periodicSalesReport');
+      await sendYearlySalesReport(
+        emails.split(',').map((e: string) => e.trim()).filter(Boolean),
+        year ? parseInt(year) : undefined,
+      );
+      res.json({ success: true, message: "Yearly report sent" });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
   // Send refund report email
   app.post("/api/admin/send-refund-report", authMiddleware, async (req: any, res) => {
     try {

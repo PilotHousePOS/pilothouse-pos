@@ -206,15 +206,25 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
   });
 
   const [dailyReportSettings, setDailyReportSettings] = useState({
-    enabled: false,
-    emails: '',
-    time: '21:00'
+    enabled: false, emails: '', time: '21:00',
   });
   const [isSavingDailyReport, setIsSavingDailyReport] = useState(false);
-  const [reportSendDate, setReportSendDate] = useState(() => {
-    // Default to today in CST (YYYY-MM-DD)
-    return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+  const [reportSendDate, setReportSendDate] = useState(() =>
+    new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' })
+  );
+
+  // Monthly report state
+  const [monthlySettings, setMonthlySettings] = useState({ enabled: false, emails: '', day: '1', time: '08:00' });
+  const [isSavingMonthly, setIsSavingMonthly] = useState(false);
+  const [testMonth, setTestMonth] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
   });
+
+  // Yearly report state
+  const [yearlySettings, setYearlySettings] = useState({ enabled: false, emails: '', time: '08:00' });
+  const [isSavingYearly, setIsSavingYearly] = useState(false);
+  const [testYear, setTestYear] = useState(() => String(new Date().getFullYear() - 1));
 
   // SMS Management state
   const [smsContactSearch, setSmsContactSearch] = useState('');
@@ -234,19 +244,19 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
     enabled: activeTab === 'sms-management',
   });
 
-  const { data: dailyReportData, isLoading: loadingDailyReport } = useQuery<any>({
-    queryKey: ['/api/admin/daily-report-settings'],
-  });
+  const { data: dailyReportData } = useQuery<any>({ queryKey: ['/api/admin/daily-report-settings'] });
+  const { data: monthlyReportData } = useQuery<any>({ queryKey: ['/api/admin/monthly-report-settings'] });
+  const { data: yearlyReportData  } = useQuery<any>({ queryKey: ['/api/admin/yearly-report-settings']  });
 
   useEffect(() => {
-    if (dailyReportData) {
-      setDailyReportSettings({
-        enabled: dailyReportData.enabled || false,
-        emails: dailyReportData.emails || '',
-        time: dailyReportData.time || '21:00'
-      });
-    }
+    if (dailyReportData) setDailyReportSettings({ enabled: dailyReportData.enabled || false, emails: dailyReportData.emails || '', time: dailyReportData.time || '21:00' });
   }, [dailyReportData]);
+  useEffect(() => {
+    if (monthlyReportData) setMonthlySettings({ enabled: monthlyReportData.enabled || false, emails: monthlyReportData.emails || '', day: monthlyReportData.day || '1', time: monthlyReportData.time || '08:00' });
+  }, [monthlyReportData]);
+  useEffect(() => {
+    if (yearlyReportData) setYearlySettings({ enabled: yearlyReportData.enabled || false, emails: yearlyReportData.emails || '', time: yearlyReportData.time || '08:00' });
+  }, [yearlyReportData]);
 
   const { data: recipients = [], isLoading: loadingRecipients } = useQuery<any[]>({
     queryKey: ['/api/admin/email/recipients'],
@@ -496,6 +506,62 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
     } finally {
       setIsSavingDailyReport(false);
     }
+  };
+
+  const handleSaveMonthlySettings = async () => {
+    setIsSavingMonthly(true);
+    try {
+      const res = await fetch('/api/admin/monthly-report-settings', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+        body: JSON.stringify(monthlySettings),
+      });
+      if (res.ok) toast({ title: "Saved", description: "Monthly report settings saved" });
+      else { const r = await res.json(); toast({ title: "Error", description: r.message, variant: "destructive" }); }
+    } catch { toast({ title: "Error", description: "Failed to save", variant: "destructive" }); }
+    finally { setIsSavingMonthly(false); }
+  };
+
+  const handleTestMonthlyReport = async () => {
+    if (!monthlySettings.emails.trim()) { toast({ title: "Missing Email", description: "Enter an email first", variant: "destructive" }); return; }
+    setIsSavingMonthly(true);
+    try {
+      const res = await fetch('/api/admin/monthly-report-settings/test', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+        body: JSON.stringify({ emails: monthlySettings.emails, month: testMonth }),
+      });
+      const r = await res.json();
+      if (res.ok) toast({ title: "Sent!", description: r.message });
+      else toast({ title: "Failed", description: r.message, variant: "destructive" });
+    } catch { toast({ title: "Error", description: "Failed to send", variant: "destructive" }); }
+    finally { setIsSavingMonthly(false); }
+  };
+
+  const handleSaveYearlySettings = async () => {
+    setIsSavingYearly(true);
+    try {
+      const res = await fetch('/api/admin/yearly-report-settings', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+        body: JSON.stringify(yearlySettings),
+      });
+      if (res.ok) toast({ title: "Saved", description: "Yearly report settings saved" });
+      else { const r = await res.json(); toast({ title: "Error", description: r.message, variant: "destructive" }); }
+    } catch { toast({ title: "Error", description: "Failed to save", variant: "destructive" }); }
+    finally { setIsSavingYearly(false); }
+  };
+
+  const handleTestYearlyReport = async () => {
+    if (!yearlySettings.emails.trim()) { toast({ title: "Missing Email", description: "Enter an email first", variant: "destructive" }); return; }
+    setIsSavingYearly(true);
+    try {
+      const res = await fetch('/api/admin/yearly-report-settings/test', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+        body: JSON.stringify({ emails: yearlySettings.emails, year: parseInt(testYear) }),
+      });
+      const r = await res.json();
+      if (res.ok) toast({ title: "Sent!", description: r.message });
+      else toast({ title: "Failed", description: r.message, variant: "destructive" });
+    } catch { toast({ title: "Error", description: "Failed to send", variant: "destructive" }); }
+    finally { setIsSavingYearly(false); }
   };
 
   const resetAutoMessageForm = () => {
@@ -960,6 +1026,148 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Pick any past date to resend that day's report to all configured emails.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* ─── Monthly Report ──────────────────────────────────── */}
+              <div className="space-y-4 pt-4 border-t">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium">Monthly Sales Report</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Automatically email a monthly revenue summary on the 1st of each month (or your chosen day)
+                    </p>
+                  </div>
+                  <Switch
+                    checked={monthlySettings.enabled}
+                    onCheckedChange={(checked) => setMonthlySettings({ ...monthlySettings, enabled: checked })}
+                  />
+                </div>
+
+                {monthlySettings.enabled && (
+                  <div className="space-y-4 pl-4 border-l-2">
+                    <div>
+                      <Label>Send report to (comma-separated emails)</Label>
+                      <Input
+                        value={monthlySettings.emails}
+                        onChange={(e) => setMonthlySettings({ ...monthlySettings, emails: e.target.value })}
+                        placeholder="owner@example.com, manager@example.com"
+                      />
+                    </div>
+                    <div className="flex gap-3">
+                      <div className="flex-1">
+                        <Label>Day of month to send</Label>
+                        <Input
+                          type="number" min="1" max="28"
+                          value={monthlySettings.day}
+                          onChange={(e) => setMonthlySettings({ ...monthlySettings, day: e.target.value })}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">Reports the <em>previous</em> month's data</p>
+                      </div>
+                      <div className="flex-1">
+                        <Label>Send time (CST)</Label>
+                        <Input
+                          type="time"
+                          value={monthlySettings.time}
+                          onChange={(e) => setMonthlySettings({ ...monthlySettings, time: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <Button onClick={handleSaveMonthlySettings} disabled={isSavingMonthly} className="bg-brand-blue hover:bg-blue-600">
+                    {isSavingMonthly ? 'Saving…' : 'Save Settings'}
+                  </Button>
+                </div>
+
+                {monthlySettings.emails && (
+                  <div className="space-y-2 pt-2 border-t">
+                    <Label>Send Report for Month</Label>
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="month"
+                        value={testMonth}
+                        max={`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`}
+                        onChange={(e) => setTestMonth(e.target.value)}
+                        className="w-44"
+                      />
+                      <Button variant="outline" onClick={handleTestMonthlyReport} disabled={isSavingMonthly}>
+                        {isSavingMonthly ? 'Sending…' : 'Send Report'}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Pick any month to send that month's report immediately.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* ─── Yearly Report ───────────────────────────────────── */}
+              <div className="space-y-4 pt-4 border-t">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium">Annual Sales Report</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Automatically email a full-year revenue summary every January 1st
+                    </p>
+                  </div>
+                  <Switch
+                    checked={yearlySettings.enabled}
+                    onCheckedChange={(checked) => setYearlySettings({ ...yearlySettings, enabled: checked })}
+                  />
+                </div>
+
+                {yearlySettings.enabled && (
+                  <div className="space-y-4 pl-4 border-l-2">
+                    <div>
+                      <Label>Send report to (comma-separated emails)</Label>
+                      <Input
+                        value={yearlySettings.emails}
+                        onChange={(e) => setYearlySettings({ ...yearlySettings, emails: e.target.value })}
+                        placeholder="owner@example.com, manager@example.com"
+                      />
+                    </div>
+                    <div>
+                      <Label>Send time on Jan 1st (CST)</Label>
+                      <Input
+                        type="time"
+                        value={yearlySettings.time}
+                        onChange={(e) => setYearlySettings({ ...yearlySettings, time: e.target.value })}
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">Reports the <em>previous</em> full calendar year</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <Button onClick={handleSaveYearlySettings} disabled={isSavingYearly} className="bg-brand-blue hover:bg-blue-600">
+                    {isSavingYearly ? 'Saving…' : 'Save Settings'}
+                  </Button>
+                </div>
+
+                {yearlySettings.emails && (
+                  <div className="space-y-2 pt-2 border-t">
+                    <Label>Send Report for Year</Label>
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="number"
+                        value={testYear}
+                        min="2020"
+                        max={String(new Date().getFullYear())}
+                        onChange={(e) => setTestYear(e.target.value)}
+                        className="w-32"
+                        placeholder="2024"
+                      />
+                      <Button variant="outline" onClick={handleTestYearlyReport} disabled={isSavingYearly}>
+                        {isSavingYearly ? 'Sending…' : 'Send Report'}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Enter any year to send that year's annual report immediately.
                     </p>
                   </div>
                 )}
