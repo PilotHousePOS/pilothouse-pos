@@ -576,7 +576,7 @@ async function runAppMigrations() {
       found_at TIMESTAMP DEFAULT NOW()
     )`);
     await migPool.query(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`);
-    await migPool.query(`INSERT INTO cart_items (user_id, supply_id, quantity) VALUES ('zz0b1cg81t', 9663, 1) ON CONFLICT (user_id, supply_id) DO NOTHING`);
+    await migPool.query(`INSERT INTO cart_items (user_id, supply_id, quantity) SELECT 'zz0b1cg81t', 9663, 1 WHERE NOT EXISTS (SELECT 1 FROM cart_items WHERE user_id = 'zz0b1cg81t' AND supply_id = 9663)`);
     const { rows: alreadyRan } = await migPool.query(`SELECT 1 FROM data_migrations WHERE key = 'price_sync_20260710'`);
     if (alreadyRan.length === 0) {
       try {
