@@ -28,7 +28,7 @@ export default function BarcodeDisplay({
         width,
         height,
         displayValue,
-        margin: 8,
+        margin: 14,
         background: "#ffffff",
         lineColor: "#000000",
         fontSize: 12,

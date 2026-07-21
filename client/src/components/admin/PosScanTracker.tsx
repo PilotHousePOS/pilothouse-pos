@@ -3,9 +3,10 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, ShieldCheck, Trash2, AlertTriangle, Clock, PackagePlus, X, CheckCheck, RefreshCw, Monitor, Package, Printer } from "lucide-react";
+import { Upload, ShieldCheck, Trash2, AlertTriangle, Clock, PackagePlus, X, CheckCheck, RefreshCw, Monitor, Package, Printer, Maximize2 } from "lucide-react";
 import { useLocation } from "wouter";
 import BarcodeDisplay from "@/components/BarcodeDisplay";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface TrackerItem {
   supply_id: number;
@@ -85,6 +86,7 @@ export default function PosScanTracker() {
   const [labelFilter, setLabelFilter]       = useState("");
   const [localThresholds, setLocalThresholds]         = useState<Record<number, number>>({});
   const [localTrackerThresholds, setLocalTrackerThresholds] = useState<Record<number, number>>({});
+  const [zoomBarcode, setZoomBarcode] = useState<{ sku: string; name: string } | null>(null);
 
   const { data: stats, isLoading: statsLoading } = useQuery<Stats>({
     queryKey: ["/api/admin/pos-scan/stats"],
@@ -522,13 +524,22 @@ export default function PosScanTracker() {
                         className="bg-white rounded-lg border border-zinc-300 p-2 flex flex-col items-center gap-1 text-center">
                         <div className="text-xs font-bold text-black leading-tight line-clamp-2 w-full">{item.name}</div>
                         {item.brand && <div className="text-[10px] text-gray-500">{item.brand}</div>}
-                        <BarcodeDisplay
-                          value={item.sku}
-                          width={1.5}
-                          height={50}
-                          displayValue={true}
-                          className="max-w-full"
-                        />
+                        <div className="relative w-full">
+                          <BarcodeDisplay
+                            value={item.sku}
+                            width={2.5}
+                            height={65}
+                            displayValue={true}
+                            className="max-w-full"
+                          />
+                          <button
+                            onClick={() => setZoomBarcode({ sku: item.sku, name: item.name })}
+                            className="no-print absolute top-0 right-0 bg-black/50 hover:bg-black/70 text-white rounded p-0.5"
+                            title="Enlarge for scanner"
+                          >
+                            <Maximize2 className="w-3 h-3" />
+                          </button>
+                        </div>
                         <div className="flex justify-between w-full text-[10px] text-gray-700 px-1">
                           <span>{CATEGORY_LABELS[item.category] ?? item.category}</span>
                           <span className="font-semibold">${Number(item.price).toFixed(2)}</span>
@@ -561,6 +572,24 @@ export default function PosScanTracker() {
           </>
         )}
       </div>
+
+      {/* Full-screen barcode zoom for Eyoyo scanner */}
+      <Dialog open={!!zoomBarcode} onOpenChange={() => setZoomBarcode(null)}>
+        <DialogContent className="bg-white max-w-2xl flex flex-col items-center gap-4 p-8">
+          <div className="text-black font-bold text-center text-lg leading-tight">{zoomBarcode?.name}</div>
+          {zoomBarcode && (
+            <BarcodeDisplay
+              value={zoomBarcode.sku}
+              width={4}
+              height={140}
+              displayValue={true}
+              className="w-full"
+            />
+          )}
+          <div className="text-gray-500 text-sm">Hold scanner to screen — dim screen brightness if needed</div>
+          <button onClick={() => setZoomBarcode(null)} className="mt-2 bg-gray-900 text-white px-6 py-2 rounded font-semibold">Done</button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
