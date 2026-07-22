@@ -2657,10 +2657,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       
       const supply = await storage.updateSupply(id, supplyData, tenantId);
       res.json(supply);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating supply:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid supply data", errors: error.errors });
+      }
+      if (error?.message === "Supply not found or access denied") {
+        return res.status(404).json({ message: "Supply not found" });
       }
       res.status(500).json({ message: "Failed to update supply" });
     }
@@ -2682,8 +2685,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const id = parseInt(req.params.id);
       await storage.deleteSupply(id, tenantId);
       res.json({ message: "Supply deleted successfully" });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting supply:", error);
+      if (error?.message === "Supply not found or access denied") {
+        return res.status(404).json({ message: "Supply not found" });
+      }
       res.status(500).json({ message: "Failed to delete supply" });
     }
   });
@@ -9631,8 +9637,11 @@ West Monroe LA 71291
         breed 
       }, tenantId);
       res.json(contact);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating contact:", error);
+      if (error?.message === "Contact not found or access denied") {
+        return res.status(404).json({ message: "Contact not found" });
+      }
       res.status(500).json({ message: "Failed to update contact" });
     }
   });
@@ -9774,8 +9783,11 @@ West Monroe LA 71291
       const id = parseInt(req.params.id);
       await storage.deleteContact(id, tenantId);
       res.json({ message: "Contact deleted successfully" });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting contact:", error);
+      if (error?.message === "Contact not found or access denied") {
+        return res.status(404).json({ message: "Contact not found" });
+      }
       res.status(500).json({ message: "Failed to delete contact" });
     }
   });

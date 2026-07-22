@@ -1810,6 +1810,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteSupply(id: number, tenantId?: number): Promise<void> {
+    // Verify tenant ownership before making any side-effect changes
+    if (tenantId) {
+      const [existing] = await db
+        .select({ id: supplies.id })
+        .from(supplies)
+        .where(and(eq(supplies.id, id), eq(supplies.tenantId, tenantId)));
+      if (!existing) throw new Error("Supply not found or access denied");
+    }
+
     // Check if supply is referenced in any order items
     const orderItemsWithSupply = await db
       .select()
@@ -3743,10 +3752,19 @@ export class DatabaseStorage implements IStorage {
       .set({ ...contact, updatedAt: new Date() })
       .where(where)
       .returning();
+    if (!updatedContact) throw new Error("Contact not found or access denied");
     return updatedContact;
   }
 
   async deleteContact(id: number, tenantId?: number): Promise<void> {
+    // Verify tenant ownership before deleting
+    if (tenantId) {
+      const [existing] = await db
+        .select({ id: contacts.id })
+        .from(contacts)
+        .where(and(eq(contacts.id, id), eq(contacts.tenantId, tenantId)));
+      if (!existing) throw new Error("Contact not found or access denied");
+    }
     const where = tenantId ? and(eq(contacts.id, id), eq(contacts.tenantId, tenantId)) : eq(contacts.id, id);
     await db.delete(contacts).where(where);
   }
