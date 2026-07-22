@@ -929,29 +929,78 @@ export default function PosPage() {
       <Dialog open={showPayment} onOpenChange={setShowPayment}>
         <DialogContent className="bg-gray-800 text-white border-gray-600 max-w-sm">
           <DialogHeader><DialogTitle className="text-white">Cash Payment</DialogTitle></DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-3">
+            {/* Total + change row */}
             <div className="flex justify-between text-xl font-bold">
               <span>Total Due</span>
               <span className="text-green-400">${total.toFixed(2)}</span>
             </div>
+
+            {/* Amount tendered display */}
             <div>
               <label className="text-xs text-gray-400 mb-1 block">Amount Tendered</label>
-              <Input type="number" value={cashTendered} onChange={e => setCashTendered(e.target.value)}
-                className="bg-gray-700 border-gray-600 text-white text-xl text-right h-12"
-                placeholder="0.00" autoFocus onKeyDown={e => e.key === "Enter" && completeCash()} />
+              <div className="bg-gray-700 border border-gray-600 rounded flex items-center justify-end px-3 h-14">
+                <span className="text-white text-2xl font-mono tracking-wide">
+                  {cashTendered === "" ? <span className="text-gray-500">0.00</span> : `$${cashTendered}`}
+                </span>
+              </div>
             </div>
-            <div className="grid grid-cols-3 gap-2">
+
+            {/* Quick amounts */}
+            <div className="grid grid-cols-6 gap-1">
               {[1, 5, 10, 20, 50, 100].map(amt => (
                 <button key={amt} onClick={() => setCashTendered(String(amt))}
-                  className="bg-gray-600 hover:bg-gray-500 rounded py-2 text-sm font-bold">${amt}</button>
+                  className="bg-gray-600 active:bg-gray-500 rounded py-1.5 text-xs font-bold">${amt}</button>
               ))}
             </div>
+
+            {/* Numpad */}
+            <div className="grid grid-cols-3 gap-2">
+              {[7,8,9,4,5,6,1,2,3].map(n => (
+                <button key={n}
+                  onClick={() => setCashTendered(prev => {
+                    const parts = prev.split(".");
+                    if (parts.length === 2 && parts[1].length >= 2) return prev;
+                    if (prev === "" && n === 0) return prev;
+                    return prev + String(n);
+                  })}
+                  className="bg-gray-600 active:bg-gray-500 rounded-lg h-14 text-2xl font-bold select-none touch-manipulation">
+                  {n}
+                </button>
+              ))}
+              {/* Decimal */}
+              <button
+                onClick={() => setCashTendered(prev => prev.includes(".") ? prev : prev === "" ? "0." : prev + ".")}
+                className="bg-gray-600 active:bg-gray-500 rounded-lg h-14 text-2xl font-bold select-none touch-manipulation">
+                .
+              </button>
+              {/* 0 */}
+              <button
+                onClick={() => setCashTendered(prev => {
+                  const parts = prev.split(".");
+                  if (parts.length === 2 && parts[1].length >= 2) return prev;
+                  if (prev === "") return prev;
+                  return prev + "0";
+                })}
+                className="bg-gray-600 active:bg-gray-500 rounded-lg h-14 text-2xl font-bold select-none touch-manipulation">
+                0
+              </button>
+              {/* Backspace */}
+              <button
+                onClick={() => setCashTendered(prev => prev.slice(0, -1))}
+                className="bg-gray-600 active:bg-gray-500 rounded-lg h-14 text-2xl font-bold select-none touch-manipulation flex items-center justify-center">
+                ⌫
+              </button>
+            </div>
+
+            {/* Change due */}
             {tendered > 0 && (
               <div className="flex justify-between text-lg font-bold border-t border-gray-600 pt-2">
                 <span>Change Due</span>
                 <span className={change >= 0 ? "text-yellow-400" : "text-red-400"}>${Math.max(0, change).toFixed(2)}</span>
               </div>
             )}
+
             <button onClick={completeCash} disabled={tendered < total || saveOrderMutation.isPending}
               className="w-full bg-green-700 hover:bg-green-600 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded py-3 font-bold text-lg">
               {saveOrderMutation.isPending ? "Processing…" : "Complete Sale"}
