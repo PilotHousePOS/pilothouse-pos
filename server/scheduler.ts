@@ -239,7 +239,7 @@ async function runYearlyReportForTenant(tenantId: number): Promise<void> {
 }
 
 // Check for trials expiring within 3 days and send one warning email per trial period
-async function runTrialExpiryWarnings(): Promise<void> {
+export async function runTrialExpiryWarnings(): Promise<void> {
   const allTenants = await storage.getAllTenants();
   const now = Date.now();
   const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
