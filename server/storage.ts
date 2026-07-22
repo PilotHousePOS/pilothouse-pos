@@ -140,7 +140,7 @@ export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
-  createUser(user: { email: string; password: string; firstName: string; lastName: string }): Promise<User>;
+  createUser(user: { email: string; password: string; firstName: string; lastName: string; tenantId?: number }): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserAdmin(id: string, isAdmin: boolean): Promise<User>;
   updateUserGroomer(id: string, isGroomer: boolean): Promise<User>;
@@ -545,7 +545,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async createUser(userData: { email: string; password: string; firstName: string; lastName: string }): Promise<User> {
+  async createUser(userData: { email: string; password: string; firstName: string; lastName: string; tenantId?: number }): Promise<User> {
     try {
       const userId = Math.random().toString(36).substring(2, 15);
       const [user] = await db
@@ -557,6 +557,7 @@ export class DatabaseStorage implements IStorage {
           lastName: userData.lastName,
           profileImageUrl: null,
           password: userData.password,
+          tenantId: userData.tenantId ?? null,
         })
         .returning();
       return user;

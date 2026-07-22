@@ -517,12 +517,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const verificationToken = crypto.randomBytes(32).toString('hex');
       const verificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-      // Create new user with hashed password (unverified)
+      // Create new user with hashed password (unverified), assigned to the current tenant
       const newUser = await storage.createUser({
         email,
         password: hashedPassword,
         firstName,
         lastName,
+        tenantId: (req as any).tenantId ?? undefined,
       });
 
       // Phone number is now required - update user and link to any existing contacts
