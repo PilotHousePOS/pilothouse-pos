@@ -262,6 +262,11 @@ export async function runTrialExpiryWarnings(): Promise<void> {
 
       // Find the tenant owner's email
       if (!tenant.ownerId) {
+        // Only alert once — skip if we already sent the owner-missing alert for this tenant
+        if (tenant.trialOwnerMissingAlertSentAt) {
+          console.log(`[Tenant ${tenant.id}] Owner-missing alert already sent at ${tenant.trialOwnerMissingAlertSentAt}, skipping`);
+          continue;
+        }
         console.warn(`[Tenant ${tenant.id}] No ownerId set, skipping trial warning email — alerting super-admins`);
         const { sendTrialOwnerMissingAlertToSuperAdmins } = await import('./sendgrid');
         await sendTrialOwnerMissingAlertToSuperAdmins({
@@ -270,11 +275,17 @@ export async function runTrialExpiryWarnings(): Promise<void> {
           trialEndsAt: tenant.trialEndsAt,
           ownerId: tenant.ownerId,
         });
+        await storage.updateTenant(tenant.id, { trialOwnerMissingAlertSentAt: new Date() } as any);
         continue;
       }
 
       const owner = await storage.getUser(tenant.ownerId);
       if (!owner?.email) {
+        // Only alert once — skip if we already sent the owner-missing alert for this tenant
+        if (tenant.trialOwnerMissingAlertSentAt) {
+          console.log(`[Tenant ${tenant.id}] Owner-missing alert already sent at ${tenant.trialOwnerMissingAlertSentAt}, skipping`);
+          continue;
+        }
         console.warn(`[Tenant ${tenant.id}] Owner has no email, skipping trial warning email — alerting super-admins`);
         const { sendTrialOwnerMissingAlertToSuperAdmins } = await import('./sendgrid');
         await sendTrialOwnerMissingAlertToSuperAdmins({
@@ -283,7 +294,14 @@ export async function runTrialExpiryWarnings(): Promise<void> {
           trialEndsAt: tenant.trialEndsAt,
           ownerId: tenant.ownerId,
         });
+        await storage.updateTenant(tenant.id, { trialOwnerMissingAlertSentAt: new Date() } as any);
         continue;
+      }
+
+      // Owner email is now present — clear any previous owner-missing alert flag so
+      // future runs can alert again if the email is removed later.
+      if (tenant.trialOwnerMissingAlertSentAt) {
+        await storage.updateTenant(tenant.id, { trialOwnerMissingAlertSentAt: null } as any);
       }
 
       const { sendTrialWarningEmail } = await import('./sendgrid');

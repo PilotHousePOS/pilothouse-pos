@@ -40,6 +40,7 @@ const STATEMENTS = [
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
   // ── tenants ────────────────────────────────────────────────────────────────
   `ALTER TABLE tenants ADD COLUMN IF NOT EXISTS trial_warning_email_sent_at TIMESTAMPTZ`,
+  `ALTER TABLE tenants ADD COLUMN IF NOT EXISTS trial_owner_missing_alert_sent_at TIMESTAMPTZ`,
   // ── pets ───────────────────────────────────────────────────────────────────
   `ALTER TABLE pets ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
   // ── groomers ───────────────────────────────────────────────────────────────
