@@ -118,8 +118,35 @@ export async function tenantMiddleware(
     }
 
     // 3. Public unauthenticated request with no slug.
-    //    In production this is a 400 — the caller must supply X-Tenant-Slug (or ?tenant=).
+    //    Routes in UNAUTHENTICATED_NO_SLUG_ALLOWLIST are permitted to proceed without
+    //    tenant context — these are platform-level endpoints (auth, onboarding, email links)
+    //    that callers legitimately reach without a store slug.
+    //    All other routes require X-Tenant-Slug (or ?tenant=) and return 400.
     //    Set ALLOW_TENANT_FALLBACK=true to keep the single-tenant / development fallback.
+
+    // Note: tenantMiddleware is mounted at app.use('/api', ...) so req.path is relative
+    // to /api, e.g. "GET /api/auth/login" arrives here as "/auth/login".
+    const UNAUTHENTICATED_NO_SLUG_ALLOWLIST = new Set([
+      // Authentication — login/logout work from platform-level pages where no slug is known.
+      // NOTE: /auth/signup is intentionally NOT here — customer signup is tenant-scoped
+      // and must include X-Tenant-Slug so the new user is linked to the correct store.
+      "/auth/login",
+      "/auth/logout",
+      "/auth/forgot-password",
+      "/auth/reset-password",
+      // Email verification links are clicked directly from emails and have no slug context.
+      "/auth/verify-email",
+      "/auth/resend-verification",
+      // Tenant self-service onboarding — no tenant exists yet at this point.
+      "/tenants/signup",
+      "/tenants/slug-check",
+    ]);
+
+    if (UNAUTHENTICATED_NO_SLUG_ALLOWLIST.has(req.path)) {
+      // No tenantId is set; route handlers that optionally use it must handle undefined.
+      return next();
+    }
+
     if (process.env.ALLOW_TENANT_FALLBACK === "true") {
       req.tenantId = 1;
       return next();
