@@ -82,7 +82,12 @@ function cleanName(name: string | undefined | null): string {
  *   so the caller can simply `return` without writing anything.
  */
 function resolveWriteTenantId(req: any, res: any): number | undefined {
-  if (req.isSuperAdmin && req.body?.targetTenantId) {
+  // Reject targetTenantId from non-super-admin callers to prevent privilege escalation.
+  if (req.body?.targetTenantId !== undefined && req.body?.targetTenantId !== null && req.body?.targetTenantId !== '') {
+    if (!req.isSuperAdmin) {
+      res.status(403).json({ message: "targetTenantId is only available to super-admins." });
+      return undefined;
+    }
     const tid = parseInt(req.body.targetTenantId, 10);
     if (!isNaN(tid) && tid > 0) return tid;
   }
