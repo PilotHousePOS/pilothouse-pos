@@ -262,6 +262,105 @@ export async function sendTrialWarningEmail(
   }
 }
 
+/**
+ * Sends an alert email to all platform super-admins when a trial tenant is skipped
+ * during the trial expiry warning run because the owner has no email (or no ownerId).
+ * Without this alert the tenant would silently miss their expiry warning.
+ */
+export async function sendTrialOwnerMissingAlertToSuperAdmins(tenant: {
+  id: number;
+  name: string;
+  trialEndsAt: Date | string | null;
+  ownerId: string | number | null | undefined;
+}): Promise<void> {
+  try {
+    const { storage } = await import('./storage');
+    const allUsers = await storage.getAllUsers();
+    const superAdmins = allUsers.filter((u: any) => u.isSuperAdmin && u.email);
+
+    if (superAdmins.length === 0) {
+      console.warn(`[trial-owner-missing-alert] No super-admins with email found to notify for tenant ${tenant.id}.`);
+      return;
+    }
+
+    const { client, fromEmail } = await getUncachableSendGridClient();
+
+    const trialEndsAt = tenant.trialEndsAt
+      ? new Date(tenant.trialEndsAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Chicago' })
+      : 'unknown';
+
+    const reason = !tenant.ownerId
+      ? 'No ownerId is set on this tenant — the owner account may not have been created yet.'
+      : 'The owner account exists but has no email address on file.';
+
+    const subject = `[PilotHouse] Trial warning skipped — owner email missing for "${tenant.name}"`;
+    const textBody = `A trial expiry warning could not be sent for the following store because the owner has no email address.\n\nStore details:\n  Tenant ID:   ${tenant.id}\n  Store Name:  ${tenant.name}\n  Trial Ends:  ${trialEndsAt}\n  Owner ID:    ${tenant.ownerId ?? '(none)'}\n\nReason: ${reason}\n\nPlease assign a valid email to the store owner so future warnings can be delivered.`;
+    const htmlBody = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
+          <h1 style="margin: 0;">PilotHouse</h1>
+        </div>
+        <div style="padding: 30px; background-color: #f9f9f9;">
+          <h2 style="color: #92400e; margin-bottom: 10px;">⚠️ Trial Warning Not Sent — Owner Email Missing</h2>
+          <p style="font-size: 15px; color: #444; line-height: 1.5;">
+            The scheduled trial expiry warning could <strong>not be delivered</strong> for the store below
+            because the owner has no email address on file. The tenant will <strong>silently miss their warning</strong>
+            unless this is resolved.
+          </p>
+          <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;">
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 8px 12px; color: #6b7280; width: 110px;">Tenant ID</td>
+              <td style="padding: 8px 12px; color: #111827; font-family: monospace;">${tenant.id}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 8px 12px; color: #6b7280;">Store Name</td>
+              <td style="padding: 8px 12px; color: #111827; font-weight: 500;">${tenant.name}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 8px 12px; color: #6b7280;">Trial Ends</td>
+              <td style="padding: 8px 12px; color: #111827;">${trialEndsAt}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 8px 12px; color: #6b7280;">Owner ID</td>
+              <td style="padding: 8px 12px; color: #111827; font-family: monospace;">${tenant.ownerId ?? '<em>(none)</em>'}</td>
+            </tr>
+          </table>
+          <div style="background-color: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 5px;">
+            <p style="margin: 0; color: #92400e; font-size: 14px;">
+              <strong>Reason:</strong> ${reason}<br><br>
+              Please assign a valid email to the store owner from the admin panel so the trial warning can be delivered.
+            </p>
+          </div>
+        </div>
+        <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+          <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
+          <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+          <p style="margin: 0;">Phone: (318) 322-3023</p>
+        </div>
+      </div>
+    `;
+
+    for (const admin of superAdmins) {
+      try {
+        await client.send({
+          to: admin.email!,
+          from: { email: fromEmail, name: 'PilotHouse' },
+          subject,
+          text: textBody,
+          html: htmlBody,
+          trackingSettings: { clickTracking: { enable: false, enableText: false } },
+        });
+        console.log(`[trial-owner-missing-alert] Alert sent to super-admin ${admin.email} for tenant ${tenant.id}`);
+      } catch (adminEmailErr) {
+        console.error(`[trial-owner-missing-alert] Failed to send alert to ${admin.email}:`, adminEmailErr);
+      }
+    }
+  } catch (error) {
+    console.error('[trial-owner-missing-alert] Error sending trial-owner-missing alert:', error);
+    // Non-fatal — never block the scheduler for an alert failure
+  }
+}
+
 export async function sendAppointmentRejectionEmail(
   toEmail: string, 
   ownerName: string,

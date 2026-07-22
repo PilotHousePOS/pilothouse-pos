@@ -262,13 +262,27 @@ export async function runTrialExpiryWarnings(): Promise<void> {
 
       // Find the tenant owner's email
       if (!tenant.ownerId) {
-        console.log(`[Tenant ${tenant.id}] No ownerId set, skipping trial warning email`);
+        console.warn(`[Tenant ${tenant.id}] No ownerId set, skipping trial warning email — alerting super-admins`);
+        const { sendTrialOwnerMissingAlertToSuperAdmins } = await import('./sendgrid');
+        await sendTrialOwnerMissingAlertToSuperAdmins({
+          id: tenant.id,
+          name: tenant.name,
+          trialEndsAt: tenant.trialEndsAt,
+          ownerId: tenant.ownerId,
+        });
         continue;
       }
 
       const owner = await storage.getUser(tenant.ownerId);
       if (!owner?.email) {
-        console.log(`[Tenant ${tenant.id}] Owner has no email, skipping trial warning email`);
+        console.warn(`[Tenant ${tenant.id}] Owner has no email, skipping trial warning email — alerting super-admins`);
+        const { sendTrialOwnerMissingAlertToSuperAdmins } = await import('./sendgrid');
+        await sendTrialOwnerMissingAlertToSuperAdmins({
+          id: tenant.id,
+          name: tenant.name,
+          trialEndsAt: tenant.trialEndsAt,
+          ownerId: tenant.ownerId,
+        });
         continue;
       }
 
