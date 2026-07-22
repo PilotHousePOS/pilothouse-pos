@@ -72,6 +72,28 @@ function cleanName(name: string | undefined | null): string {
   return name.replace(/\s+/g, ' ').trim();
 }
 
+/**
+ * Resolves the tenantId to use for a write (INSERT/UPDATE) operation.
+ *
+ * - Super-admins may pass `targetTenantId` in the request body to write on
+ *   behalf of a specific tenant.
+ * - All other callers must have req.tenantId set by tenantMiddleware.
+ * - Returns undefined and sends a 400 response when tenant context is absent,
+ *   so the caller can simply `return` without writing anything.
+ */
+function resolveWriteTenantId(req: any, res: any): number | undefined {
+  if (req.isSuperAdmin && req.body?.targetTenantId) {
+    const tid = parseInt(req.body.targetTenantId, 10);
+    if (!isNaN(tid) && tid > 0) return tid;
+  }
+  const tenantId: number | undefined = req.tenantId;
+  if (!tenantId) {
+    res.status(400).json({ message: "Tenant context is required to create records. Ensure you are logged in to a configured store account." });
+    return undefined;
+  }
+  return tenantId;
+}
+
 // Helper function to capitalize first letter of each word
 function capitalizeWords(text: string | undefined | null): string | undefined | null {
   if (!text) return text;
@@ -549,9 +571,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       console.log(`Linked ${matchingContacts.length} contacts to new user ${newUser.id}`);
 
       // Link any prior grooming appointments booked under the same phone number
-      const linkedAppts = await storage.linkAppointmentsToUser(phoneNumber, newUser.id, (req as any).tenantId);
-      if (linkedAppts > 0) {
-        console.log(`Linked ${linkedAppts} historical appointments to new user ${newUser.id} (phone match)`);
+      if ((req as any).tenantId) {
+        const linkedAppts = await storage.linkAppointmentsToUser(phoneNumber, newUser.id, (req as any).tenantId);
+        if (linkedAppts > 0) {
+          console.log(`Linked ${linkedAppts} historical appointments to new user ${newUser.id} (phone match)`);
+        }
       }
 
       // Send verification email (non-blocking — don't fail signup if email fails)
@@ -1885,6 +1909,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const { imageUrl } = req.body;
       
@@ -1897,7 +1923,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const objectStorageService = new ObjectStorageService();
       const normalizedPath = objectStorageService.normalizeObjectEntityPath(imageUrl);
 
-      const pet = await storage.updatePet(id, { imageUrl: normalizedPath }, (req as any).tenantId);
+      const pet = await storage.updatePet(id, { imageUrl: normalizedPath }, tenantId);
       res.json(pet);
     } catch (error) {
       console.error("Error updating pet image:", error);
@@ -1916,8 +1942,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const petData = insertPetSchema.parse(req.body);
-      const pet = await storage.createPet(petData);
+      const pet = await storage.createPet({ ...petData, tenantId });
       res.json(pet);
     } catch (error) {
       console.error("Error creating pet:", error);
@@ -1939,9 +1967,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const petData = insertPetSchema.partial().parse(req.body);
-      const pet = await storage.updatePet(id, petData, (req as any).tenantId);
+      const pet = await storage.updatePet(id, petData, tenantId);
       res.json(pet);
     } catch (error) {
       console.error("Error updating pet:", error);
@@ -1963,8 +1993,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
-      await storage.deletePet(id, (req as any).tenantId);
+      await storage.deletePet(id, tenantId);
       res.json({ message: "Pet deleted successfully" });
     } catch (error) {
       console.error("Error deleting pet:", error);
@@ -2017,10 +2049,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   app.patch("/api/admin/pets/:id/availability", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const { isAvailable } = req.body;
       if (typeof isAvailable !== 'boolean') return res.status(400).json({ message: "isAvailable must be a boolean" });
-      const updated = await storage.updatePet(id, { isAvailable }, (req as any).tenantId);
+      const updated = await storage.updatePet(id, { isAvailable }, tenantId);
       res.json(updated);
     } catch (error) {
       console.error("Error toggling pet availability:", error);
@@ -2531,8 +2565,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const supplyData = insertSupplySchema.parse(req.body);
-      const supply = await storage.createSupply(supplyData);
+      const supply = await storage.createSupply({ ...supplyData, tenantId });
       res.json(supply);
     } catch (error) {
       console.error("Error creating supply:", error);
@@ -2554,6 +2590,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const supplyData = insertSupplySchema.partial().parse(req.body);
       
@@ -2561,7 +2599,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       // Only run expansion during bulk import/invoice processing
       // to prevent unwanted autocorrection of manually entered names
       
-      const supply = await storage.updateSupply(id, supplyData, (req as any).tenantId);
+      const supply = await storage.updateSupply(id, supplyData, tenantId);
       res.json(supply);
     } catch (error) {
       console.error("Error updating supply:", error);
@@ -2583,8 +2621,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
-      await storage.deleteSupply(id, (req as any).tenantId);
+      await storage.deleteSupply(id, tenantId);
       res.json({ message: "Supply deleted successfully" });
     } catch (error) {
       console.error("Error deleting supply:", error);
@@ -2595,6 +2635,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   // POS Zero-Stock Tracker — upload XLS, increment/reset counters, delete after 10 consecutive zeros
   app.post("/api/admin/pos-scan/upload", requireAdminMiddleware, excelUpload.single('file'), async (req: any, res) => {
     try {
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       if (!req.file) return res.status(400).json({ message: "No file uploaded" });
       const xlsx = await import('xlsx');
       const wb = xlsx.read(req.file.buffer, { type: 'buffer' });
@@ -2647,7 +2689,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const supplyMap = new Map<string, { id: number; name: string; brand: string }>();
       for (const chunk of chunkArr(posItems.map(i => i.sku), 1000)) {
         const skuList = chunk.map(s => `'${escStr(s)}'`).join(',');
-        const tenantClause = (req as any).tenantId ? ` AND tenant_id = ${Number((req as any).tenantId)}` : '';
+        const tenantClause = ` AND tenant_id = ${Number(tenantId)}`;
         const result = await db.execute(sql.raw(`SELECT id, name, brand, sku FROM supplies WHERE sku IN (${skuList})${tenantClause}`));
         for (const row of result.rows as any[]) {
           supplyMap.set(row.sku, { id: Number(row.id), name: row.name, brand: row.brand ?? '' });
@@ -2693,7 +2735,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       // Step 3: Bulk price updates
       for (const chunk of chunkArr(priceUpdates, 500)) {
         const vals = chunk.map(({ id, price }) => `(${id}, ${price})`).join(',');
-        const tenantFilter = (req as any).tenantId ? ` AND supplies.tenant_id = ${Number((req as any).tenantId)}` : '';
+        const tenantFilter = ` AND supplies.tenant_id = ${Number(tenantId)}`;
         await db.execute(sql.raw(`UPDATE supplies SET price = v.price::numeric, price_source = 'pos', updated_at = NOW() FROM (VALUES ${vals}) AS v(id, price) WHERE supplies.id = v.id::int${tenantFilter}`));
       }
 
@@ -2706,6 +2748,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
             SET stock_quantity = v.qty::int, quantity_source = 'pos', updated_at = NOW()
             FROM (VALUES ${vals}) AS v(id, qty)
             WHERE supplies.id = v.id::int
+              AND supplies.tenant_id = ${Number(tenantId)}
               AND (manual_quantity_override = false OR manual_quantity_override IS NULL)
           `));
         }
@@ -2831,7 +2874,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   app.post("/api/pos/order", requireAdminMiddleware, async (req: any, res) => {
     try {
       const { orderNumber, items, subtotal, tax, total, paymentMethod, amountTendered, changeDue } = req.body;
-      const tenantId = (req as any).tenantId ?? null;
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       await db.execute(sql`
         INSERT INTO pos_orders (order_number, items, subtotal, tax, total, payment_method, amount_tendered, change_due, cashier_id, tenant_id)
         VALUES (
@@ -3129,22 +3173,26 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
   app.patch("/api/pos/reorder-point/:id", requireAdminMiddleware, async (req: any, res) => {
     try {
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const reorderPoint = parseInt(req.body.reorderPoint);
       if (!id || isNaN(reorderPoint) || reorderPoint < 0) return res.status(400).json({ message: "Invalid input" });
-      const tenantId = (req as any).tenantId;
-      await db.execute(sql`UPDATE supplies SET reorder_point = ${reorderPoint} WHERE id = ${id} AND (${tenantId}::int IS NULL OR tenant_id = ${tenantId})`);
+      await db.execute(sql`UPDATE supplies SET reorder_point = ${reorderPoint} WHERE id = ${id} AND tenant_id = ${tenantId}`);
       res.json({ success: true });
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
   app.post("/api/pos/seed-inventory", requireAdminMiddleware, async (req: any, res) => {
     try {
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const zeroResult = await db.execute(sql`
         UPDATE supplies s
         SET stock_quantity = 0, quantity_source = 'pos', updated_at = NOW()
         FROM pos_zero_stock_tracker t
         WHERE s.id = t.supply_id
+          AND s.tenant_id = ${tenantId}
           AND t.zero_count > 0
           AND (s.manual_quantity_override = false OR s.manual_quantity_override IS NULL)
       `);
@@ -3154,6 +3202,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
             quantity_source = 'pos', updated_at = NOW()
         FROM pos_zero_stock_tracker t
         WHERE s.id = t.supply_id
+          AND s.tenant_id = ${tenantId}
           AND t.zero_count = 0
           AND t.last_nonzero_at IS NOT NULL
           AND (s.manual_quantity_override = false OR s.manual_quantity_override IS NULL)
@@ -3183,7 +3232,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (!config || !Array.isArray(config.categories)) {
         return res.status(400).json({ message: "Invalid config" });
       }
-      await storage.upsertGroomingSetting({ setting: "pos_layout", value: JSON.stringify(config), tenantId: (req as any).tenantId });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      await storage.upsertGroomingSetting({ setting: "pos_layout", value: JSON.stringify(config), tenantId });
       res.json({ ok: true });
     } catch (e: any) {
       res.status(500).json({ message: e.message });
@@ -3205,9 +3256,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     try {
       const { sku, item_name, brand, price, mapped_category } = req.body as { sku: string; item_name: string; brand: string; price: number; mapped_category: string };
       if (!sku || !item_name || !mapped_category) return res.status(400).json({ message: "Missing required fields" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       await db.execute(sql`
-        INSERT INTO supplies (name, brand, sku, price, category, is_active, stock_quantity, created_at, updated_at)
-        VALUES (${item_name}, ${brand || null}, ${sku}, ${price || 0}, ${mapped_category}, TRUE, 0, NOW(), NOW())
+        INSERT INTO supplies (name, brand, sku, price, category, is_active, stock_quantity, tenant_id, created_at, updated_at)
+        VALUES (${item_name}, ${brand || null}, ${sku}, ${price || 0}, ${mapped_category}, TRUE, 0, ${tenantId}, NOW(), NOW())
       `);
       await db.execute(sql`DELETE FROM pos_pending_new_items WHERE sku = ${sku}`);
       res.json({ ok: true });
@@ -3229,13 +3282,15 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
   app.post("/api/admin/pos-scan/add-all-new", requireAdminMiddleware, async (req: any, res) => {
     try {
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const pending = await db.execute(sql`SELECT sku, item_name, brand, price, mapped_category FROM pos_pending_new_items`);
       let added = 0;
       for (const row of pending.rows as any[]) {
         try {
           await db.execute(sql`
-            INSERT INTO supplies (name, brand, sku, price, category, is_active, stock_quantity, created_at, updated_at)
-            VALUES (${row.item_name}, ${row.brand || null}, ${row.sku}, ${row.price || 0}, ${row.mapped_category}, TRUE, 0, NOW(), NOW())
+            INSERT INTO supplies (name, brand, sku, price, category, is_active, stock_quantity, tenant_id, created_at, updated_at)
+            VALUES (${row.item_name}, ${row.brand || null}, ${row.sku}, ${row.price || 0}, ${row.mapped_category}, TRUE, 0, ${tenantId}, NOW(), NOW())
             ON CONFLICT DO NOTHING
           `);
           added++;
@@ -3266,6 +3321,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
   app.post("/api/admin/pos-scan/protect", requireAdminMiddleware, async (req: any, res) => {
     try {
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { supplyId, protect } = req.body as { supplyId: number; protect: boolean };
       await db.execute(sql`UPDATE pos_zero_stock_tracker SET protected = ${protect}, deletion_eligible = FALSE WHERE supply_id = ${supplyId}`);
       res.json({ ok: true });
@@ -3276,6 +3333,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
   app.patch("/api/admin/pos-scan/threshold/:supplyId", requireAdminMiddleware, async (req: any, res) => {
     try {
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const supplyId = parseInt(req.params.supplyId);
       const threshold = parseInt(req.body.threshold);
       if (!supplyId || isNaN(threshold) || threshold < 1) return res.status(400).json({ message: "Invalid input" });
@@ -3297,6 +3356,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
   app.post("/api/admin/pos-scan/delete-eligible", requireAdminMiddleware, async (req: any, res) => {
     try {
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const toDelete = await db.execute(sql`SELECT supply_id, item_name FROM pos_zero_stock_tracker WHERE deletion_eligible = TRUE AND protected = FALSE`);
       if (!toDelete.rows.length) return res.json({ deleted: 0, skipped: 0 });
       let deleted = 0, skipped = 0;
@@ -3304,12 +3365,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         const id = row.supply_id;
         const inCart = await db.execute(sql`SELECT 1 FROM cart_items WHERE supply_id = ${id} LIMIT 1`);
         if (inCart.rows.length > 0) { skipped++; continue; }
-        const tenantId = (req as any).tenantId;
-        if (tenantId) {
-          await db.execute(sql`DELETE FROM supplies WHERE id = ${id} AND tenant_id = ${tenantId}`);
-        } else {
-          await db.execute(sql`DELETE FROM supplies WHERE id = ${id}`);
-        }
+        await db.execute(sql`DELETE FROM supplies WHERE id = ${id} AND tenant_id = ${tenantId}`);
         await db.execute(sql`DELETE FROM pos_zero_stock_tracker WHERE supply_id = ${id}`);
         deleted++;
       }
@@ -3332,6 +3388,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
   app.post("/api/admin/audit-keep", requireAdminMiddleware, async (req: any, res) => {
     try {
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { items } = req.body as { items: Array<{ supplyId: number; name: string; barcode: string }> };
       if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ message: "No items provided" });
       let saved = 0;
@@ -3354,6 +3412,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   // Inventory Audit batch-apply route
   app.post("/api/admin/inventory-audit/apply", requireAdminMiddleware, async (req: any, res) => {
     try {
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { actions } = req.body as {
         actions: Array<{ id: number; action: string; value?: number }>;
       };
@@ -3366,10 +3426,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
       for (const a of actions) {
         try {
-          const supply = await storage.getSupply(a.id, (req as any).tenantId);
+          const supply = await storage.getSupply(a.id, tenantId);
           if (!supply) { errors.push(`ID ${a.id}: not found`); continue; }
 
-          const auditTenantId = (req as any).tenantId;
+          const auditTenantId = tenantId;
           switch (a.action) {
             case "delete":
               await storage.deleteSupply(a.id, auditTenantId);
@@ -3517,17 +3577,19 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const { status } = req.body;
       
       // Get the order before updating to get user info
-      const existingOrder = await storage.getOrder(id, (req as any).tenantId);
+      const existingOrder = await storage.getOrder(id, tenantId);
       if (!existingOrder) {
         return res.status(404).json({ message: "Order not found" });
       }
 
       // Update the order status
-      const order = await storage.updateOrderStatus(id, status, (req as any).tenantId);
+      const order = await storage.updateOrderStatus(id, status, tenantId);
       
       // Get the customer information for notifications
       const customer = await storage.getUser(existingOrder.userId);
@@ -3558,8 +3620,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const orderId = parseInt(req.params.orderId);
-      await storage.deleteOrder(orderId, (req as any).tenantId);
+      await storage.deleteOrder(orderId, tenantId);
       
       res.json({ message: "Order deleted successfully" });
     } catch (error: any) {
@@ -3632,10 +3696,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         validatedData.taxAmount = serverTaxVal.toFixed(2);
         validatedData.totalAmount = Math.round((subtotalVal + serverTaxVal) * 100 / 100).toFixed(2);
 
+        const orderTenantId = resolveWriteTenantId(req, res);
+        if (orderTenantId === undefined) return;
         const order = await storage.createOrder(
           {
             ...validatedData,
             userId,
+            tenantId: orderTenantId,
             discountAmount: "0",
             discountReason: "Charge Account - In-Store Payment",
             stripePaymentIntentId: null,
@@ -3830,10 +3897,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       // Get payment intent ID if provided (from Stripe checkout)
       const paymentIntentId = orderData.stripePaymentIntentId;
       
+      const orderTenantId = resolveWriteTenantId(req, res);
+      if (orderTenantId === undefined) return;
       const order = await storage.createOrder(
         { 
           ...validatedData, 
           userId,
+          tenantId: orderTenantId,
           discountAmount: verifiedAstroDiscount > 0 ? verifiedAstroDiscount.toFixed(2) : "0",
           discountReason: verifiedAstroInfo ? `Astro Loyalty Reward: ${verifiedAstroInfo}` : null,
           stripePaymentIntentId: paymentIntentId || null,
@@ -3971,9 +4041,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Access denied. Admin only." });
       }
-      
+
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const orderId = parseInt(req.params.id);
-      const orderWithItems = await storage.getOrderWithItems(orderId, (req as any).tenantId);
+      const orderWithItems = await storage.getOrderWithItems(orderId, tenantId);
       
       if (!orderWithItems) {
         return res.status(404).json({ message: "Order not found" });
@@ -3999,7 +4071,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           paymentStatus: 'paid',
           paidAt: new Date(),
         });
-        await storage.updateOrderApprovalStatus(orderId, 'approved', (req as any).tenantId);
+        await storage.updateOrderApprovalStatus(orderId, 'approved', tenantId);
         console.log(`Order #${orderId} approved - fully discounted ($0.00), no payment needed`);
       } else if (orderOwner?.stripeCustomerId && orderOwner?.stripeDefaultPaymentMethod) {
         // Try to charge the customer's saved payment method
@@ -4039,7 +4111,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
             
             // Keep order in "approved" status - admin needs to manually gather items
             // and move to "ready_for_pickup" when the order is actually ready
-            await storage.updateOrderApprovalStatus(orderId, 'approved', (req as any).tenantId);
+            await storage.updateOrderApprovalStatus(orderId, 'approved', tenantId);
             
             console.log(`Order #${orderId} approved and payment charged successfully: ${paymentIntentId}`);
           } else {
@@ -4058,7 +4130,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         console.warn(`Order #${orderId} approved but payment failed: ${paymentError}`);
         
         // Update order status to approved (not ready, since not paid)
-        await storage.updateOrderApprovalStatus(orderId, 'approved', (req as any).tenantId);
+        await storage.updateOrderApprovalStatus(orderId, 'approved', tenantId);
         await storage.updateOrderStripePayment(orderId, {
           paymentStatus: 'payment_failed',
         });
@@ -4241,15 +4313,17 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Access denied. Admin only." });
       }
-      
+
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const orderId = parseInt(req.params.id);
-      const orderWithItems = await storage.getOrderWithItems(orderId, (req as any).tenantId);
+      const orderWithItems = await storage.getOrderWithItems(orderId, tenantId);
       
       if (!orderWithItems) {
         return res.status(404).json({ message: "Order not found" });
       }
       
-      await storage.updateOrderApprovalStatus(orderId, 'ready_for_pickup', (req as any).tenantId);
+      await storage.updateOrderApprovalStatus(orderId, 'ready_for_pickup', tenantId);
       
       try {
         const { notifyCustomerOrderReady } = await import('./pushNotifications');
@@ -4332,13 +4406,15 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Access denied. Admin only." });
       }
-      
+
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const orderId = parseInt(req.params.id);
-      const orderWithItems = await storage.getOrderWithItems(orderId, (req as any).tenantId);
+      const orderWithItems = await storage.getOrderWithItems(orderId, tenantId);
       
-      await storage.updateOrderApprovalStatus(orderId, 'picked_up', (req as any).tenantId);
+      await storage.updateOrderApprovalStatus(orderId, 'picked_up', tenantId);
       // Also mark the order status as completed when picked up
-      await storage.updateOrderStatus(orderId, 'completed', (req as any).tenantId);
+      await storage.updateOrderStatus(orderId, 'completed', tenantId);
 
       // Send customer SMS if they have a phone number
       if (orderWithItems?.order.userId) {
@@ -4651,14 +4727,16 @@ West Monroe LA 71291
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Access denied. Admin only." });
       }
-      
-      const allOrders = await storage.getOrders(undefined, (req as any).tenantId);
+
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      const allOrders = await storage.getOrders(undefined, tenantId);
       let fixedCount = 0;
       
       for (const order of allOrders) {
         // If approval_status is picked_up but status is not completed, fix it
         if (order.approvalStatus === 'picked_up' && order.status !== 'completed') {
-          await storage.updateOrderStatus(order.id, 'completed', (req as any).tenantId);
+          await storage.updateOrderStatus(order.id, 'completed', tenantId);
           fixedCount++;
         }
       }
@@ -4699,7 +4777,9 @@ West Monroe LA 71291
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Access denied. Admin only." });
       }
-      
+
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const orderId = parseInt(req.params.id);
       const { discountAmount, discountReason } = req.body;
       
@@ -4712,7 +4792,7 @@ West Monroe LA 71291
         return res.status(400).json({ message: "Please enter a reason for the discount." });
       }
       
-      const order = await storage.getOrder(orderId, (req as any).tenantId);
+      const order = await storage.getOrder(orderId, tenantId);
       if (!order) {
         return res.status(404).json({ message: "Order not found" });
       }
@@ -4721,7 +4801,7 @@ West Monroe LA 71291
         return res.status(400).json({ message: "Discounts can only be applied to pending orders." });
       }
       
-      const updated = await storage.applyOrderDiscount(orderId, discountAmount, discountReason.trim(), (req as any).tenantId);
+      const updated = await storage.applyOrderDiscount(orderId, discountAmount, discountReason.trim(), tenantId);
       
       console.log(`Discount applied to order #${orderId}: $${discountAmount} - "${discountReason}" by admin ${userId}`);
       
@@ -4746,7 +4826,8 @@ West Monroe LA 71291
       const { items } = req.body;
       
       // Verify the order belongs to this tenant before mutating
-      const tenantId = (req as any).tenantId as number | undefined;
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const orderToEdit = await storage.getOrder(orderId, tenantId);
       if (!orderToEdit) {
         return res.status(404).json({ message: "Order not found" });
@@ -4767,7 +4848,7 @@ West Monroe LA 71291
             price: item.price,
             productName: item.productName || item.itemName,
             category: item.category || 'uncategorized',
-            tenantId: tenantId ?? null,
+            tenantId,
           });
           newTotal += parseFloat(item.price) * item.quantity;
         }
@@ -4902,7 +4983,9 @@ West Monroe LA 71291
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Access denied. Admin only." });
       }
-      
+
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { orderId, items, reason, notes, refundType, includeConvenienceFee } = req.body;
       
       // Support both batch format (items array) and legacy single-item format
@@ -4984,7 +5067,7 @@ West Monroe LA 71291
               await storage.updateOrderStripePayment(orderId, {
                 paymentStatus: 'refunded',
               });
-              await storage.updateOrderStatus(orderId, 'refunded', (req as any).tenantId);
+              await storage.updateOrderStatus(orderId, 'refunded', tenantId);
             }
           }
         } catch (stripeError: any) {
@@ -5166,8 +5249,10 @@ West Monroe LA 71291
       if (!email) {
         return res.status(400).json({ message: "Email is required" });
       }
-      
-      const setting = await storage.addRefundReportEmail(email, (req as any).tenantId);
+
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      const setting = await storage.addRefundReportEmail(email, tenantId);
       res.json(setting);
     } catch (error) {
       console.error("Error adding refund report email:", error);
@@ -5183,9 +5268,11 @@ West Monroe LA 71291
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Access denied. Admin only." });
       }
-      
+
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
-      await storage.removeRefundReportEmail(id, (req as any).tenantId);
+      await storage.removeRefundReportEmail(id, tenantId);
       res.json({ success: true });
     } catch (error) {
       console.error("Error removing refund report email:", error);
@@ -5247,7 +5334,7 @@ West Monroe LA 71291
       const user = await storage.getUser(userId);
       
       // For regular customers: auto-link any phone-booked appointments so they show up by userId
-      if (user && !user.isAdmin && !user.isGroomer && user.phoneNumber) {
+      if (user && !user.isAdmin && !user.isGroomer && user.phoneNumber && (req as any).tenantId) {
         await storage.linkAppointmentsToUser(user.phoneNumber, userId, (req as any).tenantId);
       }
 
@@ -5730,8 +5817,10 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
-      await storage.deleteAppointment(id, (req as any).tenantId);
+      await storage.deleteAppointment(id, tenantId);
       
       res.status(204).send();
     } catch (error) {
@@ -5752,6 +5841,8 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin or groomer access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const { ownerFirstName: rawOwnerFirst, ownerLastName: rawOwnerLast, ownerPhoneNumber, pets, pricingMode, price, appointmentDate, appointmentTime } = req.body;
       const ownerFirstName = rawOwnerFirst ? cleanName(rawOwnerFirst) : rawOwnerFirst;
@@ -6041,7 +6132,7 @@ West Monroe LA 71291
             }
             
             if (Object.keys(contactUpdates).length > 0) {
-              await storage.updateContact(contact.id, contactUpdates, (req as any).tenantId);
+              await storage.updateContact(contact.id, contactUpdates, tenantId);
               console.log(`Updated contact ${contact.id} based on appointment ${id} changes`);
             }
           }
@@ -6127,11 +6218,13 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin or groomer access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const { status } = req.body;
       
       // Get appointment details before updating for customer notification
-      const oldAppointment = await storage.getAppointment(id, (req as any).tenantId);
+      const oldAppointment = await storage.getAppointment(id, tenantId);
       
       if (!oldAppointment) {
         return res.status(404).json({ message: "Appointment not found" });
@@ -6235,7 +6328,7 @@ West Monroe LA 71291
         }
       }
       
-      const appointment = await storage.updateAppointmentStatus(id, status, (req as any).tenantId);
+      const appointment = await storage.updateAppointmentStatus(id, status, tenantId);
       
       // Send customer + groomer notification for confirmed or rejected appointments
       if (oldAppointment && (status === 'confirmed' || status === 'rejected')) {
@@ -6246,7 +6339,7 @@ West Monroe LA 71291
           // Fetch groomer emails
           let groomerEmails: string[] = [];
           try {
-            const allUsers = await storage.getAllUsers((req as any).tenantId);
+            const allUsers = await storage.getAllUsers(tenantId);
             groomerEmails = allUsers
               .filter((u: any) => u.isGroomer && !u.isAdmin)
               .map((u: any) => u.email)
@@ -6266,7 +6359,7 @@ West Monroe LA 71291
                 oldAppointment.appointmentTime,
                 groomerEmails,
                 customerName,
-                (req as any).tenantId
+                tenantId
               );
             } else if (status === 'rejected') {
               await notificationService.sendAppointmentRejectedNotification(
@@ -6278,7 +6371,7 @@ West Monroe LA 71291
                 oldAppointment.appointmentTime,
                 groomerEmails,
                 customerName,
-                (req as any).tenantId
+                tenantId
               );
             }
           } catch (notificationError) {
@@ -6301,6 +6394,8 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin or groomer access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const { isHere } = req.body;
       
@@ -6308,7 +6403,7 @@ West Monroe LA 71291
         return res.status(400).json({ message: "isHere must be a boolean" });
       }
 
-      const appointment = await storage.updateAppointmentIsHere(id, isHere, (req as any).tenantId);
+      const appointment = await storage.updateAppointmentIsHere(id, isHere, tenantId);
       if (!appointment) {
         return res.status(404).json({ message: "Appointment not found" });
       }
@@ -6326,6 +6421,8 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin or groomer access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const { isPaid } = req.body;
       
@@ -6333,7 +6430,7 @@ West Monroe LA 71291
         return res.status(400).json({ message: "isPaid must be a boolean" });
       }
 
-      const appointment = await storage.updateAppointmentIsPaid(id, isPaid, (req as any).tenantId);
+      const appointment = await storage.updateAppointmentIsPaid(id, isPaid, tenantId);
       if (!appointment) {
         return res.status(404).json({ message: "Appointment not found" });
       }
@@ -6351,12 +6448,14 @@ West Monroe LA 71291
       if (!user?.isAdmin && !user?.isGroomer) {
         return res.status(403).json({ message: "Admin or groomer access required" });
       }
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const { finalAmount, readyForPayment } = req.body;
       if (readyForPayment && (finalAmount === undefined || isNaN(parseFloat(finalAmount)))) {
         return res.status(400).json({ message: "finalAmount is required when marking ready for payment" });
       }
-      const appointment = await storage.updateAppointmentReadyForPayment(id, String(parseFloat(finalAmount || "0").toFixed(2)), readyForPayment ?? true, (req as any).tenantId);
+      const appointment = await storage.updateAppointmentReadyForPayment(id, String(parseFloat(finalAmount || "0").toFixed(2)), readyForPayment ?? true, tenantId);
       if (!appointment) return res.status(404).json({ message: "Appointment not found" });
       res.json(appointment);
     } catch (error) {
@@ -6368,9 +6467,11 @@ West Monroe LA 71291
   // Customer creates Stripe checkout session to pay for grooming appointment
   app.post("/api/appointments/:id/pay-online", authMiddleware, async (req: any, res) => {
     try {
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const userId = req.user?.id;
-      const appointment = await storage.getAppointment(id, (req as any).tenantId);
+      const appointment = await storage.getAppointment(id, tenantId);
       if (!appointment) return res.status(404).json({ message: "Appointment not found" });
 
       // Allow if userId matches, OR if appointment is unlinked and phone number matches
@@ -6417,7 +6518,7 @@ West Monroe LA 71291
         });
 
         if (paymentIntent.status === 'succeeded') {
-          await storage.updateAppointmentPaidOnline(id, paymentIntent.id, (req as any).tenantId);
+          await storage.updateAppointmentPaidOnline(id, paymentIntent.id, tenantId);
           if (tipNum > 0) {
             await storage.updateAppointmentTip(id, tipNum.toFixed(2), paymentIntent.id);
           }
@@ -6468,11 +6569,13 @@ West Monroe LA 71291
   // Confirm grooming payment after Stripe checkout redirect
   app.post("/api/appointments/:id/confirm-payment", authMiddleware, async (req: any, res) => {
     try {
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const { sessionId } = req.body;
       if (!sessionId) return res.status(400).json({ message: "sessionId is required" });
 
-      const appointment = await storage.getAppointment(id, (req as any).tenantId);
+      const appointment = await storage.getAppointment(id, tenantId);
       if (!appointment) return res.status(404).json({ message: "Appointment not found" });
       const confirmUserId = req.user?.id;
       const confirmOwnerById = appointment.userId === confirmUserId;
@@ -6486,9 +6589,7 @@ West Monroe LA 71291
       }
       if (!confirmOwnerById && !confirmOwnerByPhone) return res.status(403).json({ message: "Forbidden" });
       if (confirmOwnerByPhone) {
-        const apptWhere = (req as any).tenantId
-          ? and(eq(appointments.id, id), eq(appointments.tenantId, (req as any).tenantId))
-          : eq(appointments.id, id);
+        const apptWhere = and(eq(appointments.id, id), eq(appointments.tenantId, tenantId));
         await db.update(appointments).set({ userId: confirmUserId }).where(apptWhere);
       }
       if (appointment.isPaid) return res.json({ success: true, alreadyPaid: true });
@@ -6504,7 +6605,7 @@ West Monroe LA 71291
         return res.status(400).json({ message: "Session does not match appointment" });
       }
 
-      const updated = await storage.updateAppointmentPaidOnline(id, sessionId, (req as any).tenantId);
+      const updated = await storage.updateAppointmentPaidOnline(id, sessionId, tenantId);
       res.json({ success: true, appointment: updated });
     } catch (error) {
       console.error("Error confirming grooming payment:", error);
@@ -6520,6 +6621,8 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin or groomer access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const { groomingCompleted, customMessage } = req.body;
       
@@ -6528,10 +6631,10 @@ West Monroe LA 71291
       }
 
       // Capture state BEFORE update so we only send SMS on true→false→true transition (first time only)
-      const existingAppointment = await storage.getAppointment(id, (req as any).tenantId);
+      const existingAppointment = await storage.getAppointment(id, tenantId);
       const wasAlreadyCompleted = existingAppointment?.groomingCompleted === true;
 
-      const appointment = await storage.updateAppointmentGroomingCompleted(id, groomingCompleted, (req as any).tenantId);
+      const appointment = await storage.updateAppointmentGroomingCompleted(id, groomingCompleted, tenantId);
       if (!appointment) {
         return res.status(404).json({ message: "Appointment not found" });
       }
@@ -6539,7 +6642,12 @@ West Monroe LA 71291
       // Auto-create or update contact when grooming is marked completed (pet showed up = number is real)
       if (groomingCompleted && appointment.ownerPhoneNumber) {
         const allPetNames = appointment.petName ? [appointment.petName] : [];
-        storage.getContactByPhoneNumber(appointment.ownerPhoneNumber, (req as any).tenantId).then(async existingContact => {
+        // Capture tenantId before entering the fire-and-forget callback
+        const groomingContactTenantId: number = tenantId;
+        if (!groomingContactTenantId) {
+          console.warn('[Contact auto-create] Skipping: no tenant context on request');
+        } else {
+        storage.getContactByPhoneNumber(appointment.ownerPhoneNumber, groomingContactTenantId).then(async existingContact => {
           if (!existingContact) {
             const contactName = `${appointment.ownerFirstName || ''} ${appointment.ownerLastName || ''}`.trim() || 'Unknown';
             await storage.createContact({
@@ -6552,16 +6660,17 @@ West Monroe LA 71291
               source: appointment.source || 'manual',
               notes: null,
               linkedUserId: null,
-              tenantId: (req as any).tenantId ?? null,
+              tenantId: groomingContactTenantId,
             });
           } else {
             const existingPetNames: string[] = existingContact.petNames || [];
             const merged = Array.from(new Set([...existingPetNames, ...allPetNames]));
             if (merged.length > existingPetNames.length) {
-              await storage.updateContact(existingContact.id, { petNames: merged }, (req as any).tenantId);
+              await storage.updateContact(existingContact.id, { petNames: merged }, groomingContactTenantId);
             }
           }
         }).catch(err => console.error('Failed to auto-create contact on grooming completion:', err));
+        } // end else (groomingContactTenantId present)
       }
 
       // Send SMS notification when grooming is marked as completed for the FIRST time only.
@@ -7124,6 +7233,8 @@ West Monroe LA 71291
         const firstGroomerId = firstPet.groomerId || req.body.groomerId || null;
         const cleanedOwnerFirst = req.body.ownerFirstName ? cleanName(req.body.ownerFirstName) : req.body.ownerFirstName;
         const cleanedOwnerLast = req.body.ownerLastName ? cleanName(req.body.ownerLastName) : req.body.ownerLastName;
+        const apptTenantId = resolveWriteTenantId(req, res);
+        if (apptTenantId === undefined) return;
         const appointmentData = insertAppointmentSchema.parse({ 
           ...req.body,
           ownerFirstName: cleanedOwnerFirst,
@@ -7135,6 +7246,7 @@ West Monroe LA 71291
           specialNotes: firstPet.specialNotes,
           groomerId: firstGroomerId,
           userId,
+          tenantId: apptTenantId,
           isApproved: true,
           status: 'confirmed',
           bookedByAdmin: !!isAdminOrGroomer
@@ -7336,7 +7448,9 @@ West Monroe LA 71291
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
-      const record = await storage.createBoardingRecord(req.body);
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      const record = await storage.createBoardingRecord({ ...req.body, tenantId });
       res.json(record);
     } catch (error) {
       console.error("Error creating boarding record:", error);
@@ -7349,7 +7463,9 @@ West Monroe LA 71291
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
-      const record = await storage.updateBoardingRecord(parseInt(req.params.id), req.body, (req as any).tenantId);
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      const record = await storage.updateBoardingRecord(parseInt(req.params.id), req.body, tenantId);
       res.json(record);
     } catch (error) {
       console.error("Error updating boarding record:", error);
@@ -7362,7 +7478,9 @@ West Monroe LA 71291
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
-      const record = await storage.checkInBoardingRecord(parseInt(req.params.id), (req as any).tenantId);
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      const record = await storage.checkInBoardingRecord(parseInt(req.params.id), tenantId);
       res.json(record);
     } catch (error) {
       console.error("Error checking in boarding record:", error);
@@ -7375,7 +7493,9 @@ West Monroe LA 71291
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
-      const record = await storage.checkOutBoardingRecord(parseInt(req.params.id), (req as any).tenantId);
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      const record = await storage.checkOutBoardingRecord(parseInt(req.params.id), tenantId);
       res.json(record);
     } catch (error) {
       console.error("Error checking out boarding record:", error);
@@ -7388,7 +7508,9 @@ West Monroe LA 71291
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
-      await storage.deleteBoardingRecord(parseInt(req.params.id), (req as any).tenantId);
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      await storage.deleteBoardingRecord(parseInt(req.params.id), tenantId);
       res.status(204).send();
     } catch (error) {
       console.error("Error deleting boarding record:", error);
@@ -7415,8 +7537,10 @@ West Monroe LA 71291
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { entries } = req.body;
-      const result = await storage.batchUpdateScheduleEntries(entries, (req as any).tenantId);
+      const result = await storage.batchUpdateScheduleEntries(entries, tenantId);
       res.json(result);
     } catch (error) {
       console.error("Error batch updating schedule entries:", error);
@@ -7429,7 +7553,9 @@ West Monroe LA 71291
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
-      const updated = await storage.updateScheduleEntry(parseInt(req.params.id), req.body, (req as any).tenantId);
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      const updated = await storage.updateScheduleEntry(parseInt(req.params.id), req.body, tenantId);
       res.json(updated);
     } catch (error) {
       console.error("Error updating schedule entry:", error);
@@ -7442,7 +7568,9 @@ West Monroe LA 71291
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
-      await storage.deleteScheduleEntry(parseInt(req.params.id), (req as any).tenantId);
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      await storage.deleteScheduleEntry(parseInt(req.params.id), tenantId);
       res.status(204).send();
     } catch (error) {
       console.error("Error deleting schedule entry:", error);
@@ -7469,8 +7597,10 @@ West Monroe LA 71291
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { entries } = req.body;
-      const result = await storage.batchUpdateGroomingScheduleEntries(entries, (req as any).tenantId);
+      const result = await storage.batchUpdateGroomingScheduleEntries(entries, tenantId);
       res.json(result);
     } catch (error) {
       console.error("Error batch updating grooming schedule entries:", error);
@@ -7483,7 +7613,9 @@ West Monroe LA 71291
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
-      const updated = await storage.updateGroomingScheduleEntry(parseInt(req.params.id), req.body, (req as any).tenantId);
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      const updated = await storage.updateGroomingScheduleEntry(parseInt(req.params.id), req.body, tenantId);
       res.json(updated);
     } catch (error) {
       console.error("Error updating grooming schedule entry:", error);
@@ -7496,7 +7628,9 @@ West Monroe LA 71291
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
-      await storage.deleteGroomingScheduleEntry(parseInt(req.params.id), (req as any).tenantId);
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      await storage.deleteGroomingScheduleEntry(parseInt(req.params.id), tenantId);
       res.status(204).send();
     } catch (error) {
       console.error("Error deleting grooming schedule entry:", error);
@@ -7865,10 +7999,13 @@ West Monroe LA 71291
       if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
       const { title, description, imageUrl, imageUrls, badgeText, badgeColor, linkType, linkId, externalUrl, isActive, sortOrder } = req.body;
       if (!title?.trim()) return res.status(400).json({ message: "Title is required" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const created = await storage.createSpecial({
         title: title.trim(), description, imageUrl, imageUrls: imageUrls || [], badgeText, badgeColor: badgeColor || 'red',
         linkType: linkType || 'none', linkId: linkId || null, externalUrl,
         isActive: isActive !== false, sortOrder: sortOrder ?? 0,
+        tenantId,
       });
       res.json(created);
     } catch (error) {
@@ -8309,13 +8446,15 @@ West Monroe LA 71291
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
 
       const { enabled, emails, time } = req.body;
 
       // Save settings using grooming_settings table
-      await storage.upsertGroomingSetting({ setting: 'daily_report_enabled', value: enabled ? 'true' : 'false', tenantId: (req as any).tenantId});
-      await storage.upsertGroomingSetting({ setting: 'daily_report_emails', value: emails || '', tenantId: (req as any).tenantId});
-      await storage.upsertGroomingSetting({ setting: 'daily_report_time', value: time || '21:00', tenantId: (req as any).tenantId});
+      await storage.upsertGroomingSetting({ setting: 'daily_report_enabled', value: enabled ? 'true' : 'false', tenantId});
+      await storage.upsertGroomingSetting({ setting: 'daily_report_emails', value: emails || '', tenantId});
+      await storage.upsertGroomingSetting({ setting: 'daily_report_time', value: time || '21:00', tenantId});
 
       res.json({ success: true, message: "Daily report settings saved" });
     } catch (error) {
@@ -8368,12 +8507,14 @@ West Monroe LA 71291
   app.post("/api/admin/monthly-report-settings", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { enabled, emails, day, time } = req.body;
       await Promise.all([
-        storage.upsertGroomingSetting({ setting: 'monthly_report_enabled', value: enabled ? 'true' : 'false', tenantId: (req as any).tenantId}),
-        storage.upsertGroomingSetting({ setting: 'monthly_report_emails',  value: emails || '', tenantId: (req as any).tenantId}),
-        storage.upsertGroomingSetting({ setting: 'monthly_report_day',     value: String(day || '1'), tenantId: (req as any).tenantId}),
-        storage.upsertGroomingSetting({ setting: 'monthly_report_time',    value: time  || '08:00', tenantId: (req as any).tenantId}),
+        storage.upsertGroomingSetting({ setting: 'monthly_report_enabled', value: enabled ? 'true' : 'false', tenantId}),
+        storage.upsertGroomingSetting({ setting: 'monthly_report_emails',  value: emails || '', tenantId}),
+        storage.upsertGroomingSetting({ setting: 'monthly_report_day',     value: String(day || '1'), tenantId}),
+        storage.upsertGroomingSetting({ setting: 'monthly_report_time',    value: time  || '08:00', tenantId}),
       ]);
       res.json({ success: true });
     } catch (e: any) { res.status(500).json({ message: e.message }); }
@@ -8410,11 +8551,13 @@ West Monroe LA 71291
   app.post("/api/admin/yearly-report-settings", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { enabled, emails, time } = req.body;
       await Promise.all([
-        storage.upsertGroomingSetting({ setting: 'yearly_report_enabled', value: enabled ? 'true' : 'false', tenantId: (req as any).tenantId}),
-        storage.upsertGroomingSetting({ setting: 'yearly_report_emails',  value: emails || '', tenantId: (req as any).tenantId}),
-        storage.upsertGroomingSetting({ setting: 'yearly_report_time',    value: time  || '08:00', tenantId: (req as any).tenantId}),
+        storage.upsertGroomingSetting({ setting: 'yearly_report_enabled', value: enabled ? 'true' : 'false', tenantId}),
+        storage.upsertGroomingSetting({ setting: 'yearly_report_emails',  value: emails || '', tenantId}),
+        storage.upsertGroomingSetting({ setting: 'yearly_report_time',    value: time  || '08:00', tenantId}),
       ]);
       res.json({ success: true });
     } catch (e: any) { res.status(500).json({ message: e.message }); }
@@ -8569,7 +8712,9 @@ West Monroe LA 71291
         return res.status(400).json({ message: "Setting and value are required" });
       }
 
-      const updatedSetting = await storage.upsertGroomingSetting({ setting, value, tenantId: (req as any).tenantId});
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      const updatedSetting = await storage.upsertGroomingSetting({ setting, value, tenantId});
       res.json(updatedSetting);
     } catch (error) {
       console.error("Error updating grooming setting:", error);
@@ -8626,18 +8771,21 @@ West Monroe LA 71291
         }
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+
       // Save individual tax rates
-      await storage.upsertGroomingSetting({ setting: 'tax_city', value: cityTax.toFixed(4), tenantId: (req as any).tenantId});
-      await storage.upsertGroomingSetting({ setting: 'tax_county', value: countyTax.toFixed(4), tenantId: (req as any).tenantId});
-      await storage.upsertGroomingSetting({ setting: 'tax_state', value: stateTax.toFixed(4), tenantId: (req as any).tenantId});
-      await storage.upsertGroomingSetting({ setting: 'tax_federal', value: federalTax.toFixed(4), tenantId: (req as any).tenantId});
-      await storage.upsertGroomingSetting({ setting: 'tax_show_on_receipt', value: showOnReceipt ? 'true' : 'false', tenantId: (req as any).tenantId});
-      await storage.upsertGroomingSetting({ setting: 'tax_default_for_items', value: defaultForItems ? 'true' : 'false', tenantId: (req as any).tenantId});
-      await storage.upsertGroomingSetting({ setting: 'tax_default_for_services', value: defaultForServices ? 'true' : 'false', tenantId: (req as any).tenantId});
+      await storage.upsertGroomingSetting({ setting: 'tax_city', value: cityTax.toFixed(4), tenantId});
+      await storage.upsertGroomingSetting({ setting: 'tax_county', value: countyTax.toFixed(4), tenantId});
+      await storage.upsertGroomingSetting({ setting: 'tax_state', value: stateTax.toFixed(4), tenantId});
+      await storage.upsertGroomingSetting({ setting: 'tax_federal', value: federalTax.toFixed(4), tenantId});
+      await storage.upsertGroomingSetting({ setting: 'tax_show_on_receipt', value: showOnReceipt ? 'true' : 'false', tenantId});
+      await storage.upsertGroomingSetting({ setting: 'tax_default_for_items', value: defaultForItems ? 'true' : 'false', tenantId});
+      await storage.upsertGroomingSetting({ setting: 'tax_default_for_services', value: defaultForServices ? 'true' : 'false', tenantId});
       
       // Calculate combined rate for backwards compatibility
       const taxRate = cityTax + countyTax + stateTax + federalTax;
-      await storage.upsertGroomingSetting({ setting: 'tax_rate', value: taxRate.toString(), tenantId: (req as any).tenantId});
+      await storage.upsertGroomingSetting({ setting: 'tax_rate', value: taxRate.toString(), tenantId});
       
       res.json({ success: true, taxRate, cityTax, countyTax, stateTax, federalTax, showOnReceipt, defaultForItems, defaultForServices });
     } catch (error) {
@@ -8666,15 +8814,17 @@ West Monroe LA 71291
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { email } = req.body;
       if (email && typeof email === 'string' && email.trim()) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email.trim())) {
           return res.status(400).json({ message: "Please enter a valid email address" });
         }
-        await storage.upsertGroomingSetting({ setting: 'alternate_reply_email', value: email.trim(), tenantId: (req as any).tenantId});
+        await storage.upsertGroomingSetting({ setting: 'alternate_reply_email', value: email.trim(), tenantId});
       } else {
-        await storage.upsertGroomingSetting({ setting: 'alternate_reply_email', value: '', tenantId: (req as any).tenantId});
+        await storage.upsertGroomingSetting({ setting: 'alternate_reply_email', value: '', tenantId});
       }
       res.json({ success: true });
     } catch (error) {
@@ -8730,13 +8880,16 @@ West Monroe LA 71291
         return res.status(400).json({ message: "Invalid store hours data" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+
       for (const day of DAYS_OF_WEEK) {
         if (hours[day]) {
           const { open, openTime, closeTime } = hours[day];
           await storage.upsertGroomingSetting({
             setting: `store_hours_${day}`,
             value: JSON.stringify({ open: !!open, openTime: openTime || '07:00', closeTime: closeTime || '18:00' }),
-            tenantId: (req as any).tenantId,
+            tenantId,
           });
         }
       }
@@ -8789,11 +8942,13 @@ West Monroe LA 71291
         return res.status(400).json({ message: "Date, maxBathAppointments, and maxGroomAppointments are required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const limit = await storage.upsertDailyAppointmentLimit({
         date,
         maxBathAppointments,
         maxGroomAppointments,
-        tenantId: (req as any).tenantId,
+        tenantId,
       });
       
       res.json(limit);
@@ -8809,7 +8964,9 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      await storage.deleteDailyAppointmentLimit(parseInt(req.params.id), (req as any).tenantId);
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      await storage.deleteDailyAppointmentLimit(parseInt(req.params.id), tenantId);
       res.json({ message: "Daily limit deleted successfully" });
     } catch (error) {
       console.error("Error deleting daily limit:", error);
@@ -8867,11 +9024,13 @@ West Monroe LA 71291
         return res.status(400).json({ message: "Invalid day of week (must be 1-6 for Monday-Saturday)" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const limit = await storage.upsertWeeklyAppointmentLimit({
         dayOfWeek,
         maxBathAppointments,
         maxGroomAppointments,
-        tenantId: (req as any).tenantId,
+        tenantId,
       });
       
       res.json(limit);
@@ -8887,7 +9046,9 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      await storage.deleteWeeklyAppointmentLimit(parseInt(req.params.id), (req as any).tenantId);
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      await storage.deleteWeeklyAppointmentLimit(parseInt(req.params.id), tenantId);
       res.json({ message: "Weekly limit deleted successfully" });
     } catch (error) {
       console.error("Error deleting weekly limit:", error);
@@ -9024,8 +9185,10 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const groomerData = req.body;
-      const groomer = await storage.createGroomer(groomerData);
+      const groomer = await storage.createGroomer({ ...groomerData, tenantId });
       
       // Automatically add default availability for new groomer (Mon-Sat, 8am-1:30pm)
       try {
@@ -9087,9 +9250,11 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const groomerData = req.body;
-      const groomer = await storage.updateGroomer(id, groomerData, (req as any).tenantId);
+      const groomer = await storage.updateGroomer(id, groomerData, tenantId);
       res.json(groomer);
     } catch (error) {
       console.error("Error updating groomer:", error);
@@ -9103,8 +9268,10 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
-      await storage.deleteGroomer(id, (req as any).tenantId);
+      await storage.deleteGroomer(id, tenantId);
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting groomer:", error);
@@ -9135,7 +9302,9 @@ West Monroe LA 71291
       }
 
       const groomerId = parseInt(req.params.id);
-      const availabilityData = { ...req.body, groomerId };
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      const availabilityData = { ...req.body, groomerId, tenantId };
       const availability = await storage.setGroomerAvailability(availabilityData);
       res.json(availability);
     } catch (error) {
@@ -9150,9 +9319,11 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const availabilityData = req.body;
-      const availability = await storage.updateGroomerAvailability(id, availabilityData, (req as any).tenantId);
+      const availability = await storage.updateGroomerAvailability(id, availabilityData, tenantId);
       res.json(availability);
     } catch (error) {
       console.error("Error updating groomer availability:", error);
@@ -9166,8 +9337,10 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
-      await storage.deleteGroomerAvailability(id, (req as any).tenantId);
+      await storage.deleteGroomerAvailability(id, tenantId);
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting groomer availability:", error);
@@ -9211,8 +9384,10 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const blockedDayData = req.body;
-      const blockedDay = await storage.createGroomerBlockedDay(blockedDayData);
+      const blockedDay = await storage.createGroomerBlockedDay({ ...blockedDayData, tenantId });
       res.json(blockedDay);
     } catch (error) {
       console.error("Error creating groomer blocked day:", error);
@@ -9226,8 +9401,10 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
-      await storage.deleteGroomerBlockedDay(id, (req as any).tenantId);
+      await storage.deleteGroomerBlockedDay(id, tenantId);
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting groomer blocked day:", error);
@@ -9321,6 +9498,8 @@ West Monroe LA 71291
         }
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const contact = await storage.createContact({ 
         name: capitalizedName as string, 
         email: contactEmail, 
@@ -9328,7 +9507,8 @@ West Monroe LA 71291
         petNames: capitalizedPetNames,
         notes,
         animalType,
-        breed 
+        breed,
+        tenantId,
       });
       res.json(contact);
     } catch (error) {
@@ -9344,6 +9524,8 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin or groomer access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const { name, email, phoneNumber, petNames, notes, animalType, breed } = req.body;
       const trimmedName = name?.trim();
@@ -9391,7 +9573,7 @@ West Monroe LA 71291
         notes,
         animalType,
         breed 
-      }, (req as any).tenantId);
+      }, tenantId);
       res.json(contact);
     } catch (error) {
       console.error("Error updating contact:", error);
@@ -9531,8 +9713,10 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
-      await storage.deleteContact(id, (req as any).tenantId);
+      await storage.deleteContact(id, tenantId);
       res.json({ message: "Contact deleted successfully" });
     } catch (error) {
       console.error("Error deleting contact:", error);
@@ -9548,8 +9732,10 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { normalizePhoneNumber } = await import("./phoneUtils");
-      const allContacts = await storage.getAllContacts((req as any).tenantId);
+      const allContacts = await storage.getAllContacts(tenantId);
       
       // Group contacts by normalized phone number
       const phoneGroups = new Map<string, any[]>();
@@ -9586,7 +9772,7 @@ West Monroe LA 71291
           });
           
           for (const contact of toDelete) {
-            await storage.deleteContact(contact.id, (req as any).tenantId);
+            await storage.deleteContact(contact.id, tenantId);
             deletedCount++;
           }
         }
@@ -9611,9 +9797,12 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const syncContactTenantId = resolveWriteTenantId(req, res);
+      if (syncContactTenantId === undefined) return;
+
       console.log(`[ContactSync] Sync started by admin user id=${req.user?.id} (${user.username || user.email || 'unknown'})`);
 
-      const allAppointments = await storage.getAppointments(undefined, (req as any).tenantId);
+      const allAppointments = await storage.getAppointments(undefined, syncContactTenantId);
       // Only process completed appointments — pet showed up, so the phone number is verified
       const completedAppointments = allAppointments.filter((apt: any) => apt.groomingCompleted === true);
 
@@ -9632,7 +9821,7 @@ West Monroe LA 71291
           continue;
         }
 
-        const existing = await storage.getContactByPhoneNumber(apt.ownerPhoneNumber, (req as any).tenantId);
+        const existing = await storage.getContactByPhoneNumber(apt.ownerPhoneNumber, syncContactTenantId);
         const petName = apt.petName;
 
         if (!existing) {
@@ -9647,6 +9836,7 @@ West Monroe LA 71291
             source: apt.source || 'manual',
             notes: null,
             linkedUserId: null,
+            tenantId: syncContactTenantId,
           });
           console.log(`[ContactSync] CREATED contact "${contactName}" phone=${apt.ownerPhoneNumber} pet="${petName || 'none'}" (appt id=${apt.id})`);
           createdList.push(`${contactName} (${apt.ownerPhoneNumber})`);
@@ -9655,7 +9845,7 @@ West Monroe LA 71291
           const existingPetNames: string[] = existing.petNames || [];
           const merged = Array.from(new Set([...existingPetNames, ...(petName ? [petName] : [])]));
           if (merged.length > existingPetNames.length) {
-            await storage.updateContact(existing.id, { petNames: merged }, (req as any).tenantId);
+            await storage.updateContact(existing.id, { petNames: merged }, syncContactTenantId);
             const addedPets = merged.filter(p => !existingPetNames.includes(p));
             console.log(`[ContactSync] UPDATED contact "${existing.name}" phone=${apt.ownerPhoneNumber} — added pet(s): ${addedPets.join(', ')} (appt id=${apt.id})`);
             updatedList.push(`${existing.name} (${apt.ownerPhoneNumber}) +pet: ${addedPets.join(', ')}`);
@@ -9688,6 +9878,8 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const contactId = parseInt(req.params.id);
       const { optOut } = req.body;
       
@@ -9695,7 +9887,7 @@ West Monroe LA 71291
         return res.status(400).json({ message: "optOut must be a boolean" });
       }
 
-      const contact = await storage.updateContactSmsOptOut(contactId, optOut, (req as any).tenantId);
+      const contact = await storage.updateContactSmsOptOut(contactId, optOut, tenantId);
       res.json(contact);
     } catch (error) {
       console.error("Error updating SMS opt-out:", error);
@@ -9743,12 +9935,14 @@ West Monroe LA 71291
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
       }
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
 
       const { statuses } = req.body; // Optional array of statuses to filter
       
       console.log('Running manual cleanup: Clearing past appointments and resetting "Here" status', statuses ? `for statuses: ${statuses.join(', ')}` : 'for all statuses');
       
-      const allAppointments = await storage.getAppointments(undefined, (req as any).tenantId);
+      const allAppointments = await storage.getAppointments(undefined, tenantId);
       
       // Get today's date at start of day for comparison
       const today = new Date();
@@ -9767,7 +9961,7 @@ West Monroe LA 71291
       console.log(`Resetting "Here" status for ${pastAppointmentsWithHere.length} past appointments`);
       
       for (const appointment of pastAppointmentsWithHere) {
-        await storage.updateAppointmentIsHere(appointment.id, false, (req as any).tenantId);
+        await storage.updateAppointmentIsHere(appointment.id, false, tenantId);
         console.log(`Reset "Here" status for appointment: ${appointment.id} from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
       }
       
@@ -9790,7 +9984,7 @@ West Monroe LA 71291
       for (const appointment of pastAppointments) {
         try {
           // Save to history before deleting
-          const history = await storage.saveAppointmentToHistory(appointment, { tenantId: (req as any).tenantId });
+          const history = await storage.saveAppointmentToHistory(appointment, { tenantId });
           console.log(`Saved appointment ${appointment.id} to history (history ID: ${history.id})`);
           savedCount++;
         } catch (error) {
@@ -9798,7 +9992,7 @@ West Monroe LA 71291
           // Continue with deletion even if history save fails
         }
         
-        await storage.deleteAppointment(appointment.id, (req as any).tenantId);
+        await storage.deleteAppointment(appointment.id, tenantId);
         console.log(`Deleted past appointment: ${appointment.id} (${appointment.status}) from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
       }
       
@@ -9825,9 +10019,11 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       console.log('Running manual reset: Resetting ALL "Here" statuses across all appointments');
       
-      const allAppointments = await storage.getAppointments(undefined, (req as any).tenantId);
+      const allAppointments = await storage.getAppointments(undefined, tenantId);
       
       // Find all appointments with isHere = true
       const appointmentsWithHere = allAppointments.filter((apt: any) => apt.isHere === true);
@@ -9836,7 +10032,7 @@ West Monroe LA 71291
       
       // Reset all of them
       for (const appointment of appointmentsWithHere) {
-        await storage.updateAppointmentIsHere(appointment.id, false, (req as any).tenantId);
+        await storage.updateAppointmentIsHere(appointment.id, false, tenantId);
         console.log(`Reset "Here" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
       }
       
@@ -9861,9 +10057,11 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       console.log('Running manual reset: Resetting today\'s in-store "Paid" statuses');
       
-      const allAppointments = await storage.getAppointments(undefined, (req as any).tenantId);
+      const allAppointments = await storage.getAppointments(undefined, tenantId);
       const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
       
       // Only reset TODAY's in-store-paid appointments — same scope as the nightly scheduler.
@@ -9877,7 +10075,7 @@ West Monroe LA 71291
       console.log(`Found ${appointmentsWithPaid.length} today/upcoming in-store-paid appointments to reset`);
       
       for (const appointment of appointmentsWithPaid) {
-        await storage.updateAppointmentIsPaid(appointment.id, false, (req as any).tenantId);
+        await storage.updateAppointmentIsPaid(appointment.id, false, tenantId);
         console.log(`Reset "Paid" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${appointment.appointmentDate}`);
       }
       
@@ -9902,7 +10100,9 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
-      const allAppointments = await storage.getAppointments(undefined, (req as any).tenantId);
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      const allAppointments = await storage.getAppointments(undefined, tenantId);
       const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
 
       const nonPayment = allAppointments.filter((apt: any) =>
@@ -9915,7 +10115,7 @@ West Monroe LA 71291
 
       console.log(`Dismissing ${nonPayment.length} Non-Payment appointments (bulk mark paid)`);
       for (const apt of nonPayment) {
-        await storage.updateAppointmentIsPaid(apt.id, true, (req as any).tenantId);
+        await storage.updateAppointmentIsPaid(apt.id, true, tenantId);
         console.log(`Dismissed Non-Payment appointment: ${apt.id} (${apt.ownerLastName}) from ${apt.appointmentDate}`);
       }
 
@@ -10013,8 +10213,11 @@ West Monroe LA 71291
         return res.status(400).json({ message: "Date, name, and allowedTimes array are required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+
       // Create the special date setting
-      const setting = await storage.createSpecialDateSetting({ date, name, tenantId: (req as any).tenantId });
+      const setting = await storage.createSpecialDateSetting({ date, name, tenantId });
 
       // Add allowed times
       const times = await Promise.all(
@@ -10082,8 +10285,10 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { id } = req.params;
-      await storage.deleteSpecialDateSetting(parseInt(id), (req as any).tenantId);
+      await storage.deleteSpecialDateSetting(parseInt(id), tenantId);
 
       res.json({ message: "Special date deleted successfully" });
     } catch (error) {
@@ -10207,6 +10412,9 @@ West Monroe LA 71291
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
+
+      const importTenantId = resolveWriteTenantId(req, res);
+      if (importTenantId === undefined) return;
 
       const updateExisting = req.body.updateExisting === 'true';
       const fullSync = req.body.fullSync === 'true'; // Delete items not in import file
@@ -10344,7 +10552,7 @@ West Monroe LA 71291
               brand,
               size,
               sku
-            }, (req as any).tenantId);
+            }, importTenantId);
             stats.updated++;
           } else if (!existingSupply) {
             // Add new supply
@@ -10357,7 +10565,8 @@ West Monroe LA 71291
               stockQuantity,
               brand,
               size,
-              sku
+              sku,
+              tenantId: importTenantId,
             });
             stats.added++;
           } else {
@@ -10373,12 +10582,12 @@ West Monroe LA 71291
 
       // Full sync: Delete items that exist in database but not in import file
       if (fullSync && importedNames.size > 0) {
-        const allExistingSupplies = await storage.getAllSupplies((req as any).tenantId);
+        const allExistingSupplies = await storage.getAllSupplies(importTenantId);
         for (const supply of allExistingSupplies) {
           const supplyNameLower = supply.name.toLowerCase().trim();
           if (!importedNames.has(supplyNameLower)) {
             try {
-              await storage.deleteSupply(supply.id, (req as any).tenantId);
+              await storage.deleteSupply(supply.id, importTenantId);
               stats.deleted++;
               console.log(`Deleted supply not in import: ${supply.name}`);
             } catch (err: any) {
@@ -10901,6 +11110,8 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const importData = req.body;
       
       // Validate import data format
@@ -10945,13 +11156,13 @@ West Monroe LA 71291
         const importedIds = new Set(sanitizedSupplies.map((s: any) => s.id));
         
         // Get all existing supplies
-        const existingSupplies = await storage.getAllSupplies((req as any).tenantId);
+        const existingSupplies = await storage.getAllSupplies(tenantId);
         
         // Delete supplies that are not in the import
         for (const supply of existingSupplies) {
           if (!importedIds.has(supply.id)) {
             try {
-              await storage.deleteSupply(supply.id, (req as any).tenantId);
+              await storage.deleteSupply(supply.id, tenantId);
               deletedCount++;
               console.log(`Deleted supply not in import: ${supply.name} (ID: ${supply.id})`);
             } catch (err: any) {
@@ -10990,6 +11201,8 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { skuData } = req.body;
       if (!skuData || !Array.isArray(skuData)) {
         return res.status(400).json({ message: "skuData array required" });
@@ -11000,7 +11213,7 @@ West Monroe LA 71291
       const { expandAbbreviations } = await import('./abbreviationExpansion');
       
       // Get all supplies from database
-      const allSupplies = await storage.getAllSupplies((req as any).tenantId);
+      const allSupplies = await storage.getAllSupplies(tenantId);
       console.log(`[SKU-ASSIGN] Found ${allSupplies.length} supplies in database`);
       
       // Create normalized lookup maps for matching
@@ -11081,7 +11294,7 @@ West Monroe LA 71291
         if (foundSupply) {
           // Update SKU
           try {
-            await storage.updateSupply(foundSupply.id, { sku }, (req as any).tenantId);
+            await storage.updateSupply(foundSupply.id, { sku }, tenantId);
             matched++;
             console.log(`[SKU-ASSIGN] Matched: "${abbreviatedName}" -> "${foundSupply.name}" (SKU: ${sku})`);
           } catch (err: any) {
@@ -11302,7 +11515,7 @@ West Monroe LA 71291
             name: finalName,
             description: descResult.expanded,
             ...(finalBrand && finalBrand !== supply.brand ? { brand: finalBrand } : {})
-          }, (req as any).tenantId);
+          }, tenantId);
           expandChanged++;
         } else {
           expandUnchanged++;
@@ -11320,7 +11533,7 @@ West Monroe LA 71291
       
       // Step 0: Remove invalid pets (toys/supplies that shouldn't be in pets table)
       const { detectLiveAnimal } = await import('./productCategorization');
-      const allPets = await storage.getAllPets((req as any).tenantId);
+      const allPets = await storage.getAllPets(tenantId);
       let invalidPetsRemoved = 0;
       let invalidPetsSkipped = 0;
       
@@ -11332,7 +11545,7 @@ West Monroe LA 71291
             invalidPetsSkipped++;
           } else {
             try {
-              await storage.deletePet(pet.id, (req as any).tenantId);
+              await storage.deletePet(pet.id, tenantId);
               invalidPetsRemoved++;
             } catch (error) {
               invalidPetsSkipped++;
@@ -11341,7 +11554,7 @@ West Monroe LA 71291
         }
       }
 
-      const allSupplies = await storage.getAllSupplies((req as any).tenantId);
+      const allSupplies = await storage.getAllSupplies(tenantId);
       let movedToPets = 0;
       let skippedDueToReferences = 0;
       
@@ -11349,6 +11562,7 @@ West Monroe LA 71291
         const detection = detectLiveAnimal(supply.name);
         if (detection.isLiveAnimal && detection.species) {
           try {
+            const moveTenantId = tenantId;
             await storage.createPet({
               name: supply.name,
               species: detection.species,
@@ -11358,10 +11572,11 @@ West Monroe LA 71291
               imageUrl: supply.imageUrl || null,
               imageUrls: supply.imageUrls || [],
               priceSource: supply.priceSource || 'default',
+              tenantId: moveTenantId,
             });
             
             try {
-              await storage.deleteSupply(supply.id, (req as any).tenantId);
+              await storage.deleteSupply(supply.id, tenantId);
               movedToPets++;
             } catch (deleteError: any) {
               skippedDueToReferences++;
@@ -11375,14 +11590,14 @@ West Monroe LA 71291
       // Step 2a: Assign brands to products without brands
       console.log("Step 2a: Assigning brands to products without brands...");
       const { extractBrand } = await import('./brandCatalog');
-      const freshSupplies = await storage.getAllSupplies((req as any).tenantId);
+      const freshSupplies = await storage.getAllSupplies(tenantId);
       let brandsAssigned = 0;
       
       for (const supply of freshSupplies) {
         if (!supply.brand || supply.brand.trim() === '') {
           const detectedBrand = extractBrand(supply.name);
           if (detectedBrand) {
-            await storage.updateSupply(supply.id, { brand: detectedBrand }, (req as any).tenantId);
+            await storage.updateSupply(supply.id, { brand: detectedBrand }, tenantId);
             brandsAssigned++;
           }
         }
@@ -11548,6 +11763,8 @@ West Monroe LA 71291
       const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { target, category, percentage, direction, rounding } = req.body;
 
       if (!percentage || isNaN(parseFloat(percentage)) || parseFloat(percentage) <= 0) {
@@ -11579,9 +11796,8 @@ West Monroe LA 71291
       }
 
       let updatedCount = 0;
-      const priceAdjTenantId = (req as any).tenantId ? Number((req as any).tenantId) : null;
-      const tenantClause = priceAdjTenantId ? ` AND tenant_id = ${priceAdjTenantId}` : '';
-      const petsTenantClause = priceAdjTenantId ? ` AND tenant_id = ${priceAdjTenantId}` : '';
+      const tenantClause = ` AND tenant_id = ${Number(tenantId)}`;
+      const petsTenantClause = ` AND tenant_id = ${Number(tenantId)}`;
 
       if (target === 'pets') {
         const result = await db.execute(sql.raw(`UPDATE pets SET price = ${priceExpr} WHERE price > 0${petsTenantClause}`));
@@ -11616,6 +11832,8 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
@@ -11643,7 +11861,7 @@ West Monroe LA 71291
       console.log(`Found ${excelCategories.size} products in Excel file`);
 
       // Get all supplies and update categories
-      const allSupplies = await storage.getAllSupplies((req as any).tenantId);
+      const allSupplies = await storage.getAllSupplies(tenantId);
       let updated = 0;
       let unchanged = 0;
       let notFound = 0;
@@ -11668,7 +11886,7 @@ West Monroe LA 71291
           }
 
           if (supply.category !== normalizedCategory) {
-            await storage.updateSupply(supply.id, { category: normalizedCategory }, (req as any).tenantId);
+            await storage.updateSupply(supply.id, { category: normalizedCategory }, tenantId);
             updated++;
           } else {
             unchanged++;
@@ -11756,10 +11974,10 @@ West Monroe LA 71291
       const { db } = await import('./db');
       const { sql } = await import('drizzle-orm');
       
-      const imgSyncTenantId = (req as any).tenantId ?? null;
-      const result = await db.execute(imgSyncTenantId
-        ? sql`SELECT id, name, brand FROM supplies WHERE tenant_id = ${imgSyncTenantId} ORDER BY id`
-        : sql`SELECT id, name, brand FROM supplies ORDER BY id`
+      const imgSyncTenantId = resolveWriteTenantId(req, res);
+      if (imgSyncTenantId === undefined) return;
+      const result = await db.execute(
+        sql`SELECT id, name, brand FROM supplies WHERE tenant_id = ${imgSyncTenantId} ORDER BY id`
       );
       
       const products = result.rows as Array<{ id: number; name: string; brand: string | null }>;
@@ -11781,7 +11999,7 @@ West Monroe LA 71291
           const storedPath = imageMap.get(key)!;
           await db.execute(sql`
             UPDATE supplies SET image_url = ${storedPath} WHERE id = ${product.id}
-              AND (${imgSyncTenantId}::int IS NULL OR tenant_id = ${imgSyncTenantId})
+              AND tenant_id = ${imgSyncTenantId}
           `);
           matched++;
         } else {
@@ -11820,13 +12038,15 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { id } = req.params;
       
       if (!req.file) {
         return res.status(400).json({ message: "No image file uploaded" });
       }
 
-      const supply = await storage.getSupply(parseInt(id), (req as any).tenantId);
+      const supply = await storage.getSupply(parseInt(id), tenantId);
       if (!supply) {
         return res.status(404).json({ message: "Product not found" });
       }
@@ -11875,7 +12095,7 @@ West Monroe LA 71291
         updateData.imageUrls = [...existingUrls, result.storedPath!];
       }
       
-      await storage.updateSupply(supply.id, updateData, (req as any).tenantId);
+      await storage.updateSupply(supply.id, updateData, tenantId);
 
       res.json({
         success: true,
@@ -12101,6 +12321,8 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { itemIds } = req.body;
       
       if (!itemIds || !Array.isArray(itemIds) || itemIds.length === 0) {
@@ -12191,7 +12413,8 @@ West Monroe LA 71291
               price: extractedItem.markedUpPrice,
               age: null,
               description: extractedItem.notes || null,
-              isActive: true
+              isActive: true,
+              tenantId,
             });
 
             // Mark item as added to inventory (linked to pet instead of supply)
@@ -12237,7 +12460,8 @@ West Monroe LA 71291
             description: extractedItem.notes || null,
             stockQuantity: extractedItem.quantity,
             isActive: true,
-            filterType: categorizationResult.filterType // Set filterType for aquatic/reptile specialty sections
+            filterType: categorizationResult.filterType, // Set filterType for aquatic/reptile specialty sections
+            tenantId,
           });
 
           // Mark item as added to inventory
@@ -12996,6 +13220,8 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { products, type } = req.body;
       
       if (!products || !Array.isArray(products)) {
@@ -13024,6 +13250,8 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { id } = req.params;
       const { overridePrice, overrideQuantity } = req.body;
 
@@ -13052,6 +13280,8 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { id } = req.params;
       const { overridePrice } = req.body;
 
@@ -13757,7 +13987,9 @@ West Monroe LA 71291
     const { open } = req.body;
     if (typeof open !== "boolean") return res.status(400).json({ message: "open must be a boolean" });
     try {
-      await storage.upsertGroomingSetting({ setting: "hiring_open", value: String(open), tenantId: (req as any).tenantId });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      await storage.upsertGroomingSetting({ setting: "hiring_open", value: String(open), tenantId });
       res.json({ open });
     } catch (error) {
       res.status(500).json({ message: "Failed to update hiring setting" });
@@ -14230,6 +14462,8 @@ CRITICAL RULES:
     try {
       if (!req.user?.isAdmin) return res.status(403).json({ message: "Forbidden" });
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const { updates } = req.body as { updates: { id: number; newStock: number; newPrice?: number }[] };
       if (!Array.isArray(updates) || updates.length === 0) {
         return res.status(400).json({ message: "updates array is required" });
@@ -14239,7 +14473,7 @@ CRITICAL RULES:
       for (const u of updates) {
         const patch: any = { stockQuantity: u.newStock };
         if (u.newPrice !== undefined && !isNaN(u.newPrice)) patch.price = String(u.newPrice);
-        await storage.updateSupply(u.id, patch, (req as any).tenantId);
+        await storage.updateSupply(u.id, patch, tenantId);
         applied++;
       }
 
