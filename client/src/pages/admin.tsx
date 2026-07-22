@@ -7322,6 +7322,27 @@ export default function Admin() {
   // Super-admin: local search filter for the tenant lookup card
   const [tenantLookupSearch, setTenantLookupSearch] = useState("");
 
+  // Super-admin: send trial reminder for any tenant
+  const sendTrialReminderMutation = useMutation({
+    mutationFn: async (tenantId: number) => {
+      const res = await apiRequest("POST", "/api/billing/send-trial-warning", { tenantId });
+      return res.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Trial reminder sent",
+        description: `Email sent to ${data.sentTo ?? "the tenant owner"}.`,
+      });
+    },
+    onError: (err: any) => {
+      toast({
+        title: "Failed to send reminder",
+        description: err.message || "An error occurred",
+        variant: "destructive",
+      });
+    },
+  });
+
   const { data: specialDates = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/special-dates"],
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
@@ -12924,6 +12945,7 @@ export default function Admin() {
                             <th className="text-left px-3 py-2 font-semibold">Name</th>
                             <th className="text-left px-3 py-2 font-semibold">Slug</th>
                             <th className="text-left px-3 py-2 font-semibold w-24">Status</th>
+                            <th className="text-left px-3 py-2 font-semibold w-44">Actions</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-blue-100">
@@ -12938,12 +12960,26 @@ export default function Admin() {
                                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                                   t.subscriptionStatus === 'active'
                                     ? 'bg-green-100 text-green-700'
-                                    : t.subscriptionStatus === 'trialing'
+                                    : t.subscriptionStatus === 'trial'
                                     ? 'bg-yellow-100 text-yellow-700'
                                     : 'bg-gray-100 text-gray-600'
                                 }`}>
                                   {t.subscriptionStatus ?? 'none'}
                                 </span>
+                              </td>
+                              <td className="px-3 py-2">
+                                {t.subscriptionStatus === 'trial' && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs h-7 border-yellow-400 text-yellow-700 hover:bg-yellow-50"
+                                    disabled={sendTrialReminderMutation.isPending}
+                                    onClick={() => sendTrialReminderMutation.mutate(t.id)}
+                                  >
+                                    <Mail className="w-3 h-3 mr-1" />
+                                    Send Trial Reminder
+                                  </Button>
+                                )}
                               </td>
                             </tr>
                           ))}
