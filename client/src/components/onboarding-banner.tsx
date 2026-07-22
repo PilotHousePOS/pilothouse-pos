@@ -54,6 +54,7 @@ export default function OnboardingBanner() {
     setDismissed(true);
   };
 
+  // Navigate to /onboarding without a step param — the page detects the right step itself
   const handleClick = () => {
     setLocation("/onboarding");
   };

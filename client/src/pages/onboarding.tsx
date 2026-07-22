@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle, ArrowRight, Building2, CreditCard, Users, Sparkles, Star, Package } from "lucide-react";
+import { CheckCircle, ArrowRight, Building2, CreditCard, Users, Sparkles, Star, Package, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -37,8 +37,26 @@ function StepIndicator({ current }: { current: number }) {
   );
 }
 
+// --- LocalStorage helpers for tracking completed onboarding steps ---
+
+/** Mark that the owner has explicitly completed Step 1 (Business Details) for this tenant. */
+function markStep1Done(tenantId: number) {
+  try {
+    localStorage.setItem(`onboarding_step1_done_${tenantId}`, 'true');
+  } catch {}
+}
+
+/** Returns true if the owner has previously completed Step 1 for this tenant. */
+function isStep1Done(tenantId: number): boolean {
+  try {
+    return localStorage.getItem(`onboarding_step1_done_${tenantId}`) === 'true';
+  } catch {
+    return false;
+  }
+}
+
 // Step 1: Business Details
-function Step1({ onNext }: { onNext: () => void }) {
+function Step1({ tenantId, onNext }: { tenantId: number; onNext: () => void }) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -81,6 +99,8 @@ function Step1({ onNext }: { onNext: () => void }) {
         toast({ title: err.message || "Failed to update business details", variant: "destructive" });
         return;
       }
+      // Persist that this tenant has completed Step 1 so we can skip it on return
+      markStep1Done(tenantId);
       onNext();
     } catch {
       toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
@@ -367,14 +387,47 @@ function hasVisitedOnboardingBefore(): boolean {
   try { return localStorage.getItem(ONBOARDING_VISITED_KEY) === "true"; } catch { return false; }
 }
 
+interface TenantData {
+  id: number;
+  name: string;
+  slug: string;
+  subscriptionStatus: string | null;
+}
+
+interface BillingStatus {
+  subscriptionStatus: string;
+  trialDaysLeft: number | null;
+  trialEndsAt: string | null;
+}
+
+/**
+ * Detect the first incomplete onboarding step from server state + localStorage markers.
+ *
+ * Step 0 — Business Details: skipped when the owner has previously saved it
+ *           (localStorage flag written by Step1's save handler, keyed to tenant ID).
+ * Step 1 — Choose a Plan:    skipped when billing shows an active subscription.
+ * Step 2 — Invite Staff:     always shown last; never auto-skipped.
+ */
+function detectStartStep(
+  tenantId: number,
+  billingStatus: string | undefined,
+): number {
+  const subscriptionActive =
+    billingStatus === 'active' || billingStatus === 'cancelled';
+  if (subscriptionActive) return 2;
+  if (isStep1Done(tenantId)) return 1;
+  return 0;
+}
+
 export default function Onboarding() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
 
-  // Read step from URL params (for returning from Stripe)
+  // ?step=3 is the Stripe checkout success redirect — map to internal step 2 (Invite Staff).
+  // No other URL step values are trusted as an override; page-level detection takes precedence.
   const urlParams = new URLSearchParams(window.location.search);
-  const initialStep = Math.min(Math.max(parseInt(urlParams.get('step') || '0'), 0), 2);
-  const [step, setStep] = useState(initialStep);
+  const rawUrlStep = parseInt(urlParams.get('step') || '-1', 10);
+  const stripeReturn = rawUrlStep === 3;
 
   // Detect "returning" user — someone who's been here before but didn't finish
   const isResuming = hasVisitedOnboardingBefore();
@@ -382,10 +435,49 @@ export default function Onboarding() {
   // Mark as visited so next time we show "Resume" state
   markOnboardingVisited();
 
+  // Always fetch tenant + billing to get the tenant ID and subscription state.
+  // For Stripe returns we still fetch (to get the tenant ID for localStorage), but we
+  // skip the step calculation and go straight to step 2.
+  const { data: tenantData, isLoading: tenantLoading } = useQuery<TenantData>({
+    queryKey: ['/api/tenants/current'],
+    enabled: !!user,
+    staleTime: 0,
+  });
+
+  const { data: billingData, isLoading: billingLoading } = useQuery<BillingStatus>({
+    queryKey: ['/api/billing/status'],
+    enabled: !!user,
+    staleTime: 0,
+  });
+
+  // Compute the starting step once data has loaded.
+  const detectedStep = (() => {
+    if (tenantLoading || billingLoading || !tenantData) return null;
+    if (stripeReturn) return 2;
+    return detectStartStep(tenantData.id, billingData?.subscriptionStatus);
+  })();
+
+  const [step, setStep] = useState<number | null>(null);
+
+  // Set the step exactly once when detection completes.
+  useEffect(() => {
+    if (step === null && detectedStep !== null) {
+      setStep(detectedStep);
+    }
+  }, [detectedStep, step]);
+
   if (!user) {
-    // Not logged in — redirect to signup
     setLocation('/signup');
     return null;
+  }
+
+  // Spinner while we determine which step to start on
+  if (step === null) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-white animate-spin" />
+      </div>
+    );
   }
 
   const handleFinish = () => {
@@ -428,8 +520,8 @@ export default function Onboarding() {
 
         <Card className="bg-white/10 backdrop-blur-md border border-white/20">
           <CardContent className="pt-6 pb-6">
-            {step === 0 && (
-              <Step1 onNext={() => setStep(1)} />
+            {step === 0 && tenantData && (
+              <Step1 tenantId={tenantData.id} onNext={() => setStep(1)} />
             )}
             {step === 1 && (
               <Step2
