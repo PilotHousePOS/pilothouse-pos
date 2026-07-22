@@ -221,6 +221,63 @@ describe("Stranded user is blocked from tenant-scoped endpoints (403)", () => {
   });
 });
 
+// ─── 3b. Stranded user cannot create records via POST endpoints ───────────────
+//
+// tenantMiddleware blocks non-allowlisted routes with 403 before the route
+// handler even runs, so POST endpoints share the same protection as GETs.
+// These tests confirm the rejection is present and carries a helpful message
+// (not a silent 500 or a 200 with data from another tenant).
+
+describe("Stranded user cannot create records via POST endpoints (403)", () => {
+  it("POST /api/supplies returns 403 with a helpful message", async () => {
+    const res = await agent
+      .post("/api/supplies")
+      .set("Authorization", `Bearer ${strandedToken}`)
+      .send({ name: "Test Supply", quantity: 1, unit: "box", category: "Other" });
+
+    expect(res.status).toBe(403);
+    // Must carry a human-readable error, not a blank body
+    expect(res.body).toHaveProperty("message");
+    expect(typeof res.body.message).toBe("string");
+    expect(res.body.message.length).toBeGreaterThan(0);
+  });
+
+  it("POST /api/contacts returns 403 with a helpful message", async () => {
+    const res = await agent
+      .post("/api/contacts")
+      .set("Authorization", `Bearer ${strandedToken}`)
+      .send({ firstName: "Jane", lastName: "Doe", email: "jane@example.com" });
+
+    expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty("message");
+    expect(typeof res.body.message).toBe("string");
+    expect(res.body.message.length).toBeGreaterThan(0);
+  });
+
+  it("POST /api/appointments returns 403 with a helpful message", async () => {
+    const res = await agent
+      .post("/api/appointments")
+      .set("Authorization", `Bearer ${strandedToken}`)
+      .send({ petId: 1, groomerId: 1, scheduledAt: new Date().toISOString() });
+
+    expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty("message");
+    expect(typeof res.body.message).toBe("string");
+    expect(res.body.message.length).toBeGreaterThan(0);
+  });
+
+  it("response body is not empty — client can display the reason without guessing", async () => {
+    const res = await agent
+      .post("/api/supplies")
+      .set("Authorization", `Bearer ${strandedToken}`)
+      .send({ name: "Blocked Supply", quantity: 5, unit: "bag" });
+
+    // Must not be an empty object or HTML error page
+    expect(res.body).not.toEqual({});
+    expect(res.body.message).toMatch(/tenant/i);
+  });
+});
+
 // ─── 4. PATCH /api/super-admin/users/:id/tenant — resolves a stranded account ─
 
 describe("PATCH /api/super-admin/users/:id/tenant — assigns tenant to stranded user", () => {
