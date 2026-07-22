@@ -68,6 +68,31 @@ export default function BillingPage() {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
+  // Cooldown state for the Send Trial Reminder button
+  // Stores the timestamp (ms) when the cooldown expires
+  const [reminderCooldownUntil, setReminderCooldownUntil] = useState<number | null>(null);
+  const [reminderCooldownDisplay, setReminderCooldownDisplay] = useState<string>("");
+
+  // Tick every 30 s to update the countdown label and clear the cooldown when it expires
+  useEffect(() => {
+    if (reminderCooldownUntil === null) return;
+
+    const update = () => {
+      const remaining = Math.ceil((reminderCooldownUntil - Date.now()) / 60000);
+      if (remaining <= 0) {
+        setReminderCooldownUntil(null);
+        setReminderCooldownDisplay("");
+      } else {
+        setReminderCooldownDisplay(`Resend available in ${remaining} min`);
+      }
+    };
+
+    // Run immediately so the label appears right away
+    update();
+    const id = setInterval(update, 30000);
+    return () => clearInterval(id);
+  }, [reminderCooldownUntil]);
+
   const { data: billing, isLoading: billingLoading } = useQuery<BillingStatus>({
     queryKey: ["/api/billing/status"],
     refetchOnWindowFocus: true,
@@ -107,11 +132,14 @@ export default function BillingPage() {
   const sendTrialReminderMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest("POST", "/api/billing/send-trial-warning", {});
+      const data = await response.json();
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Failed to send trial reminder");
+        // Attach cooldown info to the thrown error so onError can read it
+        const err = new Error(data.message || "Failed to send trial reminder") as Error & { cooldownRemainingMinutes?: number };
+        err.cooldownRemainingMinutes = data.cooldownRemainingMinutes;
+        throw err;
       }
-      return response.json();
+      return data;
     },
     onSuccess: (data) => {
       toast({
@@ -119,7 +147,13 @@ export default function BillingPage() {
         description: `Email sent to ${data.sentTo}${data.daysLeft !== undefined ? ` (${data.daysLeft} day${data.daysLeft === 1 ? "" : "s"} remaining)` : ""}`,
       });
     },
-    onError: (error: Error) => {
+    onError: (error: Error & { cooldownRemainingMinutes?: number }) => {
+      // If the server told us how long the cooldown lasts, start the countdown
+      if (error.cooldownRemainingMinutes && error.cooldownRemainingMinutes > 0) {
+        const expiresAt = Date.now() + error.cooldownRemainingMinutes * 60 * 1000;
+        setReminderCooldownUntil(expiresAt);
+        setReminderCooldownDisplay(`Resend available in ${error.cooldownRemainingMinutes} min`);
+      }
       toast({
         title: "Failed to send reminder",
         description: error.message,
@@ -285,14 +319,14 @@ export default function BillingPage() {
                   sendTrialReminderMutation.mutate();
                 }
               }}
-              disabled={sendTrialReminderMutation.isPending}
+              disabled={sendTrialReminderMutation.isPending || reminderCooldownUntil !== null}
             >
               {sendTrialReminderMutation.isPending ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : (
                 <Mail className="w-4 h-4 mr-2" />
               )}
-              Send Trial Reminder Email
+              {reminderCooldownUntil !== null ? reminderCooldownDisplay : "Send Trial Reminder Email"}
             </Button>
           )}
 
