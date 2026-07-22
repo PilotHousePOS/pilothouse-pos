@@ -7358,6 +7358,7 @@ export default function Admin() {
         title: "Trial reminder sent",
         description: `Email sent to ${data.sentTo ?? "the tenant owner"}.`,
       });
+      queryClient.invalidateQueries({ queryKey: ["/api/super-admin/tenants"] });
     },
     onError: (err: any) => {
       toast({
@@ -13009,18 +13010,40 @@ export default function Admin() {
                                 </span>
                               </td>
                               <td className="px-3 py-2">
-                                {t.subscriptionStatus === 'trial' && (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="text-xs h-7 border-yellow-400 text-yellow-700 hover:bg-yellow-50"
-                                    disabled={sendTrialReminderMutation.isPending}
-                                    onClick={() => sendTrialReminderMutation.mutate(t.id)}
-                                  >
-                                    <Mail className="w-3 h-3 mr-1" />
-                                    Send Trial Reminder
-                                  </Button>
-                                )}
+                                {t.subscriptionStatus === 'trial' && (() => {
+                                  const sentAt = t.trialWarningEmailSentAt ? new Date(t.trialWarningEmailSentAt) : null;
+                                  const sentRecently = sentAt ? (Date.now() - sentAt.getTime()) < 24 * 60 * 60 * 1000 : false;
+                                  const relativeLabel = sentAt ? (() => {
+                                    const diffMs = Date.now() - sentAt.getTime();
+                                    const diffMins = Math.floor(diffMs / 60000);
+                                    if (diffMins < 1) return "Sent just now";
+                                    if (diffMins < 60) return `Sent ${diffMins}m ago`;
+                                    const diffHrs = Math.floor(diffMins / 60);
+                                    if (diffHrs < 24) return `Sent ${diffHrs}h ago`;
+                                    const diffDays = Math.floor(diffHrs / 24);
+                                    return `Sent ${diffDays}d ago`;
+                                  })() : null;
+                                  return (
+                                    <div className="flex flex-col gap-1">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className={`text-xs h-7 border-yellow-400 text-yellow-700 hover:bg-yellow-50 ${sentRecently ? 'opacity-50' : ''}`}
+                                        disabled={sendTrialReminderMutation.isPending}
+                                        onClick={() => sendTrialReminderMutation.mutate(t.id)}
+                                      >
+                                        <Mail className="w-3 h-3 mr-1" />
+                                        Send Trial Reminder
+                                      </Button>
+                                      {relativeLabel && (
+                                        <span className="text-[10px] text-gray-500 flex items-center gap-0.5">
+                                          <Clock className="w-2.5 h-2.5" />
+                                          {relativeLabel}
+                                        </span>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
                               </td>
                             </tr>
                           ))}
