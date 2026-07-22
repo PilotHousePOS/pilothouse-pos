@@ -26,10 +26,11 @@ import {
   supplies,
   contacts,
   appointments,
+  appointmentItems,
   orders,
   pets,
 } from "@shared/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, and } from "drizzle-orm";
 import { generateToken } from "../auth";
 
 // ─── Shared state (populated in beforeAll) ────────────────────────────────────
@@ -55,6 +56,9 @@ let orderAId: number;
 let orderBId: number;
 let petAId: number;
 let petBId: number;
+
+/** An appointment item seeded for Tenant B — used to test mixed-ID IDOR attacks */
+let itemBId: number;
 
 // Names/values seeded for Tenant B's records — used to confirm no mutation
 let supplyBOriginalName: string;
@@ -248,6 +252,13 @@ beforeAll(async () => {
   petAId = await createTestPet(tenantAId, `PetA-${sfx}`);
   petBId = await createTestPet(tenantBId, petBOriginalName);
 
+  // Seed an appointment item for Tenant B — used in mixed-ID IDOR attack tests
+  const [itemB] = await db
+    .insert(appointmentItems)
+    .values({ appointmentId: appointmentBId, name: `ItemB-${sfx}`, price: "7.50", quantity: 1 })
+    .returning();
+  itemBId = itemB.id;
+
   // Generate JWT from the DB user row (tokenVersion must match DB)
   const dbUserA = await getDbUser(userAId);
   tokenA = generateToken(dbUserA as any);
@@ -265,6 +276,10 @@ beforeAll(async () => {
 afterAll(async () => {
   if (orderAId) await db.delete(orders).where(eq(orders.id, orderAId));
   if (orderBId) await db.delete(orders).where(eq(orders.id, orderBId));
+
+  // Delete appointment items before appointments (FK cascade would handle it,
+  // but explicit deletion avoids relying on cascade order).
+  if (itemBId) await db.delete(appointmentItems).where(eq(appointmentItems.id, itemBId));
 
   if (appointmentAId)
     await db.delete(appointments).where(eq(appointments.id, appointmentAId));
@@ -730,5 +745,137 @@ describe("PUT /api/appointments/:id — groomer cross-tenant status update rejec
 
     // Cleanup
     await db.delete(appointments).where(eq(appointments.id, throwawayApptId));
+  });
+});
+
+// ─── Appointment sub-action routes ────────────────────────────────────────────
+//
+// POST   /api/appointments/:id/items
+// PATCH  /api/appointments/:id/items/:itemId
+// DELETE /api/appointments/:id/items/:itemId
+//
+// Each route now pre-fetches the appointment scoped to req.tenantId and returns
+// 404 before performing any mutation when the appointment belongs to another tenant.
+
+describe("POST /api/appointments/:id/items — cross-tenant add rejected", () => {
+  it("returns 404 when Tenant A targets Tenant B's appointment", async () => {
+    const res = await agent
+      .post(`/api/appointments/${appointmentBId}/items`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ name: "HACKED-ITEM", price: "9.99" });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 200 when Tenant A adds an item to their own appointment", async () => {
+    const res = await agent
+      .post(`/api/appointments/${appointmentAId}/items`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ name: "Own-Item", price: "5.00" });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("appointmentId", appointmentAId);
+  });
+});
+
+describe("PATCH /api/appointments/:id/items/:itemId — cross-tenant update rejected", () => {
+  it("returns 404 when Tenant A uses Tenant B's appointment ID", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${appointmentBId}/items/999999`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ price: "99.99" });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 404 for mixed-ID attack: own appointment ID + Tenant B's item ID", async () => {
+    // Tenant A uses their valid appointment ID but Tenant B's real item ID.
+    // The item-appointment membership check must catch this.
+    const res = await agent
+      .patch(`/api/appointments/${appointmentAId}/items/${itemBId}`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ price: "99.99" });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's item price is unchanged after mixed-ID attack rejection", async () => {
+    const [row] = await db
+      .select({ price: appointmentItems.price })
+      .from(appointmentItems)
+      .where(eq(appointmentItems.id, itemBId));
+    expect(row?.price).toBe("7.50");
+  });
+});
+
+describe("DELETE /api/appointments/:id/items/:itemId — cross-tenant delete rejected", () => {
+  it("returns 404 when Tenant A uses Tenant B's appointment ID", async () => {
+    const res = await agent
+      .delete(`/api/appointments/${appointmentBId}/items/999999`)
+      .set("Authorization", `Bearer ${tokenA}`);
+
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 404 for mixed-ID attack: own appointment ID + Tenant B's item ID", async () => {
+    // Tenant A uses their valid appointment ID but Tenant B's real item ID.
+    // The item-appointment membership check must catch this.
+    const res = await agent
+      .delete(`/api/appointments/${appointmentAId}/items/${itemBId}`)
+      .set("Authorization", `Bearer ${tokenA}`);
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's item still exists after mixed-ID attack rejection", async () => {
+    const [row] = await db
+      .select({ id: appointmentItems.id })
+      .from(appointmentItems)
+      .where(eq(appointmentItems.id, itemBId));
+    expect(row).toBeDefined();
+  });
+});
+
+// ─── Appointment reschedule / cancel sub-action routes ────────────────────────
+//
+// PATCH /api/user/appointments/:id/reschedule and
+// PATCH /api/user/appointments/:id/cancel both call
+// storage.getAppointment(id, tenantId) first, so cross-tenant IDs are rejected
+// with 404 before any ownership or mutation logic runs.
+
+describe("PATCH /api/user/appointments/:id/reschedule — cross-tenant rejected", () => {
+  it("returns 404 when Tenant A targets Tenant B's appointment", async () => {
+    const res = await agent
+      .patch(`/api/user/appointments/${appointmentBId}/reschedule`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ appointmentDate: "2099-11-01", appointmentTime: "10:00 AM" });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's appointment date is unchanged after the rejected reschedule", async () => {
+    const [row] = await db
+      .select({ appointmentDate: appointments.appointmentDate })
+      .from(appointments)
+      .where(eq(appointments.id, appointmentBId));
+    expect(row?.appointmentDate).toBe("2099-12-31");
+  });
+});
+
+describe("PATCH /api/user/appointments/:id/cancel — cross-tenant rejected", () => {
+  it("returns 404 when Tenant A targets Tenant B's appointment", async () => {
+    const res = await agent
+      .patch(`/api/user/appointments/${appointmentBId}/cancel`)
+      .set("Authorization", `Bearer ${tokenA}`);
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's appointment status is unchanged after the rejected cancel", async () => {
+    const [row] = await db
+      .select({ status: appointments.status })
+      .from(appointments)
+      .where(eq(appointments.id, appointmentBId));
+    expect(row?.status).toBe(appointmentBOriginalStatus);
   });
 });

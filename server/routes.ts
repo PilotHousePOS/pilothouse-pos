@@ -19,6 +19,7 @@ import {
   orderItems,
   orders,
   appointments,
+  appointmentItems,
 } from "@shared/schema";
 import { z } from "zod/v4";
 import { notificationService } from './notifications';
@@ -6364,10 +6365,15 @@ West Monroe LA 71291
     try {
       const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin && !user?.isGroomer) return res.status(403).json({ message: "Admin or groomer access required" });
+      const tenantId: number | undefined = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "Tenant context required" });
+      const id = parseInt(req.params.id);
+      const existing = await storage.getAppointment(id, tenantId);
+      if (!existing) return res.status(404).json({ message: "Appointment not found" });
       const { supplyId, name, sku, brand, category, price, quantity } = req.body;
       if (!name || !price) return res.status(400).json({ message: "name and price are required" });
       const item = await storage.addAppointmentItem({
-        appointmentId: parseInt(req.params.id),
+        appointmentId: id,
         supplyId: supplyId || null,
         name,
         sku: sku || null,
@@ -6386,9 +6392,21 @@ West Monroe LA 71291
     try {
       const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin && !user?.isGroomer) return res.status(403).json({ message: "Admin or groomer access required" });
+      const tenantId: number | undefined = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "Tenant context required" });
+      const id = parseInt(req.params.id);
+      const itemId = parseInt(req.params.itemId);
+      // Verify the appointment belongs to this tenant
+      const existing = await storage.getAppointment(id, tenantId);
+      if (!existing) return res.status(404).json({ message: "Appointment not found" });
+      // Verify the item belongs to this appointment (prevents mixed-ID IDOR attacks)
+      const [targetItem] = await db.select().from(appointmentItems).where(
+        and(eq(appointmentItems.id, itemId), eq(appointmentItems.appointmentId, id))
+      );
+      if (!targetItem) return res.status(404).json({ message: "Appointment item not found" });
       const { price } = req.body;
       if (!price) return res.status(400).json({ message: "price is required" });
-      const item = await storage.updateAppointmentItemPrice(parseInt(req.params.itemId), String(price));
+      const item = await storage.updateAppointmentItemPrice(itemId, String(price));
       res.json(item);
     } catch (e: any) {
       res.status(500).json({ message: e.message });
@@ -6399,7 +6417,19 @@ West Monroe LA 71291
     try {
       const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin && !user?.isGroomer) return res.status(403).json({ message: "Admin or groomer access required" });
-      await storage.removeAppointmentItem(parseInt(req.params.itemId));
+      const tenantId: number | undefined = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "Tenant context required" });
+      const id = parseInt(req.params.id);
+      const itemId = parseInt(req.params.itemId);
+      // Verify the appointment belongs to this tenant
+      const existing = await storage.getAppointment(id, tenantId);
+      if (!existing) return res.status(404).json({ message: "Appointment not found" });
+      // Verify the item belongs to this appointment (prevents mixed-ID IDOR attacks)
+      const [targetItem] = await db.select().from(appointmentItems).where(
+        and(eq(appointmentItems.id, itemId), eq(appointmentItems.appointmentId, id))
+      );
+      if (!targetItem) return res.status(404).json({ message: "Appointment item not found" });
+      await storage.removeAppointmentItem(itemId);
       res.json({ success: true });
     } catch (e: any) {
       res.status(500).json({ message: e.message });
