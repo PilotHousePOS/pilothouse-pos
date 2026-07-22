@@ -6543,8 +6543,11 @@ West Monroe LA 71291
       }
       
       res.json(appointment);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating appointment:", error);
+      if (error?.message === "Appointment not found or access denied") {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
       res.status(500).json({ message: "Failed to update appointment" });
     }
   });

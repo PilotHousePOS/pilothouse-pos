@@ -2970,6 +2970,7 @@ export class DatabaseStorage implements IStorage {
       .set({ status, updatedAt: new Date() })
       .where(where)
       .returning();
+    if (!updated) throw new Error("Appointment not found or access denied");
     return updated;
   }
 
