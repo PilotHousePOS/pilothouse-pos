@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLocation } from "wouter";
-import { ArrowLeft, Mail, Save, User as UserIcon, Lock, Phone, CreditCard, Trash2, Star, Plus, Loader2, Receipt, ChevronRight } from "lucide-react";
+import { ArrowLeft, Mail, Save, User as UserIcon, Lock, Phone, CreditCard, Trash2, Star, Plus, Loader2, Receipt, ChevronRight, Link as LinkIcon, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import type { User } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { z } from "zod";
@@ -190,6 +190,12 @@ export default function Settings() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showAddCard, setShowAddCard] = useState(false);
 
+  // Store URL (slug) state
+  const [newSlug, setNewSlug] = useState("");
+  const [slugStatus, setSlugStatus] = useState<null | { available: boolean; suggestions: string[] }>(null);
+  const [isCheckingSlug, setIsCheckingSlug] = useState(false);
+  const slugDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const { data: currentUser, isLoading: userLoading, error: userError } = useQuery<User>({
     queryKey: ["/api/auth/user"],
     enabled: hasToken,
@@ -200,6 +206,39 @@ export default function Settings() {
   const { data: stripeConfig } = useQuery<{ configured: boolean; publishableKey?: string }>({
     queryKey: ["/api/stripe/config"],
     enabled: hasToken,
+  });
+
+  const { data: currentTenant } = useQuery<{ id: number; name: string; slug: string }>({
+    queryKey: ["/api/tenants/current"],
+    enabled: hasToken,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const updateSlugMutation = useMutation({
+    mutationFn: async (slug: string) => {
+      const response = await apiRequest("PATCH", "/api/tenants/current", { slug });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to update store URL");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tenants/current"] });
+      setNewSlug("");
+      setSlugStatus(null);
+      toast({
+        title: "Store URL updated",
+        description: `Your store URL is now: ${data.slug}`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update failed",
+        description: error.message || "Failed to update store URL. Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   const { data: paymentMethodsData, isLoading: paymentMethodsLoading } = useQuery<{
@@ -603,6 +642,40 @@ export default function Settings() {
     updatePasswordMutation.mutate({ currentPassword, newPassword, confirmPassword });
   };
 
+  const handleSlugChange = (value: string) => {
+    const sanitized = value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    setNewSlug(sanitized);
+    setSlugStatus(null);
+
+    if (slugDebounceRef.current) clearTimeout(slugDebounceRef.current);
+
+    if (!sanitized || sanitized === currentTenant?.slug) {
+      setIsCheckingSlug(false);
+      return;
+    }
+
+    setIsCheckingSlug(true);
+    slugDebounceRef.current = setTimeout(async () => {
+      try {
+        const response = await apiRequest("GET", `/api/tenants/slug-check?slug=${encodeURIComponent(sanitized)}`);
+        if (response.ok) {
+          const data = await response.json();
+          setSlugStatus({ available: data.available, suggestions: data.suggestions || [] });
+        }
+      } catch {
+        // silently ignore check failures
+      } finally {
+        setIsCheckingSlug(false);
+      }
+    }, 400);
+  };
+
+  const handleUpdateSlug = () => {
+    if (!newSlug.trim() || newSlug === currentTenant?.slug) return;
+    if (slugStatus && !slugStatus.available) return;
+    updateSlugMutation.mutate(newSlug);
+  };
+
   const handleUpdatePhone = () => {
     if (!phoneNumber.trim()) {
       toast({
@@ -837,6 +910,104 @@ export default function Settings() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Store URL — admins only */}
+      {currentUser.isAdmin && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <LinkIcon className="w-5 h-5" />
+              Store URL
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label className="text-sm text-gray-500">Current Store URL</Label>
+              <p className="text-gray-900 font-medium font-mono" data-testid="text-current-slug">
+                {currentTenant?.slug ? `/${currentTenant.slug}` : "—"}
+              </p>
+            </div>
+
+            <div className="p-3 rounded-md bg-amber-50 border border-amber-200 flex gap-2 text-sm text-amber-800">
+              <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+              <span>
+                Changing your store URL will break any existing links or bookmarks that use the old address.
+              </span>
+            </div>
+
+            <div>
+              <Label htmlFor="new-slug">New Store URL</Label>
+              <div className="relative mt-1">
+                <Input
+                  id="new-slug"
+                  type="text"
+                  placeholder={currentTenant?.slug || "your-store-name"}
+                  value={newSlug}
+                  onChange={(e) => handleSlugChange(e.target.value)}
+                  className="pr-8 font-mono"
+                  data-testid="input-new-slug"
+                />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                  {isCheckingSlug && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
+                  {!isCheckingSlug && slugStatus?.available === true && (
+                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  )}
+                  {!isCheckingSlug && slugStatus?.available === false && (
+                    <XCircle className="w-4 h-4 text-red-500" />
+                  )}
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Only lowercase letters, numbers, and hyphens. Example: <span className="font-mono">my-pet-shop</span>
+              </p>
+              {slugStatus?.available === true && (
+                <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" /> This URL is available.
+                </p>
+              )}
+              {slugStatus?.available === false && (
+                <div className="mt-2 space-y-1">
+                  <p className="text-xs text-red-600 flex items-center gap-1">
+                    <XCircle className="w-3 h-3" /> This URL is already taken.
+                  </p>
+                  {slugStatus.suggestions.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      <span className="text-xs text-gray-500">Suggestions:</span>
+                      {slugStatus.suggestions.map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => handleSlugChange(s)}
+                          className="text-xs font-mono text-brand-blue hover:underline px-1 py-0.5 rounded bg-blue-50 border border-blue-200"
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <Button
+              onClick={handleUpdateSlug}
+              disabled={
+                updateSlugMutation.isPending ||
+                !newSlug.trim() ||
+                newSlug === currentTenant?.slug ||
+                isCheckingSlug ||
+                slugStatus?.available === false ||
+                slugStatus === null
+              }
+              className="w-full bg-brand-blue hover:bg-blue-600"
+              data-testid="button-update-slug"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {updateSlugMutation.isPending ? "Updating..." : "Update Store URL"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Update Phone */}
       <Card className="mb-6">
