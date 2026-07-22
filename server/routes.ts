@@ -750,8 +750,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           trialEndsAt,
         });
       } catch (err: any) {
-        const isSlugConflict = err?.code === '23505' &&
-          (err?.constraint?.includes('slug') || err?.detail?.includes('slug'));
+        // Drizzle wraps the underlying pg error in err.cause, so check both the
+        // top-level error and its cause for the unique-constraint violation code/detail.
+        const pgErr = (err?.code === '23505') ? err : (err?.cause?.code === '23505' ? err.cause : null);
+        const isSlugConflict = pgErr !== null &&
+          (pgErr?.constraint?.includes('slug') || pgErr?.detail?.includes('slug'));
         if (isSlugConflict) {
           // Build a short list of available alternatives and tell the client.
           const suggestions: string[] = [];
