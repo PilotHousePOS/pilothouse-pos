@@ -14586,5 +14586,19 @@ CRITICAL RULES:
     }
   });
 
+  // GET /api/super-admin/users — list users, optionally filtered to those with no tenant (super-admin only)
+  app.get('/api/super-admin/users', requireSuperAdminMiddleware, async (req: any, res) => {
+    try {
+      const noTenant = req.query.noTenant === 'true';
+      const allUsers = await storage.getAllUsers();
+      const result = noTenant
+        ? allUsers.filter((u: any) => !u.tenantId && !u.isSuperAdmin)
+        : allUsers;
+      res.json(result.map(sanitizeUser));
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || 'Failed to fetch users' });
+    }
+  });
+
   // Server is now created externally in index.ts
 }

@@ -145,6 +145,43 @@ function PaywallGuard({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+// Shown when an authenticated user has no tenant assigned to their account
+function NoTenantScreen() {
+  return (
+    <div className="max-w-md mx-auto bg-white min-h-screen flex flex-col items-center justify-center gap-6 p-8 text-center">
+      <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center">
+        <svg className="w-8 h-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+        </svg>
+      </div>
+      <div>
+        <h1 className="text-xl font-semibold text-gray-900 mb-2">Account Not Configured</h1>
+        <p className="text-gray-600 text-sm leading-relaxed">
+          Your account isn't linked to a store yet. This usually happens when an account is created before store setup is complete.
+        </p>
+        <p className="text-gray-600 text-sm leading-relaxed mt-3">
+          Please contact support and we'll get you set up right away.
+        </p>
+      </div>
+      <a
+        href="/support"
+        className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+      >
+        Contact Support
+      </a>
+      <button
+        className="text-sm text-gray-400 hover:text-gray-600 underline"
+        onClick={() => {
+          localStorage.removeItem('token');
+          window.location.href = '/';
+        }}
+      >
+        Sign out
+      </button>
+    </div>
+  );
+}
+
 function Router() {
   const { user, isLoading } = useAuth();
   const isAuthenticated = !!user;
@@ -153,6 +190,13 @@ function Router() {
   
   if (isLoading) {
     return <PageLoader />;
+  }
+
+  // Authenticated user with no tenant assigned and not a super-admin:
+  // show a clear explanation instead of a blank/broken app.
+  const typedUser = user as any;
+  if (isAuthenticated && !typedUser?.tenantId && !typedUser?.isSuperAdmin) {
+    return <NoTenantScreen />;
   }
 
   return (

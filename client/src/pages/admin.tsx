@@ -6780,6 +6780,59 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
   );
 }
 
+// Super-admin helper: a single row for a user with no tenant, with an assign dropdown
+function NoTenantUserRow({ user, tenants, onAssigned }: { user: any; tenants: any[]; onAssigned: () => void }) {
+  const { toast } = useToast();
+  const [selectedTenantId, setSelectedTenantId] = useState<string>("");
+  const [isPending, setIsPending] = useState(false);
+
+  const handleAssign = async () => {
+    if (!selectedTenantId) return;
+    setIsPending(true);
+    try {
+      await apiRequest("PATCH", `/api/super-admin/users/${user.id}/tenant`, { tenantId: Number(selectedTenantId) });
+      toast({ title: "Tenant assigned", description: `${user.firstName} ${user.lastName} is now linked to the selected store.` });
+      onAssigned();
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Failed to assign tenant", variant: "destructive" });
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-white rounded-lg border border-amber-200">
+      <div className="flex-1 min-w-0">
+        <p className="font-medium text-sm">{user.firstName} {user.lastName}</p>
+        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+        <p className="text-xs text-gray-400">Joined: {new Date(user.createdAt).toLocaleDateString()}</p>
+      </div>
+      <div className="flex items-center gap-2">
+        <Select value={selectedTenantId} onValueChange={setSelectedTenantId}>
+          <SelectTrigger className="w-40 h-8 text-xs">
+            <SelectValue placeholder="Select store…" />
+          </SelectTrigger>
+          <SelectContent>
+            {tenants.map((t: any) => (
+              <SelectItem key={t.id} value={String(t.id)} className="text-xs">
+                {t.name} (#{t.id})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button
+          size="sm"
+          className="h-8 text-xs"
+          disabled={!selectedTenantId || isPending}
+          onClick={handleAssign}
+        >
+          {isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : "Assign"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function Admin() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const typedUser = user as User;
@@ -7239,6 +7292,30 @@ export default function Admin() {
   const { data: weeklyLimits = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/weekly-limits"],
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
+  });
+
+  // Super-admin: users with no tenant assigned
+  const { data: noTenantUsers = [], refetch: refetchNoTenantUsers } = useQuery<any[]>({
+    queryKey: ["/api/super-admin/users", { noTenant: "true" }],
+    queryFn: async () => {
+      const res = await fetch("/api/super-admin/users?noTenant=true", { credentials: "include" });
+      if (!res.ok) return [];
+      return res.json();
+    },
+    enabled: Boolean(isAuthenticated && (typedUser as any)?.isSuperAdmin),
+    staleTime: 30000,
+  });
+
+  // Super-admin: all tenants (for assignment dropdown)
+  const { data: allTenants = [] } = useQuery<any[]>({
+    queryKey: ["/api/super-admin/tenants"],
+    queryFn: async () => {
+      const res = await fetch("/api/super-admin/tenants", { credentials: "include" });
+      if (!res.ok) return [];
+      return res.json();
+    },
+    enabled: Boolean(isAuthenticated && (typedUser as any)?.isSuperAdmin),
+    staleTime: 60000,
   });
 
   const { data: specialDates = [] } = useQuery<any[]>({
@@ -12788,6 +12865,37 @@ export default function Admin() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Super-admin: users with no tenant assigned */}
+          {(typedUser as any)?.isSuperAdmin && (
+            <Card className="border-amber-300 bg-amber-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-amber-800">
+                  <AlertTriangle className="w-5 h-5" />
+                  Unassigned Users ({noTenantUsers.length})
+                </CardTitle>
+                <p className="text-sm text-amber-700">
+                  These accounts are not linked to any store. Assign them to a tenant so they can use the app.
+                </p>
+              </CardHeader>
+              {noTenantUsers.length === 0 ? (
+                <CardContent>
+                  <p className="text-sm text-green-700 font-medium">✓ All accounts are linked to a store.</p>
+                </CardContent>
+              ) : (
+                <CardContent className="space-y-3">
+                  {noTenantUsers.map((u: any) => (
+                    <NoTenantUserRow
+                      key={u.id}
+                      user={u}
+                      tenants={allTenants}
+                      onAssigned={refetchNoTenantUsers}
+                    />
+                  ))}
+                </CardContent>
+              )}
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="calendar" className="space-y-6">
