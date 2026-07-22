@@ -1,0 +1,403 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { CheckCircle, ArrowRight, Building2, CreditCard, Users, Sparkles, Star, Package } from "lucide-react";
+import { useLocation } from "wouter";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+
+const STEPS = ['Business Details', 'Choose a Plan', 'Invite Staff'];
+
+function StepIndicator({ current }: { current: number }) {
+  return (
+    <div className="flex items-center justify-center gap-2 mb-8">
+      {STEPS.map((label, i) => (
+        <div key={i} className="flex items-center gap-2">
+          <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 text-sm font-bold transition-all ${
+            i < current
+              ? 'bg-green-500 border-green-500 text-white'
+              : i === current
+              ? 'bg-brand-blue border-brand-blue text-white'
+              : 'bg-transparent border-white/30 text-white/40'
+          }`}>
+            {i < current ? <CheckCircle className="w-4 h-4" /> : i + 1}
+          </div>
+          <span className={`text-xs font-semibold hidden sm:block ${i === current ? 'text-white' : 'text-white/40'}`}>
+            {label}
+          </span>
+          {i < STEPS.length - 1 && (
+            <div className={`w-8 h-0.5 mx-1 ${i < current ? 'bg-green-500' : 'bg-white/20'}`} />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Step 1: Business Details
+function Step1({ onNext }: { onNext: () => void }) {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch current tenant data
+  const { data: tenantData } = useQuery<{ name: string; slug: string; id: number }>({
+    queryKey: ['/api/tenants/current'],
+  });
+
+  const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
+
+  // Populate from tenant data once loaded
+  const displayName = name || tenantData?.name || '';
+  const displaySlug = slug || tenantData?.slug || '';
+
+  const handleNameChange = (val: string) => {
+    setName(val);
+    if (!slug) {
+      // Auto-generate slug from name
+      setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
+    }
+  };
+
+  const handleSave = async () => {
+    if (!displayName.trim()) {
+      toast({ title: "Business name is required", variant: "destructive" });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/tenants/current', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: displayName.trim(), slug: displaySlug.trim() }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        toast({ title: err.message || "Failed to update business details", variant: "destructive" });
+        return;
+      }
+      onNext();
+    } catch {
+      toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="text-center mb-6">
+        <div className="w-14 h-14 bg-gradient-to-br from-brand-blue to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
+          <Building2 className="w-7 h-7 text-white" />
+        </div>
+        <h2 className="text-2xl font-black text-white">Confirm your business details</h2>
+        <p className="text-gray-400 mt-1 text-sm">You can change these at any time from Settings.</p>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label className="text-white font-semibold">Business Name</Label>
+        <Input
+          value={displayName}
+          onChange={e => handleNameChange(e.target.value)}
+          placeholder="Animal House Pet Store"
+          className="bg-white/10 border-white/30 text-white placeholder:text-gray-500"
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <Label className="text-white font-semibold">Business Slug</Label>
+        <div className="flex items-center gap-2">
+          <span className="text-gray-500 text-sm whitespace-nowrap">pilothouse.app/</span>
+          <Input
+            value={displaySlug}
+            onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+            placeholder="animal-house"
+            className="bg-white/10 border-white/30 text-white placeholder:text-gray-500"
+          />
+        </div>
+        <p className="text-xs text-gray-500">Used in your shareable links. Letters, numbers, and hyphens only.</p>
+      </div>
+
+      <Button
+        onClick={handleSave}
+        disabled={isLoading}
+        className="w-full bg-gradient-to-r from-brand-blue to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 rounded-xl"
+      >
+        {isLoading ? "Saving..." : (
+          <>Save & Continue <ArrowRight className="w-4 h-4 ml-2" /></>
+        )}
+      </Button>
+    </div>
+  );
+}
+
+// Step 2: Choose Plan
+function Step2({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
+  const { toast } = useToast();
+  const [selectedPlan, setSelectedPlan] = useState<'starter' | 'pro' | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const plans = [
+    {
+      id: 'starter' as const,
+      name: 'Starter',
+      price: '$49/mo',
+      icon: Package,
+      color: 'from-brand-blue to-blue-700',
+      features: ['POS & Inventory', 'Loyalty Program', 'Online Store', 'Appointments', 'Basic Reports'],
+    },
+    {
+      id: 'pro' as const,
+      name: 'Pro',
+      price: '$99/mo',
+      icon: Star,
+      color: 'from-brand-red to-red-700',
+      badge: 'Most Popular',
+      features: ['Everything in Starter', 'Advanced Analytics', 'AI Invoice Scanning', 'Priority Support', 'Multi-user Management'],
+    },
+  ];
+
+  const handleChoosePlan = async () => {
+    if (!selectedPlan) {
+      toast({ title: "Please select a plan to continue.", variant: "destructive" });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/billing/create-checkout-session', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tier: selectedPlan,
+          successUrl: `${window.location.origin}/onboarding?step=3&plan_success=1`,
+          cancelUrl: `${window.location.origin}/onboarding?step=2`,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        toast({ title: err.message || "Failed to start checkout", variant: "destructive" });
+        return;
+      }
+      const { url } = await res.json();
+      if (url) {
+        window.location.href = url;
+      }
+    } catch {
+      toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="text-center mb-6">
+        <div className="w-14 h-14 bg-gradient-to-br from-brand-orange to-brand-red rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
+          <CreditCard className="w-7 h-7 text-white" />
+        </div>
+        <h2 className="text-2xl font-black text-white">Choose your plan</h2>
+        <p className="text-gray-400 mt-1 text-sm">Your trial continues free for 14 days. Cancel anytime.</p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4">
+        {plans.map(plan => {
+          const Icon = plan.icon;
+          const isSelected = selectedPlan === plan.id;
+          return (
+            <button
+              key={plan.id}
+              type="button"
+              onClick={() => setSelectedPlan(plan.id)}
+              className={`text-left rounded-2xl border-2 p-4 transition-all duration-200 ${
+                isSelected
+                  ? 'border-brand-blue bg-brand-blue/20'
+                  : 'border-white/20 bg-white/5 hover:border-white/40'
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div className={`w-10 h-10 bg-gradient-to-br ${plan.color} rounded-xl flex items-center justify-center shadow-md flex-shrink-0`}>
+                  <Icon className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="font-bold text-white">{plan.name}</span>
+                    {plan.badge && (
+                      <span className="bg-brand-red text-white text-xs font-bold px-2 py-0.5 rounded-full">{plan.badge}</span>
+                    )}
+                    <span className="ml-auto text-white font-bold">{plan.price}</span>
+                  </div>
+                  <ul className="space-y-1 mt-2">
+                    {plan.features.map(f => (
+                      <li key={f} className="flex items-center gap-1.5 text-xs text-gray-300">
+                        <CheckCircle className="w-3 h-3 text-green-400 flex-shrink-0" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <Button
+        onClick={handleChoosePlan}
+        disabled={isLoading || !selectedPlan}
+        className="w-full bg-gradient-to-r from-brand-red to-brand-blue hover:from-red-600 hover:to-blue-600 text-white font-bold py-3 rounded-xl"
+      >
+        {isLoading ? "Redirecting to checkout..." : (
+          <>Start with {selectedPlan ? plans.find(p => p.id === selectedPlan)?.name : 'selected plan'} <ArrowRight className="w-4 h-4 ml-2" /></>
+        )}
+      </Button>
+
+      <button
+        type="button"
+        onClick={onNext}
+        className="w-full text-center text-sm text-gray-400 hover:text-white transition-colors py-2"
+      >
+        Skip for now — I'll choose a plan later
+      </button>
+    </div>
+  );
+}
+
+// Step 3: Invite Staff
+function Step3({ onFinish }: { onFinish: () => void }) {
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+
+  return (
+    <div className="space-y-5">
+      <div className="text-center mb-6">
+        <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-700 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
+          <Users className="w-7 h-7 text-white" />
+        </div>
+        <h2 className="text-2xl font-black text-white">Invite a staff member</h2>
+        <p className="text-gray-400 mt-1 text-sm">Optional — you can add staff anytime from Settings.</p>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label className="text-white font-semibold">Staff Member Name</Label>
+        <Input
+          value={name}
+          onChange={e => setName(e.target.value)}
+          placeholder="e.g. Alex Johnson"
+          className="bg-white/10 border-white/30 text-white placeholder:text-gray-500"
+        />
+      </div>
+      <div className="space-y-1.5">
+        <Label className="text-white font-semibold">Staff Member Email</Label>
+        <Input
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          placeholder="alex@yourbusiness.com"
+          className="bg-white/10 border-white/30 text-white placeholder:text-gray-500"
+        />
+      </div>
+
+      <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-3 text-sm text-blue-200">
+        <strong>Coming soon:</strong> Invitation emails will be delivered automatically. For now, share your business URL and have them sign up directly.
+      </div>
+
+      <Button
+        onClick={onFinish}
+        className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 rounded-xl"
+      >
+        <CheckCircle className="w-4 h-4 mr-2" />
+        Finish Setup & Go to Dashboard
+      </Button>
+
+      <button
+        type="button"
+        onClick={onFinish}
+        className="w-full text-center text-sm text-gray-400 hover:text-white transition-colors py-2"
+      >
+        Skip for now
+      </button>
+    </div>
+  );
+}
+
+export default function Onboarding() {
+  const [, setLocation] = useLocation();
+  const { user } = useAuth();
+
+  // Read step from URL params (for returning from Stripe)
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialStep = Math.min(Math.max(parseInt(urlParams.get('step') || '0'), 0), 2);
+  const [step, setStep] = useState(initialStep);
+
+  if (!user) {
+    // Not logged in — redirect to signup
+    setLocation('/signup');
+    return null;
+  }
+
+  const handleFinish = () => {
+    window.location.replace('/');
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-start md:items-center justify-center p-6 py-10">
+      {/* Background blobs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-brand-red/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-72 h-72 bg-brand-blue/10 rounded-full blur-3xl" />
+      </div>
+
+      <div className="w-full max-w-md relative z-10">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="w-9 h-9 bg-gradient-to-br from-brand-blue to-brand-red rounded-xl flex items-center justify-center border border-white/20">
+              <span className="text-sm font-black text-white">PH</span>
+            </div>
+            <span className="font-black text-white text-lg">PILOTHOUSE</span>
+          </div>
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1 text-xs font-semibold text-white/70 mb-2">
+            <Sparkles className="w-3 h-3 text-brand-orange" />
+            Let's get you set up
+          </div>
+        </div>
+
+        <StepIndicator current={step} />
+
+        <Card className="bg-white/10 backdrop-blur-md border border-white/20">
+          <CardContent className="pt-6 pb-6">
+            {step === 0 && (
+              <Step1 onNext={() => setStep(1)} />
+            )}
+            {step === 1 && (
+              <Step2
+                onNext={() => setStep(2)}
+                onSkip={() => setStep(2)}
+              />
+            )}
+            {step === 2 && (
+              <Step3 onFinish={handleFinish} />
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Skip all */}
+        <div className="text-center mt-4">
+          <button
+            type="button"
+            onClick={handleFinish}
+            className="text-xs text-gray-500 hover:text-gray-300 transition-colors underline"
+          >
+            Skip setup — take me to the dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

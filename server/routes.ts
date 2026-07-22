@@ -585,6 +585,135 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // ─── Tenant Self-Service Signup ───────────────────────────────────────────────
+  // POST /api/tenants/signup — create a new tenant + owner account in one step.
+  // Returns a session token; auto-logs the user in.
+  app.post('/api/tenants/signup', async (req, res) => {
+    try {
+      const { businessName, firstName: rawFirst, lastName: rawLast, email, password, phone } = req.body;
+
+      if (!businessName || !rawFirst || !rawLast || !email || !password) {
+        return res.status(400).json({ message: "Business name, owner name, email, and password are required." });
+      }
+
+      const firstName = cleanName(rawFirst);
+      const lastName = cleanName(rawLast);
+
+      // Validate password complexity
+      const passwordValidation = isPasswordComplexEnough(password);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({
+          message: passwordValidation.errors.join('. '),
+          requirements: getPasswordRequirementsMessage(),
+        });
+      }
+
+      // Check if email already in use
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "An account with this email already exists. Please sign in." });
+      }
+
+      // Generate a unique slug from the business name
+      const baseSlug = businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'business';
+      let slug = baseSlug;
+      let suffix = 1;
+      while (await storage.getTenantBySlug(slug)) {
+        slug = `${baseSlug}-${suffix++}`;
+      }
+
+      const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000); // 14 days
+
+      // Create the tenant first (ownerId set after user creation)
+      const tenant = await storage.createTenant({
+        name: businessName.trim(),
+        slug,
+        subscriptionStatus: 'trial',
+        subscriptionTier: 'starter',
+        trialEndsAt,
+      });
+
+      // Hash password and create the owner user linked to this tenant
+      const hashedPassword = await hashPassword(password);
+      const userId = Math.random().toString(36).substring(2, 15);
+      const [ownerUser] = await db.insert(users).values({
+        id: userId,
+        email: email.toLowerCase().trim(),
+        password: hashedPassword,
+        firstName,
+        lastName,
+        phoneNumber: phone ? normalizePhoneNumber(phone) : null,
+        tenantId: tenant.id,
+        isAdmin: true,
+        emailVerified: true, // Tenant owners skip email verification during onboarding
+      }).returning();
+
+      // Set tenant ownerId now that the user exists
+      await storage.updateTenant(tenant.id, { ownerId: ownerUser.id });
+
+      // Generate session token and set cookie
+      const token = generateToken(ownerUser);
+      setAuthCookie(res, token);
+
+      res.status(201).json({ ...sanitizeUser(ownerUser), token });
+    } catch (error) {
+      console.error('Tenant signup error:', error);
+      res.status(500).json({ message: "Failed to create account. Please try again." });
+    }
+  });
+
+  // GET /api/tenants/current — return the current user's tenant
+  app.get('/api/tenants/current', authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const dbUser = await storage.getUser(userId);
+      if (!dbUser?.tenantId) {
+        return res.status(404).json({ message: "No tenant found for this user." });
+      }
+      const tenant = await storage.getTenant(dbUser.tenantId);
+      if (!tenant) {
+        return res.status(404).json({ message: "Tenant not found." });
+      }
+      res.json({ id: tenant.id, name: tenant.name, slug: tenant.slug, subscriptionStatus: tenant.subscriptionStatus, subscriptionTier: tenant.subscriptionTier, trialEndsAt: tenant.trialEndsAt });
+    } catch (error) {
+      console.error('GET /api/tenants/current error:', error);
+      res.status(500).json({ message: "Failed to fetch tenant." });
+    }
+  });
+
+  // PATCH /api/tenants/current — update business name/slug for the current tenant
+  app.patch('/api/tenants/current', authMiddleware, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const dbUser = await storage.getUser(userId);
+      if (!dbUser?.tenantId) {
+        return res.status(404).json({ message: "No tenant found for this user." });
+      }
+      if (!dbUser.isAdmin) {
+        return res.status(403).json({ message: "Only admins can update business details." });
+      }
+      const { name, slug } = req.body;
+      const updates: Record<string, unknown> = {};
+      if (name) updates.name = name.trim();
+      if (slug) {
+        const sanitizedSlug = slug.toLowerCase().replace(/[^a-z0-9-]/g, '');
+        // Check slug uniqueness (ignore own tenant)
+        const existing = await storage.getTenantBySlug(sanitizedSlug);
+        if (existing && existing.id !== dbUser.tenantId) {
+          return res.status(400).json({ message: "This slug is already taken. Please choose another." });
+        }
+        updates.slug = sanitizedSlug;
+      }
+      const updated = await storage.updateTenant(dbUser.tenantId, updates as any);
+      res.json({ id: updated.id, name: updated.name, slug: updated.slug });
+    } catch (error) {
+      console.error('PATCH /api/tenants/current error:', error);
+      res.status(500).json({ message: "Failed to update business details." });
+    }
+  });
+
+  // ─── End Tenant Self-Service ──────────────────────────────────────────────────
+
   // Test-only endpoint to create users (only in development)
   app.post('/api/test/create-user', async (req, res) => {
     if (process.env.NODE_ENV !== 'development') {

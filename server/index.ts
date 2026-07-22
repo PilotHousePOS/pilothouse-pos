@@ -526,6 +526,22 @@ async function runAppMigrations() {
     // Schema additions (idempotent — safe to run every startup)
     await migPool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_notes TEXT`);
     await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_charge_account BOOLEAN DEFAULT false`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_super_admin BOOLEAN DEFAULT false`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_groomer BOOLEAN DEFAULT false`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_superior_manager BOOLEAN DEFAULT false`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS total_spent NUMERIC(10,2) DEFAULT 0`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS loyalty_credits NUMERIC(10,2) DEFAULT 0`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR(255)`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_default_payment_method VARCHAR(255)`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS notifications_enabled BOOLEAN DEFAULT false`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS marketing_emails_opt_in BOOLEAN DEFAULT true`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS appointment_emails_opt_in BOOLEAN DEFAULT true`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS abandoned_cart_email_sent_at TIMESTAMP`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT true`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_token VARCHAR(255)`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_expiry TIMESTAMP`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW()`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_number VARCHAR(100)`);
     await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS token_version INTEGER DEFAULT 0`);
     await migPool.query(`CREATE TABLE IF NOT EXISTS specials (
       id SERIAL PRIMARY KEY,
@@ -542,6 +558,27 @@ async function runAppMigrations() {
       created_at TIMESTAMP DEFAULT NOW(),
       updated_at TIMESTAMP DEFAULT NOW()
     )`);
+    // Tenant (multi-tenant SaaS) schema
+    await migPool.query(`CREATE TABLE IF NOT EXISTS tenants (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      slug VARCHAR(100) NOT NULL UNIQUE,
+      owner_id VARCHAR(255),
+      subscription_status VARCHAR(50) NOT NULL DEFAULT 'trial',
+      subscription_tier VARCHAR(50) NOT NULL DEFAULT 'starter',
+      trial_ends_at TIMESTAMP,
+      stripe_customer_id VARCHAR(255),
+      stripe_subscription_id VARCHAR(255),
+      stripe_current_period_end TIMESTAMP,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`);
+    // Ensure default tenant exists (id=1) for existing single-tenant data
+    await migPool.query(`INSERT INTO tenants (id, name, slug, subscription_status, subscription_tier)
+      VALUES (1, 'Animal House', 'animal-house', 'active', 'pro')
+      ON CONFLICT (id) DO NOTHING`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`);
+    await migPool.query(`UPDATE users SET tenant_id = 1 WHERE tenant_id IS NULL`);
+
     await migPool.query(`CREATE TABLE IF NOT EXISTS data_migrations (key VARCHAR(100) PRIMARY KEY, applied_at TIMESTAMP DEFAULT NOW())`);
     await migPool.query(`CREATE TABLE IF NOT EXISTS audit_keep_list (supply_id INTEGER PRIMARY KEY, saved_at TIMESTAMP DEFAULT NOW(), item_name TEXT, scanned_barcode TEXT)`);
     await migPool.query(`CREATE TABLE IF NOT EXISTS pos_zero_stock_tracker (

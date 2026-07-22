@@ -96,6 +96,8 @@ const Apply = safeLazy(() => import("@/pages/apply"), "apply");
 const About = safeLazy(() => import("@/pages/about"), "about");
 const SmsConsent = safeLazy(() => import("@/pages/sms-consent"), "sms-consent");
 const BillingPage = safeLazy(() => import("@/pages/billing"), "billing");
+const Signup = safeLazy(() => import("@/pages/signup"), "signup");
+const Onboarding = safeLazy(() => import("@/pages/onboarding"), "onboarding");
 
 function PageLoader() {
   return (
@@ -179,11 +181,13 @@ function Router() {
               <>
                 <Route path="/" component={Landing} />
                 <Route path="/auth" component={Auth} />
+                <Route path="/signup" component={Signup} />
                 <Route component={NotFound} />
               </>
             ) : (
               <>
                 <Route path="/" component={Home} />
+                <Route path="/onboarding" component={Onboarding} />
                 <Route path="/supplies" component={Supplies} />
                 <Route path="/supplies/:id" component={SupplyDetail} />
                 <Route path="/booking" component={Booking} />
