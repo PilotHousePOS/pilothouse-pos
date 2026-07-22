@@ -625,6 +625,7 @@ async function runAppMigrations() {
       created_at TIMESTAMP DEFAULT NOW()
     )`);
     await migPool.query(`ALTER TABLE pos_orders ADD COLUMN IF NOT EXISTS tenant_id INTEGER`);
+    await migPool.query(`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS trial_warning_email_sent_at TIMESTAMP`);
 
     await migPool.end();
     log('App migrations complete');

@@ -187,6 +187,81 @@ export async function sendContactChangeOtpEmail(
   }
 }
 
+export async function sendTrialWarningEmail(
+  toEmail: string,
+  firstName: string,
+  daysLeft: number,
+  tenantName: string,
+  baseUrl?: string,
+): Promise<void> {
+  try {
+    const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
+    const resolvedBaseUrl = baseUrl || getBaseUrl();
+    const billingUrl = `${resolvedBaseUrl}/settings/billing`;
+
+    const dayWord = daysLeft === 1 ? 'day' : 'days';
+    const urgency = daysLeft <= 1 ? '⚠️ ' : '';
+
+    const msg = {
+      to: toEmail,
+      from: { email: fromEmail, name: 'PilotHouse' },
+      replyTo,
+      subject: `${urgency}Your PilotHouse trial ends in ${daysLeft} ${dayWord}`,
+      text: `Hi ${firstName},\n\nYour PilotHouse trial for ${tenantName} expires in ${daysLeft} ${dayWord}. Subscribe now to keep full access to your store.\n\nChoose a plan: ${billingUrl}\n\nIf you have any questions, reply to this email or call us at (318) 322-3023.\n\nPilotHouse`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0;">PilotHouse</h1>
+          </div>
+          <div style="padding: 30px; background-color: #f9f9f9;">
+            <h2 style="color: #333; margin-bottom: 10px;">Your trial ends in ${daysLeft} ${dayWord}</h2>
+            <p style="font-size: 16px; line-height: 1.5; color: #444;">
+              Hi ${firstName},
+            </p>
+            <p style="font-size: 16px; line-height: 1.5; color: #444;">
+              Your PilotHouse trial for <strong>${tenantName}</strong> will expire in <strong>${daysLeft} ${dayWord}</strong>.
+              Subscribe now to keep uninterrupted access to your POS, orders, inventory, and grooming appointments.
+            </p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${billingUrl}"
+                 style="background-color: #dc2626; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+                Choose a Plan
+              </a>
+            </div>
+            <div style="background-color: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p style="margin: 0; color: #92400e; font-size: 14px;">
+                <strong>Don't lose access.</strong> After your trial ends, your store will be locked until you subscribe.
+              </p>
+            </div>
+            <p style="font-size: 14px; color: #666;">
+              Questions? Reply to this email or call us at (318) 322-3023.
+            </p>
+          </div>
+          <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+            <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
+            <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+            <p style="margin: 0;">Phone: (318) 322-3023</p>
+          </div>
+        </div>
+      `,
+    };
+
+    await client.send({
+      ...msg,
+      trackingSettings: {
+        clickTracking: { enable: false, enableText: false },
+      },
+    });
+    console.log(`Trial warning email sent to ${toEmail} (${daysLeft} days left)`);
+  } catch (error: any) {
+    console.error('Error sending trial warning email:', error);
+    if (error.response?.body) {
+      console.error('SendGrid error details:', JSON.stringify(error.response.body, null, 2));
+    }
+    throw new Error('Failed to send trial warning email');
+  }
+}
+
 export async function sendAppointmentRejectionEmail(
   toEmail: string, 
   ownerName: string,

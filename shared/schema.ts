@@ -31,6 +31,7 @@ export const tenants = pgTable("tenants", {
   stripeCustomerId: varchar("stripe_customer_id", { length: 255 }), // Stripe customer for this tenant
   stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }), // Active Stripe subscription ID
   stripeCurrentPeriodEnd: timestamp("stripe_current_period_end"), // When the current billing period ends
+  trialWarningEmailSentAt: timestamp("trial_warning_email_sent_at"), // Set when the 3-day trial warning email is sent
   createdAt: timestamp("created_at").defaultNow(),
 });
 

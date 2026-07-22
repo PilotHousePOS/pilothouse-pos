@@ -238,6 +238,57 @@ async function runYearlyReportForTenant(tenantId: number): Promise<void> {
   }
 }
 
+// Check for trials expiring within 3 days and send one warning email per trial period
+async function runTrialExpiryWarnings(): Promise<void> {
+  const allTenants = await storage.getAllTenants();
+  const now = Date.now();
+  const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+
+  for (const tenant of allTenants) {
+    try {
+      // Only trial tenants with a set expiry date
+      if (tenant.subscriptionStatus !== 'trial' || !tenant.trialEndsAt) continue;
+
+      const trialEndsAt = new Date(tenant.trialEndsAt).getTime();
+      const msLeft = trialEndsAt - now;
+
+      // Skip if already expired or more than 3 days away
+      if (msLeft <= 0 || msLeft > threeDaysMs) continue;
+
+      // Skip if we already sent the warning during this trial period
+      if (tenant.trialWarningEmailSentAt) continue;
+
+      const daysLeft = Math.max(1, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
+
+      // Find the tenant owner's email
+      if (!tenant.ownerId) {
+        console.log(`[Tenant ${tenant.id}] No ownerId set, skipping trial warning email`);
+        continue;
+      }
+
+      const owner = await storage.getUser(tenant.ownerId);
+      if (!owner?.email) {
+        console.log(`[Tenant ${tenant.id}] Owner has no email, skipping trial warning email`);
+        continue;
+      }
+
+      const { sendTrialWarningEmail } = await import('./sendgrid');
+      await sendTrialWarningEmail(
+        owner.email,
+        owner.firstName || 'there',
+        daysLeft,
+        tenant.name,
+      );
+
+      // Mark as sent so we don't send again this trial period
+      await storage.updateTenant(tenant.id, { trialWarningEmailSentAt: new Date() } as any);
+      console.log(`[Tenant ${tenant.id}] Trial warning email sent to ${owner.email} (${daysLeft} days left)`);
+    } catch (err) {
+      console.error(`[Tenant ${tenant.id}] Failed to send trial warning email:`, err);
+    }
+  }
+}
+
 export function initializeScheduledTasks() {
   // Clear approved appointments and reset "Here" status every day at 6:00 AM UTC (1:00 AM CST)
   // Must run at 6 AM UTC so that at fire-time the Chicago clock has already rolled to the new day —
@@ -293,6 +344,17 @@ export function initializeScheduledTasks() {
         await runYearlyReportForTenant(tenant.id);
       }
     } catch (err) { console.error('[Scheduler] Yearly report error:', err); }
+  }, { timezone: 'America/Chicago' });
+
+  // Trial expiry warnings — runs daily at 9 AM CST, sends one email per tenant within 3 days of expiry
+  cron.schedule('0 9 * * *', async () => {
+    try {
+      console.log('[Scheduler] Running trial expiry warning check...');
+      await runTrialExpiryWarnings();
+      console.log('[Scheduler] Trial expiry warning check complete');
+    } catch (err) {
+      console.error('[Scheduler] Trial expiry warning error:', err);
+    }
   }, { timezone: 'America/Chicago' });
 
   // Abandoned cart recovery - runs every 6 hours, sends email for carts idle 24+ hours
@@ -354,5 +416,6 @@ export function initializeScheduledTasks() {
   console.log('- Daily Sales Report: Hourly check per tenant (sends at configured time if enabled)');
   console.log('- Monthly Sales Report: Hourly check per tenant (sends on configured day/time if enabled)');
   console.log('- Yearly Sales Report: Hourly check on Jan 1 per tenant (sends at configured time if enabled)');
+  console.log('- Trial Expiry Warning: Daily at 9 AM CST (one email per tenant, ≤3 days before trial ends)');
   console.log('- Abandoned Cart Recovery: Every 6 hours (24+ hour idle carts)');
 }
